@@ -15,6 +15,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability.Cpu;
 using JetBrains.Annotations;
 using Microsoft.Win32;
+using static System.Runtime.InteropServices.RuntimeInformation;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 
 namespace BenchmarkDotNet.Portability
@@ -27,37 +28,19 @@ namespace BenchmarkDotNet.Portability
 
         public static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null; // it allocates a lot of memory, we need to check it once in order to keep Engine non-allocating!
 
-        public static bool IsFullFramework =>
-#if CLASSIC
-            true;
-#else
-            System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
-#endif
+        public static bool IsFullFramework => FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
 
         [PublicAPI]
-        public static bool IsNetNative =>
-#if CLASSIC
-            false;
-#else
-            System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase);
-#endif
+        public static bool IsNetNative => FrameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase);
 
-        public static bool IsNetCore =>
-#if CLASSIC
-            false;
-#else
-            System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase)
-                && !string.IsNullOrEmpty(typeof(object).Assembly.Location);
-#endif
+        public static bool IsNetCore => FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(typeof(object).Assembly.Location);
 
-        public static bool IsCoreRT =>
-#if CLASSIC
-            false;
-#else
-            // "The north star for CoreRT is to be a flavor of .NET Core" -> CoreRT reports .NET Core everywhere
-            System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase)
-                && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
-#endif
+        /// <summary>
+        /// "The north star for CoreRT is to be a flavor of .NET Core" -> CoreRT reports .NET Core everywhere
+        /// </summary>
+        public static bool IsCoreRT 
+            => FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase) 
+               && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
 
         public static bool InDocker => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
                 
@@ -68,36 +51,14 @@ namespace BenchmarkDotNet.Portability
         internal static string GetArchitecture() => Is64BitPlatform() ? "64bit" : "32bit";
 
         private static string DockerSdkVersion => Environment.GetEnvironmentVariable("DOTNET_VERSION");
+
         private static string DockerAspnetSdkVersion => Environment.GetEnvironmentVariable("ASPNETCORE_VERSION");
         
-        internal static bool IsWindows()
-        {
-#if CLASSIC
-            return Environment.OSVersion.Platform.ToString().Contains("Win");
-#else
-            return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-#endif
-        }
+        internal static bool IsWindows() => IsOSPlatform(OSPlatform.Windows);
 
-        internal static bool IsLinux()
-        {
-#if CLASSIC
-            return Environment.OSVersion.Platform == PlatformID.Unix
-                   && GetSysnameFromUname().Equals("Linux", StringComparison.InvariantCultureIgnoreCase);
-#else
-            return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-#endif
-        }
+        internal static bool IsLinux() => IsOSPlatform(OSPlatform.Linux);
 
-        internal static bool IsMacOSX()
-        {
-#if CLASSIC
-            return Environment.OSVersion.Platform == PlatformID.Unix
-                   && GetSysnameFromUname().Equals("Darwin", StringComparison.InvariantCultureIgnoreCase);
-#else
-            return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-#endif
-        }
+        internal static bool IsMacOSX() => IsOSPlatform(OSPlatform.OSX);
 
         public static string GetOsVersion()
         {
@@ -215,9 +176,7 @@ namespace BenchmarkDotNet.Portability
             }
             else if (IsCoreRT)
             {
-#if !CLASSIC
-                return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.Replace("Core ", "CoreRT ");
-#endif
+                return FrameworkDescription.Replace("Core ", "CoreRT ");
             }
 
             return Unknown;
@@ -240,7 +199,7 @@ namespace BenchmarkDotNet.Portability
 
         public static Platform GetCurrentPlatform()
         {
-            switch (System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture)
+            switch (ProcessArchitecture)
             {
                 case Architecture.Arm:
                     return Platform.Arm;
@@ -346,36 +305,6 @@ namespace BenchmarkDotNet.Portability
                 Version = version;
             }
         }
-
-#if CLASSIC
-
-        [DllImport("libc", SetLastError = true)]
-        private static extern int uname(IntPtr buf);
-
-        private static string GetSysnameFromUname()
-        {
-            var buf = IntPtr.Zero;
-            try
-            {
-                buf = Marshal.AllocHGlobal(8192);
-                // This is a hacktastic way of getting sysname from uname ()
-                int rc = uname(buf);
-                if (rc != 0)
-                {
-                    throw new Exception("uname from libc returned " + rc);
-                }
-
-                string os = Marshal.PtrToStringAnsi(buf);
-                return os;
-            }
-            finally
-            {
-                if (buf != IntPtr.Zero)
-                    Marshal.FreeHGlobal(buf);
-            }
-        }
-
-#endif
 
         internal static ICollection<Antivirus> GetAntivirusProducts()
         {

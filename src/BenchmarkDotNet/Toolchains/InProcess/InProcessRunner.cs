@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -12,7 +11,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 {
     internal class InProcessRunner
     {
-        public static int Run(IHost host, BenchmarkCase benchmarkCase, BenchmarkActionCodegen codegenMode, IConfig config)
+        public static int Run(IHost host, BenchmarkCase benchmarkCase, BenchmarkActionCodegen codegenMode)
         {
             // the first thing to do is to let diagnosers hook in before anything happens
             // so all jit-related diagnosers can catch first jit compilation!
@@ -30,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
                 var methodInfo = type.GetMethod(nameof(Runnable.RunCore), BindingFlags.Public | BindingFlags.Static)
                     ?? throw new InvalidOperationException($"Bug: method {nameof(Runnable.RunCore)} in {inProcessRunnableTypeName} not found.");
-                methodInfo.Invoke(null, new object[] { host, benchmarkCase, codegenMode, config });
+                methodInfo.Invoke(null, new object[] { host, benchmarkCase, codegenMode });
 
                 return 0;
             }
@@ -97,7 +96,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         [UsedImplicitly]
         private static class Runnable
         {
-            public static void RunCore(IHost host, BenchmarkCase benchmarkCase, BenchmarkActionCodegen codegenMode, IConfig config)
+            public static void RunCore(IHost host, BenchmarkCase benchmarkCase, BenchmarkActionCodegen codegenMode)
             {
                 var target = benchmarkCase.Descriptor;
                 var job = benchmarkCase.Job; // TODO: filter job (same as SourceCodePresenter does)?
@@ -147,7 +146,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     IterationCleanupAction = iterationCleanupAction.InvokeSingle,
                     TargetJob = job,
                     OperationsPerInvoke = target.OperationsPerInvoke,
-                    MeasureGcStats = config.HasMemoryDiagnoser(),
+                    MeasureGcStats = benchmarkCase.Config.HasMemoryDiagnoser(),
                     BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase)
                 };
 

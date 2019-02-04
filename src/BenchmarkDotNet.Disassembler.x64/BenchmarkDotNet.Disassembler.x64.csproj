@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <OutputType>Exe</OutputType>
     <AssemblyTitle>BenchmarkDotNet.Disassembler.x64</AssemblyTitle>
     <AssemblyName>BenchmarkDotNet.Disassembler.x64</AssemblyName>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <PlatformTarget>x64</PlatformTarget>
+    <SuppressNETCoreSdkPreviewMessage>True</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>
   <PropertyGroup>
     <OutputPath>..\BenchmarkDotNet\Disassemblers</OutputPath>

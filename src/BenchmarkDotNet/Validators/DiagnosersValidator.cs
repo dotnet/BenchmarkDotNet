@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Validators
 {
     public class DiagnosersValidator : IValidator
     {
-        public static readonly IValidator Default = new DiagnosersValidator();
+        public static readonly IValidator Composite = new DiagnosersValidator();
 
         private DiagnosersValidator()
         {

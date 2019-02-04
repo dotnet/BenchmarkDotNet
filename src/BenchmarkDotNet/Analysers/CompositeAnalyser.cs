@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Reports;
 
@@ -6,16 +7,13 @@ namespace BenchmarkDotNet.Analysers
 {
     public class CompositeAnalyser : IAnalyser
     {
-        private readonly IAnalyser[] analysers;
-        private static int counter; // TODO: improve
+        private readonly ImmutableHashSet<IAnalyser> analysers;
 
-        public CompositeAnalyser(IAnalyser[] analysers)
-        {
-            this.analysers = analysers;
-            Id = "Composite-" + ++counter;
-        }
+        public CompositeAnalyser(ImmutableHashSet<IAnalyser> analysers) => this.analysers = analysers;
 
-        public string Id { get; }
-        public IEnumerable<Conclusion> Analyse(Summary summary) => analysers.SelectMany(analyser => analyser.Analyse(summary));
+        public string Id => nameof(CompositeAnalyser);
+
+        public IEnumerable<Conclusion> Analyse(Summary summary)
+            => analysers.SelectMany(analyser => analyser.Analyse(summary));
     }
 }

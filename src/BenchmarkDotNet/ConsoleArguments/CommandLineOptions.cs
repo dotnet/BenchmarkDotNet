@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -145,11 +146,16 @@ namespace BenchmarkDotNet.ConsoleArguments
         
         [Option("statisticalTest", Required = false, HelpText = "Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s")]
         public string StatisticalTestThreshold { get; set; }
+<<<<<<< HEAD
 
         [Option("cleaningCache", Required = false, Default = CacheClearingStrategy.None, HelpText = "Cache clearing strategy. Allocations/Native")]
         public CacheClearingStrategy CacheClearingStrategy { get; set; }
 
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any(); 
+=======
+        
+        internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
+>>>>>>> 5215eeb39fab6cdaf6f698e78978d58f46acb82d
 
         [Usage(ApplicationAlias = "")]
         [PublicAPI]

@@ -26,7 +26,7 @@ using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using CommandLine;
 
 namespace BenchmarkDotNet.ConsoleArguments
@@ -46,7 +46,6 @@ namespace BenchmarkDotNet.ConsoleArguments
         };
 
         private static readonly ImmutableHashSet<string> AvailableRuntimes = ImmutableHashSet.Create(StringComparer.InvariantCultureIgnoreCase,
-            "net46",
             "net461",
             "net462",
             "net47",
@@ -85,9 +84,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "fullxml", new[] { XmlExporter.Full } }
             };
 
-        public static (bool isSuccess, ReadOnlyConfig config, CommandLineOptions options) Parse(string[] args, ILogger logger, IConfig globalConfig = null)
+        public static (bool isSuccess, IConfig config, CommandLineOptions options) Parse(string[] args, ILogger logger, IConfig globalConfig = null)
         {
-            (bool isSuccess, ReadOnlyConfig config, CommandLineOptions options) result = default;
+            (bool isSuccess, IConfig config, CommandLineOptions options) result = default;
 
             using (var parser = CreateParser(logger))
             {
@@ -193,7 +192,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             return true;
         }
 
-        private static ReadOnlyConfig CreateConfig(CommandLineOptions options, IConfig globalConfig)
+        private static IConfig CreateConfig(CommandLineOptions options, IConfig globalConfig)
         {
             var config = new ManualConfig();
 
@@ -232,12 +231,11 @@ namespace BenchmarkDotNet.ConsoleArguments
             else
                 config.Add(filters);
 
-            config.SummaryPerType = !options.Join;
+            config.Options = config.Options.Set(options.Join, ConfigOptions.JoinSummary);
+            config.Options = config.Options.Set(options.KeepBenchmarkFiles, ConfigOptions.KeepBenchmarkFiles);
+            config.Options = config.Options.Set(options.StopOnFirstError, ConfigOptions.StopOnFirstError);
 
-            config.KeepBenchmarkFiles = options.KeepBenchmarkFiles;
-            config.StopOnFirstError = options.StopOnFirstError;
-
-            return config.AsReadOnly();
+            return config;
         }
 
         private static Job GetBaseJob(CommandLineOptions options, IConfig globalConfig)
@@ -288,7 +286,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         private static IEnumerable<Job> Expand(Job baseJob, CommandLineOptions options)
         {
             if (options.RunInProcess)
-                yield return baseJob.With(InProcessToolchain.Instance);
+                yield return baseJob.With(InProcessEmitToolchain.Instance);
             else if (!string.IsNullOrEmpty(options.ClrVersion))
                 yield return baseJob.With(new ClrRuntime(options.ClrVersion)); // local builds of .NET Runtime
             else if (options.CoreRunPaths.Any())
@@ -316,7 +314,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                                 .WithCustomDotNetCliPath(options.CliPath?.FullName)
                                 .WithCustomPackagesRestorePath(options.RestorePath?.FullName)
                                 .WithTimeout(timeOut)));
-                case "net46":
                 case "net461":
                 case "net462":
                 case "net47":

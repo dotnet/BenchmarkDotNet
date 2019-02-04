@@ -116,6 +116,9 @@ namespace BenchmarkDotNet.Extensions
             if (benchmarkCase.Job.Environment.Runtime is ClrRuntime clrRuntime && !string.IsNullOrEmpty(clrRuntime.Version))
                 start.EnvironmentVariables["COMPLUS_Version"] = clrRuntime.Version;
 
+            if (benchmarkCase.Job.Environment.Runtime is MonoRuntime monoRuntime && !string.IsNullOrEmpty(monoRuntime.MonoBclPath))
+                start.EnvironmentVariables["MONO_PATH"] = monoRuntime.MonoBclPath;
+
             if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
                 return;
 

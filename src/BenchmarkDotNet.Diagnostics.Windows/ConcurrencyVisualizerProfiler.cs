@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -179,7 +180,7 @@ $@"<?xml version=""1.0""?>
 
         private string GenerateCodeInfo(DiagnoserActionParameters parameters)
         {
-            if (!parameters.Config.KeepBenchmarkFiles)
+            if (!parameters.Config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
                 return "<JustMyCode />";
 
             var folderWithDlls = Path.GetDirectoryName(parameters.BenchmarkCase.Descriptor.Type.Assembly.Location);

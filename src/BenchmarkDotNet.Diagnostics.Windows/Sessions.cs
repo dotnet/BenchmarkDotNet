@@ -128,7 +128,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             folderPath = Path.Combine(folderPath, $"{creationTime:yyyyMMdd-hhmm}-{Process.GetCurrentProcess().Id}");
             
-            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net46 vs netcoreapp2.1 etc
+            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
             if (details.Config.GetJobs().Select(job => job.Infrastructure.Toolchain).Distinct().Count() > 1)
                 folderPath = Path.Combine(folderPath, details.BenchmarkCase.Job.Infrastructure.Toolchain.Name);
 

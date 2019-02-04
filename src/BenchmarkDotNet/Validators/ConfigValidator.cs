@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Validators
 {
     public class ConfigValidator : IValidator
     {
-        public static readonly IValidator Default = new ConfigValidator();
+        public static readonly IValidator DontFailOnError = new ConfigValidator();
 
         private ConfigValidator() { }
 

@@ -4,7 +4,10 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.XUnit;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -12,10 +15,22 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class ArgumentsTests : BenchmarkTestExecutor
     {
+        public static IEnumerable<object[]> GetToolchains()
+            => new[]
+                {
+                    new object[] { Job.Default.GetToolchain() },
+                    new object[] { InProcessEmitToolchain.Instance },
+#if NETCOREAPP2_1 
+// we don't want to test CoreRT twice (for .NET 4.6 and Core 2.1) when running the integration tests (these tests take a lot of time)
+// we test against specific version to keep this test stable
+                    new object[] { Toolchains.CoreRt.CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-26414-01").ToToolchain() }
+#endif
+                };
+
         public ArgumentsTests(ITestOutputHelper output) : base(output) { }
 
-        [Fact]
-        public void ArgumentsArePassedToBenchmarks() => CanExecute<WithArguments>();
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void ArgumentsArePassedToBenchmarks(IToolchain toolchain) => CanExecute<WithArguments>(toolchain);
 
         public class WithArguments
         {
@@ -27,7 +42,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (boolean && number != 1 || !boolean && number != 2)
                     throw new InvalidOperationException("Incorrect values were passed");
             }
-            
+
             [Benchmark]
             [Arguments(true, 1)]
             [Arguments(false, 2)]
@@ -35,10 +50,10 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 if (boolean && number != 1 || !boolean && number != 2)
                     throw new InvalidOperationException("Incorrect values were passed");
-                
+
                 return Task.CompletedTask;
             }
-            
+
             [Benchmark]
             [Arguments(true, 1)]
             [Arguments(false, 2)]
@@ -46,13 +61,13 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 if (boolean && number != 1 || !boolean && number != 2)
                     throw new InvalidOperationException("Incorrect values were passed");
-                
+
                 return new ValueTask<int>(0);
             }
         }
 
-        [Fact]
-        public void ArgumentsFromSourceArePassedToBenchmarks() => CanExecute<WithArgumentsSource>();
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void ArgumentsFromSourceArePassedToBenchmarks(IToolchain toolchain) => CanExecute<WithArgumentsSource>(toolchain);
 
         public class WithArgumentsSource
         {
@@ -71,8 +86,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
-        public void ArgumentsCanBePassedByReferenceToBenchmark() => CanExecute<WithRefArguments>();
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void ArgumentsCanBePassedByReferenceToBenchmark(IToolchain toolchain) => CanExecute<WithRefArguments>(toolchain);
 
         public class WithRefArguments
         {
@@ -86,8 +101,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
-        public void NonCompileTimeConstantsCanBeReturnedFromSource() => CanExecute<WithComplexTypesReturnedFromSources>();
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void NonCompileTimeConstantsCanBeReturnedFromSource(IToolchain toolchain) => CanExecute<WithComplexTypesReturnedFromSources>(toolchain);
 
         public class WithComplexTypesReturnedFromSources
         {
@@ -143,8 +158,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
-        public void ArrayCanBeUsedAsArgument() => CanExecute<WithArray>();
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void ArrayCanBeUsedAsArgument(IToolchain toolchain) => CanExecute<WithArray>(toolchain);
 
         public class WithArray
         {
@@ -161,8 +176,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
-        public void JaggedArrayCanBeUsedAsArgument() => CanExecute<WithJaggedArray>();
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void JaggedArrayCanBeUsedAsArgument(IToolchain toolchain) => CanExecute<WithJaggedArray>(toolchain);
 
         public class WithJaggedArray
         {
@@ -197,8 +212,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
-        public void GenericTypeCanBePassedByRefAsArgument() => CanExecute<WithGenericByRef>();
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void GenericTypeCanBePassedByRefAsArgument(IToolchain toolchain) => CanExecute<WithGenericByRef>(toolchain);
 
         public class WithGenericByRef
         {
@@ -233,8 +248,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
-        public void AnArrayOfTypeWithNoParameterlessCtorCanBePassedAsArgument() => CanExecute<WithArrayOfStringAsArgument>();
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void AnArrayOfTypeWithNoParameterlessCtorCanBePassedAsArgument(IToolchain toolchain) => CanExecute<WithArrayOfStringAsArgument>(toolchain);
 
         public class WithArrayOfStringAsArgument
         {
@@ -243,15 +258,15 @@ namespace BenchmarkDotNet.IntegrationTests
             // arguments accept "params object[]", when we pass just a string[] it's recognized as an array of params
             public void TypeReflectionArrayGetType(object anArray)
             {
-                string[] strings = (string[]) anArray;
+                string[] strings = (string[])anArray;
 
                 if (strings.Length != 0)
                     throw new ArgumentException("The array should be empty");
             }
         }
 
-        [Fact]
-        public void AnArrayCanBePassedToBenchmarkAsSpan() => CanExecute<WithArrayToSpan>();
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void AnArrayCanBePassedToBenchmarkAsSpan(IToolchain toolchain) => CanExecute<WithArrayToSpan>(toolchain);
 
         public class WithArrayToSpan
         {
@@ -268,8 +283,10 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [FactDotNetCore21Only("the implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)")]
-        public void StringCanBePassedToBenchmarkAsReadOnlySpan() => CanExecute<WithStringToReadOnlySpan>();
+        [TheoryNetCore21PlusOnly("the implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)"),
+         MemberData(nameof(GetToolchains))]
+        public void StringCanBePassedToBenchmarkAsReadOnlySpan(IToolchain toolchain) => CanExecute<WithStringToReadOnlySpan>(toolchain);
+
 
         public class WithStringToReadOnlySpan
         {
@@ -286,8 +303,9 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
-        public void AnArrayOfStringsCanBeUsedAsArgument() => CanExecute<WithArrayOfStringFromArgumentSource>();
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void AnArrayOfStringsCanBeUsedAsArgument(IToolchain toolchain) =>
+            CanExecute<WithArrayOfStringFromArgumentSource>(toolchain);
 
         public class WithArrayOfStringFromArgumentSource
         {
@@ -305,8 +323,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
-        public void BenchmarkCanAcceptFewArrays() => CanExecute<FewArrays>();
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void BenchmarkCanAcceptFewArrays(IToolchain toolchain) => CanExecute<FewArrays>(toolchain);
 
         public class FewArrays
         {
@@ -325,17 +343,17 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 if (even.Length != 3 || notEven.Length != 3)
                     throw new ArgumentException("Incorrect length");
-                
+
                 if (!even.All(n => n % 2 == 0))
                     throw new ArgumentException("Not even");
-                
+
                 if (!notEven.All(n => n % 2 != 0))
                     throw new ArgumentException("Even");
             }
         }
 
-        [Fact]
-        public void VeryBigIntegersAreSupported() => CanExecute<WithVeryBigInteger>();
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void VeryBigIntegersAreSupported(IToolchain toolchain) => CanExecute<WithVeryBigInteger>(toolchain);
 
         public class WithVeryBigInteger
         {
@@ -349,15 +367,15 @@ namespace BenchmarkDotNet.IntegrationTests
             public void Method(BigInteger passed)
             {
                 BigInteger expected = GetVeryBigInteger().OfType<BigInteger>().Single();
-                
+
                 if (expected != passed)
                     throw new ArgumentException("The BigInteger has wrong value!");
             }
         }
-        
-        [Fact]
-        public void SpecialDoubleValuesAreSupported() => CanExecute<WithSpecialDoubleValues>();
-        
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void SpecialDoubleValuesAreSupported(IToolchain toolchain) => CanExecute<WithSpecialDoubleValues>(toolchain);
+
         public class WithSpecialDoubleValues
         {
             public IEnumerable<object[]> GetSpecialDoubleValues()
@@ -399,10 +417,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 }
             }
         }
-        
-        [Fact]
-        public void SpecialFloatValuesAreSupported() => CanExecute<WithSpecialFloatValues>();
-        
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void SpecialFloatValuesAreSupported(IToolchain toolchain) => CanExecute<WithSpecialFloatValues>(toolchain);
+
         public class WithSpecialFloatValues
         {
             public IEnumerable<object[]> GetSpecialFloatValues()
@@ -444,10 +462,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 }
             }
         }
-        
-        [Fact]
-        public void SpecialDecimalValuesAreSupported() => CanExecute<WithSpecialDecimalValues>();
-        
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void SpecialDecimalValuesAreSupported(IToolchain toolchain) => CanExecute<WithSpecialDecimalValues>(toolchain);
+
         public class WithSpecialDecimalValues
         {
             public IEnumerable<object[]> GetSpecialDecimalValues()
@@ -474,8 +492,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Fact]
-        public void DateTimeCanBeUsedAsArgument() => CanExecute<WithDateTime>();
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void DateTimeCanBeUsedAsArgument(IToolchain toolchain) => CanExecute<WithDateTime>(toolchain);
 
         public class WithDateTime
         {
@@ -489,14 +507,14 @@ namespace BenchmarkDotNet.IntegrationTests
             public void Test(DateTime passed)
             {
                 DateTime expected = DateTimeValues().OfType<DateTime>().Single();
-                
+
                 if (expected != passed)
                     throw new ArgumentException("The DateTime has wrong value!");
             }
         }
 
-        [Fact]
-        public void CustomTypeThatAlsoExistsInTheSystemNamespaceAsArgument() => CanExecute<WithDateTime>();
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void CustomTypeThatAlsoExistsInTheSystemNamespaceAsArgument(IToolchain toolchain) => CanExecute<CustomTypeThatAlsoExistsInTheSystemNamespace>(toolchain);
 
         public class CustomTypeThatAlsoExistsInTheSystemNamespace
         {
@@ -514,6 +532,12 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (expected != passed)
                     throw new ArgumentException("The passed enum has wrong value!");
             }
+        }
+
+        private void CanExecute<T>(IToolchain toolchain)
+        {
+            var config = CreateSimpleConfig(job: Job.Dry.With(toolchain));
+            CanExecute<T>(config);
         }
     }
 }

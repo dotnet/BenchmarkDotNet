@@ -24,9 +24,9 @@ namespace BenchmarkDotNet.Tests
                     .Single(method => method.Name == nameof(AsyncVoidMethod));
 
             var target = new Descriptor(typeof(CodeGeneratorTests), asyncVoidMethod);
-            var benchmark = BenchmarkCase.Create(target, Job.Default, null);
+            var benchmark = BenchmarkCase.Create(target, Job.Default, null, ManualConfig.CreateEmpty().CreateImmutableConfig());
 
-            Assert.Throws<NotSupportedException>(() => CodeGenerator.Generate(new BuildPartition(new[] { new BenchmarkBuildInfo(benchmark, ManualConfig.CreateEmpty().AsReadOnly(), 0) }, BenchmarkRunner.DefaultResolver)));
+            Assert.Throws<NotSupportedException>(() => CodeGenerator.Generate(new BuildPartition(new[] { new BenchmarkBuildInfo(benchmark, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0) }, BenchmarkRunnerClean.DefaultResolver)));
         }
 
         [Fact]
@@ -39,9 +39,9 @@ namespace BenchmarkDotNet.Tests
                     .Single(method => method.Name == nameof(FineMethod));
 
             var target = new Descriptor(typeof(CodeGeneratorTests), fineMethod);
-            var benchmark = BenchmarkCase.Create(target, Job.Default, new ParameterInstances(Array.Empty<ParameterInstance>()));
+            var benchmark = BenchmarkCase.Create(target, Job.Default, new ParameterInstances(Array.Empty<ParameterInstance>()), ManualConfig.CreateEmpty().CreateImmutableConfig());
 
-            var generatedSourceFile = CodeGenerator.Generate(new BuildPartition(new[] { new BenchmarkBuildInfo(benchmark, ManualConfig.CreateEmpty().AsReadOnly(), 0) }, BenchmarkRunner.DefaultResolver));
+            var generatedSourceFile = CodeGenerator.Generate(new BuildPartition(new[] { new BenchmarkBuildInfo(benchmark, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0) }, BenchmarkRunnerClean.DefaultResolver));
 
             using (StringReader stringReader = new StringReader(generatedSourceFile))
             {

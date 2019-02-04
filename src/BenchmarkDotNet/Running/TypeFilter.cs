@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Running
                 }
                 else
                 {
-                    logger.WriteLineError($"Type {type} is invalid. Only public, non-generic (closed generic types with public parameterless ctors are supported), non-abstract, non-sealed types with public instance [Benchmark] method(s) are supported.");
+                    logger.WriteLineError($"Type {type} is invalid. Only public, non-generic (closed generic types with public parameterless ctors are supported), non-abstract, non-sealed, non-static types with public instance [Benchmark] method(s) are supported.");
                     
                     return (false, Array.Empty<Type>());
                 }

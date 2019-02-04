@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Exporters.Json
                 };
 
                 // We show MemoryDiagnoser's results only if it is being used
-                if(summary.Config.HasMemoryDiagnoser())
+                if(report.BenchmarkCase.Config.HasMemoryDiagnoser())
                 {
                     data.Add("Memory", report.GcStats);
                 }

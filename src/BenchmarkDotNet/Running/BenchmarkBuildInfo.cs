@@ -4,7 +4,7 @@ namespace BenchmarkDotNet.Running
 {
     public class BenchmarkBuildInfo
     {
-        public BenchmarkBuildInfo(BenchmarkCase benchmarkCase, ReadOnlyConfig config, int id)
+        public BenchmarkBuildInfo(BenchmarkCase benchmarkCase, ImmutableConfig config, int id)
         {
             BenchmarkCase = benchmarkCase;
             Config = config;
@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Running
 
         public BenchmarkCase BenchmarkCase { get; }
 
-        public ReadOnlyConfig Config { get; }
+        public ImmutableConfig Config { get; }
 
         public BenchmarkId Id { get; }
     }

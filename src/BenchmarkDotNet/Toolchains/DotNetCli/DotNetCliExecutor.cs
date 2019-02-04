@@ -44,7 +44,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     executeParameters.BuildResult.ArtifactsPaths, 
                     executeParameters.Diagnoser, 
                     Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath), 
-                    executeParameters.Config,
                     executeParameters.Resolver);
             }
             finally
@@ -54,7 +53,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 executeParameters.Diagnoser?.Handle(
                     HostSignal.AfterProcessExit, 
-                    new DiagnoserActionParameters(null, executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Config));
+                    new DiagnoserActionParameters(null, executeParameters.BenchmarkCase, executeParameters.BenchmarkId));
             }
         }
 
@@ -64,7 +63,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                                       ArtifactsPaths artifactsPaths,
                                       IDiagnoser diagnoser,
                                       string executableName,
-                                      IConfig config,
                                       IResolver resolver)
         {
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
@@ -77,13 +75,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             using (var process = new Process { StartInfo = startInfo })
             {
-                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, config);
+                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId);
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
                 ConsoleExitHandler.Instance.Process = process;
 
-                diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId, config));
+                diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 
                 process.Start();
 

@@ -25,22 +25,13 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IValidator> GetValidators();
         IEnumerable<HardwareCounter> GetHardwareCounters();
         IEnumerable<IFilter> GetFilters();
+        IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
 
-        [CanBeNull]
-        IOrderer GetOrderer();
-        ISummaryStyle GetSummaryStyle();
+        [CanBeNull] IOrderer Orderer { get; }
+
+        SummaryStyle SummaryStyle { get; } 
 
         ConfigUnionRule UnionRule { get; }
-
-        /// <summary>
-        /// determines if all auto-generated files should be kept or removed after running the benchmarks
-        /// </summary>
-        bool KeepBenchmarkFiles { get; }
-
-        /// <summary>
-        /// determines if all benchmarks results should be joined into a single summary or not
-        /// </summary>
-        bool SummaryPerType { get; }
 
         /// <summary>
         /// the default value is "./BenchmarkDotNet.Artifacts"
@@ -52,8 +43,9 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         Encoding Encoding { get; }
 
-        IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
-
-        bool StopOnFirstError { get; }
+        /// <summary>
+        /// a set of custom flags that can enable/disable various settings
+        /// </summary>
+        ConfigOptions Options { get; }
     }
 }

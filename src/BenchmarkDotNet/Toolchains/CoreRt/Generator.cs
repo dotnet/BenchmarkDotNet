@@ -99,10 +99,14 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         }
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
-            => File.WriteAllText(artifactsPaths.ProjectFilePath, 
-                    IsNuGetCoreRt 
-                        ? GenerateProjectForNuGetBuild(buildPartition, artifactsPaths, logger) 
-                        : GenerateProjectForLocalBuild(buildPartition, artifactsPaths, logger));
+        {
+            File.WriteAllText(artifactsPaths.ProjectFilePath,
+                IsNuGetCoreRt
+                    ? GenerateProjectForNuGetBuild(buildPartition, artifactsPaths, logger)
+                    : GenerateProjectForLocalBuild(buildPartition, artifactsPaths, logger));
+
+            GenerateReflectionFile(artifactsPaths);
+        }
 
         private string GenerateProjectForNuGetBuild(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
 <Project ToolsVersion=""15.0"">
@@ -134,6 +138,9 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{coreRtVersion}"" />
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
+  <ItemGroup>
+    <RdXmlFile Include=""rd.xml"" />
+  </ItemGroup>
   <Import Project=""Sdk.targets"" Sdk=""Microsoft.NET.Sdk"" />
 </Project>";
 
@@ -162,7 +169,27 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   <ItemGroup>
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
+  <ItemGroup>
+    <RdXmlFile Include=""rd.xml"" />
+  </ItemGroup>
 </Project>";
 
+        /// <summary>
+        /// mandatory to make it possible ot call GC.GetAllocatedBytesForCurrentThread() using reflection (not part of .NET Standard)
+        /// </summary>
+        private void GenerateReflectionFile(ArtifactsPaths artifactsPaths)
+        {
+            const string content = @"
+<Directives>
+    <Application>
+        <Assembly Name=""System.Runtime"">
+            <Type Name=""System.GC"" Dynamic=""Required All"" />
+        </Assembly>
+    </Application>
+</Directives>
+";
+
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath), "rd.xml"), content);
+        }
     }
 }
