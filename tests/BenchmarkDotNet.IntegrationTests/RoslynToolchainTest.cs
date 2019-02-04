@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public RoslynToolchainTest(ITestOutputHelper output) : base(output) { }
 
         /// <summary>Prooftest for #1039.</summary>
-        [TheoryFullFrameworkOnly]
+        [Tests.XUnit.TheoryFullFrameworkOnly("Roslyn toolchain does not support .NET Core")]
         [InlineData("en-US")]
         [InlineData("fr-FR")]
         [InlineData("ru-RU")]
