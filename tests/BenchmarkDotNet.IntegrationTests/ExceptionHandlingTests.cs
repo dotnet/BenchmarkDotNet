@@ -95,5 +95,21 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark] public void Throw() => throw new Exception(BenchmarkExceptionMessage);
         }
+
+        [Fact]
+        public void WhenOneBenchmarkThrowsTheRunnerDoesNotThrow()
+            => CanExecute<OneIsThrowing>(fullValidation: false); // we don't validate here because the report is expected to miss some results
+
+        [Fact]
+        public void WhenAllBenchmarksThrowsTheRunnerDoesNotThrow()
+            => CanExecute<AlwaysThrow>(fullValidation: false); // we don't validate here because the report is expected to have no results
+
+        public class OneIsThrowing
+        {
+            [Benchmark(Baseline = true)]
+            public void Bar1() { }
+            [Benchmark]
+            public void Bar2() => throw new Exception();
+        }
     }
 }
