@@ -28,6 +28,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 
         public string IlcPath { get; }
 
+        public override bool CanBuildInParallel => false;
+
         public static CoreRtToolchainBuilder CreateBuilder() => CoreRtToolchainBuilder.Create();
         
         private static string GetExtraArguments(bool useCppCodeGenerator, string runtimeIdentifier)

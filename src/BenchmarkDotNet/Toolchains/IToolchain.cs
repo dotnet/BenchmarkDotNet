@@ -12,6 +12,7 @@ namespace BenchmarkDotNet.Toolchains
         IBuilder Builder { get; }
         IExecutor Executor { get; }
         bool IsInProcess { get; }
+        bool CanBuildInParallel { get; }
 
         bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver);
     }

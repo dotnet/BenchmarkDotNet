@@ -4,6 +4,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using JetBrains.Annotations;
 
@@ -36,6 +37,8 @@ namespace BenchmarkDotNet.Running
         public string BuildConfiguration => RepresentativeBenchmarkCase.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, Resolver);
 
         public Platform Platform => RepresentativeBenchmarkCase.Job.ResolveValue(EnvironmentMode.PlatformCharacteristic, Resolver);
+
+        public bool CanBuildInParallel => RepresentativeBenchmarkCase.Job.GetToolchain().CanBuildInParallel;
 
         [PublicAPI]
         public Jit Jit => RepresentativeBenchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, Resolver);

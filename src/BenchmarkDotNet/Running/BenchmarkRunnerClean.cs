@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Running
                 var globalChronometer = Chronometer.Start();
 
                 var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
-                var buildResults = BuildInParallel(compositeLogger, rootArtifactsFolderPath, buildPartitions, ref globalChronometer);
+                var buildResults = BuildPartitions(compositeLogger, rootArtifactsFolderPath, buildPartitions, ref globalChronometer);
 
                 try
                 {
@@ -258,6 +258,28 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineError(validationError.Message);
 
             return validationErrors.ToImmutableArray();
+        }
+
+        private static Dictionary<BuildPartition, BuildResult> BuildPartitions(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, ref StartedClock globalChronometer)
+        {
+            var buildInParallel = buildPartitions.All(partition => partition.CanBuildInParallel) && buildPartitions.Length > 1;
+
+            return buildInParallel
+                ? BuildInParallel(logger, rootArtifactsFolderPath, buildPartitions, ref globalChronometer)
+                : BuildSequentially(logger, rootArtifactsFolderPath, buildPartitions, ref globalChronometer);
+        }
+
+        private static Dictionary<BuildPartition, BuildResult> BuildSequentially(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, ref StartedClock globalChronometer)
+        {
+            logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) Sequentially: Start   *****");
+
+            var buildResults = buildPartitions
+                .Select(buildPartition => (buildPartition, buildResult: Build(buildPartition, rootArtifactsFolderPath, logger)))
+                .ToDictionary(result => result.buildPartition, result => result.buildResult);
+
+            logger.WriteLineHeader($"// ***** Done, took {globalChronometer.GetElapsed().GetTimeSpan().ToFormattedTotalTime()}   *****");
+
+            return buildResults;
         }
 
         private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, ref StartedClock globalChronometer)
