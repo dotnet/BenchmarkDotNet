@@ -71,16 +71,17 @@ namespace BenchmarkDotNet.Disassembler
                 var disasembledMethods = Disassemble(settings, runtime, state);
 
                 // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working
-                var methodsToExport = disasembledMethods.Where(method => 
-                    disasembledMethods.Count == 1  // if there is only one method we want to return it (most probably benchmark got inlined)
-                    || !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodName)).ToArray();
+                var methodsToExport = disasembledMethods.Count == 1  // if there is only one method we want to return it (most probably benchmark got inlined)
+                    ? disasembledMethods
+                    : disasembledMethods.Where(method => 
+                        !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodNameForScenarios) && !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodNameForMicroBenchmarks));
 
                 using (var stream = new FileStream(settings.ResultsPath, FileMode.Append, FileAccess.Write))
                 using (var writer = XmlWriter.Create(stream))
                 {
                     var serializer = new XmlSerializer(typeof(DisassemblyResult));
 
-                    serializer.Serialize(writer, new DisassemblyResult { Methods = methodsToExport });
+                    serializer.Serialize(writer, new DisassemblyResult { Methods = methodsToExport.ToArray() });
                 }
             }
         }
@@ -490,7 +491,8 @@ namespace BenchmarkDotNet.Disassembler
             PrintIL = printIL;
             PrintSource = printSource;
             PrintPrologAndEpilog = printPrologAndEpilog;
-            RecursiveDepth = methodName == DisassemblerConstants.DisassemblerEntryMethodName && recursiveDepth != int.MaxValue ? recursiveDepth + 1 : recursiveDepth;
+            RecursiveDepth = (methodName == DisassemblerConstants.DisassemblerEntryMethodNameForScenarios || methodName == DisassemblerConstants.DisassemblerEntryMethodNameForMicroBenchmarks) 
+                             && recursiveDepth != int.MaxValue ? recursiveDepth + 1 : recursiveDepth;
             ResultsPath = resultsPath;
         }
 

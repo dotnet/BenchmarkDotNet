@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$Ref$", provider.UseRefKeyword ? "ref" : null)
                     .Replace("$MeasureGcStats$", buildInfo.Config.HasMemoryDiagnoser() ? "true" : "false")
                     .Replace("$Encoding$", buildInfo.Config.Encoding.ToTemplateString())
-                    .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
+                    .Replace("$DisassemblerEntryMethodNameForMicroBenchmarks$", DisassemblerConstants.DisassemblerEntryMethodNameForMicroBenchmarks)
                     .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments)).ToString();
 
                 benchmarkTypeCode = Unroll(benchmarkTypeCode, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance));
