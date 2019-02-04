@@ -7,7 +7,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -73,8 +72,8 @@ namespace BenchmarkDotNet.Code
                 benchmarksCode.Add(benchmarkTypeCode);
             }
 
-            if (buildPartition.IsCoreRT)
-                extraDefines.Add("#define CORERT");
+            if (buildPartition.IsAOT)
+                extraDefines.Add("#define AOT");
 
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
                 .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
@@ -82,7 +81,7 @@ namespace BenchmarkDotNet.Code
                 .Replace("$AdditionalLogic$", string.Join(Environment.NewLine, additionalLogic))
                 .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))
                 .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmarkCase.Descriptor))
-                .Replace("$CoreRtSwitch$", GetCoreRtSwitch(buildPartition))
+                .Replace("$AOTSwitch$", GetAOTSwitch(buildPartition))
                 .ToString();
 
             return benchmarkProgramContent;
@@ -243,9 +242,9 @@ namespace BenchmarkDotNet.Code
         /// <summary>
         /// for CoreRT we can't use reflection to load type and run a method, so we simply generate a switch for all types..
         /// </summary>
-        private static string GetCoreRtSwitch(BuildPartition buildPartition)
+        private static string GetAOTSwitch(BuildPartition buildPartition)
         {
-            if (!buildPartition.IsCoreRT)
+            if (!buildPartition.IsAOT)
                 return default;
 
             var @switch = new StringBuilder(buildPartition.Benchmarks.Length * 30);

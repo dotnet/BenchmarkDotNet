@@ -30,6 +30,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 
         public override bool CanBuildInParallel => false;
 
+        public override bool IsAOT => true;
+
         public static CoreRtToolchainBuilder CreateBuilder() => CoreRtToolchainBuilder.Create();
         
         private static string GetExtraArguments(bool useCppCodeGenerator, string runtimeIdentifier)

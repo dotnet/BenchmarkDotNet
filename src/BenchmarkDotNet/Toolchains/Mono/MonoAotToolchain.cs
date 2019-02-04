@@ -20,6 +20,8 @@ namespace BenchmarkDotNet.Toolchains.Mono
 
         public override bool CanBuildInParallel => false;
 
+        public override bool IsAOT => true;
+
         public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
         {
             if (!base.IsSupported(benchmarkCase, logger, resolver))

@@ -67,6 +67,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
         public bool CanBuildInParallel => true;
 
+        public bool IsAOT => false;
+
         /// <summary>Returns a <see cref="String" /> that represents this instance.</summary>
         /// <returns>A <see cref="String" /> that represents this instance.</returns>
         public override string ToString() => GetType().Name;

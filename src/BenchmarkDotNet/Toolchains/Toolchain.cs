@@ -21,6 +21,8 @@ namespace BenchmarkDotNet.Toolchains
 
         public virtual bool CanBuildInParallel => true;
 
+        public virtual bool IsAOT => false;
+
         public Toolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor)
         {
             Name = name;

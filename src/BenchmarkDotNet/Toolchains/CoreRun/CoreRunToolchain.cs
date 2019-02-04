@@ -51,6 +51,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 
         public bool CanBuildInParallel => true;
 
+        public bool IsAOT => false;
+
         public FileInfo SourceCoreRun { get; }
 
         public FileInfo CopyCoreRun { get; }
