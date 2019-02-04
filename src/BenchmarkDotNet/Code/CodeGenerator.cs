@@ -21,6 +21,11 @@ namespace BenchmarkDotNet.Code
     internal static class CodeGenerator
     {
         internal static string Generate(BuildPartition buildPartition)
+            => buildPartition.IsScenario
+                ? GenerateForScenario(buildPartition)
+                : GenerateForMicroBenchmarks(buildPartition);
+
+        internal static string GenerateForMicroBenchmarks(BuildPartition buildPartition)
         {
             (bool useShadowCopy, string shadowCopyFolderPath) = GetShadowCopySettings();
 
@@ -58,14 +63,16 @@ namespace BenchmarkDotNet.Code
                     .Replace("$ParamsContent$", GetParamsContent(benchmark))
                     .Replace("$ArgumentsDefinition$", GetArgumentsDefinition(benchmark))
                     .Replace("$DeclareArgumentFields$", GetDeclareArgumentFields(benchmark))
-                    .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark)).Replace("$LoadArguments$", GetLoadArguments(benchmark))
+                    .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark))
+                    .Replace("$LoadArguments$", GetLoadArguments(benchmark))
                     .Replace("$PassArguments$", passArguments)
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
                     .Replace("$Ref$", provider.UseRefKeyword ? "ref" : null)
                     .Replace("$MeasureGcStats$", buildInfo.Config.HasMemoryDiagnoser() ? "true" : "false")
                     .Replace("$Encoding$", buildInfo.Config.Encoding.ToTemplateString())
                     .Replace("$DisassemblerEntryMethodNameForMicroBenchmarks$", DisassemblerConstants.DisassemblerEntryMethodNameForMicroBenchmarks)
-                    .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments)).ToString();
+                    .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments))
+                    .ToString();
 
                 benchmarkTypeCode = Unroll(benchmarkTypeCode, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance));
 
@@ -85,6 +92,24 @@ namespace BenchmarkDotNet.Code
                 .ToString();
 
             return benchmarkProgramContent;
+        }
+
+        private static string GenerateForScenario(BuildPartition buildPartition)
+        {
+            var benchmark = buildPartition.Benchmarks.Single().BenchmarkCase;
+            var provider = GetDeclarationsProvider(benchmark.Descriptor);
+            var passArguments = GetPassArguments(benchmark);
+
+            return new SmartStringBuilder(ResourceHelper.LoadTemplate("ScenariosBenchmarkProgram.txt"))
+                .Replace("$ExtraDefines$", provider is VoidDeclarationsProvider ? "#define RETURNS_VOID" : string.Empty)
+                .Replace("$WorkloadTypeName$", provider.WorkloadTypeName)
+                .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmarkCase.Descriptor))
+                .Replace("$WorkloadMethodReturnType$", provider.WorkloadMethodReturnTypeName)
+                .Replace("$DeclareArgumentFields$", GetDeclareArgumentFields(benchmark))
+                .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark))
+                .Replace("$ParamsContent$", GetParamsContent(benchmark))
+                .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments))
+                .ToString();
         }
 
         private static void AddNonEmptyUnique(HashSet<string> items, string value)

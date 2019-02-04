@@ -82,7 +82,7 @@
         public void __TrickTheJIT__()
         {
             NotEleven = new System.Random(123).Next(0, 10);
-            $DisassemblerEntryMethodName$();
+            $DisassemblerEntryMethodNameForMicroBenchmarks$();
         }
 
         private System.Int32 dummyVar;
@@ -151,7 +151,7 @@
         }
         
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
+        public $WorkloadMethodReturnType$ $DisassemblerEntryMethodNameForMicroBenchmarks$()
         {
             if (NotEleven == 11)
             {
@@ -214,7 +214,7 @@
         private void NonGenericKeepAliveWithoutBoxing($WorkloadMethodReturnType$ _) { }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
+        public $WorkloadMethodReturnType$ $DisassemblerEntryMethodNameForMicroBenchmarks$()
         {
             if (NotEleven == 11)
             {
@@ -274,7 +274,7 @@
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public ref $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
+        public ref $WorkloadMethodReturnType$ $DisassemblerEntryMethodNameForMicroBenchmarks$()
         {
             if (NotEleven == 11)
             {
@@ -323,7 +323,7 @@
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public void $DisassemblerEntryMethodName$()
+        public void $DisassemblerEntryMethodNameForMicroBenchmarks$()
         {
             if (NotEleven == 11)
             {
