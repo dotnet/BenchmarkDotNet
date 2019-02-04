@@ -116,11 +116,13 @@ namespace BenchmarkDotNet.Engines
                 warmupStage.RunWorkload(invokeCount, UnrollFactor, Strategy);
             }
 
-            Host.BeforeMainRun();
+// TODO Conters
+//            Host.BeforeMainRun();
 
             var main = actualStage.RunWorkload(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
 
-            Host.AfterMainRun();
+// TODO Conters
+//            Host.AfterMainRun();
 
             var workGcHasDone = includeMemoryStats 
                 ? MeasureGcStats(new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor)) 
@@ -150,6 +152,9 @@ namespace BenchmarkDotNet.Engines
             {
                 // this line should be before GcCollect because some strategies can allocate managed memory
                 cacheClearingStrategy?.ClearCache(affinity);
+
+                // TODO Conters
+                Host.BeforeMainRun();
             }
 
             GcCollect();
@@ -165,10 +170,17 @@ namespace BenchmarkDotNet.Engines
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStop(data.IterationMode, data.IterationStage, totalOperations);
 
-            if(!isOverhead)
-                IterationCleanupAction();
-
             GcCollect();
+
+            if (data.IsWorkload() && data.IsActualState())
+            {
+                // TODO Conters
+                Host.AfterMainRun();
+            }
+
+            // After GcCollect?
+            if (!isOverhead)
+                IterationCleanupAction();
 
             // Results
             var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, clockSpan.GetNanoseconds(), Encoding);
