@@ -45,5 +45,20 @@ namespace BenchmarkDotNet.Tests.Validators
 
             Assert.Equal(1, count);
         }
+
+        public class ScenarioWithSetup
+        {
+            [GlobalSetup] public void Setup() { }
+            [Scenario] public void Scenario() { }
+        }
+
+        [Fact]
+        public void ScenariosMustNotHaveSetupOrCleanup()
+        {
+            var validationErrors = SetupCleanupValidator.FailOnError.Validate(
+                BenchmarkConverter.TypeToBenchmarks(typeof(ScenarioWithSetup))).ToArray();
+
+            Assert.Equal(1, validationErrors.Count(v => v.IsCritical && v.Message.Contains("Scenario")));
+        }
     }
 }

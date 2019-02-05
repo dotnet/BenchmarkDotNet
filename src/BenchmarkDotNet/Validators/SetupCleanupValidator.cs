@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -26,6 +27,17 @@ namespace BenchmarkDotNet.Validators
                 validationErrors.AddRange(ValidateAttributes<GlobalCleanupAttribute>(groupByType.Key.Name, allMethods));
                 validationErrors.AddRange(ValidateAttributes<IterationSetupAttribute>(groupByType.Key.Name, allMethods));
                 validationErrors.AddRange(ValidateAttributes<IterationSetupAttribute>(groupByType.Key.Name, allMethods));
+            }
+
+            foreach (var benchmark in input.Benchmarks.Where(benchmark => benchmark.Descriptor.Kind == BenchmarkKind.Scenario))
+            {
+                if (benchmark.Descriptor.GlobalSetupMethod != null
+                    || benchmark.Descriptor.GlobalCleanupMethod != null
+                    || benchmark.Descriptor.IterationSetupMethod != null
+                    || benchmark.Descriptor.IterationCleanupMethod != null)
+                {
+                    validationErrors.Add(new ValidationError(true, "Scenario benchmarks do NOT support Setup/Cleanup methods by design. Scenario reports total execution time for entire process lifetime, we can't exclude the cost of Setup/Cleanup."));
+                }
             }
 
             return validationErrors;
