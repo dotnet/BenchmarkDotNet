@@ -1,107 +1,68 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Threading;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Loggers;
 using Microsoft.Win32.SafeHandles;
 
 namespace BenchmarkDotNet.Engines.CacheClearingStrategies
 {
     internal class AllocationsCacheClearingStrategyForWindows : ICacheClearingStrategy
     {
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr SetThreadAffinityMask(SafeThreadHandle handle, HandleRef mask);
+        private Process proces =  new Process() { StartInfo = new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = "C:\\Work\\BenchmarkDotNet\\BenchmarkDotNet.MemoryAllocator\\bin\\Release\\netcoreapp2.0\\BenchmarkDotNet.MemoryAllocator.dll",
+            UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                RedirectStandardInput = false
+            }
+        };
 
-        [SuppressUnmanagedCodeSecurity]
-        private class SafeThreadHandle : SafeHandleZeroOrMinusOneIsInvalid
-        {
-            public SafeThreadHandle() : base(true) { }
+        private int[] affinities;
 
-            protected override bool ReleaseHandle() => CloseHandle(handle);
-        }
-
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
-        private static extern bool CloseHandle(IntPtr handle);
-
-        [DllImport("kernel32")]
-        private static extern int GetCurrentThreadId();
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern SafeThreadHandle OpenThread(int access, bool inherit, int threadId);
-
-        private readonly ICacheMemoryCleaner cacheMemoryCleaner;
-
-        public AllocationsCacheClearingStrategyForWindows(ICacheMemoryCleaner cacheMemoryCleaner) => this.cacheMemoryCleaner = cacheMemoryCleaner;
-
-        public void ClearCache(IntPtr? affinity)
+        public AllocationsCacheClearingStrategyForWindows(IntPtr? affinity)
         {
             if (affinity.HasValue)
-                ClearCacheForKnownAffinity(affinity.Value);
+            {
+                this.affinities = GetAffinitiesForSelectedProcessors(affinity.Value).ToArray();
+            }
             else
-                ClearCacheForAllProcessors();
+            {
+                this.affinities = GetAffinitiesForAllProcessors();
+            }
         }
 
-        private void ClearCacheForKnownAffinity(IntPtr affinity)
-        {
-            ClearCache(GetAffinitiesForSelectedProcessors(affinity).ToArray());
-        }
-
-        private void ClearCacheForAllProcessors()
-        {
-            int cpuCount = Environment.ProcessorCount;
-
-            var affinities = new int[cpuCount];
-            for (int i = 0; i < cpuCount; ++i)
-                affinities[i] = 1 << i;
-
-            ClearCache(affinities);
-        }
-
-        private void ClearCache(int[] affinities)
+        public void ClearCache()
         {
             const int howManyProcessOnProcessor = 2;
 
-            var threads = new Thread[affinities.Length * howManyProcessOnProcessor];
-
-            int index = 0;
             for (int i = 0; i < howManyProcessOnProcessor; i++)
+            {
                 foreach (int affinity in affinities)
                 {
-                    var thread = new Thread(() => AllocateMemory(affinity)) { IsBackground = true, };
-                    thread.Start();
-
-                    threads[index++] = thread;
+                    AllocateMemory(affinity);
                 }
-
-            foreach (var thread in threads)
-                thread.Join();
+            }
         }
 
         private void AllocateMemory(int affinity)
-        {
-            SetProcessorAffinity(affinity);
-            cacheMemoryCleaner.Clean();
+        {  
+            proces.Start();
+            proces.TrySetPriority(ProcessPriorityClass.High, ConsoleLogger.Default);
+            proces.TrySetAffinity((IntPtr)affinity, ConsoleLogger.Default);
+            proces.WaitForExit();
+            var exitCode = proces.ExitCode;
+            System.IO.File.AppendAllText("c:\\work\\All.txt", "ExitCode= " + exitCode.ToString());
         }
 
-        private static void SetProcessorAffinity(long coreMask)
-        {
-            int threadId = GetCurrentThreadId();
-            SafeThreadHandle handle = null;
-            var tempHandle = new object();
-            try
-            {
-                handle = OpenThread(0x60, false, threadId);
-                if (SetThreadAffinityMask(handle, new HandleRef(tempHandle, (IntPtr) coreMask)) == IntPtr.Zero)
-                    Console.WriteLine("Failed to set processor affinity for thread " + Marshal.GetLastWin32Error());
-            }
-            finally
-            {
-                handle?.Close();
-            }
-        }
 
         private static IEnumerable<int> GetAffinitiesForSelectedProcessors(IntPtr affinityPtr)
         {
@@ -116,6 +77,17 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
                 if ((affinity & cpuMask) > 0)
                     yield return cpuMask;
             }
+        }
+
+        private int[] GetAffinitiesForAllProcessors()
+        {
+            int cpuCount = Environment.ProcessorCount;
+
+            var result = new int[cpuCount];
+            for (int i = 0; i < cpuCount; ++i)
+                result[i] = 1 << i;
+
+            return result;
         }
     }
 }

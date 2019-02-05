@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Engines.CacheClearingStrategies
 
         public AllocationsCacheClearingStrategyForOneCore(ICacheMemoryCleaner cacheMemoryCleaner) => this.cacheMemoryCleaner = cacheMemoryCleaner;
 
-        public void ClearCache(IntPtr? affinity)
+        public void ClearCache()
         {
             const int howManyProcessOnProcessor = 3;
 

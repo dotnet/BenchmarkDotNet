@@ -10,7 +10,7 @@ using BenchmarkDotNet.Mathematics.StatisticalTesting;
 
 namespace BenchmarkDotNet.Samples
 {
-    [StatisticalTestColumn(StatisticalTestKind.MannWhitney, ThresholdUnit.Microseconds, 0.2, true)]
+   // [StatisticalTestColumn(StatisticalTestKind.MannWhitney, ThresholdUnit.Microseconds, 0.2, true)]
     [Config(typeof(CompareCacheClearingStrategies))]
     public class IntroColdCpuCache
     {
@@ -18,13 +18,14 @@ namespace BenchmarkDotNet.Samples
         {
             public CompareCacheClearingStrategies()
             {
-                Add(Job.Default.WithCacheClearingStrategy(CacheClearingStrategy.None).AsBaseline());
-                Add(Job.Default.WithCacheClearingStrategy(CacheClearingStrategy.Allocations));
+                Add(Job.ShortRun.WithCacheClearingStrategy(CacheClearingStrategy.None).AsBaseline());
+                Add(Job.ShortRun.WithCacheClearingStrategy(CacheClearingStrategy.Allocations));
 
-                Add(Job.Default.WithAffinity((IntPtr) 1).WithCacheClearingStrategy(CacheClearingStrategy.None));
-                Add(Job.Default.WithAffinity((IntPtr) 1).WithCacheClearingStrategy(CacheClearingStrategy.Allocations));
+                Add(Job.ShortRun.WithAffinity((IntPtr) 1).WithCacheClearingStrategy(CacheClearingStrategy.None));
+                Add(Job.ShortRun.WithAffinity((IntPtr) 1).WithCacheClearingStrategy(CacheClearingStrategy.Allocations));
                 
                 Add(HardwareCounter.CacheMisses);
+                Add(MemoryDiagnoser.Default);
             }
         }
 
