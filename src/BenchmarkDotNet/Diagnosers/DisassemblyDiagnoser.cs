@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -92,6 +90,9 @@ namespace BenchmarkDotNet.Diagnosers
                 {
                     yield return new ValidationError(true, "InProcessToolchain has no DisassemblyDiagnoser support", benchmark);
                 }
+
+                if (benchmark.Descriptor.Kind == BenchmarkKind.Scenario)
+                    yield return new ValidationError(true, "No Disassembler support for Scenario benchmarks", benchmark);
             }
         }
 

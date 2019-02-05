@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
@@ -25,7 +26,11 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
         public void DisplayResults(ILogger logger) { }
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Array.Empty<ValidationError>();
+
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+            => validationParameters.Benchmarks
+                .Where(benchmark => benchmark.Descriptor.Kind == BenchmarkKind.Scenario)
+                .Select(benchmark => new ValidationError(true, "MemoryDiagnoser does not support Scenario benchmarks (yet).", benchmark));
         
         // the following methods are left empty on purpose
         // the action takes places in other process, and the values are gathered by Engine

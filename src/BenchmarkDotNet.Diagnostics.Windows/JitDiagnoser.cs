@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Loggers;

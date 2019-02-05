@@ -64,10 +64,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             etwProfiler.Handle(signal, parameters);
 
-            // we need to remember process Id because we loose it when the proces exits
-            if (signal == HostSignal.AfterAll)
+            // we need to remember process Id because we loose it when the process exits
+            if (signal == HostSignal.AfterAll || (signal == HostSignal.AfterProcessExit && parameters.Process != null))
                 benchmarkToProcessId[parameters.BenchmarkCase] = parameters.Process.Id;
-            else if (signal == HostSignal.AfterProcessExit)
+            if (signal == HostSignal.AfterProcessExit)
                 benchmarkToCvTraceFile[parameters.BenchmarkCase] = CreateCvTraceFile(parameters);
         }
 
