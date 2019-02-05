@@ -1,11 +1,15 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices.ComTypes;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 
@@ -63,13 +67,28 @@ namespace BenchmarkDotNet.Toolchains
                 executeParameters.Logger.WriteLineInfo($"// Start: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
                 executeParameters.Diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, executeParameters));
 
+                var clock = Chronometer.Start();
+
                 process.Start();
 
                 SetPriorityAndAffinity(process, executeParameters);
 
-                reader.ReadToEnd();
+                // for scenarios we don't want to read the output - it could affect the timing results
+                if (executeParameters.BenchmarkCase.Descriptor.Kind != BenchmarkKind.Scenario)
+                    reader.ReadToEnd();
 
                 process.WaitForExit(); // should we add timeout here?
+
+                var timeSpan = clock.GetElapsed();
+
+                if (executeParameters.BenchmarkCase.Descriptor.Kind != BenchmarkKind.Scenario)
+                    return ExecuteResult.FromExitCode(process.ExitCode, reader.GetLinesWithResults(), reader.GetLinesWithExtraOutput());
+
+                // we don't have the Results printed to the output and we don't read to output
+                // so we just add a "fake" line for the total execution time
+                var totalExecutionTime = new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, timeSpan.GetNanoseconds());
+                executeParameters.Logger.WriteLine(totalExecutionTime.ToOutputLine()); // we print it just to show the users the execution time
+                return ExecuteResult.FromExitCode(process.ExitCode, ImmutableArray.Create(totalExecutionTime.ToOutputLine()), ImmutableArray<string>.Empty);
             }
             finally
             {
@@ -79,8 +98,6 @@ namespace BenchmarkDotNet.Toolchains
                 // whether we fail or succeed we must let the diagnosers know!! MUST HAVE!!
                 executeParameters.Diagnoser?.Handle(HostSignal.AfterProcessExit, new DiagnoserActionParameters(process, executeParameters));
             }
-
-            return ExecuteResult.FromExitCode(process.ExitCode, reader.GetLinesWithResults(), reader.GetLinesWithExtraOutput());
         }
 
         private static void SetPriorityAndAffinity(Process process, ExecuteParameters executeParameters)
