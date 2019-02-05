@@ -130,7 +130,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             
             // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
             if (details.Config.GetJobs().Select(job => job.Infrastructure.Toolchain).Distinct().Count() > 1)
-                folderPath = Path.Combine(folderPath, details.BenchmarkCase.Job.Infrastructure.Toolchain.Name);
+                folderPath = Path.Combine(folderPath, (details.BenchmarkCase.Job.Infrastructure.Toolchain?.Name ?? details.BenchmarkCase.Job.Environment.Runtime.Name).ReplaceAllInvalidFileNameCharacters());
 
             if (!string.IsNullOrWhiteSpace(details.BenchmarkCase.Descriptor.Type.Namespace))
                 folderPath = Path.Combine(folderPath, details.BenchmarkCase.Descriptor.Type.Namespace.Replace('.', Path.DirectorySeparatorChar));

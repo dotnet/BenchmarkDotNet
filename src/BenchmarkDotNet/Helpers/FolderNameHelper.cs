@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Helpers
                 case bool b:
                     return b.ToLowerCase();
                 case string s:
-                    return Escape(new StringBuilder(s));
+                    return ReplaceAllInvalidFileNameCharacters(s);
                 case char c:
                     return ((int)c).ToString(); // TODO: rewrite
                 case float f:
@@ -42,10 +42,15 @@ namespace BenchmarkDotNet.Helpers
         // we can't simply use type.FullName, because for generics it's too long
         // example: typeof(List<int>).FullName => "System.Collections.Generic.List`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
         public static string ToFolderName(Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = false)
-            => Escape(new StringBuilder(type.GetCorrectCSharpTypeName(includeNamespace, includeGenericArgumentsNamespace)));
+            => ReplaceAllInvalidFileNameCharacters(type.GetCorrectCSharpTypeName(includeNamespace, includeGenericArgumentsNamespace));
         
-        private static string Escape(StringBuilder builder)
+        /// <summary>
+        /// replaces every single invalid path character with '_'
+        /// </summary>
+        internal static string ReplaceAllInvalidFileNameCharacters(this string filePath)
         {
+            var builder = new StringBuilder(filePath);
+
             foreach (char invalidPathChar in Path.GetInvalidFileNameChars())
                 builder.Replace(invalidPathChar, '_');
 
