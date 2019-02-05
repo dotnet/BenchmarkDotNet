@@ -225,7 +225,6 @@ namespace BenchmarkDotNet.Tests.Running
             var benchmarkCase = info.BenchmarksCases.Single();
 
             Assert.Equal(BenchmarkKind.Scenario, benchmarkCase.Descriptor.Kind);
-            Assert.Equal(321, benchmarkCase.Job.Run.WarmupCount);
             Assert.Equal(123, benchmarkCase.Job.Run.LaunchCount);
             Assert.Equal(RunStrategy.Monitoring, benchmarkCase.Job.Run.RunStrategy);
             Assert.False(benchmarkCase.Job.Accuracy.EvaluateOverhead);
@@ -233,7 +232,7 @@ namespace BenchmarkDotNet.Tests.Running
             Assert.False(benchmarkCase.Job.Meta.IsMutator);
         }
 
-        [ScenarioJob(launchCount: 123, warmupCount: 321)]
+        [ScenarioJob(launchCount: 123)]
         public class WithScenarioCustomSettings
         {
             [Scenario]

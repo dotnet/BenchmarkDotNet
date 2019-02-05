@@ -12,17 +12,15 @@ namespace BenchmarkDotNet.Attributes
         [PublicAPI]
         public ScenarioJobAttribute(
             int launchCount = 15,
-            int warmupCount = 1,
             string id = null,
             bool baseline = false
-        ) : base(CreateJob(id, launchCount, warmupCount, baseline)) { }
+        ) : base(CreateJob(id, launchCount, baseline)) { }
 
-        private static Job CreateJob(string id, int launchCount, int warmupCount, bool baseline)
+        private static Job CreateJob(string id, int launchCount, bool baseline)
         {
             var job = new Job(id);
 
             job.Run.LaunchCount = launchCount;
-            job.Run.WarmupCount = warmupCount;
             job.Run.RunStrategy = RunStrategy.Monitoring;
             job.Meta.Baseline = baseline;
             job.Accuracy.EvaluateOverhead = false;
