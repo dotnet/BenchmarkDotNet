@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using BenchmarkDotNet.Characteristics;
@@ -13,15 +12,11 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Extensions
 {
-    // we need it public to reuse it in the auto-generated dll
-    // but we hide it from intellisense with following attribute
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [PublicAPI]
-    public static class ProcessExtensions
+    internal static class ProcessExtensions
     {
         private static readonly TimeSpan DefaultKillTimeout = TimeSpan.FromSeconds(30);
 
-        public static void EnsureHighPriority(this Process process, ILogger logger)
+        internal static void TryEnsureHighPriority(this Process process, ILogger logger)
         {
             try
             {
@@ -48,7 +43,7 @@ namespace BenchmarkDotNet.Extensions
                 : new IntPtr(processorAffinity.ToInt32() & cpuMask);
         }
 
-        public static bool TrySetPriority(
+        internal static bool TrySetPriority(
             [NotNull] this Process process,
             ProcessPriorityClass priority,
             [NotNull] ILogger logger)
@@ -72,7 +67,7 @@ namespace BenchmarkDotNet.Extensions
             return false;
         }
 
-        public static bool TrySetAffinity(
+        internal static bool TrySetAffinity(
             [NotNull] this Process process,
             IntPtr processorAffinity,
             [NotNull] ILogger logger)
@@ -96,7 +91,7 @@ namespace BenchmarkDotNet.Extensions
             return false;
         }
 
-        public static IntPtr? TryGetAffinity([NotNull] this Process process)
+        internal static IntPtr? TryGetAffinity([NotNull] this Process process)
         {
             if (process == null)
                 throw new ArgumentNullException(nameof(process));
@@ -128,9 +123,9 @@ namespace BenchmarkDotNet.Extensions
         
         // the code below was copy-pasted from https://github.com/dotnet/cli/blob/0bc24bff775e22352c2309ef990281280f92dbaa/test/Microsoft.DotNet.Tools.Tests.Utilities/Extensions/ProcessExtensions.cs#L13
 
-        public static void KillTree(this Process process) => process.KillTree(DefaultKillTimeout);
+        internal static void KillTree(this Process process) => process.KillTree(DefaultKillTimeout);
 
-        public static void KillTree(this Process process, TimeSpan timeout)
+        internal static void KillTree(this Process process, TimeSpan timeout)
         {
             string stdout;
             if (RuntimeInformation.IsWindows())

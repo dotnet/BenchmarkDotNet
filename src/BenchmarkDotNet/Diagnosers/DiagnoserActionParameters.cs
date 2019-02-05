@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.Parameters;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -11,6 +12,11 @@ namespace BenchmarkDotNet.Diagnosers
             Process = process;
             BenchmarkCase = benchmarkCase;
             BenchmarkId = benchmarkId;
+        }
+
+        public DiagnoserActionParameters(Process process, ExecuteParameters executeParameters)
+            : this(process, executeParameters.BenchmarkCase, executeParameters.BenchmarkId)
+        {
         }
 
         public Process Process { get; }

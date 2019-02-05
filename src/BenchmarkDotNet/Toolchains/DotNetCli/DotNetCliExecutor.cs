@@ -1,113 +1,30 @@
-using System;
-using System.Diagnostics;
+using System.Collections.Immutable;
 using System.IO;
-using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Parameters;
-using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     [PublicAPI]
-    public class DotNetCliExecutor : IExecutor
+    public sealed class DotNetCliExecutor : OutOfProcessExecutor
     {
-        public DotNetCliExecutor(string customDotNetCliPath) => CustomDotNetCliPath = customDotNetCliPath;
-
         private string CustomDotNetCliPath { get; }
 
-        public ExecuteResult Execute(ExecuteParameters executeParameters)
-        {
-            if (!File.Exists(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath))
-            {
-                executeParameters.Logger.WriteLineError($"Did not find {executeParameters.BuildResult.ArtifactsPaths.ExecutablePath}, but the folder contained:");
-                foreach (var file in new DirectoryInfo(executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
-                    executeParameters.Logger.WriteLineError(file.Name);
-                
-                return new ExecuteResult(false, -1, Array.Empty<string>(), Array.Empty<string>());
-            }
+        public DotNetCliExecutor(string customDotNetCliPath) => CustomDotNetCliPath = customDotNetCliPath;
 
-            ConsoleExitHandler.Instance.Logger = executeParameters.Logger;
+        protected override (string fileName, string arguments) GetProcessStartArguments(ExecuteParameters parameters)
+            =>
+            (
+                CustomDotNetCliPath ?? "dotnet",
+                $"{Path.GetFileName(parameters.BuildResult.ArtifactsPaths.ExecutablePath).Escape()} {parameters.BenchmarkId.ToArguments()}"
+            );
 
-            try
-            {
-                return Execute(
-                    executeParameters.BenchmarkCase,
-                    executeParameters.BenchmarkId,
-                    executeParameters.Logger, 
-                    executeParameters.BuildResult.ArtifactsPaths, 
-                    executeParameters.Diagnoser, 
-                    Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath), 
-                    executeParameters.Resolver);
-            }
-            finally
-            {
-                ConsoleExitHandler.Instance.Process = null;
-                ConsoleExitHandler.Instance.Logger = null;
+        protected override ImmutableArray<EnvironmentVariable> GetImplicitEnvironmentVariables(ExecuteParameters executeParameters)
+            => string.IsNullOrEmpty(CustomDotNetCliPath)
+                ? ImmutableArray<EnvironmentVariable>.Empty
+                : ImmutableArray.Create(new EnvironmentVariable(DotNetCliCommandExecutor.DotnetMultiLevelLookupEnvVarName, "0"));
 
-                executeParameters.Diagnoser?.Handle(
-                    HostSignal.AfterProcessExit, 
-                    new DiagnoserActionParameters(null, executeParameters.BenchmarkCase, executeParameters.BenchmarkId));
-            }
-        }
-
-        private ExecuteResult Execute(BenchmarkCase benchmarkCase,
-                                      BenchmarkId benchmarkId,
-                                      ILogger logger,
-                                      ArtifactsPaths artifactsPaths,
-                                      IDiagnoser diagnoser,
-                                      string executableName,
-                                      IResolver resolver)
-        {
-            var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
-                CustomDotNetCliPath,
-                artifactsPaths.BinariesDirectoryPath,
-                $"{executableName.Escape()} {benchmarkId.ToArguments()}",
-                redirectStandardInput: true);
-
-            startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
-
-            using (var process = new Process { StartInfo = startInfo })
-            {
-                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId);
-
-                logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
-
-                ConsoleExitHandler.Instance.Process = process;
-
-                diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
-
-                process.Start();
-
-                process.EnsureHighPriority(logger);
-                if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
-                {
-                    process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
-                }
-
-                loggerWithDiagnoser.ProcessInput();
-                string standardError = process.StandardError.ReadToEnd();
-
-                process.WaitForExit(); // should we add timeout here?
-
-                if (process.ExitCode == 0)
-                {
-                    return new ExecuteResult(true, process.ExitCode, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
-                }
-
-                if (!string.IsNullOrEmpty(standardError))
-                {
-                    logger.WriteError(standardError);
-                }
-
-                return new ExecuteResult(true, process.ExitCode, Array.Empty<string>(), Array.Empty<string>());
-            }
-        }
     }
 }
