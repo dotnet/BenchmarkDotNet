@@ -49,7 +49,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class AccurateAllocations
         {
-            [Benchmark] public void Nothing() { }
             [Benchmark] public byte[] EightBytesArray() => new byte[8];
             [Benchmark] public byte[] SixtyFourBytesArray() => new byte[64];
 
@@ -65,7 +64,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
             AssertAllocations(toolchain, typeof(AccurateAllocations), new Dictionary<string, long>
             {
-                { nameof(AccurateAllocations.Nothing), 0 },
                 { nameof(AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
                 { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + + objectAllocationOverhead + arraySizeOverhead },
 
@@ -210,7 +208,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             AssertAllocations(toolchain, typeof(TimeConsuming), new Dictionary<string, long>
             {
-                { nameof(TimeConsuming.SixtyFourBytesArray), 64 + + objectAllocationOverhead + arraySizeOverhead }
+                { nameof(TimeConsuming.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead }
             });
         }
 
@@ -250,7 +248,8 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithEvaluateOverhead(false) // no need to run idle for this test
                     .WithWarmupCount(0) // don't run warmup to save some time for our CI runs
                     .WithIterationCount(1) // single iteration is enough for us
-                    .WithGcForce(false).With(toolchain))
+                    .WithGcForce(false)
+                    .With(toolchain))
                 .With(DefaultColumnProviders.Instance)
                 .With(MemoryDiagnoser.Default)
                 .With(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
