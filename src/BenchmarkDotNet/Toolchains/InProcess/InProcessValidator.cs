@@ -93,6 +93,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             result.AddRange(ValidateJob(benchmarkCase.Job, true));
             if (benchmarkCase.HasArguments)
                 result.Add(new ValidationError(true, "Arguments are not supported by the InProcessToolchain yet, see #687 for more details"));
+            if (benchmarkCase.Descriptor.Kind == BenchmarkKind.Scenario)
+                result.Add(new ValidationError(true, "Scenarios are not supported by the InProcessToolchain. By design!"));
 
             if (result.Any())
             {

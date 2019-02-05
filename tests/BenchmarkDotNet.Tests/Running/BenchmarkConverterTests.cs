@@ -202,7 +202,7 @@ namespace BenchmarkDotNet.Tests.Running
         }
 
         [Fact]
-        public void ScenariosAreRecognizedAndHaveProperDefaultValues()
+        public void ScenariosAreRecognized()
         {
             var info = BenchmarkConverter.TypeToBenchmarks(typeof(WithScenarioDefaultSettings));
 

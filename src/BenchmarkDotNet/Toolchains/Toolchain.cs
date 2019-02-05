@@ -40,6 +40,11 @@ namespace BenchmarkDotNet.Toolchains
                 logger.WriteLineError($"Llvm is supported only for Mono, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
                 return false;
             }
+            if (IsInProcess && benchmarkCase.Descriptor.Kind == BenchmarkKind.Scenario)
+            {
+                logger.WriteLineError("Scenarios are not supported by the In Process toolchains. By design!");
+                return false;
+            }
 
             if (runtime is MonoRuntime mono)
             {

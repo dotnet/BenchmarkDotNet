@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
@@ -17,6 +18,7 @@ namespace BenchmarkDotNet.Validators
         public static readonly IValidator FailOnError = new CompilationValidator();
 
         private static readonly ImmutableHashSet<string> CsharpKeywords = GetCsharpKeywords().ToImmutableHashSet();
+        private static readonly ImmutableHashSet<Type> AllowedScenarioReturnTypes = new [] { typeof(void), typeof(Task), typeof(int), typeof(Task<int>), typeof(ValueTask<int>) }.ToImmutableHashSet();
 
         private CompilationValidator() { }
 
@@ -26,7 +28,8 @@ namespace BenchmarkDotNet.Validators
             => ValidateCSharpNaming(validationParameters.Benchmarks)
                     .Union(ValidateNamingConflicts(validationParameters.Benchmarks))
                     .Union(ValidateAccessModifiers(validationParameters.Benchmarks))
-                    .Union(ValidateBindingModifiers(validationParameters.Benchmarks));
+                    .Union(ValidateBindingModifiers(validationParameters.Benchmarks))
+                    .Union(ValidateReturnTypes(validationParameters.Benchmarks));
 
         private static IEnumerable<ValidationError> ValidateCSharpNaming(IEnumerable<BenchmarkCase> benchmarks)
             => benchmarks
@@ -63,7 +66,17 @@ namespace BenchmarkDotNet.Validators
                                   $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is static. Benchmarks MUST be instance methods, static methods are not supported.",
                                   benchmark
                               ));
-                
+
+        private IEnumerable<ValidationError> ValidateReturnTypes(IReadOnlyList<BenchmarkCase> benchmarks)
+            => benchmarks.Where(benchmark => benchmark.Descriptor.Kind == BenchmarkKind.Scenario && !AllowedScenarioReturnTypes.Contains(benchmark.Descriptor.WorkloadMethod.ReturnType))
+                .Distinct(BenchmarkMethodEqualityComparer.Instance)
+                .Select(benchmark
+                    => new ValidationError(
+                        true,
+                        $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` has invalid return type. Scenario Benchmarks can return only {string.Join(", ", AllowedScenarioReturnTypes.Select(type => type.GetCorrectCSharpTypeName(false, false)))}.",
+                        benchmark
+                    ));
+
         private static bool IsValidCSharpIdentifier(string identifier) // F# allows to use whitespaces as names #479
             => !string.IsNullOrEmpty(identifier)
                && (char.IsLetter(identifier[0]) || identifier[0] == Underscore) // An identifier must start with a letter or an underscore
