@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Running
 
         public override int GetHashCode() => Value;
 
-        public string ToArguments() => $"--benchmarkName {FullBenchmarkName.Escape()} --job {JobId.Escape()} --benchmarkId {Value}";
+        public string ToArguments() => $"--benchmarkName {FullBenchmarkName.Escape()} --benchmarkId {Value}";
 
         public override string ToString() => Value.ToString();
     }

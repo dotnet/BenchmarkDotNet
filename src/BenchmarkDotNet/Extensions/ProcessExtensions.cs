@@ -120,7 +120,16 @@ namespace BenchmarkDotNet.Extensions
             foreach (var environmentVariable in benchmarkCase.Job.Environment.EnvironmentVariables)
                 start.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;
         }
-        
+
+        internal static void Log(this ProcessStartInfo startInfo, ILogger logger)
+        {
+            var shortExeName = startInfo.FileName.StartsWith(startInfo.WorkingDirectory)
+                ? Path.GetFileName(startInfo.FileName)
+                : startInfo.FileName;
+
+            logger.WriteLineInfo($"// {startInfo.WorkingDirectory}>{shortExeName} {startInfo.Arguments}");
+        }
+
         // the code below was copy-pasted from https://github.com/dotnet/cli/blob/0bc24bff775e22352c2309ef990281280f92dbaa/test/Microsoft.DotNet.Tools.Tests.Utilities/Extensions/ProcessExtensions.cs#L13
 
         internal static void KillTree(this Process process) => process.KillTree(DefaultKillTimeout);

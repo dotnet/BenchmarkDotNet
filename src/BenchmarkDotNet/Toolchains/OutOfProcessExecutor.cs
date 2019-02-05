@@ -1,7 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices.ComTypes;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
@@ -42,7 +41,7 @@ namespace BenchmarkDotNet.Toolchains
                 RedirectStandardInput = true,
                 RedirectStandardError = true,
                 CreateNoWindow = true,
-                WorkingDirectory = executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath,
+                WorkingDirectory = Path.GetDirectoryName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath),
                 FileName = fileName,
                 Arguments = arguments
             };
@@ -64,7 +63,7 @@ namespace BenchmarkDotNet.Toolchains
                 ConsoleExitHandler.Instance.Logger = executeParameters.Logger;
                 ConsoleExitHandler.Instance.Process = process;
 
-                executeParameters.Logger.WriteLineInfo($"// Start: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
+                process.StartInfo.Log(executeParameters.Logger);
                 executeParameters.Diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, executeParameters));
 
                 var clock = Chronometer.Start();
