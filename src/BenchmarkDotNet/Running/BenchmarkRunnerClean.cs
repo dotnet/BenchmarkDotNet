@@ -389,8 +389,8 @@ namespace BenchmarkDotNet.Running
 
                 executeResults.Add(executeResult);
 
-                var errors = executeResults.SelectMany(r => r.Data)
-                    .Union(executeResults.SelectMany(r => r.ExtraOutput))
+                var errors = executeResult.Data
+                    .Concat(executeResult.ExtraOutput)
                     .Where(line => line.StartsWith(ValidationErrorReporter.ConsoleErrorPrefix))
                     .Select(line => line.Substring(ValidationErrorReporter.ConsoleErrorPrefix.Length).Trim())
                     .ToArray();
