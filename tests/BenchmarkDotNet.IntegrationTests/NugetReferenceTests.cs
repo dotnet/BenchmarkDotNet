@@ -1,5 +1,4 @@
-﻿using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+﻿using BenchmarkDotNet.Jobs;
 using Xunit;
 using Xunit.Abstractions;
 using BenchmarkDotNet.Portability;
@@ -11,6 +10,7 @@ using BenchmarkDotNet.Toolchains.Roslyn;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Loggers;
 using System.Collections.Immutable;
+using BenchmarkDotNet.Tests.XUnit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public NuGetReferenceTests(ITestOutputHelper output) : base(output) { }
 
-        [Fact]
+        [FactNotLinux("For some reason this test is unstable on Ubuntu for both AzureDevOps and Travis CI")]
         public void UserCanSpecifyCustomNuGetPackageDependency()
         {
             var toolchain = RuntimeInformation.IsFullFramework
