@@ -1,4 +1,5 @@
 ﻿using System;
+using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
@@ -13,5 +14,7 @@ namespace BenchmarkDotNet.Attributes
         public bool Baseline { get; set; }
 
         public int OperationsPerInvoke { get; set; } = 1;
+
+        public BenchmarkKind Kind { get; set; } = BenchmarkKind.MicroBenchmark;
     }
 }

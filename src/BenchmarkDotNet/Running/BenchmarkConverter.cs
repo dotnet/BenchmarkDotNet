@@ -153,7 +153,7 @@ namespace BenchmarkDotNet.Running
                 categories: GetCategories(methodInfo),
                 operationsPerInvoke: attr.OperationsPerInvoke,
                 methodIndex: Array.IndexOf(targetMethods, methodInfo),
-                kind: methodInfo.HasAttribute<ScenarioAttribute>() ? BenchmarkKind.Scenario : BenchmarkKind.MicroBenchmark);
+                kind: attr.Kind);
 
             AssertMethodHasCorrectSignature("Benchmark", methodInfo);
             AssertMethodIsAccessible("Benchmark", methodInfo);

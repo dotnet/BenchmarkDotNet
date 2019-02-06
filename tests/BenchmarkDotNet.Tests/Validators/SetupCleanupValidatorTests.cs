@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Tests.Validators
         public class ScenarioWithSetup
         {
             [GlobalSetup] public void Setup() { }
-            [Scenario] public void Scenario() { }
+            [Benchmark(Kind = BenchmarkKind.Scenario)] public void Scenario() { }
         }
 
         [Fact]

@@ -144,8 +144,8 @@ namespace BenchmarkDotNet.Tests.Running
         [ClrJob, MonoJob, CoreJob]
         public class ScenariosAllRuntimes
         {
-            [Scenario] public void HelloWorld() => System.Console.WriteLine("Hello World!");
-            [Scenario] public void Empty() { }
+            [Benchmark(Kind = BenchmarkKind.Scenario)] public void HelloWorld() => System.Console.WriteLine("Hello World!");
+            [Benchmark(Kind = BenchmarkKind.Scenario)] public void Empty() { }
         }
     }
 }

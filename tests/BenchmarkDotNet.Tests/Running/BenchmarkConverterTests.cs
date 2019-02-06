@@ -213,7 +213,7 @@ namespace BenchmarkDotNet.Tests.Running
 
         public class WithScenarioDefaultSettings
         {
-            [Scenario]
+            [Benchmark(Kind = BenchmarkKind.Scenario)]
             public void HelloWorld() => Console.WriteLine("Hello World!");
         }
 
@@ -235,7 +235,7 @@ namespace BenchmarkDotNet.Tests.Running
         [ScenarioJob(launchCount: 123)]
         public class WithScenarioCustomSettings
         {
-            [Scenario]
+            [Benchmark(Kind = BenchmarkKind.Scenario)]
             public void HelloWorld() => Console.WriteLine("Hello World!");
         }
     }

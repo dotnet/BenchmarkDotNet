@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -14,19 +15,19 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class ValuesReturnedByScenario
         {
-            [Scenario]
+            [Benchmark(Kind = BenchmarkKind.Scenario)]
             public int AnInteger() => 0;
 
-            [Scenario]
+            [Benchmark(Kind = BenchmarkKind.Scenario)]
             public void Nothing() { }
 
-            [Scenario]
+            [Benchmark(Kind = BenchmarkKind.Scenario)]
             public Task ATask() => Task.CompletedTask;
 
-            [Scenario]
+            [Benchmark(Kind = BenchmarkKind.Scenario)]
             public Task<int> TaskOfInt() => Task.FromResult<int>(0);
 
-            [Scenario]
+            [Benchmark(Kind = BenchmarkKind.Scenario)]
             public ValueTask<int> ValueTaskTaskOfInt() => new ValueTask<int>(0);
         }
     }
