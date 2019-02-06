@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             {
                 process.StartInfo.Log(parameters.Logger);
 
-                var standardOutput = new StringBuilder(1000);
+                var standardOutput = new StringBuilder();
                 var standardError = new StringBuilder();
 
                 process.OutputDataReceived += (sender, args) => standardOutput.AppendLine(args.Data);
