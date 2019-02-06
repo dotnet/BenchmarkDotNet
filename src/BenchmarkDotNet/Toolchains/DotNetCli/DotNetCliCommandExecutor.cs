@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             {
                 parameters.Logger.WriteLineInfo($"// start {parameters.CliPath ?? "dotnet"} {parameters.Arguments} in {parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath}");
 
-                var standardOutput = new StringBuilder(1000);
+                var standardOutput = new StringBuilder();
                 var standardError = new StringBuilder();
 
                 process.OutputDataReceived += (sender, args) => standardOutput.AppendLine(args.Data);

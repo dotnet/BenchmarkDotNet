@@ -137,7 +137,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             => GetNuGetAddPackageCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
 
         internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null) 
-            => new StringBuilder(100)
+            => new StringBuilder()
                 .Append("restore ")
                 .Append(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\" ")
                 .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
@@ -146,7 +146,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .ToString();
         
         internal static string GetBuildCommand(BuildPartition buildPartition, string extraArguments = null) 
-            => new StringBuilder(100)
+            => new StringBuilder()
                 .Append($"build -c {buildPartition.BuildConfiguration} ") // we don't need to specify TFM, our auto-generated project contains always single one
                 .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .Append(extraArguments)
@@ -154,7 +154,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .ToString();
         
         internal static string GetPublishCommand(BuildPartition buildPartition, string extraArguments = null) 
-            => new StringBuilder(100)
+            => new StringBuilder()
                 .Append($"publish -c {buildPartition.BuildConfiguration} ") // we don't need to specify TFM, our auto-generated project contains always single one
                 .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .Append(extraArguments)
