@@ -19,7 +19,6 @@ using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
-using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Xunit;
 using Xunit.Abstractions;
@@ -38,7 +37,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 : new[]
                 {
                     new object[] { Job.Default.GetToolchain() },
-                    new object[] { InProcessToolchain.Instance },
+                    // new object[] { InProcessToolchain.Instance }, // this test takes a LOT of time and since we have new InProcessEmitToolchain we can disable it 
                     new object[] { InProcessEmitToolchain.Instance },
 #if NETCOREAPP2_1 
                     // we don't want to test CoreRT twice (for .NET 4.6 and Core 2.1) when running the integration tests (these tests take a lot of time)
