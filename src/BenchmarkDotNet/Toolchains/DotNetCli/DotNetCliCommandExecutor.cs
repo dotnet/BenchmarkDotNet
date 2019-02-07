@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
@@ -19,38 +18,33 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public static DotNetCliCommandResult Execute(DotNetCliCommand parameters)
         {
             using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
+            using (var outputReader = new AsyncProcessOutputReader(process))
             {
                 parameters.Logger.WriteLineInfo($"// start {parameters.CliPath ?? "dotnet"} {parameters.Arguments} in {parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath}");
 
-                var standardOutput = new StringBuilder();
-                var standardError = new StringBuilder();
-
-                process.OutputDataReceived += (sender, args) => standardOutput.AppendLine(args.Data);
-                process.ErrorDataReceived += (sender, args) => standardError.AppendLine(args.Data);
-                
                 var stopwatch = Stopwatch.StartNew();
 
                 process.Start();
-
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
+                outputReader.BeginRead();
 
                 if (!process.WaitForExit((int)parameters.Timeout.TotalMilliseconds))
                 {
                     parameters.Logger.WriteLineError($"// command took more that the timeout: {parameters.Timeout.TotalSeconds:0.##}s. Killing the process tree!");
 
+                    outputReader.CancelRead();
                     process.KillTree();
-                    
-                    return DotNetCliCommandResult.Failure(stopwatch.Elapsed, $"The configured timeout {parameters.Timeout} was reached!" + standardError.ToString(), standardOutput.ToString());
+
+                    return DotNetCliCommandResult.Failure(stopwatch.Elapsed, $"The configured timeout {parameters.Timeout} was reached!" + outputReader.GetErrorText(), outputReader.GetOutputText());
                 }
 
                 stopwatch.Stop();
+                outputReader.StopRead();
 
                 parameters.Logger.WriteLineInfo($"// command took {stopwatch.Elapsed.TotalSeconds:0.##}s and exited with {process.ExitCode}");
 
                 return process.ExitCode <= 0
-                    ? DotNetCliCommandResult.Success(stopwatch.Elapsed, standardOutput.ToString())
-                    : DotNetCliCommandResult.Failure(stopwatch.Elapsed, standardError.ToString(), standardOutput.ToString());
+                    ? DotNetCliCommandResult.Success(stopwatch.Elapsed, outputReader.GetOutputText())
+                    : DotNetCliCommandResult.Failure(stopwatch.Elapsed, outputReader.GetOutputText(), outputReader.GetErrorText());
             }
         }
         
