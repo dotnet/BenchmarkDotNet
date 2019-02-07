@@ -16,14 +16,14 @@ os:
   - linux
   - osx
 sudo: required
-dist: trusty
+dist: xenial
 osx_image: xcode9.2 # OS X 10.12
 mono: latest
 
 addons:
   apt:
     sources:
-      - llvm-toolchain-trusty-3.9
+      - llvm-toolchain-xenial-3.9
     packages: 
     - gettext
     - libcurl4-openssl-dev
