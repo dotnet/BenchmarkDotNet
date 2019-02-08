@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Toolchains;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Helpers
@@ -14,7 +15,7 @@ namespace BenchmarkDotNet.Helpers
         /// In the case of any exception, null will be returned.
         /// </summary>
         [CanBeNull]
-        internal static string RunAndReadOutput(string fileName, string arguments = "")
+        internal static string RunAndReadOutput(string fileName, string arguments = "", ILogger logger = null)
         {
             var processStartInfo = new ProcessStartInfo
             {
@@ -27,6 +28,7 @@ namespace BenchmarkDotNet.Helpers
                 RedirectStandardError = true
             };
             using (var process = new Process { StartInfo = processStartInfo })
+            using (new ConsoleExitHandler(process, logger ?? NullLogger.Instance))
             {
                 try
                 {
@@ -43,7 +45,7 @@ namespace BenchmarkDotNet.Helpers
         }
 
         internal static (int exitCode, ImmutableArray<string> output) RunAndReadOutputLineByLine(string fileName, string arguments = "", string workingDirectory = "",
-            Dictionary<string, string> environmentVariables = null, bool includeErrors = false)
+            Dictionary<string, string> environmentVariables = null, bool includeErrors = false, ILogger logger = null)
         {
             var processStartInfo = new ProcessStartInfo
             {
@@ -62,6 +64,7 @@ namespace BenchmarkDotNet.Helpers
 
             using (var process = new Process { StartInfo = processStartInfo })
             using (var outputReader = new AsyncProcessOutputReader(process))
+            using (new ConsoleExitHandler(process, logger ?? NullLogger.Instance))
             {
                 process.Start();
 
