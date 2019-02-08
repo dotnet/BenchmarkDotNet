@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.CoreRt
 {
@@ -12,6 +13,11 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         private string ilcPath;
         private bool useCppCodeGenerator;
         private string packagesRestorePath;
+#pragma warning disable 649 // we set those default values on purpose https://github.com/dotnet/BenchmarkDotNet/pull/1057#issuecomment-461832612
+        private bool rootAllApplicationAssemblies = false;
+        private bool ilcGenerateCompleteTypeMetadata = true;
+        private bool ilcGenerateStackTraceData = true;
+#pragma warning restore 649
 
         private bool isCoreRtConfigured;
 
@@ -21,6 +27,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         /// </summary>
         /// <param name="microsoftDotNetILCompilerVersion">the version of Microsoft.DotNet.ILCompiler which should be used. The default is: "1.0.0-alpha-*"</param>
         /// <param name="nuGetFeedUrl">url to NuGet CoreRT feed, The default is: "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"</param>
+        [PublicAPI]
         public CoreRtToolchainBuilder UseCoreRtNuGet(string microsoftDotNetILCompilerVersion = "1.0.0-alpha-*", string nuGetFeedUrl = "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json")
         {
             coreRtVersion = microsoftDotNetILCompilerVersion ?? throw new ArgumentNullException(nameof(microsoftDotNetILCompilerVersion));
@@ -38,6 +45,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         /// Based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built
         /// </summary>
         /// <param name="newIlcPath">the ilcPath, an example: "C:\Projects\corert\bin\Windows_NT.x64.Release"</param>
+        [PublicAPI]
         public CoreRtToolchainBuilder UseCoreRtLocal(string newIlcPath)
         {
             if (newIlcPath == null) throw new ArgumentNullException(nameof(newIlcPath));
@@ -56,6 +64,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         /// The transpiler is a lot less mature than the RyuJIT path. If you came here to give CoreRT a try" please don't use this option.
         /// Based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#using-cpp-code-generator
         /// </summary>
+        [PublicAPI]
         public CoreRtToolchainBuilder UseCppCodeGenerator()
         {
             useCppCodeGenerator = true;
@@ -66,7 +75,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         /// <summary>
         /// The directory to restore packages to (optional).
         /// </summary>
-        /// <returns></returns>
+        [PublicAPI]
         public CoreRtToolchainBuilder PackagesRestorePath(string packagesRestorePath)
         {
             this.packagesRestorePath = packagesRestorePath;
@@ -74,6 +83,48 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
             return this;
         }
 
+        /// <summary>
+        /// This controls the compiler behavior where all code in the application assemblies is considered dynamically reachable.
+        /// This option is disabled by default.
+        /// Enabling this option (true) has a significant effect on the size of the resulting executable because it prevents removal of unused code that would otherwise happen.
+        /// </summary>
+        [PublicAPI]
+        public CoreRtToolchainBuilder RootAllApplicationAssemblies(bool value)
+        {
+            rootAllApplicationAssemblies = value;
+
+            return this;
+        }
+
+        /// <summary>
+        /// This controls the generation of complete type metadata.
+        /// This option is enabled by default.
+        /// This is a compilation mode that prevents a situation where some members of a type are visible to reflection at runtime, but others aren't, because they weren't compiled.
+        /// </summary>
+        /// <param name="value"></param>
+        [PublicAPI]
+        public CoreRtToolchainBuilder IlcGenerateCompleteTypeMetadata(bool value)
+        {
+            ilcGenerateCompleteTypeMetadata = value;
+
+            return this;
+        }
+
+        /// <summary>
+        /// This controls generation of stack trace metadata that provides textual names in stack traces.
+        /// This option is enabled by default.
+        /// This is for example the text string one gets by calling Exception.ToString() on a caught exception.
+        /// With this option disabled, stack traces will still be generated, but will be based on reflection metadata alone (they might be less complete).
+        /// </summary>
+        [PublicAPI]
+        public CoreRtToolchainBuilder IlcGenerateStackTraceData(bool value)
+        {
+            ilcGenerateStackTraceData = value;
+
+            return this;
+        }
+
+        [PublicAPI]
         public override IToolchain ToToolchain()
         {
             if (!isCoreRtConfigured)
@@ -92,7 +143,11 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
                 feeds: Feeds,
                 useNuGetClearTag: useNuGetClearTag,
                 useTempFolderForRestore: useTempFolderForRestore,
-                timeout: timeout ?? TimeSpan.FromMinutes(5)); // downloading all CoreRT dependencies can take a LOT of time
+                timeout: timeout ?? TimeSpan.FromMinutes(5),  // downloading all CoreRT dependencies can take a LOT of time
+                rootAllApplicationAssemblies: rootAllApplicationAssemblies,
+                ilcGenerateCompleteTypeMetadata: ilcGenerateCompleteTypeMetadata,
+                ilcGenerateStackTraceData: ilcGenerateStackTraceData
+            );
         }
     }
 }
