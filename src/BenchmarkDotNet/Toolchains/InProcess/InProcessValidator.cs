@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 { EnvironmentMode.JitCharacteristic, ValidateEnvironment },
                 { EnvironmentMode.PlatformCharacteristic, ValidatePlatform },
                 { EnvironmentMode.RuntimeCharacteristic, ValidateEnvironment },
-                { EnvironmentMode.CacheClearingStrategyCharacteristic, DontValidate },
+                { EnvironmentMode.CleanCacheCharacteristic, DontValidate },
                 { GcMode.ServerCharacteristic, ValidateEnvironment },
                 { GcMode.ConcurrentCharacteristic, ValidateEnvironment },
                 { GcMode.CpuGroupsCharacteristic, ValidateEnvironment },

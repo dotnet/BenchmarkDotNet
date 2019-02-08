@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using JetBrains.Annotations;
 
@@ -14,7 +13,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<Runtime> RuntimeCharacteristic = CreateCharacteristic<Runtime>(nameof(Runtime));
         public static readonly Characteristic<IntPtr> AffinityCharacteristic = CreateCharacteristic<IntPtr>(nameof(Affinity));
         public static readonly Characteristic<GcMode> GcCharacteristic = CreateCharacteristic<GcMode>(nameof(Gc));
-        public static readonly Characteristic<CacheClearingStrategy> CacheClearingStrategyCharacteristic = CreateCharacteristic<CacheClearingStrategy>(nameof(CacheClearingStrategy));
+        public static readonly Characteristic<bool> CleanCacheCharacteristic = CreateCharacteristic<bool>(nameof(CleanCache));
         public static readonly Characteristic<IReadOnlyList<EnvironmentVariable>> EnvironmentVariablesCharacteristic = CreateCharacteristic<IReadOnlyList<EnvironmentVariable>>(nameof(EnvironmentVariables));
 
         public static readonly EnvironmentMode Clr = new EnvironmentMode(Runtime.Clr).Freeze();
@@ -86,10 +85,10 @@ namespace BenchmarkDotNet.Jobs
         /// <summary>
         /// The cache clearing strategy
         /// </summary>
-        public CacheClearingStrategy CacheClearingStrategy
+        public bool CleanCache
         {
-            get { return CacheClearingStrategyCharacteristic[this]; }
-            set { CacheClearingStrategyCharacteristic[this] = value; }
+            get { return CleanCacheCharacteristic[this]; }
+            set { CleanCacheCharacteristic[this] = value; }
         }
 
         /// <summary>

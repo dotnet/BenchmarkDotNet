@@ -8,7 +8,6 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Engines.CacheClearingStrategies;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
@@ -182,13 +181,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return false;
             }
 
-            var message = CacheClearingStrategiesFactory.Validate(options.CacheClearingStrategy, options.Affinity);
-            if (!string.IsNullOrEmpty(message))
-            {
-                logger.WriteLineError(message);
-                return false;
-            }
-
             return true;
         }
 
@@ -249,8 +241,8 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             if (options.Affinity.HasValue)
                 baseJob = baseJob.WithAffinity((IntPtr) options.Affinity.Value);
-            if (options.CacheClearingStrategy != CacheClearingStrategy.None)
-                baseJob = baseJob.WithCacheClearingStrategy(options.CacheClearingStrategy);
+            if (options.RunWithCleanCache)
+                baseJob = baseJob.WithCleanCache(options.RunWithCleanCache);
 
             if (options.LaunchCount.HasValue)
                 baseJob = baseJob.WithLaunchCount(options.LaunchCount.Value);

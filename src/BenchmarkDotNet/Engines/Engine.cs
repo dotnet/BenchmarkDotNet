@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Engines.CacheClearingStrategies;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -45,14 +44,15 @@ namespace BenchmarkDotNet.Engines
         private readonly EngineActualStage actualStage;
         private readonly bool includeMemoryStats;
         private readonly IntPtr? affinity;
-        private readonly ICacheClearingStrategy cacheClearingStrategy;
+        private readonly bool runWithCleanCache;
+        private readonly Action<long> CreateObjectsUnderTestForClearCpuCacheAction;
 
         internal Engine(
             IHost host,
             IResolver resolver,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeMemoryStats, Encoding encoding, string benchmarkName)
+            bool includeMemoryStats, Encoding encoding, string benchmarkName, Action<long> createObjectsUnderTestForClearCpuCacheAction)
         {
             
             Host = host;
@@ -67,6 +67,8 @@ namespace BenchmarkDotNet.Engines
             IterationSetupAction = iterationSetupAction;
             IterationCleanupAction = iterationCleanupAction;
             OperationsPerInvoke = operationsPerInvoke;
+            CreateObjectsUnderTestForClearCpuCacheAction = createObjectsUnderTestForClearCpuCacheAction;
+
             this.includeMemoryStats = includeMemoryStats;
             BenchmarkName = benchmarkName;
 
@@ -75,8 +77,7 @@ namespace BenchmarkDotNet.Engines
 
             affinity = TargetJob.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic) ? (IntPtr?) TargetJob.Job.Environment.Affinity : null;
 
-            var strategy = targetJob.ResolveValue(EnvironmentMode.CacheClearingStrategyCharacteristic, Resolver);
-            this.cacheClearingStrategy = CacheClearingStrategiesFactory.GetStrategy(strategy, affinity);
+            runWithCleanCache = targetJob.ResolveValue(EnvironmentMode.CleanCacheCharacteristic, Resolver);
             
             Clock = targetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
             ForceAllocations = targetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
@@ -131,12 +132,12 @@ namespace BenchmarkDotNet.Engines
             }
 
 // TODO Conters
-            Host.BeforeMainRun();
+//            Host.BeforeMainRun();
 
             var main = actualStage.RunWorkload(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
 
 // TODO Conters
-            Host.AfterMainRun();
+//            Host.AfterMainRun();
 
             var workGcHasDone = includeMemoryStats 
                 ? MeasureGcStats(new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor)) 
@@ -162,13 +163,20 @@ namespace BenchmarkDotNet.Engines
             if (!isOverhead)
                 IterationSetupAction();
 
+
+            if (data.IsWorkload() || isOverhead)
+            {
+                if (runWithCleanCache)
+                {
+                    CreateObjectsUnderTestForClearCpuCacheAction(invokeCount);
+                }
+
+            }
+
             if (data.IsWorkload() && data.IsActualState())
             {
-                // this line should be before GcCollect because some strategies can allocate managed memory
-                cacheClearingStrategy?.ClearCache();
-
-                // TODO Conters
-//                Host.BeforeMainRun();
+                // Move here because CreateObjectsUnderTestForClearCpuCacheAction allocate memory. I don't know if it is correct for all diagnosers
+                Host.BeforeMainRun();
             }
 
             GcCollect();
@@ -186,13 +194,13 @@ namespace BenchmarkDotNet.Engines
 
             GcCollect();
 
-//            if (data.IsWorkload() && data.IsActualState())
-//            {
-//                // TODO Conters
-////                Host.AfterMainRun();
-//            }
+            if (data.IsWorkload() && data.IsActualState())
+            {
+                // Move here because CreateObjectsUnderTestForClearCpuCacheAction allocate memory. I don't know if it is correct for all diagnosers
+                Host.AfterMainRun();
+            }
 
-            // After GcCollect?
+            // Move after GcCollect - I don't know if this is good
             if (!isOverhead)
                 IterationCleanupAction();
 
@@ -209,6 +217,11 @@ namespace BenchmarkDotNet.Engines
             // so even if we enable AppDomain monitoring in separate process
             // it does not matter, because we have already obtained the results!
             EnableMonitoring();
+
+            if (runWithCleanCache)
+            {
+                CreateObjectsUnderTestForClearCpuCacheAction(data.InvokeCount);
+            }
 
             IterationSetupAction(); // we run iteration setup first, so even if it allocates, it is not included in the results
 

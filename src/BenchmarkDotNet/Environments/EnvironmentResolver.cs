@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Environments
             Register(EnvironmentMode.JitCharacteristic, RuntimeInformation.GetCurrentJit);
             Register(EnvironmentMode.AffinityCharacteristic, RuntimeInformation.GetCurrentAffinity);
             Register(EnvironmentMode.EnvironmentVariablesCharacteristic, Array.Empty<EnvironmentVariable>);
-            Register(EnvironmentMode.CacheClearingStrategyCharacteristic, () => CacheClearingStrategy.None);
+            Register(EnvironmentMode.CleanCacheCharacteristic, () => false);
 
             // TODO: find a better place
             Register(AccuracyMode.AnalyzeLaunchVarianceCharacteristic, () => false);

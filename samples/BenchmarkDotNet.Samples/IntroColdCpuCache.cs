@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics.StatisticalTesting;
 
 namespace BenchmarkDotNet.Samples
 {
-   // [StatisticalTestColumn(StatisticalTestKind.MannWhitney, ThresholdUnit.Microseconds, 0.2, true)]
     [Config(typeof(CompareCacheClearingStrategies))]
     public class IntroColdCpuCache
     {
@@ -18,22 +17,20 @@ namespace BenchmarkDotNet.Samples
         {
             public CompareCacheClearingStrategies()
             {
-                Add(Job.ShortRun.WithCacheClearingStrategy(CacheClearingStrategy.None).AsBaseline());
-                Add(Job.ShortRun.WithCacheClearingStrategy(CacheClearingStrategy.Allocations));
+                Add(Job.ShortRun.WithIterationTime(TimeInterval.FromMilliseconds(10)).AsBaseline());
 
-                Add(Job.ShortRun.WithAffinity((IntPtr) 1).WithCacheClearingStrategy(CacheClearingStrategy.None));
-                Add(Job.ShortRun.WithAffinity((IntPtr) 1).WithCacheClearingStrategy(CacheClearingStrategy.Allocations));
-                
-                Add(HardwareCounter.CacheMisses);
+                Add(Job.ShortRun.WithCleanCache().WithIterationTime(TimeInterval.FromMilliseconds(10)));
+
                 Add(MemoryDiagnoser.Default);
+                Add(HardwareCounter.CacheMisses);
             }
         }
 
-        private const int arrayCount = 14 * 1024 * 1024; 
-        private readonly int[] array = Enumerable.Repeat(1, arrayCount).ToArray(); 
+        private const int arrayCount = 10 * 1024; // 10 KB
+        private readonly int[] array = Enumerable.Repeat(1, arrayCount).ToArray();
 
-        [Benchmark]
-        public int ArraySum()
+        [Benchmark(Description = "Clean Cache affect performance, Benchmark doesn't make allocation.")]
+        public int CleanCacheAffectsPerformance()
         {
             int result = 0;
             for (int i = 0; i < arrayCount; i += 16) // 16 because sizeof(int) = 4, 4 * 16 = 64 bytes.
@@ -44,39 +41,33 @@ namespace BenchmarkDotNet.Samples
             return result;
         }
 
-        [Benchmark]
-        public void Accessing()
+        [Benchmark(Description = "Clean Cache doesn't affect performance, Benchmark make allocation.")]
+        public int CleanCacheDoesNotAffectsPerformanceWithAllocationInBenchmark()
         {
-            for (int i = 0; i < arrayCount; i += 16) // 16 because sizeof(int) = 4, 4 * 16 = 64 bytes.
+            const int arrayCount2 = 10 * 1024; // 10 KB
+            int[] array2 = Enumerable.Repeat(1, arrayCount2).ToArray();
+
+            int result = 0;
+            for (int i = 0; i < arrayCount2; i += 16) // 16 because sizeof(int) = 4, 4 * 16 = 64 bytes.
             {
-                array[i] = 1;
+                result += array2[i];
             }
+
+            return result;
         }
 
-        private readonly int[,] tweDimensionalArray = new int[5000, 5000];
-
-        [Benchmark]
-        public void ArrayOfArrayAccessingByRows()
+        [Benchmark(Description = "Clean Cache doesn't affect performance, Benchmark doesn't make allocation.")]
+        public int CleanCacheDoesNotAffectsPerformanceWithoutAllocationInBenchmark()
         {
-            for (int i = 0; i < 5000; i++)
-            {
-                for (int j = 0; j < 5000; j++)
-                {
-                    tweDimensionalArray[i, j] = 1;
-                }
-            }
-        }
+            const int arrayCount2 = 10 * 1024; // 10 KB
 
-        [Benchmark]
-        public void ArrayOfArrayAccessingByColumns()
-        {
-            for (int i = 0; i < 5000; i++)
+            int result = 0;
+            for (int i = 0; i < arrayCount2; i += 16) // 16 because sizeof(int) = 4, 4 * 16 = 64 bytes.
             {
-                for (int j = 0; j < 5000; j++)
-                {
-                    tweDimensionalArray[j, i] = 1;
-                }
+                result += Math.Sign(i);
             }
+
+            return result;
         }
     }
 }
