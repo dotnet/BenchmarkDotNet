@@ -32,7 +32,8 @@ namespace BenchmarkDotNet.Toolchains.Mono
                 arguments: $"{monoRuntime.AotArgs} \"{Path.GetFullPath(exePath)}\"",
                 workingDirectory: Path.GetDirectoryName(exePath),
                 environmentVariables: environmentVariables,
-                includeErrors: true);
+                includeErrors: true,
+                logger: logger);
 
             return exitCode != 0
                 ? BuildResult.Failure(generateResult, $"Attempt to AOT failed: with exit code: {exitCode}, output: {string.Join(Environment.NewLine, output)}")
