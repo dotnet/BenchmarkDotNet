@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace BenchmarkDotNet.Diagnostics.Windows
+namespace BenchmarkDotNet.Helpers
 {
     // we need this class because when the Console window gets closed (by simply pressing x)
     // the managed event is not raised for CTRL_CLOSE_EVENT, more https://stackoverflow.com/questions/474679/capture-console-exit-c-sharp

@@ -7,6 +7,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Exporters;
@@ -96,6 +97,16 @@ namespace BenchmarkDotNet.Tests
             
             Assert.Equal(1, easyJob.Run.UnrollFactor);
             Assert.Equal(1, easyJob.Run.InvocationCount);
+        }
+
+        [Fact]
+        public void UserCanChooseStrategy()
+        {
+            var configEasy = ConfigParser.Parse(new[] { "--strategy", "ColdStart" }, new OutputLogger(Output)).config;
+
+            var job = configEasy.GetJobs().Single();
+
+            Assert.Equal(RunStrategy.ColdStart, job.Run.RunStrategy);
         }
 
         [FactDotNetCoreOnly("When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..")]

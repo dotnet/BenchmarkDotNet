@@ -4,6 +4,7 @@ using System.IO;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -22,6 +23,7 @@ namespace BenchmarkDotNet.Toolchains
                 return ExecuteResult.CreateExecutableNotFound();
 
             using (var process = new Process { StartInfo = CreateStartInfo(executeParameters) })
+            using (new ConsoleExitHandler(process, executeParameters.Logger))
                 return Execute(process, executeParameters);
         }
 
@@ -60,9 +62,6 @@ namespace BenchmarkDotNet.Toolchains
 
             try
             {
-                ConsoleExitHandler.Instance.Logger = executeParameters.Logger;
-                ConsoleExitHandler.Instance.Process = process;
-
                 process.StartInfo.Log(executeParameters.Logger);
                 executeParameters.Diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, executeParameters));
 
@@ -91,9 +90,6 @@ namespace BenchmarkDotNet.Toolchains
             }
             finally
             {
-                ConsoleExitHandler.Instance.Process = null;
-                ConsoleExitHandler.Instance.Logger = null;
-
                 // whether we fail or succeed we must let the diagnosers know!! MUST HAVE!!
                 executeParameters.Diagnoser?.Handle(HostSignal.AfterProcessExit, new DiagnoserActionParameters(process, executeParameters));
             }
