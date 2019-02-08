@@ -176,7 +176,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
         /// <summary>
         /// mandatory to make it possible to call GC.GetAllocatedBytesForCurrentThread() using reflection (not part of .NET Standard)
-        /// and DebuggableAttribute.
         /// </summary>
         private void GenerateReflectionFile(ArtifactsPaths artifactsPaths)
         {
@@ -185,7 +184,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <Application>
         <Assembly Name=""System.Runtime"">
             <Type Name=""System.GC"" Dynamic=""Required All"" />
-            <Type Name=""System.Diagnostics.DebuggableAttribute"" Dynamic=""Required All"" />
         </Assembly>
     </Application>
 </Directives>
