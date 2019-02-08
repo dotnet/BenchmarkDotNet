@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Diagnosers
             string monoPath = mono?.CustomPath ?? "mono";
             string arguments = $"--compile {fqnMethod} {llvmFlag} {exePath}";
 
-            (int exitCode, IReadOnlyList<string> output) = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables: environmentVariables, includeErrors: true);
+            var (exitCode, output) = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables: environmentVariables, includeErrors: true);
             string commandLine = $"{GetEnvironmentVariables(environmentVariables)} {monoPath} {arguments}";
             
             return OutputParser.Parse(output, benchmarkTarget.WorkloadMethod.Name, commandLine);

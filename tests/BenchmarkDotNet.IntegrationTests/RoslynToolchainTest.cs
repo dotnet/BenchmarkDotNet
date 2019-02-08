@@ -1,12 +1,9 @@
 ﻿using System.Globalization;
 using System.Threading;
-
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Toolchains.Roslyn;
-
 using Xunit;
 using Xunit.Abstractions;
 
