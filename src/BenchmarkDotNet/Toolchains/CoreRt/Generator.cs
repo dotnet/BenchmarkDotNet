@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -24,7 +23,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         internal Generator(string coreRtVersion, bool useCppCodeGenerator,
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string cliPath,
             string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag, 
-            bool useTempFolderForRestore, string packagesRestorePath)
+            bool useTempFolderForRestore, string packagesRestorePath,
+            bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData)
             : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore, packagesRestorePath), runtimeFrameworkVersion)
         {
             this.coreRtVersion = coreRtVersion;
@@ -43,6 +43,9 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         private readonly IReadOnlyDictionary<string, string> feeds;
         private readonly bool useNuGetClearTag;
         private readonly bool useTempFolderForRestore;
+        private readonly bool rootAllApplicationAssemblies;
+        private readonly bool ilcGenerateCompleteTypeMetadata;
+        private readonly bool ilcGenerateStackTraceData;
 
         private bool IsNuGetCoreRt => feeds.ContainsKey(CoreRtNuGetFeed) && !string.IsNullOrWhiteSpace(coreRtVersion);
 
@@ -129,6 +132,9 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
+    <RootAllApplicationAssemblies>{rootAllApplicationAssemblies}</RootAllApplicationAssemblies>
+    <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
+    <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
   </PropertyGroup>
   {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
   <ItemGroup>
@@ -159,6 +165,9 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
+    <RootAllApplicationAssemblies>{rootAllApplicationAssemblies}</RootAllApplicationAssemblies>
+    <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
+    <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
   </PropertyGroup>
   <Import Project=""$(MSBuildSDKsPath)\Microsoft.NET.Sdk\Sdk\Sdk.targets"" />
   <Import Project=""$(IlcPath)\build\Microsoft.NETCore.Native.targets"" />
@@ -176,7 +185,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
         /// <summary>
         /// mandatory to make it possible to call GC.GetAllocatedBytesForCurrentThread() using reflection (not part of .NET Standard)
-        /// and DebuggableAttribute.
         /// </summary>
         private void GenerateReflectionFile(ArtifactsPaths artifactsPaths)
         {
@@ -185,7 +193,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <Application>
         <Assembly Name=""System.Runtime"">
             <Type Name=""System.GC"" Dynamic=""Required All"" />
-            <Type Name=""System.Diagnostics.DebuggableAttribute"" Dynamic=""Required All"" />
         </Assembly>
     </Application>
 </Directives>
