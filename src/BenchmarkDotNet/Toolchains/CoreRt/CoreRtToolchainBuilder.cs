@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
@@ -13,11 +13,10 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         private string ilcPath;
         private bool useCppCodeGenerator;
         private string packagesRestorePath;
-#pragma warning disable 649 // we set those default values on purpose https://github.com/dotnet/BenchmarkDotNet/pull/1057#issuecomment-461832612
+        // we set those default values on purpose https://github.com/dotnet/BenchmarkDotNet/pull/1057#issuecomment-461832612
         private bool rootAllApplicationAssemblies = false;
         private bool ilcGenerateCompleteTypeMetadata = true;
         private bool ilcGenerateStackTraceData = true;
-#pragma warning restore 649
 
         private bool isCoreRtConfigured;
 

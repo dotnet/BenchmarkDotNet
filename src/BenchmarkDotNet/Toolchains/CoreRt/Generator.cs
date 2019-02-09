@@ -34,6 +34,9 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
             this.feeds = feeds;
             this.useNuGetClearTag = useNuGetClearTag;
             this.useTempFolderForRestore = useTempFolderForRestore;
+            this.rootAllApplicationAssemblies = rootAllApplicationAssemblies;
+            this.ilcGenerateCompleteTypeMetadata = ilcGenerateCompleteTypeMetadata;
+            this.ilcGenerateStackTraceData = ilcGenerateStackTraceData;
         }
 
         private readonly string coreRtVersion;
