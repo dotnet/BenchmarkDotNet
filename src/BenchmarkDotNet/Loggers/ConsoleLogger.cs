@@ -26,15 +26,20 @@ namespace BenchmarkDotNet.Loggers
 
         private void Write(LogKind logKind, Action<string> write, string text)
         {
+            var colorBefore = Console.ForegroundColor;
+
             try
             {
-                ConsoleColorHandler.SetForegroundColor(GetColor(logKind));
-                
+                var color = GetColor(logKind);
+                if (color != Console.ForegroundColor && color != Console.BackgroundColor)
+                    Console.ForegroundColor = color;
+
                 write(text);
             }
             finally
             {
-                ConsoleColorHandler.RestoreForegroundColor();
+                if (colorBefore != Console.ForegroundColor && colorBefore != Console.BackgroundColor)
+                    Console.ForegroundColor = colorBefore;
             }
         }
 
