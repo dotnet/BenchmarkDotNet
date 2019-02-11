@@ -13,7 +13,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     public class DotNetCliCommand
     {
-        private const string MandatoryUseSharedCompilationFalse = " /p:UseSharedCompilation=false";
+        /// <summary>
+        /// we use these settings to make sure that MSBuild does the job and simply quits without spawning any long living processes
+        /// we want to avoid "file in use" and "zombie processes" issues
+        /// </summary>
+        private const string MandatoryMsBuildSettings = " /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1";
         
         [PublicAPI] public string CliPath { get; }
             
@@ -142,7 +146,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .Append(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\" ")
                 .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .Append(extraArguments)
-                .Append(MandatoryUseSharedCompilationFalse)
+                .Append(MandatoryMsBuildSettings)
                 .ToString();
         
         internal static string GetBuildCommand(BuildPartition buildPartition, string extraArguments = null) 
@@ -150,7 +154,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .Append($"build -c {buildPartition.BuildConfiguration} ") // we don't need to specify TFM, our auto-generated project contains always single one
                 .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .Append(extraArguments)
-                .Append(MandatoryUseSharedCompilationFalse)
+                .Append(MandatoryMsBuildSettings)
                 .ToString();
         
         internal static string GetPublishCommand(BuildPartition buildPartition, string extraArguments = null) 
@@ -158,7 +162,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .Append($"publish -c {buildPartition.BuildConfiguration} ") // we don't need to specify TFM, our auto-generated project contains always single one
                 .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .Append(extraArguments)
-                .Append(MandatoryUseSharedCompilationFalse)
+                .Append(MandatoryMsBuildSettings)
                 .ToString();
 
         private static string GetCustomMsBuildArguments(BenchmarkCase benchmarkCase, IResolver resolver)

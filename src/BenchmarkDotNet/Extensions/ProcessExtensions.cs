@@ -132,14 +132,9 @@ namespace BenchmarkDotNet.Extensions
 
         public static void KillTree(this Process process, TimeSpan timeout)
         {
-            string stdout;
             if (RuntimeInformation.IsWindows())
             {
-                RunProcessAndWaitForExit(
-                    "taskkill",
-                    $"/T /F /PID {process.Id}",
-                    timeout,
-                    out stdout);
+                RunProcessAndIgnoreOutput("taskkill", $"/T /F /PID {process.Id}", timeout);
             }
             else
             {
@@ -153,14 +148,12 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        private static void GetAllChildIdsUnix(int parentId, ISet<int> children, TimeSpan timeout)
+        private static void KillProcessUnix(int processId, TimeSpan timeout)
+            => RunProcessAndIgnoreOutput("kill", $"-TERM {processId}", timeout);
+
+        private static void GetAllChildIdsUnix(int parentId, HashSet<int> children, TimeSpan timeout)
         {
-            string stdout;
-            var exitCode = RunProcessAndWaitForExit(
-                "pgrep",
-                $"-P {parentId}",
-                timeout,
-                out stdout);
+            var (exitCode, stdout) = RunProcessAndReadOutput("pgrep", $"-P {parentId}", timeout);
 
             if (exitCode == 0 && !string.IsNullOrEmpty(stdout))
             {
@@ -170,12 +163,9 @@ namespace BenchmarkDotNet.Extensions
                     {
                         var text = reader.ReadLine();
                         if (text == null)
-                        {
                             return;
-                        }
 
-                        int id;
-                        if (int.TryParse(text, out id))
+                        if (int.TryParse(text, out int id) && !children.Contains(id))
                         {
                             children.Add(id);
                             // Recursively get the children
@@ -186,17 +176,7 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        private static void KillProcessUnix(int processId, TimeSpan timeout)
-        {
-            string stdout;
-            RunProcessAndWaitForExit(
-                "kill",
-                $"-TERM {processId}",
-                timeout,
-                out stdout);
-        }
-
-        private static int RunProcessAndWaitForExit(string fileName, string arguments, TimeSpan timeout, out string stdout)
+        private static (int exitCode, string output) RunProcessAndReadOutput(string fileName, string arguments, TimeSpan timeout)
         {
             var startInfo = new ProcessStartInfo
             {
@@ -206,19 +186,40 @@ namespace BenchmarkDotNet.Extensions
                 UseShellExecute = false
             };
 
-            var process = Process.Start(startInfo);
-
-            stdout = null;
-            if (process.WaitForExit((int)timeout.TotalMilliseconds))
+            using (var process = Process.Start(startInfo))
             {
-                stdout = process.StandardOutput.ReadToEnd();
-            }
-            else
-            {
-                process.Kill();
-            }
+                if (process.WaitForExit((int)timeout.TotalMilliseconds))
+                {
+                    return (process.ExitCode, process.StandardOutput.ReadToEnd());
+                }
+                else
+                {
+                    process.Kill();
+                }
 
-            return process.ExitCode;
+                return (process.ExitCode, default);
+            }
+        }
+
+        private static int RunProcessAndIgnoreOutput(string fileName, string arguments, TimeSpan timeout)
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = fileName,
+                Arguments = arguments,
+                RedirectStandardOutput = false,
+                RedirectStandardError = false,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (var process = Process.Start(startInfo))
+            {
+                if (!process.WaitForExit((int) timeout.TotalMilliseconds))
+                    process.Kill();
+
+                return process.ExitCode;
+            }
         }
     }
 }
