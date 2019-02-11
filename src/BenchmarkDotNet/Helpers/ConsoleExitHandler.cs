@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Threading;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 
@@ -16,87 +15,46 @@ namespace BenchmarkDotNet.Helpers
             this.process = process;
             this.logger = logger;
 
+            Attach();
+        }
+
+        public void Dispose() => Detach();
+
+        private void Attach()
+        {
+            process.Exited += ProcessOnExited;
             Console.CancelKeyPress += CancelKeyPressHandlerCallback;
             AppDomain.CurrentDomain.ProcessExit += ProcessExitEventHandlerHandlerCallback;
-            NativeWindowsConsoleHelper.OnExit += CancelKeyPressHandlerCallback;
         }
 
-        public void Dispose()
+        private void Detach()
         {
-            NativeWindowsConsoleHelper.OnExit -= CancelKeyPressHandlerCallback;
-            AppDomain.CurrentDomain.ProcessExit -= ProcessExitEventHandlerHandlerCallback;
+            process.Exited -= ProcessOnExited;
             Console.CancelKeyPress -= CancelKeyPressHandlerCallback;
+            AppDomain.CurrentDomain.ProcessExit -= ProcessExitEventHandlerHandlerCallback;
         }
 
-        private void CancelKeyPressHandlerCallback(object sender, ConsoleCancelEventArgs e)
-        {
-            Console.ResetColor();
+        // the process has exited, so we detach the events
+        private void ProcessOnExited(object sender, EventArgs e) => Detach();
 
-            KillProcess();
-        }
+        // the user has clicked Ctrl+C so we kill the entire process tree
+        private void CancelKeyPressHandlerCallback(object sender, ConsoleCancelEventArgs e) => KillProcessTree();
 
-        private void ProcessExitEventHandlerHandlerCallback(object sender, EventArgs e) => KillProcess();
+        // the user has closed the console window so we kill the entire process tree
+        private void ProcessExitEventHandlerHandlerCallback(object sender, EventArgs e) => KillProcessTree();
 
-        // This method gives us a chance to make a "best-effort" to clean anything up after Ctrl-C is type in the Console
-        private void KillProcess()
+        private void KillProcessTree()
         {
             try
             {
-                //Save log to file as soon as possible. Without it, the file log will be empty if the process has already died.
-                logger.Flush();
-
-                if (HasProcessDied(process))
-                    return;
-
-                logger.WriteLineError($"Process {process.ProcessName}.exe (Id:{process.Id}) is still running, will now be killed with the entire process tree");
-                logger.Flush();
+                logger.Flush(); // Save log to file as soon as possible. Without it, the file log will be empty if the process has already died.
 
                 process.KillTree(); // we need to kill entire process tree, not just the process itself
-
-                if (HasProcessDied(process))
-                    return;
-
-                // Give it a bit of time to exit!
-                Thread.Sleep(500);
-
-                if (HasProcessDied(process))
-                    return;
-
-                var matchingProcess = Process.GetProcessById(process.Id);
-                if (HasProcessDied(matchingProcess) || HasProcessDied(process))
-                    return;
-
-                logger.WriteLineError($"Process {matchingProcess.ProcessName}.exe (Id:{matchingProcess.Id}) has not exited after being killed!");
             }
-            catch (ArgumentException)
+            catch
             {
-                // the process has died in the meantime, don't log the exception
+                // we don't care about exceptions here, it's shutdown and we just try to cleanup whatever we can
             }
-            catch (InvalidOperationException invalidOpEx)
-            {
-                logger.WriteLineError(invalidOpEx.Message);
-            }
-            catch (Exception ex)
-            {
-                logger.WriteLineError(ex.ToString());
-            }
-
-            logger.Flush();
-        }
-
-        private static bool HasProcessDied(Process process)
-        {
-            if (process == null)
-                return true;
-            try
-            {
-                return process.HasExited; // This can throw an exception
-            }
-            catch (Exception)
-            {
-                // Swallow!!
-            }
-            return true;
         }
     }
 }

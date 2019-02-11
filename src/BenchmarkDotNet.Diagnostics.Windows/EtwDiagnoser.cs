@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Helpers;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
@@ -42,8 +41,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             Session = CreateSession(parameters.BenchmarkCase);
 
             Console.CancelKeyPress += OnConsoleCancelKeyPress;
-
-            NativeWindowsConsoleHelper.OnExit += OnConsoleCancelKeyPress;
+            AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
 
             EnableProvider();
 
@@ -83,7 +81,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             Session.Dispose();
 
             Console.CancelKeyPress -= OnConsoleCancelKeyPress;
-            NativeWindowsConsoleHelper.OnExit -= OnConsoleCancelKeyPress;
+            AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
         }
 
         private void Clear()
@@ -93,6 +91,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         }
 
         private void OnConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e) => Session?.Dispose();
+
+        private void OnProcessExit(object sender, EventArgs e) => Session?.Dispose();
 
         private static string GetSessionName(string prefix, BenchmarkCase benchmarkCase, ParameterInstances parameters = null)
         {
