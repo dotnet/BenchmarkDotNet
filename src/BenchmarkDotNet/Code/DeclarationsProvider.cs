@@ -26,9 +26,9 @@ namespace BenchmarkDotNet.Code
 
         public string GlobalCleanupMethodName => GetMethodName(Descriptor.GlobalCleanupMethod);
 
-        public string IterationSetupMethodName => Descriptor.IterationSetupMethod?.Name ?? EmptyAction;
+        public string IterationSetupMethodName => GetMethodName(Descriptor.IterationSetupMethod);
 
-        public string IterationCleanupMethodName => Descriptor.IterationCleanupMethod?.Name ?? EmptyAction;
+        public string IterationCleanupMethodName => GetMethodName(Descriptor.IterationCleanupMethod);
 
         public abstract string ExtraDefines { get; }
 
@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Code
                 return $"() => ObjectUnderTest.{method.Name}().GetAwaiter().GetResult()";
             }
 
-            return method.Name;
+            return $"ObjectUnderTest.{method.Name}";
         }
     }
 
@@ -146,6 +146,9 @@ namespace BenchmarkDotNet.Code
         public override string WorkloadMethodDelegate(string passArguments)
             => $"({passArguments}) => {{ ObjectUnderTest.{Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";
 
+        public override string WorkloadMethodDelegateFromArray(string passArguments)
+            => $"({passArguments}) => {{ ObjectsUnderTest[i].{Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";
+
         public override string GetWorkloadMethodCall(string passArguments) => $"ObjectUnderTest.{Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult()";
 
         protected override Type WorkloadMethodReturnType => typeof(void);
@@ -164,6 +167,9 @@ namespace BenchmarkDotNet.Code
         // and will eventually throw actual exception, not aggregated one
         public override string WorkloadMethodDelegate(string passArguments)
             => $"({passArguments}) => {{ return ObjectUnderTest.{Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";
+
+        public override string WorkloadMethodDelegateFromArray(string passArguments) 
+        => $"({passArguments}) => {{ return ObjectsUnderTest[i].{Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";
 
         public override string GetWorkloadMethodCall(string passArguments) => $"ObjectUnderTest.{Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult()";
     }
