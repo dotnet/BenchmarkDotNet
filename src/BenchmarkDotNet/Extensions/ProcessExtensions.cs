@@ -215,7 +215,7 @@ namespace BenchmarkDotNet.Extensions
 
             using (var process = Process.Start(startInfo))
             {
-                if (!process.WaitForExit((int) timeout.TotalMilliseconds))
+                if (!process.WaitForExit((int)timeout.TotalMilliseconds))
                     process.Kill();
 
                 return process.ExitCode;

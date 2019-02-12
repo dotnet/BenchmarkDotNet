@@ -33,7 +33,8 @@ namespace BenchmarkDotNet.Exporters
         public static readonly IExporter Console = new MarkdownExporter
         {
             Dialect = nameof(Console),
-            StartOfGroupHighlightStrategy = MarkdownHighlightStrategy.None
+            StartOfGroupHighlightStrategy = MarkdownHighlightStrategy.None,
+            ColumnsStartWithSeparator = true // we want to be able to copy-paste the console output to GH #1062
         };
 
         public static readonly IExporter StackOverflow = new MarkdownExporter
