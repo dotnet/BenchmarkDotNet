@@ -6,6 +6,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -33,8 +34,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return new ExecuteResult(false, -1, Array.Empty<string>(), Array.Empty<string>());
             }
 
-            ConsoleExitHandler.Instance.Logger = executeParameters.Logger;
-
             try
             {
                 return Execute(
@@ -48,9 +47,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
             finally
             {
-                ConsoleExitHandler.Instance.Process = null;
-                ConsoleExitHandler.Instance.Logger = null;
-
                 executeParameters.Diagnoser?.Handle(
                     HostSignal.AfterProcessExit, 
                     new DiagnoserActionParameters(null, executeParameters.BenchmarkCase, executeParameters.BenchmarkId));
@@ -74,12 +70,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
             using (var process = new Process { StartInfo = startInfo })
+            using (new ConsoleExitHandler(process, logger))
             {
                 var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId);
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
-
-                ConsoleExitHandler.Instance.Process = process;
 
                 diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 

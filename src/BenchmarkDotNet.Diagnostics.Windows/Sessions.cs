@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -96,7 +95,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             };
 
             Console.CancelKeyPress += OnConsoleCancelKeyPress;
-            NativeWindowsConsoleHelper.OnExit += OnConsoleCancelKeyPress;
+            AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
         }
 
         public void Dispose() => TraceEventSession.Dispose();
@@ -106,7 +105,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             TraceEventSession.Stop();
 
             Console.CancelKeyPress -= OnConsoleCancelKeyPress;
-            NativeWindowsConsoleHelper.OnExit -= OnConsoleCancelKeyPress;
+            AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
         }
 
         internal abstract Session EnableProviders();
@@ -121,6 +120,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         }
 
         private void OnConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e) => Stop();
+
+        private void OnProcessExit(object sender, EventArgs e) => Stop();
 
         private string GetFilePath(DiagnoserActionParameters details, DateTime creationTime)
         {

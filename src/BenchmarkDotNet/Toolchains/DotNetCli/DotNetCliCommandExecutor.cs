@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using JetBrains.Annotations;
@@ -19,6 +20,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
             using (var outputReader = new AsyncProcessOutputReader(process))
+            using (new ConsoleExitHandler(process, parameters.Logger))
             {
                 parameters.Logger.WriteLineInfo($"// start {parameters.CliPath ?? "dotnet"} {parameters.Arguments} in {parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath}");
 
@@ -51,6 +53,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         internal static string GetDotNetSdkVersion()
         {
             using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version") })
+            using (new ConsoleExitHandler(process, NullLogger.Instance))
             {
                 try
                 {
