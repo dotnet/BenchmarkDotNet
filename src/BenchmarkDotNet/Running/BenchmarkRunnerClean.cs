@@ -83,6 +83,9 @@ namespace BenchmarkDotNet.Running
                         compositeLogger.WriteLine();
                         
                         results.Add(summary);
+
+                        if (benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.StopOnFirstError) && summary.Reports.Any(report => !report.Success))
+                            break;
                     }
 
                     if (supportedBenchmarks.Any(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)))
@@ -148,7 +151,6 @@ namespace BenchmarkDotNet.Running
                 if (!config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
                     artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
 
-                bool success;
                 if (buildResult.IsBuildSuccess)
                 {
                     var report = RunCore(benchmark, info.benchmarkId, logger, resolver, buildResult);
@@ -158,7 +160,8 @@ namespace BenchmarkDotNet.Running
                     if (report.GetResultRuns().Any())
                         logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr(config.Encoding));
 
-                    success = report.Success;
+                    if (!report.Success && config.Options.IsSet(ConfigOptions.StopOnFirstError))
+                        break;
                 }
                 else
                 {
@@ -169,15 +172,11 @@ namespace BenchmarkDotNet.Running
                     if (buildResult.ErrorMessage != null)
                         logger.WriteLineError($"// Build Error: {buildResult.ErrorMessage}");
 
-                    success = true;
+                    if(config.Options.IsSet(ConfigOptions.StopOnFirstError))
+                        break;
                 }
 
                 logger.WriteLine();
-
-                if (!success && config.Options.IsSet(ConfigOptions.StopOnFirstError))
-                {
-                    break;
-                }
             }
             
             var clockSpan = runChronometer.GetElapsed();
