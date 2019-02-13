@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Engines
         {
             long invokeCount = InvocationCount;
             IReadOnlyList<Measurement> idle = null;
-            
+
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.BenchmarkStart(BenchmarkName);
 
@@ -127,11 +127,8 @@ namespace BenchmarkDotNet.Engines
             var main = actualStage.RunWorkload(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
 
             Host.AfterMainRun();
+            var workGcHasDone = MeasureGcStats(invokeCount);
 
-            var workGcHasDone = includeMemoryStats 
-                ? MeasureGcStats(new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor)) 
-                : GcStats.Empty;
-            
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.BenchmarkStop(BenchmarkName);
 
@@ -177,7 +174,27 @@ namespace BenchmarkDotNet.Engines
             return measurement;
         }
 
-        private GcStats MeasureGcStats(IterationData data)
+        private GcStats MeasureGcStats(long invokeCount)
+        {
+            if (!includeMemoryStats)
+                return GcStats.Empty;
+
+            var workload = MeasureGcStats(
+                new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor),
+                WorkloadAction);
+            // workload might contain a call to allocating invocation setup/cleanup
+            // so it also has to be measured and excluded from the results
+            var overhead = MeasureGcStats(
+                new IterationData(IterationMode.Overhead, IterationStage.Actual, 0, invokeCount, UnrollFactor),
+                OverheadAction);
+
+            if (workload.TotalOperations != overhead.TotalOperations)
+                throw new InvalidOperationException("Bug in BDN");
+
+            return (workload - overhead).WithTotalOperations(workload.TotalOperations);
+        }
+
+        private GcStats MeasureGcStats(IterationData data, Action<long> action)
         {
             // we enable monitoring after main target run, for this single iteration which is executed at the end
             // so even if we enable AppDomain monitoring in separate process
@@ -188,7 +205,7 @@ namespace BenchmarkDotNet.Engines
 
             var initialGcStats = GcStats.ReadInitial();
 
-            WorkloadAction(data.InvokeCount / data.UnrollFactor);
+            action(data.InvokeCount / data.UnrollFactor);
 
             var finalGcStats = GcStats.ReadFinal();
 

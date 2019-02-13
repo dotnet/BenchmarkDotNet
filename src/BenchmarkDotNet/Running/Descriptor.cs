@@ -16,6 +16,8 @@ namespace BenchmarkDotNet.Running
         public MethodInfo GlobalCleanupMethod { get; }
         public MethodInfo IterationSetupMethod { get; }
         public MethodInfo IterationCleanupMethod { get; }
+        public MethodInfo InvocationSetupMethod { get; }
+        public MethodInfo InvocationCleanupMethod { get; }
         public string AdditionalLogic { get; }
         public int OperationsPerInvoke { get; }
         public string WorkloadMethodDisplayInfo { get; }
@@ -31,11 +33,13 @@ namespace BenchmarkDotNet.Running
 
         public Descriptor(
             Type type,
-            MethodInfo workloadMethod,              
+            MethodInfo workloadMethod,
             MethodInfo globalSetupMethod = null,
             MethodInfo globalCleanupMethod = null,
             MethodInfo iterationSetupMethod = null,
             MethodInfo iterationCleanupMethod = null,
+            MethodInfo invocationSetupMethod = null,
+            MethodInfo invocationCleanupMethod = null,
             string description = null,
             string additionalLogic = null,
             bool baseline = false,
@@ -49,6 +53,8 @@ namespace BenchmarkDotNet.Running
             GlobalCleanupMethod = globalCleanupMethod;
             IterationSetupMethod = iterationSetupMethod;
             IterationCleanupMethod = iterationCleanupMethod;
+            InvocationSetupMethod = invocationSetupMethod;
+            InvocationCleanupMethod = invocationCleanupMethod;
             OperationsPerInvoke = operationsPerInvoke;
             AdditionalLogic = additionalLogic ?? string.Empty;
             WorkloadMethodDisplayInfo = FormatDescription(description) ?? workloadMethod?.Name ?? "Untitled";

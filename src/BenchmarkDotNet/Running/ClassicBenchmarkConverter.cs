@@ -88,8 +88,10 @@ namespace BenchmarkDotNet.Running
                 {
                     var target = b.Descriptor;
                     return BenchmarkCase.Create(
-                        new Descriptor(target.Type, target.WorkloadMethod, target.GlobalSetupMethod, target.GlobalCleanupMethod,
+                        new Descriptor(target.Type, target.WorkloadMethod,
+                            target.GlobalSetupMethod, target.GlobalCleanupMethod,
                             target.IterationSetupMethod, target.IterationCleanupMethod,
+                            target.InvocationSetupMethod, target.InvocationCleanupMethod,
                             target.WorkloadMethodDisplayInfo, benchmarkContent, target.Baseline, target.Categories, target.OperationsPerInvoke),
                         b.Job,
                         b.Parameters,

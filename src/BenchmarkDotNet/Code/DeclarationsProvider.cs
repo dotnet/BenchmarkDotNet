@@ -30,6 +30,14 @@ namespace BenchmarkDotNet.Code
 
         public string IterationCleanupMethodName => Descriptor.IterationCleanupMethod?.Name ?? EmptyAction;
 
+        public string InvocationSetupMethodName => Descriptor.InvocationSetupMethod?.Name ?? EmptyAction;
+
+        public string InvocationCleanupMethodName => Descriptor.InvocationCleanupMethod?.Name ?? EmptyAction;
+
+        public string CallInvocationSetup => Descriptor.InvocationSetupMethod != null ? "invocationSetupAction();" : string.Empty;
+
+        public string CallInvocationCleanup => Descriptor.InvocationCleanupMethod != null ? "invocationCleanupAction();" : string.Empty;
+
         public abstract string ExtraDefines { get; }
 
         protected virtual Type WorkloadMethodReturnType => Descriptor.WorkloadMethod.ReturnType;
