@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Parameters
 
             // we just execute (cast)source.ToArray()[case][argumentIndex]; 
             // we know that source is IEnumerable so we can do that!
-            return $"{cast}System.Linq.Enumerable.ToArray({source.Name}{callPostfix})[{sourceIndex}]{indexPostfix};"; 
+            return $"{cast}System.Linq.Enumerable.ToArray(ObjectUnderTest.{source.Name}{callPostfix})[{sourceIndex}]{indexPostfix};"; 
         }
     }
 
@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Parameters
         {
             string cast = $"({Value.GetType().GetCorrectCSharpTypeName()})";
 
-            string instancePrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "instance";
+            string instancePrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "instance.ObjectUnderTest";
 
             string callPostfix = source is PropertyInfo ? string.Empty : "()";
 

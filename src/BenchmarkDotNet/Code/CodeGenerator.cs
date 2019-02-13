@@ -186,7 +186,7 @@ namespace BenchmarkDotNet.Code
                 string.Empty,
                 benchmarkCase.Parameters.Items
                     .Where(parameter => !parameter.IsArgument)
-                    .Select(parameter => $"{(parameter.IsStatic ? "" : "instance.ObjectUnderTest.")}{parameter.Name} = {parameter.ToSourceCode()};"));
+                    .Select(parameter => $"{(parameter.IsStatic ? benchmarkCase.Descriptor.Type.GetCorrectCSharpTypeName() : "instance.ObjectUnderTest")}.{parameter.Name} = {parameter.ToSourceCode()};"));
 
         private static string GetArgumentsDefinition(BenchmarkCase benchmarkCase)
             => string.Join(
