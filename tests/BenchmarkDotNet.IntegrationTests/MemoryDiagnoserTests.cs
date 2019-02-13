@@ -76,6 +76,10 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark] public void AllocateNothing() { }
 
+            [InvocationSetup]
+            [InvocationCleanup]
+            public void AllocateObject() => GC.KeepAlive(new object());
+
             [IterationSetup]
             [GlobalSetup]
             public void AllocatingSetUp() => AllocateUntilGcWakesUp();

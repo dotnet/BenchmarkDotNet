@@ -134,5 +134,30 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]
             public void SecondBenchmark() => Console.WriteLine(SecondBenchmarkCalled);
         }
+
+        [Fact]
+        public void InvocationSetupAndCleanupWorkAsExpected()
+            => CanExecute<WithInvocationSetupAndCleanup>();
+
+        public class WithInvocationSetupAndCleanup
+        {
+            private int setupInvocations, benchmarkInvocations, cleanupInvocations;
+
+            [InvocationSetup]
+            public void Setup() => setupInvocations++;
+
+            [Benchmark]
+            public void Benchmark() => benchmarkInvocations++;
+
+            [InvocationCleanup]
+            public void Cleanup() => cleanupInvocations++;
+
+            [GlobalCleanup]
+            public void Check()
+            {
+                if (setupInvocations != benchmarkInvocations || benchmarkInvocations != cleanupInvocations)
+                    throw new Exception("Incorrect number of invocations!");
+            }
+        }
     }
 }
