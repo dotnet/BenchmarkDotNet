@@ -126,7 +126,7 @@ namespace BenchmarkDotNet.Tests
 
             string importingRelativePath = $@"
 <Project Sdk=""Microsoft.NET.Sdk"">
-  <Import Project="".\test.props"" />
+  <Import Project="".{Path.DirectorySeparatorChar}test.props"" />
 </Project>";
 
             var sut = new CsProjGenerator("netcoreapp3.0", null, null, null);
