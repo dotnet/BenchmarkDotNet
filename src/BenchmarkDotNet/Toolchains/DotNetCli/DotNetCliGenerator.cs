@@ -84,12 +84,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
 
-        protected static string SetPlatform(string template, string platform) => template.Replace("$PLATFORM$", platform);
-
-        protected static string SetCodeFileName(string template, string codeFileName) => template.Replace("$CODEFILENAME$", codeFileName);
-
-        protected static string SetTargetFrameworkMoniker(string content, string targetFrameworkMoniker) => content.Replace("$TFM$", targetFrameworkMoniker);
-
         private static bool IsRootSolutionFolder(DirectoryInfo directoryInfo)
             => directoryInfo
                 .GetFileSystemInfos()
