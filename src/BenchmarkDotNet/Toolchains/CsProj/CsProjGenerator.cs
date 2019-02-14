@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -19,6 +20,11 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     [PublicAPI]
     public class CsProjGenerator : DotNetCliGenerator
     {
+        private const string DefaultSdkName = "Microsoft.NET.Sdk";
+
+        private static readonly ImmutableArray<string> SettingsWeWantToCopy =
+            new[] { "NetCoreAppImplicitPackageVersion", "RuntimeFrameworkVersion", "PackageTargetFallback", "LangVersion", "UseWpf" }.ToImmutableArray();
+
         public string RuntimeFrameworkVersion { get; }
 
         public CsProjGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string runtimeFrameworkVersion)
@@ -40,24 +46,30 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker);
 
-        [SuppressMessage("ReSharper", "StringLiteralTypo")]
+        [SuppressMessage("ReSharper", "StringLiteralTypo")] // R# complains about $variables$
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
-            string template = ResourceHelper.LoadTemplate("CsProj.txt");
             var benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
 
-            string platform = buildPartition.Platform.ToConfig();
-            string content = SetPlatform(template, platform);
-            content = SetCodeFileName(content, Path.GetFileName(artifactsPaths.ProgramCodePath));
-            content = content.Replace("$CSPROJPATH$", projectFile.FullName);
-            content = SetTargetFrameworkMoniker(content, TargetFrameworkMoniker);
-            content = content.Replace("$PROGRAMNAME$", artifactsPaths.ProgramName);
-            content = content.Replace("$RUNTIMESETTINGS$", GetRuntimeSettings(benchmark.Job.Environment.Gc, buildPartition.Resolver));
-            content = content.Replace("$COPIEDSETTINGS$", GetSettingsThatNeedsToBeCopied(projectFile));
-            content = content.Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration);
+            using (var file = new StreamReader(File.OpenRead(projectFile.FullName)))
+            {
+                var (customProperties, sdkName) = GetSettingsThatNeedsToBeCopied(file, projectFile);
 
-            File.WriteAllText(artifactsPaths.ProjectFilePath, content);
+                var content = new StringBuilder(ResourceHelper.LoadTemplate("CsProj.txt"))
+                    .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
+                    .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
+                    .Replace("$CSPROJPATH$", projectFile.FullName)
+                    .Replace("$TFM$", TargetFrameworkMoniker)
+                    .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
+                    .Replace("$RUNTIMESETTINGS$", GetRuntimeSettings(benchmark.Job.Environment.Gc, buildPartition.Resolver))
+                    .Replace("$COPIEDSETTINGS$", customProperties)
+                    .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
+                    .Replace("$SDKNAME$", sdkName)
+                    .ToString();
+
+                File.WriteAllText(artifactsPaths.ProjectFilePath, content);
+            }
         }
 
         /// <summary>
@@ -81,38 +93,45 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         // the host project or one of the .props file that it imports might contain some custom settings that needs to be copied, sth like
         // <NetCoreAppImplicitPackageVersion>2.0.0-beta-001607-00</NetCoreAppImplicitPackageVersion>
 	    // <RuntimeFrameworkVersion>2.0.0-beta-001607-00</RuntimeFrameworkVersion>
-        private string GetSettingsThatNeedsToBeCopied(FileInfo projectFile)
+        internal (string customProperties, string sdkName) GetSettingsThatNeedsToBeCopied(TextReader streamReader, FileInfo projectFile)
         {
             if (!string.IsNullOrEmpty(RuntimeFrameworkVersion)) // some power users knows what to configure, just do it and copy nothing more
-                return $"<RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>";
+                return ($"<RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>", DefaultSdkName);
 
-            var customSettings = new StringBuilder();
-            using (var file = new StreamReader(File.OpenRead(projectFile.FullName)))
+            var customProperties = new StringBuilder();
+            var sdkName = DefaultSdkName;
+
+            string line;
+            while ((line = streamReader.ReadLine()) != null)
             {
-                string line;
-                while ((line = file.ReadLine()) != null)
-                {
-                    if (line.Contains("NetCoreAppImplicitPackageVersion") || line.Contains("RuntimeFrameworkVersion") || line.Contains("PackageTargetFallback") || line.Contains("LangVersion"))
-                    {
-                        customSettings.Append(line);
-                    }
-                    else if (line.Contains("<Import Project"))
-                    {
-                        string propsFilePath = line.Trim().Split('"')[1]; // its sth like   <Import Project="..\..\build\common.props" />
-                        var directoryName = projectFile.DirectoryName ?? throw new DirectoryNotFoundException(projectFile.DirectoryName);
-                        string absolutePath = File.Exists(propsFilePath)
-                            ? propsFilePath // absolute path or relative to current dir
-                            : Path.Combine(directoryName, propsFilePath); // relative to csproj
+                var trimmedLine = line.Trim();
 
-                        if (File.Exists(absolutePath))
-                        {
-                            customSettings.Append(GetSettingsThatNeedsToBeCopied(new FileInfo(absolutePath)));
-                        }
-                    }
+                foreach (string setting in SettingsWeWantToCopy)
+                    if (trimmedLine.Contains(setting))
+                        customProperties.Append(trimmedLine);
+
+                if (trimmedLine.StartsWith("<Import Project"))
+                {
+                    string propsFilePath = trimmedLine.Split('"')[1]; // its sth like   <Import Project="..\..\build\common.props" />
+                    var directoryName = projectFile.DirectoryName ?? throw new DirectoryNotFoundException(projectFile.DirectoryName);
+                    string absolutePath = File.Exists(propsFilePath)
+                        ? propsFilePath // absolute path or relative to current dir
+                        : Path.Combine(directoryName, propsFilePath); // relative to csproj
+
+                    if (File.Exists(absolutePath))
+                        using (var importedFile = new StreamReader(File.OpenRead(absolutePath)))
+                            customProperties.Append(GetSettingsThatNeedsToBeCopied(importedFile, new FileInfo(absolutePath)).customProperties);
                 }
+
+                // custom SDKs are not added for non-netcoreapp apps (like net471), so when the TFM != netcoreapp we dont parse "<Import Sdk="
+                // we don't allow for that mostly to prevent from edge cases like the following
+                // <Import Sdk="Microsoft.NET.Sdk.WindowsDesktop" Project="Sdk.props" Condition="'$(TargetFramework)'=='netcoreapp3.0'"/>
+                if (trimmedLine.StartsWith("<Project Sdk=\"") 
+                    || (TargetFrameworkMoniker.StartsWith("netcoreapp", StringComparison.InvariantCultureIgnoreCase) &&  trimmedLine.StartsWith("<Import Sdk=\"")))
+                    sdkName = trimmedLine.Split('"')[1]; // its sth like Sdk="name"
             }
 
-            return customSettings.ToString();
+            return (customProperties.ToString(), sdkName);
         }
 
         /// <summary>

@@ -115,15 +115,10 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         }
 
         private string GenerateProjectForNuGetBuild(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
-<Project ToolsVersion=""15.0"">
+<Project Sdk=""Microsoft.NET.Sdk"">
   <PropertyGroup>
     <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
     <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
-  </PropertyGroup>
-
-  <Import Project=""Sdk.props"" Sdk=""Microsoft.NET.Sdk"" />
-
-  <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>{TargetFrameworkMoniker}</TargetFramework>
     <RuntimeIdentifier>{runtimeIdentifier}</RuntimeIdentifier>
@@ -150,7 +145,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   <ItemGroup>
     <RdXmlFile Include=""rd.xml"" />
   </ItemGroup>
-  <Import Project=""Sdk.targets"" Sdk=""Microsoft.NET.Sdk"" />
 </Project>";
 
         private string GenerateProjectForLocalBuild(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
