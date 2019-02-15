@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.Exporters
 
             if (ColumnsStartWithSeparator)
             {
-                logger.Write(TableHeaderSeparator.TrimStart());
+                logger.WriteStatistic(TableHeaderSeparator.TrimStart());
             }
 
             table.PrintLine(table.FullHeader, logger, string.Empty, TableHeaderSeparator);
@@ -158,7 +158,7 @@ namespace BenchmarkDotNet.Exporters
             {
                 if (ColumnsStartWithSeparator)
                 {
-                    logger.Write(TableHeaderSeparator.TrimStart());
+                    logger.WriteStatistic(TableHeaderSeparator.TrimStart());
                 }
 
                 logger.WriteLineStatistic(string.Join("",
@@ -174,7 +174,7 @@ namespace BenchmarkDotNet.Exporters
                 {
                     // Print logical separator
                     if (ColumnsStartWithSeparator)
-                        logger.Write(TableColumnSeparator.TrimStart());
+                        logger.WriteStatistic(TableColumnSeparator.TrimStart());
                     table.PrintLine(separatorLine, logger, string.Empty, TableColumnSeparator, highlightRow, false, StartOfGroupHighlightStrategy,
                         BoldMarkupFormat, false);
                 }
@@ -186,7 +186,7 @@ namespace BenchmarkDotNet.Exporters
                 }
 
                 if (ColumnsStartWithSeparator)
-                    logger.Write(TableColumnSeparator.TrimStart());
+                    logger.WriteStatistic(TableColumnSeparator.TrimStart());
 
                 table.PrintLine(line, logger, string.Empty, TableColumnSeparator, highlightRow, table.FullContentStartOfHighlightGroup[rowCounter],
                     StartOfGroupHighlightStrategy, BoldMarkupFormat, EscapeHtml);
