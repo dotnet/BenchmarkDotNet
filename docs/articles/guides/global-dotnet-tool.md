@@ -1,9 +1,9 @@
 ---
 uid: docs.dotnet-benchmarkdotnet
-name: The global BenchmarkDotNet tool 
+name: The global BenchmarkDotNet tool
 ---
 
-# BenchmarkDotNet as global dotnet tool  
+# BenchmarkDotNet as global dotnet tool
 
 BenchmarkDotNet is also available as a global dotnet tool and provides a convenient way to execute your benchmark(s) from the command line interface.
 
@@ -67,4 +67,8 @@ To execute all benchmarks use `--filter *`:
 dotnet benchmark MyAssemblyWithBenchmarks.dll --filter *
 ```
 
-**Note**: For further arguments for the `BenchmarkSwticher` see also [Console Arguments](console-args.md).
+**Note**: For further arguments for the `BenchmarkSwitcher` see also [Console Arguments](console-args.md).
+
+## Read more
+
+* [.NET Core Global Tools overview](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools)
