@@ -8,7 +8,7 @@
     <title>How to run your benchmarks | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="How to run your benchmarks | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -125,6 +125,12 @@
 <pre><code class="lang-cs">var summary = BenchmarkRunner.Run&lt;MyBenchmarkClass&gt;();
 var summary = BenchmarkRunner.Run(typeof(MyBenchmarkClass));
 </code></pre>
+<h2 id="global-dotnet-tool">Global dotnet tool</h2>
+<p>You can also run a banchmark using <code>BenchmarkDotNet.Tool</code>.</p>
+<pre><code class="lang-log">dotnet tool install -g BenchmarkDotNet.Tool
+</code></pre>
+<pre><code class="lang-log">dotnet benchmark MyAssemblyWithBenchmarks.dll --filter *
+</code></pre>
 <h2 id="url">Url</h2>
 <p>You can also run a benchmark directly from the internet:</p>
 <pre><code class="lang-cs">string url = &quot;&lt;E.g. direct link to raw content of a gist&gt;&quot;;
@@ -168,7 +174,7 @@ var summary = BenchmarkRunner.RunSource(benchmarkSource);
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

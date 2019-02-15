@@ -8,7 +8,7 @@
     <title>Orderers | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Orderers | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -153,6 +153,7 @@ namespace BenchmarkDotNet.Samples
 <h2 id="sample-introordermanual">Sample: IntroOrderManual</h2>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroOrderManual.cs">using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Attributes;
@@ -170,27 +171,24 @@ namespace BenchmarkDotNet.Samples
     {
         private class Config : ManualConfig
         {
-            public Config()
-            {
-                Set(new FastestToSlowestOrderer());
-            }
+            public Config() =&gt; Orderer = new FastestToSlowestOrderer();
 
             private class FastestToSlowestOrderer : IOrderer
             {
-                public IEnumerable&lt;BenchmarkCase&gt; GetExecutionOrder(BenchmarkCase[] benchmarksCase) =&gt;
+                public IEnumerable&lt;BenchmarkCase&gt; GetExecutionOrder(ImmutableArray&lt;BenchmarkCase&gt; benchmarksCase) =&gt;
                     from benchmark in benchmarksCase
                     orderby benchmark.Parameters[&quot;X&quot;] descending,
                         benchmark.Descriptor.WorkloadMethodDisplayInfo
                     select benchmark;
 
-                public IEnumerable&lt;BenchmarkCase&gt; GetSummaryOrder(BenchmarkCase[] benchmarksCase, Summary summary) =&gt;
+                public IEnumerable&lt;BenchmarkCase&gt; GetSummaryOrder(ImmutableArray&lt;BenchmarkCase&gt; benchmarksCase, Summary summary) =&gt;
                     from benchmark in benchmarksCase
                     orderby summary[benchmark].ResultStatistics.Mean
                     select benchmark;
 
                 public string GetHighlightGroupKey(BenchmarkCase benchmarkCase) =&gt; null;
 
-                public string GetLogicalGroupKey(IConfig config, BenchmarkCase[] allBenchmarksCases, BenchmarkCase benchmarkCase) =&gt;
+                public string GetLogicalGroupKey(ImmutableArray&lt;BenchmarkCase&gt; allBenchmarksCases, BenchmarkCase benchmarkCase) =&gt;
                     benchmarkCase.Job.DisplayInfo + &quot;_&quot; + benchmarkCase.Parameters.DisplayInfo;
 
                 public IEnumerable&lt;IGrouping&lt;string, BenchmarkCase&gt;&gt; GetLogicalGroupOrder(IEnumerable&lt;IGrouping&lt;string, BenchmarkCase&gt;&gt; logicalGroups) =&gt; 
@@ -243,7 +241,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ExecuteParameters
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -131,47 +131,23 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">ExecuteParameters</span></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.Parameters.html">BenchmarkDotNet.Toolchains.Parameters</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Toolchains_Parameters_ExecuteParameters_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ExecuteParameters</code></pre>
+    <pre><code class="lang-csharp hljs">public class ExecuteParameters : object</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
   
   
   <a id="BenchmarkDotNet_Toolchains_Parameters_ExecuteParameters__ctor_" data-uid="BenchmarkDotNet.Toolchains.Parameters.ExecuteParameters.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_Parameters_ExecuteParameters__ctor_BenchmarkDotNet_Toolchains_Results_BuildResult_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Running_BenchmarkId_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Characteristics_IResolver_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Diagnosers_IDiagnoser_" data-uid="BenchmarkDotNet.Toolchains.Parameters.ExecuteParameters.#ctor(BenchmarkDotNet.Toolchains.Results.BuildResult,BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Running.BenchmarkId,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Characteristics.IResolver,BenchmarkDotNet.Configs.IConfig,BenchmarkDotNet.Diagnosers.IDiagnoser)">ExecuteParameters(BuildResult, BenchmarkCase, BenchmarkId, ILogger, IResolver, IConfig, IDiagnoser)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_Parameters_ExecuteParameters__ctor_BenchmarkDotNet_Toolchains_Results_BuildResult_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Running_BenchmarkId_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Characteristics_IResolver_BenchmarkDotNet_Diagnosers_IDiagnoser_" data-uid="BenchmarkDotNet.Toolchains.Parameters.ExecuteParameters.#ctor(BenchmarkDotNet.Toolchains.Results.BuildResult,BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Running.BenchmarkId,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Characteristics.IResolver,BenchmarkDotNet.Diagnosers.IDiagnoser)">ExecuteParameters(BuildResult, BenchmarkCase, BenchmarkId, ILogger, IResolver, IDiagnoser)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ExecuteParameters(BuildResult buildResult, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, IResolver resolver, IConfig config, IDiagnoser diagnoser = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public ExecuteParameters(BuildResult buildResult, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, IResolver resolver, IDiagnoser diagnoser = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -206,11 +182,6 @@
       <tr>
         <td><a class="xref" href="BenchmarkDotNet.Characteristics.IResolver.html">IResolver</a></td>
         <td><span class="parametername">resolver</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
-        <td><span class="parametername">config</span></td>
         <td></td>
       </tr>
       <tr>
@@ -293,31 +264,6 @@
     <tbody>
       <tr>
         <td><a class="xref" href="BenchmarkDotNet.Toolchains.Results.BuildResult.html">BuildResult</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_Parameters_ExecuteParameters_Config_" data-uid="BenchmarkDotNet.Toolchains.Parameters.ExecuteParameters.Config*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_Parameters_ExecuteParameters_Config" data-uid="BenchmarkDotNet.Toolchains.Parameters.ExecuteParameters.Config">Config</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IConfig Config { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -421,7 +367,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

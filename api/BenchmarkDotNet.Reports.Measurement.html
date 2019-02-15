@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Struct Measurement
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -129,25 +129,7 @@
   <div class="markdown level0 conceptual"></div>
   <div classs="implements">
     <h5>Implements</h5>
-    <div><span class="xref">System.IComparable</span>&lt;<a class="xref" href="BenchmarkDotNet.Reports.Measurement.html">Measurement</a>&gt;</div>
-  </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.ValueType.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.ValueType.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
+    <div><span class="xref">IComparable</span>&lt;<a class="xref" href="BenchmarkDotNet.Reports.Measurement.html">Measurement</a>&gt;</div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Reports.html">BenchmarkDotNet.Reports</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
@@ -160,7 +142,7 @@
   
   
   <a id="BenchmarkDotNet_Reports_Measurement__ctor_" data-uid="BenchmarkDotNet.Reports.Measurement.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Measurement__ctor_System_Int32_BenchmarkDotNet_Engines_IterationMode_BenchmarkDotNet_Engines_IterationStage_System_Int32_System_Int64_System_Double_System_Text_Encoding_" data-uid="BenchmarkDotNet.Reports.Measurement.#ctor(System.Int32,BenchmarkDotNet.Engines.IterationMode,BenchmarkDotNet.Engines.IterationStage,System.Int32,System.Int64,System.Double,System.Text.Encoding)">Measurement(Int32, IterationMode, IterationStage, Int32, Int64, Double, Encoding)</h4>
+  <h4 id="BenchmarkDotNet_Reports_Measurement__ctor_System_Int32_BenchmarkDotNet_Engines_IterationMode_BenchmarkDotNet_Engines_IterationStage_System_Int32_System_Int64_System_Double_Encoding_" data-uid="BenchmarkDotNet.Reports.Measurement.#ctor(System.Int32,BenchmarkDotNet.Engines.IterationMode,BenchmarkDotNet.Engines.IterationStage,System.Int32,System.Int64,System.Double,Encoding)">Measurement(Int32, IterationMode, IterationStage, Int32, Int64, Double, Encoding)</h4>
   <div class="markdown level1 summary"><p>Creates an instance of <a class="xref" href="BenchmarkDotNet.Reports.Measurement.html">Measurement</a> struct.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -211,7 +193,7 @@
 </td>
       </tr>
       <tr>
-        <td><span class="xref">System.Text.Encoding</span></td>
+        <td><span class="xref">Encoding</span></td>
         <td><span class="parametername">encoding</span></td>
         <td><p>encoding to display value.</p>
 </td>
@@ -240,7 +222,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Text.Encoding</span></td>
+        <td><span class="xref">Encoding</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -444,7 +426,7 @@
   
   
   <a id="BenchmarkDotNet_Reports_Measurement_Parse_" data-uid="BenchmarkDotNet.Reports.Measurement.Parse*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Measurement_Parse_BenchmarkDotNet_Loggers_ILogger_System_String_System_Int32_System_Text_Encoding_" data-uid="BenchmarkDotNet.Reports.Measurement.Parse(BenchmarkDotNet.Loggers.ILogger,System.String,System.Int32,System.Text.Encoding)">Parse(ILogger, String, Int32, Encoding)</h4>
+  <h4 id="BenchmarkDotNet_Reports_Measurement_Parse_BenchmarkDotNet_Loggers_ILogger_System_String_System_Int32_Encoding_" data-uid="BenchmarkDotNet.Reports.Measurement.Parse(BenchmarkDotNet.Loggers.ILogger,System.String,System.Int32,Encoding)">Parse(ILogger, String, Int32, Encoding)</h4>
   <div class="markdown level1 summary"><p>Parses the benchmark statistics from the plain text line.</p>
 <p>E.g. given the input <code data-dev-comment-type="paramref" class="paramref">line</code>:</p>
 <p>WorkloadTarget 1: 10 op, 1005842518 ns</p>
@@ -484,7 +466,7 @@ total number of <a class="xref" href="BenchmarkDotNet.Reports.Measurement.html#B
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Text.Encoding</span></td>
+        <td><span class="xref">Encoding</span></td>
         <td><span class="parametername">encoding</span></td>
         <td><p>encoding to display value</p>
 </td>
@@ -557,11 +539,9 @@ total number of <a class="xref" href="BenchmarkDotNet.Reports.Measurement.html#B
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.ValueType.ToString()</span></div>
   <h3 id="implements">Implements</h3>
   <div>
-      <span class="xref">System.IComparable&lt;T&gt;</span>
+      <span class="xref">IComparable&lt;&gt;</span>
   </div>
   <h3 id="extensionmethods">Extension Methods</h3>
   <div>
@@ -571,7 +551,7 @@ total number of <a class="xref" href="BenchmarkDotNet.Reports.Measurement.html#B
       <a class="xref" href="BenchmarkDotNet.Reports.MeasurementExtensions.html#BenchmarkDotNet_Reports_MeasurementExtensions_GetAverageNanoseconds_BenchmarkDotNet_Reports_Measurement_">MeasurementExtensions.GetAverageNanoseconds(Measurement)</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Reports.MeasurementExtensions.html#BenchmarkDotNet_Reports_MeasurementExtensions_ToStr_BenchmarkDotNet_Reports_Measurement_System_Text_Encoding_">MeasurementExtensions.ToStr(Measurement, Encoding)</a>
+      <a class="xref" href="BenchmarkDotNet.Reports.MeasurementExtensions.html#BenchmarkDotNet_Reports_MeasurementExtensions_ToStr_BenchmarkDotNet_Reports_Measurement_Encoding_">MeasurementExtensions.ToStr(Measurement, Encoding)</a>
   </div>
   <div>
       <a class="xref" href="BenchmarkDotNet.Reports.MeasurementExtensions.html#BenchmarkDotNet_Reports_MeasurementExtensions_Is_BenchmarkDotNet_Reports_Measurement_BenchmarkDotNet_Engines_IterationMode_BenchmarkDotNet_Engines_IterationStage_">MeasurementExtensions.Is(Measurement, IterationMode, IterationStage)</a>
@@ -606,7 +586,7 @@ total number of <a class="xref" href="BenchmarkDotNet.Reports.Measurement.html#B
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

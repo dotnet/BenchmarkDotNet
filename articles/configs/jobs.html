@@ -8,7 +8,7 @@
     <title>Jobs | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Jobs | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -168,7 +168,7 @@
 </li>
 <li><code>LaunchCount</code>: how many times we should launch process with target benchmark</li>
 <li><code>WarmupCount</code>: how many warmup iterations should be performed</li>
-<li><code>TargetCount</code>: how many target iterations should be performed</li>
+<li><code>IterationCount</code>: how many target iterations should be performed (if specified, <code>BenchmarkDotNet.Jobs.RunMode.MinIterationCount</code> and <code>BenchmarkDotNet.Jobs.RunMode.MaxIterationCount</code> will be ignored)</li>
 <li><code>IterationTime</code>: desired time of a single iteration</li>
 <li><code>UnrollFactor</code>: how many times the benchmark method will be invoked per one iteration of a generated loop</li>
 <li><code>InvocationCount</code>: count of invocation in a single iteration (if specified, <code>IterationTime</code> will be ignored), must be a multiple of <code>UnrollFactor</code></li>
@@ -383,7 +383,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

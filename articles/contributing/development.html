@@ -8,7 +8,7 @@
     <title>Development | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Development | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -129,7 +129,7 @@
 </code></pre>
 <h3 id="if-the-packageproject-is-not-available-for-all-target-frameworks">If the package/project is not available for all target frameworks</h3>
 <p>Specify a conditional dependency:</p>
-<pre><code class="lang-xml">  &lt;ItemGroup Condition=&quot; '$(TargetFramework)' == 'net46' &quot;&gt;
+<pre><code class="lang-xml">  &lt;ItemGroup Condition=&quot; $(TargetFramework.StartsWith('net4')) &quot;&gt;
     &lt;ProjectReference Include=&quot;..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj&quot; /&gt;
   &lt;/ItemGroup&gt;
 </code></pre>
@@ -190,7 +190,7 @@ namespace BenchmarkDotNet.Loggers
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

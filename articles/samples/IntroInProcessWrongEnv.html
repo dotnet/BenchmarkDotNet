@@ -8,7 +8,7 @@
     <title>Sample: IntroInProcessWrongEnv | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroInProcessWrongEnv | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -121,13 +121,13 @@
 <h2 id="sample-introinprocesswrongenv">Sample: IntroInProcessWrongEnv</h2>
 
 <h3 id="source-code">Source code</h3>
-<pre><code class="lang-csharp" name="IntroInProcessWrongEnv.cs">using System.Runtime.CompilerServices;
+<pre><code class="lang-csharp" name="IntroInProcessWrongEnv.cs">using System;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.InProcess;
 
 namespace BenchmarkDotNet.Samples
@@ -141,7 +141,7 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                var wrongPlatform = RuntimeInformation.GetCurrentPlatform() == Platform.X86
+                var wrongPlatform = Environment.Is64BitProcess
                     ? Platform.X64
                     : Platform.X86;
 
@@ -208,7 +208,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

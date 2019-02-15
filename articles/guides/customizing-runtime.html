@@ -8,7 +8,7 @@
     <title>Customizing Runtime | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Customizing Runtime | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -120,14 +120,16 @@
             <article class="content wrap" id="_content" data-uid="docs.customizing-runtime">
 <h1 id="customizing-runtime">Customizing Runtime</h1>
 
-<p>Currently, we have only information about customzing Mono in this section.
-If you want to customize .NET Core, read an artcile about <a class="xref" href="../configs/toolchains.html">Toolchains</a>.</p>
+<p>Currently, we have only information about customizing Mono in this section.
+If you want to customize .NET Core, read an article about <a class="xref" href="../configs/toolchains.html">Toolchains</a>.</p>
 <hr>
 <h2 id="sample-introcustommono">Sample: IntroCustomMono</h2>
 <p>BenchmarkDotNet allows you to compare different runtimes, including Mono.
 If you apply <code>[MonoJob]</code> attribute to your class we use your default mono runtime.
 If you want to compare different versions of Mono you need to provide use the custom paths.
 You can do this today by using the overloaded ctor of MonoJob attribute or by specifying the runtime in a fluent way.</p>
+<p>The mono runtime can also operate as an ahead-of-time compiler. Using mono's AOT mode requires providing the AOT compilation
+arguments, as well as the path to mono's corlib. (See IntroCustomMonoObjectStyleAot in the below example).</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroCustomMono.cs">using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -163,6 +165,36 @@ namespace BenchmarkDotNet.Samples
                     &quot;Mono x64&quot;, @&quot;C:\Program Files\Mono\bin\mono.exe&quot;)));
                 Add(Job.ShortRun.With(new MonoRuntime(
                     &quot;Mono x86&quot;, @&quot;C:\Program Files (x86)\Mono\bin\mono.exe&quot;)));
+            }
+        }
+
+        [Benchmark]
+        public void Foo()
+        {
+            // Benchmark body
+        }
+    }
+
+    // ** Object Style, Using AOT **
+
+    [Config(typeof(Config))]
+    public class IntroCustomMonoObjectStyleAot
+    {
+        private class Config : ManualConfig
+        {
+            public void AddMono (string name, string mono_top_dir)
+            {
+                var aot_compile_args  = &quot;--aot=llvm&quot;;
+                var mono_bcl = $@&quot;{mono_top_dir}\lib\mono\4.5&quot;;
+                var mono_bin = $@&quot;{mono_top_dir}\bin\mono.exe&quot;;
+                Add(Job.ShortRun.With(new MonoRuntime(
+                    name, mono_bin, aot_compile_args, mono_bcl)));
+            }
+
+            public Config()
+            {
+                AddMono(&quot;Mono x64&quot;, @&quot;C:\Program Files\Mono&quot;);
+                AddMono(&quot;Mono x86&quot;, @&quot;C:\Program Files (x86)\Mono&quot;);
             }
         }
 
@@ -352,7 +384,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class BuildResult
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -147,28 +147,10 @@
       <a class="xref" href="BenchmarkDotNet.Toolchains.Results.GenerateResult.html#BenchmarkDotNet_Toolchains_Results_GenerateResult_ArtifactsToCleanup">GenerateResult.ArtifactsToCleanup</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Toolchains.Results.GenerateResult.html#BenchmarkDotNet_Toolchains_Results_GenerateResult_Success_BenchmarkDotNet_Toolchains_ArtifactsPaths_System_Collections_Generic_IReadOnlyCollection_System_String__">GenerateResult.Success(ArtifactsPaths, IReadOnlyCollection&lt;String&gt;)</a>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.Results.GenerateResult.html#BenchmarkDotNet_Toolchains_Results_GenerateResult_Success_BenchmarkDotNet_Toolchains_ArtifactsPaths_IReadOnlyCollection_System_String__">GenerateResult.Success(ArtifactsPaths, IReadOnlyCollection&lt;String&gt;)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Toolchains.Results.GenerateResult.html#BenchmarkDotNet_Toolchains_Results_GenerateResult_Failure_BenchmarkDotNet_Toolchains_ArtifactsPaths_System_Collections_Generic_IReadOnlyCollection_System_String__System_Exception_">GenerateResult.Failure(ArtifactsPaths, IReadOnlyCollection&lt;String&gt;, Exception)</a>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.Results.GenerateResult.html#BenchmarkDotNet_Toolchains_Results_GenerateResult_Failure_BenchmarkDotNet_Toolchains_ArtifactsPaths_IReadOnlyCollection_System_String__Exception_">GenerateResult.Failure(ArtifactsPaths, IReadOnlyCollection&lt;String&gt;, Exception)</a>
     </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.Results.html">BenchmarkDotNet.Toolchains.Results</a></h6>
@@ -181,13 +163,13 @@
   </h3>
   
   
-  <a id="BenchmarkDotNet_Toolchains_Results_BuildResult_BuildException_" data-uid="BenchmarkDotNet.Toolchains.Results.BuildResult.BuildException*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_Results_BuildResult_BuildException" data-uid="BenchmarkDotNet.Toolchains.Results.BuildResult.BuildException">BuildException</h4>
+  <a id="BenchmarkDotNet_Toolchains_Results_BuildResult_ErrorMessage_" data-uid="BenchmarkDotNet.Toolchains.Results.BuildResult.ErrorMessage*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_BuildResult_ErrorMessage" data-uid="BenchmarkDotNet.Toolchains.Results.BuildResult.ErrorMessage">ErrorMessage</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Exception BuildException { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public string ErrorMessage { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -199,7 +181,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Exception</span></td>
+        <td><span class="xref">System.String</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -234,12 +216,12 @@
   
   
   <a id="BenchmarkDotNet_Toolchains_Results_BuildResult_Failure_" data-uid="BenchmarkDotNet.Toolchains.Results.BuildResult.Failure*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_Results_BuildResult_Failure_BenchmarkDotNet_Toolchains_Results_GenerateResult_System_Exception_" data-uid="BenchmarkDotNet.Toolchains.Results.BuildResult.Failure(BenchmarkDotNet.Toolchains.Results.GenerateResult,System.Exception)">Failure(GenerateResult, Exception)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_BuildResult_Failure_BenchmarkDotNet_Toolchains_Results_GenerateResult_Exception_" data-uid="BenchmarkDotNet.Toolchains.Results.BuildResult.Failure(BenchmarkDotNet.Toolchains.Results.GenerateResult,Exception)">Failure(GenerateResult, Exception)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static BuildResult Failure(GenerateResult generateResult, Exception exception = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public static BuildResult Failure(GenerateResult generateResult, Exception exception)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -257,8 +239,55 @@
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Exception</span></td>
+        <td><span class="xref">Exception</span></td>
         <td><span class="parametername">exception</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.Results.BuildResult.html">BuildResult</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_Results_BuildResult_Failure_" data-uid="BenchmarkDotNet.Toolchains.Results.BuildResult.Failure*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_BuildResult_Failure_BenchmarkDotNet_Toolchains_Results_GenerateResult_System_String_" data-uid="BenchmarkDotNet.Toolchains.Results.BuildResult.Failure(BenchmarkDotNet.Toolchains.Results.GenerateResult,System.String)">Failure(GenerateResult, String)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BuildResult Failure(GenerateResult generateResult, string errorMessage)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.Results.GenerateResult.html">GenerateResult</a></td>
+        <td><span class="parametername">generateResult</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">errorMessage</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -371,7 +400,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

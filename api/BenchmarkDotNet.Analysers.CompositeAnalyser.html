@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class CompositeAnalyser
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -135,47 +135,23 @@
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Analysers.html">BenchmarkDotNet.Analysers</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Analysers_CompositeAnalyser_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class CompositeAnalyser : IAnalyser</code></pre>
+    <pre><code class="lang-csharp hljs">public class CompositeAnalyser : object, IAnalyser</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
   
   
   <a id="BenchmarkDotNet_Analysers_CompositeAnalyser__ctor_" data-uid="BenchmarkDotNet.Analysers.CompositeAnalyser.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Analysers_CompositeAnalyser__ctor_BenchmarkDotNet_Analysers_IAnalyser___" data-uid="BenchmarkDotNet.Analysers.CompositeAnalyser.#ctor(BenchmarkDotNet.Analysers.IAnalyser[])">CompositeAnalyser(IAnalyser[])</h4>
+  <h4 id="BenchmarkDotNet_Analysers_CompositeAnalyser__ctor_ImmutableHashSet_BenchmarkDotNet_Analysers_IAnalyser__" data-uid="BenchmarkDotNet.Analysers.CompositeAnalyser.#ctor(ImmutableHashSet{BenchmarkDotNet.Analysers.IAnalyser})">CompositeAnalyser(ImmutableHashSet&lt;IAnalyser&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public CompositeAnalyser(IAnalyser[] analysers)</code></pre>
+    <pre><code class="lang-csharp hljs">public CompositeAnalyser(ImmutableHashSet&lt;IAnalyser&gt; analysers)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -188,7 +164,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a>[]</td>
+        <td><span class="xref">ImmutableHashSet</span>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a>&gt;</td>
         <td><span class="parametername">analysers</span></td>
         <td></td>
       </tr>
@@ -260,7 +236,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.Conclusion.html">Conclusion</a>&gt;</td>
+        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.Conclusion.html">Conclusion</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -293,7 +269,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

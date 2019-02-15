@@ -8,7 +8,7 @@
     <title>Toolchains | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Toolchains | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -219,73 +219,6 @@ Jit=RyuJit
 <h2 id="corerun">CoreRun</h2>
 <p>To use CoreRun for running the benchmarks you need to use <code>--coreRun</code>command line argument. You can combine it with <code>--cli</code> described above. This is most probably the easiest and most reliable way of running benchmarks against local CoreFX/CoreCLR builds.</p>
 <p>Example: <code>dotnet run -c Release -- --coreRun &quot;C:\Projects\corefx\bin\testhost\netcoreapp-Windows_NT-Release-x64\shared\Microsoft.NETCore.App\9.9.9\CoreRun.exe&quot;</code></p>
-<h2 id="custom-coreclr-and-corefx">Custom CoreCLR and CoreFX</h2>
-<p>BenchmarkDotNet allows the users to run their benchmarks against ANY CoreCLR and CoreFX builds. You can compare your local build vs MyGet feed or Debug vs Release or one version vs another.</p>
-<p>To avoid problems described <a href="https://github.com/dotnet/coreclr/blob/master/Documentation/workflow/UsingDotNetCli.md#update-coreclr-using-runtime-nuget-package">here</a> a temporary folder is used when restoring packages for local builds. This is why it takes 20-30s in total to build the benchmarks.</p>
-<p>Sample config:</p>
-<pre><code class="lang-cs">public class LocalCoreClrConfig : ManualConfig
-{
-    public LocalCoreClrConfig()
-    {
-        Add(Job.ShortRun.With(
-            CustomCoreClrToolchain.CreateBuilder()
-                .DisplayName(&quot;local builds&quot;)
-                .UseCoreClrLocalBuild(&quot;2.1.0-preview2-26313-0&quot;, @&quot;C:\Projects\forks\coreclr\bin\Product\Windows_NT.x64.Release\.nuget\pkg&quot;, @&quot;C:\Projects\coreclr\packages&quot;)
-                .UseCoreFxLocalBuild(&quot;4.5.0-preview2-26313-0&quot;, @&quot;C:\Projects\forks\corefx\bin\packages\Release&quot;)
-                .ToToolchain()));
-
-        Add(Job.ShortRun.With(
-            CustomCoreClrToolchain.CreateBuilder()
-                .DisplayName(&quot;local coreclr myget corefx&quot;)
-                .UseCoreClrLocalBuild(&quot;2.1.0-preview2-26313-0&quot;, @&quot;C:\Projects\forks\coreclr\bin\Product\Windows_NT.x64.Release\.nuget\pkg&quot;, @&quot;C:\Projects\coreclr\packages&quot;)
-                .UseCoreFxNuGet(&quot;4.5.0-preview2-26215-01&quot;)
-                .ToToolchain()));
-
-        Add(Job.ShortRun.With(
-            CustomCoreClrToolchain.CreateBuilder()
-                .DisplayName(&quot;myget coreclr local corefx&quot;)
-                .UseCoreClrNuGet(&quot;2.1.0-preview2-26214-07&quot;)
-                .UseCoreFxLocalBuild(&quot;4.5.0-preview2-26313-0&quot;, @&quot;C:\Projects\forks\corefx\bin\packages\Release&quot;)
-                .ToToolchain()));
-
-        Add(Job.ShortRun.With(
-            CustomCoreClrToolchain.CreateBuilder()
-                .DisplayName(&quot;myget builds&quot;)
-                .UseCoreClrNuGet(&quot;2.1.0-preview2-26214-07&quot;)
-                .UseCoreFxNuGet(&quot;4.5.0-preview2-26215-01&quot;)
-                .ToToolchain()));
-
-        Add(DefaultConfig.Instance.GetExporters().ToArray());
-        Add(DefaultConfig.Instance.GetLoggers().ToArray());
-        Add(DefaultConfig.Instance.GetColumnProviders().ToArray());
-
-        Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, recursiveDepth: 2)));
-    }
-}
-</code></pre>
-<p>The <code>CustomCoreClrToolchainBuilder</code> offers some extra customization features for our power users:</p>
-<ul>
-<li><code>UseCoreClrDefault()</code> tells the toolchain to use the default CoreClr (for given dotnet cli and moniker), emits no direct dependency to NETCore.Runtime.CoreCLR package</li>
-<li><code>UseCoreFxDefault()</code> tells the toolchain to use the default CoreFx (for given dotnet cli and moniker), emits no direct dependency to NetCore.App package</li>
-<li><code>AdditionalNuGetFeed(string, string)</code> it allows you to define an additional NuGet feed</li>
-<li><code>UseNuGetClearTag(bool)</code> emits clear tag in the auto-generated NuGet.config file</li>
-<li><code>TargetFrameworkMoniker(string)</code> TFM, netcoreapp2.1 is the default</li>
-<li><code>DotNetCli(string)</code> if not provided, the one from PATH will be used</li>
-<li><code>RuntimeIdentifier(string)</code> if not provided, portable OS-arch will be used (example: &quot;win-x64&quot;, &quot;linux-x86&quot;)</li>
-<li><code>RuntimeFrameworkVersion(string)</code> optional, when set it's copied to the generated .csproj file</li>
-<li><code>UseTempFolderForRestore(bool)</code> restore to temp folder to keep your CI clean or install same package many times (perhaps with different content but same version number), by default true for local builds</li>
-</ul>
-<p>To make sure that you are running against the expected version of CoreCLR and CoreFX you just need to check the CoreCLR and CoreFX version numbers in the output:</p>
-<pre><code>BenchmarkDotNet=v0.10.12.20180215-develop, OS=Windows 10 Redstone 3 [1709, Fall Creators Update] (10.0.16299.192)
-Intel Core i7-3687U CPU 2.10GHz (Ivy Bridge), 1 CPU, 4 logical cores and 2 physical cores
-Frequency=2533308 Hz, Resolution=394.7408 ns, Timer=TSC
-.NET Core SDK=2.1.300-preview2-008162
-  [Host]     : .NET Core 2.0.5 (CoreCLR 4.6.26020.03, CoreFX 4.6.26018.01), 64bit RyuJIT
-  Job-DHYYZE : .NET Core ? (CoreCLR 4.6.26313.0, CoreFX 4.6.26313.0), 64bit RyuJIT
-  Job-VGTPFY : .NET Core ? (CoreCLR 4.6.26313.0, CoreFX 4.6.26215.01), 64bit RyuJIT
-  Job-IYZFNW : .NET Core ? (CoreCLR 4.6.26214.07, CoreFX 4.6.26215.01), 64bit RyuJIT
-  Job-CTQFFQ : .NET Core ? (CoreCLR 4.6.26214.07, CoreFX 4.6.26313.0), 64bit RyuJIT
-</code></pre>
 <hr>
 <h2 id="sample-introinprocess">Sample: IntroInProcess</h2>
 <p>InProcessToolchain is our toolchain which does not generate any new executable.
@@ -357,13 +290,13 @@ namespace BenchmarkDotNet.Samples
 <hr>
 <h2 id="sample-introinprocesswrongenv">Sample: IntroInProcessWrongEnv</h2>
 <h3 id="source-code">Source code</h3>
-<pre><code class="lang-csharp" name="IntroInProcessWrongEnv.cs">using System.Runtime.CompilerServices;
+<pre><code class="lang-csharp" name="IntroInProcessWrongEnv.cs">using System;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.InProcess;
 
 namespace BenchmarkDotNet.Samples
@@ -377,7 +310,7 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                var wrongPlatform = RuntimeInformation.GetCurrentPlatform() == Platform.X86
+                var wrongPlatform = Environment.Is64BitProcess
                     ? Platform.X64
                     : Platform.X86;
 
@@ -504,7 +437,7 @@ public class TheTypeWithBenchmarks
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

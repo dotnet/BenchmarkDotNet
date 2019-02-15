@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class BenchmarkBuildInfo
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -131,47 +131,23 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">BenchmarkBuildInfo</span></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Running.html">BenchmarkDotNet.Running</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Running_BenchmarkBuildInfo_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class BenchmarkBuildInfo</code></pre>
+    <pre><code class="lang-csharp hljs">public class BenchmarkBuildInfo : object</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
   
   
   <a id="BenchmarkDotNet_Running_BenchmarkBuildInfo__ctor_" data-uid="BenchmarkDotNet.Running.BenchmarkBuildInfo.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Running_BenchmarkBuildInfo__ctor_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Configs_ReadOnlyConfig_System_Int32_" data-uid="BenchmarkDotNet.Running.BenchmarkBuildInfo.#ctor(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Configs.ReadOnlyConfig,System.Int32)">BenchmarkBuildInfo(BenchmarkCase, ReadOnlyConfig, Int32)</h4>
+  <h4 id="BenchmarkDotNet_Running_BenchmarkBuildInfo__ctor_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Configs_ImmutableConfig_System_Int32_" data-uid="BenchmarkDotNet.Running.BenchmarkBuildInfo.#ctor(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Configs.ImmutableConfig,System.Int32)">BenchmarkBuildInfo(BenchmarkCase, ImmutableConfig, Int32)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public BenchmarkBuildInfo(BenchmarkCase benchmarkCase, ReadOnlyConfig config, int id)</code></pre>
+    <pre><code class="lang-csharp hljs">public BenchmarkBuildInfo(BenchmarkCase benchmarkCase, ImmutableConfig config, int id)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -189,7 +165,7 @@
         <td></td>
       </tr>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ReadOnlyConfig.html">ReadOnlyConfig</a></td>
+        <td><a class="xref" href="BenchmarkDotNet.Configs.ImmutableConfig.html">ImmutableConfig</a></td>
         <td><span class="parametername">config</span></td>
         <td></td>
       </tr>
@@ -235,7 +211,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ReadOnlyConfig Config { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public ImmutableConfig Config { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -247,7 +223,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ReadOnlyConfig.html">ReadOnlyConfig</a></td>
+        <td><a class="xref" href="BenchmarkDotNet.Configs.ImmutableConfig.html">ImmutableConfig</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -301,7 +277,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

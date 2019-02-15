@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class BaselineColumn
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -135,35 +135,11 @@
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Columns.IColumn.html">IColumn</a></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Columns.html">BenchmarkDotNet.Columns</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Columns_BaselineColumn_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class BaselineColumn : IColumn</code></pre>
+    <pre><code class="lang-csharp hljs">public class BaselineColumn : object, IColumn</code></pre>
   </div>
   <h3 id="fields">Fields
   </h3>
@@ -445,12 +421,12 @@
   
   
   <a id="BenchmarkDotNet_Columns_BaselineColumn_GetValue_" data-uid="BenchmarkDotNet.Columns.BaselineColumn.GetValue*"></a>
-  <h4 id="BenchmarkDotNet_Columns_BaselineColumn_GetValue_BenchmarkDotNet_Reports_Summary_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Reports_ISummaryStyle_" data-uid="BenchmarkDotNet.Columns.BaselineColumn.GetValue(BenchmarkDotNet.Reports.Summary,BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Reports.ISummaryStyle)">GetValue(Summary, BenchmarkCase, ISummaryStyle)</h4>
+  <h4 id="BenchmarkDotNet_Columns_BaselineColumn_GetValue_BenchmarkDotNet_Reports_Summary_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Reports_SummaryStyle_" data-uid="BenchmarkDotNet.Columns.BaselineColumn.GetValue(BenchmarkDotNet.Reports.Summary,BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Reports.SummaryStyle)">GetValue(Summary, BenchmarkCase, SummaryStyle)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string GetValue(Summary summary, BenchmarkCase benchmarkCase, ISummaryStyle style)</code></pre>
+    <pre><code class="lang-csharp hljs">public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -473,7 +449,7 @@
         <td></td>
       </tr>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Reports.ISummaryStyle.html">ISummaryStyle</a></td>
+        <td><a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></td>
         <td><span class="parametername">style</span></td>
         <td></td>
       </tr>
@@ -587,10 +563,6 @@
   <div>
       <a class="xref" href="BenchmarkDotNet.Columns.IColumn.html">IColumn</a>
   </div>
-  <h3 id="extensionmethods">Extension Methods</h3>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Columns.ColumnExtensions.html#BenchmarkDotNet_Columns_ColumnExtensions_ToProvider_BenchmarkDotNet_Columns_IColumn_">ColumnExtensions.ToProvider(IColumn)</a>
-  </div>
 </article>
           </div>
           
@@ -615,7 +587,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

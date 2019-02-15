@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class SummaryStyle
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -131,53 +131,68 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">SummaryStyle</span></div>
   </div>
-  <div classs="implements">
-    <h5>Implements</h5>
-    <div><a class="xref" href="BenchmarkDotNet.Reports.ISummaryStyle.html">ISummaryStyle</a></div>
-  </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Reports.html">BenchmarkDotNet.Reports</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Reports_SummaryStyle_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class SummaryStyle : ISummaryStyle</code></pre>
+    <pre><code class="lang-csharp hljs">public class SummaryStyle : IEquatable&lt;SummaryStyle&gt;</code></pre>
   </div>
-  <h3 id="properties">Properties
+  <h3 id="constructors">Constructors
   </h3>
   
   
-  <a id="BenchmarkDotNet_Reports_SummaryStyle_Default_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.Default*"></a>
+  <a id="BenchmarkDotNet_Reports_SummaryStyle__ctor_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.#ctor*"></a>
+  <h4 id="BenchmarkDotNet_Reports_SummaryStyle__ctor_System_Boolean_BenchmarkDotNet_Columns_SizeUnit_BenchmarkDotNet_Horology_TimeUnit_System_Boolean_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Boolean,BenchmarkDotNet.Columns.SizeUnit,BenchmarkDotNet.Horology.TimeUnit,System.Boolean)">SummaryStyle(Boolean, SizeUnit, TimeUnit, Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SummaryStyle(bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">printUnitsInHeader</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Columns.SizeUnit.html">SizeUnit</a></td>
+        <td><span class="parametername">sizeUnit</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Horology.TimeUnit.html">TimeUnit</a></td>
+        <td><span class="parametername">timeUnit</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">printUnitsInContent</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
   <h4 id="BenchmarkDotNet_Reports_SummaryStyle_Default" data-uid="BenchmarkDotNet.Reports.SummaryStyle.Default">Default</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static SummaryStyle Default { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public static readonly SummaryStyle Default</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
+  <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -192,6 +207,8 @@
       </tr>
     </tbody>
   </table>
+  <h3 id="properties">Properties
+  </h3>
   
   
   <a id="BenchmarkDotNet_Reports_SummaryStyle_PrintUnitsInContent_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.PrintUnitsInContent*"></a>
@@ -200,7 +217,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool PrintUnitsInContent { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool PrintUnitsInContent { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -225,7 +242,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool PrintUnitsInHeader { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool PrintUnitsInHeader { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -250,7 +267,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public SizeUnit SizeUnit { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public SizeUnit SizeUnit { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -275,7 +292,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TimeUnit TimeUnit { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public TimeUnit TimeUnit { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -296,13 +313,122 @@
   </h3>
   
   
+  <a id="BenchmarkDotNet_Reports_SummaryStyle_Equals_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.Equals*"></a>
+  <h4 id="BenchmarkDotNet_Reports_SummaryStyle_Equals_BenchmarkDotNet_Reports_SummaryStyle_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.Equals(BenchmarkDotNet.Reports.SummaryStyle)">Equals(SummaryStyle)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Equals(SummaryStyle other)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></td>
+        <td><span class="parametername">other</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Reports_SummaryStyle_Equals_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.Equals*"></a>
+  <h4 id="BenchmarkDotNet_Reports_SummaryStyle_Equals_System_Object_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.Equals(System.Object)">Equals(Object)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool Equals(object obj)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Reports_SummaryStyle_GetHashCode_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.GetHashCode*"></a>
+  <h4 id="BenchmarkDotNet_Reports_SummaryStyle_GetHashCode" data-uid="BenchmarkDotNet.Reports.SummaryStyle.GetHashCode">GetHashCode()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override int GetHashCode()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Reports_SummaryStyle_WithSizeUnit_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.WithSizeUnit*"></a>
   <h4 id="BenchmarkDotNet_Reports_SummaryStyle_WithSizeUnit_BenchmarkDotNet_Columns_SizeUnit_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.WithSizeUnit(BenchmarkDotNet.Columns.SizeUnit)">WithSizeUnit(SizeUnit)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ISummaryStyle WithSizeUnit(SizeUnit sizeUnit)</code></pre>
+    <pre><code class="lang-csharp hljs">public SummaryStyle WithSizeUnit(SizeUnit sizeUnit)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -331,7 +457,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Reports.ISummaryStyle.html">ISummaryStyle</a></td>
+        <td><a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -344,7 +470,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ISummaryStyle WithTimeUnit(TimeUnit timeUnit)</code></pre>
+    <pre><code class="lang-csharp hljs">public SummaryStyle WithTimeUnit(TimeUnit timeUnit)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -373,15 +499,107 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Reports.ISummaryStyle.html">ISummaryStyle</a></td>
+        <td><a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></td>
         <td></td>
       </tr>
     </tbody>
   </table>
-  <h3 id="implements">Implements</h3>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Reports.ISummaryStyle.html">ISummaryStyle</a>
+  <h3 id="operators">Operators
+  </h3>
+  
+  
+  <a id="BenchmarkDotNet_Reports_SummaryStyle_op_Equality_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.op_Equality*"></a>
+  <h4 id="BenchmarkDotNet_Reports_SummaryStyle_op_Equality_BenchmarkDotNet_Reports_SummaryStyle_BenchmarkDotNet_Reports_SummaryStyle_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.op_Equality(BenchmarkDotNet.Reports.SummaryStyle,BenchmarkDotNet.Reports.SummaryStyle)">Equality(SummaryStyle, SummaryStyle)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator ==(SummaryStyle left, SummaryStyle right)</code></pre>
   </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Reports_SummaryStyle_op_Inequality_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.op_Inequality*"></a>
+  <h4 id="BenchmarkDotNet_Reports_SummaryStyle_op_Inequality_BenchmarkDotNet_Reports_SummaryStyle_BenchmarkDotNet_Reports_SummaryStyle_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.op_Inequality(BenchmarkDotNet.Reports.SummaryStyle,BenchmarkDotNet.Reports.SummaryStyle)">Inequality(SummaryStyle, SummaryStyle)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator !=(SummaryStyle left, SummaryStyle right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
 </article>
           </div>
           
@@ -406,7 +624,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

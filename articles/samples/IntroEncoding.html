@@ -8,7 +8,7 @@
     <title>Sample: IntroEncoding | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroEncoding | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -162,10 +162,7 @@ namespace BenchmarkDotNet.Samples
     {
         private class Config : ManualConfig
         {
-            public Config()
-            {
-                Set(Encoding.Unicode);
-            }
+            public Config() =&gt; Encoding = Encoding.Unicode;
         }
 
         [Benchmark]
@@ -249,7 +246,7 @@ Skewness = 0.12, Kurtosis = 1.56, MValue = 2
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

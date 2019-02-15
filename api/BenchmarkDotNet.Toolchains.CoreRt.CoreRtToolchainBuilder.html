@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class CoreRtToolchainBuilder
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -144,9 +144,6 @@
       <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_customDotNetCliPath">CustomDotNetCliToolchainBuilder.customDotNetCliPath</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_targetFrameworkMoniker">CustomDotNetCliToolchainBuilder.targetFrameworkMoniker</a>
-    </div>
-    <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_displayName">CustomDotNetCliToolchainBuilder.displayName</a>
     </div>
     <div>
@@ -171,6 +168,9 @@
       <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_TargetFrameworkMoniker_System_String_">CustomDotNetCliToolchainBuilder.TargetFrameworkMoniker(String)</a>
     </div>
     <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_GetTargetFrameworkMoniker">CustomDotNetCliToolchainBuilder.GetTargetFrameworkMoniker()</a>
+    </div>
+    <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_DotNetCli_System_String_">CustomDotNetCliToolchainBuilder.DotNetCli(String)</a>
     </div>
     <div>
@@ -186,31 +186,10 @@
       <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_UseTempFolderForRestore_System_Boolean_">CustomDotNetCliToolchainBuilder.UseTempFolderForRestore(Boolean)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_Timeout_System_TimeSpan_">CustomDotNetCliToolchainBuilder.Timeout(TimeSpan)</a>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_Timeout_TimeSpan_">CustomDotNetCliToolchainBuilder.Timeout(TimeSpan)</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_GetPortableRuntimeIdentifier">CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier()</a>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
     </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.CoreRt.html">BenchmarkDotNet.Toolchains.CoreRt</a></h6>
@@ -231,6 +210,185 @@
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static CoreRtToolchainBuilder Create()</code></pre>
   </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchainBuilder.html">CoreRtToolchainBuilder</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_CoreRt_CoreRtToolchainBuilder_IlcGenerateCompleteTypeMetadata_" data-uid="BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchainBuilder.IlcGenerateCompleteTypeMetadata*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_CoreRt_CoreRtToolchainBuilder_IlcGenerateCompleteTypeMetadata_System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchainBuilder.IlcGenerateCompleteTypeMetadata(System.Boolean)">IlcGenerateCompleteTypeMetadata(Boolean)</h4>
+  <div class="markdown level1 summary"><p>This controls the generation of complete type metadata.
+This option is enabled by default.
+This is a compilation mode that prevents a situation where some members of a type are visible to reflection at runtime, but others aren't, because they weren't compiled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CoreRtToolchainBuilder IlcGenerateCompleteTypeMetadata(bool value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchainBuilder.html">CoreRtToolchainBuilder</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_CoreRt_CoreRtToolchainBuilder_IlcGenerateStackTraceData_" data-uid="BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchainBuilder.IlcGenerateStackTraceData*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_CoreRt_CoreRtToolchainBuilder_IlcGenerateStackTraceData_System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchainBuilder.IlcGenerateStackTraceData(System.Boolean)">IlcGenerateStackTraceData(Boolean)</h4>
+  <div class="markdown level1 summary"><p>This controls generation of stack trace metadata that provides textual names in stack traces.
+This option is enabled by default.
+This is for example the text string one gets by calling Exception.ToString() on a caught exception.
+With this option disabled, stack traces will still be generated, but will be based on reflection metadata alone (they might be less complete).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CoreRtToolchainBuilder IlcGenerateStackTraceData(bool value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchainBuilder.html">CoreRtToolchainBuilder</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_CoreRt_CoreRtToolchainBuilder_PackagesRestorePath_" data-uid="BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchainBuilder.PackagesRestorePath*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_CoreRt_CoreRtToolchainBuilder_PackagesRestorePath_System_String_" data-uid="BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchainBuilder.PackagesRestorePath(System.String)">PackagesRestorePath(String)</h4>
+  <div class="markdown level1 summary"><p>The directory to restore packages to (optional).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CoreRtToolchainBuilder PackagesRestorePath(string packagesRestorePath)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">packagesRestorePath</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchainBuilder.html">CoreRtToolchainBuilder</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_CoreRt_CoreRtToolchainBuilder_RootAllApplicationAssemblies_" data-uid="BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchainBuilder.RootAllApplicationAssemblies*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_CoreRt_CoreRtToolchainBuilder_RootAllApplicationAssemblies_System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchainBuilder.RootAllApplicationAssemblies(System.Boolean)">RootAllApplicationAssemblies(Boolean)</h4>
+  <div class="markdown level1 summary"><p>This controls the compiler behavior where all code in the application assemblies is considered dynamically reachable.
+This option is disabled by default.
+Enabling this option (true) has a significant effect on the size of the resulting executable because it prevents removal of unused code that would otherwise happen.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CoreRtToolchainBuilder RootAllApplicationAssemblies(bool value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
@@ -421,7 +579,7 @@ Based on <a href="https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

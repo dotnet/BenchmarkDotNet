@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class BenchmarkCase
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -131,31 +131,6 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">BenchmarkCase</span></div>
   </div>
-  <div classs="implements">
-    <h5>Implements</h5>
-    <div><span class="xref">System.IComparable</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</div>
-  </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Running.html">BenchmarkDotNet.Running</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Running_BenchmarkCase_syntax">Syntax</h5>
@@ -164,6 +139,31 @@
   </div>
   <h3 id="properties">Properties
   </h3>
+  
+  
+  <a id="BenchmarkDotNet_Running_BenchmarkCase_Config_" data-uid="BenchmarkDotNet.Running.BenchmarkCase.Config*"></a>
+  <h4 id="BenchmarkDotNet_Running_BenchmarkCase_Config" data-uid="BenchmarkDotNet.Running.BenchmarkCase.Config">Config</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ImmutableConfig Config { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Configs.ImmutableConfig.html">ImmutableConfig</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="BenchmarkDotNet_Running_BenchmarkCase_Descriptor_" data-uid="BenchmarkDotNet.Running.BenchmarkCase.Descriptor*"></a>
@@ -386,12 +386,12 @@
   
   
   <a id="BenchmarkDotNet_Running_BenchmarkCase_Create_" data-uid="BenchmarkDotNet.Running.BenchmarkCase.Create*"></a>
-  <h4 id="BenchmarkDotNet_Running_BenchmarkCase_Create_BenchmarkDotNet_Running_Descriptor_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Parameters_ParameterInstances_" data-uid="BenchmarkDotNet.Running.BenchmarkCase.Create(BenchmarkDotNet.Running.Descriptor,BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Parameters.ParameterInstances)">Create(Descriptor, Job, ParameterInstances)</h4>
+  <h4 id="BenchmarkDotNet_Running_BenchmarkCase_Create_BenchmarkDotNet_Running_Descriptor_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Parameters_ParameterInstances_BenchmarkDotNet_Configs_ImmutableConfig_" data-uid="BenchmarkDotNet.Running.BenchmarkCase.Create(BenchmarkDotNet.Running.Descriptor,BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Parameters.ParameterInstances,BenchmarkDotNet.Configs.ImmutableConfig)">Create(Descriptor, Job, ParameterInstances, ImmutableConfig)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static BenchmarkCase Create(Descriptor descriptor, Job job, ParameterInstances parameters)</code></pre>
+    <pre><code class="lang-csharp hljs">public static BenchmarkCase Create(Descriptor descriptor, Job job, ParameterInstances parameters, ImmutableConfig config)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -416,6 +416,11 @@
       <tr>
         <td><a class="xref" href="BenchmarkDotNet.Parameters.ParameterInstances.html">ParameterInstances</a></td>
         <td><span class="parametername">parameters</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Configs.ImmutableConfig.html">ImmutableConfig</a></td>
+        <td><span class="parametername">config</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -460,12 +465,6 @@
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.Object.ToString()</span></div>
-  <h3 id="implements">Implements</h3>
-  <div>
-      <span class="xref">System.IComparable&lt;T&gt;</span>
-  </div>
 </article>
           </div>
           
@@ -490,7 +489,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

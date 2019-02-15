@@ -8,7 +8,7 @@
     <title>Parameterization | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Parameterization | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -220,8 +220,8 @@ Just use complex types as you wish and override <code>ToString</code> method to 
 <li><code>Nullable&lt;T&gt;</code>, where <code>T</code> is an enum or boolean</li>
 </ul>
 <h3 id="source-code">Source code</h3>
-<pre><code class="lang-csharp" name="IntroParamsAllValues.cs">using System.Threading;
-using BenchmarkDotNet.Attributes;
+<pre><code class="lang-csharp" name="IntroParamsAllValues.cs">using BenchmarkDotNet.Attributes;
+using System.Threading;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -230,9 +230,9 @@ namespace BenchmarkDotNet.Samples
     {
         public enum CustomEnum
         {
-            A,
-            BB,
-            CCC
+            One = 1,
+            Two,
+            Three
         }
 
         [ParamsAllValues]
@@ -245,23 +245,23 @@ namespace BenchmarkDotNet.Samples
         public void Benchmark()
         {
             Thread.Sleep(
-                E.ToString().Length * 100 +
+                (int)E * 100 +
                 (B == true ? 20 : B == false ? 10 : 0));
         }
     }
 }
 </code></pre><h3 id="output">Output</h3>
-<pre><code class="lang-markdown">    Method |   E |     B |     Mean | Error |
----------- |---- |------ |---------:|------:|
- Benchmark |   A |     ? | 101.9 ms |    NA |
- Benchmark |   A | False | 111.9 ms |    NA |
- Benchmark |   A |  True | 122.3 ms |    NA |
- Benchmark |  BB |     ? | 201.5 ms |    NA |
- Benchmark |  BB | False | 211.8 ms |    NA |
- Benchmark |  BB |  True | 221.4 ms |    NA |
- Benchmark | CCC |     ? | 301.8 ms |    NA |
- Benchmark | CCC | False | 312.3 ms |    NA |
- Benchmark | CCC |  True | 322.2 ms |    NA |
+<pre><code class="lang-markdown">    Method |     E |     B |     Mean | Error |
+---------- |------ |------ |---------:|------:|
+ Benchmark |   One |     ? | 101.4 ms |    NA |
+ Benchmark |   One | False | 111.1 ms |    NA |
+ Benchmark |   One |  True | 122.0 ms |    NA |
+ Benchmark |   Two |     ? | 201.3 ms |    NA |
+ Benchmark |   Two | False | 212.1 ms |    NA |
+ Benchmark |   Two |  True | 221.3 ms |    NA |
+ Benchmark | Three |     ? | 301.4 ms |    NA |
+ Benchmark | Three | False | 311.5 ms |    NA |
+ Benchmark | Three |  True | 320.8 ms |    NA |
 
 // * Legends *
   E     : Value of the 'E' parameter
@@ -513,7 +513,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

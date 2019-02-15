@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class JobExtensions
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -131,35 +131,11 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">JobExtensions</span></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Jobs.html">BenchmarkDotNet.Jobs</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Jobs_JobExtensions_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static class JobExtensions</code></pre>
+    <pre><code class="lang-csharp hljs">public static class JobExtensions : object</code></pre>
   </div>
   <h3 id="methods">Methods
   </h3>
@@ -722,7 +698,7 @@ Monitoring: no overhead evaluating, with several target iterations. Perfect for 
   
   
   <a id="BenchmarkDotNet_Jobs_JobExtensions_With_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_With_BenchmarkDotNet_Jobs_Job_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Jobs_Argument__" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With(BenchmarkDotNet.Jobs.Job,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.Argument})">With(Job, IReadOnlyList&lt;Argument&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_With_BenchmarkDotNet_Jobs_Job_IReadOnlyList_BenchmarkDotNet_Jobs_Argument__" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With(BenchmarkDotNet.Jobs.Job,IReadOnlyList{BenchmarkDotNet.Jobs.Argument})">With(Job, IReadOnlyList&lt;Argument&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -745,7 +721,7 @@ Monitoring: no overhead evaluating, with several target iterations. Perfect for 
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.Argument.html">Argument</a>&gt;</td>
+        <td><span class="xref">IReadOnlyList</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.Argument.html">Argument</a>&gt;</td>
         <td><span class="parametername">arguments</span></td>
         <td></td>
       </tr>
@@ -769,7 +745,7 @@ Monitoring: no overhead evaluating, with several target iterations. Perfect for 
   
   
   <a id="BenchmarkDotNet_Jobs_JobExtensions_With_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_With_BenchmarkDotNet_Jobs_Job_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Jobs_EnvironmentVariable__" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With(BenchmarkDotNet.Jobs.Job,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable})">With(Job, IReadOnlyList&lt;EnvironmentVariable&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_With_BenchmarkDotNet_Jobs_Job_IReadOnlyList_BenchmarkDotNet_Jobs_EnvironmentVariable__" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With(BenchmarkDotNet.Jobs.Job,IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable})">With(Job, IReadOnlyList&lt;EnvironmentVariable&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -792,7 +768,7 @@ Monitoring: no overhead evaluating, with several target iterations. Perfect for 
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>&gt;</td>
+        <td><span class="xref">IReadOnlyList</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>&gt;</td>
         <td><span class="parametername">environmentVariables</span></td>
         <td></td>
       </tr>
@@ -816,7 +792,7 @@ Monitoring: no overhead evaluating, with several target iterations. Perfect for 
   
   
   <a id="BenchmarkDotNet_Jobs_JobExtensions_WithAffinity_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithAffinity*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithAffinity_BenchmarkDotNet_Jobs_Job_System_IntPtr_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithAffinity(BenchmarkDotNet.Jobs.Job,System.IntPtr)">WithAffinity(Job, IntPtr)</h4>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithAffinity_BenchmarkDotNet_Jobs_Job_IntPtr_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithAffinity(BenchmarkDotNet.Jobs.Job,IntPtr)">WithAffinity(Job, IntPtr)</h4>
   <div class="markdown level1 summary"><p>ProcessorAffinity for the benchmark process.
 See also: <a href="https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx">https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx</a></p>
 </div>
@@ -841,7 +817,7 @@ See also: <a href="https://msdn.microsoft.com/library/system.diagnostics.process
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.IntPtr</span></td>
+        <td><span class="xref">IntPtr</span></td>
         <td><span class="parametername">affinity</span></td>
         <td></td>
       </tr>
@@ -1554,8 +1530,7 @@ If specified, it must be a multiple of <a class="xref" href="BenchmarkDotNet.Job
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Obsolete(&quot;Please use the new WithBaseline instead&quot;)]
-public static Job WithIsBaseline(this Job job, bool value)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Job WithIsBaseline(this Job job, bool value)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -2188,7 +2163,7 @@ The default value is 6</p>
   
   
   <a id="BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithNuGet*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_BenchmarkDotNet_Jobs_Job_System_Collections_Generic_IReadOnlyCollection_BenchmarkDotNet_Jobs_NuGetReference__" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,System.Collections.Generic.IReadOnlyCollection{BenchmarkDotNet.Jobs.NuGetReference})">WithNuGet(Job, IReadOnlyCollection&lt;NuGetReference&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_BenchmarkDotNet_Jobs_Job_IReadOnlyCollection_BenchmarkDotNet_Jobs_NuGetReference__" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,IReadOnlyCollection{BenchmarkDotNet.Jobs.NuGetReference})">WithNuGet(Job, IReadOnlyCollection&lt;NuGetReference&gt;)</h4>
   <div class="markdown level1 summary"><p>Runs the job with a specific NuGet dependencies which will be resolved during the Job build process</p>
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -2212,7 +2187,7 @@ The default value is 6</p>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyCollection</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.NuGetReference.html">NuGetReference</a>&gt;</td>
+        <td><span class="xref">IReadOnlyCollection</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.NuGetReference.html">NuGetReference</a>&gt;</td>
         <td><span class="parametername">nuGetReferences</span></td>
         <td><p>A collection of NuGet dependencies</p>
 </td>
@@ -2394,8 +2369,7 @@ The default value is 6</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Obsolete(&quot;Please use the new WithOutlierMode instead&quot;)]
-public static Job WithRemoveOutliers(this Job job, bool value)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Job WithRemoveOutliers(this Job job, bool value)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -2442,8 +2416,7 @@ public static Job WithRemoveOutliers(this Job job, bool value)</code></pre>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Obsolete(&quot;Please use WithIterationCount instead (rename)&quot;)]
-public static Job WithTargetCount(this Job job, int count)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Job WithTargetCount(this Job job, int count)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -2603,7 +2576,7 @@ The default value is 16.</p>
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

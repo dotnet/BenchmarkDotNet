@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class DefaultOrderer
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -135,35 +135,11 @@
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Order.IOrderer.html">IOrderer</a></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Order.html">BenchmarkDotNet.Order</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Order_DefaultOrderer_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class DefaultOrderer : IOrderer</code></pre>
+    <pre><code class="lang-csharp hljs">public class DefaultOrderer : object, IOrderer</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -257,12 +233,12 @@
   
   
   <a id="BenchmarkDotNet_Order_DefaultOrderer_GetExecutionOrder_" data-uid="BenchmarkDotNet.Order.DefaultOrderer.GetExecutionOrder*"></a>
-  <h4 id="BenchmarkDotNet_Order_DefaultOrderer_GetExecutionOrder_BenchmarkDotNet_Running_BenchmarkCase___" data-uid="BenchmarkDotNet.Order.DefaultOrderer.GetExecutionOrder(BenchmarkDotNet.Running.BenchmarkCase[])">GetExecutionOrder(BenchmarkCase[])</h4>
+  <h4 id="BenchmarkDotNet_Order_DefaultOrderer_GetExecutionOrder_ImmutableArray_BenchmarkDotNet_Running_BenchmarkCase__" data-uid="BenchmarkDotNet.Order.DefaultOrderer.GetExecutionOrder(ImmutableArray{BenchmarkDotNet.Running.BenchmarkCase})">GetExecutionOrder(ImmutableArray&lt;BenchmarkCase&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;BenchmarkCase&gt; GetExecutionOrder(BenchmarkCase[] benchmarksCase)</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;BenchmarkCase&gt; GetExecutionOrder(ImmutableArray&lt;BenchmarkCase&gt; benchmarkCases)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -275,8 +251,8 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>[]</td>
-        <td><span class="parametername">benchmarksCase</span></td>
+        <td><span class="xref">ImmutableArray</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td><span class="parametername">benchmarkCases</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -291,7 +267,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -341,12 +317,12 @@
   
   
   <a id="BenchmarkDotNet_Order_DefaultOrderer_GetLogicalGroupKey_" data-uid="BenchmarkDotNet.Order.DefaultOrderer.GetLogicalGroupKey*"></a>
-  <h4 id="BenchmarkDotNet_Order_DefaultOrderer_GetLogicalGroupKey_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Running_BenchmarkCase___BenchmarkDotNet_Running_BenchmarkCase_" data-uid="BenchmarkDotNet.Order.DefaultOrderer.GetLogicalGroupKey(BenchmarkDotNet.Configs.IConfig,BenchmarkDotNet.Running.BenchmarkCase[],BenchmarkDotNet.Running.BenchmarkCase)">GetLogicalGroupKey(IConfig, BenchmarkCase[], BenchmarkCase)</h4>
+  <h4 id="BenchmarkDotNet_Order_DefaultOrderer_GetLogicalGroupKey_ImmutableArray_BenchmarkDotNet_Running_BenchmarkCase__BenchmarkDotNet_Running_BenchmarkCase_" data-uid="BenchmarkDotNet.Order.DefaultOrderer.GetLogicalGroupKey(ImmutableArray{BenchmarkDotNet.Running.BenchmarkCase},BenchmarkDotNet.Running.BenchmarkCase)">GetLogicalGroupKey(ImmutableArray&lt;BenchmarkCase&gt;, BenchmarkCase)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string GetLogicalGroupKey(IConfig config, BenchmarkCase[] allBenchmarksCases, BenchmarkCase benchmarkCase)</code></pre>
+    <pre><code class="lang-csharp hljs">public string GetLogicalGroupKey(ImmutableArray&lt;BenchmarkCase&gt; allBenchmarksCases, BenchmarkCase benchmarkCase)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -359,12 +335,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
-        <td><span class="parametername">config</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>[]</td>
+        <td><span class="xref">ImmutableArray</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
         <td><span class="parametername">allBenchmarksCases</span></td>
         <td></td>
       </tr>
@@ -393,7 +364,7 @@
   
   
   <a id="BenchmarkDotNet_Order_DefaultOrderer_GetLogicalGroupOrder_" data-uid="BenchmarkDotNet.Order.DefaultOrderer.GetLogicalGroupOrder*"></a>
-  <h4 id="BenchmarkDotNet_Order_DefaultOrderer_GetLogicalGroupOrder_System_Collections_Generic_IEnumerable_System_Linq_IGrouping_System_String_BenchmarkDotNet_Running_BenchmarkCase___" data-uid="BenchmarkDotNet.Order.DefaultOrderer.GetLogicalGroupOrder(System.Collections.Generic.IEnumerable{System.Linq.IGrouping{System.String,BenchmarkDotNet.Running.BenchmarkCase}})">GetLogicalGroupOrder(IEnumerable&lt;IGrouping&lt;String, BenchmarkCase&gt;&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Order_DefaultOrderer_GetLogicalGroupOrder_IEnumerable_IGrouping_System_String_BenchmarkDotNet_Running_BenchmarkCase___" data-uid="BenchmarkDotNet.Order.DefaultOrderer.GetLogicalGroupOrder(IEnumerable{IGrouping{System.String,BenchmarkDotNet.Running.BenchmarkCase}})">GetLogicalGroupOrder(IEnumerable&lt;IGrouping&lt;String, BenchmarkCase&gt;&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -411,7 +382,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<span class="xref">System.Linq.IGrouping</span>&lt;<span class="xref">System.String</span>, <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;&gt;</td>
+        <td><span class="xref">IEnumerable</span>&lt;<span class="xref">IGrouping</span>&lt;<span class="xref">System.String</span>, <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;&gt;</td>
         <td><span class="parametername">logicalGroups</span></td>
         <td></td>
       </tr>
@@ -427,7 +398,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<span class="xref">System.Linq.IGrouping</span>&lt;<span class="xref">System.String</span>, <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;&gt;</td>
+        <td><span class="xref">IEnumerable</span>&lt;<span class="xref">IGrouping</span>&lt;<span class="xref">System.String</span>, <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -435,12 +406,12 @@
   
   
   <a id="BenchmarkDotNet_Order_DefaultOrderer_GetSummaryOrder_" data-uid="BenchmarkDotNet.Order.DefaultOrderer.GetSummaryOrder*"></a>
-  <h4 id="BenchmarkDotNet_Order_DefaultOrderer_GetSummaryOrder_BenchmarkDotNet_Running_BenchmarkCase___BenchmarkDotNet_Reports_Summary_" data-uid="BenchmarkDotNet.Order.DefaultOrderer.GetSummaryOrder(BenchmarkDotNet.Running.BenchmarkCase[],BenchmarkDotNet.Reports.Summary)">GetSummaryOrder(BenchmarkCase[], Summary)</h4>
+  <h4 id="BenchmarkDotNet_Order_DefaultOrderer_GetSummaryOrder_ImmutableArray_BenchmarkDotNet_Running_BenchmarkCase__BenchmarkDotNet_Reports_Summary_" data-uid="BenchmarkDotNet.Order.DefaultOrderer.GetSummaryOrder(ImmutableArray{BenchmarkDotNet.Running.BenchmarkCase},BenchmarkDotNet.Reports.Summary)">GetSummaryOrder(ImmutableArray&lt;BenchmarkCase&gt;, Summary)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;BenchmarkCase&gt; GetSummaryOrder(BenchmarkCase[] benchmarksCase, Summary summary)</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;BenchmarkCase&gt; GetSummaryOrder(ImmutableArray&lt;BenchmarkCase&gt; benchmarksCases, Summary summary)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -453,8 +424,8 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>[]</td>
-        <td><span class="parametername">benchmarksCase</span></td>
+        <td><span class="xref">ImmutableArray</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td><span class="parametername">benchmarksCases</span></td>
         <td></td>
       </tr>
       <tr>
@@ -474,7 +445,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -482,12 +453,12 @@
   
   
   <a id="BenchmarkDotNet_Order_DefaultOrderer_GetSummaryOrderForGroup_" data-uid="BenchmarkDotNet.Order.DefaultOrderer.GetSummaryOrderForGroup*"></a>
-  <h4 id="BenchmarkDotNet_Order_DefaultOrderer_GetSummaryOrderForGroup_BenchmarkDotNet_Running_BenchmarkCase___BenchmarkDotNet_Reports_Summary_" data-uid="BenchmarkDotNet.Order.DefaultOrderer.GetSummaryOrderForGroup(BenchmarkDotNet.Running.BenchmarkCase[],BenchmarkDotNet.Reports.Summary)">GetSummaryOrderForGroup(BenchmarkCase[], Summary)</h4>
+  <h4 id="BenchmarkDotNet_Order_DefaultOrderer_GetSummaryOrderForGroup_ImmutableArray_BenchmarkDotNet_Running_BenchmarkCase__BenchmarkDotNet_Reports_Summary_" data-uid="BenchmarkDotNet.Order.DefaultOrderer.GetSummaryOrderForGroup(ImmutableArray{BenchmarkDotNet.Running.BenchmarkCase},BenchmarkDotNet.Reports.Summary)">GetSummaryOrderForGroup(ImmutableArray&lt;BenchmarkCase&gt;, Summary)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected virtual IEnumerable&lt;BenchmarkCase&gt; GetSummaryOrderForGroup(BenchmarkCase[] benchmarksCase, Summary summary)</code></pre>
+    <pre><code class="lang-csharp hljs">protected virtual IEnumerable&lt;BenchmarkCase&gt; GetSummaryOrderForGroup(ImmutableArray&lt;BenchmarkCase&gt; benchmarksCase, Summary summary)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -500,7 +471,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>[]</td>
+        <td><span class="xref">ImmutableArray</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
         <td><span class="parametername">benchmarksCase</span></td>
         <td></td>
       </tr>
@@ -521,7 +492,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -554,7 +525,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

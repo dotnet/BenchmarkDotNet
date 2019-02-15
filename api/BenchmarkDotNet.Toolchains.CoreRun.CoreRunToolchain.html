@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class CoreRunToolchain
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -135,45 +135,24 @@
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.CoreRun.html">BenchmarkDotNet.Toolchains.CoreRun</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Toolchains_CoreRun_CoreRunToolchain_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class CoreRunToolchain : IToolchain</code></pre>
+    <pre><code class="lang-csharp hljs">public class CoreRunToolchain : object, IToolchain</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
   
   
   <a id="BenchmarkDotNet_Toolchains_CoreRun_CoreRunToolchain__ctor_" data-uid="BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_CoreRun_CoreRunToolchain__ctor_System_IO_FileInfo_System_Boolean_System_String_System_IO_FileInfo_System_IO_DirectoryInfo_System_String_System_Nullable_System_TimeSpan__" data-uid="BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.#ctor(System.IO.FileInfo,System.Boolean,System.String,System.IO.FileInfo,System.IO.DirectoryInfo,System.String,System.Nullable{System.TimeSpan})">CoreRunToolchain(FileInfo, Boolean, String, FileInfo, DirectoryInfo, String, Nullable&lt;TimeSpan&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_CoreRun_CoreRunToolchain__ctor_FileInfo_System_Boolean_System_String_FileInfo_DirectoryInfo_System_String_System_Nullable_TimeSpan__" data-uid="BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.#ctor(FileInfo,System.Boolean,System.String,FileInfo,DirectoryInfo,System.String,System.Nullable{TimeSpan})">CoreRunToolchain(FileInfo, Boolean, String, FileInfo, DirectoryInfo, String, Nullable&lt;TimeSpan&gt;)</h4>
   <div class="markdown level1 summary"><p>creates a CoreRunToolchain which is using provided CoreRun to execute .NET Core apps</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public CoreRunToolchain(FileInfo coreRun, bool createCopy = true, string targetFrameworkMoniker = &quot;netcoreapp2.1&quot;, FileInfo customDotNetCliPath = null, DirectoryInfo restorePath = null, string displayName = &quot;CoreRun&quot;, TimeSpan? timeout = default(TimeSpan? ))</code></pre>
+    <pre><code class="lang-csharp hljs">public CoreRunToolchain(FileInfo coreRun, bool createCopy = true, string targetFrameworkMoniker = &quot;netcoreapp2.1&quot;, FileInfo customDotNetCliPath = null, DirectoryInfo restorePath = null, string displayName = &quot;CoreRun&quot;, TimeSpan? timeout = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -186,7 +165,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td><span class="xref">FileInfo</span></td>
         <td><span class="parametername">coreRun</span></td>
         <td><p>the path to CoreRun</p>
 </td>
@@ -204,13 +183,13 @@
 </td>
       </tr>
       <tr>
-        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td><span class="xref">FileInfo</span></td>
         <td><span class="parametername">customDotNetCliPath</span></td>
         <td><p>path to dotnet cli, if not provided the one from PATH will be used</p>
 </td>
       </tr>
       <tr>
-        <td><span class="xref">System.IO.DirectoryInfo</span></td>
+        <td><span class="xref">DirectoryInfo</span></td>
         <td><span class="parametername">restorePath</span></td>
         <td><p>the directory to restore packages to</p>
 </td>
@@ -222,7 +201,7 @@
 </td>
       </tr>
       <tr>
-        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.TimeSpan</span>&gt;</td>
+        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">TimeSpan</span>&gt;</td>
         <td><span class="parametername">timeout</span></td>
         <td><p>the timeout for building the benchmarks</p>
 </td>
@@ -276,7 +255,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td><span class="xref">FileInfo</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -301,7 +280,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td><span class="xref">FileInfo</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -358,6 +337,31 @@
   </table>
   
   
+  <a id="BenchmarkDotNet_Toolchains_CoreRun_CoreRunToolchain_IsInProcess_" data-uid="BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.IsInProcess*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_CoreRun_CoreRunToolchain_IsInProcess" data-uid="BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.IsInProcess">IsInProcess</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsInProcess { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Toolchains_CoreRun_CoreRunToolchain_Name_" data-uid="BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.Name*"></a>
   <h4 id="BenchmarkDotNet_Toolchains_CoreRun_CoreRunToolchain_Name" data-uid="BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.Name">Name</h4>
   <div class="markdown level1 summary"></div>
@@ -401,7 +405,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.IO.DirectoryInfo</span></td>
+        <td><span class="xref">DirectoryInfo</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -426,7 +430,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td><span class="xref">FileInfo</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -510,8 +514,6 @@
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.Object.ToString()</span></div>
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a>
@@ -540,7 +542,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

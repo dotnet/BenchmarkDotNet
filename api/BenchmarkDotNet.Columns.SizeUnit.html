@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class SizeUnit
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -131,35 +131,11 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">SizeUnit</span></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Columns.html">BenchmarkDotNet.Columns</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Columns_SizeUnit_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class SizeUnit</code></pre>
+    <pre><code class="lang-csharp hljs">public class SizeUnit : IEquatable&lt;SizeUnit&gt;</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -479,6 +455,90 @@
   </table>
   
   
+  <a id="BenchmarkDotNet_Columns_SizeUnit_Equals_" data-uid="BenchmarkDotNet.Columns.SizeUnit.Equals*"></a>
+  <h4 id="BenchmarkDotNet_Columns_SizeUnit_Equals_BenchmarkDotNet_Columns_SizeUnit_" data-uid="BenchmarkDotNet.Columns.SizeUnit.Equals(BenchmarkDotNet.Columns.SizeUnit)">Equals(SizeUnit)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Equals(SizeUnit other)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Columns.SizeUnit.html">SizeUnit</a></td>
+        <td><span class="parametername">other</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Columns_SizeUnit_Equals_" data-uid="BenchmarkDotNet.Columns.SizeUnit.Equals*"></a>
+  <h4 id="BenchmarkDotNet_Columns_SizeUnit_Equals_System_Object_" data-uid="BenchmarkDotNet.Columns.SizeUnit.Equals(System.Object)">Equals(Object)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool Equals(object obj)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Columns_SizeUnit_GetBestSizeUnit_" data-uid="BenchmarkDotNet.Columns.SizeUnit.GetBestSizeUnit*"></a>
   <h4 id="BenchmarkDotNet_Columns_SizeUnit_GetBestSizeUnit_System_Int64___" data-uid="BenchmarkDotNet.Columns.SizeUnit.GetBestSizeUnit(System.Int64[])">GetBestSizeUnit(Int64[])</h4>
   <div class="markdown level1 summary"></div>
@@ -519,6 +579,127 @@
       </tr>
     </tbody>
   </table>
+  
+  
+  <a id="BenchmarkDotNet_Columns_SizeUnit_GetHashCode_" data-uid="BenchmarkDotNet.Columns.SizeUnit.GetHashCode*"></a>
+  <h4 id="BenchmarkDotNet_Columns_SizeUnit_GetHashCode" data-uid="BenchmarkDotNet.Columns.SizeUnit.GetHashCode">GetHashCode()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override int GetHashCode()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="operators">Operators
+  </h3>
+  
+  
+  <a id="BenchmarkDotNet_Columns_SizeUnit_op_Equality_" data-uid="BenchmarkDotNet.Columns.SizeUnit.op_Equality*"></a>
+  <h4 id="BenchmarkDotNet_Columns_SizeUnit_op_Equality_BenchmarkDotNet_Columns_SizeUnit_BenchmarkDotNet_Columns_SizeUnit_" data-uid="BenchmarkDotNet.Columns.SizeUnit.op_Equality(BenchmarkDotNet.Columns.SizeUnit,BenchmarkDotNet.Columns.SizeUnit)">Equality(SizeUnit, SizeUnit)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator ==(SizeUnit left, SizeUnit right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Columns.SizeUnit.html">SizeUnit</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Columns.SizeUnit.html">SizeUnit</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Columns_SizeUnit_op_Inequality_" data-uid="BenchmarkDotNet.Columns.SizeUnit.op_Inequality*"></a>
+  <h4 id="BenchmarkDotNet_Columns_SizeUnit_op_Inequality_BenchmarkDotNet_Columns_SizeUnit_BenchmarkDotNet_Columns_SizeUnit_" data-uid="BenchmarkDotNet.Columns.SizeUnit.op_Inequality(BenchmarkDotNet.Columns.SizeUnit,BenchmarkDotNet.Columns.SizeUnit)">Inequality(SizeUnit, SizeUnit)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator !=(SizeUnit left, SizeUnit right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Columns.SizeUnit.html">SizeUnit</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Columns.SizeUnit.html">SizeUnit</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
 </article>
           </div>
           
@@ -543,7 +724,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class TimeUnit
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -131,35 +131,11 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">TimeUnit</span></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Horology.html">BenchmarkDotNet.Horology</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Horology_TimeUnit_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class TimeUnit</code></pre>
+    <pre><code class="lang-csharp hljs">public class TimeUnit : IEquatable&lt;TimeUnit&gt;</code></pre>
   </div>
   <h3 id="fields">Fields
   </h3>
@@ -488,6 +464,90 @@
   </table>
   
   
+  <a id="BenchmarkDotNet_Horology_TimeUnit_Equals_" data-uid="BenchmarkDotNet.Horology.TimeUnit.Equals*"></a>
+  <h4 id="BenchmarkDotNet_Horology_TimeUnit_Equals_BenchmarkDotNet_Horology_TimeUnit_" data-uid="BenchmarkDotNet.Horology.TimeUnit.Equals(BenchmarkDotNet.Horology.TimeUnit)">Equals(TimeUnit)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Equals(TimeUnit other)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Horology.TimeUnit.html">TimeUnit</a></td>
+        <td><span class="parametername">other</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Horology_TimeUnit_Equals_" data-uid="BenchmarkDotNet.Horology.TimeUnit.Equals*"></a>
+  <h4 id="BenchmarkDotNet_Horology_TimeUnit_Equals_System_Object_" data-uid="BenchmarkDotNet.Horology.TimeUnit.Equals(System.Object)">Equals(Object)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool Equals(object obj)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Horology_TimeUnit_GetBestTimeUnit_" data-uid="BenchmarkDotNet.Horology.TimeUnit.GetBestTimeUnit*"></a>
   <h4 id="BenchmarkDotNet_Horology_TimeUnit_GetBestTimeUnit_System_Double___" data-uid="BenchmarkDotNet.Horology.TimeUnit.GetBestTimeUnit(System.Double[])">GetBestTimeUnit(Double[])</h4>
   <div class="markdown level1 summary"><p>This method chooses the best time unit for representing a set of time measurements.</p>
@@ -533,13 +593,38 @@
   </table>
   
   
+  <a id="BenchmarkDotNet_Horology_TimeUnit_GetHashCode_" data-uid="BenchmarkDotNet.Horology.TimeUnit.GetHashCode*"></a>
+  <h4 id="BenchmarkDotNet_Horology_TimeUnit_GetHashCode" data-uid="BenchmarkDotNet.Horology.TimeUnit.GetHashCode">GetHashCode()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override int GetHashCode()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Horology_TimeUnit_ToInterval_" data-uid="BenchmarkDotNet.Horology.TimeUnit.ToInterval*"></a>
   <h4 id="BenchmarkDotNet_Horology_TimeUnit_ToInterval_System_Int64_" data-uid="BenchmarkDotNet.Horology.TimeUnit.ToInterval(System.Int64)">ToInterval(Int64)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TimeInterval ToInterval(long value = 1L)</code></pre>
+    <pre><code class="lang-csharp hljs">public TimeInterval ToInterval(long value = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -573,6 +658,102 @@
       </tr>
     </tbody>
   </table>
+  <h3 id="operators">Operators
+  </h3>
+  
+  
+  <a id="BenchmarkDotNet_Horology_TimeUnit_op_Equality_" data-uid="BenchmarkDotNet.Horology.TimeUnit.op_Equality*"></a>
+  <h4 id="BenchmarkDotNet_Horology_TimeUnit_op_Equality_BenchmarkDotNet_Horology_TimeUnit_BenchmarkDotNet_Horology_TimeUnit_" data-uid="BenchmarkDotNet.Horology.TimeUnit.op_Equality(BenchmarkDotNet.Horology.TimeUnit,BenchmarkDotNet.Horology.TimeUnit)">Equality(TimeUnit, TimeUnit)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator ==(TimeUnit left, TimeUnit right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Horology.TimeUnit.html">TimeUnit</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Horology.TimeUnit.html">TimeUnit</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Horology_TimeUnit_op_Inequality_" data-uid="BenchmarkDotNet.Horology.TimeUnit.op_Inequality*"></a>
+  <h4 id="BenchmarkDotNet_Horology_TimeUnit_op_Inequality_BenchmarkDotNet_Horology_TimeUnit_BenchmarkDotNet_Horology_TimeUnit_" data-uid="BenchmarkDotNet.Horology.TimeUnit.op_Inequality(BenchmarkDotNet.Horology.TimeUnit,BenchmarkDotNet.Horology.TimeUnit)">Inequality(TimeUnit, TimeUnit)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator !=(TimeUnit left, TimeUnit right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Horology.TimeUnit.html">TimeUnit</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Horology.TimeUnit.html">TimeUnit</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
 </article>
           </div>
           
@@ -597,7 +778,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class GenerateResult
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -132,39 +132,18 @@
     <div class="level1"><span class="xref">GenerateResult</span></div>
       <div class="level2"><a class="xref" href="BenchmarkDotNet.Toolchains.Results.BuildResult.html">BuildResult</a></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.Results.html">BenchmarkDotNet.Toolchains.Results</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Toolchains_Results_GenerateResult_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class GenerateResult</code></pre>
+    <pre><code class="lang-csharp hljs">public class GenerateResult : object</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
   
   
   <a id="BenchmarkDotNet_Toolchains_Results_GenerateResult__ctor_" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_Results_GenerateResult__ctor_BenchmarkDotNet_Toolchains_ArtifactsPaths_System_Boolean_System_Exception_System_Collections_Generic_IReadOnlyCollection_System_String__" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.#ctor(BenchmarkDotNet.Toolchains.ArtifactsPaths,System.Boolean,System.Exception,System.Collections.Generic.IReadOnlyCollection{System.String})">GenerateResult(ArtifactsPaths, Boolean, Exception, IReadOnlyCollection&lt;String&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_GenerateResult__ctor_BenchmarkDotNet_Toolchains_ArtifactsPaths_System_Boolean_Exception_IReadOnlyCollection_System_String__" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.#ctor(BenchmarkDotNet.Toolchains.ArtifactsPaths,System.Boolean,Exception,IReadOnlyCollection{System.String})">GenerateResult(ArtifactsPaths, Boolean, Exception, IReadOnlyCollection&lt;String&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -192,12 +171,12 @@
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Exception</span></td>
+        <td><span class="xref">Exception</span></td>
         <td><span class="parametername">generateException</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyCollection</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td><span class="xref">IReadOnlyCollection</span>&lt;<span class="xref">System.String</span>&gt;</td>
         <td><span class="parametername">artifactsToCleanup</span></td>
         <td></td>
       </tr>
@@ -250,7 +229,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyCollection</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td><span class="xref">IReadOnlyCollection</span>&lt;<span class="xref">System.String</span>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -275,7 +254,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Exception</span></td>
+        <td><span class="xref">Exception</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -310,7 +289,7 @@
   
   
   <a id="BenchmarkDotNet_Toolchains_Results_GenerateResult_Failure_" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.Failure*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_Results_GenerateResult_Failure_BenchmarkDotNet_Toolchains_ArtifactsPaths_System_Collections_Generic_IReadOnlyCollection_System_String__System_Exception_" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.Failure(BenchmarkDotNet.Toolchains.ArtifactsPaths,System.Collections.Generic.IReadOnlyCollection{System.String},System.Exception)">Failure(ArtifactsPaths, IReadOnlyCollection&lt;String&gt;, Exception)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_GenerateResult_Failure_BenchmarkDotNet_Toolchains_ArtifactsPaths_IReadOnlyCollection_System_String__Exception_" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.Failure(BenchmarkDotNet.Toolchains.ArtifactsPaths,IReadOnlyCollection{System.String},Exception)">Failure(ArtifactsPaths, IReadOnlyCollection&lt;String&gt;, Exception)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -333,12 +312,12 @@
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyCollection</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td><span class="xref">IReadOnlyCollection</span>&lt;<span class="xref">System.String</span>&gt;</td>
         <td><span class="parametername">artifactsToCleanup</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Exception</span></td>
+        <td><span class="xref">Exception</span></td>
         <td><span class="parametername">exception</span></td>
         <td></td>
       </tr>
@@ -362,7 +341,7 @@
   
   
   <a id="BenchmarkDotNet_Toolchains_Results_GenerateResult_Success_" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.Success*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_Results_GenerateResult_Success_BenchmarkDotNet_Toolchains_ArtifactsPaths_System_Collections_Generic_IReadOnlyCollection_System_String__" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.Success(BenchmarkDotNet.Toolchains.ArtifactsPaths,System.Collections.Generic.IReadOnlyCollection{System.String})">Success(ArtifactsPaths, IReadOnlyCollection&lt;String&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_GenerateResult_Success_BenchmarkDotNet_Toolchains_ArtifactsPaths_IReadOnlyCollection_System_String__" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.Success(BenchmarkDotNet.Toolchains.ArtifactsPaths,IReadOnlyCollection{System.String})">Success(ArtifactsPaths, IReadOnlyCollection&lt;String&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -385,7 +364,7 @@
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyCollection</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td><span class="xref">IReadOnlyCollection</span>&lt;<span class="xref">System.String</span>&gt;</td>
         <td><span class="parametername">artifactsToCleanup</span></td>
         <td></td>
       </tr>
@@ -431,8 +410,6 @@
       </tr>
     </tbody>
   </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.Object.ToString()</span></div>
 </article>
           </div>
           
@@ -457,7 +434,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

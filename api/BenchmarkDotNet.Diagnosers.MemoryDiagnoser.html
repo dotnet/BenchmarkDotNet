@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class MemoryDiagnoser
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -135,35 +135,11 @@
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Diagnosers.IDiagnoser.html">IDiagnoser</a></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Diagnosers.html">BenchmarkDotNet.Diagnosers</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Diagnosers_MemoryDiagnoser_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class MemoryDiagnoser : IDiagnoser</code></pre>
+    <pre><code class="lang-csharp hljs">public class MemoryDiagnoser : object, IDiagnoser</code></pre>
   </div>
   <h3 id="fields">Fields
   </h3>
@@ -213,7 +189,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a>&gt;</td>
+        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -238,7 +214,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Exporters.IExporter.html">IExporter</a>&gt;</td>
+        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Exporters.IExporter.html">IExporter</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -263,7 +239,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td><span class="xref">IEnumerable</span>&lt;<span class="xref">System.String</span>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -408,7 +384,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Reports.Metric.html">Metric</a>&gt;</td>
+        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Reports.Metric.html">Metric</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -450,7 +426,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</td>
+        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -483,7 +459,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

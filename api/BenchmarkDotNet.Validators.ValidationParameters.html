@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ValidationParameters
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -131,47 +131,23 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">ValidationParameters</span></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Validators.html">BenchmarkDotNet.Validators</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Validators_ValidationParameters_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ValidationParameters</code></pre>
+    <pre><code class="lang-csharp hljs">public class ValidationParameters : object</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
   
   
   <a id="BenchmarkDotNet_Validators_ValidationParameters__ctor_" data-uid="BenchmarkDotNet.Validators.ValidationParameters.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Validators_ValidationParameters__ctor_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Running_BenchmarkCase__BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Validators.ValidationParameters.#ctor(System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Running.BenchmarkCase},BenchmarkDotNet.Configs.IConfig)">ValidationParameters(IReadOnlyList&lt;BenchmarkCase&gt;, IConfig)</h4>
+  <h4 id="BenchmarkDotNet_Validators_ValidationParameters__ctor_IReadOnlyList_BenchmarkDotNet_Running_BenchmarkCase__BenchmarkDotNet_Configs_ImmutableConfig_" data-uid="BenchmarkDotNet.Validators.ValidationParameters.#ctor(IReadOnlyList{BenchmarkDotNet.Running.BenchmarkCase},BenchmarkDotNet.Configs.ImmutableConfig)">ValidationParameters(IReadOnlyList&lt;BenchmarkCase&gt;, ImmutableConfig)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ValidationParameters(IReadOnlyList&lt;BenchmarkCase&gt; benchmarks, IConfig config)</code></pre>
+    <pre><code class="lang-csharp hljs">public ValidationParameters(IReadOnlyList&lt;BenchmarkCase&gt; benchmarks, ImmutableConfig config)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -184,12 +160,12 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td><span class="xref">IReadOnlyList</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
         <td><span class="parametername">benchmarks</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
+        <td><a class="xref" href="BenchmarkDotNet.Configs.ImmutableConfig.html">ImmutableConfig</a></td>
         <td><span class="parametername">config</span></td>
         <td></td>
       </tr>
@@ -217,7 +193,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td><span class="xref">IReadOnlyList</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -230,7 +206,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IConfig Config { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public ImmutableConfig Config { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -242,7 +218,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
+        <td><a class="xref" href="BenchmarkDotNet.Configs.ImmutableConfig.html">ImmutableConfig</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -357,7 +333,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

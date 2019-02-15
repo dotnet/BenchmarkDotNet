@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class CsProjGenerator
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -134,7 +134,6 @@
     <div class="level3"><span class="xref">CsProjGenerator</span></div>
       <div class="level4"><a class="xref" href="BenchmarkDotNet.Toolchains.CoreRt.Generator.html">Generator</a></div>
       <div class="level4"><a class="xref" href="BenchmarkDotNet.Toolchains.CoreRun.CoreRunGenerator.html">CoreRunGenerator</a></div>
-      <div class="level4"><a class="xref" href="BenchmarkDotNet.Toolchains.CustomCoreClr.Generator.html">Generator</a></div>
   </div>
   <div classs="implements">
     <h5>Implements</h5>
@@ -167,15 +166,6 @@
       <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator_GenerateBuildScript_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Toolchains_ArtifactsPaths_">DotNetCliGenerator.GenerateBuildScript(BuildPartition, ArtifactsPaths)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator_SetPlatform_System_String_System_String_">DotNetCliGenerator.SetPlatform(String, String)</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator_SetCodeFileName_System_String_System_String_">DotNetCliGenerator.SetCodeFileName(String, String)</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator_SetTargetFrameworkMoniker_System_String_System_String_">DotNetCliGenerator.SetTargetFrameworkMoniker(String, String)</a>
-    </div>
-    <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GenerateProject_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Loggers_ILogger_System_String_">GeneratorBase.GenerateProject(BuildPartition, ILogger, String)</a>
     </div>
     <div>
@@ -186,27 +176,6 @@
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GenerateCode_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Toolchains_ArtifactsPaths_">GeneratorBase.GenerateCode(BuildPartition, ArtifactsPaths)</a>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
     </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.html">BenchmarkDotNet.Toolchains.CsProj</a></h6>
@@ -472,7 +441,7 @@
   
   
   <a id="BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetProjectFilePath_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetProjectFilePath*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetProjectFilePath_System_Type_BenchmarkDotNet_Loggers_ILogger_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetProjectFilePath(System.Type,BenchmarkDotNet.Loggers.ILogger)">GetProjectFilePath(Type, ILogger)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetProjectFilePath_Type_BenchmarkDotNet_Loggers_ILogger_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetProjectFilePath(Type,BenchmarkDotNet.Loggers.ILogger)">GetProjectFilePath(Type, ILogger)</h4>
   <div class="markdown level1 summary"><p>returns a path to the project file which defines the benchmarks</p>
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -491,7 +460,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Type</span></td>
+        <td><span class="xref">Type</span></td>
         <td><span class="parametername">benchmarkTarget</span></td>
         <td></td>
       </tr>
@@ -512,7 +481,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td><span class="xref">FileInfo</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -593,7 +562,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

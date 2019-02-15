@@ -18,7 +18,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Analysers.AnalyserBase.html",
-          "hash": "08egRWHVsIun2c8KPpjX5A=="
+          "hash": "9jJ6LZLy3Z3iyjaQD5zsSg=="
         }
       },
       "is_incremental": false,
@@ -30,7 +30,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Analysers.CompositeAnalyser.html",
-          "hash": "puouqy/yAKrSuoXk82QkIg=="
+          "hash": "9u3bBSgDV98R4DD6z76P5Q=="
         }
       },
       "is_incremental": false,
@@ -42,7 +42,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Analysers.Conclusion.html",
-          "hash": "gl15KxRbggsQQ/y29e/z3Q=="
+          "hash": "Yh22211GOAI0QaEY1WqMdQ=="
         }
       },
       "is_incremental": false,
@@ -54,7 +54,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Analysers.ConclusionHelper.html",
-          "hash": "S9rGaNAFYFFFH8PvsimN1Q=="
+          "hash": "c9MKcMglojJDL+Yf7kTuDQ=="
         }
       },
       "is_incremental": false,
@@ -66,7 +66,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Analysers.ConclusionKind.html",
-          "hash": "Ze+prSgln+qDHFJeDnJaXA=="
+          "hash": "qDBOvMdAxJAs3Ko8QH6c2w=="
         }
       },
       "is_incremental": false,
@@ -78,7 +78,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Analysers.EnvironmentAnalyser.html",
-          "hash": "S/sHfYikrMY5+bBMWCOVnQ=="
+          "hash": "71WbfzgOTyEkNCIfnIrfkw=="
         }
       },
       "is_incremental": false,
@@ -90,7 +90,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Analysers.IAnalyser.html",
-          "hash": "z/1Tw5+aVlAis40yGagwZQ=="
+          "hash": "THQBGM9bsKIjD0QV6PLiAQ=="
         }
       },
       "is_incremental": false,
@@ -102,7 +102,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Analysers.MinIterationTimeAnalyser.html",
-          "hash": "AFRqIGRbdjVpit8J5/ZhCw=="
+          "hash": "Jy+EQU8KWMChrEeBbigjkg=="
         }
       },
       "is_incremental": false,
@@ -114,7 +114,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Analysers.MultimodalDistributionAnalyzer.html",
-          "hash": "G04aJhCXxd8jvXDUcqPrLQ=="
+          "hash": "tmBA0Ya6EaCqbUarje8hRA=="
         }
       },
       "is_incremental": false,
@@ -126,7 +126,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Analysers.OutliersAnalyser.html",
-          "hash": "u3PgwwYLBfBru11tBAq69A=="
+          "hash": "RZAArIrivxlnkegLRAMlBA=="
         }
       },
       "is_incremental": false,
@@ -138,7 +138,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Analysers.RuntimeErrorAnalyser.html",
-          "hash": "Vk1CtWNKw6PdBF0lfGSQ1Q=="
+          "hash": "+OWgDgqF6FsO179ENQp/Tw=="
         }
       },
       "is_incremental": false,
@@ -150,7 +150,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Analysers.ZeroMeasurementAnalyser.html",
-          "hash": "xuefMgW54MD1CNJaIhiPjg=="
+          "hash": "sMIMSmLjTZo0ozbDp/JPsg=="
         }
       },
       "is_incremental": false,
@@ -162,7 +162,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Analysers.ZeroMeasurementHelper.html",
-          "hash": "p0XIDoPo/BfSYrraFh4PnQ=="
+          "hash": "ihRJcK1FGwjbN1jsfbm9Vg=="
         }
       },
       "is_incremental": false,
@@ -174,7 +174,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Analysers.html",
-          "hash": "SCslaV+YDFpuhr41Ap8DWA=="
+          "hash": "EUQEnPEfFwsBrA227fd7rQ=="
         }
       },
       "is_incremental": false,
@@ -186,7 +186,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.AllCategoriesFilterAttribute.html",
-          "hash": "f7UiW4BdeewXNYcrVb6QuA=="
+          "hash": "E+miMcrLjojkzEuCOHhb3w=="
         }
       },
       "is_incremental": false,
@@ -198,7 +198,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.AllStatisticsColumnAttribute.html",
-          "hash": "hJF9w6TkhZ/IM9mqAbnbpg=="
+          "hash": "p0PpQ3ZXukdtxskXAGeNBA=="
         }
       },
       "is_incremental": false,
@@ -210,7 +210,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.AnyCategoriesFilterAttribute.html",
-          "hash": "rsQ3xuW6S2VHzkBIyFDnOg=="
+          "hash": "9eqDtBYvevunaqPKak/eBw=="
         }
       },
       "is_incremental": false,
@@ -222,7 +222,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ArgumentsAttribute.html",
-          "hash": "h90wGLUCqkgIcnUtpBVPjg=="
+          "hash": "Bba2f3u6wzalSud3F9Vm/g=="
         }
       },
       "is_incremental": false,
@@ -234,7 +234,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html",
-          "hash": "SUSxL9YHVtaP4eWIojWh2w=="
+          "hash": "ZWKDq+jNBbCCcDrNdzXVmA=="
         }
       },
       "is_incremental": false,
@@ -246,7 +246,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ArtifactsPathAttribute.html",
-          "hash": "wLddGpdFRxvgEZ20enlBoA=="
+          "hash": "s328+b+M4vnwwBylgln9Qw=="
         }
       },
       "is_incremental": false,
@@ -258,7 +258,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.AsciiDocExporterAttribute.html",
-          "hash": "tJFDvsG3ySG9A/WAtSxIYg=="
+          "hash": "nJ/K4rdgH/IZauhcPRLgRQ=="
         }
       },
       "is_incremental": false,
@@ -270,7 +270,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.BaselineColumnAttribute.html",
-          "hash": "4iyZnyh+5vBjqoUZIYnHNg=="
+          "hash": "W5Qz3xXPeVg4rxwB0u7LzA=="
         }
       },
       "is_incremental": false,
@@ -282,7 +282,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.BenchmarkAttribute.html",
-          "hash": "Hs//we/Ag/D4+4MhVJnT+Q=="
+          "hash": "LiudXLOwk6RMR4ddFPd7tA=="
         }
       },
       "is_incremental": false,
@@ -294,7 +294,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.BenchmarkCategoryAttribute.html",
-          "hash": "xiIeMYn71hsbvhU7NNUsVg=="
+          "hash": "gcHYsulHR8pxQZXnzfwbpA=="
         }
       },
       "is_incremental": false,
@@ -306,7 +306,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.CategoriesColumnAttribute.html",
-          "hash": "sUy8jRoBtbOvspU1t//Fgg=="
+          "hash": "UmErhMGMrnGF/sJcjDgvYQ=="
         }
       },
       "is_incremental": false,
@@ -318,7 +318,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ClrJobAttribute.html",
-          "hash": "3cYyd2EUn5NDPWUkrIYP4Q=="
+          "hash": "y/WUzd0NY0b2EY6FOPyjqQ=="
         }
       },
       "is_incremental": false,
@@ -330,7 +330,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ColumnConfigBaseAttribute.html",
-          "hash": "dgMzBZgUbBk2ghulUpRn7w=="
+          "hash": "Tz4wa8mE5FGed4H5fwhqIw=="
         }
       },
       "is_incremental": false,
@@ -342,7 +342,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ConfidenceIntervalErrorColumnAttribute.html",
-          "hash": "u6gBvmhRLy3bMuaaD/SU+Q=="
+          "hash": "u1LaYS4CmcYTeoon8fmIMA=="
         }
       },
       "is_incremental": false,
@@ -354,7 +354,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ConfigAttribute.html",
-          "hash": "syEsyhFGQaNBuVTjqzHXow=="
+          "hash": "uLSzXECHvepbuewX467RDw=="
         }
       },
       "is_incremental": false,
@@ -366,7 +366,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.CoreJobAttribute.html",
-          "hash": "2jeyZwo4sdC8KwAQQxRQVQ=="
+          "hash": "YnKkWVmA0797W7hgxKanGA=="
         }
       },
       "is_incremental": false,
@@ -378,7 +378,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.CoreRtJobAttribute.html",
-          "hash": "o9wI1uWmx1W+630XX806+w=="
+          "hash": "+v6XCnUTSg9hHVgFToOCbA=="
         }
       },
       "is_incremental": false,
@@ -390,7 +390,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.CsvExporterAttribute.html",
-          "hash": "nIqoDG3zHDcIKhscWm1gew=="
+          "hash": "t16Ssv6KBzFGD0bNyrFY5w=="
         }
       },
       "is_incremental": false,
@@ -402,7 +402,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.CsvMeasurementsExporterAttribute.html",
-          "hash": "on1ZZ/fqsnDBoMcajEpNsQ=="
+          "hash": "5M7NU3Y4zs7RkXCdgdKSPA=="
         }
       },
       "is_incremental": false,
@@ -414,7 +414,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.DisassemblyDiagnoserAttribute.html",
-          "hash": "tCXlA6rMf3yTDAN/A1Nerw=="
+          "hash": "ptlFrUMV6mjNjiEwrQXTbA=="
         }
       },
       "is_incremental": false,
@@ -426,7 +426,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.DryClrJobAttribute.html",
-          "hash": "+dxPukmhYpUPd1Gbgywq6w=="
+          "hash": "6CMHK06d3axOMBIp9txUTw=="
         }
       },
       "is_incremental": false,
@@ -438,7 +438,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.DryCoreJobAttribute.html",
-          "hash": "1E/qQ/NIbTkE6xE2CSvLLg=="
+          "hash": "3WROeFgw+CZJaWYMVB0QUQ=="
         }
       },
       "is_incremental": false,
@@ -450,7 +450,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.DryCoreRtJobAttribute.html",
-          "hash": "ygvQuNLA70Qi5Cc7a2RABA=="
+          "hash": "GUUVu8IHf70YReRks0MYkw=="
         }
       },
       "is_incremental": false,
@@ -462,7 +462,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.DryJobAttribute.html",
-          "hash": "GDjzXBZBvX2qnr4yxOR/Bg=="
+          "hash": "DXrfDoBgWC2Q/4tS2DTusg=="
         }
       },
       "is_incremental": false,
@@ -474,7 +474,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.DryMonoJobAttribute.html",
-          "hash": "X8I3xkm0/IFlXthi4rjdSg=="
+          "hash": "Oryg13pm2EuStkZeAxHI1Q=="
         }
       },
       "is_incremental": false,
@@ -486,7 +486,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.EncodingAttribute.ASCII.html",
-          "hash": "pkVHcjZZ1WGRXOLlIC1dog=="
+          "hash": "pXWSz4USIVvTGR9q9BQfPg=="
         }
       },
       "is_incremental": false,
@@ -498,7 +498,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.EncodingAttribute.Unicode.html",
-          "hash": "6G8ZPhyQ+VJocWKx21EZuA=="
+          "hash": "9QNDe9lhrZapDmGBDjWmEw=="
         }
       },
       "is_incremental": false,
@@ -510,7 +510,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.EncodingAttribute.html",
-          "hash": "/f8Ew2O9M4da22JR4fBH4A=="
+          "hash": "ETPdmIm6Jv5kRsHHz52Sdg=="
         }
       },
       "is_incremental": false,
@@ -522,7 +522,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.EvaluateOverheadAttribute.html",
-          "hash": "B6vk6dBgj95yTHxqb261tw=="
+          "hash": "tqO30XYEuBmi8wonguPJlA=="
         }
       },
       "is_incremental": false,
@@ -534,7 +534,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ExecutionValidatorAttribute.html",
-          "hash": "FpZn573Pa9R3YzCgd3a4rQ=="
+          "hash": "vvuR9uLUFiTZTrfwKgq+dQ=="
         }
       },
       "is_incremental": false,
@@ -546,7 +546,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ExporterConfigBaseAttribute.html",
-          "hash": "VFPxwVfEy+PP3qKEaG9EtA=="
+          "hash": "nNgBSPIZSgcdbgBKXK35cg=="
         }
       },
       "is_incremental": false,
@@ -558,7 +558,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.FilterConfigBaseAttribute.html",
-          "hash": "C1+dVgLWG+9DR/WP4rbxQA=="
+          "hash": "fdPMPlQ6YaFSS6BkyAwN3w=="
         }
       },
       "is_incremental": false,
@@ -570,7 +570,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.GcConcurrentAttribute.html",
-          "hash": "mKlXk4352Q6weIFxDNzQjA=="
+          "hash": "2IY4c55+XOefLa0doSrghA=="
         }
       },
       "is_incremental": false,
@@ -582,7 +582,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.GcForceAttribute.html",
-          "hash": "W0YD+4Mwby9oEXzL8U6CBA=="
+          "hash": "E1XIa1RmVJE36Rxdx2IzVQ=="
         }
       },
       "is_incremental": false,
@@ -594,7 +594,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.GcServerAttribute.html",
-          "hash": "QiYVIFZXM4YFuYwubCwcDg=="
+          "hash": "j7nY1NGAgszaCj41Bi7uIQ=="
         }
       },
       "is_incremental": false,
@@ -606,7 +606,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.GenericTypeArgumentsAttribute.html",
-          "hash": "XmZsQHJZucA95DSrDGTWOA=="
+          "hash": "0mzBbjIalZ6myXRZtRHAlw=="
         }
       },
       "is_incremental": false,
@@ -618,7 +618,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.GlobalCleanupAttribute.html",
-          "hash": "XoYm1+5pT7ccfEA9VWEAnQ=="
+          "hash": "k0RTGI1PsrNsP6W/DzHiAA=="
         }
       },
       "is_incremental": false,
@@ -630,7 +630,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.GlobalSetupAttribute.html",
-          "hash": "7yYbvOoqv2bK7n3Xa3G9Mw=="
+          "hash": "+dBxqw/LUa90LT6/7loDZA=="
         }
       },
       "is_incremental": false,
@@ -642,7 +642,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.GroupBenchmarksByAttribute.html",
-          "hash": "/wOszyu4nyUkHCv5IKsNkA=="
+          "hash": "bcDEsFF6kJJCjI1pI06xzQ=="
         }
       },
       "is_incremental": false,
@@ -654,7 +654,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.HardwareCountersAttribute.html",
-          "hash": "6sqm2Vm5khQZzuhPYht/6g=="
+          "hash": "7n4J/SYTPpibQCwCLUA+sg=="
         }
       },
       "is_incremental": false,
@@ -666,7 +666,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.HtmlExporterAttribute.html",
-          "hash": "U8W0+L1jYiUMIqNWk6Xg+A=="
+          "hash": "9p4CSqgCA5OVtGFYgwrjEw=="
         }
       },
       "is_incremental": false,
@@ -678,7 +678,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.InProcessAttribute.html",
-          "hash": "x5QgiMhU5ej3xgtldT1Z/Q=="
+          "hash": "oIqA8rW76Oere6pDWrNHHQ=="
         }
       },
       "is_incremental": false,
@@ -690,7 +690,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.InnerIterationCountAttribute.html",
-          "hash": "sbE8SYzNZdWyRiWDKP34eg=="
+          "hash": "zAlmjndwf78ggBmR6vunzQ=="
         }
       },
       "is_incremental": false,
@@ -702,7 +702,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.InvocationCountAttribute.html",
-          "hash": "yIXqGieaD0I5+ZWJxcqgfA=="
+          "hash": "WTfZoV/Y5AasFLdeSpsvZQ=="
         }
       },
       "is_incremental": false,
@@ -714,7 +714,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.IterationCleanupAttribute.html",
-          "hash": "O9196dDfa2yeaIrxbEiB2Q=="
+          "hash": "FteXaVvgmb5o3xADq+Eaag=="
         }
       },
       "is_incremental": false,
@@ -726,7 +726,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.IterationCountAttribute.html",
-          "hash": "pBli3JubXkBz7SlCpJyKdw=="
+          "hash": "/Kjs38qZJUwmmPWUE3n5Fw=="
         }
       },
       "is_incremental": false,
@@ -738,7 +738,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.IterationSetupAttribute.html",
-          "hash": "Fmdrqy9dyXPKeWGmyfaC/Q=="
+          "hash": "NC+X8s1G2jRLZ+Y7wiyTZw=="
         }
       },
       "is_incremental": false,
@@ -750,7 +750,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.IterationTimeAttribute.html",
-          "hash": "IdBMo1Cqc75ijZQ/v4P/RA=="
+          "hash": "6FgeXMnscFS4HKKJQ7X8Ig=="
         }
       },
       "is_incremental": false,
@@ -762,7 +762,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.IterationsColumnAttribute.html",
-          "hash": "lw0u4ivH4oFHbGtwZNqT8Q=="
+          "hash": "GPhesn2zZGbwA4mUo0u/Nw=="
         }
       },
       "is_incremental": false,
@@ -774,7 +774,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.JobConfigBaseAttribute.html",
-          "hash": "2LEzqhLL0UonYnkooHAvuA=="
+          "hash": "S4QI6td2K/w3eERlZ2VOrA=="
         }
       },
       "is_incremental": false,
@@ -786,7 +786,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.JobMutatorConfigBaseAttribute.html",
-          "hash": "HKXjYiIyZTjb1Vv22cQDMw=="
+          "hash": "VTNc4IIsQynxYyU48fAMWw=="
         }
       },
       "is_incremental": false,
@@ -798,7 +798,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.JsonExporterAttribute.BriefAttribute.html",
-          "hash": "uWB2uHRtSf8ETwtzl6zEnQ=="
+          "hash": "ec0tnrq9MDS69LZforH3Mg=="
         }
       },
       "is_incremental": false,
@@ -810,7 +810,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.JsonExporterAttribute.BriefCompressed.html",
-          "hash": "IyCb02vtsNCkxi52T3mBaw=="
+          "hash": "uTik66hO2bkwpgVsJMsbMQ=="
         }
       },
       "is_incremental": false,
@@ -822,7 +822,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.JsonExporterAttribute.Full.html",
-          "hash": "hsqjc2Okpl1uBiJEpL/sQQ=="
+          "hash": "N3upLnmZgZepO4ozKQPWlg=="
         }
       },
       "is_incremental": false,
@@ -834,7 +834,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.JsonExporterAttribute.FullCompressed.html",
-          "hash": "TnLNX2oTCCOrDrV0LE03+A=="
+          "hash": "RcsA5xDjU6QOS+cjIbWaDQ=="
         }
       },
       "is_incremental": false,
@@ -846,7 +846,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.JsonExporterAttribute.html",
-          "hash": "nrsr11IgSwcZrVy2aABKMA=="
+          "hash": "326aTBZtnW5kRT8Zgh5DjA=="
         }
       },
       "is_incremental": false,
@@ -858,7 +858,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.KeepBenchmarkFilesAttribute.html",
-          "hash": "LOPRwiMU4TmykpM7F7pN2A=="
+          "hash": "3jJn3pcPcDDCwzZH8Fqm+A=="
         }
       },
       "is_incremental": false,
@@ -870,7 +870,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.KurtosisColumnAttribute.html",
-          "hash": "32afHoi/ZIHYOegAiQUDGA=="
+          "hash": "5G7/jMhXtkC540iHvWaXAA=="
         }
       },
       "is_incremental": false,
@@ -882,7 +882,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.LegacyJitX64JobAttribute.html",
-          "hash": "0TvnMZE2eZE1gtOeDaxgMA=="
+          "hash": "nF1ypT40E7xH9mU9to4WPQ=="
         }
       },
       "is_incremental": false,
@@ -894,7 +894,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.LegacyJitX86JobAttribute.html",
-          "hash": "pAEVowQkdZeP9m5rqhprHQ=="
+          "hash": "bY2Vh5pdRBwEGidO0NcjGQ=="
         }
       },
       "is_incremental": false,
@@ -906,7 +906,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.LogicalGroupColumnAttribute.html",
-          "hash": "p1/e2Re2ty8ly3yyaMCmMw=="
+          "hash": "WpPfG5KRDT1jpI0JCpcZtA=="
         }
       },
       "is_incremental": false,
@@ -918,7 +918,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.LongRunJobAttribute.html",
-          "hash": "TbGLK34hFMRH2vXr/s0Z1w=="
+          "hash": "bCVZ10I5Ku8ytcedwn46IQ=="
         }
       },
       "is_incremental": false,
@@ -930,7 +930,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MValueColumnAttribute.html",
-          "hash": "wRglRrPX1+c5RvSBMZLk5g=="
+          "hash": "d6/bPDSz2N9he6akN6EGPQ=="
         }
       },
       "is_incremental": false,
@@ -942,7 +942,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MarkdownExporterAttribute.Atlassian.html",
-          "hash": "P0jIrNTn/ZGn2Y3XPyyxwA=="
+          "hash": "rhYrxogXgS8ma2u6Qbg7OA=="
         }
       },
       "is_incremental": false,
@@ -954,7 +954,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MarkdownExporterAttribute.Default.html",
-          "hash": "sC0L9rNdbVXbJDBBElca+Q=="
+          "hash": "vOa+VEH/5oHOpSZfa9C+qw=="
         }
       },
       "is_incremental": false,
@@ -966,7 +966,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MarkdownExporterAttribute.GitHub.html",
-          "hash": "N2QnWkjScIvTouM7F+rkrQ=="
+          "hash": "pby1anQM9NFM3mByou/U9g=="
         }
       },
       "is_incremental": false,
@@ -978,7 +978,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MarkdownExporterAttribute.StackOverflow.html",
-          "hash": "MG8e0fkruKNvOc8CBCLNUg=="
+          "hash": "NK/37CK+p6Q0Yi0oLPtBmQ=="
         }
       },
       "is_incremental": false,
@@ -990,7 +990,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MarkdownExporterAttribute.html",
-          "hash": "a/Z3M2xhAav7uZGhHHULvA=="
+          "hash": "7ag8LfnMqWmJ5UaSzOSzbA=="
         }
       },
       "is_incremental": false,
@@ -1002,7 +1002,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MaxAbsoluteErrorAttribute.html",
-          "hash": "WcM+Qs2jAeob6LOMv92Vpw=="
+          "hash": "f8LW0zht1f/9eLUt4rQmEQ=="
         }
       },
       "is_incremental": false,
@@ -1014,7 +1014,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MaxColumnAttribute.html",
-          "hash": "jiqtDeXrbuNGgLxweNt8uQ=="
+          "hash": "EHEABKtTlN35SfRLLuswlw=="
         }
       },
       "is_incremental": false,
@@ -1026,7 +1026,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MaxIterationCountAttribute.html",
-          "hash": "GPeKq0JzD+mRl4unyvqVRw=="
+          "hash": "wiqbbFdiuk9ZfkLFHLMh3g=="
         }
       },
       "is_incremental": false,
@@ -1038,7 +1038,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MaxRelativeErrorAttribute.html",
-          "hash": "68DsKZjezrj9v/OwQPbDgQ=="
+          "hash": "hFaN6h/8R6DtgRWRON0NTQ=="
         }
       },
       "is_incremental": false,
@@ -1050,7 +1050,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MaxWarmupCountAttribute.html",
-          "hash": "a9K58N2Oinrqx6AwPopYew=="
+          "hash": "G4412pHDe4qkrnE6ykM4qw=="
         }
       },
       "is_incremental": false,
@@ -1062,7 +1062,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MeanColumnAttribute.html",
-          "hash": "GY86Pb355joq09zipg6kxw=="
+          "hash": "6AibFqIA47wSiJdxWlW+eg=="
         }
       },
       "is_incremental": false,
@@ -1074,7 +1074,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MedianColumnAttribute.html",
-          "hash": "Vo0Ar0h6riP+HZxxFbEjYQ=="
+          "hash": "YvXJEKq5qwBm3wy8erFLIw=="
         }
       },
       "is_incremental": false,
@@ -1086,7 +1086,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MediumRunJobAttribute.html",
-          "hash": "xoxu6MSwf3fEA1PS4HlcNA=="
+          "hash": "Cw4zgA8rDKreiChs/+Ztrg=="
         }
       },
       "is_incremental": false,
@@ -1098,7 +1098,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MemoryDiagnoserAttribute.html",
-          "hash": "wkpNc81Qf/FObmJ/ufIcvw=="
+          "hash": "XQjvYCbwYgJNnk0DoPHX+A=="
         }
       },
       "is_incremental": false,
@@ -1110,7 +1110,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MinColumnAttribute.html",
-          "hash": "PanNAqdWocjExXyRdT0emQ=="
+          "hash": "e669LT4kXKrtrwAcyPK1Eg=="
         }
       },
       "is_incremental": false,
@@ -1122,7 +1122,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MinInvokeCountAttribute.html",
-          "hash": "9LMsNuQDiGAG8tP3KucUCw=="
+          "hash": "5IE67ztFHyB+uPLM/EXGMQ=="
         }
       },
       "is_incremental": false,
@@ -1134,7 +1134,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MinIterationCountAttribute.html",
-          "hash": "8UgyyUZ80K2/4JNgqY29Ig=="
+          "hash": "2BirYvKmVwn7UveoVLEa7w=="
         }
       },
       "is_incremental": false,
@@ -1146,7 +1146,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MinIterationTimeAttribute.html",
-          "hash": "thLoT0VE8UBSIQqQJ4cstg=="
+          "hash": "7aIaal8o6LGtQ7XIkwJMoQ=="
         }
       },
       "is_incremental": false,
@@ -1158,7 +1158,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MinWarmupCountAttribute.html",
-          "hash": "4w6W1CkiUrmv69UNqV/frQ=="
+          "hash": "SCyCVCkliFyxthWA5msd7g=="
         }
       },
       "is_incremental": false,
@@ -1170,7 +1170,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.MonoJobAttribute.html",
-          "hash": "c9cJrpHBxVzNvPWAMI4qaQ=="
+          "hash": "m2GSHGKZ7DJwJNc8bHpZlQ=="
         }
       },
       "is_incremental": false,
@@ -1182,7 +1182,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.NamespaceColumnAttribute.html",
-          "hash": "g73IEB1Th4a1wxbamQFbiQ=="
+          "hash": "inBhsbMxh24eakBtPWgPbg=="
         }
       },
       "is_incremental": false,
@@ -1194,7 +1194,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.OrdererAttribute.html",
-          "hash": "NTMAK1zPCLcGod70LGNgww=="
+          "hash": "KOhWq2PIPSyhqeuX24EDFA=="
         }
       },
       "is_incremental": false,
@@ -1206,7 +1206,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.OutliersAttribute.html",
-          "hash": "rnWbl4K98ZOoxhXWqdTVDw=="
+          "hash": "sNHgicAaJCRcPuhXDKW2Bg=="
         }
       },
       "is_incremental": false,
@@ -1218,7 +1218,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ParamsAllValuesAttribute.html",
-          "hash": "RkeDe9d4V1ZyZ4S/WeY0mg=="
+          "hash": "W8j/qtUrJO7ECE631su8nw=="
         }
       },
       "is_incremental": false,
@@ -1230,7 +1230,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ParamsAttribute.html",
-          "hash": "qLZOvuvHpUE/x4e/KKo8FA=="
+          "hash": "4qM7EHHRDgXJgVfgjeAycQ=="
         }
       },
       "is_incremental": false,
@@ -1242,7 +1242,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ParamsSourceAttribute.html",
-          "hash": "UFVGoloo+MkVPK9dRbZXGQ=="
+          "hash": "iLTxqjeVnrkFGWse8e8mrQ=="
         }
       },
       "is_incremental": false,
@@ -1254,7 +1254,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.PlainExporterAttribute.html",
-          "hash": "CCLAiZmoWEwDpwC7obX/iA=="
+          "hash": "K/mPDLcVibXwPSE03sVHsg=="
         }
       },
       "is_incremental": false,
@@ -1266,7 +1266,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ProcessCountAttribute.html",
-          "hash": "JDlqiCUKVlqtzWz8zV3v/w=="
+          "hash": "tOfaTDlHnxnkIx4ncSklwA=="
         }
       },
       "is_incremental": false,
@@ -1278,7 +1278,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.Q1ColumnAttribute.html",
-          "hash": "jiYFVUUI9aexaTB3lRLp8g=="
+          "hash": "AR1k994lPPac5WTog6HBUA=="
         }
       },
       "is_incremental": false,
@@ -1290,7 +1290,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.Q3ColumnAttribute.html",
-          "hash": "2o3I5aDIObdINwqw2vKCsQ=="
+          "hash": "JPyS/Q++U5cgF/yaT9TKdw=="
         }
       },
       "is_incremental": false,
@@ -1302,7 +1302,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.RPlotExporterAttribute.html",
-          "hash": "6gAFP1gVlZxqV3D8sh611Q=="
+          "hash": "JRZow3bD9yGiINaWohMz0g=="
         }
       },
       "is_incremental": false,
@@ -1314,7 +1314,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.RankColumnAttribute.html",
-          "hash": "5SMNWLdpxC2zxuhs2yb3aA=="
+          "hash": "Ahx9/iFiJ52NgEfopNfqNg=="
         }
       },
       "is_incremental": false,
@@ -1326,7 +1326,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ReturnValueValidatorAttribute.html",
-          "hash": "peflxxm84J6LOz/I6Y+GkA=="
+          "hash": "QRdy5JK8Ht070UCr62qUgw=="
         }
       },
       "is_incremental": false,
@@ -1338,7 +1338,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.RunOncePerIterationAttribute.html",
-          "hash": "ZSfs3QGYGYg1RsP35ZFuiA=="
+          "hash": "g89z+smqksdRvH4CX65mLQ=="
         }
       },
       "is_incremental": false,
@@ -1350,7 +1350,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.RyuJitX64JobAttribute.html",
-          "hash": "UWz5kre+ANJ7M6NnQNIw3w=="
+          "hash": "6l1LAndU/PrALZ/PNEpR9Q=="
         }
       },
       "is_incremental": false,
@@ -1362,7 +1362,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.RyuJitX86JobAttribute.html",
-          "hash": "hfVyYXiAYUklNm+zYsgOtg=="
+          "hash": "BVdU8NQhgY8KizRpShIjxQ=="
         }
       },
       "is_incremental": false,
@@ -1374,7 +1374,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ShortRunJobAttribute.html",
-          "hash": "Z7kU0aci/PaRsrffrVarkQ=="
+          "hash": "/w02qw33llXn64rsn8jarQ=="
         }
       },
       "is_incremental": false,
@@ -1386,7 +1386,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.SimpleJobAttribute.html",
-          "hash": "q4EsqmcKuPQdYV/+Zxw9mA=="
+          "hash": "tAdkFoXqrn8r6bulChK3CQ=="
         }
       },
       "is_incremental": false,
@@ -1398,7 +1398,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.SkewnessColumnAttribute.html",
-          "hash": "e5KF3DhqOt7EISye/Y3Skg=="
+          "hash": "fOFbYRVoVjIdvOYi1v4BeQ=="
         }
       },
       "is_incremental": false,
@@ -1410,7 +1410,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.html",
-          "hash": "vVPyjkl24EOc4BNmH2BuzA=="
+          "hash": "iU8shvY1GL/k1ns7DsjUtg=="
         }
       },
       "is_incremental": false,
@@ -1422,7 +1422,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.StdDevColumnAttribute.html",
-          "hash": "SzLrUxU1aJc5IUfc7740ug=="
+          "hash": "B7TDj4HlWod2QEreaeq1/Q=="
         }
       },
       "is_incremental": false,
@@ -1434,7 +1434,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.StdErrorColumnAttribute.html",
-          "hash": "VEA/cpC50EmhiKSRvZ+IbQ=="
+          "hash": "2nhp6gegNo2ycooWlag9ZQ=="
         }
       },
       "is_incremental": false,
@@ -1446,7 +1446,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.StopOnFirstErrorAttribute.html",
-          "hash": "thTRo3q6gfuImI4Ep7I6TA=="
+          "hash": "JW4QTQehvaCxw0TJvWwqRw=="
         }
       },
       "is_incremental": false,
@@ -1458,7 +1458,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.TargetedAttribute.html",
-          "hash": "EQXiYoYRjCyK+GXWLxFP0w=="
+          "hash": "74s9oE8d6Vl8P7hFHG5QYg=="
         }
       },
       "is_incremental": false,
@@ -1470,7 +1470,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.ValidatorConfigBaseAttribute.html",
-          "hash": "iq4URJxpL7v1EFPkbYdlUQ=="
+          "hash": "LgpZel2o/8UqpSjuphycoA=="
         }
       },
       "is_incremental": false,
@@ -1482,7 +1482,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.VeryLongRunJobAttribute.html",
-          "hash": "CKu54nOtXc8FJ2g3oXSlIw=="
+          "hash": "KECSlJRpkYSIGogDaao6Iw=="
         }
       },
       "is_incremental": false,
@@ -1494,7 +1494,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.WarmupCountAttribute.html",
-          "hash": "k+28X297MSfo1f67sfMMwQ=="
+          "hash": "EtLXPz3yt6zMPg1k+LEw5g=="
         }
       },
       "is_incremental": false,
@@ -1506,7 +1506,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.html",
-          "hash": "iRYLwjk/ME5NDCmScZkuiA=="
+          "hash": "vylJ8pfSAMYCzZoxQq34BA=="
         }
       },
       "is_incremental": false,
@@ -1518,7 +1518,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.XmlExporterAttribute.Brief.html",
-          "hash": "QEqYIb29+XCCv/XqMi+FRQ=="
+          "hash": "ScwSR0KTX5HH0IFspXKpYQ=="
         }
       },
       "is_incremental": false,
@@ -1530,7 +1530,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.XmlExporterAttribute.BriefCompressed.html",
-          "hash": "c1AFmjIZFU7aIzwa19eU9w=="
+          "hash": "6E3xfGx9ESZ5vDO8I/A1Lw=="
         }
       },
       "is_incremental": false,
@@ -1542,7 +1542,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.XmlExporterAttribute.Full.html",
-          "hash": "35IezyjBy27XRpMZo4Fahw=="
+          "hash": "icnHlnAwKQVa+4baIHm1CA=="
         }
       },
       "is_incremental": false,
@@ -1554,7 +1554,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.XmlExporterAttribute.FullCompressed.html",
-          "hash": "8qw6Id9o0mkkwGYRUqOlpg=="
+          "hash": "VO9Kw8T6+PgVfvXMe7m8Ww=="
         }
       },
       "is_incremental": false,
@@ -1566,7 +1566,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.XmlExporterAttribute.html",
-          "hash": "5lIx0KE2KZuc2CiOD2SeZA=="
+          "hash": "Ks0iAX5WIsN56ahB14kmyQ=="
         }
       },
       "is_incremental": false,
@@ -1578,7 +1578,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Attributes.html",
-          "hash": "xGELQ8EwMeUNYHidor1EHw=="
+          "hash": "+fIK3zat+liPeGrPujnFbg=="
         }
       },
       "is_incremental": false,
@@ -1590,7 +1590,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Characteristics.Characteristic-1.html",
-          "hash": "Ywjd7b5d8Dkbf/ztM7I58Q=="
+          "hash": "of0NH2ojiAvUIRZ0yb1FRw=="
         }
       },
       "is_incremental": false,
@@ -1602,7 +1602,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Characteristics.Characteristic.html",
-          "hash": "+sL/uTcK+U6MYIbDbHhvQQ=="
+          "hash": "ZENQSytQdeflYh/KZijU0w=="
         }
       },
       "is_incremental": false,
@@ -1614,7 +1614,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Characteristics.CharacteristicHelper.html",
-          "hash": "ArqR95kWMpMGhcEhc7VNpQ=="
+          "hash": "VdwQLnJeoJ4flgIqLK4dXQ=="
         }
       },
       "is_incremental": false,
@@ -1626,7 +1626,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Characteristics.CharacteristicObject-1.html",
-          "hash": "05Pw1kAJf9p3Hn1190C6hg=="
+          "hash": "mYIu56s9vftZ+Ry+v7jAqg=="
         }
       },
       "is_incremental": false,
@@ -1638,7 +1638,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Characteristics.CharacteristicObject.html",
-          "hash": "BAwW3VxJXIykhA7ZIeMDQQ=="
+          "hash": "Azn1/uqr8NGO6f4o9CbLSQ=="
         }
       },
       "is_incremental": false,
@@ -1650,7 +1650,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Characteristics.CharacteristicPresenter.html",
-          "hash": "Lcz+kxMfWJPfyydKLETpiQ=="
+          "hash": "bE1PznTPea+DnPMmf7Ucxw=="
         }
       },
       "is_incremental": false,
@@ -1662,7 +1662,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Characteristics.CharacteristicSet.html",
-          "hash": "upWI0WENImCA7P/BQOQ5bw=="
+          "hash": "Snzzzs2aUOYwtvZxriKTpg=="
         }
       },
       "is_incremental": false,
@@ -1674,7 +1674,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Characteristics.CharacteristicSetPresenter.html",
-          "hash": "RkEAtkKsNqVdN0yZpUEDGw=="
+          "hash": "oaINd+bQz1vYwqqXEmrMNQ=="
         }
       },
       "is_incremental": false,
@@ -1686,7 +1686,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Characteristics.CompositeResolver.html",
-          "hash": "sg4jzUyeeinoazi+E2XnBg=="
+          "hash": "hNg0BPrX40auLMzSnunpyA=="
         }
       },
       "is_incremental": false,
@@ -1698,7 +1698,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Characteristics.IResolver.html",
-          "hash": "W/irjBZ+ATZ93i9DNPHfBw=="
+          "hash": "OoXSTM20nTB3x9hJeJgC1w=="
         }
       },
       "is_incremental": false,
@@ -1710,7 +1710,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Characteristics.Resolver.html",
-          "hash": "yvFf2NWyQUSWxf+SAj2MLQ=="
+          "hash": "LAp14YZ0TtNDfiAzQwEAtg=="
         }
       },
       "is_incremental": false,
@@ -1722,7 +1722,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Characteristics.html",
-          "hash": "EJjW06Ck9okjAT78vu7Tsw=="
+          "hash": "q5vLb81qBG/T3LD7BlMiCg=="
         }
       },
       "is_incremental": false,
@@ -1734,7 +1734,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Code.ArrayParam-1.html",
-          "hash": "COXlk7xftb2UO2XV4xvlbg=="
+          "hash": "tV3NUKqa2ZG5uY1jJ9VPOQ=="
         }
       },
       "is_incremental": false,
@@ -1746,7 +1746,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Code.IParam.html",
-          "hash": "sxUcfsWhIPUIP0rrV0DmrQ=="
+          "hash": "8Kn7kuYIO0yX69olrlpToA=="
         }
       },
       "is_incremental": false,
@@ -1758,7 +1758,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Code.html",
-          "hash": "v1lvmNcC4GidkLjolDufOg=="
+          "hash": "LmvfnvQlfbxn44pFRBvWAg=="
         }
       },
       "is_incremental": false,
@@ -1770,7 +1770,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.BaselineColumn.html",
-          "hash": "HJp2Y3+o5grvR4JKvXd/yQ=="
+          "hash": "gxM5zmXpKQ2mn95CE2cefw=="
         }
       },
       "is_incremental": false,
@@ -1782,7 +1782,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.BaselineCustomColumn.html",
-          "hash": "yPUuPGAUyyNzTbYO7LKaUQ=="
+          "hash": "zPjIEqfrxsyaYkKDJeKAmg=="
         }
       },
       "is_incremental": false,
@@ -1794,7 +1794,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.BaselineRatioColumn.RatioMetric.html",
-          "hash": "BICLAgog+an1CeB647r0kw=="
+          "hash": "c1hk4prfmrLcCwDKu9fmIw=="
         }
       },
       "is_incremental": false,
@@ -1806,7 +1806,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.BaselineRatioColumn.html",
-          "hash": "b3lVHnG33rhMDssqvWw+OQ=="
+          "hash": "RtPPtauKygkAd21WwfOTOw=="
         }
       },
       "is_incremental": false,
@@ -1818,7 +1818,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.BaselineScaledColumn.ScaledKind.html",
-          "hash": "FjWEzmrGODEF6/Fcz+56Wg=="
+          "hash": "aYxE909n0hplVA4ea3eXTw=="
         }
       },
       "is_incremental": false,
@@ -1830,7 +1830,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.BaselineScaledColumn.html",
-          "hash": "7T00zHUIOiWwiF21+XkQEA=="
+          "hash": "MB1oqUi1sjYfxFr2QKwTRw=="
         }
       },
       "is_incremental": false,
@@ -1842,7 +1842,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.CategoriesColumn.html",
-          "hash": "iUxiGs8nH4oZawsWLj/Ruw=="
+          "hash": "ChpE1E/3Dce5CRKI9b9imA=="
         }
       },
       "is_incremental": false,
@@ -1854,7 +1854,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.ColumnCategory.html",
-          "hash": "lbbZX4aMO4tqLXiHDsLoIw=="
+          "hash": "QET4Z3zdM/F+od3CzeU6Og=="
         }
       },
       "is_incremental": false,
@@ -1866,7 +1866,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.ColumnExtensions.html",
-          "hash": "yDme2DQgxmahi39xx13fDQ=="
+          "hash": "JiisHXoErpUYVePjyK/k8Q=="
         }
       },
       "is_incremental": false,
@@ -1878,7 +1878,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.CompositeColumnProvider.html",
-          "hash": "v4ii9VBo7wEueNZ6Ipdj+A=="
+          "hash": "9c6/dtGqrwCd68kM/eL3ZA=="
         }
       },
       "is_incremental": false,
@@ -1890,7 +1890,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.DefaultColumnProviders.html",
-          "hash": "FY0CDsjZVpPL/9k4zxyODQ=="
+          "hash": "6hHa19iZVIOwgq5EKUXQpg=="
         }
       },
       "is_incremental": false,
@@ -1902,7 +1902,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.EmptyColumnProvider.html",
-          "hash": "XmBR3licuYMk3uxvCjapTA=="
+          "hash": "HoF8KIqFHvxtH2PvexeQUA=="
         }
       },
       "is_incremental": false,
@@ -1914,7 +1914,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.IColumn.html",
-          "hash": "wTCjH3ZYPNEnQIMoDkModg=="
+          "hash": "hwzE0rQAxXJonqoHYQW2VQ=="
         }
       },
       "is_incremental": false,
@@ -1926,7 +1926,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.IColumnProvider.html",
-          "hash": "WCxkE/Kd+bwzFmkdhfE38g=="
+          "hash": "kQ4nTgJ4uXiYM35ERELKow=="
         }
       },
       "is_incremental": false,
@@ -1938,7 +1938,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.JobCharacteristicColumn.html",
-          "hash": "BGkgBq83FkIaX421A1Q8ng=="
+          "hash": "LNa/nof/9G+pj9k/ttYpTw=="
         }
       },
       "is_incremental": false,
@@ -1950,7 +1950,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.LogicalGroupColumn.html",
-          "hash": "GvNwEqLYG94hR9H1+48vUA=="
+          "hash": "8GOMhCCkG9EypafkBBfI2A=="
         }
       },
       "is_incremental": false,
@@ -1962,7 +1962,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.MetricColumn.html",
-          "hash": "7WQrSWIGBtdKmGGiWfPN9Q=="
+          "hash": "5D/PdB8ywjqMd0wUK+UuqA=="
         }
       },
       "is_incremental": false,
@@ -1974,7 +1974,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.ParamColumn.html",
-          "hash": "xNoXXb1TDIOkvnp14shLdA=="
+          "hash": "qwcBrNuAvTRPXd74ggk9QQ=="
         }
       },
       "is_incremental": false,
@@ -1986,7 +1986,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.RankColumn.html",
-          "hash": "ebesgd0lbbNtcfEOpl0lQQ=="
+          "hash": "DvDU08rXLTK+ga6+or1/dw=="
         }
       },
       "is_incremental": false,
@@ -1998,7 +1998,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.SimpleColumnProvider.html",
-          "hash": "jyFr8qHQXNOI6Dbnh2gA/Q=="
+          "hash": "aY1ghNsk98C9KFu1AKxR7A=="
         }
       },
       "is_incremental": false,
@@ -2010,7 +2010,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.SizeUnit.html",
-          "hash": "M1kU8lR7wClKZBtO1DvoyQ=="
+          "hash": "YZ5e4daOktt9f9ky7vIPrQ=="
         }
       },
       "is_incremental": false,
@@ -2022,7 +2022,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.StatisticColumn.html",
-          "hash": "7F5trKwYImedCa4rNV6R9w=="
+          "hash": "kWk1/v3D2JOS7HbLIoCT0Q=="
         }
       },
       "is_incremental": false,
@@ -2034,7 +2034,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.StatisticalTestColumn.html",
-          "hash": "fBvtUatbiPnBSmrxk/Rouw=="
+          "hash": "+RBssLycQhjrfU7cSWyX4g=="
         }
       },
       "is_incremental": false,
@@ -2046,7 +2046,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.TagColumn.html",
-          "hash": "TvB3pAdm8XwMZZsUxAbCnA=="
+          "hash": "NGApU9cedKBZ4vxr6MSmKA=="
         }
       },
       "is_incremental": false,
@@ -2058,7 +2058,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.TargetMethodColumn.html",
-          "hash": "mraFt9iAaTEQP8D7HWm16w=="
+          "hash": "vUc/aV+vMb3CbiY9Fn8vSw=="
         }
       },
       "is_incremental": false,
@@ -2070,7 +2070,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.UnitType.html",
-          "hash": "D7KwaUzT3krKUtXo56kGLA=="
+          "hash": "Zi1l3ylpqq3JZQGriSVTQQ=="
         }
       },
       "is_incremental": false,
@@ -2082,7 +2082,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Columns.html",
-          "hash": "+XvXuGaBXN7Csz4zqBRqlg=="
+          "hash": "NU3m41+vPuqDjMLWUzDJYw=="
         }
       },
       "is_incremental": false,
@@ -2094,7 +2094,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule.html",
-          "hash": "/SuCbjZGRqI0KPJjCKXX5A=="
+          "hash": "s3wjTvli6G+u8ck1y2d7Sw=="
         }
       },
       "is_incremental": false,
@@ -2106,7 +2106,19 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Configs.ConfigExtensions.html",
-          "hash": "OIN7l4K+Ct8aCbHEVQZWvg=="
+          "hash": "W1/PUNpgUK7Tk1OUpBa6MQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Configs.ConfigOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Configs.ConfigOptions.html",
+          "hash": "Hg+xXnBVw0Mank6k6iY/ZA=="
         }
       },
       "is_incremental": false,
@@ -2118,7 +2130,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Configs.ConfigUnionRule.html",
-          "hash": "0qByQ0i3DTC9VhOtlJp/zg=="
+          "hash": "sGMKIgB23xHydpNOXSy+Ww=="
         }
       },
       "is_incremental": false,
@@ -2130,7 +2142,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Configs.DebugBuildConfig.html",
-          "hash": "VtRJ22a003N0EVZeOW1aZA=="
+          "hash": "JvV/D17h6OY9yqAVbHl32g=="
         }
       },
       "is_incremental": false,
@@ -2142,7 +2154,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Configs.DebugConfig.html",
-          "hash": "dPiMTpayd8CoV80qneNgjQ=="
+          "hash": "6N3yPZPjlehev+08RnPFSA=="
         }
       },
       "is_incremental": false,
@@ -2154,7 +2166,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Configs.DebugInProcessConfig.html",
-          "hash": "nq8eGB4mwceF2ProiEd9ng=="
+          "hash": "HVtrHWJXi6qfdM1OwxrTOg=="
         }
       },
       "is_incremental": false,
@@ -2166,7 +2178,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Configs.DefaultConfig.html",
-          "hash": "rEqbOF9w+vNzyaxyPBex3A=="
+          "hash": "WdlKjpyNsXDHl6dyX7DMDg=="
         }
       },
       "is_incremental": false,
@@ -2178,7 +2190,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Configs.IConfig.html",
-          "hash": "QPQfVZYo3e5wFPBrWRO4kg=="
+          "hash": "9ruTi4jzkprQhvY9HwWnng=="
         }
       },
       "is_incremental": false,
@@ -2190,7 +2202,31 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Configs.IConfigSource.html",
-          "hash": "ZWrVvcljPZsYKTYSeLwqXg=="
+          "hash": "CQO8L2q/YXjGB8JGsJJVew=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Configs.ImmutableConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Configs.ImmutableConfig.html",
+          "hash": "C4BRn6+Nnralz8ENRlcPEg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Configs.ImmutableConfigBuilder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Configs.ImmutableConfigBuilder.html",
+          "hash": "eNSdOUA4AsbZY0iHodCxYg=="
         }
       },
       "is_incremental": false,
@@ -2202,19 +2238,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Configs.ManualConfig.html",
-          "hash": "8nQaqE5wbMMlEKrG4pDTxA=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Configs.ReadOnlyConfig.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Configs.ReadOnlyConfig.html",
-          "hash": "XWJVrdi3mHX0XbNrVG5jDw=="
+          "hash": "CBTYKeSniieZJjxh1K5sqA=="
         }
       },
       "is_incremental": false,
@@ -2226,7 +2250,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Configs.html",
-          "hash": "alPPd/WReonJMHa3pCAP5Q=="
+          "hash": "25XOd1DDMJc7zzZ5OK6njg=="
         }
       },
       "is_incremental": false,
@@ -2238,7 +2262,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html",
-          "hash": "DhU4kVWY6b3RjSG2f6Obcw=="
+          "hash": "1r9mn0tQZxcwh1NVZ2HZCA=="
         }
       },
       "is_incremental": false,
@@ -2250,7 +2274,19 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.ConsoleArguments.ConfigParser.html",
-          "hash": "MX5b0nLPV9jc0lPxvpCHMA=="
+          "hash": "VKehdSnWmiDWsprN9hebfw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.ConsoleArguments.CorrectionsSuggester.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.ConsoleArguments.CorrectionsSuggester.html",
+          "hash": "G9xwuBmPncJEf62B5w8z6w=="
         }
       },
       "is_incremental": false,
@@ -2262,7 +2298,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.ConsoleArguments.ListBenchmarks.ListBenchmarkCaseMode.html",
-          "hash": "bbOfdMOzSk7vrVfymxkRQw=="
+          "hash": "L+P78NY4m1h0b1vDlb3EqQ=="
         }
       },
       "is_incremental": false,
@@ -2274,7 +2310,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.ConsoleArguments.ListBenchmarks.html",
-          "hash": "4aR2g3QjA9LuvC4dc5/zcg=="
+          "hash": "1B7qsZ+5+3UZQM+Ovh1hqg=="
         }
       },
       "is_incremental": false,
@@ -2286,7 +2322,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.ConsoleArguments.html",
-          "hash": "INUWeQCTvJu6YIXSRO3TtA=="
+          "hash": "Laa2oc/RZ0EofWkYJIJ2TA=="
         }
       },
       "is_incremental": false,
@@ -2298,7 +2334,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.Asm.html",
-          "hash": "o4hh/Ndi4R2WNGtl0Qra8g=="
+          "hash": "MncrRlfuwXyncrG+gmIVkw=="
         }
       },
       "is_incremental": false,
@@ -2310,7 +2346,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.Code.html",
-          "hash": "hRRjYUuTog6+Hym2z9lhPQ=="
+          "hash": "7WdkHq2xIx8dCjP7MFtgIg=="
         }
       },
       "is_incremental": false,
@@ -2322,7 +2358,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.CompositeDiagnoser.html",
-          "hash": "11uTYZOZDWVtZJUMmcqSIQ=="
+          "hash": "O7fJXL9uybE2vlgVMN2DUA=="
         }
       },
       "is_incremental": false,
@@ -2334,7 +2370,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.DiagnoserActionParameters.html",
-          "hash": "UqsViR1cB0ygLdhA+XjjHA=="
+          "hash": "hLJc8+kHV8c4Rs5sCe/6Iw=="
         }
       },
       "is_incremental": false,
@@ -2346,7 +2382,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.DiagnoserResults.html",
-          "hash": "SRn19N717RR5HfV9QzeEqw=="
+          "hash": "wck+BkkNlOjb3zvKlkFQXQ=="
         }
       },
       "is_incremental": false,
@@ -2358,7 +2394,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.DisassembledMethod.html",
-          "hash": "NF5uAczKc2atzOhgfZwVyA=="
+          "hash": "+MncKlSAoq+QLuFcjE5wtA=="
         }
       },
       "is_incremental": false,
@@ -2370,7 +2406,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.DisassemblerConstants.html",
-          "hash": "dafSymigTkh4ONNj/VOtmA=="
+          "hash": "206JCadHGyP6QWPt7uDy3g=="
         }
       },
       "is_incremental": false,
@@ -2382,7 +2418,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.DisassemblyAnalyzer.html",
-          "hash": "ldD+ZKZYRnRkWLIn0Ux7IA=="
+          "hash": "s7XYAMVPcAlyDitTldTCxw=="
         }
       },
       "is_incremental": false,
@@ -2394,7 +2430,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.DisassemblyDiagnoser.html",
-          "hash": "oO9mIXB7ECuubE000J+SgQ=="
+          "hash": "+D79FW9FkeFdIEtxcqYOJw=="
         }
       },
       "is_incremental": false,
@@ -2406,7 +2442,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.html",
-          "hash": "fKhalluAYWJVqtU5QxB95g=="
+          "hash": "1q8LVSXG8jLWNkVcxDV1KA=="
         }
       },
       "is_incremental": false,
@@ -2418,7 +2454,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.DisassemblyResult.html",
-          "hash": "DI1FqxX3AyqQ7W1JknulmQ=="
+          "hash": "bdY0X29iRPklbjq5XG+wqw=="
         }
       },
       "is_incremental": false,
@@ -2430,7 +2466,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.HardwareCounter.html",
-          "hash": "/Dd4lwmPHqTfbjU8o0LNbg=="
+          "hash": "yeQPV5Ni00McBv+HD/jbSg=="
         }
       },
       "is_incremental": false,
@@ -2442,7 +2478,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.HardwareCounterExtensions.html",
-          "hash": "coF+Oy3My1vOv1aZGkqVqw=="
+          "hash": "OaYL6ct2liPbHOzwPKmDQA=="
         }
       },
       "is_incremental": false,
@@ -2454,7 +2490,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.IConfigurableDiagnoser-1.html",
-          "hash": "aD8LXMtPlOUeVRoApy4pFw=="
+          "hash": "qMP1vK72vYGEhgRZqusIVw=="
         }
       },
       "is_incremental": false,
@@ -2466,7 +2502,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.IDiagnoser.html",
-          "hash": "dqqqDH3+iJYedZP7Ylz1EQ=="
+          "hash": "oCB6pTXvYb4zlqcuGitVhg=="
         }
       },
       "is_incremental": false,
@@ -2478,7 +2514,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.IL.html",
-          "hash": "3M07qF9D4u2ajIQFooMKXg=="
+          "hash": "JTfUKn4+vk56Si6MAfSapA=="
         }
       },
       "is_incremental": false,
@@ -2490,7 +2526,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.Map.html",
-          "hash": "xzf3iRymFlk7KLZZrXgu9g=="
+          "hash": "oMlFwNrxZ+IBqPpjal2F/g=="
         }
       },
       "is_incremental": false,
@@ -2502,7 +2538,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.MemoryDiagnoser.html",
-          "hash": "Ssmb73aGNdGcmTeAyuMC8Q=="
+          "hash": "2I/iIBLY84UapdOT9GgL8A=="
         }
       },
       "is_incremental": false,
@@ -2514,7 +2550,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.PmcStats.html",
-          "hash": "i395XC7YAHHaRJSZFCE3mg=="
+          "hash": "jms4pPLu/0iZciIjRvettg=="
         }
       },
       "is_incremental": false,
@@ -2526,7 +2562,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.PreciseMachineCounter.html",
-          "hash": "iUSshsfOLudXZMSYGis88A=="
+          "hash": "2q1eIYSnazmE2vpeyGGo6Q=="
         }
       },
       "is_incremental": false,
@@ -2538,7 +2574,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.RunMode.html",
-          "hash": "Lx7nw3pZ7RO8m+yK/viCZQ=="
+          "hash": "LU3BAV5Tht8TRSG+dqA3Cw=="
         }
       },
       "is_incremental": false,
@@ -2550,7 +2586,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.Sharp.html",
-          "hash": "bnpRryvvrmI/2GhilpyLSw=="
+          "hash": "C27xH8BojldEUtOtbcZYHg=="
         }
       },
       "is_incremental": false,
@@ -2562,7 +2598,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.UnresolvedDiagnoser.html",
-          "hash": "Kb3PJxjOcl93s1iMTlmhOg=="
+          "hash": "dLox/ol/NvhbZkdraaIREw=="
         }
       },
       "is_incremental": false,
@@ -2574,7 +2610,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.WindowsDisassembler.html",
-          "hash": "KJPDFkx550Ri5HbLSXe01A=="
+          "hash": "o3XVKX1OwSvmM424l5Lc4g=="
         }
       },
       "is_incremental": false,
@@ -2586,7 +2622,19 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Diagnosers.html",
-          "hash": "LoBG4/GSnNh1BuLsIHwrzw=="
+          "hash": "LiT8zzehgeQV5Gr2TclqWQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Engines.AutoWarmupStoppingCriteria.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Engines.AutoWarmupStoppingCriteria.html",
+          "hash": "7iDzXeZHjgkd67GFXGZabw=="
         }
       },
       "is_incremental": false,
@@ -2598,7 +2646,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.ConsoleHost.html",
-          "hash": "ECGrKgDdK+HLd3jxWJme0A=="
+          "hash": "qA20Q51p2k8gTR6dWrqiSA=="
         }
       },
       "is_incremental": false,
@@ -2610,7 +2658,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.Consumer.html",
-          "hash": "xnNajlI6ggWfQ3Y+crcWjw=="
+          "hash": "bX0Cxa+205rW3DnOoessfw=="
         }
       },
       "is_incremental": false,
@@ -2622,7 +2670,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.ConsumerExtensions.html",
-          "hash": "SVzG94wOckl+0X5ZRQYUng=="
+          "hash": "2ziozI7+MoMkHtjYukhTbA=="
         }
       },
       "is_incremental": false,
@@ -2634,7 +2682,19 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.DeadCodeEliminationHelper.html",
-          "hash": "8PzJ/wR95KcTBYW8GSc2bQ=="
+          "hash": "0LwNMqJNxHiEZRjAyFrWUQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Engines.DefaultStoppingCriteriaFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Engines.DefaultStoppingCriteriaFactory.html",
+          "hash": "WY+zRaNlZ/E/y/Qn4dztMA=="
         }
       },
       "is_incremental": false,
@@ -2646,7 +2706,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.Engine.Signals.html",
-          "hash": "Uit71bu4ZAvpCSox6NIR4Q=="
+          "hash": "u2i6YKJJvK259ikuZ+Vhsg=="
         }
       },
       "is_incremental": false,
@@ -2658,7 +2718,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.Engine.html",
-          "hash": "+O/BoB1NrKcO/S2aH02hqA=="
+          "hash": "hqHatFygxy0O2+GSPvPK1g=="
         }
       },
       "is_incremental": false,
@@ -2670,7 +2730,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.EngineActualStage.html",
-          "hash": "MetoHLZIvlh2xjSye2MlXA=="
+          "hash": "Xd+jGw3/dFftSU/O3AKgHQ=="
         }
       },
       "is_incremental": false,
@@ -2682,7 +2742,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.EngineEventSource.Tasks.html",
-          "hash": "4+zQ48SFjs//mgjq1kDdcg=="
+          "hash": "+mel+sHYTYpRrI/lxay9Fw=="
         }
       },
       "is_incremental": false,
@@ -2694,7 +2754,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.EngineEventSource.html",
-          "hash": "3hd3TY6S4wZkbXOFU6z+uA=="
+          "hash": "DaWg/T/UxwdlbjdmIZBX4Q=="
         }
       },
       "is_incremental": false,
@@ -2706,7 +2766,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.EngineFactory.html",
-          "hash": "k/J1Hs59oUWWuF3IU3rJ4g=="
+          "hash": "XV1UGdNI7ZZMYAxy1ITGIA=="
         }
       },
       "is_incremental": false,
@@ -2718,7 +2778,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.EngineParameters.html",
-          "hash": "Dri03vq0+m7JFXgz0FV7sA=="
+          "hash": "3flkTZ7AavMvQtPWpAdPxw=="
         }
       },
       "is_incremental": false,
@@ -2730,7 +2790,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.EngineResolver.html",
-          "hash": "P+zpdU4MebSPl2rS25rmIg=="
+          "hash": "CuTvTkbpzawy3Xpe1KxMOQ=="
         }
       },
       "is_incremental": false,
@@ -2742,7 +2802,19 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.EngineStage.html",
-          "hash": "VP6XebI1LuGG6sqjr28MwQ=="
+          "hash": "1W8i8NKpYE+MLpK9Nq0uIQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Engines.FixedStoppingCriteria.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Engines.FixedStoppingCriteria.html",
+          "hash": "0wol+rJU8rQCS/Xg3/6wdA=="
         }
       },
       "is_incremental": false,
@@ -2754,7 +2826,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.GcStats.html",
-          "hash": "id4RO+RxcmYZeh3h282H9w=="
+          "hash": "gZUIKhiqF7HmeBllF8Lv2Q=="
         }
       },
       "is_incremental": false,
@@ -2766,7 +2838,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.HostExtensions.html",
-          "hash": "nLWvTOee1vORVRr0Kabvvw=="
+          "hash": "4c6HyLjfdGy62AA/flkBUQ=="
         }
       },
       "is_incremental": false,
@@ -2778,7 +2850,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.HostSignal.html",
-          "hash": "oTZylzskvsFPdZoy2oLk8Q=="
+          "hash": "1wFYe69Ae7B7ULsfotga8A=="
         }
       },
       "is_incremental": false,
@@ -2790,7 +2862,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.IEngine.html",
-          "hash": "fyuxBsRBq8ELtCOyOfFv5g=="
+          "hash": "zVnM4aoRuxolIvLrgx5IWA=="
         }
       },
       "is_incremental": false,
@@ -2802,7 +2874,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.IEngineFactory.html",
-          "hash": "C7YAJ+oEp4xx2jVEiCWJyg=="
+          "hash": "FItmB3DC1Lqbbsabw0rvPg=="
         }
       },
       "is_incremental": false,
@@ -2814,7 +2886,19 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.IHost.html",
-          "hash": "ajbR8MVxGt8/YCkOyZfaoQ=="
+          "hash": "LDb8MUHbZmN+k3Eul6Bqbg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Engines.IStoppingCriteria.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Engines.IStoppingCriteria.html",
+          "hash": "gt8kXa1AE1QvjhOvyJ9SJA=="
         }
       },
       "is_incremental": false,
@@ -2826,7 +2910,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.IterationData.html",
-          "hash": "kAiqkGJIIF9sTd7GECKH3w=="
+          "hash": "g+9iRmybY+Bm0/KJq0iBnQ=="
         }
       },
       "is_incremental": false,
@@ -2838,7 +2922,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.IterationMode.html",
-          "hash": "3rUpdJuN1mGeNtMEZ9IxOw=="
+          "hash": "9jSQR9NkZILbfSL+ncj05g=="
         }
       },
       "is_incremental": false,
@@ -2850,7 +2934,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.IterationStage.html",
-          "hash": "at6uGbnCJR9XiDfoMFbSTQ=="
+          "hash": "jQZ9QSiam/VzkSBUcfQ6nA=="
         }
       },
       "is_incremental": false,
@@ -2862,7 +2946,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.RunResults.html",
-          "hash": "ih1bIvqEq6wlSRzyxXOEkg=="
+          "hash": "bwWVGbBFG37YopELg7gR/A=="
         }
       },
       "is_incremental": false,
@@ -2874,7 +2958,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.RunStrategy.html",
-          "hash": "va7/281hPIejRbGSSXf+5A=="
+          "hash": "yxUO9DpGRfwGH5ZfSNqCXw=="
         }
       },
       "is_incremental": false,
@@ -2886,7 +2970,31 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.RunStrategyExtensions.html",
-          "hash": "XBPxA/J/Edyc3iwoyZm54Q=="
+          "hash": "OuuAzMo2UifcFSJwKlTOmw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Engines.StoppingCriteriaBase.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Engines.StoppingCriteriaBase.html",
+          "hash": "9Sjm54nVky7H9f0KAwgWwg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Engines.StoppingResult.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Engines.StoppingResult.html",
+          "hash": "VhjACZcqLUZILy3LeU2dIQ=="
         }
       },
       "is_incremental": false,
@@ -2898,7 +3006,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Engines.html",
-          "hash": "yl6xEsQFT3F41LsYwKW7eQ=="
+          "hash": "w2o15sBJJn6IrlVRjpleIw=="
         }
       },
       "is_incremental": false,
@@ -2910,7 +3018,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Environments.BenchmarkEnvironmentInfo.html",
-          "hash": "ZOkCvTQ/MqdszW3YFyIx9A=="
+          "hash": "4odrRmv4K6caSN+GoTdjdQ=="
         }
       },
       "is_incremental": false,
@@ -2922,7 +3030,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Environments.ClrRuntime.html",
-          "hash": "93fIoTTz2umGq3vVuW5tYA=="
+          "hash": "Q9cAsvXygmctHrirpcxKXA=="
         }
       },
       "is_incremental": false,
@@ -2934,7 +3042,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Environments.CoreRtRuntime.html",
-          "hash": "MdQ47OVQbzSLswP7lAI5lw=="
+          "hash": "dg3O4AEzkWDoB4FcGttKkw=="
         }
       },
       "is_incremental": false,
@@ -2946,7 +3054,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Environments.CoreRuntime.html",
-          "hash": "28/DvfXofeZEmGFs4slQFQ=="
+          "hash": "3guxApUhXxnTvnrc39uWLw=="
         }
       },
       "is_incremental": false,
@@ -2958,7 +3066,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Environments.EnvironmentResolver.html",
-          "hash": "n6PWybaWxBeWMM0K2TmY+Q=="
+          "hash": "aru471RYW46A2lo2T9C0uw=="
         }
       },
       "is_incremental": false,
@@ -2970,7 +3078,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Environments.GcResolver.html",
-          "hash": "KMPjAWcK4Q4cHdTvJOMOeQ=="
+          "hash": "2RbJfrT6f0xqyTVXn6Kpmg=="
         }
       },
       "is_incremental": false,
@@ -2982,7 +3090,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Environments.HostEnvironmentInfo.html",
-          "hash": "mWk2OgtL/ODMz65lxC6E4Q=="
+          "hash": "7yZG9O0qm9ozGQUVarDLEA=="
         }
       },
       "is_incremental": false,
@@ -2994,7 +3102,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Environments.InfrastructureResolver.html",
-          "hash": "hReUh6tKJc8mLfZPT8w9jA=="
+          "hash": "gxZ3trdIVAZ5qJ7TIhmMbg=="
         }
       },
       "is_incremental": false,
@@ -3006,7 +3114,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Environments.Jit.html",
-          "hash": "oQjzjNb6XDRkzeYAo8nvOA=="
+          "hash": "8P+vvy0s9f2iShl1MsaB6w=="
         }
       },
       "is_incremental": false,
@@ -3018,7 +3126,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Environments.MonoRuntime.html",
-          "hash": "vUaS7wz/zs97QTVjBWVOFQ=="
+          "hash": "LosboMLev/UAa+DycmAmIw=="
         }
       },
       "is_incremental": false,
@@ -3030,7 +3138,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Environments.OsBrandStringHelper.html",
-          "hash": "4R+sdkV2xhWI8SS6BvVtqA=="
+          "hash": "ZLzkKoD0p0d4O6MJk7bKoA=="
         }
       },
       "is_incremental": false,
@@ -3042,7 +3150,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Environments.Platform.html",
-          "hash": "pWjWd+bq7ExqDh7PQ30FkQ=="
+          "hash": "7IDz0Cs/tAn8yDKxGW+SvA=="
         }
       },
       "is_incremental": false,
@@ -3054,7 +3162,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Environments.ProcessorBrandStringHelper.html",
-          "hash": "hTBubKTY0ZPgysqW0zeQiQ=="
+          "hash": "txNsykRTBmCYxaO3P5l4zA=="
         }
       },
       "is_incremental": false,
@@ -3066,7 +3174,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Environments.Runtime.html",
-          "hash": "7hsCwXl6pwC0WAqYT8OtPA=="
+          "hash": "JicAEneFaNzpmrEOReF/vw=="
         }
       },
       "is_incremental": false,
@@ -3078,7 +3186,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Environments.html",
-          "hash": "KLOc+y5XUOqJr6dmrX7fMQ=="
+          "hash": "1eBaF6B8JM5mhRPubu7vtA=="
         }
       },
       "is_incremental": false,
@@ -3090,7 +3198,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.AsciiDocExporter.html",
-          "hash": "nCgzyV/jE2Y7vqVGAt+a/g=="
+          "hash": "ustOGT9iHYGdDsvR/ixiMw=="
         }
       },
       "is_incremental": false,
@@ -3102,7 +3210,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.BenchmarkReportExporter.html",
-          "hash": "iDLse5IFMwwULeFtLfW+xg=="
+          "hash": "4/9WESdlTgn7x7C3rcJ27A=="
         }
       },
       "is_incremental": false,
@@ -3114,7 +3222,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.CombinedDisassemblyExporter.html",
-          "hash": "n36G/0iLCz8VbN0BJNLXqA=="
+          "hash": "25gTrxpQJ8GqBsiHpFaCJw=="
         }
       },
       "is_incremental": false,
@@ -3126,7 +3234,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.CompositeExporter.html",
-          "hash": "cjx+53LabpBzPKHvlkelSA=="
+          "hash": "4SBYpt6YufDVPjspLkvkrA=="
         }
       },
       "is_incremental": false,
@@ -3138,7 +3246,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.Csv.CsvExporter.html",
-          "hash": "jsk9yM/Zm6Q6u/dThfGcmQ=="
+          "hash": "d8rm+JX6pxKmxsZCiPuYEQ=="
         }
       },
       "is_incremental": false,
@@ -3150,7 +3258,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.Csv.CsvHelper.html",
-          "hash": "1okUoxhbTGs5I/qp0ZV5pA=="
+          "hash": "KCRV9umi0woAI81h0g/O5g=="
         }
       },
       "is_incremental": false,
@@ -3162,7 +3270,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.Csv.CsvMeasurementsExporter.html",
-          "hash": "ktiXQbh1ymjzElWThGos7w=="
+          "hash": "XRf2FpYhLNi8lAmVGFG6JA=="
         }
       },
       "is_incremental": false,
@@ -3174,7 +3282,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.Csv.CsvSeparator.html",
-          "hash": "atskB1MTwzsC2Ud6hMqHHA=="
+          "hash": "9awwQER+jh8wOqX+Xti9Zg=="
         }
       },
       "is_incremental": false,
@@ -3186,7 +3294,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.Csv.CsvSeparatorExtensions.html",
-          "hash": "zXVh6xZFzm1x9fwCwy8k2A=="
+          "hash": "o0UHiiABy2BmKKmoG6TIig=="
         }
       },
       "is_incremental": false,
@@ -3198,7 +3306,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.Csv.html",
-          "hash": "d5f14uUu7mpvYtCgB5JHjQ=="
+          "hash": "hcvLm9JjamNwEv5zzxf9vg=="
         }
       },
       "is_incremental": false,
@@ -3210,7 +3318,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.DefaultExporters.html",
-          "hash": "JhmUgmAKKFybNDNvuVASIg=="
+          "hash": "eHyEPJli6hGDGJ9vNVl20g=="
         }
       },
       "is_incremental": false,
@@ -3222,7 +3330,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.ExporterBase.html",
-          "hash": "aWbc26Sm+tuhAtn0Cfx9Vg=="
+          "hash": "dooHaGxrSZRWLFsV7otFqQ=="
         }
       },
       "is_incremental": false,
@@ -3234,7 +3342,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.HtmlExporter.html",
-          "hash": "oIhgqlCPj5T2lNfnZuPMbQ=="
+          "hash": "7EHHZ9b0y0YtOoQZ2YnC8A=="
         }
       },
       "is_incremental": false,
@@ -3246,7 +3354,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.IExporter.html",
-          "hash": "qZQkg/rIvtGPn142cr9dOA=="
+          "hash": "ygm2SPzdti7zCa9vi5kADA=="
         }
       },
       "is_incremental": false,
@@ -3258,7 +3366,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.InstructionPointerExporter.html",
-          "hash": "3/GgF1gWN6mwZYHy0LwtdA=="
+          "hash": "BISFZ5RvBhD/XCPX+ZNhRQ=="
         }
       },
       "is_incremental": false,
@@ -3270,7 +3378,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.Json.JsonExporter.html",
-          "hash": "b/VeIQOcIR9iZAuRGoKO4g=="
+          "hash": "oQROTqI4/2xjEoJ/XzfJfA=="
         }
       },
       "is_incremental": false,
@@ -3282,7 +3390,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.Json.JsonExporterBase.html",
-          "hash": "YF0yOCQ5tXNY4jkY/3XXTQ=="
+          "hash": "9CLN6EL66QOx6VwQlxl20Q=="
         }
       },
       "is_incremental": false,
@@ -3294,7 +3402,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.Json.html",
-          "hash": "U0iA5zLuTpSvF3ksKNrdTQ=="
+          "hash": "Q5rcNjzxYkSCc9FKBA68MQ=="
         }
       },
       "is_incremental": false,
@@ -3306,7 +3414,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.MarkdownExporter.MarkdownHighlightStrategy.html",
-          "hash": "jeNXknF3724zFylXRw5Arg=="
+          "hash": "MF/yHI4QMcEAptsenSxnFA=="
         }
       },
       "is_incremental": false,
@@ -3318,7 +3426,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.MarkdownExporter.html",
-          "hash": "hagLO2qGA1GwLFiE/489qQ=="
+          "hash": "W9LqPqQt0DRGnKMc1oIcjw=="
         }
       },
       "is_incremental": false,
@@ -3330,7 +3438,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.PlainExporter.html",
-          "hash": "67X4LzYm0RqnjMiP+6yHwA=="
+          "hash": "DO932mufLD8jKBVuqKYJDQ=="
         }
       },
       "is_incremental": false,
@@ -3342,7 +3450,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.PrettyGithubMarkdownDiffDisassemblyExporter.html",
-          "hash": "/WrmQh/j757ymBjl/ObmDQ=="
+          "hash": "REccvoXaggL5NMWomCQ4sQ=="
         }
       },
       "is_incremental": false,
@@ -3354,7 +3462,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.PrettyGithubMarkdownDisassemblyExporter.html",
-          "hash": "jaGlhj7OPQabZ5dbCyYmkQ=="
+          "hash": "OBKLEM1SyKkYJJWj042BBg=="
         }
       },
       "is_incremental": false,
@@ -3366,7 +3474,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.PrettyHtmlDisassemblyExporter.html",
-          "hash": "w7PmtAEcWcp6nIKJ2uAXgQ=="
+          "hash": "B/2uYx+JWvJjtmDRO+RwsQ=="
         }
       },
       "is_incremental": false,
@@ -3378,7 +3486,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.RPlotExporter.html",
-          "hash": "hDsIi61ckscI3LS336/kdA=="
+          "hash": "Ovg++wsSirKMmCmKz8mk+Q=="
         }
       },
       "is_incremental": false,
@@ -3390,7 +3498,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.RawDisassemblyExporter.html",
-          "hash": "0LJwzk36dcrtXEMWJ8j1aw=="
+          "hash": "FPRBGr/tMhOzPSkZTDr08A=="
         }
       },
       "is_incremental": false,
@@ -3402,7 +3510,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.Xml.XmlExporter.html",
-          "hash": "OSdb8Jy7BpCsAnlpuGJjFw=="
+          "hash": "WVDiPigOgEIOnqQV3beRtA=="
         }
       },
       "is_incremental": false,
@@ -3414,7 +3522,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.Xml.XmlExporterBase.html",
-          "hash": "NYKJkJaDS9RKHsJYJYaHuQ=="
+          "hash": "abAhMrrLEydY7q3ONFS1RA=="
         }
       },
       "is_incremental": false,
@@ -3426,7 +3534,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.Xml.html",
-          "hash": "eTy61U/xKHt+1AGfiZtUiw=="
+          "hash": "UpIplthSLvRh71fS/tnVCg=="
         }
       },
       "is_incremental": false,
@@ -3438,7 +3546,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Exporters.html",
-          "hash": "SJNhyUSvYqz/SM6SFP4N+g=="
+          "hash": "j8hLOre/wJgtT06eJJO/yg=="
         }
       },
       "is_incremental": false,
@@ -3450,7 +3558,19 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Extensions.ConfigurationExtensions.html",
-          "hash": "OoiS/2BiujBDcYwZobD/1g=="
+          "hash": "w7md4XzzTEldBsq/uZgpfg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Extensions.ProcessExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Extensions.ProcessExtensions.html",
+          "hash": "45gYTRdHChcIXm7ORay5UQ=="
         }
       },
       "is_incremental": false,
@@ -3462,7 +3582,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Extensions.ReportExtensions.html",
-          "hash": "qlcSkLY3icfTkKoJGHcXZg=="
+          "hash": "4Jp+VR8qx16/tfUXY4+KPQ=="
         }
       },
       "is_incremental": false,
@@ -3474,7 +3594,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Extensions.StatisticsExtensions.html",
-          "hash": "fd4F/Pqd5zE64GHrNlrtdQ=="
+          "hash": "1EFx+4EYTYrTd+QZxLgjgA=="
         }
       },
       "is_incremental": false,
@@ -3486,7 +3606,19 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Extensions.StringAndTextExtensions.html",
-          "hash": "Mrh3kqOSBZKG3kXaKejbYA=="
+          "hash": "XAz5ZCz3a5ql/Vz9vIocjQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Extensions.ThreadExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Extensions.ThreadExtensions.html",
+          "hash": "AB/1bUHhVrHpsVtTmYOsvA=="
         }
       },
       "is_incremental": false,
@@ -3498,7 +3630,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Extensions.html",
-          "hash": "UsViDnMoixGlC58B9fBpcw=="
+          "hash": "4ccBu15ko85S08T87Fsy9Q=="
         }
       },
       "is_incremental": false,
@@ -3510,7 +3642,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Filters.AllCategoriesFilter.html",
-          "hash": "4OXcD/mevjjDE8+/feFtzA=="
+          "hash": "hqO9Ln0NELmwaz9GyNtvtQ=="
         }
       },
       "is_incremental": false,
@@ -3522,7 +3654,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Filters.AnyCategoriesFilter.html",
-          "hash": "3HjVvyjTVX6BN/h/nAW8Og=="
+          "hash": "pNWUCMLfVVKQ5TMvji2GcA=="
         }
       },
       "is_incremental": false,
@@ -3534,7 +3666,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Filters.AttributesFilter.html",
-          "hash": "0f9gu/m+C9wQXplT+ZZfTQ=="
+          "hash": "ErcLZeERC+2I4VwL3+puIg=="
         }
       },
       "is_incremental": false,
@@ -3546,7 +3678,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Filters.DisjunctionFilter.html",
-          "hash": "D8f0ZEs++qqUxzsFJ/tQLg=="
+          "hash": "b/aT3bpfQE4Ei2GvQqmPBQ=="
         }
       },
       "is_incremental": false,
@@ -3558,7 +3690,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Filters.GlobFilter.html",
-          "hash": "FoowOvtqMoMYGjqDDUB2OQ=="
+          "hash": "CRbJso1XEhnZngzpSUKERg=="
         }
       },
       "is_incremental": false,
@@ -3570,7 +3702,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Filters.IFilter.html",
-          "hash": "MwY9Is+edsItnszVgWXTfQ=="
+          "hash": "c3diiCGOnQ+KsD8gEENw2g=="
         }
       },
       "is_incremental": false,
@@ -3582,7 +3714,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Filters.NameFilter.html",
-          "hash": "guWYazaPWBR4bCRgfmISAQ=="
+          "hash": "UI3pLkKeMv8rSLxa+b4KZw=="
         }
       },
       "is_incremental": false,
@@ -3594,7 +3726,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Filters.SimpleFilter.html",
-          "hash": "2OXZSiat6YEc0uRh0+ADUQ=="
+          "hash": "6njnTiVnzApqhf5Z/teOQw=="
         }
       },
       "is_incremental": false,
@@ -3606,7 +3738,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Filters.UnionFilter.html",
-          "hash": "H1gE0ZX8mOnA8owERq/mTw=="
+          "hash": "f/a/d2PDykn87kJFdY/rlg=="
         }
       },
       "is_incremental": false,
@@ -3618,7 +3750,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Filters.html",
-          "hash": "fnxIF9rZWarE6zKT3eRuZQ=="
+          "hash": "GH4deOEVakdJcIwatQr2+Q=="
         }
       },
       "is_incremental": false,
@@ -3630,7 +3762,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Helpers.ExternalToolsHelper.html",
-          "hash": "AaVZuJc3S4ynK6UVnVAzdg=="
+          "hash": "EumkocgdkokRQaZPcaAKXw=="
         }
       },
       "is_incremental": false,
@@ -3642,7 +3774,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Helpers.FolderNameHelper.html",
-          "hash": "GE7QkMQkH7t9bwZ4JekyYA=="
+          "hash": "6uUFDm9+BApbGv09IkGxRw=="
         }
       },
       "is_incremental": false,
@@ -3654,7 +3786,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Helpers.MultiEncodingString.html",
-          "hash": "RM8O8RwBra45xIzmTmVrwQ=="
+          "hash": "O4r90iF5/RiLnItDmeuVLw=="
         }
       },
       "is_incremental": false,
@@ -3666,7 +3798,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Helpers.SourceCodeHelper.html",
-          "hash": "ERAmHns8o2Yz5F7e453ekw=="
+          "hash": "Qo0yUylYh9aXlOYwSrumzg=="
         }
       },
       "is_incremental": false,
@@ -3678,7 +3810,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Helpers.html",
-          "hash": "JzzYW0Cdh4gzV3bCru+xCA=="
+          "hash": "SKchVR2Mehupg3N4h+qbpw=="
         }
       },
       "is_incremental": false,
@@ -3690,7 +3822,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Horology.Chronometer.html",
-          "hash": "OZ7KNdyNaBmRvJwmugCRow=="
+          "hash": "9EdKwXeqUc80EbW2HV7ANg=="
         }
       },
       "is_incremental": false,
@@ -3702,7 +3834,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Horology.ClockExtensions.html",
-          "hash": "cJb2EF4i8Wh90gBIdb1+4A=="
+          "hash": "TlVI9ZhOsxhgDGDRohC9+g=="
         }
       },
       "is_incremental": false,
@@ -3714,7 +3846,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Horology.ClockSpan.html",
-          "hash": "ady692Mh0lzNEVAf3wvMBg=="
+          "hash": "sqrXlMTBq0gUkRjv5VVP5A=="
         }
       },
       "is_incremental": false,
@@ -3726,7 +3858,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Horology.Frequency.html",
-          "hash": "lm5ONWYys+KQm9LRu5MWUw=="
+          "hash": "tYfPKcNTrg7kuTxWE6OwdQ=="
         }
       },
       "is_incremental": false,
@@ -3738,7 +3870,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Horology.FrequencyUnit.html",
-          "hash": "yg9yP3WKMfl9xfJ21ECPMA=="
+          "hash": "ETwYGqa6jpGOSVx7jCKlYw=="
         }
       },
       "is_incremental": false,
@@ -3750,7 +3882,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Horology.HardwareTimerKind.html",
-          "hash": "aehxvyWhGpnWgOlPZ7VrTQ=="
+          "hash": "zeovozM93n0J0peAIkV/Sw=="
         }
       },
       "is_incremental": false,
@@ -3762,7 +3894,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Horology.IClock.html",
-          "hash": "i73wyuhbyIqW1bQ7eamecw=="
+          "hash": "6RfKD90N4U2z+2CAcNOh8A=="
         }
       },
       "is_incremental": false,
@@ -3774,7 +3906,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Horology.StartedClock.html",
-          "hash": "/alcC6qAgpfDPvwTsf8dNA=="
+          "hash": "UdGHXczUA8hbAb/1mdXCnQ=="
         }
       },
       "is_incremental": false,
@@ -3786,7 +3918,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Horology.TimeInterval.html",
-          "hash": "2zsJwq1E+jeR5EGwtP4biA=="
+          "hash": "4QzGFZJRRFL3bt8i6wsj7Q=="
         }
       },
       "is_incremental": false,
@@ -3798,7 +3930,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Horology.TimeUnit.html",
-          "hash": "ptQhdplSbKb8OpQ8mr4v7Q=="
+          "hash": "BWfC8K6T9a0yOZO+HlCpcg=="
         }
       },
       "is_incremental": false,
@@ -3810,7 +3942,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Horology.html",
-          "hash": "tlJ2WLtFQgDGyFp8tZicQA=="
+          "hash": "yf7zAqeDGr6taskqX7JekQ=="
         }
       },
       "is_incremental": false,
@@ -3822,7 +3954,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.AccuracyMode.html",
-          "hash": "qUjE8Xz1E6oWtxo1NOUQ0w=="
+          "hash": "I4KhCKs4X5y+QYqP1xTuQw=="
         }
       },
       "is_incremental": false,
@@ -3834,7 +3966,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.Argument.html",
-          "hash": "yX+r6UdL2qElwsfGT4c8bQ=="
+          "hash": "ykc8ClytTk2dhUa9HR202A=="
         }
       },
       "is_incremental": false,
@@ -3846,7 +3978,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.EnvironmentMode.html",
-          "hash": "fMcTp7fvHLsZMtReQ+bIjw=="
+          "hash": "Fq3L68q4trIc9qgy6m0XpA=="
         }
       },
       "is_incremental": false,
@@ -3858,7 +3990,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.EnvironmentVariable.html",
-          "hash": "Yzyw4wQnt9psoLLtiILqgw=="
+          "hash": "mVEIh25fb37dJ9fErIGq/w=="
         }
       },
       "is_incremental": false,
@@ -3870,7 +4002,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.GcMode.html",
-          "hash": "oNFTW2xO5GUQfHItF0WjEA=="
+          "hash": "JPoWA7GsPPs5FfT2K//10w=="
         }
       },
       "is_incremental": false,
@@ -3882,7 +4014,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.GcModeExtensions.html",
-          "hash": "0CYJpje58zohWVTUx1ZFog=="
+          "hash": "4tfrH+GCP4gg+UA95xZc1A=="
         }
       },
       "is_incremental": false,
@@ -3894,7 +4026,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.InfrastructureMode.html",
-          "hash": "BbVw4TZwtU8ZSFe61YDFTg=="
+          "hash": "p85J8JQu956cnxe6AFfpKQ=="
         }
       },
       "is_incremental": false,
@@ -3906,7 +4038,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.Job.html",
-          "hash": "dZc5OLs4+EctUNP/LjfCvQ=="
+          "hash": "Ahy1uIdVciQA+sfNo/BLuQ=="
         }
       },
       "is_incremental": false,
@@ -3918,7 +4050,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.JobExtensions.html",
-          "hash": "Eqy1QHQzpetvYjKAnYf1uw=="
+          "hash": "JULgCNGAOZA5EYT1/NqdhA=="
         }
       },
       "is_incremental": false,
@@ -3930,7 +4062,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.JobIdGenerator.html",
-          "hash": "8zgOvib2VMHf6deLqvVPxA=="
+          "hash": "eMu0iXCF/8RpiN7Bz+wjyg=="
         }
       },
       "is_incremental": false,
@@ -3942,7 +4074,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.JobMode-1.html",
-          "hash": "fK33L46cYgpLDJ7EAKFKJg=="
+          "hash": "NP9Q+blx2juIWRa9fp497Q=="
         }
       },
       "is_incremental": false,
@@ -3954,7 +4086,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.MetaMode.html",
-          "hash": "ij8mPaRFFyRJu1JYySrzJQ=="
+          "hash": "DdS5gAsd++rL5wQOi5djKw=="
         }
       },
       "is_incremental": false,
@@ -3966,7 +4098,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.MonoArgument.html",
-          "hash": "ZNK8sk6Xx3gR1/RtROxGJQ=="
+          "hash": "4gGv4PlWtZgQxiONflzNAQ=="
         }
       },
       "is_incremental": false,
@@ -3978,7 +4110,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.MsBuildArgument.html",
-          "hash": "fd1xwy+nEFew2/SDYUf5Qw=="
+          "hash": "5SOPuwxb3MbjfdwWCWGZEQ=="
         }
       },
       "is_incremental": false,
@@ -3990,7 +4122,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.NuGetReference.html",
-          "hash": "uPX1p2U9+AMH4+90onzcTw=="
+          "hash": "/ukFhE6NY+BD6P180yC1iQ=="
         }
       },
       "is_incremental": false,
@@ -4002,7 +4134,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.NuGetReferenceList.html",
-          "hash": "4LsZ+Cj3sW4xPl0Qt2i4YA=="
+          "hash": "sAXCtM49vHYxr7PTe7kUnA=="
         }
       },
       "is_incremental": false,
@@ -4014,7 +4146,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.RunMode.html",
-          "hash": "pQMnHWUJjB4D/ATZcqpZuQ=="
+          "hash": "RURslrmQwh7RJDIUjZOhNQ=="
         }
       },
       "is_incremental": false,
@@ -4026,7 +4158,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Jobs.html",
-          "hash": "cAHMCes9iPnvIDbitxzaZg=="
+          "hash": "aDcQyPUqzM8yCVBP8GT5Yg=="
         }
       },
       "is_incremental": false,
@@ -4038,19 +4170,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Loggers.AccumulationLogger.html",
-          "hash": "bImzV9S+eBdX7v5LT+KRkg=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Loggers.CompositeLogger.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Loggers.CompositeLogger.html",
-          "hash": "ra4Y+7mOvwrevWtfyW8LxA=="
+          "hash": "cjcQvtqnGFylL4Wi+7mFtQ=="
         }
       },
       "is_incremental": false,
@@ -4062,7 +4182,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Loggers.ConsoleLogger.html",
-          "hash": "ZDBUeGBiM6jRffqmTk4big=="
+          "hash": "AhOScrPzplAJVwqeuoVW4g=="
         }
       },
       "is_incremental": false,
@@ -4074,7 +4194,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Loggers.ILogger.html",
-          "hash": "vV5C5nDYVOsWV/2pEtkhQA=="
+          "hash": "zsHxX404h187sglT/2dKUQ=="
         }
       },
       "is_incremental": false,
@@ -4086,7 +4206,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Loggers.LinqPadLogger.html",
-          "hash": "xz65JMgdUWWK8/eh4Ku4KQ=="
+          "hash": "jDQAbvl3GxINwibnB3jm4w=="
         }
       },
       "is_incremental": false,
@@ -4098,7 +4218,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Loggers.LogKind.html",
-          "hash": "m0bWJ0YCxUA2GAibC/bYWg=="
+          "hash": "JIKO2A7PHid6DpkWybxzyw=="
         }
       },
       "is_incremental": false,
@@ -4110,7 +4230,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Loggers.LoggerExtensions.html",
-          "hash": "F7669LP3GBUzzeIIVfa47g=="
+          "hash": "W4tqyaaRKF7J/+KUvUx5KA=="
         }
       },
       "is_incremental": false,
@@ -4122,7 +4242,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Loggers.LoggerWithPrefix.html",
-          "hash": "w1YcM8Y1P1iYzxnhwK8rWg=="
+          "hash": "BGnDQIDqbpYFePxvu3pJ6g=="
         }
       },
       "is_incremental": false,
@@ -4134,7 +4254,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Loggers.NullLogger.html",
-          "hash": "I9b8N05rqtri68cJ9CUJOA=="
+          "hash": "tAkHbcakn4f/wmUJWF9lGw=="
         }
       },
       "is_incremental": false,
@@ -4146,7 +4266,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Loggers.StreamLogger.html",
-          "hash": "YVJhjdLTwVQwEVg7f/LDqQ=="
+          "hash": "63UEIgxrTLlWssgb+txo3Q=="
         }
       },
       "is_incremental": false,
@@ -4158,7 +4278,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Loggers.html",
-          "hash": "6kQw97MQDHBZf0JuKlgR4w=="
+          "hash": "FF00It+M+0ud/fKxe0bu1g=="
         }
       },
       "is_incremental": false,
@@ -4170,7 +4290,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.ConfidenceInterval.html",
-          "hash": "hn0jSBrYKTJD0p9zHv++bw=="
+          "hash": "f/fu2AsfFL/7S8z1nu0goQ=="
         }
       },
       "is_incremental": false,
@@ -4182,7 +4302,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.ConfidenceLevel.html",
-          "hash": "jWQpjZCIaSsa8YZ8WCIJwg=="
+          "hash": "vLKPtFNMoL7R9eLJhorB5A=="
         }
       },
       "is_incremental": false,
@@ -4194,7 +4314,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.ConfidenceLevelExtensions.html",
-          "hash": "jM2HBpXvVeWfuNX4/YBrVg=="
+          "hash": "wP8RQbmt+qNHGD+GiRq19Q=="
         }
       },
       "is_incremental": false,
@@ -4206,7 +4326,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.Histograms.AdaptiveHistogramBuilder.html",
-          "hash": "dCsmwORuMZ1avW9W9/1tCA=="
+          "hash": "IrcXpJag7DMgbOJDgaxqSA=="
         }
       },
       "is_incremental": false,
@@ -4218,7 +4338,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.Histograms.BinSizeRule.html",
-          "hash": "TtVOPJjQmVTN5TzA64PJvQ=="
+          "hash": "aVY0lQynsuXjM07iI62Tow=="
         }
       },
       "is_incremental": false,
@@ -4230,7 +4350,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.Histograms.Histogram.html",
-          "hash": "LzWlf8MprUFMBK5fFaoysg=="
+          "hash": "LUbafiq/86fmWxaIRUiK9A=="
         }
       },
       "is_incremental": false,
@@ -4242,7 +4362,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.Histograms.HistogramBin.html",
-          "hash": "qrvgIzs2WdG/nR8Xapf8EQ=="
+          "hash": "Z6iK2y0FlaW0N5AjIZMEVg=="
         }
       },
       "is_incremental": false,
@@ -4254,7 +4374,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.Histograms.HistogramBuilder.html",
-          "hash": "e9vtz9aY/0SU3NzyJTS4FA=="
+          "hash": "W4Tc8/EfHHjkLbdUz73cWA=="
         }
       },
       "is_incremental": false,
@@ -4266,7 +4386,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.Histograms.HistogramExtensions.html",
-          "hash": "ONDj4twpjOjRU3/69SDB9Q=="
+          "hash": "kV3wF1Y24uqG9aIuSdPfxA=="
         }
       },
       "is_incremental": false,
@@ -4278,7 +4398,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.Histograms.IHistogramBuilder.html",
-          "hash": "FA7c7DW5pt8hUeHciTTHTw=="
+          "hash": "YTCKLr8PnakVXu1MHk/KYw=="
         }
       },
       "is_incremental": false,
@@ -4290,7 +4410,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.Histograms.html",
-          "hash": "OhU24zkYXhzeXAzYk8Z8ug=="
+          "hash": "6vrpLmy2/aqoe6nlNZ2g8w=="
         }
       },
       "is_incremental": false,
@@ -4302,7 +4422,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.MathHelper.html",
-          "hash": "oe1Ubzv1athfZO6CyNDvzw=="
+          "hash": "Q99e+UOEncKNhXMqcwCe2Q=="
         }
       },
       "is_incremental": false,
@@ -4314,7 +4434,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.NumeralSystem.html",
-          "hash": "GIctEmeoOl1+djnxX0kN5A=="
+          "hash": "CEvm6I8xmT/A1ZDLIpb8iA=="
         }
       },
       "is_incremental": false,
@@ -4326,7 +4446,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.NumeralSystemExtensions.html",
-          "hash": "YGRS2TofBzREJM7m3zvxhQ=="
+          "hash": "6Qsa4ka2Prv6zb3rt0tiQw=="
         }
       },
       "is_incremental": false,
@@ -4338,7 +4458,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.OutlierMode.html",
-          "hash": "nMxamDiWF0th+F2sOxOjpw=="
+          "hash": "/QWpSCAraPgNbmfvxejayQ=="
         }
       },
       "is_incremental": false,
@@ -4350,7 +4470,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.PercentileValues.html",
-          "hash": "wNXJh/UuDUBBdgwnstmLGQ=="
+          "hash": "UgNYuEatFOlpgeerifBQdw=="
         }
       },
       "is_incremental": false,
@@ -4362,7 +4482,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.AbsoluteThreshold.html",
-          "hash": "P86eAP1N5CS1v+cne0D0/Q=="
+          "hash": "LVOg/jpjsEnqEGNYxuoGDw=="
         }
       },
       "is_incremental": false,
@@ -4374,7 +4494,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.AbsoluteTimeThreshold.html",
-          "hash": "/upQ3c/I3MhjEMPSVejZnQ=="
+          "hash": "KYtsHbgKXFwN1OViCJI3Tg=="
         }
       },
       "is_incremental": false,
@@ -4386,7 +4506,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.EquivalenceTestConclusion.html",
-          "hash": "MHHtdf8Z6AgaqQAO0ei7Cg=="
+          "hash": "MEptbBqwWVDaXZAUPRYTOA=="
         }
       },
       "is_incremental": false,
@@ -4398,7 +4518,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.EquivalenceTestResult.html",
-          "hash": "9zxxgT4CWwEQmPbeUS7rFw=="
+          "hash": "DxgA66IvbeDJCcQM11MTcg=="
         }
       },
       "is_incremental": false,
@@ -4410,7 +4530,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.IOneSidedTest-1.html",
-          "hash": "yu4sDAXcUxYi8UP+42SD8w=="
+          "hash": "Np5y+I1p0neckaP04vwPtw=="
         }
       },
       "is_incremental": false,
@@ -4422,7 +4542,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.MannWhitneyResult.html",
-          "hash": "czntmQ2u8LAWO3rfrjJWTA=="
+          "hash": "OSqR0R4P7xpHa8AgyQJ+bA=="
         }
       },
       "is_incremental": false,
@@ -4434,7 +4554,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.MannWhitneyTest.html",
-          "hash": "upye6ZOMDVmiLIrRsemxqw=="
+          "hash": "dyKIRHU+tbvYZnPbzwGvtw=="
         }
       },
       "is_incremental": false,
@@ -4446,7 +4566,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.OneSidedTestResult.html",
-          "hash": "5wLx989CclLaBgVUSmGsrg=="
+          "hash": "FNCQeWf7b0c1H1yRbuqflg=="
         }
       },
       "is_incremental": false,
@@ -4458,7 +4578,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.RelativeThreshold.html",
-          "hash": "WkY4nAe59ILO/jgDlrGobQ=="
+          "hash": "4vv23ZYurr6PaYkAZlLH0g=="
         }
       },
       "is_incremental": false,
@@ -4470,7 +4590,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.StatisticalTestHelper.html",
-          "hash": "vPTU2GH4HvBmO1pl6uUlDg=="
+          "hash": "BhNEHNeWhWYu/PPJKBdEvw=="
         }
       },
       "is_incremental": false,
@@ -4482,7 +4602,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.StatisticalTestKind.html",
-          "hash": "y0p5JQTcv7GEmxrp8TYezw=="
+          "hash": "idnTeBJX8LARCBStycIX2w=="
         }
       },
       "is_incremental": false,
@@ -4494,7 +4614,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.StudentTest.html",
-          "hash": "XqGn2eQnruivegls3y2grA=="
+          "hash": "Lv68/Pay/HEqTZ0PmwvSIA=="
         }
       },
       "is_incremental": false,
@@ -4506,7 +4626,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.Threshold.html",
-          "hash": "sEx/yfDKzlv5xUCD9A9aDw=="
+          "hash": "zsCmFcqmIT8rFEnUl/gPQA=="
         }
       },
       "is_incremental": false,
@@ -4518,7 +4638,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.ThresholdUnit.html",
-          "hash": "dec9LNWSQtpP9ivNPDgvDg=="
+          "hash": "whhv+Ysp5hZxsB9kDH9HVQ=="
         }
       },
       "is_incremental": false,
@@ -4530,7 +4650,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.TostResult-1.html",
-          "hash": "S1U9iRwJYDrDTj6sNA/piQ=="
+          "hash": "87ShnBQ3LiE8kYAKia7xUw=="
         }
       },
       "is_incremental": false,
@@ -4542,7 +4662,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.WelchResult.html",
-          "hash": "jb0GbaR1nCyeQqZf9Ec5TQ=="
+          "hash": "LMJIZ5Mz7QFZfSMzJQc4UQ=="
         }
       },
       "is_incremental": false,
@@ -4554,7 +4674,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.WelchTest.html",
-          "hash": "AveC13VN+gyTfOk2pZvz2Q=="
+          "hash": "j3oa3Erkj4tORVSWEnoLUQ=="
         }
       },
       "is_incremental": false,
@@ -4566,7 +4686,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.StatisticalTesting.html",
-          "hash": "i/a91BR6UWlTkt6ysqwJxA=="
+          "hash": "dNTevL9Ug27Xpc5XjU6iUA=="
         }
       },
       "is_incremental": false,
@@ -4578,7 +4698,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.Statistics.html",
-          "hash": "m8yfa3SV7MA0z+nTyjy5dw=="
+          "hash": "Ei51EBAps5zE+rqJLnUmCQ=="
         }
       },
       "is_incremental": false,
@@ -4590,7 +4710,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Mathematics.html",
-          "hash": "KlfPTLlnDhn0ZxQTF8BEnA=="
+          "hash": "OR4AH2niO3o5o8cqPkBMoQ=="
         }
       },
       "is_incremental": false,
@@ -4602,7 +4722,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Order.DefaultOrderer.html",
-          "hash": "zkoYh2Q+0+ADUOB8OK0wWg=="
+          "hash": "90vNqZO+n2PyTrYHgCzovw=="
         }
       },
       "is_incremental": false,
@@ -4614,7 +4734,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Order.IOrderer.html",
-          "hash": "Vn75SGkRnR1x3lS1QDKdKg=="
+          "hash": "yatE778sw38FoWJQ5UfluQ=="
         }
       },
       "is_incremental": false,
@@ -4626,7 +4746,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Order.MethodOrderPolicy.html",
-          "hash": "Bhuel9eP+NyMgK4Af9FD/Q=="
+          "hash": "xpWsbf0CtUxxeZ+CtKjIqQ=="
         }
       },
       "is_incremental": false,
@@ -4638,7 +4758,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Order.SummaryOrderPolicy.html",
-          "hash": "+6rlfMLB9+Owh/a296ipBg=="
+          "hash": "DDkcZF53CpyN1WCKxjtrRQ=="
         }
       },
       "is_incremental": false,
@@ -4650,7 +4770,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Order.html",
-          "hash": "PpeF89oIfucCk7g5yBpdFg=="
+          "hash": "nv3ActnwFEmAjOrx71SQMg=="
         }
       },
       "is_incremental": false,
@@ -4662,7 +4782,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Parameters.ParameterDefinition.html",
-          "hash": "HvlaGa5PxIOYDH289yHQnw=="
+          "hash": "sueVWT4W5RaVXL30rIRDpQ=="
         }
       },
       "is_incremental": false,
@@ -4674,7 +4794,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Parameters.ParameterDefinitions.html",
-          "hash": "B/MIaE8st1TNEBMl6MonHw=="
+          "hash": "hLSHiT69nRlNWhz27gBqYg=="
         }
       },
       "is_incremental": false,
@@ -4686,7 +4806,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Parameters.ParameterInstance.html",
-          "hash": "9sE+eh5E8S1Q+MCFk1q2IQ=="
+          "hash": "f50ARqjpVc1tNElFYJCjMQ=="
         }
       },
       "is_incremental": false,
@@ -4698,7 +4818,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Parameters.ParameterInstances.html",
-          "hash": "0pC+QHwbeptwizWVP/Beyg=="
+          "hash": "cIWKR+kDsjtLc33nCOpoow=="
         }
       },
       "is_incremental": false,
@@ -4710,7 +4830,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Parameters.html",
-          "hash": "O/3Ddrlvd6tgST6cf8Fjvg=="
+          "hash": "GixceWt0NY+cAYXVeIF6/Q=="
         }
       },
       "is_incremental": false,
@@ -4722,7 +4842,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Portability.Antivirus.html",
-          "hash": "VYWUi37f6hou9BHSySE7oA=="
+          "hash": "NoUlvGe8fM6qWFa/UJvkfg=="
         }
       },
       "is_incremental": false,
@@ -4734,7 +4854,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Portability.Cpu.CpuInfo.html",
-          "hash": "jc94Eas8v/E+buN4D+E4mg=="
+          "hash": "4iJ3zS7sQxpU2KvYLGgk9g=="
         }
       },
       "is_incremental": false,
@@ -4746,7 +4866,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Portability.Cpu.CpuInfoFormatter.html",
-          "hash": "mLGpOHQa+oj2cHluVwQW+A=="
+          "hash": "lOYFKT84EM+LK7yn6vyV6A=="
         }
       },
       "is_incremental": false,
@@ -4758,7 +4878,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Portability.Cpu.html",
-          "hash": "nGpjdXK8mvWsrw81mu+/dw=="
+          "hash": "Y52uH+Qt/BrliiUr9BTcng=="
         }
       },
       "is_incremental": false,
@@ -4770,7 +4890,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Portability.HyperV.html",
-          "hash": "wXQVs8SZiPmnkDQsSPfMlA=="
+          "hash": "IVsjmk7Zx82pSDWFFRdCUA=="
         }
       },
       "is_incremental": false,
@@ -4782,7 +4902,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Portability.VMware.html",
-          "hash": "ZZia9fbsfMwNHE+LvU+jEw=="
+          "hash": "GQyqcmglkzUeQCnrZQV1xQ=="
         }
       },
       "is_incremental": false,
@@ -4794,7 +4914,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Portability.VirtualBox.html",
-          "hash": "BpweuIRQRkiBSVQ69JxGlQ=="
+          "hash": "brrBeqPBA7Vhqyfr9HRECA=="
         }
       },
       "is_incremental": false,
@@ -4806,7 +4926,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Portability.VirtualMachineHypervisor.html",
-          "hash": "3/n785ZccGNB44Sld5zSMg=="
+          "hash": "NgVgzfYJJJWgYBF0LsXIkQ=="
         }
       },
       "is_incremental": false,
@@ -4818,7 +4938,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Portability.html",
-          "hash": "ONMREqEvx+s7Da6M56C/8Q=="
+          "hash": "vTgjsu3o4hv3TlqRdV+9wQ=="
         }
       },
       "is_incremental": false,
@@ -4830,7 +4950,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Properties.BenchmarkDotNetInfo.html",
-          "hash": "sEq02rVsY0YQsYl/H8JhbQ=="
+          "hash": "F2gO1wIvvvCBUoyB2PK3ug=="
         }
       },
       "is_incremental": false,
@@ -4842,7 +4962,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Properties.html",
-          "hash": "5tlI3ik8zgrhaWXO09WK/Q=="
+          "hash": "l+SEzr+rs9QBk7ITYqQsPQ=="
         }
       },
       "is_incremental": false,
@@ -4854,7 +4974,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Reports.BenchmarkReport.html",
-          "hash": "+fOdX8azoHLz5M6rGTlDUg=="
+          "hash": "+roS03WmKuewU9yZ0iVaKA=="
         }
       },
       "is_incremental": false,
@@ -4866,7 +4986,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Reports.BenchmarkReportExtensions.html",
-          "hash": "xs12XEk31LQwdbeNOV9ZaQ=="
+          "hash": "qv3rYkhJbTCgecd54RYCFA=="
         }
       },
       "is_incremental": false,
@@ -4878,19 +4998,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Reports.IMetricDescriptor.html",
-          "hash": "GVa7LcA+oTXVhuk8FNDe2g=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Reports.ISummaryStyle.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Reports.ISummaryStyle.html",
-          "hash": "Wn8vJ363Nm+NxO5Qg29i4w=="
+          "hash": "IibeztzQ55BPiwBmBoclKQ=="
         }
       },
       "is_incremental": false,
@@ -4902,7 +5010,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Reports.Measurement.html",
-          "hash": "18x2a4eo6J6LhZpeaU1kAw=="
+          "hash": "jzT+LBOpUldlx5qIQPz7Gg=="
         }
       },
       "is_incremental": false,
@@ -4914,7 +5022,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Reports.MeasurementExtensions.html",
-          "hash": "/MsG8zmjn5WLLR5Fx7vDGQ=="
+          "hash": "Ls/tLxEpav2emwVQSw8GFg=="
         }
       },
       "is_incremental": false,
@@ -4926,7 +5034,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Reports.Metric.html",
-          "hash": "fr35ura4T054KWuVvTtfjQ=="
+          "hash": "/AMms83788RZxEwjJNjlow=="
         }
       },
       "is_incremental": false,
@@ -4938,7 +5046,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Reports.MetricDescriptorEqualityComparer.html",
-          "hash": "Lq+BsQv2QhTYr+9+kUMo/g=="
+          "hash": "f/SmJ/+rKhMxkGeCOi+Xyg=="
         }
       },
       "is_incremental": false,
@@ -4950,7 +5058,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Reports.Summary.html",
-          "hash": "AI7nrpOnJYw4XNTsDKy6sw=="
+          "hash": "2BrhaYWMg5/Ahl1TN7cmyg=="
         }
       },
       "is_incremental": false,
@@ -4962,7 +5070,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Reports.SummaryExtensions.html",
-          "hash": "gKn2AEnbAlB1MJzwXEEaCw=="
+          "hash": "su2vMxHex17fee6GTT+4TA=="
         }
       },
       "is_incremental": false,
@@ -4974,7 +5082,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Reports.SummaryStyle.html",
-          "hash": "vxJWcO9kuPlIzpNjI5+c4w=="
+          "hash": "caD6zZqdkofs/sti8DMRow=="
         }
       },
       "is_incremental": false,
@@ -4986,7 +5094,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification.html",
-          "hash": "mbDVF++r6sqsKQ0vUXyURw=="
+          "hash": "Oe2xwbOSp9TRxmVWcKTVwQ=="
         }
       },
       "is_incremental": false,
@@ -4998,7 +5106,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.html",
-          "hash": "sBHxO/ERGKXSeQ5MjXdaRQ=="
+          "hash": "CEP5QF8rHJnu7O2c7YStNA=="
         }
       },
       "is_incremental": false,
@@ -5010,7 +5118,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Reports.SummaryTable.html",
-          "hash": "KEkHBCJtYqqo43v/YMkglg=="
+          "hash": "SaYIcwYjLx9xuC/AvYNf8A=="
         }
       },
       "is_incremental": false,
@@ -5022,7 +5130,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Reports.SummaryTableExtensions.html",
-          "hash": "Io76FNRi/AdxDlVa7fTH4g=="
+          "hash": "T+jOZ8gjfzMEq09f1VvU+w=="
         }
       },
       "is_incremental": false,
@@ -5034,7 +5142,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Reports.html",
-          "hash": "J7Loy/dCGnK5jZVELyTIjw=="
+          "hash": "0rGtadRETuKqDUjAjmn+rA=="
         }
       },
       "is_incremental": false,
@@ -5046,7 +5154,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Running.BenchmarkBuildInfo.html",
-          "hash": "RQOTQDmFb65LNDDdzeHCqg=="
+          "hash": "IRSi8JWDZ4L0yxswCqD/Rw=="
         }
       },
       "is_incremental": false,
@@ -5058,7 +5166,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Running.BenchmarkCase.html",
-          "hash": "0thPOi9ryvQ6rRcLYTochQ=="
+          "hash": "3D8NJ+Z/fEePYjzfld4P3w=="
         }
       },
       "is_incremental": false,
@@ -5070,7 +5178,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Running.BenchmarkConverter.html",
-          "hash": "Tf1fKNxSw13Hf0fWEhppKw=="
+          "hash": "GKtLN1ZSovrT6lnvqSpumw=="
         }
       },
       "is_incremental": false,
@@ -5082,7 +5190,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Running.BenchmarkId.html",
-          "hash": "uKe6Lh9p99cvN1R29anCig=="
+          "hash": "b9yLsvloF/z4fMq5h9mYog=="
         }
       },
       "is_incremental": false,
@@ -5094,7 +5202,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Running.BenchmarkPartitioner.html",
-          "hash": "XnLcwkquGarv7QloG2WVBA=="
+          "hash": "Yh4bckUjeVpr1v+wT1QNjA=="
         }
       },
       "is_incremental": false,
@@ -5106,7 +5214,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Running.BenchmarkRunInfo.html",
-          "hash": "pcwiV3Bbg0VuRKe4xr0JXQ=="
+          "hash": "QTSIBOonbhEjFneiNESU4Q=="
         }
       },
       "is_incremental": false,
@@ -5118,7 +5226,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Running.BenchmarkRunner.html",
-          "hash": "g19ZVvwPEQZUYGGOAFu1MA=="
+          "hash": "MeD+NcHGT9U7hNoCJtxE4Q=="
         }
       },
       "is_incremental": false,
@@ -5130,7 +5238,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Running.BenchmarkSwitcher.html",
-          "hash": "fKaizZP3EVh14u6Rgtlhqw=="
+          "hash": "hFPBFtBwqyDaG7v8kfy1yQ=="
         }
       },
       "is_incremental": false,
@@ -5142,7 +5250,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Running.BuildPartition.html",
-          "hash": "y1qdSb6fFDJ4KNkiaeRkkg=="
+          "hash": "mMF47XQnpwmlLaBr6dgL0Q=="
         }
       },
       "is_incremental": false,
@@ -5154,7 +5262,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Running.Descriptor.html",
-          "hash": "8mucllpJxoObFAIeFUPHNw=="
+          "hash": "IeOwlgiSUsG9mQuo5qqcxA=="
         }
       },
       "is_incremental": false,
@@ -5166,7 +5274,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Running.html",
-          "hash": "JT+FIjubEvv8f+NizqwaZQ=="
+          "hash": "aFtBabAS48FPzdhUnQTQkA=="
         }
       },
       "is_incremental": false,
@@ -5178,7 +5286,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.ArtifactsPaths.html",
-          "hash": "HUYIsgJVxFymAdjH0TvFVA=="
+          "hash": "DIOay/g692xBPAQU2qVqWw=="
         }
       },
       "is_incremental": false,
@@ -5190,7 +5298,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchain.html",
-          "hash": "8wgotp1+OLlfzP8cCJlu8w=="
+          "hash": "u6gNP77TPad02SUgzcxiOg=="
         }
       },
       "is_incremental": false,
@@ -5202,7 +5310,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchainBuilder.html",
-          "hash": "u3JBxI8EVpwlkrtJEgNvlw=="
+          "hash": "98UINvXncE4C1/UKYfPBwg=="
         }
       },
       "is_incremental": false,
@@ -5214,7 +5322,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.CoreRt.Generator.html",
-          "hash": "Wsta0cGKfoyqjnnO03YMSg=="
+          "hash": "QNjrPhj/DG9SwWHMvfUSgQ=="
         }
       },
       "is_incremental": false,
@@ -5226,7 +5334,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.CoreRt.html",
-          "hash": "O8PjHPbpWNh/HvNdVz11uw=="
+          "hash": "1N1ZplgiKoCGZ5sbh9Q3nw=="
         }
       },
       "is_incremental": false,
@@ -5238,7 +5346,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.CoreRun.CoreRunGenerator.html",
-          "hash": "Gql26Gs888SpqJjuJH/quQ=="
+          "hash": "wHeY/RR0yPieKfq6AZT/QQ=="
         }
       },
       "is_incremental": false,
@@ -5250,7 +5358,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.CoreRun.CoreRunPublisher.html",
-          "hash": "eTDX3+L09wI2it8FQYSo5A=="
+          "hash": "QzDDscxvYTGxBdfPwpSg6Q=="
         }
       },
       "is_incremental": false,
@@ -5262,7 +5370,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.html",
-          "hash": "Z00m7sE0TJ8HcvNtve1DRQ=="
+          "hash": "d4HAtWHT+luyOr8V3K8Z9w=="
         }
       },
       "is_incremental": false,
@@ -5274,7 +5382,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.CoreRun.html",
-          "hash": "S1OA80Z1htCjOydeKOemiw=="
+          "hash": "DXaByaeJ/KJI0tBdCf6EJQ=="
         }
       },
       "is_incremental": false,
@@ -5286,7 +5394,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.html",
-          "hash": "Xlepw2xJcuH2c82a7iqw6g=="
+          "hash": "WcHJJnsOl7vQQ2yT1OQOdQ=="
         }
       },
       "is_incremental": false,
@@ -5298,7 +5406,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.html",
-          "hash": "Xh7qthOmDlriJMzegA2rOQ=="
+          "hash": "oMEXZ5xp0RM1RDwyJ/V1jA=="
         }
       },
       "is_incremental": false,
@@ -5310,7 +5418,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html",
-          "hash": "KTTk3SPoeY8RWOx57ky7Dg=="
+          "hash": "G5AUnrdGj62ZvQpN3aKvXw=="
         }
       },
       "is_incremental": false,
@@ -5322,55 +5430,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.CsProj.html",
-          "hash": "HkBpuk0Sofy6vX6SSc7NzQ=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Toolchains.CustomCoreClr.CustomCoreClrToolchain.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Toolchains.CustomCoreClr.CustomCoreClrToolchain.html",
-          "hash": "qINasQeYoIiGhdQV73dl8Q=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Toolchains.CustomCoreClr.CustomCoreClrToolchainBuilder.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Toolchains.CustomCoreClr.CustomCoreClrToolchainBuilder.html",
-          "hash": "+fdLK+vQS8ULYb+YekBM/g=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Toolchains.CustomCoreClr.Generator.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Toolchains.CustomCoreClr.Generator.html",
-          "hash": "J9jHNZPPpvs3w8xu2/9ptw=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Toolchains.CustomCoreClr.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Toolchains.CustomCoreClr.html",
-          "hash": "/+TUYcDQLeXqMMW/AgjPCA=="
+          "hash": "+9JnCOwK94/rmTxVO1wh1g=="
         }
       },
       "is_incremental": false,
@@ -5382,7 +5442,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html",
-          "hash": "7iY1XfdknJLOODnAQeNpOw=="
+          "hash": "Pf7bvcXA0Zovj9k6iDtRvw=="
         }
       },
       "is_incremental": false,
@@ -5394,7 +5454,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.html",
-          "hash": "Kfq98AJTqG/zpGKUCpVLBA=="
+          "hash": "5kAy/wPQt7Qoo5gWKczy5g=="
         }
       },
       "is_incremental": false,
@@ -5406,7 +5466,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html",
-          "hash": "ty4l7hRztqz9fXXB8mlHdQ=="
+          "hash": "sPIwGAvvA3R112zdZdsv7g=="
         }
       },
       "is_incremental": false,
@@ -5418,7 +5478,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandExecutor.html",
-          "hash": "TTKc0tFhRIe3mg9izUF8Lw=="
+          "hash": "wWymBSKTHJ8OXXsTDvF4lQ=="
         }
       },
       "is_incremental": false,
@@ -5430,7 +5490,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html",
-          "hash": "FcVeZ1G8IyOfEnEFErpWbQ=="
+          "hash": "aVBTwMhL9/8bI9r+yZswXg=="
         }
       },
       "is_incremental": false,
@@ -5442,7 +5502,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliExecutor.html",
-          "hash": "cJAqx/Gwu7qa0ilbgB5HDA=="
+          "hash": "3H50ipN6Y5pga/U2sfTVBA=="
         }
       },
       "is_incremental": false,
@@ -5454,7 +5514,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html",
-          "hash": "4MUnPhgXI9STXGLbVvDZSA=="
+          "hash": "PzPZd2sB32w3kuU9IpjpTg=="
         }
       },
       "is_incremental": false,
@@ -5466,7 +5526,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher.html",
-          "hash": "tyWf/WvaATLitmiRnJ0mog=="
+          "hash": "7nzOxpXWgVdRKd1ioeDN0g=="
         }
       },
       "is_incremental": false,
@@ -5478,7 +5538,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html",
-          "hash": "dYZ90foHFpAPTlUTc18atA=="
+          "hash": "i1c/irP4D3kOBHp5GV+9WQ=="
         }
       },
       "is_incremental": false,
@@ -5490,7 +5550,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.DotNetCli.html",
-          "hash": "wQybyknsGDQTH9hRLU4+SQ=="
+          "hash": "mHDMQw6oo7n1ssMSwQlASQ=="
         }
       },
       "is_incremental": false,
@@ -5502,7 +5562,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.Executor.html",
-          "hash": "NOatGt0nBL/iB5tRAoaPwA=="
+          "hash": "9hpLSr8qmCUwGE0GKejOQg=="
         }
       },
       "is_incremental": false,
@@ -5514,7 +5574,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.GeneratorBase.html",
-          "hash": "rmY2mulChsL7DkUoAEXFTg=="
+          "hash": "WdesJZ5neFe9IPuQ108SPA=="
         }
       },
       "is_incremental": false,
@@ -5526,7 +5586,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.IBuilder.html",
-          "hash": "IBTn4pCqXRiVIpEtMxIO+w=="
+          "hash": "coPCsGYCwVkT+NjceYyi6A=="
         }
       },
       "is_incremental": false,
@@ -5538,7 +5598,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.IExecutor.html",
-          "hash": "R7ThogXR2yWvZ+ACZth6/g=="
+          "hash": "lEV5mXfuCnysUWvLwd897w=="
         }
       },
       "is_incremental": false,
@@ -5550,7 +5610,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.IGenerator.html",
-          "hash": "fb6n8fM4IoJUEeNkyp53Aw=="
+          "hash": "FtdH02v/biFT53y/mry18w=="
         }
       },
       "is_incremental": false,
@@ -5562,7 +5622,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.IToolchain.html",
-          "hash": "H1N81cf0SfR5wGdgEl6nyg=="
+          "hash": "IabVHBxIQ1SVY9oNnplC/Q=="
         }
       },
       "is_incremental": false,
@@ -5574,7 +5634,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.BenchmarkAction.html",
-          "hash": "lVpj440dRutJAkOBfN83oQ=="
+          "hash": "1sX+GGE4nM64/7YM1W8VmA=="
         }
       },
       "is_incremental": false,
@@ -5586,7 +5646,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.BenchmarkActionCodegen.html",
-          "hash": "Q/JZQ5pmIQRs8aEMsNxiCw=="
+          "hash": "c/Gz1/4pz41Hv0/1d3bZFA=="
         }
       },
       "is_incremental": false,
@@ -5598,7 +5658,151 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.BenchmarkActionFactory.html",
-          "hash": "SjJt7R+pAj6ACK4wwGVDMg=="
+          "hash": "bLWmtFYAIcMTXFwAnlslZA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.ConsumableTypeInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.ConsumableTypeInfo.html",
+          "hash": "qJkq98VKh6JcWac2T76pbw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableActionKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableActionKind.html",
+          "hash": "gP65zKdV8o3s47b1e5zUBg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants.html",
+          "hash": "WIf/j7fbm9P0k8xs8J5tTA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableProgram.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableProgram.html",
+          "hash": "vC40z7ncajHOlqZeJ67ipA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReuse.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReuse.html",
+          "hash": "jWhGlXmeDvjNl7Ue6G5wqg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.html",
+          "hash": "LZgiuHbDfVEzRnbCGzRNwQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.InProcessEmitArtifactsPath.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.InProcessEmitArtifactsPath.html",
+          "hash": "9r4FZLIJoeGY0GKRNRlGLQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.InProcessEmitBuilder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.InProcessEmitBuilder.html",
+          "hash": "mSegPNLB47XZHNmpicQ9Og=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.InProcessEmitExecutor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.InProcessEmitExecutor.html",
+          "hash": "i/8r5+ugDpCMaAFcWh7DmQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.InProcessEmitGenerator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.InProcessEmitGenerator.html",
+          "hash": "nCwPqsxrD22oXTLBShcf4A=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.InProcessEmitToolchain.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.InProcessEmitToolchain.html",
+          "hash": "Mp4GK4+5ncSH4s34duLsBQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.html",
+          "hash": "Cq+HOOHJgB7I4ryzuudPOA=="
         }
       },
       "is_incremental": false,
@@ -5610,7 +5814,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessBuilder.html",
-          "hash": "74G2Xv5SqXVr1bhLdUTzTg=="
+          "hash": "pGUMt4o5zg52NC2weHI/VQ=="
         }
       },
       "is_incremental": false,
@@ -5622,7 +5826,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessExecutor.html",
-          "hash": "qL3f2vlucSoL8VwUivrwhQ=="
+          "hash": "+A/Bob9OyCKRv2BtAJsIEw=="
         }
       },
       "is_incremental": false,
@@ -5634,7 +5838,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessGenerator.html",
-          "hash": "1V2uQ67VGsd9qAAmalRAtQ=="
+          "hash": "VC811cNeY2FtfCtO9KanMQ=="
         }
       },
       "is_incremental": false,
@@ -5646,7 +5850,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessHost.html",
-          "hash": "sASiHQmiZ5eg43MGsKjbbQ=="
+          "hash": "jFvu5S7gITU4tqBXfE1Gmg=="
         }
       },
       "is_incremental": false,
@@ -5658,7 +5862,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessToolchain.html",
-          "hash": "j5HmjzqlKjuaPdO6FY6YKw=="
+          "hash": "oCqIVdMnrYL8qzGEpE/j8Q=="
         }
       },
       "is_incremental": false,
@@ -5670,7 +5874,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessValidator.html",
-          "hash": "WOtSCkn3BMqutbuLf3KL1w=="
+          "hash": "CfPBgAZi7892ilGD6rzOPQ=="
         }
       },
       "is_incremental": false,
@@ -5682,7 +5886,43 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.html",
-          "hash": "MzhBxdIuGZQJpo/d3engXQ=="
+          "hash": "9gD/nxMk3xP3/MaQsPRSBA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.Mono.MonoAotBuilder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.Mono.MonoAotBuilder.html",
+          "hash": "lZmIHxSpzL0qkM0HicwRgA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.Mono.MonoAotToolchain.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.Mono.MonoAotToolchain.html",
+          "hash": "nO7WnppFcx9wHc6Skzpz7Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Toolchains.Mono.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Toolchains.Mono.html",
+          "hash": "S2jcpdOs9l8qtJ8Vr7BgaA=="
         }
       },
       "is_incremental": false,
@@ -5694,7 +5934,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.Parameters.ExecuteParameters.html",
-          "hash": "kSpWlgU0G8LW5U2F76Gdtg=="
+          "hash": "ALPTJnSX8L/kkon2h8av8A=="
         }
       },
       "is_incremental": false,
@@ -5706,7 +5946,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.Parameters.html",
-          "hash": "vKt9R7uOfkbEXp7z4eLDKQ=="
+          "hash": "h/rmg1QesDNZPsuQk2GhuA=="
         }
       },
       "is_incremental": false,
@@ -5718,7 +5958,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.Results.BuildResult.html",
-          "hash": "wD+WyoyFpEng6PequG9IMg=="
+          "hash": "BAnrEVQPRdpTv767YdQQPA=="
         }
       },
       "is_incremental": false,
@@ -5730,7 +5970,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.Results.ExecuteResult.html",
-          "hash": "lart8iJfaN709nQuzWvtZw=="
+          "hash": "V8UMA/nwVvVOgjij31B8dQ=="
         }
       },
       "is_incremental": false,
@@ -5742,7 +5982,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.Results.GenerateResult.html",
-          "hash": "WlYK/i2xKKgMR9of/hRp/Q=="
+          "hash": "epzoew4PVeyS0sOO6XHdbQ=="
         }
       },
       "is_incremental": false,
@@ -5754,7 +5994,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.Results.html",
-          "hash": "tkVQf8/2gcq8H4BtVc1deg=="
+          "hash": "zw80Y5a/UI54DogYWy8fBg=="
         }
       },
       "is_incremental": false,
@@ -5766,7 +6006,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.Roslyn.Builder.html",
-          "hash": "xbNP0uc9F5uARQAbaJ9TGw=="
+          "hash": "+9SzgpAatS8JHfFL0FHHnQ=="
         }
       },
       "is_incremental": false,
@@ -5778,7 +6018,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.Roslyn.Generator.html",
-          "hash": "c0ScpyYpLs+RjDKEGG35Wg=="
+          "hash": "SRtR2XNzwL0ZX+hH8vP7+Q=="
         }
       },
       "is_incremental": false,
@@ -5790,7 +6030,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.Roslyn.RoslynToolchain.html",
-          "hash": "Nqr+MqxGxQZTbr2JNr3lew=="
+          "hash": "ZIARrB9s/nDNNrs/OhN3qQ=="
         }
       },
       "is_incremental": false,
@@ -5802,7 +6042,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.Roslyn.html",
-          "hash": "0iKAoZw2GOzCXvCX//uOvw=="
+          "hash": "/tgduHZAv9t8E4fcNzDCyw=="
         }
       },
       "is_incremental": false,
@@ -5814,7 +6054,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.Toolchain.html",
-          "hash": "sFQ6T7pRBdYEqrpTwGwefA=="
+          "hash": "D4a70SmHmzrNc2ttYXT32A=="
         }
       },
       "is_incremental": false,
@@ -5826,7 +6066,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.html",
-          "hash": "s9iSII9Ts3koCqfS8mPF8Q=="
+          "hash": "OXrN7p5k0jGK559qHYql3A=="
         }
       },
       "is_incremental": false,
@@ -5838,7 +6078,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.BaselineValidator.html",
-          "hash": "LuCH/CFb2SB6XhRzRiWHsw=="
+          "hash": "dS9YDhaG4DdH/Jy213TMLg=="
         }
       },
       "is_incremental": false,
@@ -5850,7 +6090,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.CompilationValidator.html",
-          "hash": "H6sWTWLbGodDqmIEbpuXHg=="
+          "hash": "j9+hud1gMN2VypZrogjtuw=="
         }
       },
       "is_incremental": false,
@@ -5862,7 +6102,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.ConfigValidator.html",
-          "hash": "grPuJ1rqrtX1PXPFuDZ8dA=="
+          "hash": "RQStxxnAE0cZkGM3hvDN6A=="
         }
       },
       "is_incremental": false,
@@ -5874,7 +6114,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.DeferredExecutionValidator.html",
-          "hash": "M06tLjyY0uUv2gK992n4TQ=="
+          "hash": "L289YBtmvn/6/T3e5SrkUA=="
         }
       },
       "is_incremental": false,
@@ -5886,7 +6126,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.DiagnosersValidator.html",
-          "hash": "hlHpl87rCW9yv4XGA2HXhw=="
+          "hash": "QYf1lsVMByEpjMkqGEyVhQ=="
         }
       },
       "is_incremental": false,
@@ -5898,7 +6138,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.ExecutionValidator.html",
-          "hash": "mkBjVRngMXOmv9h2cFRZpQ=="
+          "hash": "G+ro8PfGSKgVosZ5ChTJ0g=="
         }
       },
       "is_incremental": false,
@@ -5910,7 +6150,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.ExecutionValidatorBase.html",
-          "hash": "ibD3Izu5qh0rJ4L2I/+nNQ=="
+          "hash": "0StmNLqI5wrOwqDJ+c3+qw=="
         }
       },
       "is_incremental": false,
@@ -5922,7 +6162,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.GenericBenchmarksValidator.html",
-          "hash": "4t5sCjIlc/sNs/IGaMAmFw=="
+          "hash": "05ObMCT9q6KknPuKv2bWBg=="
         }
       },
       "is_incremental": false,
@@ -5934,7 +6174,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.IValidator.html",
-          "hash": "RZ1I7Ve/ccWlEd9od2i++w=="
+          "hash": "6rAE69eyik/6QRpbrhcbLw=="
         }
       },
       "is_incremental": false,
@@ -5946,7 +6186,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.JitOptimizationsValidator.html",
-          "hash": "lGKo3dcBD9MAiMFs8oozLA=="
+          "hash": "waHaMKLnyyHIj5b/4g10Tg=="
         }
       },
       "is_incremental": false,
@@ -5958,7 +6198,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.ReturnValueValidator.html",
-          "hash": "8475npTdCOk+KXPJsEGk0g=="
+          "hash": "ZNmmgUyew+c+thAP/eobzQ=="
         }
       },
       "is_incremental": false,
@@ -5970,7 +6210,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.RunModeValidator.html",
-          "hash": "Im1bfzQBZdWup9K2akkGQA=="
+          "hash": "6FJCUe6tpCxNRLMzm0EDWg=="
         }
       },
       "is_incremental": false,
@@ -5982,7 +6222,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.SetupCleanupValidator.html",
-          "hash": "eKPxlQKwl6wObMYYY8olvA=="
+          "hash": "DaQJWkyuAlStkI5WefNltQ=="
         }
       },
       "is_incremental": false,
@@ -5994,7 +6234,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.ShadowCopyValidator.html",
-          "hash": "e8Nn54rL7gzkYi4st/mpSg=="
+          "hash": "s7FNr7CvU0CR4X+Jf4wlig=="
         }
       },
       "is_incremental": false,
@@ -6006,7 +6246,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.ValidationError.html",
-          "hash": "3QaD62Kx/C/lb2BCVp9Afw=="
+          "hash": "A3noN+HfFUJMqtyymnEb3A=="
         }
       },
       "is_incremental": false,
@@ -6018,7 +6258,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.ValidationErrorReporter.html",
-          "hash": "BhnGexfDHBmlEwYKtWXdtA=="
+          "hash": "AyL5b3Miw4mYmGI8BghUiA=="
         }
       },
       "is_incremental": false,
@@ -6030,7 +6270,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.ValidationParameters.html",
-          "hash": "23lHk9OZu+61rvy8HPtNAg=="
+          "hash": "d2ktb0nf9X8ObfPoM728QQ=="
         }
       },
       "is_incremental": false,
@@ -6042,7 +6282,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Validators.html",
-          "hash": "I5U8ZcYhKmOUGeVhV/6HrA=="
+          "hash": "wtUeeQTCJ0o4/yWoyctuLA=="
         }
       },
       "is_incremental": false,
@@ -6054,7 +6294,7 @@
       "output": {
         ".html": {
           "relative_path": "api/index.html",
-          "hash": "VBrEAqYAMatFfokVKuSZIw=="
+          "hash": "b6MR6HXbeVt17N1ibMyFWg=="
         }
       },
       "is_incremental": false,
@@ -6066,7 +6306,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "LkmTorHX9X01gKqe4hTK7Q=="
+          "hash": "c9nlOBkF5okIMWiKsT+M7A=="
         }
       },
       "is_incremental": false,
@@ -6078,7 +6318,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/configs/analysers.html",
-          "hash": "rV7asFK2EQFgeV0aNuvonw=="
+          "hash": "fOSApundcahyfvSd6YhHqw=="
         }
       },
       "is_incremental": false,
@@ -6090,7 +6330,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/configs/columns.html",
-          "hash": "nQ46DiN98bhsZOToqs4i4g=="
+          "hash": "X/wfDAXQ+rwtAmf+Wc0XDA=="
         }
       },
       "is_incremental": false,
@@ -6102,7 +6342,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/configs/configs.html",
-          "hash": "ed6ji3Iu2O7/6kj+Kgz1lg=="
+          "hash": "RcOYqK7v35fCqbt+5+xA7Q=="
         }
       },
       "is_incremental": false,
@@ -6114,7 +6354,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/configs/diagnosers.html",
-          "hash": "EwrzQtZSFK0L2IZq8sfNpg=="
+          "hash": "Hm3+IBSQBrBSoiSkcE8VcA=="
         }
       },
       "is_incremental": false,
@@ -6126,7 +6366,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/configs/encoding.html",
-          "hash": "dJ2oFXjTkc+S0BZGFSpJpQ=="
+          "hash": "uTatvugIAvpgSpcOTRIXaQ=="
         }
       },
       "is_incremental": false,
@@ -6138,7 +6378,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/configs/exporters.html",
-          "hash": "O5WdyqTmtAo0CB7nLM7AVQ=="
+          "hash": "Voerz+4WIxQ7/LhDbJ5lIw=="
         }
       },
       "is_incremental": false,
@@ -6150,7 +6390,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/configs/filters.html",
-          "hash": "PqE13RxMXh33pIKibyIzNA=="
+          "hash": "y6nm1VP2r4t0R2EXk4X1iQ=="
         }
       },
       "is_incremental": false,
@@ -6162,7 +6402,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/configs/jobs.html",
-          "hash": "/z4VhoAFDPblzBx5XR/Sig=="
+          "hash": "TRAm9lS7WV2pfdN1zlaULg=="
         }
       },
       "is_incremental": false,
@@ -6174,7 +6414,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/configs/loggers.html",
-          "hash": "ICjYYQXutizvfu1sVc3jcQ=="
+          "hash": "fmyWDVKrWdHbot5d615qLg=="
         }
       },
       "is_incremental": false,
@@ -6186,7 +6426,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/configs/orderers.html",
-          "hash": "eQUSQ6RXA/ncTESLoc/dPA=="
+          "hash": "2oGfRc2y4vHLjsT57xr3YQ=="
         }
       },
       "is_incremental": false,
@@ -6198,7 +6438,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/configs/toolchains.html",
-          "hash": "bh61xT9CbTkZHwfNjLtBEA=="
+          "hash": "pESS5f2o/bfub9szcQdC0A=="
         }
       },
       "is_incremental": false,
@@ -6210,7 +6450,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/configs/validators.html",
-          "hash": "XaJIigQcT3M6Kw81je0VnQ=="
+          "hash": "TbBn61XHpIytXSy6+OEndQ=="
         }
       },
       "is_incremental": false,
@@ -6222,7 +6462,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/contributing/building.html",
-          "hash": "54JVI3Lzimr9BMc0jMPJkg=="
+          "hash": "f+XfTn+nqNcrxz1B6yMvww=="
         }
       },
       "is_incremental": false,
@@ -6234,7 +6474,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/contributing/debugging.html",
-          "hash": "crXPjmUrD8SUZd+ok8cPog=="
+          "hash": "GI3Gjpb2XGIsdBoSXFsKyA=="
         }
       },
       "is_incremental": false,
@@ -6246,7 +6486,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/contributing/development.html",
-          "hash": "qCaJ//cll1beKUsg3uMgzA=="
+          "hash": "6yBY2D0zMcqmzBNtfs7JeQ=="
         }
       },
       "is_incremental": false,
@@ -6258,7 +6498,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/contributing/disassembler.html",
-          "hash": "6l8LbN35zXwy5uRc8O2rYA=="
+          "hash": "OEfwnQ7Sb813TQ2eOyQ+AA=="
         }
       },
       "is_incremental": false,
@@ -6270,7 +6510,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/contributing/documentation.html",
-          "hash": "P78X5QUTa+AQI9hURjOYTw=="
+          "hash": "l1QkcWpKrIvXOojn2Z1bDw=="
         }
       },
       "is_incremental": false,
@@ -6282,7 +6522,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/contributing/miscellaneous.html",
-          "hash": "4ifkaa/KfY68PRlSRH7Ydg=="
+          "hash": "igGO5dIrT2WpsnO4trBMUw=="
         }
       },
       "is_incremental": false,
@@ -6294,7 +6534,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/contributing/running-tests.html",
-          "hash": "lzEHs2O8o2loj+QEcBtfGA=="
+          "hash": "TBQ1CM+U/f0lfKNvjk9FTA=="
         }
       },
       "is_incremental": false,
@@ -6306,7 +6546,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/faq.html",
-          "hash": "nvJWaGKDOhH+bw5EuOlNbg=="
+          "hash": "F82Lmd56WZiujD8k5nlXZw=="
         }
       },
       "is_incremental": false,
@@ -6318,7 +6558,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/features/baselines.html",
-          "hash": "6hwxxv/ED7+xcGFWU5zwlw=="
+          "hash": "d8IKs1kR57NWqChtCP9sCQ=="
         }
       },
       "is_incremental": false,
@@ -6330,7 +6570,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/features/disassembler.html",
-          "hash": "ZuXe1dtsrPwv5zl8IFni9g=="
+          "hash": "UjWheMb+8dHuwNIfNv4LoA=="
         }
       },
       "is_incremental": false,
@@ -6342,7 +6582,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/features/etwprofiler.html",
-          "hash": "UZ8Wgn5YB7jRWusetAE65g=="
+          "hash": "wtudEc2mJZVReMqmJA7PUA=="
         }
       },
       "is_incremental": false,
@@ -6354,7 +6594,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/features/parameterization.html",
-          "hash": "06JZafFOONQE94YCLV8YOA=="
+          "hash": "4gOc2I1bB1ueYoFksZAWJw=="
         }
       },
       "is_incremental": false,
@@ -6366,7 +6606,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/features/setup-and-cleanup.html",
-          "hash": "PKdHqSHRZAN1QxwtRSGB3Q=="
+          "hash": "3iz3gRl/iDh/bvaGbJ/GiA=="
         }
       },
       "is_incremental": false,
@@ -6378,7 +6618,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/features/statistics.html",
-          "hash": "BYcFuVDGM+++F2YZFvKmqA=="
+          "hash": "xV9znJu1HcUVqlW/96y68w=="
         }
       },
       "is_incremental": false,
@@ -6390,7 +6630,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/guides/choosing-run-strategy.html",
-          "hash": "xm2afPgdkCj3/D3cYShxzg=="
+          "hash": "lcVEz8myej2vHJL9u+/iXA=="
         }
       },
       "is_incremental": false,
@@ -6402,7 +6642,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/guides/console-args.html",
-          "hash": "FXR3CVIZwaD7ekdeyrEvsw=="
+          "hash": "V8JtOoBTnEEBn0IwW4mkiw=="
         }
       },
       "is_incremental": false,
@@ -6414,7 +6654,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/guides/customizing-runtime.html",
-          "hash": "ymwUDeCKwcbAg/wek1D+IQ=="
+          "hash": "stSx1H/rQYcLTyzcUNpekw=="
         }
       },
       "is_incremental": false,
@@ -6426,7 +6666,19 @@
       "output": {
         ".html": {
           "relative_path": "articles/guides/getting-started.html",
-          "hash": "x9wNcFJTbsodocEMAqJL7w=="
+          "hash": "coDVxxwUBG/XuAeRibM4gQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/guides/global-dotnet-tool.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/guides/global-dotnet-tool.html",
+          "hash": "8UossS4HaxjcKnt3REnj7A=="
         }
       },
       "is_incremental": false,
@@ -6438,7 +6690,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/guides/good-practices.html",
-          "hash": "9pP1Zu2VRdSiFy2Kv9mCOg=="
+          "hash": "WB4M97jiBLtypT9iOrcZQA=="
         }
       },
       "is_incremental": false,
@@ -6450,7 +6702,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/guides/how-it-works.html",
-          "hash": "MVfMGBw31pXFXZS1orh8Yw=="
+          "hash": "XE1HUHSpwSj7sPkOWCGwBQ=="
         }
       },
       "is_incremental": false,
@@ -6462,7 +6714,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/guides/how-to-run.html",
-          "hash": "+qZs/l90awsHTwzzdw+1/Q=="
+          "hash": "j0URaJfpnNprat7nnvZL1A=="
         }
       },
       "is_incremental": false,
@@ -6474,7 +6726,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/guides/nuget.html",
-          "hash": "1x44rXfDtrLYQLhKzAx0YQ=="
+          "hash": "ZBIQ3clgFwfjimcdOLxJ3g=="
         }
       },
       "is_incremental": false,
@@ -6486,7 +6738,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/guides/troubleshooting.html",
-          "hash": "a/tQVuLlUObELph07KXNzg=="
+          "hash": "lEoJaBn7p8OS4hmUDk4+Qg=="
         }
       },
       "is_incremental": false,
@@ -6498,7 +6750,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/license.html",
-          "hash": "ixeClh7V+7pLrnAnBbISpA=="
+          "hash": "LBSItF2kETBcBjfQJS3TiA=="
         }
       },
       "is_incremental": false,
@@ -6510,7 +6762,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/overview.html",
-          "hash": "5WyjXTSHaoAXqmhs6iGIBA=="
+          "hash": "Ur9uWF8rmQQ136uHW3liNA=="
         }
       },
       "is_incremental": false,
@@ -6522,7 +6774,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroArguments.html",
-          "hash": "4MaW9qjn4whCSsZcVzhUGA=="
+          "hash": "xhjv6IX8FcuGo2SJ3cShfw=="
         }
       },
       "is_incremental": false,
@@ -6534,7 +6786,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroArgumentsSource.html",
-          "hash": "9sc0832r0uQrzf6oZyebiA=="
+          "hash": "5UdpC292DCQT0q9SJp2vFg=="
         }
       },
       "is_incremental": false,
@@ -6546,7 +6798,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroArrayParam.html",
-          "hash": "wncLvdfu8VPTBg3vr6MiWg=="
+          "hash": "jJQMPOBq/Lg6D/0Fqz8Oxw=="
         }
       },
       "is_incremental": false,
@@ -6558,7 +6810,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroBasic.html",
-          "hash": "A9YHombWPfsUSMbYZJ5uEw=="
+          "hash": "vqnKtp4ruU9iieXqLoNdeg=="
         }
       },
       "is_incremental": false,
@@ -6570,7 +6822,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroBenchmarkBaseline.html",
-          "hash": "VCfWB+blKIfGoCz6fJXnBw=="
+          "hash": "PuQDBcYZcUZkC2l7M5Sgzw=="
         }
       },
       "is_incremental": false,
@@ -6582,7 +6834,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroCategories.html",
-          "hash": "JyeEwKKv3yJ/Ir6bOo8+lg=="
+          "hash": "pLfz0qhCitR6zHiZ46Qs6w=="
         }
       },
       "is_incremental": false,
@@ -6594,7 +6846,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroCategoryBaseline.html",
-          "hash": "W6myUXbczLa4w6xswUejUg=="
+          "hash": "n5voCG1IFbwkeo10kht3Sg=="
         }
       },
       "is_incremental": false,
@@ -6606,7 +6858,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroColdStart.html",
-          "hash": "xianATTAEfXDv9+Ii1HuaQ=="
+          "hash": "jaBQmoaNWQBgiJsUVFLmMA=="
         }
       },
       "is_incremental": false,
@@ -6618,7 +6870,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroConfigSource.html",
-          "hash": "BIIAJry1vdkV9Jcgl7XYlw=="
+          "hash": "as7K/j9zWXDyRQ3Kc/t1yw=="
         }
       },
       "is_incremental": false,
@@ -6630,7 +6882,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroConfigUnion.html",
-          "hash": "lcomgYtsz1WgZpeQAYjtag=="
+          "hash": "XMtzdGNkCO7FGqBSHwlpqQ=="
         }
       },
       "is_incremental": false,
@@ -6642,7 +6894,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroCustomMono.html",
-          "hash": "f/ff736FyhEx5h1D1dbFsQ=="
+          "hash": "jFusZ7CbUFwZMQzi3/Rl/A=="
         }
       },
       "is_incremental": false,
@@ -6654,7 +6906,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroCustomMonoArguments.html",
-          "hash": "WRk81vWearRijO88GEeWOQ=="
+          "hash": "aHV+CNCZGZTecgpto9CPyw=="
         }
       },
       "is_incremental": false,
@@ -6666,7 +6918,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroDeferredExecution.html",
-          "hash": "W5AwBhWYbSrtnMD54GTdvg=="
+          "hash": "TaGtwj8cHNMnD3EgNmt0mQ=="
         }
       },
       "is_incremental": false,
@@ -6678,7 +6930,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroDisassembly.html",
-          "hash": "ubqz7GzaAan6FetUihFfjg=="
+          "hash": "lzUJCjkOaBPwSFMBuB23+w=="
         }
       },
       "is_incremental": false,
@@ -6690,7 +6942,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroDisassemblyAllJits.html",
-          "hash": "9gsjNKVnX5osX6IVd92n+g=="
+          "hash": "ebJZpeQtQRYifGbI8SZ3gg=="
         }
       },
       "is_incremental": false,
@@ -6702,7 +6954,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroDisassemblyDry.html",
-          "hash": "Fcyj7MSDGQWoxxnMybxVGw=="
+          "hash": "junqB9AeQOeKpsr2DlIsVQ=="
         }
       },
       "is_incremental": false,
@@ -6714,7 +6966,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroDisassemblyRyuJit.html",
-          "hash": "zTayBomc85WTIuuAxn2JTw=="
+          "hash": "r6+EYtt/qastjq3rJFE+WA=="
         }
       },
       "is_incremental": false,
@@ -6726,7 +6978,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroEncoding.html",
-          "hash": "DXPxAcBkWfnsFWpfGazFeg=="
+          "hash": "P3JcGOXuBgOEgy+cF6EtvA=="
         }
       },
       "is_incremental": false,
@@ -6738,7 +6990,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroEnvVars.html",
-          "hash": "MswrQqbJYKAcB58VbnLSRQ=="
+          "hash": "zO21t/QURC0zp++TVCs+Gw=="
         }
       },
       "is_incremental": false,
@@ -6750,7 +7002,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroExport.html",
-          "hash": "N3p3vmL2yFxnMCSV7UIsFQ=="
+          "hash": "DBOa2F6sU+QJ+rM6r6KMmg=="
         }
       },
       "is_incremental": false,
@@ -6762,7 +7014,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroExportJson.html",
-          "hash": "bCE9y6C/Xonp9NdIOdxQAw=="
+          "hash": "7awRTLdNmToKmq+mf/gbCA=="
         }
       },
       "is_incremental": false,
@@ -6774,7 +7026,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroExportXml.html",
-          "hash": "lqidmLQhSJXJ8D2AUvBgUA=="
+          "hash": "cCWSF9Ycu9axaGEPkXynkw=="
         }
       },
       "is_incremental": false,
@@ -6786,7 +7038,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroFilters.html",
-          "hash": "Hse2k1PpxiWAf4dUjXeb4Q=="
+          "hash": "3sJrU7W8xrlNgn0TRt/rag=="
         }
       },
       "is_incremental": false,
@@ -6798,7 +7050,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroFluentConfigBuilder.html",
-          "hash": "1G9Ph06NEe3Gz0+DekaoYQ=="
+          "hash": "TmxOtj34MtJ4pOvLP1FaWQ=="
         }
       },
       "is_incremental": false,
@@ -6810,7 +7062,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroGcMode.html",
-          "hash": "LEd+lQS+PGX81i9HcBWGiQ=="
+          "hash": "i+MgajdnyZYq83zoJMCKIQ=="
         }
       },
       "is_incremental": false,
@@ -6822,7 +7074,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroGenericTypeArguments.html",
-          "hash": "iPOV4d7COrzcyP6EsLv8uQ=="
+          "hash": "RHv02B5D7fBvJa/ecZlMSw=="
         }
       },
       "is_incremental": false,
@@ -6834,7 +7086,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroHardwareCounters.html",
-          "hash": "3Ru/ocrq3p9GFBCHP5XbiQ=="
+          "hash": "RI32nWRWxtiNCO7+MJHi8g=="
         }
       },
       "is_incremental": false,
@@ -6846,7 +7098,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroInProcess.html",
-          "hash": "8xf6l/qJR+c54G+3RQdZqQ=="
+          "hash": "8OHRdccU/gLaPgn5Hx7s0Q=="
         }
       },
       "is_incremental": false,
@@ -6858,7 +7110,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroInProcessWrongEnv.html",
-          "hash": "UVKde2+UAy0OwcIYjbsB1A=="
+          "hash": "ZjXjOJlAINnvrswkpI3xiQ=="
         }
       },
       "is_incremental": false,
@@ -6870,7 +7122,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroJobBaseline.html",
-          "hash": "6EYikWiJWmivTdL57UmJ1A=="
+          "hash": "UC4blFkp+Olp5SN8BcKflA=="
         }
       },
       "is_incremental": false,
@@ -6882,7 +7134,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroJoin.html",
-          "hash": "h/ydTll5QtpG/8q7tnu2fQ=="
+          "hash": "BUHXjOyTDEu9QYCJOpk/JA=="
         }
       },
       "is_incremental": false,
@@ -6894,7 +7146,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroMonitoring.html",
-          "hash": "QkGUA2+d4Gr0xhxisnsA9A=="
+          "hash": "Un9yYLBeSXok0Sc7VtHHbA=="
         }
       },
       "is_incremental": false,
@@ -6906,7 +7158,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroMultimodal.html",
-          "hash": "zcMrzdfHjjJl089hmoyYeA=="
+          "hash": "W0qlvBM5PzyOALzHSCDBkA=="
         }
       },
       "is_incremental": false,
@@ -6918,7 +7170,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroNuGet.html",
-          "hash": "nYyqF7LMhGngmTAtaJFMjA=="
+          "hash": "AsEgJO/C7TlEmRN/ke32MQ=="
         }
       },
       "is_incremental": false,
@@ -6930,7 +7182,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroOrderAttr.html",
-          "hash": "+MH8ZsGNwVzda3UyFMg13Q=="
+          "hash": "sM64myO+xs4Pjem3uxBUGA=="
         }
       },
       "is_incremental": false,
@@ -6942,7 +7194,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroOrderManual.html",
-          "hash": "Ayk65/8EGBwaRfFes81BZA=="
+          "hash": "kpmAmm0zbyBOhba5O1HRYA=="
         }
       },
       "is_incremental": false,
@@ -6954,7 +7206,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroOutliers.html",
-          "hash": "VwUJ6HF24zHgtyK6LDDfLw=="
+          "hash": "fBEmMA8FMEW+p9pJVuiq1Q=="
         }
       },
       "is_incremental": false,
@@ -6966,7 +7218,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroParams.html",
-          "hash": "R57VD0WRdP06cLKt7PeLqw=="
+          "hash": "t3a+UVh//3ItoiCWzoe2IQ=="
         }
       },
       "is_incremental": false,
@@ -6978,7 +7230,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroParamsAllValues.html",
-          "hash": "KcPOtwGZiJfP8Hy2F1J4gA=="
+          "hash": "6+b8wDFGpI4wmGXMvrJIhw=="
         }
       },
       "is_incremental": false,
@@ -6990,7 +7242,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroParamsSource.html",
-          "hash": "U9fM6QLSlBPvU5d99sgmqA=="
+          "hash": "99ElF/0oF1qBhHjfTc1Zww=="
         }
       },
       "is_incremental": false,
@@ -7002,7 +7254,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroPercentiles.html",
-          "hash": "TlqIGVkEKKXJQn78npX53Q=="
+          "hash": "6VP6Zp5aqkIP9QO3tRO2EQ=="
         }
       },
       "is_incremental": false,
@@ -7014,7 +7266,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroRankColumn.html",
-          "hash": "uPIeyGPnuZ8fLSdU0DXjmg=="
+          "hash": "1q+EzbNYu3Vss0j6sCUxnQ=="
         }
       },
       "is_incremental": false,
@@ -7026,7 +7278,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroRatioSD.html",
-          "hash": "pVYifCYjuU/Rpzd+mIugGw=="
+          "hash": "Cop6UmvQRWwkFJDGwh54FQ=="
         }
       },
       "is_incremental": false,
@@ -7038,7 +7290,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroSetupCleanupGlobal.html",
-          "hash": "TlI03baK+LGRlL1p4K67Lg=="
+          "hash": "x+YCtMd/zYY/5RY5q0LEog=="
         }
       },
       "is_incremental": false,
@@ -7050,7 +7302,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroSetupCleanupIteration.html",
-          "hash": "8jMinDf25P4QIKZGTFzSmg=="
+          "hash": "KX9DOBLmEpEQyHraN3sKRQ=="
         }
       },
       "is_incremental": false,
@@ -7062,7 +7314,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroSetupCleanupTarget.html",
-          "hash": "DT5jJaPYCJxWk7W0Q7+UiA=="
+          "hash": "vS0QwmhEcfr3q7BixDSh2g=="
         }
       },
       "is_incremental": false,
@@ -7074,7 +7326,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroStaThread.html",
-          "hash": "vrAUuFoUPlwwa4Z0CJuwiw=="
+          "hash": "vpfIxkGrb3yoU8GXu86Rlg=="
         }
       },
       "is_incremental": false,
@@ -7086,7 +7338,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroStatisticalTesting.html",
-          "hash": "iI3jPRoq32YYnjyXN/sR3A=="
+          "hash": "fNTDGJmIWRiKwYqeDf8vEw=="
         }
       },
       "is_incremental": false,
@@ -7098,7 +7350,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroStatisticsColumns.html",
-          "hash": "n638A5lr83LS6h+8i/fNzw=="
+          "hash": "JTX2b+buey+64mNzQmnehA=="
         }
       },
       "is_incremental": false,
@@ -7110,7 +7362,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroStopOnFirstError.html",
-          "hash": "Gs7a7tHAI9YSui5JT5CuOw=="
+          "hash": "B4behWyJ68HmaMvwClXjRQ=="
         }
       },
       "is_incremental": false,
@@ -7122,7 +7374,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroTagColumn.html",
-          "hash": "uxmGsQsyPtYNTXyY4wrvYQ=="
+          "hash": "N1PfxT+E26zzmoSKy4CENg=="
         }
       },
       "is_incremental": false,
@@ -7134,7 +7386,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/samples/IntroTailcall.html",
-          "hash": "qPwem+ntWN+EZw/Ocm3XIQ=="
+          "hash": "fytarY7vaPAklsgu61d55w=="
         }
       },
       "is_incremental": false,
@@ -7146,7 +7398,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/team.html",
-          "hash": "YeCm65ZKuGNwdWgZXlfNDg=="
+          "hash": "BrIsxqBiKjW6II0xEoW58Q=="
         }
       },
       "is_incremental": false,
@@ -7158,7 +7410,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/toc.html",
-          "hash": "hZIJVY/iuBdANOoNLuTvAg=="
+          "hash": "7A++f07MTtFWvFemvFPWTg=="
         }
       },
       "is_incremental": false,
@@ -7170,7 +7422,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/full.html",
-          "hash": "p6SWejd3/VcT3W7EBz1qWA=="
+          "hash": "/SJBv4A3OwNWBnbO5ryt7A=="
         }
       },
       "is_incremental": false,
@@ -7182,7 +7434,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/index.html",
-          "hash": "2xTBQuRk/3tZbgllA3I4gg=="
+          "hash": "JR7456VdsTXrASfWlEMOpg=="
         }
       },
       "is_incremental": false,
@@ -7194,7 +7446,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/toc.html",
-          "hash": "GueiD0lZAEfToXqz8SjGUg=="
+          "hash": "Cgvt92mq4e+N51YKdNFFmQ=="
         }
       },
       "is_incremental": false,
@@ -7206,7 +7458,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.10.0.html",
-          "hash": "32CwJbc1zz+B47X1BauuSA=="
+          "hash": "09QhLlJXxGdYQvylm/gOog=="
         }
       },
       "is_incremental": false,
@@ -7218,7 +7470,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.10.1.html",
-          "hash": "VJl4EdJOZWWzp91Ok+Cqeg=="
+          "hash": "TF7H7wPg5eMRxVFOQsx4/Q=="
         }
       },
       "is_incremental": false,
@@ -7230,7 +7482,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.10.10.html",
-          "hash": "WEfdAaLwXdjtLzNUUIf4IA=="
+          "hash": "GaUk+IxjiGBX8MzYf5KGcA=="
         }
       },
       "is_incremental": false,
@@ -7242,7 +7494,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.10.11.html",
-          "hash": "DYSUUST7DW5Ypiz87vek3g=="
+          "hash": "Z1Oxxpfr/pervml6ZeR1bg=="
         }
       },
       "is_incremental": false,
@@ -7254,7 +7506,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.10.12.html",
-          "hash": "c9HWHUDt5tVwQPDj/Q9gKg=="
+          "hash": "gQIGnY4q6rEKo9axVdJBgg=="
         }
       },
       "is_incremental": false,
@@ -7266,7 +7518,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.10.13.html",
-          "hash": "9bf/bUSlhQmmuVrcsoxfhg=="
+          "hash": "688uq3+OQ9RKb1xGO02IwQ=="
         }
       },
       "is_incremental": false,
@@ -7278,7 +7530,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.10.14.html",
-          "hash": "8KTNlSorYvd9LIcFHwKupA=="
+          "hash": "1lO4KzfSHz+TD6cGVyahbw=="
         }
       },
       "is_incremental": false,
@@ -7290,7 +7542,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.10.2.html",
-          "hash": "ZuAM/f1v9CMODjlVFUXeKg=="
+          "hash": "ZjfGUymgQ6og6a0WrUz1QA=="
         }
       },
       "is_incremental": false,
@@ -7302,7 +7554,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.10.3.html",
-          "hash": "9PQdxwq/wdIDpSSAZXr7WQ=="
+          "hash": "zPyRNmtg7nMMSqTzdNCXUw=="
         }
       },
       "is_incremental": false,
@@ -7314,7 +7566,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.10.4.html",
-          "hash": "RglXTLRmBdTkchteStHxtw=="
+          "hash": "BOd7dGXez/a7MYW0OQKLAQ=="
         }
       },
       "is_incremental": false,
@@ -7326,7 +7578,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.10.5.html",
-          "hash": "cmx4bd9uVcmR//MNVSaKZA=="
+          "hash": "KCnMB1xboU2BJ6GwN6hSqA=="
         }
       },
       "is_incremental": false,
@@ -7338,7 +7590,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.10.6.html",
-          "hash": "cb0uXDsL9k0M7jZaKxegVQ=="
+          "hash": "ZmxS2OtUWeW8LPoLabkdWQ=="
         }
       },
       "is_incremental": false,
@@ -7350,7 +7602,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.10.7.html",
-          "hash": "oOr8OCSs6MD3admQywe5rA=="
+          "hash": "Qbfigb3s+spp8Oh2O2XORw=="
         }
       },
       "is_incremental": false,
@@ -7362,7 +7614,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.10.8.html",
-          "hash": "uHN4H1XgSjz8341hN4CLLw=="
+          "hash": "EnSyJmebPx86+ER4DPSKuA=="
         }
       },
       "is_incremental": false,
@@ -7374,7 +7626,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.10.9.html",
-          "hash": "XaukKjKDfGtlWBVkmhfSow=="
+          "hash": "FjAEQSbRfpB2gYit/dFj1g=="
         }
       },
       "is_incremental": false,
@@ -7386,7 +7638,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.11.0.html",
-          "hash": "2ksFzfjmfT3gzgLcAXeBhg=="
+          "hash": "6ziT7wFLfwUGM6TFdLKlsw=="
         }
       },
       "is_incremental": false,
@@ -7398,7 +7650,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.11.1.html",
-          "hash": "El91BpY7NU/7NgYIFivFtg=="
+          "hash": "XQToU8B95FqDeVJR660luw=="
         }
       },
       "is_incremental": false,
@@ -7410,7 +7662,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.11.2.html",
-          "hash": "S6oDGi5FvbW0Rv16Qm4Vdg=="
+          "hash": "kzu/jF346C7xGX8iXZbLGQ=="
         }
       },
       "is_incremental": false,
@@ -7422,7 +7674,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.11.3.html",
-          "hash": "iAGLwZ/VaIa2KEyWCiipNA=="
+          "hash": "0/VANGTOpdqVrEloIXqtbw=="
         }
       },
       "is_incremental": false,
@@ -7434,7 +7686,19 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.11.4.html",
-          "hash": "0qBHzRmND3F/EfaVz73R0A=="
+          "hash": "jxPg0jMUWNxHvzK+HyJcyA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "changelog/v0.11.5.md",
+      "output": {
+        ".html": {
+          "relative_path": "changelog/v0.11.5.html",
+          "hash": "TzMfotwvBjsHkscq9OS5Ig=="
         }
       },
       "is_incremental": false,
@@ -7446,7 +7710,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.7.0.html",
-          "hash": "PlFqnZB6ojAXv023C6dBNw=="
+          "hash": "5xnr27M8sRyOwpozHazG6w=="
         }
       },
       "is_incremental": false,
@@ -7458,7 +7722,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.7.1.html",
-          "hash": "tjXdX+GjWcOvv0gOmp2ixg=="
+          "hash": "26v+cS/5TDz9K1zTX2QSBA=="
         }
       },
       "is_incremental": false,
@@ -7470,7 +7734,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.7.2.html",
-          "hash": "mx2rx8tpHECWI82ntZfL5A=="
+          "hash": "z8ZF/l+3DNvPqloKg20Jaw=="
         }
       },
       "is_incremental": false,
@@ -7482,7 +7746,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.7.3.html",
-          "hash": "2GdNJgUzhPOaCQ/DQXahcA=="
+          "hash": "1YZ7SKTk07OrsQTuECx0Bg=="
         }
       },
       "is_incremental": false,
@@ -7494,7 +7758,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.7.4.html",
-          "hash": "aMLoTO5CEnoTxV+6EUudkg=="
+          "hash": "SFGy/eO2nzFcWtrDVuIyoA=="
         }
       },
       "is_incremental": false,
@@ -7506,7 +7770,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.7.5.html",
-          "hash": "kXZwVCiVpfEi6eGiI8g7kg=="
+          "hash": "VEq1cq2XANWWtSVR9tpoOg=="
         }
       },
       "is_incremental": false,
@@ -7518,7 +7782,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.7.6.html",
-          "hash": "gAYzpU9nH58d13CRMrrNbA=="
+          "hash": "XYyVaxqq88JCnmtZ3k9V5g=="
         }
       },
       "is_incremental": false,
@@ -7530,7 +7794,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.7.7.html",
-          "hash": "wEWYnM6uBMPP6dlvHDje4A=="
+          "hash": "EBNtGcg7wogvrMZMJF2rVg=="
         }
       },
       "is_incremental": false,
@@ -7542,7 +7806,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.7.8.html",
-          "hash": "9125Jn5SNMZ/YqNJYIMU5w=="
+          "hash": "mEjA7eDPXtctEmIJM9eSww=="
         }
       },
       "is_incremental": false,
@@ -7554,7 +7818,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.8.0.html",
-          "hash": "KxoI6Beq0vUJsEiq/Xc1ew=="
+          "hash": "2FfL5DELMGjzabFnOdp/5Q=="
         }
       },
       "is_incremental": false,
@@ -7566,7 +7830,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.8.1.html",
-          "hash": "+AQ+U0dYdtw8rVFh3GjSnQ=="
+          "hash": "VU9t7hG9qqvzUc2j4AJVUg=="
         }
       },
       "is_incremental": false,
@@ -7578,7 +7842,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.8.2.html",
-          "hash": "DvgOYedg5y6kg6EzGQKCYA=="
+          "hash": "PcTUblD2vS1owAy2Q5zwWg=="
         }
       },
       "is_incremental": false,
@@ -7590,7 +7854,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.9.0.html",
-          "hash": "q6ONDlN6Ksnd0XEcRJWpuw=="
+          "hash": "uVSXQjbpja4N8pIxyDGyUw=="
         }
       },
       "is_incremental": false,
@@ -7602,7 +7866,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.9.1.html",
-          "hash": "6snB6GfFJ+NDQ046PEWp3g=="
+          "hash": "kCDKciqml2YHcTsfUT+vUA=="
         }
       },
       "is_incremental": false,
@@ -7614,7 +7878,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.9.2.html",
-          "hash": "Dj//o7G/piVQdx8RUOlivQ=="
+          "hash": "MuXVypzKrs72oMTJRO7GBg=="
         }
       },
       "is_incremental": false,
@@ -7626,7 +7890,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.9.3.html",
-          "hash": "e0oLOLBPwHtIhcm9OxYSUg=="
+          "hash": "OULdMXRY+Lozru3XR7m67w=="
         }
       },
       "is_incremental": false,
@@ -7638,7 +7902,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.9.4.html",
-          "hash": "lsY0qCfeZkxOYJda1hLgoQ=="
+          "hash": "o0WPqLQeuzbTDl0r8wbXRA=="
         }
       },
       "is_incremental": false,
@@ -7650,7 +7914,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.9.5.html",
-          "hash": "jKkSKJJWDoeylMAE7NauBw=="
+          "hash": "uB3iJ/4P2zRTaQkQqelEIw=="
         }
       },
       "is_incremental": false,
@@ -7662,7 +7926,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.9.6.html",
-          "hash": "o0Bk8kwfaGMS06ORHAjZ2g=="
+          "hash": "54T3xwVdnO+y3cpL4HhZFA=="
         }
       },
       "is_incremental": false,
@@ -7674,7 +7938,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.9.7.html",
-          "hash": "EimteusQVN9mfFHMo+TJgQ=="
+          "hash": "q/bDCAW5n6CQEs3YMpCrqw=="
         }
       },
       "is_incremental": false,
@@ -7686,7 +7950,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.9.8.html",
-          "hash": "o1Bo2zG8E0xLl8gFPck95w=="
+          "hash": "NIojNoaNJWj4lDxEUcPB7A=="
         }
       },
       "is_incremental": false,
@@ -7698,7 +7962,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.9.9.html",
-          "hash": "F0mNQZBNu8aGir9GSJzc3Q=="
+          "hash": "+hsml/+IIuG8+//1vwo5Sw=="
         }
       },
       "is_incremental": false,
@@ -7743,7 +8007,7 @@
       "output": {
         ".html": {
           "relative_path": "index.html",
-          "hash": "MmktHqv2ydStZhXibRwx/A=="
+          "hash": "PN/BVH2PT/e9Ct1FdW2gJg=="
         }
       },
       "is_incremental": false,
@@ -7865,7 +8129,7 @@
       "output": {
         ".html": {
           "relative_path": "toc.html",
-          "hash": "PsIajqLpmu/mcq6vIMsH2A=="
+          "hash": "graP2ErrPDwwkE4IFmDFgg=="
         }
       },
       "is_incremental": false,
@@ -7877,26 +8141,36 @@
       "status": {
         "can_incremental": false,
         "details": "Cannot build incrementally because last build info is missing.",
-        "incrementalPhase": "build"
+        "incrementalPhase": "build",
+        "total_file_count": 0,
+        "skipped_file_count": 0
       },
       "processors": {
-        "ResourceDocumentProcessor": {
-          "can_incremental": false,
-          "details": "Processor ResourceDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
-          "incrementalPhase": "build"
-        },
-        "ConceptualDocumentProcessor": {
-          "can_incremental": false,
-          "incrementalPhase": "build"
-        },
-        "ManagedReferenceDocumentProcessor": {
-          "can_incremental": false,
-          "incrementalPhase": "build"
-        },
         "TocDocumentProcessor": {
           "can_incremental": false,
           "details": "Processor TocDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
-          "incrementalPhase": "build"
+          "incrementalPhase": "build",
+          "total_file_count": 0,
+          "skipped_file_count": 0
+        },
+        "ResourceDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor ResourceDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build",
+          "total_file_count": 0,
+          "skipped_file_count": 0
+        },
+        "ManagedReferenceDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build",
+          "total_file_count": 523,
+          "skipped_file_count": 0
+        },
+        "ConceptualDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build",
+          "total_file_count": 138,
+          "skipped_file_count": 0
         }
       }
     },
@@ -7904,7 +8178,9 @@
       "status": {
         "can_incremental": false,
         "details": "Cannot support incremental post processing, the reason is: should not trace intermediate info.",
-        "incrementalPhase": "postProcessing"
+        "incrementalPhase": "postProcessing",
+        "total_file_count": 0,
+        "skipped_file_count": 0
       },
       "processors": {}
     }

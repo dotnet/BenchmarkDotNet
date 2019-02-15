@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ArrayParam&lt;T&gt;
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -135,35 +135,11 @@
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Code.IParam.html">IParam</a></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Code.html">BenchmarkDotNet.Code</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Code_ArrayParam_1_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ArrayParam&lt;T&gt; : IParam</code></pre>
+    <pre><code class="lang-csharp hljs">public class ArrayParam&lt;T&gt; : object, IParam</code></pre>
   </div>
   <h5 class="typeParameters">Type Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -237,7 +213,7 @@
   
   
   <a id="BenchmarkDotNet_Code_ArrayParam_1_ForComplexTypes_" data-uid="BenchmarkDotNet.Code.ArrayParam`1.ForComplexTypes*"></a>
-  <h4 id="BenchmarkDotNet_Code_ArrayParam_1_ForComplexTypes__0___System_Func__0_System_String__" data-uid="BenchmarkDotNet.Code.ArrayParam`1.ForComplexTypes(`0[],System.Func{`0,System.String})">ForComplexTypes(T[], Func&lt;T, String&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Code_ArrayParam_1_ForComplexTypes__0___Func__0_System_String__" data-uid="BenchmarkDotNet.Code.ArrayParam`1.ForComplexTypes(`0[],Func{`0,System.String})">ForComplexTypes(T[], Func&lt;T, String&gt;)</h4>
   <div class="markdown level1 summary"><p>for types where calling .ToString() will be NOT enough to re-create them in auto-generated source code file</p>
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -262,7 +238,7 @@
 </td>
       </tr>
       <tr>
-        <td><span class="xref">System.Func</span>&lt;T, <span class="xref">System.String</span>&gt;</td>
+        <td><span class="xref">Func</span>&lt;T, <span class="xref">System.String</span>&gt;</td>
         <td><span class="parametername">toSourceCode</span></td>
         <td><p>method which transforms an item of type T to it's C# representation
 example: point =&gt; $&quot;new Point2d({point.X}, {point.Y})&quot;</p>
@@ -381,7 +357,7 @@ example: point =&gt; $&quot;new Point2d({point.X}, {point.Y})&quot;</p>
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>

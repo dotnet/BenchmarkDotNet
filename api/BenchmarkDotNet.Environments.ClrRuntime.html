@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ClrRuntime
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.37.1.0">
+    <meta name="generator" content="docfx 2.40.10.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -134,8 +134,7 @@
   </div>
   <div classs="implements">
     <h5>Implements</h5>
-    <div><span class="xref">System.IEquatable</span>&lt;<a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a>&gt;</div>
-    <div><span class="xref">System.IEquatable</span>&lt;<a class="xref" href="BenchmarkDotNet.Environments.ClrRuntime.html">ClrRuntime</a>&gt;</div>
+    <div><span class="xref">IEquatable</span>&lt;<a class="xref" href="BenchmarkDotNet.Environments.ClrRuntime.html">ClrRuntime</a>&gt;</div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -160,24 +159,12 @@
     <div>
       <a class="xref" href="BenchmarkDotNet.Environments.Runtime.html#BenchmarkDotNet_Environments_Runtime_Equals_BenchmarkDotNet_Environments_Runtime_">Runtime.Equals(Runtime)</a>
     </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Environments.html">BenchmarkDotNet.Environments</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Environments_ClrRuntime_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ClrRuntime : Runtime, IEquatable&lt;Runtime&gt;, IEquatable&lt;ClrRuntime&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public class ClrRuntime : Runtime, IEquatable&lt;ClrRuntime&gt;</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -365,10 +352,7 @@ BenchmarkDotNet in going to pass <code>COMPLUS_Version</code> env var to the pro
   <div><a class="xref" href="BenchmarkDotNet.Environments.Runtime.html#BenchmarkDotNet_Environments_Runtime_GetHashCode">Runtime.GetHashCode()</a></div>
   <h3 id="implements">Implements</h3>
   <div>
-      <span class="xref">System.IEquatable&lt;T&gt;</span>
-  </div>
-  <div>
-      <span class="xref">System.IEquatable&lt;T&gt;</span>
+      <span class="xref">IEquatable&lt;&gt;</span>
   </div>
 </article>
           </div>
@@ -394,7 +378,7 @@ BenchmarkDotNet in going to pass <code>COMPLUS_Version</code> env var to the pro
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2018 .NET Foundation and contributors
+            Copyright &copy; 2013–2019 .NET Foundation and contributors
             
           </div>
         </div>
