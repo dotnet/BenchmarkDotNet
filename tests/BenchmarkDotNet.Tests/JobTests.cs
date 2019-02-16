@@ -8,7 +8,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.CsProj;
 using Xunit;
 
-namespace BenchmarkDotNet.IntegrationTests
+namespace BenchmarkDotNet.Tests
 {
     [Trait("Category", "JobTests")]
     public static class JobTests
