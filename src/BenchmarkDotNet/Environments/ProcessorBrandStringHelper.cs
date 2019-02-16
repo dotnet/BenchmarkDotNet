@@ -1,7 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Portability.Cpu;
 using JetBrains.Annotations;
@@ -72,28 +75,59 @@ namespace BenchmarkDotNet.Environments
             {
                 string model = processorName.Substring("Intel Core".Length).Trim();
 
-                // Core i3/5/7
+                // Core i3/5/7/9
                 if (
                     model.Length > 4 &&
                     model[0] == 'i' &&
-                    (model[1] == '3' || model[1] == '5' || model[1] == '7') &&
+                    (model[1] == '3' || model[1] == '5' || model[1] == '7' || model[1] == '9') &&
                     (model[2] == '-' || model[2] == ' '))
                 {
                     string modelNumber = model.Substring(3);
                     if (modelNumber.StartsWith("CPU"))
                         modelNumber = modelNumber.Substring(3).Trim();
-                    return ParseIntroCoreMicroarchitecture(modelNumber);
+                    if (modelNumber.Contains("CPU"))
+                        modelNumber = modelNumber.Substring(0, modelNumber.IndexOf("CPU", StringComparison.Ordinal)).Trim();
+                    return ParseIntelCoreMicroarchitecture(modelNumber);
                 }
             }
 
             return null;
         }
 
+        private static readonly Lazy<Dictionary<string, string>> KnownMicroarchitectures = new Lazy<Dictionary<string, string>>(() =>
+        {
+            var data = ResourceHelper.LoadResource("BenchmarkDotNet.Environments.microarchitectures.txt").Split('\r', '\n');
+            var dictionary = new Dictionary<string, string>();
+            string currentMicroarchitecture = null;
+            foreach (string line in data)
+            {
+               if (line.StartsWith("//") || string.IsNullOrWhiteSpace(line))
+                   continue;
+               if (line.StartsWith("#"))
+               {
+                   currentMicroarchitecture = line.Substring(1).Trim();
+                   continue;
+               }
+
+               string modelNumber = line.Trim();
+               if (dictionary.ContainsKey(modelNumber))
+                   throw new Exception($"{modelNumber} is defined twice in microarchitectures.txt");
+               if (currentMicroarchitecture == null)
+                   throw new Exception($"{modelNumber} doesn't have defined microarchitecture in microarchitectures.txt");
+               dictionary[modelNumber] = currentMicroarchitecture;
+            }
+
+            return dictionary;
+        });
+
         // see http://www.intel.com/content/www/us/en/processors/processor-numbers.html
         [CanBeNull]
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
-        private static string ParseIntroCoreMicroarchitecture([NotNull] string modelNumber)
+        internal static string ParseIntelCoreMicroarchitecture([NotNull] string modelNumber)
         {
+            if (KnownMicroarchitectures.Value.ContainsKey(modelNumber))
+                return KnownMicroarchitectures.Value[modelNumber];
+            
             if (modelNumber.Length >= 3 && modelNumber.Substring(0, 3).All(char.IsDigit) &&
                 (modelNumber.Length == 3 || !char.IsDigit(modelNumber[3])))
                 return "Nehalem";
@@ -115,11 +149,7 @@ namespace BenchmarkDotNet.Environments
                     case '7':
                         return "Kaby Lake";
                     case '8':
-                    {
-                        if (modelNumber.Length >= 5 && modelNumber[4] == 'U')
-                            return "Kaby Lake R";
                         return "Coffee Lake";
-                    }
                     default:
                         return null;
                 }
