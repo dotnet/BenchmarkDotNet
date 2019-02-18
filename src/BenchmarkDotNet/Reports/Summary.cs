@@ -133,7 +133,12 @@ namespace BenchmarkDotNet.Reports
         public bool HasBaselines() => BenchmarksCases.Any(IsBaseline);
 
         private static IOrderer GetConfiguredOrdererOrDefaultOne(IEnumerable<ImmutableConfig> configs)
-            => configs.SingleOrDefault(config => config.Orderer != DefaultOrderer.Instance)?.Orderer ?? DefaultOrderer.Instance;
+            => configs
+                   .Where(config => config.Orderer != DefaultOrderer.Instance)
+                   .Select(config => config.Orderer)
+                   .Distinct()
+                   .SingleOrDefault()
+               ?? DefaultOrderer.Instance;
 
         private static SummaryStyle GetConfiguredSummaryStyleOrNull(ImmutableArray<BenchmarkCase> benchmarkCases)
             => benchmarkCases.Select(benchmark => benchmark.Config.SummaryStyle).Distinct().SingleOrDefault();
