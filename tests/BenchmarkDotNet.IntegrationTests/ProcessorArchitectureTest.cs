@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
@@ -14,6 +14,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         const string X86FailedCaption = "// x86FAILED";
         const string X64FailedCaption = "// x64FAILED";
+        const string ARMFailedCaption = "// ARMFAILED";
         const string AnyCpuOkCaption = "// AnyCpuOkCaption";
         const string HostPlatformOkCaption = "// HostPlatformOkCaption";
         const string BenchmarkNotFound = "// There are no benchmarks found";
@@ -23,12 +24,20 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void SpecifiedProccesorArchitectureMustBeRespected()
+        public void SpecifiedProcessorArchitectureMustBeRespected()
         {
 #if !CORE // dotnet cli does not support x86 compilation so far, so I disable this test
             Verify(Platform.X86, typeof(X86Benchmark), X86FailedCaption);
 #endif
-            Verify(Platform.X64, typeof(X64Benchmark), X64FailedCaption);
+            if (RuntimeInformation.ProcessArchitecture == Architecture.Arm)
+            {
+                Verify(Platform.Arm, typeof(ArmBenchmark), ARMFailedCaption);
+            }
+            else
+            {
+                Verify(Platform.X64, typeof(X64Benchmark), X64FailedCaption);
+            }
+            
             Verify(Platform.AnyCpu, typeof(AnyCpuBenchmark), "nvm");
         }
 
@@ -77,6 +86,18 @@ namespace BenchmarkDotNet.IntegrationTests
             public void AnyCpu()
             {
                 Console.WriteLine(AnyCpuOkCaption);
+            }
+        }
+        
+        public class ArmBenchmark
+        {
+            [Benchmark]
+            public void Arm()
+            {
+                if (RuntimeInformation.ProcessArchitecture != Architecture.Arm)
+                {
+                    throw new InvalidOperationException(ARMFailedCaption);
+                }
             }
         }
 

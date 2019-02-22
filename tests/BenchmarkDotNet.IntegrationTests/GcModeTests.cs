@@ -5,6 +5,7 @@ using Xunit.Abstractions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Tests.XUnit;
 #if CLASSIC
 using BenchmarkDotNet.Environments;
 #endif
@@ -38,7 +39,7 @@ namespace BenchmarkDotNet.IntegrationTests
             CanExecute<WorkstationGcOnly>(config);
         }
 
-        [Fact]
+        [FactSkipArm("TODO")]
         public void CanEnableConcurrentGcMode()
         {
             var config = CreateConfig(new GcMode { Concurrent = true });
