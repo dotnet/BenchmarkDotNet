@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Validators
                             $"Assembly {group.Key.GetName().Name} which defines benchmarks references non-optimized {referencedAssemblyName.Name}"
                             + (TreatsWarningsAsErrors
                                 ? $"{Environment.NewLine}\tIf you own this dependency, please, build it in RELEASE." +
-                                  $"{Environment.NewLine}\tIf you don't, you can create custom config with {nameof(JitOptimizationsValidator)}.{nameof(DontFailOnError)} to disable our custom policy and allow this benchmark to run."
+                                  $"{Environment.NewLine}\tIf you don't, you can disable this policy by using 'config.With(ConfigOptions.DisableOptimizationsValidator)'."
                                 : string.Empty));
                     }
                 }
@@ -46,12 +46,13 @@ namespace BenchmarkDotNet.Validators
                     yield return new ValidationError(
                         TreatsWarningsAsErrors,
                         $"Assembly {group.Key.GetName().Name} which defines benchmarks is non-optimized" + Environment.NewLine +
-                        "Benchmark was built without optimization enabled (most probably a DEBUG configuration). Please, build it in RELEASE."
+                        "Benchmark was built without optimization enabled (most probably a DEBUG configuration). Please, build it in RELEASE." + Environment.NewLine +
+                        "If you want to debug the benchmarks, please see https://benchmarkdotnet.org/articles/guides/troubleshooting.html#debugging-benchmarks."
                         + (group.Key.IsLinqPad()
                             ? Environment.NewLine + "Please enable optimizations in your LINQPad. Go to Preferences -> Query and select \"compile with /optimize+\""
                             : string.Empty));
                 }
             }
-        }        
+        }
     }
 }
