@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Helpers
                     return $"System.DateTime.Parse(\"{dateTime.ToString(CultureInfo.InvariantCulture)}\", System.Globalization.CultureInfo.InvariantCulture)";
             }
             if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
-                return $"({value.GetType().GetCorrectCSharpTypeName()}){ToInvariantCultureString(value)}";
+                return $"({value.GetType().GetCorrectCSharpTypeName()})({ToInvariantCultureString(value)})";
             if (value is Type type)
                 return "typeof(" + type.GetCorrectCSharpTypeName() + ")";
             if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)

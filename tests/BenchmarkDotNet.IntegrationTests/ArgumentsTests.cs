@@ -558,18 +558,16 @@ namespace BenchmarkDotNet.IntegrationTests
             [Arguments(LongFlagEnum.First | LongFlagEnum.Second, ByteFlagEnum.Third | ByteFlagEnum.Fourth)]
             public void Test(LongFlagEnum passedLongFlagEnum, ByteFlagEnum passedByteFlagEnum)
             {
-                var expectedLongFlagEnum = LongFlagEnum.First | LongFlagEnum.Second;
-                if (expectedLongFlagEnum != passedLongFlagEnum)
+                if ((LongFlagEnum.First | LongFlagEnum.Second) != passedLongFlagEnum)
                     throw new ArgumentException("The passed long flag enum has wrong value!");
 
-                var expectedByteFlagEnum = ByteFlagEnum.Third | ByteFlagEnum.Fourth;
-                if (expectedByteFlagEnum != passedByteFlagEnum)
+                if ((ByteFlagEnum.Third | ByteFlagEnum.Fourth) != passedByteFlagEnum)
                     throw new ArgumentException("The passed byte flag enum has wrong value!");
             }
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
-        public void UndefinedEnumValuesAreSupported(IToolchain toolchain) => CanExecute<WithEnumFlags>(toolchain);
+        public void UndefinedEnumValuesAreSupported(IToolchain toolchain) => CanExecute<WithUndefinedEnumValue>(toolchain);
 
         public class WithUndefinedEnumValue
         {
@@ -580,16 +578,17 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [Benchmark]
-            [Arguments(SomeEnum.First, (SomeEnum)100)]
-            public void Test(SomeEnum defined, SomeEnum undefined)
+            [Arguments(SomeEnum.First, (SomeEnum)100, (SomeEnum)(-100))]
+            public void Test(SomeEnum defined, SomeEnum undefined, SomeEnum undefinedNegative)
             {
-                var expectedDefined = SomeEnum.First;
-                if (expectedDefined != defined)
+                if (SomeEnum.First != defined)
                     throw new ArgumentException("The passed defined enum has wrong value!");
 
-                var expectedUndefined = (SomeEnum)100;
-                if (expectedUndefined != undefined)
+                if ((SomeEnum)100 != undefined)
                     throw new ArgumentException("The passed undefined enum has wrong value!");
+
+                if ((SomeEnum)(-100) != undefinedNegative)
+                    throw new ArgumentException("The passed undefined negative enum has wrong value!");
             }
         }
 
