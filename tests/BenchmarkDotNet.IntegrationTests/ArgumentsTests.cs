@@ -529,6 +529,45 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void EnumFlagsAreSupported(IToolchain toolchain) => CanExecute<WithEnumFlags>(toolchain);
+
+        public class WithEnumFlags
+        {
+            [Flags]
+            public enum LongFlagEnum : long
+            {
+                None = 0,
+                First = 1 << 0,
+                Second = 1 << 1,
+                Third = 1 << 2,
+                Fourth = 1 << 3
+            }
+
+            [Flags]
+            public enum ByteFlagEnum : byte
+            {
+                None = 0,
+                First = 1 << 0,
+                Second = 1 << 1,
+                Third = 1 << 2,
+                Fourth = 1 << 3
+            }
+
+            [Benchmark]
+            [Arguments(LongFlagEnum.First | LongFlagEnum.Second, ByteFlagEnum.Third | ByteFlagEnum.Fourth)]
+            public void Test(LongFlagEnum passedLongFlagEnum, ByteFlagEnum passedByteFlagEnum)
+            {
+                var expectedLongFlagEnum = LongFlagEnum.First | LongFlagEnum.Second;
+                if (expectedLongFlagEnum != passedLongFlagEnum)
+                    throw new ArgumentException("The passed long flag enum has wrong value!");
+
+                var expectedByteFlagEnum = ByteFlagEnum.Third | ByteFlagEnum.Fourth;
+                if (expectedByteFlagEnum != passedByteFlagEnum)
+                    throw new ArgumentException("The passed byte flag enum has wrong value!");
+            }
+        }
+
         private void CanExecute<T>(IToolchain toolchain)
         {
             var config = CreateSimpleConfig(job: Job.Dry.With(toolchain));
