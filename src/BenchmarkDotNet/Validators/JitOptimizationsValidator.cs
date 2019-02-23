@@ -11,10 +11,7 @@ namespace BenchmarkDotNet.Validators
         public static readonly IValidator DontFailOnError = new JitOptimizationsValidator(false);
         public static readonly IValidator FailOnError = new JitOptimizationsValidator(true);
 
-        private JitOptimizationsValidator(bool failOnErrors)
-        {
-            TreatsWarningsAsErrors = failOnErrors;
-        }
+        private JitOptimizationsValidator(bool failOnErrors) => TreatsWarningsAsErrors = failOnErrors;
 
         public bool TreatsWarningsAsErrors { get; }
 
