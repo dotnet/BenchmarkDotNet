@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Diagnosers
             internal static readonly IMetricDescriptor Instance = new AllocatedMemoryMetricDescriptor();
             
             public string Id => "Allocated Memory";
-            public string DisplayName => "Allocated Memory/Op";
+            public string DisplayName => "Allocated";
             public string Legend => "Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)";
             public string NumberFormat => "N0";
             public UnitType UnitType => UnitType.Size;
@@ -61,8 +61,8 @@ namespace BenchmarkDotNet.Diagnosers
             private GarbageCollectionsMetricDescriptor(int generationId)
             {
                 Id = $"Gen{generationId}Collects";
-                DisplayName = $"Gen {generationId}/1k Op";
-                Legend = $"GC Generation {generationId} collects per 1k Operations";
+                DisplayName = $"Gen {generationId}";
+                Legend = $"GC Generation {generationId} collects per 1000 operations";
             }
 
             public string Id { get; }
