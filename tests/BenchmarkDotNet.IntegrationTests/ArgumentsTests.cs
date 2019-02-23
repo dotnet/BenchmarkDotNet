@@ -568,6 +568,31 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void UndefinedEnumValuesAreSupported(IToolchain toolchain) => CanExecute<WithEnumFlags>(toolchain);
+
+        public class WithUndefinedEnumValue
+        {
+            [Flags]
+            public enum SomeEnum : long
+            {
+                First = 0, Last = 1
+            }
+
+            [Benchmark]
+            [Arguments(SomeEnum.First, (SomeEnum)100)]
+            public void Test(SomeEnum defined, SomeEnum undefined)
+            {
+                var expectedDefined = SomeEnum.First;
+                if (expectedDefined != defined)
+                    throw new ArgumentException("The passed defined enum has wrong value!");
+
+                var expectedUndefined = (SomeEnum)100;
+                if (expectedUndefined != undefined)
+                    throw new ArgumentException("The passed undefined enum has wrong value!");
+            }
+        }
+
         private void CanExecute<T>(IToolchain toolchain)
         {
             var config = CreateSimpleConfig(job: Job.Dry.With(toolchain));
