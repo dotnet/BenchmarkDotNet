@@ -180,8 +180,57 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithCustomBuildConfiguration(this Job job, string buildConfiguration) =>
             job.WithCore(j => j.Infrastructure.BuildConfiguration = buildConfiguration);
 
-        public static Job With(this Job job, IReadOnlyList<EnvironmentVariable> environmentVariables) =>
-            job.WithCore(j => j.Environment.EnvironmentVariables = environmentVariables);
+        /// <summary>
+        /// Creates a new job based on the given job with specified environment variables.
+        /// It overrides the whole list of environment variables which were defined in the original job.
+        /// </summary>
+        /// <param name="job">The original job</param>
+        /// <param name="environmentVariables">The environment variables for the new job</param>
+        /// <exception cref="InvalidOperationException">
+        /// Throws an exception if <paramref name="environmentVariables"/> contains two variables with the same key.
+        /// </exception>
+        /// <returns>The new job with overriden environment variables</returns>
+        public static Job With(this Job job, IReadOnlyList<EnvironmentVariable> environmentVariables)
+        {
+            var keys = new HashSet<string>();
+            foreach (var variable in environmentVariables)
+            {
+                if (keys.Contains(variable.Key))
+                    throw new InvalidOperationException($"The '{variable.Key}' environment variables is defined twice");
+                keys.Add(variable.Key);
+            }
+            return job.WithCore(j => j.Environment.EnvironmentVariables = environmentVariables);
+        }
+
+        /// <summary>
+        /// Creates a new job based on the given job with additional environment variable.
+        /// All existed environment variables of the original job will be copied to the new one.
+        /// If the original job already contains an environment variable with the same key, it will be overriden.
+        /// </summary>
+        /// <param name="job">The original job</param>
+        /// <param name="environmentVariable">The new environment variable which should be added for the new job</param>
+        /// <returns>The new job with additional environment variable</returns>
+        public static Job With(this Job job, EnvironmentVariable environmentVariable) 
+            => job.WithCore(j => j.Environment.SetEnvironmentVariable(environmentVariable));
+
+        /// <summary>
+        /// Creates a new job based on the given job with additional environment variable.
+        /// All existed environment variables of the original job will be copied to the new one.
+        /// If the original job already contains an environment variable with the same key, it will be overriden.
+        /// </summary>
+        /// <param name="job">The original job</param>
+        /// <param name="key">The key of the new environment variable</param>
+        /// <param name="value">The value of the new environment variable</param>
+        /// <returns>The new job with additional environment variable</returns>
+        public static Job WithEnvironmentVariable(this Job job, [NotNull] string key, [NotNull] string value)
+            => job.With(new EnvironmentVariable(key, value));
+
+        /// <summary>
+        /// Creates a new job based on the given job without any environment variables.
+        /// </summary>
+        /// <param name="job">The original job</param>
+        /// <returns>The new job which doesn't have any environment variables</returns>
+        public static Job WithoutEnvironmentVariables(this Job job) => job.With(Array.Empty<EnvironmentVariable>());
 
         public static Job With(this Job job, IReadOnlyList<Argument> arguments) => job.WithCore(j => j.Infrastructure.Arguments = arguments);
         
