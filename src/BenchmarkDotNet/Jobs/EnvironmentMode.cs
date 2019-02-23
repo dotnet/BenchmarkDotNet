@@ -92,5 +92,20 @@ namespace BenchmarkDotNet.Jobs
             set => EnvironmentVariablesCharacteristic[this] = value;
         }
 
+        /// <summary>
+        /// Adds the specified <paramref name="variable"/> to <see cref="EnvironmentVariables"/>.
+        /// If <see cref="EnvironmentVariables"/> already contains a variable with the same key,
+        /// it will be overriden.
+        /// </summary>
+        /// <param name="variable">The new environment variable which should be added to <see cref="EnvironmentVariables"/></param>
+        public void SetEnvironmentVariable(EnvironmentVariable variable)
+        {
+            var newVariables = new List<EnvironmentVariable>();
+            if (EnvironmentVariables != null)
+                newVariables.AddRange(EnvironmentVariables);
+            newVariables.RemoveAll(v => v.Key.Equals(variable.Key, StringComparison.Ordinal));
+            newVariables.Add(variable);
+            EnvironmentVariables = newVariables;
+        }
     }
 }
