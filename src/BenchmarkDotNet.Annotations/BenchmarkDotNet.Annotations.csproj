@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <AssemblyTitle>BenchmarkDotNet.Annotations</AssemblyTitle>
+    <TargetFramework>netstandard1.0</TargetFramework>
+    <AssemblyName>BenchmarkDotNet.Annotations</AssemblyName>
+    <PackageId>BenchmarkDotNet.Annotations</PackageId>
+    <!-- to keep backward compat we did NOT rename the namesapce -->
+    <RootNamespace>BenchmarkDotNet.Attributes</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\BenchmarkDotNet\Helpers\CodeAnnotations.cs" Link="CodeAnnotations.cs" />
+  </ItemGroup>
+</Project>

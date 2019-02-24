@@ -45,4 +45,7 @@
     <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.Rocks.dll" />
     <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.dll" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj" />
+  </ItemGroup>
 </Project>

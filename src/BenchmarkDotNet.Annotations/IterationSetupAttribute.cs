@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Attributes
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     [MeansImplicitUse]
-    public class IterationSetupAttribute: TargetedAttribute
+    public class IterationSetupAttribute : TargetedAttribute
     {
     }
 }
