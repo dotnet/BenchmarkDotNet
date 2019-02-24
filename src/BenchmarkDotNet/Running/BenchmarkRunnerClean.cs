@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Running
 {
     internal static class BenchmarkRunnerClean
     {
-        private static int benchmarkRunIndex;
+        private const string DateTimeFormat = "yyyyMMdd-hhmmss";
 
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvironmentResolver.Instance, InfrastructureResolver.Instance);
 
@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Running
             
             var title = GetTitle(benchmarkRunInfos);
             var rootArtifactsFolderPath = GetRootArtifactsFolderPath(benchmarkRunInfos);
-            var resultsFolderPath = GetResultsFolderPath(rootArtifactsFolderPath);
+            var resultsFolderPath = GetResultsFolderPath(rootArtifactsFolderPath, benchmarkRunInfos);
 
             using (var streamLogger = new StreamLogger(new StreamWriter(Path.Combine(rootArtifactsFolderPath, title + ".log"), append: false)))
             {
@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Running
                     {
                         var runChronometer = Chronometer.Start();
                         
-                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup, rootArtifactsFolderPath, ref runChronometer);
+                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup, rootArtifactsFolderPath, resultsFolderPath, ref runChronometer);
                         
                         if (!benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.JoinSummary))
                             PrintSummary(compositeLogger, benchmarkRunInfo.Config, summary);
@@ -112,26 +112,13 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static string GetTitle(BenchmarkRunInfo[] benchmarkRunInfos)
-        {
-            // few types might have the same name: A.Name and B.Name will both report "Name"
-            // in that case, we can not use the type name as file name because they would be getting overwritten #529
-            var uniqueTargetTypes = benchmarkRunInfos.SelectMany(info => info.BenchmarksCases.Select(benchmark => benchmark.Descriptor.Type)).Distinct().ToArray();
-
-            if (uniqueTargetTypes.Length == 1)
-                return FolderNameHelper.ToFolderName(uniqueTargetTypes[0]);
-
-            benchmarkRunIndex++;
-
-            return $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
-        }
-
         private static Summary Run(BenchmarkRunInfo benchmarkRunInfo, 
                                    Dictionary<BenchmarkCase, (BenchmarkId benchmarkId, BuildResult buildResult)> buildResults, 
                                    IResolver resolver,
                                    ILogger logger, 
                                    List<string> artifactsToCleanup, 
                                    string rootArtifactsFolderPath,
+                                   string resultsFolderPath,
                                    ref StartedClock runChronometer)
         {
             var benchmarks = benchmarkRunInfo.BenchmarksCases;
@@ -184,7 +171,7 @@ namespace BenchmarkDotNet.Running
             return new Summary(title,
                 reports.ToImmutableArray(),
                 HostEnvironmentInfo.GetCurrent(),
-                GetResultsFolderPath(rootArtifactsFolderPath),
+                resultsFolderPath,
                 clockSpan.GetTimeSpan(), 
                 Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
         }
@@ -507,7 +494,26 @@ namespace BenchmarkDotNet.Running
             return customPath != default ? customPath.CreateIfNotExists() : defaultPath;
         }
 
-        private static string GetResultsFolderPath(string rootArtifactsFolderPath) => Path.Combine(rootArtifactsFolderPath, "results").CreateIfNotExists();
+        private static string GetTitle(BenchmarkRunInfo[] benchmarkRunInfos)
+        {
+            // few types might have the same name: A.Name and B.Name will both report "Name"
+            // in that case, we can not use the type name as file name because they would be getting overwritten #529
+            var uniqueTargetTypes = benchmarkRunInfos.SelectMany(info => info.BenchmarksCases.Select(benchmark => benchmark.Descriptor.Type)).Distinct().ToArray();
+
+            var fileNamePrefix = (uniqueTargetTypes.Length == 1)
+                ? FolderNameHelper.ToFolderName(uniqueTargetTypes[0])
+                : "BenchmarkRun";
+
+            return $"{fileNamePrefix}-{DateTime.Now.ToString(DateTimeFormat)}";
+        }
+
+        private static string GetResultsFolderPath(string rootArtifactsFolderPath, BenchmarkRunInfo[] benchmarkRunInfos)
+        {
+            if (benchmarkRunInfos.Any(info => info.Config.Options.IsSet(ConfigOptions.DontOverwriteResults)))
+                return Path.Combine(rootArtifactsFolderPath, DateTime.Now.ToString(DateTimeFormat)).CreateIfNotExists();
+
+            return Path.Combine(rootArtifactsFolderPath, "results").CreateIfNotExists();
+        }
 
         private static ILogger CreateCompositeLogger(BenchmarkRunInfo[] benchmarkRunInfos, StreamLogger streamLogger)
         {
