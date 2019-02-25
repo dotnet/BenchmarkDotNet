@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.IntegrationTests
             CanExecute<WorkstationGcOnly>(config);
         }
 
-        [FactSkipArm("TODO")]
+        [FactSkipArm("It is not supported by ARM")]
         public void CanEnableConcurrentGcMode()
         {
             var config = CreateConfig(new GcMode { Concurrent = true });
