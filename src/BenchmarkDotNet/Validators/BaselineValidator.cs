@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using BenchmarkDotNet.Order;
 
 namespace BenchmarkDotNet.Validators
 {

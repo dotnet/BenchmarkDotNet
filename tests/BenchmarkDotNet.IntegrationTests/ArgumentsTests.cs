@@ -529,6 +529,69 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void EnumFlagsAreSupported(IToolchain toolchain) => CanExecute<WithEnumFlags>(toolchain);
+
+        public class WithEnumFlags
+        {
+            [Flags]
+            public enum LongFlagEnum : long
+            {
+                None = 0,
+                First = 1 << 0,
+                Second = 1 << 1,
+                Third = 1 << 2,
+                Fourth = 1 << 3
+            }
+
+            [Flags]
+            public enum ByteFlagEnum : byte
+            {
+                None = 0,
+                First = 1 << 0,
+                Second = 1 << 1,
+                Third = 1 << 2,
+                Fourth = 1 << 3
+            }
+
+            [Benchmark]
+            [Arguments(LongFlagEnum.First | LongFlagEnum.Second, ByteFlagEnum.Third | ByteFlagEnum.Fourth)]
+            public void Test(LongFlagEnum passedLongFlagEnum, ByteFlagEnum passedByteFlagEnum)
+            {
+                if ((LongFlagEnum.First | LongFlagEnum.Second) != passedLongFlagEnum)
+                    throw new ArgumentException("The passed long flag enum has wrong value!");
+
+                if ((ByteFlagEnum.Third | ByteFlagEnum.Fourth) != passedByteFlagEnum)
+                    throw new ArgumentException("The passed byte flag enum has wrong value!");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void UndefinedEnumValuesAreSupported(IToolchain toolchain) => CanExecute<WithUndefinedEnumValue>(toolchain);
+
+        public class WithUndefinedEnumValue
+        {
+            [Flags]
+            public enum SomeEnum : long
+            {
+                First = 0, Last = 1
+            }
+
+            [Benchmark]
+            [Arguments(SomeEnum.First, (SomeEnum)100, (SomeEnum)(-100))]
+            public void Test(SomeEnum defined, SomeEnum undefined, SomeEnum undefinedNegative)
+            {
+                if (SomeEnum.First != defined)
+                    throw new ArgumentException("The passed defined enum has wrong value!");
+
+                if ((SomeEnum)100 != undefined)
+                    throw new ArgumentException("The passed undefined enum has wrong value!");
+
+                if ((SomeEnum)(-100) != undefinedNegative)
+                    throw new ArgumentException("The passed undefined negative enum has wrong value!");
+            }
+        }
+
         private void CanExecute<T>(IToolchain toolchain)
         {
             var config = CreateSimpleConfig(job: Job.Dry.With(toolchain));

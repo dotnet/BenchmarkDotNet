@@ -57,6 +57,19 @@ namespace BenchmarkDotNet.Tests.Horology
             }
         }
 
+        [Fact]
+        public void ParseTest()
+        {
+            Assert.True(Frequency.TryParseHz("2", out var a));
+            Assert.Equal(2, a.Hertz, 4);
+            Assert.True(Frequency.TryParseKHz("3.456", out var b));
+            Assert.Equal(3456, b.Hertz, 4);
+            Assert.True(Frequency.TryParseMHz("9.87654321", out var c));
+            Assert.Equal(9876543.21, c.Hertz, 4);
+            Assert.True(Frequency.TryParseGHz("0.000000003", out var d));
+            Assert.Equal(3, d.Hertz, 4);
+        }
+
         [AssertionMethod]
         private static void AreEqual(Frequency expected, Frequency actual) => AreEqual(expected.Hertz, actual.Hertz);
 

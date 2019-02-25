@@ -253,7 +253,7 @@ namespace BenchmarkDotNet.Running
             foreach (var benchmarkRunInfo in benchmarks)
                 validationErrors.AddRange(benchmarkRunInfo.Config.GetCompositeValidator().Validate(new ValidationParameters(benchmarkRunInfo.BenchmarksCases, benchmarkRunInfo.Config)));
 
-            foreach (var validationError in validationErrors)
+            foreach (var validationError in validationErrors.Distinct())
                 logger.WriteLineError(validationError.Message);
 
             return validationErrors.ToImmutableArray();

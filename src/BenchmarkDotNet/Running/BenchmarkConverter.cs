@@ -19,9 +19,12 @@ namespace BenchmarkDotNet.Running
         {
             if (type.IsGenericTypeDefinition)
                 throw new ArgumentException($"{type.Name} is generic type definition, use BenchmarkSwitcher for it"); // for "open generic types" should be used BenchmarkSwitcher
+
+            // We should check all methods including private to notify users about private methods with the [Benchmark] attribute
+            var bindingFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
             
             var fullConfig = GetFullConfig(type, config);
-            var allMethods = type.GetMethods();
+            var allMethods = type.GetMethods(bindingFlags);
             return MethodsToBenchmarksWithFullConfig(type, allMethods, fullConfig);
         }
 
