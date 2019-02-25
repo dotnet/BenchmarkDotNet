@@ -9,7 +9,7 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class AllSetupAndCleanupTargetSpecificBenchmarkTest : BenchmarkTestExecutor
+    public class SetupAndCleanupTests : BenchmarkTestExecutor
     {
         private const string FirstPrefix = "// ### First Called: ";
         private const string FirstGlobalSetupCalled = FirstPrefix + "GlobalSetup";
@@ -73,16 +73,16 @@ namespace BenchmarkDotNet.IntegrationTests
             "// ### Second Called: GlobalCleanup"
         };
 
-        public AllSetupAndCleanupTargetSpecificBenchmarkTest(ITestOutputHelper output) : base(output) { }
+        public SetupAndCleanupTests(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void AllSetupAndCleanupMethodRunsForSpecificBenchmarkTest()
+        public void AllSetupAndCleanupMethodRunsForSpecificBenchmark()
         {
             var logger = new OutputLogger(Output);
             var miniJob = Job.Default.With(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
             var config = CreateSimpleConfig(logger, miniJob);
 
-            CanExecute<AllSetupAndCleanupAttributeSpecificTargetsBenchmarks>(config);
+            CanExecute<Benchmarks>(config);
             Output.WriteLine(OutputDelimeter);
             Output.WriteLine(OutputDelimeter);
             Output.WriteLine(OutputDelimeter);
@@ -98,7 +98,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal(secondExpectedLogLines, secondActualLogLines);
         }
 
-        public class AllSetupAndCleanupAttributeSpecificTargetsBenchmarks
+        public class Benchmarks
         {
             private int setupCounter;
             private int cleanupCounter;
@@ -134,6 +134,5 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]
             public void SecondBenchmark() => Console.WriteLine(SecondBenchmarkCalled);
         }
-
     }
 }

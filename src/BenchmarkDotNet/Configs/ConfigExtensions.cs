@@ -37,6 +37,10 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         [PublicAPI] public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.With(m => m.Options = m.Options.Set(value, ConfigOptions.KeepBenchmarkFiles));
         /// <summary>
+        /// determines if the exported result files should not be overwritten (be default they are overwritten)
+        /// </summary>
+        [PublicAPI] public static IConfig DontOverwriteResults(this IConfig config, bool value = true) => config.With(m => m.Options = m.Options.Set(value, ConfigOptions.DontOverwriteResults));
+        /// <summary>
         /// determines if benchmarking should be stopped after the first error (by default it's not)
         /// </summary>
         [PublicAPI] public static IConfig StopOnFirstError(this IConfig config, bool value = true) => config.With(m => m.Options = m.Options.Set(value, ConfigOptions.StopOnFirstError));
