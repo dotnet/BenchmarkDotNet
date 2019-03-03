@@ -10,7 +10,7 @@ namespace _BenchmarkProjectName_
     public class $(BenchmarkName)
     {
 
-        [Benchmark(Description = "Your description here")]
+        [Benchmark]
         public void YourBenchmark()
         {
             // Implement your benchmark here

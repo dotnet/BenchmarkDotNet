@@ -29,12 +29,12 @@
         "FileRename" : "_BenchmarkName_",
         "replaces": "$(BenchmarkName)"
       },
-      "framework": {
+      "frameworks": {
         "type": "parameter",
         "datatype": "string",
-        "description": "The target framework for the project.",
+        "description": "The target framework(s) for the project (e.g. netstandard2.0;net472).",
         "defaultValue": "netstandard2.0",
-        "replaces": "$(Framework)"
+        "replaces": "$(Frameworks)"
       },
       "config": {
         "type": "parameter",
