@@ -71,5 +71,37 @@ namespace BenchmarkDotNet.Tests.Configs
             [OperatingSystemsFilter(allowed: false, PlatformID.Win32NT)]
             public void Method() { }
         }
+
+        [Fact]
+        public void CanEnableOrDisableTheBenchmarkPerOperatingSystemArchitecture()
+        {
+            var allowed = BenchmarkConverter.TypeToBenchmarks(typeof(WithBenchmarkAllowedForX64));
+            var notallowed = BenchmarkConverter.TypeToBenchmarks(typeof(WithBenchmarkNotAllowedForX64));
+
+            if (RuntimeInformation.OSArchitecture == Architecture.X64)
+            {
+                Assert.NotEmpty(allowed.BenchmarksCases);
+                Assert.Empty(notallowed.BenchmarksCases);
+            }
+            else
+            {
+                Assert.Empty(allowed.BenchmarksCases);
+                Assert.NotEmpty(notallowed.BenchmarksCases);
+            }
+        }
+
+        public class WithBenchmarkAllowedForX64
+        {
+            [Benchmark]
+            [OperatingSystemsArchitectureFilter(allowed: true, Architecture.X64)]
+            public void Method() { }
+        }
+
+        public class WithBenchmarkNotAllowedForX64
+        {
+            [Benchmark]
+            [OperatingSystemsArchitectureFilter(allowed: false, Architecture.X64)]
+            public void Method() { }
+        }
     }
 }
