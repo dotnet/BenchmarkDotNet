@@ -30,13 +30,6 @@ namespace BenchmarkDotNet.Running
         }
 
         [PublicAPI]
-        public static Summary Run(Type type, MethodInfo[] methods, IConfig config = null)
-        {
-            using (DirtyAssemblyResolveHelper.Create())
-                return RunWithDirtyAssemblyResolveHelper(type, methods, config);
-        }
-
-        [PublicAPI]
         public static Summary[] Run(Assembly assembly, IConfig config = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
@@ -74,10 +67,6 @@ namespace BenchmarkDotNet.Running
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Type type, IConfig config)
             => BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.TypeToBenchmarks(type, config) }).Single();
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Summary RunWithDirtyAssemblyResolveHelper(Type type, MethodInfo[] methods, IConfig config = null)
-            => BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.MethodsToBenchmarks(type, methods, config) }).Single();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary[] RunWithDirtyAssemblyResolveHelper(Assembly assembly, IConfig config = null)
