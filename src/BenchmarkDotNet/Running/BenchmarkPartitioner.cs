@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Running
     {
         public static BuildPartition[] CreateForBuild(BenchmarkRunInfo[] supportedBenchmarks, IResolver resolver)
             => supportedBenchmarks
-                .SelectMany(info => info.BenchmarksCases.Select(benchmark => (benchmark, info.Config)))
+                .SelectMany(info => info.BenchmarksCases.Select(benchmark => (benchmark, benchmark.Config)))
                 .GroupBy(tuple => tuple.benchmark, BenchmarkRuntimePropertiesComparer.Instance)
                 .Select(group => new BuildPartition(group.Select((item, index) => new BenchmarkBuildInfo(item.benchmark, item.Config, index)).ToArray(), resolver))
                 .ToArray();
