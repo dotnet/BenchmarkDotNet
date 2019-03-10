@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Tests.Configs
     public class ConfigPerMethodTests
     {
         [Fact]
-        public void PetMethodConfigsAreRespected()
+        public void PerMethodConfigsAreRespected()
         {
             var never = BenchmarkConverter.TypeToBenchmarks(typeof(WithBenchmarkThatShouldNeverRun));
 
