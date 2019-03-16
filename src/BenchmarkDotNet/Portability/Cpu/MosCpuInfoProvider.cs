@@ -34,8 +34,11 @@ namespace BenchmarkDotNet.Portability.Cpu
                     physicalCoreCount += (uint) moProcessor[WmicCpuInfoKeyNames.NumberOfCores];
                     logicalCoreCount += (uint) moProcessor[WmicCpuInfoKeyNames.NumberOfLogicalProcessors];
                     maxClockSpeed = (uint) moProcessor[WmicCpuInfoKeyNames.MaxClockSpeed];
-                }
+                    nominalClockSpeed = (uint) moProcessor[WmicCpuInfoKeyNames.CurrentClockSpeed];
+				}
             }
+
+            minClockSpeed = Math.Min(nominalClockSpeed, maxClockSpeed);
 
             return new CpuInfo(
                 processorModelNames.Count > 0 ? string.Join(", ", processorModelNames) : null,

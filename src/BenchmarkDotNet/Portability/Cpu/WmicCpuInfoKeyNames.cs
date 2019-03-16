@@ -6,5 +6,6 @@
         internal const string NumberOfCores = "NumberOfCores";
         internal const string Name = "Name";
         internal const string MaxClockSpeed = "MaxClockSpeed";
+        internal const string CurrentClockSpeed = "CurrentClockSpeed";
     }
 }
