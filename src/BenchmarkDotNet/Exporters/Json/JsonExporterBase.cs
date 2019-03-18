@@ -45,8 +45,8 @@ namespace BenchmarkDotNet.Exporters.Json
                 HardwareTimerKind = summary.HostEnvironmentInfo.HardwareTimerKind.ToString()
             };
 
-            // If we just ask SimpleJson to serialise the entire "summary" object it throws several errors.
-            // So we are more specific in what we serialise (plus some fields/properties aren't relevant)
+            // If we just ask SimpleJson to serialize the entire "summary" object it throws several errors.
+            // So we are more specific in what we serialize (plus some fields/properties aren't relevant)
 
             var benchmarks = summary.Reports.Select(report =>
             {

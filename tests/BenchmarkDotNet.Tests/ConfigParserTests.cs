@@ -287,7 +287,7 @@ namespace BenchmarkDotNet.Tests
         {
             var config = ConfigParser.Parse(new[] { "--runtimes", "net461", "MONO", "netcoreapp3.0", "CoreRT"}, new OutputLogger(Output)).config;
 
-            Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as basline
+            Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRtRuntime));
@@ -307,7 +307,7 @@ namespace BenchmarkDotNet.Tests
             
             var mockSummary = MockFactory.CreateSummary(config);
 
-            Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as basline
+            Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
             Assert.False(config.GetJobs().Last().Meta.Baseline);
 
             var statisticalTestColumn = config.GetColumnProviders().SelectMany(columnProvider => columnProvider.GetColumns(mockSummary)).OfType<StatisticalTestColumn>().Single();
