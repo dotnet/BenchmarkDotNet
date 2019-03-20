@@ -384,7 +384,7 @@ namespace BenchmarkDotNet.Running
                 if (useDiagnoser)
                 {
                     if (benchmarkCase.Config.HasMemoryDiagnoser())
-                        gcStats = GcStats.Parse(executeResult.Data.Last(line => !string.IsNullOrEmpty(line)));
+                        gcStats = GcStats.Parse(executeResult.Data.Last(line => !string.IsNullOrEmpty(line) && line.StartsWith(GcStats.ResultsLinePrefix)));
                     
                     metrics.AddRange(
                         noOverheadCompositeDiagnoser.ProcessResults(
