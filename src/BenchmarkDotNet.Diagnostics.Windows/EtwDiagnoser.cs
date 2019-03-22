@@ -38,10 +38,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             BenchmarkToProcess.Add(parameters.BenchmarkCase, parameters.Process.Id);
             StatsPerProcess.TryAdd(parameters.Process.Id, GetInitializedStats(parameters));
 
-            Session = CreateSession(parameters.BenchmarkCase);
-
+            // Important: Must wire-up clean-up events prior to acquiring IDisposable instance (Session property)
+            // This is in effect the inverted sequence of actions in the Stop() method.
             Console.CancelKeyPress += OnConsoleCancelKeyPress;
             AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
+            
+            Session = CreateSession(parameters.BenchmarkCase);
 
             EnableProvider();
 
