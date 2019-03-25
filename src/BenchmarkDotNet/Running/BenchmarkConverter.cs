@@ -244,20 +244,20 @@ namespace BenchmarkDotNet.Running
         private static void AssertMethodHasCorrectSignature(string methodType, MethodInfo methodInfo)
         {
             if (methodInfo.GetParameters().Any() && !methodInfo.HasAttribute<ArgumentsAttribute>() && !methodInfo.HasAttribute<ArgumentsSourceAttribute>())
-                throw new InvalidOperationException($"{methodType} method {methodInfo.Name} has incorrect signature.\nMethod shouldn't have any arguments.");
+                throw new InvalidBenchmarkDeclarationException($"{methodType} method {methodInfo.Name} has incorrect signature.\nMethod shouldn't have any arguments.");
         }
 
         private static void AssertMethodIsAccessible(string methodType, MethodInfo methodInfo)
         {
             if (!methodInfo.IsPublic)
-                throw new InvalidOperationException($"{methodType} method {methodInfo.Name} has incorrect access modifiers.\nMethod must be public.");
+                throw new InvalidBenchmarkDeclarationException($"{methodType} method {methodInfo.Name} has incorrect access modifiers.\nMethod must be public.");
 
             var declaringType = methodInfo.DeclaringType;
 
             while (declaringType != null)
             {
                 if (!declaringType.GetTypeInfo().IsPublic && !declaringType.GetTypeInfo().IsNestedPublic)
-                    throw new InvalidOperationException($"{declaringType.FullName} containing {methodType} method {methodInfo.Name} has incorrect access modifiers.\nDeclaring type must be public.");
+                    throw new InvalidBenchmarkDeclarationException($"{declaringType.FullName} containing {methodType} method {methodInfo.Name} has incorrect access modifiers.\nDeclaring type must be public.");
 
                 declaringType = declaringType.DeclaringType;
             }
@@ -266,7 +266,7 @@ namespace BenchmarkDotNet.Running
         private static void AssertMethodIsNotGeneric(string methodType, MethodInfo methodInfo)
         {
             if (methodInfo.IsGenericMethod)
-                throw new InvalidOperationException($"{methodType} method {methodInfo.Name} is generic.\nGeneric {methodType} methods are not supported.");
+                throw new InvalidBenchmarkDeclarationException($"{methodType} method {methodInfo.Name} is generic.\nGeneric {methodType} methods are not supported.");
         }
 
         private static object[] GetValidValues(object[] values, Type parameterType)
@@ -305,13 +305,13 @@ namespace BenchmarkDotNet.Running
                     paramsSourceProperty,
                     parentType));
 
-            throw new InvalidOperationException($"{parentType.Name} has no public, accessible method/property called {sourceName}, unable to read values for [ParamsSource]");
+            throw new InvalidBenchmarkDeclarationException($"{parentType.Name} has no public, accessible method/property called {sourceName}, unable to read values for [ParamsSource]");
         }
 
         private static object[] ToArray(object sourceValue, MemberInfo memberInfo, Type type)
         {
             if (!(sourceValue is IEnumerable collection))
-                throw new InvalidOperationException($"{memberInfo.Name} of type {type.Name} does not implement IEnumerable, unable to read values for [ParamsSource]");
+                throw new InvalidBenchmarkDeclarationException($"{memberInfo.Name} of type {type.Name} does not implement IEnumerable, unable to read values for [ParamsSource]");
 
             return collection.Cast<object>().ToArray();
         }
