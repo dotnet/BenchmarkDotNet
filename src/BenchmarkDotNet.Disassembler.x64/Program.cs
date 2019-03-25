@@ -253,12 +253,22 @@ namespace BenchmarkDotNet.Disassembler
                 {
                     yield return new Sharp
                     {
-                        TextRepresentation = sourceLine + Environment.NewLine + new string(' ', sourceLocation.ColStart - 1) + new string('^', sourceLocation.ColEnd - sourceLocation.ColStart),
+                        TextRepresentation = sourceLine + Environment.NewLine + GetSmartPrefix(sourceLine, sourceLocation.ColStart - 1) + new string('^', sourceLocation.ColEnd - sourceLocation.ColStart),
                         FilePath = sourceLocation.FilePath,
                         LineNumber = line
                     };
                 }
             }
+        }
+
+        static string GetSmartPrefix(string sourceLine, int length)
+        {
+            var prefix = new char[length];
+            for (int i = 0; i < length; i++)
+                prefix[i] = sourceLine[i] == '\t' 
+                    ? sourceLine[i] 
+                    : ' ';
+            return new string(prefix);
         }
 
         static IEnumerable<Asm> GetAsm(ILToNativeMap map, State state, int depth, ClrMethod currentMethod)
