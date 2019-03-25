@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using JetBrains.Annotations;
 using Microsoft.Win32;
 
 namespace BenchmarkDotNet.Helpers
@@ -29,18 +28,6 @@ namespace BenchmarkDotNet.Helpers
                     return null;
                 return Convert.ToInt32(ndpKey.GetValue("Release"));
             }
-        }
-        
-        [NotNull]
-        internal static string GetCurrentNetFrameworkVersion()
-        {
-            var releaseNumber = GetReleaseNumberFromWindowsRegistry();
-            if (!releaseNumber.HasValue)
-                return "?";
-
-            return FrameworkVersions
-                       .FirstOrDefault(v => releaseNumber >= v.minReleaseNumber)
-                       .version ?? "?";
         }
 
         internal static string GetLatestNetDeveloperPackVersion()

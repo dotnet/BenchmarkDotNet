@@ -39,7 +39,6 @@ namespace BenchmarkDotNet.Exporters.Json
                 summary.HostEnvironmentInfo.HasAttachedDebugger,
                 summary.HostEnvironmentInfo.HasRyuJit,
                 summary.HostEnvironmentInfo.Configuration,
-                summary.HostEnvironmentInfo.JitModules,
                 DotNetCliVersion = summary.HostEnvironmentInfo.DotNetSdkVersion.Value,
                 summary.HostEnvironmentInfo.ChronometerFrequency,
                 HardwareTimerKind = summary.HostEnvironmentInfo.HardwareTimerKind.ToString()
