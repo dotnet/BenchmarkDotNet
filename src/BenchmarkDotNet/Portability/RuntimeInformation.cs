@@ -216,6 +216,13 @@ namespace BenchmarkDotNet.Portability
 
         public static bool Is64BitPlatform() => IntPtr.Size == 8;
 
+        /// <summary>
+        /// Determines if the current runtime supports threading.
+        /// </summary>
+        /// <remarks>This property returns <c>false</c> when running under WebAssembly, otherwise <c>true</c>.</remarks>
+        internal static bool SupportsThreading() => !System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Create("WEBASSEMBLY"));
+
+
         private static IEnumerable<JitModule> GetJitModules()
         {
             return

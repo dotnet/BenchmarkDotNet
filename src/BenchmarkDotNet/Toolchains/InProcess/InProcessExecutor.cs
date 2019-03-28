@@ -78,14 +78,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             if (Synchronous)
             {
-                var exitCode = ExecuteCore(host, executeParameters);
+                var exitCode = ExecuteCoreSynchronous(host, executeParameters);
 
                 return GetExecutionResult(host.RunResults, exitCode, executeParameters.Logger, executeParameters.BenchmarkCase.Config.Encoding);
             }
             else
             {
                 int exitCode = -1;
-                var runThread = new Thread(() => exitCode = ExecuteCore(host, executeParameters));
+                var runThread = new Thread(() => exitCode = ExecuteCoreAsynchronous(host, executeParameters));
 
                 if (executeParameters.BenchmarkCase.Descriptor.WorkloadMethod.GetCustomAttributes<STAThreadAttribute>(false).Any())
                 {
@@ -107,56 +107,58 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             }
         }
 
-        private int ExecuteCore(IHost host, ExecuteParameters parameters)
+        private int ExecuteCoreAsynchronous(IHost host, ExecuteParameters parameters)
         {
             int exitCode = -1;
 
-            if (Synchronous)
+            var process = Process.GetCurrentProcess();
+            var oldPriority = process.PriorityClass;
+            var oldAffinity = process.TryGetAffinity();
+            var thread = Thread.CurrentThread;
+            var oldThreadPriority = thread.Priority;
+
+            var affinity = parameters.BenchmarkCase.Job.ResolveValueAsNullable(EnvironmentMode.AffinityCharacteristic);
+            try
             {
-                try
+                process.TrySetPriority(ProcessPriorityClass.High, parameters.Logger);
+                thread.TrySetPriority(ThreadPriority.Highest, parameters.Logger);
+
+                if (affinity != null)
                 {
-                    exitCode = InProcessRunner.Run(host, parameters.BenchmarkCase, CodegenMode);
+                    process.TrySetAffinity(affinity.Value, parameters.Logger);
                 }
-                catch (Exception ex)
+
+                exitCode = InProcessRunner.Run(host, parameters.BenchmarkCase, CodegenMode);
+            }
+            catch (Exception ex)
+            {
+                parameters.Logger.WriteLineError($"// ! {GetType().Name}, exception: {ex}");
+            }
+            finally
+            {
+                process.TrySetPriority(oldPriority, parameters.Logger);
+                thread.TrySetPriority(oldThreadPriority, parameters.Logger);
+
+                if (affinity != null && oldAffinity != null)
                 {
-                    parameters.Logger.WriteLineError($"// ! {GetType().Name}, exception: {ex}");
+                    process.TrySetAffinity(oldAffinity.Value, parameters.Logger);
                 }
             }
-            else
+
+            return exitCode;
+        }
+
+        private int ExecuteCoreSynchronous(IHost host, ExecuteParameters parameters)
+        {
+            int exitCode = -1;
+
+            try
             {
-                var process = Process.GetCurrentProcess();
-                var oldPriority = process.PriorityClass;
-                var oldAffinity = process.TryGetAffinity();
-                var thread = Thread.CurrentThread;
-                var oldThreadPriority = thread.Priority;
-
-                var affinity = parameters.BenchmarkCase.Job.ResolveValueAsNullable(EnvironmentMode.AffinityCharacteristic);
-                try
-                {
-                    process.TrySetPriority(ProcessPriorityClass.High, parameters.Logger);
-                    thread.TrySetPriority(ThreadPriority.Highest, parameters.Logger);
-
-                    if (affinity != null)
-                    {
-                        process.TrySetAffinity(affinity.Value, parameters.Logger);
-                    }
-
-                    exitCode = InProcessRunner.Run(host, parameters.BenchmarkCase, CodegenMode);
-                }
-                catch (Exception ex)
-                {
-                    parameters.Logger.WriteLineError($"// ! {GetType().Name}, exception: {ex}");
-                }
-                finally
-                {
-                    process.TrySetPriority(oldPriority, parameters.Logger);
-                    thread.TrySetPriority(oldThreadPriority, parameters.Logger);
-
-                    if (affinity != null && oldAffinity != null)
-                    {
-                        process.TrySetAffinity(oldAffinity.Value, parameters.Logger);
-                    }
-                }
+                exitCode = InProcessRunner.Run(host, parameters.BenchmarkCase, CodegenMode);
+            }
+            catch (Exception ex)
+            {
+                parameters.Logger.WriteLineError($"// ! {GetType().Name}, exception: {ex}");
             }
 
             return exitCode;

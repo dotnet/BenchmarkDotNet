@@ -16,6 +16,7 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Parameters;
@@ -252,7 +253,7 @@ namespace BenchmarkDotNet.Running
 
             var buildLogger = buildPartitions.Length == 1 ? logger : NullLogger.Instance; // when we have just one partition we can print to std out
 
-            var partitionQuery = DefaultConfig.SupportsThreading
+            var partitionQuery = RuntimeInformation.SupportsThreading()
                 ? buildPartitions.AsParallel()
                 : buildPartitions.AsEnumerable();
 

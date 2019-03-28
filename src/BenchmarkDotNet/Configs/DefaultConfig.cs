@@ -88,11 +88,5 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
 
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
-
-        /// <summary>
-        /// Determines if the current runtime supports threading.
-        /// </summary>
-        /// <remarks>This property returns <c>false</c> when running under WebAssembly, otherwise <c>true</c>.</remarks>
-        public static bool SupportsThreading { get; } = !RuntimeInformation.IsOSPlatform(OSPlatform.Create("WEBASSEMBLY"));
     }
 }
