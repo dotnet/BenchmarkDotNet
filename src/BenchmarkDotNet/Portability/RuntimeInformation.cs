@@ -351,22 +351,37 @@ namespace BenchmarkDotNet.Portability
             {
                 try
                 {
-                    using (var searcher = new ManagementObjectSearcher("Select * from Win32_ComputerSystem"))
-                    {
-                        using (var items = searcher.Get())
-                        {
-                            foreach (var item in items)
-                            {
-                                string manufacturer = item["Manufacturer"]?.ToString();
-                                string model = item["Model"]?.ToString();
-                                return hypervisors.FirstOrDefault(x => x.IsVirtualMachine(manufacturer, model));
-                            }
-                        }
-                    }
+                    return GetVirtualMachineHypervisor(hypervisors);
                 }
                 catch
                 {
                     // Never mind
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the hypervisors from WMI
+        /// </summary>
+        /// <remarks>
+        /// This method is separated from <see cref="GetVirtualMachineHypervisor()"/> in case 
+        /// the runtime assemblies for System.Management are not available, such as in WebAssembly.
+        /// </remarks>
+
+        private static VirtualMachineHypervisor GetVirtualMachineHypervisor(VirtualMachineHypervisor[] hypervisors)
+        {
+            using (var searcher = new ManagementObjectSearcher("Select * from Win32_ComputerSystem"))
+            {
+                using (var items = searcher.Get())
+                {
+                    foreach (var item in items)
+                    {
+                        string manufacturer = item["Manufacturer"]?.ToString();
+                        string model = item["Model"]?.ToString();
+                        return hypervisors.FirstOrDefault(x => x.IsVirtualMachine(manufacturer, model));
+                    }
                 }
             }
 
