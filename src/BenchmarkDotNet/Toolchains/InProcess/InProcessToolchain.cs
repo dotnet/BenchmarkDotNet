@@ -19,6 +19,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary>The toolchain instance without output logging.</summary>
         public static readonly IToolchain DontLogOutput = new InProcessToolchain(false);
 
+        /// <summary>The default toolchain instance.</summary>
+        public static readonly IToolchain Synchronous = new InProcessToolchain(
+            InProcessExecutor.DefaultTimeout,
+            BenchmarkActionCodegen.ReflectionEmit,
+            true, 
+            true);
+
         /// <summary>Initializes a new instance of the <see cref="InProcessToolchain" /> class.</summary>
         /// <param name="logOutput"><c>true</c> if the output should be logged.</param>
         public InProcessToolchain(bool logOutput) : this(
@@ -32,11 +39,21 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <param name="timeout">Timeout for the run.</param>
         /// <param name="codegenMode">Describes how benchmark action code is generated.</param>
         /// <param name="logOutput"><c>true</c> if the output should be logged.</param>
-        public InProcessToolchain(TimeSpan timeout, BenchmarkActionCodegen codegenMode, bool logOutput)
+        public InProcessToolchain(TimeSpan timeout, BenchmarkActionCodegen codegenMode, bool logOutput) 
+            : this(timeout, codegenMode, logOutput, false)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="InProcessToolchain" /> class.</summary>
+        /// <param name="timeout">Timeout for the run.</param>
+        /// <param name="codegenMode">Describes how benchmark action code is generated.</param>
+        /// <param name="logOutput"><c>true</c> if the output should be logged.</param>
+        /// <param name="synchronous"><c>true</c> if the benchmarks should run synchronously.</param>
+        public InProcessToolchain(TimeSpan timeout, BenchmarkActionCodegen codegenMode, bool logOutput, bool synchronous)
         {
             Generator = new InProcessGenerator();
             Builder = new InProcessBuilder();
-            Executor = new InProcessExecutor(timeout, codegenMode, logOutput);
+            Executor = new InProcessExecutor(timeout, codegenMode, logOutput, synchronous);
         }
 
         /// <summary>Determines whether the specified benchmark is supported.</summary>

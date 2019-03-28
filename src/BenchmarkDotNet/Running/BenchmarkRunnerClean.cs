@@ -252,8 +252,11 @@ namespace BenchmarkDotNet.Running
 
             var buildLogger = buildPartitions.Length == 1 ? logger : NullLogger.Instance; // when we have just one partition we can print to std out
 
-            var buildResults = buildPartitions
-                .AsParallel()
+            var partitionQuery = DefaultConfig.SupportsThreading
+                ? buildPartitions.AsParallel()
+                : buildPartitions.AsEnumerable();
+
+            var buildResults = partitionQuery
                 .Select(buildPartition => (buildPartition, buildResult: Build(buildPartition, rootArtifactsFolderPath, buildLogger)))
                 .ToDictionary(result => result.buildPartition, result => result.buildResult);
 

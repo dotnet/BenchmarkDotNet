@@ -167,10 +167,18 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private IConfig CreateInProcessConfig(BenchmarkActionCodegen codegenMode, OutputLogger logger = null, IDiagnoser diagnoser = null)
+        private IConfig CreateInProcessConfig(BenchmarkActionCodegen codegenMode, OutputLogger logger = null, IDiagnoser diagnoser = null, bool synchronous = false)
         {
             return new ManualConfig()
-                .With(Job.Dry.With(new InProcessToolchain(TimeSpan.Zero, codegenMode, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
+                .With(
+                    Job.Dry.With(
+                        new InProcessToolchain(
+                            timeout: TimeSpan.Zero,
+                            codegenMode: codegenMode, 
+                            logOutput: true, 
+                            synchronous: synchronous))
+                        .WithInvocationCount(UnrollFactor)
+                        .WithUnrollFactor(UnrollFactor))
                 .With(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
                 .With(DefaultColumnProviders.Instance);
         }
@@ -206,6 +214,32 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var logger = new OutputLogger(Output);
             var config = CreateInProcessConfig(BenchmarkActionCodegen.DelegateCombine, logger);
+
+            try
+            {
+                BenchmarkAllCases.Counter = 0;
+
+                var summary = CanExecute<BenchmarkAllCases>(config);
+
+                var testLog = logger.GetLog();
+                Assert.Contains("// Benchmark: BenchmarkAllCases.InvokeOnceVoid:", testLog);
+                Assert.DoesNotContain("No benchmarks found", logger.GetLog());
+
+                // Operations + GlobalSetup + GlobalCleanup
+                var expectedCount = summary.Reports.SelectMany(r => r.AllMeasurements).Sum(m => m.Operations + 2);
+                Assert.Equal(expectedCount, BenchmarkAllCases.Counter);
+            }
+            finally
+            {
+                BenchmarkAllCases.Counter = 0;
+            }
+        }
+
+        [Fact]
+        public void SynchronousInProcessBenchmarkAllCasesDelegateCombineSupported()
+        {
+            var logger = new OutputLogger(Output);
+            var config = CreateInProcessConfig(BenchmarkActionCodegen.DelegateCombine, logger, synchronous: true);
 
             try
             {

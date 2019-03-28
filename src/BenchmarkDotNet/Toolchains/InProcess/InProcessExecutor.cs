@@ -33,6 +33,16 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <param name="codegenMode">Describes how benchmark action code is generated.</param>
         /// <param name="logOutput"><c>true</c> if the output should be logged.</param>
         public InProcessExecutor(TimeSpan timeout, BenchmarkActionCodegen codegenMode, bool logOutput)
+            : this(timeout, codegenMode, logOutput, false)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="InProcessExecutor" /> class.</summary>
+        /// <param name="timeout">Timeout for the run.</param>
+        /// <param name="codegenMode">Describes how benchmark action code is generated.</param>
+        /// <param name="logOutput"><c>true</c> if the output should be logged.</param>
+        /// <param name="synchronous"><c>true</c> benchmarks should run synchronously.</param>
+        public InProcessExecutor(TimeSpan timeout, BenchmarkActionCodegen codegenMode, bool logOutput, bool synchronous)
         {
             if (timeout == TimeSpan.Zero)
                 timeout = DefaultTimeout;
@@ -40,6 +50,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             ExecutionTimeout = timeout;
             CodegenMode = codegenMode;
             LogOutput = logOutput;
+            Synchronous = synchronous;
         }
 
         /// <summary>Timeout for the run.</summary>
@@ -54,6 +65,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <value><c>true</c> if the output should be logged; otherwise, <c>false</c>.</value>
         public bool LogOutput { get; }
 
+        /// <summary>Gets a value indicating whether the benchmarks will be run synchronously, without starting a separate thread.</summary>
+        /// <value><c>true</c> if benchmarks should run synchronously; otherwise, <c>false</c>.</value>
+        public bool Synchronous { get; }
+
         /// <summary>Executes the specified benchmark.</summary>
         public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
@@ -61,62 +76,86 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             var hostLogger = LogOutput ? executeParameters.Logger : NullLogger.Instance;
             var host = new InProcessHost(executeParameters.BenchmarkCase, hostLogger, executeParameters.Diagnoser);
 
-            int exitCode = -1;
-            var runThread = new Thread(() => exitCode = ExecuteCore(host, executeParameters));
-
-            if (executeParameters.BenchmarkCase.Descriptor.WorkloadMethod.GetCustomAttributes<STAThreadAttribute>(false).Any())
+            if (Synchronous)
             {
-                runThread.SetApartmentState(ApartmentState.STA);
+                var exitCode = ExecuteCore(host, executeParameters);
+
+                return GetExecutionResult(host.RunResults, exitCode, executeParameters.Logger, executeParameters.BenchmarkCase.Config.Encoding);
             }
+            else
+            {
+                int exitCode = -1;
+                var runThread = new Thread(() => exitCode = ExecuteCore(host, executeParameters));
 
-            runThread.IsBackground = true;
+                if (executeParameters.BenchmarkCase.Descriptor.WorkloadMethod.GetCustomAttributes<STAThreadAttribute>(false).Any())
+                {
+                    runThread.SetApartmentState(ApartmentState.STA);
+                }
 
-            var timeout = HostEnvironmentInfo.GetCurrent().HasAttachedDebugger ? UnderDebuggerTimeout : ExecutionTimeout;
+                runThread.IsBackground = true;
 
-            runThread.Start();
+                var timeout = HostEnvironmentInfo.GetCurrent().HasAttachedDebugger ? UnderDebuggerTimeout : ExecutionTimeout;
 
-            if (!runThread.Join((int)timeout.TotalMilliseconds))
-                throw new InvalidOperationException(
-                    $"Benchmark {executeParameters.BenchmarkCase.DisplayInfo} takes to long to run. " +
-                    "Prefer to use out-of-process toolchains for long-running benchmarks.");
+                runThread.Start();
 
-            return GetExecutionResult(host.RunResults, exitCode, executeParameters.Logger, executeParameters.BenchmarkCase.Config.Encoding);
+                if (!runThread.Join((int)timeout.TotalMilliseconds))
+                    throw new InvalidOperationException(
+                        $"Benchmark {executeParameters.BenchmarkCase.DisplayInfo} takes to long to run. " +
+                        "Prefer to use out-of-process toolchains for long-running benchmarks.");
+
+                return GetExecutionResult(host.RunResults, exitCode, executeParameters.Logger, executeParameters.BenchmarkCase.Config.Encoding);
+            }
         }
 
         private int ExecuteCore(IHost host, ExecuteParameters parameters)
         {
             int exitCode = -1;
-            var process = Process.GetCurrentProcess();
-            var oldPriority = process.PriorityClass;
-            var oldAffinity = process.TryGetAffinity();
-            var thread = Thread.CurrentThread;
-            var oldThreadPriority = thread.Priority;
 
-            var affinity = parameters.BenchmarkCase.Job.ResolveValueAsNullable(EnvironmentMode.AffinityCharacteristic);
-            try
+            if (Synchronous)
             {
-                process.TrySetPriority(ProcessPriorityClass.High, parameters.Logger);
-                thread.TrySetPriority(ThreadPriority.Highest, parameters.Logger);
-
-                if (affinity != null)
+                try
                 {
-                    process.TrySetAffinity(affinity.Value, parameters.Logger);
+                    exitCode = InProcessRunner.Run(host, parameters.BenchmarkCase, CodegenMode);
                 }
-
-                exitCode = InProcessRunner.Run(host, parameters.BenchmarkCase, CodegenMode);
-            }
-            catch (Exception ex)
-            {
-                parameters.Logger.WriteLineError($"// ! {GetType().Name}, exception: {ex}");
-            }
-            finally
-            {
-                process.TrySetPriority(oldPriority, parameters.Logger);
-                thread.TrySetPriority(oldThreadPriority, parameters.Logger);
-
-                if (affinity != null && oldAffinity != null)
+                catch (Exception ex)
                 {
-                    process.TrySetAffinity(oldAffinity.Value, parameters.Logger);
+                    parameters.Logger.WriteLineError($"// ! {GetType().Name}, exception: {ex}");
+                }
+            }
+            else
+            {
+                var process = Process.GetCurrentProcess();
+                var oldPriority = process.PriorityClass;
+                var oldAffinity = process.TryGetAffinity();
+                var thread = Thread.CurrentThread;
+                var oldThreadPriority = thread.Priority;
+
+                var affinity = parameters.BenchmarkCase.Job.ResolveValueAsNullable(EnvironmentMode.AffinityCharacteristic);
+                try
+                {
+                    process.TrySetPriority(ProcessPriorityClass.High, parameters.Logger);
+                    thread.TrySetPriority(ThreadPriority.Highest, parameters.Logger);
+
+                    if (affinity != null)
+                    {
+                        process.TrySetAffinity(affinity.Value, parameters.Logger);
+                    }
+
+                    exitCode = InProcessRunner.Run(host, parameters.BenchmarkCase, CodegenMode);
+                }
+                catch (Exception ex)
+                {
+                    parameters.Logger.WriteLineError($"// ! {GetType().Name}, exception: {ex}");
+                }
+                finally
+                {
+                    process.TrySetPriority(oldPriority, parameters.Logger);
+                    thread.TrySetPriority(oldThreadPriority, parameters.Logger);
+
+                    if (affinity != null && oldAffinity != null)
+                    {
+                        process.TrySetAffinity(oldAffinity.Value, parameters.Logger);
+                    }
                 }
             }
 
