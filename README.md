@@ -165,9 +165,9 @@ BenchmarkDotNet supports all kinds of .NET stacks:
 
 The library is used by a large number of projects for performance discussions or as a part of the codebase:
 
-* [CoreCLR](https://github.com/dotnet/coreclr/issues?utf8=✓&q=BenchmarkDotNet) (.NET Core runtime)
-* [CoreFX](https://github.com/dotnet/corefx/issues?utf8=✓&q=BenchmarkDotNet) (.NET Core foundational libraries;
-  see also [official benchmarking guide](https://github.com/dotnet/corefx/blob/master/Documentation/project-docs/benchmarking.md)),
+* [dotnet/performance](https://github.com/dotnet/performance) (official benchmarks used for testing the performance of all .NET Runtimes)
+* [CoreCLR](https://github.com/dotnet/coreclr/issues?utf8=✓&q=BenchmarkDotNet) (.NET Core Runtime)
+* [CoreFX](https://github.com/dotnet/corefx/issues?utf8=✓&q=BenchmarkDotNet) (.NET Core Base Class Libraries)
 * [Roslyn](https://github.com/dotnet/roslyn/search?q=BenchmarkDotNet&type=Issues&utf8=✓) (C# and Visual Basic compiler)
 * [KestrelHttpServer](https://github.com/aspnet/KestrelHttpServer/tree/master/benchmarks/Kestrel.Performance) (A cross platform web server for ASP.NET Core)
 * [SignalR](https://github.com/aspnet/SignalR/tree/master/benchmarks/Microsoft.AspNetCore.SignalR.Microbenchmarks)
