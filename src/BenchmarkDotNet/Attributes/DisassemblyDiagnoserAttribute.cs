@@ -4,6 +4,7 @@ using BenchmarkDotNet.Diagnosers;
 
 namespace BenchmarkDotNet.Attributes
 {
+    [AttributeUsage(AttributeTargets.Class)]
     public class DisassemblyDiagnoserAttribute : Attribute, IConfigSource
     {
         /// <param name="printIL">IL will be printed. False by default.</param>
