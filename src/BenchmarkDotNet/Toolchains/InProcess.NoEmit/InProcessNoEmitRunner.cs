@@ -9,12 +9,14 @@ using BenchmarkDotNet.Running;
 
 using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Toolchains.InProcess
+namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
-    [Obsolete("Please use BenchmarkDotNet.Toolchains.InProcess.NoEmit.* classes")]
-    internal class InProcessRunner
+    /// <summary>
+    /// In-process (no emit) toolchain runner
+    /// </summary>
+    internal class InProcessNoEmitRunner
     {
-        public static int Run(IHost host, BenchmarkCase benchmarkCase, BenchmarkActionCodegen codegenMode)
+        public static int Run(IHost host, BenchmarkCase benchmarkCase)
         {
             // the first thing to do is to let diagnosers hook in before anything happens
             // so all jit-related diagnosers can catch first jit compilation!
@@ -26,13 +28,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 // which could cause the jitting/assembly loading to happen before we do anything
                 // we have some jitting diagnosers and we want them to catch all the informations!!
 
-                string inProcessRunnableTypeName = $"{typeof(InProcessRunner).FullName}+{nameof(Runnable)}";
-                var type = typeof(InProcessRunner).GetTypeInfo().Assembly.GetType(inProcessRunnableTypeName)
+                string inProcessRunnableTypeName = $"{typeof(InProcessNoEmitRunner).FullName}+{nameof(Runnable)}";
+                var type = typeof(InProcessNoEmitRunner).GetTypeInfo().Assembly.GetType(inProcessRunnableTypeName)
                     ?? throw new InvalidOperationException($"Bug: type {inProcessRunnableTypeName} not found.");
 
                 var methodInfo = type.GetMethod(nameof(Runnable.RunCore), BindingFlags.Public | BindingFlags.Static)
                     ?? throw new InvalidOperationException($"Bug: method {nameof(Runnable.RunCore)} in {inProcessRunnableTypeName} not found.");
-                methodInfo.Invoke(null, new object[] { host, benchmarkCase, codegenMode });
+                methodInfo.Invoke(null, new object[] { host, benchmarkCase });
 
                 return 0;
             }
@@ -99,7 +101,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         [UsedImplicitly]
         private static class Runnable
         {
-            public static void RunCore(IHost host, BenchmarkCase benchmarkCase, BenchmarkActionCodegen codegenMode)
+            public static void RunCore(IHost host, BenchmarkCase benchmarkCase)
             {
                 var target = benchmarkCase.Descriptor;
                 var job = benchmarkCase.Job; // TODO: filter job (same as SourceCodePresenter does)?
@@ -107,8 +109,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
                 // DONTTOUCH: these should be allocated together
                 var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type);
-                var workloadAction = BenchmarkActionFactory.CreateWorkload(target, instance, codegenMode, unrollFactor);
-                var overheadAction = BenchmarkActionFactory.CreateOverhead(target, instance, codegenMode, unrollFactor);
+                var workloadAction = BenchmarkActionFactory.CreateWorkload(target, instance, unrollFactor);
+                var overheadAction = BenchmarkActionFactory.CreateOverhead(target, instance, unrollFactor);
                 var globalSetupAction = BenchmarkActionFactory.CreateGlobalSetup(target, instance);
                 var globalCleanupAction = BenchmarkActionFactory.CreateGlobalCleanup(target, instance);
                 var iterationSetupAction = BenchmarkActionFactory.CreateIterationSetup(target, instance);
@@ -150,6 +152,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     TargetJob = job,
                     OperationsPerInvoke = target.OperationsPerInvoke,
                     MeasureGcStats = benchmarkCase.Config.HasMemoryDiagnoser(),
+                    Encoding = benchmarkCase.Config.Encoding,
                     BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase)
                 };
 

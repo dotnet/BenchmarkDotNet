@@ -4,39 +4,39 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 
-namespace BenchmarkDotNet.Toolchains.InProcess
+using JetBrains.Annotations;
+
+namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /// <summary>
-    ///     A toolchain to run the benchmarks in-process.
+    ///     A toolchain to run the benchmarks in-process (no emit).
     /// </summary>
     /// <seealso cref="IToolchain" />
-    [Obsolete("Please use BenchmarkDotNet.Toolchains.InProcess.NoEmit.* classes")]
-    public sealed class InProcessToolchain : IToolchain
+    [PublicAPI]
+    public sealed class InProcessNoEmitToolchain : IToolchain
     {
         /// <summary>The default toolchain instance.</summary>
-        public static readonly IToolchain Instance = new InProcessToolchain(true);
+        public static readonly IToolchain Instance = new InProcessNoEmitToolchain(true);
 
         /// <summary>The toolchain instance without output logging.</summary>
-        public static readonly IToolchain DontLogOutput = new InProcessToolchain(false);
+        public static readonly IToolchain DontLogOutput = new InProcessNoEmitToolchain(false);
 
-        /// <summary>Initializes a new instance of the <see cref="InProcessToolchain" /> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="InProcessNoEmitToolchain" /> class.</summary>
         /// <param name="logOutput"><c>true</c> if the output should be logged.</param>
-        public InProcessToolchain(bool logOutput) : this(
-            InProcessExecutor.DefaultTimeout,
-            BenchmarkActionCodegen.ReflectionEmit,
+        public InProcessNoEmitToolchain(bool logOutput) : this(
+            InProcessNoEmitExecutor.DefaultTimeout,
             logOutput)
         {
         }
 
-        /// <summary>Initializes a new instance of the <see cref="InProcessToolchain" /> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="InProcessNoEmitToolchain" /> class.</summary>
         /// <param name="timeout">Timeout for the run.</param>
-        /// <param name="codegenMode">Describes how benchmark action code is generated.</param>
         /// <param name="logOutput"><c>true</c> if the output should be logged.</param>
-        public InProcessToolchain(TimeSpan timeout, BenchmarkActionCodegen codegenMode, bool logOutput)
+        public InProcessNoEmitToolchain(TimeSpan timeout, bool logOutput)
         {
-            Generator = new InProcessGenerator();
-            Builder = new InProcessBuilder();
-            Executor = new InProcessExecutor(timeout, codegenMode, logOutput);
+            Generator = new InProcessNoEmitGenerator();
+            Builder = new InProcessNoEmitBuilder();
+            Executor = new InProcessNoEmitExecutor(timeout, logOutput);
         }
 
         /// <summary>Determines whether the specified benchmark is supported.</summary>
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
         /// <summary>Name of the toolchain.</summary>
         /// <value>The name of the toolchain.</value>
-        public string Name => nameof(InProcessToolchain);
+        public string Name => nameof(InProcessNoEmitToolchain);
 
         /// <summary>The generator.</summary>
         /// <value>The generator.</value>

@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -30,7 +31,7 @@ namespace BenchmarkDotNet.Validators
                 {
                     try
                     {
-                        InProcessRunner.FillMembers(benchmarkTypeInstance, benchmark);
+                        InProcessNoEmitRunner.FillMembers(benchmarkTypeInstance, benchmark);
                         var result = benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null);
 
                         if (benchmark.Descriptor.WorkloadMethod.ReturnType != typeof(void))
@@ -125,7 +126,7 @@ namespace BenchmarkDotNet.Validators
                     return false;
 
                 var method = equatableInterface.GetMethod(nameof(IEquatable<object>.Equals), BindingFlags.Public | BindingFlags.Instance);
-                return (bool?) method?.Invoke(x, new[] { y }) ?? false;
+                return (bool?)method?.Invoke(x, new[] { y }) ?? false;
             }
 
             private bool CompareStructural(object x, object y)

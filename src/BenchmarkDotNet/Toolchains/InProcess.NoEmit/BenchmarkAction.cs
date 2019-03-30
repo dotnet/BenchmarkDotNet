@@ -1,9 +1,11 @@
 ﻿using System;
 
-namespace BenchmarkDotNet.Toolchains.InProcess
+using JetBrains.Annotations;
+
+namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /// <summary>Common API to run the Setup/Clean/Idle/Run methods</summary>
-    [Obsolete("Please use BenchmarkDotNet.Toolchains.InProcess.NoEmit.* classes")]
+    [PublicAPI]
     public abstract class BenchmarkAction
     {
         /// <summary>Gets or sets invoke single callback.</summary>

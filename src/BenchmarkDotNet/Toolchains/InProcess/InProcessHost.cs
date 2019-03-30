@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.InProcess
@@ -55,7 +57,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
         /// <summary>Current config</summary>
         [PublicAPI] public IConfig Config { get; set; }
-        
+
         /// <summary>Passes text to the host.</summary>
         /// <param name="message">Text to write.</param>
         public void Write(string message) => logger.Write(message);
@@ -66,8 +68,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary>Passes text (new line appended) to the host.</summary>
         /// <param name="message">Text to write.</param>
         public void WriteLine(string message) => logger.WriteLine(message);
-        
-        
+
+
         /// <summary>Sends notification signal to the host.</summary>
         /// <param name="hostSignal">The signal to send.</param>
         public void SendSignal(HostSignal hostSignal)
@@ -77,7 +79,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             if (diagnoser == null)
                 throw new NullReferenceException(nameof(diagnoser));
-            
+
             diagnoser.Handle(hostSignal, diagnoserActionParameters);
         }
 

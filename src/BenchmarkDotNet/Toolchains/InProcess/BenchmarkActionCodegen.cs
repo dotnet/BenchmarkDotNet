@@ -5,6 +5,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
     /// <summary>
     ///     How benchmark action code is generated
     /// </summary>
+    [Obsolete("Please use BenchmarkDotNet.Toolchains.InProcess.NoEmit.* classes")]
     public enum BenchmarkActionCodegen
     {
         /// <summary>
