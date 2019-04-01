@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Portability;
 using CommandLine;
@@ -68,6 +68,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("keepFiles", Required = false, Default = false, HelpText = "Determines if all auto-generated files should be kept or removed after running the benchmarks.")]
         public bool KeepBenchmarkFiles { get; set; }
 
+        [Option("noOverwrite", Required = false, Default = false, HelpText = "Determines if the exported result files should not be overwritten (be default they are overwritten).")]
+        public bool DontOverwriteResults { get; set; }
+
         [Option("counters", Required = false, HelpText = "Hardware Counters", Separator = '+')]
         public IEnumerable<string> HardwareCounters { get; set; }
         
@@ -121,7 +124,10 @@ namespace BenchmarkDotNet.ConsoleArguments
         
         [Option("unrollFactor", Required = false, HelpText = "How many times the benchmark method will be invoked per one iteration of a generated loop. 16 by default")]
         public int? UnrollFactor { get; set; }
-        
+
+        [Option("strategy", Required = false, HelpText = "The RunStrategy that should be used. Throughput/ColdStart/Monitoring.")]
+        public RunStrategy? RunStrategy { get; set; }
+
         [Option("runOncePerIteration", Required = false, Default = false, HelpText = "Run the benchmark exactly once per iteration.")]
         public bool RunOncePerIteration { get; set; }
 

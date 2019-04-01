@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Running
 {
     internal static class BenchmarkRunnerClean
     {
-        private static int benchmarkRunIndex;
+        private const string DateTimeFormat = "yyyyMMdd-hhmmss";
 
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvironmentResolver.Instance, InfrastructureResolver.Instance);
 
@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Running
             
             var title = GetTitle(benchmarkRunInfos);
             var rootArtifactsFolderPath = GetRootArtifactsFolderPath(benchmarkRunInfos);
-            var resultsFolderPath = GetResultsFolderPath(rootArtifactsFolderPath);
+            var resultsFolderPath = GetResultsFolderPath(rootArtifactsFolderPath, benchmarkRunInfos);
 
             using (var streamLogger = new StreamLogger(new StreamWriter(Path.Combine(rootArtifactsFolderPath, title + ".log"), append: false)))
             {
@@ -52,7 +52,9 @@ namespace BenchmarkDotNet.Running
                 if (validationErrors.Any(validationError => validationError.IsCritical))
                     return new [] { Summary.ValidationFailed(title, resultsFolderPath, validationErrors) };
 
+                var benchmarksToRunCount = supportedBenchmarks.Sum(benchmarkInfo => benchmarkInfo.BenchmarksCases.Length);
                 compositeLogger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
+                compositeLogger.WriteLineHeader($"// ***** Found {benchmarksToRunCount} benchmark(s) in total *****");
                 var globalChronometer = Chronometer.Start();
 
                 var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
@@ -70,15 +72,20 @@ namespace BenchmarkDotNet.Running
                     {
                         var runChronometer = Chronometer.Start();
                         
-                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup, rootArtifactsFolderPath, ref runChronometer);
+                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup, rootArtifactsFolderPath, resultsFolderPath, ref runChronometer);
                         
                         if (!benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.JoinSummary))
                             PrintSummary(compositeLogger, benchmarkRunInfo.Config, summary);
-                        
+
+                        benchmarksToRunCount -= benchmarkRunInfo.BenchmarksCases.Length;
+                        compositeLogger.WriteLineHeader($"// ** Remained {benchmarksToRunCount} benchmark(s) to run **");
                         LogTotalTime(compositeLogger, runChronometer.GetElapsed().GetTimeSpan(), summary.GetNumberOfExecutedBenchmarks(), message: "Run time");
                         compositeLogger.WriteLine();
                         
                         results.Add(summary);
+
+                        if (benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.StopOnFirstError) && summary.Reports.Any(report => !report.Success))
+                            break;
                     }
 
                     if (supportedBenchmarks.Any(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)))
@@ -105,26 +112,13 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static string GetTitle(BenchmarkRunInfo[] benchmarkRunInfos)
-        {
-            // few types might have the same name: A.Name and B.Name will both report "Name"
-            // in that case, we can not use the type name as file name because they would be getting overwritten #529
-            var uniqueTargetTypes = benchmarkRunInfos.SelectMany(info => info.BenchmarksCases.Select(benchmark => benchmark.Descriptor.Type)).Distinct().ToArray();
-
-            if (uniqueTargetTypes.Length == 1)
-                return FolderNameHelper.ToFolderName(uniqueTargetTypes[0]);
-
-            benchmarkRunIndex++;
-
-            return $"BenchmarkRun-{benchmarkRunIndex:##000}-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}";
-        }
-
         private static Summary Run(BenchmarkRunInfo benchmarkRunInfo, 
                                    Dictionary<BenchmarkCase, (BenchmarkId benchmarkId, BuildResult buildResult)> buildResults, 
                                    IResolver resolver,
                                    ILogger logger, 
                                    List<string> artifactsToCleanup, 
                                    string rootArtifactsFolderPath,
+                                   string resultsFolderPath,
                                    ref StartedClock runChronometer)
         {
             var benchmarks = benchmarkRunInfo.BenchmarksCases;
@@ -133,7 +127,7 @@ namespace BenchmarkDotNet.Running
             string title = GetTitle(new[] { benchmarkRunInfo });
             var powerManagementApplier = new PowerManagementApplier(logger);
 
-            logger.WriteLineInfo("// Found benchmarks:");
+            logger.WriteLineInfo($"// Found {benchmarks.Length} benchmarks:");
             foreach (var benchmark in benchmarks)
                 logger.WriteLineInfo($"//   {benchmark.DisplayInfo}");
             logger.WriteLine();
@@ -146,7 +140,6 @@ namespace BenchmarkDotNet.Running
                 if (!config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
                     artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
 
-                bool success;
                 if (buildResult.IsBuildSuccess)
                 {
                     var report = RunCore(benchmark, info.benchmarkId, logger, resolver, buildResult);
@@ -156,7 +149,8 @@ namespace BenchmarkDotNet.Running
                     if (report.GetResultRuns().Any())
                         logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr(config.Encoding));
 
-                    success = report.Success;
+                    if (!report.Success && config.Options.IsSet(ConfigOptions.StopOnFirstError))
+                        break;
                 }
                 else
                 {
@@ -167,15 +161,11 @@ namespace BenchmarkDotNet.Running
                     if (buildResult.ErrorMessage != null)
                         logger.WriteLineError($"// Build Error: {buildResult.ErrorMessage}");
 
-                    success = true;
+                    if(config.Options.IsSet(ConfigOptions.StopOnFirstError))
+                        break;
                 }
 
                 logger.WriteLine();
-
-                if (!success && config.Options.IsSet(ConfigOptions.StopOnFirstError))
-                {
-                    break;
-                }
             }
             
             var clockSpan = runChronometer.GetElapsed();
@@ -184,7 +174,7 @@ namespace BenchmarkDotNet.Running
             return new Summary(title,
                 reports.ToImmutableArray(),
                 HostEnvironmentInfo.GetCurrent(),
-                GetResultsFolderPath(rootArtifactsFolderPath),
+                resultsFolderPath,
                 clockSpan.GetTimeSpan(), 
                 Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
         }
@@ -253,7 +243,7 @@ namespace BenchmarkDotNet.Running
             foreach (var benchmarkRunInfo in benchmarks)
                 validationErrors.AddRange(benchmarkRunInfo.Config.GetCompositeValidator().Validate(new ValidationParameters(benchmarkRunInfo.BenchmarksCases, benchmarkRunInfo.Config)));
 
-            foreach (var validationError in validationErrors)
+            foreach (var validationError in validationErrors.Distinct())
                 logger.WriteLineError(validationError.Message);
 
             return validationErrors.ToImmutableArray();
@@ -397,7 +387,7 @@ namespace BenchmarkDotNet.Running
                 if (useDiagnoser)
                 {
                     if (benchmarkCase.Config.HasMemoryDiagnoser())
-                        gcStats = GcStats.Parse(executeResult.Data.Last(line => !string.IsNullOrEmpty(line)));
+                        gcStats = GcStats.Parse(executeResult.Data.Last(line => !string.IsNullOrEmpty(line) && line.StartsWith(GcStats.ResultsLinePrefix)));
                     
                     metrics.AddRange(
                         noOverheadCompositeDiagnoser.ProcessResults(
@@ -507,7 +497,26 @@ namespace BenchmarkDotNet.Running
             return customPath != default ? customPath.CreateIfNotExists() : defaultPath;
         }
 
-        private static string GetResultsFolderPath(string rootArtifactsFolderPath) => Path.Combine(rootArtifactsFolderPath, "results").CreateIfNotExists();
+        private static string GetTitle(BenchmarkRunInfo[] benchmarkRunInfos)
+        {
+            // few types might have the same name: A.Name and B.Name will both report "Name"
+            // in that case, we can not use the type name as file name because they would be getting overwritten #529
+            var uniqueTargetTypes = benchmarkRunInfos.SelectMany(info => info.BenchmarksCases.Select(benchmark => benchmark.Descriptor.Type)).Distinct().ToArray();
+
+            var fileNamePrefix = (uniqueTargetTypes.Length == 1)
+                ? FolderNameHelper.ToFolderName(uniqueTargetTypes[0])
+                : "BenchmarkRun";
+
+            return $"{fileNamePrefix}-{DateTime.Now.ToString(DateTimeFormat)}";
+        }
+
+        private static string GetResultsFolderPath(string rootArtifactsFolderPath, BenchmarkRunInfo[] benchmarkRunInfos)
+        {
+            if (benchmarkRunInfos.Any(info => info.Config.Options.IsSet(ConfigOptions.DontOverwriteResults)))
+                return Path.Combine(rootArtifactsFolderPath, DateTime.Now.ToString(DateTimeFormat)).CreateIfNotExists();
+
+            return Path.Combine(rootArtifactsFolderPath, "results").CreateIfNotExists();
+        }
 
         private static ILogger CreateCompositeLogger(BenchmarkRunInfo[] benchmarkRunInfos, StreamLogger streamLogger)
         {

@@ -56,7 +56,8 @@ namespace BenchmarkDotNet.Exporters
                         totalSizeInBytes += asm.SizeInBytes;
                     }
 
-                    logger.WriteLine($"       {element.TextRepresentation}");
+                    string prefix = "       ";
+                    logger.WriteLine($"{prefix}{element.TextRepresentation.Replace("\n", "\n" + prefix)}");
                 }
 
                 logger.WriteLine($"; Total bytes of code {totalSizeInBytes}");

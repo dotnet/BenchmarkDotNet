@@ -24,7 +24,11 @@ namespace BenchmarkDotNet.Configs
         /// <summary>
         /// determines if "mandatory" optimizations validator should be entirely turned off
         /// </summary>
-        DisableOptimizationsValidator = 1 << 3
+        DisableOptimizationsValidator = 1 << 3,
+        /// <summary>
+        /// determines if the exported result files should not be overwritten (be default they are overwritten)
+        /// </summary>
+        DontOverwriteResults = 1 << 4
     }
 
     internal static class ConfigOptionsExtensions

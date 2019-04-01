@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
+using BenchmarkDotNet.Loggers;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Helpers
@@ -12,7 +14,7 @@ namespace BenchmarkDotNet.Helpers
         /// In the case of any exception, null will be returned.
         /// </summary>
         [CanBeNull]
-        internal static string RunAndReadOutput(string fileName, string arguments = "")
+        internal static string RunAndReadOutput(string fileName, string arguments = "", ILogger logger = null)
         {
             var processStartInfo = new ProcessStartInfo
             {
@@ -25,6 +27,7 @@ namespace BenchmarkDotNet.Helpers
                 RedirectStandardError = true
             };
             using (var process = new Process { StartInfo = processStartInfo })
+            using (new ConsoleExitHandler(process, logger ?? NullLogger.Instance))
             {
                 try
                 {
@@ -40,11 +43,9 @@ namespace BenchmarkDotNet.Helpers
             }
         }
 
-        internal static (int exitCode, IReadOnlyList<string> output) RunAndReadOutputLineByLine(string fileName, string arguments = "", string workingDirectory = "",
-            Dictionary<string, string> environmentVariables = null, bool includeErrors = false)
+        internal static (int exitCode, ImmutableArray<string> output) RunAndReadOutputLineByLine(string fileName, string arguments = "", string workingDirectory = "",
+            Dictionary<string, string> environmentVariables = null, bool includeErrors = false, ILogger logger = null)
         {
-            var output = new List<string>(20000);
-
             var processStartInfo = new ProcessStartInfo
             {
                 FileName = fileName,
@@ -61,20 +62,18 @@ namespace BenchmarkDotNet.Helpers
                     processStartInfo.Environment[environmentVariable.Key] = environmentVariable.Value;
 
             using (var process = new Process { StartInfo = processStartInfo })
+            using (var outputReader = new AsyncProcessOutputReader(process))
+            using (new ConsoleExitHandler(process, logger ?? NullLogger.Instance))
             {
-                process.OutputDataReceived += (sender, args) => output.Add(args.Data);
-                process.ErrorDataReceived += (sender, args) =>
-                {
-                    if (includeErrors)
-                        output.Add(args.Data);
-                };
-
                 process.Start();
 
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
+                outputReader.BeginRead();
 
                 process.WaitForExit();
+
+                outputReader.StopRead();
+
+                var output = includeErrors ? outputReader.GetOutputAndErrorLines() : outputReader.GetOutputLines();
 
                 return (process.ExitCode, output);
             }

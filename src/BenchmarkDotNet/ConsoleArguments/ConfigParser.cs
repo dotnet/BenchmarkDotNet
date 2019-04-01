@@ -24,7 +24,7 @@ using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using CommandLine;
 
 namespace BenchmarkDotNet.ConsoleArguments
@@ -224,6 +224,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             config.Options = config.Options.Set(options.Join, ConfigOptions.JoinSummary);
             config.Options = config.Options.Set(options.KeepBenchmarkFiles, ConfigOptions.KeepBenchmarkFiles);
+            config.Options = config.Options.Set(options.DontOverwriteResults, ConfigOptions.DontOverwriteResults);
             config.Options = config.Options.Set(options.StopOnFirstError, ConfigOptions.StopOnFirstError);
 
             return config;
@@ -261,6 +262,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithInvocationCount(options.InvocationCount.Value);
             if (options.UnrollFactor.HasValue)
                 baseJob = baseJob.WithUnrollFactor(options.UnrollFactor.Value);
+            if (options.RunStrategy.HasValue)
+                baseJob = baseJob.With(options.RunStrategy.Value);
             if (options.RunOncePerIteration)
                 baseJob = baseJob.RunOncePerIteration();
 
@@ -275,7 +278,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         private static IEnumerable<Job> Expand(Job baseJob, CommandLineOptions options)
         {
             if (options.RunInProcess)
-                yield return baseJob.With(InProcessToolchain.Instance);
+                yield return baseJob.With(InProcessEmitToolchain.Instance);
             else if (!string.IsNullOrEmpty(options.ClrVersion))
                 yield return baseJob.With(new ClrRuntime(options.ClrVersion)); // local builds of .NET Runtime
             else if (options.CoreRunPaths.Any())

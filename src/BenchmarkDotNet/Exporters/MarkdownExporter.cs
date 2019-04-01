@@ -33,7 +33,8 @@ namespace BenchmarkDotNet.Exporters
         public static readonly IExporter Console = new MarkdownExporter
         {
             Dialect = nameof(Console),
-            StartOfGroupHighlightStrategy = MarkdownHighlightStrategy.None
+            StartOfGroupHighlightStrategy = MarkdownHighlightStrategy.None,
+            ColumnsStartWithSeparator = true // we want to be able to copy-paste the console output to GH #1062
         };
 
         public static readonly IExporter StackOverflow = new MarkdownExporter
@@ -106,7 +107,7 @@ namespace BenchmarkDotNet.Exporters
 
             PrintTable(summary.Table, logger);
 
-            // TODO: move this logic to an analyser
+            // TODO: move this logic to an analyzer
             var benchmarksWithTroubles = summary.Reports.Where(r => !r.GetResultRuns().Any()).Select(r => r.BenchmarkCase).ToList();
             if (benchmarksWithTroubles.Count > 0)
             {
@@ -149,7 +150,7 @@ namespace BenchmarkDotNet.Exporters
 
             if (ColumnsStartWithSeparator)
             {
-                logger.Write(TableHeaderSeparator.TrimStart());
+                logger.WriteStatistic(TableHeaderSeparator.TrimStart());
             }
 
             table.PrintLine(table.FullHeader, logger, string.Empty, TableHeaderSeparator);
@@ -157,7 +158,7 @@ namespace BenchmarkDotNet.Exporters
             {
                 if (ColumnsStartWithSeparator)
                 {
-                    logger.Write(TableHeaderSeparator.TrimStart());
+                    logger.WriteStatistic(TableHeaderSeparator.TrimStart());
                 }
 
                 logger.WriteLineStatistic(string.Join("",
@@ -173,19 +174,19 @@ namespace BenchmarkDotNet.Exporters
                 {
                     // Print logical separator
                     if (ColumnsStartWithSeparator)
-                        logger.Write(TableColumnSeparator.TrimStart());
+                        logger.WriteStatistic(TableColumnSeparator.TrimStart());
                     table.PrintLine(separatorLine, logger, string.Empty, TableColumnSeparator, highlightRow, false, StartOfGroupHighlightStrategy,
                         BoldMarkupFormat, false);
                 }
 
-                // Each time we hit the start of a new group, alternative the colour (in the console) or display bold in Markdown
+                // Each time we hit the start of a new group, alternative the color (in the console) or display bold in Markdown
                 if (table.FullContentStartOfHighlightGroup[rowCounter])
                 {
                     highlightRow = !highlightRow;
                 }
 
                 if (ColumnsStartWithSeparator)
-                    logger.Write(TableColumnSeparator.TrimStart());
+                    logger.WriteStatistic(TableColumnSeparator.TrimStart());
 
                 table.PrintLine(line, logger, string.Empty, TableColumnSeparator, highlightRow, table.FullContentStartOfHighlightGroup[rowCounter],
                     StartOfGroupHighlightStrategy, BoldMarkupFormat, EscapeHtml);

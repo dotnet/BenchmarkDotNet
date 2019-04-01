@@ -13,7 +13,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void GlobalSetupAttributeMethodsMustHaveNoParameters()
         {
-            Assert.Throws<InvalidOperationException>(() => CanExecute<GlobalSetupAttributeInvalidMethod>());
+            var summary = CanExecute<GlobalSetupAttributeInvalidMethod>(fullValidation: false);
+            Assert.Equal("GlobalSetup method GlobalSetup has incorrect signature.\nMethod shouldn't have any arguments.", summary.Title);
         }
 
         public class GlobalSetupAttributeInvalidMethod

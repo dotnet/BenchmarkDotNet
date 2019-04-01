@@ -12,13 +12,14 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
-using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -36,17 +37,17 @@ namespace BenchmarkDotNet.IntegrationTests
                 : new[]
                 {
                     new object[] { Job.Default.GetToolchain() },
-                    new object[] { InProcessToolchain.Instance },
-    #if NETCOREAPP2_1 
+                    // new object[] { InProcessToolchain.Instance }, // this test takes a LOT of time and since we have new InProcessEmitToolchain we can disable it 
+                    new object[] { InProcessEmitToolchain.Instance },
+#if NETCOREAPP2_1 
                     // we don't want to test CoreRT twice (for .NET 4.6 and Core 2.1) when running the integration tests (these tests take a lot of time)
                     // we test against specific version to keep this test stable
-                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-26414-01").ToToolchain() }
-    #endif
+                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-27408-02").ToToolchain() }
+#endif
                 };
 
         public class AccurateAllocations
         {
-            [Benchmark] public void Nothing() { }
             [Benchmark] public byte[] EightBytesArray() => new byte[8];
             [Benchmark] public byte[] SixtyFourBytesArray() => new byte[64];
 
@@ -62,7 +63,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
             AssertAllocations(toolchain, typeof(AccurateAllocations), new Dictionary<string, long>
             {
-                { nameof(AccurateAllocations.Nothing), 0 },
                 { nameof(AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
                 { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + + objectAllocationOverhead + arraySizeOverhead },
 
@@ -180,17 +180,17 @@ namespace BenchmarkDotNet.IntegrationTests
                 { nameof(WithOperationsPerInvokeBenchmarks.WithOperationsPerInvoke), objectAllocationOverhead + IntPtr.Size }
             });
         }
-        
+
         public class TimeConsuming
         {
-            [Benchmark] 
+            [Benchmark]
             public byte[] SixtyFourBytesArray()
             {
                 // this benchmark should hit allocation quantum problem
                 // it allocates a little of memory, but it takes a lot of time to execute so we can't run in thousands of times!
-                
-                Thread.Sleep(TimeSpan.FromSeconds(0.5)); 
-                
+
+                Thread.Sleep(TimeSpan.FromSeconds(0.5));
+
                 return new byte[64];
             }
         }
@@ -201,13 +201,13 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             if (toolchain is CoreRtToolchain) // the fix has not yet been backported to CoreRT
                 return;
-            
+
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
             long arraySizeOverhead = IntPtr.Size; // array length
 
             AssertAllocations(toolchain, typeof(TimeConsuming), new Dictionary<string, long>
             {
-                { nameof(TimeConsuming.SixtyFourBytesArray), 64 + + objectAllocationOverhead + arraySizeOverhead }
+                { nameof(TimeConsuming.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead }
             });
         }
 
@@ -223,7 +223,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 // CoreRT is missing some of the CoreCLR threading/task related perf improvements, so sizeof(Task<int>) calculated for CoreCLR < sizeof(Task<int>) on CoreRT
                 // see https://github.com/dotnet/corert/issues/5705 for more
                 if (benchmarkAllocationsValidator.Key == nameof(AccurateAllocations.AllocateTask) && toolchain is CoreRtToolchain)
-                    continue; 
+                    continue;
 
                 var allocatingBenchmarks = benchmarks.BenchmarksCases.Where(benchmark => benchmark.DisplayInfo.Contains(benchmarkAllocationsValidator.Key));
 
@@ -235,28 +235,23 @@ namespace BenchmarkDotNet.IntegrationTests
 
                     if (benchmarkAllocationsValidator.Value == 0)
                     {
-#if CLASSIC
-                        // it's still not perfect for this case. We don't allocate memory, but the api that we use reports 3 * Allocation Quantum in this case
-                        if (toolchain is InProcessToolchain) 
-                            continue;
-#endif
                         Assert.Equal(0, benchmarkReport.GcStats.GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects: true));
                     }
                 }
             }
         }
 
-        private IConfig CreateConfig(IToolchain toolchain) 
+        private IConfig CreateConfig(IToolchain toolchain)
             => ManualConfig.CreateEmpty()
                 .With(Job.ShortRun
                     .WithEvaluateOverhead(false) // no need to run idle for this test
                     .WithWarmupCount(0) // don't run warmup to save some time for our CI runs
                     .WithIterationCount(1) // single iteration is enough for us
-                    .WithGcForce(false).With(toolchain)) 
-                .With(DefaultConfig.Instance.GetLoggers().ToArray())
+                    .WithGcForce(false)
+                    .With(toolchain))
                 .With(DefaultColumnProviders.Instance)
                 .With(MemoryDiagnoser.Default)
-                .With(new OutputLogger(output));
+                .With(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
 
         // note: don't copy, never use in production systems (it should work but I am not 100% sure)
         private int CalculateRequiredSpace<T>()
