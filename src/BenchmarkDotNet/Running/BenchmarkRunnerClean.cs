@@ -125,6 +125,7 @@ namespace BenchmarkDotNet.Running
             var config = benchmarkRunInfo.Config;
             var reports = new List<BenchmarkReport>();
             string title = GetTitle(new[] { benchmarkRunInfo });
+            var powerManagementApplier = new PowerManagementApplier(logger);
 
             logger.WriteLineInfo($"// Found {benchmarks.Length} benchmarks:");
             foreach (var benchmark in benchmarks)
@@ -132,6 +133,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
             foreach (var benchmark in benchmarks)
             {
+                powerManagementApplier.ApplyPerformancePlan(benchmark.Job.Environment.PowerPlanMode.PowerPlan);
                 var info = buildResults[benchmark];
                 var buildResult = info.buildResult;
 
@@ -168,6 +170,7 @@ namespace BenchmarkDotNet.Running
             
             var clockSpan = runChronometer.GetElapsed();
 
+            powerManagementApplier.ApplyUserPowerPlan();
             return new Summary(title,
                 reports.ToImmutableArray(),
                 HostEnvironmentInfo.GetCurrent(),
