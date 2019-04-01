@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Running
                     {
                         powerPlanChanged = false;
                         var powerPlanFriendlyName = PowerManagementHelper.CurrentPlanFriendlyName;
-                        logger.WriteInfo($"Succesfully reverted power plan (GUID: {userCurrentPowerPlan.Value} FriendlyName: {powerPlanFriendlyName})");
+                        logger.WriteLineInfo($"Successfully reverted power plan (GUID: {userCurrentPowerPlan.Value} FriendlyName: {powerPlanFriendlyName})");
                     }
                 }
                 catch (Exception ex)
