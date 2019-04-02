@@ -132,18 +132,42 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">NetCoreAppSettings</span></div>
   </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.html">BenchmarkDotNet.Toolchains.DotNetCli</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class NetCoreAppSettings : object</code></pre>
+    <pre><code class="lang-csharp hljs">public class NetCoreAppSettings</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
   
   
   <a id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings__ctor_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings__ctor_System_String_System_String_System_String_System_String_System_String_System_Nullable_TimeSpan__" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor(System.String,System.String,System.String,System.String,System.String,System.Nullable{TimeSpan})">NetCoreAppSettings(String, String, String, String, String, Nullable&lt;TimeSpan&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings__ctor_System_String_System_String_System_String_System_String_System_String_System_Nullable_System_TimeSpan__" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor(System.String,System.String,System.String,System.String,System.String,System.Nullable{System.TimeSpan})">NetCoreAppSettings(String, String, String, String, String, Nullable&lt;TimeSpan&gt;)</h4>
   <div class="markdown level1 summary"><param name="targetFrameworkMoniker">
 sample values: netcoreapp2.0, netcoreapp2.1
 
@@ -164,7 +188,7 @@ simply ignored if null
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public NetCoreAppSettings(string targetFrameworkMoniker, string runtimeFrameworkVersion, string name, string customDotNetCliPath = null, string packagesPath = null, TimeSpan? timeout = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public NetCoreAppSettings(string targetFrameworkMoniker, string runtimeFrameworkVersion, string name, string customDotNetCliPath = null, string packagesPath = null, TimeSpan? timeout = default(TimeSpan? ))</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -202,7 +226,7 @@ simply ignored if null
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">TimeSpan</span>&gt;</td>
+        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.TimeSpan</span>&gt;</td>
         <td><span class="parametername">timeout</span></td>
         <td></td>
       </tr>
@@ -229,7 +253,7 @@ simply ignored if null
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">Lazy</span>&lt;<a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html">NetCoreAppSettings</a>&gt;</td>
+        <td><span class="xref">System.Lazy</span>&lt;<a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html">NetCoreAppSettings</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -253,7 +277,7 @@ simply ignored if null
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">TimeSpan</span></td>
+        <td><span class="xref">System.TimeSpan</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -505,7 +529,7 @@ simply ignored if null
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">TimeSpan</span></td>
+        <td><span class="xref">System.TimeSpan</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -609,7 +633,7 @@ simply ignored if null
   
   
   <a id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_WithTimeout_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithTimeout*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_WithTimeout_System_Nullable_TimeSpan__" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithTimeout(System.Nullable{TimeSpan})">WithTimeout(Nullable&lt;TimeSpan&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_WithTimeout_System_Nullable_System_TimeSpan__" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithTimeout(System.Nullable{System.TimeSpan})">WithTimeout(Nullable&lt;TimeSpan&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -627,7 +651,7 @@ simply ignored if null
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">TimeSpan</span>&gt;</td>
+        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.TimeSpan</span>&gt;</td>
         <td><span class="parametername">timeOut</span></td>
         <td></td>
       </tr>

@@ -123,7 +123,7 @@
 <hr>
 <h2 id="sample-introparams">Sample: IntroParams</h2>
 <p>You can mark one or several fields or properties in your class by
-the <a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAttribute.html"><code>[Params]</code></a> attribute.
+the <a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a> attribute.
 In this attribute, you can specify set of values.
 Every value must be a compile-time constant.
 As a result, you will get results for each combination of params values.</p>
@@ -161,9 +161,9 @@ namespace BenchmarkDotNet.Samples
 <hr>
 <h2 id="sample-introparamssource">Sample: IntroParamsSource</h2>
 <p>In case you want to use a lot of values, you should use
-<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsSourceAttribute.html"><code>[ParamsSource]</code></a>
+<a href="xref:BenchmarkDotNet.Attributes.ParamsSourceAttribute"><code>[ParamsSource]</code></a>
 You can mark one or several fields or properties in your class by the
-<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAttribute.html"><code>[Params]</code></a> attribute.
+<a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a> attribute.
 In this attribute, you have to specify the name of public method/property which is going to provide the values
 (something that implements <code>IEnumerable</code>).
 The source must be within benchmarked type!</p>
@@ -274,7 +274,7 @@ namespace BenchmarkDotNet.Samples
 </ul>
 <hr>
 <h2 id="sample-introarguments">Sample: IntroArguments</h2>
-<p>As an alternative to using <a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAttribute.html"><code>[Params]</code></a>,
+<p>As an alternative to using <a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a>,
 you can specify arguments for your benchmarks.
 There are several ways to do it (described below).</p>
 <div class="IMPORTANT">
@@ -282,11 +282,11 @@ There are several ways to do it (described below).</p>
 <p><code>InProcessToolchain</code> does not support Arguments (yet!).
 See <a href="https://github.com/dotnet/BenchmarkDotNet/issues/687">#687</a> for more details.</p>
 </div>
-<p>The <a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsAttribute.html"><code>[Arguments]</code></a> allows you to provide a set of values.
+<p>The <a href="xref:BenchmarkDotNet.Attributes.ArgumentsAttribute"><code>[Arguments]</code></a> allows you to provide a set of values.
 Every value must be a compile-time constant (it's C# lanugage limitation for attributes in general).
 You can also combine
-<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsAttribute.html"><code>[Arguments]</code></a> with
-<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAttribute.html"><code>[Params]</code></a>.
+<a href="xref:BenchmarkDotNet.Attributes.ArgumentsAttribute"><code>[Arguments]</code></a> with
+<a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a>.
 As a result, you will get results for each combination of params values.</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroArguments.cs">using System.Threading;
@@ -333,9 +333,9 @@ namespace BenchmarkDotNet.Samples
 <hr>
 <h2 id="sample-introargumentssource">Sample: IntroArgumentsSource</h2>
 <p>In case you want to use a lot of values, you should use
-<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html"><code>[ArgumentsSource]</code></a>.</p>
+<a href="xref:BenchmarkDotNet.Attributes.ArgumentsSourceAttribute"><code>[ArgumentsSource]</code></a>.</p>
 <p>You can mark one or several fields or properties in your class by the
-<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html"><code>[ArgumentsSource]</code></a> attribute.
+<a href="xref:BenchmarkDotNet.Attributes.ArgumentsSourceAttribute"><code>[ArgumentsSource]</code></a> attribute.
 In this attribute, you have to specify the name of public method/property which is going to provide the values
 (something that implements <code>IEnumerable</code>).
 The source must be within benchmarked type!</p>

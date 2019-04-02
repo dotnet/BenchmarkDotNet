@@ -135,18 +135,42 @@
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Engines.IHost.html">IHost</a></div>
   </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Engines.html">BenchmarkDotNet.Engines</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Engines_ConsoleHost_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class ConsoleHost : object, IHost</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class ConsoleHost : IHost</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
   
   
   <a id="BenchmarkDotNet_Engines_ConsoleHost__ctor_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Engines_ConsoleHost__ctor_TextWriter_TextReader_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.#ctor(TextWriter,TextReader)">ConsoleHost(TextWriter, TextReader)</h4>
+  <h4 id="BenchmarkDotNet_Engines_ConsoleHost__ctor_System_IO_TextWriter_System_IO_TextReader_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.#ctor(System.IO.TextWriter,System.IO.TextReader)">ConsoleHost(TextWriter, TextReader)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -164,12 +188,12 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">TextWriter</span></td>
+        <td><span class="xref">System.IO.TextWriter</span></td>
         <td><span class="parametername">outWriter</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">TextReader</span></td>
+        <td><span class="xref">System.IO.TextReader</span></td>
         <td><span class="parametername">inReader</span></td>
         <td></td>
       </tr>
@@ -325,6 +349,22 @@
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="BenchmarkDotNet.Engines.IHost.html">IHost</a>
+  </div>
+  <h3 id="extensionmethods">Extension Methods</h3>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html#BenchmarkDotNet_Engines_HostExtensions_WriteLine_BenchmarkDotNet_Engines_IHost_System_String_System_Object___">HostExtensions.WriteLine(IHost, String, Object[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html#BenchmarkDotNet_Engines_HostExtensions_BeforeAnythingElse_BenchmarkDotNet_Engines_IHost_">HostExtensions.BeforeAnythingElse(IHost)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html#BenchmarkDotNet_Engines_HostExtensions_BeforeMainRun_BenchmarkDotNet_Engines_IHost_">HostExtensions.BeforeMainRun(IHost)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html#BenchmarkDotNet_Engines_HostExtensions_AfterMainRun_BenchmarkDotNet_Engines_IHost_">HostExtensions.AfterMainRun(IHost)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html#BenchmarkDotNet_Engines_HostExtensions_AfterAll_BenchmarkDotNet_Engines_IHost_">HostExtensions.AfterAll(IHost)</a>
   </div>
 </article>
           </div>

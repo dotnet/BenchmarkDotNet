@@ -135,11 +135,35 @@
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></div>
   </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Configs.html">BenchmarkDotNet.Configs</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Configs_ManualConfig_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ManualConfig : object, IConfig</code></pre>
+    <pre><code class="lang-csharp hljs">public class ManualConfig : IConfig</code></pre>
   </div>
   <h3 id="properties">Properties
   </h3>
@@ -188,7 +212,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">Encoding</span></td>
+        <td><span class="xref">System.Text.Encoding</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -201,7 +225,8 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool KeepBenchmarkFiles { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Obsolete(&quot;This property will soon be removed, please start using .Options instead&quot;)]
+public bool KeepBenchmarkFiles { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -276,7 +301,8 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool StopOnFirstError { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Obsolete(&quot;This property will soon be removed, please start using .Options instead&quot;)]
+public bool StopOnFirstError { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -301,7 +327,8 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool SummaryPerType { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Obsolete(&quot;This property will soon be removed, please start using .Options instead&quot;)]
+public bool SummaryPerType { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -781,7 +808,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -806,7 +833,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Columns.IColumnProvider.html">IColumnProvider</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Columns.IColumnProvider.html">IColumnProvider</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -831,7 +858,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Diagnosers.IDiagnoser.html">IDiagnoser</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Diagnosers.IDiagnoser.html">IDiagnoser</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -856,7 +883,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Exporters.IExporter.html">IExporter</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Exporters.IExporter.html">IExporter</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -881,7 +908,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Filters.IFilter.html">IFilter</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Filters.IFilter.html">IFilter</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -906,7 +933,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Diagnosers.HardwareCounter.html">HardwareCounter</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Diagnosers.HardwareCounter.html">HardwareCounter</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -931,7 +958,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -956,7 +983,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -981,7 +1008,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule.html">BenchmarkLogicalGroupRule</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule.html">BenchmarkLogicalGroupRule</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -1006,7 +1033,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Validators.IValidator.html">IValidator</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Validators.IValidator.html">IValidator</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -1061,6 +1088,67 @@
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a>
+  </div>
+  <h3 id="extensionmethods">Extension Methods</h3>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Columns_IColumn___">ConfigExtensions.With(IConfig, IColumn[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Columns_IColumnProvider___">ConfigExtensions.With(IConfig, IColumnProvider[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Loggers_ILogger___">ConfigExtensions.With(IConfig, ILogger[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Exporters_IExporter___">ConfigExtensions.With(IConfig, IExporter[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Diagnosers_IDiagnoser___">ConfigExtensions.With(IConfig, IDiagnoser[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Analysers_IAnalyser___">ConfigExtensions.With(IConfig, IAnalyser[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Validators_IValidator___">ConfigExtensions.With(IConfig, IValidator[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Jobs_Job___">ConfigExtensions.With(IConfig, Job[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Order_IOrderer_">ConfigExtensions.With(IConfig, IOrderer)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Diagnosers_HardwareCounter___">ConfigExtensions.With(IConfig, HardwareCounter[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Filters_IFilter___">ConfigExtensions.With(IConfig, IFilter[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_System_Text_Encoding_">ConfigExtensions.With(IConfig, Encoding)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Reports_SummaryStyle_">ConfigExtensions.With(IConfig, SummaryStyle)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_KeepBenchmarkFiles_BenchmarkDotNet_Configs_IConfig_System_Boolean_">ConfigExtensions.KeepBenchmarkFiles(IConfig, Boolean)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_DontOverwriteResults_BenchmarkDotNet_Configs_IConfig_System_Boolean_">ConfigExtensions.DontOverwriteResults(IConfig, Boolean)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_StopOnFirstError_BenchmarkDotNet_Configs_IConfig_System_Boolean_">ConfigExtensions.StopOnFirstError(IConfig, Boolean)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_WithArtifactsPath_BenchmarkDotNet_Configs_IConfig_System_String_">ConfigExtensions.WithArtifactsPath(IConfig, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Configs_ConfigOptions_">ConfigExtensions.With(IConfig, ConfigOptions)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Configs_BenchmarkLogicalGroupRule___">ConfigExtensions.With(IConfig, BenchmarkLogicalGroupRule[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_CreateImmutableConfig_BenchmarkDotNet_Configs_IConfig_">ConfigExtensions.CreateImmutableConfig(IConfig)</a>
   </div>
 </article>
           </div>

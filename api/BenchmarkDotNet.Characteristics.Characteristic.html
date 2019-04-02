@@ -132,18 +132,39 @@
     <div class="level1"><span class="xref">Characteristic</span></div>
       <div class="level2"><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;T&gt;</div>
   </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Characteristics.html">BenchmarkDotNet.Characteristics</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Characteristics_Characteristic_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class Characteristic : object</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract class Characteristic</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
   
   
   <a id="BenchmarkDotNet_Characteristics_Characteristic__ctor_" data-uid="BenchmarkDotNet.Characteristics.Characteristic.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Characteristics_Characteristic__ctor_System_String_Type_Type_System_Object_System_Boolean_System_Boolean_" data-uid="BenchmarkDotNet.Characteristics.Characteristic.#ctor(System.String,Type,Type,System.Object,System.Boolean,System.Boolean)">Characteristic(String, Type, Type, Object, Boolean, Boolean)</h4>
+  <h4 id="BenchmarkDotNet_Characteristics_Characteristic__ctor_System_String_System_Type_System_Type_System_Object_System_Boolean_System_Boolean_" data-uid="BenchmarkDotNet.Characteristics.Characteristic.#ctor(System.String,System.Type,System.Type,System.Object,System.Boolean,System.Boolean)">Characteristic(String, Type, Type, Object, Boolean, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -166,12 +187,12 @@
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">Type</span></td>
+        <td><span class="xref">System.Type</span></td>
         <td><span class="parametername">characteristicType</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">Type</span></td>
+        <td><span class="xref">System.Type</span></td>
         <td><span class="parametername">declaringType</span></td>
         <td></td>
       </tr>
@@ -240,7 +261,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">Type</span></td>
+        <td><span class="xref">System.Type</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -265,7 +286,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">Type</span></td>
+        <td><span class="xref">System.Type</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -571,7 +592,7 @@
   
   
   <a id="BenchmarkDotNet_Characteristics_Characteristic_Create_" data-uid="BenchmarkDotNet.Characteristics.Characteristic.Create*"></a>
-  <h4 id="BenchmarkDotNet_Characteristics_Characteristic_Create__2_System_String_Func_BenchmarkDotNet_Characteristics_CharacteristicObject___1___1____1_System_Boolean_" data-uid="BenchmarkDotNet.Characteristics.Characteristic.Create``2(System.String,Func{BenchmarkDotNet.Characteristics.CharacteristicObject,``1,``1},``1,System.Boolean)">Create&lt;TOwner, T&gt;(String, Func&lt;CharacteristicObject, T, T&gt;, T, Boolean)</h4>
+  <h4 id="BenchmarkDotNet_Characteristics_Characteristic_Create__2_System_String_System_Func_BenchmarkDotNet_Characteristics_CharacteristicObject___1___1____1_System_Boolean_" data-uid="BenchmarkDotNet.Characteristics.Characteristic.Create``2(System.String,System.Func{BenchmarkDotNet.Characteristics.CharacteristicObject,``1,``1},``1,System.Boolean)">Create&lt;TOwner, T&gt;(String, Func&lt;CharacteristicObject, T, T&gt;, T, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -595,7 +616,7 @@
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">Func</span>&lt;<a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html">CharacteristicObject</a>, T, T&gt;</td>
+        <td><span class="xref">System.Func</span>&lt;<a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html">CharacteristicObject</a>, T, T&gt;</td>
         <td><span class="parametername">resolver</span></td>
         <td></td>
       </tr>
@@ -794,6 +815,8 @@
       </tr>
     </tbody>
   </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.Object.ToString()</span></div>
   <h3 id="extensionmethods">Extension Methods</h3>
   <div>
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicHelper.html#BenchmarkDotNet_Characteristics_CharacteristicHelper_IsPresentableCharacteristic_BenchmarkDotNet_Characteristics_Characteristic_System_Boolean_">CharacteristicHelper.IsPresentableCharacteristic(Characteristic, Boolean)</a>

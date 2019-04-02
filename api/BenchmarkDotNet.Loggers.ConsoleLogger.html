@@ -135,18 +135,42 @@
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></div>
   </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Loggers.html">BenchmarkDotNet.Loggers</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Loggers_ConsoleLogger_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class ConsoleLogger : object, ILogger</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class ConsoleLogger : ILogger</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
   
   
   <a id="BenchmarkDotNet_Loggers_ConsoleLogger__ctor_" data-uid="BenchmarkDotNet.Loggers.ConsoleLogger.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Loggers_ConsoleLogger__ctor_Dictionary_BenchmarkDotNet_Loggers_LogKind_ConsoleColor__" data-uid="BenchmarkDotNet.Loggers.ConsoleLogger.#ctor(Dictionary{BenchmarkDotNet.Loggers.LogKind,ConsoleColor})">ConsoleLogger(Dictionary&lt;LogKind, ConsoleColor&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Loggers_ConsoleLogger__ctor_System_Collections_Generic_Dictionary_BenchmarkDotNet_Loggers_LogKind_System_ConsoleColor__" data-uid="BenchmarkDotNet.Loggers.ConsoleLogger.#ctor(System.Collections.Generic.Dictionary{BenchmarkDotNet.Loggers.LogKind,System.ConsoleColor})">ConsoleLogger(Dictionary&lt;LogKind, ConsoleColor&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -164,7 +188,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">Dictionary</span>&lt;<a class="xref" href="BenchmarkDotNet.Loggers.LogKind.html">LogKind</a>, <span class="xref">ConsoleColor</span>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.Dictionary</span>&lt;<a class="xref" href="BenchmarkDotNet.Loggers.LogKind.html">LogKind</a>, <span class="xref">System.ConsoleColor</span>&gt;</td>
         <td><span class="parametername">colorScheme</span></td>
         <td></td>
       </tr>
@@ -218,7 +242,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">Dictionary</span>&lt;<a class="xref" href="BenchmarkDotNet.Loggers.LogKind.html">LogKind</a>, <span class="xref">ConsoleColor</span>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.Dictionary</span>&lt;<a class="xref" href="BenchmarkDotNet.Loggers.LogKind.html">LogKind</a>, <span class="xref">System.ConsoleColor</span>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -310,6 +334,55 @@
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a>
+  </div>
+  <h3 id="extensionmethods">Extension Methods</h3>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteLine_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.WriteLine(ILogger, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteLineHelp_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.WriteLineHelp(ILogger, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteLineHeader_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.WriteLineHeader(ILogger, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteLineResult_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.WriteLineResult(ILogger, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteLineStatistic_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.WriteLineStatistic(ILogger, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteLineInfo_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.WriteLineInfo(ILogger, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteLineError_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.WriteLineError(ILogger, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteLineHint_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.WriteLineHint(ILogger, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_Write_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.Write(ILogger, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteHelp_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.WriteHelp(ILogger, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteHeader_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.WriteHeader(ILogger, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteResult_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.WriteResult(ILogger, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteStatistic_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.WriteStatistic(ILogger, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteInfo_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.WriteInfo(ILogger, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteError_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.WriteError(ILogger, String)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Loggers.LoggerExtensions.html#BenchmarkDotNet_Loggers_LoggerExtensions_WriteHint_BenchmarkDotNet_Loggers_ILogger_System_String_">LoggerExtensions.WriteHint(ILogger, String)</a>
   </div>
 </article>
           </div>

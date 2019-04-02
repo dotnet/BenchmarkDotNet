@@ -131,11 +131,35 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">ConfigExtensions</span></div>
   </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Configs.html">BenchmarkDotNet.Configs</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Configs_ConfigExtensions_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static class ConfigExtensions : object</code></pre>
+    <pre><code class="lang-csharp hljs">public static class ConfigExtensions</code></pre>
   </div>
   <h3 id="methods">Methods
   </h3>
@@ -177,6 +201,54 @@
     <tbody>
       <tr>
         <td><a class="xref" href="BenchmarkDotNet.Configs.ImmutableConfig.html">ImmutableConfig</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Configs_ConfigExtensions_DontOverwriteResults_" data-uid="BenchmarkDotNet.Configs.ConfigExtensions.DontOverwriteResults*"></a>
+  <h4 id="BenchmarkDotNet_Configs_ConfigExtensions_DontOverwriteResults_BenchmarkDotNet_Configs_IConfig_System_Boolean_" data-uid="BenchmarkDotNet.Configs.ConfigExtensions.DontOverwriteResults(BenchmarkDotNet.Configs.IConfig,System.Boolean)">DontOverwriteResults(IConfig, Boolean)</h4>
+  <div class="markdown level1 summary"><p>determines if the exported result files should not be overwritten (be default they are overwritten)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IConfig DontOverwriteResults(this IConfig config, bool value = true)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
+        <td><span class="parametername">config</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -939,7 +1011,7 @@
   
   
   <a id="BenchmarkDotNet_Configs_ConfigExtensions_With_" data-uid="BenchmarkDotNet.Configs.ConfigExtensions.With*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_Encoding_" data-uid="BenchmarkDotNet.Configs.ConfigExtensions.With(BenchmarkDotNet.Configs.IConfig,Encoding)">With(IConfig, Encoding)</h4>
+  <h4 id="BenchmarkDotNet_Configs_ConfigExtensions_With_BenchmarkDotNet_Configs_IConfig_System_Text_Encoding_" data-uid="BenchmarkDotNet.Configs.ConfigExtensions.With(BenchmarkDotNet.Configs.IConfig,System.Text.Encoding)">With(IConfig, Encoding)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -962,7 +1034,7 @@
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">Encoding</span></td>
+        <td><span class="xref">System.Text.Encoding</span></td>
         <td><span class="parametername">encoding</span></td>
         <td></td>
       </tr>

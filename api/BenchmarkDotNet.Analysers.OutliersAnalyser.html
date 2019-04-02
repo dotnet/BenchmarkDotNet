@@ -153,6 +153,27 @@
     <div>
       <a class="xref" href="BenchmarkDotNet.Analysers.AnalyserBase.html#BenchmarkDotNet_Analysers_AnalyserBase_CreateError_System_String_BenchmarkDotNet_Reports_BenchmarkReport_System_Boolean_">AnalyserBase.CreateError(String, BenchmarkReport, Boolean)</a>
     </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Analysers.html">BenchmarkDotNet.Analysers</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
@@ -259,7 +280,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.Conclusion.html">Conclusion</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.Conclusion.html">Conclusion</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -269,13 +290,13 @@
   
   
   <a id="BenchmarkDotNet_Analysers_OutliersAnalyser_GetMessage_" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser.GetMessage*"></a>
-  <h4 id="BenchmarkDotNet_Analysers_OutliersAnalyser_GetMessage_System_Int32_System_Int32_" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser.GetMessage(System.Int32,System.Int32)">GetMessage(Int32, Int32)</h4>
+  <h4 id="BenchmarkDotNet_Analysers_OutliersAnalyser_GetMessage_System_Double___System_Double___System_Double___System_Double___" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser.GetMessage(System.Double[],System.Double[],System.Double[],System.Double[])">GetMessage(Double[], Double[], Double[], Double[])</h4>
   <div class="markdown level1 summary"><p>Returns a nice message which can be displayed in the summary.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static string GetMessage(int actualOutliers, int allOutliers)</code></pre>
+    <pre><code class="lang-csharp hljs">public static string GetMessage(double[] actualOutliers, double[] allOutliers, double[] lowerOutliers, double[] upperOutliers)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -288,15 +309,27 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Int32</span></td>
+        <td><span class="xref">System.Double</span>[]</td>
         <td><span class="parametername">actualOutliers</span></td>
         <td><p>Actual outliers which were removed from the statistics</p>
 </td>
       </tr>
       <tr>
-        <td><span class="xref">System.Int32</span></td>
+        <td><span class="xref">System.Double</span>[]</td>
         <td><span class="parametername">allOutliers</span></td>
         <td><p>All outliers which present in the distribution (lower and upper)</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Double</span>[]</td>
+        <td><span class="parametername">lowerOutliers</span></td>
+        <td><p>All lower outliers</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Double</span>[]</td>
+        <td><span class="parametername">upperOutliers</span></td>
+        <td><p>All upper outliers</p>
 </td>
       </tr>
     </tbody>

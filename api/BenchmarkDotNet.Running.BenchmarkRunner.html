@@ -131,61 +131,38 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">BenchmarkRunner</span></div>
   </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Running.html">BenchmarkDotNet.Running</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Running_BenchmarkRunner_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static class BenchmarkRunner : object</code></pre>
+    <pre><code class="lang-csharp hljs">public static class BenchmarkRunner</code></pre>
   </div>
   <h3 id="methods">Methods
   </h3>
-  
-  
-  <a id="BenchmarkDotNet_Running_BenchmarkRunner_Run_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run*"></a>
-  <h4 id="BenchmarkDotNet_Running_BenchmarkRunner_Run_Assembly_BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run(Assembly,BenchmarkDotNet.Configs.IConfig)">Run(Assembly, IConfig)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Summary[] Run(Assembly assembly, IConfig config = null)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">Assembly</span></td>
-        <td><span class="parametername">assembly</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
-        <td><span class="parametername">config</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Reports.Summary.html">Summary</a>[]</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
   
   
   <a id="BenchmarkDotNet_Running_BenchmarkRunner_Run_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run*"></a>
@@ -273,7 +250,54 @@
   
   
   <a id="BenchmarkDotNet_Running_BenchmarkRunner_Run_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run*"></a>
-  <h4 id="BenchmarkDotNet_Running_BenchmarkRunner_Run_Type_BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run(Type,BenchmarkDotNet.Configs.IConfig)">Run(Type, IConfig)</h4>
+  <h4 id="BenchmarkDotNet_Running_BenchmarkRunner_Run_System_Reflection_Assembly_BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Reflection.Assembly,BenchmarkDotNet.Configs.IConfig)">Run(Assembly, IConfig)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Summary[] Run(Assembly assembly, IConfig config = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Reflection.Assembly</span></td>
+        <td><span class="parametername">assembly</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
+        <td><span class="parametername">config</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Reports.Summary.html">Summary</a>[]</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Running_BenchmarkRunner_Run_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run*"></a>
+  <h4 id="BenchmarkDotNet_Running_BenchmarkRunner_Run_System_Type_BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Type,BenchmarkDotNet.Configs.IConfig)">Run(Type, IConfig)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -291,7 +315,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">Type</span></td>
+        <td><span class="xref">System.Type</span></td>
         <td><span class="parametername">type</span></td>
         <td></td>
       </tr>
@@ -320,7 +344,7 @@
   
   
   <a id="BenchmarkDotNet_Running_BenchmarkRunner_Run_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run*"></a>
-  <h4 id="BenchmarkDotNet_Running_BenchmarkRunner_Run_Type_MethodInfo___BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run(Type,MethodInfo[],BenchmarkDotNet.Configs.IConfig)">Run(Type, MethodInfo[], IConfig)</h4>
+  <h4 id="BenchmarkDotNet_Running_BenchmarkRunner_Run_System_Type_System_Reflection_MethodInfo___BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Type,System.Reflection.MethodInfo[],BenchmarkDotNet.Configs.IConfig)">Run(Type, MethodInfo[], IConfig)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -338,12 +362,12 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">Type</span></td>
+        <td><span class="xref">System.Type</span></td>
         <td><span class="parametername">type</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">MethodInfo</span>[]</td>
+        <td><span class="xref">System.Reflection.MethodInfo</span>[]</td>
         <td><span class="parametername">methods</span></td>
         <td></td>
       </tr>

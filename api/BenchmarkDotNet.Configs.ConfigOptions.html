@@ -130,7 +130,8 @@
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Configs_ConfigOptions_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public enum ConfigOptions : int</code></pre>
+    <pre><code class="lang-csharp hljs">[Flags]
+public enum ConfigOptions</code></pre>
   </div>
   <h3 id="fields">Fields
   </h3>
@@ -150,6 +151,11 @@
       <tr>
         <td id="BenchmarkDotNet_Configs_ConfigOptions_DisableOptimizationsValidator">DisableOptimizationsValidator</td>
         <td><p>determines if &quot;mandatory&quot; optimizations validator should be entirely turned off</p>
+</td>
+      </tr>
+      <tr>
+        <td id="BenchmarkDotNet_Configs_ConfigOptions_DontOverwriteResults">DontOverwriteResults</td>
+        <td><p>determines if the exported result files should not be overwritten (be default they are overwritten)</p>
 </td>
       </tr>
       <tr>

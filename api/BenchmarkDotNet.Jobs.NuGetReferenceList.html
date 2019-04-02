@@ -132,11 +132,35 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">NuGetReferenceList</span></div>
   </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><span class="xref">System.Collections.Generic.IReadOnlyCollection</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.NuGetReference.html">NuGetReference</a>&gt;</div>
+    <div><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.NuGetReference.html">NuGetReference</a>&gt;</div>
+    <div><span class="xref">System.Collections.IEnumerable</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Jobs.html">BenchmarkDotNet.Jobs</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Jobs_NuGetReferenceList_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class NuGetReferenceList : IReadOnlyCollection&lt;NuGetReference&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public class NuGetReferenceList : IReadOnlyCollection&lt;NuGetReference&gt;, IEnumerable&lt;NuGetReference&gt;, IEnumerable</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -153,7 +177,7 @@
   
   
   <a id="BenchmarkDotNet_Jobs_NuGetReferenceList__ctor_" data-uid="BenchmarkDotNet.Jobs.NuGetReferenceList.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_NuGetReferenceList__ctor_IReadOnlyCollection_BenchmarkDotNet_Jobs_NuGetReference__" data-uid="BenchmarkDotNet.Jobs.NuGetReferenceList.#ctor(IReadOnlyCollection{BenchmarkDotNet.Jobs.NuGetReference})">NuGetReferenceList(IReadOnlyCollection&lt;NuGetReference&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Jobs_NuGetReferenceList__ctor_System_Collections_Generic_IReadOnlyCollection_BenchmarkDotNet_Jobs_NuGetReference__" data-uid="BenchmarkDotNet.Jobs.NuGetReferenceList.#ctor(System.Collections.Generic.IReadOnlyCollection{BenchmarkDotNet.Jobs.NuGetReference})">NuGetReferenceList(IReadOnlyCollection&lt;NuGetReference&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -171,7 +195,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IReadOnlyCollection</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.NuGetReference.html">NuGetReference</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IReadOnlyCollection</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.NuGetReference.html">NuGetReference</a>&gt;</td>
         <td><span class="parametername">readOnlyCollection</span></td>
         <td></td>
       </tr>
@@ -275,6 +299,8 @@
       </tr>
     </tbody>
   </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.Object.Equals(System.Object)</span></div>
   
   
   <a id="BenchmarkDotNet_Jobs_NuGetReferenceList_GetEnumerator_" data-uid="BenchmarkDotNet.Jobs.NuGetReferenceList.GetEnumerator*"></a>
@@ -295,7 +321,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerator</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.NuGetReference.html">NuGetReference</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerator</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.NuGetReference.html">NuGetReference</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -325,6 +351,52 @@
       </tr>
     </tbody>
   </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.Object.GetHashCode()</span></div>
+  <h3 id="eii">Explicit Interface Implementations
+  </h3>
+  
+  
+  <a id="BenchmarkDotNet_Jobs_NuGetReferenceList_System_Collections_IEnumerable_GetEnumerator_" data-uid="BenchmarkDotNet.Jobs.NuGetReferenceList.System#Collections#IEnumerable#GetEnumerator*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_NuGetReferenceList_System_Collections_IEnumerable_GetEnumerator" data-uid="BenchmarkDotNet.Jobs.NuGetReferenceList.System#Collections#IEnumerable#GetEnumerator">IEnumerable.GetEnumerator()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IEnumerator IEnumerable.GetEnumerator()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.IEnumerator</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <span class="xref">System.Collections.Generic.IReadOnlyCollection&lt;T&gt;</span>
+  </div>
+  <div>
+      <span class="xref">System.Collections.Generic.IEnumerable&lt;T&gt;</span>
+  </div>
+  <div>
+      <span class="xref">System.Collections.IEnumerable</span>
+  </div>
+  <h3 id="extensionmethods">Extension Methods</h3>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Engines.ConsumerExtensions.html#BenchmarkDotNet_Engines_ConsumerExtensions_Consume_System_Collections_IEnumerable_BenchmarkDotNet_Engines_Consumer_">ConsumerExtensions.Consume(IEnumerable, Consumer)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Engines.ConsumerExtensions.html#BenchmarkDotNet_Engines_ConsumerExtensions_Consume__1_System_Collections_Generic_IEnumerable___0__BenchmarkDotNet_Engines_Consumer_">ConsumerExtensions.Consume&lt;T&gt;(IEnumerable&lt;T&gt;, Consumer)</a>
+  </div>
 </article>
           </div>
           

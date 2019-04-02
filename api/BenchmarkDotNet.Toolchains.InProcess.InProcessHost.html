@@ -136,11 +136,35 @@
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Engines.IHost.html">IHost</a></div>
   </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.InProcess.html">BenchmarkDotNet.Toolchains.InProcess</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Toolchains_InProcess_InProcessHost_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class InProcessHost : object, IHost</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class InProcessHost : IHost</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -426,6 +450,22 @@
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="BenchmarkDotNet.Engines.IHost.html">IHost</a>
+  </div>
+  <h3 id="extensionmethods">Extension Methods</h3>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html#BenchmarkDotNet_Engines_HostExtensions_WriteLine_BenchmarkDotNet_Engines_IHost_System_String_System_Object___">HostExtensions.WriteLine(IHost, String, Object[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html#BenchmarkDotNet_Engines_HostExtensions_BeforeAnythingElse_BenchmarkDotNet_Engines_IHost_">HostExtensions.BeforeAnythingElse(IHost)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html#BenchmarkDotNet_Engines_HostExtensions_BeforeMainRun_BenchmarkDotNet_Engines_IHost_">HostExtensions.BeforeMainRun(IHost)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html#BenchmarkDotNet_Engines_HostExtensions_AfterMainRun_BenchmarkDotNet_Engines_IHost_">HostExtensions.AfterMainRun(IHost)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html#BenchmarkDotNet_Engines_HostExtensions_AfterAll_BenchmarkDotNet_Engines_IHost_">HostExtensions.AfterAll(IHost)</a>
   </div>
   <h3 id="seealso">See Also</h3>
   <div class="seealso">

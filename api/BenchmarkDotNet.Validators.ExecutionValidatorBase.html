@@ -137,11 +137,35 @@
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Validators.IValidator.html">IValidator</a></div>
   </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Validators.html">BenchmarkDotNet.Validators</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Validators_ExecutionValidatorBase_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class ExecutionValidatorBase : object, IValidator</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract class ExecutionValidatorBase : IValidator</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -204,7 +228,7 @@
   
   
   <a id="BenchmarkDotNet_Validators_ExecutionValidatorBase_ExecuteBenchmarks_" data-uid="BenchmarkDotNet.Validators.ExecutionValidatorBase.ExecuteBenchmarks*"></a>
-  <h4 id="BenchmarkDotNet_Validators_ExecutionValidatorBase_ExecuteBenchmarks_System_Object_IEnumerable_BenchmarkDotNet_Running_BenchmarkCase__List_BenchmarkDotNet_Validators_ValidationError__" data-uid="BenchmarkDotNet.Validators.ExecutionValidatorBase.ExecuteBenchmarks(System.Object,IEnumerable{BenchmarkDotNet.Running.BenchmarkCase},List{BenchmarkDotNet.Validators.ValidationError})">ExecuteBenchmarks(Object, IEnumerable&lt;BenchmarkCase&gt;, List&lt;ValidationError&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Validators_ExecutionValidatorBase_ExecuteBenchmarks_System_Object_System_Collections_Generic_IEnumerable_BenchmarkDotNet_Running_BenchmarkCase__System_Collections_Generic_List_BenchmarkDotNet_Validators_ValidationError__" data-uid="BenchmarkDotNet.Validators.ExecutionValidatorBase.ExecuteBenchmarks(System.Object,System.Collections.Generic.IEnumerable{BenchmarkDotNet.Running.BenchmarkCase},System.Collections.Generic.List{BenchmarkDotNet.Validators.ValidationError})">ExecuteBenchmarks(Object, IEnumerable&lt;BenchmarkCase&gt;, List&lt;ValidationError&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -227,12 +251,12 @@
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
         <td><span class="parametername">benchmarks</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">List</span>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</td>
         <td><span class="parametername">errors</span></td>
         <td></td>
       </tr>
@@ -241,7 +265,7 @@
   
   
   <a id="BenchmarkDotNet_Validators_ExecutionValidatorBase_GetDisplayExceptionMessage_" data-uid="BenchmarkDotNet.Validators.ExecutionValidatorBase.GetDisplayExceptionMessage*"></a>
-  <h4 id="BenchmarkDotNet_Validators_ExecutionValidatorBase_GetDisplayExceptionMessage_Exception_" data-uid="BenchmarkDotNet.Validators.ExecutionValidatorBase.GetDisplayExceptionMessage(Exception)">GetDisplayExceptionMessage(Exception)</h4>
+  <h4 id="BenchmarkDotNet_Validators_ExecutionValidatorBase_GetDisplayExceptionMessage_System_Exception_" data-uid="BenchmarkDotNet.Validators.ExecutionValidatorBase.GetDisplayExceptionMessage(System.Exception)">GetDisplayExceptionMessage(Exception)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -259,7 +283,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">Exception</span></td>
+        <td><span class="xref">System.Exception</span></td>
         <td><span class="parametername">ex</span></td>
         <td></td>
       </tr>
@@ -317,7 +341,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>

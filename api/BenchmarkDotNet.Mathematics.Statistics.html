@@ -131,18 +131,39 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">Statistics</span></div>
   </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Mathematics.html">BenchmarkDotNet.Mathematics</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Mathematics_Statistics_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class Statistics : object</code></pre>
+    <pre><code class="lang-csharp hljs">public class Statistics</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
   
   
   <a id="BenchmarkDotNet_Mathematics_Statistics__ctor_" data-uid="BenchmarkDotNet.Mathematics.Statistics.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Mathematics_Statistics__ctor_IEnumerable_System_Double__" data-uid="BenchmarkDotNet.Mathematics.Statistics.#ctor(IEnumerable{System.Double})">Statistics(IEnumerable&lt;Double&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Mathematics_Statistics__ctor_System_Collections_Generic_IEnumerable_System_Double__" data-uid="BenchmarkDotNet.Mathematics.Statistics.#ctor(System.Collections.Generic.IEnumerable{System.Double})">Statistics(IEnumerable&lt;Double&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -160,7 +181,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<span class="xref">System.Double</span>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<span class="xref">System.Double</span>&gt;</td>
         <td><span class="parametername">values</span></td>
         <td></td>
       </tr>
@@ -169,7 +190,7 @@
   
   
   <a id="BenchmarkDotNet_Mathematics_Statistics__ctor_" data-uid="BenchmarkDotNet.Mathematics.Statistics.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Mathematics_Statistics__ctor_IEnumerable_System_Int32__" data-uid="BenchmarkDotNet.Mathematics.Statistics.#ctor(IEnumerable{System.Int32})">Statistics(IEnumerable&lt;Int32&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Mathematics_Statistics__ctor_System_Collections_Generic_IEnumerable_System_Int32__" data-uid="BenchmarkDotNet.Mathematics.Statistics.#ctor(System.Collections.Generic.IEnumerable{System.Int32})">Statistics(IEnumerable&lt;Int32&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -187,7 +208,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IEnumerable</span>&lt;<span class="xref">System.Int32</span>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<span class="xref">System.Int32</span>&gt;</td>
         <td><span class="parametername">values</span></td>
         <td></td>
       </tr>
@@ -517,7 +538,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">IReadOnlyList</span>&lt;<span class="xref">System.Double</span>&gt;</td>
+        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<span class="xref">System.Double</span>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -1273,6 +1294,8 @@
       </tr>
     </tbody>
   </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.Object.ToString()</span></div>
   
   
   <a id="BenchmarkDotNet_Mathematics_Statistics_WithoutOutliers_" data-uid="BenchmarkDotNet.Mathematics.Statistics.WithoutOutliers*"></a>
@@ -1303,7 +1326,7 @@
       <a class="xref" href="BenchmarkDotNet.Extensions.StatisticsExtensions.html#BenchmarkDotNet_Extensions_StatisticsExtensions_ToStr_BenchmarkDotNet_Mathematics_Statistics_">StatisticsExtensions.ToStr(Statistics)</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Extensions.StatisticsExtensions.html#BenchmarkDotNet_Extensions_StatisticsExtensions_ToTimeStr_BenchmarkDotNet_Mathematics_Statistics_Encoding_BenchmarkDotNet_Horology_TimeUnit_System_Boolean_">StatisticsExtensions.ToTimeStr(Statistics, Encoding, TimeUnit, Boolean)</a>
+      <a class="xref" href="BenchmarkDotNet.Extensions.StatisticsExtensions.html#BenchmarkDotNet_Extensions_StatisticsExtensions_ToTimeStr_BenchmarkDotNet_Mathematics_Statistics_System_Text_Encoding_BenchmarkDotNet_Horology_TimeUnit_System_Boolean_">StatisticsExtensions.ToTimeStr(Statistics, Encoding, TimeUnit, Boolean)</a>
   </div>
   <div>
       <a class="xref" href="BenchmarkDotNet.Mathematics.Histograms.HistogramExtensions.html#BenchmarkDotNet_Mathematics_Histograms_HistogramExtensions_GetOptimalBinSize_BenchmarkDotNet_Mathematics_Statistics_System_Nullable_BenchmarkDotNet_Mathematics_Histograms_BinSizeRule__">HistogramExtensions.GetOptimalBinSize(Statistics, Nullable&lt;BinSizeRule&gt;)</a>

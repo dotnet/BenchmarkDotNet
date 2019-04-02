@@ -133,11 +133,35 @@ IMPORTANT: this type IS NOT thread safe.</p>
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">RunnableConstants</span></div>
   </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.html">BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Toolchains_InProcess_Emit_Implementation_RunnableConstants_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class RunnableConstants : object</code></pre>
+    <pre><code class="lang-csharp hljs">public class RunnableConstants</code></pre>
   </div>
   <h3 id="fields">Fields
   </h3>
@@ -148,7 +172,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string ArgFieldPrefix = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string ArgFieldPrefix = &quot;__argField&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -172,7 +196,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string ArgParamPrefix = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string ArgParamPrefix = &quot;arg&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -196,7 +220,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string ConsumerFieldName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string ConsumerFieldName = &quot;consumer&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -220,7 +244,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string Dummy1MethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string Dummy1MethodName = &quot;Dummy1&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -244,7 +268,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string Dummy2MethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string Dummy2MethodName = &quot;Dummy2&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -268,7 +292,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string Dummy3MethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string Dummy3MethodName = &quot;Dummy3&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -292,7 +316,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string DummyParamName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string DummyParamName = &quot;_&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -316,7 +340,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const int DummyUnrollFactor = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const int DummyUnrollFactor = 64</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -340,7 +364,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string DummyVarFieldName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string DummyVarFieldName = &quot;dummyVar&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -364,7 +388,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string DynamicAssemblySuffix = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string DynamicAssemblySuffix = &quot;Emitted&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -388,7 +412,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string EmittedTypePrefix = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string EmittedTypePrefix = &quot;BenchmarkDotNet.Autogenerated.Runnable_&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -412,7 +436,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string ForDisassemblyDiagnoserMethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string ForDisassemblyDiagnoserMethodName = &quot;__ForDisassemblyDiagnoser__&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -436,7 +460,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string GlobalCleanupActionFieldName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string GlobalCleanupActionFieldName = &quot;globalCleanupAction&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -460,7 +484,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string GlobalCleanupMethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string GlobalCleanupMethodName = &quot;GlobalCleanup&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -484,7 +508,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string GlobalSetupActionFieldName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string GlobalSetupActionFieldName = &quot;globalSetupAction&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -508,7 +532,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string GlobalSetupMethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string GlobalSetupMethodName = &quot;GlobalSetup&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -532,7 +556,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string InvokeCountParamName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string InvokeCountParamName = &quot;invokeCount&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -556,7 +580,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string IsByRefLikeAttributeTypeName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string IsByRefLikeAttributeTypeName = &quot;System.Runtime.CompilerServices.IsByRefLikeAttribute&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -580,7 +604,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string IterationCleanupActionFieldName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string IterationCleanupActionFieldName = &quot;iterationCleanupAction&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -604,7 +628,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string IterationCleanupMethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string IterationCleanupMethodName = &quot;IterationCleanup&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -628,7 +652,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string IterationSetupActionFieldName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string IterationSetupActionFieldName = &quot;iterationSetupAction&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -652,7 +676,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string IterationSetupMethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string IterationSetupMethodName = &quot;IterationSetup&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -676,7 +700,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string NonGenericKeepAliveWithoutBoxingMethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string NonGenericKeepAliveWithoutBoxingMethodName = &quot;NonGenericKeepAliveWithoutBoxing&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -700,7 +724,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string NotElevenFieldName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string NotElevenFieldName = &quot;NotEleven&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -724,7 +748,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string OpImplicitMethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string OpImplicitMethodName = &quot;op_Implicit&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -748,7 +772,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string OverheadActionNoUnrollMethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string OverheadActionNoUnrollMethodName = &quot;OverheadActionNoUnroll&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -772,7 +796,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string OverheadActionUnrollMethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string OverheadActionUnrollMethodName = &quot;OverheadActionUnroll&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -796,7 +820,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string OverheadDelegateFieldName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string OverheadDelegateFieldName = &quot;overheadDelegate&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -820,7 +844,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string OverheadDelegateTypeSuffix = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string OverheadDelegateTypeSuffix = &quot;OverheadDelegate&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -844,7 +868,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string OverheadImplementationMethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string OverheadImplementationMethodName = &quot;__Overhead&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -868,7 +892,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string RunMethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string RunMethodName = &quot;Run&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -892,7 +916,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string TrickTheJitCoreMethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string TrickTheJitCoreMethodName = &quot;__TrickTheJIT__&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -916,7 +940,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string WorkloadActionNoUnrollMethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string WorkloadActionNoUnrollMethodName = &quot;WorkloadActionNoUnroll&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -940,7 +964,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string WorkloadActionUnrollMethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string WorkloadActionUnrollMethodName = &quot;WorkloadActionUnroll&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -964,7 +988,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string WorkloadDefaultValueHolderFieldName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string WorkloadDefaultValueHolderFieldName = &quot;workloadDefaultValueHolder&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -988,7 +1012,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string WorkloadDelegateFieldName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string WorkloadDelegateFieldName = &quot;workloadDelegate&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1012,7 +1036,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string WorkloadDelegateTypeSuffix = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string WorkloadDelegateTypeSuffix = &quot;WorkloadDelegate&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1036,7 +1060,7 @@ IMPORTANT: this type IS NOT thread safe.</p>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public const string WorkloadImplementationMethodName = null</code></pre>
+    <pre><code class="lang-csharp hljs">public const string WorkloadImplementationMethodName = &quot;__Workload&quot;</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">

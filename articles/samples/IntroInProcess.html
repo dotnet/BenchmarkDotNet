@@ -120,10 +120,9 @@
             <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Samples.IntroInProcess">
 <h2 id="sample-introinprocess">Sample: IntroInProcess</h2>
 
-<p>InProcessToolchain is our toolchain which does not generate any new executable.
+<p>InProcessEmitToolchain is our toolchain which does not generate any new executable.
 It emits IL on the fly and runs it from within the process itself.
-It can be usefull if want to run the benchmarks very fast or
-if you want to run them for framework which we don't support.
+It can be usefull if want to run the benchmarks very fast or if you want to run them for framework which we don't support.
 An example could be a local build of CoreCLR.</p>
 <h3 id="usage">Usage</h3>
 <pre><code class="lang-cs">[InProcessAttribute]
@@ -137,7 +136,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -156,7 +155,7 @@ namespace BenchmarkDotNet.Samples
 
                 Add(Job.MediumRun
                     .WithLaunchCount(1)
-                    .With(InProcessToolchain.Instance)
+                    .With(InProcessEmitToolchain.Instance)
                     .WithId(&quot;InProcess&quot;));
             }
         }
