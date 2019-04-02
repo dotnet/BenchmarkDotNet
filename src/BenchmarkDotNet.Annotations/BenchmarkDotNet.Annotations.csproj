@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.Annotations</AssemblyTitle>
-    <TargetFramework>netstandard1.0</TargetFramework>
+    <TargetFrameworks>netstandard1.0;netstandard2.0</TargetFrameworks>
     <AssemblyName>BenchmarkDotNet.Annotations</AssemblyName>
     <PackageId>BenchmarkDotNet.Annotations</PackageId>
     <RootNamespace>BenchmarkDotNet</RootNamespace>
