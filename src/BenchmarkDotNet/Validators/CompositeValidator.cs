@@ -17,6 +17,6 @@ namespace BenchmarkDotNet.Validators
             => validators.Any(validator => validator.TreatsWarningsAsErrors);
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) 
-            => validators.SelectMany(validator => validator.Validate(validationParameters));
+            => validators.SelectMany(validator => validator.Validate(validationParameters)).Distinct();
     }
 }

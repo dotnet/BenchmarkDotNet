@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <PackageId>BenchmarkDotNetTool</PackageId>
+    <PackageId>BenchmarkDotNet.Tool</PackageId>
     <ToolCommandName>dotnet-benchmark</ToolCommandName>
 
     <IsPackable>true</IsPackable>
@@ -19,10 +19,6 @@
     <ProjectReference Include="..\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
 
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.CommandLine">
-      <HintPath>..\..\System.CommandLine.dll</HintPath>
-    </Reference>
+    <PackageReference Include="System.CommandLine.Experimental" Version="0.2.0-alpha.19174.3" />
   </ItemGroup>
 </Project>

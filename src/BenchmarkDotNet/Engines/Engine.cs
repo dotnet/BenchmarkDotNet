@@ -82,7 +82,21 @@ namespace BenchmarkDotNet.Engines
             actualStage = new EngineActualStage(this);
         }
 
-        public void Dispose() => GlobalCleanupAction?.Invoke();
+        public void Dispose()
+        {
+            try
+            {
+                GlobalCleanupAction?.Invoke();
+            }
+            catch (Exception e)
+            {
+                Host.SendError("Exception during GlobalCleanup!");
+                Host.SendError(e.Message);
+
+                // we don't rethrow because this code is executed in a finally block
+                // and it could possibly overwrite current exception #1045
+            }
+        }
 
         public RunResults Run()
         {

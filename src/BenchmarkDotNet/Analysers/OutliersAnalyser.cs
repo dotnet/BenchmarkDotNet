@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Analysers
             }
 
             if (allOutliers.Any())
-                yield return CreateHint(GetMessage(actualOutliers.Length, allOutliers.Length), report);
+                yield return CreateHint(GetMessage(actualOutliers, allOutliers, statistics.LowerOutliers, statistics.UpperOutliers), report);
         }
 
         /// <summary>
@@ -48,23 +48,47 @@ namespace BenchmarkDotNet.Analysers
         /// </summary>
         /// <param name="actualOutliers">Actual outliers which were removed from the statistics</param>
         /// <param name="allOutliers">All outliers which present in the distribution (lower and upper)</param>
+        /// <param name="lowerOutliers">All lower outliers</param>
+        /// <param name="upperOutliers">All upper outliers</param>
         /// <returns>The message</returns>
         [PublicAPI, NotNull, Pure]
-        public static string GetMessage(int actualOutliers, int allOutliers)
+        public static string GetMessage(double[] actualOutliers, double[] allOutliers, double[] lowerOutliers, double[] upperOutliers)
         {
+            if (allOutliers.Length == 0)
+                return string.Empty;
+
             string Format(int n, string verb)
             {
                 string words = n == 1 ? "outlier  was " : "outliers were";
                 return $"{n} {words} {verb}";
             }
 
-            if (allOutliers == 0)
-                return string.Empty;
-            if (actualOutliers == allOutliers)
-                return Format(actualOutliers, "removed");
-            if (actualOutliers == 0)
-                return Format(allOutliers, "detected");
-            return Format(actualOutliers, "removed") + ", " + Format(allOutliers, "detected");
+            var rangeMessages = new List<string> { GetRangeMessage(lowerOutliers), GetRangeMessage(upperOutliers) };
+            rangeMessages.RemoveAll(string.IsNullOrEmpty);
+            string rangeMessage = rangeMessages.Any()
+                ? " (" + string.Join(", ", rangeMessages) + ")"
+                : string.Empty;
+
+            if (actualOutliers.Length == allOutliers.Length)
+                return Format(actualOutliers.Length, "removed") + rangeMessage;
+            if (actualOutliers.Length == 0)
+                return Format(allOutliers.Length, "detected") + rangeMessage;
+            return Format(actualOutliers.Length, "removed") + ", " + Format(allOutliers.Length, "detected") + rangeMessage;
+        }
+
+        [CanBeNull]
+        private static string GetRangeMessage([NotNull] double[] values)
+        {
+            switch (values.Length) {
+                case 0:
+                    return null;
+                case 1:
+                    return values.First().ToTimeStr(format: "N2");
+                case 2:
+                    return values.Min().ToTimeStr(format: "N2") + ", " + values.Max().ToTimeStr(format: "N2");
+                default:
+                    return values.Min().ToTimeStr(format: "N2") + ".." + values.Max().ToTimeStr(format: "N2");
+            }
         }
     }
 }

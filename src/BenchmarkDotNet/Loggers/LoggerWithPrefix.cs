@@ -1,4 +1,6 @@
-﻿namespace BenchmarkDotNet.Loggers
+﻿using System;
+
+namespace BenchmarkDotNet.Loggers
 {
     /// <summary>
     /// Adds prefix for each line
@@ -17,26 +19,40 @@
 
         public void Write(LogKind logKind, string text)
         {
-            if (isNewLine)
+            var lines = text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            WriteSimple(logKind, lines[0]);
+            
+            for (int i = 1; i < lines.Length; i++)
+            {
+                WriteLine();
+                WriteSimple(logKind, lines[i]);
+            }
+        }
+
+        private void WriteSimple(LogKind logKind, string text)
+        {
+            AddPrefixIfNeeded(logKind, text);
+            Logger.Write(text);
+        }
+
+        private void AddPrefixIfNeeded(LogKind logKind, string text)
+        {
+            if (isNewLine && !string.IsNullOrEmpty(text))
             {
                 Logger.Write(logKind, Prefix);
                 isNewLine = false;
             }
+        }
 
-            Logger.Write(logKind, text);
+        public void WriteLine(LogKind logKind, string text)
+        {
+            Write(logKind, text);
+            WriteLine();
         }
 
         public void WriteLine()
         {
             Logger.WriteLine();
-
-            isNewLine = true;
-        }
-
-        public void WriteLine(LogKind logKind, string text)
-        {
-            Logger.Write(logKind, Prefix);
-            Logger.WriteLine(logKind, text);
 
             isNewLine = true;
         }

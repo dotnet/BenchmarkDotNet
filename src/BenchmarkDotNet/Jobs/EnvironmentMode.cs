@@ -14,6 +14,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<IntPtr> AffinityCharacteristic = CreateCharacteristic<IntPtr>(nameof(Affinity));
         public static readonly Characteristic<GcMode> GcCharacteristic = CreateCharacteristic<GcMode>(nameof(Gc));
         public static readonly Characteristic<IReadOnlyList<EnvironmentVariable>> EnvironmentVariablesCharacteristic = CreateCharacteristic<IReadOnlyList<EnvironmentVariable>>(nameof(EnvironmentVariables));
+        public static readonly Characteristic<PowerPlanMode> PowerPlanModeCharacteristic = CreateCharacteristic<PowerPlanMode>(nameof(PowerPlanMode));
 
         public static readonly EnvironmentMode Clr = new EnvironmentMode(Runtime.Clr).Freeze();
         public static readonly EnvironmentMode Core = new EnvironmentMode(Runtime.Core).Freeze();
@@ -42,6 +43,7 @@ namespace BenchmarkDotNet.Jobs
         [PublicAPI] public EnvironmentMode(string id) : base(id)
         {
             GcCharacteristic[this] = new GcMode();
+            PowerPlanModeCharacteristic[this] = new PowerPlanMode();
         }
 
         /// <summary>
@@ -92,5 +94,26 @@ namespace BenchmarkDotNet.Jobs
             set => EnvironmentVariablesCharacteristic[this] = value;
         }
 
+        /// <summary>
+        /// Adds the specified <paramref name="variable"/> to <see cref="EnvironmentVariables"/>.
+        /// If <see cref="EnvironmentVariables"/> already contains a variable with the same key,
+        /// it will be overriden.
+        /// </summary>
+        /// <param name="variable">The new environment variable which should be added to <see cref="EnvironmentVariables"/></param>
+        public void SetEnvironmentVariable(EnvironmentVariable variable)
+        {
+            var newVariables = new List<EnvironmentVariable>();
+            if (EnvironmentVariables != null)
+                newVariables.AddRange(EnvironmentVariables);
+            newVariables.RemoveAll(v => v.Key.Equals(variable.Key, StringComparison.Ordinal));
+            newVariables.Add(variable);
+            EnvironmentVariables = newVariables;
+        }
+
+        public PowerPlanMode PowerPlanMode
+        {
+            get => PowerPlanModeCharacteristic[this];
+            set => PowerPlanModeCharacteristic[this] = value;
+        }
     }
 }

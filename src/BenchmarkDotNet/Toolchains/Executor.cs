@@ -4,11 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -37,11 +37,10 @@ namespace BenchmarkDotNet.Toolchains
 
         private ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, string exePath, string workingDirectory, string args, IDiagnoser diagnoser, IResolver resolver)
         {
-            ConsoleExitHandler.Instance.Logger = logger;
-
             try
             {
                 using (var process = new Process { StartInfo = CreateStartInfo(benchmarkCase, exePath, args, workingDirectory, resolver) })
+                using (new ConsoleExitHandler(process, logger))
                 {
                     var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId);
 
@@ -52,9 +51,6 @@ namespace BenchmarkDotNet.Toolchains
             }
             finally
             {
-                ConsoleExitHandler.Instance.Process = null;
-                ConsoleExitHandler.Instance.Logger = null;
-
                 diagnoser?.Handle(HostSignal.AfterProcessExit, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId));
             }
         }
@@ -62,8 +58,6 @@ namespace BenchmarkDotNet.Toolchains
         private ExecuteResult Execute(Process process, BenchmarkCase benchmarkCase, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser, ILogger logger)
         {
             logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
-
-            ConsoleExitHandler.Instance.Process = process;
 
             process.Start();
 

@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public CoreRtTests(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
         [Fact]
-        public void CoreRtIsSupported()
+        public void LatestCoreRtVersionIsSupported()
         {
             if (!RuntimeInformation.Is64BitPlatform()) // CoreRT does not support 32bit yet
                 return;
@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .With(Job.Dry
                     .With(Runtime.CoreRT)
                     .With(CoreRtToolchain.CreateBuilder()
-                        .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-26414-01") // we test against specific version to keep this test stable
+                        .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-*") // we test against latest version to make sure we support latest version and avoid issues like #1055
                         .ToToolchain()));
 
             CanExecute<CoreRtBenchmark>(config);

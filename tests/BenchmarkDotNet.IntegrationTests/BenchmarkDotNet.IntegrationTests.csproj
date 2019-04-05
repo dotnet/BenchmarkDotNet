@@ -30,6 +30,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.1" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
@@ -50,6 +51,65 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="InProcess.EmitTests.T4\RunnableClassCaseBenchmark.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>RunnableClassCaseBenchmark.tt</DependentUpon>
+    </Compile>
+    <Compile Update="InProcess.EmitTests.T4\RunnableManyArgsCaseBenchmark.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>RunnableManyArgsCaseBenchmark.tt</DependentUpon>
+    </Compile>
+    <Compile Update="InProcess.EmitTests.T4\RunnableRefStructCaseBenchmark.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>RunnableRefStructCaseBenchmark.tt</DependentUpon>
+    </Compile>
+    <Compile Update="InProcess.EmitTests.T4\RunnableStructCaseBenchmark.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>RunnableStructCaseBenchmark.tt</DependentUpon>
+    </Compile>
+    <Compile Update="InProcess.EmitTests.T4\RunnableTaskCaseBenchmark.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>RunnableTaskCaseBenchmark.tt</DependentUpon>
+    </Compile>
+    <Compile Update="InProcess.EmitTests.T4\RunnableVoidCaseBenchmark.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>RunnableVoidCaseBenchmark.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="InProcess.EmitTests.T4\RunnableClassCaseBenchmark.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>RunnableClassCaseBenchmark.cs</LastGenOutput>
+    </None>
+    <None Update="InProcess.EmitTests.T4\RunnableManyArgsCaseBenchmark.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>RunnableManyArgsCaseBenchmark.cs</LastGenOutput>
+    </None>
+    <None Update="InProcess.EmitTests.T4\RunnableRefStructCaseBenchmark.tt">
+      <LastGenOutput>RunnableRefStructCaseBenchmark.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="InProcess.EmitTests.T4\RunnableStructCaseBenchmark.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>RunnableStructCaseBenchmark.cs</LastGenOutput>
+    </None>
+    <None Update="InProcess.EmitTests.T4\RunnableTaskCaseBenchmark.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>RunnableTaskCaseBenchmark.cs</LastGenOutput>
+    </None>
+    <None Update="InProcess.EmitTests.T4\RunnableVoidCaseBenchmark.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>RunnableVoidCaseBenchmark.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 </Project>

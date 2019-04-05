@@ -22,17 +22,18 @@ namespace BenchmarkDotNet.Toolchains.Mono
                 return result;
 
             var exePath = generateResult.ArtifactsPaths.ExecutablePath;
-            var monoRuntime = buildPartition.Runtime as MonoRuntime;
+            var monoRuntime = (MonoRuntime)buildPartition.Runtime;
             var environmentVariables = string.IsNullOrEmpty(monoRuntime.MonoBclPath)
                 ? null
-                : new Dictionary<string, string>() { { "MONO_PATH", monoRuntime.MonoBclPath } };
+                : new Dictionary<string, string> { { "MONO_PATH", monoRuntime.MonoBclPath } };
 
-            (int exitCode, IReadOnlyList<string> output) = ProcessHelper.RunAndReadOutputLineByLine(
+            var (exitCode, output) = ProcessHelper.RunAndReadOutputLineByLine(
                 fileName: monoRuntime.CustomPath ?? "mono",
                 arguments: $"{monoRuntime.AotArgs} \"{Path.GetFullPath(exePath)}\"",
                 workingDirectory: Path.GetDirectoryName(exePath),
                 environmentVariables: environmentVariables,
-                includeErrors: true);
+                includeErrors: true,
+                logger: logger);
 
             return exitCode != 0
                 ? BuildResult.Failure(generateResult, $"Attempt to AOT failed: with exit code: {exitCode}, output: {string.Join(Environment.NewLine, output)}")

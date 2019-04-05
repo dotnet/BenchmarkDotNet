@@ -4,6 +4,7 @@ using BenchmarkDotNet.Diagnosers;
 
 namespace BenchmarkDotNet.Attributes
 {
+    [AttributeUsage(AttributeTargets.Class)]
     public class MemoryDiagnoserAttribute : Attribute, IConfigSource
     {
         public IConfig Config { get; }

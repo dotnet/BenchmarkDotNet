@@ -63,6 +63,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <value>The executor.</value>
         public IExecutor Executor { get; }
 
+        public bool IsInProcess => true;
+
         /// <summary>Returns a <see cref="String" /> that represents this instance.</summary>
         /// <returns>A <see cref="String" /> that represents this instance.</returns>
         public override string ToString() => GetType().Name;

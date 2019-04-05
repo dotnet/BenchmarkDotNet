@@ -3,6 +3,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.Mocks;
 using Xunit;
@@ -62,6 +63,17 @@ namespace BenchmarkDotNet.Tests.Reports
             var table = new SummaryTable(summary);
 
             Assert.Equal(SummaryTable.SummaryTableColumn.TextJustification.Left, table.Columns.First(c => c.Header == "Param").Justify);
+        }
+
+        [Fact] // Issue #1070
+        public void CustomOrdererIsSupported()
+        {
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            config.Orderer = new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Alphabetical);
+            var summary = MockFactory.CreateSummary(config);
+            Assert.True(summary.Orderer is DefaultOrderer defaultOrderer && 
+                        defaultOrderer.SummaryOrderPolicy == SummaryOrderPolicy.FastestToSlowest &&
+                        defaultOrderer.MethodOrderPolicy == MethodOrderPolicy.Alphabetical);
         }
     }
 }

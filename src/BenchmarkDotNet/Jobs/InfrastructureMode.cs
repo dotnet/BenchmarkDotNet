@@ -4,7 +4,7 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -20,8 +20,8 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<IReadOnlyList<Argument>> ArgumentsCharacteristic = CreateCharacteristic<IReadOnlyList<Argument>>(nameof(Arguments));
         public static readonly Characteristic<IReadOnlyCollection<NuGetReference>> NuGetReferencesCharacteristic = CreateCharacteristic<IReadOnlyCollection<NuGetReference>>(nameof(NuGetReferences));
 
-        public static readonly InfrastructureMode InProcess = new InfrastructureMode(InProcessToolchain.Instance);
-        public static readonly InfrastructureMode InProcessDontLogOutput = new InfrastructureMode(InProcessToolchain.DontLogOutput);
+        public static readonly InfrastructureMode InProcess = new InfrastructureMode(InProcessEmitToolchain.Instance);
+        public static readonly InfrastructureMode InProcessDontLogOutput = new InfrastructureMode(InProcessEmitToolchain.DontLogOutput);
 
         public InfrastructureMode() { }
 
