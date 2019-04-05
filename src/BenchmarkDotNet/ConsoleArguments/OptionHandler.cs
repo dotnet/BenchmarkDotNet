@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Mathematics;
 
 namespace BenchmarkDotNet.ConsoleArguments
@@ -29,6 +30,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             string[] attribute,
             bool join,
             bool keepFiles,
+            bool noOverwrite,
             string[] counters,
             FileInfo cli,
             DirectoryInfo packages,
@@ -47,6 +49,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             int? maxIterationCount,
             int? invocationCount,
             int? unrollFactor,
+            RunStrategy? strategy,
             bool runOncePerIteration,
             bool info,
             ListBenchmarkCaseMode list,
@@ -76,6 +79,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 AttributeNames = attribute ?? new string[] { },
                 Join = join,
                 KeepBenchmarkFiles = keepFiles,
+                DontOverwriteResults = noOverwrite,
                 HardwareCounters = counters ?? new string[] { },
                 CliPath = cli,
                 RestorePath = packages,
@@ -94,6 +98,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 MaxIterationCount = maxIterationCount,
                 InvocationCount = invocationCount,
                 UnrollFactor = unrollFactor,
+                RunStrategy = strategy,
                 RunOncePerIteration = runOncePerIteration,
                 PrintInformation = info,
                 ListBenchmarkCaseMode = list,

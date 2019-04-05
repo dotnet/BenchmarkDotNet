@@ -8,13 +8,15 @@ using BenchmarkDotNet.Mathematics;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
+    using BenchmarkDotNet.Engines;
+
     internal static class CommandLineParser
     {
         internal static int Parser(OptionHandler optionHandler, string[] args, ILogger logger, string description = null, Argument argument = null) 
         {
             var parser = new CommandLineBuilder(Root(optionHandler, description, argument))
                 // parser
-                .AddVersionOption()
+                .UseVersionOption()
 
                 // middleware
                 .UseHelp()
@@ -26,7 +28,15 @@ namespace BenchmarkDotNet.ConsoleArguments
                 .UseParseErrorReporting()
                 .UseExceptionHandler()
                 .CancelOnProcessTermination()
-
+                .UseMiddleware(
+                    async (context, next) =>
+                        {
+                            context.BindingContext
+                                .AddService(
+                                    optionHandler.GetType(),
+                                    () => optionHandler);
+                            await next(context);
+                        })
                 .Build();
 
             return parser.InvokeAsync(args, new CommandLineConsole(logger)).Result;
@@ -38,7 +48,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             root.Description = description;
             AddAllOptions(root);
 
-            root.Handler = new MethodBinder(optionHandler.GetType().GetMethod("Init"), () => optionHandler);
+            root.Handler = CommandHandler.Create(optionHandler.GetType().GetMethod("Init"));
 
             return root;
         }
@@ -62,6 +72,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             command.AddOption(Attribute());
             command.AddOption(Join());
             command.AddOption(KeepFiles());
+            command.AddOption(NoOverwrite());
             command.AddOption(Counters());
             command.AddOption(Cli());
             command.AddOption(Packages());
@@ -80,6 +91,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             command.AddOption(MaxIterationCount());
             command.AddOption(InvocationCount());
             command.AddOption(UnrollFactor());
+            command.AddOption(RunStrategy());
             command.AddOption(RunOncePerIteration());
             command.AddOption(Info());
             command.AddOption(List());
@@ -156,6 +168,10 @@ namespace BenchmarkDotNet.ConsoleArguments
                 "Determines if all auto-generated files should be kept or removed after running the benchmarks.",
                 new Argument<bool>(false) { Arity = ArgumentArity.ZeroOrOne });
 
+            Option NoOverwrite() => new Option("--noOverwrite",
+                "Determines if all auto-generated files should be kept or removed after running the benchmarks.",
+                new Argument<bool>(false) { Arity = ArgumentArity.ZeroOrOne });
+
             Option Counters() => new Option(new[] { "--counters" }, // TODO Separator = '+'
                 "Hardware Counters",
                 new Argument<string[]> { Arity = ArgumentArity.ZeroOrMore });
@@ -228,6 +244,10 @@ namespace BenchmarkDotNet.ConsoleArguments
             Option UnrollFactor() => new Option("--unrollFactor",
                 "How many times the benchmark method will be invoked per one iteration of a generated loop. 16 by default",
                 new Argument<int?> { Arity = ArgumentArity.ZeroOrOne });
+
+            Option RunStrategy() => new Option("--strategy",
+                "The RunStrategy that should be used. Throughput/ColdStart/Monitoring.",
+                new Argument<RunStrategy?> { Arity = ArgumentArity.ZeroOrOne });
 
             Option RunOncePerIteration() => new Option("--runOncePerIteration",
                 "Run the benchmark exactly once per iteration.",

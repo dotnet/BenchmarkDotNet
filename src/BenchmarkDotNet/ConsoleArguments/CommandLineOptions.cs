@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Mathematics;
 
 namespace BenchmarkDotNet.ConsoleArguments
@@ -45,6 +46,8 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         public bool KeepBenchmarkFiles { get; set; }
 
+        public bool DontOverwriteResults { get; set; }
+
         public IEnumerable<string> HardwareCounters { get; set; }
 
         public FileInfo CliPath { get; set; }
@@ -80,6 +83,8 @@ namespace BenchmarkDotNet.ConsoleArguments
         public int? InvocationCount { get; set; }
 
         public int? UnrollFactor { get; set; }
+
+        public RunStrategy? RunStrategy { get; set; }
 
         public bool RunOncePerIteration { get; set; }
 

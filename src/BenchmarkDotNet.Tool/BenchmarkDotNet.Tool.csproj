@@ -20,5 +20,6 @@
 
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
     <PackageReference Include="System.CommandLine.Experimental" Version="0.2.0-alpha.19174.3" />
+    <PackageReference Include="System.CommandLine.Rendering" Version="0.2.0-alpha.19174.3" />
   </ItemGroup>
 </Project>
