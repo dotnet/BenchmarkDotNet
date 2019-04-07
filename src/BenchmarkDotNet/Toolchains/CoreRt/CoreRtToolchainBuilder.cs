@@ -25,9 +25,9 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         /// Based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld/README.md#add-corert-to-your-project
         /// </summary>
         /// <param name="microsoftDotNetILCompilerVersion">the version of Microsoft.DotNet.ILCompiler which should be used. The default is: "1.0.0-alpha-*"</param>
-        /// <param name="nuGetFeedUrl">url to NuGet CoreRT feed, The default is: "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"</param>
+        /// <param name="nuGetFeedUrl">url to NuGet CoreRT feed, The default is: "https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json"</param>
         [PublicAPI]
-        public CoreRtToolchainBuilder UseCoreRtNuGet(string microsoftDotNetILCompilerVersion = "1.0.0-alpha-*", string nuGetFeedUrl = "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json")
+        public CoreRtToolchainBuilder UseCoreRtNuGet(string microsoftDotNetILCompilerVersion = "1.0.0-alpha-*", string nuGetFeedUrl = "https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json")
         {
             coreRtVersion = microsoftDotNetILCompilerVersion ?? throw new ArgumentNullException(nameof(microsoftDotNetILCompilerVersion));
 
