@@ -14,6 +14,22 @@ using Microsoft.Diagnostics.Tracing.Session;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
+    internal class HeapSession : Session
+    {
+        public HeapSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime) 
+            : base(FullNameProvider.GetBenchmarkName(details.BenchmarkCase) + "Heap", details, config, creationTime)
+        {
+            
+        }
+
+        protected override string FileExtension => ".userheap.etl";
+        internal override Session EnableProviders()
+        {
+            var osHeapExe = Path.ChangeExtension(Details.Process.StartInfo.FileName, ".exe");
+            TraceEventSession.EnableWindowsHeapProvider(osHeapExe);
+            return this;
+        }
+    }
     internal class UserSession : Session
     {
         public UserSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
@@ -56,7 +72,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             try
             {
-                TraceEventSession.EnableKernelProvider(keywords, KernelTraceEventParser.Keywords.Profile);
+                TraceEventSession.EnableKernelProvider(keywords, keywords); //TODO ? In this way it is created in PerfView
             }
             catch (Win32Exception)
             {
@@ -112,7 +128,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         internal string MergeFiles(Session other) 
         {
-            //  `other` is not used here because MergeInPlace expects .etl and .kernel.etl files in this folder
+            //  `other` is not used here because MergeInPlace expects .etl and .kernel.etl and user*.etl files in this folder
             // it searches for them and merges into a single file
             TraceEventSession.MergeInPlace(FilePath, TextWriter.Null);
 

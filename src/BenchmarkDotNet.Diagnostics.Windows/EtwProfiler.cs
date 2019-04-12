@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
@@ -26,7 +25,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private readonly Dictionary<BenchmarkCase, string> benchmarkToEtlFile;
         private readonly Dictionary<BenchmarkCase, PreciseMachineCounter[]> benchmarkToCounters;
 
-        private Session kernelSession, userSession;
+        private Session kernelSession, userSession, heapSession;
 
         [PublicAPI] // parameterless ctor required by DiagnosersLoader to support creating this profiler via console line args
         public EtwProfiler() : this(new EtwProfilerConfig(performExtraBenchmarksRun: false)) { }
@@ -90,7 +89,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             logger.WriteLineInfo(benchmarkToEtlFile.Values.First());
         }
 
-        private void Start(DiagnoserActionParameters parameters)
+        public void Start(DiagnoserActionParameters parameters)
         {
             var counters = benchmarkToCounters[parameters.BenchmarkCase] = parameters.Config
                 .GetHardwareCounters()
@@ -102,32 +101,44 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             try
             {
+                if (parameters.Process?.StartInfo.FileName != null)
+                {
+                    foreach (var provider in config.Providers)
+                    {
+                        provider.options.ProcessNameFilter = new List<string>() { parameters.Process?.StartInfo.FileName };
+                    }
+                }
+
                 userSession = new UserSession(parameters, config, CreationTime).EnableProviders();
+                heapSession = new HeapSession(parameters, config, CreationTime).EnableProviders();
                 kernelSession = new KernelSession(parameters, config, CreationTime).EnableProviders();
             }
             catch (Exception)
             {
                 userSession?.Dispose();
+                heapSession?.Dispose();
                 kernelSession?.Dispose();
                 
                 throw;
             }
         }
 
-        private void Stop(DiagnoserActionParameters parameters)
+        public void Stop(DiagnoserActionParameters parameters)
         {
             WaitForDelayedEvents();
 
             try
             {
                 kernelSession.Stop();
+                heapSession.Stop();
                 userSession.Stop();
-
+                
                 benchmarkToEtlFile[parameters.BenchmarkCase] = userSession.MergeFiles(kernelSession);
             }
             finally
             {
                 kernelSession.Dispose();
+                heapSession.Dispose();
                 userSession.Dispose();
             }
         }
