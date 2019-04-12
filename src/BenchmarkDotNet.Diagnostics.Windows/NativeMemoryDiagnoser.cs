@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Diagnostics.Windows.PerfView;
@@ -15,11 +14,9 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using Microsoft.Diagnostics.Symbols;
-using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Etlx;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
-using Microsoft.Diagnostics.Tracing.Session;
 using Address = System.UInt64;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
@@ -58,7 +55,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public string Type { get; set; }
             public long Size { get; set; }
         }
-        private (long totalMemory, long memoryLeak) CreateCvTraceFile(BenchmarkCase parameters)
+
+        //Code is inspired by https://github.com/Microsoft/perfview/blob/master/src/PerfView/PerfViewData.cs#L5719-L5944
+        private (long totalMemory, long memoryLeak) ParseEtlFile(BenchmarkCase parameters)
         {
             (long totalMemory, long memoryLeak) result = (0, 0);
 
@@ -77,7 +76,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
                 var start = false;
                 var isFirstActualStartEnd = false;
-                StringBuilder bud = new StringBuilder();
 
                 long totalOperation = 0;
 
@@ -88,12 +86,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                         start = true;
                     }
 
-                    bud.AppendLine($"WorkloadActualStart {data.ProcessID}, {data.TimeStampRelativeMSec}, {IterationMode.Workload}, {data.TotalOperations}");
                     totalOperation = data.TotalOperations;
                 };
                 bdnEventsParser.WorkloadActualStop += data =>
                 {
-                    bud.AppendLine($"WorkloadActualStop {data.ProcessID}, {data.TimeStampRelativeMSec}, {IterationMode.Workload}, {data.TotalOperations}");
                     start = false;
                     isFirstActualStartEnd = true;
                 };
@@ -120,7 +116,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     {
                         return;
                     }
-                    bud.AppendLine($"WorkloadActualStop {data.ProcessID}, {data.TimeStampRelativeMSec}, {IterationMode.Workload}, {data.AllocSize}");
 
                     var allocs = lastHeapAllocs;
                     if (data.HeapHandle != lastHeapHandle)
@@ -130,11 +125,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
                     // Add the 'Type ALLOCATION_TYPE' if available.  
                     string allocationType = GetAllocationType(callStackIndex);
-                    if (allocationType != null)
-                    {
-                        bud.AppendLine($"allocationType={allocationType}");
-                    }
-
+                    
                     allocs[data.AllocAddress] = new NativeAllocation() { Size = data.AllocSize, Type = allocationType };
 
                     cumMetric += data.AllocSize;
@@ -186,7 +177,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     {
                         return;
                     }
-                    bud.AppendLine($"HeapTraceFree {data.ProcessID}, {data.TimeStampRelativeMSec}, {data.FreeAddress}");
                     var allocs = lastHeapAllocs;
                     if (data.HeapHandle != lastHeapHandle)
                     {
@@ -214,7 +204,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     {
                         return;
                     }
-                    bud.AppendLine($"HeapTraceReAlloc {data.ProcessID}, {data.TimeStampRelativeMSec}, {data.OldAllocAddress}");
 
                     var allocs = lastHeapAllocs;
                     if (data.HeapHandle != lastHeapHandle)
@@ -242,7 +231,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     {
                         return;
                     }
-                    bud.AppendLine($"HeapTraceDestroy {data.ProcessID}, {data.TimeStampRelativeMSec}");
 
                     // Heap is dieing, kill all objects in it.   
                     var allocs = lastHeapAllocs;
@@ -301,7 +289,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (!etwProfiler.BenchmarkToEtlFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
                 yield break;
 
-            var result = CreateCvTraceFile(results.BenchmarkCase);
+            var result = ParseEtlFile(results.BenchmarkCase);
 
             yield return new Metric(new NativeMemoryDescriptor(), result.totalMemory);
             yield return new Metric(new NativeMemoryLeakDescriptor(), result.memoryLeak);
