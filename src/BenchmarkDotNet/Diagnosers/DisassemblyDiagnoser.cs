@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -11,6 +12,7 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnosers
@@ -62,7 +64,8 @@ namespace BenchmarkDotNet.Diagnosers
         {
             var benchmark = parameters.BenchmarkCase;
 
-            switch (signal) {
+            switch (signal)
+            {
                 case HostSignal.AfterAll when ShouldUseWindowsDisassembler(benchmark):
                     results.Add(benchmark, windowsDisassembler.Disassemble(parameters));
                     break;
@@ -86,7 +89,10 @@ namespace BenchmarkDotNet.Diagnosers
                     yield return new ValidationError(false, "No Disassembler support, only Mono is supported for non-Windows OS", benchmark);
 
                 if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic)
-                    && benchmark.Job.Infrastructure.Toolchain is InProcessToolchain)
+#pragma warning disable 618
+                    && (benchmark.Job.Infrastructure.Toolchain is InProcessToolchain
+#pragma warning restore 618
+                        || benchmark.Job.Infrastructure.Toolchain is InProcessNoEmitToolchain))
                 {
                     yield return new ValidationError(true, "InProcessToolchain has no DisassemblyDiagnoser support", benchmark);
                 }

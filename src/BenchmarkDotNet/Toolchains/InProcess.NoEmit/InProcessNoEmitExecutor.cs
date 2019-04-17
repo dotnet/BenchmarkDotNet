@@ -14,41 +14,37 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 
-namespace BenchmarkDotNet.Toolchains.InProcess
+using JetBrains.Annotations;
+
+namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /// <summary>
-    /// Implementation of <see cref="IExecutor" /> for in-process benchmarks.
+    /// Implementation of <see cref="IExecutor" /> for in-process (no emit) toolchain.
     /// </summary>
+    [PublicAPI]
     [SuppressMessage("ReSharper", "ArrangeBraces_using")]
-    [Obsolete("Please use BenchmarkDotNet.Toolchains.InProcess.NoEmit.* classes")]
-    public class InProcessExecutor : IExecutor
+    public class InProcessNoEmitExecutor : IExecutor
     {
         private static readonly TimeSpan UnderDebuggerTimeout = TimeSpan.FromDays(1);
 
         /// <summary> Default timeout for in-process benchmarks. </summary>
         public static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(5);
 
-        /// <summary>Initializes a new instance of the <see cref="InProcessExecutor" /> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="InProcessNoEmitExecutor" /> class.</summary>
         /// <param name="timeout">Timeout for the run.</param>
-        /// <param name="codegenMode">Describes how benchmark action code is generated.</param>
         /// <param name="logOutput"><c>true</c> if the output should be logged.</param>
-        public InProcessExecutor(TimeSpan timeout, BenchmarkActionCodegen codegenMode, bool logOutput)
+        public InProcessNoEmitExecutor(TimeSpan timeout, bool logOutput)
         {
             if (timeout == TimeSpan.Zero)
                 timeout = DefaultTimeout;
 
             ExecutionTimeout = timeout;
-            CodegenMode = codegenMode;
             LogOutput = logOutput;
         }
 
         /// <summary>Timeout for the run.</summary>
         /// <value>The timeout for the run.</value>
         public TimeSpan ExecutionTimeout { get; }
-
-        /// <summary>Describes how benchmark action code is generated.</summary>
-        /// <value>Benchmark action code generation mode.</value>
-        public BenchmarkActionCodegen CodegenMode { get; }
 
         /// <summary>Gets a value indicating whether the output should be logged.</summary>
         /// <value><c>true</c> if the output should be logged; otherwise, <c>false</c>.</value>
@@ -103,7 +99,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     process.TrySetAffinity(affinity.Value, parameters.Logger);
                 }
 
-                exitCode = InProcessRunner.Run(host, parameters.BenchmarkCase, CodegenMode);
+                exitCode = InProcessNoEmitRunner.Run(host, parameters.BenchmarkCase);
             }
             catch (Exception ex)
             {
