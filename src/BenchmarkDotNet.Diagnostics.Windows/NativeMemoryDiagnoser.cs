@@ -273,7 +273,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     Logger.WriteLine($"Not deallocated objects types:");
                     foreach (var type in groups)
                     {
-                        Logger.WriteLine($"{type.Type} = {type.Size / totalOperation:n3}");
+                        Logger.WriteLine($"{type.Type ?? "unknown types"} = {type.Size / totalOperation:n3}");
                     }
 
                 }
