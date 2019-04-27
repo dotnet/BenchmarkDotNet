@@ -14,6 +14,9 @@ namespace BenchmarkDotNet.Samples
             {
                 Add(Job.MediumRun.WithPowerPlan(PowerPlan.HighPerformance));
                 Add(Job.MediumRun.WithPowerPlan(PowerPlan.UserPowerPlan));
+                Add(Job.MediumRun.WithPowerPlan(PowerPlan.Balanced));
+                Add(Job.MediumRun.WithPowerPlan(PowerPlan.PowerSaver));
+                Add(Job.MediumRun.WithPowerPlan("a1841308-3541-4fab-bc81-f71556f20b4a"));
             }
         }
 

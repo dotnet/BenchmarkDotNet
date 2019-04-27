@@ -4,5 +4,7 @@
     {
         HighPerformance,
         UserPowerPlan,
+        PowerSaver,
+        Balanced
     }
 }

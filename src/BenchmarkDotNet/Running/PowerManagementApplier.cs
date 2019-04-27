@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 
@@ -16,7 +17,9 @@ namespace BenchmarkDotNet.Running
         private static readonly Dictionary<PowerPlan, string> powerPlansDict = new Dictionary<PowerPlan, string>()
         {
             { PowerPlan.UserPowerPlan, null },
-            { PowerPlan.HighPerformance, "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c" }
+            { PowerPlan.HighPerformance, "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c" },
+            { PowerPlan.PowerSaver, "a1841308-3541-4fab-bc81-f71556f20b4a" },
+            { PowerPlan.Balanced, "381b4222-f694-41f0-9685-ff5bb260df2e" },
         };
 
         internal PowerManagementApplier(ILogger logger)
@@ -24,9 +27,9 @@ namespace BenchmarkDotNet.Running
             this.logger = logger;
         }
 
-        internal void ApplyPerformancePlan(PowerPlan powerPlan)
+        internal void ApplyPerformancePlan(PowerPlanMode powerPlanMode)
         {
-            var guid = powerPlansDict[powerPlan];
+            var guid = powerPlanMode.PowerPlanGuid ?? powerPlansDict[powerPlanMode.PowerPlan];
             ApplyPerformancePlan(guid);
         }
 

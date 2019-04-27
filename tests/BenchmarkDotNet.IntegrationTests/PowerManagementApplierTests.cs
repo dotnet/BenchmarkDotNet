@@ -25,7 +25,10 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var powerManagementApplier = new PowerManagementApplier(logger);
             var config = DefaultConfig.Instance.With(logger);
-            powerManagementApplier.ApplyPerformancePlan(PowerPlan.HighPerformance);
+            powerManagementApplier.ApplyPerformancePlan(new Jobs.PowerPlanMode()
+            {
+                PowerPlan = PowerPlan.HighPerformance
+            });
             Assert.Equal(HighPerformancePlanGuid, PowerManagementHelper.CurrentPlan.ToString());
             Assert.Equal("High performance", PowerManagementHelper.CurrentPlanFriendlyName);
             powerManagementApplier.ApplyUserPowerPlan();
@@ -39,7 +42,10 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var powerManagementApplier = new PowerManagementApplier(logger);
             var config = DefaultConfig.Instance.With(logger);
-            powerManagementApplier.ApplyPerformancePlan(PowerPlan.UserPowerPlan);
+            powerManagementApplier.ApplyPerformancePlan(new Jobs.PowerPlanMode()
+            {
+                PowerPlan = PowerPlan.UserPowerPlan
+            });
             Assert.Equal(userPlan.ToString(), PowerManagementHelper.CurrentPlan.ToString());
             powerManagementApplier.ApplyUserPowerPlan();
             Assert.Equal(userPlan, PowerManagementHelper.CurrentPlan);
