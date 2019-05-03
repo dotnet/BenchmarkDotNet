@@ -65,6 +65,23 @@
       "_appLogoPath" : "logo/icon.svg",
       "_appFaviconPath": "logo/icon-32.png",
       "_enableSearch": "true"
+    },
+    "sitemap":
+    {
+      "baseUrl": "https://benchmarkdotnet.org/",
+      "priority": 0.8,
+      "changefreq": "monthly",
+      "fileOptions":{
+          "**/articles/**": {
+              "priority": 0.8
+          },
+          "**/changelog/**": {
+              "priority": 0.5
+          },
+          "**/api/**": {
+              "priority": 0.3
+          }
+      }
     }
   }
 }
