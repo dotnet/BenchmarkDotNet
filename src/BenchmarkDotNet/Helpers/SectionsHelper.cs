@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Helpers
         public static List<Dictionary<string, string>> ParseSections([CanBeNull] string content, char separator)
         {
             return
-                Regex.Split(content ?? "", "(\r?\n){2,}")
+                Regex.Split(content ?? "", "(\r*\n){2,}")
                     .Select(s => ParseSection(s, separator))
                     .Where(s => s.Count > 0)
                     .ToList();
