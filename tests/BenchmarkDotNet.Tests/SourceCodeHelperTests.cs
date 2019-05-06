@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using BenchmarkDotNet.Helpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -30,6 +31,13 @@ namespace BenchmarkDotNet.Tests
             output.WriteLine("ACTUAL    : " + actual);
             output.WriteLine("EXPECTED  : " + expected);
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void SupportsGuid()
+        {
+            const string guidAsString = "e9a42b02-d5df-448d-aa00-03f14749eb61";
+            Assert.Equal($"System.Guid.Parse(\"{guidAsString}\")", SourceCodeHelper.ToSourceCode(Guid.Parse(guidAsString)));
         }
 
         [Fact]
