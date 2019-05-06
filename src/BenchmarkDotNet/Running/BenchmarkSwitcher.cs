@@ -9,6 +9,7 @@ using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
@@ -66,7 +67,25 @@ namespace BenchmarkDotNet.Running
         private IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[] args, IConfig config)
         {
             var logger = config.GetNonNullCompositeLogger();
-            var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args, logger, config);
+
+            OptionHandler optionHandler = new OptionHandler();
+            var result = CommandLineParser.Parser(
+                optionHandler, 
+                args,
+                logger,
+                $"{BenchmarkDotNetInfo.FullTitle} - Powerful .NET library for benchmarking.");
+
+            if (result != 0 || optionHandler.Options == null)
+            {
+                return Array.Empty<Summary>();
+            }
+
+            return Run(optionHandler.Options, config, logger);
+        }
+
+        internal IEnumerable<Summary> Run(CommandLineOptions options, IConfig config, ILogger logger)
+        { 
+            var (isParsingSuccess, parsedConfig) = ConfigParser.Parse(options, logger, config);
             if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
                 return Array.Empty<Summary>();
 

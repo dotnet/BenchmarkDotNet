@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Run(new[] { "--DOES_NOT_EXIST" }, config);
             
             Assert.Empty(summaries);
-            Assert.Contains("Option 'DOES_NOT_EXIST' is unknown.", logger.GetLog());
+            Assert.Contains("Unrecognized command or argument '--DOES_NOT_EXIST'", logger.GetLog());
         }
         
         [Fact]

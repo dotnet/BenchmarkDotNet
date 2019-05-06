@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Tests
 
         [Theory]
         [InlineData("--job=dry", "--exporters", "html", "rplot")]
-        [InlineData("--JOB=dry", "--EXPORTERS", "html", "rplot")] // case insensitive
+        //[InlineData("--JOB=dry", "--EXPORTERS", "html", "rplot")] // TODO case insensitive ?
         [InlineData("-j", "dry", "-e", "html", "rplot")] // alias
         public void SimpleConfigParsedCorrectly(params string[] args)
         {
@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.Tests
             
             var config = ConfigParser.Parse(new[]
             {
-                "--LaunchCount", launchCount.ToString(), 
+                "--launchCount", launchCount.ToString(), 
                 "--warmupCount",  warmupCount.ToString(),
                 "--iterationTime", iterationTime.ToString(),
                 "--iterationCount", iterationCount.ToString()
@@ -328,7 +328,8 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanParseHardwareCounters()
         {
-            var config = ConfigParser.Parse(new[] { "--counters", $"{nameof(HardwareCounter.CacheMisses)}+{nameof(HardwareCounter.InstructionRetired)}"}, new OutputLogger(Output)).config;
+            //TODO Spliting value of attribute?
+            var config = ConfigParser.Parse(new[] { "--counters", $"{nameof(HardwareCounter.CacheMisses)}", $"{nameof(HardwareCounter.InstructionRetired)}"}, new OutputLogger(Output)).config;
 
             Assert.Equal(2, config.GetHardwareCounters().Count());
             Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.CacheMisses));
