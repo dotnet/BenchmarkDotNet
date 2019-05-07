@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
@@ -9,7 +10,12 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Columns
 {
-    public class StatisticColumn : IColumn
+    public interface IStatisticColumn : IColumn
+    {
+        List<double> GetAllValues(Summary summary, SummaryStyle style);
+    }
+    
+    public class StatisticColumn : IStatisticColumn
     {
         private enum Priority
         {
@@ -19,17 +25,17 @@ namespace BenchmarkDotNet.Columns
             Additional
         }
         
-        public static readonly IColumn Mean = new StatisticColumn("Mean", "Arithmetic mean of all measurements",
+        public static readonly IStatisticColumn Mean = new StatisticColumn("Mean", "Arithmetic mean of all measurements",
             s => s.Mean, Priority.Main);
 
         public static readonly IColumn StdErr = new StatisticColumn("StdErr", "Standard error of all measurements",
-            s => s.StandardError, Priority.Main);
+            s => s.StandardError, Priority.Main, parentColumn: Mean);
 
         public static readonly IColumn StdDev = new StatisticColumn("StdDev", "Standard deviation of all measurements",
-            s => s.StandardDeviation, Priority.Main);
+            s => s.StandardDeviation, Priority.Main, parentColumn: Mean);
 
         public static readonly IColumn Error = new StatisticColumn("Error", "Half of 99.9% confidence interval",
-            s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, ConfidenceLevel.L999).Margin, Priority.Main);
+            s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, ConfidenceLevel.L999).Margin, Priority.Main, parentColumn: Mean);
 
         public static readonly IColumn OperationsPerSecond = new StatisticColumn("Op/s", "Operation per second",
             s => 1.0 * 1000 * 1000 * 1000 / s.Mean, Priority.Additional, UnitType.Dimensionless);
@@ -95,11 +101,14 @@ namespace BenchmarkDotNet.Columns
         public string Id => nameof(StatisticColumn) + "." + ColumnName;
         public string ColumnName { get; }
         private readonly Priority priority;
+        private readonly IStatisticColumn parentColumn;
 
-        private StatisticColumn(string columnName, string legend, Func<Statistics, double> calc, Priority priority, UnitType type = UnitType.Time)
+        private StatisticColumn(string columnName, string legend, Func<Statistics, double> calc, Priority priority, UnitType type = UnitType.Time,
+            IStatisticColumn parentColumn = null)
         {
             this.calc = calc;
             this.priority = priority;
+            this.parentColumn = parentColumn;
             UnitType = type;
             ColumnName = columnName;
             Legend = legend;
@@ -120,21 +129,21 @@ namespace BenchmarkDotNet.Columns
 
         public string Legend { get; }
 
-        private string Format(Summary summary, ImmutableConfig config, Statistics statistics, SummaryStyle style)
-        {
-            if (statistics == null)
-                return "NA";
-
-            var allValues = summary
-                .Reports
+        public List<double> GetAllValues(Summary summary, SummaryStyle style)
+            => summary.Reports
                 .Where(r => r.ResultStatistics != null)
                 .Select(r => calc(r.ResultStatistics))
                 .Where(v => !double.IsNaN(v) && !double.IsInfinity(v))
                 .Select(v => UnitType == UnitType.Time ? v / style.TimeUnit.NanosecondAmount : v)
                 .ToList();
-            double minValue = allValues.Any() ? allValues.Min() : 0;
-            bool allValuesAreZeros = allValues.All(v => Math.Abs(v) < 1e-9);
-            string format = "N" + (allValuesAreZeros ? 1 : GetBestAmountOfDecimalDigits(minValue));
+
+        private string Format(Summary summary, ImmutableConfig config, Statistics statistics, SummaryStyle style)
+        {
+            if (statistics == null)
+                return "NA";
+            
+            int precision = summary.DisplayPrecisionManager.GetPrecision(style, this, parentColumn);
+            string format = "N" + precision;
 
             double value = calc(statistics);
             if (double.IsNaN(value))
@@ -150,15 +159,5 @@ namespace BenchmarkDotNet.Columns
 
         private static IColumn CreatePercentileColumn(int percentiles, Func<Statistics, double> calc) => new StatisticColumn(
             "P" + percentiles, "Percentile " + percentiles, calc, Priority.Percentiles);
-
-        // TODO: Move to a better place
-        public static int GetBestAmountOfDecimalDigits(double value)
-        {
-            if (double.IsNaN(value) || double.IsInfinity(value))
-                return 1;
-            if (value < 1 - 1e-9)
-                return 4;
-            return MathHelper.Clamp((int) Math.Truncate(-Math.Log10(value)) + 3, 1, 4);
-        }
     }
 }
