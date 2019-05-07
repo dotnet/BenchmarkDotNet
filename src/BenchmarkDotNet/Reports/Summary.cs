@@ -29,6 +29,8 @@ namespace BenchmarkDotNet.Reports
 
         private ImmutableDictionary<BenchmarkCase, BenchmarkReport> ReportMap {get; }
         private BaseliningStrategy BaseliningStrategy {get; }
+        
+        internal DisplayPrecisionManager DisplayPrecisionManager { get; }
 
         public Summary(
             string title,
@@ -46,6 +48,7 @@ namespace BenchmarkDotNet.Reports
 
             ReportMap = reports.ToImmutableDictionary(report => report.BenchmarkCase, report => report);
             
+            DisplayPrecisionManager = new DisplayPrecisionManager(this);
             Orderer = GetConfiguredOrdererOrDefaultOne(reports.Select(report => report.BenchmarkCase.Config));
             BenchmarksCases = Orderer.GetSummaryOrder(reports.Select(report => report.BenchmarkCase).ToImmutableArray(), this).ToImmutableArray(); // we sort it first
             Reports = BenchmarksCases.Select(b => ReportMap[b]).ToImmutableArray(); // we use sorted collection to re-create reports list

@@ -13,9 +13,9 @@ WarmupCount=15
 ....
 [options="header"]
 |===
-|  Method|      Mean|  Error|  StdDev|       P67
-|     Foo|  1.000 ns|     NA|  0.0 ns|  1.000 ns
-|     Bar|  1.000 ns|     NA|  0.0 ns|  1.000 ns
+|  Method|      Mean|  Error|    StdDev|       P67
+|     Foo|  1.000 ns|     NA|  0.000 ns|  1.000 ns
+|     Bar|  1.000 ns|     NA|  0.000 ns|  1.000 ns
 |===
 ############################################
 HtmlExporter
@@ -48,8 +48,8 @@ WarmupCount=15
 <table>
 <thead><tr><th>Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>P67</th>
 </tr>
-</thead><tbody><tr><td>Foo</td><td>1.000 ns</td><td>NA</td><td>0.0 ns</td><td>1.000 ns</td>
-</tr><tr><td>Bar</td><td>1.000 ns</td><td>NA</td><td>0.0 ns</td><td>1.000 ns</td>
+</thead><tbody><tr><td>Foo</td><td>1.000 ns</td><td>NA</td><td>0.000 ns</td><td>1.000 ns</td>
+</tr><tr><td>Bar</td><td>1.000 ns</td><td>NA</td><td>0.000 ns</td><td>1.000 ns</td>
 </tr></tbody></table>
 </body>
 </html>
@@ -380,10 +380,10 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
 Job=LongRun  IterationCount=100  LaunchCount=3  
 WarmupCount=15  
 
- Method |     Mean | Error | StdDev |      P67 |
-------- |---------:|------:|-------:|---------:|
-    Foo | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
-    Bar | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
+ Method |     Mean | Error |   StdDev |      P67 |
+------- |---------:|------:|---------:|---------:|
+    Foo | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
+    Bar | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
 ############################################
 MarkdownExporter-atlassian
 ############################################
@@ -399,9 +399,9 @@ Job=LongRun  IterationCount=100  LaunchCount=3
 WarmupCount=15  
 
 {noformat}
-||Method ||    Mean ||Error ||StdDev ||     P67 ||
-|    Foo | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
-|    Bar | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
+||Method ||    Mean ||Error ||  StdDev ||     P67 ||
+|    Foo | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
+|    Bar | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
 ############################################
 MarkdownExporter-console
 ############################################
@@ -415,10 +415,10 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
 Job=LongRun  IterationCount=100  LaunchCount=3  
 WarmupCount=15  
 
-| Method |     Mean | Error | StdDev |      P67 |
-|------- |---------:|------:|-------:|---------:|
-|    Foo | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
-|    Bar | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
+| Method |     Mean | Error |   StdDev |      P67 |
+|------- |---------:|------:|---------:|---------:|
+|    Foo | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
+|    Bar | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
 ############################################
 MarkdownExporter-github
 ############################################
@@ -434,10 +434,10 @@ Job=LongRun  IterationCount=100  LaunchCount=3
 WarmupCount=15  
 
 ```
-| Method |     Mean | Error | StdDev |      P67 |
-|------- |---------:|------:|-------:|---------:|
-|    Foo | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
-|    Bar | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
+| Method |     Mean | Error |   StdDev |      P67 |
+|------- |---------:|------:|---------:|---------:|
+|    Foo | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
+|    Bar | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
 ############################################
 MarkdownExporter-stackoverflow
 ############################################
@@ -451,10 +451,10 @@ MarkdownExporter-stackoverflow
     Job=LongRun  IterationCount=100  LaunchCount=3  
     WarmupCount=15  
 
-     Method |     Mean | Error | StdDev |      P67 |
-    ------- |---------:|------:|-------:|---------:|
-        Foo | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
-        Bar | 1.000 ns |    NA | 0.0 ns | 1.000 ns |
+     Method |     Mean | Error |   StdDev |      P67 |
+    ------- |---------:|------:|---------:|---------:|
+        Foo | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
+        Bar | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
 ############################################
 PlainExporter
 ############################################
