@@ -27,6 +27,8 @@ namespace BenchmarkDotNet.Helpers
         [NotNull]
         public static List<Dictionary<string, string>> ParseSections([CanBeNull] string content, char separator)
         {
+            // wmic doubles the carriage return character due to a bug.
+            // Therefore, the * quantifier should be used to workaround it.
             return
                 Regex.Split(content ?? "", "(\r*\n){2,}")
                     .Select(s => ParseSection(s, separator))
