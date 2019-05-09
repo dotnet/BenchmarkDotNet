@@ -1,0 +1,15 @@
+{{!Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE file in the project root for full license information.}}
+
+<script type="text/javascript" src="{{_rel}}styles/docfx.vendor.js"></script>
+<script type="text/javascript" src="{{_rel}}styles/docfx.js"></script>
+<script type="text/javascript" src="{{_rel}}styles/main.js"></script>
+<!-- at the end of the BODY -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+<script type="text/javascript">
+    docsearch({
+        apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
+        indexName: 'benchmarkdotnet',
+        inputSelector: '#search-query',
+        debug: false // Set debug to true if you want to inspect the dropdown
+    });
+</script>
