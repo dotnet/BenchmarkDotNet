@@ -64,7 +64,7 @@
       "_appFooter" : "Copyright &copy; 2013–2019 .NET Foundation and contributors",
       "_appLogoPath" : "logo/icon.svg",
       "_appFaviconPath": "logo/icon-32.png",
-      "_enableSearch": "true"
+      "_enableSearch": false
     },
     "sitemap":
     {
