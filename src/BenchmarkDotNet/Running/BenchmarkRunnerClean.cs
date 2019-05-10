@@ -108,6 +108,7 @@ namespace BenchmarkDotNet.Running
                 {
                     compositeLogger.WriteLineHeader("// * Artifacts cleanup *");
                     Cleanup(new HashSet<string>(artifactsToCleanup.Distinct()));
+                    compositeLogger.Flush();
                 }
             }
         }
