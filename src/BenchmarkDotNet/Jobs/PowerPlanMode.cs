@@ -1,12 +1,13 @@
 ﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using System;
 
 namespace BenchmarkDotNet.Jobs
 {
     public sealed class PowerPlanMode : JobMode<PowerPlanMode>
     {
         public static readonly Characteristic<PowerPlan> PowerPlanCharacteristic = CreateCharacteristic<PowerPlan>(nameof(PowerPlan));
-        public static readonly Characteristic<string> PowerPlanGuidCharacteristic = CreateCharacteristic<string>(nameof(PowerPlanGuid));
+        public static readonly Characteristic<Guid> PowerPlanGuidCharacteristic = CreateCharacteristic<Guid>(nameof(PowerPlanGuid));
 
         public PowerPlanMode() : this(null)
         {
@@ -22,7 +23,7 @@ namespace BenchmarkDotNet.Jobs
             set { PowerPlanCharacteristic[this] = value; }
         }
 
-        public string PowerPlanGuid
+        public Guid PowerPlanGuid
         {
             get { return PowerPlanGuidCharacteristic[this]; }
             set { PowerPlanGuidCharacteristic[this] = value; }

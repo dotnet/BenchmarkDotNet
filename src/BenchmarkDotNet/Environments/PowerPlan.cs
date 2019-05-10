@@ -5,6 +5,7 @@
         HighPerformance,
         UserPowerPlan,
         PowerSaver,
-        Balanced
+        Balanced,
+        UltimatePerformance
     }
 }
