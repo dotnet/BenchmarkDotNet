@@ -179,6 +179,13 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public static Job WithPowerPlan(this Job job, PowerPlan powerPlan) => job.WithCore(j => j.Environment.PowerPlanMode.PowerPlan = powerPlan);
 
+        /// <summary>
+        /// Setting power plans by guid.
+        /// The default value is HighPerformance.
+        /// <remarks>Only available for Windows.</remarks>
+        /// </summary>
+        public static Job WithPowerPlan(this Job job, Guid powerPlanGuid) => job.WithCore(j => j.Environment.PowerPlanMode.PowerPlanGuid = powerPlanGuid);
+
         // Infrastructure
         public static Job With(this Job job, IToolchain toolchain) => job.WithCore(j => j.Infrastructure.Toolchain = toolchain);
         [PublicAPI] public static Job With(this Job job, IClock clock) => job.WithCore(j => j.Infrastructure.Clock = clock);

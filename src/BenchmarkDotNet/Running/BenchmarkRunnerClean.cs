@@ -134,7 +134,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
             foreach (var benchmark in benchmarks)
             {
-                powerManagementApplier.ApplyPerformancePlan(benchmark.Job.Environment.PowerPlanMode.PowerPlan);
+                powerManagementApplier.ApplyPerformancePlan(benchmark.Job.Environment.PowerPlanMode);
                 var info = buildResults[benchmark];
                 var buildResult = info.buildResult;
 
