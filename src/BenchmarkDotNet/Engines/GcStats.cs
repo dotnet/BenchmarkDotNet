@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Engines
         public static readonly long AllocationQuantum = CalculateAllocationQuantumSize();
 
         private static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = CreateGetAllocatedBytesForCurrentThreadDelegate();
-        private static readonly Func<bool, long> GetGetTotalAllocatedBytesDelegate = CreateGetGetTotalAllocatedBytesDelegate();
+        private static readonly Func<bool, long> GetTotalAllocatedBytesDelegate = CreateGetTotalAllocatedBytesDelegate();
 
         public static readonly GcStats Empty = new GcStats(0, 0, 0, 0, 0);
 
@@ -144,8 +144,8 @@ namespace BenchmarkDotNet.Engines
             if (RuntimeInformation.IsFullFramework) // it can be a .NET app consuming our .NET Standard package
                 return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
 
-            if (GetGetTotalAllocatedBytesDelegate != null) // it's .NET Core 3.0 with the new API available
-                return GetGetTotalAllocatedBytesDelegate.Invoke(true); // true for the "precise" argument
+            if (GetTotalAllocatedBytesDelegate != null) // it's .NET Core 3.0 with the new API available
+                return GetTotalAllocatedBytesDelegate.Invoke(true); // true for the "precise" argument
 
             // https://apisof.net/catalog/System.GC.GetAllocatedBytesForCurrentThread() is not part of the .NET Standard, so we use reflection to call it..
             return GetAllocatedBytesForCurrentThreadDelegate.Invoke();
@@ -160,7 +160,7 @@ namespace BenchmarkDotNet.Engines
             return method != null ? (Func<long>)method.CreateDelegate(typeof(Func<long>)) : null;
         }
 
-        private static Func<bool, long> CreateGetGetTotalAllocatedBytesDelegate()
+        private static Func<bool, long> CreateGetTotalAllocatedBytesDelegate()
         {
             // this method is not a part of .NET Standard so we need to use reflection
             var method = typeof(GC).GetTypeInfo().GetMethod("GetTotalAllocatedBytes", BindingFlags.Public | BindingFlags.Static);
