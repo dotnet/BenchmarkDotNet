@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Running
                 {
                     powerPlanChanged = true;
                     var powerPlanFriendlyName = PowerManagementHelper.CurrentPlanFriendlyName;
-                    logger.WriteInfo($"Setup power plan (GUID: {guid} FriendlyName: {powerPlanFriendlyName})");
+                    logger.WriteLineInfo($"Setup power plan (GUID: {guid} FriendlyName: {powerPlanFriendlyName})");
                 }
                 else
                     logger.WriteLineError($"Cannot setup power plan (GUID: {guid})");
