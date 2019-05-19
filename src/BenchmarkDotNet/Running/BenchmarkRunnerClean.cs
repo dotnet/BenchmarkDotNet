@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Running
 {
     internal static class BenchmarkRunnerClean
     {
-        private const string DateTimeFormat = "yyyyMMdd-HHmmss";
+        internal const string DateTimeFormat = "yyyyMMdd-HHmmss";
 
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvironmentResolver.Instance, InfrastructureResolver.Instance);
 

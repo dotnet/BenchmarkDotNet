@@ -97,9 +97,10 @@ namespace BenchmarkDotNet.Environments
 
         public override bool Equals(object obj) => obj is MonoRuntime other && Equals(other);
 
-        public bool Equals(MonoRuntime other) => other != null && Name == other.Name && CustomPath == other.CustomPath && AotArgs == other.AotArgs && MonoBclPath == other.MonoBclPath;
+        public bool Equals(MonoRuntime other) 
+            => Name == other?.Name && CustomPath == other?.CustomPath && AotArgs == other?.AotArgs && MonoBclPath == other?.MonoBclPath;
 
-        int GetHashCodeComposite() => String.Format("{0}{1}{2}", CustomPath?.GetHashCode(), AotArgs?.GetHashCode(), MonoBclPath?.GetHashCode()).GetHashCode ();
-        public override int GetHashCode() => Name.GetHashCode() ^ GetHashCodeComposite ();
+        public override int GetHashCode() 
+            => Name.GetHashCode() ^ (CustomPath?.GetHashCode() ?? 0) ^ (AotArgs?.GetHashCode() ?? 0) ^ (MonoBclPath?.GetHashCode() ?? 0);
     }
 }
