@@ -11,6 +11,7 @@ namespace BenchmarkDotNet.Helpers
         // should be ordered by release number
         private static readonly (int minReleaseNumber, string version)[] FrameworkVersions =
         {
+            (528040, "4.8"),
             (461808, "4.7.2"),
             (461308, "4.7.1"),
             (460798, "4.7"),
