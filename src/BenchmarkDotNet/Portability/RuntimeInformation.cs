@@ -160,7 +160,7 @@ namespace BenchmarkDotNet.Portability
             }
             else if (IsFullFramework)
             {
-                return FrameworkDescription;
+                return FrameworkVersionHelper.GetFrameworkDescription();
             }
             else if (IsNetCore)
             {
