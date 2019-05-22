@@ -2,50 +2,47 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Running
 {
-    internal class PowerManagementApplier
+    internal class PowerManagementApplier : IDisposable
     {
-        private readonly ILogger logger;
-        private Guid? userCurrentPowerPlan;
-        private bool powerPlanChanged = false;
-        private bool isInitialized = false;
-        private static readonly Dictionary<PowerPlan, Guid?> powerPlansDict = new Dictionary<PowerPlan, Guid?>()
+        private static readonly Guid UserPowerPlan = new Guid("67b4a053-3646-4532-affd-0535c9ea82a7");
+
+        private static readonly Dictionary<PowerPlan, Guid> powerPlansDict = new Dictionary<PowerPlan, Guid>()
         {
-            { PowerPlan.UserPowerPlan, null },
+            { PowerPlan.UserPowerPlan, UserPowerPlan },
             { PowerPlan.HighPerformance, new Guid("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c") },
             { PowerPlan.PowerSaver, new Guid("a1841308-3541-4fab-bc81-f71556f20b4a") },
             { PowerPlan.Balanced, new Guid("381b4222-f694-41f0-9685-ff5bb260df2e") },
             { PowerPlan.UltimatePerformance, new Guid("e9a42b02-d5df-448d-aa00-03f14749eb61") },
         };
 
-        internal PowerManagementApplier(ILogger logger)
+        private readonly ILogger logger;
+        private Guid? userCurrentPowerPlan;
+        private bool powerPlanChanged = false;
+        private bool isInitialized = false;
+
+        internal PowerManagementApplier(ILogger logger) => this.logger = logger;
+
+        public void Dispose() => ApplyUserPowerPlan();
+
+        internal static Guid Map(PowerPlan value) => powerPlansDict[value];
+
+        internal void ApplyPerformancePlan(Guid id)
         {
-            this.logger = logger;
+            if (!RuntimeInformation.IsWindows() || id == Guid.Empty)
+                return;
+
+            if (!powerPlanChanged && id != UserPowerPlan)
+                ApplyPlanByGuid(id);
+            else
+                ApplyUserPowerPlan();
         }
 
-        internal void ApplyPerformancePlan(PowerPlanMode powerPlanMode)
-        {
-            var guid = powerPlanMode.PowerPlanGuid  == Guid.Empty ? powerPlansDict[powerPlanMode.PowerPlan] : powerPlanMode.PowerPlanGuid;
-            ApplyPerformancePlan(guid);
-        }
-
-        internal void ApplyPerformancePlan(Guid? guid)
-        {
-            if (RuntimeInformation.IsWindows())
-            {
-                if (guid != null && powerPlanChanged == false)
-                    ApplyPlanByGuid(guid.Value);
-                else if (guid == null)
-                    ApplyUserPowerPlan();
-            }
-        }
-
-        internal void ApplyUserPowerPlan()
+        private void ApplyUserPowerPlan()
         {
             if (powerPlanChanged && RuntimeInformation.IsWindows())
             {

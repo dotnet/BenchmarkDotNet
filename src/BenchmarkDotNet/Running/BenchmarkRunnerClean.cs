@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Running
                     {
                         var runChronometer = Chronometer.Start();
                         
-                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup, rootArtifactsFolderPath, resultsFolderPath, ref runChronometer);
+                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup, resultsFolderPath, ref runChronometer);
                         
                         if (!benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.JoinSummary))
                             PrintSummary(compositeLogger, benchmarkRunInfo.Config, summary);
@@ -118,7 +118,6 @@ namespace BenchmarkDotNet.Running
                                    IResolver resolver,
                                    ILogger logger, 
                                    List<string> artifactsToCleanup, 
-                                   string rootArtifactsFolderPath,
                                    string resultsFolderPath,
                                    ref StartedClock runChronometer)
         {
@@ -126,52 +125,55 @@ namespace BenchmarkDotNet.Running
             var config = benchmarkRunInfo.Config;
             var reports = new List<BenchmarkReport>();
             string title = GetTitle(new[] { benchmarkRunInfo });
-            var powerManagementApplier = new PowerManagementApplier(logger);
 
             logger.WriteLineInfo($"// Found {benchmarks.Length} benchmarks:");
             foreach (var benchmark in benchmarks)
                 logger.WriteLineInfo($"//   {benchmark.DisplayInfo}");
             logger.WriteLine();
-            foreach (var benchmark in benchmarks)
+
+            using (var powerManagementApplier = new PowerManagementApplier(logger))
             {
-                powerManagementApplier.ApplyPerformancePlan(benchmark.Job.Environment.PowerPlanMode);
-                var info = buildResults[benchmark];
-                var buildResult = info.buildResult;
-
-                if (!config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
-                    artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
-
-                if (buildResult.IsBuildSuccess)
+                foreach (var benchmark in benchmarks)
                 {
-                    var report = RunCore(benchmark, info.benchmarkId, logger, resolver, buildResult);
-                    if (report.AllMeasurements.Any(m => m.Operations == 0))
-                        throw new InvalidOperationException("An iteration with 'Operations == 0' detected");
-                    reports.Add(report);
-                    if (report.GetResultRuns().Any())
-                        logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr(config.Encoding));
+                    powerManagementApplier.ApplyPerformancePlan(benchmark.Job.Environment.PowerPlanMode);
 
-                    if (!report.Success && config.Options.IsSet(ConfigOptions.StopOnFirstError))
-                        break;
+                    var info = buildResults[benchmark];
+                    var buildResult = info.buildResult;
+
+                    if (!config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
+                        artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
+
+                    if (buildResult.IsBuildSuccess)
+                    {
+                        var report = RunCore(benchmark, info.benchmarkId, logger, resolver, buildResult);
+                        if (report.AllMeasurements.Any(m => m.Operations == 0))
+                            throw new InvalidOperationException("An iteration with 'Operations == 0' detected");
+                        reports.Add(report);
+                        if (report.GetResultRuns().Any())
+                            logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr(config.Encoding));
+
+                        if (!report.Success && config.Options.IsSet(ConfigOptions.StopOnFirstError))
+                            break;
+                    }
+                    else
+                    {
+                        reports.Add(new BenchmarkReport(false, benchmark, buildResult, buildResult, default, default, default, default));
+
+                        if (buildResult.GenerateException != null)
+                            logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException.Message}");
+                        if (buildResult.ErrorMessage != null)
+                            logger.WriteLineError($"// Build Error: {buildResult.ErrorMessage}");
+
+                        if (config.Options.IsSet(ConfigOptions.StopOnFirstError))
+                            break;
+                    }
+
+                    logger.WriteLine();
                 }
-                else
-                {
-                    reports.Add(new BenchmarkReport(false, benchmark, buildResult, buildResult, default, default, default, default));
-
-                    if (buildResult.GenerateException != null)
-                        logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException.Message}");
-                    if (buildResult.ErrorMessage != null)
-                        logger.WriteLineError($"// Build Error: {buildResult.ErrorMessage}");
-
-                    if(config.Options.IsSet(ConfigOptions.StopOnFirstError))
-                        break;
-                }
-
-                logger.WriteLine();
             }
             
             var clockSpan = runChronometer.GetElapsed();
 
-            powerManagementApplier.ApplyUserPowerPlan();
             return new Summary(title,
                 reports.ToImmutableArray(),
                 HostEnvironmentInfo.GetCurrent(),

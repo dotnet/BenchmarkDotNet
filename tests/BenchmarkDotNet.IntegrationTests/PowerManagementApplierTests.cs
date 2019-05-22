@@ -1,12 +1,8 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Environments;
+﻿using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
-using System.Threading;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -24,14 +20,13 @@ namespace BenchmarkDotNet.IntegrationTests
             var userPlan = PowerManagementHelper.CurrentPlan;
             var logger = new OutputLogger(Output);
             var powerManagementApplier = new PowerManagementApplier(logger);
-            var config = DefaultConfig.Instance.With(logger);
-            powerManagementApplier.ApplyPerformancePlan(new Jobs.PowerPlanMode()
-            {
-                PowerPlan = PowerPlan.HighPerformance
-            });
+
+            powerManagementApplier.ApplyPerformancePlan(PowerManagementApplier.Map(PowerPlan.HighPerformance));
+
             Assert.Equal(HighPerformancePlanGuid, PowerManagementHelper.CurrentPlan.ToString());
             Assert.Equal("High performance", PowerManagementHelper.CurrentPlanFriendlyName);
-            powerManagementApplier.ApplyUserPowerPlan();
+            powerManagementApplier.Dispose();
+
             Assert.Equal(userPlan, PowerManagementHelper.CurrentPlan);
         }
 
@@ -41,13 +36,12 @@ namespace BenchmarkDotNet.IntegrationTests
             var userPlan = PowerManagementHelper.CurrentPlan;
             var logger = new OutputLogger(Output);
             var powerManagementApplier = new PowerManagementApplier(logger);
-            var config = DefaultConfig.Instance.With(logger);
-            powerManagementApplier.ApplyPerformancePlan(new Jobs.PowerPlanMode()
-            {
-                PowerPlan = PowerPlan.UserPowerPlan
-            });
+
+            powerManagementApplier.ApplyPerformancePlan(PowerManagementApplier.Map(PowerPlan.UserPowerPlan));
+
             Assert.Equal(userPlan.ToString(), PowerManagementHelper.CurrentPlan.ToString());
-            powerManagementApplier.ApplyUserPowerPlan();
+            powerManagementApplier.Dispose();
+
             Assert.Equal(userPlan, PowerManagementHelper.CurrentPlan);
         }
     }
