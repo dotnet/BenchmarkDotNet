@@ -399,25 +399,6 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Throws<ArgumentException>(() => a[j] = new CharacteristicSet()); // not assignable;
             Assert.Throws<ArgumentException>(() => a[j] = 123); // not assignable;
         }
-
-        [Fact]
-        public static void Test07GetCharacteristics()
-        {
-            // Update expected values only if Job properties were changed.
-            // Otherwise, there's a bug.
-            var a = CharacteristicHelper
-                .GetThisTypeCharacteristics(typeof(Job))
-                .Select(c => c.Id);
-            Assert.Equal("Id;Accuracy;Environment;Infrastructure;Meta;Run", string.Join(";", a));
-            a = CharacteristicHelper
-                .GetAllCharacteristics(typeof(Job))
-                .Select(c => c.Id);
-            Assert.Equal("Id;Accuracy;AnalyzeLaunchVariance;EvaluateOverhead;" +
-                "MaxAbsoluteError;MaxRelativeError;MinInvokeCount;MinIterationTime;OutlierMode;Environment;Affinity;EnvironmentVariables;" +
-                "Jit;Platform;Runtime;Gc;AllowVeryLargeObjects;Concurrent;CpuGroups;Force;HeapAffinitizeMask;HeapCount;NoAffinitize;" +
-                "RetainVm;Server;PowerPlanMode;PowerPlan;PowerPlanGuid;Infrastructure;Arguments;BuildConfiguration;Clock;EngineFactory;NuGetReferences;Toolchain;Meta;Baseline;IsDefault;IsMutator;Run;InvocationCount;IterationCount;IterationTime;" +
-                "LaunchCount;MaxIterationCount;MaxWarmupIterationCount;MinIterationCount;MinWarmupIterationCount;RunStrategy;UnrollFactor;WarmupCount", string.Join(";", a));
-        }
         
         [Fact]
         public static void MutatorAppliedToOtherJobOverwritesOnlyTheConfiguredSettings()
