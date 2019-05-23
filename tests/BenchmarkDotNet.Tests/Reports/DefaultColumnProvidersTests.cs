@@ -78,7 +78,8 @@ namespace BenchmarkDotNet.Tests.Reports
                 "MockSummary",
                 CreateBenchmarks(DefaultConfig.Instance).Select(b => CreateReport(b, hugeSd, metrics)).ToImmutableArray(),
                 new HostEnvironmentInfoBuilder().Build(),
-                "",
+                string.Empty,
+                string.Empty,
                 TimeSpan.FromMinutes(1),
                 ImmutableArray<ValidationError>.Empty);
             MarkdownExporter.Default.ExportToLog(summary, logger);
