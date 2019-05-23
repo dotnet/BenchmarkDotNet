@@ -28,8 +28,8 @@ namespace BenchmarkDotNet.Analysers
                 if (BaselineCustomColumn.ResultsAreInvalid(summary, benchmarkCase, baseline) == false)
                     continue;
 
-                var message = "A question mark '?' symbol indicates that it was not possible " +
-                                $"to compute ({columNames}) because the baseline value is too close to zero.";
+                var message = "A question mark '?' symbol indicates that it was not possible to compute the " +
+                                $"({columNames}) column(s) because the baseline value is too close to zero.";
 
                 yield return Conclusion.CreateWarning(Id, message);
             }
