@@ -194,7 +194,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [TheoryNetCoreOnly("Only .NET Core 2.0+ API is bug free for this case"), MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocationQuantumIsNotAnIssueForNetCore21Plus(IToolchain toolchain)
         {

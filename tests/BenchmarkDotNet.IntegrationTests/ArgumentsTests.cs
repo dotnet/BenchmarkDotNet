@@ -278,7 +278,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [TheoryNetCoreOnly("the implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)"),
+         MemberData(nameof(GetToolchains))]
         public void StringCanBePassedToBenchmarkAsReadOnlySpan(IToolchain toolchain) => CanExecute<WithStringToReadOnlySpan>(toolchain);
 
         public class WithStringToReadOnlySpan
