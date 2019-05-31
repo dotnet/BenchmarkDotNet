@@ -14,14 +14,8 @@ namespace BenchmarkDotNet.Columns
             string logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
             var baseline = summary.GetBaseline(logicalGroupKey);
             bool isBaseline = summary.IsBaseline(benchmarkCase);
-            bool invalidResults = baseline == null ||
-                                 summary[baseline] == null ||
-                                 summary[baseline].ResultStatistics == null ||
-                                 !summary[baseline].ResultStatistics.CanBeInverted() ||
-                                 summary[benchmarkCase] == null ||
-                                 summary[benchmarkCase].ResultStatistics == null;
 
-            if (invalidResults)
+            if (ResultsAreInvalid(summary, benchmarkCase, baseline))
                 return "?";
 
             var baselineStat = summary[baseline].ResultStatistics;
@@ -42,5 +36,15 @@ namespace BenchmarkDotNet.Columns
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);
         public override string ToString() => ColumnName;
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
+
+        internal static bool ResultsAreInvalid(Summary summary, BenchmarkCase benchmarkCase, BenchmarkCase baseline)
+        {
+            return baseline == null ||
+                   summary[baseline] == null ||
+                   summary[baseline].ResultStatistics == null ||
+                   !summary[baseline].ResultStatistics.CanBeInverted() ||
+                   summary[benchmarkCase] == null ||
+                   summary[benchmarkCase].ResultStatistics == null;
+        }
     }
 }

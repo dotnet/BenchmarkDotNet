@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Engines
 
         public IEnumerable<Measurement> GetMeasurements()
         {
-            double overhead = Overhead == null ? 0.0 : new Statistics(Overhead.Select(m => m.Nanoseconds)).Mean;
+            double overhead = Overhead == null ? 0.0 : new Statistics(Overhead.Select(m => m.Nanoseconds)).Median;
             var mainStats = new Statistics(Workload.Select(m => m.Nanoseconds));
             int resultIndex = 0;
             foreach (var measurement in Workload)

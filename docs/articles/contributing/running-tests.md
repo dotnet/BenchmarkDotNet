@@ -4,9 +4,8 @@
 that belong to the testing projects.
 * To run "Core" tests you just need to open Test Explorer in Visual Studio and rebuild the solution. Then tests show up in Test Explorer and you can simply run them.
 
-@alert Important
-Remember to do both before pulling a PR or publishing new version
-@end
+> [!IMPORTANT]
+> Remember to do both before pulling a PR or publishing new version
 
 * For some unit tests (e.g. for exporter tests) BenchmarkDotNet uses [approval tests'](http://approvaltests.sourceforge.net/) implementation for .NET: [ApprovalTests.Net](https://github.com/approvals/ApprovalTests.Net).
 	* The expected value for each test is stored in a `*.approved.txt` file located near the test source file in the repository. ApprovalTests.NET generates approved file's names automatically according test name and its parameters. This files must be added under the source control. 

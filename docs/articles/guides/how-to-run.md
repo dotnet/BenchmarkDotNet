@@ -11,7 +11,7 @@ var summary = BenchmarkRunner.Run(typeof(MyBenchmarkClass));
 
 ## Global dotnet tool
 
-You can also run a banchmark using `BenchmarkDotNet.Tool`.
+You can also run a benchmark using `BenchmarkDotNet.Tool`.
 
 ```log
 dotnet tool install -g BenchmarkDotNet.Tool

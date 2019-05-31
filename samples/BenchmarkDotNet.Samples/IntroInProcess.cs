@@ -3,7 +3,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Samples
 
                 Add(Job.MediumRun
                     .WithLaunchCount(1)
-                    .With(InProcessToolchain.Instance)
+                    .With(InProcessEmitToolchain.Instance)
                     .WithId("InProcess"));
             }
         }

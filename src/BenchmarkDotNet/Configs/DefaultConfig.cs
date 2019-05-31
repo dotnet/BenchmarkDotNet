@@ -51,6 +51,7 @@ namespace BenchmarkDotNet.Configs
             yield return MultimodalDistributionAnalyzer.Default;
             yield return RuntimeErrorAnalyser.Default;
             yield return ZeroMeasurementAnalyser.Default;
+            yield return BaselineCustomAnalyzer.Default;
         }
 
         public IEnumerable<IValidator> GetValidators()

@@ -224,6 +224,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             config.Options = config.Options.Set(options.Join, ConfigOptions.JoinSummary);
             config.Options = config.Options.Set(options.KeepBenchmarkFiles, ConfigOptions.KeepBenchmarkFiles);
+            config.Options = config.Options.Set(options.DontOverwriteResults, ConfigOptions.DontOverwriteResults);
             config.Options = config.Options.Set(options.StopOnFirstError, ConfigOptions.StopOnFirstError);
 
             return config;

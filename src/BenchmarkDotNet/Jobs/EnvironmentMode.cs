@@ -14,6 +14,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<IntPtr> AffinityCharacteristic = CreateCharacteristic<IntPtr>(nameof(Affinity));
         public static readonly Characteristic<GcMode> GcCharacteristic = CreateCharacteristic<GcMode>(nameof(Gc));
         public static readonly Characteristic<IReadOnlyList<EnvironmentVariable>> EnvironmentVariablesCharacteristic = CreateCharacteristic<IReadOnlyList<EnvironmentVariable>>(nameof(EnvironmentVariables));
+        public static readonly Characteristic<Guid> PowerPlanModeCharacteristic = CreateCharacteristic<Guid>(nameof(PowerPlanMode));
 
         public static readonly EnvironmentMode Clr = new EnvironmentMode(Runtime.Clr).Freeze();
         public static readonly EnvironmentMode Core = new EnvironmentMode(Runtime.Core).Freeze();
@@ -24,14 +25,14 @@ namespace BenchmarkDotNet.Jobs
         public static readonly EnvironmentMode RyuJitX64 = new EnvironmentMode(nameof(RyuJitX64), Jit.RyuJit, Platform.X64).Freeze();
         public static readonly EnvironmentMode RyuJitX86 = new EnvironmentMode(nameof(RyuJitX86), Jit.RyuJit, Platform.X86).Freeze();
 
-        [PublicAPI] public EnvironmentMode() : this(id: null) { }
+        [PublicAPI]
+        public EnvironmentMode() : this(id: null) { }
 
-        [PublicAPI] public EnvironmentMode(Runtime runtime) : this(runtime.ToString())
-        {
-            Runtime = runtime;
-        }
+        [PublicAPI]
+        public EnvironmentMode(Runtime runtime) : this(runtime.ToString()) => Runtime = runtime;
 
-        [PublicAPI] public EnvironmentMode(string id, Jit jit, Platform platform) : this(id)
+        [PublicAPI]
+        public EnvironmentMode(string id, Jit jit, Platform platform) : this(id)
         {
             Jit = jit;
             Platform = platform;
@@ -39,10 +40,8 @@ namespace BenchmarkDotNet.Jobs
                 Runtime = Runtime.Clr;
         }
 
-        [PublicAPI] public EnvironmentMode(string id) : base(id)
-        {
-            GcCharacteristic[this] = new GcMode();
-        }
+        [PublicAPI]
+        public EnvironmentMode(string id) : base(id) => GcCharacteristic[this] = new GcMode();
 
         /// <summary>
         /// Platform (x86 or x64)
@@ -90,6 +89,16 @@ namespace BenchmarkDotNet.Jobs
         {
             get => EnvironmentVariablesCharacteristic[this];
             set => EnvironmentVariablesCharacteristic[this] = value;
+        }
+
+        /// <summary>
+        /// Power Plan Mode
+        /// </summary>
+        /// <remarks>Supported only on Windows.</remarks>
+        public Guid PowerPlanMode
+        {
+            get => PowerPlanModeCharacteristic[this];
+            set => PowerPlanModeCharacteristic[this] = value;
         }
 
         /// <summary>

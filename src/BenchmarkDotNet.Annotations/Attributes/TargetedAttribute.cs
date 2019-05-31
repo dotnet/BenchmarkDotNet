@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Attributes
 {
@@ -17,10 +16,10 @@ namespace BenchmarkDotNet.Attributes
         /// </summary>
         public string Target
         {
-            set => Targets = string.IsNullOrEmpty(value) ? Array.Empty<string>() : value.Split(','); // , is for backward compat
+            set => Targets = string.IsNullOrEmpty(value) ? new string[0] : value.Split(','); // , is for backward compat
             get => throw new InvalidOperationException("Please use Targets property"); // kept to keep compiler happy "Named attribute arguments must be fields which are not readonly, static, or const, or read-write properties which are public and not static."
         }
 
-        public bool Match(MethodInfo method) => Targets.IsNullOrEmpty() || Targets.Contains(method.Name);
+        public bool Match(MethodInfo method) => Targets == null || Targets.Length == 0 || Targets.Contains(method.Name);
     }
 }

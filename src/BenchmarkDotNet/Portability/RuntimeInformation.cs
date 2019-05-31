@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
 using System.Management;
 using System.Reflection;
@@ -161,9 +160,7 @@ namespace BenchmarkDotNet.Portability
             }
             else if (IsFullFramework)
             {
-                string frameworkVersion = FrameworkVersionHelper.GetCurrentNetFrameworkVersion();
-                string clrVersion = Environment.Version.ToString();
-                return $".NET Framework {frameworkVersion} (CLR {clrVersion})";
+                return FrameworkVersionHelper.GetFrameworkDescription();
             }
             else if (IsNetCore)
             {
@@ -216,17 +213,6 @@ namespace BenchmarkDotNet.Portability
 
         public static bool Is64BitPlatform() => IntPtr.Size == 8;
 
-        private static IEnumerable<JitModule> GetJitModules()
-        {
-            return
-                Process.GetCurrentProcess().Modules
-                    .OfType<ProcessModule>()
-                    .Where(module => module.ModuleName.Contains("jit"))
-                    .Select(module => new JitModule(Path.GetFileNameWithoutExtension(module.FileName), module.FileVersionInfo.ProductVersion));
-        }
-
-        internal static string GetJitModulesInfo() => string.Join(";", GetJitModules().Select(m => m.Name + "-v" + m.Version));
-
         internal static bool HasRyuJit()
         {
             if (IsMono)
@@ -243,24 +229,16 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetJitInfo()
         {
-            if (IsCoreRT)
+            if (IsCoreRT || IsNetNative)
                 return "AOT";
             if (IsMono)
                 return ""; // There is no helpful information about JIT on Mono
-            if (IsNetCore)
-                return "RyuJIT"; // CoreCLR supports only RyuJIT
+            if (IsNetCore || HasRyuJit()) // CoreCLR supports only RyuJIT
+                return "RyuJIT";
+            if (IsFullFramework)
+                return  "LegacyJIT";
 
-            // We are working on Full CLR, so there are only LegacyJIT and RyuJIT
-            var modules = GetJitModules().ToArray();
-            string jitName = HasRyuJit() ? "RyuJIT" : "LegacyJIT";
-            if (modules.Length == 1)
-            {
-                // If we have only one JIT module, we know the version of the current JIT compiler
-                return jitName + "-v" + modules[0].Version;
-            }
-
-            // Otherwise, let's just print information about all modules
-            return jitName + "/" + GetJitModulesInfo();
+            return Unknown;
         }
 
         internal static IntPtr GetCurrentAffinity() => Process.GetCurrentProcess().TryGetAffinity() ?? default;

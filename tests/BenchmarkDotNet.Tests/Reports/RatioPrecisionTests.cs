@@ -67,8 +67,9 @@ namespace BenchmarkDotNet.Tests.Reports
             var summary = new Summary(
                 "MockSummary",
                 benchmarkReports.ToImmutableArray(),
-                new HostEnvironmentInfoBuilder().Build(), 
-                "",
+                new HostEnvironmentInfoBuilder().Build(),
+                string.Empty,
+                string.Empty,
                 TimeSpan.FromMinutes(1),
                 ImmutableArray<ValidationError>.Empty);
             MarkdownExporter.Default.ExportToLog(summary, logger);

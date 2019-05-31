@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
@@ -8,6 +7,8 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
@@ -125,22 +126,17 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private string GetFilePath(DiagnoserActionParameters details, DateTime creationTime)
         {
-            var folderPath = details.Config.ArtifactsPath;
+            string fileName = $@"{FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type)}.{FullNameProvider.GetMethodName(details.BenchmarkCase)}";
 
-            folderPath = Path.Combine(folderPath, $"{creationTime:yyyyMMdd-hhmm}-{Process.GetCurrentProcess().Id}");
-            
             // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
-            if (details.Config.GetJobs().Select(job => job.Infrastructure.Toolchain).Distinct().Count() > 1)
-                folderPath = Path.Combine(folderPath, details.BenchmarkCase.Job.Infrastructure.Toolchain.Name);
+            if (details.Config.GetJobs().Select(job => job.GetToolchain()).Distinct().Count() > 1)
+                fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.Job.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
 
-            if (!string.IsNullOrWhiteSpace(details.BenchmarkCase.Descriptor.Type.Namespace))
-                folderPath = Path.Combine(folderPath, details.BenchmarkCase.Descriptor.Type.Namespace.Replace('.', Path.DirectorySeparatorChar));
+            fileName += $"-{creationTime.ToString(BenchmarkRunnerClean.DateTimeFormat)}";
 
-            folderPath = Path.Combine(folderPath, FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type, includeNamespace: false));
+            fileName = FolderNameHelper.ToFolderName(fileName);
 
-            var fileName = FolderNameHelper.ToFolderName(FullNameProvider.GetMethodName(details.BenchmarkCase));
-
-            return Path.Combine(folderPath, $"{fileName}{FileExtension}");
+            return Path.Combine(details.Config.ArtifactsPath, $"{fileName}{FileExtension}");
         }
 
         private string EnsureFolderExists(string filePath)

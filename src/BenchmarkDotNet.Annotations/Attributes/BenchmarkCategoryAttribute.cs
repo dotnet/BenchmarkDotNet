@@ -1,5 +1,5 @@
-using System;
 using JetBrains.Annotations;
+using System;
 
 namespace BenchmarkDotNet.Attributes
 {
@@ -11,9 +11,6 @@ namespace BenchmarkDotNet.Attributes
         // CLS-Compliant Code requires a constructor without an array in the argument list
         [PublicAPI] protected BenchmarkCategoryAttribute() { }
 
-        public BenchmarkCategoryAttribute(params string[] categories)
-        {
-            Categories = categories;
-        }
+        public BenchmarkCategoryAttribute(params string[] categories) => Categories = categories;
     }
 }

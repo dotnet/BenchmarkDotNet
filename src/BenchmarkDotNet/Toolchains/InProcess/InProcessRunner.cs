@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Reflection;
+
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.InProcess
 {
+    [Obsolete("Please use BenchmarkDotNet.Toolchains.InProcess.NoEmit.* classes")]
     internal class InProcessRunner
     {
         public static int Run(IHost host, BenchmarkCase benchmarkCase, BenchmarkActionCodegen codegenMode)

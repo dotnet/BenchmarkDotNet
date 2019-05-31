@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             etwProfiler.Handle(signal, parameters);
 
-            // we need to remember process Id because we loose it when the proces exits
+            // we need to remember process Id because we loose it when the process exits
             if (signal == HostSignal.AfterAll)
                 benchmarkToProcessId[parameters.BenchmarkCase] = parameters.Process.Id;
             else if (signal == HostSignal.AfterProcessExit)

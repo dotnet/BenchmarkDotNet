@@ -23,21 +23,20 @@ namespace BenchmarkDotNet.Tests.Mocks
                 "MockSummary",
                 runInfo.BenchmarksCases.Select((benchmark, index) => CreateReport(benchmark, 5, (index + 1) * 100)).ToImmutableArray(),
                 new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
-                "",
+                string.Empty,
+                string.Empty,
                 TimeSpan.FromMinutes(1),
                 ImmutableArray<ValidationError>.Empty);
         }
 
-        public static Summary CreateSummary(IConfig config)
-        {
-            return new Summary(
+        public static Summary CreateSummary(IConfig config) => new Summary(
                 "MockSummary",
                 CreateReports(config),
                 new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
-                "",
+                string.Empty,
+                string.Empty,
                 TimeSpan.FromMinutes(1),
                 ImmutableArray<ValidationError>.Empty);
-        }
 
         private static ImmutableArray<BenchmarkReport> CreateReports(IConfig config) 
             => CreateBenchmarks(config).Select(CreateSimpleReport).ToImmutableArray();
@@ -50,7 +49,7 @@ namespace BenchmarkDotNet.Tests.Mocks
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, int n, double nanoseconds)
         {
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
-            var executeResult = new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
+            var executeResult = new ExecuteResult(true, 0, Array.Empty<string>(), new[] { $"// Runtime=extra output line" });
             var measurements = Enumerable.Range(0, n)
                 .Select(index => new Measurement(1, IterationMode.Workload, IterationStage.Result, index + 1, 1, nanoseconds + index))
                 .ToList();

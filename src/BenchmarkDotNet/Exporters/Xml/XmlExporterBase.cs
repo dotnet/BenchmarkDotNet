@@ -59,6 +59,8 @@ namespace BenchmarkDotNet.Exporters.Xml
                 builder.WithExcludedProperty(nameof(BenchmarkReportDto.Measurements));
             }
 
+            builder.WithExcludedProperty(nameof(Measurement.Encoding));
+
             return builder.Build();
         }
     }

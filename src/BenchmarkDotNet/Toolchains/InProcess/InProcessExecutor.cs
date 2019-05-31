@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -12,15 +13,14 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.InProcess
 {
     /// <summary>
     /// Implementation of <see cref="IExecutor" /> for in-process benchmarks.
     /// </summary>
-    [PublicAPI]
     [SuppressMessage("ReSharper", "ArrangeBraces_using")]
+    [Obsolete("Please use BenchmarkDotNet.Toolchains.InProcess.NoEmit.* classes")]
     public class InProcessExecutor : IExecutor
     {
         private static readonly TimeSpan UnderDebuggerTimeout = TimeSpan.FromDays(1);

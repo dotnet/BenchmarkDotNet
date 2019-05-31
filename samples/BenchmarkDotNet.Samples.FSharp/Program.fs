@@ -34,7 +34,7 @@ type StringKeyComparison () =
     [<Benchmark>]
     member self.OrdinalLookup () = lookup arr dict2
 
-#if !NETCOREAPP2_0
+#if !NETCOREAPP2_1
 [<BenchmarkDotNet.Diagnostics.Windows.Configs.TailCallDiagnoser>]
 #endif
 type TailCallDetector () =

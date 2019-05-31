@@ -54,6 +54,33 @@ NumberOfLogicalProcessors=16
         }
 
         [Fact]
+        public void RealTwoProcessorEightCoresWithWmicBugTest()
+        {
+            const string cpuInfo =
+                "\r\r\n" +
+                "\r\r\n" +
+                "MaxClockSpeed=3111\r\r\n" +
+                "Name=Intel(R) Xeon(R) CPU E5-2687W 0 @ 3.10GHz\r\r\n" +
+                "NumberOfCores=8\r\r\n" +
+                "NumberOfLogicalProcessors=16\r\r\n" +
+                "\r\r\n" +
+                "\r\r\n" +
+                "MaxClockSpeed=3111\r\r\n" +
+                "Name=Intel(R) Xeon(R) CPU E5-2687W 0 @ 3.10GHz\r\r\n" +
+                "NumberOfCores=8\r\r\n" +
+                "NumberOfLogicalProcessors=16\r\r\n" +
+                "\r\r\n" +
+                "\r\r\n" +
+                "\r\r\n";
+            var parser = WmicCpuInfoParser.ParseOutput(cpuInfo);
+            Assert.Equal("Intel(R) Xeon(R) CPU E5-2687W 0 @ 3.10GHz", parser.ProcessorName);
+            Assert.Equal(2, parser.PhysicalProcessorCount);
+            Assert.Equal(16, parser.PhysicalCoreCount);
+            Assert.Equal(32, parser.LogicalCoreCount);
+            Assert.Equal(3111 * Frequency.MHz, parser.MaxFrequency);
+        }
+
+        [Fact]
         public void RealOneProcessorFourCoresTest()
         {
             const string cpuInfo = @"
