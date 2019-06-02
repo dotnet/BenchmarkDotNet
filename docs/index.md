@@ -130,7 +130,7 @@ BenchmarkDotNet has a lot of awesome features for deep performance investigation
 * **Execution control:** BenchmarkDotNet tries to choose the best possible way to evaluate performance, but you can also manually control amount of iterations, switch between cold start and warmed state, set the accuracy level, tune GC parameters, change environment variables, and more
 * **Statistics:** by default, you will see the most important statistics like mean and standard deviation; but you can also manually ask for min/max values, confidence intervals, skewness, kurtosis, quartile, percentiles, or define own metrics
 * **Comparing environments:** [Easy way](http://benchmarkdotnet.org/Configs/Jobs.htm) to compare different environments (x86 vs x64, LegacyJit vs RyuJit, Mono vs .NET Core, and so on)
-* **Relative performance:** you can [easily]((http://benchmarkdotnet.org/Advanced/Baseline.htm)) evaluate difference between different methods of environments
+* **Relative performance:** you can [easily](http://benchmarkdotnet.org/Advanced/Baseline.htm) evaluate difference between different methods of environments
 * **Memory diagnostics:** the library not only measure performance of your code, but also prints information about memory traffic and amount of GC collections
 * **Disassembly diagnostics:** you can ask for an assembly listing with the help of single additional attribute
 * **Parametrization:** performance can be evaluated for different sets of input [parameters](http://benchmarkdotnet.org/Advanced/Params.htm) like in popular unit test frameworks
