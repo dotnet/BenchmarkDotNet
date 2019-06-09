@@ -122,6 +122,11 @@ namespace BenchmarkDotNet.Diagnosers
             consoleExitHandler = new ConsoleExitHandler(perfCollectProcess, parameters.Config.GetCompositeLogger());
 
             perfCollectProcess.Start();
+
+            while(perfCollectProcess.StandardOutput.ReadLine()?.IndexOf("Collection started", StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                // wait until the script starts the actual collection
+            }
         }
 
         private Process CreatePerfCollectProcess(DiagnoserActionParameters parameters, FileInfo perfCollectFile)
@@ -131,7 +136,7 @@ namespace BenchmarkDotNet.Diagnosers
             var start = new ProcessStartInfo
             {
                 FileName = "/bin/bash",
-                Arguments = $"-c \"sudo {perfCollectFile.FullName} collect {traceName}\"",
+                Arguments = $"-c \"sudo '{perfCollectFile.FullName}' collect '{traceName}'\"",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardInput = true,
@@ -158,7 +163,10 @@ namespace BenchmarkDotNet.Diagnosers
                     perfCollectProcess.KillTree();
                 }
 
-                benchmarkToTraceFile[parameters.BenchmarkCase] = TraceFileHelper.GetFilePath(parameters.BenchmarkCase, parameters.Config, creationTime, ".trace.zip");
+                if (perfCollectProcess.HasExited && perfCollectProcess.ExitCode == 0)
+                {
+                    benchmarkToTraceFile[parameters.BenchmarkCase] = TraceFileHelper.GetFilePath(parameters.BenchmarkCase, parameters.Config, creationTime, ".trace.zip");
+                }
             }
             finally
             {
