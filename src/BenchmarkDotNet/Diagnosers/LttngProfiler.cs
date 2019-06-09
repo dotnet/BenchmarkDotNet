@@ -154,7 +154,12 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 perfCollectProcess.StandardInput.Close(); // signal Ctrl + C to the script to tell it to stop profiling
 
-                if (!perfCollectProcess.WaitForExit((int)config.TracePostProcessingTimeout.TotalMilliseconds))
+                while (perfCollectProcess.StandardOutput.ReadLine()?.IndexOf("Trace saved", StringComparison.OrdinalIgnoreCase) < 0)
+                {
+                    // wait until the script ends post-processing
+                }
+
+                if (!perfCollectProcess.HasExited && !perfCollectProcess.WaitForExit((int)config.TracePostProcessingTimeout.TotalMilliseconds))
                 {
                     var logger = parameters.Config.GetCompositeLogger();
                     logger.WriteLineError($"The perfcollect script did not finish the post processing in {config.TracePostProcessingTimeout.TotalSeconds}s.");
