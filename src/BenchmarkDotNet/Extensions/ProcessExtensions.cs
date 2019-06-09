@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -118,6 +120,12 @@ namespace BenchmarkDotNet.Extensions
 
             if (benchmarkCase.Job.Environment.Runtime is MonoRuntime monoRuntime && !string.IsNullOrEmpty(monoRuntime.MonoBclPath))
                 start.EnvironmentVariables["MONO_PATH"] = monoRuntime.MonoBclPath;
+
+            if (benchmarkCase.Config.GetDiagnosers().OfType<LttngProfiler>().Any())
+            {
+                start.EnvironmentVariables["COMPlus_PerfMapEnabled"] = "1";
+                start.EnvironmentVariables["COMPlus_EnableEventLog"] = "1";
+            }
 
             if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
                 return;

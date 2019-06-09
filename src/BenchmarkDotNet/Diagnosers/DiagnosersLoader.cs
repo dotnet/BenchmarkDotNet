@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -41,10 +43,16 @@ namespace BenchmarkDotNet.Diagnosers
             if (RuntimeInformation.IsWindows())
                 return LoadClassic();
 
-            return LoadCore();
+            return LoadCore().ToArray();
         }
 
-        private static IDiagnoser[] LoadCore() => new IDiagnoser[] { MemoryDiagnoser.Default };
+        private static IEnumerable<IDiagnoser> LoadCore()
+        {
+            yield return MemoryDiagnoser.Default;
+
+            if (RuntimeInformation.IsLinux())
+                yield return LttngProfiler.Default;
+        }
 
         private static IDiagnoser[] LoadMono() 
             => new IDiagnoser[]

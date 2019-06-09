@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             Details = details;
             Config = config;
-            FilePath = EnsureFolderExists(GetFilePath(details, creationTime));
+            FilePath = TraceFileHelper.EnsureFolderExists(TraceFileHelper.GetFilePath(details.BenchmarkCase, details.Config, creationTime, FileExtension)).FullName;
 
             TraceEventSession = new TraceEventSession(sessionName, FilePath)
             {
@@ -123,30 +123,5 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private void OnConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e) => Stop();
 
         private void OnProcessExit(object sender, EventArgs e) => Stop();
-
-        private string GetFilePath(DiagnoserActionParameters details, DateTime creationTime)
-        {
-            string fileName = $@"{FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type)}.{FullNameProvider.GetMethodName(details.BenchmarkCase)}";
-
-            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
-            if (details.Config.GetJobs().Select(job => job.GetToolchain()).Distinct().Count() > 1)
-                fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.Job.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
-
-            fileName += $"-{creationTime.ToString(BenchmarkRunnerClean.DateTimeFormat)}";
-
-            fileName = FolderNameHelper.ToFolderName(fileName);
-
-            return Path.Combine(details.Config.ArtifactsPath, $"{fileName}{FileExtension}");
-        }
-
-        private string EnsureFolderExists(string filePath)
-        {
-            string directoryPath = Path.GetDirectoryName(filePath);
-
-            if (!Directory.Exists(directoryPath))
-                Directory.CreateDirectory(directoryPath);
-
-            return filePath;
-        }
     }
 }

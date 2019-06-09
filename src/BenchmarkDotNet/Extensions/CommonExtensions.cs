@@ -123,6 +123,14 @@ namespace BenchmarkDotNet.Extensions
             return directoryPath;
         }
 
+        internal static DirectoryInfo CreateIfNotExists(this DirectoryInfo directory)
+        {
+            if (!directory.Exists)
+                directory.Create();
+
+            return directory;
+        }
+
         internal static bool IsNotNullButDoesNotExist(this FileSystemInfo fileInfo)
             => fileInfo != null && !fileInfo.Exists;
     }
