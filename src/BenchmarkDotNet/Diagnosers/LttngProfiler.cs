@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Diagnosers
             using (var client = new WebClient())
             {
                 logger.WriteLineInfo($"downloading perfcollect: {perfCollectFile.FullName}");
-                client.DownloadFile("https://aka.ms/perfcollect", "perfcollect");
+                client.DownloadFile("https://aka.ms/perfcollect", perfCollectFile.FullName);
             }
 
             var processOutput = ProcessHelper.RunAndReadOutput("/bin/bash", $"-c \"sudo chmod +x {perfCollectFile.FullName}\"", logger);
