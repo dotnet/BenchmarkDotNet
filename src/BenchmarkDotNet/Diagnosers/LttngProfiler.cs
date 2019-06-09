@@ -152,7 +152,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             try
             {
-                perfCollectProcess.StandardInput.Close(); // signal Ctrl + C to the script to tell it to stop profiling
+                Mono.Unix.Native.Syscall.kill(perfCollectProcess.Id, Mono.Unix.Native.Signum.SIGINT); // signal Ctrl + C to the script to tell it to stop profiling
 
                 while (perfCollectProcess.StandardOutput.ReadLine()?.IndexOf("Trace saved", StringComparison.OrdinalIgnoreCase) < 0)
                 {
