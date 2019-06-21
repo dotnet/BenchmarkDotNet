@@ -171,7 +171,7 @@ The library is used by a large number of projects for performance discussions or
 * [Roslyn](https://github.com/dotnet/roslyn/search?q=BenchmarkDotNet&type=Issues&utf8=✓) (C# and Visual Basic compiler)
 * [KestrelHttpServer](https://github.com/aspnet/KestrelHttpServer/tree/master/benchmarks/Kestrel.Performance) (A cross platform web server for ASP.NET Core)
 * [SignalR](https://github.com/aspnet/SignalR/tree/master/benchmarks/Microsoft.AspNetCore.SignalR.Microbenchmarks)
-* [EntityFrameworkCore](https://github.com/aspnet/EntityFrameworkCore/tree/master/benchmarks)
+* [EntityFrameworkCore](https://github.com/aspnet/EntityFrameworkCore/tree/master/benchmark)
 * [F#](https://github.com/fsharp/fsharp/blob/master/tests/scripts/array-perf/array-perf.fs)
 * [Orleans](https://github.com/dotnet/orleans/tree/master/test/Benchmarks)
 * [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json/tree/master/Src/Newtonsoft.Json.Tests/Benchmarks)

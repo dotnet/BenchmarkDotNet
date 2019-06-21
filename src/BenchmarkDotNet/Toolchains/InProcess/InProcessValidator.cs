@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Validators;
+
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.InProcess
@@ -77,9 +81,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         }
 
         private static string ValidateToolchain(Job job, Characteristic characteristic) =>
-            job.Infrastructure.Toolchain is InProcessToolchain
+            job.Infrastructure.Toolchain is InProcessEmitToolchain
+            || job.Infrastructure.Toolchain is InProcessNoEmitToolchain
+#pragma warning disable 618
+            || job.Infrastructure.Toolchain is InProcessToolchain
+#pragma warning restore 618
                 ? null
-                : $"should be instance of {nameof(InProcessToolchain)}.";
+                : $"should be instance of {nameof(InProcessEmitToolchain)} or {nameof(InProcessNoEmitToolchain)}.";
 
         /// <summary>The instance of validator that does NOT fail on error.</summary>
         public static readonly IValidator DontFailOnError = new InProcessValidator(false);

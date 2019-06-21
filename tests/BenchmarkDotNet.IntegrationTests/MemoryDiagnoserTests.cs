@@ -37,7 +37,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 : new[]
                 {
                     new object[] { Job.Default.GetToolchain() },
-                    // new object[] { InProcessToolchain.Instance }, // this test takes a LOT of time and since we have new InProcessEmitToolchain we can disable it 
                     new object[] { InProcessEmitToolchain.Instance },
 #if NETCOREAPP2_1 
                     // we don't want to test CoreRT twice (for .NET 4.6 and Core 2.1) when running the integration tests (these tests take a lot of time)
@@ -208,6 +207,51 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertAllocations(toolchain, typeof(TimeConsuming), new Dictionary<string, long>
             {
                 { nameof(TimeConsuming.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead }
+            });
+        }
+
+        public class MultiThreadedAllocation
+        {
+            public const int Size = 1_000_000;
+            public const int ThreadsCount = 10;
+
+            private Thread[] threads;
+
+            [IterationSetup]
+            public void SetupIteration()
+            {
+                threads = Enumerable.Range(0, ThreadsCount)
+                    .Select(_ => new Thread(() => GC.KeepAlive(new byte[Size])))
+                    .ToArray();
+            }
+
+            [Benchmark]
+            public void Allocate()
+            {
+                foreach (var thread in threads)
+                {
+                    thread.Start();
+                    thread.Join();
+                }
+            }
+        }
+
+        [TheoryNetCore30(".NET Core 3.0 preview6+ exposes a GC.GetTotalAllocatedBytes method which makes it possible to work"), MemberData(nameof(GetToolchains))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void MemoryDiagnoserIsAccurateForMultiThreadedBenchmarks(IToolchain toolchain)
+        {
+            if (toolchain is CoreRtToolchain) // the API has not been yet ported to CoreRT
+                return;
+
+            long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
+            long arraySizeOverhead = IntPtr.Size; // array length
+            long memoryAllocatedPerArray = (MultiThreadedAllocation.Size + objectAllocationOverhead + arraySizeOverhead);
+            long threadStartAndJoinOverhead = 112; // this is more or less a magic number taken from memory profiler
+            long allocatedMemoryPerThread = memoryAllocatedPerArray + threadStartAndJoinOverhead;
+
+            AssertAllocations(toolchain, typeof(MultiThreadedAllocation), new Dictionary<string, long>
+            {
+                { nameof(MultiThreadedAllocation.Allocate), allocatedMemoryPerThread * MultiThreadedAllocation.ThreadsCount }
             });
         }
 

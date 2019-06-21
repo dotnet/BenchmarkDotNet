@@ -282,7 +282,6 @@ namespace BenchmarkDotNet.IntegrationTests
          MemberData(nameof(GetToolchains))]
         public void StringCanBePassedToBenchmarkAsReadOnlySpan(IToolchain toolchain) => CanExecute<WithStringToReadOnlySpan>(toolchain);
 
-
         public class WithStringToReadOnlySpan
         {
             private const string expectedString = "very nice string";
@@ -315,6 +314,26 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 if (array.Length != 123)
                     throw new ArgumentException("The array was empty");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))] // make sure BDN mimics xunit's MemberData behaviour
+        public void AnIEnumerableOfArrayOfObjectsCanBeUsedAsArgumentForBenchmarkAcceptingSingleArgument(IToolchain toolchain)
+            => CanExecute<WithIEnumerableOfArrayOfObjectsFromArgumentSource>(toolchain);
+
+        public class WithIEnumerableOfArrayOfObjectsFromArgumentSource
+        {
+            public IEnumerable<object[]> GetArguments()
+            {
+                yield return new object[] { true };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(GetArguments))]
+            public void SingleArgument(bool boolean)
+            {
+                if (boolean != true)
+                    throw new ArgumentException("The value of boolean was incorrect");
             }
         }
 

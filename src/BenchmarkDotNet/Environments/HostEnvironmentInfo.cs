@@ -43,8 +43,6 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public Lazy<CpuInfo> CpuInfo { get; protected set; }
 
-        public string JitModules { get; protected set; }
-
         /// <summary>
         /// .NET Core SDK version
         /// <remarks>It's expensive to call (creates new process by calling `dotnet --version`)</remarks>
@@ -82,7 +80,6 @@ namespace BenchmarkDotNet.Environments
             CpuInfo = new Lazy<CpuInfo>(RuntimeInformation.GetCpuInfo);
             ChronometerFrequency = Chronometer.Frequency;
             HardwareTimerKind = Chronometer.HardwareTimerKind;
-            JitModules = RuntimeInformation.GetJitModulesInfo();
             DotNetSdkVersion = new Lazy<string>(DotNetCliCommandExecutor.GetDotNetSdkVersion);
             IsMonoInstalled = new Lazy<bool>(() => !string.IsNullOrEmpty(ProcessHelper.RunAndReadOutput("mono", "--version")));
             AntivirusProducts = new Lazy<ICollection<Antivirus>>(RuntimeInformation.GetAntivirusProducts);

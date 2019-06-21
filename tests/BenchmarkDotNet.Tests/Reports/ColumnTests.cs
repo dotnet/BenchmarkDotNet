@@ -45,27 +45,5 @@ namespace BenchmarkDotNet.Tests.Reports
             output.WriteLine(logger.GetLog());
             return summary;
         }
-
-        [Theory]
-        [InlineData(4, 0.01)]
-        [InlineData(4, 0.123456)]
-        [InlineData(4, 0.1)]
-        [InlineData(4, 0.0)]
-        [InlineData(4, 0.9)]
-        [InlineData(3, 1)]
-        [InlineData(3, 1.5)]
-        [InlineData(3, 9.999999999)]
-        [InlineData(2, 10)]
-        [InlineData(2, 99.99999999)]
-        [InlineData(1, 100)]
-        [InlineData(1, 999.9999999)]
-        [InlineData(1, 10000)]
-        [InlineData(1, 100000)]
-        [InlineData(1, double.NaN)]
-        [InlineData(1, double.PositiveInfinity)]
-        public void BestAmountOfDecimalDigitsTest(int expected, double value)
-        {
-            Assert.Equal(expected, StatisticColumn.GetBestAmountOfDecimalDigits(value));
-        }
     }
 }

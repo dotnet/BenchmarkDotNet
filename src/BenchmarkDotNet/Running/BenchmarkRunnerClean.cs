@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Running
 {
     internal static class BenchmarkRunnerClean
     {
-        private const string DateTimeFormat = "yyyyMMdd-hhmmss";
+        internal const string DateTimeFormat = "yyyyMMdd-HHmmss";
 
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvironmentResolver.Instance, InfrastructureResolver.Instance);
 
@@ -39,18 +39,19 @@ namespace BenchmarkDotNet.Running
             var title = GetTitle(benchmarkRunInfos);
             var rootArtifactsFolderPath = GetRootArtifactsFolderPath(benchmarkRunInfos);
             var resultsFolderPath = GetResultsFolderPath(rootArtifactsFolderPath, benchmarkRunInfos);
+            var logFilePath = Path.Combine(rootArtifactsFolderPath, title + ".log");
 
-            using (var streamLogger = new StreamLogger(new StreamWriter(Path.Combine(rootArtifactsFolderPath, title + ".log"), append: false)))
+            using (var streamLogger = new StreamLogger(new StreamWriter(logFilePath, append: false)))
             {
                 var compositeLogger = CreateCompositeLogger(benchmarkRunInfos, streamLogger);
                 
                 var supportedBenchmarks = GetSupportedBenchmarks(benchmarkRunInfos, compositeLogger, resolver);
                 if (!supportedBenchmarks.Any(benchmarks => benchmarks.BenchmarksCases.Any()))
-                    return new [] { Summary.NothingToRun(title, resultsFolderPath) };
+                    return new [] { Summary.NothingToRun(title, resultsFolderPath, logFilePath) };
 
                 var validationErrors = Validate(supportedBenchmarks, compositeLogger);
                 if (validationErrors.Any(validationError => validationError.IsCritical))
-                    return new [] { Summary.ValidationFailed(title, resultsFolderPath, validationErrors) };
+                    return new [] { Summary.ValidationFailed(title, resultsFolderPath, logFilePath, validationErrors) };
 
                 var benchmarksToRunCount = supportedBenchmarks.Sum(benchmarkInfo => benchmarkInfo.BenchmarksCases.Length);
                 compositeLogger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
@@ -72,7 +73,7 @@ namespace BenchmarkDotNet.Running
                     {
                         var runChronometer = Chronometer.Start();
                         
-                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup, rootArtifactsFolderPath, resultsFolderPath, ref runChronometer);
+                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup, resultsFolderPath, logFilePath, ref runChronometer);
                         
                         if (!benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.JoinSummary))
                             PrintSummary(compositeLogger, benchmarkRunInfo.Config, summary);
@@ -108,6 +109,7 @@ namespace BenchmarkDotNet.Running
                 {
                     compositeLogger.WriteLineHeader("// * Artifacts cleanup *");
                     Cleanup(new HashSet<string>(artifactsToCleanup.Distinct()));
+                    compositeLogger.Flush();
                 }
             }
         }
@@ -117,64 +119,68 @@ namespace BenchmarkDotNet.Running
                                    IResolver resolver,
                                    ILogger logger, 
                                    List<string> artifactsToCleanup, 
-                                   string rootArtifactsFolderPath,
                                    string resultsFolderPath,
+                                   string logFilePath,
                                    ref StartedClock runChronometer)
         {
             var benchmarks = benchmarkRunInfo.BenchmarksCases;
             var config = benchmarkRunInfo.Config;
             var reports = new List<BenchmarkReport>();
             string title = GetTitle(new[] { benchmarkRunInfo });
-            var powerManagementApplier = new PowerManagementApplier(logger);
 
             logger.WriteLineInfo($"// Found {benchmarks.Length} benchmarks:");
             foreach (var benchmark in benchmarks)
                 logger.WriteLineInfo($"//   {benchmark.DisplayInfo}");
             logger.WriteLine();
-            foreach (var benchmark in benchmarks)
+
+            using (var powerManagementApplier = new PowerManagementApplier(logger))
             {
-                powerManagementApplier.ApplyPerformancePlan(benchmark.Job.Environment.PowerPlanMode.PowerPlan);
-                var info = buildResults[benchmark];
-                var buildResult = info.buildResult;
-
-                if (!config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
-                    artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
-
-                if (buildResult.IsBuildSuccess)
+                foreach (var benchmark in benchmarks)
                 {
-                    var report = RunCore(benchmark, info.benchmarkId, logger, resolver, buildResult);
-                    if (report.AllMeasurements.Any(m => m.Operations == 0))
-                        throw new InvalidOperationException("An iteration with 'Operations == 0' detected");
-                    reports.Add(report);
-                    if (report.GetResultRuns().Any())
-                        logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr(config.Encoding));
+                    powerManagementApplier.ApplyPerformancePlan(benchmark.Job.Environment.PowerPlanMode);
 
-                    if (!report.Success && config.Options.IsSet(ConfigOptions.StopOnFirstError))
-                        break;
+                    var info = buildResults[benchmark];
+                    var buildResult = info.buildResult;
+
+                    if (!config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
+                        artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
+
+                    if (buildResult.IsBuildSuccess)
+                    {
+                        var report = RunCore(benchmark, info.benchmarkId, logger, resolver, buildResult);
+                        if (report.AllMeasurements.Any(m => m.Operations == 0))
+                            throw new InvalidOperationException("An iteration with 'Operations == 0' detected");
+                        reports.Add(report);
+                        if (report.GetResultRuns().Any())
+                            logger.WriteLineStatistic(report.GetResultRuns().GetStatistics().ToTimeStr(config.Encoding));
+
+                        if (!report.Success && config.Options.IsSet(ConfigOptions.StopOnFirstError))
+                            break;
+                    }
+                    else
+                    {
+                        reports.Add(new BenchmarkReport(false, benchmark, buildResult, buildResult, default, default, default, default));
+
+                        if (buildResult.GenerateException != null)
+                            logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException.Message}");
+                        if (buildResult.ErrorMessage != null)
+                            logger.WriteLineError($"// Build Error: {buildResult.ErrorMessage}");
+
+                        if (config.Options.IsSet(ConfigOptions.StopOnFirstError))
+                            break;
+                    }
+
+                    logger.WriteLine();
                 }
-                else
-                {
-                    reports.Add(new BenchmarkReport(false, benchmark, buildResult, buildResult, default, default, default, default));
-
-                    if (buildResult.GenerateException != null)
-                        logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException.Message}");
-                    if (buildResult.ErrorMessage != null)
-                        logger.WriteLineError($"// Build Error: {buildResult.ErrorMessage}");
-
-                    if(config.Options.IsSet(ConfigOptions.StopOnFirstError))
-                        break;
-                }
-
-                logger.WriteLine();
             }
             
             var clockSpan = runChronometer.GetElapsed();
 
-            powerManagementApplier.ApplyUserPowerPlan();
             return new Summary(title,
                 reports.ToImmutableArray(),
                 HostEnvironmentInfo.GetCurrent(),
                 resultsFolderPath,
+                logFilePath,
                 clockSpan.GetTimeSpan(), 
                 Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
         }

@@ -30,6 +30,8 @@ namespace BenchmarkDotNet.Helpers
                     return $"System.Numerics.BigInteger.Parse(\"{bigInteger.ToString(CultureInfo.InvariantCulture)}\", System.Globalization.CultureInfo.InvariantCulture)";
                 case DateTime dateTime:
                     return $"System.DateTime.Parse(\"{dateTime.ToString(CultureInfo.InvariantCulture)}\", System.Globalization.CultureInfo.InvariantCulture)";
+                case Guid guid:
+                    return $"System.Guid.Parse(\"{guid.ToString()}\")";
             }
             if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
                 return $"({value.GetType().GetCorrectCSharpTypeName()})({ToInvariantCultureString(value)})";

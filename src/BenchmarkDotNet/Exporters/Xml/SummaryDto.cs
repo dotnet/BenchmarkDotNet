@@ -45,17 +45,13 @@ namespace BenchmarkDotNet.Exporters.Xml
         public bool HasAttachedDebugger => hei.HasAttachedDebugger;
         public bool HasRyuJit => hei.HasRyuJit;
         public string Configuration => hei.Configuration;
-        public string JitModules => hei.JitModules;
         public string DotNetSdkVersion => hei.DotNetSdkVersion.Value;
         public ChronometerDto ChronometerFrequency => new ChronometerDto(hei.ChronometerFrequency);
         public string HardwareTimerKind => hei.HardwareTimerKind.ToString();
 
         private readonly HostEnvironmentInfo hei;
 
-        public HostEnvironmentInfoDto(HostEnvironmentInfo hei)
-        {
-            this.hei = hei;
-        }
+        public HostEnvironmentInfoDto(HostEnvironmentInfo hei) => this.hei = hei;
     }
 
     internal class ChronometerDto
@@ -64,10 +60,7 @@ namespace BenchmarkDotNet.Exporters.Xml
 
         private readonly Frequency frequency;
 
-        public ChronometerDto(Frequency frequency)
-        {
-            this.frequency = frequency;
-        }
+        public ChronometerDto(Frequency frequency) => this.frequency = frequency;
     }
 
     internal class BenchmarkReportDto

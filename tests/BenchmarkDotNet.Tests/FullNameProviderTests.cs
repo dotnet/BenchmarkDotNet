@@ -193,7 +193,7 @@ namespace BenchmarkDotNet.Tests
 
         public IEnumerable<object[]> Data()
         {
-            yield return new object[] { ArrayParam<int>.ForPrimitives(new[] { 1, 2, 3 }), 4 };
+            yield return new object[] { new int[] { 1, 2, 3 }, 4 };
         }
     }
 
@@ -230,7 +230,7 @@ namespace BenchmarkDotNet.Tests
 
         public IEnumerable<object[]> Data()
         {
-            yield return new object[] { ArrayParam<int>.ForPrimitives(Enumerable.Range(0, 100).ToArray()) };
+            yield return new object[] { Enumerable.Range(0, 100).ToArray() };
         }
     }
 

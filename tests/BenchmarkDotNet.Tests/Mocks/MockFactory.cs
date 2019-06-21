@@ -23,21 +23,20 @@ namespace BenchmarkDotNet.Tests.Mocks
                 "MockSummary",
                 runInfo.BenchmarksCases.Select((benchmark, index) => CreateReport(benchmark, 5, (index + 1) * 100)).ToImmutableArray(),
                 new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
-                "",
+                string.Empty,
+                string.Empty,
                 TimeSpan.FromMinutes(1),
                 ImmutableArray<ValidationError>.Empty);
         }
 
-        public static Summary CreateSummary(IConfig config)
-        {
-            return new Summary(
+        public static Summary CreateSummary(IConfig config) => new Summary(
                 "MockSummary",
                 CreateReports(config),
                 new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
-                "",
+                string.Empty,
+                string.Empty,
                 TimeSpan.FromMinutes(1),
                 ImmutableArray<ValidationError>.Empty);
-        }
 
         private static ImmutableArray<BenchmarkReport> CreateReports(IConfig config) 
             => CreateBenchmarks(config).Select(CreateSimpleReport).ToImmutableArray();

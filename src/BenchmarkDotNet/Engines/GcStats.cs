@@ -12,7 +12,8 @@ namespace BenchmarkDotNet.Engines
 
         public static readonly long AllocationQuantum = CalculateAllocationQuantumSize();
 
-        private static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = GetAllocatedBytesForCurrentThread();
+        private static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = CreateGetAllocatedBytesForCurrentThreadDelegate();
+        private static readonly Func<bool, long> GetTotalAllocatedBytesDelegate = CreateGetTotalAllocatedBytesDelegate();
 
         public static readonly GcStats Empty = new GcStats(0, 0, 0, 0, 0);
 
@@ -143,11 +144,14 @@ namespace BenchmarkDotNet.Engines
             if (RuntimeInformation.IsFullFramework) // it can be a .NET app consuming our .NET Standard package
                 return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
 
+            if (GetTotalAllocatedBytesDelegate != null) // it's .NET Core 3.0 with the new API available
+                return GetTotalAllocatedBytesDelegate.Invoke(true); // true for the "precise" argument
+
             // https://apisof.net/catalog/System.GC.GetAllocatedBytesForCurrentThread() is not part of the .NET Standard, so we use reflection to call it..
             return GetAllocatedBytesForCurrentThreadDelegate.Invoke();
         }
 
-        private static Func<long> GetAllocatedBytesForCurrentThread()
+        private static Func<long> CreateGetAllocatedBytesForCurrentThreadDelegate()
         {
             // this method is not a part of .NET Standard so we need to use reflection
             var method = typeof(GC).GetTypeInfo().GetMethod("GetAllocatedBytesForCurrentThread", BindingFlags.Public | BindingFlags.Static);
@@ -155,7 +159,16 @@ namespace BenchmarkDotNet.Engines
             // we create delegate to avoid boxing, IMPORTANT!
             return method != null ? (Func<long>)method.CreateDelegate(typeof(Func<long>)) : null;
         }
-  
+
+        private static Func<bool, long> CreateGetTotalAllocatedBytesDelegate()
+        {
+            // this method is not a part of .NET Standard so we need to use reflection
+            var method = typeof(GC).GetTypeInfo().GetMethod("GetTotalAllocatedBytes", BindingFlags.Public | BindingFlags.Static);
+
+            // we create delegate to avoid boxing, IMPORTANT!
+            return method != null ? (Func<bool, long>)method.CreateDelegate(typeof(Func<bool, long>)) : null;
+        }
+
         public string ToOutputLine() 
             => $"{ResultsLinePrefix} {Gen0Collections} {Gen1Collections} {Gen2Collections} {AllocatedBytes} {TotalOperations}";
 
