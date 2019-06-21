@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                              | ClrTraceEventParser.Keywords.Loader
                              | ClrTraceEventParser.Keywords.NGen),
                     new TraceEventProviderOptions { StacksEnabled = false }), // stacks are too expensive for our purposes
-                (new Guid("0866B2B8-5CEF-5DB9-2612-0C0FFD814A44"), TraceEventLevel.Informational, MatchAnyKeywords, null) // ArrayPool events
+                (new Guid("0866B2B8-5CEF-5DB9-2612-0C0FFD814A44"), TraceEventLevel.Informational, MatchAnyKeywords, new TraceEventProviderOptions()) // ArrayPool events
             };
         }
     }
