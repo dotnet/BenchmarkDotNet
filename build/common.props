@@ -34,7 +34,7 @@
   </PropertyGroup>
   
   <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' ">
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>7.2</LangVersion>
     
     <Major>0</Major>
     <Minor>11</Minor>
