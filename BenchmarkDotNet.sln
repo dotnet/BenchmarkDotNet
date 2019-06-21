@@ -45,8 +45,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Integration
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Annotations", "src\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj", "{D9F5065B-6190-431B-850C-117E3D64AB33}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.IntegrationTests.NativeAllocation", "tests\BenchmarkDotNet.IntegrationTests.NativeAllocation\BenchmarkDotNet.IntegrationTests.NativeAllocation.csproj", "{F50D2909-2730-439B-9FC7-FAD24AF4FABD}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -273,18 +271,6 @@ Global
 		{D9F5065B-6190-431B-850C-117E3D64AB33}.Release|x64.Build.0 = Release|Any CPU
 		{D9F5065B-6190-431B-850C-117E3D64AB33}.Release|x86.ActiveCfg = Release|Any CPU
 		{D9F5065B-6190-431B-850C-117E3D64AB33}.Release|x86.Build.0 = Release|Any CPU
-		{F50D2909-2730-439B-9FC7-FAD24AF4FABD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F50D2909-2730-439B-9FC7-FAD24AF4FABD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F50D2909-2730-439B-9FC7-FAD24AF4FABD}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{F50D2909-2730-439B-9FC7-FAD24AF4FABD}.Debug|x64.Build.0 = Debug|Any CPU
-		{F50D2909-2730-439B-9FC7-FAD24AF4FABD}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F50D2909-2730-439B-9FC7-FAD24AF4FABD}.Debug|x86.Build.0 = Debug|Any CPU
-		{F50D2909-2730-439B-9FC7-FAD24AF4FABD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F50D2909-2730-439B-9FC7-FAD24AF4FABD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F50D2909-2730-439B-9FC7-FAD24AF4FABD}.Release|x64.ActiveCfg = Release|Any CPU
-		{F50D2909-2730-439B-9FC7-FAD24AF4FABD}.Release|x64.Build.0 = Release|Any CPU
-		{F50D2909-2730-439B-9FC7-FAD24AF4FABD}.Release|x86.ActiveCfg = Release|Any CPU
-		{F50D2909-2730-439B-9FC7-FAD24AF4FABD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
