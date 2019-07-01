@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -20,8 +21,8 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class LttngProfiler : IProfiler
     {
+        private const int SuccesExitCode = 0;
         private const string PerfCollectFileName = "perfcollect";
-
         public static readonly IDiagnoser Default = new LttngProfiler(new LttngProfilerConfig(performExtraBenchmarksRun: false));
 
         private readonly LttngProfilerConfig config;
@@ -29,7 +30,7 @@ namespace BenchmarkDotNet.Diagnosers
         private readonly Dictionary<BenchmarkCase, FileInfo> benchmarkToTraceFile = new Dictionary<BenchmarkCase, FileInfo>();
 
         private Process perfCollectProcess;
-        private ConsoleExitHandler consoleExitHandler;
+        private ManualResetEventSlim signal = new ManualResetEventSlim();
 
         [PublicAPI]
         public LttngProfiler(LttngProfilerConfig config) => this.config = config;
@@ -51,10 +52,18 @@ namespace BenchmarkDotNet.Diagnosers
             if (!RuntimeInformation.IsLinux())
             {
                 yield return new ValidationError(true, "The LttngProfiler works only on Linux!");
+                yield break;
             }
+
+            if (Mono.Unix.Native.Syscall.getuid() != 0)
+            {
+                yield return new ValidationError(true, "You must run as root to use LttngProfiler.");
+                yield break;
+            }
+
             if (validationParameters.Benchmarks.Any() && !TryInstallPerfCollect(validationParameters))
             {
-                yield return new ValidationError(true, "Please run as sudo, it's required to use LttngProfiler.");
+                yield return new ValidationError(true, "Failed to install perfcollect script. Please follow the instructions from https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/linux-performance-tracing.md#preparing-your-machine");
             }
         }
 
@@ -70,7 +79,7 @@ namespace BenchmarkDotNet.Diagnosers
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
             // it's crucial to start the trace before the process starts and stop it after the benchmarked process stops to have all of the necessary events in the trace file!
-            if (signal == HostSignal.BeforeProcessStart)
+            if (signal == HostSignal.BeforeAnythingElse)
                 Start(parameters);
             else if (signal == HostSignal.AfterProcessExit)
                 Stop(parameters);
@@ -90,19 +99,28 @@ namespace BenchmarkDotNet.Diagnosers
             perfCollectFile = new FileInfo(Path.Combine(scriptInstallationDirectory.FullName, PerfCollectFileName));
             using (var client = new WebClient())
             {
-                logger.WriteLineInfo($"downloading perfcollect: {perfCollectFile.FullName}");
+                logger.WriteLineInfo($"// Downloading perfcollect: {perfCollectFile.FullName}");
                 client.DownloadFile("https://aka.ms/perfcollect", perfCollectFile.FullName);
             }
 
-            var processOutput = ProcessHelper.RunAndReadOutput("/bin/bash", $"-c \"sudo chmod +x {perfCollectFile.FullName}\"", logger);
-            if (processOutput != null)
+            if (Mono.Unix.Native.Syscall.chmod(perfCollectFile.FullName, Mono.Unix.Native.FilePermissions.S_IXUSR) != SuccesExitCode)
             {
-                processOutput = ProcessHelper.RunAndReadOutput("/bin/bash", $"-c \"sudo {perfCollectFile.FullName} install\"", logger);
+                logger.WriteError($"Unable to make perfcollect script an executable, the last error was: {Mono.Unix.Native.Syscall.GetLastError()}");
             }
-
-            if (processOutput != null)
+            else
             {
-                return true;
+                (int exitCode, var output) = ProcessHelper.RunAndReadOutputLineByLine(perfCollectFile.FullName, "install", perfCollectFile.Directory.FullName, null, includeErrors: true, logger);
+
+                if (exitCode == SuccesExitCode)
+                {
+                    return true;
+                }
+
+                logger.WriteLineError("Failed to install perfcollect");
+                foreach(var outputLine in output)
+                {
+                    logger.WriteLine(outputLine);
+                }
             }
 
             if (perfCollectFile.Exists)
@@ -119,28 +137,46 @@ namespace BenchmarkDotNet.Diagnosers
 
             perfCollectProcess = CreatePerfCollectProcess(parameters, perfCollectFile);
 
-            consoleExitHandler = new ConsoleExitHandler(perfCollectProcess, parameters.Config.GetCompositeLogger());
+            var logger = parameters.Config.GetCompositeLogger();
+
+            perfCollectProcess.OutputDataReceived += OnOutputDataReceived;
+
+            signal.Reset();
 
             perfCollectProcess.Start();
+            perfCollectProcess.BeginOutputReadLine();
 
-            while(perfCollectProcess.StandardOutput.ReadLine()?.IndexOf("Collection started", StringComparison.OrdinalIgnoreCase) < 0)
+            WaitForSignal(logger, "// Collection with perfcollect started"); // wait until the script starts the actual collection
+        }
+
+        private void Stop(DiagnoserActionParameters parameters)
+        {
+            if (perfCollectProcess == null)
             {
-                // wait until the script starts the actual collection
+                return;
+            }
+
+            var logger = parameters.Config.GetCompositeLogger();
+
+            if (WaitForSignal(logger, "// Collection with perfcollect stopped"))
+            {
+                benchmarkToTraceFile[parameters.BenchmarkCase] = TraceFileHelper.GetFilePath(parameters.BenchmarkCase, parameters.Config, creationTime, ".trace.zip");
+
+                CleanupPerfCollectProcess(logger);
             }
         }
 
         private Process CreatePerfCollectProcess(DiagnoserActionParameters parameters, FileInfo perfCollectFile)
         {
             var traceName = TraceFileHelper.GetFilePath(parameters.BenchmarkCase, parameters.Config, creationTime, fileExtension: null).Name;
+            // todo: escape characters bash does not like ' ', '(' etc
 
             var start = new ProcessStartInfo
             {
-                FileName = "/bin/bash",
-                Arguments = $"-c \"sudo '{perfCollectFile.FullName}' collect '{traceName}'\"",
+                FileName = perfCollectFile.FullName,
+                Arguments = $"collect {traceName} -pid {parameters.Process.Id}",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
-                RedirectStandardInput = true,
-                RedirectStandardError = true,
                 CreateNoWindow = true,
                 WorkingDirectory = perfCollectFile.Directory.FullName
             };
@@ -148,35 +184,50 @@ namespace BenchmarkDotNet.Diagnosers
             return new Process { StartInfo = start };
         }
 
-        private void Stop(DiagnoserActionParameters parameters)
+        private void OnOutputDataReceived(object sender, DataReceivedEventArgs e)
         {
+            if (e.Data?.IndexOf("Collection started", StringComparison.OrdinalIgnoreCase) >= 0)
+                signal.Set();
+            else if (e.Data?.IndexOf("Trace saved", StringComparison.OrdinalIgnoreCase) >= 0)
+                signal.Set();
+            else if (e.Data?.IndexOf("This script must be run as root", StringComparison.OrdinalIgnoreCase) >= 0)
+                Environment.FailFast("To use LttngProfiler you must run as root."); // should never happen, ensured by Validate()
+        }
+
+        private bool WaitForSignal(ILogger logger, string message)
+        {
+            if (signal.Wait(config.Timeout))
+            {
+                signal.Reset();
+
+                logger.WriteLineInfo(message);
+
+                return true;
+            }
+
+            logger.WriteLineError($"The perfcollect script did not start/finish in {config.Timeout.TotalSeconds}s.");
+            logger.WriteLineInfo("You can create LttngProfiler providing LttngProfilerConfig with custom timeout value.");
+
+            CleanupPerfCollectProcess(logger);
+
+            return false;
+        }
+
+        private void CleanupPerfCollectProcess(ILogger logger)
+        {
+            logger.Flush(); // flush recently logged message to disk
+
             try
             {
-                Mono.Unix.Native.Syscall.kill(perfCollectProcess.Id, Mono.Unix.Native.Signum.SIGINT); // signal Ctrl + C to the script to tell it to stop profiling
+                perfCollectProcess.OutputDataReceived -= OnOutputDataReceived;
 
-                while (perfCollectProcess.StandardOutput.ReadLine()?.IndexOf("Trace saved", StringComparison.OrdinalIgnoreCase) < 0)
+                if (!perfCollectProcess.HasExited)
                 {
-                    // wait until the script ends post-processing
-                }
-
-                if (!perfCollectProcess.HasExited && !perfCollectProcess.WaitForExit((int)config.TracePostProcessingTimeout.TotalMilliseconds))
-                {
-                    var logger = parameters.Config.GetCompositeLogger();
-                    logger.WriteLineError($"The perfcollect script did not finish the post processing in {config.TracePostProcessingTimeout.TotalSeconds}s.");
-                    logger.WriteLineInfo("You can create LttngProfiler providing LttngProfilerConfig with custom timeout value.");
-
-                    perfCollectProcess.KillTree();
-                }
-
-                if (perfCollectProcess.HasExited && perfCollectProcess.ExitCode == 0)
-                {
-                    benchmarkToTraceFile[parameters.BenchmarkCase] = TraceFileHelper.GetFilePath(parameters.BenchmarkCase, parameters.Config, creationTime, ".trace.zip");
+                    perfCollectProcess.KillTree(); // kill the entire process tree
                 }
             }
             finally
             {
-                consoleExitHandler.Dispose();
-                consoleExitHandler = null;
                 perfCollectProcess.Dispose();
                 perfCollectProcess = null;
             }
@@ -186,14 +237,14 @@ namespace BenchmarkDotNet.Diagnosers
     public class LttngProfilerConfig
     {
         /// <param name="performExtraBenchmarksRun">if set to true, benchmarks will be executed one more time with the profiler attached. If set to false, there will be no extra run but the results will contain overhead. True by default.</param>
-        /// <param name="tracePostProcessingTimeoutInSeconds">how long should we wait for the perfcollect script to finish processing trace. 30s by default</param>
-        public LttngProfilerConfig(bool performExtraBenchmarksRun = true, int tracePostProcessingTimeoutInSeconds = 30)
+        /// <param name="timeoutInSeconds">how long should we wait for the perfcollect script to start collecting and/or finish processing the trace. 30s by default</param>
+        public LttngProfilerConfig(bool performExtraBenchmarksRun = true, int timeoutInSeconds = 60)
         {
             RunMode = performExtraBenchmarksRun ? RunMode.ExtraRun : RunMode.NoOverhead;
-            TracePostProcessingTimeout = TimeSpan.FromSeconds(tracePostProcessingTimeoutInSeconds);
+            Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
         }
 
-        public TimeSpan TracePostProcessingTimeout { get; }
+        public TimeSpan Timeout { get; }
 
         public RunMode RunMode { get; }
     }
