@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             var content = new StringBuilder(300)
                 .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition)}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(buildPartition)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition)}")
                 .ToString();
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
