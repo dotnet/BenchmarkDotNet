@@ -8,7 +8,6 @@ using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Samples
 {
-    [ClrJob, MonoJob, CoreJob, CoreRtJob]
     public class Algo_Md5VsSha256
     {
         private const int N = 10000;
@@ -36,9 +35,8 @@ namespace BenchmarkDotNet.Samples
         {
             BenchmarkRunner
                 .Run<Algo_Md5VsSha256>(
-                    ManualConfig
-                        .Create(DefaultConfig.Instance)
-                        .With(Job.RyuJitX64)
+                    DefaultConfig.Instance
+                        .With(Job.Clr)
                         .With(Job.Core)
                         .With(ExecutionValidator.FailOnError));
         }
