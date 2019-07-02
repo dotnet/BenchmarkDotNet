@@ -3,7 +3,7 @@ using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples
 {
-    [TargetFrameworkJob(TargetFrameworkMoniker.Net461)]
+    [TargetFrameworkJob(TargetFrameworkMoniker.Net461, baseline: true)]
     [TargetFrameworkJob(TargetFrameworkMoniker.Mono)]
     [TargetFrameworkJob(TargetFrameworkMoniker.Netcoreapp21)]
     public class IntroJobBaseline
