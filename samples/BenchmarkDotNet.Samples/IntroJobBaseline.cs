@@ -1,10 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples
 {
-    [ClrJob(baseline: true)]
-    [MonoJob]
-    [CoreJob]
+    [TargetFrameworkJob(TargetFrameworkMoniker.Net461)]
+    [TargetFrameworkJob(TargetFrameworkMoniker.Mono)]
+    [TargetFrameworkJob(TargetFrameworkMoniker.Netcoreapp21)]
     public class IntroJobBaseline
     {
         [Benchmark]
