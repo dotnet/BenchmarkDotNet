@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Toolchains
                 case CoreRuntime _:
                     return CsProjCoreToolchain.Current.Value;
                 case CoreRtRuntime _:
-                    return CoreRtToolchain.LatestMyGetBuild;
+                    return CoreRtToolchain.LatestBuild;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtime), runtime, "Runtime not supported");
             }
