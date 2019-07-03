@@ -49,6 +49,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             "net47",
             "net471",
             "net472",
+            "net48",
             "netcoreapp2.0",
             "netcoreapp2.1",
             "netcoreapp2.2",
@@ -311,6 +312,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case "net47":
                 case "net471":
                 case "net472":
+                case "net48":
                     return baseJob.With(Runtime.Clr).With(CsProjClassicNetToolchain.From(runtime, options.RestorePath?.FullName, timeOut));
                 case "netcoreapp2.0":
                 case "netcoreapp2.1":

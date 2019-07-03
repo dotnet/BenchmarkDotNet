@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Loggers
         public void Dispose() => writer.Dispose();
 
         [PublicAPI]
-        public StreamLogger(string filePath, bool append = false) => writer = new StreamWriter(filePath, append: false);
+        public StreamLogger(string filePath, bool append = false) => writer = new StreamWriter(filePath, append);
 
         public void Write(LogKind logKind, string text) => writer.Write(text);
 
