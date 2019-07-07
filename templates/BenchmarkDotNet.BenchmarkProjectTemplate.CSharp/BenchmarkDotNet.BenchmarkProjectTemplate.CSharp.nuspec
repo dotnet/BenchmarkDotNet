@@ -2,16 +2,15 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>BenchmarkDotNet.BenchmarkProjectTemplate.CSharp</id>
-    <version>0.11.3</version>
+    <version>1.0.0</version>
     <description>A Benchmark project template.</description>
     <authors>BenchmarkDotNet</authors>
     <copyright>.NET Foundation and contributors</copyright>
     <tags>benchmark;benchmarking;performance;template</tags>
     <iconUrl>https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/master/docs/guide/logo.png</iconUrl>
-    <projectUrl>https://github.com/dotnet/BenchmarkDotNet</projectUrl>
-    <license>MIT</license>
-    <RepositoryType>git</RepositoryType>
-    <repository>https://github.com/dotnet/BenchmarkDotNet</repository>
+    <projectUrl>https://benchmarkdotnet.org</projectUrl>
+    <license type="expression">MIT</license>
+    <repository type="git" url="https://github.com/dotnet/BenchmarkDotNet" ></repository>
     <packageTypes>
       <packageType name="Template" />
     </packageTypes>

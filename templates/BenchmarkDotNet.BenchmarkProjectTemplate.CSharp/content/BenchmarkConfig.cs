@@ -7,13 +7,11 @@ using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 
-
 namespace _BenchmarkProjectName_
 {
-
     public class BenchmarkConfig : ManualConfig
     {
-        public Config()
+        public BenchmarkConfig()
         {
             // Configure your benchmarks, see for more details: https://benchmarkdotnet.org/articles/configs/configs.html.
             //Add(Job.Dry);

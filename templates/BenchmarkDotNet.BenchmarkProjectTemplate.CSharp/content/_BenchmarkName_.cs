@@ -9,13 +9,10 @@ namespace _BenchmarkProjectName_
 #endif
     public class $(BenchmarkName)
     {
-
         [Benchmark]
         public void YourBenchmark()
         {
             // Implement your benchmark here
-
-            
         }
     }
 }
