@@ -1,9 +1,11 @@
-﻿open System;
-open BenchmarkDotNet;
-open BenchmarkDotNet.Attributes;
+﻿module Benchmark 
+
+open System
+open BenchmarkDotNet
+open BenchmarkDotNet.Attributes
 
 #if config
-[<Config(typeof(BenchmarkConfig))>]
+[<Config(typedefof<Configs.BenchmarkConfig>)>]
 #endif
 type $(BenchmarkName) () =
     [<Params(0, 1, 15, 100)>]
@@ -36,3 +38,5 @@ type $(BenchmarkName) () =
 
     [<Benchmark>]
     member this.AsyncToSync () = Async.Sleep(this.sleepTime) |> Async.RunSynchronously
+
+
