@@ -9,10 +9,6 @@ As an alternative to using [`[Params]`](xref:BenchmarkDotNet.Attributes.ParamsAt
 There are several ways to do it (described below). 
 
 
-> [!IMPORTANT]
-> `InProcessToolchain` does not support Arguments (yet!).
-> See [#687](https://github.com/dotnet/BenchmarkDotNet/issues/687) for more details. 
-
 The [`[Arguments]`](xref:BenchmarkDotNet.Attributes.ArgumentsAttribute) allows you to provide a set of values.
 Every value must be a compile-time constant (it's C# lanugage limitation for attributes in general).
 You can also combine
