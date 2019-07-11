@@ -45,12 +45,12 @@ namespace BenchmarkDotNet.Running
         /// <summary>
         /// Run all available benchmarks.
         /// </summary>
-        [PublicAPI] public IEnumerable<Summary> RunAll() => Run(new[] { "--filter", "*" });
+        [PublicAPI] public IEnumerable<Summary> RunAll(IConfig config = null) => Run(new[] { "--filter", "*" }, config);
 
         /// <summary>
         /// Run all available benchmarks and join them to a single summary
         /// </summary>
-        [PublicAPI] public Summary RunAllJoined() => Run(new[] { "--filter", "*", "--join" }).Single();
+        [PublicAPI] public Summary RunAllJoined(IConfig config = null) => Run(new[] { "--filter", "*", "--join" }, config).Single();
 
         [PublicAPI]
         public IEnumerable<Summary> Run(string[] args = null, IConfig config = null)
