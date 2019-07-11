@@ -1,4 +1,7 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Diagnostics;
+using System.Drawing;
+using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Diagnostics.Windows.Configs;
 
@@ -31,6 +34,24 @@ namespace BenchmarkDotNet.Samples
                     }
                 }
             }
+        }
+
+        private const int Size = 256;
+        int ArraySize = Size * Marshal.SizeOf(typeof(int));
+
+        [Benchmark]
+        public unsafe void AllocHGlobal()
+        {
+            IntPtr unmanagedHandle = Marshal.AllocHGlobal(ArraySize);
+            Span<byte> unmanaged = new Span<byte>(unmanagedHandle.ToPointer(), ArraySize);
+            Marshal.FreeHGlobal(unmanagedHandle);
+        }
+
+        [Benchmark]
+        public unsafe void AllocHGlobalWithLeaks()
+        {
+            IntPtr unmanagedHandle = Marshal.AllocHGlobal(ArraySize);
+            Span<byte> unmanaged = new Span<byte>(unmanagedHandle.ToPointer(), ArraySize);
         }
     }
 }

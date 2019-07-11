@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Diagnostics.Windows.PerfView;
 using BenchmarkDotNet.Diagnostics.Windows.Tracing;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -50,12 +49,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             etwProfiler.Handle(signal, parameters);
         }
 
-        private class NativeAllocation
-        {
-            public string Type { get; set; }
-            public long Size { get; set; }
-        }
-
         //Code is inspired by https://github.com/Microsoft/perfview/blob/master/src/PerfView/PerfViewData.cs#L5719-L5944
         private (long totalMemory, long memoryLeak) ParseEtlFile(BenchmarkCase parameters)
         {
@@ -96,14 +89,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
                 var heapParser = new HeapTraceProviderTraceEventParser(eventSource);
                 // We index by heap address and then within the heap we remember the allocation stack
-                var heaps = new Dictionary<Address, Dictionary<Address, NativeAllocation>>();
-                Dictionary<Address, NativeAllocation> lastHeapAllocs = null;
-
-                // These three variables are used in the local function GetAllocationType defined below.
-                // and are used to look up type names associated with the native allocations.   
-                var loadedModules = new Dictionary<TraceModuleFile, NativeSymbolModule>();
-                var allocationTypeNames = new Dictionary<CallStackIndex, string>();
-                var symReader = GetSymbolReader(traceFilePath, SymbolReaderOptions.CacheOnly);
+                var heaps = new Dictionary<Address, Dictionary<Address, long>>();
+                Dictionary<Address, long> lastHeapAllocs = null;
 
                 Address lastHeapHandle = 0;
 
@@ -121,55 +108,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     if (data.HeapHandle != lastHeapHandle)
                         allocs = GetHeap(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
 
-                    var callStackIndex = data.CallStackIndex();
-
-                    // Add the 'Type ALLOCATION_TYPE' if available.  
-                    string allocationType = GetAllocationType(callStackIndex);
-                    
-                    allocs[data.AllocAddress] = new NativeAllocation() { Size = data.AllocSize, Type = allocationType };
+                    allocs[data.AllocAddress] = data.AllocSize;
 
                     cumMetric += data.AllocSize;
                     totalAllocation += data.AllocSize;
-
-
-                    /*****************************************************************************/
-                    // Performs a stack crawl to match the best typename to this allocation. 
-                    // Returns null if no typename was found.
-                    // This updates loadedModules and allocationTypeNames. It reads symReader/eventLog.
-                    string GetAllocationType(CallStackIndex csi)
-                    {
-                        if (!allocationTypeNames.TryGetValue(csi, out var typeName))
-                        {
-                            const int frameLimit = 25; // typically you need about 10 frames to get out of the OS functions 
-                                                       // to get to a frame that has type information.   We'll search up this many frames
-                                                       // before giving up on getting type information for the allocation.  
-
-                            int frameCount = 0;
-                            for (var current = csi; current != CallStackIndex.Invalid && frameCount < frameLimit; current = eventLog.CallStacks.Caller(current), frameCount++)
-                            {
-                                var module = eventLog.CodeAddresses.ModuleFile(eventLog.CallStacks.CodeAddressIndex(current));
-                                if (module == null)
-                                    continue;
-
-                                if (!loadedModules.TryGetValue(module, out var symbolModule))
-                                {
-                                    loadedModules[module] = symbolModule =
-                                        (module.PdbSignature != Guid.Empty
-                                            ? symReader.FindSymbolFilePath(module.PdbName, module.PdbSignature, module.PdbAge, module.FilePath)
-                                            : symReader.FindSymbolFilePathForModule(module.FilePath)) is string pdb
-                                        ? symReader.OpenNativeSymbolFile(pdb)
-                                        : null;
-                                }
-
-                                typeName = symbolModule?.GetTypeForHeapAllocationSite(
-                                        (uint)(eventLog.CodeAddresses.Address(eventLog.CallStacks.CodeAddressIndex(current)) - module.ImageBase)
-                                    ) ?? typeName;
-
-                            }
-                            allocationTypeNames[csi] = typeName;
-                        }
-                        return typeName;
-                    }
                 };
                 heapParser.HeapTraceFree += delegate (HeapFreeTraceData data)
                 {
@@ -183,10 +125,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                         allocs = GetHeap(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
                     }
 
-                    NativeAllocation alloc;
-                    if (allocs.TryGetValue(data.FreeAddress, out alloc))
+                    if (allocs.TryGetValue(data.FreeAddress, out long alloc))
                     {
-                        cumMetric -= alloc.Size;
+                        cumMetric -= alloc;
 
                         allocs.Remove(data.FreeAddress);
                     }
@@ -212,16 +153,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     }
 
                     // This is a clone of the Free code 
-                    NativeAllocation alloc;
-                    if (allocs.TryGetValue(data.OldAllocAddress, out alloc))
+                    if (allocs.TryGetValue(data.OldAllocAddress, out long alloc))
                     {
-                        cumMetric -= alloc.Size;
+                        cumMetric -= alloc;
 
                         allocs.Remove(data.OldAllocAddress);
                     }
 
                     // This is a clone of the Alloc code (sigh don't clone code)
-                    allocs[data.NewAllocAddress] = new NativeAllocation() { Size = data.NewAllocSize, Type = alloc?.Type };
+                    allocs[data.NewAllocAddress] = data.NewAllocSize;
 
                     cumMetric += data.NewAllocSize;
                 };
@@ -242,7 +182,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     foreach (var alloc in allocs.Values)
                     {
                         // TODO this is a clone of the free code.  
-                        cumMetric -= alloc.Size;
+                        cumMetric -= alloc;
                     }
                 };
 
@@ -266,16 +206,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 {
                     Logger.WriteLine("heap address: " + item.Address);
                     Logger.WriteLine($"Count of not deallocated object: {item.Count / totalOperation}");
-
-                    //This should be the same as {cumMetric / totalOperation:n3}
-                    //Logger.WriteLine($"Not deallocated objects size: {item.types.Sum(p => p.Size) / totalOperation:n3}");
-                    var groups = item.types.GroupBy(p => p.Type).Select(p => new { Type = p.Key, Size = p.Sum(s => s.Size) });
-                    Logger.WriteLine($"Not deallocated objects types:");
-                    foreach (var type in groups)
-                    {
-                        Logger.WriteLine($"{type.Type ?? "unknown types"} = {type.Size / totalOperation:n3}");
-                    }
-
                 }
             }
 
@@ -300,23 +230,18 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         /// <summary>
         /// Implements a simple one-element cache for find the heap to look in.  
         /// </summary>
-        private static Dictionary<Address, NativeAllocation> GetHeap(Address heapHandle, Dictionary<Address, Dictionary<Address, NativeAllocation>> heaps, ref Dictionary<Address, NativeAllocation> lastHeapAllocs, ref Address lastHeapHandle)
+        private static Dictionary<Address, long> GetHeap(Address heapHandle, Dictionary<Address, Dictionary<Address, long>> heaps, ref Dictionary<Address, long> lastHeapAllocs, ref Address lastHeapHandle)
         {
-            Dictionary<Address, NativeAllocation> ret;
+            Dictionary<Address, long> ret;
 
             if (!heaps.TryGetValue(heapHandle, out ret))
             {
-                ret = new Dictionary<Address, NativeAllocation>();
+                ret = new Dictionary<Address, long>();
                 heaps.Add(heapHandle, ret);
             }
             lastHeapHandle = heapHandle;
             lastHeapAllocs = ret;
             return ret;
-        }
-
-        public SymbolReader GetSymbolReader(string filePath, SymbolReaderOptions symbolFlags = SymbolReaderOptions.None)
-        {
-            return App.GetSymbolReader(filePath, symbolFlags);
         }
 
         private static EtwProfilerConfig CreateDefaultConfig()
