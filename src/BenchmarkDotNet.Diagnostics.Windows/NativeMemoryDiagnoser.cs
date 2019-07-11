@@ -196,7 +196,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 result.totalMemory = totalAllocation / totalOperation;
                 result.memoryLeak = cumMetric / totalOperation;
 
-                Logger.WriteLine($"Total native memory allocated: {result.totalMemory:n3}");
+                Logger.WriteLine($"Total allocated native memory: {result.totalMemory:n3}");
                 if (cumMetric != 0)
                 {
                     Logger.WriteLine($"Total memory leak: {result.memoryLeak:n3}");
@@ -204,7 +204,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 var heapInfoList = heaps.Select(h => new { Address = h.Key, h.Value.Count, types = h.Value.Values });
                 foreach (var item in heapInfoList.Where(p => p.Count > 0))
                 {
-                    Logger.WriteLine("heap address: " + item.Address);
                     Logger.WriteLine($"Count of not deallocated object: {item.Count / totalOperation}");
                 }
             }
