@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Analysers;
@@ -29,7 +30,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         [PublicAPI] // parameterless ctor required by DiagnosersLoader to support creating this profiler via console line args
         public EtwProfiler() : this(new EtwProfilerConfig(performExtraBenchmarksRun: false)) { }
-        
+
         [PublicAPI]
         public EtwProfiler(EtwProfilerConfig config)
         {
@@ -43,15 +44,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public string ShortName => "ETW";
 
         public IEnumerable<string> Ids => new [] { nameof(EtwProfiler) };
-        
+
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
-        
+
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
 
         public IReadOnlyDictionary<BenchmarkCase, PmcStats> Results => ImmutableDictionary<BenchmarkCase, PmcStats>.Empty;
 
         internal IReadOnlyDictionary<BenchmarkCase, string> BenchmarkToEtlFile => benchmarkToEtlFile;
-        
+
         private DateTime CreationTime { get; }
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => runMode;
@@ -84,7 +85,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             if (!benchmarkToEtlFile.Any())
                 return;
-            
+
             logger.WriteLineInfo($"Exported {benchmarkToEtlFile.Count} trace file(s). Example:");
             logger.WriteLineInfo(benchmarkToEtlFile.Values.First());
         }
@@ -101,13 +102,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             try
             {
-                if (parameters.Process?.StartInfo.FileName != null)
-                {
-                    foreach (var provider in config.Providers)
-                    {
-                        provider.options.ProcessNameFilter = new List<string>() { parameters.Process?.StartInfo.FileName };
-                    }
-                }
+                ApplyProcessNameFilter(parameters);
 
                 userSession = new UserSession(parameters, config, CreationTime).EnableProviders();
                 heapSession = new HeapSession(parameters, config, CreationTime).EnableProviders();
@@ -118,8 +113,19 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 userSession?.Dispose();
                 heapSession?.Dispose();
                 kernelSession?.Dispose();
-                
+
                 throw;
+            }
+        }
+
+        private void ApplyProcessNameFilter(DiagnoserActionParameters parameters)
+        {
+            if (parameters.Process?.StartInfo.FileName != null)
+            {
+//                foreach (var provider in config.Providers)
+//                {
+//                    provider.options.ProcessNameFilter = new List<string>() { Path.GetFileName(parameters.Process?.StartInfo.FileName) };
+//                }
             }
         }
 
@@ -132,7 +138,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 kernelSession.Stop();
                 heapSession.Stop();
                 userSession.Stop();
-                
+
                 benchmarkToEtlFile[parameters.BenchmarkCase] = userSession.MergeFiles(kernelSession);
             }
             finally

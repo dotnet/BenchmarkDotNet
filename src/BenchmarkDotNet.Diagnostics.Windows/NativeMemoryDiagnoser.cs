@@ -12,7 +12,6 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
-using Microsoft.Diagnostics.Symbols;
 using Microsoft.Diagnostics.Tracing.Etlx;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
@@ -27,10 +26,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private readonly EtwProfiler etwProfiler;
 
         [PublicAPI] // parameterless ctor required by DiagnosersLoader to support creating this profiler via console line args
-        public NativeMemoryDiagnoser()
-        {
-            etwProfiler = new EtwProfiler(CreateDefaultConfig());
-        }
+        public NativeMemoryDiagnoser() => etwProfiler = new EtwProfiler(CreateDefaultConfig());
 
         public IEnumerable<string> Ids => new[] { nameof(NativeMemoryDiagnoser) };
 
@@ -39,15 +35,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
         public void DisplayResults(ILogger logger)
         {
-            logger.WriteLineHeader(new string('-', 20));
+            logger.WriteLineHeader(LogSeparator);
             foreach (var line in Logger.CapturedOutput)
                 logger.Write(line.Kind, line.Text);
         }
 
-        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
-        {
-            etwProfiler.Handle(signal, parameters);
-        }
+        public void Handle(HostSignal signal, DiagnoserActionParameters parameters) => etwProfiler.Handle(signal, parameters);
 
         //Code is inspired by https://github.com/Microsoft/perfview/blob/master/src/PerfView/PerfViewData.cs#L5719-L5944
         private (long totalMemory, long memoryLeak) ParseEtlFile(BenchmarkCase parameters)
@@ -55,11 +48,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             (long totalMemory, long memoryLeak) result = (0, 0);
 
             var traceFilePath = etwProfiler.BenchmarkToEtlFile[parameters];
-            var etlxFile = Path.ChangeExtension(traceFilePath, ".etlx");
-            var options = new TraceLogOptions();
-            TraceLog.CreateFromEventTraceLogFile(traceFilePath, etlxFile, options);
 
-            using (var eventLog = new TraceLog(etlxFile))
+            using (var eventLog = new TraceLog(TraceLog.CreateFromEventTraceLogFile(traceFilePath)))
             {
                 TraceEvents events = eventLog.Events;
 
@@ -94,7 +84,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
                 Address lastHeapHandle = 0;
 
-                long cumMetric = 0;
+                long nativeLeakSize = 0;
                 long totalAllocation = 0;
 
                 heapParser.HeapTraceAlloc += delegate (HeapAllocTraceData data)
@@ -106,12 +96,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
                     var allocs = lastHeapAllocs;
                     if (data.HeapHandle != lastHeapHandle)
-                        allocs = GetHeap(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
+                        allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
 
                     allocs[data.AllocAddress] = data.AllocSize;
 
-                    cumMetric += data.AllocSize;
-                    totalAllocation += data.AllocSize;
+                    checked
+                    {
+                        nativeLeakSize += data.AllocSize;
+                        totalAllocation += data.AllocSize;
+                    }
                 };
                 heapParser.HeapTraceFree += delegate (HeapFreeTraceData data)
                 {
@@ -122,12 +115,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     var allocs = lastHeapAllocs;
                     if (data.HeapHandle != lastHeapHandle)
                     {
-                        allocs = GetHeap(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
+                        allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
                     }
 
                     if (allocs.TryGetValue(data.FreeAddress, out long alloc))
                     {
-                        cumMetric -= alloc;
+                        nativeLeakSize -= alloc;
 
                         allocs.Remove(data.FreeAddress);
                     }
@@ -140,7 +133,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     }
                     // Reallocs that actually move stuff will cause a Alloc and delete event
                     // so there is nothing to do for those events.  But when the address is
-                    // the same we need to resize 
+                    // the same we need to resize
                     if (data.OldAllocAddress != data.NewAllocAddress)
                     {
                         return;
@@ -149,13 +142,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     var allocs = lastHeapAllocs;
                     if (data.HeapHandle != lastHeapHandle)
                     {
-                        allocs = GetHeap(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
+                        allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
                     }
 
-                    // This is a clone of the Free code 
+                    // This is a clone of the Free code
                     if (allocs.TryGetValue(data.OldAllocAddress, out long alloc))
                     {
-                        cumMetric -= alloc;
+                        nativeLeakSize -= alloc;
 
                         allocs.Remove(data.OldAllocAddress);
                     }
@@ -163,7 +156,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                     // This is a clone of the Alloc code (sigh don't clone code)
                     allocs[data.NewAllocAddress] = data.NewAllocSize;
 
-                    cumMetric += data.NewAllocSize;
+                    nativeLeakSize += data.NewAllocSize;
                 };
                 heapParser.HeapTraceDestroy += delegate (HeapTraceData data)
                 {
@@ -172,17 +165,17 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                         return;
                     }
 
-                    // Heap is dieing, kill all objects in it.   
+                    // Heap is dieing, kill all objects in it.
                     var allocs = lastHeapAllocs;
                     if (data.HeapHandle != lastHeapHandle)
                     {
-                        allocs = GetHeap(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
+                        allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
                     }
 
                     foreach (var alloc in allocs.Values)
                     {
-                        // TODO this is a clone of the free code.  
-                        cumMetric -= alloc;
+                        // TODO this is a clone of the free code.
+                        nativeLeakSize -= alloc;
                     }
                 };
 
@@ -194,10 +187,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 Logger.WriteLineHeader(LogSeparator);
 
                 result.totalMemory = totalAllocation / totalOperation;
-                result.memoryLeak = cumMetric / totalOperation;
+                result.memoryLeak = nativeLeakSize / totalOperation;
 
                 Logger.WriteLine($"Total allocated native memory: {result.totalMemory:n3}");
-                if (cumMetric != 0)
+                if (nativeLeakSize != 0)
                 {
                     Logger.WriteLine($"Total memory leak: {result.memoryLeak:n3}");
                 }
@@ -220,16 +213,16 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             var result = ParseEtlFile(results.BenchmarkCase);
 
-            yield return new Metric(new NativeMemoryDescriptor(), result.totalMemory);
+            yield return new Metric(new AllocatedNativeMemoryDescriptor(), result.totalMemory);
             yield return new Metric(new NativeMemoryLeakDescriptor(), result.memoryLeak);
-        } 
+        }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => etwProfiler.Validate(validationParameters);
 
         /// <summary>
-        /// Implements a simple one-element cache for find the heap to look in.  
+        /// Implements a simple one-element cache for find the heap to look in.
         /// </summary>
-        private static Dictionary<Address, long> GetHeap(Address heapHandle, Dictionary<Address, Dictionary<Address, long>> heaps, ref Dictionary<Address, long> lastHeapAllocs, ref Address lastHeapHandle)
+        private static Dictionary<Address, long> CreateHeapCache(Address heapHandle, Dictionary<Address, Dictionary<Address, long>> heaps, ref Dictionary<Address, long> lastHeapAllocs, ref Address lastHeapHandle)
         {
             Dictionary<Address, long> ret;
 
@@ -249,9 +242,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             return new EtwProfilerConfig(
                 performExtraBenchmarksRun: true,
-                kernelKeywords: kernelKeywords);
+                kernelKeywords: kernelKeywords,
+                createHeapSession: true);
         }
-
-        public string ShortName => "Native";
     }
 }

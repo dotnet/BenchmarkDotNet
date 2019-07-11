@@ -17,10 +17,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 {
     internal class HeapSession : Session
     {
-        public HeapSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime) 
+        public HeapSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
             : base(FullNameProvider.GetBenchmarkName(details.BenchmarkCase) + "Heap", details, config, creationTime)
         {
-            
         }
 
         protected override string FileExtension => ".userheap.etl";
@@ -59,13 +58,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             : base(KernelTraceEventParser.KernelSessionName, details, config, creationTime)
         {
         }
-        
+
         protected override string FileExtension => ".kernel.etl";
 
         internal override Session EnableProviders()
         {
-            var keywords = Config.KernelKeywords 
-                | KernelTraceEventParser.Keywords.ImageLoad // handles stack frames from native modules, SUPER IMPORTANT! 
+            var keywords = Config.KernelKeywords
+                | KernelTraceEventParser.Keywords.ImageLoad // handles stack frames from native modules, SUPER IMPORTANT!
                 | KernelTraceEventParser.Keywords.Profile; // CPU stacks
 
             if (Details.Config.GetHardwareCounters().Any())
@@ -86,7 +85,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             return this;
         }
     }
-    
+
     internal abstract class Session : IDisposable
     {
         protected abstract string FileExtension { get; }
@@ -94,7 +93,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         protected TraceEventSession TraceEventSession { get; }
 
         protected DiagnoserActionParameters Details { get; }
-        
+
         protected EtwProfilerConfig Config { get; }
 
         internal string FilePath { get; }
@@ -127,7 +126,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         internal abstract Session EnableProviders();
 
-        internal string MergeFiles(Session other) 
+        internal string MergeFiles(Session other)
         {
             //  `other` is not used here because MergeInPlace expects .etl and .kernel.etl and user*.etl files in this folder
             // it searches for them and merges into a single file
