@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public IReadOnlyCollection<(Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)> Providers { get; }
 
-        private bool CreateHeapSession { get; }
+        public bool CreateHeapSession { get; }
 
         /// <param name="performExtraBenchmarksRun">if set to true, benchmarks will be executed one more time with the profiler attached. If set to false, there will be no extra run but the results will contain overhead. True by default.</param>
         /// <param name="bufferSizeInMb">ETW session buffer size, in MB. 256 by default</param>

@@ -105,7 +105,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 ApplyProcessNameFilter(parameters);
 
                 userSession = new UserSession(parameters, config, CreationTime).EnableProviders();
-                heapSession = new HeapSession(parameters, config, CreationTime).EnableProviders();
+
+                if (config.CreateHeapSession)
+                    heapSession = new HeapSession(parameters, config, CreationTime).EnableProviders();
+
                 kernelSession = new KernelSession(parameters, config, CreationTime).EnableProviders();
             }
             catch (Exception)
@@ -122,10 +125,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             if (parameters.Process?.StartInfo.FileName != null)
             {
-//                foreach (var provider in config.Providers)
-//                {
-//                    provider.options.ProcessNameFilter = new List<string>() { Path.GetFileName(parameters.Process?.StartInfo.FileName) };
-//                }
+                foreach (var provider in config.Providers)
+                {
+                    provider.options.ProcessNameFilter = new List<string>() { Path.GetFileName(parameters.Process?.StartInfo.FileName) };
+                }
             }
         }
 
@@ -136,7 +139,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             try
             {
                 kernelSession.Stop();
-                heapSession.Stop();
+                heapSession?.Stop();
                 userSession.Stop();
 
                 benchmarkToEtlFile[parameters.BenchmarkCase] = userSession.MergeFiles(kernelSession);
@@ -144,7 +147,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             finally
             {
                 kernelSession.Dispose();
-                heapSession.Dispose();
+                heapSession?.Dispose();
                 userSession.Dispose();
             }
         }

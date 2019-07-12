@@ -13,7 +13,6 @@ using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using Microsoft.Diagnostics.Tracing.Parsers;
 
-
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public class NativeMemoryDiagnoser : IDiagnoser
