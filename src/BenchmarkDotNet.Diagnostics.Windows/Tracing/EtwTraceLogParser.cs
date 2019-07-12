@@ -10,22 +10,24 @@ using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
 
 namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 {
-    public class TraceLogParser
+    public class EtwTraceLogParser
     {
+        private readonly string etlFilePath;
+        private readonly PreciseMachineCounter[] counters;
         private readonly Dictionary<int, ProcessMetrics> processIdToData = new Dictionary<int, ProcessMetrics>();
         private readonly Dictionary<int, int> profileSourceIdToInterval = new Dictionary<int, int>();
 
-        public static IEnumerable<Metric> Parse(string etlFilePath, PreciseMachineCounter[] counters)
+        public EtwTraceLogParser(string etlFilePath, PreciseMachineCounter[] counters)
         {
-            using (var traceLog = new TraceLog(TraceLog.CreateFromEventTraceLogFile(etlFilePath)))
-            {
-                var traceLogEventSource = traceLog.Events.GetSource();
-
-                return new TraceLogParser().Parse(traceLogEventSource, counters);
-            }
+            this.etlFilePath = etlFilePath;
+            this.counters = counters;
+        }
+        public IEnumerable<Metric> Parse()
+        {
+            return TraceLogParserHelper.Parse(etlFilePath, ParseTraceEventSource);
         }
 
-        private IEnumerable<Metric> Parse(TraceLogEventSource traceLogEventSource, PreciseMachineCounter[] counters)
+        private IEnumerable<Metric> ParseTraceEventSource(TraceLogEventSource traceLogEventSource)
         {
             var bdnEventsParser = new EngineEventLogParser(traceLogEventSource);
             var kernelEventsParser = new KernelTraceEventParser(traceLogEventSource);
