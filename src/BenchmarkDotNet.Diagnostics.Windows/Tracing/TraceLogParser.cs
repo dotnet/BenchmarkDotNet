@@ -3,31 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Reports;f
 using Microsoft.Diagnostics.Tracing.Etlx;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
 
 namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 {
-    public class EtwTraceLogParser
+    public class TraceLogParser
     {
-        private readonly string etlFilePath;
-        private readonly PreciseMachineCounter[] counters;
         private readonly Dictionary<int, ProcessMetrics> processIdToData = new Dictionary<int, ProcessMetrics>();
         private readonly Dictionary<int, int> profileSourceIdToInterval = new Dictionary<int, int>();
 
-        public EtwTraceLogParser(string etlFilePath, PreciseMachineCounter[] counters)
+        public static IEnumerable<Metric> Parse(string etlFilePath, PreciseMachineCounter[] counters)
         {
-            this.etlFilePath = etlFilePath;
-            this.counters = counters;
-        }
-        public IEnumerable<Metric> Parse()
-        {
-            return TraceLogParserHelper.Parse(etlFilePath, ParseTraceEventSource);
+            using (var traceLog = new TraceLog(TraceLog.CreateFromEventTraceLogFile(etlFilePath)))
+            {
+                var traceLogEventSource = traceLog.Events.GetSource();
+
+                return new TraceLogParser().Parse(traceLogEventSource, counters);
+            }
         }
 
-        private IEnumerable<Metric> ParseTraceEventSource(TraceLogEventSource traceLogEventSource)
+        private IEnumerable<Metric> Parse(TraceLogEventSource traceLogEventSource, PreciseMachineCounter[] counters)
         {
             var bdnEventsParser = new EngineEventLogParser(traceLogEventSource);
             var kernelEventsParser = new KernelTraceEventParser(traceLogEventSource);

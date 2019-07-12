@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (!benchmarkToCounters.TryGetValue(results.BenchmarkCase, out var counters) || counters.IsEmpty())
                 return Array.Empty<Metric>();
 
-            return new EtwTraceLogParser(traceFilePath, counters).Parse();
+            return TraceLogParser.Parse(traceFilePath, counters);
         }
 
         public void DisplayResults(ILogger logger)
