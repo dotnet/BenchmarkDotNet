@@ -93,7 +93,7 @@ for (file in files) {
     densityPlot <- ggplot(df, aes(x=Measurement_Value, fill=Job_Id)) +
       ggtitle(paste(title, "/", target)) +
       xlab(paste("Time,", timeUnit)) +
-      geom_density(alpha=.5)
+      geom_density(alpha=.5, bw="SJ")
     printNice(densityPlot)
     ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-density.png"), file), densityPlot)
 
@@ -107,7 +107,7 @@ for (file in files) {
       paramsDensityPlot <- ggplot(paramsDf, aes(x=Measurement_Value, fill=Job_Id)) +
         ggtitle(paste(title, "/", target, "/", params)) +
         xlab(paste("Time,", timeUnit)) +
-        geom_density(alpha=.5)
+        geom_density(alpha=.5, bw="SJ")
       printNice(paramsDensityPlot)
       ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-", params, "-density.png"), file), paramsDensityPlot)
 
@@ -143,7 +143,7 @@ for (file in files) {
       densityPlotJob <- ggplot(jobDf, aes(x=Measurement_Value, fill="red")) +
         ggtitle(paste(title, "/", target, "/", job)) +
         xlab(paste("Time,", timeUnit)) +
-        geom_density(alpha=.5)
+        geom_density(alpha=.5, bw="SJ")
       printNice(densityPlotJob)
       ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-", job, "-density.png"), file), densityPlotJob)
     }
