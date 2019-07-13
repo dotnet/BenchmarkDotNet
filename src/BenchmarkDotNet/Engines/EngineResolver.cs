@@ -38,10 +38,10 @@ namespace BenchmarkDotNet.Engines
                 switch (strategy)
                 {
                     case RunStrategy.Throughput:
-                        return OutlierMode.OnlyUpper;
+                        return OutlierMode.RemoveUpper;
                     case RunStrategy.ColdStart:
                     case RunStrategy.Monitoring:
-                        return OutlierMode.None;
+                        return OutlierMode.DontRemove;
                     default:
                         throw new NotSupportedException($"Unknown runStrategy: {strategy}");
                 }

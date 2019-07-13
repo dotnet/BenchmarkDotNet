@@ -320,7 +320,7 @@ namespace BenchmarkDotNet.Jobs
         [Obsolete("Please use the new WithOutlierMode instead")]
         [PublicAPI]
         public static Job WithRemoveOutliers(this Job job, bool value) =>
-            job.WithCore(j => j.Accuracy.OutlierMode = value ? OutlierMode.OnlyUpper : OutlierMode.None);
+            job.WithCore(j => j.Accuracy.OutlierMode = value ? OutlierMode.RemoveUpper : OutlierMode.DontRemove);
 
         [PublicAPI]
         public static Job WithAnalyzeLaunchVariance(this Job job, bool value) => job.WithCore(j => j.Accuracy.AnalyzeLaunchVariance = value);
