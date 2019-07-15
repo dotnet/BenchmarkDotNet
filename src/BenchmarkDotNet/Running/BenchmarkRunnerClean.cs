@@ -360,6 +360,11 @@ namespace BenchmarkDotNet.Running
                     useDiagnoser ? noOverheadCompositeDiagnoser : null,
                     ref success);
 
+                if (executeResult.ProcessId.HasValue)
+                {
+                    logger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} has exited with code {executeResult.ExitCode}");
+                }
+
                 executeResults.Add(executeResult);
 
                 var errors = executeResults.SelectMany(r => r.Data)
