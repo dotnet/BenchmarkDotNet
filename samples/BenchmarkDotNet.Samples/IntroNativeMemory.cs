@@ -36,8 +36,8 @@ namespace BenchmarkDotNet.Samples
             }
         }
 
-        private const int Size = 256;
-        int ArraySize = Size * Marshal.SizeOf(typeof(int));
+        private const int Size = 20; // Greater value could cause System.OutOfMemoryException.
+        private int ArraySize = Size * Marshal.SizeOf(typeof(int));
 
         [Benchmark]
         public unsafe void AllocHGlobal()

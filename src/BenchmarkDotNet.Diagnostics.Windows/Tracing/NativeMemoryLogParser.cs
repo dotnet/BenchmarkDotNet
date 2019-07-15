@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -169,10 +172,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                 var totalMemory = totalAllocation / totalOperation;
                 var memoryLeak = nativeLeakSize / totalOperation;
 
-                logger.WriteLine($"Total allocated native memory: {totalMemory:n3}");
+                logger.WriteLine($"Total allocated native memory: {totalMemory.ToSizeStr(SizeUnit.B)}");
                 if (nativeLeakSize != 0)
                 {
-                    logger.WriteLine($"Total memory leak: {memoryLeak:n3}");
+                    logger.WriteLine($"Total memory leak: {memoryLeak.ToSizeStr(SizeUnit.B)}");
                 }
 
                 var heapInfoList = heaps.Select(h => new { Address = h.Key, h.Value.Count, types = h.Value.Values });

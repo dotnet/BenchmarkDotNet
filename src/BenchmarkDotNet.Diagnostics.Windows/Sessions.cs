@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         protected override string FileExtension => ".userheap.etl";
         internal override Session EnableProviders()
         {
-            var osHeapExe = Path.ChangeExtension(Details.Process.StartInfo.FileName, ".exe");
+            var osHeapExe = Path.GetFileName(Path.ChangeExtension(Details.Process.StartInfo.FileName, ".exe"));
             TraceEventSession.EnableWindowsHeapProvider(osHeapExe);
             return this;
         }
@@ -107,7 +107,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             TraceEventSession = new TraceEventSession(sessionName, FilePath)
             {
                 BufferSizeMB = config.BufferSizeInMb,
-                CpuSampleIntervalMSec = config.CpuSampleIntervalInMiliseconds
+                CpuSampleIntervalMSec = config.CpuSampleIntervalInMiliseconds,
             };
 
             Console.CancelKeyPress += OnConsoleCancelKeyPress;
@@ -125,15 +125,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         }
 
         internal abstract Session EnableProviders();
-
-        internal string MergeFiles(Session other)
-        {
-            //  `other` is not used here because MergeInPlace expects .etl and .kernel.etl and user*.etl files in this folder
-            // it searches for them and merges into a single file
-            TraceEventSession.MergeInPlace(FilePath, TextWriter.Null);
-
-            return FilePath;
-        }
 
         private void OnConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e) => Stop();
 

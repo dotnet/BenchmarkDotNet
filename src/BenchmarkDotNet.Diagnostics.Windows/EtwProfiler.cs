@@ -102,14 +102,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             try
             {
-                ApplyProcessNameFilter(parameters);
-
-                userSession = new UserSession(parameters, config, CreationTime).EnableProviders();
-
+                kernelSession = new KernelSession(parameters, config, CreationTime).EnableProviders();
                 if (config.CreateHeapSession)
                     heapSession = new HeapSession(parameters, config, CreationTime).EnableProviders();
-
-                kernelSession = new KernelSession(parameters, config, CreationTime).EnableProviders();
+                userSession = new UserSession(parameters, config, CreationTime).EnableProviders();
             }
             catch (Exception)
             {
@@ -121,28 +117,17 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             }
         }
 
-        private void ApplyProcessNameFilter(DiagnoserActionParameters parameters)
-        {
-            if (parameters.Process?.StartInfo.FileName != null)
-            {
-                foreach (var provider in config.Providers)
-                {
-                    provider.options.ProcessNameFilter = new List<string>() { Path.GetFileName(parameters.Process?.StartInfo.FileName) };
-                }
-            }
-        }
-
         public void Stop(DiagnoserActionParameters parameters)
         {
             WaitForDelayedEvents();
-
+            string userSessionFile;
             try
             {
                 kernelSession.Stop();
                 heapSession?.Stop();
                 userSession.Stop();
 
-                benchmarkToEtlFile[parameters.BenchmarkCase] = userSession.MergeFiles(kernelSession);
+                userSessionFile = userSession.FilePath;
             }
             finally
             {
@@ -150,6 +135,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 heapSession?.Dispose();
                 userSession.Dispose();
             }
+
+            // Merge the 'primary' etl file X.etl (userSession) with any files that match .clr*.etl .user*.etl. and .kernel.etl.
+            TraceEventSession.MergeInPlace(userSessionFile, TextWriter.Null);
+
+            benchmarkToEtlFile[parameters.BenchmarkCase] = userSessionFile;
         }
 
         private static int GetInterval(ProfileSourceInfo info) => Math.Min(info.MaxInterval, Math.Max(info.MinInterval, info.Interval));
@@ -158,6 +148,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         /// ETW sessions receive events with a slight delay.
         /// This increases the likelihood that all relevant events are processed by the collection thread by the time we are done with the benchmark.
         /// </summary>
-        private static void WaitForDelayedEvents() => Thread.Sleep(TimeSpan.FromMilliseconds(500));
+        private static void WaitForDelayedEvents() => Thread.Sleep(TimeSpan.FromMilliseconds(1000));
     }
 }

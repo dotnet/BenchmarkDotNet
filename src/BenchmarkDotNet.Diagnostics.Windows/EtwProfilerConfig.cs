@@ -67,14 +67,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                              | ClrTraceEventParser.Keywords.Loader
                              | ClrTraceEventParser.Keywords.NGen),
                     new TraceEventProviderOptions { StacksEnabled = false }), // stacks are too expensive for our purposes
-                (new Guid("0866B2B8-5CEF-5DB9-2612-0C0FFD814A44"), TraceEventLevel.Informational, MatchAnyKeywords, new TraceEventProviderOptions()) // ArrayPool events
+                (new Guid("0866B2B8-5CEF-5DB9-2612-0C0FFD814A44"), TraceEventLevel.Informational, MatchAnyKeywords, null) // ArrayPool events
             };
-
-            // All providers should have the option filled, if they don't have we have to create the options ourselves.
-            if (Providers.Any(p => p.options == null))
-            {
-                Providers = Providers.Select(p => (p.providerGuid, p.providerLevel, p.keywords, p.options ?? new TraceEventProviderOptions())).ToImmutableList();
-            }
         }
     }
 }
