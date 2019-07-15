@@ -62,7 +62,7 @@ You can also use one of the following attributes (apply it on a class that conta
 [ConcurrencyVisualizerProfiler]
 ```
 
-In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on.
+In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on. The column Gen X means number of GC collections per 1000 operations for that generation.
 
 ## Restrictions
 
