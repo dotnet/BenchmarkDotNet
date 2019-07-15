@@ -188,12 +188,12 @@ namespace BenchmarkDotNet.Tests.Running
             
             Assert.Equal(1, benchmarkCase.Job.Run.InvocationCount);
             Assert.Equal(1, benchmarkCase.Job.Run.UnrollFactor);
-            Assert.Equal(OutlierMode.None, benchmarkCase.Job.Accuracy.OutlierMode);
+            Assert.Equal(OutlierMode.DontRemove, benchmarkCase.Job.Accuracy.OutlierMode);
             Assert.False(benchmarkCase.Job.Meta.IsMutator);
         }
 
         [RunOncePerIteration]
-        [Outliers(OutlierMode.None)]
+        [Outliers(OutlierMode.DontRemove)]
         public class WithFewMutators
         {
             [Benchmark] public void Method() { }

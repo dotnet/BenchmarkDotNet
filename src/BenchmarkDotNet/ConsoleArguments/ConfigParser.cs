@@ -237,7 +237,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 globalConfig?.GetJobs().SingleOrDefault(job => job.Meta.IsDefault) // global config might define single custom Default job
                 ?? AvailableJobs[options.BaseJob.ToLowerInvariant()];
 
-            if (baseJob != Job.Dry && options.Outliers != OutlierMode.OnlyUpper)
+            if (baseJob != Job.Dry && options.Outliers != OutlierMode.RemoveUpper)
                 baseJob = baseJob.WithOutlierMode(options.Outliers);
 
             if (options.Affinity.HasValue)

@@ -197,7 +197,7 @@ dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --sta
 * `-e`, `--exporters` GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML
 * `-i`, `--inProcess` (Default: false) Run benchmarks in Process
 * `-a`, `--artifacts` Valid path to accessible directory
-* `--outliers` (Default: OnlyUpper) None/OnlyUpper/OnlyLower/All
+* `--outliers` (Default: RemoveUpper) DontRemove/RemoveUpper/RemoveLower/RemoveAll
 * `--affinity` Affinity mask to set for the benchmark process
 * `--allStats` (Default: false) Displays all statistics (min, max & more)
 * `--attribute` Run all methods with given attribute (applied to class or method)
