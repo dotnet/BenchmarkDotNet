@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.Tests.Reports
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, bool hugeSd, Metric[] metrics)
         {
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
-            var executeResult = new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
+            var executeResult = new ExecuteResult(true, 0, default, Array.Empty<string>(), Array.Empty<string>());
             bool isFoo = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Foo";
             bool isBar = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Bar";            
             var measurements = new List<Measurement>

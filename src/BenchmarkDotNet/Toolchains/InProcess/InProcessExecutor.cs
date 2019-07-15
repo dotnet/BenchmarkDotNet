@@ -127,13 +127,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         {
             if (exitCode != 0)
             {
-                return new ExecuteResult(true, exitCode, Array.Empty<string>(), Array.Empty<string>());
+                return new ExecuteResult(true, exitCode, default, Array.Empty<string>(), Array.Empty<string>());
             }
 
             var lines = runResults.GetMeasurements().Select(measurement => measurement.ToOutputLine()).ToList();
             lines.Add(runResults.GCStats.ToOutputLine());
 
-            return new ExecuteResult(true, 0, lines.ToArray(), Array.Empty<string>());
+            return new ExecuteResult(true, 0, default, lines.ToArray(), Array.Empty<string>());
         }
     }
 }
