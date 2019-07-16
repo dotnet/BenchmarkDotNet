@@ -11,7 +11,9 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
+using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
+using Microsoft.Diagnostics.Tracing.Session;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
@@ -57,9 +59,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             // We add VirtualAlloc because we want to catch low level VirtualAlloc and VirtualFree calls.
             // We should add also VAMap which means that we want to log mapping of files into memory.
-            var kernelKeywords = KernelTraceEventParser.Keywords.Default | KernelTraceEventParser.Keywords.VirtualAlloc | KernelTraceEventParser.Keywords.VAMap;
+            var kernelKeywords = KernelTraceEventParser.Keywords.VirtualAlloc | KernelTraceEventParser.Keywords.VAMap;
 
             return new EtwProfilerConfig(
+                providers: Enumerable.Empty<(Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)>().ToList(),
                 performExtraBenchmarksRun: true,
                 kernelKeywords: kernelKeywords,
                 createHeapSession: true);
