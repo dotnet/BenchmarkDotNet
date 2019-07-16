@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             logger.WriteLineInfo(benchmarkToEtlFile.Values.First());
         }
 
-        public void Start(DiagnoserActionParameters parameters)
+        private void Start(DiagnoserActionParameters parameters)
         {
             var counters = benchmarkToCounters[parameters.BenchmarkCase] = parameters.Config
                 .GetHardwareCounters()
@@ -117,7 +117,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             }
         }
 
-        public void Stop(DiagnoserActionParameters parameters)
+        private void Stop(DiagnoserActionParameters parameters)
         {
             WaitForDelayedEvents();
             string userSessionFile;
