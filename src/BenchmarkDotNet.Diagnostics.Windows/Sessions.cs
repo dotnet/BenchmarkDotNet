@@ -23,6 +23,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         }
 
         protected override string FileExtension => ".userheap.etl";
+
         internal override Session EnableProviders()
         {
             var osHeapExe = Path.GetFileName(Path.ChangeExtension(Details.Process.StartInfo.FileName, ".exe"));
@@ -30,6 +31,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             return this;
         }
     }
+
     internal class UserSession : Session
     {
         public UserSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
@@ -72,7 +74,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             try
             {
-                TraceEventSession.EnableKernelProvider(keywords, keywords); //TODO ? In this way it is created in PerfView
+                TraceEventSession.EnableKernelProvider(keywords, KernelTraceEventParser.Keywords.Profile);
             }
             catch (Win32Exception)
             {

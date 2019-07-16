@@ -148,6 +148,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         /// ETW sessions receive events with a slight delay.
         /// This increases the likelihood that all relevant events are processed by the collection thread by the time we are done with the benchmark.
         /// </summary>
-        private static void WaitForDelayedEvents() => Thread.Sleep(TimeSpan.FromMilliseconds(1000));
+        private static void WaitForDelayedEvents() => Thread.Sleep(TimeSpan.FromMilliseconds(500));
     }
 }

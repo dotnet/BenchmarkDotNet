@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Samples
             }
         }
 
-        private const int Size = 20; // Greater value could cause System.OutOfMemoryException.
+        private const int Size = 20; // Greater value could cause System.OutOfMemoryException for test with memory leaks.
         private int ArraySize = Size * Marshal.SizeOf(typeof(int));
 
         [Benchmark]

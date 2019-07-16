@@ -16,7 +16,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
     public class NativeMemoryLogParser
     {
         private static readonly string LogSeparator = new string('-', 20);
+
         private readonly string etlFilePath;
+
         private readonly BenchmarkCase benchmarkCase;
 
         private readonly ILogger logger;
@@ -27,7 +29,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             this.benchmarkCase = benchmarkCase;
             this.logger = logger;
         }
-
 
         //Code is inspired by https://github.com/Microsoft/perfview/blob/master/src/PerfView/PerfViewData.cs#L5719-L5944
         public IEnumerable<Metric> Parse()
@@ -77,7 +78,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
                     var allocs = lastHeapAllocs;
                     if (data.HeapHandle != lastHeapHandle)
+                    {
                         allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
+                    }
 
                     allocs[data.AllocAddress] = data.AllocSize;
 
@@ -169,13 +172,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                 logger.WriteLineInfo($"{benchmarkCase.DisplayInfo}");
                 logger.WriteLineHeader(LogSeparator);
 
-                var totalMemory = totalAllocation / totalOperation;
-                var memoryLeak = nativeLeakSize / totalOperation;
+                var memoryAllocatedPerOperation = totalAllocation / totalOperation;
+                var memoryLeakPerOperation = nativeLeakSize / totalOperation;
 
-                logger.WriteLine($"Total allocated native memory: {totalMemory.ToSizeStr(SizeUnit.B)}");
+                logger.WriteLine($"Native memory allocated per single operation: {memoryAllocatedPerOperation.ToSizeStr(SizeUnit.B)}");
                 if (nativeLeakSize != 0)
                 {
-                    logger.WriteLine($"Total memory leak: {memoryLeak.ToSizeStr(SizeUnit.B)}");
+                    logger.WriteLine($"Native memory leak per single operation: {memoryLeakPerOperation.ToSizeStr(SizeUnit.B)}");
                 }
 
                 var heapInfoList = heaps.Select(h => new { Address = h.Key, h.Value.Count, types = h.Value.Values });
@@ -184,8 +187,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                     logger.WriteLine($"Count of not deallocated object: {item.Count / totalOperation}");
                 }
 
-                yield return new Metric(new AllocatedNativeMemoryDescriptor(), totalMemory);
-                yield return new Metric(new NativeMemoryLeakDescriptor(), memoryLeak);
+                yield return new Metric(new AllocatedNativeMemoryDescriptor(), memoryAllocatedPerOperation);
+                yield return new Metric(new NativeMemoryLeakDescriptor(), memoryLeakPerOperation);
             }
         }
 
@@ -198,6 +201,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                 ret = new Dictionary<Address, long>();
                 heaps.Add(heapHandle, ret);
             }
+
             lastHeapHandle = heapHandle;
             lastHeapAllocs = ret;
             return ret;

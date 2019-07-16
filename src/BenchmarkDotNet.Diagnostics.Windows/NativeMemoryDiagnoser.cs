@@ -18,7 +18,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     public class NativeMemoryDiagnoser : IDiagnoser
     {
         private static readonly string LogSeparator = new string('-', 20);
-        internal readonly LogCapture Logger = new LogCapture();
+
+        private readonly LogCapture logger = new LogCapture();
+
         private readonly EtwProfiler etwProfiler;
 
         [PublicAPI] // parameterless ctor required by DiagnosersLoader to support creating this profiler via console line args
@@ -29,11 +31,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
 
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
-        public void DisplayResults(ILogger logger)
+
+        public void DisplayResults(ILogger resultLogger)
         {
-            logger.WriteLineHeader(LogSeparator);
-            foreach (var line in Logger.CapturedOutput)
-                logger.Write(line.Kind, line.Text);
+            resultLogger.WriteLineHeader(LogSeparator);
+            foreach (var line in this.logger.CapturedOutput)
+                resultLogger.Write(line.Kind, line.Text);
         }
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) => etwProfiler.Handle(signal, parameters);
@@ -45,13 +48,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (!etwProfiler.BenchmarkToEtlFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
                 return Enumerable.Empty<Metric>();
 
-            return new NativeMemoryLogParser(traceFilePath, results.BenchmarkCase, Logger).Parse();
+            return new NativeMemoryLogParser(traceFilePath, results.BenchmarkCase, logger).Parse();
         }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => etwProfiler.Validate(validationParameters);
 
         private static EtwProfilerConfig CreateDefaultConfig()
         {
+            // We add VirtualAlloc because we want to catch low level VirtualAlloc and VirtualFree calls.
+            // We should add also VAMap which means that we want to log mapping of files into memory.
             var kernelKeywords = KernelTraceEventParser.Keywords.Default | KernelTraceEventParser.Keywords.VirtualAlloc | KernelTraceEventParser.Keywords.VAMap;
 
             return new EtwProfilerConfig(
