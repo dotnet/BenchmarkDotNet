@@ -9,7 +9,7 @@ name: Overview
 
 Create new console application and install the [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/) NuGet package. We support:
 
-* *Projects:* `*.csproj` (classic and modern with PackageReferences), `*.xproj`/`project.json`
+* *Projects:* `*.csproj`/`*.fsproj` (classic and modern with PackageReferences), `*.xproj`/`project.json`
 * *Runtimes:* Full .NET Framework (4.6+), .NET Core (2.0+), Mono, CoreRT
 * *OS:* Windows, Linux, MacOS
 * *Languages:* C#, F#, VB
