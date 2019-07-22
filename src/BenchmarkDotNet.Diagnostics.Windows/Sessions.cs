@@ -15,6 +15,23 @@ using Microsoft.Diagnostics.Tracing.Session;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
+    internal class HeapSession : Session
+    {
+        public HeapSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
+            : base(FullNameProvider.GetBenchmarkName(details.BenchmarkCase) + "Heap", details, config, creationTime)
+        {
+        }
+
+        protected override string FileExtension => ".userheap.etl";
+
+        internal override Session EnableProviders()
+        {
+            var osHeapExe = Path.GetFileName(Path.ChangeExtension(Details.Process.StartInfo.FileName, ".exe"));
+            TraceEventSession.EnableWindowsHeapProvider(osHeapExe);
+            return this;
+        }
+    }
+
     internal class UserSession : Session
     {
         public UserSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
@@ -43,13 +60,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             : base(KernelTraceEventParser.KernelSessionName, details, config, creationTime)
         {
         }
-        
+
         protected override string FileExtension => ".kernel.etl";
 
         internal override Session EnableProviders()
         {
-            var keywords = Config.KernelKeywords 
-                | KernelTraceEventParser.Keywords.ImageLoad // handles stack frames from native modules, SUPER IMPORTANT! 
+            var keywords = Config.KernelKeywords
+                | KernelTraceEventParser.Keywords.ImageLoad // handles stack frames from native modules, SUPER IMPORTANT!
                 | KernelTraceEventParser.Keywords.Profile; // CPU stacks
 
             if (Details.Config.GetHardwareCounters().Any())
@@ -70,7 +87,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             return this;
         }
     }
-    
+
     internal abstract class Session : IDisposable
     {
         protected abstract string FileExtension { get; }
@@ -78,7 +95,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         protected TraceEventSession TraceEventSession { get; }
 
         protected DiagnoserActionParameters Details { get; }
-        
+
         protected EtwProfilerConfig Config { get; }
 
         internal string FilePath { get; }
@@ -92,7 +109,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             TraceEventSession = new TraceEventSession(sessionName, FilePath)
             {
                 BufferSizeMB = config.BufferSizeInMb,
-                CpuSampleIntervalMSec = config.CpuSampleIntervalInMiliseconds
+                CpuSampleIntervalMSec = config.CpuSampleIntervalInMiliseconds,
             };
 
             Console.CancelKeyPress += OnConsoleCancelKeyPress;
@@ -110,15 +127,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         }
 
         internal abstract Session EnableProviders();
-
-        internal string MergeFiles(Session other) 
-        {
-            //  `other` is not used here because MergeInPlace expects .etl and .kernel.etl files in this folder
-            // it searches for them and merges into a single file
-            TraceEventSession.MergeInPlace(FilePath, TextWriter.Null);
-
-            return FilePath;
-        }
 
         private void OnConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e) => Stop();
 
