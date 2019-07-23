@@ -1,100 +1,108 @@
-- name: IntroBasic
-  href: IntroBasic.md
-- name: IntroParams
-  href: IntroParams.md
-- name: IntroParamsSource
-  href: IntroParamsSource.md
 - name: IntroArguments
   href: IntroArguments.md
 - name: IntroArgumentsSource
   href: IntroArgumentsSource.md
 - name: IntroArrayParam
   href: IntroArrayParam.md
-- name: IntroParamsAllValues
-  href: IntroParamsAllValues.md
+- name: IntroBasic
+  href: IntroBasic.md
 - name: IntroBenchmarkBaseline
   href: IntroBenchmarkBaseline.md
-- name: IntroRatioSD
-  href: IntroRatioSD.md
+- name: IntroCategories
+  href: IntroCategories.md
 - name: IntroCategoryBaseline
   href: IntroCategoryBaseline.md
-- name: IntroJobBaseline
-  href: IntroJobBaseline.md
-- name: IntroEnvVars
-  href: IntroEnvVars.md
-- name: IntroStaThread
-  href: IntroStaThread.md
-- name: IntroSetupCleanupGlobal
-  href: IntroSetupCleanupGlobal.md
-- name: IntroSetupCleanupIteration
-  href: IntroSetupCleanupIteration.md
-- name: IntroSetupCleanupTarget
-  href: IntroSetupCleanupTarget.md
+- name: IntroColdStart
+  href: IntroColdStart.md
+- name: IntroConfigSource
+  href: IntroConfigSource.md
+- name: IntroConfigUnion
+  href: IntroConfigUnion.md
 - name: IntroCustomMono
   href: IntroCustomMono.md
 - name: IntroCustomMonoArguments
   href: IntroCustomMonoArguments.md
-- name: IntroCategories
-  href: IntroCategories.md
-- name: IntroFilters
-  href: IntroFilters.md
-- name: IntroJoin
-  href: IntroJoin.md
-- name: IntroStatisticsColumns
-  href: IntroStatisticsColumns.md
-- name: IntroPercentiles
-  href: IntroPercentiles.md
-- name: IntroRankColumn
-  href: IntroRankColumn.md
-- name: IntroStatisticalTesting
-  href: IntroStatisticalTesting.md
-- name: IntroMultimodal
-  href: IntroMultimodal.md
-- name: IntroOutliers
-  href: IntroOutliers.md
-- name: IntroHardwareCounters
-  href: IntroHardwareCounters.md
+- name: IntroDeferredExecution
+  href: IntroDeferredExecution.md
 - name: IntroDisassembly
   href: IntroDisassembly.md
-- name: IntroDisassemblyRyuJit
-  href: IntroDisassemblyRyuJit.md
 - name: IntroDisassemblyAllJits
   href: IntroDisassemblyAllJits.md
 - name: IntroDisassemblyDry
   href: IntroDisassemblyDry.md
-- name: IntroTailcall
-  href: IntroTailcall.md
-- name: IntroColdStart
-  href: IntroColdStart.md
-- name: IntroMonitoring
-  href: IntroMonitoring.md
+- name: IntroDisassemblyRyuJit
+  href: IntroDisassemblyRyuJit.md
+- name: IntroEncoding
+  href: IntroEncoding.md
+- name: IntroEnvVars
+  href: IntroEnvVars.md
 - name: IntroExport
   href: IntroExport.md
 - name: IntroExportJson
   href: IntroExportJson.md
 - name: IntroExportXml
   href: IntroExportXml.md
-- name: IntroTagColumn
-  href: IntroTagColumn.md
-- name: IntroConfigSource
-  href: IntroConfigSource.md
-- name: IntroConfigUnion
-  href: IntroConfigUnion.md
+- name: IntroFilters
+  href: IntroFilters.md
 - name: IntroFluentConfigBuilder
   href: IntroFluentConfigBuilder.md
+- name: IntroGcMode
+  href: IntroGcMode.md
+- name: IntroGenericTypeArguments
+  href: IntroGenericTypeArguments.md
+- name: IntroHardwareCounters
+  href: IntroHardwareCounters.md
+- name: IntroInliningDiagnoser
+  href: IntroInliningDiagnoser.md
 - name: IntroInProcess
   href: IntroInProcess.md
 - name: IntroInProcessWrongEnv
   href: IntroInProcessWrongEnv.md
+- name: IntroJobBaseline
+  href: IntroJobBaseline.md
+- name: IntroJoin
+  href: IntroJoin.md
+- name: IntroMonitoring
+  href: IntroMonitoring.md
+- name: IntroMultimodal
+  href: IntroMultimodal.md
+- name: IntroNuGet
+  href: IntroNuGet.md
 - name: IntroOrderAttr
   href: IntroOrderAttr.md
 - name: IntroOrderManual
   href: IntroOrderManual.md
-- name: IntroGenericTypeArguments
-  href: IntroGenericTypeArguments.md
-- name: IntroDeferredExecution
-  href: IntroDeferredExecution.md
-- name: IntroNuGet
-  href: IntroNuGet.md
+- name: IntroOutliers
+  href: IntroOutliers.md
+- name: IntroParams
+  href: IntroParams.md
+- name: IntroParamsAllValues
+  href: IntroParamsAllValues.md
+- name: IntroParamsSource
+  href: IntroParamsSource.md
+- name: IntroPercentiles
+  href: IntroPercentiles.md
+- name: IntroPowerPlan
+  href: IntroPowerPlan.md
+- name: IntroRankColumn
+  href: IntroRankColumn.md
+- name: IntroRatioSD
+  href: IntroRatioSD.md
+- name: IntroSetupCleanupGlobal
+  href: IntroSetupCleanupGlobal.md
+- name: IntroSetupCleanupIteration
+  href: IntroSetupCleanupIteration.md
+- name: IntroSetupCleanupTarget
+  href: IntroSetupCleanupTarget.md
+- name: IntroStaThread
+  href: IntroStaThread.md
+- name: IntroStatisticalTesting
+  href: IntroStatisticalTesting.md
+- name: IntroStatisticsColumns
+  href: IntroStatisticsColumns.md
 - name: IntroStopOnFirstError
   href: IntroStopOnFirstError.md
+- name: IntroTagColumn
+  href: IntroTagColumn.md
+- name: IntroTailcall
+  href: IntroTailcall.md
