@@ -10,13 +10,13 @@ library(tidyr)
 library(grid)
 library(gridExtra)
 
-isEmpty = function(val){
+isEmpty <- function(val){
    is.null(val) | val == ""
 }
 
-getParamsValues = function(params){ 
-   separator = "-"
-   values = params[!isEmpty(params)]
+getParamsValues <- function(params){ 
+   separator <- "-"
+   values <- params[!isEmpty(params)]
    paste(replace(values, TRUE, paste0(separator, values)), collapse = "")
 }
 
@@ -118,7 +118,7 @@ for (file in files) {
         xlab(paste("Time,", timeUnit)) +
         geom_density(alpha=.5, bw="SJ")
       printNice(paramsDensityPlot)
-      paramsValues = getParamsValues(c(target,params))
+      paramsValues <- getParamsValues(c(target,params))
       ggsaveNice(gsub("-measurements.csv", paste0(paramsValues, "-density.png"), file), paramsDensityPlot)
 
       paramsFacetDensityPlot <- paramsDensityPlot + facet_wrap(~Job_Id)
