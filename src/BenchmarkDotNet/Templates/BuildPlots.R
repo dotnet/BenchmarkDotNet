@@ -11,14 +11,13 @@ library(grid)
 library(gridExtra)
 
 isEmpty <- function(val){
-   is.null(val) || val == ""
+   is.null(val) | val == ""
 }
 
-verifyParams <- function(params){ 
-  value = "Default"
-  if(!isEmpty(params)) 
-    value =  params
-  value
+getParamsValues <- function(params){ 
+   separator = "-"
+   values = params[!isEmpty(params)]
+   paste(replace(values, TRUE, paste0(separator, values)), collapse = "")
 }
 
 ends_with <- function(vars, match, ignore.case = TRUE) {
@@ -114,17 +113,17 @@ for (file in files) {
 
     for (params in unique(df$Params)) {
       paramsDf <- df %>% filter(Params == params)
-      paramsValue <- verifyParams(params)
       paramsDensityPlot <- ggplot(paramsDf, aes(x=Measurement_Value, fill=Job_Id)) +
-        ggtitle(paste(title, "/", target, "/", paramsValue)) +
+        ggtitle(paste(title, "/", target, "/", params)) +
         xlab(paste("Time,", timeUnit)) +
         geom_density(alpha=.5, bw="SJ")
       printNice(paramsDensityPlot)
-      ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-", paramsValue, "-density.png"), file), paramsDensityPlot)
+      paramsValues <- getParamsValues(c(target,params))
+      ggsaveNice(gsub("-measurements.csv", paste0(paramsValues, "-density.png"), file), paramsDensityPlot)
 
       paramsFacetDensityPlot <- paramsDensityPlot + facet_wrap(~Job_Id)
       printNice(paramsFacetDensityPlot)
-      ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-", paramsValue, "-facetDensity.png"), file), paramsFacetDensityPlot)
+      ggsaveNice(gsub("-measurements.csv", paste0(paramsValues, "-facetDensity.png"), file), paramsFacetDensityPlot)
     }
 
     for (job in unique(df$Job_Id)) {
