@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
-        internal static string GetArchitecture() => Is64BitPlatform() ? "64bit" : "32bit";
+        internal static string GetArchitecture() => GetCurrentPlatform().ToString();
 
         private static string DockerSdkVersion => Environment.GetEnvironmentVariable("DOTNET_VERSION");
 
