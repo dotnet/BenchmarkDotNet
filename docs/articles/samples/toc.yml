@@ -66,6 +66,8 @@
   href: IntroMonitoring.md
 - name: IntroMultimodal
   href: IntroMultimodal.md
+- name: IntroNativeMemory
+  href: IntroNativeMemory.md
 - name: IntroNuGet
   href: IntroNuGet.md
 - name: IntroOrderAttr
