@@ -38,7 +38,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void DisplayResults(ILogger resultLogger)
         {
-            resultLogger.WriteLineHeader(LogSeparator);
+            if (!etwProfiler.BenchmarkToEtlFile.Any())
+            {
+                resultLogger.WriteLineInfo($"Exported {etwProfiler.BenchmarkToEtlFile.Count} trace file(s). Example:");
+                resultLogger.WriteLineInfo(etwProfiler.BenchmarkToEtlFile.Values.First());
+            }
+
             foreach (var line in logger.CapturedOutput)
                 resultLogger.Write(line.Kind, line.Text);
         }
