@@ -6,11 +6,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Configs
 {
     [PublicAPI]
     [AttributeUsage(AttributeTargets.Class)]
-    public class NativeMemoryDiagnoserAttribute : Attribute, IConfigSource
+    public class NativeMemoryProfilerAttribute : Attribute, IConfigSource
     {
-        public NativeMemoryDiagnoserAttribute()
+        public NativeMemoryProfilerAttribute()
         {
-            Config = ManualConfig.CreateEmpty().With(new NativeMemoryDiagnoser());
+            Config = ManualConfig.CreateEmpty().With(new NativeMemoryProfiler());
         }
 
         public IConfig Config { get; }

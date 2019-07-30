@@ -4,7 +4,7 @@ uid: BenchmarkDotNet.Samples.IntroNativeMemory
 
 ## Sample: IntroNativeMemory
 
-The `NativeMemoryDiagnoser` diagnoser uses `EtwProfiler` to profile the code using ETW and adds the extra columns `Allocated native memory` and `Native memory leak` to the benchmark results table.
+The `NativeMemoryProfiler` uses `EtwProfiler` to profile the code using ETW and adds the extra columns `Allocated native memory` and `Native memory leak` to the benchmark results table.
 
 ### Source code
 

@@ -17,10 +17,8 @@ using Microsoft.Diagnostics.Tracing.Session;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
-    public class NativeMemoryDiagnoser : IProfiler
+    public class NativeMemoryProfiler : IProfiler
     {
-        private static readonly string LogSeparator = new string('-', 20);
-
         private readonly LogCapture logger = new LogCapture();
 
         private readonly EtwProfiler etwProfiler;
@@ -28,9 +26,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public string ShortName => "NativeMemory";
 
         [PublicAPI] // parameterless ctor required by DiagnosersLoader to support creating this profiler via console line args
-        public NativeMemoryDiagnoser() => etwProfiler = new EtwProfiler(CreateDefaultConfig());
+        public NativeMemoryProfiler() => etwProfiler = new EtwProfiler(CreateDefaultConfig());
 
-        public IEnumerable<string> Ids => new[] { nameof(NativeMemoryDiagnoser) };
+        public IEnumerable<string> Ids => new[] { nameof(NativeMemoryProfiler) };
 
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
 
