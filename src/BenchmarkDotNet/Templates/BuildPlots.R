@@ -14,7 +14,7 @@ isEmpty <- function(val){
    is.null(val) | val == ""
 }
 
-getParamsValues <- function(params){ 
+createPrefix <- function(params){ 
    separator <- "-"
    values <- params[!isEmpty(params)]
    paste(replace(values, TRUE, paste0(separator, values)), collapse = "")
@@ -118,12 +118,12 @@ for (file in files) {
         xlab(paste("Time,", timeUnit)) +
         geom_density(alpha=.5, bw="SJ")
       printNice(paramsDensityPlot)
-      paramsValues <- getParamsValues(c(target,params))
-      ggsaveNice(gsub("-measurements.csv", paste0(paramsValues, "-density.png"), file), paramsDensityPlot)
+      prefix <- createPrefix(c(target,params))
+      ggsaveNice(gsub("-measurements.csv", paste0(prefix, "-density.png"), file), paramsDensityPlot)
 
       paramsFacetDensityPlot <- paramsDensityPlot + facet_wrap(~Job_Id)
       printNice(paramsFacetDensityPlot)
-      ggsaveNice(gsub("-measurements.csv", paste0(paramsValues, "-facetDensity.png"), file), paramsFacetDensityPlot)
+      ggsaveNice(gsub("-measurements.csv", paste0(prefix, "-facetDensity.png"), file), paramsFacetDensityPlot)
     }
 
     for (job in unique(df$Job_Id)) {
