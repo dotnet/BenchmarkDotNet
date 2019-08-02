@@ -8,7 +8,7 @@ using BenchmarkDotNet.Diagnostics.Windows.Configs;
 namespace BenchmarkDotNet.Samples
 {
     [ShortRunJob]
-    [NativeMemoryDiagnoser]
+    [NativeMemoryProfiler]
     [MemoryDiagnoser]
     public class IntroNativeMemory
     {

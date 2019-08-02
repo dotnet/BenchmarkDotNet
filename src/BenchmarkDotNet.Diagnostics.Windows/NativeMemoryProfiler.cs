@@ -17,18 +17,18 @@ using Microsoft.Diagnostics.Tracing.Session;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
-    public class NativeMemoryDiagnoser : IDiagnoser
+    public class NativeMemoryProfiler : IProfiler
     {
-        private static readonly string LogSeparator = new string('-', 20);
-
         private readonly LogCapture logger = new LogCapture();
 
         private readonly EtwProfiler etwProfiler;
 
-        [PublicAPI] // parameterless ctor required by DiagnosersLoader to support creating this profiler via console line args
-        public NativeMemoryDiagnoser() => etwProfiler = new EtwProfiler(CreateDefaultConfig());
+        public string ShortName => "NativeMemory";
 
-        public IEnumerable<string> Ids => new[] { nameof(NativeMemoryDiagnoser) };
+        [PublicAPI] // parameterless ctor required by DiagnosersLoader to support creating this profiler via console line args
+        public NativeMemoryProfiler() => etwProfiler = new EtwProfiler(CreateDefaultConfig());
+
+        public IEnumerable<string> Ids => new[] { nameof(NativeMemoryProfiler) };
 
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
 
@@ -36,8 +36,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void DisplayResults(ILogger resultLogger)
         {
-            resultLogger.WriteLineHeader(LogSeparator);
-            foreach (var line in this.logger.CapturedOutput)
+            if (etwProfiler.BenchmarkToEtlFile.Any())
+            {
+                resultLogger.WriteLineInfo($"Exported {etwProfiler.BenchmarkToEtlFile.Count} trace file(s). Example:");
+                resultLogger.WriteLineInfo(etwProfiler.BenchmarkToEtlFile.Values.First());
+            }
+
+            foreach (var line in logger.CapturedOutput)
                 resultLogger.Write(line.Kind, line.Text);
         }
 

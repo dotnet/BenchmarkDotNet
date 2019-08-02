@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         /// <param name="intervalSelectors">interval per hardware counter, if not provided then default values will be used.</param>
         /// <param name="kernelKeywords">kernel session keywords, ImageLoad (for native stack frames) and Profile (for CPU Stacks) are the defaults</param>
         /// <param name="providers">providers that should be enabled, if not provided then default values will be used</param>
-        /// <param name="createHeapSession">value indicating whether to create heap session. False by default, used internally by NativeMemoryDiagnoser.</param>
+        /// <param name="createHeapSession">value indicating whether to create heap session. False by default, used internally by NativeMemoryProfiler.</param>
         public EtwProfilerConfig(
             bool performExtraBenchmarksRun = true,
             int bufferSizeInMb = 256,
