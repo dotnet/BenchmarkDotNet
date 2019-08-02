@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Running
     internal static class BenchmarkRunnerClean
     {
         internal const string DateTimeFormat = "yyyyMMdd-HHmmss";
-
+        
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvironmentResolver.Instance, InfrastructureResolver.Instance);
 
         internal static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos)
@@ -196,7 +196,7 @@ namespace BenchmarkDotNet.Running
             string currentDirectory = Directory.GetCurrentDirectory();
             foreach (string file in config.GetCompositeExporter().ExportToFiles(summary, logger))
             {
-                logger.WriteLineInfo($"  {file.Replace(currentDirectory, string.Empty).Trim('/', '\\')}");
+                logger.WriteLineInfo($"  {file.GetBaseName(currentDirectory)}");
             }
 
             logger.WriteLine();
