@@ -16,6 +16,7 @@ namespace BenchmarkDotNet.Exporters
         public static readonly IExporter Default = new RPlotExporter();
         public string Name => nameof(RPlotExporter);
 
+        private const string ImageExtension = ".png";
         private static readonly object BuildScriptLock = new object();
 
         public IEnumerable<IExporter> Dependencies
@@ -30,9 +31,7 @@ namespace BenchmarkDotNet.Exporters
             const string logFileName = "BuildPlots.log";
             yield return scriptFileName;
 
-            string fileNamePrefix = Path.Combine(summary.ResultsDirectoryPath, summary.Title);
             string csvFullPath = CsvMeasurementsExporter.Default.GetArtifactFullName(summary);
-
             string scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
             string logFullPath = Path.Combine(summary.ResultsDirectoryPath, logFileName);
             string script = ResourceHelper.
@@ -65,8 +64,7 @@ namespace BenchmarkDotNet.Exporters
                 process?.WaitForExit();
             }
 
-            yield return fileNamePrefix + "-boxplot.png";
-            yield return fileNamePrefix + "-barplot.png";
+            yield return $"*{ImageExtension}";
         }
 
         public void ExportToLog(Summary summary, ILogger logger)
