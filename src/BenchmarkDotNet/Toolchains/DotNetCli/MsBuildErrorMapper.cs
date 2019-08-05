@@ -13,13 +13,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 new Regex("warning NU1702: ProjectReference '(.*)' was resolved using '(.*)' instead of the project target framework '(.*)'. This project may not be fully compatible with your project.", 
                     RegexOptions.CultureInvariant | RegexOptions.Compiled),
                 match => $@"The project which defines benchmarks targets '{Map(match.Groups[2])}', you can not benchmark '{Map(match.Groups[3])}'." + Environment.NewLine +
-                    $"To be able to benchmark '{Map(match.Groups[3])}' you need to use <TargetFrameworks>{Map(match.Groups[2])};{Map(match.Groups[3])}<TargetFrameworks/> in your project file ('{match.Groups[1]}')."
+                    $"To be able to benchmark '{Map(match.Groups[3])}' you need to use <TargetFrameworks>{Map(match.Groups[2])};{Map(match.Groups[3])}</TargetFrameworks> in your project file ('{match.Groups[1]}')."
             ),
             (
                 new Regex("error NU1201: Project (.*) is not compatible with (.*) ((.*)) / (.*). Project (.*) supports: (.*) ((.*))", 
                     RegexOptions.CultureInvariant | RegexOptions.Compiled),
                 match => $@"The project which defines benchmarks targets '{match.Groups[7]}', you can not benchmark '{match.Groups[2]}'." + Environment.NewLine +
-                    $"To be able to benchmark '{match.Groups[2]}' you need to use <TargetFrameworks>{match.Groups[7].Value};{match.Groups[2].Value}<TargetFrameworks/> in your project file ('{match.Groups[1]}')."
+                    $"To be able to benchmark '{match.Groups[2]}' you need to use <TargetFrameworks>{match.Groups[7].Value};{match.Groups[2].Value}</TargetFrameworks> in your project file ('{match.Groups[1]}')."
             )
         };
 

@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             string expectedErrorMessage = "The project which defines benchmarks targets 'net461', you can not benchmark 'netcoreapp2.1'."
                 + Environment.NewLine +
-                "To be able to benchmark 'netcoreapp2.1' you need to use <TargetFrameworks>net461;netcoreapp2.1<TargetFrameworks/> in your project file";
+                "To be able to benchmark 'netcoreapp2.1' you need to use <TargetFrameworks>net461;netcoreapp2.1</TargetFrameworks> in your project file";
 
             var logger = new OutputLogger(output);
 
@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             string expectedErrorMessage = "The project which defines benchmarks targets 'netcoreapp2.1', you can not benchmark 'net461'."
                 + Environment.NewLine +
-                "To be able to benchmark 'net461' you need to use <TargetFrameworks>netcoreapp2.1;net461<TargetFrameworks/> in your project file";
+                "To be able to benchmark 'net461' you need to use <TargetFrameworks>netcoreapp2.1;net461</TargetFrameworks> in your project file";
 
             var logger = new OutputLogger(output);
 
