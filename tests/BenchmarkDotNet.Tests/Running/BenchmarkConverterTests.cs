@@ -173,7 +173,7 @@ namespace BenchmarkDotNet.Tests.Running
         }
 
         [MaxIterationCount(int.MaxValue)] // mutator attribute is before job attribute
-        [TargetFrameworkJob(TargetFrameworkMoniker.Netcoreapp21)]
+        [TargetFrameworkJob(TargetFrameworkMoniker.NetCoreApp21)]
         public class WithMutatorAfterJobAttribute
         {
             [Benchmark] public void Method() { }

@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Tests.Running
 
         [TargetFrameworkJob(TargetFrameworkMoniker.Net461)]
         [TargetFrameworkJob(TargetFrameworkMoniker.Mono)]
-        [TargetFrameworkJob(TargetFrameworkMoniker.Netcoreapp21)]
+        [TargetFrameworkJob(TargetFrameworkMoniker.NetCoreApp21)]
         public class AllRuntimes
         {
             [Benchmark] public void M1() { }

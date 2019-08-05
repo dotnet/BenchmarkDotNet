@@ -26,13 +26,13 @@ namespace BenchmarkDotNet.Extensions
                     return CsProjClassicNetToolchain.Net472;
                 case TargetFrameworkMoniker.Net48:
                     return CsProjClassicNetToolchain.Net48;
-                case TargetFrameworkMoniker.Netcoreapp20:
+                case TargetFrameworkMoniker.NetCoreApp20:
                     return CsProjCoreToolchain.NetCoreApp20;
-                case TargetFrameworkMoniker.Netcoreapp21:
+                case TargetFrameworkMoniker.NetCoreApp21:
                     return CsProjCoreToolchain.NetCoreApp21;
-                case TargetFrameworkMoniker.Netcoreapp22:
+                case TargetFrameworkMoniker.NetCoreApp22:
                     return CsProjCoreToolchain.NetCoreApp22;
-                case TargetFrameworkMoniker.Netcoreapp30:
+                case TargetFrameworkMoniker.NetCoreApp30:
                     return CsProjCoreToolchain.NetCoreApp30;
                 case TargetFrameworkMoniker.Mono:
                     return RoslynToolchain.Instance;
@@ -54,10 +54,10 @@ namespace BenchmarkDotNet.Extensions
                 case TargetFrameworkMoniker.Net472:
                 case TargetFrameworkMoniker.Net48:
                     return Runtime.Clr;
-                case TargetFrameworkMoniker.Netcoreapp20:
-                case TargetFrameworkMoniker.Netcoreapp21:
-                case TargetFrameworkMoniker.Netcoreapp22:
-                case TargetFrameworkMoniker.Netcoreapp30:
+                case TargetFrameworkMoniker.NetCoreApp20:
+                case TargetFrameworkMoniker.NetCoreApp21:
+                case TargetFrameworkMoniker.NetCoreApp22:
+                case TargetFrameworkMoniker.NetCoreApp30:
                     return Runtime.Core;
                 case TargetFrameworkMoniker.Mono:
                     return Runtime.Mono;
