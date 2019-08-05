@@ -43,23 +43,6 @@ namespace BenchmarkDotNet.ConsoleArguments
             { "verylong", Job.VeryLongRun }
         };
 
-        private static readonly ImmutableHashSet<string> AvailableRuntimes = ImmutableHashSet.Create(StringComparer.InvariantCultureIgnoreCase,
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48",
-            "netcoreapp2.0",
-            "netcoreapp2.1",
-            "netcoreapp2.2",
-            "netcoreapp3.0",
-            "clr",
-            "core",
-            "mono",
-            "corert"
-        );
-
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
         [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
         private static readonly IReadOnlyDictionary<string, IExporter[]> AvailableExporters =
@@ -118,9 +101,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
 
             foreach (string runtime in options.Runtimes)
-                if (!AvailableRuntimes.Contains(runtime))
+                if (!Enum.TryParse<TargetFrameworkMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out _))
                 {
-                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", AvailableRuntimes.OrderBy(name => name))}.");
+                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(TargetFrameworkMoniker)).Select(name => name.ToLower()).OrderBy(name => name))}.");
                     return false;
                 }
 
