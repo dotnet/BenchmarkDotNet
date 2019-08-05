@@ -281,15 +281,6 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             switch (runtime)
             {
-                case "clr":
-                    return baseJob.With(Runtime.Clr);
-                case "core":
-                    return baseJob.With(Runtime.Core).With(
-                        CsProjCoreToolchain.From(
-                            NetCoreAppSettings.GetCurrentVersion()
-                                .WithCustomDotNetCliPath(options.CliPath?.FullName)
-                                .WithCustomPackagesRestorePath(options.RestorePath?.FullName)
-                                .WithTimeout(timeOut)));
                 case "net461":
                 case "net462":
                 case "net47":
@@ -301,6 +292,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case "netcoreapp2.1":
                 case "netcoreapp2.2":
                 case "netcoreapp3.0":
+                case "netcoreapp3.1":
+                case "netcoreapp5.0":
                     return baseJob.With(Runtime.Core).With(
                         CsProjCoreToolchain.From(new NetCoreAppSettings(runtime, null, runtime, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));
                 case "mono":

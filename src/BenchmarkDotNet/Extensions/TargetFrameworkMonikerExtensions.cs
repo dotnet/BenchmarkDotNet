@@ -34,6 +34,10 @@ namespace BenchmarkDotNet.Extensions
                     return CsProjCoreToolchain.NetCoreApp22;
                 case TargetFrameworkMoniker.NetCoreApp30:
                     return CsProjCoreToolchain.NetCoreApp30;
+                case TargetFrameworkMoniker.NetCoreApp31:
+                    return CsProjCoreToolchain.NetCoreApp31;
+                case TargetFrameworkMoniker.NetCoreApp50:
+                    return CsProjCoreToolchain.NetCoreApp50;
                 case TargetFrameworkMoniker.Mono:
                     return RoslynToolchain.Instance;
                 case TargetFrameworkMoniker.CoreRt:
