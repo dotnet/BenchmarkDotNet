@@ -62,6 +62,8 @@ namespace BenchmarkDotNet.Extensions
                 case TargetFrameworkMoniker.NetCoreApp21:
                 case TargetFrameworkMoniker.NetCoreApp22:
                 case TargetFrameworkMoniker.NetCoreApp30:
+                case TargetFrameworkMoniker.NetCoreApp31:
+                case TargetFrameworkMoniker.NetCoreApp50:
                     return Runtime.Core;
                 case TargetFrameworkMoniker.Mono:
                     return Runtime.Mono;
