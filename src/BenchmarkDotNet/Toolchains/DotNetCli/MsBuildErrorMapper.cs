@@ -20,7 +20,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     RegexOptions.CultureInvariant | RegexOptions.Compiled),
                 match => $@"The project which defines benchmarks targets '{match.Groups[7]}', you can not benchmark '{match.Groups[2]}'." + Environment.NewLine +
                     $"To be able to benchmark '{match.Groups[2]}' you need to use <TargetFrameworks>{match.Groups[7].Value};{match.Groups[2].Value}</TargetFrameworks> in your project file ('{match.Groups[1]}')."
-            )
+            ),
+            (
+                new Regex("error NETSDK1045: The current .NET SDK does not support targeting (.*).  Either target (.*) or lower, or use a version of the .NET SDK that supports (.*).",
+                    RegexOptions.CultureInvariant | RegexOptions.Compiled),
+                match => $"The current .NET SDK does not support targeting {match.Groups[1]}. You need to install it or pass the path to dotnet cli via the `--cli` console line argument."
+            ),
         };
 
         internal static bool TryToExplainFailureReason(BuildResult buildResult, out string reason)
