@@ -43,6 +43,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                 var isFirstActualStartEnd = false;
 
                 long totalOperation = 0;
+                long countOfAllocatedObject = 0;
 
                 bdnEventsParser.WorkloadActualStart += data =>
                 {
@@ -86,6 +87,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
                     checked
                     {
+                        countOfAllocatedObject++;
                         nativeLeakSize += data.AllocSize;
                         totalAllocation += data.AllocSize;
                     }
@@ -116,10 +118,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                     {
                         return;
                     }
-
                     // Reallocs that actually move stuff will cause a Alloc and delete event
-                    // so there is nothing to do for those events.  But when the address is
-                    // the same we need to resize
+                    // so there is nothing to do for those events. But when the address is
+                    // the same we need to resize.
                     if (data.OldAllocAddress != data.NewAllocAddress)
                     {
                         return;
@@ -142,7 +143,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                     // This is a clone of the Alloc code (sigh don't clone code)
                     allocs[data.NewAllocAddress] = data.NewAllocSize;
 
-                    nativeLeakSize += data.NewAllocSize;
+                    checked
+                    {
+                        nativeLeakSize += data.NewAllocSize;
+                    }
                 };
                 heapParser.HeapTraceDestroy += delegate(HeapTraceData data)
                 {
@@ -160,7 +164,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
                     foreach (var alloc in allocs.Values)
                     {
-                        // TODO this is a clone of the free code.
                         nativeLeakSize -= alloc;
                     }
                 };
@@ -176,6 +179,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                 var memoryLeakPerOperation = nativeLeakSize / totalOperation;
 
                 logger.WriteLine($"Native memory allocated per single operation: {memoryAllocatedPerOperation.ToSizeStr(SizeUnit.B)}");
+                logger.WriteLine($"Count of allocated object: {countOfAllocatedObject / totalOperation}");
+
                 if (nativeLeakSize != 0)
                 {
                     logger.WriteLine($"Native memory leak per single operation: {memoryLeakPerOperation.ToSizeStr(SizeUnit.B)}");
