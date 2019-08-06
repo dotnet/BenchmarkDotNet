@@ -103,7 +103,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             foreach (string runtime in options.Runtimes)
                 if (!Enum.TryParse<TargetFrameworkMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out _))
                 {
-                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(TargetFrameworkMoniker)).Select(name => name.ToLower()).OrderBy(name => name))}.");
+                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(TargetFrameworkMoniker)).Select(name => name.ToLower()))}.");
                     return false;
                 }
 
@@ -272,33 +272,41 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return CreateCoreJobWithCli(baseJob, options);
             else
                 foreach (string runtime in options.Runtimes) // known runtimes
-                    yield return CreateJobForGivenRuntime(baseJob, runtime.ToLowerInvariant(), options);
+                    yield return CreateJobForGivenRuntime(baseJob, runtime, options);
         }
 
         private static Job CreateJobForGivenRuntime(Job baseJob, string runtime, CommandLineOptions options)
         {
             TimeSpan? timeOut = options.TimeOutInSeconds.HasValue ? TimeSpan.FromSeconds(options.TimeOutInSeconds.Value) : default(TimeSpan?);
 
-            switch (runtime)
+            if (!Enum.TryParse(runtime.Replace(".", string.Empty), ignoreCase: true, out TargetFrameworkMoniker targetFrameworkMoniker))
             {
-                case "net461":
-                case "net462":
-                case "net47":
-                case "net471":
-                case "net472":
-                case "net48":
-                    return baseJob.With(Runtime.Clr).With(CsProjClassicNetToolchain.From(runtime, options.RestorePath?.FullName, timeOut));
-                case "netcoreapp2.0":
-                case "netcoreapp2.1":
-                case "netcoreapp2.2":
-                case "netcoreapp3.0":
-                case "netcoreapp3.1":
-                case "netcoreapp5.0":
-                    return baseJob.With(Runtime.Core).With(
-                        CsProjCoreToolchain.From(new NetCoreAppSettings(runtime, null, runtime, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));
-                case "mono":
+                throw new InvalidOperationException("Impossible, already validated by the Validate method");
+            }
+
+            switch (targetFrameworkMoniker)
+            {
+                case TargetFrameworkMoniker.Net461:
+                case TargetFrameworkMoniker.Net462:
+                case TargetFrameworkMoniker.Net47:
+                case TargetFrameworkMoniker.Net471:
+                case TargetFrameworkMoniker.Net472:
+                case TargetFrameworkMoniker.Net48:
+                    return baseJob
+                        .With(targetFrameworkMoniker.GetRuntime())
+                        .With(CsProjClassicNetToolchain.From(targetFrameworkMoniker.ToMsBuildName(), options.RestorePath?.FullName, timeOut));
+                case TargetFrameworkMoniker.NetCoreApp20:
+                case TargetFrameworkMoniker.NetCoreApp21:
+                case TargetFrameworkMoniker.NetCoreApp22:
+                case TargetFrameworkMoniker.NetCoreApp30:
+                case TargetFrameworkMoniker.NetCoreApp31:
+                case TargetFrameworkMoniker.NetCoreApp50:
+                    return baseJob
+                        .With(targetFrameworkMoniker.GetRuntime())
+                        .With(CsProjCoreToolchain.From(new NetCoreAppSettings(targetFrameworkMoniker.ToMsBuildName(), null, runtime, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));
+                case TargetFrameworkMoniker.Mono:
                     return baseJob.With(new MonoRuntime("Mono", options.MonoPath?.FullName));
-                case "corert":
+                case TargetFrameworkMoniker.CoreRt:
                     var builder = CoreRtToolchain.CreateBuilder();
 
                     if (options.CliPath != null)

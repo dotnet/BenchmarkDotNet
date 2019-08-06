@@ -73,5 +73,38 @@ namespace BenchmarkDotNet.Extensions
                     throw new ArgumentOutOfRangeException(nameof(targetFrameworkMoniker), targetFrameworkMoniker, "Target Framework Moniker not supported");
             }
         }
+
+        internal static string ToMsBuildName(this TargetFrameworkMoniker targetFrameworkMoniker)
+        {
+            switch (targetFrameworkMoniker)
+            {
+                case TargetFrameworkMoniker.Net461:
+                    return "net461";
+                case TargetFrameworkMoniker.Net462:
+                    return "net462";
+                case TargetFrameworkMoniker.Net47:
+                    return "net47";
+                case TargetFrameworkMoniker.Net471:
+                    return "net471";
+                case TargetFrameworkMoniker.Net472:
+                    return "net472";
+                case TargetFrameworkMoniker.Net48:
+                    return "net48";
+                case TargetFrameworkMoniker.NetCoreApp20:
+                    return "netcoreapp2.0";
+                case TargetFrameworkMoniker.NetCoreApp21:
+                    return "netcoreapp2.1";
+                case TargetFrameworkMoniker.NetCoreApp22:
+                    return "netcoreapp2.2";
+                case TargetFrameworkMoniker.NetCoreApp30:
+                    return "netcoreapp3.0";
+                case TargetFrameworkMoniker.NetCoreApp31:
+                    return "netcoreapp3.1";
+                case TargetFrameworkMoniker.NetCoreApp50:
+                    return "netcoreapp5.0";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(targetFrameworkMoniker), targetFrameworkMoniker, "Target Framework Moniker not supported");
+            }
+        }
     }
 }
