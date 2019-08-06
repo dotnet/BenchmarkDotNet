@@ -37,12 +37,10 @@
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
-    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.SingleRuntime.DotNetCore\BenchmarkDotNet.IntegrationTests.SingleRuntime.DotNetCore.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.CustomPaths\BenchmarkDotNet.IntegrationTests.CustomPaths.csproj" />
-    <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.SingleRuntime.DotNetFramework\BenchmarkDotNet.IntegrationTests.SingleRuntime.DotNetFramework.csproj" />
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="2.2.0" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime" />
