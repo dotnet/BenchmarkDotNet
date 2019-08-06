@@ -21,13 +21,13 @@ If you want to test multiple frameworks, your project file **MUST target all of 
 <TargetFrameworks>netcoreapp3.0;netcoreapp2.1;net48</TargetFrameworks>
 ```
 
-**If you run your benchmarks without specifying any custom settings, BenchmarkDotNet is going to run the benchmarks using the same framework as the host process**:
+If you run your benchmarks without specifying any custom settings, BenchmarkDotNet is going to run the benchmarks **using the same framework as the host process**:
 
 ```cmd
 dotnet run -c Release -f netcoreapp2.1 # is going to run the benchmarks using .NET Core 2.1
 dotnet run -c Release -f netcoreapp3.0 # is going to run the benchmarks using .NET Core 3.0
 dotnet run -c Release -f net48         # is going to run the benchmarks using .NET 4.8
-mono $pathToExe                        # is going to run the benchmarks using Mono
+mono $pathToExe                        # is going to run the benchmarks using Mono from your PATH
 ```
 
 To run the benchmarks for multiple runtimes with a single command, you need to specify the target framework moniker names via `--runtimes|-r` console argument:
@@ -36,6 +36,14 @@ To run the benchmarks for multiple runtimes with a single command, you need to s
 dotnet run -c Release -f netcoreapp2.1 --runtimes netcoreapp2.1 netcoreapp3.0 # is going to run the benchmarks using .NET Core 2.1 and .NET Core 3.0
 dotnet run -c Release -f netcoreapp2.1 --runtimes netcoreapp2.1 net48         # is going to run the benchmarks using .NET Core 2.1 and .NET 4.8
 ```
+
+What is going to happen if you provide multiple Full .NET Framework monikers? Let's say:
+
+```cmd
+dotnet run -c Release -f net461 net472 net48
+```
+
+Full .NET Framework always runs every .NET executable using the latest .NET Framework available on a given machine. If you try to run the benchmarks for a few .NET TFMs, they are all going to be executed using the latest .NET Framework from your machine. The only difference is that they are all going to have different features enabled depending on target version they were compiled for. You can read more about this [here](https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/version-compatibility) and [here](https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/application-compatibility). This is **Windows Operating System behavior which can not be controlled by BenchmarkDotNet or any other tool**.
 
 **Note:** Console arguments support works only if you pass the `args` to `BenchmarkSwitcher`:
 
