@@ -10,16 +10,18 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private static readonly (Regex regex, Func<Match, string> translation)[] rules = new (Regex rule, Func<Match, string> translation)[]
         {
             (
-                new Regex("warning NU1702: ProjectReference '(.*)' was resolved using '(.*)' instead of the project target framework '(.*)'. This project may not be fully compatible with your project.", 
+                new Regex("warning NU1702: ProjectReference '(.*)' was resolved using '(.*)' instead of the project target framework '(.*)'. This project may not be fully compatible with your project.",
                     RegexOptions.CultureInvariant | RegexOptions.Compiled),
-                match => $@"The project which defines benchmarks targets '{Map(match.Groups[2])}', you can not benchmark '{Map(match.Groups[3])}'." + Environment.NewLine +
-                    $"To be able to benchmark '{Map(match.Groups[3])}' you need to use <TargetFrameworks>{Map(match.Groups[2])};{Map(match.Groups[3])}</TargetFrameworks> in your project file ('{match.Groups[1]}')."
+                match => $@"The project which defines benchmarks does not target '{Map(match.Groups[3])}'." + Environment.NewLine +
+                    $"You need to add '{Map(match.Groups[3])}' to <TargetFrameworks> in your project file ('{match.Groups[1]}')." + Environment.NewLine +
+                    $"Example: <TargetFrameworks>{Map(match.Groups[2])};{Map(match.Groups[3])}</TargetFrameworks>"
             ),
             (
                 new Regex("error NU1201: Project (.*) is not compatible with (.*) ((.*)) / (.*). Project (.*) supports: (.*) ((.*))", 
                     RegexOptions.CultureInvariant | RegexOptions.Compiled),
-                match => $@"The project which defines benchmarks targets '{match.Groups[7]}', you can not benchmark '{match.Groups[2]}'." + Environment.NewLine +
-                    $"To be able to benchmark '{match.Groups[2]}' you need to use <TargetFrameworks>{match.Groups[7].Value};{match.Groups[2].Value}</TargetFrameworks> in your project file ('{match.Groups[1]}')."
+                match => $@"The project which defines benchmarks does not target '{Map(match.Groups[2])}'." + Environment.NewLine +
+                    $"You need to add '{Map(match.Groups[2])}' to <TargetFrameworks> in your project file ('{match.Groups[1]}')." + Environment.NewLine +
+                    $"Example: <TargetFrameworks>{Map(match.Groups[7])};{Map(match.Groups[2])}</TargetFrameworks>"
             ),
             (
                 new Regex("error NETSDK1045: The current .NET SDK does not support targeting (.*).  Either target (.*) or lower, or use a version of the .NET SDK that supports (.*).",
