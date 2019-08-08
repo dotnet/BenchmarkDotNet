@@ -26,10 +26,13 @@ The current Diagnosers are:
   Please see Adam Sitnik's [blog post](http://adamsitnik.com/Disassembly-Diagnoser/) for all the details.
 - ETW Profiler (`EtwProfiler`).
   It allows you to not only benchmark, but also profile the code. It's using TraceEvent, which internally uses ETW and exports all the information to a trace file. The trace file contains all of the stack traces captured by the profiler, PDBs to resolve symbols for both native and managed code and captured GC, JIT and CLR events. Please use one of the free tools: PerfView or Windows Performance Analyzer to analyze and visualize the data from trace file. You can find this diagnoser in a separate package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`): [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/)
+  Please see Adam Sitnik's [blog post](https://adamsitnik.com/ETW-Profiler/) for all the details.
 - Concurrency Visualizer Profiler (`ConcurrencyVisualizerProfiler`)
   It uses `EtwProfiler` to profile the code using ETW and create not only `.etl` file but also a CVTrace file which can be opened by Concurrency Visualizer plugin from Visual Studio.
+  Please see Adam Sitnik's [blog post](https://adamsitnik.com/ConcurrencyVisualizer-Profiler/) for all the details.
 - Native Memory Profiler (`NativeMemoryProfiler`)
   It uses `EtwProfiler` to profile the code using ETW and adds the extra columns `Allocated native memory` and `Native memory leak`.
+  Please see Wojciech Nagórski's [blog post](https://wojciechnagorski.com/2019/08/analyzing-native-memory-allocation-with-benchmarkdotnet/) for all the details.
 
 ## Usage
 
