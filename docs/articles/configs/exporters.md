@@ -20,7 +20,7 @@ By default, files with results will be located in
 
 ## Plots
 
-You can install [R](https://www.r-project.org/) to automatically get nice plots of your benchmark results.
+[You can install R](https://www.r-project.org/) to automatically get nice plots of your benchmark results.
 First, make sure `Rscript.exe` or `Rscript` is in your path,
   or define an R_HOME environment variable pointing to the R installation directory (containing the `bin` directory).
 Use `RPlotExporter.Default` and `CsvMeasurementsExporter.Default` in your config,
