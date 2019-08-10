@@ -22,7 +22,8 @@ By default, files with results will be located in
 
 [You can install R](https://www.r-project.org/) to automatically get nice plots of your benchmark results.
 First, make sure `Rscript.exe` or `Rscript` is in your path,
-  or define an R_HOME environment variable pointing to the R installation directory (containing the `bin` directory).
+  or define an R_HOME environment variable pointing to the R installation directory.  
+_eg: If `Rscript` is located in `/path/to/R/R-1.2.3/bin/Rscript`, then `R_HOME` must point to `/path/to/R/R-1.2.3/`, it **should not** point to `/path/to/R/R-1.2.3/bin`_  
 Use `RPlotExporter.Default` and `CsvMeasurementsExporter.Default` in your config,
   and the `BuildPlots.R` script in your bin directory will take care of the rest.
 
