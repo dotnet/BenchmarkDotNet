@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Exporters
 
             string fileNamePrefix = Path.Combine(summary.ResultsDirectoryPath, summary.Title);
             string csvFullPath = CsvMeasurementsExporter.Default.GetArtifactFullName(summary);
-            
+
             string scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
             string logFullPath = Path.Combine(summary.ResultsDirectoryPath, logFileName);
             string script = ResourceHelper.
@@ -42,26 +42,9 @@ namespace BenchmarkDotNet.Exporters
             lock (BuildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
-            string rscriptExecutable = RuntimeInformation.IsWindows() ? "Rscript.exe" : "Rscript";
-            string rscriptPath;
-            string rHome = Environment.GetEnvironmentVariable("R_HOME");
-            if (rHome != null)
+            if(!TryFindRScript(consoleLogger, out string rscriptPath))
             {
-                rscriptPath = Path.Combine(rHome, "bin", rscriptExecutable);
-                if (!File.Exists(rscriptPath))
-                {
-                    consoleLogger.WriteLineError($"RPlotExporter requires R_HOME to point to the directory containing bin{Path.DirectorySeparatorChar}{rscriptExecutable} (currently points to {rHome})");
-                    yield break;
-                }
-            }
-            else // No R_HOME, try the path
-            {
-                rscriptPath = FindInPath(rscriptExecutable);
-                if (rscriptPath == null)
-                {
-                    consoleLogger.WriteLineError($"RPlotExporter couldn't find {rscriptExecutable} in your PATH and no R_HOME environment variable is defined");
-                    yield break;
-                }
+                yield break;
             }
 
             var start = new ProcessStartInfo
@@ -91,12 +74,40 @@ namespace BenchmarkDotNet.Exporters
             throw new NotSupportedException();
         }
 
+        public static bool TryFindRScript(ILogger consoleLogger, out string rscriptPath)
+        {
+            string rscriptExecutable = RuntimeInformation.IsWindows() ? "Rscript.exe" : "Rscript";
+            rscriptPath = null;
+            string rHome = Environment.GetEnvironmentVariable("R_HOME");
+            if (rHome != null)
+            {
+                rscriptPath = Path.Combine(rHome, "bin", rscriptExecutable);
+                if (File.Exists(rscriptPath))
+                {
+                    return true;
+                }
+
+                consoleLogger.WriteLineError($"RPlotExporter requires R_HOME to point to the parent directory of the existing '{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}{rscriptExecutable} (currently points to {rHome})");
+                rscriptPath = null;
+            }
+
+            // No R_HOME, or R_HOME points to a wrong folder, try the path
+            rscriptPath = FindInPath(rscriptExecutable);
+            if (rscriptPath == null)
+            {
+                consoleLogger.WriteLineError($"RPlotExporter couldn't find {rscriptExecutable} in your PATH and no R_HOME environment variable is defined");
+                return false;
+            }
+
+            return true;
+        }
+
         private static string FindInPath(string fileName)
         {
             string path = Environment.GetEnvironmentVariable("PATH");
             if (path == null)
                 return null;
-            
+
             var dirs = path.Split(Path.PathSeparator);
             foreach (string dir in dirs)
             {
