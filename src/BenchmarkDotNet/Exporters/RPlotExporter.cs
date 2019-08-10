@@ -88,7 +88,6 @@ namespace BenchmarkDotNet.Exporters
                 }
 
                 consoleLogger.WriteLineError($"RPlotExporter requires R_HOME to point to the parent directory of the existing '{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}{rscriptExecutable} (currently points to {rHome})");
-                rscriptPath = null;
             }
 
             // No R_HOME, or R_HOME points to a wrong folder, try the path
