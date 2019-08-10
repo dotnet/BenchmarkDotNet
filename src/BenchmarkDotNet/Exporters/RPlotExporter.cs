@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.Exporters
             throw new NotSupportedException();
         }
 
-        public static bool TryFindRScript(ILogger consoleLogger, out string rscriptPath)
+        private static bool TryFindRScript(ILogger consoleLogger, out string rscriptPath)
         {
             string rscriptExecutable = RuntimeInformation.IsWindows() ? "Rscript.exe" : "Rscript";
             rscriptPath = null;
