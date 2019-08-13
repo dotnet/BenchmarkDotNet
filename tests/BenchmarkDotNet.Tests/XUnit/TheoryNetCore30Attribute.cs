@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Tests.XUnit
         // ReSharper disable once VirtualMemberCallInConstructor
         public TheoryNetCore30Attribute(string skipReason)
         {
-            if (NetCoreAppSettings.GetCurrentVersion().Is(TargetFrameworkMoniker.NetCoreApp30))
+            if (!NetCoreAppSettings.GetCurrentVersion().Is(TargetFrameworkMoniker.NetCoreApp30))
                 Skip = skipReason;
         }
     }
