@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Configs
                 case CoreRuntime _:
                     return CsProjCoreToolchain.Current.Value;
                 case CoreRtRuntime _:
-                    return CoreRtToolchain.LatestMyGetBuild;
+                    return CoreRtToolchain.LatestBuild;
                 default:
                     throw new NotSupportedException("Runtime not supported!");
             }

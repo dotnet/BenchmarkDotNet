@@ -1,9 +1,12 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DryCoreJob, DryMonoJob, DryClrJob(Platform.X86)]
+    [DryJob(TargetFrameworkMoniker.NetCoreApp21)]
+    [DryJob(TargetFrameworkMoniker.Mono)]
+    [DryJob(TargetFrameworkMoniker.Net461, Jit.LegacyJit, Platform.X86)]
     [DisassemblyDiagnoser]
     public class IntroDisassembly
     {

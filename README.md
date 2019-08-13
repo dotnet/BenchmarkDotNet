@@ -54,7 +54,6 @@ using BenchmarkDotNet.Running;
 
 namespace MyBenchmarks
 {
-    [ClrJob(baseline: true), CoreJob, MonoJob, CoreRtJob]
     [RPlotExporter, RankColumn]
     public class Md5VsSha256
     {

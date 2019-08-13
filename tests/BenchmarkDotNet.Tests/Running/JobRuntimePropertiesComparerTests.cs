@@ -53,7 +53,9 @@ namespace BenchmarkDotNet.Tests.Running
                 Assert.Equal(2, grouping.Count()); // M1 + M2
         }
 
-        [ClrJob, MonoJob, CoreJob]
+        [TargetFrameworkJob(TargetFrameworkMoniker.Net461)]
+        [TargetFrameworkJob(TargetFrameworkMoniker.Mono)]
+        [TargetFrameworkJob(TargetFrameworkMoniker.NetCoreApp21)]
         public class AllRuntimes
         {
             [Benchmark] public void M1() { }

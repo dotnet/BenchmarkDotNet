@@ -20,10 +20,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         private readonly ITestOutputHelper output;
 
-        public MultipleRuntimesTest(ITestOutputHelper outputHelper)
-        {
-            output = outputHelper;
-        }
+        public MultipleRuntimesTest(ITestOutputHelper outputHelper) => output = outputHelper;
 
         [FactWindowsOnly("CLR is a valid job only on Windows")]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]

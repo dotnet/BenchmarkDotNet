@@ -5,65 +5,103 @@ name: Toolchains
 
 # Toolchains
 
-In BenchmarkDotNet we generate, build and execute new console app per every benchmark. A **toolchain** contains generator, builder, and executor. 
+To achieve process-level isolation, BenchmarkDotNet generates, builds and executes a new console app per every benchmark. A **toolchain** contains generator, builder, and executor.
 
-When you run your benchmarks without specifying the toolchain in an explicit way, we use the default one. It works OOTB, you don't need to worry about anything.
+When you run your benchmarks without specifying the toolchain in an explicit way, the default one is used:
 
-We use Roslyn for classic .NET and Mono, and `dotnet cli` for .NET Core and CoreRT.
+* Roslyn for Full .NET Framework and Mono
+* dotnet cli for .NET Core and CoreRT
 
 ## Multiple frameworks support
 
-You can target multiple frameworks with single, modern csproj file:
+
+If you want to test multiple frameworks, your project file **MUST target all of them** and you **MUST install the corresponding SDKs**:
 
 ```xml
-<TargetFrameworks>netcoreapp2.0;net462</TargetFrameworks>
+<TargetFrameworks>netcoreapp3.0;netcoreapp2.1;net48</TargetFrameworks>
 ```
 
-BenchmarkDotNet allows you to take full advantage of that. With single config, we can execute the benchmarks for all the frameworks that you have listed in your csproj file.
+If you run your benchmarks without specifying any custom settings, BenchmarkDotNet is going to run the benchmarks **using the same framework as the host process**:
 
-If you specify `Runtime` in explicit way, we just choose the right toolchain for you.
+```cmd
+dotnet run -c Release -f netcoreapp2.1 # is going to run the benchmarks using .NET Core 2.1
+dotnet run -c Release -f netcoreapp3.0 # is going to run the benchmarks using .NET Core 3.0
+dotnet run -c Release -f net48         # is going to run the benchmarks using .NET 4.8
+mono $pathToExe                        # is going to run the benchmarks using Mono from your PATH
+```
+
+To run the benchmarks for multiple runtimes with a single command, you need to specify the target framework moniker names via `--runtimes|-r` console argument:
+
+```cmd
+dotnet run -c Release -f netcoreapp2.1 --runtimes netcoreapp2.1 netcoreapp3.0 # is going to run the benchmarks using .NET Core 2.1 and .NET Core 3.0
+dotnet run -c Release -f netcoreapp2.1 --runtimes netcoreapp2.1 net48         # is going to run the benchmarks using .NET Core 2.1 and .NET 4.8
+```
+
+What is going to happen if you provide multiple Full .NET Framework monikers? Let's say:
+
+```cmd
+dotnet run -c Release -f net461 net472 net48
+```
+
+Full .NET Framework always runs every .NET executable using the latest .NET Framework available on a given machine. If you try to run the benchmarks for a few .NET TFMs, they are all going to be executed using the latest .NET Framework from your machine. The only difference is that they are all going to have different features enabled depending on target version they were compiled for. You can read more about this [here](https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/version-compatibility) and [here](https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/application-compatibility). This is **.NET Framework behavior which can not be controlled by BenchmarkDotNet or any other tool**.
+
+**Note:** Console arguments support works only if you pass the `args` to `BenchmarkSwitcher`:
 
 ```cs
-[ClrJob, MonoJob, CoreJob, CoreRtJob]
-public class Algo_Md5VsSha256
+class Program
 {
-    // the benchmarks are going to be executed for classic .NET, Mono (default path), .NET Core and CoreRT (latest version)
+    static void Main(string[] args) 
+        => BenchmarkSwitcher
+            .FromAssembly(typeof(Program).Assembly)
+            .Run(args); // crucial to make it work
 }
 ```
 
-### TFM
-
-At some point of time we need to choose the target framework moniker (TFM).
-
-When you are running your app with benchmark as .NET Core app, we just check the version of the `System.Runtime.dll` which allows us to decide which version of .NET Core you are using.
-
-But when you are running your project as classic .NET (.NET 4.6.2 for example), we don't know which TFM to choose for your .NET Core Runtime, so we use the default one - **netcoreapp2.0**.
-
-If the default `netcoreapp2.0` is not OK for you, you must configure the toolchains in explicit way:
+You can achieve the same thing using `[TargetFrameworkJobAttribute]`:
 
 ```cs
-public class MultipleRuntimes : ManualConfig
-{
-    public MultipleRuntimes()
-    {
-        Add(Job.Default.With(CsProjCoreToolchain.NetCoreApp21)); // .NET Core 2.1
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 
-        Add(Job.Default.With(CsProjClassicNetToolchain.Net462)); // NET 4.6.2
+namespace BenchmarkDotNet.Samples
+{
+    [TargetFrameworkJob(TargetFrameworkMoniker.Net48)]
+    [TargetFrameworkJob(TargetFrameworkMoniker.Mono)]
+    [TargetFrameworkJob(TargetFrameworkMoniker.NetCoreApp21)]
+    [TargetFrameworkJob(TargetFrameworkMoniker.NetCoreApp30)]
+    public class TheClassWithBenchmarks
+```
+
+Or using a custom config:
+
+```cs
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.CsProj;
+
+namespace BenchmarkDotNet.Samples
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var config = DefaultConfig.Instance
+                .With(Job.Default.With(CsProjCoreToolchain.NetCoreApp21))
+                .With(Job.Default.With(CsProjCoreToolchain.NetCoreApp30))
+                .With(Job.Default.With(CsProjClassicNetToolchain.Net48))
+                .With(Job.Mono);
+
+            BenchmarkSwitcher
+                .FromAssembly(typeof(Program).Assembly)
+                .Run(args, config);
+        }
     }
 }
-
-[Config(typeof(MultipleRuntimes))]
-public class TypeWithBenchmarks
-{
-}
 ```
 
-After doing this, you can run your benchmarks via:
+The recommended way of running the benchmarks for multiple runtimes is to use the `--runtimes` console line argument. By using the console line argument you don't need to edit the source code anytime you want to change the list of runtimes. Moreover, if you share the source code of the benchmark other people can run it even if they don't have the exact same framework version installed.
 
-* `dotnet run -c Release -f net462`
-* `dotnet run -c Release -f netcoreapp2.0`
-
-And they are going to be executed for both runtimes.
 
 ## Custom .NET Core Runtime
 

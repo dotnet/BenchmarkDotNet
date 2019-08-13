@@ -8,9 +8,9 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
     public class CoreRtToolchain : Toolchain
     {
         /// <summary>
-        /// target latest (1.0.0-alpha-*) CoreRT build from https://dotnet.myget.org/F/dotnet-core/api/v3/index.json
+        /// target latest (1.0.0-alpha-*) CoreRT build from https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json
         /// </summary>
-        public static readonly IToolchain LatestMyGetBuild = CreateBuilder().UseCoreRtNuGet().ToToolchain();
+        public static readonly IToolchain LatestBuild = CreateBuilder().UseCoreRtNuGet().ToToolchain();
 
         internal CoreRtToolchain(string displayName, 
             string coreRtVersion, string ilcPath, bool useCppCodeGenerator,

@@ -163,7 +163,9 @@ namespace BenchmarkDotNet.Running
 
                         if (buildResult.GenerateException != null)
                             logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException.Message}");
-                        if (buildResult.ErrorMessage != null)
+                        else if (!buildResult.IsBuildSuccess && buildResult.TryToExplainFailureReason(out string reason))
+                            logger.WriteLineError($"// Build Error: {reason}");
+                        else if (buildResult.ErrorMessage != null)
                             logger.WriteLineError($"// Build Error: {buildResult.ErrorMessage}");
 
                         if (config.Options.IsSet(ConfigOptions.StopOnFirstError))
@@ -274,7 +276,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build..   *****");
 
             foreach (var buildPartition in buildPartitions)
-                if(buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess)
+                if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess && !buildResults[buildPartition].TryToExplainFailureReason(out var reason))
                     buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, buildLogger);
 
             logger.WriteLineHeader($"// ***** Done, took {globalChronometer.GetElapsed().GetTimeSpan().ToFormattedTotalTime()}   *****");
