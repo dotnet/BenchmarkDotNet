@@ -1,4 +1,6 @@
 using System;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 
@@ -82,6 +84,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         public TimeSpan Timeout { get; }
 
+        public bool Is(TargetFrameworkMoniker targetFrameworkMoniker) => targetFrameworkMoniker.ToMsBuildName() == TargetFrameworkMoniker;
+
         public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath, Timeout);
         
@@ -96,7 +100,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (RuntimeInformation.IsFullFramework)
                 return Default;
 
-            string netCoreAppVersion = null;
+            string netCoreAppVersion;
 
             try
             {
@@ -110,20 +114,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (string.IsNullOrEmpty(netCoreAppVersion))
                 return Default;
 
-            if (netCoreAppVersion.StartsWith("2.0", StringComparison.InvariantCultureIgnoreCase))
-                return NetCoreApp20;
-            if (netCoreAppVersion.StartsWith("2.1", StringComparison.InvariantCultureIgnoreCase))
-                return NetCoreApp21;
-            if (netCoreAppVersion.StartsWith("2.2", StringComparison.InvariantCultureIgnoreCase))
-                return NetCoreApp22;
-            if (netCoreAppVersion.StartsWith("3.0", StringComparison.InvariantCultureIgnoreCase))
-                return NetCoreApp30;
-            if (netCoreAppVersion.StartsWith("3.1", StringComparison.InvariantCultureIgnoreCase))
-                return NetCoreApp31;
-            if (netCoreAppVersion.StartsWith("5.0", StringComparison.InvariantCultureIgnoreCase))
-                return NetCoreApp50;
+            string version = netCoreAppVersion.Substring(0, 3); // 2.0, 3.1 etc
 
-            return Default;
+            return new NetCoreAppSettings($"netcoreapp{version}", null, $".NET Core {version}");
         }
     }
 }
