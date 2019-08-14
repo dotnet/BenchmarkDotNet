@@ -80,6 +80,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     new List<Measurement> { new Measurement(1, IterationMode.Workload, IterationStage.Actual, 1, 1, 1) },
                     OutlierMode.DontRemove,
                     default,
+                    default,
                     default);
             }
 

@@ -15,7 +15,6 @@ namespace BenchmarkDotNet.Reports
         public BenchmarkCase BenchmarkCase { get; }
         public IReadOnlyList<Measurement> AllMeasurements { get; }
         public GcStats GcStats { get; }
-        public ThreadingStats ThreadingStats { get; }
         [PublicAPI] public bool Success { get; }
         [PublicAPI] public GenerateResult GenerateResult { get; }
         [PublicAPI] public BuildResult BuildResult { get; }

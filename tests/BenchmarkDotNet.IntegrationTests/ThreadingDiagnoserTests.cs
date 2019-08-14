@@ -2,7 +2,6 @@
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -43,10 +42,10 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summary = BenchmarkRunner.Run<CompletedWorkItemCount>(config);
 
-            AssertStats(summary, new Dictionary<string, Action<ThreadingStats>>
+            AssertStats(summary, new Dictionary<string, (string metricName, double expectedValue)>
             {
-                { nameof(CompletedWorkItemCount.DoNothing), stats => Assert.Equal(0, stats.CompletedWorkItemCount) },
-                { nameof(CompletedWorkItemCount.CompleteOneWorkItem), stats => Assert.Equal(1, stats.CompletedWorkItemCount) }
+                { nameof(CompletedWorkItemCount.DoNothing), ("CompletedWorkItemCount", 0.0) },
+                { nameof(CompletedWorkItemCount.CompleteOneWorkItem), ("CompletedWorkItemCount", 1.0) }
             });
         }
 
@@ -71,10 +70,10 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summary = BenchmarkRunner.Run<LockContentionCount>(config);
 
-            AssertStats(summary, new Dictionary<string, Action<ThreadingStats>>
+            AssertStats(summary, new Dictionary<string, (string metricName, double expectedValue)>
             {
-                { nameof(LockContentionCount.DoNothing), stats => Assert.Equal(0, stats.LockContentionCount) },
-                { nameof(LockContentionCount.RunIntoLockContention), stats => Assert.Equal(1, stats.LockContentionCount) }
+                { nameof(LockContentionCount.DoNothing), ("LockContentionCount", 0.0) },
+                { nameof(LockContentionCount.RunIntoLockContention), ("LockContentionCount", 1.0) }
             });
         }
 
@@ -140,13 +139,15 @@ namespace BenchmarkDotNet.IntegrationTests
                 .With(ThreadingDiagnoser.Default)
                 .With(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
 
-        private void AssertStats(Summary summary, Dictionary<string, Action<ThreadingStats>> assertions)
+        private void AssertStats(Summary summary, Dictionary<string, (string metricName, double expectedValue)> assertions)
         {
             foreach (var assertion in assertions)
             {
                 var selectedReport = summary.Reports.Single(report => report.BenchmarkCase.DisplayInfo.Contains(assertion.Key));
 
-                assertion.Value(selectedReport.ThreadingStats);
+                var metric = selectedReport.Metrics.Single(m => m.Key == assertion.Value.metricName);
+
+                Assert.Equal(assertion.Value.expectedValue, metric.Value.Value);
             }
         }
     }

@@ -86,6 +86,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public bool Is(TargetFrameworkMoniker targetFrameworkMoniker) => targetFrameworkMoniker.ToMsBuildName() == TargetFrameworkMoniker;
 
+        public bool IsOlderThan(TargetFrameworkMoniker targetFrameworkMoniker) 
+            => TargetFrameworkMoniker.CompareTo(targetFrameworkMoniker.ToMsBuildName()) < 0;
+
         public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath, Timeout);
         

@@ -93,6 +93,9 @@ namespace BenchmarkDotNet.Configs
         public IDiagnoser GetCompositeDiagnoser() => new CompositeDiagnoser(diagnosers);
 
         public bool HasMemoryDiagnoser() => diagnosers.Contains(MemoryDiagnoser.Default);
+        public bool HasThreadingDiagnoser() => diagnosers.Contains(ThreadingDiagnoser.Default);
+
+        public bool HasExtraStatsDiagnoser() => HasMemoryDiagnoser() || HasThreadingDiagnoser();
 
         public IDiagnoser GetCompositeDiagnoser(BenchmarkCase benchmarkCase, RunMode runMode)
         {
