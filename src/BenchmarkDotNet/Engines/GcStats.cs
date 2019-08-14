@@ -7,6 +7,12 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
 {
+    public struct ThreadingStats
+    {
+        public long CompletedWorkItemCount { get; }
+        public long LockContentionCount { get; }
+    }
+
     public struct GcStats
     {
         internal const string ResultsLinePrefix = "GC: ";
