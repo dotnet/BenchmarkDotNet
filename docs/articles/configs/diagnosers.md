@@ -33,6 +33,7 @@ The current Diagnosers are:
 - Native Memory Profiler (`NativeMemoryProfiler`)
   It uses `EtwProfiler` to profile the code using ETW and adds the extra columns `Allocated native memory` and `Native memory leak`.
   Please see Wojciech Nagórski's [blog post](https://wojciechnagorski.com/2019/08/analyzing-native-memory-allocation-with-benchmarkdotnet/) for all the details.
+- Threading Diagnoser (`ThreadingDiagnoser`) - .NET Core 3.0+ diagnoser that reports some Threading statistics.
 
 ## Usage
 
@@ -54,6 +55,7 @@ private class Config : ManualConfig
         Add(MemoryDiagnoser.Default);
         Add(new InliningDiagnoser());
         Add(new EtwProfiler());
+        Add(ThreadingDiagnoser.Default);
     }
 }
 ```
@@ -66,6 +68,7 @@ You can also use one of the following attributes (apply it on a class that conta
 [EtwProfiler]
 [ConcurrencyVisualizerProfiler]
 [NativeMemoryProfiler]
+[ThreadingDiagnoser]
 ```
 
 In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on. The column Gen X means number of GC collections per 1000 operations for that generation.
@@ -77,6 +80,8 @@ In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on. The column Gen X means
 	* Mono currently [does not](http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono) expose any api to get the number of allocated bytes. That's why our Mono users will get `?` in Allocated column.
 	* In order to get the number of allocated bytes in cross platform way we are using `GC.GetAllocatedBytesForCurrentThread` which recently got [exposed](https://github.com/dotnet/corefx/pull/12489) for netcoreapp1.1. That's why BenchmarkDotNet does not support netcoreapp1.0 from version 0.10.1.
 	* MemoryDiagnoser is `99.5%` accurate about allocated memory when using default settings or Job.ShortRun (or any longer job than it).
+* Threading Diagnoser:
+    * Works only for .NET Core 3.0+
 * HardwareCounters:
 	* Windows 8+ only (we plan to add Unix support in the future)
     * No Hyper-V (Virtualization) support
@@ -113,3 +118,5 @@ In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on. The column Gen X means
 [!include[IntroTailcall](../samples/IntroTailcall.md)]
 
 [!include[IntroNativeMemory](../samples/IntroNativeMemory.md)]
+
+[!include[IntroThreadingDiagnoser](../samples/ThreadingDiagnoser.md)]
