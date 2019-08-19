@@ -9,6 +9,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using System;
@@ -32,6 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 : new[]
                 {
                     new object[] { Job.Default.GetToolchain() },
+                    new object[] { CoreRtToolchain.LatestBuild },
                     new object[] { InProcessEmitToolchain.Instance },
                 };
 
