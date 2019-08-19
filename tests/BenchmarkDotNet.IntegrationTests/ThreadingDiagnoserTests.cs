@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Attributes;
+#if NETCOREAPP3_0
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
@@ -27,15 +28,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public ThreadingDiagnoserTests(ITestOutputHelper outputHelper) => output = outputHelper;
 
-        public static IEnumerable<object[]> GetToolchains()
-            => !RuntimeInformation.IsNetCore || !NetCoreAppSettings.GetCurrentVersion().Is(TargetFrameworkMoniker.NetCoreApp30) // APIs added in .NET Core 3.0 https://github.com/dotnet/corefx/issues/35500
-                ? Array.Empty<object[]>()
-                : new[]
-                {
-                    new object[] { Job.Default.GetToolchain() },
-                    new object[] { CoreRtToolchain.LatestBuild },
-                    new object[] { InProcessEmitToolchain.Instance },
-                };
+        public static IEnumerable<object[]> GetToolchains() => new[]
+        {
+            new object[] { Job.Default.GetToolchain() },
+            new object[] { CoreRtToolchain.LatestBuild },
+            new object[] { InProcessEmitToolchain.Instance },
+        };
 
         [Theory, MemberData(nameof(GetToolchains))]
         public void CompletedWorkItemCounIsAccurate(IToolchain toolchain)
@@ -155,3 +153,4 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
 }
+#endif
