@@ -186,13 +186,13 @@ namespace BenchmarkDotNet.Engines
 
             IterationSetupAction(); // we run iteration setup first, so even if it allocates, it is not included in the results
 
+            var initialThreadingStats = ThreadingStats.ReadInitial(); // this method might allocate
             var initialGcStats = GcStats.ReadInitial();
-            var initialThreadingStats = ThreadingStats.Read(); // this method does not allocate
 
             WorkloadAction(data.InvokeCount / data.UnrollFactor);
 
-            var finalThreadingStats = ThreadingStats.Read();
             var finalGcStats = GcStats.ReadFinal();
+            var finalThreadingStats = ThreadingStats.ReadFinal();
 
             IterationCleanupAction(); // we run iteration cleanup after collecting GC stats 
 

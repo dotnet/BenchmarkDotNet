@@ -147,7 +147,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 var metric = selectedReport.Metrics.Single(m => m.Key == assertion.Value.metricName);
 
-                Assert.Equal(assertion.Value.expectedValue, metric.Value.Value);
+                // precision is set to 3 because CoreCLR might schedule some work item on it's own and hence affect the results..
+                Assert.Equal(assertion.Value.expectedValue, metric.Value.Value, precision: 3);
             }
         }
     }

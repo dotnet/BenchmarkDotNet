@@ -128,6 +128,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
             var lines = runResults.GetMeasurements().Select(measurement => measurement.ToOutputLine()).ToList();
             lines.Add(runResults.GCStats.ToOutputLine());
+            lines.Add(runResults.GCStats.ToOutputLine());
 
             return new ExecuteResult(true, 0, default, lines.ToArray(), Array.Empty<string>());
         }

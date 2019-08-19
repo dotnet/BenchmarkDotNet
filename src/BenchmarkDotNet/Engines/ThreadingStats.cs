@@ -7,8 +7,9 @@ namespace BenchmarkDotNet.Engines
     {
         internal const string ResultsLinePrefix = "Threading: ";
 
-        private static readonly Func<long> GetCompletedWorkItemCountDelegate = CreateGetCompletedWorkItemCountDelegate();
-        private static readonly Func<long> GetLockContentionCountDelegate = CreateGetLockContentionCountDelegate();
+        // BDN targets .NET Standard 2.0, these properties are not part of it
+        private static readonly Func<long> GetCompletedWorkItemCountDelegate = CreateGetterDelegate(typeof(ThreadPool), "CompletedWorkItemCount");
+        private static readonly Func<long> GetLockContentionCountDelegate = CreateGetterDelegate(typeof(Monitor), "LockContentionCount");
 
         public static ThreadingStats Empty => new ThreadingStats(0, 0, 0);
 
@@ -23,10 +24,18 @@ namespace BenchmarkDotNet.Engines
             TotalOperations = totalOperations;
         }
 
-        public static ThreadingStats Read()
+        public static ThreadingStats ReadInitial()
         {
-            long completedWorkItemCount = GetCompletedWorkItemCountDelegate != null ? GetCompletedWorkItemCountDelegate() : default;
-            long lockContentionCount = GetLockContentionCountDelegate != null ? GetLockContentionCountDelegate() : default;
+            long lockContentionCount = GetLockContentionCountDelegate(); // Monitor.LockContentionCount can schedule a work item and needs to be called before ThreadPool.CompletedWorkItemCount
+            long completedWorkItemCount = GetCompletedWorkItemCountDelegate();
+
+            return new ThreadingStats(completedWorkItemCount, lockContentionCount, 0);
+        }
+
+        public static ThreadingStats ReadFinal()
+        {
+            long completedWorkItemCount = GetCompletedWorkItemCountDelegate();
+            long lockContentionCount = GetLockContentionCountDelegate(); // Monitor.LockContentionCount can schedule a work item and needs to be called after ThreadPool.CompletedWorkItemCount
 
             return new ThreadingStats(completedWorkItemCount, lockContentionCount, 0);
         }
@@ -61,21 +70,16 @@ namespace BenchmarkDotNet.Engines
                 left.LockContentionCount - right.LockContentionCount,
                 left.TotalOperations - right.TotalOperations);
 
-        public ThreadingStats WithTotalOperations(long totalOperationsCount) => this + new ThreadingStats(0, 0, totalOperationsCount);
+        public ThreadingStats WithTotalOperations(long totalOperationsCount) => new ThreadingStats(CompletedWorkItemCount, LockContentionCount, totalOperationsCount);
 
         public override string ToString() => ToOutputLine();
-
-        // BDN targets .NET Standard 2.0, these methods are not part of it
-        private static Func<long> CreateGetCompletedWorkItemCountDelegate() => CreateGetterDelegate(typeof(ThreadPool), "CompletedWorkItemCount");
-
-        private static Func<long> CreateGetLockContentionCountDelegate() => CreateGetterDelegate(typeof(Monitor), "LockContentionCount");
 
         private static Func<long> CreateGetterDelegate(Type type, string propertyName)
         {
             var property = type.GetProperty(propertyName);
 
             // we create delegate to avoid boxing, IMPORTANT!
-            return property != null ? (Func<long>)property.GetGetMethod().CreateDelegate(typeof(Func<long>)) : null;
+            return property != null ? (Func<long>)property.GetGetMethod().CreateDelegate(typeof(Func<long>)) : () => 0;
         }
     }
 }
