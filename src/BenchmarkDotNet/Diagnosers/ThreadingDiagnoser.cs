@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             if (!RuntimeInformation.IsNetCore || NetCoreAppSettings.Current.Value.IsOlderThan(TargetFrameworkMoniker.NetCoreApp30))
             {
-                yield return new ValidationError(true, "ThreadingDiagnoser supports only .NET Core 3.0+");
+                yield return new ValidationError(false, "ThreadingDiagnoser supports only .NET Core 3.0+");
             }
         }
 
