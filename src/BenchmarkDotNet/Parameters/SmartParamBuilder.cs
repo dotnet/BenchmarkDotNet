@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Parameters
 
         public string ToSourceCode()
         {
-            string cast = $"({Value.GetType().GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
+            string cast = $"({parameterDefinitions[argumentIndex].ParameterType.GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
 
             string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
