@@ -151,7 +151,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     IterationCleanupAction = iterationCleanupAction.InvokeSingle,
                     TargetJob = job,
                     OperationsPerInvoke = target.OperationsPerInvoke,
-                    MeasureExtraStats = benchmarkCase.Config.HasThreadingDiagnoser(),
+                    MeasureExtraStats = benchmarkCase.Config.HasExtraStatsDiagnoser(),
                     Encoding = benchmarkCase.Config.Encoding,
                     BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase)
                 };

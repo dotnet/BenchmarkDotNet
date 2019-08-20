@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Engines
     {
         internal const string ResultsLinePrefix = "Threading: ";
 
-        // BDN targets .NET Standard 2.0, these properties are not part of it
+        // BDN targets .NET Standard 2.0, these properties are not part of .NET Standard 2.0, were added in .NET Core 3.0
         private static readonly Func<long> GetCompletedWorkItemCountDelegate = CreateGetterDelegate(typeof(ThreadPool), "CompletedWorkItemCount");
         private static readonly Func<long> GetLockContentionCountDelegate = CreateGetterDelegate(typeof(Monitor), "LockContentionCount");
 
