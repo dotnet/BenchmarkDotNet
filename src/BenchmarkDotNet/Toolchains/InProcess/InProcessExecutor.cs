@@ -132,6 +132,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             var lines = runResults.GetMeasurements().Select(measurement => measurement.ToOutputLine()).ToList();
             lines.Add(runResults.GCStats.ToOutputLine());
+            lines.Add(runResults.ThreadingStats.ToOutputLine());
 
             return new ExecuteResult(true, 0, default, lines.ToArray(), Array.Empty<string>());
         }

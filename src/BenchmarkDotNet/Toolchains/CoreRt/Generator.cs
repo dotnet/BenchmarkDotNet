@@ -191,6 +191,12 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         <Assembly Name=""System.Runtime"">
             <Type Name=""System.GC"" Dynamic=""Required All"" />
         </Assembly>
+        <Assembly Name=""System.Threading.ThreadPool"">
+            <Type Name=""System.Threading.ThreadPool"" Dynamic=""Required All"" />
+        </Assembly>
+        <Assembly Name=""System.Threading"">
+            <Type Name=""System.Threading.Monitor"" Dynamic=""Required All"" />
+        </Assembly>
     </Application>
 </Directives>
 ";

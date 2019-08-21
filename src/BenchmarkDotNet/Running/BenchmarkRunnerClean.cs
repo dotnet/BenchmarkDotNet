@@ -330,6 +330,7 @@ namespace BenchmarkDotNet.Running
             var success = true;
             var executeResults = new List<ExecuteResult>();
             var gcStats = default(GcStats);
+            var threadingStats = default(ThreadingStats);
             var metrics = new List<Metric>();
 
             logger.WriteLineInfo("// *** Execute ***");
@@ -401,10 +402,13 @@ namespace BenchmarkDotNet.Running
                 {
                     if (benchmarkCase.Config.HasMemoryDiagnoser())
                         gcStats = GcStats.Parse(executeResult.Data.Last(line => !string.IsNullOrEmpty(line) && line.StartsWith(GcStats.ResultsLinePrefix)));
-                    
+
+                    if (benchmarkCase.Config.HasThreadingDiagnoser())
+                        threadingStats = ThreadingStats.Parse(executeResult.Data.Last(line => !string.IsNullOrEmpty(line) && line.StartsWith(ThreadingStats.ResultsLinePrefix)));
+
                     metrics.AddRange(
                         noOverheadCompositeDiagnoser.ProcessResults(
-                            new DiagnoserResults(benchmarkCase, measurements.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations), gcStats)));
+                            new DiagnoserResults(benchmarkCase, measurements.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations), gcStats, threadingStats)));
                 }
 
                 if (autoLaunchCount && launchIndex == 2 && analyzeRunToRunVariance)
@@ -443,7 +447,7 @@ namespace BenchmarkDotNet.Running
 
                 metrics.AddRange(
                     extraRunCompositeDiagnoser.ProcessResults(
-                        new DiagnoserResults(benchmarkCase, allRuns.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations), gcStats)));
+                        new DiagnoserResults(benchmarkCase, allRuns.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations), gcStats, threadingStats)));
 
                 logger.WriteLine();
             }

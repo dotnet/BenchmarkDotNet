@@ -37,7 +37,7 @@
                 IterationCleanupAction = instance.iterationCleanupAction,
                 TargetJob = job,
                 OperationsPerInvoke = $OperationsPerInvoke$,
-                MeasureGcStats = $MeasureGcStats$,
+                MeasureExtraStats = $MeasureExtraStats$,
                 Encoding = $Encoding$,
                 BenchmarkName = benchmarkName
             };
