@@ -1,5 +1,5 @@
 ﻿using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Portability;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.XUnit
@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Tests.XUnit
         // ReSharper disable once VirtualMemberCallInConstructor
         public TheoryNetCore30Attribute(string skipReason)
         {
-            if (!NetCoreAppSettings.GetCurrentVersion().Is(TargetFrameworkMoniker.NetCoreApp30))
+            if (RuntimeInformation.GetCurrentRuntime().TargetFrameworkMoniker != TargetFrameworkMoniker.NetCoreApp30)
                 Skip = skipReason;
         }
     }

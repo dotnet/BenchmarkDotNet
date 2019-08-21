@@ -200,8 +200,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenTwoConfigsAreAddedTheRegularJobsAreJustAdded()
         {
-            var configWithClrJob = CreateConfigFromJobs(Job.Clr);
-            var cofingWithCoreJob = CreateConfigFromJobs(Job.Core);
+            var configWithClrJob = CreateConfigFromJobs(Job.Default.With(CoreRuntime.Core21));
+            var cofingWithCoreJob = CreateConfigFromJobs(Job.Default.With(ClrRuntime.Net461));
 
             foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithClrJob, cofingWithCoreJob))
             {
@@ -218,7 +218,9 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             const int warmupCount = 2;
             var configWithMutatorJob = CreateConfigFromJobs(Job.Default.WithWarmupCount(warmupCount).AsMutator());
-            var configWithTwoStandardJobs = CreateConfigFromJobs(Job.Clr, Job.Core);
+            var configWithTwoStandardJobs = CreateConfigFromJobs(
+                Job.Default.With(ClrRuntime.Net461), 
+                Job.Default.With(CoreRuntime.Core21));
 
             foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithTwoStandardJobs, configWithMutatorJob))
             {

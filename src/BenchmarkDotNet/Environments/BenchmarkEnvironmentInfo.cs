@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Environments
             if (job.Environment.Jit == Jit.RyuJit && !RuntimeInformation.HasRyuJit())
                 yield return new ValidationError(true, "RyuJIT is requested but it is not available in current environment");
             var currentRuntime = RuntimeInformation.GetCurrentRuntime();
-            if (job.Environment.Jit == Jit.LegacyJit && !currentRuntime.Equals(Runtime.Clr))
+            if (job.Environment.Jit == Jit.LegacyJit && !(currentRuntime is ClrRuntime))
                 yield return new ValidationError(true, $"LegacyJIT is requested but it is not available for {currentRuntime}");
         }
     }

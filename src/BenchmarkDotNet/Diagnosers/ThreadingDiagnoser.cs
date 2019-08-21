@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnosers
@@ -40,9 +39,14 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
-            if (!RuntimeInformation.IsNetCore || NetCoreAppSettings.Current.Value.IsOlderThan(TargetFrameworkMoniker.NetCoreApp30))
+            foreach (var benchmark in validationParameters.Benchmarks)
             {
-                yield return new ValidationError(false, $"{nameof(ThreadingDiagnoser)} supports only .NET Core 3.0+");
+                var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance);
+
+                if (runtime.TargetFrameworkMoniker < TargetFrameworkMoniker.NetCoreApp30)
+                {
+                    yield return new ValidationError(true, $"{nameof(ThreadingDiagnoser)} supports only .NET Core 3.0+", benchmark);
+                }
             }
         }
 

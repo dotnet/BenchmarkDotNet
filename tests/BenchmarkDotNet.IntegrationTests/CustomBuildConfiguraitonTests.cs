@@ -1,8 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains.CsProj;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -17,11 +15,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void UserCanSpecifyCustomBuildConfiguration()
         {
-            var toolchain = RuntimeInformation.IsFullFramework
-                ? CsProjClassicNetToolchain.Net461 // no support for Roslyn toolchain for this feature
-                : CsProjCoreToolchain.Current.Value;
+            var jobWithCustomConfiguration = Job.Dry.WithCustomBuildConfiguration("CUSTOM");
 
-            var jobWithCustomConfiguration = Job.Dry.WithCustomBuildConfiguration("CUSTOM").With(toolchain);
             var config = CreateSimpleConfig(job: jobWithCustomConfiguration);
 
             CanExecute<CustomBuildConfiguraiton>(config);

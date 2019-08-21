@@ -1,107 +1,53 @@
 ﻿using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.CoreRt;
-using BenchmarkDotNet.Toolchains.CsProj;
-using BenchmarkDotNet.Toolchains.Roslyn;
 using System;
 
 namespace BenchmarkDotNet.Extensions
 {
     internal static class TargetFrameworkMonikerExtensions
     {
-        internal static IToolchain GetToolchain(this TargetFrameworkMoniker targetFrameworkMoniker)
-        {
-            switch (targetFrameworkMoniker)
-            {
-                case TargetFrameworkMoniker.Net461:
-                    return CsProjClassicNetToolchain.Net461;
-                case TargetFrameworkMoniker.Net462:
-                    return CsProjClassicNetToolchain.Net462;
-                case TargetFrameworkMoniker.Net47:
-                    return CsProjClassicNetToolchain.Net47;
-                case TargetFrameworkMoniker.Net471:
-                    return CsProjClassicNetToolchain.Net471;
-                case TargetFrameworkMoniker.Net472:
-                    return CsProjClassicNetToolchain.Net472;
-                case TargetFrameworkMoniker.Net48:
-                    return CsProjClassicNetToolchain.Net48;
-                case TargetFrameworkMoniker.NetCoreApp20:
-                    return CsProjCoreToolchain.NetCoreApp20;
-                case TargetFrameworkMoniker.NetCoreApp21:
-                    return CsProjCoreToolchain.NetCoreApp21;
-                case TargetFrameworkMoniker.NetCoreApp22:
-                    return CsProjCoreToolchain.NetCoreApp22;
-                case TargetFrameworkMoniker.NetCoreApp30:
-                    return CsProjCoreToolchain.NetCoreApp30;
-                case TargetFrameworkMoniker.NetCoreApp31:
-                    return CsProjCoreToolchain.NetCoreApp31;
-                case TargetFrameworkMoniker.NetCoreApp50:
-                    return CsProjCoreToolchain.NetCoreApp50;
-                case TargetFrameworkMoniker.Mono:
-                    return RoslynToolchain.Instance;
-                case TargetFrameworkMoniker.CoreRt:
-                    return CoreRtToolchain.LatestBuild;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(targetFrameworkMoniker), targetFrameworkMoniker, "Target Framework Moniker not supported");
-            }
-        }
-
         internal static Runtime GetRuntime(this TargetFrameworkMoniker targetFrameworkMoniker)
         {
             switch (targetFrameworkMoniker)
             {
                 case TargetFrameworkMoniker.Net461:
+                    return ClrRuntime.Net461;
                 case TargetFrameworkMoniker.Net462:
+                    return ClrRuntime.Net462;
                 case TargetFrameworkMoniker.Net47:
+                    return ClrRuntime.Net47;
                 case TargetFrameworkMoniker.Net471:
+                    return ClrRuntime.Net471;
                 case TargetFrameworkMoniker.Net472:
+                    return ClrRuntime.Net472;
                 case TargetFrameworkMoniker.Net48:
-                    return Runtime.Clr;
+                    return ClrRuntime.Net48;
                 case TargetFrameworkMoniker.NetCoreApp20:
+                    return CoreRuntime.Core20;
                 case TargetFrameworkMoniker.NetCoreApp21:
+                    return CoreRuntime.Core21;
                 case TargetFrameworkMoniker.NetCoreApp22:
+                    return CoreRuntime.Core22;
                 case TargetFrameworkMoniker.NetCoreApp30:
+                    return CoreRuntime.Core30;
                 case TargetFrameworkMoniker.NetCoreApp31:
+                    return CoreRuntime.Core31;
                 case TargetFrameworkMoniker.NetCoreApp50:
-                    return Runtime.Core;
+                    return CoreRuntime.Core50;
                 case TargetFrameworkMoniker.Mono:
-                    return Runtime.Mono;
-                case TargetFrameworkMoniker.CoreRt:
-                    return Runtime.CoreRT;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(targetFrameworkMoniker), targetFrameworkMoniker, "Target Framework Moniker not supported");
-            }
-        }
-
-        internal static string ToMsBuildName(this TargetFrameworkMoniker targetFrameworkMoniker)
-        {
-            switch (targetFrameworkMoniker)
-            {
-                case TargetFrameworkMoniker.Net461:
-                    return "net461";
-                case TargetFrameworkMoniker.Net462:
-                    return "net462";
-                case TargetFrameworkMoniker.Net47:
-                    return "net47";
-                case TargetFrameworkMoniker.Net471:
-                    return "net471";
-                case TargetFrameworkMoniker.Net472:
-                    return "net472";
-                case TargetFrameworkMoniker.Net48:
-                    return "net48";
-                case TargetFrameworkMoniker.NetCoreApp20:
-                    return "netcoreapp2.0";
-                case TargetFrameworkMoniker.NetCoreApp21:
-                    return "netcoreapp2.1";
-                case TargetFrameworkMoniker.NetCoreApp22:
-                    return "netcoreapp2.2";
-                case TargetFrameworkMoniker.NetCoreApp30:
-                    return "netcoreapp3.0";
-                case TargetFrameworkMoniker.NetCoreApp31:
-                    return "netcoreapp3.1";
-                case TargetFrameworkMoniker.NetCoreApp50:
-                    return "netcoreapp5.0";
+                    return MonoRuntime.Default;
+                case TargetFrameworkMoniker.CoreRt20:
+                    return CoreRtRuntime.CoreRt20;
+                case TargetFrameworkMoniker.CoreRt21:
+                    return CoreRtRuntime.CoreRt21;
+                case TargetFrameworkMoniker.CoreRt22:
+                    return CoreRtRuntime.CoreRt22;
+                case TargetFrameworkMoniker.CoreRt30:
+                    return CoreRtRuntime.CoreRt30;
+                case TargetFrameworkMoniker.CoreRt31:
+                    return CoreRtRuntime.CoreRt31;
+                case TargetFrameworkMoniker.CoreRt50:
+                    return CoreRtRuntime.CoreRt50;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(targetFrameworkMoniker), targetFrameworkMoniker, "Target Framework Moniker not supported");
             }

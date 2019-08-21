@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -17,6 +16,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Validators;
 
@@ -51,25 +51,8 @@ namespace BenchmarkDotNet.Configs
             => new[]
             {
                 Job.Default
-                    .With(GetToolchainThatGeneratesProjectFile())
                     .WithCustomBuildConfiguration("Debug") // will do `-c Debug everywhere` 
             };
-
-        private IToolchain GetToolchainThatGeneratesProjectFile()
-        {
-            switch (RuntimeInformation.GetCurrentRuntime())
-            {
-                case ClrRuntime _:
-                case MonoRuntime _:
-                    return CsProjClassicNetToolchain.Current.Value;
-                case CoreRuntime _:
-                    return CsProjCoreToolchain.Current.Value;
-                case CoreRtRuntime _:
-                    return CoreRtToolchain.LatestBuild;
-                default:
-                    throw new NotSupportedException("Runtime not supported!");
-            }
-        }
     }
 
     public abstract class DebugConfig : IConfig

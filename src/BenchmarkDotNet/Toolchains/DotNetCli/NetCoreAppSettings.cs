@@ -1,7 +1,4 @@
 using System;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
@@ -20,10 +17,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp30 = new NetCoreAppSettings("netcoreapp3.0", null, ".NET Core 3.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp31 = new NetCoreAppSettings("netcoreapp3.1", null, ".NET Core 3.1");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp50 = new NetCoreAppSettings("netcoreapp5.0", null, ".NET Core 5.0");
-
-        public static readonly Lazy<NetCoreAppSettings> Current = new Lazy<NetCoreAppSettings>(GetCurrentVersion);
-
-        private static NetCoreAppSettings Default => NetCoreApp21;
 
         /// <summary>
         /// <param name="targetFrameworkMoniker">
@@ -84,11 +77,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         public TimeSpan Timeout { get; }
 
-        public bool Is(TargetFrameworkMoniker targetFrameworkMoniker) => targetFrameworkMoniker.ToMsBuildName() == TargetFrameworkMoniker;
-
-        public bool IsOlderThan(TargetFrameworkMoniker targetFrameworkMoniker) 
-            => TargetFrameworkMoniker.CompareTo(targetFrameworkMoniker.ToMsBuildName()) < 0;
-
         public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath, Timeout);
         
@@ -98,28 +86,5 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public NetCoreAppSettings WithTimeout(TimeSpan? timeOut)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, Name, CustomDotNetCliPath, PackagesPath, timeOut ?? Timeout);
 
-        internal static NetCoreAppSettings GetCurrentVersion()
-        {
-            if (RuntimeInformation.IsFullFramework)
-                return Default;
-
-            string netCoreAppVersion;
-
-            try
-            {
-                netCoreAppVersion = RuntimeInformation.GetNetCoreVersion(); // it might throw on CoreRT
-            }
-            catch
-            {
-                return Default;
-            }
-
-            if (string.IsNullOrEmpty(netCoreAppVersion))
-                return Default;
-
-            string version = netCoreAppVersion.Substring(0, 3); // 2.0, 3.1 etc
-
-            return new NetCoreAppSettings($"netcoreapp{version}", null, $".NET Core {version}");
-        }
     }
 }

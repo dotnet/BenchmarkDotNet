@@ -28,6 +28,13 @@ namespace BenchmarkDotNet.Helpers
             return $".NET Framework {releaseVersion} ({servicingVersion})";
         }
 
+        internal static string GetFrameworkReleaseVersion()
+        {
+            var fullName = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription; // sth like .NET Framework 4.7.3324.0
+            var servicingVersion = new string(fullName.SkipWhile(c => !char.IsDigit(c)).ToArray());
+            return MapToReleaseVersion(servicingVersion);
+        }
+
         internal static string MapToReleaseVersion(string servicingVersion)
         {
             // the following code assumes that .NET 4.6.1 is the oldest supported version
