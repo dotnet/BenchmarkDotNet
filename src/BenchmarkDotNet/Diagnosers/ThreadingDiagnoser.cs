@@ -34,6 +34,9 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
+            if (!RuntimeInformation.IsNetCore || NetCoreAppSettings.Current.Value.IsOlderThan(TargetFrameworkMoniker.NetCoreApp30))
+                yield break;
+
             yield return new Metric(CompletedWorkItemCountMetricDescriptor.Instance, results.ThreadingStats.CompletedWorkItemCount / (double)results.ThreadingStats.TotalOperations);
             yield return new Metric(LockContentionCountMetricDescriptor.Instance, results.ThreadingStats.LockContentionCount / (double)results.ThreadingStats.TotalOperations);
         }
