@@ -81,7 +81,7 @@ Setup(_ =>
         Information("Build will use FrameworkPathOverride={0} since not building on Windows.", frameworkPathOverride);
         msBuildSettings.WithProperty("FrameworkPathOverride", frameworkPathOverride);
     }
-    
+
     msBuildSettings.WithProperty("UseSharedCompilation", "false");
 });
 
@@ -128,22 +128,22 @@ Task("FastTests")
             DotNetCoreTest("./tests/BenchmarkDotNet.Tests/BenchmarkDotNet.Tests.csproj", GetTestSettingsParameters(version));
         }
     });
-    
+
 Task("SlowTestsNet461")
     .IsDependentOn("Build")
     .WithCriteria(!skipTests && isRunningOnWindows)
     .Does(() =>
     {
         DotNetCoreTest(integrationTestsProjectPath, GetTestSettingsParameters("net461"));
-    }); 
+    });
 
-Task("SlowTestsNetCore2")
+Task("SlowTestsNetCore3")
 	.IsDependentOn("Build")
 	.WithCriteria(!skipTests)
 	.Does(() =>
 	{
-		DotNetCoreTest(integrationTestsProjectPath, GetTestSettingsParameters("netcoreapp2.1"));
-	});          
+		DotNetCoreTest(integrationTestsProjectPath, GetTestSettingsParameters("netcoreapp3.0"));
+	});
 
 Task("Pack")
     .IsDependentOn("Build")
@@ -213,7 +213,7 @@ Task("Default")
     .IsDependentOn("Restore")
     .IsDependentOn("Build")
     .IsDependentOn("FastTests")
-    .IsDependentOn("SlowTestsNetCore2")
+    .IsDependentOn("SlowTestsNetCore3")
     .IsDependentOn("SlowTestsNet461")
     .IsDependentOn("Pack");
 
@@ -229,12 +229,12 @@ private DotNetCoreTestSettings GetTestSettingsParameters(string tfm)
                     NoBuild = true,
 					NoRestore = true,
 					Logger = "trx"
-				}; 
+				};
 }
 
 private void RunDocfx(string args)
 {
-	if (!isRunningOnWindows)    
+	if (!isRunningOnWindows)
         StartProcess("mono", new ProcessSettings { Arguments = docfxExe + " " + args });
 	else
 		StartProcess(docfxExe, new ProcessSettings { Arguments = args });
@@ -283,7 +283,7 @@ private void DocfxChangelogDownload(string version, string versionPrevious, stri
 	Verbose("DocfxChangelogDownload: " + version);
 	// Required environment variables: GITHIB_PRODUCT, GITHUB_TOKEN
 	StartProcess("dotnet", new ProcessSettings
-	{ 
+	{
 		WorkingDirectory = changelogGenDir + "ChangeLogBuilder",
 		Arguments = "run -- " + version + " " + versionPrevious + " " + lastCommit
 	});
