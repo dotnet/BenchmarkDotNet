@@ -192,8 +192,8 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime mono && mono.CustomPath == fakeMonoPath));
         }
-        
-        [Fact]
+
+        [FactWindowsOnly("Testing local builds of Full .NET Framework is supported only on Windows")]
         public void ClrVersionParsedCorrectly()
         {
             const string clrVersion = "secret";
