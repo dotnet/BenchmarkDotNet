@@ -1,7 +1,15 @@
-﻿namespace BenchmarkDotNet.Jobs
+namespace BenchmarkDotNet.Jobs
 {
     public enum TargetFrameworkMoniker
     {
+        /// <summary>
+        /// not recognized, possibly a new version of .NET Core
+        /// </summary>
+        NotRecognized = 0,
+        /// <summary>
+        /// Mono
+        /// </summary>
+        Mono,
         /// <summary>
         /// .NET 4.6.1
         /// </summary>
@@ -51,12 +59,28 @@
         /// </summary>
         NetCoreApp50,
         /// <summary>
-        /// Mono
+        /// CoreRT compiled as netcoreapp2.0
         /// </summary>
-        Mono,
+        CoreRt20,
         /// <summary>
-        /// CoreRT
+        /// CoreRT compiled as netcoreapp2.1
         /// </summary>
-        CoreRt,
+        CoreRt21,
+        /// <summary>
+        /// CoreRT compiled as netcoreapp2.2
+        /// </summary>
+        CoreRt22,
+        /// <summary>
+        /// CoreRT compiled as netcoreapp3.0
+        /// </summary>
+        CoreRt30,
+        /// <summary>
+        /// CoreRT compiled as netcoreapp3.1
+        /// </summary>
+        CoreRt31,
+        /// <summary>
+        /// CoreRT compiled as netcoreapp5.0
+        /// </summary>
+        CoreRt50,
     }
 }

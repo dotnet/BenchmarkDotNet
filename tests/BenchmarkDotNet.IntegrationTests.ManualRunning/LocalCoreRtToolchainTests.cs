@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using Xunit;
@@ -27,10 +28,12 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         public void CanBenchmarkLocalCoreRtUsingRyuJit()
         {
             var config = ManualConfig.CreateEmpty()
-                .With(Job.DryCoreRT.With(
-                    CoreRtToolchain.CreateBuilder()
-                        .UseCoreRtLocal(IlcPath)
-                        .ToToolchain()));
+                .With(Job.Dry
+                    .With(CoreRtRuntime.CoreRt21)
+                    .With(
+                        CoreRtToolchain.CreateBuilder()
+                            .UseCoreRtLocal(IlcPath)
+                            .ToToolchain()));
 
             CanExecute<CoreRtBenchmark>(config);
         }
@@ -39,11 +42,13 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         public void CanBenchmarkLocalCoreRtUsingCppCodeGen()
         {
             var config = ManualConfig.CreateEmpty()
-                .With(Job.DryCoreRT.With(
-                    CoreRtToolchain.CreateBuilder()
-                        .UseCoreRtLocal(IlcPath)
-                        .UseCppCodeGenerator() // https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#using-cpp-code-generator
-                        .ToToolchain()));
+                .With(Job.Dry
+                    .With(CoreRtRuntime.CoreRt21)
+                    .With(
+                        CoreRtToolchain.CreateBuilder()
+                            .UseCoreRtLocal(IlcPath)
+                            .UseCppCodeGenerator() // https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#using-cpp-code-generator
+                            .ToToolchain()));
 
             CanExecute<CoreRtBenchmark>(config);
         }

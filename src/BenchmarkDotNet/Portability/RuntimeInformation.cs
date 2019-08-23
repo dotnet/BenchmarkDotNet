@@ -183,15 +183,15 @@ namespace BenchmarkDotNet.Portability
         {
             //do not change the order of conditions because it may cause incorrect determination of runtime
             if (IsMono)
-                return Runtime.Mono;
+                return MonoRuntime.Default;
             if (IsFullFramework)
-                return Runtime.Clr;
+                return ClrRuntime.GetCurrentVersion();
             if (IsNetCore)
-                return Runtime.Core;
+                return CoreRuntime.GetCurrentVersion();
             if (IsCoreRT)
-                return Runtime.CoreRT;
+                return CoreRtRuntime.GetCurrentVersion();
             
-            throw new NotSupportedException("Unknown .NET Framework"); // todo: adam sitnik fix it
+            throw new NotSupportedException("Unknown .NET Runtime");
         }
 
         public static Platform GetCurrentPlatform()

@@ -131,11 +131,11 @@ namespace BenchmarkDotNet.Tests.Running
         public void JobMutatorsApplySettingsToAllNonMutatorJobs()
         {
             var info = BenchmarkConverter.TypeToBenchmarks(
-                    typeof(WithMutator), 
+                    typeof(WithMutator),
                     DefaultConfig.Instance
-                        .With(Job.Clr)
-                        .With(Job.Core));
-            
+                        .With(Job.Default.With(ClrRuntime.Net461))
+                        .With(Job.Default.With(CoreRuntime.Core21)));
+
             Assert.Equal(2, info.BenchmarksCases.Length);
             Assert.All(info.BenchmarksCases, benchmark => Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxIterationCount));
             Assert.Single(info.BenchmarksCases, benchmark => benchmark.Job.Environment.Runtime is ClrRuntime);

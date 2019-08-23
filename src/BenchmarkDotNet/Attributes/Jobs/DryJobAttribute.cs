@@ -32,7 +32,8 @@ namespace BenchmarkDotNet.Attributes
 
         private static Job GetJob(TargetFrameworkMoniker targetFrameworkMoniker, Jit? jit, Platform? platform)
         {
-            var baseJob = GetBaseJob(targetFrameworkMoniker.GetRuntime());
+            var runtime = targetFrameworkMoniker.GetRuntime();
+            var baseJob = Job.Dry.With(runtime).WithId($"Dry-{runtime.Name}");
             var id = baseJob.Id;
 
             if (jit.HasValue)
@@ -47,24 +48,7 @@ namespace BenchmarkDotNet.Attributes
                 id += "-" + platform.Value;
             }
 
-            return baseJob.With(targetFrameworkMoniker.GetToolchain()).WithId(id);
-        }
-
-        private static Job GetBaseJob(Runtime runtime)
-        {
-            switch (runtime)
-            {
-                case CoreRtRuntime _:
-                    return Job.DryCoreRT;
-                case CoreRuntime _:
-                    return Job.DryCore;
-                case ClrRuntime _:
-                    return Job.DryClr;
-                case MonoRuntime _:
-                    return Job.DryMono;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(runtime), runtime, "Runtime not supported");
-            }
+            return baseJob.WithId(id).Freeze();
         }
     }
 }

@@ -266,7 +266,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.RunInProcess)
                 yield return baseJob.With(InProcessEmitToolchain.Instance);
             else if (!string.IsNullOrEmpty(options.ClrVersion))
-                yield return baseJob.With(new ClrRuntime(options.ClrVersion)); // local builds of .NET Runtime
+                yield return baseJob.With(ClrRuntime.CreateForLocalFullNetFrameworkBuild(options.ClrVersion)); // local builds of .NET Runtime
             else if (options.CoreRunPaths.Any())
                 foreach (var coreRunPath in options.CoreRunPaths)
                     yield return CreateCoreRunJob(baseJob, options, coreRunPath); // local CoreFX and CoreCLR builds
@@ -277,11 +277,11 @@ namespace BenchmarkDotNet.ConsoleArguments
                     yield return CreateJobForGivenRuntime(baseJob, runtime, options);
         }
 
-        private static Job CreateJobForGivenRuntime(Job baseJob, string runtime, CommandLineOptions options)
+        private static Job CreateJobForGivenRuntime(Job baseJob, string runtimeId, CommandLineOptions options)
         {
             TimeSpan? timeOut = options.TimeOutInSeconds.HasValue ? TimeSpan.FromSeconds(options.TimeOutInSeconds.Value) : default(TimeSpan?);
 
-            if (!Enum.TryParse(runtime.Replace(".", string.Empty), ignoreCase: true, out TargetFrameworkMoniker targetFrameworkMoniker))
+            if (!Enum.TryParse(runtimeId.Replace(".", string.Empty), ignoreCase: true, out TargetFrameworkMoniker targetFrameworkMoniker))
             {
                 throw new InvalidOperationException("Impossible, already validated by the Validate method");
             }
@@ -296,7 +296,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case TargetFrameworkMoniker.Net48:
                     return baseJob
                         .With(targetFrameworkMoniker.GetRuntime())
-                        .With(CsProjClassicNetToolchain.From(targetFrameworkMoniker.ToMsBuildName(), options.RestorePath?.FullName, timeOut));
+                        .With(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName, timeOut));
                 case TargetFrameworkMoniker.NetCoreApp20:
                 case TargetFrameworkMoniker.NetCoreApp21:
                 case TargetFrameworkMoniker.NetCoreApp22:
@@ -305,10 +305,15 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case TargetFrameworkMoniker.NetCoreApp50:
                     return baseJob
                         .With(targetFrameworkMoniker.GetRuntime())
-                        .With(CsProjCoreToolchain.From(new NetCoreAppSettings(targetFrameworkMoniker.ToMsBuildName(), null, runtime, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));
+                        .With(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));
                 case TargetFrameworkMoniker.Mono:
                     return baseJob.With(new MonoRuntime("Mono", options.MonoPath?.FullName));
-                case TargetFrameworkMoniker.CoreRt:
+                case TargetFrameworkMoniker.CoreRt20:
+                case TargetFrameworkMoniker.CoreRt21:
+                case TargetFrameworkMoniker.CoreRt22:
+                case TargetFrameworkMoniker.CoreRt30:
+                case TargetFrameworkMoniker.CoreRt31:
+                case TargetFrameworkMoniker.CoreRt50:
                     var builder = CoreRtToolchain.CreateBuilder();
 
                     if (options.CliPath != null)
@@ -325,10 +330,13 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                     if (timeOut.HasValue)
                         builder.Timeout(timeOut.Value);
-                    
-                    return baseJob.With(Runtime.CoreRT).With(builder.ToToolchain());
+
+                    var runtime = targetFrameworkMoniker.GetRuntime();
+                    builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
+
+                    return baseJob.With(runtime).With(builder.ToToolchain());
                 default:
-                    throw new NotSupportedException($"Runtime {runtime} is not supported");
+                    throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
         }
 
@@ -358,24 +366,22 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static Job CreateCoreRunJob(Job baseJob, CommandLineOptions options, FileInfo coreRunPath)
             => baseJob
-                .With(Runtime.Core)
                 .With(new CoreRunToolchain(
                     coreRunPath,
                     createCopy: true,
-                    targetFrameworkMoniker: options.Runtimes.SingleOrDefault() ?? NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker,
+                    targetFrameworkMoniker: options.Runtimes.SingleOrDefault() ?? RuntimeInformation.GetCurrentRuntime().MsBuildMoniker,
                     customDotNetCliPath: options.CliPath,
                     restorePath: options.RestorePath,
                     displayName: GetCoreRunToolchainDisplayName(options.CoreRunPaths, coreRunPath)));
 
         private static Job CreateCoreJobWithCli(Job baseJob, CommandLineOptions options)
             => baseJob
-                .With(Runtime.Core)
                 .With(CsProjCoreToolchain.From(
                     new NetCoreAppSettings(
-                        targetFrameworkMoniker: NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker, 
+                        targetFrameworkMoniker: RuntimeInformation.GetCurrentRuntime().MsBuildMoniker, 
                         customDotNetCliPath: options.CliPath?.FullName,
                         runtimeFrameworkVersion: null,
-                        name: NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker,
+                        name: RuntimeInformation.GetCurrentRuntime().Name,
                         packagesPath: options.RestorePath?.FullName)));
 
         /// <summary>

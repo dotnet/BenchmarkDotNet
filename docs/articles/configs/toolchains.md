@@ -76,9 +76,9 @@ Or using a custom config:
 
 ```cs
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.CsProj;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -87,10 +87,10 @@ namespace BenchmarkDotNet.Samples
         static void Main(string[] args)
         {
             var config = DefaultConfig.Instance
-                .With(Job.Default.With(CsProjCoreToolchain.NetCoreApp21))
-                .With(Job.Default.With(CsProjCoreToolchain.NetCoreApp30))
-                .With(Job.Default.With(CsProjClassicNetToolchain.Net48))
-                .With(Job.Mono);
+                .With(Job.Default.With(CoreRuntime.Core21))
+                .With(Job.Default.With(CoreRuntime.Core30))
+                .With(Job.Default.With(ClrRuntime.Net48))
+                .With(Job.Default.With(MonoRuntime.Default));
 
             BenchmarkSwitcher
                 .FromAssembly(typeof(Program).Assembly)
@@ -131,7 +131,7 @@ BenchmarkSwitcher
     .FromAssembly(typeof(Program).Assembly)
     .Run(args, 
         DefaultConfig.Instance.With(
-            Job.ShortRun.With(new ClrRuntime(version: "4.0"))));
+            Job.ShortRun.With(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "4.0"))));
 ```
 
 This sends the provided version as a `COMPLUS_Version` env var to the benchmarked process.
@@ -194,14 +194,14 @@ BenchmarkDotNet supports [CoreRT](https://github.com/dotnet/corert)! However, yo
 
 * CoreRT is a flavor of .NET Core. Which means that:
   *  you have to target .NET Core to be able to build CoreRT benchmarks (`<TargetFramework>netcoreapp2.1</TargetFramework>` in the .csproj file)
-  *  you have to specify the CoreRT runtime in an explicit way, either by using `[CoreRtJob]` attribute or by using the fluent Job config API `Job.ShortRun.With(Runtime.CoreRT)`
+  *  you have to specify the CoreRT runtime in an explicit way, either by using `[TargetFrameworkJob]` attribute or by using the fluent Job config API `Job.ShortRun.With(CoreRtRuntime.$version)`
   *  to run CoreRT benchmark you run the app as a .NET Core/.NET process (`dotnet run -c Release -f netcoreapp2.1`) and BenchmarkDotNet does all the CoreRT compilation for you. If you want to check what files are generated you need to apply `[KeepBenchmarkFiles]` attribute to the class which defines benchmarks.
 
 By default BenchmarkDotNet uses the latest version of `Microsoft.DotNet.ILCompiler` to build the CoreRT benchmark according to [this instructions](https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project).
 
 ```cs
 var config = DefaultConfig.Instance
-    .With(Job.Default.With(Runtime.CoreRT)); // uses the latest CoreRT version
+    .With(Job.Default.With(CoreRtRuntime.CoreRt21)); // compiles the benchmarks as netcoreapp2.1 and uses the latest CoreRT to build a native app
 
 BenchmarkSwitcher
     .FromAssembly(typeof(Program).Assembly)
@@ -209,7 +209,7 @@ BenchmarkSwitcher
 ```
 
 ```cs
-[CoreRtJob] // uses the latest CoreRT version
+[TargetFrameworkJob(TargetFrameworkMoniker.CoreRt21)] // compiles the benchmarks as netcoreapp2.1 and uses the latest CoreRT to build a native app
 public class TheTypeWithBenchmarks
 {
    [Benchmark] // the benchmarks go here
@@ -223,10 +223,10 @@ If you want to benchmark some particular version of CoreRT you have to specify i
 ```cs
 var config = DefaultConfig.Instance
     .With(Job.ShortRun
-        .With(Runtime.CoreRT)
         .With(CoreRtToolchain.CreateBuilder()
             .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-26412-02") // the version goes here
             .DisplayName("CoreRT NuGet")
+            .TargetFrameworkMoniker("netcoreapp2.1")
             .ToToolchain()));
 ```
 
@@ -237,10 +237,10 @@ If you are an CoreRT contributor and you want to benchmark your local build of C
 ```cs
 var config = DefaultConfig.Instance
     .With(Job.ShortRun
-        .With(Runtime.CoreRT)
         .With(CoreRtToolchain.CreateBuilder()
             .UseCoreRtLocal(@"C:\Projects\corert\bin\Windows_NT.x64.Release") // IlcPath
             .DisplayName("Core RT RyuJit")
+            .TargetFrameworkMoniker("netcoreapp2.1")
             .ToToolchain()));
 ```
 
@@ -254,12 +254,14 @@ If you want to test [CPP Code Generator](https://github.com/dotnet/corert/blob/7
 
 ```cs
 var config = DefaultConfig.Instance
-    .With(Job.CoreRT.With(
-        CoreRtToolchain.CreateBuilder()
-            .UseCoreRtLocal(@"C:\Projects\corert\bin\Windows_NT.x64.Release") // IlcPath
-            .UseCppCodeGenerator() // ENABLE IT
-            .DisplayName("CPP")
-            .ToToolchain()));
+    .With(Job.Default
+        .With(
+            CoreRtToolchain.CreateBuilder()
+                .UseCoreRtLocal(@"C:\Projects\corert\bin\Windows_NT.x64.Release") // IlcPath
+                .UseCppCodeGenerator() // ENABLE IT
+                .TargetFrameworkMoniker("netcoreapp2.1")
+                .DisplayName("CPP")
+                .ToToolchain()));
 ```
 
 **Note**: You might get some `The method or operation is not implemented.` errors as of today if the code that you are trying to benchmark is using some features that are not implemented by CoreRT/transpiler yet...

@@ -1,0 +1,70 @@
+﻿using System;
+using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
+
+namespace BenchmarkDotNet.Environments
+{
+    public class ClrRuntime : Runtime, IEquatable<ClrRuntime>
+    {
+        public static readonly ClrRuntime Net461 = new ClrRuntime(TargetFrameworkMoniker.Net461, "net461", ".NET 4.6.1");
+        public static readonly ClrRuntime Net462 = new ClrRuntime(TargetFrameworkMoniker.Net462, "net462", ".NET 4.6.2");
+        public static readonly ClrRuntime Net47 = new ClrRuntime(TargetFrameworkMoniker.Net47, "net47", ".NET 4.7");
+        public static readonly ClrRuntime Net471 = new ClrRuntime(TargetFrameworkMoniker.Net471, "net471", ".NET 4.7.1");
+        public static readonly ClrRuntime Net472 = new ClrRuntime(TargetFrameworkMoniker.Net472, "net472", ".NET 4.7.2");
+        public static readonly ClrRuntime Net48 = new ClrRuntime(TargetFrameworkMoniker.Net48, "net48", ".NET 4.8");
+
+        public string Version { get; }
+
+        private ClrRuntime(TargetFrameworkMoniker targetFrameworkMoniker, string msBuildMoniker, string displayName, string version = null)
+            : base(targetFrameworkMoniker, msBuildMoniker, displayName)
+        {
+            Version = version;
+        }
+
+        /// <param name="version">YOU PROBABLY DON'T NEED IT, but if you are a .NET Runtime developer..
+        /// please set it to particular .NET Runtime version if you want to benchmark it.
+        /// BenchmarkDotNet in going to pass `COMPLUS_Version` env var to the process for you.
+        /// </param>
+        public static ClrRuntime CreateForLocalFullNetFrameworkBuild(string version)
+        {
+            if (string.IsNullOrEmpty(version)) throw new ArgumentNullException(nameof(version));
+
+            var current = GetCurrentVersion();
+
+            return new ClrRuntime(current.TargetFrameworkMoniker, current.MsBuildMoniker, version, version);
+        }
+
+        public override bool Equals(object obj) => obj is ClrRuntime other && Equals(other);
+
+        public bool Equals(ClrRuntime other) => other != null && base.Equals(other) && Version == other.Version;
+
+        public override int GetHashCode() => base.GetHashCode() ^ (Version?.GetHashCode() ?? 0);
+
+        internal static ClrRuntime GetCurrentVersion()
+        {
+            if (!RuntimeInformation.IsWindows())
+            {
+                throw new NotSupportedException("Full .NET Framework supports Windows OS only.");
+            }
+
+            // this logic is put to a separate method to avoid any assembly loading issues on non Windows systems
+            string sdkVersion = FrameworkVersionHelper.GetLatestNetDeveloperPackVersion();
+
+            string version = sdkVersion
+                ?? FrameworkVersionHelper.GetFrameworkReleaseVersion(); // .NET Developer Pack is not installed 
+
+            switch (version)
+            {
+                case "4.6.1": return Net461;
+                case "4.6.2": return Net462;
+                case "4.7":   return Net47;
+                case "4.7.1": return Net471;
+                case "4.7.2": return Net472;
+                case "4.8":   return Net48;
+                default: // unlikely to happen but theoretically possible
+                    return new ClrRuntime(TargetFrameworkMoniker.NotRecognized, $"net{version.Replace(".", null)}", $".NET {version}");
+            }
+        }
+    }
+}

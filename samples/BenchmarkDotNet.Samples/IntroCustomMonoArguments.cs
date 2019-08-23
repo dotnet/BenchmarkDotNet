@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples
@@ -16,10 +17,12 @@ namespace BenchmarkDotNet.Samples
                 // optimizations to be turned off by prefixing the optimization
                 // name with a minus sign.
 
-                Add(Job.Mono
+                Add(Job.Default
+                    .With(MonoRuntime.Default)
                     .With(new[] { new MonoArgument("--optimize=inline") })
                     .WithId("Inlining enabled"));
-                Add(Job.Mono
+                Add(Job.Default
+                    .With(MonoRuntime.Default)
                     .With(new[] { new MonoArgument("--optimize=-inline") })
                     .WithId("Inlining disabled"));
             }

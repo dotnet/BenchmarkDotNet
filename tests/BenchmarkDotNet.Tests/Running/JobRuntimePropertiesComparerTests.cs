@@ -4,6 +4,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Running
@@ -62,15 +63,15 @@ namespace BenchmarkDotNet.Tests.Running
             [Benchmark] public void M2() { }
         }
 
-        [Fact]
+        [FactWindowsOnly("Full Framework is supported only on Windows")]
         public void CustomClrBuildJobsAreGroupedByVersion()
         {
             const string version = "abcd";
 
             var config = ManualConfig.Create(DefaultConfig.Instance)
-                .With(Job.Default.With(new ClrRuntime(version: version)))
-                .With(Job.Default.With(new ClrRuntime(version: "it's a different version")))
-                .With(Job.Clr);
+                .With(Job.Default.With(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: version)))
+                .With(Job.Default.With(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "it's a different version")))
+                .With(Job.Default.With(ClrRuntime.GetCurrentVersion()));
 
             var benchmarks1 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1), config);
             var benchmarks2 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain2), config);
