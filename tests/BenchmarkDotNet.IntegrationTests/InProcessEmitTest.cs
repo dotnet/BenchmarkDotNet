@@ -222,7 +222,6 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-
         [Fact]
         public void InProcessEmitToolchainSupportsIterationSetupAndCleanup()
         {
