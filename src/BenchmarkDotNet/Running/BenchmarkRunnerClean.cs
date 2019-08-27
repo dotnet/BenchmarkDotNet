@@ -273,7 +273,7 @@ namespace BenchmarkDotNet.Running
             if (buildPartitions.Length <= 1 || !buildResults.Values.Any(result => result.IsGenerateSuccess && !result.IsBuildSuccess))
                 return buildResults;
 
-            logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build..   *****");
+            logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build   *****");
 
             foreach (var buildPartition in buildPartitions)
                 if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess && !buildResults[buildPartition].TryToExplainFailureReason(out var reason))
