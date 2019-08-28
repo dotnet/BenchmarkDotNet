@@ -41,17 +41,13 @@ namespace BenchmarkDotNet.Portability
             => FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase) 
                && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
 
-        public static bool InDocker => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
+        public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
                 
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
         internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
         internal static string GetArchitecture() => GetCurrentPlatform().ToString();
-
-        private static string DockerSdkVersion => Environment.GetEnvironmentVariable("DOTNET_VERSION");
-
-        private static string DockerAspnetSdkVersion => Environment.GetEnvironmentVariable("ASPNETCORE_VERSION");
         
         internal static bool IsWindows() => IsOSPlatform(OSPlatform.Windows);
 
@@ -120,20 +116,6 @@ namespace BenchmarkDotNet.Portability
             return null;
         }
 
-        internal static string GetNetCoreVersion() => InDocker ? GetDockerNetCoreVersion() : GetBaseNetCoreVersion();
-
-        private static string GetDockerNetCoreVersion() => string.IsNullOrEmpty(DockerSdkVersion) ? DockerAspnetSdkVersion : DockerSdkVersion;
-
-        private static string GetBaseNetCoreVersion()
-        {
-            var assembly = typeof(GCSettings).GetTypeInfo().Assembly;
-            var assemblyPath = assembly.CodeBase.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
-            int netCoreAppIndex = Array.IndexOf(assemblyPath, "Microsoft.NETCore.App");
-            if (netCoreAppIndex > 0 && netCoreAppIndex < assemblyPath.Length - 2)
-                return assemblyPath[netCoreAppIndex + 1];
-            return null;            
-        }
-        
         internal static string GetRuntimeVersion()
         {
             if (IsMono)
@@ -164,7 +146,7 @@ namespace BenchmarkDotNet.Portability
             }
             else if (IsNetCore)
             {
-                string runtimeVersion = GetNetCoreVersion() ?? "?";
+                string runtimeVersion = CoreRuntime.TryGetVersion(out var version) ? version.ToString() : "?";
 
                 var coreclrAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
                 var corefxAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(Regex).GetTypeInfo().Assembly.Location);

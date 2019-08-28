@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Versioning;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 
@@ -41,25 +44,75 @@ namespace BenchmarkDotNet.Environments
                 throw new NotSupportedException("It's impossible to reliably detect the version of .NET Core if the process is not a .NET Core process!");
             }
 
-            string netCoreAppVersion = RuntimeInformation.GetNetCoreVersion();
-            if (!string.IsNullOrEmpty(netCoreAppVersion) && Version.TryParse(netCoreAppVersion, out _))
+            if (!TryGetVersion(out Version version))
             {
-                return FromNetCoreAppVersion(netCoreAppVersion);
+                throw new NotSupportedException("Unable to recognize .NET Core version, please report a bug at https://github.com/dotnet/BenchmarkDotNet");
             }
 
-            var coreclrAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(object).Assembly.Location);
-            // coreclrAssemblyInfo.Product*Part properties return 0 so we have to implement some ugly parsing...
-            return FromProductVersion(coreclrAssemblyInfo.ProductVersion, coreclrAssemblyInfo.ProductName); 
+            return FromVersion(version);
         }
 
-        internal static CoreRuntime FromNetCoreAppVersion(string netCoreAppVersion)
+        internal static CoreRuntime FromVersion(Version version)
         {
-            var version = Version.Parse(netCoreAppVersion);
+            switch (version)
+            {
+                case Version v when v.Major == 2 && v.Minor == 0: return Core20;
+                case Version v when v.Major == 2 && v.Minor == 1: return Core21;
+                case Version v when v.Major == 2 && v.Minor == 2: return Core22;
+                case Version v when v.Major == 3 && v.Minor == 0: return Core30;
+                case Version v when v.Major == 3 && v.Minor == 1: return Core31;
+                case Version v when v.Major == 5 && v.Minor == 0: return Core50;
+                default:
+                    return CreateForNewVersion($"netcoreapp{version.Major}.{version.Minor}", $".NET Core {version.Major}.{version.Minor}");
+            }
+        }
 
-            string msBuildMoniker = $"netcoreapp{version.Major}.{version.Minor}";
-            string displayName = $".NET Core {version.Major}.{version.Minor}";
+        internal static bool TryGetVersion(out Version version)
+        {
+            // we can't just use System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription
+            // because it can be null and it reports versions like 4.6.* for .NET Core 2.*
 
-            return FromMoniker(msBuildMoniker, displayName);
+            string runtimeDirectory = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
+            if (TryGetVersionFromRuntimeDirectory(runtimeDirectory, out version))
+            {
+                return true;
+            }
+
+            var systemPrivateCoreLib = FileVersionInfo.GetVersionInfo(typeof(object).Assembly.Location);
+            // systemPrivateCoreLib.Product*Part properties return 0 so we have to implement some ugly parsing...
+            if (TryGetVersionFromProductInfo(systemPrivateCoreLib.ProductVersion, systemPrivateCoreLib.ProductName, out version))
+            {
+                return true;
+            }
+
+            string frameworkName = Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
+            if (TryGetVersionFromFrameworkName(frameworkName, out version))
+            {
+                return true;
+            }
+
+            if (RuntimeInformation.IsRunningInContainer)
+            {
+                return Version.TryParse(Environment.GetEnvironmentVariable("DOTNET_VERSION"), out version) 
+                    || Version.TryParse(Environment.GetEnvironmentVariable("ASPNETCORE_VERSION"), out version);
+            }
+
+            version = null;
+            return false;
+        }
+
+        // sample input:
+        // for dotnet run: C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.1.12\
+        // for dotnet publish: C:\Users\adsitnik\source\repos\ConsoleApp25\ConsoleApp25\bin\Release\netcoreapp2.0\win-x64\publish\
+        internal static bool TryGetVersionFromRuntimeDirectory(string runtimeDirectory, out Version version)
+        {
+            if (!string.IsNullOrEmpty(runtimeDirectory) && Version.TryParse(GetParsableVersionPart(new DirectoryInfo(runtimeDirectory).Name), out version))
+            {
+                return true;
+            }
+
+            version = null;
+            return false;
         }
 
         // sample input: 
@@ -68,50 +121,55 @@ namespace BenchmarkDotNet.Environments
         // 2.2: 4.6.27817.03 @BuiltBy: dlab14-DDVSOWINAGE101 @Branch: release/2.2 @SrcCode: https://github.com/dotnet/coreclr/tree/ce1d090d33b400a25620c0145046471495067cc7, Microsoft .NET Framework
         // 3.0: 3.0.0-preview8.19379.2+ac25be694a5385a6a1496db40de932df0689b742, Microsoft .NET Core
         // 5.0: 5.0.0-alpha1.19413.7+0ecefa44c9d66adb8a997d5778dc6c246ad393a7, Microsoft .NET Core
-        internal static CoreRuntime FromProductVersion(string productVersion, string productName)
+        internal static bool TryGetVersionFromProductInfo(string productVersion, string productName, out Version version)
         {
-            if (productName.IndexOf(".NET Core", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (!string.IsNullOrEmpty(productVersion) && !string.IsNullOrEmpty(productName))
             {
-                // Version.TryParse does not handle thing like 3.0.0-WORD
-                string parsableVersion = new string(productVersion.TakeWhile(c => char.IsDigit(c) || c == '.').ToArray());
-                if (Version.TryParse(productVersion, out var version) || Version.TryParse(parsableVersion, out version))
+                if (productName.IndexOf(".NET Core", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    return FromMoniker($"netcoreapp{version.Major}.{version.Minor}", $".NET Core {version.Major}.{version.Minor}");
+                    string parsableVersion = GetParsableVersionPart(productVersion);
+                    if (Version.TryParse(productVersion, out version) || Version.TryParse(parsableVersion, out version))
+                    {
+                        return true;
+                    }
+                }
+
+                // yes, .NET Core 2.X has a product name == .NET Framework...
+                if (productName.IndexOf(".NET Framework", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    const string releaseVersionPrefix = "release/";
+                    int releaseVersionIndex = productVersion.IndexOf(releaseVersionPrefix);
+                    if (releaseVersionIndex > 0)
+                    {
+                        string releaseVersion = GetParsableVersionPart(productVersion.Substring(releaseVersionIndex + releaseVersionPrefix.Length));
+
+                        return Version.TryParse(releaseVersion, out version);
+                    }
                 }
             }
 
-            // yes, .NET Core 2.X has a product name == .NET Framework...
-            if (productName.IndexOf(".NET Framework", StringComparison.OrdinalIgnoreCase) >= 0)
-            {
-                const string releaseVersionPrefix = "release/";
-                int releaseVersionIndex = productVersion.IndexOf(releaseVersionPrefix);
-                if (releaseVersionIndex > 0)
-                {
-                    string releaseVersion = new string(productVersion.Skip(releaseVersionIndex + releaseVersionPrefix.Length).TakeWhile(c => !char.IsWhiteSpace(c)).ToArray());
-
-                    return FromMoniker($"netcoreapp{releaseVersion}", $".NET Core {releaseVersion}");
-                }
-
-                // BenchmarkDotNet targets .NET Standard 2.0, so it's safe to asume that it can be only .NET Core 2.0 now..
-                return Core20;
-            }
-
-            throw new NotSupportedException($"Unable to recognize .NET Core version, the productVersion was {productVersion}, productName was {productName}");
+            version = null;
+            return false;
         }
 
-        private static CoreRuntime FromMoniker(string msBuildMoniker, string displayName)
+        // sample input:
+        // .NETCoreApp,Version=v2.0
+        // .NETCoreApp,Version=v2.1
+        internal static bool TryGetVersionFromFrameworkName(string frameworkName, out Version version)
         {
-            switch (msBuildMoniker)
+            const string versionPrefix = ".NETCoreApp,Version=v";
+            if (!string.IsNullOrEmpty(frameworkName) && frameworkName.StartsWith(versionPrefix))
             {
-                case "netcoreapp2.0": return Core20;
-                case "netcoreapp2.1": return Core21;
-                case "netcoreapp2.2": return Core22;
-                case "netcoreapp3.0": return Core30;
-                case "netcoreapp3.1": return Core31;
-                case "netcoreapp5.0": return Core50;
-                default: // support future version of .NET Core
-                    return CreateForNewVersion(msBuildMoniker, displayName);
+                string frameworkVersion = GetParsableVersionPart(frameworkName.Substring(versionPrefix.Length));
+
+                return Version.TryParse(frameworkVersion, out version);
             }
+
+            version = null;
+            return false;
         }
+
+        // Version.TryParse does not handle thing like 3.0.0-WORD
+        private static string GetParsableVersionPart(string fullVersionName) => new string(fullVersionName.TakeWhile(c => char.IsDigit(c) || c == '.').ToArray());
     }
 }
