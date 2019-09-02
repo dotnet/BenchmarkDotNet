@@ -38,6 +38,8 @@ It can be enabled in few ways, some of them:
 * Use the new attribute (apply it on a class that contains Benchmarks):
 
 ```cs
+using BenchmarkDotNet.Diagnostics.Windows.Configs;
+
 [EtwProfiler]
 public class TheClassThatContainsBenchmarks { /* benchmarks go here */ }
 ```
