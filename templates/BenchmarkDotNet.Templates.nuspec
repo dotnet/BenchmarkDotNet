@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
-    <id>BenchmarkDotNet.BenchmarkProjectTemplate.CSharp</id>
-    <version>1.0.0</version>
-    <description>A Benchmark project template.</description>
+    <id>BenchmarkDotNet.Templates</id>
+    <version>0.11.5</version>
+    <description>BenchmarkDotnet templates.</description>
     <authors>BenchmarkDotNet</authors>
     <copyright>.NET Foundation and contributors</copyright>
     <tags>benchmark;benchmarking;performance;template</tags>
@@ -15,4 +15,7 @@
       <packageType name="Template" />
     </packageTypes>
   </metadata>
+   <files>
+    <file src="Content/**" target="" />
+  </files>
 </package>

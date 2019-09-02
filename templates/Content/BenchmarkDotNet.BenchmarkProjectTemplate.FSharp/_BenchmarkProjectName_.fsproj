@@ -10,9 +10,9 @@
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <Tailcalls>true</Tailcalls>
   </PropertyGroup>
- <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.1*" />
-    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.1*" />
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
+    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.11.5" Condition="'$(OS)' == 'Windows_NT'"/>
   </ItemGroup>
   <ItemGroup Condition="'$(config)' == true">
     <Compile Include="BenchmarkConfig.fs" />
