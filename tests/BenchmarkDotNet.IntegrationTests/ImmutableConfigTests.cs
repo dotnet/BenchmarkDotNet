@@ -8,6 +8,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Validators;
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void DuplicateColumnProvidersAreExcluded()
         {
             var mutable = ManualConfig.CreateEmpty();
-            
+
             mutable.Add(DefaultColumnProviders.Job);
             mutable.Add(DefaultColumnProviders.Job);
 
@@ -34,7 +35,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void DuplicateLoggersAreExcluded()
         {
             var mutable = ManualConfig.CreateEmpty();
-            
+
             mutable.Add(ConsoleLogger.Default);
             mutable.Add(ConsoleLogger.Default);
 
@@ -47,7 +48,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void DuplicateHardwareCountersAreExcluded()
         {
             var mutable = ManualConfig.CreateEmpty();
-            
+
             mutable.Add(HardwareCounter.CacheMisses);
             mutable.Add(HardwareCounter.CacheMisses);
 
@@ -55,12 +56,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.Equal(HardwareCounter.CacheMisses, final.GetHardwareCounters().Single());
         }
-        
+
         [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because CoreRT compiler goes crazy when some dependency has reference to TraceEvent...")]
         public void WhenUserDefinesHardwareCountersWeChooseTheRightDiagnoser()
         {
             var mutable = ManualConfig.CreateEmpty();
-            
+
             mutable.Add(HardwareCounter.CacheMisses);
 
             var final = ImmutableConfigBuilder.Create(mutable);
@@ -68,12 +69,12 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Single(final.GetDiagnosers());
             Assert.Single(final.GetDiagnosers().OfType<IHardwareCountersDiagnoser>());
         }
-        
+
         [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers and disassembler only for Windows. This test is disabled for .NET Core because CoreRT compiler goes crazy when some dependency has reference to TraceEvent...")]
         public void WhenUserDefinesHardwareCountersAndUsesDissasemblyDiagnoserWeAddInstructionPointerExporter()
         {
             var mutable = ManualConfig.CreateEmpty();
-            
+
             mutable.Add(HardwareCounter.CacheMisses);
             mutable.Add(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.All));
 
@@ -83,12 +84,12 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Single(final.GetDiagnosers().OfType<IDisassemblyDiagnoser>());
             Assert.Single(final.GetExporters().OfType<InstructionPointerExporter>());
         }
-        
+
         [Fact]
         public void DuplicateDiagnosersAreExcludedBasedOnType()
         {
             var mutable = ManualConfig.CreateEmpty();
-            
+
             mutable.Add(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.All));
             mutable.Add(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.Asm));
 
@@ -101,7 +102,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void DuplicateExportersAreExcluded()
         {
             var mutable = ManualConfig.CreateEmpty();
-            
+
             mutable.Add(MarkdownExporter.GitHub);
             mutable.Add(MarkdownExporter.GitHub);
 
@@ -109,12 +110,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.Same(MarkdownExporter.GitHub, final.GetExporters().Single());
         }
-        
+
         [Fact]
         public void DuplicateAnalyzersAreExcluded()
         {
             var mutable = ManualConfig.CreateEmpty();
-            
+
             mutable.Add(OutliersAnalyser.Default);
             mutable.Add(OutliersAnalyser.Default);
 
@@ -122,12 +123,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.Same(OutliersAnalyser.Default, final.GetAnalysers().Single());
         }
-        
+
         [Fact]
         public void DuplicateValidatorsAreExcludedBasedOnTreatsWarningsAsErrorsProperty()
         {
             var mutable = ManualConfig.CreateEmpty();
-            
+
             mutable.Add(JitOptimizationsValidator.DontFailOnError);
             mutable.Add(JitOptimizationsValidator.FailOnError);
 
@@ -135,7 +136,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.Same(JitOptimizationsValidator.FailOnError, final.GetValidators().OfType<JitOptimizationsValidator>().Single());
         }
-        
+
         [Fact]
         public void BaseLineValidatorIsMandatory()
         {
@@ -174,11 +175,11 @@ namespace BenchmarkDotNet.IntegrationTests
         public void MissingExporterDependencyIsAddedWhenNeeded()
         {
             var mutable = ManualConfig.CreateEmpty();
-            
+
             mutable.Add(TestExporter.Default);
 
             var exporters = ImmutableConfigBuilder.Create(mutable).GetExporters().ToArray();
-            
+
             Assert.Equal(2, exporters.Length);
             Assert.Equal(new IExporter[] { TestExporterDependency.Default, TestExporter.Default }, exporters);
         }
@@ -187,16 +188,16 @@ namespace BenchmarkDotNet.IntegrationTests
         public void MissingDependencyIsNotAddedWhenItIsAlreadyPresent()
         {
             var mutable = ManualConfig.CreateEmpty();
-            
+
             mutable.Add(TestExporter.Default);
             mutable.Add(TestExporterDependency.Default);
-            
+
             var exporters = ImmutableConfigBuilder.Create(mutable).GetExporters().ToArray();
-            
+
             Assert.Equal(2, exporters.Length);
             Assert.Equal(new IExporter[] { TestExporterDependency.Default, TestExporter.Default }, exporters);
         }
-        
+
         [Fact]
         public void WhenTwoConfigsAreAddedTheRegularJobsAreJustAdded()
         {
@@ -206,33 +207,33 @@ namespace BenchmarkDotNet.IntegrationTests
             foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithClrJob, cofingWithCoreJob))
             {
                 var runnableJobs = added.GetJobs();
-                
+
                 Assert.Equal(2, runnableJobs.Count());
                 Assert.Single(runnableJobs, job => job.Environment.Runtime is ClrRuntime);
                 Assert.Single(runnableJobs, job => job.Environment.Runtime is CoreRuntime);
             }
         }
-        
+
         [Fact]
         public void WhenTwoConfigsAreAddedTheMutatorJobsAreAppliedToAllOtherJobs()
         {
             const int warmupCount = 2;
             var configWithMutatorJob = CreateConfigFromJobs(Job.Default.WithWarmupCount(warmupCount).AsMutator());
             var configWithTwoStandardJobs = CreateConfigFromJobs(
-                Job.Default.With(ClrRuntime.Net461), 
+                Job.Default.With(ClrRuntime.Net461),
                 Job.Default.With(CoreRuntime.Core21));
 
             foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithTwoStandardJobs, configWithMutatorJob))
             {
                 var runnableJobs = added.GetJobs();
-                
+
                 Assert.Equal(2, runnableJobs.Count());
                 Assert.All(runnableJobs, job => Assert.Equal(warmupCount, job.Run.WarmupCount));
                 Assert.Single(runnableJobs, job => job.Environment.Runtime is ClrRuntime);
                 Assert.Single(runnableJobs, job => job.Environment.Runtime is CoreRuntime);
             }
         }
-        
+
         [Fact]
         public void WhenTwoConfigsAreAddedTheMutatorJobsAreAppliedToCustomDefaultJobIfPresent()
         {
@@ -250,7 +251,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.False(mergedJob.Meta.IsMutator); // after the merge the "child" job becomes a standard job
             }
         }
-        
+
         [Fact]
         public void WhenTwoConfigsAreAddedTheMutatorJobsAreAppliedToDefaultJobIfCustomDefaultJobIsNotPresent()
         {
@@ -266,27 +267,43 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.Single(mergedJob.GetCharacteristicsWithValues(), changedCharacteristic => ReferenceEquals(changedCharacteristic, Jobs.RunMode.WarmupCountCharacteristic));
             }
         }
-        
+
+        [Fact]
+        public void WhenArtifactsPathIsNullDefaultValueShouldBeUsed()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+            var final = ImmutableConfigBuilder.Create(mutable);
+            Assert.Equal(final.ArtifactsPath, DefaultConfig.Instance.ArtifactsPath);
+        }
+
+        [Fact]
+        public void WhenOrdererIsNullDefaultValueShouldBeUsed()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+            var final = ImmutableConfigBuilder.Create(mutable);
+            Assert.Equal(final.Orderer, DefaultOrderer.Instance);
+        }
+
         private static ManualConfig CreateConfigFromJobs(params Job[] jobs)
         {
             var config = ManualConfig.CreateEmpty();
-            
+
             config.Add(jobs);
 
             return config;
         }
-        
+
         private static ImmutableConfig[] AddLeftToTheRightAndRightToTheLef(ManualConfig left, ManualConfig right)
         {
             var rightAddedToLeft = ManualConfig.Create(left);
             rightAddedToLeft.Add(right);
-            
+
             var leftAddedToTheRight = ManualConfig.Create(right);
             leftAddedToTheRight.Add(left);
 
             return new []{ rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig() };
         }
-        
+
         public class TestExporter : IExporter, IExporterDependencies
         {
             public static readonly TestExporter Default = new TestExporter();
