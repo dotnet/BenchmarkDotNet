@@ -1,19 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Tests.Builders;
-using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.Results;
-using BenchmarkDotNet.Validators;
+using BenchmarkDotNet.Tests.Mocks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -53,61 +46,15 @@ namespace BenchmarkDotNet.Tests.Reports
             Assert.Equal("metric2", columns[1].Id);
         }
 
-        private class FakeMetricDescriptor : IMetricDescriptor
-        {
-            public FakeMetricDescriptor(string id, string legend)
-            {
-                Id = id;
-                Legend = legend;
-            }
-            
-            public string Id { get; }
-            public string DisplayName => Id;
-            public string Legend { get; }
-            public string NumberFormat { get; }
-            public UnitType UnitType { get; }
-            public string Unit { get; }
-            public bool TheGreaterTheBetter { get; }
-        }
-
         // TODO: Union this with MockFactory
         private Summary CreateSummary(bool hugeSd, Metric[] metrics)
         {
             var logger = new AccumulationLogger();
-            var summary = new Summary(
-                "MockSummary",
-                CreateBenchmarks(DefaultConfig.Instance).Select(b => CreateReport(b, hugeSd, metrics)).ToImmutableArray(),
-                new HostEnvironmentInfoBuilder().Build(),
-                string.Empty,
-                string.Empty,
-                TimeSpan.FromMinutes(1),
-                ImmutableArray<ValidationError>.Empty);
+            var summary = MockFactory.CreateSummary<MockBenchmarkClass>(DefaultConfig.Instance, hugeSd, metrics);
             MarkdownExporter.Default.ExportToLog(summary, logger);
             output.WriteLine(logger.GetLog());
             return summary;
         }
-
-        private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, bool hugeSd, Metric[] metrics)
-        {
-            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
-            var executeResult = new ExecuteResult(true, 0, default, Array.Empty<string>(), Array.Empty<string>());
-            bool isFoo = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Foo";
-            bool isBar = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Bar";            
-            var measurements = new List<Measurement>
-            {
-                new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, 1),
-                new Measurement(1, IterationMode.Workload, IterationStage.Result, 2, 1, hugeSd && isFoo ? 2 : 1),
-                new Measurement(1, IterationMode.Workload, IterationStage.Result, 3, 1, hugeSd && isBar ? 3 : 1),
-                new Measurement(1, IterationMode.Workload, IterationStage.Result, 4, 1, hugeSd && isFoo ? 2 : 1),
-                new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, hugeSd && isBar ? 3 : 1),
-                new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, 1)
-            };
-            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default, metrics);
-        }
-
-        private static IEnumerable<BenchmarkCase> CreateBenchmarks(IConfig config) =>
-            BenchmarkConverter.TypeToBenchmarks(typeof(MockBenchmarkClass), config).BenchmarksCases;
-
 
         [LongRunJob]
         public class MockBenchmarkClass
