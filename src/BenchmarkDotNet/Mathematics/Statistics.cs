@@ -91,14 +91,20 @@ namespace BenchmarkDotNet.Mathematics
         {
             switch (outlierMode)
             {
+#pragma warning disable 618
                 case OutlierMode.None:
+                case OutlierMode.DontRemove:
                     return false;
                 case OutlierMode.OnlyUpper:
+                case OutlierMode.RemoveUpper:
                     return IsUpperOutlier(value);
                 case OutlierMode.OnlyLower:
+                case OutlierMode.RemoveLower:
                     return IsLowerOutlier(value);
                 case OutlierMode.All:
+                case OutlierMode.RemoveAll:
                     return IsOutlier(value);
+#pragma warning restore 618
                 default:
                     throw new ArgumentOutOfRangeException(nameof(outlierMode), outlierMode, null);
             }
@@ -109,14 +115,20 @@ namespace BenchmarkDotNet.Mathematics
         {
             switch (outlierMode)
             {
+#pragma warning disable 618
                 case OutlierMode.None:
+                case OutlierMode.DontRemove:
                     return Array.Empty<double>();
                 case OutlierMode.OnlyUpper:
+                case OutlierMode.RemoveUpper:
                     return UpperOutliers;
                 case OutlierMode.OnlyLower:
+                case OutlierMode.RemoveLower:
                     return LowerOutliers;
                 case OutlierMode.All:
+                case OutlierMode.RemoveAll:
                     return AllOutliers;
+#pragma warning restore 618
                 default:
                     throw new ArgumentOutOfRangeException(nameof(outlierMode), outlierMode, null);
             }

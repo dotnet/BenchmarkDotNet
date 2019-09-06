@@ -15,14 +15,14 @@ namespace BenchmarkDotNet.Diagnosers
         private const string DiagnosticAssemblyName = "BenchmarkDotNet.Diagnostics.Windows";
 
         // Make the Diagnosers lazy-loaded, so they are only instantiated if needed
-        private static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers 
+        private static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers
             = new Lazy<IDiagnoser[]>(LoadDiagnosers, LazyThreadSafetyMode.ExecutionAndPublication);
 
         internal static IDiagnoser GetImplementation<TDiagnoser>() where TDiagnoser : IDiagnoser
             => LazyLoadedDiagnosers.Value
                     .FirstOrDefault(diagnoser => diagnoser is TDiagnoser) // few diagnosers can implement same interface, order matters
                 ?? GetUnresolvedDiagnoser<TDiagnoser>();
-        
+
         internal static IDiagnoser GetImplementation<TDiagnoser>(Predicate<TDiagnoser> filter) where TDiagnoser : IDiagnoser
             => LazyLoadedDiagnosers.Value
                     .FirstOrDefault(diagnoser => diagnoser is TDiagnoser typed && filter(typed)) // few diagnosers can implement same interface, order matters
@@ -46,13 +46,13 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static IDiagnoser[] LoadCore() => new IDiagnoser[] { MemoryDiagnoser.Default };
 
-        private static IDiagnoser[] LoadMono() 
+        private static IDiagnoser[] LoadMono()
             => new IDiagnoser[]
             {
                 // this method should return a IHardwareCountersDiagnoser when we implement Hardware Counters for Unix
                 MemoryDiagnoser.Default,
-                DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()) 
-            }; 
+                DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig())
+            };
 
         private static IDiagnoser[] LoadClassic()
         {
@@ -79,7 +79,8 @@ namespace BenchmarkDotNet.Diagnosers
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.PmcDiagnoser"),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.EtwProfiler"),
-                        CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.ConcurrencyVisualizerProfiler")
+                        CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.ConcurrencyVisualizerProfiler"),
+                        CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.NativeMemoryProfiler")
                     };
                 }
             }

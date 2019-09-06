@@ -6,9 +6,10 @@ namespace BenchmarkDotNet.Helpers
 {
     internal static class ResourceHelper
     {
-        internal static string LoadTemplate(string name)
+        internal static string LoadTemplate(string name) => LoadResource("BenchmarkDotNet.Templates." + name);
+
+        internal static string LoadResource(string resourceName)
         {
-            string resourceName = "BenchmarkDotNet.Templates." + name;
             using (var stream = GetResourceStream(resourceName))
             {
                 if (stream == null)

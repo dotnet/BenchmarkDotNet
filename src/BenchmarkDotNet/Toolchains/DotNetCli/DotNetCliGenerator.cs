@@ -78,17 +78,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             var content = new StringBuilder(300)
                 .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition)}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(buildPartition)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition)}")
                 .ToString();
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
-
-        protected static string SetPlatform(string template, string platform) => template.Replace("$PLATFORM$", platform);
-
-        protected static string SetCodeFileName(string template, string codeFileName) => template.Replace("$CODEFILENAME$", codeFileName);
-
-        protected static string SetTargetFrameworkMoniker(string content, string targetFrameworkMoniker) => content.Replace("$TFM$", targetFrameworkMoniker);
 
         private static bool IsRootSolutionFolder(DirectoryInfo directoryInfo)
             => directoryInfo

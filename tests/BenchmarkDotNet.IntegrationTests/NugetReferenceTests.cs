@@ -1,9 +1,8 @@
-﻿using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
+﻿using BenchmarkDotNet.Jobs;
 using Xunit;
 using Xunit.Abstractions;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Attributes;
 using Newtonsoft.Json;
 using System;
@@ -11,6 +10,7 @@ using BenchmarkDotNet.Toolchains.Roslyn;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Loggers;
 using System.Collections.Immutable;
+using BenchmarkDotNet.Tests.XUnit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -18,12 +18,10 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public NuGetReferenceTests(ITestOutputHelper output) : base(output) { }
 
-        [Fact]
+        [FactNotLinux("For some reason this test is unstable on Ubuntu for both AzureDevOps and Travis CI")]
         public void UserCanSpecifyCustomNuGetPackageDependency()
         {
-            var toolchain = RuntimeInformation.IsFullFramework
-                ? CsProjClassicNetToolchain.Current.Value // this .NET toolchain will do the right thing, the default RoslynToolchain does not support it
-                : CsProjCoreToolchain.Current.Value;
+            var toolchain = RuntimeInformation.GetCurrentRuntime().GetToolchain(preferMsBuildToolchains: true);
 
             var job = Job.Dry.With(toolchain).WithNuGet("Newtonsoft.Json", "11.0.2");
             var config = CreateSimpleConfig(job: job);

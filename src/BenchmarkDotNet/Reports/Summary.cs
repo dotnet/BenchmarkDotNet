@@ -16,6 +16,7 @@ namespace BenchmarkDotNet.Reports
     {
         [PublicAPI] public string Title { get; }
         [PublicAPI] public string ResultsDirectoryPath { get; }
+        [PublicAPI] public string LogFilePath { get; }
         [PublicAPI] public HostEnvironmentInfo HostEnvironmentInfo { get; }
         [PublicAPI] public TimeSpan TotalTime { get; }
         [PublicAPI] public SummaryStyle Style { get; }
@@ -29,23 +30,28 @@ namespace BenchmarkDotNet.Reports
 
         private ImmutableDictionary<BenchmarkCase, BenchmarkReport> ReportMap {get; }
         private BaseliningStrategy BaseliningStrategy {get; }
+        
+        internal DisplayPrecisionManager DisplayPrecisionManager { get; }
 
         public Summary(
             string title,
             ImmutableArray<BenchmarkReport> reports,
             HostEnvironmentInfo hostEnvironmentInfo,
             string resultsDirectoryPath,
+            string logFilePath,
             TimeSpan totalTime,
             ImmutableArray<ValidationError> validationErrors)
         {
             Title = title;
             ResultsDirectoryPath = resultsDirectoryPath;
+            LogFilePath = logFilePath;
             HostEnvironmentInfo = hostEnvironmentInfo;
             TotalTime = totalTime;
             ValidationErrors = validationErrors;
 
             ReportMap = reports.ToImmutableDictionary(report => report.BenchmarkCase, report => report);
             
+            DisplayPrecisionManager = new DisplayPrecisionManager(this);
             Orderer = GetConfiguredOrdererOrDefaultOne(reports.Select(report => report.BenchmarkCase.Config));
             BenchmarksCases = Orderer.GetSummaryOrder(reports.Select(report => report.BenchmarkCase).ToImmutableArray(), this).ToImmutableArray(); // we sort it first
             Reports = BenchmarksCases.Select(b => ReportMap[b]).ToImmutableArray(); // we use sorted collection to re-create reports list
@@ -66,11 +72,11 @@ namespace BenchmarkDotNet.Reports
 
         public int GetNumberOfExecutedBenchmarks() => Reports.Count(report => report.ExecuteResults.Any(result => result.FoundExecutable));
 
-        internal static Summary NothingToRun(string title, string resultsDirectoryPath)
-            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, TimeSpan.Zero, ImmutableArray<ValidationError>.Empty);
+        internal static Summary NothingToRun(string title, string resultsDirectoryPath, string logFilePath)
+            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, ImmutableArray<ValidationError>.Empty);
 
-        internal static Summary ValidationFailed(string title, string resultsDirectoryPath, ImmutableArray<ValidationError> validationErrors)
-            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, TimeSpan.Zero, validationErrors);
+        internal static Summary ValidationFailed(string title, string resultsDirectoryPath, string logFilePath, ImmutableArray<ValidationError> validationErrors)
+            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, validationErrors);
 
         internal static Summary Join(List<Summary> summaries, ClockSpan clockSpan) 
             => new Summary(
@@ -78,6 +84,7 @@ namespace BenchmarkDotNet.Reports
                 summaries.SelectMany(summary => summary.Reports).ToImmutableArray(),
                 HostEnvironmentInfo.GetCurrent(), 
                 summaries.First().ResultsDirectoryPath,
+                summaries.First().LogFilePath,
                 clockSpan.GetTimeSpan(),
                 summaries.SelectMany(summary => summary.ValidationErrors).ToImmutableArray());
 
@@ -133,7 +140,12 @@ namespace BenchmarkDotNet.Reports
         public bool HasBaselines() => BenchmarksCases.Any(IsBaseline);
 
         private static IOrderer GetConfiguredOrdererOrDefaultOne(IEnumerable<ImmutableConfig> configs)
-            => configs.SingleOrDefault(config => config.Orderer != DefaultOrderer.Instance)?.Orderer ?? DefaultOrderer.Instance;
+            => configs
+                   .Where(config => config.Orderer != DefaultOrderer.Instance)
+                   .Select(config => config.Orderer)
+                   .Distinct()
+                   .SingleOrDefault()
+               ?? DefaultOrderer.Instance;
 
         private static SummaryStyle GetConfiguredSummaryStyleOrNull(ImmutableArray<BenchmarkCase> benchmarkCases)
             => benchmarkCases.Select(benchmark => benchmark.Config.SummaryStyle).Distinct().SingleOrDefault();

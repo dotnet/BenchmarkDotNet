@@ -21,13 +21,15 @@ namespace BenchmarkDotNet.Order
         private readonly IComparer<BenchmarkCase> benchmarkComparer;
         private readonly IComparer<IGrouping<string, BenchmarkCase>> logicalGroupComparer;
 
-        private readonly SummaryOrderPolicy summaryOrderPolicy;
+        public SummaryOrderPolicy SummaryOrderPolicy { get; }
+        public MethodOrderPolicy MethodOrderPolicy { get; }
 
         public DefaultOrderer(
             SummaryOrderPolicy summaryOrderPolicy = SummaryOrderPolicy.Default, 
             MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared)
         {
-            this.summaryOrderPolicy = summaryOrderPolicy;
+            SummaryOrderPolicy = summaryOrderPolicy;
+            MethodOrderPolicy = methodOrderPolicy;
             IComparer<Descriptor> targetComparer = new DescriptorComparer(methodOrderPolicy);
             benchmarkComparer = new BenchmarkComparer(paramsComparer, jobComparer, targetComparer);
             logicalGroupComparer = new LogicalGroupComparer(benchmarkComparer);
@@ -51,7 +53,7 @@ namespace BenchmarkDotNet.Order
         
         protected virtual IEnumerable<BenchmarkCase> GetSummaryOrderForGroup(ImmutableArray<BenchmarkCase> benchmarksCase, Summary summary)
         {            
-            switch (summaryOrderPolicy)
+            switch (SummaryOrderPolicy)
             {
                 case SummaryOrderPolicy.FastestToSlowest:
                     return benchmarksCase.OrderBy(b => summary[b]?.ResultStatistics?.Mean ?? 0d);
@@ -68,7 +70,7 @@ namespace BenchmarkDotNet.Order
 
         public string GetHighlightGroupKey(BenchmarkCase benchmarkCase)
         {
-            switch (summaryOrderPolicy)
+            switch (SummaryOrderPolicy)
             {
                 case SummaryOrderPolicy.Default:
                     return benchmarkCase.Parameters.DisplayInfo;

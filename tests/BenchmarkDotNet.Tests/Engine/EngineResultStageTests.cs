@@ -21,17 +21,17 @@ namespace BenchmarkDotNet.Tests.Engine
             Add(measurements, 104);
             Add(measurements, 500); // It's an outlier
 
-            CheckResults(5, measurements, OutlierMode.OnlyUpper);
-            CheckResults(5, measurements, OutlierMode.All);
+            CheckResults(5, measurements, OutlierMode.RemoveUpper);
+            CheckResults(5, measurements, OutlierMode.RemoveAll);
             
-            CheckResults(6, measurements, OutlierMode.None);
-            CheckResults(6, measurements, OutlierMode.OnlyLower);
+            CheckResults(6, measurements, OutlierMode.DontRemove);
+            CheckResults(6, measurements, OutlierMode.RemoveLower);
         }
 
         [AssertionMethod]
         private static void CheckResults(int expectedResultCount, List<Measurement> measurements, OutlierMode outlierMode)
         {
-            Assert.Equal(expectedResultCount, new RunResults(null, measurements, outlierMode, default, default).GetMeasurements().Count());
+            Assert.Equal(expectedResultCount, new RunResults(null, measurements, outlierMode, default, default, default).GetMeasurements().Count());
         }
 
         private static void Add(List<Measurement> measurements, int time)

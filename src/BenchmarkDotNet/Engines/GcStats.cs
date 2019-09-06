@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
@@ -12,7 +13,8 @@ namespace BenchmarkDotNet.Engines
 
         public static readonly long AllocationQuantum = CalculateAllocationQuantumSize();
 
-        private static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = GetAllocatedBytesForCurrentThread();
+        private static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = CreateGetAllocatedBytesForCurrentThreadDelegate();
+        private static readonly Func<bool, long> GetTotalAllocatedBytesDelegate = CreateGetTotalAllocatedBytesDelegate();
 
         public static readonly GcStats Empty = new GcStats(0, 0, 0, 0, 0);
 
@@ -41,8 +43,9 @@ namespace BenchmarkDotNet.Engines
         {
             get
             {
-                bool excludeAllocationQuantumSideEffects = !RuntimeInformation.IsNetCore || NetCoreAppSettings.Current.Value == NetCoreAppSettings.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
-                
+                bool excludeAllocationQuantumSideEffects = !RuntimeInformation.IsNetCore
+                    || RuntimeInformation.GetCurrentRuntime().TargetFrameworkMoniker == TargetFrameworkMoniker.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
+
                 return GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects) == 0
                     ? 0
                     : (long) Math.Round( // let's round it to reduce the side effects of Allocation quantum
@@ -143,11 +146,14 @@ namespace BenchmarkDotNet.Engines
             if (RuntimeInformation.IsFullFramework) // it can be a .NET app consuming our .NET Standard package
                 return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
 
+            if (GetTotalAllocatedBytesDelegate != null) // it's .NET Core 3.0 with the new API available
+                return GetTotalAllocatedBytesDelegate.Invoke(true); // true for the "precise" argument
+
             // https://apisof.net/catalog/System.GC.GetAllocatedBytesForCurrentThread() is not part of the .NET Standard, so we use reflection to call it..
             return GetAllocatedBytesForCurrentThreadDelegate.Invoke();
         }
 
-        private static Func<long> GetAllocatedBytesForCurrentThread()
+        private static Func<long> CreateGetAllocatedBytesForCurrentThreadDelegate()
         {
             // this method is not a part of .NET Standard so we need to use reflection
             var method = typeof(GC).GetTypeInfo().GetMethod("GetAllocatedBytesForCurrentThread", BindingFlags.Public | BindingFlags.Static);
@@ -155,7 +161,16 @@ namespace BenchmarkDotNet.Engines
             // we create delegate to avoid boxing, IMPORTANT!
             return method != null ? (Func<long>)method.CreateDelegate(typeof(Func<long>)) : null;
         }
-  
+
+        private static Func<bool, long> CreateGetTotalAllocatedBytesDelegate()
+        {
+            // this method is not a part of .NET Standard so we need to use reflection
+            var method = typeof(GC).GetTypeInfo().GetMethod("GetTotalAllocatedBytes", BindingFlags.Public | BindingFlags.Static);
+
+            // we create delegate to avoid boxing, IMPORTANT!
+            return method != null ? (Func<bool, long>)method.CreateDelegate(typeof(Func<bool, long>)) : null;
+        }
+
         public string ToOutputLine() 
             => $"{ResultsLinePrefix} {Gen0Collections} {Gen1Collections} {Gen2Collections} {AllocatedBytes} {TotalOperations}";
 

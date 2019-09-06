@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Reports
                 if (escapeHtml)
                     text = text.HtmlEncode();
 
-                if (highlightRow) // write the row in an alternative colour
+                if (highlightRow) // write the row in an alternative color
                 {
                     logger.WriteHeader(text);
                 }

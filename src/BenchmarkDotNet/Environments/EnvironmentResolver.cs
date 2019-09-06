@@ -3,6 +3,7 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -19,6 +20,7 @@ namespace BenchmarkDotNet.Environments
             Register(EnvironmentMode.JitCharacteristic, RuntimeInformation.GetCurrentJit);
             Register(EnvironmentMode.AffinityCharacteristic, RuntimeInformation.GetCurrentAffinity);
             Register(EnvironmentMode.EnvironmentVariablesCharacteristic, Array.Empty<EnvironmentVariable>);
+            Register(EnvironmentMode.PowerPlanModeCharacteristic, () => PowerManagementApplier.Map(PowerPlan.HighPerformance));
 
             // TODO: find a better place
             Register(AccuracyMode.AnalyzeLaunchVarianceCharacteristic, () => false);

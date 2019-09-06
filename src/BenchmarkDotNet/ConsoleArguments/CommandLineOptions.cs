@@ -1,12 +1,12 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Portability;
 using CommandLine;
 using CommandLine.Text;
 using JetBrains.Annotations;
@@ -29,6 +29,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('m', "memory", Required = false, Default = false, HelpText = "Prints memory statistics")]
         public bool UseMemoryDiagnoser { get; set; }
 
+        [Option('t', "threading", Required = false, Default = false, HelpText = "Prints threading statistics")]
+        public bool UseThreadingDiagnoser { get; set; }
+
         [Option('d', "disasm", Required = false, Default = false, HelpText = "Gets disassembly of benchmarked code")]
         public bool UseDisassemblyDiagnoser { get; set; }
         
@@ -44,7 +47,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('a', "artifacts", Required = false, HelpText = "Valid path to accessible directory")]
         public DirectoryInfo ArtifactsDirectory { get; set; }
 
-        [Option("outliers", Required = false, Default = OutlierMode.OnlyUpper, HelpText = "None/OnlyUpper/OnlyLower/All")]
+        [Option("outliers", Required = false, Default = OutlierMode.RemoveUpper, HelpText = "DontRemove/RemoveUpper/RemoveLower/RemoveAll")]
         public OutlierMode Outliers { get; set; }
 
         [Option("affinity", Required = false, HelpText = "Affinity mask to set for the benchmark process")]
@@ -67,6 +70,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         
         [Option("keepFiles", Required = false, Default = false, HelpText = "Determines if all auto-generated files should be kept or removed after running the benchmarks.")]
         public bool KeepBenchmarkFiles { get; set; }
+
+        [Option("noOverwrite", Required = false, Default = false, HelpText = "Determines if the exported result files should not be overwritten (be default they are overwritten).")]
+        public bool DontOverwriteResults { get; set; }
 
         [Option("counters", Required = false, HelpText = "Hardware Counters", Separator = '+')]
         public IEnumerable<string> HardwareCounters { get; set; }
@@ -121,7 +127,10 @@ namespace BenchmarkDotNet.ConsoleArguments
         
         [Option("unrollFactor", Required = false, HelpText = "How many times the benchmark method will be invoked per one iteration of a generated loop. 16 by default")]
         public int? UnrollFactor { get; set; }
-        
+
+        [Option("strategy", Required = false, HelpText = "The RunStrategy that should be used. Throughput/ColdStart/Monitoring.")]
+        public RunStrategy? RunStrategy { get; set; }
+
         [Option("runOncePerIteration", Required = false, Default = false, HelpText = "Run the benchmark exactly once per iteration.")]
         public bool RunOncePerIteration { get; set; }
 
@@ -164,11 +173,11 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Use MemoryDiagnoser to get GC stats", shortName, new CommandLineOptions { UseMemoryDiagnoser = true });
                 yield return new Example("Use DisassemblyDiagnoser to get disassembly", shortName, new CommandLineOptions { UseDisassemblyDiagnoser = true });
                 yield return new Example("Use HardwareCountersDiagnoser to get hardware counter info", longName, new CommandLineOptions { HardwareCounters = new [] { nameof(HardwareCounter.CacheMisses), nameof(HardwareCounter.InstructionRetired) } });
-                yield return new Example("Run all benchmarks exactly once", shortName, new CommandLineOptions { BaseJob = "Dry", Filters = new[] { HandleWildcardsOnUnix("*") } });
-                yield return new Example("Run all benchmarks from System.Memory namespace", shortName, new CommandLineOptions { Filters = new[] { HandleWildcardsOnUnix("System.Memory*") } });
+                yield return new Example("Run all benchmarks exactly once", shortName, new CommandLineOptions { BaseJob = "Dry", Filters = new[] { Escape("*") } });
+                yield return new Example("Run all benchmarks from System.Memory namespace", shortName, new CommandLineOptions { Filters = new[] { Escape("System.Memory*") } });
                 yield return new Example("Run all benchmarks from ClassA and ClassB using type names", shortName, new CommandLineOptions { Filters = new[] { "ClassA", "ClassB" } });
-                yield return new Example("Run all benchmarks from ClassA and ClassB using patterns", shortName, new CommandLineOptions { Filters = new[] { HandleWildcardsOnUnix("*.ClassA.*"), HandleWildcardsOnUnix("*.ClassB.*") } });
-                yield return new Example("Run all benchmarks called `BenchmarkName` and show the results in single summary", longName, new CommandLineOptions { Join = true, Filters = new[] { HandleWildcardsOnUnix("*.BenchmarkName") } });
+                yield return new Example("Run all benchmarks from ClassA and ClassB using patterns", shortName, new CommandLineOptions { Filters = new[] { Escape("*.ClassA.*"), Escape("*.ClassB.*") } });
+                yield return new Example("Run all benchmarks called `BenchmarkName` and show the results in single summary", longName, new CommandLineOptions { Join = true, Filters = new[] { Escape("*.BenchmarkName") } });
                 yield return new Example("Run selected benchmarks once per iteration", longName, new CommandLineOptions { RunOncePerIteration = true });
                 yield return new Example("Run selected benchmarks 100 times per iteration. Perform single warmup iteration and 5 actual workload iterations", longName, new CommandLineOptions { InvocationCount = 100, WarmupIterationCount = 1, IterationCount = 5});
                 yield return new Example("Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations", longName, new CommandLineOptions { IterationTimeInMilliseconds = 250, MinIterationCount = 9, MaxIterationCount = 15});
@@ -177,6 +186,6 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
         }
 
-        private static string HandleWildcardsOnUnix(string input) => !RuntimeInformation.IsWindows() && input.IndexOf('*') >= 0 ? $"'{input}'" : input; // #842
+        private static string Escape(string input) => UserInteractionHelper.EscapeCommandExample(input);
     }
 }

@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Tests.Environments
         [InlineData("Intel(R) Core(TM) i7-7700 CPU @ 3.60GHz", "Intel Core i7-7700 CPU 3.60GHz (Kaby Lake)")]
         [InlineData("Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz ", "Intel Core i7-8650U CPU 1.90GHz (Kaby Lake R)")]
         [InlineData("Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz", "Intel Core i7-8700K CPU 3.70GHz (Coffee Lake)")]
-        public void IntroCoreIsPrettified(string originalName, string prettifiedName) =>
+        public void IntelCoreIsPrettified(string originalName, string prettifiedName) =>
             Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(new CpuInfo(originalName, nominalFrequency: null)));
 
         [Theory]
@@ -49,6 +49,15 @@ namespace BenchmarkDotNet.Tests.Environments
                 maxFrequency: null);
 
             Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(cpuInfo, includeMaxFrequency: true));
+        }
+
+        [Theory]
+        [InlineData("8130U", "Kaby Lake")]
+        [InlineData("9900K", "Coffee Lake")]
+        [InlineData("8809G", "Kaby Lake G")]
+        public void IntelCoreMicroarchitecture(string modelNumber, string microarchitecture)
+        {
+            Assert.Equal(microarchitecture, ProcessorBrandStringHelper.ParseIntelCoreMicroarchitecture(modelNumber));
         }
         
         [Theory]

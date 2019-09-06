@@ -7,6 +7,7 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Running;
 using Xunit;
+using BenchmarkDotNet.Tests.XUnit;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -120,7 +121,7 @@ namespace BenchmarkDotNet.Tests
             }
         }
 
-        [Fact]
+        [FactWindowsOnly("Full Framework is supported only on Windows")]
         public void RemovesStartupSettingsForPrivateBuildsOfClr()
         {
             const string input =
@@ -138,7 +139,7 @@ namespace BenchmarkDotNet.Tests
             using (var source = new StringReader(input))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(new Job { Environment = { Runtime = new ClrRuntime(version: "4.0")} }.Freeze(), source, destination, Resolver);
+                AppConfigGenerator.Generate(new Job { Environment = { Runtime = ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "4.0")} }.Freeze(), source, destination, Resolver);
 
                 AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
             }
@@ -163,7 +164,7 @@ namespace BenchmarkDotNet.Tests
             using (var source = new StringReader(input))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(new Job { Environment = { Runtime = new ClrRuntime() } }.Freeze(), source, destination, Resolver);
+                AppConfigGenerator.Generate(new Job { Environment = { Runtime = ClrRuntime.Net461 } }.Freeze(), source, destination, Resolver);
 
                 AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
             }

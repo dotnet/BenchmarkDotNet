@@ -4,7 +4,7 @@ uid: BenchmarkDotNet.Samples.IntroStopOnFirstError
 
 ## Sample: IntroStopOnFirstError
 
-BenchmarkDotNet can be configured to stop on first error. You just have to add `StopOnFirstError` attrubute to your class or use `--stopOnfirstError` command line argument.
+BenchmarkDotNet can be configured to stop on first error. You just have to add `StopOnFirstError` attribute to your class or use `--stopOnFirstError` command line argument.
 
 ### Source code
 

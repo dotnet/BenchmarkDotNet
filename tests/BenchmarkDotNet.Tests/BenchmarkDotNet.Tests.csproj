@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.Tests</AssemblyTitle>
-    <TargetFrameworks>net461;netcoreapp2.0;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp2.1</TargetFrameworks>
     <AssemblyName>BenchmarkDotNet.Tests</AssemblyName>
     <PackageId>BenchmarkDotNet.Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>

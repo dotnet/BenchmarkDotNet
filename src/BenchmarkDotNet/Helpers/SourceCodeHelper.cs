@@ -30,10 +30,11 @@ namespace BenchmarkDotNet.Helpers
                     return $"System.Numerics.BigInteger.Parse(\"{bigInteger.ToString(CultureInfo.InvariantCulture)}\", System.Globalization.CultureInfo.InvariantCulture)";
                 case DateTime dateTime:
                     return $"System.DateTime.Parse(\"{dateTime.ToString(CultureInfo.InvariantCulture)}\", System.Globalization.CultureInfo.InvariantCulture)";
+                case Guid guid:
+                    return $"System.Guid.Parse(\"{guid.ToString()}\")";
             }
-
             if (ReflectionUtils.GetTypeInfo(value.GetType()).IsEnum)
-                return value.GetType().GetCorrectCSharpTypeName() + "." + value;
+                return $"({value.GetType().GetCorrectCSharpTypeName()})({ToInvariantCultureString(value)})";
             if (value is Type type)
                 return "typeof(" + type.GetCorrectCSharpTypeName() + ")";
             if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)
@@ -128,6 +129,31 @@ namespace BenchmarkDotNet.Helpers
                 return "System.Single.MinValue";
             
             return value.ToString("G", CultureInfo.InvariantCulture) + "f";
+        }
+
+        private static string ToInvariantCultureString(object @enum)
+        {
+            switch (Type.GetTypeCode(Enum.GetUnderlyingType(@enum.GetType())))
+            {
+                case TypeCode.Byte:
+                    return ((byte)@enum).ToString(CultureInfo.InvariantCulture);
+                case TypeCode.Int16:
+                    return ((short)@enum).ToString(CultureInfo.InvariantCulture);
+                case TypeCode.Int32:
+                    return ((int)@enum).ToString(CultureInfo.InvariantCulture);
+                case TypeCode.Int64:
+                    return ((long)@enum).ToString(CultureInfo.InvariantCulture);
+                case TypeCode.SByte:
+                    return ((sbyte)@enum).ToString(CultureInfo.InvariantCulture);
+                case TypeCode.UInt16:
+                    return ((ushort)@enum).ToString(CultureInfo.InvariantCulture);
+                case TypeCode.UInt32:
+                    return ((uint)@enum).ToString(CultureInfo.InvariantCulture);
+                case TypeCode.UInt64:
+                    return ((ulong)@enum).ToString(CultureInfo.InvariantCulture);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(@enum));
+            }
         }
     }
 }

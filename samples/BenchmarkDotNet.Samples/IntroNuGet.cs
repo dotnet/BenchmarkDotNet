@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.CsProj;
 using Newtonsoft.Json;
 
 namespace BenchmarkDotNet.Samples
@@ -26,7 +23,8 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                var baseJob = Job.MediumRun.With(CsProjCoreToolchain.Current.Value);
+                var baseJob = Job.MediumRun;
+
                 Add(baseJob.WithNuGet("Newtonsoft.Json", "11.0.2").WithId("11.0.2"));
                 Add(baseJob.WithNuGet("Newtonsoft.Json", "11.0.1").WithId("11.0.1"));
                 Add(baseJob.WithNuGet("Newtonsoft.Json", "10.0.3").WithId("10.0.3"));

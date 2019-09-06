@@ -125,6 +125,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 reports: typesWithBenchmarks.Length > 0 ? CreateReports(typesWithBenchmarks, config) : ImmutableArray<BenchmarkReport>.Empty,
                 hostEnvironmentInfo: Environments.HostEnvironmentInfo.GetCurrent(),
                 resultsDirectoryPath: resultsDirectoryPath,
+                logFilePath: string.Empty,
                 totalTime: System.TimeSpan.Zero,
                 validationErrors: ImmutableArray<ValidationError>.Empty
             );

@@ -45,24 +45,21 @@ namespace BenchmarkDotNet.Running
         /// <summary>
         /// Run all available benchmarks.
         /// </summary>
-        [PublicAPI] public IEnumerable<Summary> RunAll() => Run(new[] { "--filter", "*" });
+        [PublicAPI] public IEnumerable<Summary> RunAll(IConfig config = null) => Run(new[] { "--filter", "*" }, config);
 
         /// <summary>
         /// Run all available benchmarks and join them to a single summary
         /// </summary>
-        [PublicAPI] public Summary RunAllJoined() => Run(new[] { "--filter", "*", "--join" }).Single();
+        [PublicAPI] public Summary RunAllJoined(IConfig config = null) => Run(new[] { "--filter", "*", "--join" }, config).Single();
 
         [PublicAPI]
         public IEnumerable<Summary> Run(string[] args = null, IConfig config = null)
         {
-            args = args ?? Array.Empty<string>();
-            config = config ?? DefaultConfig.Instance;
-
             // VS generates bad assembly binding redirects for ValueTuple for Full .NET Framework 
             // we need to keep the logic that uses it in a separate method and create DirtyAssemblyResolveHelper first
             // so it can ignore the version mismatch ;)
             using (DirtyAssemblyResolveHelper.Create())
-                return RunWithDirtyAssemblyResolveHelper(args, config);
+                return RunWithDirtyAssemblyResolveHelper(args ?? Array.Empty<string>(), config ?? DefaultConfig.Instance);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -109,7 +106,7 @@ namespace BenchmarkDotNet.Running
                 return Array.Empty<Summary>();
             }
 
-            return BenchmarkRunner.Run(filteredBenchmarks);
+            return BenchmarkRunnerClean.Run(filteredBenchmarks);
         }
 
         private static void PrintList(ILogger nonNullLogger, IConfig effectiveConfig, IReadOnlyList<Type> allAvailableTypesWithRunnableBenchmarks, CommandLineOptions options)

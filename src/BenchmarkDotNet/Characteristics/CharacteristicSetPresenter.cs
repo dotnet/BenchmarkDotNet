@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
 using JetBrains.Annotations;
@@ -71,7 +72,8 @@ namespace BenchmarkDotNet.Characteristics
                 typeof(IToolchain), // there is no need to set toolchain in child process, it was causing parameterless ctor requirement for all IToolchain implementations
                 typeof(IReadOnlyCollection<HardwareCounter>), // we don't need to export this array to child process
                 typeof(IReadOnlyList<Argument>),
-                typeof(IReadOnlyList<EnvironmentVariable>)
+                typeof(IReadOnlyList<EnvironmentVariable>),
+                typeof(Runtime) // there is no need to set runtime in child process, it was causing parameterless ctor requirement for all Runtime implementations
             };
 
             public override string ToPresentation(CharacteristicObject obj)

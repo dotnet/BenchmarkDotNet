@@ -110,7 +110,7 @@ You can also filter the benchmarks by categories:
 The `--runtimes` or just `-r` allows you to run the benchmarks for selected Runtimes. Available options are: 
 
 * Clr - BDN will either use Roslyn (if you run it as .NET app) or latest installed .NET SDK to build the benchmarks (if you run it as .NET Core app)
-* Core - if you run it as .NET Core app, BDN will use the same target framework moniker, if you run it as .NET app it's going to use netcoreapp2.0
+* Core - if you run it as .NET Core app, BDN will use the same target framework moniker, if you run it as .NET app it's going to use netcoreapp2.1
 * Mono - it's going to use the Mono from `$Path`, you can override  it with `--monoPath`
 * CoreRT - it's going to use latest CoreRT. Can be customized with additional options: `--ilcPath`, `--coreRtVersion` 
 * net46, net461, net462, net47, net471, net472 - to build and run benchmarks against specific .NET framework version 
@@ -197,7 +197,7 @@ dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --sta
 * `-e`, `--exporters` GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML
 * `-i`, `--inProcess` (Default: false) Run benchmarks in Process
 * `-a`, `--artifacts` Valid path to accessible directory
-* `--outliers` (Default: OnlyUpper) None/OnlyUpper/OnlyLower/All
+* `--outliers` (Default: RemoveUpper) DontRemove/RemoveUpper/RemoveLower/RemoveAll
 * `--affinity` Affinity mask to set for the benchmark process
 * `--allStats` (Default: false) Displays all statistics (min, max & more)
 * `--attribute` Run all methods with given attribute (applied to class or method)
@@ -208,3 +208,5 @@ dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --sta
 * `--stopOnFirstError` Stop on first error.
 * `--help` Display this help screen.
 * `--version` Display version information.
+* `--keepFiles` Determines if all auto-generated files should be kept or removed after running the benchmarks.
+* `--noOverwrite` Determines if the exported result files should not be overwritten.

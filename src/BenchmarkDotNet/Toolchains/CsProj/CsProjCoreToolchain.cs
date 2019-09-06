@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -19,8 +17,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI] public static readonly IToolchain NetCoreApp21 = From(NetCoreAppSettings.NetCoreApp21);
         [PublicAPI] public static readonly IToolchain NetCoreApp22 = From(NetCoreAppSettings.NetCoreApp22);
         [PublicAPI] public static readonly IToolchain NetCoreApp30 = From(NetCoreAppSettings.NetCoreApp30);
-
-        [PublicAPI] public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(() => From(NetCoreAppSettings.GetCurrentVersion()));
+        [PublicAPI] public static readonly IToolchain NetCoreApp31 = From(NetCoreAppSettings.NetCoreApp31);
+        [PublicAPI] public static readonly IToolchain NetCoreApp50 = From(NetCoreAppSettings.NetCoreApp50);
 
         private CsProjCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath) 
             : base(name, generator, builder, executor)

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using Microsoft.Diagnostics.Tracing.Session;
@@ -11,7 +12,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private readonly bool logFailuresOnly = true;
         private readonly bool filterByNamespace = true;
-        private string expectedNamespace;
+        private readonly string[] allowedNamespaces = null;
+        private string defaultNamespace;
 
         // ReSharper disable once EmptyConstructor parameterless ctor is mandatory for DiagnosersLoader.CreateDiagnoser
         public InliningDiagnoser() { }
@@ -27,11 +29,23 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             this.filterByNamespace = filterByNamespace;
         }
 
+        /// <summary>
+        /// creates new InliningDiagnoser
+        /// </summary>
+        /// <param name="logFailuresOnly">only the methods that failed to get inlined. True by default.</param>
+        /// <param name="allowedNamespaces">list of namespaces from which inlining message should be print.</param>
+        public InliningDiagnoser(bool logFailuresOnly = true, string[] allowedNamespaces = null)
+        {
+            this.logFailuresOnly = logFailuresOnly;
+            this.allowedNamespaces = allowedNamespaces;
+            this.filterByNamespace = true;
+        }
+
         public override IEnumerable<string> Ids => new[] { nameof(InliningDiagnoser) };
 
         protected override void AttachToEvents(TraceEventSession session, BenchmarkCase benchmarkCase)
         {
-            expectedNamespace = benchmarkCase.Descriptor.WorkloadMethod.DeclaringType.Namespace;
+            defaultNamespace = benchmarkCase.Descriptor.WorkloadMethod.DeclaringType.Namespace;
 
             Logger.WriteLine();
             Logger.WriteLineHeader(LogSeparator);
@@ -45,9 +59,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 if (StatsPerProcess.TryGetValue(jitData.ProcessID, out _))
                 {
                     var shouldPrint = !logFailuresOnly
-                        && (!filterByNamespace
-                            || jitData.InlinerNamespace.StartsWith(expectedNamespace)
-                            || jitData.InlineeNamespace.StartsWith(expectedNamespace));
+                        && ShouldPrintEventInfo(jitData.InlinerNamespace, jitData.InlineeNamespace);
 
                     if (shouldPrint)
                     {
@@ -86,6 +98,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         }
         
         private bool ShouldPrintEventInfo(string inlinerNamespace, string inlineeNamespace)
-            => !filterByNamespace || inlinerNamespace.StartsWith(expectedNamespace) || inlineeNamespace.StartsWith(expectedNamespace);
+            => !filterByNamespace || 
+                (allowedNamespaces?.Any(x=> inlineeNamespace.StartsWith(x) || inlinerNamespace.StartsWith(x)) 
+                    ?? (inlinerNamespace.StartsWith(defaultNamespace)) || inlineeNamespace.StartsWith(defaultNamespace));
     }
 }

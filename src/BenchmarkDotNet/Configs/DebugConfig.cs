@@ -16,8 +16,10 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CsProj;
-using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Validators;
+
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Configs
@@ -28,47 +30,29 @@ namespace BenchmarkDotNet.Configs
     [PublicAPI]
     public class DebugInProcessConfig : DebugConfig
     {
-        public override IEnumerable<Job> GetJobs() 
+        public override IEnumerable<Job> GetJobs()
             => new[]
             {
                 Job.Default
                     .With(
-                        new InProcessToolchain(
+                        new InProcessEmitToolchain(
                             TimeSpan.FromHours(1), // 1h should be enough to debug the benchmark
-                            BenchmarkActionCodegen.ReflectionEmit, 
                             true))
             };
     }
-    
+
     /// <summary>
     /// config which allows to build benchmarks in Debug
     /// </summary>
     [PublicAPI]
     public class DebugBuildConfig : DebugConfig
     {
-        public override IEnumerable<Job> GetJobs() 
-            => new[] 
-            { 
+        public override IEnumerable<Job> GetJobs()
+            => new[]
+            {
                 Job.Default
-                    .With(GetToolchainThatGeneratesProjectFile())
                     .WithCustomBuildConfiguration("Debug") // will do `-c Debug everywhere` 
             };
-        
-        private IToolchain GetToolchainThatGeneratesProjectFile()
-        {
-            switch (RuntimeInformation.GetCurrentRuntime())
-            {
-                case ClrRuntime _:
-                case MonoRuntime _:
-                    return CsProjClassicNetToolchain.Current.Value;
-                case CoreRuntime _:
-                    return CsProjCoreToolchain.Current.Value;
-                case CoreRtRuntime _:
-                    return CoreRtToolchain.LatestMyGetBuild;
-                default:
-                    throw new NotSupportedException("Runtime not supported!");
-            }
-        }
     }
 
     public abstract class DebugConfig : IConfig
@@ -78,7 +62,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IValidator> GetValidators() => Array.Empty<IValidator>();
         public IEnumerable<IColumnProvider> GetColumnProviders() => DefaultColumnProviders.Instance;
         public IEnumerable<IExporter> GetExporters() => Array.Empty<IExporter>();
-        public IEnumerable<ILogger> GetLoggers() => new []{ ConsoleLogger.Default };
+        public IEnumerable<ILogger> GetLoggers() => new[] { ConsoleLogger.Default };
         public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
         public IEnumerable<IAnalyser> GetAnalysers() => Array.Empty<IAnalyser>();
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();

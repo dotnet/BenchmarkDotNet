@@ -1,20 +1,37 @@
-﻿using System;
+using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
+    internal class HeapSession : Session
+    {
+        public HeapSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
+            : base(FullNameProvider.GetBenchmarkName(details.BenchmarkCase) + "Heap", details, config, creationTime)
+        {
+        }
+
+        protected override string FileExtension => ".userheap.etl";
+
+        internal override Session EnableProviders()
+        {
+            var osHeapExe = Path.GetFileName(Path.ChangeExtension(Details.Process.StartInfo.FileName, ".exe"));
+            TraceEventSession.EnableWindowsHeapProvider(osHeapExe);
+            return this;
+        }
+    }
+
     internal class UserSession : Session
     {
         public UserSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
@@ -43,13 +60,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             : base(KernelTraceEventParser.KernelSessionName, details, config, creationTime)
         {
         }
-        
+
         protected override string FileExtension => ".kernel.etl";
 
         internal override Session EnableProviders()
         {
-            var keywords = Config.KernelKeywords 
-                | KernelTraceEventParser.Keywords.ImageLoad // handles stack frames from native modules, SUPER IMPORTANT! 
+            var keywords = Config.KernelKeywords
+                | KernelTraceEventParser.Keywords.ImageLoad // handles stack frames from native modules, SUPER IMPORTANT!
                 | KernelTraceEventParser.Keywords.Profile; // CPU stacks
 
             if (Details.Config.GetHardwareCounters().Any())
@@ -70,7 +87,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             return this;
         }
     }
-    
+
     internal abstract class Session : IDisposable
     {
         protected abstract string FileExtension { get; }
@@ -78,7 +95,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         protected TraceEventSession TraceEventSession { get; }
 
         protected DiagnoserActionParameters Details { get; }
-        
+
         protected EtwProfilerConfig Config { get; }
 
         internal string FilePath { get; }
@@ -92,11 +109,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             TraceEventSession = new TraceEventSession(sessionName, FilePath)
             {
                 BufferSizeMB = config.BufferSizeInMb,
-                CpuSampleIntervalMSec = config.CpuSampleIntervalInMiliseconds
+                CpuSampleIntervalMSec = config.CpuSampleIntervalInMiliseconds,
             };
 
             Console.CancelKeyPress += OnConsoleCancelKeyPress;
-            NativeWindowsConsoleHelper.OnExit += OnConsoleCancelKeyPress;
+            AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
         }
 
         public void Dispose() => TraceEventSession.Dispose();
@@ -106,40 +123,28 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             TraceEventSession.Stop();
 
             Console.CancelKeyPress -= OnConsoleCancelKeyPress;
-            NativeWindowsConsoleHelper.OnExit -= OnConsoleCancelKeyPress;
+            AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
         }
 
         internal abstract Session EnableProviders();
 
-        internal string MergeFiles(Session other) 
-        {
-            //  `other` is not used here because MergeInPlace expects .etl and .kernel.etl files in this folder
-            // it searches for them and merges into a single file
-            TraceEventSession.MergeInPlace(FilePath, TextWriter.Null);
-
-            return FilePath;
-        }
-
         private void OnConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e) => Stop();
+
+        private void OnProcessExit(object sender, EventArgs e) => Stop();
 
         private string GetFilePath(DiagnoserActionParameters details, DateTime creationTime)
         {
-            var folderPath = details.Config.ArtifactsPath;
+            string fileName = $@"{FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type)}.{FullNameProvider.GetMethodName(details.BenchmarkCase)}";
 
-            folderPath = Path.Combine(folderPath, $"{creationTime:yyyyMMdd-hhmm}-{Process.GetCurrentProcess().Id}");
-            
             // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
-            if (details.Config.GetJobs().Select(job => job.Infrastructure.Toolchain).Distinct().Count() > 1)
-                folderPath = Path.Combine(folderPath, details.BenchmarkCase.Job.Infrastructure.Toolchain.Name);
+            if (details.Config.GetJobs().Select(job => job.GetToolchain()).Distinct().Count() > 1)
+                fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.Job.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
 
-            if (!string.IsNullOrWhiteSpace(details.BenchmarkCase.Descriptor.Type.Namespace))
-                folderPath = Path.Combine(folderPath, details.BenchmarkCase.Descriptor.Type.Namespace.Replace('.', Path.DirectorySeparatorChar));
+            fileName += $"-{creationTime.ToString(BenchmarkRunnerClean.DateTimeFormat)}";
 
-            folderPath = Path.Combine(folderPath, FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type, includeNamespace: false));
+            fileName = FolderNameHelper.ToFolderName(fileName);
 
-            var fileName = FolderNameHelper.ToFolderName(FullNameProvider.GetMethodName(details.BenchmarkCase));
-
-            return Path.Combine(folderPath, $"{fileName}{FileExtension}");
+            return Path.Combine(details.Config.ArtifactsPath, $"{fileName}{FileExtension}");
         }
 
         private string EnsureFolderExists(string filePath)

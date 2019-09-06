@@ -7,6 +7,7 @@ using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Exporters;
@@ -23,6 +24,7 @@ using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using Xunit;
 using Xunit.Abstractions;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -98,6 +100,16 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(1, easyJob.Run.InvocationCount);
         }
 
+        [Fact]
+        public void UserCanChooseStrategy()
+        {
+            var configEasy = ConfigParser.Parse(new[] { "--strategy", "ColdStart" }, new OutputLogger(Output)).config;
+
+            var job = configEasy.GetJobs().Single();
+
+            Assert.Equal(RunStrategy.ColdStart, job.Run.RunStrategy);
+        }
+
         [FactDotNetCoreOnly("When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..")]
         public void UnknownConfigMeansFailure()
         {
@@ -121,7 +133,7 @@ namespace BenchmarkDotNet.Tests
             Assert.False(ConfigParser.Parse(new[] { "--coreRun", nonExistingFile }, new OutputLogger(Output)).isSuccess);
         }
 
-        [Fact]
+        [FactDotNetCoreOnly("Detecting current version of .NET Core works only for .NET Core processes")]
         public void CoreRunConfigParsedCorrectlyWhenRuntimeNotSpecified()
         {
             var fakeDotnetCliPath = typeof(object).Assembly.Location;
@@ -132,7 +144,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             CoreRunToolchain toolchain = config.GetJobs().Single().GetToolchain() as CoreRunToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker); // runtime was not specified so the default was used
+            Assert.Equal(RuntimeInformation.GetCurrentRuntime().MsBuildMoniker, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker); // runtime was not specified so the current was used
             Assert.Equal(fakeCoreRunPath, toolchain.SourceCoreRun.FullName);
             Assert.Equal(fakeDotnetCliPath, toolchain.CustomDotNetCliPath.FullName);
             Assert.Equal(fakeRestorePackages, toolchain.RestorePath.FullName);
@@ -180,8 +192,8 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime mono && mono.CustomPath == fakeMonoPath));
         }
-        
-        [Fact]
+
+        [FactWindowsOnly("Testing local builds of Full .NET Framework is supported only on Windows")]
         public void ClrVersionParsedCorrectly()
         {
             const string clrVersion = "secret";
@@ -195,7 +207,7 @@ namespace BenchmarkDotNet.Tests
         public void CoreRtPathParsedCorrectly()
         {
             var fakeCoreRtPath =  new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory;
-            var config = ConfigParser.Parse(new[] { "-r", "corert", "--ilcPath", fakeCoreRtPath.FullName }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "-r", "corert30", "--ilcPath", fakeCoreRtPath.FullName }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
             CoreRtToolchain toolchain = config.GetJobs().Single().GetToolchain() as CoreRtToolchain;
@@ -274,13 +286,13 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
-            var config = ConfigParser.Parse(new[] { "--runtimes", "net461", "MONO", "netcoreapp3.0", "CoreRT"}, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "--runtimes", "net461", "MONO", "netcoreapp3.0", "CoreRT30"}, new OutputLogger(Output)).config;
 
-            Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as basline
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime));
+            Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
+            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net461"));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime));
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRtRuntime));
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRtRuntime));
+            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRuntime.TargetFrameworkMoniker == TargetFrameworkMoniker.NetCoreApp30));
+            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRtRuntime coreRtRuntime && coreRtRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRtRuntime.TargetFrameworkMoniker == TargetFrameworkMoniker.CoreRt30));
         }
         
         [Theory]
@@ -296,7 +308,7 @@ namespace BenchmarkDotNet.Tests
             
             var mockSummary = MockFactory.CreateSummary(config);
 
-            Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as basline
+            Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
             Assert.False(config.GetJobs().Last().Meta.Baseline);
 
             var statisticalTestColumn = config.GetColumnProviders().SelectMany(columnProvider => columnProvider.GetColumns(mockSummary)).OfType<StatisticalTestColumn>().Single();

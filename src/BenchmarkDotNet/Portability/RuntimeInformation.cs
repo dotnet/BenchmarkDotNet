@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
 using System.Management;
 using System.Reflection;
@@ -42,17 +41,13 @@ namespace BenchmarkDotNet.Portability
             => FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase) 
                && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
 
-        public static bool InDocker => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
+        public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
                 
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
         internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
-        internal static string GetArchitecture() => Is64BitPlatform() ? "64bit" : "32bit";
-
-        private static string DockerSdkVersion => Environment.GetEnvironmentVariable("DOTNET_VERSION");
-
-        private static string DockerAspnetSdkVersion => Environment.GetEnvironmentVariable("ASPNETCORE_VERSION");
+        internal static string GetArchitecture() => GetCurrentPlatform().ToString();
         
         internal static bool IsWindows() => IsOSPlatform(OSPlatform.Windows);
 
@@ -121,20 +116,6 @@ namespace BenchmarkDotNet.Portability
             return null;
         }
 
-        internal static string GetNetCoreVersion() => InDocker ? GetDockerNetCoreVersion() : GetBaseNetCoreVersion();
-
-        private static string GetDockerNetCoreVersion() => string.IsNullOrEmpty(DockerSdkVersion) ? DockerAspnetSdkVersion : DockerSdkVersion;
-
-        private static string GetBaseNetCoreVersion()
-        {
-            var assembly = typeof(GCSettings).GetTypeInfo().Assembly;
-            var assemblyPath = assembly.CodeBase.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
-            int netCoreAppIndex = Array.IndexOf(assemblyPath, "Microsoft.NETCore.App");
-            if (netCoreAppIndex > 0 && netCoreAppIndex < assemblyPath.Length - 2)
-                return assemblyPath[netCoreAppIndex + 1];
-            return null;            
-        }
-        
         internal static string GetRuntimeVersion()
         {
             if (IsMono)
@@ -161,13 +142,11 @@ namespace BenchmarkDotNet.Portability
             }
             else if (IsFullFramework)
             {
-                string frameworkVersion = FrameworkVersionHelper.GetCurrentNetFrameworkVersion();
-                string clrVersion = Environment.Version.ToString();
-                return $".NET Framework {frameworkVersion} (CLR {clrVersion})";
+                return FrameworkVersionHelper.GetFrameworkDescription();
             }
             else if (IsNetCore)
             {
-                string runtimeVersion = GetNetCoreVersion() ?? "?";
+                string runtimeVersion = CoreRuntime.TryGetVersion(out var version) ? version.ToString() : "?";
 
                 var coreclrAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
                 var corefxAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(Regex).GetTypeInfo().Assembly.Location);
@@ -186,15 +165,15 @@ namespace BenchmarkDotNet.Portability
         {
             //do not change the order of conditions because it may cause incorrect determination of runtime
             if (IsMono)
-                return Runtime.Mono;
+                return MonoRuntime.Default;
             if (IsFullFramework)
-                return Runtime.Clr;
+                return ClrRuntime.GetCurrentVersion();
             if (IsNetCore)
-                return Runtime.Core;
+                return CoreRuntime.GetCurrentVersion();
             if (IsCoreRT)
-                return Runtime.CoreRT;
+                return CoreRtRuntime.GetCurrentVersion();
             
-            throw new NotSupportedException("Unknown .NET Framework"); // todo: adam sitnik fix it
+            throw new NotSupportedException("Unknown .NET Runtime");
         }
 
         public static Platform GetCurrentPlatform()
@@ -216,17 +195,6 @@ namespace BenchmarkDotNet.Portability
 
         public static bool Is64BitPlatform() => IntPtr.Size == 8;
 
-        private static IEnumerable<JitModule> GetJitModules()
-        {
-            return
-                Process.GetCurrentProcess().Modules
-                    .OfType<ProcessModule>()
-                    .Where(module => module.ModuleName.Contains("jit"))
-                    .Select(module => new JitModule(Path.GetFileNameWithoutExtension(module.FileName), module.FileVersionInfo.ProductVersion));
-        }
-
-        internal static string GetJitModulesInfo() => string.Join(";", GetJitModules().Select(m => m.Name + "-v" + m.Version));
-
         internal static bool HasRyuJit()
         {
             if (IsMono)
@@ -243,24 +211,16 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetJitInfo()
         {
-            if (IsCoreRT)
+            if (IsCoreRT || IsNetNative)
                 return "AOT";
             if (IsMono)
                 return ""; // There is no helpful information about JIT on Mono
-            if (IsNetCore)
-                return "RyuJIT"; // CoreCLR supports only RyuJIT
+            if (IsNetCore || HasRyuJit()) // CoreCLR supports only RyuJIT
+                return "RyuJIT";
+            if (IsFullFramework)
+                return  "LegacyJIT";
 
-            // We are working on Full CLR, so there are only LegacyJIT and RyuJIT
-            var modules = GetJitModules().ToArray();
-            string jitName = HasRyuJit() ? "RyuJIT" : "LegacyJIT";
-            if (modules.Length == 1)
-            {
-                // If we have only one JIT module, we know the version of the current JIT compiler
-                return jitName + "-v" + modules[0].Version;
-            }
-
-            // Otherwise, let's just print information about all modules
-            return jitName + "/" + GetJitModulesInfo();
+            return Unknown;
         }
 
         internal static IntPtr GetCurrentAffinity() => Process.GetCurrentProcess().TryGetAffinity() ?? default;

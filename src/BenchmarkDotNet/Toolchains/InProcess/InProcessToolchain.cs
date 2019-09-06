@@ -1,8 +1,8 @@
 ﻿using System;
+
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.InProcess
 {
@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
     ///     A toolchain to run the benchmarks in-process.
     /// </summary>
     /// <seealso cref="IToolchain" />
-    [PublicAPI]
+    [Obsolete("Please use BenchmarkDotNet.Toolchains.InProcess.NoEmit.* classes")]
     public sealed class InProcessToolchain : IToolchain
     {
         /// <summary>The default toolchain instance.</summary>
@@ -63,8 +63,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <value>The executor.</value>
         public IExecutor Executor { get; }
 
-        /// <summary>Returns a <see cref="String" /> that represents this instance.</summary>
-        /// <returns>A <see cref="String" /> that represents this instance.</returns>
+        public bool IsInProcess => true;
+
+        /// <summary>Returns a <see cref="string" /> that represents this instance.</summary>
+        /// <returns>A <see cref="string" /> that represents this instance.</returns>
         public override string ToString() => GetType().Name;
     }
 }

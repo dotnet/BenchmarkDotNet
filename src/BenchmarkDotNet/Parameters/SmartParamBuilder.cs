@@ -23,13 +23,24 @@ namespace BenchmarkDotNet.Parameters
         {
             var unwrappedValue = valuesInfo.values[sourceIndex];
 
-            if (unwrappedValue is object[] array && parameterDefinitions.Length > 1)
+            if (unwrappedValue is object[] array)
             {
-                if (parameterDefinitions.Length != array.Length)
-                    throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of arguments provided by [ArgumentsSource({valuesInfo.source.Name})]! {array.Length} instead of {parameterDefinitions.Length}.");
+                // the user provided object[] for a benchmark accepting a single argument
+                if (parameterDefinitions.Length == 1 && array.Length == 1 
+                    && array[0].GetType() == benchmark.GetParameters().FirstOrDefault()?.ParameterType) // the benchmark that accepts an object[] as argument
+                {
+                    return new ParameterInstances(
+                        new[] { Create(parameterDefinitions, array[0], valuesInfo.source, sourceIndex, argumentIndex: 0) });
+                }
 
-                return new ParameterInstances(
-                    array.Select((value, argumentIndex) => Create(parameterDefinitions, value, valuesInfo.source, sourceIndex, argumentIndex)).ToArray());
+                if (parameterDefinitions.Length > 1)
+                {
+                    if (parameterDefinitions.Length != array.Length)
+                        throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of arguments provided by [ArgumentsSource({valuesInfo.source.Name})]! {array.Length} instead of {parameterDefinitions.Length}.");
+
+                    return new ParameterInstances(
+                        array.Select((value, argumentIndex) => Create(parameterDefinitions, value, valuesInfo.source, sourceIndex, argumentIndex)).ToArray());
+                }
             }
 
             if (parameterDefinitions.Length == 1)
@@ -72,7 +83,7 @@ namespace BenchmarkDotNet.Parameters
 
         public string ToSourceCode()
         {
-            string cast = $"({Value.GetType().GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
+            string cast = $"({parameterDefinitions[argumentIndex].ParameterType.GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
 
             string callPostfix = source is PropertyInfo ? string.Empty : "()";
 

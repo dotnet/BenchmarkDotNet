@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -12,15 +13,14 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.InProcess
 {
     /// <summary>
     /// Implementation of <see cref="IExecutor" /> for in-process benchmarks.
     /// </summary>
-    [PublicAPI]
     [SuppressMessage("ReSharper", "ArrangeBraces_using")]
+    [Obsolete("Please use BenchmarkDotNet.Toolchains.InProcess.NoEmit.* classes")]
     public class InProcessExecutor : IExecutor
     {
         private static readonly TimeSpan UnderDebuggerTimeout = TimeSpan.FromDays(1);
@@ -127,13 +127,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         {
             if (exitCode != 0)
             {
-                return new ExecuteResult(true, exitCode, Array.Empty<string>(), Array.Empty<string>());
+                return new ExecuteResult(true, exitCode, default, Array.Empty<string>(), Array.Empty<string>());
             }
 
             var lines = runResults.GetMeasurements().Select(measurement => measurement.ToOutputLine()).ToList();
             lines.Add(runResults.GCStats.ToOutputLine());
+            lines.Add(runResults.ThreadingStats.ToOutputLine());
 
-            return new ExecuteResult(true, 0, lines.ToArray(), Array.Empty<string>());
+            return new ExecuteResult(true, 0, default, lines.ToArray(), Array.Empty<string>());
         }
     }
 }

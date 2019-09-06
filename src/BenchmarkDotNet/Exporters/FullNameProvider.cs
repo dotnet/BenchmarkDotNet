@@ -8,10 +8,11 @@ using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Exporters
 {
-    internal static class FullNameProvider 
+    public static class FullNameProvider 
     {
         private static readonly IReadOnlyDictionary<Type, string> Aliases = new Dictionary<Type, string>
         {
@@ -45,10 +46,10 @@ namespace BenchmarkDotNet.Exporters
             { typeof(char?), "char?" }
         };
         
-        internal static string GetBenchmarkName(BenchmarkCase benchmarkCase)
+        [PublicAPI("used by the dotnet/performance repository")]
+        public static string GetBenchmarkName(BenchmarkCase benchmarkCase)
         {
             var type = benchmarkCase.Descriptor.Type;
-            var method = benchmarkCase.Descriptor.WorkloadMethod;
 
             // we can't just use type.FullName because we need sth different for generics (it reports SimpleGeneric`1[[System.Int32, mscorlib, Version=4.0.0.0)
             var name = new StringBuilder();

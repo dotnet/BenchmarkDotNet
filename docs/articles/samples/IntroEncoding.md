@@ -5,8 +5,8 @@ uid: BenchmarkDotNet.Samples.IntroEncoding
 ## Sample: IntroEncoding
 
 BenchmarkDotNet currently supports two encodings for output - `ASCII` and `Unicode`.
-By default `ASCII` is setted.
-`Unicode` allows to use special characters, like `μ` and `±`. 
+By default `ASCII` is set.
+`Unicode` allows to use special characters, like `μ` and `±`.
 *Encoding* allows you to set encoding in your benchmark.
 
 > [!WARNING]

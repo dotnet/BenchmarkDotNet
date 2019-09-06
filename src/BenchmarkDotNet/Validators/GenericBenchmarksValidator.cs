@@ -19,6 +19,6 @@ namespace BenchmarkDotNet.Validators
                 .SelectMany(assembly => assembly.GetRunnableBenchmarks())
                 .SelectMany(GenericBenchmarksBuilder.BuildGenericsIfNeeded)
                 .Where(result => !result.isSuccess)
-                .Select(result => new ValidationError(false, $"Genetic type {result.result.Name} failed to build due to wrong type argument or arguments count, ignoring."));
+                .Select(result => new ValidationError(false, $"Generic type {result.result.Name} failed to build due to wrong type argument or arguments count, ignoring."));
     }
 }

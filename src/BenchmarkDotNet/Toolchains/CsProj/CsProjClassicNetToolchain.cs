@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -24,21 +20,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI] public static readonly IToolchain Net47 = new CsProjClassicNetToolchain("net47");
         [PublicAPI] public static readonly IToolchain Net471 = new CsProjClassicNetToolchain("net471");
         [PublicAPI] public static readonly IToolchain Net472 = new CsProjClassicNetToolchain("net472");
-        private static readonly IToolchain Default = Net461; // the lowest version we support
-
-        private static readonly Dictionary<string, IToolchain> Toolchains = new Dictionary<string, IToolchain>
-        {
-            { "4.6.1", Net461 },
-            { "4.6.2", Net462 },
-            { "4.7", Net47 },
-            { "4.7.1", Net471 },
-            { "4.7.2", Net472 }
-        };
-
-        [PublicAPI]
-        public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(GetCurrentVersion);
-
-        private string targetFrameworkMoniker;
+        [PublicAPI] public static readonly IToolchain Net48 = new CsProjClassicNetToolchain("net48");
 
         private CsProjClassicNetToolchain(string targetFrameworkMoniker, string packagesPath = null, TimeSpan? timeout = null)
             : base(targetFrameworkMoniker,
@@ -46,7 +28,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath: null, timeout: timeout),
                 new Executor())
         {
-            this.targetFrameworkMoniker = targetFrameworkMoniker;
         }
 
         public static IToolchain From(string targetFrameworkMoniker, string packagesPath = null, TimeSpan? timeout = null)
@@ -67,19 +48,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 return false;
 
             return true;
-        }
-
-        private static IToolchain GetCurrentVersion()
-        {
-            if (!RuntimeInformation.IsWindows())
-                return Net461; // we return .NET 4.6 which during validation will tell the user about lack of support
-            
-            // this logic is put to a separate method to avoid any assembly loading issues on non Windows systems
-            string version = FrameworkVersionHelper.GetLatestNetDeveloperPackVersion();
-            if (version == null) // .NET Developer Pack is not installed 
-                return Default;
-            
-            return Toolchains.TryGetValue(version, out var toolchain) ? toolchain : Default;
         }
     }
 }

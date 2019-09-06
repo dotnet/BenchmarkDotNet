@@ -61,10 +61,27 @@
     "globalMetadata" :
     {
       "_appTitle" : "BenchmarkDotNet",
-      "_appFooter" : "Copyright &copy; 2013–2018 .NET Foundation and contributors",
+      "_appFooter" : "Copyright &copy; 2013–2019 .NET Foundation and contributors",
       "_appLogoPath" : "logo/icon.svg",
       "_appFaviconPath": "logo/icon-32.png",
-      "_enableSearch": "true"
+      "_enableSearch": false
+    },
+    "sitemap":
+    {
+      "baseUrl": "https://benchmarkdotnet.org/",
+      "priority": 0.8,
+      "changefreq": "monthly",
+      "fileOptions":{
+          "**/articles/**": {
+              "priority": 0.8
+          },
+          "**/changelog/**": {
+              "priority": 0.5
+          },
+          "**/api/**": {
+              "priority": 0.3
+          }
+      }
     }
   }
 }

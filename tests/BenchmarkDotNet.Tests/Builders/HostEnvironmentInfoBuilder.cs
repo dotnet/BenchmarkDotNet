@@ -78,7 +78,6 @@ namespace BenchmarkDotNet.Tests.Builders
             IsConcurrentGC = isConcurrentGC;
             IsServerGC = isServerGC;
             JitInfo = jitInfo;
-            JitModules = jitModules;
             OsVersion = new Lazy<string>(() => osVersion);
             CpuInfo = new Lazy<CpuInfo>(() => cpuInfo);
             RuntimeVersion = runtimeVersion;

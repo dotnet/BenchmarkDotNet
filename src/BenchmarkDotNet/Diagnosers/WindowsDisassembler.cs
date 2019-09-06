@@ -7,8 +7,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Properties;
@@ -88,8 +88,10 @@ namespace BenchmarkDotNet.Diagnosers
             var dir = new FileInfo(assemblyWithDisassemblersInResources.Location).Directory ?? throw new DirectoryNotFoundException();
             string disassemblerPath = Path.Combine(
                     dir.FullName,
-                    BenchmarkDotNetInfo.FullVersion // possible update
-                    + exeName); // separate process per architecture!!
+                    FolderNameHelper.ToFolderName(BenchmarkDotNetInfo.FullVersion), // possible update
+                    exeName); // separate process per architecture!!
+
+            Path.GetDirectoryName(disassemblerPath).CreateIfNotExists();
 
 #if !PRERELEASE_DEVELOP // for development we always want to copy the file to not omit any dev changes (Properties.BenchmarkDotNetInfo.FullVersion in file name is not enough)
             if (File.Exists(disassemblerPath))

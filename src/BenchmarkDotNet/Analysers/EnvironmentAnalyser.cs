@@ -2,10 +2,12 @@
 using System.Linq;
 using System.Reflection;
 using System.Text;
+
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
 namespace BenchmarkDotNet.Analysers
 {
@@ -54,7 +56,7 @@ namespace BenchmarkDotNet.Analysers
             foreach (var av in avProducts)
                 sb.AppendLine($"        - {av}");
 
-            sb.AppendLine($"Use {nameof(InProcessToolchain)} to avoid new process creation.");
+            sb.AppendLine($"Use {nameof(InProcessEmitToolchain)} or {nameof(InProcessNoEmitToolchain)} to avoid new process creation.");
 
             return sb.ToString();
         }
