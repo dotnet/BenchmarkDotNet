@@ -4,6 +4,10 @@
     "skipRestore": {
       "longName": "no-restore",
       "shortName": ""
+    },
+    "consoleApp": {
+      "longName": "console-app",
+      "shortName": ""
     }
   }
 }

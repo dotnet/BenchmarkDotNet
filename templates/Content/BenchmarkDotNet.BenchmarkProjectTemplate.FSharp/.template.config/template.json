@@ -19,13 +19,13 @@
 
   "sourceName": "_BenchmarkProjectName_",
   "preferNameDirectory": true,
-  "defaultName": "MyBenchmark",
+  "defaultName": "BenchmarkSuite",
   "symbols": {
     "benchmarkName": {
       "type": "parameter",
       "datatype": "string",
       "description": "The name of the benchmark class.",
-      "defaultValue": "MyBenchmark",
+      "defaultValue": "Benchmarks",
       "FileRename": "_BenchmarkName_",
       "replaces": "$(BenchmarkName)"
     },
@@ -47,6 +47,12 @@
       "datatype": "bool",
       "description": "If specified, skips the automatic restore of the project on create.",
       "defaultValue": "false"
+    },
+    "consoleApp": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "If specified, the project is set up as console app.",
+      "defaultValue": "false"
     }
   },
   "sources": [
@@ -60,7 +66,13 @@
         {
           "condition": "(!config)",
           "exclude": [
-            "BenchmarkConfig.cs"
+            "BenchmarkConfig.fs"
+          ]
+        },
+        {
+          "condition": "(!consoleApp)",
+          "exclude": [
+            "Program.fs"
           ]
         }
       ]

@@ -1,4 +1,4 @@
-﻿module Benchmark 
+﻿module _BenchmarkProjectName_ 
 
 open System
 open BenchmarkDotNet

@@ -1,8 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Condition="'$(consoleApp)' == 'true'">
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(consoleApp)' == 'false'">
+    <TargetFrameworks>$(Frameworks)</TargetFrameworks >
+  </PropertyGroup>
   <PropertyGroup>
-    <TargetFrameworks>$(Frameworks)</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>true</Optimize>

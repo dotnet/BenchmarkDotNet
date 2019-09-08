@@ -41,19 +41,28 @@ dotnet new benchmark -lang VB
 
 ## Project template specific options
 
-The template projects has four additional options - all of them are optional.
+The template projects has five additional options - all of them are optional.
+
+By default a class library project targeting netstandard2.0 is created.
+You can specify `-f` or `--frameworks` to change targeting to one or more frameworks:
+
+```log
+dotnet new benchmark -f netstandard2.0;net472
+```
+
+The option `--console-app` creates a console app project targeting `netcoreapp3.0` with an entry point:
+
+```log
+dotnet new benchmark --console-app
+```
+
+This lets you run the benchmarks from console (`dotnet run`) or from your favorite IDE.
+**Note:** option `-f` or `--frameworks` will be ignored when `--console-app` is set.
 
 The option `-b` or `--benchmarkName` sets the name of the benchmark class:
 
 ```log
 dotnet new benchmark -b Md5VsSha256
-```
-
-By default it will create benchmark project targeted to netstandard2.0.
-You can specify `-f` or `--frameworks` to change targeting to one or more frameworks:
-
-```log
-dotnet new benchmark -f netstandard2.0;net472
 ```
 
 BenchmarkDotNet lets you create a dedicated configuration class (see [Configs](xref:docs.configs)) to customize the execution of your benchmarks.

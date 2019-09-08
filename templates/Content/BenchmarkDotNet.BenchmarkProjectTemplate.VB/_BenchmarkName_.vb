@@ -9,7 +9,14 @@ Namespace _BenchmarkProjectName_
 #End If
     Public Class $(BenchmarkName)
         <Benchmark>
-        Public Sub YourBenchmark()
+        Public Sub Scenario1()
+        
+        ' Implement your benchmark here
+
+        End Sub
+
+        <Benchmark>
+        Public Sub Scenario2()
         
         ' Implement your benchmark here
 
