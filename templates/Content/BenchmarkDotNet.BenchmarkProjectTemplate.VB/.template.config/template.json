@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "identity": "BenchmarkDotNet.BenchmarkProjectTemplate.VB",
+  "name": "Benchmark Project",
+  "shortName": "benchmark",
+  "groupIdentity": "BenchmarkDotNet",
+  "classifications": [
+    "Benchmark",
+    "Library"
+  ],
+  "precedence": "3000",
+  "tags": {
+    "language": "VB",
+    "type": "project"
+  },
+  "description": "A project template for creating benchmarks.",
+  "author": ".NET Foundation and contributors",
+  "generatorVersions": "[1.0.0.0-*)",
+
+  "sourceName": "_BenchmarkProjectName_",
+  "preferNameDirectory": true,
+  "defaultName": "BenchmarkSuite",
+  "symbols": {
+    "benchmarkName": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "The name of the benchmark class.",
+      "defaultValue": "Benchmarks",
+      "FileRename": "_BenchmarkName_",
+      "replaces": "$(BenchmarkName)"
+    },
+    "frameworks": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "The target framework(s) for the project (e.g. netstandard2.0;net472).",
+      "defaultValue": "netstandard2.0",
+      "replaces": "$(Frameworks)"
+    },
+    "config": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Adds a benchmark config class.",
+      "defaultValue": "false"
+    },
+    "skipRestore": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "If specified, skips the automatic restore of the project on create.",
+      "defaultValue": "false"
+    },
+    "consoleApp": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "If specified, the project is set up as console app.",
+      "defaultValue": "false"
+    }
+  },
+  "sources": [
+    {
+      "source": "./",
+      "target": "./",
+      "exclude": [
+        ".template.config/**"
+      ],
+      "modifiers": [
+        {
+          "condition": "(!config)",
+          "exclude": [
+            "BenchmarkConfig.vb"
+          ]
+        },
+        {
+          "condition": "(!consoleApp)",
+          "exclude": [
+            "Program.vb"
+          ]
+        }
+      ]
+    }
+  ],
+  "primaryOutputs": [
+    {
+      "path": "_BenchmarkProjectName_.vbproj"
+    }
+  ],
+  "postActions": [
+    {
+      "condition": "(!skipRestore)",
+      "description": "Restore NuGet packages required by this project.",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet restore'"
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
+}

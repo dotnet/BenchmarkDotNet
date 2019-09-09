@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Condition="'$(consoleApp)' == 'true'">
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(consoleApp)' == 'false'">
+    <TargetFrameworks>$(Frameworks)</TargetFrameworks >
+  </PropertyGroup>
+  <PropertyGroup>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <Configuration>Release</Configuration>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <Tailcalls>true</Tailcalls>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
+    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.11.5" Condition="'$(OS)' == 'Windows_NT'"/>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(BenchmarkName).fs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(config)' == true">
+    <Compile Include="BenchmarkConfig.fs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(consoleApp)' == true">
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+</Project>
