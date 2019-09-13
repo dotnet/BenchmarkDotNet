@@ -1,11 +1,11 @@
-﻿using System.Reflection;
-using BenchmarkDotNet.Characteristics;
+﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.CsProj
@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             var benchmarkAssembly = benchmarkCase.Descriptor.Type.Assembly;
             if (benchmarkAssembly.IsLinqPad())
             {
-                logger.WriteLineError($"Currently LINQPad does not support .NET Core benchmarks (see dotnet/BenchmarkDotNet#975), benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
+                logger.WriteLineError($"Currently CsProjCoreToolchain does not support LINQPad 6+. Please use {nameof(InProcessEmitToolchain)} instead. Benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
                 return false;
             }
 
