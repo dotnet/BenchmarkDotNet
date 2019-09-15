@@ -17,13 +17,15 @@ namespace BenchmarkDotNet.Loggers
         {
             // Detect if being run from LINQPad; see https://github.com/dotnet/BenchmarkDotNet/issues/445#issuecomment-300723741
             MethodInfo withStyle = null;
-            if (AppDomain.CurrentDomain.FriendlyName.StartsWith("LINQPad Query Server", StringComparison.OrdinalIgnoreCase))
+            if (AppDomain.CurrentDomain.FriendlyName.StartsWith("LINQPad", StringComparison.OrdinalIgnoreCase))
             {
                 try
                 {
                     // Use reflection to avoid taking a dependency on the LINQPad assembly
-                    var util = Type.GetType("LINQPad.Util, LINQPad, Version=1.0.0.0, Culture=neutral, PublicKeyToken=21353812cd2a2db5", throwOnError: true);
-                    withStyle = util.GetMethod("WithStyle", BindingFlags.Static | BindingFlags.Public);
+                    var util = Type.GetType("LINQPad.Util, LINQPad, Version=1.0.0.0, Culture=neutral, PublicKeyToken=21353812cd2a2db5", throwOnError: false) ??
+                               Type.GetType("LINQPad.Util, LINQPad.Runtime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=21353812cd2a2db5", throwOnError: false);
+
+                    withStyle = util?.GetMethod("WithStyle", BindingFlags.Static | BindingFlags.Public);
                 }
                 catch (Exception)
                 {

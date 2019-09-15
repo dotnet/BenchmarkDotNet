@@ -286,7 +286,7 @@ namespace BenchmarkDotNet.Running
 
         private static BuildResult Build(BuildPartition buildPartition, string rootArtifactsFolderPath, ILogger buildLogger)
         {
-            var toolchain = buildPartition.RepresentativeBenchmarkCase.Job.GetToolchain(); // it's guaranteed that all the benchmarks in single partition have same toolchain
+            var toolchain = buildPartition.RepresentativeBenchmarkCase.GetToolchain(); // it's guaranteed that all the benchmarks in single partition have same toolchain
 
             var generateResult = toolchain.Generator.GenerateProject(buildPartition, buildLogger, rootArtifactsFolderPath);
 
@@ -305,7 +305,7 @@ namespace BenchmarkDotNet.Running
 
         private static BenchmarkReport RunCore(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, IResolver resolver, BuildResult buildResult)
         {
-            var toolchain = benchmarkCase.Job.GetToolchain();
+            var toolchain = benchmarkCase.GetToolchain();
 
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmarkCase.DisplayInfo);
@@ -495,7 +495,7 @@ namespace BenchmarkDotNet.Running
 
         private static BenchmarkRunInfo[] GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, ILogger logger, IResolver resolver)
             => benchmarkRunInfos.Select(info => new BenchmarkRunInfo(
-                    info.BenchmarksCases.Where(benchmark => benchmark.Job.GetToolchain().IsSupported(benchmark, logger, resolver)).ToArray(),
+                    info.BenchmarksCases.Where(benchmark => benchmark.GetToolchain().IsSupported(benchmark, logger, resolver)).ToArray(),
                     info.Type,
                     info.Config))
                 .Where(infos => infos.BenchmarksCases.Any())

@@ -210,6 +210,6 @@ namespace BenchmarkDotNet.Extensions
                 (!typeInfo.IsGenericTypeDefinition || typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any())
                     && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it       
 
-        internal static bool IsLinqPad(this Assembly assembly) => assembly.FullName.ToUpper().Contains("LINQPAD");
+        internal static bool IsLinqPad(this Assembly assembly) => assembly.FullName.IndexOf("LINQPAD", StringComparison.OrdinalIgnoreCase) >= 0;
     }
 }
