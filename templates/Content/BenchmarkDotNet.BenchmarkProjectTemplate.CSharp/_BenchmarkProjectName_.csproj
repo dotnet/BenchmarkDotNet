@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(consoleApp)' == 'false'">
-    <TargetFrameworks>$(Frameworks)</TargetFrameworks >
+    <TargetFrameworks>$(Frameworks)</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
     <PlatformTarget>AnyCPU</PlatformTarget>
