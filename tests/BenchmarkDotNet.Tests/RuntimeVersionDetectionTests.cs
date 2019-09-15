@@ -110,7 +110,10 @@ namespace BenchmarkDotNet.Tests
             var runtime = RuntimeInformation.GetCurrentRuntime();
 
 #if NETFRAMEWORK
-            Assert.True(runtime is ClrRuntime);
+            if (RuntimeInformation.IsWindows())
+                Assert.True(runtime is ClrRuntime);
+            else
+                Assert.True(runtime is MonoRuntime);
 #elif NETCOREAPP2_1
             Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.TargetFrameworkMoniker == TargetFrameworkMoniker.NetCoreApp21);
 #elif NETCOREAPP2_2
