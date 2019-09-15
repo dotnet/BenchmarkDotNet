@@ -5,12 +5,10 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
     public class MannWhitneyTest : IOneSidedTest<MannWhitneyResult>
     {
         public static readonly MannWhitneyTest Instance = new MannWhitneyTest();
-        
-        private const int SmallN = 32;
 
         private static double PValueForSmallN(int n, int m, double u)
         {
-            int q = (int)Math.Floor(u + 1e-9);
+            int q = (int) Math.Floor(u + 1e-9);
             int nm = Math.Max(n, m);
             var w = new long[nm + 1, nm + 1, q + 1];
             for (int i = 0; i <= nm; i++)
@@ -29,17 +27,17 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
                     w[i, j, k] = w[i - 1, j, k - j] + w[i, j - 1, k];
             }
 
-            long denominator = MathHelper.BinomialCoefficient(n + m, m);
+            long denominator = BinomialCoefficientHelper.GetBinomialCoefficient(n + m, m);
             long p = 0;
             if (q <= n * m / 2)
             {
-                for (var i = 0; i <= q; i++)
+                for (int i = 0; i <= q; i++)
                     p += w[n, m, i];
             }
             else
             {
                 q = n * m - q;
-                for (var i = 0; i < q; i++)
+                for (int i = 0; i < q; i++)
                     p += w[n, m, i];
                 p = denominator - p;
             }
@@ -59,7 +57,7 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
             int n = x.Length, m = y.Length;
             if (Math.Min(n, m) < 3 || Math.Max(n, m) < 5)
                 return null; // Test can't be applied
-            
+
             var xy = new double[n + m];
             for (int i = 0; i < n; i++)
                 xy[i] = x[i];
@@ -71,7 +69,7 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
             Array.Sort(index, (i, j) => xy[i].CompareTo(xy[j]));
 
             var ranks = new double[n + m];
-            for (int i = 0; i < n + m; )
+            for (int i = 0; i < n + m;)
             {
                 int j = i;
                 while (j + 1 < n + m && Math.Abs(xy[index[j + 1]] - xy[index[i]]) < 1e-9)
@@ -81,7 +79,7 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
                     ranks[k] = rank;
                 i = j + 1;
             }
-                
+
             double ux = 0;
             for (int i = 0; i < n + m; i++)
                 if (index[i] < n)
@@ -89,7 +87,7 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
             ux -= n * (n + 1) / 2.0;
             double uy = n * m - ux;
 
-            if (n <= SmallN && m <= SmallN)
+            if (n + m <= BinomialCoefficientHelper.MaxAcceptableN)
             {
                 double pValue = 1 - PValueForSmallN(n, m, ux - 1);
                 return new MannWhitneyResult(ux, uy, pValue, threshold);
