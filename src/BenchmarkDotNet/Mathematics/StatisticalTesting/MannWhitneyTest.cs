@@ -4,7 +4,7 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
 {
     public class MannWhitneyTest : IOneSidedTest<MannWhitneyResult>
     {
-        public static MannWhitneyTest Instance = new MannWhitneyTest();
+        public static readonly MannWhitneyTest Instance = new MannWhitneyTest();
         
         private const int SmallN = 32;
 
