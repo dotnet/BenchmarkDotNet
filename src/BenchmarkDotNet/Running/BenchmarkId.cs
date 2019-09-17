@@ -13,7 +13,8 @@ namespace BenchmarkDotNet.Running
         public BenchmarkId(int value, BenchmarkCase benchmarkCase)
         {
             Value = value;
-            FullBenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase);
+            // FullBenchmarkName is passed to Process.Start as an argument and each OS limits the max argument length, so we have to limit it too
+            FullBenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase, maxArgumentLength: 32);
             JobId = benchmarkCase.Job.Id;
         }
 
