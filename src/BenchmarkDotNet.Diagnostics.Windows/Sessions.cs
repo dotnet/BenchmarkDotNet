@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     internal class HeapSession : Session
     {
         public HeapSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
-            : base(FullNameProvider.GetBenchmarkName(details.BenchmarkCase) + "Heap", details, config, creationTime)
+            : base(GetBenchmarkName(details.BenchmarkCase) + "Heap", details, config, creationTime)
         {
         }
 
@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     internal class UserSession : Session
     {
         public UserSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
-            : base(FullNameProvider.GetBenchmarkName(details.BenchmarkCase), details, config, creationTime)
+            : base(GetBenchmarkName(details.BenchmarkCase), details, config, creationTime)
         {
         }
 
@@ -90,6 +90,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
     internal abstract class Session : IDisposable
     {
+        private const int MaxBenchmarkNameLength = 128;
+
         protected abstract string FileExtension { get; }
 
         protected TraceEventSession TraceEventSession { get; }
@@ -134,7 +136,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private string GetFilePath(DiagnoserActionParameters details, DateTime creationTime)
         {
-            string fileName = $@"{FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type)}.{FullNameProvider.GetMethodName(details.BenchmarkCase)}";
+            string methodName = GetBenchmarkName(details.BenchmarkCase);
+            string fileName = $@"{FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type)}.{methodName}";
 
             // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
             if (details.Config.GetJobs().Select(job => job.GetToolchain()).Distinct().Count() > 1)
@@ -145,6 +148,20 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             fileName = FolderNameHelper.ToFolderName(fileName);
 
             return Path.Combine(details.Config.ArtifactsPath, $"{fileName}{FileExtension}");
+        }
+
+        // benchmark name is used as part of trace file name and we need to make sure that long string arguments don't hit "path is too long" exception
+        protected static string GetBenchmarkName(BenchmarkCase benchmarkCase)
+        {
+            string methodName = FullNameProvider.GetMethodName(benchmarkCase);
+            if (methodName.Length <= MaxBenchmarkNameLength)
+                return methodName;
+
+            methodName = FullNameProvider.GetMethodName(benchmarkCase, maxArgumentLength: 24); // try to limit argument length
+            if (methodName.Length <= MaxBenchmarkNameLength)
+                return methodName;
+
+            return methodName.Substring(0, MaxBenchmarkNameLength);
         }
 
         private string EnsureFolderExists(string filePath)
