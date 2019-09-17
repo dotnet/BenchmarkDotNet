@@ -636,10 +636,27 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private void CanExecute<T>(IToolchain toolchain)
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void VeryLongStringsAreSupported(IToolchain toolchain) => CanExecute<WithVeryLongString>(toolchain);
+
+        public class WithVeryLongString
         {
-            var config = CreateSimpleConfig(job: Job.Dry.With(toolchain));
-            CanExecute<T>(config);
+            private readonly string LongString = new string('a', 200_000);
+
+            public IEnumerable<object> Arguments()
+            {
+                yield return LongString;
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Arguments))]
+            public void Test(string value)
+            {
+                if (value != LongString)
+                    throw new ArgumentException("The passed string has wrong value!");
+            }
         }
+
+        private void CanExecute<T>(IToolchain toolchain) => CanExecute<T>(CreateSimpleConfig(job: Job.Dry.With(toolchain)));
     }
 }
