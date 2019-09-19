@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 foreach (var file in new DirectoryInfo(executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
                     executeParameters.Logger.WriteLineError(file.Name);
                 
-                return new ExecuteResult(false, -1, Array.Empty<string>(), Array.Empty<string>());
+                return new ExecuteResult(false, -1, default, Array.Empty<string>(), Array.Empty<string>());
             }
 
             try
@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 if (process.ExitCode == 0)
                 {
-                    return new ExecuteResult(true, process.ExitCode, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
+                    return new ExecuteResult(true, process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
                 }
 
                 if (!string.IsNullOrEmpty(standardError))
@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     logger.WriteError(standardError);
                 }
 
-                return new ExecuteResult(true, process.ExitCode, Array.Empty<string>(), Array.Empty<string>());
+                return new ExecuteResult(true, process.ExitCode, process.Id, Array.Empty<string>(), Array.Empty<string>());
             }
         }
     }

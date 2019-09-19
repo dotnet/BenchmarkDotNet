@@ -9,7 +9,7 @@ name: Overview
 
 Create new console application and install the [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/) NuGet package. We support:
 
-* *Projects:* `*.csproj` (classic and modern with PackageReferences), `*.xproj`/`project.json`
+* *Projects:* classic and modern with PackageReferences
 * *Runtimes:* Full .NET Framework (4.6+), .NET Core (2.0+), Mono, CoreRT
 * *OS:* Windows, Linux, MacOS
 * *Languages:* C#, F#, VB
@@ -51,7 +51,7 @@ namespace MyBenchmarks
     {
         public static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<Md5VsSha256>();
+            var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
         }
     }
 }

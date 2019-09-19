@@ -174,7 +174,8 @@ namespace BenchmarkDotNet.Running
                         member.Name,
                         member.IsStatic,
                         getValidValues(member.Attribute, member.ParameterType),
-                        false));
+                        false,
+                        member.ParameterType));
             }
 
             var paramsDefinitions = GetDefinitions<ParamsAttribute>((attribute, parameterType) => GetValidValues(attribute.Values, parameterType));
@@ -195,7 +196,7 @@ namespace BenchmarkDotNet.Running
         private static IEnumerable<ParameterInstances> GetArgumentsDefinitions(MethodInfo benchmark, Type target)
         {
             var parameterDefinitions = benchmark.GetParameters()
-                .Select(parameter => new ParameterDefinition(parameter.Name, false, Array.Empty<object>(), true))
+                .Select(parameter => new ParameterDefinition(parameter.Name, false, Array.Empty<object>(), true, parameter.ParameterType))
                 .ToArray();
 
             if (parameterDefinitions.IsEmpty())

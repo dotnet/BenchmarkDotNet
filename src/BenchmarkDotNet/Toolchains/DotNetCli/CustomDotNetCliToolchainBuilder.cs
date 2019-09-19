@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 using Microsoft.DotNet.PlatformAbstractions;
 
@@ -46,16 +48,24 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return this;
         }
 
-        /// <param name="newTargetFrameworkMoniker">TFM, netcoreapp2.1 is the default</param>
+        /// <param name="targetFrameworkMoniker">TFM, example: netcoreapp2.1</param>
         [PublicAPI]
-        public CustomDotNetCliToolchainBuilder TargetFrameworkMoniker(string newTargetFrameworkMoniker = "netcoreapp2.1")
+        public CustomDotNetCliToolchainBuilder TargetFrameworkMoniker(string targetFrameworkMoniker)
         {
-            targetFrameworkMoniker = newTargetFrameworkMoniker ?? throw new ArgumentNullException(nameof(newTargetFrameworkMoniker));
+            this.targetFrameworkMoniker = targetFrameworkMoniker ?? throw new ArgumentNullException(nameof(targetFrameworkMoniker));
 
             return this;
         }
 
-        protected string GetTargetFrameworkMoniker() => targetFrameworkMoniker ?? NetCoreAppSettings.Current.Value.TargetFrameworkMoniker;
+        protected string GetTargetFrameworkMoniker()
+        {
+            if (!string.IsNullOrEmpty(targetFrameworkMoniker))
+                return targetFrameworkMoniker;
+            if (!RuntimeInformation.IsNetCore)
+                throw new NotSupportedException("You must specify the target framework moniker in explicit way using builder.TargetFrameworkMoniker(tfm) method");
+
+            return CoreRuntime.GetCurrentVersion().MsBuildMoniker;
+        }
 
         /// <param name="newCustomDotNetCliPath">if not provided, the one from PATH will be used</param>
         [PublicAPI]
@@ -126,8 +136,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             // Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.GetRuntimeIdentifier()
             // returns win10-x64, we want the simpler form win-x64
             // the values taken from https://docs.microsoft.com/en-us/dotnet/core/rid-catalog#macos-rids
-            string osPart = RuntimeEnvironment.OperatingSystemPlatform == Platform.Windows
-                ? "win" : (RuntimeEnvironment.OperatingSystemPlatform == Platform.Linux ? "linux" : "osx");
+            string osPart = RuntimeInformation.IsWindows() ? "win" : (RuntimeInformation.IsMacOSX() ? "osx" : "linux");
 
             return $"{osPart}-{RuntimeEnvironment.RuntimeArchitecture}";
         }

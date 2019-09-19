@@ -17,7 +17,7 @@ os:
   - osx
 sudo: required
 dist: xenial
-osx_image: xcode9.2 # OS X 10.12
+osx_image: xcode11 # macOS 10.14
 mono: latest
 
 addons:

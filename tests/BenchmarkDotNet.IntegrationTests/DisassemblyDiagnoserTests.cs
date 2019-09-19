@@ -29,14 +29,14 @@ namespace BenchmarkDotNet.IntegrationTests
             => new[]
             {
 #if CLASSIC
-                new object[] { Jit.LegacyJit, Platform.X86, Runtime.Clr }, // 32bit LegacyJit for desktop .NET
-                new object[] { Jit.LegacyJit, Platform.X64, Runtime.Clr }, // 64bit LegacyJit for desktop .NET
+                new object[] { Jit.LegacyJit, Platform.X86, ClrRuntime.Net461 }, // 32bit LegacyJit for desktop .NET
+                new object[] { Jit.LegacyJit, Platform.X64, ClrRuntime.Net461 }, // 64bit LegacyJit for desktop .NET
 
-                new object[] { Jit.RyuJit, Platform.X64, Runtime.Clr }, // RyuJit for desktop .NET
+                new object[] { Jit.RyuJit, Platform.X64, ClrRuntime.Net461 }, // RyuJit for desktop .NET
 #endif
-                new object[] { Jit.RyuJit, Platform.X64, Runtime.Core }, // .NET Core
+                new object[] { Jit.RyuJit, Platform.X64, CoreRuntime.Core21 }, // .NET Core
 
-                // we could add new object[] { Jit.Llvm, Platform.X64, Runtime.Mono } here but our CI would need to have Mono installed..
+                // we could add new object[] { Jit.Llvm, Platform.X64, new MonoRuntime() } here but our CI would need to have Mono installed..
             };
 
         public class WithCalls

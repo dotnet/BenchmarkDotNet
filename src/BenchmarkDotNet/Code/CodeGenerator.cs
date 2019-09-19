@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$PassArguments$", passArguments)
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
                     .Replace("$Ref$", provider.UseRefKeyword ? "ref" : null)
-                    .Replace("$MeasureGcStats$", buildInfo.Config.HasMemoryDiagnoser() ? "true" : "false")
+                    .Replace("$MeasureExtraStats$", buildInfo.Config.HasExtraStatsDiagnoser() ? "true" : "false")
                     .Replace("$Encoding$", buildInfo.Config.Encoding.ToTemplateString())
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
                     .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments)).ToString();
@@ -98,7 +98,7 @@ namespace BenchmarkDotNet.Code
         {
             string benchmarkDotNetLocation = Path.GetDirectoryName(typeof(CodeGenerator).GetTypeInfo().Assembly.Location);
 
-            if (benchmarkDotNetLocation != null && benchmarkDotNetLocation.ToUpper().Contains("LINQPAD"))
+            if (benchmarkDotNetLocation != null && benchmarkDotNetLocation.IndexOf("LINQPAD", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 /* "LINQPad normally puts the compiled query into a different folder than the referenced assemblies 
                  * - this allows for optimizations to reduce file I/O, which is important in the scratchpad scenario"

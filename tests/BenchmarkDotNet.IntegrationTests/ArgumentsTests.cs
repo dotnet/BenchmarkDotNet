@@ -172,6 +172,31 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
+        public void IEnumerableCanBeUsedAsArgument(IToolchain toolchain) => CanExecute<WithIEnumerable>(toolchain);
+
+        public class WithIEnumerable
+        {
+            private static IEnumerable<int> Iterator() { yield return 1; }
+
+            public IEnumerable<object[]> Sources()
+            {
+                yield return new object[] { "Empty", Enumerable.Empty<int>() };
+                yield return new object[] { "Range", Enumerable.Range(0, 10) };
+                yield return new object[] { "List", new List<int>() { 1, 2, 3 } };
+                yield return new object[] { "int[]", new int[] { 1, 2, 3 } };
+                yield return new object[] { "int[].Select", new int[] { 1, 2, 3 }.Select(i => i) };
+                yield return new object[] { "int[].Select.Where", new int[] { 1, 2, 3 }.Select(i => i).Where(i => i % 2 == 0) };
+                yield return new object[] { "Iterator", Iterator() };
+                yield return new object[] { "Iterator.Select", Iterator().Select(i => i) };
+                yield return new object[] { "Iterator.Select.Where", Iterator().Select(i => i).Where(i => i % 2 == 0) };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Sources))]
+            public void Any(string name, IEnumerable<int> source) => source.Any();
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
         public void JaggedArrayCanBeUsedAsArgument(IToolchain toolchain) => CanExecute<WithJaggedArray>(toolchain);
 
         public class WithJaggedArray

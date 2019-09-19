@@ -29,6 +29,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('m', "memory", Required = false, Default = false, HelpText = "Prints memory statistics")]
         public bool UseMemoryDiagnoser { get; set; }
 
+        [Option('t', "threading", Required = false, Default = false, HelpText = "Prints threading statistics")]
+        public bool UseThreadingDiagnoser { get; set; }
+
         [Option('d', "disasm", Required = false, Default = false, HelpText = "Gets disassembly of benchmarked code")]
         public bool UseDisassemblyDiagnoser { get; set; }
         
@@ -44,7 +47,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('a', "artifacts", Required = false, HelpText = "Valid path to accessible directory")]
         public DirectoryInfo ArtifactsDirectory { get; set; }
 
-        [Option("outliers", Required = false, Default = OutlierMode.OnlyUpper, HelpText = "None/OnlyUpper/OnlyLower/All")]
+        [Option("outliers", Required = false, Default = OutlierMode.RemoveUpper, HelpText = "DontRemove/RemoveUpper/RemoveLower/RemoveAll")]
         public OutlierMode Outliers { get; set; }
 
         [Option("affinity", Required = false, HelpText = "Affinity mask to set for the benchmark process")]

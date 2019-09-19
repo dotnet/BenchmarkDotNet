@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Validators
                          .Select(benchmark => new ValidationError(true, $"Generic class {benchmark.Descriptor.Type.GetDisplayName()} has non public generic argument(s)"));
 
         private static IEnumerable<ValidationError> ValidateBindingModifiers(IEnumerable<BenchmarkCase> benchmarks)
-            => benchmarks.Where(x => x.Descriptor.WorkloadMethod.IsStatic && !x.Job.GetToolchain().IsInProcess)
+            => benchmarks.Where(x => x.Descriptor.WorkloadMethod.IsStatic && !x.GetToolchain().IsInProcess)
                           .Distinct(BenchmarkMethodEqualityComparer.Instance)
                           .Select(benchmark
                               => new ValidationError(

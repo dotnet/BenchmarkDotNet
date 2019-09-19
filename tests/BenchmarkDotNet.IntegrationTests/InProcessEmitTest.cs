@@ -221,5 +221,36 @@ namespace BenchmarkDotNet.IntegrationTests
                 return new ValueTask<decimal>(DecimalResult);
             }
         }
+
+        [Fact]
+        public void InProcessEmitToolchainSupportsIterationSetupAndCleanup()
+        {
+            var logger = new OutputLogger(Output);
+            var config = CreateInProcessConfig(logger);
+
+            WithIterationSetupAndCleanup.SetupCounter = 0;
+            WithIterationSetupAndCleanup.BenchmarkCounter = 0;
+            WithIterationSetupAndCleanup.CleanupCounter = 0;
+
+            var summary = CanExecute<WithIterationSetupAndCleanup>(config);
+
+            Assert.Equal(1, WithIterationSetupAndCleanup.SetupCounter);
+            Assert.Equal(16, WithIterationSetupAndCleanup.BenchmarkCounter);
+            Assert.Equal(1, WithIterationSetupAndCleanup.CleanupCounter);
+        }
+
+        public class WithIterationSetupAndCleanup
+        {
+            public static int SetupCounter, BenchmarkCounter, CleanupCounter;
+
+            [IterationSetup]
+            public void Setup() => Interlocked.Increment(ref SetupCounter);
+
+            [Benchmark]
+            public void Benchmark() => Interlocked.Increment(ref BenchmarkCounter);
+
+            [IterationCleanup]
+            public void Cleanup() => Interlocked.Increment(ref CleanupCounter);
+        }
     }
 }

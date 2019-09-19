@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
@@ -26,11 +26,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private readonly Dictionary<BenchmarkCase, string> benchmarkToEtlFile;
         private readonly Dictionary<BenchmarkCase, PreciseMachineCounter[]> benchmarkToCounters;
 
-        private Session kernelSession, userSession;
+        private Session kernelSession, userSession, heapSession;
 
         [PublicAPI] // parameterless ctor required by DiagnosersLoader to support creating this profiler via console line args
         public EtwProfiler() : this(new EtwProfilerConfig(performExtraBenchmarksRun: false)) { }
-        
+
         [PublicAPI]
         public EtwProfiler(EtwProfilerConfig config)
         {
@@ -44,15 +44,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public string ShortName => "ETW";
 
         public IEnumerable<string> Ids => new [] { nameof(EtwProfiler) };
-        
+
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
-        
+
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
 
         public IReadOnlyDictionary<BenchmarkCase, PmcStats> Results => ImmutableDictionary<BenchmarkCase, PmcStats>.Empty;
 
         internal IReadOnlyDictionary<BenchmarkCase, string> BenchmarkToEtlFile => benchmarkToEtlFile;
-        
+
         private DateTime CreationTime { get; }
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => runMode;
@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             if (!benchmarkToEtlFile.Any())
                 return;
-            
+
             logger.WriteLineInfo($"Exported {benchmarkToEtlFile.Count} trace file(s). Example:");
             logger.WriteLineInfo(benchmarkToEtlFile.Values.First());
         }
@@ -102,14 +102,17 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             try
             {
-                userSession = new UserSession(parameters, config, CreationTime).EnableProviders();
                 kernelSession = new KernelSession(parameters, config, CreationTime).EnableProviders();
+                if (config.CreateHeapSession)
+                    heapSession = new HeapSession(parameters, config, CreationTime).EnableProviders();
+                userSession = new UserSession(parameters, config, CreationTime).EnableProviders();
             }
             catch (Exception)
             {
                 userSession?.Dispose();
+                heapSession?.Dispose();
                 kernelSession?.Dispose();
-                
+
                 throw;
             }
         }
@@ -117,19 +120,26 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private void Stop(DiagnoserActionParameters parameters)
         {
             WaitForDelayedEvents();
-
+            string userSessionFile;
             try
             {
                 kernelSession.Stop();
+                heapSession?.Stop();
                 userSession.Stop();
 
-                benchmarkToEtlFile[parameters.BenchmarkCase] = userSession.MergeFiles(kernelSession);
+                userSessionFile = userSession.FilePath;
             }
             finally
             {
                 kernelSession.Dispose();
+                heapSession?.Dispose();
                 userSession.Dispose();
             }
+
+            // Merge the 'primary' etl file X.etl (userSession) with any files that match .clr*.etl .user*.etl. and .kernel.etl.
+            TraceEventSession.MergeInPlace(userSessionFile, TextWriter.Null);
+
+            benchmarkToEtlFile[parameters.BenchmarkCase] = userSessionFile;
         }
 
         private static int GetInterval(ProfileSourceInfo info) => Math.Min(info.MaxInterval, Math.Max(info.MinInterval, info.Interval));

@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class ValuesReturnedByBenchmark
         {
-#if !CORE
+#if !NETCOREAPP
             [Benchmark]
             public System.Windows.Point? TypeFromCustomFrameworkAssembly() => new System.Windows.Point();
 

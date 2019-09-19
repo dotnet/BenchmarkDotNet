@@ -6,13 +6,15 @@ namespace BenchmarkDotNet.Toolchains.Results
     {
         public bool FoundExecutable { get; }
         public int ExitCode { get; }
+        public int? ProcessId { get; }
         public IReadOnlyList<string> Data { get; }
         public IReadOnlyList<string> ExtraOutput { get; }
 
-        public ExecuteResult(bool foundExecutable, int exitCode, IReadOnlyList<string> data, IReadOnlyList<string> linesWithExtraOutput)
+        public ExecuteResult(bool foundExecutable, int exitCode, int? processId, IReadOnlyList<string> data, IReadOnlyList<string> linesWithExtraOutput)
         {
             FoundExecutable = foundExecutable;
             Data = data;
+            ProcessId = processId;
             ExitCode = exitCode;
             ExtraOutput = linesWithExtraOutput;
         }

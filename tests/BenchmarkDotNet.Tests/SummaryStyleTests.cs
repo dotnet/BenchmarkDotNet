@@ -15,6 +15,7 @@ namespace BenchmarkDotNet.Tests
             (
                 printUnitsInHeader: true,
                 printUnitsInContent: false,
+                printZeroValuesInContent: true,
                 sizeUnit: SizeUnit.B,
                 timeUnit: TimeUnit.Millisecond
             );
@@ -23,6 +24,7 @@ namespace BenchmarkDotNet.Tests
             
             Assert.True(config.SummaryStyle.PrintUnitsInHeader);
             Assert.False(config.SummaryStyle.PrintUnitsInContent);
+            Assert.True(config.SummaryStyle.PrintZeroValuesInContent);
             Assert.Equal(SizeUnit.B, config.SummaryStyle.SizeUnit);
             Assert.Equal(TimeUnit.Millisecond, config.SummaryStyle.TimeUnit);
         }

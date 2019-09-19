@@ -16,10 +16,6 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<IReadOnlyList<EnvironmentVariable>> EnvironmentVariablesCharacteristic = CreateCharacteristic<IReadOnlyList<EnvironmentVariable>>(nameof(EnvironmentVariables));
         public static readonly Characteristic<Guid> PowerPlanModeCharacteristic = CreateCharacteristic<Guid>(nameof(PowerPlanMode));
 
-        public static readonly EnvironmentMode Clr = new EnvironmentMode(Runtime.Clr).Freeze();
-        public static readonly EnvironmentMode Core = new EnvironmentMode(Runtime.Core).Freeze();
-        public static readonly EnvironmentMode Mono = new EnvironmentMode(Runtime.Mono).Freeze();
-        public static readonly EnvironmentMode CoreRT = new EnvironmentMode(Runtime.CoreRT).Freeze();
         public static readonly EnvironmentMode LegacyJitX86 = new EnvironmentMode(nameof(LegacyJitX86), Jit.LegacyJit, Platform.X86).Freeze();
         public static readonly EnvironmentMode LegacyJitX64 = new EnvironmentMode(nameof(LegacyJitX64), Jit.LegacyJit, Platform.X64).Freeze();
         public static readonly EnvironmentMode RyuJitX64 = new EnvironmentMode(nameof(RyuJitX64), Jit.RyuJit, Platform.X64).Freeze();
@@ -36,8 +32,6 @@ namespace BenchmarkDotNet.Jobs
         {
             Jit = jit;
             Platform = platform;
-            if (jit == Jit.LegacyJit)
-                Runtime = Runtime.Clr;
         }
 
         [PublicAPI]

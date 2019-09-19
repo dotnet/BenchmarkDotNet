@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Mathematics
             double standardError = standardDeviation / Math.Sqrt(n);
             var confidenceInterval = new ConfidenceInterval(mean, standardError, n);
 
-            if (outlierMode == OutlierMode.None) // most simple scenario is done without allocations! but this is not the default case
+            if (outlierMode == OutlierMode.DontRemove) // most simple scenario is done without allocations! but this is not the default case
                 return new MeasurementsStatistics(standardError, mean, confidenceInterval);
 
             measurements.Sort(); // sort in place
@@ -136,14 +136,20 @@ namespace BenchmarkDotNet.Mathematics
         {
             switch (outlierMode)
             {
+#pragma warning disable 618
                 case OutlierMode.None:
+                case OutlierMode.DontRemove:
                     return false;
                 case OutlierMode.OnlyUpper:
+                case OutlierMode.RemoveUpper:
                     return value > upperFence;
                 case OutlierMode.OnlyLower:
+                case OutlierMode.RemoveLower:
                     return value < lowerFence;
                 case OutlierMode.All:
+                case OutlierMode.RemoveAll:
                     return value < lowerFence || value > upperFence;
+#pragma warning restore 618
                 default:
                     throw new ArgumentOutOfRangeException(nameof(outlierMode), outlierMode, null);
             }            

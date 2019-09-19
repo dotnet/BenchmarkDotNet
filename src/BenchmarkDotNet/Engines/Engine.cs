@@ -42,14 +42,14 @@ namespace BenchmarkDotNet.Engines
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineActualStage actualStage;
-        private readonly bool includeMemoryStats;
+        private readonly bool includeExtraStats;
 
         internal Engine(
             IHost host,
             IResolver resolver,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeMemoryStats, Encoding encoding, string benchmarkName)
+            bool includeExtraStats, Encoding encoding, string benchmarkName)
         {
             
             Host = host;
@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Engines
             IterationSetupAction = iterationSetupAction;
             IterationCleanupAction = iterationCleanupAction;
             OperationsPerInvoke = operationsPerInvoke;
-            this.includeMemoryStats = includeMemoryStats;
+            this.includeExtraStats = includeExtraStats;
             BenchmarkName = benchmarkName;
 
             Resolver = resolver;
@@ -128,16 +128,16 @@ namespace BenchmarkDotNet.Engines
 
             Host.AfterMainRun();
 
-            var workGcHasDone = includeMemoryStats 
-                ? MeasureGcStats(new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor)) 
-                : GcStats.Empty;
+            (GcStats workGcHasDone, ThreadingStats threadingStats) = includeExtraStats 
+                ? GetExtraStats(new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor))
+                : (GcStats.Empty, ThreadingStats.Empty);
             
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.BenchmarkStop(BenchmarkName);
 
             var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
 
-            return new RunResults(idle, main, outlierMode, workGcHasDone, Encoding);
+            return new RunResults(idle, main, outlierMode, workGcHasDone, threadingStats, Encoding);
         }
 
         public Measurement RunIteration(IterationData data)
@@ -177,7 +177,7 @@ namespace BenchmarkDotNet.Engines
             return measurement;
         }
 
-        private GcStats MeasureGcStats(IterationData data)
+        private (GcStats, ThreadingStats) GetExtraStats(IterationData data)
         {
             // we enable monitoring after main target run, for this single iteration which is executed at the end
             // so even if we enable AppDomain monitoring in separate process
@@ -186,15 +186,20 @@ namespace BenchmarkDotNet.Engines
 
             IterationSetupAction(); // we run iteration setup first, so even if it allocates, it is not included in the results
 
+            var initialThreadingStats = ThreadingStats.ReadInitial(); // this method might allocate
             var initialGcStats = GcStats.ReadInitial();
 
             WorkloadAction(data.InvokeCount / data.UnrollFactor);
 
             var finalGcStats = GcStats.ReadFinal();
+            var finalThreadingStats = ThreadingStats.ReadFinal();
 
             IterationCleanupAction(); // we run iteration cleanup after collecting GC stats 
 
-            return (finalGcStats - initialGcStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
+            GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
+            ThreadingStats threadingStats = (finalThreadingStats - initialThreadingStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
+
+            return (gcStats, threadingStats);
         }
 
         private void GcCollect()

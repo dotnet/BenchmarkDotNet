@@ -84,5 +84,13 @@ namespace BenchmarkDotNet.Extensions
             }
             return sb.ToString();
         }
+        
+        /// <summary>
+        /// Returns file base name
+        /// </summary>
+        internal static string GetBaseName(this string path, string directory)
+        {
+            return path.Replace(directory, string.Empty).Trim('/', '\\');
+        }
     }
 }

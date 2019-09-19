@@ -10,9 +10,9 @@ namespace BenchmarkDotNet.Exporters.Csv
         private readonly CsvSeparator separator;
         protected override string FileExtension => "csv";
 
-        public static readonly IExporter Default = new CsvExporter(CsvSeparator.CurrentCulture, SummaryStyle.Default);
+        public static readonly IExporter Default = new CsvExporter(CsvSeparator.CurrentCulture, SummaryStyle.Default.WithZeroMetricValuesInContent());
 
-        public CsvExporter(CsvSeparator separator) : this (separator, SummaryStyle.Default)
+        public CsvExporter(CsvSeparator separator) : this (separator, SummaryStyle.Default.WithZeroMetricValuesInContent())
         {
         }
 

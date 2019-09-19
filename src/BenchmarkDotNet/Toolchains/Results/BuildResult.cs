@@ -1,4 +1,5 @@
 ﻿using System;
+using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.Results
@@ -29,5 +30,7 @@ namespace BenchmarkDotNet.Toolchains.Results
             => new BuildResult(generateResult, false, $"Exception! {Environment.NewLine}Message: {exception.Message},{Environment.NewLine}Stack trace:{Environment.NewLine}{exception.StackTrace}");
 
         public override string ToString() => "BuildResult: " + (IsBuildSuccess ? "Success" : "Failure");
+
+        internal bool TryToExplainFailureReason(out string reason) => MsBuildErrorMapper.TryToExplainFailureReason(this, out reason);
     }
 }

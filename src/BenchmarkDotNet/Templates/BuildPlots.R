@@ -10,6 +10,16 @@ library(tidyr)
 library(grid)
 library(gridExtra)
 
+isEmpty <- function(val){
+   is.null(val) | val == ""
+}
+
+createPrefix <- function(params){ 
+   separator <- "-"
+   values <- params[!isEmpty(params)]
+   paste(replace(values, TRUE, paste0(separator, values)), collapse = "")
+}
+
 ends_with <- function(vars, match, ignore.case = TRUE) {
   if (ignore.case)
     match <- tolower(match)
@@ -93,7 +103,7 @@ for (file in files) {
     densityPlot <- ggplot(df, aes(x=Measurement_Value, fill=Job_Id)) +
       ggtitle(paste(title, "/", target)) +
       xlab(paste("Time,", timeUnit)) +
-      geom_density(alpha=.5)
+      geom_density(alpha=.5, bw="SJ")
     printNice(densityPlot)
     ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-density.png"), file), densityPlot)
 
@@ -103,17 +113,17 @@ for (file in files) {
 
     for (params in unique(df$Params)) {
       paramsDf <- df %>% filter(Params == params)
-
       paramsDensityPlot <- ggplot(paramsDf, aes(x=Measurement_Value, fill=Job_Id)) +
         ggtitle(paste(title, "/", target, "/", params)) +
         xlab(paste("Time,", timeUnit)) +
-        geom_density(alpha=.5)
+        geom_density(alpha=.5, bw="SJ")
       printNice(paramsDensityPlot)
-      ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-", params, "-density.png"), file), paramsDensityPlot)
+      prefix <- createPrefix(c(target,params))
+      ggsaveNice(gsub("-measurements.csv", paste0(prefix, "-density.png"), file), paramsDensityPlot)
 
       paramsFacetDensityPlot <- paramsDensityPlot + facet_wrap(~Job_Id)
       printNice(paramsFacetDensityPlot)
-      ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-", params, "-facetDensity.png"), file), paramsFacetDensityPlot)
+      ggsaveNice(gsub("-measurements.csv", paste0(prefix, "-facetDensity.png"), file), paramsFacetDensityPlot)
     }
 
     for (job in unique(df$Job_Id)) {
@@ -143,7 +153,7 @@ for (file in files) {
       densityPlotJob <- ggplot(jobDf, aes(x=Measurement_Value, fill="red")) +
         ggtitle(paste(title, "/", target, "/", job)) +
         xlab(paste("Time,", timeUnit)) +
-        geom_density(alpha=.5)
+        geom_density(alpha=.5, bw="SJ")
       printNice(densityPlotJob)
       ggsaveNice(gsub("-measurements.csv", paste0("-", target, "-", job, "-density.png"), file), densityPlotJob)
     }

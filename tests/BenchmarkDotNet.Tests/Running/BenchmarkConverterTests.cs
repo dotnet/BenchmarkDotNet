@@ -131,11 +131,11 @@ namespace BenchmarkDotNet.Tests.Running
         public void JobMutatorsApplySettingsToAllNonMutatorJobs()
         {
             var info = BenchmarkConverter.TypeToBenchmarks(
-                    typeof(WithMutator), 
+                    typeof(WithMutator),
                     DefaultConfig.Instance
-                        .With(Job.Clr)
-                        .With(Job.Core));
-            
+                        .With(Job.Default.With(ClrRuntime.Net461))
+                        .With(Job.Default.With(CoreRuntime.Core21)));
+
             Assert.Equal(2, info.BenchmarksCases.Length);
             Assert.All(info.BenchmarksCases, benchmark => Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxIterationCount));
             Assert.Single(info.BenchmarksCases, benchmark => benchmark.Job.Environment.Runtime is ClrRuntime);
@@ -173,7 +173,7 @@ namespace BenchmarkDotNet.Tests.Running
         }
 
         [MaxIterationCount(int.MaxValue)] // mutator attribute is before job attribute
-        [CoreJob]
+        [TargetFrameworkJob(TargetFrameworkMoniker.NetCoreApp21)]
         public class WithMutatorAfterJobAttribute
         {
             [Benchmark] public void Method() { }
@@ -188,12 +188,12 @@ namespace BenchmarkDotNet.Tests.Running
             
             Assert.Equal(1, benchmarkCase.Job.Run.InvocationCount);
             Assert.Equal(1, benchmarkCase.Job.Run.UnrollFactor);
-            Assert.Equal(OutlierMode.None, benchmarkCase.Job.Accuracy.OutlierMode);
+            Assert.Equal(OutlierMode.DontRemove, benchmarkCase.Job.Accuracy.OutlierMode);
             Assert.False(benchmarkCase.Job.Meta.IsMutator);
         }
 
         [RunOncePerIteration]
-        [Outliers(OutlierMode.None)]
+        [Outliers(OutlierMode.DontRemove)]
         public class WithFewMutators
         {
             [Benchmark] public void Method() { }

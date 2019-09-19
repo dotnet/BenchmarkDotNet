@@ -22,10 +22,13 @@ namespace BenchmarkDotNet.Engines
 
         public GcStats GCStats { get; }
 
+        public ThreadingStats ThreadingStats { get; }
+
         public RunResults([CanBeNull] IReadOnlyList<Measurement> overhead,
                           [NotNull] IReadOnlyList<Measurement> workload,
                           OutlierMode outlierMode,
                           GcStats gcStats,
+                          ThreadingStats threadingStats,
                           Encoding encoding)
         {
             this.outlierMode = outlierMode;
@@ -33,6 +36,7 @@ namespace BenchmarkDotNet.Engines
             Overhead = overhead;
             Workload = workload;
             GCStats = gcStats;
+            ThreadingStats = threadingStats;
         }
 
         public IEnumerable<Measurement> GetMeasurements()
@@ -65,6 +69,7 @@ namespace BenchmarkDotNet.Engines
                 outWriter.WriteLine(measurement.ToOutputLine());
 
             outWriter.WriteLine(GCStats.ToOutputLine());
+            outWriter.WriteLine(ThreadingStats.ToOutputLine());
             outWriter.WriteLine();
         }
 
