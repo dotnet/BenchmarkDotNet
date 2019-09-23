@@ -642,18 +642,21 @@ namespace BenchmarkDotNet.IntegrationTests
         public class WithVeryLongString
         {
             private readonly string LongString = new string('a', 200_000);
+            private readonly string LongString2 = new string('a', 200_000 - 1) + "b";
 
-            public IEnumerable<object> Arguments()
+            public IEnumerable<object[]> Arguments()
             {
-                yield return LongString;
+                yield return new object[] { LongString, LongString2 };
             }
 
             [Benchmark]
             [ArgumentsSource(nameof(Arguments))]
-            public void Test(string value)
+            public void Test(string first, string second)
             {
-                if (value != LongString)
-                    throw new ArgumentException("The passed string has wrong value!");
+                if (first != LongString)
+                    throw new ArgumentException($"{nameof(first)} passed string has wrong value!");
+                if (second != LongString2)
+                    throw new ArgumentException($"{nameof(second)} passed string has wrong value!");
             }
         }
 
