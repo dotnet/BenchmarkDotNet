@@ -28,7 +28,11 @@ namespace BenchmarkDotNet.Configs
         /// <summary>
         /// determines if the exported result files should not be overwritten (be default they are overwritten)
         /// </summary>
-        DontOverwriteResults = 1 << 4
+        DontOverwriteResults = 1 << 4,
+        /// <summary>
+        /// Determines if the log file should be disabled. 
+        /// </summary>
+        DisableLogFile = 1 << 5
     }
 
     internal static class ConfigOptionsExtensions
