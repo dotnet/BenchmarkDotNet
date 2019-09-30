@@ -32,7 +32,7 @@ Param(
 )
 
 $CakeVersion = "0.30.0"
-$DotNetVersion = "3.0.100";
+$RequiredDotNetVersions = @("3.0.100", "2.1.802");
 $DotNetInstallerUri = "https://dot.net/v1/dotnet-install.ps1";
 $NugetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
 
@@ -68,20 +68,56 @@ Function Remove-PathVariable([string]$VariableToRemove)
     }
 }
 
-# Get .NET Core CLI path if installed.
-$FoundDotNetCliVersion = $null;
-if (Get-Command dotnet -ErrorAction SilentlyContinue) {
-    $FoundDotNetCliVersion = dotnet --version;
+<#
+.SYNOPSIS
+Gets a list of missing dotnet SDKs that are required.
+
+.NOTES
+When `dotnet --list-sdks` fails, it will install all required dotnet SDK's.
+#>
+
+Function Get-MissingDotNetVersions()
+{
+    $foundDotNetVersions = @();
+
+    if (Get-Command dotnet -ErrorAction SilentlyContinue) {
+        $listSdksResults = dotnet --list-sdks
+
+        foreach ($sdk in $listSdksResults) {
+            # First item in the array contains the full version string
+            $version = $sdk.Split(' ', [StringSplitOptions]::RemoveEmptyEntries)[0]
+            $foundDotNetVersions += $version
+        }
+    }
+
+    $missingDotNetVersions = @()
+    foreach ($requiredDotNetVersion in $RequiredDotNetVersions) {
+        $isMissing = $true
+        foreach ($foundDotNetVersion in $foundDotNetVersions) {
+            if($foundDotNetVersion -eq $requiredDotNetVersion) {
+                $isMissing = $false
+                break
+            }
+        }
+        if($isMissing){
+            $missingDotNetVersions += $requiredDotNetVersion
+        }
+    }
+    return ,$missingDotNetVersions
 }
 
-if($FoundDotNetCliVersion -ne $DotNetVersion) {
+$missingDotNetVersions = Get-MissingDotNetVersions
+
+if($missingDotNetVersions.Length -gt 0){
     $InstallPath = Join-Path $PSScriptRoot ".dotnet"
     if (!(Test-Path $InstallPath)) {
         mkdir -Force $InstallPath | Out-Null;
     }
     (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, "$InstallPath\dotnet-install.ps1");
-    & $InstallPath\dotnet-install.ps1 -Channel $DotNetChannel -Version $DotNetVersion -InstallDir $InstallPath;
-
+    
+    foreach ($dotNetVersion in $missingDotNetVersions) {
+        & $InstallPath\dotnet-install.ps1 -Channel $DotNetChannel -Version $dotNetVersion -InstallDir $InstallPath;    
+    }
     Remove-PathVariable "$InstallPath"
     $env:PATH = "$InstallPath;$env:PATH"
 }
