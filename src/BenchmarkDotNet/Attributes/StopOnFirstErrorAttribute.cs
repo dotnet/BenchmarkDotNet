@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Configs;
 using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Attributes 
+namespace BenchmarkDotNet.Attributes
 {
     /// <summary>
     /// determines if running should be stop after first error

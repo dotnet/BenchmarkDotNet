@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
                 parsed = default;
                 return false;
             }
-            
+
             var trimmed = input.Trim().ToLowerInvariant();
             var number = new string(trimmed.TakeWhile(c => char.IsDigit(c) || c == '.' || c == ',').ToArray());
             var unit = new string(trimmed.SkipWhile(c => char.IsDigit(c) || c == '.' || c == ',' || char.IsWhiteSpace(c)).ToArray());

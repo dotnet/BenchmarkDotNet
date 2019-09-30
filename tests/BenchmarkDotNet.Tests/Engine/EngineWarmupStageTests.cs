@@ -59,20 +59,20 @@ namespace BenchmarkDotNet.Tests.Engine
         public void MinAndMaxWarmupCountAttributesCanForceAutoWarmup()
         {
             const int explicitWarmupCount = 1;
-            
+
             var warmupCountEqualOne = DefaultConfig.Instance.With(Job.Default.WithWarmupCount(explicitWarmupCount));
 
             var benchmarkRunInfo = BenchmarkConverter.TypeToBenchmarks(typeof(WithForceAutoWarmup), warmupCountEqualOne);
 
             var mergedJob = benchmarkRunInfo.BenchmarksCases.Single().Job;
-            
+
             Assert.Equal(EngineResolver.ForceAutoWarmup, mergedJob.Run.WarmupCount);
             Assert.Equal(2, mergedJob.Run.MinWarmupIterationCount);
             Assert.Equal(4, mergedJob.Run.MaxWarmupIterationCount);
-            
+
             AutoTest(data => TimeInterval.Millisecond * (data.Index % 2), 2, 4, job: mergedJob);
         }
-        
+
         [MinWarmupCount(2, forceAutoWarmup: true)]
         [MaxWarmupCount(4, forceAutoWarmup: true)]
         public class WithForceAutoWarmup

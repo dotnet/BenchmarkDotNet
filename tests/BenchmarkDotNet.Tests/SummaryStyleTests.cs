@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Tests
             );
 
             var config = ManualConfig.CreateEmpty().With(summaryStyle);
-            
+
             Assert.True(config.SummaryStyle.PrintUnitsInHeader);
             Assert.False(config.SummaryStyle.PrintUnitsInContent);
             Assert.Equal(SizeUnit.B, config.SummaryStyle.SizeUnit);

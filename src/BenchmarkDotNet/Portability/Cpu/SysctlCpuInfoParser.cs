@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Portability.Cpu
                 return result;
             return null;
         }
-        
+
         [CanBeNull]
         private static long? GetPositiveLongValue([NotNull] Dictionary<string, string> sysctl, [NotNull] string keyName)
         {

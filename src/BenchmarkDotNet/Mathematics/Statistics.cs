@@ -154,17 +154,17 @@ namespace BenchmarkDotNet.Mathematics
 
         /// <summary>
         /// Statistics for [1/X]. If Min is less then or equal to 0, returns null.
-        /// </summary>        
+        /// </summary>
         public Statistics Invert() => CanBeInverted() ? new Statistics(SortedValues.Select(x => 1 / x)) : null;
 
         /// <summary>
         /// Mean for [X*Y].
-        /// </summary>        
+        /// </summary>
         public static double MulMean(Statistics x, Statistics y) => x.Mean * y.Mean;
 
         /// <summary>
         /// Mean for [X/Y].
-        /// </summary>        
+        /// </summary>
         public static double DivMean([CanBeNull] Statistics x, [CanBeNull] Statistics y)
         {
             if (x == null || y == null)

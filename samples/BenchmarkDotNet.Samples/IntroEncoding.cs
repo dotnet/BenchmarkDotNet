@@ -7,7 +7,7 @@ using BenchmarkDotNet.Running;
 namespace BenchmarkDotNet.Samples
 {
     // *** Attribute Style ***
-    
+
     [EncodingAttribute.Unicode]
     public class IntroEncoding
     {
@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Samples
             return waitUntil;
         }
     }
-    
+
     // *** Object Style ***
 
     [Config(typeof(Config))]
@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Samples
             return waitUntil;
         }
     }
-    
+
     // *** Fluent Config ***
 
     public class IntroEncodingFluentConfig

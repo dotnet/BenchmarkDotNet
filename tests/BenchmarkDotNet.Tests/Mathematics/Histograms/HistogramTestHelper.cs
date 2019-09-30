@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Tests.Mathematics.Histograms
             var actualHistogram = builder.BuildWithFixedBinSize(values, binSize);
             Check(output, bins, actualHistogram);
         }
-        
+
         [AssertionMethod]
         public static void DoHistogramTest([NotNull] ITestOutputHelper output, [NotNull] IHistogramBuilder builder,
             [NotNull] double[] values, [NotNull] bool[] states)
@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Tests.Mathematics.Histograms
             for (int i = 0; i < actualHistogram.Bins.Length; i++)
                 Assert.Equal(expectedBins[i], actualHistogram.Bins[i].Values);
         }
-        
+
         [AssertionMethod]
         private static void Check([NotNull] ITestOutputHelper output, [NotNull] bool[] expectedStates, Histogram actualHistogram)
         {

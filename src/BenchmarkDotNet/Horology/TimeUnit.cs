@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Horology
         [PublicAPI] public static readonly TimeUnit[] All = { Nanosecond, Microsecond, Millisecond, Second, Minute, Hour, Day };
 
         /// <summary>
-        /// This method chooses the best time unit for representing a set of time measurements. 
+        /// This method chooses the best time unit for representing a set of time measurements.
         /// </summary>
         /// <param name="values">The list of time measurements in nanoseconds.</param>
         /// <returns>Best time unit.</returns>

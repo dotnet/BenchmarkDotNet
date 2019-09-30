@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Exporters
     public class PrettyHtmlDisassemblyExporter : ExporterBase
     {
         private static readonly Lazy<string> HighlightingLabelsScript = new Lazy<string>(() => ResourceHelper.LoadTemplate("highlightingLabelsScript.js"));
-            
+
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
         public PrettyHtmlDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Exporters
                         logger.WriteLine($"<tr class=\"{(even && diffTheLabels ? "evenMap" : string.Empty)}\">");
                         logger.WriteLine($"<td id=\"{referenceIndex}_{label.Id}\" class=\"label\" data-label=\"{referenceIndex}_{label.TextRepresentation}\"><pre><code>{label.TextRepresentation}</pre></code></td>");
                         logger.WriteLine("<td>&nbsp;</td></tr>");
-                        
+
                         continue;
                     }
 

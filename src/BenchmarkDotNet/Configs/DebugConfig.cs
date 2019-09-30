@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Configs
             => new[]
             {
                 Job.Default
-                    .WithCustomBuildConfiguration("Debug") // will do `-c Debug everywhere` 
+                    .WithCustomBuildConfiguration("Debug") // will do `-c Debug everywhere`
             };
     }
 

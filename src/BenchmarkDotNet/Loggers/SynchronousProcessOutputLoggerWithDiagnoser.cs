@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Loggers
 
                 if (line == null)
                     continue;
-                
+
                 logger.WriteLine(LogKind.Default, line);
 
                 if (!line.StartsWith("//"))

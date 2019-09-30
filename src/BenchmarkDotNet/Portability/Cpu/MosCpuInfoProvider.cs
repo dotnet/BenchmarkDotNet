@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             uint nominalClockSpeed = 0;
             uint maxClockSpeed = 0;
             uint minClockSpeed = 0;
-            
+
 
             var mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
             foreach (var moProcessor in mosProcessor.Get().Cast<ManagementObject>())

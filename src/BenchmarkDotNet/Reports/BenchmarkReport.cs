@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Reports
             BuildResult buildResult,
             IReadOnlyList<ExecuteResult> executeResults,
             IReadOnlyList<Measurement> allMeasurements,
-            GcStats gcStats, 
+            GcStats gcStats,
             IReadOnlyList<Metric> metrics)
         {
             Success = success;

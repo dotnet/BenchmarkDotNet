@@ -16,11 +16,11 @@ namespace BenchmarkDotNet.Reports
     {
         private static Measurement Error (Encoding encoding) => new Measurement(-1, IterationMode.Unknown, IterationStage.Unknown, 0, 0, 0, encoding);
 
-        private static readonly int IterationInfoNameMaxWidth 
+        private static readonly int IterationInfoNameMaxWidth
             = Enum.GetNames(typeof(IterationMode)).Max(text => text.Length) + Enum.GetNames(typeof(IterationStage)).Max(text => text.Length);
 
         public IterationMode IterationMode { get; }
-        
+
         public IterationStage IterationStage { get; }
 
         public int LaunchIndex { get; }
@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Reports
         /// Gets the total number of nanoseconds it took to perform all operations.
         /// </summary>
         public double Nanoseconds { get; }
-        
+
         /// <summary>
         /// Creates an instance of <see cref="Measurement"/> struct.
         /// </summary>
@@ -64,11 +64,11 @@ namespace BenchmarkDotNet.Reports
         public string ToOutputLine()
         {
             string alignedIterationInfo = (IterationMode.ToString() + IterationStage).PadRight(IterationInfoNameMaxWidth, ' ');
-            
+
             // Usually, a benchmarks takes more than 10 iterations (rarely more than 99)
             // PadLeft(2, ' ') looks like a good trade-off between alignment and amount of characters
             string alignedIterationIndex = IterationIndex.ToString().PadLeft(2, ' ');
-            
+
             return $"{alignedIterationInfo} {alignedIterationIndex}: {GetDisplayValue()}";
         }
 
@@ -77,12 +77,12 @@ namespace BenchmarkDotNet.Reports
 
         /// <summary>
         /// Parses the benchmark statistics from the plain text line.
-        /// 
+        ///
         /// E.g. given the input <paramref name="line"/>:
-        /// 
+        ///
         ///     WorkloadTarget 1: 10 op, 1005842518 ns
-        /// 
-        /// Will extract the number of <see cref="Operations"/> performed and the 
+        ///
+        /// Will extract the number of <see cref="Operations"/> performed and the
         /// total number of <see cref="Nanoseconds"/> it took to perform them.
         /// </summary>
         /// <param name="logger">The logger to write any diagnostic messages to.</param>
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Reports
         {
             if (encoding == null)
                 encoding = Encoding.ASCII;
-            
+
             if (line == null || line.StartsWith(GcStats.ResultsLinePrefix))
                 return Error(encoding);
 
@@ -109,13 +109,13 @@ namespace BenchmarkDotNet.Reports
                     if (char.IsUpper(iterationInfoSplit[0][i]))
                     {
                         iterationStageIndex = i;
-                        break;                        
+                        break;
                     }
 
                 string iterationModeStr = iterationInfoSplit[0].Substring(0, iterationStageIndex);
                 string iterationStageStr = iterationInfoSplit[0].Substring(iterationStageIndex);
-                                
-                
+
+
                 var iterationMode = ParseIterationMode(iterationModeStr);
                 var iterationStage = ParseIterationStage(iterationStageStr);
                 int.TryParse(iterationInfoSplit[1], out int iterationIndex);

@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Configs
 
         [CanBeNull] IOrderer Orderer { get; }
 
-        SummaryStyle SummaryStyle { get; } 
+        SummaryStyle SummaryStyle { get; }
 
         ConfigUnionRule UnionRule { get; }
 
@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Configs
         /// the default value is "./BenchmarkDotNet.Artifacts"
         /// </summary>
         string ArtifactsPath { get; }
-        
+
         /// <summary>
         /// the default value is ASCII
         /// </summary>

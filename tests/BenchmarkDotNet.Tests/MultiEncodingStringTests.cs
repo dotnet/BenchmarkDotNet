@@ -12,13 +12,13 @@ namespace BenchmarkDotNet.Tests
         {
             var enc1 = Encoding.ASCII;
             var enc2 = Encoding.Unicode;
-            
+
             Assert.Equal(new MultiEncodingString("string", "otherString"), new MultiEncodingString("string", "otherString"));
             Assert.Equal(new MultiEncodingString("string", "otherString").GetHashCode(), new MultiEncodingString("string", "otherString").GetHashCode());
-            
+
             Assert.NotEqual(new MultiEncodingString(new[] {new KeyValuePair<Encoding, string>(enc1,"string")}),
                             new MultiEncodingString(new[] {new KeyValuePair<Encoding, string>(enc2,"string")}));
-            
+
             Assert.NotEqual(new MultiEncodingString(new[] {new KeyValuePair<Encoding, string>(enc1,"string")}).GetHashCode(),
                             new MultiEncodingString(new[] {new KeyValuePair<Encoding, string>(enc2,"string")}).GetHashCode());
         }
@@ -32,10 +32,10 @@ namespace BenchmarkDotNet.Tests
             var mes = new MultiEncodingString("string", "otherString");
             var otherMes = new MultiEncodingString(new[] { new KeyValuePair<Encoding, string>(enc1, "string"),
                                                            new KeyValuePair<Encoding, string>(enc2, "otherString") });
-            
+
             Assert.Equal("string", mes.ToString(enc1));
             Assert.Equal("otherString", mes.ToString(enc2));
-            
+
             Assert.Equal("string", otherMes.ToString(enc1));
             Assert.Equal("otherString", otherMes.ToString(enc2));
         }

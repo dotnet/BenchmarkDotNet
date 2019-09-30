@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return Path.Combine(directoryInfo.FullName, programName);
             }
 
-            // we did not find global.json or any Visual Studio solution file? 
+            // we did not find global.json or any Visual Studio solution file?
             // let's return it in the old way and hope that it works ;)
             var parent = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent;
             if (parent == null)
@@ -87,6 +87,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private static bool IsRootSolutionFolder(DirectoryInfo directoryInfo)
             => directoryInfo
                 .GetFileSystemInfos()
-                .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");          
+                .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
     }
 }

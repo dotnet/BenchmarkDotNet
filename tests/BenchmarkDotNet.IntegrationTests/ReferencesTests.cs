@@ -9,11 +9,11 @@ namespace BenchmarkDotNet.IntegrationTests
 
 #if CLASSIC
         [Fact]
-        public void BenchmarksThatUseTypeFromCustomPathDllAreSupported() 
+        public void BenchmarksThatUseTypeFromCustomPathDllAreSupported()
             => CanExecute<BenchmarkDotNet.IntegrationTests.CustomPaths.BenchmarksThatUseTypeFromCustomPathDll>();
 
         [Fact]
-        public void BenchmarksThatReturnTypeFromCustomPathDllAreSupported() 
+        public void BenchmarksThatReturnTypeFromCustomPathDllAreSupported()
             => CanExecute<BenchmarkDotNet.IntegrationTests.CustomPaths.BenchmarksThatReturnTypeFromCustomPathDll>();
 #endif
         [Fact]

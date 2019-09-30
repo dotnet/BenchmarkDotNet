@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Order
 
         [PublicAPI, NotNull]
         IEnumerable<IGrouping<string, BenchmarkCase>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>> logicalGroups);
-        
+
         [PublicAPI]
         bool SeparateLogicalGroups { get; }
     }

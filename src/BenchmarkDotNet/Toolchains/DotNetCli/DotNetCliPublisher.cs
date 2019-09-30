@@ -25,12 +25,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private TimeSpan Timeout { get; }
 
-        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger) 
+        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
             => new DotNetCliCommand(
-                    CustomDotNetCliPath, 
-                    ExtraArguments, 
-                    generateResult, 
-                    logger, 
+                    CustomDotNetCliPath,
+                    ExtraArguments,
+                    generateResult,
+                    logger,
                     buildPartition,
                     EnvironmentVariables,
                     Timeout)

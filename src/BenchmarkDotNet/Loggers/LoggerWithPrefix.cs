@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Loggers
         {
             var lines = text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             WriteSimple(logKind, lines[0]);
-            
+
             for (int i = 1; i < lines.Length; i++)
             {
                 WriteLine();

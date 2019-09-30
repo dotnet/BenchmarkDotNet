@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Exporters
 
             string fileNamePrefix = Path.Combine(summary.ResultsDirectoryPath, summary.Title);
             string csvFullPath = CsvMeasurementsExporter.Default.GetArtifactFullName(summary);
-            
+
             string scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
             string logFullPath = Path.Combine(summary.ResultsDirectoryPath, logFileName);
             string script = ResourceHelper.
@@ -96,7 +96,7 @@ namespace BenchmarkDotNet.Exporters
             string path = Environment.GetEnvironmentVariable("PATH");
             if (path == null)
                 return null;
-            
+
             var dirs = path.Split(Path.PathSeparator);
             foreach (string dir in dirs)
             {

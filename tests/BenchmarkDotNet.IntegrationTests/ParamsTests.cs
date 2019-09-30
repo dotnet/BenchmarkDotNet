@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public int ParamProperty { get; private set; }
 
             private HashSet<int> collectedParams = new HashSet<int>();
-            
+
             [Benchmark]
             public void Benchmark()
             {
@@ -168,7 +168,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Fact]
         public void InvalidFileNamesInParamsAreSupported() => CanExecute<InvalidFileNamesInParams>();
-        
+
         public class InvalidFileNamesInParams
         {
             [Params("/\\@#$%")]
@@ -196,15 +196,15 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new InvalidOperationException("Wrong character escaping!");
             }
         }
-        
+
         [Fact]
         public void ArrayCanBeUsedAsParameter() => CanExecute<WithArray>();
-        
+
         public class WithArray
         {
             [Params(new[] { 0, 1, 2 })]
             public int[] Array;
-            
+
             [Benchmark]
             public void AcceptingArray()
             {

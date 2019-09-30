@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData('a', "'a'")]
         [InlineData('\\', "'\\\\'")]
         [InlineData(0.123f, "0.123f")]
-        [InlineData(0.123d, "0.123d")]        
+        [InlineData(0.123d, "0.123d")]
         [InlineData(BindingFlags.Public, "(System.Reflection.BindingFlags)(16)")]
         public void ToSourceCodeSimpleTest(object original, string expected)
         {

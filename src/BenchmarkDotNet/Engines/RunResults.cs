@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Engines
     {
         private readonly OutlierMode outlierMode;
         private readonly Encoding encoding;
-        
+
         [CanBeNull, PublicAPI]
         public IReadOnlyList<Measurement> Overhead { get; }
 
@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Engines
                 yield return new Measurement(
                     measurement.LaunchIndex,
                     IterationMode.Workload,
-                    IterationStage.Result, 
+                    IterationStage.Result,
                     ++resultIndex,
                     measurement.Operations,
                     value,

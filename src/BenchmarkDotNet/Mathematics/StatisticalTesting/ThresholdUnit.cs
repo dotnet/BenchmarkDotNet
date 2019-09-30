@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
             { ThresholdUnit.Minutes, "m" },
         };
 
-        internal static readonly IReadOnlyDictionary<string, ThresholdUnit> ShortNameToUnit = UnitToShortName.ToDictionary(pair => pair.Value, pair => pair.Key); 
+        internal static readonly IReadOnlyDictionary<string, ThresholdUnit> ShortNameToUnit = UnitToShortName.ToDictionary(pair => pair.Value, pair => pair.Key);
 
         internal static string ToShortName(this ThresholdUnit thresholdUnit) => UnitToShortName[thresholdUnit];
     }

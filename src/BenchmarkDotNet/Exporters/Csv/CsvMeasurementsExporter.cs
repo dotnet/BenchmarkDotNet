@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Exporters.Csv
                 new MeasurementColumn("Target_Type", (summary, report, m) => report.BenchmarkCase.Descriptor.Type.Name),
                 new MeasurementColumn("Target_Method", (summary, report, m) => report.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo)
             };
-            
+
             // Job
             foreach (var characteristic in CharacteristicHelper.GetAllPresentableCharacteristics(typeof(Job), true))
                 columns.Add(new MeasurementColumn("Job_" + characteristic.Id, (summary, report, m) => Presenter.ToPresentation(report.BenchmarkCase.Job, characteristic)));

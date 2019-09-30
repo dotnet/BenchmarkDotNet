@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Tests.Validators
         public class ReturningIQueryable
         {
             private IQueryable field = Enumerable.Empty<int>().AsQueryable();
-            
+
             [Benchmark] public IQueryable Benchmark() => field;
             [Benchmark] public Task<IQueryable> BenchmarkTask() => Task.FromResult(field);
             [Benchmark] public ValueTask<IQueryable> BenchmarkValueTask() => new ValueTask<IQueryable>(field);
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Tests.Validators
         public class ReturningIQueryableOfInt
         {
             private IQueryable<int> field = Enumerable.Empty<int>().AsQueryable();
-            
+
             [Benchmark] public IQueryable<int> Benchmark() => Enumerable.Empty<int>().AsQueryable();
             [Benchmark] public Task<IQueryable<int>> BenchmarkTask() => Task.FromResult(field);
             [Benchmark] public ValueTask<IQueryable<int>> BenchmarkValueTask() => new ValueTask<IQueryable<int>>(field);
@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Tests.Validators
         public class ReturningArray
         {
             private int[] field = Array.Empty<int>();
-            
+
             [Benchmark] public int[] Benchmark() => field;
             [Benchmark] public Task<int[]> BenchmarkTask() => Task.FromResult(field);
             [Benchmark] public ValueTask<int[]> BenchmarkValueTask() => new ValueTask<int[]>(field);
@@ -96,7 +96,7 @@ namespace BenchmarkDotNet.Tests.Validators
         public class ReturningDictionary
         {
             private Dictionary<int, int> field = new Dictionary<int, int>();
-            
+
             [Benchmark] public Dictionary<int, int> Benchmark() => field;
             [Benchmark] public Task<Dictionary<int, int>> BenchmarkTask() => Task.FromResult(field);
             [Benchmark] public ValueTask<Dictionary<int, int>> BenchmarkValueTask() => new ValueTask<Dictionary<int, int>>(field);

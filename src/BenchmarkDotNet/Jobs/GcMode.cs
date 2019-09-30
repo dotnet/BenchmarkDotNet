@@ -102,8 +102,8 @@ namespace BenchmarkDotNet.Jobs
         }
 
         /// <summary>
-        ///  specify the # of Server GC threads/heaps, must be smaller than the # of logical CPUs the process is allowed to run on, 
-        ///  ie, if you don't specifically affinitize your process it means the # of total logical CPUs on the machine; 
+        ///  specify the # of Server GC threads/heaps, must be smaller than the # of logical CPUs the process is allowed to run on,
+        ///  ie, if you don't specifically affinitize your process it means the # of total logical CPUs on the machine;
         ///  otherwise this is the # of logical CPUs you affinitized your process to.
         /// </summary>
         public int HeapCount

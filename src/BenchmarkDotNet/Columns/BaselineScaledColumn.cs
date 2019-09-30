@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Columns
 {
-    [Obsolete("Use BaselineRatioColumn"), PublicAPI]    
+    [Obsolete("Use BaselineRatioColumn"), PublicAPI]
     public class BaselineScaledColumn : BaselineCustomColumn
     {
         public enum ScaledKind
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Columns
                 switch (Kind)
                 {
                     case ScaledKind.Mean:
-                        return "Scaled";                    
+                        return "Scaled";
                     default:
                         throw new NotSupportedException();
                 }

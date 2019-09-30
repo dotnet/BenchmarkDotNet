@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Tests.Running
             var config = ManualConfig.Create(DefaultConfig.Instance)
                 .With(job1)
                 .With(job2);
-            
+
             var benchmarks1 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1), config);
             var benchmarks2 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain2), config);
 

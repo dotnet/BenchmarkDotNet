@@ -38,10 +38,10 @@ namespace BenchmarkDotNet.Tests.Mocks
                 TimeSpan.FromMinutes(1),
                 ImmutableArray<ValidationError>.Empty);
 
-        private static ImmutableArray<BenchmarkReport> CreateReports(IConfig config) 
+        private static ImmutableArray<BenchmarkReport> CreateReports(IConfig config)
             => CreateBenchmarks(config).Select(CreateSimpleReport).ToImmutableArray();
 
-        private static BenchmarkCase[] CreateBenchmarks(IConfig config) 
+        private static BenchmarkCase[] CreateBenchmarks(IConfig config)
             => BenchmarkConverter.TypeToBenchmarks(typeof(MockBenchmarkClass), config).BenchmarksCases;
 
         private static BenchmarkReport CreateSimpleReport(BenchmarkCase benchmarkCase) => CreateReport(benchmarkCase, 1, 1);

@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Properties
-        
+
         private CharacteristicObject Owner { get; set; }
 
         protected CharacteristicObject OwnerOrSelf => Owner ?? this;
@@ -315,7 +315,7 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Apply
-        
+
         [PublicAPI]
         public void Apply(CharacteristicObject other) => ApplyCore(other);
 
@@ -362,7 +362,7 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Freeze / unfreeze
-        
+
         [PublicAPI]
         public void Freeze() => FreezeCore();
 

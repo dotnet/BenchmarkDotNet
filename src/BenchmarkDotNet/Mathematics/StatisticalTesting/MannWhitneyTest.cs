@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
     public class MannWhitneyTest : IOneSidedTest<MannWhitneyResult>
     {
         public static MannWhitneyTest Instance = new MannWhitneyTest();
-        
+
         private const int SmallN = 32;
 
         private static double PValueForSmallN(int n, int m, double u)
@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
             int n = x.Length, m = y.Length;
             if (Math.Min(n, m) < 3 || Math.Max(n, m) < 5)
                 return null; // Test can't be applied
-            
+
             var xy = new double[n + m];
             for (int i = 0; i < n; i++)
                 xy[i] = x[i];
@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
                     ranks[k] = rank;
                 i = j + 1;
             }
-                
+
             double ux = 0;
             for (int i = 0; i < n + m; i++)
                 if (index[i] < n)

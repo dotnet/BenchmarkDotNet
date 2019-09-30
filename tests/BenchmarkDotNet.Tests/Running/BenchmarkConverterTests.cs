@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Tests.Running
         public void IfIterationSetupIsProvidedTheBenchmarkShouldRunOncePerIteration()
         {
             var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(Derived)).BenchmarksCases.Single();
-            
+
             Assert.Equal(1, benchmark.Job.Run.InvocationCount);
             Assert.Equal(1, benchmark.Job.Run.UnrollFactor);
         }
@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Tests.Running
         public void IfIterationCleanupIsProvidedTheBenchmarkShouldRunOncePerIteration()
         {
             var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithIterationCleanupOnly)).BenchmarksCases.Single();
-            
+
             Assert.Equal(1, benchmark.Job.Run.InvocationCount);
             Assert.Equal(1, benchmark.Job.Run.UnrollFactor);
         }
@@ -98,31 +98,31 @@ namespace BenchmarkDotNet.Tests.Running
             [IterationCleanup] public void Cleanup() { }
             [Benchmark] public void Benchmark() { }
         }
-        
+
         [Fact]
         public void InvocationCountIsRespectedForBenchmarksWithIterationSetup()
         {
             const int InvocationCount = 100;
-            
-            var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(Derived), 
+
+            var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(Derived),
                 DefaultConfig.Instance.With(Job.Default
                     .WithInvocationCount(InvocationCount)))
                 .BenchmarksCases.Single();
-            
+
             Assert.Equal(InvocationCount, benchmark.Job.Run.InvocationCount);
             Assert.NotNull(benchmark.Descriptor.IterationSetupMethod);
         }
-        
+
         [Fact]
         public void UnrollFactorIsRespectedForBenchmarksWithIterationSetup()
         {
             const int UnrollFactor = 13;
-            
-            var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(Derived), 
+
+            var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(Derived),
                     DefaultConfig.Instance.With(Job.Default
                         .WithUnrollFactor(UnrollFactor)))
                 .BenchmarksCases.Single();
-            
+
             Assert.Equal(UnrollFactor, benchmark.Job.Run.UnrollFactor);
             Assert.NotNull(benchmark.Descriptor.IterationSetupMethod);
         }
@@ -148,25 +148,25 @@ namespace BenchmarkDotNet.Tests.Running
         {
             [Benchmark] public void Method() { }
         }
-        
+
         [Fact]
         public void JobMutatorsApplySettingsToDefaultJobIfNoneOfTheConfigsContainsJob()
         {
             var info = BenchmarkConverter.TypeToBenchmarks(typeof(WithMutator));
-            
+
             var benchmark = info.BenchmarksCases.Single();
-            
+
             Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxIterationCount);
             Assert.False(benchmark.Job.Meta.IsMutator);
         }
-        
+
         [Fact]
         public void OrderOfAppliedAttributesDoesNotAffectMutators()
         {
             var info = BenchmarkConverter.TypeToBenchmarks(typeof(WithMutatorAfterJobAttribute));
-            
+
             var benchmark = info.BenchmarksCases.Single();
-            
+
             Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxIterationCount);
             Assert.True(benchmark.Job.Environment.Runtime is CoreRuntime);
             Assert.False(benchmark.Job.Meta.IsMutator);
@@ -178,14 +178,14 @@ namespace BenchmarkDotNet.Tests.Running
         {
             [Benchmark] public void Method() { }
         }
-        
+
         [Fact]
         public void FewMutatorsCanBeAppliedToSameType()
         {
             var info = BenchmarkConverter.TypeToBenchmarks(typeof(WithFewMutators));
-            
+
             var benchmarkCase = info.BenchmarksCases.Single();
-            
+
             Assert.Equal(1, benchmarkCase.Job.Run.InvocationCount);
             Assert.Equal(1, benchmarkCase.Job.Run.UnrollFactor);
             Assert.Equal(OutlierMode.DontRemove, benchmarkCase.Job.Accuracy.OutlierMode);

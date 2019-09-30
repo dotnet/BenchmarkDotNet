@@ -37,25 +37,25 @@ namespace BenchmarkDotNet.Diagnosers
             string fqnMethod = GetMethodName(benchmarkTarget);
             string llvmFlag = GetLlvmFlag(benchmarkCase.Job);
             string exePath = benchmarkTarget.Type.GetTypeInfo().Assembly.Location;
-            
+
             var environmentVariables = new Dictionary<string, string> { ["MONO_VERBOSE_METHOD"] = fqnMethod };
             string monoPath = mono?.CustomPath ?? "mono";
             string arguments = $"--compile {fqnMethod} {llvmFlag} {exePath}";
 
             var (exitCode, output) = ProcessHelper.RunAndReadOutputLineByLine(monoPath, arguments, environmentVariables: environmentVariables, includeErrors: true);
             string commandLine = $"{GetEnvironmentVariables(environmentVariables)} {monoPath} {arguments}";
-            
+
             return OutputParser.Parse(output, benchmarkTarget.WorkloadMethod.Name, commandLine);
         }
 
-        private static string GetEnvironmentVariables(Dictionary<string, string> environmentVariables) 
+        private static string GetEnvironmentVariables(Dictionary<string, string> environmentVariables)
             => string.Join(" ", environmentVariables.Select(e => $"{e.Key}={e.Value}"));
 
         private static string GetMethodName(Descriptor descriptor)
             => $"{descriptor.Type.GetTypeInfo().Namespace}.{descriptor.Type.GetTypeInfo().Name}:{descriptor.WorkloadMethod.Name}";
 
         // TODO: use resolver
-        // TODO: introduce a global helper method for LlvmFlag 
+        // TODO: introduce a global helper method for LlvmFlag
         private static string GetLlvmFlag(Job job) =>
             job.ResolveValue(EnvironmentMode.JitCharacteristic, Jit.Default) == Jit.Llvm ? "--llvm" : "--nollvm";
 
@@ -112,7 +112,7 @@ namespace BenchmarkDotNet.Diagnosers
                 };
             }
 
-            private static DisassemblyResult CreateErrorResult([ItemCanBeNull] IReadOnlyList<string> input, 
+            private static DisassemblyResult CreateErrorResult([ItemCanBeNull] IReadOnlyList<string> input,
                 string methodName, string commandLine, string message)
             {
                 return new DisassemblyResult

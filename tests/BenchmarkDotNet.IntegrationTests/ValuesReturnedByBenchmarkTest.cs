@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public ImmutableArray<int> TypeFromNetStandardNuGetPackage() => ImmutableArray<int>.Empty;
-            
+
             [Benchmark]
             public ValueTuple<int> TypeInTwoDlls() => new ValueTuple<int>();
 
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public Job TypeCalledJob() => new Job();
 
             public class Job { }
-            
+
             [Benchmark]
             public NoNamespace TypeWithoutNamespace() => new NoNamespace();
         }

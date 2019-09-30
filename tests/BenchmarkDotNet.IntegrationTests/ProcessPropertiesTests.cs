@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class ProcessPropertiesTests : BenchmarkTestExecutor
     {
-        public ProcessPropertiesTests(ITestOutputHelper output) 
+        public ProcessPropertiesTests(ITestOutputHelper output)
             : base(output)
         {
         }
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
     public class CustomAffinity
     {
-        public static readonly IntPtr Value = new IntPtr(2); 
+        public static readonly IntPtr Value = new IntPtr(2);
 
         [Benchmark]
         public void Ensure()

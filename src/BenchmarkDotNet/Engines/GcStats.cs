@@ -106,7 +106,7 @@ namespace BenchmarkDotNet.Engines
         public static GcStats ReadInitial()
         {
             // this will force GC.Collect, so we want to do this before collecting collections counts
-            long allocatedBytes = GetAllocatedBytes(); 
+            long allocatedBytes = GetAllocatedBytes();
 
             return new GcStats(
                 GC.CollectionCount(0),
@@ -123,9 +123,9 @@ namespace BenchmarkDotNet.Engines
                 GC.CollectionCount(1),
                 GC.CollectionCount(2),
 
-                // this will force GC.Collect, so we want to do this after collecting collections counts 
+                // this will force GC.Collect, so we want to do this after collecting collections counts
                 // to exclude this single full forced collection from results
-                GetAllocatedBytes(), 
+                GetAllocatedBytes(),
                 0);
         }
 
@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.Engines
             if (RuntimeInformation.IsMono) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
                 return 0;
 
-            // "This instance Int64 property returns the number of bytes that have been allocated by a specific 
+            // "This instance Int64 property returns the number of bytes that have been allocated by a specific
             // AppDomain. The number is accurate as of the last garbage collection." - CLR via C#
             // so we enforce GC.Collect here just to make sure we get accurate results
             GC.Collect();
@@ -171,7 +171,7 @@ namespace BenchmarkDotNet.Engines
             return method != null ? (Func<bool, long>)method.CreateDelegate(typeof(Func<bool, long>)) : null;
         }
 
-        public string ToOutputLine() 
+        public string ToOutputLine()
             => $"{ResultsLinePrefix} {Gen0Collections} {Gen1Collections} {Gen2Collections} {AllocatedBytes} {TotalOperations}";
 
         public static GcStats Parse(string line)

@@ -62,8 +62,8 @@ namespace BenchmarkDotNet.IntegrationTests
                     GlobalCleanupAction = engineParameters.GlobalCleanupAction,
                     GlobalSetupAction = engineParameters.GlobalSetupAction
                 };
-                
-                engine.GlobalSetupAction?.Invoke(); // engine factory is now supposed to create an engine which is ready to run (hence the method name change) 
+
+                engine.GlobalSetupAction?.Invoke(); // engine factory is now supposed to create an engine which is ready to run (hence the method name change)
 
                 return engine;
             }
@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             public void Dispose() => GlobalCleanupAction?.Invoke();
-            
+
             public IHost Host { get; }
             public void WriteLine() { }
             public void WriteLine(string line) { }

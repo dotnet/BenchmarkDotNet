@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Environments
         /// <summary>
         /// Display name
         /// </summary>
-        [PublicAPI] 
+        [PublicAPI]
         public string Name { get; }
 
         /// <summary>

@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Samples
         [Benchmark]
         public void Foo()
         {
-            
+
         }
     }
 }

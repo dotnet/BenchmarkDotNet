@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Samples
         [Benchmark]
         public byte[] Sha256() => sha256.ComputeHash(data);
     }
-    
+
     public class IntroFluentConfigBuilder
     {
         public static void Run()

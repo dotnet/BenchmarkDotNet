@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Engines
             return new ThreadingStats(completedWorkItemCount, lockContentionCount, totalOperationsCount);
         }
 
-        public static ThreadingStats operator +(ThreadingStats left, ThreadingStats right) 
+        public static ThreadingStats operator +(ThreadingStats left, ThreadingStats right)
             => new ThreadingStats(
                 left.CompletedWorkItemCount + right.CompletedWorkItemCount,
                 left.LockContentionCount + right.LockContentionCount,

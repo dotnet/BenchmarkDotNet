@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
     /// then update the hardcoded path
     /// and run following command from console:
     /// dotnet test -c Release -f netcoreapp2.1 --filter "FullyQualifiedName~BenchmarkDotNet.IntegrationTests.ManualRunning.LocalCoreRtToolchainTests"
-    /// 
+    ///
     /// in perfect world we would do this OOB for you, but building CoreRT
     /// so it's not part of our CI jobs
     /// </summary>

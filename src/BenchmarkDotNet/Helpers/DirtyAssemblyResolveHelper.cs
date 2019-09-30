@@ -7,9 +7,9 @@ using System.Reflection;
 /// Sometimes NuGet/VS/other tool does not generate the right assembly binding redirects
 /// or just for any other magical reasons
 /// our users get FileNotFoundException when trying to run their benchmarks
-/// 
+///
 /// We want our users to be happy and we try to help the .NET framework when it fails to load an assembly
-/// 
+///
 /// It's not recommended to copy this code OR reuse it anywhere. It's an UGLY WORKAROUND.
 ///
 /// If one day we can remove it, the person doing that should celebrate!!
@@ -40,7 +40,7 @@ internal class DirtyAssemblyResolveHelper : IDisposable
 
         // the file is right there, but has most probably different version and there is no assembly redirect
         // so we just load it and ignore the version mismatch
-        // we can at least try because benchmarks are not executed in the Host process, 
+        // we can at least try because benchmarks are not executed in the Host process,
         // so even if we load some bad version of the assembly
         // we might still produce the right exe with proper references
 

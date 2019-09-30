@@ -41,19 +41,19 @@ namespace BenchmarkDotNet.Horology
         [PublicAPI, Pure] public static Frequency operator *(Frequency a, int k) => new Frequency(a.Hertz * k);
         [PublicAPI, Pure] public static Frequency operator *(double k, Frequency a) => new Frequency(a.Hertz * k);
         [PublicAPI, Pure] public static Frequency operator *(int k, Frequency a) => new Frequency(a.Hertz * k);
-        
+
         [PublicAPI, Pure] public static bool TryParse(string s, FrequencyUnit unit, out Frequency freq)
         {
             bool success = double.TryParse(s, NumberStyles.Any, HostEnvironmentInfo.MainCultureInfo, out double result);
             freq = new Frequency(result, unit);
             return success;
         }
-        
+
         [PublicAPI, Pure] public static bool TryParseHz(string s, out Frequency freq) => TryParse(s, FrequencyUnit.Hz, out freq);
         [PublicAPI, Pure] public static bool TryParseKHz(string s, out Frequency freq) => TryParse(s, FrequencyUnit.KHz, out freq);
         [PublicAPI, Pure] public static bool TryParseMHz(string s, out Frequency freq) => TryParse(s, FrequencyUnit.MHz, out freq);
         [PublicAPI, Pure] public static bool TryParseGHz(string s, out Frequency freq) => TryParse(s, FrequencyUnit.GHz, out freq);
-        
+
         [PublicAPI, Pure] public override string ToString() => Hertz + " " + FrequencyUnit.Hz.Name;
     }
 }

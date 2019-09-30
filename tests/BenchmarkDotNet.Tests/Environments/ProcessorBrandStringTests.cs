@@ -33,19 +33,19 @@ namespace BenchmarkDotNet.Tests.Environments
         {
             Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(new CpuInfo(originalName, nominalFrequency: Frequency.FromGHz(actualFrequency)), includeMaxFrequency: true));
         }
-        
+
         [Theory]
         [InlineData("AMD Ryzen 7 2700X Eight-Core Processor", "AMD Ryzen 7 2700X 4.10GHz", 4.1, 8, 16)]
         [InlineData("AMD Ryzen 7 2700X Eight-Core Processor", "AMD Ryzen 7 2700X Eight-Core Processor 4.10GHz", 4.1, null, null)]
         public void AmdIsPrettifiedWithDiffFrequencies(string originalName, string prettifiedName, double actualFrequency, int? physicalCoreCount, int? logicalCoreCount)
         {
             var cpuInfo = new CpuInfo(
-                originalName, 
+                originalName,
                 physicalProcessorCount: null,
-                physicalCoreCount, 
-                logicalCoreCount, 
+                physicalCoreCount,
+                logicalCoreCount,
                 Frequency.FromGHz(actualFrequency),
-                minFrequency: null, 
+                minFrequency: null,
                 maxFrequency: null);
 
             Assert.Equal(prettifiedName, ProcessorBrandStringHelper.Prettify(cpuInfo, includeMaxFrequency: true));
@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Tests.Environments
         {
             Assert.Equal(microarchitecture, ProcessorBrandStringHelper.ParseIntelCoreMicroarchitecture(modelNumber));
         }
-        
+
         [Theory]
         [InlineData("", "Unknown processor")]
         [InlineData(null, "Unknown processor")]

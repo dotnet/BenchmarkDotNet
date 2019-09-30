@@ -5,16 +5,16 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Reports;
 
-namespace BenchmarkDotNet.Analysers 
+namespace BenchmarkDotNet.Analysers
 {
-    public class ZeroMeasurementAnalyser : AnalyserBase 
+    public class ZeroMeasurementAnalyser : AnalyserBase
     {
         public override string Id => "ZeroMeasurement";
-        
+
         public static readonly IAnalyser Default = new ZeroMeasurementAnalyser();
 
         private static readonly TimeInterval FallbackCpuResolutionValue = TimeInterval.FromNanoseconds(0.2d);
-        
+
         private ZeroMeasurementAnalyser() { }
 
         protected override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
@@ -29,13 +29,13 @@ namespace BenchmarkDotNet.Analysers
             if (workloadMeasurements.IsEmpty())
                 yield break;
             var workload = workloadMeasurements.GetStatistics();
-            
+
             var threshold = currentFrequency.Value.ToResolution().Nanoseconds / 2;
 
             var zeroMeasurement = overheadMeasurements.Any()
                 ? ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workload.WithoutOutliers(), overheadMeasurements.GetStatistics().WithoutOutliers())
                 : ZeroMeasurementHelper.CheckZeroMeasurementOneSample(workload.WithoutOutliers(), threshold);
-            
+
             if (zeroMeasurement)
                 yield return CreateWarning("The method duration is indistinguishable from the empty method duration",
                                            report, false);

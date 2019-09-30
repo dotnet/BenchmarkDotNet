@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Tests.Reports
             output.WriteLine("DefaultStatisticsColumns: " + columnNames);
             Assert.Equal(expectedColumnNames, columnNames);
         }
-        
+
         [Fact]
         public void EveyMetricHasItsOwnColumn()
         {
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Tests.Reports
             var summary = CreateSummary(false, metrics);
 
             var columns = DefaultColumnProviders.Metrics.GetColumns(summary).ToArray();
-            
+
             Assert.Equal("metric1", columns[0].Id);
             Assert.Equal("metric2", columns[1].Id);
         }
@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Tests.Reports
                 Id = id;
                 Legend = legend;
             }
-            
+
             public string Id { get; }
             public string DisplayName => Id;
             public string Legend { get; }
@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Tests.Reports
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
             var executeResult = new ExecuteResult(true, 0, default, Array.Empty<string>(), Array.Empty<string>());
             bool isFoo = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Foo";
-            bool isBar = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Bar";            
+            bool isBar = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Bar";
             var measurements = new List<Measurement>
             {
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, 1),

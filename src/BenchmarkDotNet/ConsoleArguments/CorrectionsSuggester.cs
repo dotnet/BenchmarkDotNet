@@ -21,12 +21,12 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 var namesCollection = type.GetMethods()
                     .Where(methodInfo => methodInfo.HasAttribute<BenchmarkAttribute>())
-                    .Select(methodInfo => $@"{(type.IsGenericType 
-                        ? type.GetDisplayName() 
+                    .Select(methodInfo => $@"{(type.IsGenericType
+                        ? type.GetDisplayName()
                         : type.FullName)}.{methodInfo.Name}")
                     .ToArray();
                 benchmarkNames.AddRange(namesCollection);
-                
+
                 var names = namesCollection.Select(name => name.Split('.', '+')).SelectMany(GetAllPartialNames);
                 possibleBenchmarkNames.AddRange(names);
             }
@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             if (userInput == null)
                 throw new ArgumentNullException(nameof(userInput));
-            
+
             var calculator = new LevenshteinDistanceCalculator();
             return possibleBenchmarkNames
                 .Select(name => (name: name, distance: calculator.Calculate(userInput, name)))

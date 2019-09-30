@@ -8,9 +8,9 @@ namespace BenchmarkDotNet.Validators
     public class GenericBenchmarksValidator : IValidator
     {
         public static readonly IValidator DontFailOnError = new GenericBenchmarksValidator();
-        
+
         public bool TreatsWarningsAsErrors => false;
-        
+
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => validationParameters
                 .Benchmarks

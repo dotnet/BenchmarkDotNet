@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Tests.Engine
 
             CheckResults(5, measurements, OutlierMode.RemoveUpper);
             CheckResults(5, measurements, OutlierMode.RemoveAll);
-            
+
             CheckResults(6, measurements, OutlierMode.DontRemove);
             CheckResults(6, measurements, OutlierMode.RemoveLower);
         }

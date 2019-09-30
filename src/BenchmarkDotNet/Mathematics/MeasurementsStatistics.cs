@@ -152,7 +152,7 @@ namespace BenchmarkDotNet.Mathematics
 #pragma warning restore 618
                 default:
                     throw new ArgumentOutOfRangeException(nameof(outlierMode), outlierMode, null);
-            }            
+            }
         }
     }
 }
