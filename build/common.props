@@ -17,6 +17,8 @@
 	
     <UseSharedCompilation>false</UseSharedCompilation>
     <SuppressNETCoreSdkPreviewMessage>True</SuppressNETCoreSdkPreviewMessage>
+
+    <CodeAnalysisRuleSet>$(SolutionDir)CodingStyle.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' And $(TargetFramework.StartsWith('net4')) ">
@@ -62,4 +64,14 @@
     <TargetFrameworkRootPath Condition="'$(TargetFrameworkRootPath)' == '' AND Exists('/usr/local/lib/mono/xbuild-frameworks')">/usr/local/lib/mono/xbuild-frameworks</TargetFrameworkRootPath>
     <TargetFrameworkRootPath Condition="'$(TargetFrameworkRootPath)' == '' AND Exists('/usr/lib/mono/xbuild-frameworks')">/usr/lib/mono/xbuild-frameworks</TargetFrameworkRootPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.4">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
 </Project>
