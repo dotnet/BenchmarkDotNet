@@ -84,9 +84,8 @@ namespace BenchmarkDotNet.Portability
             {
                 try
                 {
-                    using (var ndpKey = RegistryKey
-                        .OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
-                        .OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion"))
+                    using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+                    using (var ndpKey = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion"))
                     {
                         if (ndpKey == null)
                             return null;
@@ -273,19 +272,18 @@ namespace BenchmarkDotNet.Portability
             {
                 try
                 {
-                    var wmi = new ManagementObjectSearcher(@"root\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
-                    var data = wmi.Get();
-
-                    foreach (var o in data)
-                    {
-                        var av = (ManagementObject) o;
-                        if (av != null)
+                    using (var wmi = new ManagementObjectSearcher(@"root\SecurityCenter2", "SELECT * FROM AntiVirusProduct"))
+                    using (var data = wmi.Get())
+                        foreach (var o in data)
                         {
-                            string name = av["displayName"].ToString();
-                            string path = av["pathToSignedProductExe"].ToString();
-                            products.Add(new Antivirus(name, path));
+                            var av = (ManagementObject) o;
+                            if (av != null)
+                            {
+                                string name = av["displayName"].ToString();
+                                string path = av["pathToSignedProductExe"].ToString();
+                                products.Add(new Antivirus(name, path));
+                            }
                         }
-                    }
                 }
                 catch
                 {
