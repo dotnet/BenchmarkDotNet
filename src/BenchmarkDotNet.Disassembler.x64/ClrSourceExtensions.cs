@@ -24,7 +24,7 @@ namespace Microsoft.Diagnostics.RuntimeExt
         // TODO Not sure we want this to be a shared dictionary, especially without
         //      any synchronization. Probably want to put this hanging off the Context
         //      somewhere, or inside SymbolCache.
-        static Dictionary<PdbInfo, PdbReader> s_pdbReaders = new Dictionary<PdbInfo, PdbReader>();
+        private static readonly Dictionary<PdbInfo, PdbReader> s_pdbReaders = new Dictionary<PdbInfo, PdbReader>();
 
         public static SourceLocation GetSourceLocation(this ClrMethod method, int ilOffset)
         {

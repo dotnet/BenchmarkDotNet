@@ -16,5 +16,7 @@
   href: console-args.md
 - name: Troubleshooting
   href: troubleshooting.md
-- name: The global BenchmarkDotNet tool
+- name: BenchmarkDotNet as global dotnet tool
   href: global-dotnet-tool.md
+- name: BenchmarkDotNet templates
+  href: dotnet-new-templates.md

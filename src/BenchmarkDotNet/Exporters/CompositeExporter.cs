@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Exporters
 {
     public class CompositeExporter : IExporter
     {
-        private ImmutableArray<IExporter> exporters;
+        private readonly ImmutableArray<IExporter> exporters;
         
         public CompositeExporter(ImmutableArray<IExporter> exporters) => this.exporters = exporters;
 

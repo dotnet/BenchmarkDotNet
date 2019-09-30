@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
 {
     public class WelchTest : IOneSidedTest<WelchResult>
     {
-        public static WelchTest Instance = new WelchTest();
+        public static readonly WelchTest Instance = new WelchTest();
         
         /// <summary>
         /// Checks that (x-y) > threshold

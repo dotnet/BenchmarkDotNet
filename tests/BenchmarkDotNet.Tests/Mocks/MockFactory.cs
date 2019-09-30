@@ -38,11 +38,23 @@ namespace BenchmarkDotNet.Tests.Mocks
                 TimeSpan.FromMinutes(1),
                 ImmutableArray<ValidationError>.Empty);
 
-        private static ImmutableArray<BenchmarkReport> CreateReports(IConfig config) 
-            => CreateBenchmarks(config).Select(CreateSimpleReport).ToImmutableArray();
+        public static Summary CreateSummary(IConfig config, bool hugeSd, Metric[] metrics)
+            => CreateSummary<MockBenchmarkClass>(config, hugeSd, metrics);
 
-        private static BenchmarkCase[] CreateBenchmarks(IConfig config) 
-            => BenchmarkConverter.TypeToBenchmarks(typeof(MockBenchmarkClass), config).BenchmarksCases;
+        public static Summary CreateSummary<TBenchmark>(IConfig config, bool hugeSd, Metric[] metrics) => new Summary(
+                "MockSummary",
+                CreateBenchmarks<TBenchmark>(config).Select(b => CreateReport(b, hugeSd, metrics)).ToImmutableArray(),
+                new HostEnvironmentInfoBuilder().Build(),
+                string.Empty,
+                string.Empty,
+                TimeSpan.FromMinutes(1),
+                ImmutableArray<ValidationError>.Empty);
+
+        private static ImmutableArray<BenchmarkReport> CreateReports(IConfig config) 
+            => CreateBenchmarks<MockBenchmarkClass>(config).Select(CreateSimpleReport).ToImmutableArray();
+
+        private static BenchmarkCase[] CreateBenchmarks<TBenchmarks>(IConfig config) 
+            => BenchmarkConverter.TypeToBenchmarks(typeof(TBenchmarks), config).BenchmarksCases;
 
         private static BenchmarkReport CreateSimpleReport(BenchmarkCase benchmarkCase) => CreateReport(benchmarkCase, 1, 1);
 
@@ -54,6 +66,24 @@ namespace BenchmarkDotNet.Tests.Mocks
                 .Select(index => new Measurement(1, IterationMode.Workload, IterationStage.Result, index + 1, 1, nanoseconds + index))
                 .ToList();
             return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default, Array.Empty<Metric>());
+        }
+
+        private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, bool hugeSd, Metric[] metrics)
+        {
+            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
+            var executeResult = new ExecuteResult(true, 0, default, Array.Empty<string>(), Array.Empty<string>());
+            bool isFoo = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Foo";
+            bool isBar = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Bar";
+            var measurements = new List<Measurement>
+            {
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 2, 1, hugeSd && isFoo ? 2 : 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 3, 1, hugeSd && isBar ? 3 : 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 4, 1, hugeSd && isFoo ? 2 : 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, hugeSd && isBar ? 3 : 1),
+                new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, 1)
+            };
+            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default, metrics);
         }
 
         [LongRunJob]

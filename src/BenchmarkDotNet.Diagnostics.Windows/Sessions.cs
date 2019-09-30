@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
             if (details.Config.GetJobs().Select(job => job.GetToolchain()).Distinct().Count() > 1)
-                fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.Job.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
+                fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
 
             fileName += $"-{creationTime.ToString(BenchmarkRunnerClean.DateTimeFormat)}";
 
