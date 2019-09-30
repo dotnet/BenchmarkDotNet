@@ -177,7 +177,6 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-
         [Fact]
         public void WhenUserDoesNotProvideFilterOrCategoriesViaCommandLineWeAskToChooseBenchmark()
         {
