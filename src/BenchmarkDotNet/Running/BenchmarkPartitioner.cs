@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Running
 
                 if (AreDifferent(GetRuntime(jobX), GetRuntime(jobY))) // Mono vs .NET vs Core
                     return false;
-                if (AreDifferent(jobX.GetToolchain(), jobY.GetToolchain())) // Mono vs .NET vs Core vs InProcess
+                if (AreDifferent(x.GetToolchain(), y.GetToolchain())) // Mono vs .NET vs Core vs InProcess
                     return false;
                 if (jobX.Environment.Jit != jobY.Environment.Jit) // Jit is set per exe in .config file
                     return false;
@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Running
             {
                 var job = obj.Job;
 
-                int hashCode = job.GetToolchain().GetHashCode();
+                int hashCode = obj.GetToolchain().GetHashCode();
 
                 hashCode ^=  GetRuntime(job).GetType().MetadataToken;
 

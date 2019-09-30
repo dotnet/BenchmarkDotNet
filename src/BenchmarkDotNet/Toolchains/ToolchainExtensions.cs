@@ -1,9 +1,12 @@
 ﻿using System;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.Roslyn;
 
@@ -11,14 +14,19 @@ namespace BenchmarkDotNet.Toolchains
 {
     internal static class ToolchainExtensions
     {
-        internal static IToolchain GetToolchain(this Job job)
+        internal static IToolchain GetToolchain(this BenchmarkCase benchmarkCase) => GetToolchain(benchmarkCase.Job, benchmarkCase.Descriptor);
+
+        internal static IToolchain GetToolchain(this Job job) => GetToolchain(job, null);
+
+        private static IToolchain GetToolchain(Job job, Descriptor descriptor)
             => job.HasValue(InfrastructureMode.ToolchainCharacteristic)
                 ? job.Infrastructure.Toolchain
                 : GetToolchain(
                     job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance),
+                    descriptor,
                     job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic) || job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic));
 
-        internal static IToolchain GetToolchain(this Runtime runtime, bool preferMsBuildToolchains = false)
+        internal static IToolchain GetToolchain(this Runtime runtime, Descriptor descriptor = null, bool preferMsBuildToolchains = false)
         {
             switch (runtime)
             {
@@ -37,9 +45,12 @@ namespace BenchmarkDotNet.Toolchains
                     return RoslynToolchain.Instance;
 
                 case CoreRuntime coreRuntime:
-                    return coreRuntime.TargetFrameworkMoniker != TargetFrameworkMoniker.NotRecognized
-                            ? GetToolchain(coreRuntime.TargetFrameworkMoniker)
-                            : CsProjCoreToolchain.From(new DotNetCli.NetCoreAppSettings(coreRuntime.MsBuildMoniker, null, coreRuntime.Name));
+                    if (descriptor != null && descriptor.Type.Assembly.IsLinqPad())
+                        return InProcessEmitToolchain.Instance;
+                    if (coreRuntime.TargetFrameworkMoniker != TargetFrameworkMoniker.NotRecognized)
+                        return GetToolchain(coreRuntime.TargetFrameworkMoniker);
+                    
+                    return CsProjCoreToolchain.From(new DotNetCli.NetCoreAppSettings(coreRuntime.MsBuildMoniker, null, coreRuntime.Name));
 
                 case CoreRtRuntime coreRtRuntime:
                     return coreRtRuntime.TargetFrameworkMoniker != TargetFrameworkMoniker.NotRecognized

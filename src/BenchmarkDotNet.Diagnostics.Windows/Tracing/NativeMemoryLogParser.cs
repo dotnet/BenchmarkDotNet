@@ -175,6 +175,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                 logger.WriteLineInfo($"{benchmarkCase.DisplayInfo}");
                 logger.WriteLineHeader(LogSeparator);
 
+                if (totalOperation == 0)
+                {
+                    logger.WriteLine($"Something went wrong. The trace file {etlFilePath} does not contain BenchmarkDotNet engine events.");
+                    yield break;
+                }
+
                 var memoryAllocatedPerOperation = totalAllocation / totalOperation;
                 var memoryLeakPerOperation = nativeLeakSize / totalOperation;
 
