@@ -75,5 +75,38 @@ namespace BenchmarkDotNet.Tests.Reports
                         defaultOrderer.SummaryOrderPolicy == SummaryOrderPolicy.FastestToSlowest &&
                         defaultOrderer.MethodOrderPolicy == MethodOrderPolicy.Alphabetical);
         }
+
+        [Fact] // Issue #1168
+        public void ZeroValueInMetricColumnIsDashedByDefault()
+        {
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var metrics = new[] { new Metric(new FakeMetricDescriptor("metric1", "some legend", "0.0"), 0.0) };
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary);
+            var actual = table.Columns.First(c => c.Header == "metric1").Content;
+
+            // assert
+            Assert.True(actual.All(value => "-" == value));
+        }
+
+        [Fact] // Issue #1168
+        public void ZeroValueInMetricColumnIsNotDashedWithCustomStyle()
+        {
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var metrics = new[] { new Metric(new FakeMetricDescriptor("metric1", "some legend", "0.0"), 0.0) };
+            var style = config.SummaryStyle.WithZeroMetricValuesInContent();
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary, style);
+            var actual = table.Columns.First(c => c.Header == "metric1").Content;
+
+            // assert
+            Assert.True(actual.All(value => "0.0" == value));
+        }
     }
 }

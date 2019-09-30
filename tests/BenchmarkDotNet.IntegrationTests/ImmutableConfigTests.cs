@@ -8,6 +8,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Validators;
@@ -265,6 +266,22 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.False(mergedJob.Meta.IsMutator); // after the merge the "child" job becomes a standard job
                 Assert.Single(mergedJob.GetCharacteristicsWithValues(), changedCharacteristic => ReferenceEquals(changedCharacteristic, Jobs.RunMode.WarmupCountCharacteristic));
             }
+        }
+
+        [Fact]
+        public void WhenArtifactsPathIsNullDefaultValueShouldBeUsed()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+            var final = ImmutableConfigBuilder.Create(mutable);
+            Assert.Equal(final.ArtifactsPath, DefaultConfig.Instance.ArtifactsPath);
+        }
+
+        [Fact]
+        public void WhenOrdererIsNullDefaultValueShouldBeUsed()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+            var final = ImmutableConfigBuilder.Create(mutable);
+            Assert.Equal(final.Orderer, DefaultOrderer.Instance);
         }
 
         private static ManualConfig CreateConfigFromJobs(params Job[] jobs)

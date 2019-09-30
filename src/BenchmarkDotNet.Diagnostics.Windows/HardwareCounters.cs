@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic)
                     && (benchmark.Job.Infrastructure.Toolchain is InProcessToolchain || benchmark.Job.Infrastructure.Toolchain is InProcessEmitToolchain))
                 {
-                    yield return new ValidationError(true, "Hardware Counters are not supported for InProcessToolchain.", benchmark);
+                    yield return new ValidationError(true, "Hardware Counters and EtwProfiler are not supported for InProcessToolchain.", benchmark);
                 }
             }
         }
