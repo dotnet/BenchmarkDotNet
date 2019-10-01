@@ -39,8 +39,8 @@ namespace BenchmarkDotNet.Helpers
         /// <summary>Ctor for custom encoding presentations</summary>
         public MultiEncodingString(IEnumerable<KeyValuePair<Encoding, string>> encodedStrings)
         {
-            var sourceStrings = encodedStrings ?? new KeyValuePair<Encoding, string>[] { };
-
+            var sourceStrings = encodedStrings ?? System.Array.Empty<KeyValuePair<Encoding, string>>();
+            
             this.encodedStrings = sourceStrings.Where(kvp => kvp.Value != null)
                                                .ToDictionary(_ => _.Key.EncodingName,
                                                              _ => _.Value);

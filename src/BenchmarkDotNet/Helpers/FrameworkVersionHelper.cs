@@ -55,9 +55,8 @@ namespace BenchmarkDotNet.Helpers
 
         private static int? GetReleaseNumberFromWindowsRegistry()
         {
-            using (var ndpKey = RegistryKey
-                .OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
-                .OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\"))
+            using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+            using (var ndpKey = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\"))
             {
                 if (ndpKey == null)
                     return null;
