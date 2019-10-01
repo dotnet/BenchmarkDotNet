@@ -18,6 +18,9 @@ namespace BenchmarkDotNet.Tests.Configs
         public void DefaultConfigDoesNotStopOnFirstError() => Assert.False(DefaultConfig.Instance.Options.HasFlag(ConfigOptions.StopOnFirstError));
 
         [Fact]
+        public void DefaultConfigDoesNotDisableLogFile() => Assert.False(DefaultConfig.Instance.Options.HasFlag(ConfigOptions.DisableLogFile));
+        
+        [Fact]
         public void DefaultConfigDoesDisableOptimizationsValidator() => Assert.False(DefaultConfig.Instance.Options.HasFlag(ConfigOptions.DisableOptimizationsValidator));
 
         [Fact]
