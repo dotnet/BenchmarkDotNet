@@ -25,8 +25,8 @@ namespace BenchmarkDotNet.Columns
         public bool IsAvailable(Summary summary) => summary.Reports.Any(report => report.Metrics.ContainsKey(descriptor.Id));
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => GetValue(summary, benchmarkCase, SummaryStyle.Default);
-        
-        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) 
+
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style)
         {
             if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase].Metrics.TryGetValue(descriptor.Id, out Metric metric) || (metric.Value == 0.0 && !style.PrintZeroValuesInContent))
                 return "-";

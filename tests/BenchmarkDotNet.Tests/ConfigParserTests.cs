@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             Assert.Contains(Job.Dry, config.GetJobs());
         }
-        
+
         [Fact]
         public void UserCanSpecifyHowManyTimesTheBenchmarkShouldBeExecuted()
         {
@@ -72,30 +72,30 @@ namespace BenchmarkDotNet.Tests
             const int warmupCount = 1;
             const int iterationTime = 250;
             const int iterationCount = 20;
-            
+
             var config = ConfigParser.Parse(new[]
             {
-                "--LaunchCount", launchCount.ToString(), 
+                "--LaunchCount", launchCount.ToString(),
                 "--warmupCount",  warmupCount.ToString(),
                 "--iterationTime", iterationTime.ToString(),
                 "--iterationCount", iterationCount.ToString()
             }, new OutputLogger(Output)).config;
 
             var job = config.GetJobs().Single();
-            
+
             Assert.Equal(launchCount, job.Run.LaunchCount);
             Assert.Equal(warmupCount, job.Run.WarmupCount);
             Assert.Equal(TimeInterval.FromMilliseconds(iterationTime), job.Run.IterationTime);
             Assert.Equal(iterationCount, job.Run.IterationCount);
         }
-        
+
         [Fact]
         public void UserCanEasilyRequestToRunTheBenchmarkOncePerIteration()
         {
             var configEasy = ConfigParser.Parse(new[] { "--runOncePerIteration" }, new OutputLogger(Output)).config;
 
             var easyJob = configEasy.GetJobs().Single();
-            
+
             Assert.Equal(1, easyJob.Run.UnrollFactor);
             Assert.Equal(1, easyJob.Run.InvocationCount);
         }
@@ -149,7 +149,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(fakeDotnetCliPath, toolchain.CustomDotNetCliPath.FullName);
             Assert.Equal(fakeRestorePackages, toolchain.RestorePath.FullName);
         }
-        
+
         [Fact]
         public void CoreRunConfigParsedCorrectlyWhenRuntimeSpecified()
         {
@@ -167,7 +167,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(fakeDotnetCliPath, toolchain.CustomDotNetCliPath.FullName);
             Assert.Equal(fakeRestorePackages, toolchain.RestorePath.FullName);
         }
-        
+
         [Fact]
         public void UserCanSpecifyMultipleCoreRunPaths()
         {
@@ -182,7 +182,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(jobs.Where(job => job.GetToolchain() is CoreRunToolchain toolchain && toolchain.SourceCoreRun.FullName == fakeCoreRunPath_2));
             Assert.Equal(2, jobs.Select(job => job.Id).Distinct().Count()); // each job must have a unique ID
         }
-        
+
         [Fact]
         public void MonoPathParsedCorrectly()
         {
@@ -202,7 +202,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime clr && clr.Version == clrVersion));
         }
-        
+
         [Fact]
         public void CoreRtPathParsedCorrectly()
         {
@@ -214,7 +214,7 @@ namespace BenchmarkDotNet.Tests
             Assert.NotNull(toolchain);
             Assert.Equal(fakeCoreRtPath.FullName, toolchain.IlcPath);
         }
-        
+
         [Theory]
         [InlineData("netcoreapp2.0")]
         [InlineData("netcoreapp2.1")]
@@ -239,10 +239,10 @@ namespace BenchmarkDotNet.Tests
         [InlineData(ConfigOptions.StopOnFirstError, "--stopOnFirstError")]
         [InlineData(ConfigOptions.DisableLogFile, "--disableLogFile" )]
         [InlineData(
-            ConfigOptions.JoinSummary | 
-            ConfigOptions.KeepBenchmarkFiles | 
-            ConfigOptions.DontOverwriteResults | 
-            ConfigOptions.StopOnFirstError | 
+            ConfigOptions.JoinSummary |
+            ConfigOptions.KeepBenchmarkFiles |
+            ConfigOptions.DontOverwriteResults |
+            ConfigOptions.StopOnFirstError |
             ConfigOptions.DisableLogFile, "--join", "--keepFiles", "--noOverwrite", "--stopOnFirstError", "--disableLogFile")]
         [InlineData(
             ConfigOptions.JoinSummary |
@@ -266,7 +266,7 @@ namespace BenchmarkDotNet.Tests
             Assert.NotNull(toolchain);
             Assert.Equal(fakeRestoreDirectory, ((DotNetCliGenerator)toolchain.Generator).PackagesPath);
         }
-        
+
         [Fact]
         public void UserCanSpecifyBuildTimeout()
         {
@@ -278,7 +278,7 @@ namespace BenchmarkDotNet.Tests
             Assert.NotNull(toolchain);
             Assert.Equal(timeoutInSeconds, ((DotNetCliBuilder)toolchain.Builder).Timeout.TotalSeconds);
         }
-        
+
         [Fact]
         public void WhenUserDoesNotSpecifyTimeoutTheDefaultValueIsUsed()
         {
@@ -289,7 +289,7 @@ namespace BenchmarkDotNet.Tests
             Assert.NotNull(toolchain);
             Assert.Equal(NetCoreAppSettings.DefaultBuildTimeout, ((DotNetCliBuilder)toolchain.Builder).Timeout);
         }
-        
+
         [Theory]
         [InlineData("net461")]
         [InlineData("net462")]
@@ -305,7 +305,7 @@ namespace BenchmarkDotNet.Tests
             Assert.NotNull(toolchain);
             Assert.Equal(tfm, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
         }
-        
+
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
@@ -317,7 +317,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRuntime.TargetFrameworkMoniker == TargetFrameworkMoniker.NetCoreApp30));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRtRuntime coreRtRuntime && coreRtRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRtRuntime.TargetFrameworkMoniker == TargetFrameworkMoniker.CoreRt30));
         }
-        
+
         [Theory]
         [InlineData(ThresholdUnit.Ratio, 5)]
         [InlineData(ThresholdUnit.Milliseconds, 10)]
@@ -325,10 +325,10 @@ namespace BenchmarkDotNet.Tests
         {
             var config = ConfigParser.Parse(new[]
             {
-                "--runtimes", "netcoreapp2.1", "netcoreapp2.2", 
+                "--runtimes", "netcoreapp2.1", "netcoreapp2.2",
                 "--statisticalTest", $"{thresholdValue.ToString(CultureInfo.InvariantCulture)}{thresholdUnit.ToShortName()}"
             }, new OutputLogger(Output)).config;
-            
+
             var mockSummary = MockFactory.CreateSummary(config);
 
             Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
@@ -375,11 +375,11 @@ namespace BenchmarkDotNet.Tests
         public void CanParseDisassemblerWithCustomRecursiveDepth()
         {
             const int depth = 123;
-            
+
             var config = ConfigParser.Parse(new[] { "--disasm", "--disasmDepth", depth.ToString()}, new OutputLogger(Output)).config;
 
             var diagnoser = config.GetDiagnosers().OfType<DisassemblyDiagnoser>().Single();
-            
+
             Assert.Equal(depth, diagnoser.Config.RecursiveDepth);
             Assert.True(diagnoser.Config.PrintPrologAndEpilog); // we want this option to be enabled by default for command line users
         }
@@ -399,9 +399,9 @@ namespace BenchmarkDotNet.Tests
                 .With(Job.Default
                     .WithWarmupCount(1)
                     .AsDefault());
-            
+
             var parserdConfig = ConfigParser.Parse(new[] { "--warmupCount", "2"}, new OutputLogger(Output), globalConfig).config;
-            
+
             Assert.Equal(2, parserdConfig.GetJobs().Single().Run.WarmupCount);
             Assert.False(parserdConfig.GetJobs().Single().Meta.IsDefault); // after the merge the job is not "default" anymore
         }

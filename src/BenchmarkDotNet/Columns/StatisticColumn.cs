@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Columns
     {
         List<double> GetAllValues(Summary summary, SummaryStyle style);
     }
-    
+
     public class StatisticColumn : IStatisticColumn
     {
         private enum Priority
@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Columns
             Percentiles,
             Additional
         }
-        
+
         public static readonly IStatisticColumn Mean = new StatisticColumn("Mean", "Arithmetic mean of all measurements",
             s => s.Mean, Priority.Main);
 
@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Columns
         /// </summary>
         public static readonly IColumn MValue = new StatisticColumn("MValue", "Modal value, see http://www.brendangregg.com/FrequencyTrails/modes.html",
             MathHelper.CalculateMValue, Priority.Additional, UnitType.Dimensionless);
-        
+
         public static readonly IColumn Iterations = new StatisticColumn("Iterations", "Number of target iterations",
             s => s.N, Priority.Additional, UnitType.Dimensionless);
 
@@ -141,7 +141,7 @@ namespace BenchmarkDotNet.Columns
         {
             if (statistics == null)
                 return "NA";
-            
+
             int precision = summary.DisplayPrecisionManager.GetPrecision(style, this, parentColumn);
             string format = "N" + precision;
 

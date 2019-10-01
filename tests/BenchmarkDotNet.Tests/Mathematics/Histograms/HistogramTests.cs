@@ -84,7 +84,7 @@ namespace BenchmarkDotNet.Tests.Mathematics.Histograms
             output.WriteLine($"=== {title}:Full ===");
             output.WriteLine(histogram.ToTimeStr(full: true));
         }
-        
+
         [Theory]
         [InlineData(new[] { 1.0, 2.0, 3.0 })]
         [InlineData(new[] { 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 })]

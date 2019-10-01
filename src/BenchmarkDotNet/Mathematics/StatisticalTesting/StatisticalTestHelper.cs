@@ -12,13 +12,13 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
         {
             if (baseline.SequenceEqual(candidate)) // WelchTest would throw StackoverflowException ;)
                 return new TostResult<T>(threshold, EquivalenceTestConclusion.Base, null, null);
-            
+
             var fasterTestResult = test.IsGreater(baseline, candidate, threshold);
             var slowerTestResult = test.IsGreater(candidate, baseline, threshold);
 
             EquivalenceTestConclusion conclusion;
             if (fasterTestResult == null || slowerTestResult == null)
-                conclusion = EquivalenceTestConclusion.Unknown;            
+                conclusion = EquivalenceTestConclusion.Unknown;
             else if (fasterTestResult.NullHypothesisIsRejected)
                 conclusion = EquivalenceTestConclusion.Faster;
             else if (slowerTestResult.NullHypothesisIsRejected)

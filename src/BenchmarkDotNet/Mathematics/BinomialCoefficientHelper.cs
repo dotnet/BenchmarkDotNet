@@ -5,12 +5,12 @@ namespace BenchmarkDotNet.Mathematics
     public static class BinomialCoefficientHelper
     {
         public const int MaxAcceptableN = 65;
-        
+
         private static long[,] pascalTriangle;
 
         public static long GetBinomialCoefficient(int n, int k)
         {
-            const int maxN = MaxAcceptableN; 
+            const int maxN = MaxAcceptableN;
             if (n < 0 || n > maxN)
                 throw new ArgumentOutOfRangeException(nameof(n));
             if (k < 0 || k > n)
@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Mathematics
                     }
                 }
             }
-                        
+
             return pascalTriangle[n, k];
         }
     }

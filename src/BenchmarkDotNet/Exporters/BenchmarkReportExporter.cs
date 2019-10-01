@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Exporters
         private BenchmarkReportExporter()
         {
         }
-        
+
         public override void ExportToLog(Summary summary, ILogger logger)
         {
             foreach (var report in summary.Reports)

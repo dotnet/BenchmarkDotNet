@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Horology
     {
         /// <summary>
         /// Time in the following format: {th}:{mm}:{ss} ({ts} sec)
-        /// 
+        ///
         /// where
         ///   {th}: total hours (two digits)
         ///   {mm}: minutes (two digits)

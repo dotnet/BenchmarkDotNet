@@ -4,7 +4,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.IntegrationTests.DisabledOptimizations
-{               
+{
     internal class JitOptimizationsValidatorConfig : ManualConfig
     {
         public JitOptimizationsValidatorConfig()

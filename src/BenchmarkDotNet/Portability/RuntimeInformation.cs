@@ -37,18 +37,18 @@ namespace BenchmarkDotNet.Portability
         /// <summary>
         /// "The north star for CoreRT is to be a flavor of .NET Core" -> CoreRT reports .NET Core everywhere
         /// </summary>
-        public static bool IsCoreRT 
-            => FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase) 
+        public static bool IsCoreRT
+            => FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase)
                && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
 
         public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
-                
+
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
         internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
         internal static string GetArchitecture() => GetCurrentPlatform().ToString();
-        
+
         internal static bool IsWindows() => IsOSPlatform(OSPlatform.Windows);
 
         internal static bool IsLinux() => IsOSPlatform(OSPlatform.Linux);
@@ -171,7 +171,7 @@ namespace BenchmarkDotNet.Portability
                 return CoreRuntime.GetCurrentVersion();
             if (IsCoreRT)
                 return CoreRtRuntime.GetCurrentVersion();
-            
+
             throw new NotSupportedException("Unknown .NET Runtime");
         }
 

@@ -140,7 +140,7 @@ namespace BenchmarkDotNet.Code
     {
         public TaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
-        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
+        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way,
         // and will eventually throw actual exception, not aggregated one
         public override string WorkloadMethodDelegate(string passArguments)
             => $"({passArguments}) => {{ {Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";
@@ -159,7 +159,7 @@ namespace BenchmarkDotNet.Code
 
         protected override Type WorkloadMethodReturnType => Descriptor.WorkloadMethod.ReturnType.GetTypeInfo().GetGenericArguments().Single();
 
-        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
+        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way,
         // and will eventually throw actual exception, not aggregated one
         public override string WorkloadMethodDelegate(string passArguments)
             => $"({passArguments}) => {{ return {Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";

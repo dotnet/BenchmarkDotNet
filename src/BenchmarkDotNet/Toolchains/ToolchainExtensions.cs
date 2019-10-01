@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Toolchains
                         return InProcessEmitToolchain.Instance;
                     if (coreRuntime.TargetFrameworkMoniker != TargetFrameworkMoniker.NotRecognized)
                         return GetToolchain(coreRuntime.TargetFrameworkMoniker);
-                    
+
                     return CsProjCoreToolchain.From(new DotNetCli.NetCoreAppSettings(coreRuntime.MsBuildMoniker, null, coreRuntime.Name));
 
                 case CoreRtRuntime coreRtRuntime:

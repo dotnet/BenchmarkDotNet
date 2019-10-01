@@ -28,14 +28,14 @@ namespace BenchmarkDotNet.Running
     internal static class BenchmarkRunnerClean
     {
         internal const string DateTimeFormat = "yyyyMMdd-HHmmss";
-        
+
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvironmentResolver.Instance, InfrastructureResolver.Instance);
 
         internal static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos)
         {
             var resolver = DefaultResolver;
             var artifactsToCleanup = new List<string>();
-            
+
             var title = GetTitle(benchmarkRunInfos);
             var rootArtifactsFolderPath = GetRootArtifactsFolderPath(benchmarkRunInfos);
             var resultsFolderPath = GetResultsFolderPath(rootArtifactsFolderPath, benchmarkRunInfos);
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Running
             using (var streamLogger = new StreamLogger(GetLogFileStreamWriter(benchmarkRunInfos, logFilePath)))
             {
                 var compositeLogger = CreateCompositeLogger(benchmarkRunInfos, streamLogger);
-                
+
                 var supportedBenchmarks = GetSupportedBenchmarks(benchmarkRunInfos, compositeLogger, resolver);
                 if (!supportedBenchmarks.Any(benchmarks => benchmarks.BenchmarksCases.Any()))
                     return new [] { Summary.NothingToRun(title, resultsFolderPath, logFilePath) };
@@ -72,9 +72,9 @@ namespace BenchmarkDotNet.Running
                     foreach (var benchmarkRunInfo in supportedBenchmarks) // we run them in the old order now using the new build artifacts
                     {
                         var runChronometer = Chronometer.Start();
-                        
+
                         var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup, resultsFolderPath, logFilePath, ref runChronometer);
-                        
+
                         if (!benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.JoinSummary))
                             PrintSummary(compositeLogger, benchmarkRunInfo.Config, summary);
 
@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Running
                         compositeLogger.WriteLineHeader($"// ** Remained {benchmarksToRunCount} benchmark(s) to run **");
                         LogTotalTime(compositeLogger, runChronometer.GetElapsed().GetTimeSpan(), summary.GetNumberOfExecutedBenchmarks(), message: "Run time");
                         compositeLogger.WriteLine();
-                        
+
                         results.Add(summary);
 
                         if (benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.StopOnFirstError) && summary.Reports.Any(report => !report.Success))
@@ -92,13 +92,13 @@ namespace BenchmarkDotNet.Running
                     if (supportedBenchmarks.Any(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)))
                     {
                         var joinedSummary = Summary.Join(results, globalChronometer.GetElapsed());
-                        
+
                         PrintSummary(compositeLogger, supportedBenchmarks.First(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)).Config, joinedSummary);
-                        
+
                         results.Clear();
                         results.Add(joinedSummary);
                     }
-                    
+
                     var totalTime = globalChronometer.GetElapsed().GetTimeSpan();
                     int totalNumberOfExecutedBenchmarks = results.Sum(summary => summary.GetNumberOfExecutedBenchmarks());
                     LogTotalTime(compositeLogger, totalTime, totalNumberOfExecutedBenchmarks, "Global total time");
@@ -114,11 +114,11 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static Summary Run(BenchmarkRunInfo benchmarkRunInfo, 
-                                   Dictionary<BenchmarkCase, (BenchmarkId benchmarkId, BuildResult buildResult)> buildResults, 
+        private static Summary Run(BenchmarkRunInfo benchmarkRunInfo,
+                                   Dictionary<BenchmarkCase, (BenchmarkId benchmarkId, BuildResult buildResult)> buildResults,
                                    IResolver resolver,
-                                   ILogger logger, 
-                                   List<string> artifactsToCleanup, 
+                                   ILogger logger,
+                                   List<string> artifactsToCleanup,
                                    string resultsFolderPath,
                                    string logFilePath,
                                    ref StartedClock runChronometer)
@@ -175,7 +175,7 @@ namespace BenchmarkDotNet.Running
                     logger.WriteLine();
                 }
             }
-            
+
             var clockSpan = runChronometer.GetElapsed();
 
             return new Summary(title,
@@ -183,7 +183,7 @@ namespace BenchmarkDotNet.Running
                 HostEnvironmentInfo.GetCurrent(),
                 resultsFolderPath,
                 logFilePath,
-                clockSpan.GetTimeSpan(), 
+                clockSpan.GetTimeSpan(),
                 Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
         }
 
@@ -553,7 +553,7 @@ namespace BenchmarkDotNet.Running
                         builder.Add(logger);
 
             builder.Add(streamLogger);
-            
+
             return new CompositeLogger(builder.ToImmutable());
         }
 

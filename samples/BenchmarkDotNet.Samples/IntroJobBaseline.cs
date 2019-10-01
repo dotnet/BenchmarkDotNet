@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Samples
     public class IntroJobBaseline
     {
         [Benchmark]
-        public int SplitJoin() 
+        public int SplitJoin()
             => string.Join(",", new string[1000]).Split(',').Length;
     }
 }

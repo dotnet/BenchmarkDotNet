@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Analysers
             var statistics = report.ResultStatistics;
             if (statistics == null || statistics.N < EngineResolver.DefaultMinWorkloadIterationCount)
                 yield break;
-                    
+
             double mValue = MathHelper.CalculateMValue(statistics);
             if (mValue > 4.2)
                 yield return Create("is multimodal", mValue, report);

@@ -24,13 +24,13 @@ namespace BenchmarkDotNet.Reports
         [PublicAPI] public SummaryTable Table { get; }
         [PublicAPI] public string AllRuntimes { get; }
         [PublicAPI] public ImmutableArray<ValidationError> ValidationErrors { get; }
-        
+
         [PublicAPI] public ImmutableArray<BenchmarkCase> BenchmarksCases { get; }
         [PublicAPI] public ImmutableArray<BenchmarkReport> Reports { get; }
 
         private ImmutableDictionary<BenchmarkCase, BenchmarkReport> ReportMap {get; }
         private BaseliningStrategy BaseliningStrategy {get; }
-        
+
         internal DisplayPrecisionManager DisplayPrecisionManager { get; }
 
         public Summary(
@@ -50,12 +50,12 @@ namespace BenchmarkDotNet.Reports
             ValidationErrors = validationErrors;
 
             ReportMap = reports.ToImmutableDictionary(report => report.BenchmarkCase, report => report);
-            
+
             DisplayPrecisionManager = new DisplayPrecisionManager(this);
             Orderer = GetConfiguredOrdererOrDefaultOne(reports.Select(report => report.BenchmarkCase.Config));
             BenchmarksCases = Orderer.GetSummaryOrder(reports.Select(report => report.BenchmarkCase).ToImmutableArray(), this).ToImmutableArray(); // we sort it first
             Reports = BenchmarksCases.Select(b => ReportMap[b]).ToImmutableArray(); // we use sorted collection to re-create reports list
-            BaseliningStrategy = BaseliningStrategy.Create(BenchmarksCases); 
+            BaseliningStrategy = BaseliningStrategy.Create(BenchmarksCases);
             Style = GetConfiguredSummaryStyleOrNull(BenchmarksCases);
             Table = GetTable(Style);
             AllRuntimes = BuildAllRuntimes(HostEnvironmentInfo, Reports);
@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Reports
 
         /// <summary>
         /// Returns a report for the given benchmark or null if there is no a corresponded report.
-        /// </summary>        
+        /// </summary>
         public BenchmarkReport this[BenchmarkCase benchmarkCase] => ReportMap.GetValueOrDefault(benchmarkCase);
 
         public bool HasCriticalValidationErrors => ValidationErrors.Any(validationError => validationError.IsCritical);
@@ -78,11 +78,11 @@ namespace BenchmarkDotNet.Reports
         internal static Summary ValidationFailed(string title, string resultsDirectoryPath, string logFilePath, ImmutableArray<ValidationError> validationErrors)
             => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, validationErrors);
 
-        internal static Summary Join(List<Summary> summaries, ClockSpan clockSpan) 
+        internal static Summary Join(List<Summary> summaries, ClockSpan clockSpan)
             => new Summary(
                 $"BenchmarkRun-joined-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}",
                 summaries.SelectMany(summary => summary.Reports).ToImmutableArray(),
-                HostEnvironmentInfo.GetCurrent(), 
+                HostEnvironmentInfo.GetCurrent(),
                 summaries.First().ResultsDirectoryPath,
                 summaries.First().LogFilePath,
                 clockSpan.GetTimeSpan(),
@@ -122,17 +122,17 @@ namespace BenchmarkDotNet.Reports
         public string GetLogicalGroupKey(BenchmarkCase benchmarkCase)
             => Orderer.GetLogicalGroupKey(BenchmarksCases, benchmarkCase);
 
-        public bool IsBaseline(BenchmarkCase benchmarkCase) 
+        public bool IsBaseline(BenchmarkCase benchmarkCase)
             => BaseliningStrategy.IsBaseline(benchmarkCase);
 
         [CanBeNull]
-        public BenchmarkCase GetBaseline(string logicalGroupKey) 
+        public BenchmarkCase GetBaseline(string logicalGroupKey)
             => BenchmarksCases
                 .Where(b => GetLogicalGroupKey(b) == logicalGroupKey)
                 .FirstOrDefault(IsBaseline);
 
         [NotNull]
-        public IEnumerable<BenchmarkCase> GetNonBaselines(string logicalGroupKey) 
+        public IEnumerable<BenchmarkCase> GetNonBaselines(string logicalGroupKey)
             => BenchmarksCases
                 .Where(b => GetLogicalGroupKey(b) == logicalGroupKey)
                 .Where(b => !IsBaseline(b));

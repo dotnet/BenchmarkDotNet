@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Helpers
         /// (read more here: <a href="https://www.shellscript.sh/escape.html">https://www.shellscript.sh/escape.html</a>).
         ///
         /// This method escapes such characters on non-Windows platforms.
-        /// 
+        ///
         /// </summary>
         /// <remarks>
         /// See also:

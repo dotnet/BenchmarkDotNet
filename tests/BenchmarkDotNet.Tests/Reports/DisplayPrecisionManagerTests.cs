@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Tests.Reports
                 Assert.Equal(expectedPrecision, actualPrecision);
             }
         }
-        
+
         [Theory]
         [InlineData(4, 0.01)]
         [InlineData(4, 0.123456)]

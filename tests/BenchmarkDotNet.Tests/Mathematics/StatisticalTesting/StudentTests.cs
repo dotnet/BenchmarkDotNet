@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Tests.Mathematics.StatisticalTesting
     public class StudentTests
     {
         private readonly ITestOutputHelper output;
-        
+
         public StudentTests(ITestOutputHelper output) => this.output = output;
 
         [Fact]
@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Tests.Mathematics.StatisticalTesting
             Check(x, 100, 0.6487);
             Check(x, 101, 1);
         }
-        
+
         [AssertionMethod]
         private void Check(double[] x, double y, double pvalue)
         {

@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Jobs
         /// GcMode
         /// </summary>
         public GcMode Gc => GcCharacteristic[this];
-        
+
         public IReadOnlyList<EnvironmentVariable> EnvironmentVariables
         {
             get => EnvironmentVariablesCharacteristic[this];

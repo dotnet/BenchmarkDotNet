@@ -22,58 +22,58 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void MethodsWithoutArgumentsAreSupported() 
+        public void MethodsWithoutArgumentsAreSupported()
             => AssertBenchmarkName<SimplestCase>("BenchmarkDotNet.Tests.SimplestCase.Method");
 
         [Fact]
         public void NestedTypesAreSupported()
         {
-            AssertBenchmarkName<Level0.Level1>("BenchmarkDotNet.Tests.Level0+Level1.Method"); // '+' is used for nested types 
-            AssertBenchmarkName<Level0.Level1.Level2>("BenchmarkDotNet.Tests.Level0+Level1+Level2.Method"); // '+' is used for nested types 
-        } 
+            AssertBenchmarkName<Level0.Level1>("BenchmarkDotNet.Tests.Level0+Level1.Method"); // '+' is used for nested types
+            AssertBenchmarkName<Level0.Level1.Level2>("BenchmarkDotNet.Tests.Level0+Level1+Level2.Method"); // '+' is used for nested types
+        }
 
         [Fact]
-        public void IntegerArgumentsAreSupported() 
+        public void IntegerArgumentsAreSupported()
             => AssertBenchmarkName<SingleIntArgument>("BenchmarkDotNet.Tests.SingleIntArgument.Method(arg: 1)");
 
         [Fact]
-        public void CharacterArgumentsAreSupported() 
+        public void CharacterArgumentsAreSupported()
             => AssertBenchmarkName<SingleCharArgument>("BenchmarkDotNet.Tests.SingleCharArgument.Method(arg: 'c')");
 
         [Fact]
-        public void NullArgumentsAreSupported() 
+        public void NullArgumentsAreSupported()
             => AssertBenchmarkName<SingleNullArgument>("BenchmarkDotNet.Tests.SingleNullArgument.Method(arg: null)"); // null is just a null (not "null")
 
         [Fact]
-        public void EnumArgumentsAreSupported() 
+        public void EnumArgumentsAreSupported()
             => AssertBenchmarkName<SingleEnumArgument>("BenchmarkDotNet.Tests.SingleEnumArgument.Method(arg: Read)"); // no enum type name, just value
 
         [Fact]
-        public void MultipleArgumentsAreSupported() 
+        public void MultipleArgumentsAreSupported()
             => AssertBenchmarkName<FewStringArguments>("BenchmarkDotNet.Tests.FewStringArguments.Method(arg1: \"a\", arg2: \"b\", arg3: \"c\", arg4: \"d\")");
 
         [Fact]
-        public void DateTimeArgumentsAreSupported() 
+        public void DateTimeArgumentsAreSupported()
             => AssertBenchmarkName<SingleDateTimeArgument>("BenchmarkDotNet.Tests.SingleDateTimeArgument.Method(arg: 9999-12-31T23:59:59.9999999)");
 
         [Fact]
-        public void GuidArgumentsAreSupported() 
+        public void GuidArgumentsAreSupported()
             => AssertBenchmarkName<SingleGuidArgument>("BenchmarkDotNet.Tests.SingleGuidArgument.Method(arg: 00000000-0000-0000-0000-000000000000)");
 
         [Fact]
-        public void GenericArgumentsAreSupported() 
+        public void GenericArgumentsAreSupported()
             => AssertBenchmarkName<SimpleGeneric<int>>("BenchmarkDotNet.Tests.SimpleGeneric<Int32>.Method");
 
         [Fact]
-        public void ArraysAreSupported() 
+        public void ArraysAreSupported()
             => AssertBenchmarkName<WithArray>("BenchmarkDotNet.Tests.WithArray.Method(array: [1, 2, 3], value: 4)");
 
         [Fact]
-        public void UnicodeIsSupported() 
+        public void UnicodeIsSupported()
             => AssertBenchmarkName<WithCrazyUnicodeCharacters>("BenchmarkDotNet.Tests.WithCrazyUnicodeCharacters.Method(arg1: \"" + "FOO" + "\", arg2: \""+ "\u03C3" + "\", arg3: \"" + "x\u0305" + "\")");
-        
+
         [Fact]
-        public void TabsAndEnters() 
+        public void TabsAndEnters()
             => AssertBenchmarkName<WithTabAndEnter>("BenchmarkDotNet.Tests.WithTabAndEnter.Method(tab: \"1\\t2\", enter: \"3\\r\\n4\")");
 
         [Fact]
@@ -83,23 +83,23 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void ArraysWithNullsAreSupported()
             => AssertBenchmarkName<WithArrayOfNullStrings>("BenchmarkDotNet.Tests.WithArrayOfNullStrings.Method(array: [null, null])");
-        
+
         [Fact]
-        public void MultipleParamsAreSupported() 
+        public void MultipleParamsAreSupported()
             => AssertBenchmarkName<WithParameters>("BenchmarkDotNet.Tests.WithParameters.Method(Field1: 100, Field2: 200)");
-        
+
         [Fact]
-        public void ArgumentsAndParamsUsedTogetherAreSupported() 
+        public void ArgumentsAndParamsUsedTogetherAreSupported()
             => AssertBenchmarkName<WithArgumentsAndParameters>("BenchmarkDotNet.Tests.WithArgumentsAndParameters.Method(arg: \"anArgument\", Field: 100)");
 
         [Fact]
         public void TypeArgumentsAreWrappedWithTypeofKeywordAndShortTypeNamesAreUsed()
             => AssertBenchmarkName<WithTypesAsArguments>("BenchmarkDotNet.Tests.WithTypesAsArguments.GetConverter(typeToConvert: typeof(bool), expectedConverter: typeof(System.ComponentModel.BooleanConverter))");
-        
+
         [Fact]
         public void NullableTypesAsArgumentsAreSupported()
             => AssertBenchmarkName<WithNullableTypeAsArgument>("BenchmarkDotNet.Tests.WithNullableTypeAsArgument.GetConverter(typeToConvert: typeof(BenchmarkDotNet.Tests.SomeValueType?), expectedConverter: typeof(System.ComponentModel.NullableConverter))");
-        
+
         [Fact]
         public void VoidTypeAsArgumentIsTransaltedToSystemDotVoid()
             => AssertBenchmarkName<WithVoidTypeAsArgument>("BenchmarkDotNet.Tests.WithVoidTypeAsArgument.GetConverter(typeToConvert: typeof(System.Void), expectedConverter: typeof(System.ComponentModel.TypeConverter))");
@@ -214,7 +214,7 @@ namespace BenchmarkDotNet.Tests
             yield return new object[] { "FOO", "\u03C3", "x\u0305" }; // https://github.com/Microsoft/xunit-performance/blob/f1d1d62a934694d8cd19063e60e04c590711d904/tests/simpleharness/Program.cs#L29
         }
     }
-    
+
     public class WithTabAndEnter
     {
         [Benchmark]
@@ -250,14 +250,14 @@ namespace BenchmarkDotNet.Tests
     {
         [Params(100)]
         public int Field1;
-        
+
         [Params(200)]
         public int Field2;
 
         [Benchmark]
         public int Method() => Field1 + Field2;
     }
-    
+
     public class WithArgumentsAndParameters
     {
         [Params(100)]
@@ -267,7 +267,7 @@ namespace BenchmarkDotNet.Tests
         [Arguments("anArgument")]
         public int Method(string arg) => Field;
     }
-    
+
     public class WithTypesAsArguments
     {
         [Benchmark]
@@ -281,7 +281,7 @@ namespace BenchmarkDotNet.Tests
         [Arguments(typeof(SomeValueType?), typeof(NullableConverter))]
         public TypeConverter GetConverter(Type typeToConvert, Type expectedConverter) => TypeDescriptor.GetConverter(typeToConvert);
     }
-    
+
     public struct SomeValueType { }
 
     public class WithVoidTypeAsArgument

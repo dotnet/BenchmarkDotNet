@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Running
         }
 
         public int Value { get; }
-        
+
         private string JobId { get; }
 
         private string FullBenchmarkName { get; }

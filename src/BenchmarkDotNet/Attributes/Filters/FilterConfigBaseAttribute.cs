@@ -3,7 +3,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Filters;
 
 namespace BenchmarkDotNet.Attributes
-{    
+{
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
     public abstract class FilterConfigBaseAttribute : Attribute, IConfigSource
     {

@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Validators
 
         private const BindingFlags reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters input) => 
+        public IEnumerable<ValidationError> Validate(ValidationParameters input) =>
             input.Benchmarks
                 .Select(benchmark => benchmark.Descriptor.Type)
                 .Distinct()
@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Validators
         {
             underlyingType = Nullable.GetUnderlyingType(paramType);
             return underlyingType != null;
-        }        
+        }
 
         private ValidationError GetErrorOrDefault(Type parameterType)
         {

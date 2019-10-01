@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Running
         internal static (bool allTypesValid, IReadOnlyList<Type> runnable) GetTypesWithRunnableBenchmarks(IEnumerable<Type> types, IEnumerable<Assembly> assemblies, ILogger logger)
         {
             var validRunnableTypes = new List<Type>();
-            
+
             foreach (var type in types)
             {
                 if (type.ContainsRunnableBenchmarks())
@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Running
                 else
                 {
                     logger.WriteLineError($"Type {type} is invalid. Only public, non-generic (closed generic types with public parameterless ctors are supported), non-abstract, non-sealed, non-static types with public instance [Benchmark] method(s) are supported.");
-                    
+
                     return (false, Array.Empty<Type>());
                 }
             }

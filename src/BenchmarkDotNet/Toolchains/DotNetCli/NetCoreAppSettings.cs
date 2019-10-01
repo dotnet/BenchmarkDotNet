@@ -38,8 +38,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         [PublicAPI]
         public NetCoreAppSettings(
-            string targetFrameworkMoniker, 
-            string runtimeFrameworkVersion, 
+            string targetFrameworkMoniker,
+            string runtimeFrameworkVersion,
             string name,
             string customDotNetCliPath = null,
             string packagesPath = null,
@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public string Name { get; }
 
         public string CustomDotNetCliPath { get; }
-        
+
         /// <summary>
         /// The directory to restore packages to.
         /// </summary>
@@ -79,10 +79,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath, Timeout);
-        
+
         public NetCoreAppSettings WithCustomPackagesRestorePath(string packagesPath, string displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, CustomDotNetCliPath, packagesPath, Timeout);
-        
+
         public NetCoreAppSettings WithTimeout(TimeSpan? timeOut)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, Name, CustomDotNetCliPath, PackagesPath, timeOut ?? Timeout);
 

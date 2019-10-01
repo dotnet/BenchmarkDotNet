@@ -96,14 +96,14 @@ namespace BenchmarkDotNet.Diagnosers
             // 00007ff7`ffbfd2e6 e80570ae5f      call coreclr!MetaDataGetDispenser+0x72810 (00007ff8`5f6e42f0)
             // 00007ff7`ffbfd318 ffc7            inc edi
             // 00007ff7`ffbfd320 7cba jl      00007ff7`ffbfd2dc
-            // 
+            //
             // so it's always something like
             // address byteRepresentation instruction   [arguments] [extraArguments]
             string address = NextWord(asm.TextRepresentation, ref i);
             string byteRepresentation = NextWord(asm.TextRepresentation, ref i);
             string instruction = NextWord(asm.TextRepresentation, ref i);
 
-            // it's sth like 
+            // it's sth like
             // call    System_Private_CoreLib+0x577460 (00007ff8`59ae7460)
             // and we can not get managed method for this address
             if (!string.IsNullOrEmpty(asm.Comment) && asm.Comment != DisassemblerConstants.NotManagedMethod)

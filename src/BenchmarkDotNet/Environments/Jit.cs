@@ -7,7 +7,7 @@
         /// <remarks>By default</remarks>
         /// </summary>
         Default,
-        
+
         /// <summary>
         /// LegacyJIT
         /// <remarks>Supported only for Full Framework</remarks>

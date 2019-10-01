@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Validators
         [PublicAPI] public bool IsCritical { get; }
         [PublicAPI] public string Message { get; }
         [PublicAPI] public BenchmarkCase BenchmarkCase { get; }
-        
+
         public override string ToString() => Message;
 
         public bool Equals(ValidationError other)

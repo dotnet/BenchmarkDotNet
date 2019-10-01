@@ -26,24 +26,24 @@ namespace BenchmarkDotNet.Engines
                 throw new ArgumentNullException(nameof(engineParameters.TargetJob));
 
             engineParameters.GlobalSetupAction?.Invoke(); // whatever the settings are, we MUST call global setup here, the global cleanup is part of Engine's Dispose
-            
+
             if (!engineParameters.NeedsJitting) // just create the engine, do NOT jit
                 return CreateMultiActionEngine(engineParameters);
 
             int jitIndex = 0;
-            
+
             if (engineParameters.HasInvocationCount || engineParameters.HasUnrollFactor) // it's a job with explicit configuration, just create the engine and jit it
             {
                 var warmedUpMultiActionEngine = CreateMultiActionEngine(engineParameters);
-                
+
                 DeadCodeEliminationHelper.KeepAliveWithoutBoxing(Jit(warmedUpMultiActionEngine, ++jitIndex, invokeCount: engineParameters.UnrollFactor, unrollFactor: engineParameters.UnrollFactor));
 
                 return warmedUpMultiActionEngine;
             }
-            
+
             var singleActionEngine = CreateSingleActionEngine(engineParameters);
             var singleInvocationTime = Jit(singleActionEngine, ++jitIndex, invokeCount: 1, unrollFactor: 1);
-            
+
             if (singleInvocationTime > engineParameters.IterationTime)
                 return singleActionEngine; // executing once takes longer than iteration time => long running benchmark, needs no pilot and no overhead
 
@@ -55,17 +55,17 @@ namespace BenchmarkDotNet.Engines
                 return singleActionEngine;
 
             int roundedUpTimesPerIteration = (int)Math.Ceiling(timesPerIteration);
-            
+
             if (roundedUpTimesPerIteration < defaultUnrollFactor) // if we run it defaultUnrollFactor times per iteration, it's going to take longer than IterationTime
             {
                 var needsPilot = engineParameters.TargetJob
                     .WithUnrollFactor(1) // we don't want to use unroll factor!
                     .WithMinInvokeCount(2) // the minimum is 2 (not the default 4 which can be too much and not 1 which we already know is not enough)
                     .WithEvaluateOverhead(false); // it's something very time consuming, it overhead is too small compared to total time
-                
+
                 return CreateEngine(engineParameters, needsPilot, engineParameters.OverheadActionNoUnroll, engineParameters.WorkloadActionNoUnroll);
             }
-            
+
             var multiActionEngine = CreateMultiActionEngine(engineParameters);
 
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(Jit(multiActionEngine, ++jitIndex, invokeCount: defaultUnrollFactor, unrollFactor: defaultUnrollFactor));
@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Engines
             engine.Dummy1Action.Invoke();
 
             DeadCodeEliminationHelper.KeepAliveWithoutBoxing(engine.RunIteration(new IterationData(IterationMode.Overhead, IterationStage.Jitting, jitIndex, invokeCount, unrollFactor))); // don't forget to JIT idle
-            
+
             engine.Dummy2Action.Invoke();
 
             var result = engine.RunIteration(new IterationData(IterationMode.Workload, IterationStage.Jitting, jitIndex, invokeCount, unrollFactor));
@@ -87,20 +87,20 @@ namespace BenchmarkDotNet.Engines
             engine.Dummy3Action.Invoke();
 
             engine.WriteLine();
-            
+
             return TimeInterval.FromNanoseconds(result.Nanoseconds);
         }
 
-        private static Engine CreateMultiActionEngine(EngineParameters engineParameters) 
+        private static Engine CreateMultiActionEngine(EngineParameters engineParameters)
             => CreateEngine(engineParameters, engineParameters.TargetJob, engineParameters.OverheadActionUnroll, engineParameters.WorkloadActionUnroll);
 
-        private static Engine CreateSingleActionEngine(EngineParameters engineParameters) 
+        private static Engine CreateSingleActionEngine(EngineParameters engineParameters)
             => CreateEngine(engineParameters,
                 engineParameters.TargetJob
-                    .WithInvocationCount(1).WithUnrollFactor(1) // run the benchmark exactly once per iteration 
+                    .WithInvocationCount(1).WithUnrollFactor(1) // run the benchmark exactly once per iteration
                     .WithEvaluateOverhead(false), // it's something very time consuming, it overhead is too small compared to total time
                     // todo: consider if we should set the warmup count to 2
-                engineParameters.OverheadActionNoUnroll, 
+                engineParameters.OverheadActionNoUnroll,
                 engineParameters.WorkloadActionNoUnroll);
 
         private static Engine CreateEngine(EngineParameters engineParameters, Job job, Action<long> idle, Action<long> main)

@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Attributes
         // CLS-Compliant Code requires a constructor without an array in the argument list
         [PublicAPI]
         public AnyCategoriesFilterAttribute() { }
-        
+
         public AnyCategoriesFilterAttribute(params string[] targetCategories) : base(new AnyCategoriesFilter(targetCategories)) { }
     }
 }

@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Extensions
                 parent = parent.DeclaringType;
             }
             prefix += nestedTypes;
-                
+
 
             if (type.GetTypeInfo().IsGenericParameter)
                 return type.Name;
@@ -140,9 +140,9 @@ namespace BenchmarkDotNet.Extensions
         {
             var typeInfo = type.GetTypeInfo();
 
-            if (typeInfo.IsAbstract 
-                || typeInfo.IsSealed 
-                || typeInfo.IsNotPublic 
+            if (typeInfo.IsAbstract
+                || typeInfo.IsSealed
+                || typeInfo.IsNotPublic
                 || typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo))
                 return false;
 
@@ -160,18 +160,18 @@ namespace BenchmarkDotNet.Extensions
         {
             var allFields = type.GetFields(reflectionFlags)
                                 .Select(f => (
-                                    Name: f.Name, 
+                                    Name: f.Name,
                                     Attribute: f.ResolveAttribute<TAttribute>(),
                                     IsPrivate: f.IsPrivate,
-                                    IsStatic: f.IsStatic, 
+                                    IsStatic: f.IsStatic,
                                     ParameterType: f.FieldType));
 
             var allProperties = type.GetProperties(reflectionFlags)
                                     .Select(p => (
-                                        Name: p.Name, 
-                                        Attribute: p.ResolveAttribute<TAttribute>(), 
-                                        IsPrivate: p.GetSetMethod() == null, 
-                                        IsStatic: p.GetSetMethod() != null && p.GetSetMethod().IsStatic, 
+                                        Name: p.Name,
+                                        Attribute: p.ResolveAttribute<TAttribute>(),
+                                        IsPrivate: p.GetSetMethod() == null,
+                                        IsStatic: p.GetSetMethod() != null && p.GetSetMethod().IsStatic,
                                         PropertyType: p.PropertyType));
 
             var joined = allFields.Concat(allProperties).Where(member => member.Attribute != null).ToArray();
@@ -186,7 +186,7 @@ namespace BenchmarkDotNet.Extensions
         {
             if (argumentInstance == null)
                 return false;
-            
+
             // IsByRefLikeAttribute is not exposed for older runtimes, so we need to check it in an ugly way ;)
             bool isByRefLike = argumentType.GetCustomAttributes().Any(attribute => attribute.ToString().Contains("IsByRefLike"));
             if (!isByRefLike)
@@ -197,7 +197,7 @@ namespace BenchmarkDotNet.Extensions
             var implicitCastsDefinedInArgumentInstance = instanceType.GetMethods().Where(method => method.Name == "op_Implicit" && method.GetParameters().Any()).ToArray();
             if (implicitCastsDefinedInArgumentInstance.Any(implicitCast => implicitCast.ReturnType == argumentType && implicitCast.GetParameters().All(p => p.ParameterType == instanceType)))
                 return true;
-                
+
             var implicitCastsDefinedInArgumentType = argumentType.GetMethods().Where(method => method.Name == "op_Implicit" && method.GetParameters().Any()).ToArray();
             if (implicitCastsDefinedInArgumentType.Any(implicitCast => implicitCast.ReturnType == argumentType && implicitCast.GetParameters().All(p => p.ParameterType == instanceType)))
                 return true;
@@ -208,7 +208,7 @@ namespace BenchmarkDotNet.Extensions
         private static bool IsRunnableGenericType(TypeInfo typeInfo)
             => // if it is an open generic - there must be GenericBenchmark attributes
                 (!typeInfo.IsGenericTypeDefinition || typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any())
-                    && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it       
+                    && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it
 
         internal static bool IsLinqPad(this Assembly assembly) => assembly.FullName.IndexOf("LINQPAD", StringComparison.OrdinalIgnoreCase) >= 0;
     }

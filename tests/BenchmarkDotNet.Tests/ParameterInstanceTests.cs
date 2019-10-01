@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Tests
         public void TrimmingTheValuesMakesThemActuallyShorter(string initialLongText, string expectedDisplayText)
         {
             var parameter = new ParameterInstance(definition, initialLongText);
-            
+
             Assert.Equal(expectedDisplayText, parameter.ToDisplayText());
         }
 
@@ -59,6 +59,6 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(expectedName, parameter.ToDisplayText());
         }
     }
-    
+
     public class ATypeWithAVeryVeryVeryVeryVeryVeryLongNameeeeeeeee { }
 }

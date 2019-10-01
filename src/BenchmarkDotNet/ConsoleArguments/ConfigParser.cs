@@ -126,13 +126,13 @@ namespace BenchmarkDotNet.ConsoleArguments
                     logger.WriteLineError($"The provided path to CoreRun: \"{coreRunPath}\" does NOT exist. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.");
                     return false;
                 }
-            
+
             if (options.MonoPath.IsNotNullButDoesNotExist())
             {
                 logger.WriteLineError($"The provided {nameof(options.MonoPath)} \"{options.MonoPath}\" does NOT exist.");
                 return false;
             }
-            
+
             if (options.CoreRtPath.IsNotNullButDoesNotExist())
             {
                 logger.WriteLineError($"The provided {nameof(options.CoreRtPath)} \"{options.CoreRtPath}\" does NOT exist.");
@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 logger.WriteLineError("You can't use more than 3 HardwareCounters at the same time.");
                 return false;
             }
-            
+
             foreach (var counterName in options.HardwareCounters)
                 if (!Enum.TryParse(counterName, ignoreCase: true, out HardwareCounter _))
                 {
@@ -175,12 +175,12 @@ namespace BenchmarkDotNet.ConsoleArguments
             var expanded = Expand(baseJob.UnfreezeCopy(), options).ToArray(); // UnfreezeCopy ensures that each of the expanded jobs will have it's own ID
             if (expanded.Length > 1)
                 expanded[0] = expanded[0].AsBaseline(); // if the user provides multiple jobs, then the first one should be a baseline
-            config.Add(expanded); 
+            config.Add(expanded);
             if (config.GetJobs().IsEmpty() && baseJob != Job.Default)
                 config.Add(baseJob);
 
             config.Add(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
-            
+
             config.Add(options.HardwareCounters
                 .Select(counterName => (HardwareCounter)Enum.Parse(typeof(HardwareCounter), counterName, ignoreCase: true))
                 .ToArray());
@@ -219,7 +219,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static Job GetBaseJob(CommandLineOptions options, IConfig globalConfig)
         {
-            var baseJob = 
+            var baseJob =
                 globalConfig?.GetJobs().SingleOrDefault(job => job.Meta.IsDefault) // global config might define single custom Default job
                 ?? AvailableJobs[options.BaseJob.ToLowerInvariant()];
 
@@ -379,7 +379,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             => baseJob
                 .With(CsProjCoreToolchain.From(
                     new NetCoreAppSettings(
-                        targetFrameworkMoniker: RuntimeInformation.GetCurrentRuntime().MsBuildMoniker, 
+                        targetFrameworkMoniker: RuntimeInformation.GetCurrentRuntime().MsBuildMoniker,
                         customDotNetCliPath: options.CliPath?.FullName,
                         runtimeFrameworkVersion: null,
                         name: RuntimeInformation.GetCurrentRuntime().Name,
@@ -419,7 +419,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return coreRunPath.FullName;
 
             var lastCommonDirectorySeparatorIndex = coreRunPath.FullName.LastIndexOf(Path.DirectorySeparatorChar, commonLongestPrefixIndex - 1);
-            
+
             return coreRunPath.FullName.Substring(lastCommonDirectorySeparatorIndex);
         }
     }

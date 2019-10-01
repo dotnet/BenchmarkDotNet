@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             if (!benchmarkToCvTraceFile.Any())
                 return;
-            
+
             logger.WriteLineInfo($"Exported {benchmarkToCvTraceFile.Count} CV trace file(s). Example:");
             logger.WriteLineInfo(benchmarkToCvTraceFile.Values.First());
             logger.WriteLineInfo("DO remember that this Diagnoser just tries to mimic the CVCollectionCmd.exe and you need to have Visual Studio with Concurrency Visualizer plugin installed to visualize the data.");
@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private static EtwProfilerConfig CreateDefaultConfig()
         {
             var kernelKeywords = KernelTraceEventParser.Keywords.ImageLoad | KernelTraceEventParser.Keywords.Profile; // same as for EtwProfiler
-            
+
             // following keywords come from decompiled "GetLocalTraceProviders" of CVCollectionService.exe
             // we don't use KernelTraceEventParser.Keywords.Dispatcher because it blows the CV Visualizer in VS, same goes for KernelTraceEventParser.Keywords.ThreadTime which I tried to experiment with
             kernelKeywords |= KernelTraceEventParser.Keywords.Process | KernelTraceEventParser.Keywords.Thread | KernelTraceEventParser.Keywords.ContextSwitch;
@@ -111,7 +111,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                              | ClrTraceEventParser.Keywords.ThreadTransfer), // extra
                     new TraceEventProviderOptions { StacksEnabled = false }) // stacks are too expensive for our purposes
             };
-            
+
             return new EtwProfilerConfig(
                 performExtraBenchmarksRun: false,
                 kernelKeywords: kernelKeywords,
@@ -126,8 +126,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             var directoryPath = Path.GetDirectoryName(traceFilePath);
             var cvPathFile = Path.ChangeExtension(traceFilePath, ".CvTrace");
             var traceFileName = Path.GetFileName(traceFilePath);
-            
-            File.WriteAllText(cvPathFile, 
+
+            File.WriteAllText(cvPathFile,
 $@"<?xml version=""1.0""?>
 <ConcurrencyTrace xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" MajorVersion=""1"" MinorVersion=""0"">
   <Config MajorVersion=""1"" MinorVersion=""0"">

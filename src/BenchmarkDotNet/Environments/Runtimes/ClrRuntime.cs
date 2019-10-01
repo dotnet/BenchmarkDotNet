@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Environments
             string sdkVersion = FrameworkVersionHelper.GetLatestNetDeveloperPackVersion();
 
             string version = sdkVersion
-                ?? FrameworkVersionHelper.GetFrameworkReleaseVersion(); // .NET Developer Pack is not installed 
+                ?? FrameworkVersionHelper.GetFrameworkReleaseVersion(); // .NET Developer Pack is not installed
 
             switch (version)
             {

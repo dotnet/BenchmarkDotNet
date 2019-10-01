@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Characteristics
             };
 
             public override string ToPresentation(CharacteristicObject obj)
-                => string.Join(Separator, 
+                => string.Join(Separator,
                         GetPresentableCharacteristics(obj, includeIgnoreOnApply: true)
                             .Select(c => CharacteristicPresenter.ToPresentation(obj, c)));
 

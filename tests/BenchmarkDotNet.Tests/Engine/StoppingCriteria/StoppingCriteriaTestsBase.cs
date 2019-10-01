@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Tests.Engine.StoppingCriteria
                 Assert.Equal(expectedIsFinished, actualIsFinished);
             }
         }
-        
+
         private static IReadOnlyList<Measurement> Generate(params double[] values)
         {
             var measurements = new List<Measurement>(values.Length);
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Tests.Engine.StoppingCriteria
         public class Warnings
         {
             public static readonly Warnings Empty = new Warnings();
-            
+
             public string[] Messages { get; }
 
             public Warnings(params string[] messages) => Messages = messages;

@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Extensions
             // it will be resolved to:
             //     string.Format(System.IFormatProvider, string, params object[]) // .NET 4.5
             //     string.Format(System.IFormatProvider, string, object)          // .NET 4.6
-            // Unfortunately, Mono doesn't have the second overload (with object instead of params object[]).            
+            // Unfortunately, Mono doesn't have the second overload (with object instead of params object[]).
             var args = new object[] { value };
             return string.Format(HostEnvironmentInfo.MainCultureInfo, $"{{0:{format}}}", args);
         }
@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Extensions
             foreach (var item in collection)
                 hashSet.Add(item);
         }
-        
+
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
             => dictionary.TryGetValue(key, out var value) ? value : default;
 

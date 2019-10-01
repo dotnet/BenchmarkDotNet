@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Validators
     public static class ValidationErrorReporter
     {
         public const string ConsoleErrorPrefix = "// ERROR: ";
-        
+
         [UsedImplicitly] // Generated benchmarks
         public static bool ReportIfAny(IEnumerable<ValidationError> validationErrors, IHost host)
         {

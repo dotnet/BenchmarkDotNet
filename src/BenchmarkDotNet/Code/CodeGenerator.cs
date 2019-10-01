@@ -100,9 +100,9 @@ namespace BenchmarkDotNet.Code
 
             if (benchmarkDotNetLocation != null && benchmarkDotNetLocation.IndexOf("LINQPAD", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                /* "LINQPad normally puts the compiled query into a different folder than the referenced assemblies 
+                /* "LINQPad normally puts the compiled query into a different folder than the referenced assemblies
                  * - this allows for optimizations to reduce file I/O, which is important in the scratchpad scenario"
-                 * 
+                 *
                  * so in case we detect we are running from LINQPad, we give a hint to assembly loading to search also in this folder
                  */
 
@@ -217,7 +217,7 @@ namespace BenchmarkDotNet.Code
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
                     .Select((parameter, index) => $"{GetParameterModifier(parameter)} arg{index}"));
 
-        private static string GetExtraAttributes(Descriptor descriptor) 
+        private static string GetExtraAttributes(Descriptor descriptor)
             => descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any() ? "[System.STAThreadAttribute]" : string.Empty;
 
         private static string GetEngineFactoryTypeName(BenchmarkCase benchmarkCase)

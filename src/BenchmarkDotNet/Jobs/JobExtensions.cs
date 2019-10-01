@@ -70,8 +70,8 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithGcRetainVm(this Job job, bool value) => job.WithCore(j => j.Environment.Gc.RetainVm = value);
 
         /// <summary>
-        ///  specify the # of Server GC threads/heaps, must be smaller than the # of logical CPUs the process is allowed to run on, 
-        ///  ie, if you don't specifically affinitize your process it means the # of total logical CPUs on the machine; 
+        ///  specify the # of Server GC threads/heaps, must be smaller than the # of logical CPUs the process is allowed to run on,
+        ///  ie, if you don't specifically affinitize your process it means the # of total logical CPUs on the machine;
         ///  otherwise this is the # of logical CPUs you affinitized your process to.
         /// </summary>
         [PublicAPI]
@@ -230,7 +230,7 @@ namespace BenchmarkDotNet.Jobs
         /// <param name="job">The original job</param>
         /// <param name="environmentVariable">The new environment variable which should be added for the new job</param>
         /// <returns>The new job with additional environment variable</returns>
-        public static Job With(this Job job, EnvironmentVariable environmentVariable) 
+        public static Job With(this Job job, EnvironmentVariable environmentVariable)
             => job.WithCore(j => j.Environment.SetEnvironmentVariable(environmentVariable));
 
         /// <summary>
@@ -253,7 +253,7 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithoutEnvironmentVariables(this Job job) => job.With(Array.Empty<EnvironmentVariable>());
 
         public static Job With(this Job job, IReadOnlyList<Argument> arguments) => job.WithCore(j => j.Infrastructure.Arguments = arguments);
-        
+
         /// <summary>
         /// Runs the job with a specific NuGet dependency which will be resolved during the Job build process
         /// </summary>
@@ -336,7 +336,7 @@ namespace BenchmarkDotNet.Jobs
         /// mutator job should not be added to the config, but instead applied to other jobs in given config
         /// </summary>
         public static Job AsMutator(this Job job) => job.WithCore(j => j.Meta.IsMutator = true);
-        
+
         /// <summary>
         /// use it if you want to specify custom default settings for default job used by console arguments parser
         /// </summary>

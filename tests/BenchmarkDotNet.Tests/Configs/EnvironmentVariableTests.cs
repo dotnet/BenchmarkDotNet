@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Equal(new EnvironmentVariable("c", "d"), job.Environment.EnvironmentVariables[1]);
             Assert.Equal(new EnvironmentVariable("e", "f"), job.Environment.EnvironmentVariables[2]);
         }
-        
+
         [Fact]
         public void OverrideOneVariable()
         {

@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Exporters
     public class CompositeExporter : IExporter
     {
         private readonly ImmutableArray<IExporter> exporters;
-        
+
         public CompositeExporter(ImmutableArray<IExporter> exporters) => this.exporters = exporters;
 
         public string Name => nameof(CompositeExporter);
@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Exporters
                 exporter.ExportToLog(summary, logger);
         }
 
-        public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger) 
+        public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
             => exporters.SelectMany(exporter => exporter.ExportToFiles(summary, consoleLogger));
     }
 }

@@ -11,9 +11,9 @@ namespace BenchmarkDotNet.Attributes
         // CLS-Compliant Code requires a constructor which use only CLS-compliant types
         [PublicAPI]
         public JobMutatorConfigBaseAttribute() => Config = ManualConfig.CreateEmpty();
-        
+
         protected JobMutatorConfigBaseAttribute(Job job) => Config = ManualConfig.CreateEmpty().With(job.AsMutator());
-        
+
         public IConfig Config { get; }
     }
 }

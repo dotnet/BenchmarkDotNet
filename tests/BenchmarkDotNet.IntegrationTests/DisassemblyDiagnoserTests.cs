@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             [Benchmark] public void JustReturn() { }
         }
-        
+
         [TheoryWindowsOnly(WindowsOnly)]
         [MemberData(nameof(GetAllJits))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]

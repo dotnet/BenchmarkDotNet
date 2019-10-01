@@ -30,10 +30,10 @@ namespace BenchmarkDotNet.Engines
             maxIterationCount = engine.TargetJob.ResolveValue(RunMode.MaxIterationCountCharacteristic, engine.Resolver);
         }
 
-        public IReadOnlyList<Measurement> RunOverhead(long invokeCount, int unrollFactor) 
+        public IReadOnlyList<Measurement> RunOverhead(long invokeCount, int unrollFactor)
             => RunAuto(invokeCount, IterationMode.Overhead, unrollFactor);
 
-        public IReadOnlyList<Measurement> RunWorkload(long invokeCount, int unrollFactor, bool forceSpecific = false) 
+        public IReadOnlyList<Measurement> RunWorkload(long invokeCount, int unrollFactor, bool forceSpecific = false)
             => Run(invokeCount, IterationMode.Workload, false, unrollFactor, forceSpecific);
 
         internal IReadOnlyList<Measurement> Run(long invokeCount, IterationMode iterationMode, bool runAuto, int unrollFactor, bool forceSpecific = false)

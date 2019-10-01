@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Attributes
         {
             public Unicode() : base(Encoding.Unicode) { }
         }
-        
+
         [PublicAPI]
         public class ASCII: EncodingAttribute
         {

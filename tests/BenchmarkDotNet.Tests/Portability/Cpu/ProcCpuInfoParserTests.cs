@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Null(parser.PhysicalCoreCount);
             Assert.Null(parser.LogicalCoreCount);
             Assert.Null(parser.NominalFrequency);
-            
+
             Assert.Null(parser.MaxFrequency);
             Assert.Null(parser.MinFrequency);
         }

@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Running
 
         public Descriptor(
             Type type,
-            MethodInfo workloadMethod,              
+            MethodInfo workloadMethod,
             MethodInfo globalSetupMethod = null,
             MethodInfo globalCleanupMethod = null,
             MethodInfo iterationSetupMethod = null,

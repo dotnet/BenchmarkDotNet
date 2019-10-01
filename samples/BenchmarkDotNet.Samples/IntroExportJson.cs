@@ -6,7 +6,7 @@ using BenchmarkDotNet.Exporters.Json;
 namespace BenchmarkDotNet.Samples
 {
     // *** Attribute style ***
-    
+
     [DryJob]
     [JsonExporterAttribute.Brief]
     [JsonExporterAttribute.Full]
@@ -18,9 +18,9 @@ namespace BenchmarkDotNet.Samples
         [Benchmark] public void Sleep10() => Thread.Sleep(10);
         [Benchmark] public void Sleep20() => Thread.Sleep(20);
     }
-    
+
     // *** Object style ***
-    
+
     [Config(typeof(Config))]
     public class IntroJsonExportObjectStyle
     {
@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Samples
                 Add(JsonExporter.Custom("-custom", indentJson: true, excludeMeasurements: true));
             }
         }
-        
+
         [Benchmark] public void Sleep10() => Thread.Sleep(10);
         [Benchmark] public void Sleep20() => Thread.Sleep(20);
     }

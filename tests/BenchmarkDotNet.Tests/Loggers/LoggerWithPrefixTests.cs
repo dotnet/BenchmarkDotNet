@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Tests.Loggers
     {
         private readonly LoggerWithPrefix loggerWithPrefix;
         private readonly AccumulationLogger logger;
-        
+
         public LoggerWithPrefixTests()
         {
             logger = new AccumulationLogger();
@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Tests.Loggers
             loggerWithPrefix.Write("2");
             Assert.Equal("prefix12", logger.GetLog());
         }
-        
+
         [Fact]
         public void WriteLine()
         {
@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Tests.Loggers
             loggerWithPrefix.WriteLine("2");
             Assert.Equal($"prefix1{Environment.NewLine}prefix2{Environment.NewLine}", logger.GetLog());
         }
-        
+
         [Fact]
         public void Write_EmptyLine()
         {
@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Tests.Loggers
             loggerWithPrefix.Write(string.Empty);
             Assert.Equal(string.Empty, logger.GetLog());
         }
-        
+
         [Fact]
         public void WriteLine_EmptyLine()
         {
@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Tests.Loggers
             loggerWithPrefix.WriteLine(string.Empty);
             Assert.Equal($"{Environment.NewLine}{Environment.NewLine}", logger.GetLog());
         }
-        
+
         [Fact]
         public void WriteLineWithoutArg()
         {
@@ -62,35 +62,35 @@ namespace BenchmarkDotNet.Tests.Loggers
             loggerWithPrefix.Write($"1{Environment.NewLine}2");
             Assert.Equal($"prefix1{Environment.NewLine}prefix2", logger.GetLog());
         }
-        
+
         [Fact]
         public void WriteLine_StringWithNewLine()
         {
             loggerWithPrefix.WriteLine($"1{Environment.NewLine}2");
             Assert.Equal($"prefix1{Environment.NewLine}prefix2{Environment.NewLine}", logger.GetLog());
         }
-        
+
         [Fact]
         public void Write_StringWithMultipleNewLine()
         {
             loggerWithPrefix.Write($"1{Environment.NewLine}2{Environment.NewLine}3");
             Assert.Equal($"prefix1{Environment.NewLine}prefix2{Environment.NewLine}prefix3", logger.GetLog());
         }
-        
+
         [Fact]
         public void WriteLine_StringWithMultipleNewLine()
         {
             loggerWithPrefix.WriteLine($"1{Environment.NewLine}2{Environment.NewLine}3");
             Assert.Equal($"prefix1{Environment.NewLine}prefix2{Environment.NewLine}prefix3{Environment.NewLine}", logger.GetLog());
         }
-        
+
         [Fact]
         public void Write_StringWithEmptyNewLine()
         {
             loggerWithPrefix.Write($"1{Environment.NewLine}{Environment.NewLine}2");
             Assert.Equal($"prefix1{Environment.NewLine}{Environment.NewLine}prefix2", logger.GetLog());
         }
-        
+
         [Fact]
         public void WriteLine_StringWithEmptyNewLine()
         {
