@@ -154,7 +154,10 @@ namespace BenchmarkDotNet.ConsoleArguments
         
         [Option("statisticalTest", Required = false, HelpText = "Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s")]
         public string StatisticalTestThreshold { get; set; }
-        
+
+        [Option("disableLogFile", Required = false, HelpText = "Disables the logfile.")]
+        public bool DisableLogFile { get; set; }
+
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
         [Usage(ApplicationAlias = "")]

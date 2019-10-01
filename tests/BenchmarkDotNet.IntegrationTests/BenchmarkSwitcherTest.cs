@@ -13,6 +13,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using Xunit.Abstractions;
+using System.IO;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -124,7 +125,58 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Contains("BenchmarkDotNet.IntegrationTests.ClassA.Method1", logger.GetLog());
             Assert.DoesNotContain("BenchmarkDotNet.IntegrationTests.ClassA.Method2", logger.GetLog());
         }
-        
+
+
+        [Fact]
+        public void WhenDisableLogFileWeDontWriteToFile()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger).With(ConfigOptions.DisableLogFile);
+            string logFilePath = null;
+            try
+            {
+                var summaries = BenchmarkSwitcher
+                    .FromTypes(new[] { typeof(ClassA) })
+                    .RunAll(config);
+
+                var summary = summaries.Single();
+                logFilePath = summary.LogFilePath;
+                Assert.False(File.Exists(logFilePath), $"Logfile '{logFilePath}' should not exist, but it does.");
+            }
+            finally
+            {
+                if (!string.IsNullOrWhiteSpace(logFilePath))
+                {
+                    File.Delete(logFilePath);
+                }
+            }
+        }
+
+        [Fact]
+        public void EnsureLogFileIsWritten()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().With(logger);
+            string logFilePath = null;
+            try
+            {
+                var summaries = BenchmarkSwitcher
+                    .FromTypes(new[] { typeof(ClassA) })
+                    .RunAll(config);
+
+                var summary = summaries.Single();
+                logFilePath = summary.LogFilePath;
+                Assert.True(File.Exists(logFilePath), $"Logfile '{logFilePath}' should exist, but it does not.");
+            }
+            finally
+            {
+                if (!string.IsNullOrWhiteSpace(logFilePath))
+                {
+                    File.Delete(logFilePath);
+                }
+            }
+        }
+
         [Fact]
         public void WhenUserDoesNotProvideFilterOrCategoriesViaCommandLineWeAskToChooseBenchmark()
         {

@@ -210,3 +210,4 @@ dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --sta
 * `--version` Display version information.
 * `--keepFiles` Determines if all auto-generated files should be kept or removed after running the benchmarks.
 * `--noOverwrite` Determines if the exported result files should not be overwritten.
+* `--disableLogFile` Disables the logfile.
