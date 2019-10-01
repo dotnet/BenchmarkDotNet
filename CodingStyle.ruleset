@@ -6,10 +6,8 @@
     <Rule Id="CA1028" Action="None" /> <!-- Enum storage should be Int32 -->
     <Rule Id="CA1030" Action="None" /> <!-- Use events where appropriate -->
     <Rule Id="CA1031" Action="None" /> <!-- Do not catch general exception types -->
-    <Rule Id="CA1032" Action="None" /> <!-- Implement standard exception constructors  -->
     <Rule Id="CA1034" Action="None" /> <!-- Nested types should not be visible -->
     <Rule Id="CA1036" Action="None" /> <!-- Overload comparison operators when implementing System.IComparable -->
-    <Rule Id="CA1041" Action="None" /> <!-- Provide ObsoleteAttribute message -->
     <Rule Id="CA1043" Action="None" /> <!-- Use integral or string argument for indexers -->
     <Rule Id="CA1044" Action="None" /> <!-- Properties should not be write only -->
     <Rule Id="CA1051" Action="None" /> <!-- Do not declare visible instance fields -->
@@ -20,7 +18,6 @@
     <Rule Id="CA1058" Action="None" /> <!-- Types should not extend certain base types -->
     <Rule Id="CA1061" Action="None" /> <!-- Do not hide base class methods -->
     <Rule Id="CA1062" Action="None" /> <!-- Validate arguments of public methods -->
-    <Rule Id="CA1063" Action="None" /> <!-- Implement IDisposable correctly -->
     <Rule Id="CA1064" Action="None" /> <!-- Exceptions should be public -->
     <Rule Id="CA1065" Action="None" /> <!-- Do not raise exceptions in unexpected locations -->
     <Rule Id="CA1066" Action="None" /> <!-- Type should implement IEquatable -->
@@ -40,7 +37,6 @@
     <Rule Id="CA1717" Action="None" /> <!-- Only FlagsAttribute enums should have plural names -->
     <Rule Id="CA1720" Action="None" /> <!-- Identifier contains type name -->
     <Rule Id="CA1721" Action="None" /> <!-- Property names should not match get methods -->
-    <Rule Id="CA1724" Action="None" /> <!-- Type names should not match namespaces -->
     <Rule Id="CA1801" Action="None" /> <!-- Review unused parameters -->
     <Rule Id="CA1806" Action="None" /> <!-- Do not ignore method results -->
     <Rule Id="CA1812" Action="None" /> <!-- Avoid uninstantiated internal classes -->
@@ -50,20 +46,15 @@
     <Rule Id="CA1819" Action="None" /> <!-- Properties should not return arrays -->
     <Rule Id="CA1820" Action="None" /> <!-- Test for empty strings using string length -->
     <Rule Id="CA1822" Action="None" /> <!-- Mark members as static -->
-    <Rule Id="CA1827" Action="None" /> <!-- Do not use Count() when Any() can be used -->
-    <Rule Id="CA2000" Action="None" /> <!-- Dispose objects before losing scope -->
     <Rule Id="CA2010" Action="None" /> <!-- Always consume the value returned by methods marked with PreserveSigAttribute -->
     <Rule Id="CA2100" Action="None" /> <!-- Review SQL queries for security vulnerabilities -->
     <Rule Id="CA2101" Action="None" /> <!-- Specify marshaling for P/Invoke string arguments -->
     <Rule Id="CA2119" Action="None" /> <!-- Seal methods that satisfy private interfaces -->
-    <Rule Id="CA2208" Action="None" /> <!-- Instantiate exception arguments correctly -->
     <Rule Id="CA2211" Action="None" /> <!-- Non-constant fields should not be visible -->
-    <Rule Id="CA2213" Action="None" /> <!-- Disposable Fields should be disposed -->
     <Rule Id="CA2214" Action="None" /> <!-- Do not call overridable methods in constructors -->
     <Rule Id="CA2216" Action="None" /> <!-- Disposable types should declare finalizer -->
     <Rule Id="CA2219" Action="None" /> <!-- Do not raise exceptions in finally clauses -->
     <Rule Id="CA2225" Action="None" /> <!-- Operator overloads have named alternates -->
-    <Rule Id="CA2227" Action="None" /> <!-- Collection properties should be read only -->
     <Rule Id="CA2231" Action="None" /> <!-- Overload operator equals when overriding ValueType.Equals -->
     <Rule Id="CA2235" Action="None" /> <!-- Serializable type has non serializable field -->
     <Rule Id="CA2237" Action="None" /> <!-- Add [Serializable] to types that implement ISerializable -->
