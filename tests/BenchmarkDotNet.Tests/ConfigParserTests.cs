@@ -231,7 +231,30 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(tfm, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
             Assert.Equal(fakeDotnetCliPath, toolchain.CustomDotNetCliPath);
         }
-        
+
+        [Theory]
+        [InlineData(ConfigOptions.JoinSummary, "--join")]
+        [InlineData(ConfigOptions.KeepBenchmarkFiles, "--keepFiles")]
+        [InlineData(ConfigOptions.DontOverwriteResults, "--noOverwrite")]
+        [InlineData(ConfigOptions.StopOnFirstError, "--stopOnFirstError")]
+        [InlineData(ConfigOptions.DisableLogFile, "--disableLogFile" )]
+        [InlineData(
+            ConfigOptions.JoinSummary | 
+            ConfigOptions.KeepBenchmarkFiles | 
+            ConfigOptions.DontOverwriteResults | 
+            ConfigOptions.StopOnFirstError | 
+            ConfigOptions.DisableLogFile, "--join", "--keepFiles", "--noOverwrite", "--stopOnFirstError", "--disableLogFile")]
+        [InlineData(
+            ConfigOptions.JoinSummary |
+            ConfigOptions.KeepBenchmarkFiles |
+            ConfigOptions.StopOnFirstError, "--join", "--keepFiles", "--stopOnFirstError")]
+        public void ConfigOptionsParsedCorrectly(ConfigOptions expectedConfigOption, params string[] configOptionArgs)
+        {
+            var config = ConfigParser.Parse(configOptionArgs, new OutputLogger(Output)).config;
+            Assert.Equal(expectedConfigOption, config.Options);
+            Assert.NotEqual(ConfigOptions.Default, config.Options);
+        }
+
         [Fact]
         public void PackagesPathParsedCorrectly()
         {
