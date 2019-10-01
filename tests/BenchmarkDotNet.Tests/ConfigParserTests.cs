@@ -239,7 +239,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(ConfigOptions.StopOnFirstError, "--stopOnFirstError")]
         [InlineData(ConfigOptions.DisableLogFile, "--disableLogFile" )]
         [InlineData(
-            ConfigOptions.JoinSummary
+            ConfigOptions.JoinSummary |
             ConfigOptions.KeepBenchmarkFiles |
             ConfigOptions.DontOverwriteResults |
             ConfigOptions.StopOnFirstError |
