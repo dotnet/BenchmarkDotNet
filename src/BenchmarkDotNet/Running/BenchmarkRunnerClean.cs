@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Running
             var resultsFolderPath = GetResultsFolderPath(rootArtifactsFolderPath, benchmarkRunInfos);
             var logFilePath = Path.Combine(rootArtifactsFolderPath, title + ".log");
 
-            using (var streamLogger = new StreamLogger(new StreamWriter(logFilePath, append: false)))
+            using (var streamLogger = new StreamLogger(GetLogFileStreamWriter(benchmarkRunInfos, logFilePath)))
             {
                 var compositeLogger = CreateCompositeLogger(benchmarkRunInfos, streamLogger);
                 
@@ -533,6 +533,14 @@ namespace BenchmarkDotNet.Running
                 return Path.Combine(rootArtifactsFolderPath, DateTime.Now.ToString(DateTimeFormat)).CreateIfNotExists();
 
             return Path.Combine(rootArtifactsFolderPath, "results").CreateIfNotExists();
+        }
+
+        private static StreamWriter GetLogFileStreamWriter(BenchmarkRunInfo[] benchmarkRunInfos, string logFilePath)
+        {
+            if (benchmarkRunInfos.Any(info => info.Config.Options.IsSet(ConfigOptions.DisableLogFile)))
+                return StreamWriter.Null;
+
+            return new StreamWriter(logFilePath, append: false);
         }
 
         private static ILogger CreateCompositeLogger(BenchmarkRunInfo[] benchmarkRunInfos, StreamLogger streamLogger)
