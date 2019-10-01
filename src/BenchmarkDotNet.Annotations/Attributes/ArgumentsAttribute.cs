@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Attributes
 
         // CLS-Compliant Code requires a constructor without an array in the argument list
         [PublicAPI]
-        public ArgumentsAttribute() => Values = Array.Empty<object>();
+        public ArgumentsAttribute() => Values = new object[0];
 
         public ArgumentsAttribute(params object[] values)
             => Values = values ?? new object[] { null }; // when users do Arguments(null) they mean one, null argument
