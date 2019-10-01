@@ -26,19 +26,22 @@ namespace BenchmarkDotNet.Toolchains
 
         internal static void Generate(Job job, TextReader source, TextWriter destination, IResolver resolver)
         {
-            var xmlReader = XmlReader.Create(source);
-            var xmlDocument = new XmlDocument();
+            using (var xmlReader = XmlReader.Create(source))
+            {
+                var xmlDocument = new XmlDocument();
 
-            var configurationElement = GetOrCreateConfigurationElement(xmlDocument, xmlReader);
-            var runtimeElement = GetOrCreateRuntimeElement(xmlDocument, configurationElement);
+                var configurationElement = GetOrCreateConfigurationElement(xmlDocument, xmlReader);
 
-            ClearStartupSettingsForCustomClr(configurationElement, job.Environment.Runtime);
-            ClearAllRuntimeSettingsThatCanBeSetOnlyByJobConfiguration(runtimeElement);
+                var runtimeElement = GetOrCreateRuntimeElement(xmlDocument, configurationElement);
 
-            GenerateJitSettings(xmlDocument, runtimeElement, job.Environment);
-            GenerateGCSettings(xmlDocument, runtimeElement, job.Environment.Gc, resolver);
+                ClearStartupSettingsForCustomClr(configurationElement, job.Environment.Runtime);
+                ClearAllRuntimeSettingsThatCanBeSetOnlyByJobConfiguration(runtimeElement);
 
-            xmlDocument.Save(destination);
+                GenerateJitSettings(xmlDocument, runtimeElement, job.Environment);
+                GenerateGCSettings(xmlDocument, runtimeElement, job.Environment.Gc, resolver);
+
+                xmlDocument.Save(destination);
+            }
         }
 
         private static XmlNode GetOrCreateConfigurationElement(XmlDocument xmlDocument, XmlReader xmlReader)
