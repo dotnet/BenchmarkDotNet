@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Tests.Configs
 
         [Fact]
         public void DefaultConfigDoesNotDisableLogFile() => Assert.False(DefaultConfig.Instance.Options.HasFlag(ConfigOptions.DisableLogFile));
-        
+
         [Fact]
         public void DefaultConfigDoesDisableOptimizationsValidator() => Assert.False(DefaultConfig.Instance.Options.HasFlag(ConfigOptions.DisableOptimizationsValidator));
 

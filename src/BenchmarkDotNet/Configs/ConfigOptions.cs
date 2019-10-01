@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         DontOverwriteResults = 1 << 4,
         /// <summary>
-        /// Determines if the log file should be disabled. 
+        /// Determines if the log file should be disabled.
         /// </summary>
         DisableLogFile = 1 << 5
     }

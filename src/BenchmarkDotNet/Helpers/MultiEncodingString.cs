@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Helpers
         public MultiEncodingString(IEnumerable<KeyValuePair<Encoding, string>> encodedStrings)
         {
             var sourceStrings = encodedStrings ?? System.Array.Empty<KeyValuePair<Encoding, string>>();
-            
+
             this.encodedStrings = sourceStrings.Where(kvp => kvp.Value != null)
                                                .ToDictionary(_ => _.Key.EncodingName,
                                                              _ => _.Value);

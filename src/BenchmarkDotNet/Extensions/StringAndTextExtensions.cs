@@ -84,7 +84,7 @@ namespace BenchmarkDotNet.Extensions
             }
             return sb.ToString();
         }
-        
+
         /// <summary>
         /// Returns file base name
         /// </summary>
