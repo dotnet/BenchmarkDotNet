@@ -212,7 +212,15 @@ namespace BenchmarkDotNet.Running
                     throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of defined arguments provided with [Arguments]! {argumentsAttribute.Values.Length} instead of {parameterDefinitions.Length}.");
 
                 yield return new ParameterInstances(
-                    argumentsAttribute.Values.Select((value, index) => new ParameterInstance(parameterDefinitions[index], Map(value), summaryStyle)).ToArray());
+                    argumentsAttribute
+                        .Values
+                        .Select((value, index) =>
+                            { 
+                                var definition = parameterDefinitions[index];
+                                var type = definition.ParameterType;
+                                return new ParameterInstance(parameterDefinitions[index], Map(value, type), summaryStyle);
+                            })
+                        .ToArray());
             }
 
             if (!benchmark.HasAttribute<ArgumentsSourceAttribute>())
@@ -278,15 +286,24 @@ namespace BenchmarkDotNet.Running
                 return new object[] { null };
             }
 
-            return values?.Select(Map).ToArray();
+            return values?.Select(value => Map(value, parameterType)).ToArray();
         }
 
-        private static object Map(object providedValue)
+        private static object Map(object providedValue, Type type)
         {
             if (providedValue == null)
                 return null;
 
-            return providedValue.GetType().IsArray ? ArrayParam<IParam>.FromObject(providedValue) : providedValue;
+            type = type ?? providedValue.GetType();
+            if (type.IsArray)
+            {
+                return ArrayParam<IParam>.FromObject(providedValue);
+            }
+            else if (type.IsEnum)
+            {
+                return EnumParam.FromObject(providedValue, type);
+            }            
+            return providedValue;
         }
 
         private static (MemberInfo source, object[] values) GetValidValuesForParamsSource(Type parentType, string sourceName)
