@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Parameters;
 using System.Linq;
 using Xunit;
+using BenchmarkDotNet.Configs;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -11,21 +12,22 @@ namespace BenchmarkDotNet.Tests
         public void BasicComparisionTest()
         {
             var comparer = ParameterComparer.Instance;
+            var config = DefaultConfig.Instance.CreateImmutableConfig();
 
             var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>(), isArgument: false, parameterType: null);
             var originalData = new[]
             {
                 new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 5)
+                    new ParameterInstance(sharedDefinition, 5, config)
                 }),
                 new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 1)
+                    new ParameterInstance(sharedDefinition, 1, config)
                 }),
                 new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 3)
+                    new ParameterInstance(sharedDefinition, 3, config)
                 })
             };
             var sortedData = originalData.OrderBy(d => d, comparer).ToArray();
@@ -39,33 +41,34 @@ namespace BenchmarkDotNet.Tests
         public void MultiParameterComparisionTest()
         {
             var comparer = ParameterComparer.Instance;
+            var config = DefaultConfig.Instance.CreateImmutableConfig();
 
             var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>(), isArgument: false, parameterType: null);
             var originalData = new[]
             {
                 new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 5),
-                    new ParameterInstance(sharedDefinition, "z"),
-                    new ParameterInstance(sharedDefinition, 1.0)
+                    new ParameterInstance(sharedDefinition, 5, config),
+                    new ParameterInstance(sharedDefinition, "z", config),
+                    new ParameterInstance(sharedDefinition, 1.0, config)
                 }),
                 new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 5),
-                    new ParameterInstance(sharedDefinition, "a"),
-                    new ParameterInstance(sharedDefinition, 0.0)
+                    new ParameterInstance(sharedDefinition, 5, config),
+                    new ParameterInstance(sharedDefinition, "a", config),
+                    new ParameterInstance(sharedDefinition, 0.0, config)
                 }),
                 new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 5),
-                    new ParameterInstance(sharedDefinition, "a"),
-                    new ParameterInstance(sharedDefinition, 1.0)
+                    new ParameterInstance(sharedDefinition, 5, config),
+                    new ParameterInstance(sharedDefinition, "a", config),
+                    new ParameterInstance(sharedDefinition, 1.0, config)
                 }),
                 new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 3),
-                    new ParameterInstance(sharedDefinition, "a"),
-                    new ParameterInstance(sharedDefinition, 97.5)
+                    new ParameterInstance(sharedDefinition, 3, config),
+                    new ParameterInstance(sharedDefinition, "a", config),
+                    new ParameterInstance(sharedDefinition, 97.5, config)
                 })
             };
 
@@ -93,25 +96,26 @@ namespace BenchmarkDotNet.Tests
         public void AlphaNumericComparisionTest()
         {
             var comparer = ParameterComparer.Instance;
+            var config = DefaultConfig.Instance.CreateImmutableConfig();
 
             var sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>(), isArgument: false, parameterType: null);
             var originalData = new[]
             {
                 new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 100)
+                    new ParameterInstance(sharedDefinition, 100, config)
                 }),
                 new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 1000)
+                    new ParameterInstance(sharedDefinition, 1000, config)
                 }),
                 new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 2000)
+                    new ParameterInstance(sharedDefinition, 2000, config)
                 }),
                 new ParameterInstances(new[]
                 {
-                    new ParameterInstance(sharedDefinition, 500)
+                    new ParameterInstance(sharedDefinition, 500, config)
                 })
             };
 

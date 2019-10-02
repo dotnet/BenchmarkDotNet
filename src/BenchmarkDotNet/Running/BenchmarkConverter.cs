@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Running
             var targetMethods = benchmarkMethods.Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
 
             var parameterDefinitions = GetParameterDefinitions(containingType);
-            var parameterInstancesList = parameterDefinitions.Expand();
+            var parameterInstancesList = parameterDefinitions.Expand(immutableConfig);
 
             var jobs = immutableConfig.GetJobs();
 
@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Running
             var benchmarks = new List<BenchmarkCase>();
             foreach (var target in targets)
             {
-                var argumentsDefinitions = GetArgumentsDefinitions(target.WorkloadMethod, target.Type).ToArray();
+                var argumentsDefinitions = GetArgumentsDefinitions(target.WorkloadMethod, target.Type, immutableConfig).ToArray();
 
                 var parameterInstances =
                     (from parameterInstance in parameterInstancesList
@@ -193,7 +193,7 @@ namespace BenchmarkDotNet.Running
             return new ParameterDefinitions(definitions);
         }
 
-        private static IEnumerable<ParameterInstances> GetArgumentsDefinitions(MethodInfo benchmark, Type target)
+        private static IEnumerable<ParameterInstances> GetArgumentsDefinitions(MethodInfo benchmark, Type target, ImmutableConfig config)
         {
             var parameterDefinitions = benchmark.GetParameters()
                 .Select(parameter => new ParameterDefinition(parameter.Name, false, Array.Empty<object>(), true, parameter.ParameterType))
@@ -211,7 +211,7 @@ namespace BenchmarkDotNet.Running
                     throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of defined arguments provided with [Arguments]! {argumentsAttribute.Values.Length} instead of {parameterDefinitions.Length}.");
 
                 yield return new ParameterInstances(
-                    argumentsAttribute.Values.Select((value, index) => new ParameterInstance(parameterDefinitions[index], Map(value))).ToArray());
+                    argumentsAttribute.Values.Select((value, index) => new ParameterInstance(parameterDefinitions[index], Map(value), config)).ToArray());
             }
 
             if (!benchmark.HasAttribute<ArgumentsSourceAttribute>())
@@ -221,7 +221,7 @@ namespace BenchmarkDotNet.Running
 
             var valuesInfo = GetValidValuesForParamsSource(target, argumentsSourceAttribute.Name);
             for (int sourceIndex = 0; sourceIndex < valuesInfo.values.Length; sourceIndex++)
-                yield return SmartParamBuilder.CreateForArguments(benchmark, parameterDefinitions, valuesInfo, sourceIndex);
+                yield return SmartParamBuilder.CreateForArguments(benchmark, parameterDefinitions, valuesInfo, sourceIndex, config);
         }
 
         private static string[] GetCategories(MethodInfo method)

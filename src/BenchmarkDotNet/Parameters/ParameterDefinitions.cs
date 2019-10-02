@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 
@@ -9,14 +10,11 @@ namespace BenchmarkDotNet.Parameters
     {
         [PublicAPI] public IReadOnlyList<ParameterDefinition> Items { get; }
 
-        public ParameterDefinitions(IReadOnlyList<ParameterDefinition> items)
-        {
-            Items = items;
-        }
+        public ParameterDefinitions(IReadOnlyList<ParameterDefinition> items) => Items = items;
 
-        public IReadOnlyList<ParameterInstances> Expand() => Expand(new[] { new ParameterInstances(new List<ParameterInstance>()) }, Items);
+        public IReadOnlyList<ParameterInstances> Expand(ImmutableConfig config) => Expand(new[] { new ParameterInstances(new List<ParameterInstance>()) }, Items, config);
 
-        private static IReadOnlyList<ParameterInstances> Expand(IReadOnlyList<ParameterInstances> instancesList, IReadOnlyList<ParameterDefinition> definitions)
+        private static IReadOnlyList<ParameterInstances> Expand(IReadOnlyList<ParameterInstances> instancesList, IReadOnlyList<ParameterDefinition> definitions, ImmutableConfig config)
         {
             if (definitions.IsNullOrEmpty())
                 return instancesList;
@@ -28,11 +26,11 @@ namespace BenchmarkDotNet.Parameters
                 {
                     var items = new List<ParameterInstance>();
                     items.AddRange(instances.Items);
-                    items.Add(new ParameterInstance(nextDefinition, value));
+                    items.Add(new ParameterInstance(nextDefinition, value, config));
                     newInstancesList.Add(new ParameterInstances(items));
                 }
             }
-            return Expand(newInstancesList, definitions.Skip(1).ToArray());
+            return Expand(newInstancesList, definitions.Skip(1).ToArray(), config);
         }
 
         public override string ToString() => Items.Any() ? string.Join(",", Items.Select(item => item.Name)) : "<empty>";
