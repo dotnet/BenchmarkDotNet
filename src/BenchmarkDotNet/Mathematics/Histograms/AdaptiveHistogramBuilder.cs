@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Mathematics.Histograms
             if (binSize < Resolution)
                 binSize = Resolution;
             binSize = NiceCeiling(binSize);
-            
+
             var list = values.ToList();
             if (list.IsEmpty())
                 throw new ArgumentException("Values should be non-empty", nameof(values));

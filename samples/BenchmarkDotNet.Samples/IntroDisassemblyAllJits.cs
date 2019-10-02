@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Samples
                 Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3, printDiff: true)));
             }
         }
-        
+
         private Increment increment = new Increment();
 
         [Benchmark]

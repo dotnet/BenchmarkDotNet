@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Cpu
 {
-    /// <summary>    
+    /// <summary>
     /// CPU information from output of the `sysctl -a` command.
     /// MacOSX only.
     /// </summary>

@@ -20,12 +20,12 @@ namespace BenchmarkDotNet.Samples
                     new NameFilter(name => name.Contains("A")),
                     new NameFilter(name => name.Contains("1"))
                 ));
-                
+
                 // benchmark with names with length < 3
                 Add(new NameFilter(name => name.Length < 3));
             }
         }
-    
+
         [Benchmark] public void A1() => Thread.Sleep(10); // Will be benchmarked
         [Benchmark] public void A2() => Thread.Sleep(10); // Will be benchmarked
         [Benchmark] public void A3() => Thread.Sleep(10); // Will be benchmarked

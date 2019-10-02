@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Parameters
         private const int MaxDisplayTextInnerLength = 15 + 5; // 5 is for postfix " [15]"
 
         [PublicAPI] public ParameterDefinition Definition { get; }
-        
+
         private readonly object value;
 
         public ParameterInstance(ParameterDefinition definition, object value)
@@ -27,8 +27,8 @@ namespace BenchmarkDotNet.Parameters
 
         public object Value => value is IParam parameter ? parameter.Value : value;
 
-        public string ToSourceCode() 
-            => value is IParam parameter 
+        public string ToSourceCode()
+            => value is IParam parameter
                 ? parameter.ToSourceCode()
                 : SourceCodeHelper.ToSourceCode(value);
 
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Parameters
 
         public override string ToString() => ToDisplayText();
 
-        private static string Trim(string value) 
+        private static string Trim(string value)
             => value.Length <= MaxDisplayTextInnerLength
                 ? value
                 : value.Substring(0, 5) + "(...)" + value.Substring(value.Length - 5, 5) + $" [{value.Length}]";

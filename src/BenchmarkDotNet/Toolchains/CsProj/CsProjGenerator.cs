@@ -126,7 +126,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 // custom SDKs are not added for non-netcoreapp apps (like net471), so when the TFM != netcoreapp we dont parse "<Import Sdk="
                 // we don't allow for that mostly to prevent from edge cases like the following
                 // <Import Sdk="Microsoft.NET.Sdk.WindowsDesktop" Project="Sdk.props" Condition="'$(TargetFramework)'=='netcoreapp3.0'"/>
-                if (trimmedLine.StartsWith("<Project Sdk=\"") 
+                if (trimmedLine.StartsWith("<Project Sdk=\"")
                     || (TargetFrameworkMoniker.StartsWith("netcoreapp", StringComparison.InvariantCultureIgnoreCase) &&  trimmedLine.StartsWith("<Import Sdk=\"")))
                     sdkName = trimmedLine.Split('"')[1]; // its sth like Sdk="name"
             }

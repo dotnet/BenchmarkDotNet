@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var unsupportedJobConfig = CreateSimpleConfig(job: unsupportedJob);
             var unsupportedJobBenchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithCallToNewtonsoft), unsupportedJobConfig);
             var unsupportedJobLogger = new CompositeLogger(unsupportedJobConfig.GetLoggers().ToImmutableHashSet());
-            foreach (var benchmarkCase in unsupportedJobBenchmark.BenchmarksCases) 
+            foreach (var benchmarkCase in unsupportedJobBenchmark.BenchmarksCases)
             {
                 Assert.False(toolchain.IsSupported(benchmarkCase, unsupportedJobLogger, BenchmarkRunnerClean.DefaultResolver));
             }

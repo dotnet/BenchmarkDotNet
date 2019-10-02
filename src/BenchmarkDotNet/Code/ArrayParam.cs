@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Code
                 throw new InvalidOperationException("The argument must be an array");
             if (!SourceCodeHelper.IsCompilationTimeConstant(type.GetElementType()))
                 throw new InvalidOperationException("The argument must be an array of primitives");
-            
+
             var arrayParamType = typeof(ArrayParam<>).MakeGenericType(type.GetElementType());
 
             var methodInfo = arrayParamType.GetMethod(nameof(ForPrimitives), BindingFlags.Public | BindingFlags.Static)

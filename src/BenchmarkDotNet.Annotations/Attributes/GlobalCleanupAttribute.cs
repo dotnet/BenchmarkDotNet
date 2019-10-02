@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Attributes
     /// <remarks>It's going to be executed only once, after all benchmark runs.</remarks>
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    [MeansImplicitUse]    
+    [MeansImplicitUse]
     public class GlobalCleanupAttribute : TargetedAttribute
     {
     }

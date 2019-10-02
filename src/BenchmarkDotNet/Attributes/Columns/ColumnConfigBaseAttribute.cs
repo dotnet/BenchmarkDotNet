@@ -4,7 +4,7 @@ using BenchmarkDotNet.Configs;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
-{    
+{
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
     public abstract class ColumnConfigBaseAttribute : Attribute, IConfigSource
     {

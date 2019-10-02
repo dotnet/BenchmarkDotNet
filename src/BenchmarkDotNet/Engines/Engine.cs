@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Engines
         [PublicAPI] public IResolver Resolver { get; }
         [PublicAPI] public Encoding Encoding { get; }
         [PublicAPI] public string BenchmarkName { get; }
-        
+
         private IClock Clock { get; }
         private bool ForceAllocations { get; }
         private int UnrollFactor { get; }
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Engines
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
             bool includeExtraStats, Encoding encoding, string benchmarkName)
         {
-            
+
             Host = host;
             OverheadAction = overheadAction;
             Dummy1Action = dummy1Action;
@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Engines
         {
             long invokeCount = InvocationCount;
             IReadOnlyList<Measurement> idle = null;
-            
+
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.BenchmarkStart(BenchmarkName);
 
@@ -128,10 +128,10 @@ namespace BenchmarkDotNet.Engines
 
             Host.AfterMainRun();
 
-            (GcStats workGcHasDone, ThreadingStats threadingStats) = includeExtraStats 
+            (GcStats workGcHasDone, ThreadingStats threadingStats) = includeExtraStats
                 ? GetExtraStats(new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor))
                 : (GcStats.Empty, ThreadingStats.Empty);
-            
+
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.BenchmarkStop(BenchmarkName);
 
@@ -194,7 +194,7 @@ namespace BenchmarkDotNet.Engines
             var finalGcStats = GcStats.ReadFinal();
             var finalThreadingStats = ThreadingStats.ReadFinal();
 
-            IterationCleanupAction(); // we run iteration cleanup after collecting GC stats 
+            IterationCleanupAction(); // we run iteration cleanup after collecting GC stats
 
             GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
             ThreadingStats threadingStats = (finalThreadingStats - initialThreadingStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
@@ -244,12 +244,12 @@ namespace BenchmarkDotNet.Engines
                     { HostSignal.AfterAll, "// AfterAll" }
                 };
 
-            private static readonly Dictionary<string, HostSignal> MessagesToSignals 
+            private static readonly Dictionary<string, HostSignal> MessagesToSignals
                 = SignalsToMessages.ToDictionary(p => p.Value, p => p.Key);
 
             public static string ToMessage(HostSignal signal) => SignalsToMessages[signal];
 
-            public static bool TryGetSignal(string message, out HostSignal signal) 
+            public static bool TryGetSignal(string message, out HostSignal signal)
                 => MessagesToSignals.TryGetValue(message, out signal);
         }
     }

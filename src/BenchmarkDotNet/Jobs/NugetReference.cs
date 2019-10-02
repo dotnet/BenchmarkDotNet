@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Jobs
                 throw new InvalidOperationException($"Invalid version specified: {packageVersion}");
 
             PackageVersion = packageVersion;
-            
+
         }
 
         public string PackageName { get; }

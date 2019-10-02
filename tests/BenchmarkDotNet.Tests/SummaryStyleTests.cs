@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Tests
             );
 
             var config = ManualConfig.CreateEmpty().With(summaryStyle);
-            
+
             Assert.True(config.SummaryStyle.PrintUnitsInHeader);
             Assert.False(config.SummaryStyle.PrintUnitsInContent);
             Assert.True(config.SummaryStyle.PrintZeroValuesInContent);

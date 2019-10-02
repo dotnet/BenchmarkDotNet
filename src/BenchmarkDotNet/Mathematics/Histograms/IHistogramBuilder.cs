@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Mathematics.Histograms
     {
         [PublicAPI, Pure, NotNull]
         Histogram Build(Statistics s, BinSizeRule? rule = null);
-        
+
         [PublicAPI, Pure, NotNull]
         Histogram BuildWithFixedBinSize(IEnumerable<double> values, double binSize);
     }

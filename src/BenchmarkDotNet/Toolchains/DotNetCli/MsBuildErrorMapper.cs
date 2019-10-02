@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     $"Example: <TargetFrameworks>{Map(match.Groups[2])};{Map(match.Groups[3])}</TargetFrameworks>"
             ),
             (
-                new Regex("error NU1201: Project (.*) is not compatible with (.*) ((.*)) / (.*). Project (.*) supports: (.*) ((.*))", 
+                new Regex("error NU1201: Project (.*) is not compatible with (.*) ((.*)) / (.*). Project (.*) supports: (.*) ((.*))",
                     RegexOptions.CultureInvariant | RegexOptions.Compiled),
                 match => $@"The project which defines benchmarks does not target '{Map(match.Groups[2])}'." + Environment.NewLine +
                     $"You need to add '{Map(match.Groups[2])}' to <TargetFrameworks> in your project file ('{match.Groups[1]}')." + Environment.NewLine +

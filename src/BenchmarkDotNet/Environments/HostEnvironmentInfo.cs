@@ -14,7 +14,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Environments
 {
-    // this class is used by our auto-generated benchmark program, 
+    // this class is used by our auto-generated benchmark program,
     // keep it in mind if you want to do some renaming
     // you can find the source code at Templates\BenchmarkProgram.txt
     public class HostEnvironmentInfo : BenchmarkEnvironmentInfo
@@ -110,7 +110,7 @@ namespace BenchmarkDotNet.Environments
         private static string GetBenchmarkDotNetVersion() => BenchmarkDotNetInfo.FullVersion;
 
         /// <summary>
-        /// Return string representation of CPU and environment configuration including BenchmarkDotNet, OS and .NET version  
+        /// Return string representation of CPU and environment configuration including BenchmarkDotNet, OS and .NET version
         /// </summary>
         [PublicAPI]
         public static string GetInformation()

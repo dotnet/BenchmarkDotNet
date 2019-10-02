@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             this.measure = measure;
             TargetJob = job;
         }
-        
+
         public void Dispose() => GlobalSetupAction?.Invoke();
 
         [UsedImplicitly]

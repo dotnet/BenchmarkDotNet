@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Engines
                 throw new ArgumentOutOfRangeException($"InvokeCount({invokeCount}) should be a multiple of UnrollFactor({unrollFactor}).");
             return engine.RunIteration(new IterationData(mode, stage, index, invokeCount, unrollFactor));
         }
-        
+
         internal List<Measurement> Run(IStoppingCriteria criteria, long invokeCount, IterationMode mode, IterationStage stage, int unrollFactor)
         {
             var measurements = new List<Measurement>(criteria.MaxIterationCount);

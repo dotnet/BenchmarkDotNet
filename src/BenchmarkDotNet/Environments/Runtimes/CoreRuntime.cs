@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.Environments
 
             if (RuntimeInformation.IsRunningInContainer)
             {
-                return Version.TryParse(Environment.GetEnvironmentVariable("DOTNET_VERSION"), out version) 
+                return Version.TryParse(Environment.GetEnvironmentVariable("DOTNET_VERSION"), out version)
                     || Version.TryParse(Environment.GetEnvironmentVariable("ASPNETCORE_VERSION"), out version);
             }
 
@@ -115,7 +115,7 @@ namespace BenchmarkDotNet.Environments
             return false;
         }
 
-        // sample input: 
+        // sample input:
         // 2.0: 4.6.26614.01 @BuiltBy: dlab14-DDVSOWINAGE018 @Commit: a536e7eec55c538c94639cefe295aa672996bf9b, Microsoft .NET Framework
         // 2.1: 4.6.27817.01 @BuiltBy: dlab14-DDVSOWINAGE101 @Branch: release/2.1 @SrcCode: https://github.com/dotnet/coreclr/tree/6f78fbb3f964b4f407a2efb713a186384a167e5c, Microsoft .NET Framework
         // 2.2: 4.6.27817.03 @BuiltBy: dlab14-DDVSOWINAGE101 @Branch: release/2.2 @SrcCode: https://github.com/dotnet/coreclr/tree/ce1d090d33b400a25620c0145046471495067cc7, Microsoft .NET Framework

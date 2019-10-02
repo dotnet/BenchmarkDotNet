@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         /// </summary>
         public static readonly IToolchain Core50 = CreateBuilder().UseCoreRtNuGet().TargetFrameworkMoniker("netcoreapp5.0").ToToolchain();
 
-        internal CoreRtToolchain(string displayName, 
+        internal CoreRtToolchain(string displayName,
             string coreRtVersion, string ilcPath, bool useCppCodeGenerator,
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string runtimeIdentifier,
             string customDotNetCliPath, string packagesRestorePath,
@@ -40,10 +40,10 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
             TimeSpan timeout,
             bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData)
             : base(displayName,
-                new Generator(coreRtVersion, useCppCodeGenerator, runtimeFrameworkVersion, targetFrameworkMoniker, customDotNetCliPath, 
+                new Generator(coreRtVersion, useCppCodeGenerator, runtimeFrameworkVersion, targetFrameworkMoniker, customDotNetCliPath,
                     runtimeIdentifier, feeds, useNuGetClearTag, useTempFolderForRestore, packagesRestorePath,
                     rootAllApplicationAssemblies, ilcGenerateCompleteTypeMetadata, ilcGenerateStackTraceData),
-                new DotNetCliPublisher(customDotNetCliPath, GetExtraArguments(useCppCodeGenerator, runtimeIdentifier), GetEnvironmentVariables(ilcPath), timeout), 
+                new DotNetCliPublisher(customDotNetCliPath, GetExtraArguments(useCppCodeGenerator, runtimeIdentifier), GetEnvironmentVariables(ilcPath), timeout),
                 new Executor())
         {
             IlcPath = ilcPath;
@@ -52,10 +52,10 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         public string IlcPath { get; }
 
         public static CoreRtToolchainBuilder CreateBuilder() => CoreRtToolchainBuilder.Create();
-        
+
         private static string GetExtraArguments(bool useCppCodeGenerator, string runtimeIdentifier)
             => useCppCodeGenerator ? $"-r {runtimeIdentifier} /p:NativeCodeGen=cpp" : $"-r {runtimeIdentifier}";
-        
+
         // https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built
         // we have to pass IlcPath env var to get it working
         private static IReadOnlyList<EnvironmentVariable> GetEnvironmentVariables(string ilcPath)

@@ -231,7 +231,7 @@ namespace BenchmarkDotNet.Environments
                 string systemVersionNumbers = systemVersion.Substring(firstDigitIndex).Trim();
                 return $"{systemVersionTitle} {codeName} {systemVersionNumbers} [{kernelVersion}]";
             }
-            
+
             return $"{systemVersion} [{kernelVersion}]";
         }
     }

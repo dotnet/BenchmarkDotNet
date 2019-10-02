@@ -39,7 +39,10 @@ namespace BenchmarkDotNet.Exporters
 
             using (var stream = new StreamWriter(filePath, append: false))
             {
-                ExportToLog(summary, new StreamLogger(stream));
+                using (var streamLogger = new StreamLogger(stream))
+                {
+                    ExportToLog(summary, streamLogger);
+                }
             }
 
             return new[] { filePath };

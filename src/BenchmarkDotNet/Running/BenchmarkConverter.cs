@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Running
 
             // We should check all methods including private to notify users about private methods with the [Benchmark] attribute
             var bindingFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-            
+
             var fullConfig = GetFullConfig(type, config);
             var allMethods = type.GetMethods(bindingFlags);
             return MethodsToBenchmarksWithFullConfig(type, allMethods, fullConfig);
@@ -90,11 +90,11 @@ namespace BenchmarkDotNet.Running
                 var allAttributes = typeAttributes.Concat(assemblyAttributes);
                 var configs = allAttributes.Select(attribute => attribute.Config)
                     .OrderBy(c => c.GetJobs().Count(job => job.Meta.IsMutator)); // configs with mutators must be the ones applied at the end
-                
+
                 foreach (var configFromAttribute in configs)
                     config = ManualConfig.Union(config, configFromAttribute);
             }
-            
+
             return ImmutableConfigBuilder.Create(config);
         }
 
@@ -239,7 +239,7 @@ namespace BenchmarkDotNet.Running
             return attributes.SelectMany(attr => attr.Categories).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
         }
 
-        private static ImmutableArray<BenchmarkCase> GetFilteredBenchmarks(IList<BenchmarkCase> benchmarks, IList<IFilter> filters) 
+        private static ImmutableArray<BenchmarkCase> GetFilteredBenchmarks(IList<BenchmarkCase> benchmarks, IList<IFilter> filters)
             => benchmarks.Where(benchmark => filters.All(filter => filter.Predicate(benchmark))).ToImmutableArray();
 
         private static void AssertMethodHasCorrectSignature(string methodType, MethodInfo methodInfo)

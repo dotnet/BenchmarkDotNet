@@ -2,7 +2,7 @@ using System;
 
 namespace BenchmarkDotNet.Attributes
 {
-    [Obsolete("Plase use TargetFrameworkAttribute instead.", true)]
+    [Obsolete("Please use TargetFrameworkAttribute instead.", true)]
     public class CoreJobAttribute : Attribute
     {
     }

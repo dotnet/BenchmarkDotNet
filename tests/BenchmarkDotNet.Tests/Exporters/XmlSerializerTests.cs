@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         [MemberData(nameof(SerializeTestDataNames))]
         public void SerializeThrowsGivenNullArguments(string dataName)
         {
-            var (writer, source, exception) = SerializeTestDataItems[dataName]; 
+            var (writer, source, exception) = SerializeTestDataItems[dataName];
             var serializer = XmlSerializer.GetBuilder(typeof(MockSource)).Build();
             Assert.Throws(exception, () => serializer.Serialize(writer, source));
         }
@@ -163,7 +163,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                 exception = Exception;
             }
         }
-            
+
         private static readonly Dictionary<string, SerializeTestData> SerializeTestDataItems = new Dictionary<string, SerializeTestData>
         {
             {"Null", new SerializeTestData(null, null, typeof(ArgumentNullException))},

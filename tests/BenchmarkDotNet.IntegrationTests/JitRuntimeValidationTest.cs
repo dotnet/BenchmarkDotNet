@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             Verify(ClrRuntime.Net461, jit, platform, expectedText);
         }
-        
+
 //        [TheoryWindowsOnly("CLR is a valid job only on Windows")]
 //        [InlineData(Jit.LegacyJit, Platform.X86, LegacyJitNotAvailableForMono)]
 //        [InlineData(Jit.LegacyJit, Platform.X64, LegacyJitNotAvailableForMono)]

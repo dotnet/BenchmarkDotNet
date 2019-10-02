@@ -75,7 +75,10 @@ namespace BenchmarkDotNet.Exporters
 
             using (var stream = new StreamWriter(filePath, append: false))
             {
-                PrettyGithubMarkdownDisassemblyExporter.Export(new StreamLogger(stream), disassemblyResult, quotingCode: false);
+                using (var streamLogger = new StreamLogger(stream))
+                {
+                    PrettyGithubMarkdownDisassemblyExporter.Export(streamLogger, disassemblyResult, quotingCode: false);
+                }
             }
 
             return filePath;

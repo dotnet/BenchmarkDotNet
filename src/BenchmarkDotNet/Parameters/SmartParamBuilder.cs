@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Parameters
             if (unwrappedValue is object[] array)
             {
                 // the user provided object[] for a benchmark accepting a single argument
-                if (parameterDefinitions.Length == 1 && array.Length == 1 
+                if (parameterDefinitions.Length == 1 && array.Length == 1
                     && array[0].GetType() == benchmark.GetParameters().FirstOrDefault()?.ParameterType) // the benchmark that accepts an object[] as argument
                 {
                     return new ParameterInstances(
@@ -87,13 +87,13 @@ namespace BenchmarkDotNet.Parameters
 
             string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
-            string indexPostfix = parameterDefinitions.Length > 1 
-                ? $"[{argumentIndex}]" // IEnumerable<object[]> 
+            string indexPostfix = parameterDefinitions.Length > 1
+                ? $"[{argumentIndex}]" // IEnumerable<object[]>
                 : string.Empty; // IEnumerable<object>
 
-            // we just execute (cast)source.ToArray()[case][argumentIndex]; 
+            // we just execute (cast)source.ToArray()[case][argumentIndex];
             // we know that source is IEnumerable so we can do that!
-            return $"{cast}System.Linq.Enumerable.ToArray({source.Name}{callPostfix})[{sourceIndex}]{indexPostfix};"; 
+            return $"{cast}System.Linq.Enumerable.ToArray({source.Name}{callPostfix})[{sourceIndex}]{indexPostfix};";
         }
     }
 
@@ -123,7 +123,7 @@ namespace BenchmarkDotNet.Parameters
 
             string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
-            // we just execute (cast)source.ToArray()[index]; 
+            // we just execute (cast)source.ToArray()[index];
             return $"{cast}System.Linq.Enumerable.ToArray({instancePrefix}.{source.Name}{callPostfix})[{index}];";
         }
     }

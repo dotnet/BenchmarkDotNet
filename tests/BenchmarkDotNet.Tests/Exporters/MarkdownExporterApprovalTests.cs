@@ -48,16 +48,16 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             var logger = new AccumulationLogger();
             logger.WriteLine("=== " + benchmarkType.Name + " ===");
-            
+
             var exporter = MarkdownExporter.Mock;
             var summary = MockFactory.CreateSummary(benchmarkType);
             exporter.ExportToLog(summary, logger);
-            
+
             var validator = BaselineValidator.FailOnError;
             var errors = validator.Validate(new ValidationParameters(summary.BenchmarksCases, summary.BenchmarksCases.First().Config)).ToList();
             logger.WriteLine();
             logger.WriteLine("Errors: " + errors.Count);
-            foreach (var error in errors) 
+            foreach (var error in errors)
                 logger.WriteLineError("* " + error.Message);
 
             Approvals.Verify(logger.GetLog());
@@ -218,9 +218,9 @@ namespace BenchmarkDotNet.Tests.Exporters
                 [Benchmark] public void Foo() { }
                 [Benchmark] public void Bar() { }
             }
-            
+
             /* MethodJobBaseline */
-            
+
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1", baseline: true), SimpleJob(id: "Job2")]
             public class MethodJobBaseline_MethodsJobs
@@ -234,11 +234,11 @@ namespace BenchmarkDotNet.Tests.Exporters
             public class MethodJobBaseline_MethodsJobsParams
             {
                 [Params(2, 10), UsedImplicitly] public int Param;
-                
+
                 [Benchmark(Baseline = true)] public void Foo() {}
                 [Benchmark] public void Bar() {}
             }
-            
+
             /* Invalid */
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
@@ -254,7 +254,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             {
                 [Benchmark] public void Foo() {}
                 [Benchmark] public void Bar() {}
-            }                       
+            }
         }
     }
 }

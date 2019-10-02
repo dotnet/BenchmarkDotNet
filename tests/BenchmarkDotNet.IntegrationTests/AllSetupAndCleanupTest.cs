@@ -21,14 +21,14 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private readonly string[] expectedLogLines = {
             "// ### Called: GlobalSetup",
-            
+
             "// ### Called: IterationSetup (1)", // MainWarmup1
             "// ### Called: Benchmark", // MainWarmup1
             "// ### Called: IterationCleanup (1)", // MainWarmup1
             "// ### Called: IterationSetup (2)", // MainWarmup2
             "// ### Called: Benchmark", // MainWarmup2
             "// ### Called: IterationCleanup (2)", // MainWarmup2
-            
+
             "// ### Called: IterationSetup (3)", // MainTarget1
             "// ### Called: Benchmark", // MainTarget1
             "// ### Called: IterationCleanup (3)", // MainTarget1
@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.IntegrationTests
             "// ### Called: IterationSetup (5)", // MainTarget3
             "// ### Called: Benchmark", // MainTarget3
             "// ### Called: IterationCleanup (5)", // MainTarget3
-            
+
             "// ### Called: GlobalCleanup"
         };
 
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = CreateSimpleConfig(logger, miniJob);
 
             CanExecute<AllSetupAndCleanupAttributeBenchmarks>(config);
-            
+
             var actualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(Prefix)).ToArray();
             foreach (string line in actualLogLines)
                 Output.WriteLine(line);

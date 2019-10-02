@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Mathematics.Histograms
 {
-    internal class SimpleHistogramBuilder : IHistogramBuilder    
+    internal class SimpleHistogramBuilder : IHistogramBuilder
     {
         [PublicAPI, Pure]
         public Histogram Build(Statistics s, BinSizeRule? rule = null)
@@ -20,11 +20,11 @@ namespace BenchmarkDotNet.Mathematics.Histograms
         {
                 if (binSize < 1e-9)
                     throw new ArgumentException($"binSize ({binSize.ToStr()}) should be a positive number", nameof(binSize));
-    
+
                 var list = values.ToList();
                 if (list.IsEmpty())
                     throw new ArgumentException("Values should be non-empty", nameof(values));
-    
+
                 list.Sort();
 
             int firstBin = GetBinIndex(list.First(), binSize);

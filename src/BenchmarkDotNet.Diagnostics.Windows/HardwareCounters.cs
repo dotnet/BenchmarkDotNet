@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 { HardwareCounter.BranchInstructionRetired, "BranchInstructionRetired" },
                 { HardwareCounter.BranchMispredictsRetired, "BranchMispredictsRetired" }
             };
-        
+
         public static IEnumerable<ValidationError> Validate(ValidationParameters validationParameters, bool mandatory)
         {
             if (!RuntimeInformation.IsWindows())
@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 yield return new ValidationError(true, "Hardware Counters and EtwProfiler are supported only on Windows");
                 yield break;
             }
-            
+
             if (!validationParameters.Config.GetHardwareCounters().Any() && mandatory)
             {
                 yield return new ValidationError(true, "No Hardware Counters defined, probably a bug");

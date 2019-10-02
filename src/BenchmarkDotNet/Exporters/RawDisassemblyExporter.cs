@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Exporters
                     $"<tr><th colspan=\"2\" id=\"{method.NativeCode}\" style=\"text-align: left;\">{FormatMethodAddress(method.NativeCode)} {method.Name}</th><th></th></tr>");
 
                 // there is no need to distinguish the maps visually if there is only one type of code
-                bool diffTheMaps = method.Maps.SelectMany(map => map.Instructions).Select(ins => ins.GetType()).Distinct().Count() > 1; 
+                bool diffTheMaps = method.Maps.SelectMany(map => map.Instructions).Select(ins => ins.GetType()).Distinct().Count() > 1;
 
                 bool evenMap = true;
                 foreach (var map in method.Maps)
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Exporters
 
                     evenMap = !evenMap;
                 }
-                
+
                 if(!string.IsNullOrEmpty(method.CommandLine))
                     logger.WriteLine($"<tr><td colspan=\"2\">{method.CommandLine}</td></tr>");
 

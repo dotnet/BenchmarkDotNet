@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Engines
 
         public class Tasks
         {
-            [PublicAPI] public const EventTask Benchmark = (EventTask)1;    
+            [PublicAPI] public const EventTask Benchmark = (EventTask)1;
             [PublicAPI] public const EventTask OverheadJitting = (EventTask)2;
             [PublicAPI] public const EventTask WorkloadJitting = (EventTask)3;
             [PublicAPI] public const EventTask WorkloadPilot = (EventTask)4;
@@ -37,61 +37,61 @@ namespace BenchmarkDotNet.Engines
         }
 
         internal static readonly EngineEventSource Log = new EngineEventSource();
-        
+
         private EngineEventSource() { }
 
         [Event(BenchmarkStartEventId, Level = EventLevel.Informational, Task = Tasks.Benchmark, Opcode = EventOpcode.Start)]
         internal void BenchmarkStart(string benchmarkName) => WriteEvent(BenchmarkStartEventId, benchmarkName);
-        
+
         [Event(BenchmarkStopEventId, Level = EventLevel.Informational, Task = Tasks.Benchmark, Opcode = EventOpcode.Stop)]
         internal void BenchmarkStop(string benchmarkName) => WriteEvent(BenchmarkStopEventId, benchmarkName);
-        
+
         [Event(OverheadJittingStartEventId, Level = EventLevel.Informational, Task = Tasks.OverheadJitting, Opcode = EventOpcode.Start)]
         internal void OverheadJittingStart(long totalOperations) => WriteEvent(OverheadJittingStartEventId, totalOperations);
-        
+
         [Event(OverheadJittingStopEventId, Level = EventLevel.Informational, Task = Tasks.OverheadJitting, Opcode = EventOpcode.Stop)]
         internal void OverheadJittingStop(long totalOperations) => WriteEvent(OverheadJittingStopEventId, totalOperations);
-        
+
         [Event(WorkloadJittingStartEventId, Level = EventLevel.Informational, Task = Tasks.WorkloadJitting, Opcode = EventOpcode.Start)]
         internal void WorkloadJittingStart(long totalOperations) => WriteEvent(WorkloadJittingStartEventId, totalOperations);
-        
+
         [Event(WorkloadJittingStopEventId, Level = EventLevel.Informational, Task = Tasks.WorkloadJitting, Opcode = EventOpcode.Stop)]
         internal void WorkloadJittingStop(long totalOperations) => WriteEvent(WorkloadJittingStopEventId, totalOperations);
-        
+
         [Event(WorkloadPilotStartEventId, Level = EventLevel.Informational, Task = Tasks.WorkloadPilot, Opcode = EventOpcode.Start)]
         internal void WorkloadPilotStart(long totalOperations) => WriteEvent(WorkloadPilotStartEventId, totalOperations);
-        
+
         [Event(WorkloadPilotStopEventId, Level = EventLevel.Informational, Task = Tasks.WorkloadPilot, Opcode = EventOpcode.Stop)]
         internal void WorkloadPilotStop(long totalOperations) => WriteEvent(WorkloadPilotStopEventId, totalOperations);
-        
+
         [Event(OverheadWarmupStartEventId, Level = EventLevel.Informational, Task = Tasks.OverheadWarmup, Opcode = EventOpcode.Start)]
         internal void OverheadWarmupStart(long totalOperations) => WriteEvent(OverheadWarmupStartEventId, totalOperations);
-        
+
         [Event(OverheadWarmupStopEventId, Level = EventLevel.Informational, Task = Tasks.OverheadWarmup, Opcode = EventOpcode.Stop)]
         internal void OverheadWarmupStop(long totalOperations) => WriteEvent(OverheadWarmupStopEventId, totalOperations);
-        
+
         [Event(OverheadActualStartEventId, Level = EventLevel.Informational, Task = Tasks.OverheadActual, Opcode = EventOpcode.Start)]
         internal void OverheadActualStart(long totalOperations) => WriteEvent(OverheadActualStartEventId, totalOperations);
-        
+
         [Event(OverheadActualStopEventId, Level = EventLevel.Informational, Task = Tasks.OverheadActual, Opcode = EventOpcode.Stop)]
         internal void OverheadActualStop(long totalOperations) => WriteEvent(OverheadActualStopEventId, totalOperations);
-        
+
         [Event(WorkloadWarmupStartEventId, Level = EventLevel.Informational, Task = Tasks.WorkloadWarmup, Opcode = EventOpcode.Start)]
         internal void WorkloadWarmupStart(long totalOperations) => WriteEvent(WorkloadWarmupStartEventId, totalOperations);
-        
+
         [Event(WorkloadWarmupStopEventId, Level = EventLevel.Informational, Task = Tasks.WorkloadWarmup, Opcode = EventOpcode.Stop)]
         internal void WorkloadWarmupStop(long totalOperations) => WriteEvent(WorkloadWarmupStopEventId, totalOperations);
-        
+
         [Event(WorkloadActualStartEventId, Level = EventLevel.Informational, Task = Tasks.WorkloadActual, Opcode = EventOpcode.Start)]
         internal void WorkloadActualStart(long totalOperations) => WriteEvent(WorkloadActualStartEventId, totalOperations);
-        
+
         [Event(WorkloadActualStopEventId, Level = EventLevel.Informational, Task = Tasks.WorkloadActual, Opcode = EventOpcode.Stop)]
         internal void WorkloadActualStop(long totalOperations) => WriteEvent(WorkloadActualStopEventId, totalOperations);
 
         [NonEvent]
         internal void IterationStart(IterationMode mode, IterationStage stage, long totalOperations)
         {
-            switch (stage) 
+            switch (stage)
             {
                 case IterationStage.Jitting when mode == IterationMode.Overhead:
                     OverheadJittingStart(totalOperations);
@@ -118,11 +118,11 @@ namespace BenchmarkDotNet.Engines
                     throw new ArgumentOutOfRangeException(nameof(stage), stage, null);
             }
         }
-        
+
         [NonEvent]
         internal void IterationStop(IterationMode mode, IterationStage stage, long totalOperations)
         {
-            switch (stage) 
+            switch (stage)
             {
                 case IterationStage.Jitting when mode == IterationMode.Overhead:
                     OverheadJittingStop(totalOperations);

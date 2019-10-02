@@ -54,7 +54,10 @@ namespace BenchmarkDotNet.Exporters
 
             using (var stream = new StreamWriter(filePath, append: false))
             {
-                Export(new StreamLogger(stream), benchmarkCase, totals, perMethod, pmcStats.Counters.Keys.ToArray());
+                using (var streamLogger = new StreamLogger(stream))
+                {
+                    Export(streamLogger, benchmarkCase, totals, perMethod, pmcStats.Counters.Keys.ToArray());
+                }
             }
 
             return filePath;

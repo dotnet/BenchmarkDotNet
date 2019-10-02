@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Filters
     {
         private readonly (string userValue, Regex regex)[] patterns;
 
-        public GlobFilter(string[] patterns) 
+        public GlobFilter(string[] patterns)
             => this.patterns = patterns.Select(pattern => (pattern, new Regex(WildcardToRegex(pattern), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))).ToArray();
 
         public bool Predicate(BenchmarkCase benchmarkCase)

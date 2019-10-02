@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 executeParameters.Logger.WriteLineError($"Did not find {executeParameters.BuildResult.ArtifactsPaths.ExecutablePath}, but the folder contained:");
                 foreach (var file in new DirectoryInfo(executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
                     executeParameters.Logger.WriteLineError(file.Name);
-                
+
                 return new ExecuteResult(false, -1, default, Array.Empty<string>(), Array.Empty<string>());
             }
 
@@ -39,16 +39,16 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return Execute(
                     executeParameters.BenchmarkCase,
                     executeParameters.BenchmarkId,
-                    executeParameters.Logger, 
-                    executeParameters.BuildResult.ArtifactsPaths, 
-                    executeParameters.Diagnoser, 
-                    Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath), 
+                    executeParameters.Logger,
+                    executeParameters.BuildResult.ArtifactsPaths,
+                    executeParameters.Diagnoser,
+                    Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath),
                     executeParameters.Resolver);
             }
             finally
             {
                 executeParameters.Diagnoser?.Handle(
-                    HostSignal.AfterProcessExit, 
+                    HostSignal.AfterProcessExit,
                     new DiagnoserActionParameters(null, executeParameters.BenchmarkCase, executeParameters.BenchmarkId));
             }
         }

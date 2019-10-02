@@ -3,9 +3,9 @@
     public enum IterationMode
     {
         Overhead,
-        
+
         Workload,
-        
+
         Unknown
     }
 }

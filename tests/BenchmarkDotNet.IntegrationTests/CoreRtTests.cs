@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             if (!RuntimeInformation.Is64BitPlatform()) // CoreRT does not support 32bit yet
                 return;
-            
+
             var config = ManualConfig.CreateEmpty()
                 .With(Job.Dry
                     .With(CoreRtRuntime.GetCurrentVersion())

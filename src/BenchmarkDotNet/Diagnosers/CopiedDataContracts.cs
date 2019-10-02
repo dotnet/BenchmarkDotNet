@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Diagnosers
         /// The native end offset of this ASM representation
         /// </summary>
         public ulong EndAddress { get; set; }
-        
+
         public uint SizeInBytes { get; set; }
     }
 
@@ -68,8 +68,8 @@ namespace BenchmarkDotNet.Diagnosers
 
         public DisassemblyResult()
         {
-            Methods = new DisassembledMethod[0];
-            Errors = new string[0];
+            Methods = System.Array.Empty<DisassembledMethod>();
+            Errors = System.Array.Empty<string>();
         }
     }
 

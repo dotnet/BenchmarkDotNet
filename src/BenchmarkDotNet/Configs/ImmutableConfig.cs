@@ -38,13 +38,13 @@ namespace BenchmarkDotNet.Configs
             ImmutableHashSet<HardwareCounter> uniqueHardwareCounters,
             ImmutableHashSet<IDiagnoser> uniqueDiagnosers,
             ImmutableArray<IExporter> uniqueExporters,
-            ImmutableHashSet<IAnalyser> unqueAnalyzers, 
+            ImmutableHashSet<IAnalyser> unqueAnalyzers,
             ImmutableHashSet<IValidator> uniqueValidators,
             ImmutableHashSet<IFilter> uniqueFilters,
             ImmutableHashSet<BenchmarkLogicalGroupRule> uniqueRules,
-            ImmutableHashSet<Job> uniqueRunnableJobs, 
-            ConfigUnionRule unionRule, 
-            string artifactsPath, 
+            ImmutableHashSet<Job> uniqueRunnableJobs,
+            ConfigUnionRule unionRule,
+            string artifactsPath,
             Encoding encoding,
             IOrderer orderer,
             SummaryStyle summaryStyle,
@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Configs
         public string ArtifactsPath { get; }
         public Encoding Encoding { get; }
         public ConfigOptions Options { get; }
-        [NotNull] public IOrderer Orderer { get; } 
+        [NotNull] public IOrderer Orderer { get; }
         public SummaryStyle SummaryStyle { get; }
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => rules;
-        
+
         public ILogger GetCompositeLogger() => new CompositeLogger(loggers);
         public IExporter GetCompositeExporter() => new CompositeExporter(exporters);
         public IValidator GetCompositeValidator() => new CompositeValidator(validators);

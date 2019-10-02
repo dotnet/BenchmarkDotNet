@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Engines
         internal const int ForceAutoWarmup = -1;
         internal const int DefaultMinWarmupIterationCount = 6;
         internal const int DefaultMaxWarmupIterationCount = 50;
-        
+
         public static readonly IResolver Instance = new EngineResolver();
 
         private EngineResolver()

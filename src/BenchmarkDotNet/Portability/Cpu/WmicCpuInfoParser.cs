@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             int physicalCoreCount = 0;
             int logicalCoreCount = 0;
             int processorsCount = 0;
-            
+
             var currentClockSpeed = Frequency.Zero;
             var maxClockSpeed = Frequency.Zero;
             var minClockSpeed = Frequency.Zero;
@@ -38,8 +38,8 @@ namespace BenchmarkDotNet.Portability.Cpu
                     processorModelNames.Add(name);
                     processorsCount++;
                 }
-                
-                if (processor.TryGetValue(WmicCpuInfoKeyNames.MaxClockSpeed, out string frequencyValue) 
+
+                if (processor.TryGetValue(WmicCpuInfoKeyNames.MaxClockSpeed, out string frequencyValue)
                     && int.TryParse(frequencyValue, out int frequency)
                     && frequency > 0)
                 {

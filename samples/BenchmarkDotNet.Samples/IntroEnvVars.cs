@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Samples
         private class ConfigWithCustomEnvVars : ManualConfig
         {
             private const string JitNoInline = "COMPlus_JitNoInline";
-            
+
             public ConfigWithCustomEnvVars()
             {
                 Add(Job.Default.With(CoreRuntime.Core21).WithId("Inlining enabled"));

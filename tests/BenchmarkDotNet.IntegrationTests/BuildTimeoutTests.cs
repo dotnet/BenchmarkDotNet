@@ -19,11 +19,11 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             if (!RuntimeInformation.Is64BitPlatform()) // CoreRT does not support 32bit yet
                 return;
-            
+
             // we use CoreRT on purpose because it takes a LOT of time to build it
             // so we can be sure that timeout = 1s should fail!
             var timeout = TimeSpan.FromSeconds(1);
-            
+
             var config = ManualConfig.CreateEmpty()
                 .With(Job.Dry
                     .With(CoreRtRuntime.CoreRt21)

@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             }
             return null;
         }
-        
+
         private static string GetCpuSpeed()
         {
             var output = ProcessHelper.RunAndReadOutput("/bin/bash", "-c \"lscpu | grep MHz\"")?
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Portability.Cpu
 
             Frequency.TryParseMHz(input[3].Trim().Replace(',', '.'), out var minFrequency);
             Frequency.TryParseMHz(input[5].Trim().Replace(',', '.'), out var maxFrequency);
-            
+
             return $"\n{ProcCpuInfoKeyNames.MinFrequency}\t:{minFrequency.ToMHz()}\n{ProcCpuInfoKeyNames.MaxFrequency}\t:{maxFrequency.ToMHz()}\n";
         }
     }

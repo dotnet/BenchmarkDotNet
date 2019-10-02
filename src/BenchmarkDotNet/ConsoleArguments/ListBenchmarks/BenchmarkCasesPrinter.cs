@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
     internal class BenchmarkCasesPrinter : IBenchmarkCasesPrinter
     {
         private readonly IBenchmarkCasesPrinter printer;
-        
+
         public BenchmarkCasesPrinter(ListBenchmarkCaseMode listBenchmarkCaseMode)
         {
             printer = listBenchmarkCaseMode == ListBenchmarkCaseMode.Tree
