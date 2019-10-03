@@ -218,7 +218,7 @@ namespace BenchmarkDotNet.Running
                             { 
                                 var definition = parameterDefinitions[index];
                                 var type = definition.ParameterType;
-                                return new ParameterInstance(parameterDefinitions[index], Map(value, type), summaryStyle);
+                                return new ParameterInstance(definition, Map(value, type), summaryStyle);
                             })
                         .ToArray());
             }
@@ -294,12 +294,16 @@ namespace BenchmarkDotNet.Running
             if (providedValue == null)
                 return null;
 
-            type = type ?? providedValue.GetType();
-            if (type.IsArray)
+            if (providedValue.GetType().IsArray)
             {
                 return ArrayParam<IParam>.FromObject(providedValue);
             }
-            else if (type.IsEnum)
+            // Usually providedValue contains all needed type information,
+            // but in case of F# enum types in attributes are erased.
+            // We can to restore them from types of arguments and fields.
+            // See also:
+            // https://github.com/dotnet/fsharp/issues/995
+            else if (providedValue.GetType().IsEnum || type.IsEnum)
             {
                 return EnumParam.FromObject(providedValue, type);
             }            
