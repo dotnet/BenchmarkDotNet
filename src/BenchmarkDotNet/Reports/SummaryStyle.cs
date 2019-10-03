@@ -1,7 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Parameters;
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace BenchmarkDotNet.Reports
@@ -9,6 +8,7 @@ namespace BenchmarkDotNet.Reports
     public class SummaryStyle : IEquatable<SummaryStyle>
     {
         public static readonly SummaryStyle Default = new SummaryStyle(printUnitsInHeader: false, printUnitsInContent: true, printZeroValuesInContent: false, sizeUnit: null, timeUnit: null);
+        internal const int DefaultMaxParameterColumnWidth = 15 + 5; // 5 is for postfix " [15]"
 
         public bool PrintUnitsInHeader { get; }
         public bool PrintUnitsInContent { get; }
@@ -17,10 +17,10 @@ namespace BenchmarkDotNet.Reports
         public SizeUnit SizeUnit { get; }
         public TimeUnit TimeUnit { get; }
 
-        public SummaryStyle(bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true, bool printZeroValuesInContent = false, int maxParameterColumnWidth = ParameterInstance.DefaultMaxDisplayTextInnerLength)
+        public SummaryStyle(bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true, bool printZeroValuesInContent = false, int maxParameterColumnWidth = DefaultMaxParameterColumnWidth)
         {
-            if (maxParameterColumnWidth < ParameterInstance.DefaultMaxDisplayTextInnerLength)
-                throw new ArgumentOutOfRangeException(nameof(maxParameterColumnWidth), $"{ParameterInstance.DefaultMaxDisplayTextInnerLength} is the minimum.");
+            if (maxParameterColumnWidth < DefaultMaxParameterColumnWidth)
+                throw new ArgumentOutOfRangeException(nameof(maxParameterColumnWidth), $"{DefaultMaxParameterColumnWidth} is the minimum.");
 
             PrintUnitsInHeader = printUnitsInHeader;
             PrintUnitsInContent = printUnitsInContent;

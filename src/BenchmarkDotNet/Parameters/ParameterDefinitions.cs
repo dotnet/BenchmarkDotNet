@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Parameters
@@ -12,9 +12,9 @@ namespace BenchmarkDotNet.Parameters
 
         public ParameterDefinitions(IReadOnlyList<ParameterDefinition> items) => Items = items;
 
-        public IReadOnlyList<ParameterInstances> Expand(ImmutableConfig config) => Expand(new[] { new ParameterInstances(new List<ParameterInstance>()) }, Items, config);
+        public IReadOnlyList<ParameterInstances> Expand(SummaryStyle summaryStyle) => Expand(new[] { new ParameterInstances(new List<ParameterInstance>()) }, Items, summaryStyle);
 
-        private static IReadOnlyList<ParameterInstances> Expand(IReadOnlyList<ParameterInstances> instancesList, IReadOnlyList<ParameterDefinition> definitions, ImmutableConfig config)
+        private static IReadOnlyList<ParameterInstances> Expand(IReadOnlyList<ParameterInstances> instancesList, IReadOnlyList<ParameterDefinition> definitions, SummaryStyle summaryStyle)
         {
             if (definitions.IsNullOrEmpty())
                 return instancesList;
@@ -26,11 +26,11 @@ namespace BenchmarkDotNet.Parameters
                 {
                     var items = new List<ParameterInstance>();
                     items.AddRange(instances.Items);
-                    items.Add(new ParameterInstance(nextDefinition, value, config));
+                    items.Add(new ParameterInstance(nextDefinition, value, summaryStyle));
                     newInstancesList.Add(new ParameterInstances(items));
                 }
             }
-            return Expand(newInstancesList, definitions.Skip(1).ToArray(), config);
+            return Expand(newInstancesList, definitions.Skip(1).ToArray(), summaryStyle);
         }
 
         public override string ToString() => Items.Any() ? string.Join(",", Items.Select(item => item.Name)) : "<empty>";

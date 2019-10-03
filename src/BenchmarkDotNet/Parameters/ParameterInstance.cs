@@ -1,8 +1,8 @@
 ﻿using System;
 using BenchmarkDotNet.Code;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Parameters
@@ -10,18 +10,17 @@ namespace BenchmarkDotNet.Parameters
     public class ParameterInstance
     {
         public const string NullParameterTextRepresentation = "?";
-        internal const int DefaultMaxDisplayTextInnerLength = 15 + 5; // 5 is for postfix " [15]"
 
         [PublicAPI] public ParameterDefinition Definition { get; }
 
         private readonly object value;
-        private readonly ImmutableConfig config;
+        private readonly int maxParamterColumnWidth;
 
-        public ParameterInstance(ParameterDefinition definition, object value, ImmutableConfig config)
+        public ParameterInstance(ParameterDefinition definition, object value, SummaryStyle summaryStyle)
         {
             Definition = definition;
             this.value = value;
-            this.config = config;
+            maxParamterColumnWidth = summaryStyle?.MaxParamterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
         }
 
         public string Name => Definition.Name;
@@ -41,13 +40,13 @@ namespace BenchmarkDotNet.Parameters
                 case null:
                     return NullParameterTextRepresentation;
                 case IParam parameter:
-                    return Trim(parameter.DisplayText, config.SummaryStyle?.MaxParamterColumnWidth ?? DefaultMaxDisplayTextInnerLength);
+                    return Trim(parameter.DisplayText, maxParamterColumnWidth);
                 // no trimming for types!
                 case Type type:
                     return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).GetDisplayName()}?" : type.GetDisplayName();
             }
 
-            return Trim(value.ToString(), config.SummaryStyle?.MaxParamterColumnWidth ?? DefaultMaxDisplayTextInnerLength);
+            return Trim(value.ToString(), maxParamterColumnWidth);
         }
 
         public override string ToString() => ToDisplayText();

@@ -17,8 +17,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("short")]
         public void ShortParameterValuesDisplayOriginalValue(object value)
         {
-            var config = DefaultConfig.Instance.CreateImmutableConfig();
-            var parameter = new ParameterInstance(definition, value, config);
+            var parameter = new ParameterInstance(definition, value, null);
 
             Assert.Equal(value.ToString(), parameter.ToDisplayText());
         }
@@ -29,8 +28,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("this is a test to see what happens when we call tolower.", "this (...)ower. [56]")]
         public void VeryLongParameterValuesAreTrimmed(string initialLongText, string expectedDisplayText)
         {
-            var config = DefaultConfig.Instance.CreateImmutableConfig();
-            var parameter = new ParameterInstance(definition, initialLongText, config);
+            var parameter = new ParameterInstance(definition, initialLongText, null);
 
             Assert.NotEqual(initialLongText, parameter.ToDisplayText());
 
@@ -46,8 +44,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("012345678901234567890", "01234(...)67890 [21]")]
         public void TrimmingTheValuesMakesThemActuallyShorter(string initialLongText, string expectedDisplayText)
         {
-            var config = DefaultConfig.Instance.CreateImmutableConfig();
-            var parameter = new ParameterInstance(definition, initialLongText, config);
+            var parameter = new ParameterInstance(definition, initialLongText, null);
 
             Assert.Equal(expectedDisplayText, parameter.ToDisplayText());
         }
@@ -59,8 +56,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(typeof(List<int>), "List<Int32>")]
         public void TypeParameterValuesDisplayNotTrimmedTypeNameWithoutNamespace(Type type, string expectedName)
         {
-            var config = DefaultConfig.Instance.CreateImmutableConfig();
-            var parameter = new ParameterInstance(definition, type, config);
+            var parameter = new ParameterInstance(definition, type, null);
 
             Assert.Equal(expectedName, parameter.ToDisplayText());
         }
@@ -70,8 +66,8 @@ namespace BenchmarkDotNet.Tests
         [InlineData("0123456789012345678901234567890123456789", 30, "0123456789(...)0123456789 [40]")]
         public void MaxParamterColumnWidthCanBeCustomized(string initialLongText, int maxParameterColumnWidth, string expectedDisplayText)
         {
-            var config = DefaultConfig.Instance.With(SummaryStyle.Default.WithMaxParameterColumnWidth(maxParameterColumnWidth)).CreateImmutableConfig();
-            var parameter = new ParameterInstance(definition, initialLongText, config);
+            var summaryStyle = SummaryStyle.Default.WithMaxParameterColumnWidth(maxParameterColumnWidth);
+            var parameter = new ParameterInstance(definition, initialLongText, summaryStyle);
 
             Assert.Equal(expectedDisplayText, parameter.ToDisplayText());
         }

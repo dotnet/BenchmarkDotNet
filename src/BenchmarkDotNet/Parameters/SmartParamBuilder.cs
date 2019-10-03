@@ -6,6 +6,7 @@ using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Parameters
 {
@@ -20,7 +21,7 @@ namespace BenchmarkDotNet.Parameters
             return values.Select((value, index) => new SmartParameter(source, value, index)).ToArray();
         }
 
-        internal static ParameterInstances CreateForArguments(MethodInfo benchmark, ParameterDefinition[] parameterDefinitions, (MemberInfo source, object[] values) valuesInfo, int sourceIndex, ImmutableConfig config)
+        internal static ParameterInstances CreateForArguments(MethodInfo benchmark, ParameterDefinition[] parameterDefinitions, (MemberInfo source, object[] values) valuesInfo, int sourceIndex, SummaryStyle summaryStyle)
         {
             var unwrappedValue = valuesInfo.values[sourceIndex];
 
@@ -31,7 +32,7 @@ namespace BenchmarkDotNet.Parameters
                     && array[0].GetType() == benchmark.GetParameters().FirstOrDefault()?.ParameterType) // the benchmark that accepts an object[] as argument
                 {
                     return new ParameterInstances(
-                        new[] { Create(parameterDefinitions, array[0], valuesInfo.source, sourceIndex, argumentIndex: 0, config) });
+                        new[] { Create(parameterDefinitions, array[0], valuesInfo.source, sourceIndex, argumentIndex: 0, summaryStyle) });
                 }
 
                 if (parameterDefinitions.Length > 1)
@@ -40,25 +41,25 @@ namespace BenchmarkDotNet.Parameters
                         throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of arguments provided by [ArgumentsSource({valuesInfo.source.Name})]! {array.Length} instead of {parameterDefinitions.Length}.");
 
                     return new ParameterInstances(
-                        array.Select((value, argumentIndex) => Create(parameterDefinitions, value, valuesInfo.source, sourceIndex, argumentIndex, config)).ToArray());
+                        array.Select((value, argumentIndex) => Create(parameterDefinitions, value, valuesInfo.source, sourceIndex, argumentIndex, summaryStyle)).ToArray());
                 }
             }
 
             if (parameterDefinitions.Length == 1)
             {
                 return new ParameterInstances(
-                    new[] { Create(parameterDefinitions, unwrappedValue, valuesInfo.source, sourceIndex, argumentIndex: 0, config) });
+                    new[] { Create(parameterDefinitions, unwrappedValue, valuesInfo.source, sourceIndex, argumentIndex: 0, summaryStyle) });
             }
 
             throw new NotSupportedException($"Benchmark {benchmark.Name} has invalid type of arguments provided by [ArgumentsSource({valuesInfo.source.Name})]. It should be IEnumerable<object[]> or IEnumerable<object>.");
         }
 
-        private static ParameterInstance Create(ParameterDefinition[] parameterDefinitions, object value, MemberInfo source, int sourceIndex, int argumentIndex, ImmutableConfig config)
+        private static ParameterInstance Create(ParameterDefinition[] parameterDefinitions, object value, MemberInfo source, int sourceIndex, int argumentIndex, SummaryStyle summaryStyle)
         {
             if (SourceCodeHelper.IsCompilationTimeConstant(value))
-                return new ParameterInstance(parameterDefinitions[argumentIndex], value, config);
+                return new ParameterInstance(parameterDefinitions[argumentIndex], value, summaryStyle);
 
-            return new ParameterInstance(parameterDefinitions[argumentIndex], new SmartArgument(parameterDefinitions, value, source, sourceIndex, argumentIndex), config);
+            return new ParameterInstance(parameterDefinitions[argumentIndex], new SmartArgument(parameterDefinitions, value, source, sourceIndex, argumentIndex), summaryStyle);
         }
     }
 

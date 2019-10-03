@@ -159,7 +159,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("disableLogFile", Required = false, HelpText = "Disables the logfile.")]
         public bool DisableLogFile { get; set; }
 
-        [Option("maxWidth", Required = false, HelpText = "Max Paramter Column Width, the default is 20.")]
+        [Option("maxWidth", Required = false, HelpText = "Max paramter column width, the default is 20.")]
         public int? MaxParamterColumnWidth { get; set; }
 
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
