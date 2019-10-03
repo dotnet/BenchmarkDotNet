@@ -400,10 +400,24 @@ namespace BenchmarkDotNet.Tests
                     .WithWarmupCount(1)
                     .AsDefault());
 
-            var parserdConfig = ConfigParser.Parse(new[] { "--warmupCount", "2"}, new OutputLogger(Output), globalConfig).config;
+            var parsedConfig = ConfigParser.Parse(new[] { "--warmupCount", "2"}, new OutputLogger(Output), globalConfig).config;
 
-            Assert.Equal(2, parserdConfig.GetJobs().Single().Run.WarmupCount);
-            Assert.False(parserdConfig.GetJobs().Single().Meta.IsDefault); // after the merge the job is not "default" anymore
+            Assert.Equal(2, parsedConfig.GetJobs().Single().Run.WarmupCount);
+            Assert.False(parsedConfig.GetJobs().Single().Meta.IsDefault); // after the merge the job is not "default" anymore
+        }
+
+        [Fact]
+        public void UserCanSpecifyCustomMaxParamterColumnWidth()
+        {
+            const int customValue = 1234;
+
+            var globalConfig = DefaultConfig.Instance;
+
+            Assert.NotEqual(customValue, globalConfig.SummaryStyle.MaxParamterColumnWidth);
+
+            var parsedConfig = ConfigParser.Parse(new[] { "--maxWidth", customValue.ToString() }, new OutputLogger(Output), globalConfig).config;
+
+            Assert.Equal(customValue, parsedConfig.SummaryStyle.MaxParamterColumnWidth);
         }
     }
 }
