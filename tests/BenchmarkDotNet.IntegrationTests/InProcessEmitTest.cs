@@ -38,25 +38,24 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private IConfig CreateInProcessAndRoslynConfig(OutputLogger logger)
         {
-            var config = new ManualConfig();
-
-            config.AddColumnProvider(DefaultConfig.Instance.GetColumnProviders().ToArray());
-            config.AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray());
-            config.AddExporter(DefaultConfig.Instance.GetExporters().ToArray());
-            config.AddFilter(DefaultConfig.Instance.GetFilters().ToArray());
-            config.AddLogger(DefaultConfig.Instance.GetLoggers().ToArray());
-            config.AddJob(
-                Job.Dry
-                    .With(InProcessEmitToolchain.DontLogOutput)
-                    .WithInvocationCount(4)
-                    .WithUnrollFactor(4));
-            config.AddJob(
-                Job.Dry
-                    .With(new RoslynToolchain())
-                    .WithInvocationCount(4)
-                    .WithUnrollFactor(4));
-            config.Options |= ConfigOptions.KeepBenchmarkFiles;
-            config.AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default));
+            var config = new ManualConfig()
+                .AddColumnProvider(DefaultConfig.Instance.GetColumnProviders().ToArray())
+                .AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray())
+                .AddExporter(DefaultConfig.Instance.GetExporters().ToArray())
+                .AddFilter(DefaultConfig.Instance.GetFilters().ToArray())
+                .AddLogger(DefaultConfig.Instance.GetLoggers().ToArray())
+                .AddJob(
+                    Job.Dry
+                        .With(InProcessEmitToolchain.DontLogOutput)
+                        .WithInvocationCount(4)
+                        .WithUnrollFactor(4))
+                .AddJob(
+                    Job.Dry
+                        .With(new RoslynToolchain())
+                        .WithInvocationCount(4)
+                        .WithUnrollFactor(4))
+                .WithOptions(ConfigOptions.KeepBenchmarkFiles)
+                .AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default));
 
             return config;
         }

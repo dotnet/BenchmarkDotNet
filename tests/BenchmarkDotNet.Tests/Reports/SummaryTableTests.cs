@@ -68,8 +68,8 @@ namespace BenchmarkDotNet.Tests.Reports
         [Fact] // Issue #1070
         public void CustomOrdererIsSupported()
         {
-            var config = ManualConfig.Create(DefaultConfig.Instance);
-            config.Orderer = new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Alphabetical);
+            var config = ManualConfig.Create(DefaultConfig.Instance)
+                .WithOrderer(new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Alphabetical));
             var summary = MockFactory.CreateSummary(config);
             Assert.True(summary.Orderer is DefaultOrderer defaultOrderer &&
                         defaultOrderer.SummaryOrderPolicy == SummaryOrderPolicy.FastestToSlowest &&

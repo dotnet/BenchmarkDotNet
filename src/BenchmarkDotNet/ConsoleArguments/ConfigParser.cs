@@ -208,14 +208,14 @@ namespace BenchmarkDotNet.ConsoleArguments
             else
                 config.AddFilter(filters);
 
-            config.Options = config.Options.Set(options.Join, ConfigOptions.JoinSummary);
-            config.Options = config.Options.Set(options.KeepBenchmarkFiles, ConfigOptions.KeepBenchmarkFiles);
-            config.Options = config.Options.Set(options.DontOverwriteResults, ConfigOptions.DontOverwriteResults);
-            config.Options = config.Options.Set(options.StopOnFirstError, ConfigOptions.StopOnFirstError);
-            config.Options = config.Options.Set(options.DisableLogFile, ConfigOptions.DisableLogFile);
+            config.WithOptionsIf(options.Join, ConfigOptions.JoinSummary);
+            config.WithOptionsIf(options.KeepBenchmarkFiles, ConfigOptions.KeepBenchmarkFiles);
+            config.WithOptionsIf(options.DontOverwriteResults, ConfigOptions.DontOverwriteResults);
+            config.WithOptionsIf(options.StopOnFirstError, ConfigOptions.StopOnFirstError);
+            config.WithOptionsIf(options.DisableLogFile, ConfigOptions.DisableLogFile);
 
             if (options.MaxParamterColumnWidth.HasValue)
-                config.SummaryStyle = SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParamterColumnWidth.Value);
+                config.WithSummaryStyle(SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParamterColumnWidth.Value));
 
             return config;
         }
