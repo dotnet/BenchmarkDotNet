@@ -25,8 +25,8 @@ namespace BenchmarkDotNet.Samples
 
                 AddJob(Job.MediumRun
                     .WithLaunchCount(1)
-                    .With(wrongPlatform)
-                    .With(InProcessEmitToolchain.Instance)
+                    .WithPlatform(wrongPlatform)
+                    .WithToolchain(InProcessEmitToolchain.Instance)
                     .WithId("InProcess"));
 
                 AddValidator(InProcessValidator.DontFailOnError);

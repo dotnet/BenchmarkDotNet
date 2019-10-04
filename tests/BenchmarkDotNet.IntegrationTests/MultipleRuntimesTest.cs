@@ -29,8 +29,8 @@ namespace BenchmarkDotNet.IntegrationTests
             var summary = BenchmarkRunner
                 .Run<C>(
                     ManualConfig.CreateEmpty()
-                        .AddJob(Job.Dry.With(CoreRuntime.Core21).With(Platform.X64).WithId("Core"))
-                        .AddJob(Job.Dry.With(ClrRuntime.Net461).WithId("Framework"))
+                        .AddJob(Job.Dry.WithRuntime(CoreRuntime.Core21).WithX64().WithId("Core"))
+                        .AddJob(Job.Dry.WithRuntime(ClrRuntime.Net461).WithId("Framework"))
                         .AddColumnProvider(DefaultColumnProviders.Instance)
                         .AddLogger(new OutputLogger(output)));
 

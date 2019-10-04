@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, TailCallDiagnoser diagnoser) => ManualConfig.CreateEmpty()
-            .AddJob(Job.Dry.With(jit).With(platform).With(runtime))
+            .AddJob(Job.Dry.WithJit(jit).WithPlatform(platform).WithRuntime(runtime))
             .AddLogger(DefaultConfig.Instance.GetLoggers().ToArray())
             .AddColumnProvider(DefaultColumnProviders.Instance)
             .AddDiagnoser(diagnoser)

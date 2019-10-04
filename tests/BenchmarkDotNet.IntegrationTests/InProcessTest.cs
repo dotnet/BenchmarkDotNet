@@ -170,7 +170,7 @@ namespace BenchmarkDotNet.IntegrationTests
         private IConfig CreateInProcessConfig(BenchmarkActionCodegen codegenMode, OutputLogger logger = null, IDiagnoser diagnoser = null)
         {
             return new ManualConfig()
-                .AddJob(Job.Dry.With(new InProcessToolchain(TimeSpan.Zero, codegenMode, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
+                .AddJob(Job.Dry.WithToolchain(new InProcessToolchain(TimeSpan.Zero, codegenMode, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
                 .AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
                 .AddColumnProvider(DefaultColumnProviders.Instance);
         }

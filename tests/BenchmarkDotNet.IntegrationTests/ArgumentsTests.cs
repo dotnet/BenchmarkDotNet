@@ -638,7 +638,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private void CanExecute<T>(IToolchain toolchain)
         {
-            var config = CreateSimpleConfig(job: Job.Dry.With(toolchain));
+            var config = CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain));
             CanExecute<T>(config);
         }
     }

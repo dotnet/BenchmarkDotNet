@@ -136,7 +136,10 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, IDiagnoser disassemblyDiagnoser, RunStrategy runStrategy)
             => ManualConfig.CreateEmpty()
-                .AddJob(Job.Dry.With(jit).With(platform).With(runtime).With(runStrategy))
+                .AddJob(Job.Dry.WithJit(jit)
+                    .WithPlatform(platform)
+                    .WithRuntime(runtime)
+                    .WithStrategy(runStrategy))
                 .AddLogger(DefaultConfig.Instance.GetLoggers().ToArray())
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(disassemblyDiagnoser)

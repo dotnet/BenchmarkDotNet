@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
 
             var config = ManualConfig.CreateEmpty()
-                    .AddJob(Job.Dry.With(platform))
+                    .AddJob(Job.Dry.WithPlatform(platform))
                     .AddLogger(logger); // make sure we get an output in the TestRunner log
 
             CanExecute(benchmark, config);

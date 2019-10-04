@@ -18,12 +18,12 @@ namespace BenchmarkDotNet.Samples
                 // name with a minus sign.
 
                 AddJob(Job.Default
-                    .With(MonoRuntime.Default)
-                    .With(new[] { new MonoArgument("--optimize=inline") })
+                    .WithRuntime(MonoRuntime.Default)
+                    .WithArgument(new[] { new MonoArgument("--optimize=inline") })
                     .WithId("Inlining enabled"));
                 AddJob(Job.Default
-                    .With(MonoRuntime.Default)
-                    .With(new[] { new MonoArgument("--optimize=-inline") })
+                    .WithRuntime(MonoRuntime.Default)
+                    .WithArgument(new[] { new MonoArgument("--optimize=-inline") })
                     .WithId("Inlining disabled"));
             }
         }

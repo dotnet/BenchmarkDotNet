@@ -179,7 +179,7 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Equal("NewId", j.Id); // id set
 
             j = j.Freeze()
-                .With(Platform.X64)
+                .WithX64()
                 .WithLaunchCount(2);
 
             Assert.Equal("NewId", j.Id); // id not lost
@@ -225,7 +225,7 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Equal("MyId", j.Id);
             Assert.Equal("MyId", j.Environment.Id);
 
-            j = j.With(Jit.RyuJit);  // custom id will flow
+            j = j.WithRyuJit();  // custom id will flow
             Assert.Equal("MyId", j.Id);
         }
 
@@ -238,7 +238,7 @@ namespace BenchmarkDotNet.Tests.Configs
 
             Assert.Equal(id, jobWithId.Id);
 
-            var shouldHaveSameId = jobWithId.With(Jit.RyuJit);
+            var shouldHaveSameId = jobWithId.WithRyuJit();
 
             Assert.Equal(id, shouldHaveSameId.Id);
         }
@@ -248,7 +248,7 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var predefinedJob = Job.Default;
 
-            var customJob = predefinedJob.With(Jit.RyuJit);
+            var customJob = predefinedJob.WithRyuJit();
 
             Assert.NotEqual(predefinedJob.Id, customJob.Id);
         }
@@ -288,7 +288,7 @@ namespace BenchmarkDotNet.Tests.Configs
             // filter by properties
             j.Environment.Apply(
                 new Job()
-                    .With(Jit.RyuJit)
+                    .WithRyuJit()
                     .WithGcAllowVeryLargeObjects(true)
                     .WithIterationCount(3)
                     .WithLaunchCount(22));
@@ -403,7 +403,7 @@ namespace BenchmarkDotNet.Tests.Configs
         [Fact]
         public static void MutatorAppliedToOtherJobOverwritesOnlyTheConfiguredSettings()
         {
-            var jobBefore = Job.Default.With(CoreRuntime.Core30); // this is a default job with Runtime set to Core
+            var jobBefore = Job.Default.WithRuntime(CoreRuntime.Core30); // this is a default job with Runtime set to Core
             var copy = jobBefore.UnfreezeCopy();
 
             Assert.False(copy.HasValue(RunMode.MaxIterationCountCharacteristic));

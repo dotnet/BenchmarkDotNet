@@ -69,9 +69,9 @@ namespace BenchmarkDotNet.Tests.Running
             const string version = "abcd";
 
             var config = ManualConfig.Create(DefaultConfig.Instance)
-                .AddJob(Job.Default.With(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: version)))
-                .AddJob(Job.Default.With(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "it's a different version")))
-                .AddJob(Job.Default.With(ClrRuntime.GetCurrentVersion()));
+                .AddJob(Job.Default.WithRuntime(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: version)))
+                .AddJob(Job.Default.WithRuntime(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "it's a different version")))
+                .AddJob(Job.Default.WithRuntime(ClrRuntime.GetCurrentVersion()));
 
             var benchmarks1 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1), config);
             var benchmarks2 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain2), config);

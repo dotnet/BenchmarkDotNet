@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Samples
 
                 AddJob(Job.MediumRun
                     .WithLaunchCount(1)
-                    .With(InProcessEmitToolchain.Instance)
+                    .WithToolchain(InProcessEmitToolchain.Instance)
                     .WithId("InProcess"));
             }
         }

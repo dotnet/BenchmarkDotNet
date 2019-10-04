@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -13,12 +14,30 @@ namespace BenchmarkDotNet.Jobs
 {
     public static class JobExtensions
     {
-        public static Job With(this Job job, Platform platform) => job.WithCore(j => j.Environment.Platform = platform);
+        [Obsolete("This property will soon be removed, please start using WithAnyCpu, WithX64, WithX86, WithArm, WithArm64 or WithPlatform instead")]
+        public static Job With(this Job job, Platform platform) => job.WithPlatform(platform);
+        public static Job WithPlatform(this Job job, Platform platform) => job.WithCore(j => j.Environment.Platform = platform);
+        public static Job WithAnyCpu(this Job job) => job.WithCore(j => j.Environment.Platform = Platform.AnyCpu);
+        public static Job WithX64(this Job job) => job.WithCore(j => j.Environment.Platform = Platform.X64);
+        public static Job WithX86(this Job job) => job.WithCore(j => j.Environment.Platform = Platform.X86);
+        public static Job WithArm(this Job job) => job.WithCore(j => j.Environment.Platform = Platform.Arm);
+        public static Job WithArm64(this Job job) => job.WithCore(j => j.Environment.Platform = Platform.Arm64);
+
         public static Job WithId(this Job job, string id) => new Job(id, job);
 
         // Env
-        public static Job With(this Job job, Jit jit) => job.WithCore(j => j.Environment.Jit = jit);
-        public static Job With(this Job job, Runtime runtime) => job.WithCore(j => j.Environment.Runtime = runtime);
+        [Obsolete("This property will soon be removed, please start using WithDefaultJit, WithLegacyJit, WithRyuJit, WithLlvm or WithJit instead")]
+        public static Job With(this Job job, Jit jit) => job.WithJit(jit);
+        public static Job WithJit(this Job job, Jit jit) => job.WithCore(j => j.Environment.Jit = jit);
+        public static Job WithDefaultJit(this Job job) => job.WithCore(j => j.Environment.Jit = Jit.Default);
+        public static Job WithLegacyJit(this Job job) => job.WithCore(j => j.Environment.Jit = Jit.LegacyJit);
+        public static Job WithRyuJit(this Job job) => job.WithCore(j => j.Environment.Jit = Jit.RyuJit);
+        public static Job WithLlvm(this Job job) => job.WithCore(j => j.Environment.Jit = Jit.Llvm);
+
+        [Obsolete("This property will soon be removed, please start using WithRuntime instead")]
+
+        public static Job With(this Job job, Runtime runtime) => job.WithRuntime(runtime);
+        public static Job WithRuntime(this Job job, Runtime runtime) => job.WithCore(j => j.Environment.Runtime = runtime);
 
         /// <summary>
         /// ProcessorAffinity for the benchmark process.
@@ -90,17 +109,42 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithHeapAffinitizeMask(this Job job, int heapAffinitizeMask) =>
             job.WithCore(j => j.Environment.Gc.HeapAffinitizeMask = heapAffinitizeMask);
 
+        [Obsolete("This property will soon be removed, please start using WithGcMode instead")]
         [PublicAPI]
-        public static Job With(this Job job, GcMode gc) => job.WithCore(j => EnvironmentMode.GcCharacteristic[j] = gc);
+        public static Job With(this Job job, GcMode gc) => job.WithGcMode(gc);
+
+        [PublicAPI]
+        public static Job WithGcMode(this Job job, GcMode gc) => job.WithCore(j => EnvironmentMode.GcCharacteristic[j] = gc);
 
         // Run
         /// <summary>
-        /// Available values: Throughput and ColdStart.
+        /// Available values: Throughput, ColdStart and Monitoring.
         ///     Throughput: default strategy which allows to get good precision level.
         ///     ColdStart: should be used only for measuring cold start of the application or testing purpose.
         ///     Monitoring: no overhead evaluating, with several target iterations. Perfect for macrobenchmarks without a steady state with high variance.
         /// </summary>
-        public static Job With(this Job job, RunStrategy strategy) => job.WithCore(j => j.Run.RunStrategy = strategy);
+        [Obsolete("This property will soon be removed, please start using WithThroughputStrategy, WithColdStartStrategy or WithMonitoringStrategy instead")]
+        public static Job With(this Job job, RunStrategy strategy) => job.WithCore(j => j.Run.RunStrategy = strategy);        // Run
+        
+        /// <summary>
+        /// Available values: Throughput, ColdStart and Monitoring.
+        ///     Throughput: default strategy which allows to get good precision level.
+        ///     ColdStart: should be used only for measuring cold start of the application or testing purpose.
+        ///     Monitoring: no overhead evaluating, with several target iterations. Perfect for macrobenchmarks without a steady state with high variance.
+        /// </summary>
+        public static Job WithStrategy(this Job job, RunStrategy strategy) => job.WithCore(j => j.Run.RunStrategy = strategy);
+        /// <summary>
+        /// Throughput: default strategy which allows to get good precision level.
+        /// </summary>
+        public static Job WithThroughputStrategy(this Job job) => job.WithCore(j => j.Run.RunStrategy = RunStrategy.Throughput);
+        /// <summary>
+        /// ColdStart: should be used only for measuring cold start of the application or testing purpose.
+        /// </summary>
+        public static Job WithColdStartStrategy(this Job job) => job.WithCore(j => j.Run.RunStrategy = RunStrategy.ColdStart);
+        /// <summary>
+        /// Monitoring: no overhead evaluating, with several target iterations. Perfect for macrobenchmarks without a steady state with high variance.
+        /// </summary>
+        public static Job WithMonitoringStrategy(this Job job) => job.WithCore(j => j.Run.RunStrategy = RunStrategy.Monitoring);
 
         /// <summary>
         /// How many times we should launch process with target benchmark.
@@ -193,9 +237,16 @@ namespace BenchmarkDotNet.Jobs
         public static Job DontEnforcePowerPlan(this Job job) => job.WithCore(j => j.Environment.PowerPlanMode = Guid.Empty);
 
         // Infrastructure
-        public static Job With(this Job job, IToolchain toolchain) => job.WithCore(j => j.Infrastructure.Toolchain = toolchain);
-        [PublicAPI] public static Job With(this Job job, IClock clock) => job.WithCore(j => j.Infrastructure.Clock = clock);
-        [PublicAPI] public static Job With(this Job job, IEngineFactory engineFactory) => job.WithCore(j => j.Infrastructure.EngineFactory = engineFactory);
+        [Obsolete("This property will soon be removed, please start using WithToolchain instead")]
+        public static Job With(this Job job, IToolchain toolchain) => job.WithToolchain(toolchain);
+        public static Job WithToolchain(this Job job, IToolchain toolchain) => job.WithCore(j => j.Infrastructure.Toolchain = toolchain);
+
+        [Obsolete("This property will soon be removed, please start using WithClock instead")]
+        [PublicAPI] public static Job With(this Job job, IClock clock) => job.WithClock(clock);
+        [PublicAPI] public static Job WithClock(this Job job, IClock clock) => job.WithCore(j => j.Infrastructure.Clock = clock);
+        [Obsolete("This property will soon be removed, please start using WithEngineFactory instead")]
+        [PublicAPI] public static Job With(this Job job, IEngineFactory engineFactory) => job.WithEngineFactory(engineFactory);
+        [PublicAPI] public static Job WithEngineFactory(this Job job, IEngineFactory engineFactory) => job.WithCore(j => j.Infrastructure.EngineFactory = engineFactory);
 
         public static Job WithCustomBuildConfiguration(this Job job, string buildConfiguration) =>
             job.WithCore(j => j.Infrastructure.BuildConfiguration = buildConfiguration);
@@ -210,7 +261,20 @@ namespace BenchmarkDotNet.Jobs
         /// Throws an exception if <paramref name="environmentVariables"/> contains two variables with the same key.
         /// </exception>
         /// <returns>The new job with overriden environment variables</returns>
-        public static Job With(this Job job, IReadOnlyList<EnvironmentVariable> environmentVariables)
+        [Obsolete("This property will soon be removed, please start using WithEnvironmentVariables instead")]
+        public static Job With(this Job job, IReadOnlyList<EnvironmentVariable> environmentVariables) => job.WithEnvironmentVariables(environmentVariables.ToArray());
+        
+        /// <summary>
+        /// Creates a new job based on the given job with specified environment variables.
+        /// It overrides the whole list of environment variables which were defined in the original job.
+        /// </summary>
+        /// <param name="job">The original job</param>
+        /// <param name="environmentVariables">The environment variables for the new job</param>
+        /// <exception cref="InvalidOperationException">
+        /// Throws an exception if <paramref name="environmentVariables"/> contains two variables with the same key.
+        /// </exception>
+        /// <returns>The new job with overriden environment variables</returns>
+        public static Job WithEnvironmentVariables(this Job job, params EnvironmentVariable[] environmentVariables)
         {
             var keys = new HashSet<string>();
             foreach (var variable in environmentVariables)
@@ -230,7 +294,19 @@ namespace BenchmarkDotNet.Jobs
         /// <param name="job">The original job</param>
         /// <param name="environmentVariable">The new environment variable which should be added for the new job</param>
         /// <returns>The new job with additional environment variable</returns>
+        [Obsolete("This property will soon be removed, please start using WithEnvironmentVariable instead")]
         public static Job With(this Job job, EnvironmentVariable environmentVariable)
+            => job.WithEnvironmentVariable(environmentVariable);
+
+        /// <summary>
+        /// Creates a new job based on the given job with additional environment variable.
+        /// All existed environment variables of the original job will be copied to the new one.
+        /// If the original job already contains an environment variable with the same key, it will be overriden.
+        /// </summary>
+        /// <param name="job">The original job</param>
+        /// <param name="environmentVariable">The new environment variable which should be added for the new job</param>
+        /// <returns>The new job with additional environment variable</returns>
+        public static Job WithEnvironmentVariable(this Job job, EnvironmentVariable environmentVariable)
             => job.WithCore(j => j.Environment.SetEnvironmentVariable(environmentVariable));
 
         /// <summary>
@@ -243,16 +319,19 @@ namespace BenchmarkDotNet.Jobs
         /// <param name="value">The value of the new environment variable</param>
         /// <returns>The new job with additional environment variable</returns>
         public static Job WithEnvironmentVariable(this Job job, [NotNull] string key, [NotNull] string value)
-            => job.With(new EnvironmentVariable(key, value));
+            => job.WithEnvironmentVariable(new EnvironmentVariable(key, value));
 
         /// <summary>
         /// Creates a new job based on the given job without any environment variables.
         /// </summary>
         /// <param name="job">The original job</param>
         /// <returns>The new job which doesn't have any environment variables</returns>
-        public static Job WithoutEnvironmentVariables(this Job job) => job.With(Array.Empty<EnvironmentVariable>());
+        public static Job WithoutEnvironmentVariables(this Job job) => job.WithEnvironmentVariables(Array.Empty<EnvironmentVariable>());
 
-        public static Job With(this Job job, IReadOnlyList<Argument> arguments) => job.WithCore(j => j.Infrastructure.Arguments = arguments);
+        [Obsolete("This property will soon be removed, please start using WithArgument instead")]
+        public static Job With(this Job job, IReadOnlyList<Argument> arguments) => job.WithArgument(arguments);
+
+        public static Job WithArgument(this Job job, IReadOnlyList<Argument> arguments) => job.WithCore(j => j.Infrastructure.Arguments = arguments);
 
         /// <summary>
         /// Runs the job with a specific NuGet dependency which will be resolved during the Job build process
