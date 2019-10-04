@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public PlatformConfig(Runtime runtime, Jit jit, Platform platform)
             {
-                Add(new Job(Job.Dry, new EnvironmentMode()
+                AddJob(new Job(Job.Dry, new EnvironmentMode()
                 {
                     Runtime = runtime,
                     Jit = jit,
@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.IntegrationTests
         private void Verify(Runtime runtime, Jit jit, Platform platform, string expectedText)
         {
             var logger = new OutputLogger(Output);
-            var config = new PlatformConfig(runtime, jit, platform).With(logger).With(DefaultColumnProviders.Instance);
+            var config = new PlatformConfig(runtime, jit, platform).AddLogger(logger).AddColumnProvider(DefaultColumnProviders.Instance);
 
             BenchmarkRunner.Run(new[] { BenchmarkConverter.TypeToBenchmarks(typeof(TestBenchmark), config) });
 

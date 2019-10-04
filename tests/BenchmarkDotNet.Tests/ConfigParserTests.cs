@@ -396,7 +396,7 @@ namespace BenchmarkDotNet.Tests
         public void UserCanSpecifyCustomDefaultJobAndOverwriteItsSettingsViaConsoleArgs()
         {
             var globalConfig = DefaultConfig.Instance
-                .With(Job.Default
+                .AddJob(Job.Default
                     .WithWarmupCount(1)
                     .AsDefault());
 

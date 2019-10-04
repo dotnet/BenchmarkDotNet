@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Tests.Reports
         [Fact]
         public void NumericColumnIsRightJustified()
         {
-            var config = ManualConfig.Create(DefaultConfig.Instance).With(StatisticColumn.Mean);
+            var config = ManualConfig.Create(DefaultConfig.Instance).AddColumn(StatisticColumn.Mean);
             var summary = MockFactory.CreateSummary(config);
             var table = new SummaryTable(summary);
 
@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Tests.Reports
         [Fact]
         public void TextColumnIsLeftJustified()
         {
-            var config = ManualConfig.Create(DefaultConfig.Instance).With(new ParamColumn("Param"));
+            var config = ManualConfig.Create(DefaultConfig.Instance).AddColumn(new ParamColumn("Param"));
             var summary = MockFactory.CreateSummary(config);
             var table = new SummaryTable(summary);
 

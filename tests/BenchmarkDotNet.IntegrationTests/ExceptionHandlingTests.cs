@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.IntegrationTests
         private void SourceExceptionMessageIsDisplayed<TBenchmark>(Job job)
         {
             var logger = new AccumulationLogger();
-            var config = ManualConfig.CreateEmpty().With(job).With(logger);
+            var config = ManualConfig.CreateEmpty().AddJob(job).AddLogger(logger);
 
             CanExecute<TBenchmark>(config, fullValidation: false); // we don't validate here because the report is expected to have no results
 

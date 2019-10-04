@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void Test()
         {
             var logger = new OutputLogger(output);
-            var config = DefaultConfig.Instance.With(logger);
+            var config = DefaultConfig.Instance.AddLogger(logger);
             var summary = BenchmarkRunner.Run<PerformanceUnitTest>(config);
 
             // Sanity checks, to be sure that the different benchmarks actually run

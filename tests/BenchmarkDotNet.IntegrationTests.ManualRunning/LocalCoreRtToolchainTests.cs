@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         public void CanBenchmarkLocalCoreRtUsingRyuJit()
         {
             var config = ManualConfig.CreateEmpty()
-                .With(Job.Dry
+                .AddJob(Job.Dry
                     .With(CoreRtRuntime.CoreRt21)
                     .With(
                         CoreRtToolchain.CreateBuilder()
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         public void CanBenchmarkLocalCoreRtUsingCppCodeGen()
         {
             var config = ManualConfig.CreateEmpty()
-                .With(Job.Dry
+                .AddJob(Job.Dry
                     .With(CoreRtRuntime.CoreRt21)
                     .With(
                         CoreRtToolchain.CreateBuilder()

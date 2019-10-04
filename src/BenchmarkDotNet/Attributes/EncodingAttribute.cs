@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Attributes
     {
         public IConfig Config { get; }
 
-        private EncodingAttribute(Encoding encoding) => Config = ManualConfig.CreateEmpty().With(encoding);
+        private EncodingAttribute(Encoding encoding) => Config = ManualConfig.CreateEmpty().WithEncoding(encoding);
 
         [PublicAPI]
         public class Unicode: EncodingAttribute

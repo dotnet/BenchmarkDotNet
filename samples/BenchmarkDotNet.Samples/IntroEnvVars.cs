@@ -14,8 +14,8 @@ namespace BenchmarkDotNet.Samples
 
             public ConfigWithCustomEnvVars()
             {
-                Add(Job.Default.With(CoreRuntime.Core21).WithId("Inlining enabled"));
-                Add(Job.Default.With(CoreRuntime.Core21)
+                AddJob(Job.Default.With(CoreRuntime.Core21).WithId("Inlining enabled"));
+                AddJob(Job.Default.With(CoreRuntime.Core21)
                     .With(new[] { new EnvironmentVariable(JitNoInline, "1") })
                     .WithId("Inlining disabled"));
             }

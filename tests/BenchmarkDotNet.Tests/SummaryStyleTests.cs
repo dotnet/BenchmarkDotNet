@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Tests
                 timeUnit: TimeUnit.Millisecond
             );
 
-            var config = ManualConfig.CreateEmpty().With(summaryStyle);
+            var config = ManualConfig.CreateEmpty().WithSummaryStyle(summaryStyle);
 
             Assert.True(config.SummaryStyle.PrintUnitsInHeader);
             Assert.False(config.SummaryStyle.PrintUnitsInContent);

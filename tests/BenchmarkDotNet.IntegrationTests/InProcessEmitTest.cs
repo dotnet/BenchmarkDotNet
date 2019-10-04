@@ -31,32 +31,32 @@ namespace BenchmarkDotNet.IntegrationTests
         private IConfig CreateInProcessConfig(OutputLogger logger)
         {
             return new ManualConfig()
-                .With(Job.Dry.With(new InProcessEmitToolchain(TimeSpan.Zero, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
-                .With(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
-                .With(DefaultColumnProviders.Instance);
+                .AddJob(Job.Dry.With(new InProcessEmitToolchain(TimeSpan.Zero, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
+                .AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
+                .AddColumnProvider(DefaultColumnProviders.Instance);
         }
 
         private IConfig CreateInProcessAndRoslynConfig(OutputLogger logger)
         {
             var config = new ManualConfig();
 
-            config.Add(DefaultConfig.Instance.GetColumnProviders().ToArray());
-            config.Add(DefaultConfig.Instance.GetAnalysers().ToArray());
-            config.Add(DefaultConfig.Instance.GetExporters().ToArray());
-            config.Add(DefaultConfig.Instance.GetFilters().ToArray());
-            config.Add(DefaultConfig.Instance.GetLoggers().ToArray());
-            config.Add(
+            config.AddColumnProvider(DefaultConfig.Instance.GetColumnProviders().ToArray());
+            config.AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray());
+            config.AddExporter(DefaultConfig.Instance.GetExporters().ToArray());
+            config.AddFilter(DefaultConfig.Instance.GetFilters().ToArray());
+            config.AddLogger(DefaultConfig.Instance.GetLoggers().ToArray());
+            config.AddJob(
                 Job.Dry
                     .With(InProcessEmitToolchain.DontLogOutput)
                     .WithInvocationCount(4)
                     .WithUnrollFactor(4));
-            config.Add(
+            config.AddJob(
                 Job.Dry
                     .With(new RoslynToolchain())
                     .WithInvocationCount(4)
                     .WithUnrollFactor(4));
             config.Options |= ConfigOptions.KeepBenchmarkFiles;
-            config.Add(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default));
+            config.AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default));
 
             return config;
         }

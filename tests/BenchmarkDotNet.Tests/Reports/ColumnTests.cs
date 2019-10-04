@@ -23,12 +23,12 @@ namespace BenchmarkDotNet.Tests.Reports
         public void UniqueIdTest()
         {
             var config = ManualConfig.Create(DefaultConfig.Instance)
-                .With(StatisticColumn.Mean)
-                .With(StatisticColumn.Mean)
-                .With(StatisticColumn.StdDev)
-                .With(StatisticColumn.Mean)
-                .With(StatisticColumn.Mean)
-                .With(StatisticColumn.P67);
+                .AddColumn(StatisticColumn.Mean)
+                .AddColumn(StatisticColumn.Mean)
+                .AddColumn(StatisticColumn.StdDev)
+                .AddColumn(StatisticColumn.Mean)
+                .AddColumn(StatisticColumn.Mean)
+                .AddColumn(StatisticColumn.P67);
 
             var summary = CreateSummary(config);
             var columns = summary.GetColumns();

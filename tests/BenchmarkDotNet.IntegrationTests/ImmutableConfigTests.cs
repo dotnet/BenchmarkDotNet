@@ -23,8 +23,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(DefaultColumnProviders.Job);
-            mutable.Add(DefaultColumnProviders.Job);
+            mutable.AddColumnProvider(DefaultColumnProviders.Job);
+            mutable.AddColumnProvider(DefaultColumnProviders.Job);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -36,8 +36,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(ConsoleLogger.Default);
-            mutable.Add(ConsoleLogger.Default);
+            mutable.AddLogger(ConsoleLogger.Default);
+            mutable.AddLogger(ConsoleLogger.Default);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -49,8 +49,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(HardwareCounter.CacheMisses);
-            mutable.Add(HardwareCounter.CacheMisses);
+            mutable.AddHardwareCounter(HardwareCounter.CacheMisses);
+            mutable.AddHardwareCounter(HardwareCounter.CacheMisses);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(HardwareCounter.CacheMisses);
+            mutable.AddHardwareCounter(HardwareCounter.CacheMisses);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -75,8 +75,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(HardwareCounter.CacheMisses);
-            mutable.Add(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.All));
+            mutable.AddHardwareCounter(HardwareCounter.CacheMisses);
+            mutable.AddDiagnoser(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.All));
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -90,8 +90,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.All));
-            mutable.Add(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.Asm));
+            mutable.AddDiagnoser(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.All));
+            mutable.AddDiagnoser(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.Asm));
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -103,8 +103,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(MarkdownExporter.GitHub);
-            mutable.Add(MarkdownExporter.GitHub);
+            mutable.AddExporter(MarkdownExporter.GitHub);
+            mutable.AddExporter(MarkdownExporter.GitHub);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -116,8 +116,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(OutliersAnalyser.Default);
-            mutable.Add(OutliersAnalyser.Default);
+            mutable.AddAnalyser(OutliersAnalyser.Default);
+            mutable.AddAnalyser(OutliersAnalyser.Default);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -129,8 +129,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(JitOptimizationsValidator.DontFailOnError);
-            mutable.Add(JitOptimizationsValidator.FailOnError);
+            mutable.AddValidator(JitOptimizationsValidator.DontFailOnError);
+            mutable.AddValidator(JitOptimizationsValidator.FailOnError);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -158,14 +158,14 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void JitOptimizationsValidatorIsMandatoryCanBeDisabledOnDemand()
         {
-            var disabled = ImmutableConfigBuilder.Create(ManualConfig.CreateEmpty().With(ConfigOptions.DisableOptimizationsValidator));
+            var disabled = ImmutableConfigBuilder.Create(ManualConfig.CreateEmpty().WithOptions(ConfigOptions.DisableOptimizationsValidator));
 
             Assert.DoesNotContain(JitOptimizationsValidator.FailOnError, disabled.GetValidators());
             Assert.DoesNotContain(JitOptimizationsValidator.DontFailOnError, disabled.GetValidators());
 
             var enabledThenDisabled = ImmutableConfigBuilder.Create(ManualConfig.CreateEmpty()
-                .With(JitOptimizationsValidator.FailOnError) // we enable it first (to mimic few configs merge)
-                .With(ConfigOptions.DisableOptimizationsValidator)); // then disable
+                .AddValidator(JitOptimizationsValidator.FailOnError) // we enable it first (to mimic few configs merge)
+                .WithOptions(ConfigOptions.DisableOptimizationsValidator)); // then disable
 
             Assert.DoesNotContain(JitOptimizationsValidator.FailOnError, enabledThenDisabled.GetValidators());
             Assert.DoesNotContain(JitOptimizationsValidator.DontFailOnError, enabledThenDisabled.GetValidators());
@@ -176,7 +176,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(TestExporter.Default);
+            mutable.AddExporter(TestExporter.Default);
 
             var exporters = ImmutableConfigBuilder.Create(mutable).GetExporters().ToArray();
 
@@ -189,8 +189,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(TestExporter.Default);
-            mutable.Add(TestExporterDependency.Default);
+            mutable.AddExporter(TestExporter.Default);
+            mutable.AddExporter(TestExporterDependency.Default);
 
             var exporters = ImmutableConfigBuilder.Create(mutable).GetExporters().ToArray();
 
@@ -288,7 +288,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var config = ManualConfig.CreateEmpty();
 
-            config.Add(jobs);
+            config.AddJob(jobs);
 
             return config;
         }

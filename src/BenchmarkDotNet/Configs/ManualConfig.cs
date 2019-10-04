@@ -69,17 +69,102 @@ namespace BenchmarkDotNet.Configs
             set => Options = Options.Set(value, ConfigOptions.StopOnFirstError);
         }
 
-        public void Add(params IColumn[] newColumns) => columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
-        public void Add(params IColumnProvider[] newColumnProviders) => columnProviders.AddRange(newColumnProviders);
-        public void Add(params IExporter[] newExporters) => exporters.AddRange(newExporters);
-        public void Add(params ILogger[] newLoggers) => loggers.AddRange(newLoggers);
-        public void Add(params IDiagnoser[] newDiagnosers) => diagnosers.AddRange(newDiagnosers);
-        public void Add(params IAnalyser[] newAnalysers) => analysers.AddRange(newAnalysers);
-        public void Add(params IValidator[] newValidators) => validators.AddRange(newValidators);
-        public void Add(params Job[] newJobs) => jobs.AddRange(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
-        public void Add(params HardwareCounter[] newHardwareCounters) => hardwareCounters.AddRange(newHardwareCounters);
-        public void Add(params IFilter[] newFilters) => filters.AddRange(newFilters);
-        public void Add(params BenchmarkLogicalGroupRule[] rules) => logicalGroupRules.AddRange(rules);
+        [Obsolete("This property will soon be removed, please start using AddColumn instead.")]
+        public void Add(params IColumn[] newColumns) => AddColumn(newColumns);
+
+        public IConfig AddColumn(params IColumn[] newColumns)
+        {
+            columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
+            return this;
+        }
+
+        [Obsolete("This property will soon be removed, please start using AddColumnProvider instead.")]
+        public void Add(params IColumnProvider[] newColumnProviders) => AddColumnProvider(newColumnProviders);
+
+        public IConfig AddColumnProvider(params IColumnProvider[] newColumnProviders)
+        {
+            columnProviders.AddRange(newColumnProviders);
+            return this;
+        }
+
+        [Obsolete("This property will soon be removed, please start using AddExporter instead.")]
+        public void Add(params IExporter[] newExporters) => AddExporter(newExporters);
+
+        public IConfig AddExporter(params IExporter[] newExporters)
+        {
+            exporters.AddRange(newExporters);
+            return this;
+        }
+
+        [Obsolete("This property will soon be removed, please start using AddLogger instead.")]
+        public void Add(params ILogger[] newLoggers) => AddLogger(newLoggers);
+
+        public IConfig AddLogger(params ILogger[] newLoggers)
+        {
+            loggers.AddRange(newLoggers);
+            return this;
+        }
+
+        [Obsolete("This property will soon be removed, please start using AddDiagnoser instead.")]
+        public void Add(params IDiagnoser[] newDiagnosers) => AddDiagnoser(newDiagnosers);
+
+        public IConfig AddDiagnoser(params IDiagnoser[] newDiagnosers)
+        {
+            diagnosers.AddRange(newDiagnosers);
+            return this;
+        }
+
+        [Obsolete("This property will soon be removed, please start using AddAnalyser instead.")]
+        public void Add(params IAnalyser[] newAnalysers) => AddAnalyser(newAnalysers);
+
+        public IConfig AddAnalyser(params IAnalyser[] newAnalysers)
+        {
+            analysers.AddRange(newAnalysers);
+            return this;
+        }
+
+        [Obsolete("This property will soon be removed, please start using AddValidator instead.")]
+        public void Add(params IValidator[] newValidators) => AddValidator(newValidators);
+
+        public IConfig AddValidator(params IValidator[] newValidators)
+        {
+            validators.AddRange(newValidators);
+            return this;
+        }
+
+        [Obsolete("This property will soon be removed, please start using AddJob instead.")]
+        public void Add(params Job[] newJobs) => AddJob(newJobs);
+
+        public IConfig AddJob(params Job[] newJobs)
+        {
+            jobs.AddRange(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
+            return this;
+        }
+
+        [Obsolete("This property will soon be removed, please start using AddHardwareCounter instead.")]
+        public void Add(params HardwareCounter[] newHardwareCounters) => AddHardwareCounter(newHardwareCounters);
+        public IConfig AddHardwareCounter(params HardwareCounter[] newHardwareCounters)
+        {
+            hardwareCounters.AddRange(newHardwareCounters);
+            return this;
+        }
+
+        [Obsolete("This property will soon be removed, please start using AddFilter instead.")]
+        public void Add(params IFilter[] newFilters) => AddFilter(newFilters);
+        public IConfig AddFilter(params IFilter[] newFilters)
+        {
+            filters.AddRange(newFilters);
+            return this;
+        }
+
+        [Obsolete("This property will soon be removed, please start using .GroupBenchmarksBy instead.")]
+        public void Add(params BenchmarkLogicalGroupRule[] rules) => GroupBenchmarksBy(rules);
+        public IConfig GroupBenchmarksBy(params BenchmarkLogicalGroupRule[] rules)
+        {
+            logicalGroupRules.AddRange(rules);
+            return this;
+        }
+
 
         [PublicAPI]
         public void Add(IConfig config)
@@ -117,11 +202,11 @@ namespace BenchmarkDotNet.Configs
             {
                 case ConfigUnionRule.AlwaysUseLocal:
                     manualConfig.Add(localConfig);
-                    manualConfig.Add(globalConfig.GetFilters().ToArray()); // the filters should be merged anyway
+                    manualConfig.AddFilter(globalConfig.GetFilters().ToArray()); // the filters should be merged anyway
                     break;
                 case ConfigUnionRule.AlwaysUseGlobal:
                     manualConfig.Add(globalConfig);
-                    manualConfig.Add(localConfig.GetFilters().ToArray()); // the filters should be merged anyway
+                    manualConfig.AddFilter(localConfig.GetFilters().ToArray()); // the filters should be merged anyway
                     break;
                 case ConfigUnionRule.Union:
                     manualConfig.Add(globalConfig);

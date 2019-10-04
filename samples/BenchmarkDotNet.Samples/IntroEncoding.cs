@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Samples
             BenchmarkRunner.Run<IntroEncodingFluentConfig>(
                 ManualConfig
                     .Create(DefaultConfig.Instance)
-                    .With(Encoding.Unicode));
+                    .WithEncoding(Encoding.Unicode));
         }
 
         [Benchmark]

@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var timeout = TimeSpan.FromSeconds(1);
 
             var config = ManualConfig.CreateEmpty()
-                .With(Job.Dry
+                .AddJob(Job.Dry
                     .With(CoreRtRuntime.CoreRt21)
                     .With(CoreRtToolchain.CreateBuilder()
                         .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-27408-02") // we test against specific version to keep this test stable

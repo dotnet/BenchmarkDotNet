@@ -136,11 +136,11 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, IDiagnoser disassemblyDiagnoser, RunStrategy runStrategy)
             => ManualConfig.CreateEmpty()
-                .With(Job.Dry.With(jit).With(platform).With(runtime).With(runStrategy))
-                .With(DefaultConfig.Instance.GetLoggers().ToArray())
-                .With(DefaultColumnProviders.Instance)
-                .With(disassemblyDiagnoser)
-                .With(new OutputLogger(Output));
+                .AddJob(Job.Dry.With(jit).With(platform).With(runtime).With(runStrategy))
+                .AddLogger(DefaultConfig.Instance.GetLoggers().ToArray())
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddDiagnoser(disassemblyDiagnoser)
+                .AddLogger(new OutputLogger(Output));
 
         private void AssertDisassembled(IDisassemblyDiagnoser diagnoser, string methodSignature)
         {

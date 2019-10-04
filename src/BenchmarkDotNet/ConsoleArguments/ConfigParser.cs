@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -176,38 +175,38 @@ namespace BenchmarkDotNet.ConsoleArguments
             var expanded = Expand(baseJob.UnfreezeCopy(), options).ToArray(); // UnfreezeCopy ensures that each of the expanded jobs will have it's own ID
             if (expanded.Length > 1)
                 expanded[0] = expanded[0].AsBaseline(); // if the user provides multiple jobs, then the first one should be a baseline
-            config.Add(expanded);
+            config.AddJob(expanded);
             if (config.GetJobs().IsEmpty() && baseJob != Job.Default)
-                config.Add(baseJob);
+                config.AddJob(baseJob);
 
-            config.Add(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
+            config.AddExporter(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
 
-            config.Add(options.HardwareCounters
+            config.AddHardwareCounter(options.HardwareCounters
                 .Select(counterName => (HardwareCounter)Enum.Parse(typeof(HardwareCounter), counterName, ignoreCase: true))
                 .ToArray());
 
             if (options.UseMemoryDiagnoser)
-                config.Add(MemoryDiagnoser.Default);
+                config.AddDiagnoser(MemoryDiagnoser.Default);
             if (options.UseThreadingDiagnoser)
-                config.Add(ThreadingDiagnoser.Default);
+                config.AddDiagnoser(ThreadingDiagnoser.Default);
             if (options.UseDisassemblyDiagnoser)
-                config.Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(recursiveDepth: options.DisassemblerRecursiveDepth, printPrologAndEpilog: true, printDiff: options.DisassemblerDiff)));
+                config.AddDiagnoser(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(recursiveDepth: options.DisassemblerRecursiveDepth, printPrologAndEpilog: true, printDiff: options.DisassemblerDiff)));
             if (!string.IsNullOrEmpty(options.Profiler))
-                config.Add(DiagnosersLoader.GetImplementation<IProfiler>(profiler => profiler.ShortName.EqualsWithIgnoreCase(options.Profiler)));
+                config.AddDiagnoser(DiagnosersLoader.GetImplementation<IProfiler>(profiler => profiler.ShortName.EqualsWithIgnoreCase(options.Profiler)));
 
             if (options.DisplayAllStatistics)
-                config.Add(StatisticColumn.AllStatistics);
+                config.AddColumn(StatisticColumn.AllStatistics);
             if (!string.IsNullOrEmpty(options.StatisticalTestThreshold) && Threshold.TryParse(options.StatisticalTestThreshold, out var threshold))
-                config.Add(new StatisticalTestColumn(StatisticalTestKind.MannWhitney, threshold));
+                config.AddColumn(new StatisticalTestColumn(StatisticalTestKind.MannWhitney, threshold));
 
             if (options.ArtifactsDirectory != null)
                 config.ArtifactsPath = options.ArtifactsDirectory.FullName;
 
             var filters = GetFilters(options).ToArray();
             if (filters.Length > 1)
-                config.Add(new UnionFilter(filters));
+                config.AddFilter(new UnionFilter(filters));
             else
-                config.Add(filters);
+                config.AddFilter(filters);
 
             config.Options = config.Options.Set(options.Join, ConfigOptions.JoinSummary);
             config.Options = config.Options.Set(options.KeepBenchmarkFiles, ConfigOptions.KeepBenchmarkFiles);
