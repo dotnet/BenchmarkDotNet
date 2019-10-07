@@ -13,19 +13,19 @@ namespace BenchmarkDotNet.Samples
         {
             public MultipleJits()
             {
-                AddJob(Job.ShortRun.WithRuntime(new MonoRuntime(name: "Mono x86", customPath: @"C:\Program Files (x86)\Mono\bin\mono.exe")).WithX86());
-                AddJob(Job.ShortRun.WithRuntime(new MonoRuntime(name: "Mono x64", customPath: @"C:\Program Files\Mono\bin\mono.exe")).WithX64());
+                AddJob(Job.ShortRun.WithPlatform(Platform.X86).WithRuntime(new MonoRuntime(name: "Mono x86", customPath: @"C:\Program Files (x86)\Mono\bin\mono.exe")));
+                AddJob(Job.ShortRun.WithPlatform(Platform.X64).WithRuntime(new MonoRuntime(name: "Mono x64", customPath: @"C:\Program Files\Mono\bin\mono.exe")));
 
-                AddJob(Job.ShortRun.WithLegacyJit().WithX86().WithRuntime(ClrRuntime.Net461));
-                AddJob(Job.ShortRun.WithLegacyJit().WithX64().WithRuntime(ClrRuntime.Net461));
+                AddJob(Job.ShortRun.WithJit(Jit.LegacyJit).WithPlatform(Platform.X86).WithRuntime(ClrRuntime.Net461));
+                AddJob(Job.ShortRun.WithJit(Jit.LegacyJit).WithPlatform(Platform.X64).WithRuntime(ClrRuntime.Net461));
 
-                AddJob(Job.ShortRun.WithRyuJit().WithX64().WithRuntime(ClrRuntime.Net461));
+                AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(ClrRuntime.Net461));
 
                 // RyuJit for .NET Core 2.0
-                AddJob(Job.ShortRun.WithRyuJit().WithX64().WithRuntime(CoreRuntime.Core20));
+                AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core20));
 
                 // RyuJit for .NET Core 2.1
-                AddJob(Job.ShortRun.WithRyuJit().WithX64().WithRuntime(CoreRuntime.Core21));
+                AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core21));
 
                 AddDiagnoser(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3, printDiff: true)));
             }

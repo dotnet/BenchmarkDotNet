@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Job Clr;
         [Obsolete("Please use Job.Default.WithRuntime(CoreRuntime.Core$Version) instead", true)]
         public static readonly Job Core;
-        [Obsolete("Please use Job.Default.With(MonoRuntime.Default) instead", true)]
+        [Obsolete("Please use Job.Default.WithRuntime(MonoRuntime.Default) instead", true)]
         public static readonly Job Mono;
         [Obsolete("Please use Job.Default.WithRuntime(CoreRtRuntime.CoreRt$Version) instead", true)]
         public static readonly Job CoreRT;
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Job DryClr;
         [Obsolete("Please use Job.Dry.WithRuntime(CoreRuntime.Core$Version) instead", true)]
         public static readonly Job DryCore;
-        [Obsolete("Please use Job.Dry.With(MonoRuntime.Default) instead", true)]
+        [Obsolete("Please use Job.Dry.WithRuntime(MonoRuntime.Default) instead", true)]
         public static readonly Job DryMono;
         [Obsolete("Please use Job.Dry.WithRuntime(CoreRtRuntime.CoreRt$Version) instead", true)]
         public static readonly Job DryCoreRT;

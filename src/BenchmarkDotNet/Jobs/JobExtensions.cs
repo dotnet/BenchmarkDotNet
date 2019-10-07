@@ -14,28 +14,19 @@ namespace BenchmarkDotNet.Jobs
 {
     public static class JobExtensions
     {
-        [Obsolete("This property will soon be removed, please start using WithAnyCpu, WithX64, WithX86, WithArm, WithArm64 or WithPlatform instead")]
+        [Obsolete("This property will soon be removed, please start using WithPlatform instead")]
         public static Job With(this Job job, Platform platform) => job.WithPlatform(platform);
         public static Job WithPlatform(this Job job, Platform platform) => job.WithCore(j => j.Environment.Platform = platform);
-        public static Job WithAnyCpu(this Job job) => job.WithCore(j => j.Environment.Platform = Platform.AnyCpu);
-        public static Job WithX64(this Job job) => job.WithCore(j => j.Environment.Platform = Platform.X64);
-        public static Job WithX86(this Job job) => job.WithCore(j => j.Environment.Platform = Platform.X86);
-        public static Job WithArm(this Job job) => job.WithCore(j => j.Environment.Platform = Platform.Arm);
-        public static Job WithArm64(this Job job) => job.WithCore(j => j.Environment.Platform = Platform.Arm64);
 
         public static Job WithId(this Job job, string id) => new Job(id, job);
 
         // Env
-        [Obsolete("This property will soon be removed, please start using WithDefaultJit, WithLegacyJit, WithRyuJit, WithLlvm or WithJit instead")]
+        [Obsolete("This property will soon be removed, please start using WithJit instead")]
         public static Job With(this Job job, Jit jit) => job.WithJit(jit);
         public static Job WithJit(this Job job, Jit jit) => job.WithCore(j => j.Environment.Jit = jit);
-        public static Job WithDefaultJit(this Job job) => job.WithCore(j => j.Environment.Jit = Jit.Default);
-        public static Job WithLegacyJit(this Job job) => job.WithCore(j => j.Environment.Jit = Jit.LegacyJit);
-        public static Job WithRyuJit(this Job job) => job.WithCore(j => j.Environment.Jit = Jit.RyuJit);
-        public static Job WithLlvm(this Job job) => job.WithCore(j => j.Environment.Jit = Jit.Llvm);
+
 
         [Obsolete("This property will soon be removed, please start using WithRuntime instead")]
-
         public static Job With(this Job job, Runtime runtime) => job.WithRuntime(runtime);
         public static Job WithRuntime(this Job job, Runtime runtime) => job.WithCore(j => j.Environment.Runtime = runtime);
 
@@ -123,7 +114,7 @@ namespace BenchmarkDotNet.Jobs
         ///     ColdStart: should be used only for measuring cold start of the application or testing purpose.
         ///     Monitoring: no overhead evaluating, with several target iterations. Perfect for macrobenchmarks without a steady state with high variance.
         /// </summary>
-        [Obsolete("This property will soon be removed, please start using WithThroughputStrategy, WithColdStartStrategy or WithMonitoringStrategy instead")]
+        [Obsolete("This property will soon be removed, please start using WithStrategy instead")]
         public static Job With(this Job job, RunStrategy strategy) => job.WithCore(j => j.Run.RunStrategy = strategy);        // Run
         
         /// <summary>
@@ -133,18 +124,6 @@ namespace BenchmarkDotNet.Jobs
         ///     Monitoring: no overhead evaluating, with several target iterations. Perfect for macrobenchmarks without a steady state with high variance.
         /// </summary>
         public static Job WithStrategy(this Job job, RunStrategy strategy) => job.WithCore(j => j.Run.RunStrategy = strategy);
-        /// <summary>
-        /// Throughput: default strategy which allows to get good precision level.
-        /// </summary>
-        public static Job WithThroughputStrategy(this Job job) => job.WithCore(j => j.Run.RunStrategy = RunStrategy.Throughput);
-        /// <summary>
-        /// ColdStart: should be used only for measuring cold start of the application or testing purpose.
-        /// </summary>
-        public static Job WithColdStartStrategy(this Job job) => job.WithCore(j => j.Run.RunStrategy = RunStrategy.ColdStart);
-        /// <summary>
-        /// Monitoring: no overhead evaluating, with several target iterations. Perfect for macrobenchmarks without a steady state with high variance.
-        /// </summary>
-        public static Job WithMonitoringStrategy(this Job job) => job.WithCore(j => j.Run.RunStrategy = RunStrategy.Monitoring);
 
         /// <summary>
         /// How many times we should launch process with target benchmark.

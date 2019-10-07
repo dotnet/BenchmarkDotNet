@@ -42,8 +42,8 @@ namespace BenchmarkDotNet.Tests.Engine
         private static readonly Dictionary<string, Job> JobsWhichDontRequireJitting = new Dictionary<string, Job>
         {
             { "Dry", Job.Dry },
-            { "ColdStart", Job.Default.WithColdStartStrategy() },
-            { "Monitoring", Job.Default.WithMonitoringStrategy() }
+            { "ColdStart", Job.Default.WithStrategy(RunStrategy.ColdStart) },
+            { "Monitoring", Job.Default.WithStrategy(RunStrategy.Monitoring) }
         };
 
         [UsedImplicitly]
