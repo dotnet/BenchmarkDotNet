@@ -208,11 +208,11 @@ namespace BenchmarkDotNet.ConsoleArguments
             else
                 config.AddFilter(filters);
 
-            config.WithOptionsIf(options.Join, ConfigOptions.JoinSummary);
-            config.WithOptionsIf(options.KeepBenchmarkFiles, ConfigOptions.KeepBenchmarkFiles);
-            config.WithOptionsIf(options.DontOverwriteResults, ConfigOptions.DontOverwriteResults);
-            config.WithOptionsIf(options.StopOnFirstError, ConfigOptions.StopOnFirstError);
-            config.WithOptionsIf(options.DisableLogFile, ConfigOptions.DisableLogFile);
+            config.WithSwitchingOptions(options.Join, ConfigOptions.JoinSummary);
+            config.WithSwitchingOptions(options.KeepBenchmarkFiles, ConfigOptions.KeepBenchmarkFiles);
+            config.WithSwitchingOptions(options.DontOverwriteResults, ConfigOptions.DontOverwriteResults);
+            config.WithSwitchingOptions(options.StopOnFirstError, ConfigOptions.StopOnFirstError);
+            config.WithSwitchingOptions(options.DisableLogFile, ConfigOptions.DisableLogFile);
 
             if (options.MaxParamterColumnWidth.HasValue)
                 config.WithSummaryStyle(SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParamterColumnWidth.Value));

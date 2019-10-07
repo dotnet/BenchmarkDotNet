@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Configs
             return this;
         }
 
-        public ManualConfig WithOptionsIf(bool value, ConfigOptions options)
+        public ManualConfig WithSwitchingOptions(bool value, ConfigOptions options)
         {
             Options = Options.Set(value, options);
             return this;
@@ -99,21 +99,21 @@ namespace BenchmarkDotNet.Configs
         public bool KeepBenchmarkFiles
         {
             get => Options.IsSet(ConfigOptions.KeepBenchmarkFiles);
-            set => Options = Options.Set(value, ConfigOptions.KeepBenchmarkFiles);
+            set => WithSwitchingOptions(value, ConfigOptions.KeepBenchmarkFiles);
         }
 
         [Obsolete("This property will soon be removed, please start using .Options instead")]
         public bool SummaryPerType
         {
             get => !Options.IsSet(ConfigOptions.JoinSummary);
-            set => Options = Options.Set(!value, ConfigOptions.JoinSummary);
+            set => WithSwitchingOptions(!value, ConfigOptions.JoinSummary);
         }
 
         [Obsolete("This property will soon be removed, please start using .Options instead")]
         public bool StopOnFirstError
         {
             get => Options.IsSet(ConfigOptions.StopOnFirstError);
-            set => Options = Options.Set(value, ConfigOptions.StopOnFirstError);
+            set => WithSwitchingOptions(value, ConfigOptions.StopOnFirstError);
         }
 
         [Obsolete("This property will soon be removed, please start using AddColumn instead.")]
