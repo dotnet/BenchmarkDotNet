@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Configs
                 // if users define hardware counters via [HardwareCounters] we need to dynamically load the right diagnoser
                 var hardwareCountersDiagnoser = DiagnosersLoader.GetImplementation<IHardwareCountersDiagnoser>();
 
-                if (hardwareCountersDiagnoser != default && !builder.Contains(hardwareCountersDiagnoser))
+                if (hardwareCountersDiagnoser != default(IDiagnoser) && !builder.Contains(hardwareCountersDiagnoser))
                     builder.Add(hardwareCountersDiagnoser);
             }
 
@@ -106,7 +106,7 @@ namespace BenchmarkDotNet.Configs
             var disassemblyDiagnoser = uniqueDiagnosers.OfType<IDisassemblyDiagnoser>().SingleOrDefault();
 
             // we can use InstructionPointerExporter only when we have both IHardwareCountersDiagnoser and IDisassemblyDiagnoser
-            if (hardwareCounterDiagnoser != default && disassemblyDiagnoser != default)
+            if (hardwareCounterDiagnoser != default(IHardwareCountersDiagnoser) && disassemblyDiagnoser != default(IDisassemblyDiagnoser))
                 result.Add(new InstructionPointerExporter(hardwareCounterDiagnoser, disassemblyDiagnoser));
 
             for (int i = result.Count - 1; i >=0; i--)

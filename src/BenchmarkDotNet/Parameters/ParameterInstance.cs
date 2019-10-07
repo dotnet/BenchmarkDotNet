@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Parameters
@@ -9,16 +10,17 @@ namespace BenchmarkDotNet.Parameters
     public class ParameterInstance
     {
         public const string NullParameterTextRepresentation = "?";
-        private const int MaxDisplayTextInnerLength = 15 + 5; // 5 is for postfix " [15]"
 
         [PublicAPI] public ParameterDefinition Definition { get; }
 
         private readonly object value;
+        private readonly int maxParamterColumnWidth;
 
-        public ParameterInstance(ParameterDefinition definition, object value)
+        public ParameterInstance(ParameterDefinition definition, object value, SummaryStyle summaryStyle)
         {
             Definition = definition;
             this.value = value;
+            maxParamterColumnWidth = summaryStyle?.MaxParamterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
         }
 
         public string Name => Definition.Name;
@@ -38,20 +40,27 @@ namespace BenchmarkDotNet.Parameters
                 case null:
                     return NullParameterTextRepresentation;
                 case IParam parameter:
-                    return Trim(parameter.DisplayText);
+                    return Trim(parameter.DisplayText, maxParamterColumnWidth);
                 // no trimming for types!
                 case Type type:
                     return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).GetDisplayName()}?" : type.GetDisplayName();
             }
 
-            return Trim(value.ToString());
+            return Trim(value.ToString(), maxParamterColumnWidth);
         }
 
         public override string ToString() => ToDisplayText();
 
-        private static string Trim(string value)
-            => value.Length <= MaxDisplayTextInnerLength
-                ? value
-                : value.Substring(0, 5) + "(...)" + value.Substring(value.Length - 5, 5) + $" [{value.Length}]";
+        private static string Trim(string value, int maxDisplayTextInnerLength)
+        {
+            if (value.Length <= maxDisplayTextInnerLength)
+                return value;
+
+            var postfix = $" [{value.Length}]";
+            const string dots = "(...)";
+            int take = (maxDisplayTextInnerLength - postfix.Length - dots.Length) / 2;
+
+            return value.Substring(0, take) + dots + value.Substring(value.Length - take, take) + postfix;
+        }
     }
 }

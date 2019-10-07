@@ -20,6 +20,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
@@ -213,6 +214,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.Options = config.Options.Set(options.DontOverwriteResults, ConfigOptions.DontOverwriteResults);
             config.Options = config.Options.Set(options.StopOnFirstError, ConfigOptions.StopOnFirstError);
             config.Options = config.Options.Set(options.DisableLogFile, ConfigOptions.DisableLogFile);
+
+            if (options.MaxParamterColumnWidth.HasValue)
+                config.SummaryStyle = SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParamterColumnWidth.Value);
 
             return config;
         }
