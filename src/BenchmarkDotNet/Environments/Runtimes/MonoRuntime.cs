@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Environments
 
         public string MonoBclPath { get; }
 
-        private MonoRuntime(string name) : base(TargetFrameworkMoniker.Mono, "mono", name)
+        private MonoRuntime(string name) : base(RuntimeMoniker.Mono, "mono", name)
         {
         }
 

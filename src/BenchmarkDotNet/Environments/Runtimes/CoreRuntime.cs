@@ -11,14 +11,14 @@ namespace BenchmarkDotNet.Environments
 {
     public class CoreRuntime : Runtime
     {
-        public static readonly CoreRuntime Core20 = new CoreRuntime(TargetFrameworkMoniker.NetCoreApp20, "netcoreapp2.0", ".NET Core 2.0");
-        public static readonly CoreRuntime Core21 = new CoreRuntime(TargetFrameworkMoniker.NetCoreApp21, "netcoreapp2.1", ".NET Core 2.1");
-        public static readonly CoreRuntime Core22 = new CoreRuntime(TargetFrameworkMoniker.NetCoreApp22, "netcoreapp2.2", ".NET Core 2.2");
-        public static readonly CoreRuntime Core30 = new CoreRuntime(TargetFrameworkMoniker.NetCoreApp30, "netcoreapp3.0", ".NET Core 3.0");
-        public static readonly CoreRuntime Core31 = new CoreRuntime(TargetFrameworkMoniker.NetCoreApp31, "netcoreapp3.1", ".NET Core 3.1");
-        public static readonly CoreRuntime Core50 = new CoreRuntime(TargetFrameworkMoniker.NetCoreApp50, "netcoreapp5.0", ".NET Core 5.0");
+        public static readonly CoreRuntime Core20 = new CoreRuntime(RuntimeMoniker.NetCoreApp20, "netcoreapp2.0", ".NET Core 2.0");
+        public static readonly CoreRuntime Core21 = new CoreRuntime(RuntimeMoniker.NetCoreApp21, "netcoreapp2.1", ".NET Core 2.1");
+        public static readonly CoreRuntime Core22 = new CoreRuntime(RuntimeMoniker.NetCoreApp22, "netcoreapp2.2", ".NET Core 2.2");
+        public static readonly CoreRuntime Core30 = new CoreRuntime(RuntimeMoniker.NetCoreApp30, "netcoreapp3.0", ".NET Core 3.0");
+        public static readonly CoreRuntime Core31 = new CoreRuntime(RuntimeMoniker.NetCoreApp31, "netcoreapp3.1", ".NET Core 3.1");
+        public static readonly CoreRuntime Core50 = new CoreRuntime(RuntimeMoniker.NetCoreApp50, "netcoreapp5.0", ".NET Core 5.0");
 
-        private CoreRuntime(TargetFrameworkMoniker targetFrameworkMoniker, string msBuildMoniker, string displayName)
+        private CoreRuntime(RuntimeMoniker targetFrameworkMoniker, string msBuildMoniker, string displayName)
             : base(targetFrameworkMoniker, msBuildMoniker, displayName)
         {
         }
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Environments
             if (string.IsNullOrEmpty(msBuildMoniker)) throw new ArgumentNullException(nameof(msBuildMoniker));
             if (string.IsNullOrEmpty(displayName)) throw new ArgumentNullException(nameof(displayName));
 
-            return new CoreRuntime(TargetFrameworkMoniker.NotRecognized, msBuildMoniker, displayName);
+            return new CoreRuntime(RuntimeMoniker.NotRecognized, msBuildMoniker, displayName);
         }
 
         internal static CoreRuntime GetCurrentVersion()

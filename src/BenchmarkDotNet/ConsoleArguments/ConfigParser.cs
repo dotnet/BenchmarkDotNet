@@ -102,9 +102,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
 
             foreach (string runtime in options.Runtimes)
-                if (!Enum.TryParse<TargetFrameworkMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out _))
+                if (!Enum.TryParse<RuntimeMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out _))
                 {
-                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(TargetFrameworkMoniker)).Select(name => name.ToLower()))}.");
+                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(RuntimeMoniker)).Select(name => name.ToLower()))}.");
                     return false;
                 }
 
@@ -286,39 +286,39 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             TimeSpan? timeOut = options.TimeOutInSeconds.HasValue ? TimeSpan.FromSeconds(options.TimeOutInSeconds.Value) : default(TimeSpan?);
 
-            if (!Enum.TryParse(runtimeId.Replace(".", string.Empty), ignoreCase: true, out TargetFrameworkMoniker targetFrameworkMoniker))
+            if (!Enum.TryParse(runtimeId.Replace(".", string.Empty), ignoreCase: true, out RuntimeMoniker runtimeMoniker))
             {
                 throw new InvalidOperationException("Impossible, already validated by the Validate method");
             }
 
-            switch (targetFrameworkMoniker)
+            switch (runtimeMoniker)
             {
-                case TargetFrameworkMoniker.Net461:
-                case TargetFrameworkMoniker.Net462:
-                case TargetFrameworkMoniker.Net47:
-                case TargetFrameworkMoniker.Net471:
-                case TargetFrameworkMoniker.Net472:
-                case TargetFrameworkMoniker.Net48:
+                case RuntimeMoniker.Net461:
+                case RuntimeMoniker.Net462:
+                case RuntimeMoniker.Net47:
+                case RuntimeMoniker.Net471:
+                case RuntimeMoniker.Net472:
+                case RuntimeMoniker.Net48:
                     return baseJob
-                        .With(targetFrameworkMoniker.GetRuntime())
+                        .With(runtimeMoniker.GetRuntime())
                         .With(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName, timeOut));
-                case TargetFrameworkMoniker.NetCoreApp20:
-                case TargetFrameworkMoniker.NetCoreApp21:
-                case TargetFrameworkMoniker.NetCoreApp22:
-                case TargetFrameworkMoniker.NetCoreApp30:
-                case TargetFrameworkMoniker.NetCoreApp31:
-                case TargetFrameworkMoniker.NetCoreApp50:
+                case RuntimeMoniker.NetCoreApp20:
+                case RuntimeMoniker.NetCoreApp21:
+                case RuntimeMoniker.NetCoreApp22:
+                case RuntimeMoniker.NetCoreApp30:
+                case RuntimeMoniker.NetCoreApp31:
+                case RuntimeMoniker.NetCoreApp50:
                     return baseJob
-                        .With(targetFrameworkMoniker.GetRuntime())
+                        .With(runtimeMoniker.GetRuntime())
                         .With(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));
-                case TargetFrameworkMoniker.Mono:
+                case RuntimeMoniker.Mono:
                     return baseJob.With(new MonoRuntime("Mono", options.MonoPath?.FullName));
-                case TargetFrameworkMoniker.CoreRt20:
-                case TargetFrameworkMoniker.CoreRt21:
-                case TargetFrameworkMoniker.CoreRt22:
-                case TargetFrameworkMoniker.CoreRt30:
-                case TargetFrameworkMoniker.CoreRt31:
-                case TargetFrameworkMoniker.CoreRt50:
+                case RuntimeMoniker.CoreRt20:
+                case RuntimeMoniker.CoreRt21:
+                case RuntimeMoniker.CoreRt22:
+                case RuntimeMoniker.CoreRt30:
+                case RuntimeMoniker.CoreRt31:
+                case RuntimeMoniker.CoreRt50:
                     var builder = CoreRtToolchain.CreateBuilder();
 
                     if (options.CliPath != null)
@@ -336,7 +336,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     if (timeOut.HasValue)
                         builder.Timeout(timeOut.Value);
 
-                    var runtime = targetFrameworkMoniker.GetRuntime();
+                    var runtime = runtimeMoniker.GetRuntime();
                     builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
 
                     return baseJob.With(runtime).With(builder.ToToolchain());

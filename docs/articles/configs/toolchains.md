@@ -57,7 +57,7 @@ class Program
 }
 ```
 
-You can achieve the same thing using `[TargetFrameworkJobAttribute]`:
+You can achieve the same thing using `[SimpleJobAttribute]`:
 
 ```cs
 using BenchmarkDotNet.Attributes;
@@ -65,10 +65,10 @@ using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples
 {
-    [TargetFrameworkJob(TargetFrameworkMoniker.Net48)]
-    [TargetFrameworkJob(TargetFrameworkMoniker.Mono)]
-    [TargetFrameworkJob(TargetFrameworkMoniker.NetCoreApp21)]
-    [TargetFrameworkJob(TargetFrameworkMoniker.NetCoreApp30)]
+    [SimpleJob(runtimeMoniker: RuntimeMoniker.Net48)]
+    [SimpleJob(runtimeMoniker: RuntimeMoniker.Mono)]
+    [SimpleJob(runtimeMoniker: RuntimeMoniker.NetCoreApp21)]
+    [SimpleJob(runtimeMoniker: RuntimeMoniker.NetCoreApp30)]
     public class TheClassWithBenchmarks
 ```
 
@@ -209,7 +209,7 @@ BenchmarkSwitcher
 ```
 
 ```cs
-[TargetFrameworkJob(TargetFrameworkMoniker.CoreRt21)] // compiles the benchmarks as netcoreapp2.1 and uses the latest CoreRT to build a native app
+[TargetFrameworkJob(RuntimeMoniker.CoreRt21)] // compiles the benchmarks as netcoreapp2.1 and uses the latest CoreRT to build a native app
 public class TheTypeWithBenchmarks
 {
    [Benchmark] // the benchmarks go here
