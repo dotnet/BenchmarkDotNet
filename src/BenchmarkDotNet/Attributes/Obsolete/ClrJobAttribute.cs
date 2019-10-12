@@ -4,7 +4,7 @@ using System;
 
 namespace BenchmarkDotNet.Attributes
 {
-    [Obsolete("Please use SimpleJobAttribute instead.", false)]
+    [Obsolete("Please use [SimpleJob(RuntimeMoniker.Net$)] instead.", false)]
     public class ClrJobAttribute : JobConfigBaseAttribute
     {
         public ClrJobAttribute() : base(Job.Default.With(ClrRuntime.GetCurrentVersion()))

@@ -3,7 +3,7 @@ namespace BenchmarkDotNet.Jobs
     public enum RuntimeMoniker
     {
         /// <summary>
-        /// the same Runtime as the host Process
+        /// the same Runtime as the host Process (default setting)
         /// </summary>
         HostProcess = 0,
         /// <summary>

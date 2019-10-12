@@ -19,9 +19,8 @@ namespace BenchmarkDotNet.Attributes
             int targetCount = DefaultValue,
             int invocationCount = DefaultValue,
             string id = null,
-            bool baseline = false,
-            RuntimeMoniker runtimeMoniker = RuntimeMoniker.HostProcess
-        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, null, baseline, runtimeMoniker)) { }
+            bool baseline = false
+        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, null, baseline)) { }
 
         [PublicAPI]
         public SimpleJobAttribute(
@@ -31,12 +30,22 @@ namespace BenchmarkDotNet.Attributes
             int targetCount = DefaultValue,
             int invocationCount = DefaultValue,
             string id = null,
-            bool baseline = false,
-            RuntimeMoniker runtimeMoniker = RuntimeMoniker.HostProcess
-        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, runStrategy, baseline, runtimeMoniker)) { }
+            bool baseline = false
+        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, runStrategy, baseline)) { }
+
+        [PublicAPI]
+        public SimpleJobAttribute(
+            RuntimeMoniker runtimeMoniker,
+            int launchCount = DefaultValue,
+            int warmupCount = DefaultValue,
+            int targetCount = DefaultValue,
+            int invocationCount = DefaultValue,
+            string id = null,
+            bool baseline = false
+        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, null, baseline, runtimeMoniker)) { }
 
         private static Job CreateJob(string id, int launchCount, int warmupCount, int targetCount, int invocationCount, RunStrategy? runStrategy,
-            bool baseline, RuntimeMoniker runtimeMoniker)
+            bool baseline, RuntimeMoniker runtimeMoniker = RuntimeMoniker.HostProcess)
         {
             var job = new Job(id);
             if (launchCount != DefaultValue)

@@ -4,7 +4,7 @@ using System;
 
 namespace BenchmarkDotNet.Attributes
 {
-    [Obsolete("Please use DryJobAttribute instead. Use the ctor that requires RuntimeMoniker, Jit and Platform arguments.", false)]
+    [Obsolete("Please use [DryJob(RuntimeMoniker.Net$)] instead.", false)]
     public class DryClrJobAttribute : JobConfigBaseAttribute
     {
         public DryClrJobAttribute() : base(Job.Dry.With(ClrRuntime.GetCurrentVersion()))
