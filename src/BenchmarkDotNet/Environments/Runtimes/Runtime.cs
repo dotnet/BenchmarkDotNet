@@ -32,19 +32,19 @@ namespace BenchmarkDotNet.Environments
         /// <summary>
         /// Target Framework Moniker
         /// </summary>
-        public TargetFrameworkMoniker TargetFrameworkMoniker { get; }
+        public RuntimeMoniker RuntimeMoniker { get; }
 
         /// <summary>
         /// MsBuild Target Framework Moniker, example: net461, netcoreapp2.1
         /// </summary>
         public string MsBuildMoniker { get; }
 
-        protected Runtime(TargetFrameworkMoniker targetFrameworkMoniker, string msBuildMoniker, string displayName)
+        protected Runtime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
         {
             if (string.IsNullOrEmpty(displayName)) throw new ArgumentNullException(nameof(displayName));
             if (string.IsNullOrEmpty(msBuildMoniker)) throw new ArgumentNullException(nameof(msBuildMoniker));
 
-            TargetFrameworkMoniker = targetFrameworkMoniker;
+            RuntimeMoniker = runtimeMoniker;
             MsBuildMoniker = msBuildMoniker;
             Name = displayName;
         }
@@ -52,10 +52,10 @@ namespace BenchmarkDotNet.Environments
         public override string ToString() => Name;
 
         public bool Equals(Runtime other)
-            => other != null && other.Name == Name && other.MsBuildMoniker == MsBuildMoniker && other.TargetFrameworkMoniker == TargetFrameworkMoniker;
+            => other != null && other.Name == Name && other.MsBuildMoniker == MsBuildMoniker && other.RuntimeMoniker == RuntimeMoniker;
 
         public override bool Equals(object obj) => obj is Runtime other && Equals(other);
 
-        public override int GetHashCode() => Name.GetHashCode() ^ (int)TargetFrameworkMoniker ^ MsBuildMoniker.GetHashCode();
+        public override int GetHashCode() => Name.GetHashCode() ^ (int)RuntimeMoniker ^ MsBuildMoniker.GetHashCode();
     }
 }

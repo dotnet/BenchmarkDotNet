@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Engines
             get
             {
                 bool excludeAllocationQuantumSideEffects = !RuntimeInformation.IsNetCore
-                    || RuntimeInformation.GetCurrentRuntime().TargetFrameworkMoniker == TargetFrameworkMoniker.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
+                    || RuntimeInformation.GetCurrentRuntime().RuntimeMoniker == RuntimeMoniker.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
 
                 return GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects) == 0
                     ? 0

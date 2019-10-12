@@ -4,9 +4,9 @@ using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DryJob(TargetFrameworkMoniker.NetCoreApp21)]
-    [DryJob(TargetFrameworkMoniker.Mono)]
-    [DryJob(TargetFrameworkMoniker.Net461, Jit.LegacyJit, Platform.X86)]
+    [DryJob(RuntimeMoniker.NetCoreApp21)]
+    [DryJob(RuntimeMoniker.Mono)]
+    [DryJob(RuntimeMoniker.Net461, Jit.LegacyJit, Platform.X86)]
     [DisassemblyDiagnoser]
     public class IntroDisassembly
     {
