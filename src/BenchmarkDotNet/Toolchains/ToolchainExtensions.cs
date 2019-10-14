@@ -32,8 +32,8 @@ namespace BenchmarkDotNet.Toolchains
             {
                 case ClrRuntime clrRuntime:
                     if (RuntimeInformation.IsNetCore || preferMsBuildToolchains)
-                        return clrRuntime.TargetFrameworkMoniker != TargetFrameworkMoniker.NotRecognized
-                            ? GetToolchain(clrRuntime.TargetFrameworkMoniker)
+                        return clrRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
+                            ? GetToolchain(clrRuntime.RuntimeMoniker)
                             : CsProjClassicNetToolchain.From(clrRuntime.MsBuildMoniker);
 
                     return RoslynToolchain.Instance;
@@ -47,14 +47,14 @@ namespace BenchmarkDotNet.Toolchains
                 case CoreRuntime coreRuntime:
                     if (descriptor != null && descriptor.Type.Assembly.IsLinqPad())
                         return InProcessEmitToolchain.Instance;
-                    if (coreRuntime.TargetFrameworkMoniker != TargetFrameworkMoniker.NotRecognized)
-                        return GetToolchain(coreRuntime.TargetFrameworkMoniker);
+                    if (coreRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized)
+                        return GetToolchain(coreRuntime.RuntimeMoniker);
 
                     return CsProjCoreToolchain.From(new DotNetCli.NetCoreAppSettings(coreRuntime.MsBuildMoniker, null, coreRuntime.Name));
 
                 case CoreRtRuntime coreRtRuntime:
-                    return coreRtRuntime.TargetFrameworkMoniker != TargetFrameworkMoniker.NotRecognized
-                            ? GetToolchain(coreRtRuntime.TargetFrameworkMoniker)
+                    return coreRtRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
+                            ? GetToolchain(coreRtRuntime.RuntimeMoniker)
                             : CoreRtToolchain.CreateBuilder().UseCoreRtNuGet().TargetFrameworkMoniker(coreRtRuntime.MsBuildMoniker).ToToolchain();
 
                 default:
@@ -62,45 +62,45 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private static IToolchain GetToolchain(TargetFrameworkMoniker targetFrameworkMoniker)
+        private static IToolchain GetToolchain(RuntimeMoniker targetFrameworkMoniker)
         {
             switch (targetFrameworkMoniker)
             {
-                case TargetFrameworkMoniker.Net461:
+                case RuntimeMoniker.Net461:
                     return CsProjClassicNetToolchain.Net461;
-                case TargetFrameworkMoniker.Net462:
+                case RuntimeMoniker.Net462:
                     return CsProjClassicNetToolchain.Net462;
-                case TargetFrameworkMoniker.Net47:
+                case RuntimeMoniker.Net47:
                     return CsProjClassicNetToolchain.Net47;
-                case TargetFrameworkMoniker.Net471:
+                case RuntimeMoniker.Net471:
                     return CsProjClassicNetToolchain.Net471;
-                case TargetFrameworkMoniker.Net472:
+                case RuntimeMoniker.Net472:
                     return CsProjClassicNetToolchain.Net472;
-                case TargetFrameworkMoniker.Net48:
+                case RuntimeMoniker.Net48:
                     return CsProjClassicNetToolchain.Net48;
-                case TargetFrameworkMoniker.NetCoreApp20:
+                case RuntimeMoniker.NetCoreApp20:
                     return CsProjCoreToolchain.NetCoreApp20;
-                case TargetFrameworkMoniker.NetCoreApp21:
+                case RuntimeMoniker.NetCoreApp21:
                     return CsProjCoreToolchain.NetCoreApp21;
-                case TargetFrameworkMoniker.NetCoreApp22:
+                case RuntimeMoniker.NetCoreApp22:
                     return CsProjCoreToolchain.NetCoreApp22;
-                case TargetFrameworkMoniker.NetCoreApp30:
+                case RuntimeMoniker.NetCoreApp30:
                     return CsProjCoreToolchain.NetCoreApp30;
-                case TargetFrameworkMoniker.NetCoreApp31:
+                case RuntimeMoniker.NetCoreApp31:
                     return CsProjCoreToolchain.NetCoreApp31;
-                case TargetFrameworkMoniker.NetCoreApp50:
+                case RuntimeMoniker.NetCoreApp50:
                     return CsProjCoreToolchain.NetCoreApp50;
-                case TargetFrameworkMoniker.CoreRt20:
+                case RuntimeMoniker.CoreRt20:
                     return CoreRtToolchain.Core20;
-                case TargetFrameworkMoniker.CoreRt21:
+                case RuntimeMoniker.CoreRt21:
                     return CoreRtToolchain.Core21;
-                case TargetFrameworkMoniker.CoreRt22:
+                case RuntimeMoniker.CoreRt22:
                     return CoreRtToolchain.Core22;
-                case TargetFrameworkMoniker.CoreRt30:
+                case RuntimeMoniker.CoreRt30:
                     return CoreRtToolchain.Core30;
-                case TargetFrameworkMoniker.CoreRt31:
+                case RuntimeMoniker.CoreRt31:
                     return CoreRtToolchain.Core31;
-                case TargetFrameworkMoniker.CoreRt50:
+                case RuntimeMoniker.CoreRt50:
                     return CoreRtToolchain.Core50;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(targetFrameworkMoniker), targetFrameworkMoniker, "Target Framework Moniker not supported");

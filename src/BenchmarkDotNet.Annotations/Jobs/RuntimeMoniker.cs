@@ -1,11 +1,15 @@
 namespace BenchmarkDotNet.Jobs
 {
-    public enum TargetFrameworkMoniker
+    public enum RuntimeMoniker
     {
+        /// <summary>
+        /// the same Runtime as the host Process (default setting)
+        /// </summary>
+        HostProcess = 0,
         /// <summary>
         /// not recognized, possibly a new version of .NET Core
         /// </summary>
-        NotRecognized = 0,
+        NotRecognized,
         /// <summary>
         /// Mono
         /// </summary>
