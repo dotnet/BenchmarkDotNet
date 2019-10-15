@@ -68,8 +68,11 @@ namespace BenchmarkDotNet.Engines
             foreach (var measurement in GetMeasurements())
                 outWriter.WriteLine(measurement.ToOutputLine());
 
-            outWriter.WriteLine(GCStats.ToOutputLine());
-            outWriter.WriteLine(ThreadingStats.ToOutputLine());
+            if (!GCStats.Equals(GcStats.Empty))
+                outWriter.WriteLine(GCStats.ToOutputLine());
+            if (!ThreadingStats.Equals(ThreadingStats.Empty))
+                outWriter.WriteLine(ThreadingStats.ToOutputLine());
+
             outWriter.WriteLine();
         }
 

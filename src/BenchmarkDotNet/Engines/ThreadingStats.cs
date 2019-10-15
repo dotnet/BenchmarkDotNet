@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace BenchmarkDotNet.Engines
 {
-    public struct ThreadingStats
+    public struct ThreadingStats : IEquatable<ThreadingStats>
     {
         internal const string ResultsLinePrefix = "Threading: ";
 
@@ -80,6 +80,21 @@ namespace BenchmarkDotNet.Engines
 
             // we create delegate to avoid boxing, IMPORTANT!
             return property != null ? (Func<long>)property.GetGetMethod().CreateDelegate(typeof(Func<long>)) : () => 0;
+        }
+
+        public bool Equals(ThreadingStats other) => CompletedWorkItemCount == other.CompletedWorkItemCount && LockContentionCount == other.LockContentionCount && TotalOperations == other.TotalOperations;
+
+        public override bool Equals(object obj) => obj is ThreadingStats other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = CompletedWorkItemCount.GetHashCode();
+                hashCode = (hashCode * 397) ^ LockContentionCount.GetHashCode();
+                hashCode = (hashCode * 397) ^ TotalOperations.GetHashCode();
+                return hashCode;
+            }
         }
     }
 }
