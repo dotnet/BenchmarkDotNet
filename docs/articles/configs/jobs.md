@@ -88,7 +88,7 @@ public class MyBenchmarks
 {
     private class Config : ManualConfig
     {
-        public Config()
+        public void Config()
         {
             Add(
                 new Job("MySuperJob", RunMode.Dry, EnvMode.RyuJitX64)
