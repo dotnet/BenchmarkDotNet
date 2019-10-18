@@ -51,10 +51,14 @@ namespace BenchmarkDotNet.Mathematics.ChangePointDetection
 
             // Checking corner cases
             if (n <= 2)
-                return new int[0];
+            {
+                return Array.Empty<int>();
+            }
+
             if (minDistance < 1 || minDistance > n)
-                throw new ArgumentOutOfRangeException(
-                    nameof(minDistance), $"{minDistance} should be in range from 1 to data.Length");
+            {
+                throw new ArgumentOutOfRangeException(nameof(minDistance), $"{minDistance} should be in range from 1 to data.Length");
+            }
 
             // The penalty which we add to the final cost for each additional changepoint
             // Here we use the Modified Bayesian Information Criterion
@@ -79,7 +83,9 @@ namespace BenchmarkDotNet.Mathematics.ChangePointDetection
             var bestCost = new double[n + 1];
             bestCost[0] = -penalty;
             for (int currentTau = minDistance; currentTau < 2 * minDistance; currentTau++)
+            {
                 bestCost[currentTau] = Cost(0, currentTau);
+            }
 
             // `previousChangePointIndex` is an array of references to previous changepoints. If the current segment ends at
             // the position `i`, the previous segment ends at the position `previousChangePointIndex[i]`. It's a 1-based
@@ -90,8 +96,12 @@ namespace BenchmarkDotNet.Mathematics.ChangePointDetection
             // tau values, we use a whitelist of "good" tau values that can be used in the optimal solution. If we are 100%
             // sure that some of the tau values will not help us to form the optimal solution, such values should be
             // removed. See [Killick2012] for details.
-            var previousTaus = new List<int>(n + 1) { 0, minDistance };
-            var costForPreviousTau = new List<double>(n + 1);
+            // maximum size of the list is n + 1
+            var previousTaus = new int[n + 1];
+            previousTaus[0] = 0;
+            previousTaus[1] = minDistance;
+            int previousTauLength = 2;
+            var costForPreviousTau = new double[n + 1];
 
             // Following the dynamic programming approach, we enumerate all tau positions. For each `currentTau`, we pretend
             // that it's the end of the last segment and trying to find the end of the previous segment.
@@ -100,25 +110,31 @@ namespace BenchmarkDotNet.Mathematics.ChangePointDetection
                 // For each previous tau, we should calculate the cost of taking this tau as the end of the previous
                 // segment. This cost equals the cost for the `previousTau` plus cost of the new segment (from `previousTau`
                 // to `currentTau`) plus penalty for the new changepoint.
-                costForPreviousTau.Clear();
-                foreach (int previousTau in previousTaus)
-                    costForPreviousTau.Add(bestCost[previousTau] + Cost(previousTau, currentTau) + penalty);
+                for (int i = 0; i < previousTauLength; i++)
+                {
+                    int previousTau = previousTaus[i];
+                    costForPreviousTau[i] = bestCost[previousTau] + Cost(previousTau, currentTau) + penalty;
+                }
 
                 // Now we should choose the tau that provides the minimum possible cost.
-                int bestPreviousTauIndex = WhichMin(costForPreviousTau);
+                int bestPreviousTauIndex = WhichMin(costForPreviousTau, previousTauLength);
                 bestCost[currentTau] = costForPreviousTau[bestPreviousTauIndex];
                 previousChangePointIndex[currentTau] = previousTaus[bestPreviousTauIndex];
 
                 // Prune phase: we remove "useless" tau values that will not help to achieve minimum cost in the future
                 double currentBestCost = bestCost[currentTau];
                 int newPreviousTausSize = 0;
-                for (int i = 0; i < previousTaus.Count; i++)
+                for (int i = 0; i < previousTauLength; i++)
+                {
                     if (costForPreviousTau[i] < currentBestCost + penalty)
+                    {
                         previousTaus[newPreviousTausSize++] = previousTaus[i];
-                previousTaus.RemoveRange(newPreviousTausSize, previousTaus.Count - newPreviousTausSize);
+                    }
+                }
 
                 // We add a new tau value that is located on the `minDistance` distance from the next `currentTau` value
-                previousTaus.Add(currentTau - (minDistance - 1));
+                previousTaus[newPreviousTausSize] = currentTau - minDistance + 1;
+                previousTauLength = newPreviousTausSize + 1;
             }
 
             // Here we collect the result list of changepoint indexes `changePointIndexes` using `previousChangePointIndex`
@@ -129,6 +145,7 @@ namespace BenchmarkDotNet.Mathematics.ChangePointDetection
                 changePointIndexes.Add(currentIndex - 1); // 1-based indexes should be be transformed to 0-based indexes
                 currentIndex = previousChangePointIndex[currentIndex];
             }
+
             changePointIndexes.Reverse(); // The result changepoints should be sorted in ascending order.
             return changePointIndexes.ToArray();
         }
@@ -153,51 +170,73 @@ namespace BenchmarkDotNet.Mathematics.ChangePointDetection
         /// </list>
         /// </remarks>
         /// </summary>
-        private static int[,] GetPartialSums(double[] data, int k)
+        private static int[] GetPartialSums(double[] data, int k)
         {
             int n = data.Length;
-            var partialSums = new int[k, n + 1];
-            var sortedData = data.OrderBy(it => it).ToArray();
+            var partialSums = new int[k * (n + 1)];
+            var sortedData = new double[data.Length];
+            Array.Copy(data, sortedData, data.Length);
+            Array.Sort(sortedData);
 
+            int offset = 0;
             for (int i = 0; i < k; i++)
             {
                 double z = -1 + (2 * i + 1.0) / k; // Values from (-1+1/k) to (1-1/k) with step = 2/k
                 double p = 1.0 / (1 + Math.Pow(2 * n - 1, -z)); // Values from 0.0 to 1.0
                 double t = sortedData[(int) Math.Truncate((n - 1) * p)]; // Quantile value, formula (2.1) in [Haynes2017]
 
-                for (int tau = 1; tau <= n; tau++)
+                int nextValue = partialSums[offset];
+                int tau = 0;
+                do
                 {
-                    partialSums[i, tau] = partialSums[i, tau - 1];
-                    if (data[tau - 1] < t)
-                        partialSums[i, tau] += 2; // We use doubled value (2) instead of original 1.0
-                    if (data[tau - 1] == t)
-                        partialSums[i, tau] += 1; // We use doubled value (1) instead of original 0.5
-                }
+                    double dataValue = data[tau];
+                    tau++;
+
+                    if (dataValue < t)
+                    {
+                        nextValue += 2;
+                    }
+                    else if (dataValue == t)
+                    {
+                        nextValue++;
+                    }
+
+                    partialSums[offset + tau] = nextValue;
+                } while (tau < n);
+
+                offset += n + 1;
             }
+
             return partialSums;
         }
 
         /// <summary>
         /// Calculates the cost of the (tau1; tau2] segment.
         /// </summary>
-        private static double GetSegmentCost(int[,] partialSums, int tau1, int tau2, int k, int n)
+        private static double GetSegmentCost(int[] partialSums, int tau1, int tau2, int k, int n)
         {
             double sum = 0;
+            int offset = tau1;
+            int tauDiff = tau2 - tau1;
             for (int i = 0; i < k; i++)
             {
                 // actualSum is (count(data[j] < t) * 2 + count(data[j] == t) * 1) for j=tau1..tau2-1
-                int actualSum = partialSums[i, tau2] - partialSums[i, tau1];
+                int actualSum = partialSums[offset + tauDiff] - partialSums[offset];
 
                 // We skip these two cases (correspond to fit = 0 or fit = 1) because of invalid Math.Log values
-                if (actualSum != 0 && actualSum != (tau2 - tau1) * 2)
+                if (actualSum != 0 && actualSum != tauDiff * 2)
                 {
                     // Empirical CDF $\hat{F}_i(t)$ (Section 2.1 "Model" in [Haynes2017])
-                    double fit = actualSum * 0.5 / (tau2 - tau1);
+                    double fit = actualSum * 0.5 / tauDiff;
+
                     // Segment cost $\mathcal{L}_{np}$ (Section 2.2 "Nonparametric maximum likelihood" in [Haynes2017])
-                    double lnp = (tau2 - tau1) * (fit * Math.Log(fit) + (1 - fit) * Math.Log(1 - fit));
+                    double lnp = tauDiff * (fit * Math.Log(fit) + (1 - fit) * Math.Log(1 - fit));
                     sum += lnp;
                 }
+
+                offset += n + 1;
             }
+
             double c = -Math.Log(2 * n - 1); // Constant from Lemma 3.1 in [Haynes2017]
             return 2.0 * c / k * sum; // See Section 3.1 "Discrete approximation" in [Haynes2017]
         }
@@ -206,19 +245,23 @@ namespace BenchmarkDotNet.Mathematics.ChangePointDetection
         /// Returns the index of the minimum element.
         /// In case if there are several minimum elements in the given list, the index of the first one will be returned.
         /// </summary>
-        private static int WhichMin(IList<double> values)
+        private static int WhichMin(double[] values, int length)
         {
-            if (values.Count == 0)
+            if (length == 0)
+            {
                 throw new InvalidOperationException("Array should contain elements");
+            }
 
             double minValue = values[0];
             int minIndex = 0;
-            for (int i = 1; i < values.Count; i++)
+            for (int i = 1; i < length; i++)
+            {
                 if (values[i] < minValue)
                 {
                     minValue = values[i];
                     minIndex = i;
                 }
+            }
 
             return minIndex;
         }
