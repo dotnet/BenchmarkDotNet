@@ -117,13 +117,13 @@ namespace BenchmarkDotNet.Tests
 #elif NETCOREAPP2_1
             Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp21);
 #elif NETCOREAPP2_2
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == TargetFrameworkMoniker.NetCoreApp22);
+            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp22);
 #elif NETCOREAPP3_0
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == TargetFrameworkMoniker.NetCoreApp30);
+            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp30);
 #elif NETCOREAPP3_1
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == TargetFrameworkMoniker.NetCoreApp31);
+            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp31);
 #elif NETCOREAPP5_0
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == TargetFrameworkMoniker.NetCoreApp50);
+            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp50);
 #endif
         }
     }
