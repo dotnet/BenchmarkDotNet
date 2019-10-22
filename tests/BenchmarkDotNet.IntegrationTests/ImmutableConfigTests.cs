@@ -150,9 +150,12 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var fromEmpty = ImmutableConfigBuilder.Create(ManualConfig.CreateEmpty());
             Assert.Contains(JitOptimizationsValidator.DontFailOnError, fromEmpty.GetValidators());
-
+            
+#if !DEBUG
+            // DefaultConfig.Instance doesn't include JitOptimizationsValidator.FailOnError in the DEBUG mode
             var fromDefault = ImmutableConfigBuilder.Create(DefaultConfig.Instance);
             Assert.Contains(JitOptimizationsValidator.FailOnError, fromDefault.GetValidators());
+#endif
         }
 
         [Fact]
