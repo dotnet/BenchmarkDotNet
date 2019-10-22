@@ -14,7 +14,7 @@ using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Validators;
 using Xunit;
 
-namespace BenchmarkDotNet.IntegrationTests
+namespace BenchmarkDotNet.Tests.Configs
 {
     public class ImmutableConfigTests
     {
