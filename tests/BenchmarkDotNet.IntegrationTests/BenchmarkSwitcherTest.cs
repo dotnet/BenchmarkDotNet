@@ -213,7 +213,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Theory]
         [InlineData("--allCategories")]
         [InlineData("--anyCategories")]
-        public void WhenUserProvidesCategoriesWithtFiltersWeDontAskToChooseBenchmarkJustUseCombinedFilterAndRunTheBenchmarks(string categoriesConsoleLineArgument)
+        public void WhenUserProvidesCategoriesWithFiltersWeDontAskToChooseBenchmarkJustUseCombinedFilterAndRunTheBenchmarks(string categoriesConsoleLineArgument)
         {
             var logger = new OutputLogger(Output);
             var config = ManualConfig.CreateEmpty().With(logger);

@@ -68,11 +68,11 @@ namespace BenchmarkDotNet.Disassembler
 
                 var state = new State(runtime, (IDebugControl)dataTarget.DebuggerInterface);
 
-                var disasembledMethods = Disassemble(settings, runtime, state);
+                var disassembledMethods = Disassemble(settings, runtime, state);
 
                 // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working
-                var methodsToExport = disasembledMethods.Where(method => 
-                    disasembledMethods.Count == 1  // if there is only one method we want to return it (most probably benchmark got inlined)
+                var methodsToExport = disassembledMethods.Where(method => 
+                    disassembledMethods.Count == 1  // if there is only one method we want to return it (most probably benchmark got inlined)
                     || !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodName)).ToArray();
 
                 using (var stream = new FileStream(settings.ResultsPath, FileMode.Append, FileAccess.Write))
@@ -326,7 +326,7 @@ namespace BenchmarkDotNet.Disassembler
 
         static string TryEnqueueCalledMethod(string textRepresentation, State state, int depth, ClrMethod currentMethod)
         {
-            if (!TryGetHexAdress(textRepresentation, out ulong address))
+            if (!TryGetHexAddress(textRepresentation, out ulong address))
                 return null; // call    qword ptr [rax+20h] // needs further research
 
             var method = state.Runtime.GetMethodByAddress(address);
@@ -343,7 +343,7 @@ namespace BenchmarkDotNet.Disassembler
             return method.GetFullSignature();
         }
 
-        static bool TryGetHexAdress(string textRepresentation, out ulong address)
+        static bool TryGetHexAddress(string textRepresentation, out ulong address)
         {
             // it's always "something call something addr`ess something"
             // 00007ffe`16fb04e4 e897fbffff      call    00007ffe`16fb0080 // static or instance method call
@@ -558,17 +558,17 @@ namespace BenchmarkDotNet.Disassembler
 
     struct MethodId : IEquatable<MethodId>
     {
-        internal uint MethodMetatadataTokenId { get; }
-        internal uint TypeMetatadataTokenId { get; }
+        internal uint MethodMetadataTokenId { get; }
+        internal uint TypeMetadataTokenId { get; }
 
-        public MethodId(uint methodMetatadataTokenId, uint typeMetatadataTokenId) : this()
+        public MethodId(uint methodMetadataTokenId, uint typeMetadataTokenId) : this()
         {
-            MethodMetatadataTokenId = methodMetatadataTokenId;
-            TypeMetatadataTokenId = typeMetatadataTokenId;
+            MethodMetadataTokenId = methodMetadataTokenId;
+            TypeMetadataTokenId = typeMetadataTokenId;
         }
 
-        public bool Equals(MethodId other) => MethodMetatadataTokenId == other.MethodMetatadataTokenId && TypeMetatadataTokenId == other.TypeMetatadataTokenId;
+        public bool Equals(MethodId other) => MethodMetadataTokenId == other.MethodMetadataTokenId && TypeMetadataTokenId == other.TypeMetadataTokenId;
         public override bool Equals(object other) => other is MethodId methodId && Equals(methodId);
-        public override int GetHashCode() => (int)(MethodMetatadataTokenId ^ TypeMetatadataTokenId);
+        public override int GetHashCode() => (int)(MethodMetadataTokenId ^ TypeMetadataTokenId);
     }
 }

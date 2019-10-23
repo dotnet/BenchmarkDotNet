@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Tests
         [Theory]
         [InlineData("012345678901234567890", 21, "012345678901234567890")] // the default is 20
         [InlineData("0123456789012345678901234567890123456789", 30, "0123456789(...)0123456789 [40]")]
-        public void MaxParamterColumnWidthCanBeCustomized(string initialLongText, int maxParameterColumnWidth, string expectedDisplayText)
+        public void MaxParameterColumnWidthCanBeCustomized(string initialLongText, int maxParameterColumnWidth, string expectedDisplayText)
         {
             var summaryStyle = SummaryStyle.Default.WithMaxParameterColumnWidth(maxParameterColumnWidth);
             var parameter = new ParameterInstance(definition, initialLongText, summaryStyle);
@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(-100)]
         [InlineData(0)]
         [InlineData(10)]
-        public void MaxParamterColumnWidthCanNotBeSetToValueLessThanDefault(int newWidth)
+        public void MaxParameterColumnWidthCanNotBeSetToValueLessThanDefault(int newWidth)
             => Assert.Throws<ArgumentOutOfRangeException>(() => SummaryStyle.Default.WithMaxParameterColumnWidth(newWidth));
     }
 

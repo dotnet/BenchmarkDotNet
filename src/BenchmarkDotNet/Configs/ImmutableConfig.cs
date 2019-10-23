@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Configs
             ImmutableHashSet<HardwareCounter> uniqueHardwareCounters,
             ImmutableHashSet<IDiagnoser> uniqueDiagnosers,
             ImmutableArray<IExporter> uniqueExporters,
-            ImmutableHashSet<IAnalyser> unqueAnalyzers,
+            ImmutableHashSet<IAnalyser> uniqueAnalyzers,
             ImmutableHashSet<IValidator> uniqueValidators,
             ImmutableHashSet<IFilter> uniqueFilters,
             ImmutableHashSet<BenchmarkLogicalGroupRule> uniqueRules,
@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Configs
             hardwareCounters = uniqueHardwareCounters;
             diagnosers = uniqueDiagnosers;
             exporters = uniqueExporters;
-            analysers = unqueAnalyzers;
+            analysers = uniqueAnalyzers;
             validators = uniqueValidators;
             filters = uniqueFilters;
             rules = uniqueRules;

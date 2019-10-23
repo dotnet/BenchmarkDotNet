@@ -73,9 +73,9 @@ namespace BenchmarkDotNet.Tests.Validators
         [InlineData(typeof(ReturningIQueryable))]
         [InlineData(typeof(ReturningIQueryableOfInt))]
         [InlineData(typeof(ReturningLazyOfInt))]
-        public void DeferredExecutionMeansError(Type returningDefferedExecutionResult)
+        public void DeferredExecutionMeansError(Type returningDeferredExecutionResult)
         {
-            var benchmarks = BenchmarkConverter.TypeToBenchmarks(returningDefferedExecutionResult);
+            var benchmarks = BenchmarkConverter.TypeToBenchmarks(returningDeferredExecutionResult);
 
             var validationErrors = DeferredExecutionValidator.FailOnError.Validate(benchmarks).ToArray();
 

@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Tests.Columns
         [Theory]
         [InlineData(StatisticalTestKind.MannWhitney, ThresholdUnit.Ratio, 0.02)]
         [InlineData(StatisticalTestKind.Welch, ThresholdUnit.Ratio, 0.02)]
-        public void ImprovementsreDetected(StatisticalTestKind statisticalTestKind, ThresholdUnit thresholdUnit, double thresholdValue)
+        public void ImprovementsDetected(StatisticalTestKind statisticalTestKind, ThresholdUnit thresholdUnit, double thresholdValue)
         {
             var baseline = new[] { 10.0, 10.01, 10.02, 10.0, 10.03, 10.02, 9.99, 9.98, 10.0, 10.02 };
             var current = baseline.Select(value => value * 0.97).ToArray();

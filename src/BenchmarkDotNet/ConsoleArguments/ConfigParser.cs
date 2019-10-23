@@ -215,8 +215,8 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.Options = config.Options.Set(options.StopOnFirstError, ConfigOptions.StopOnFirstError);
             config.Options = config.Options.Set(options.DisableLogFile, ConfigOptions.DisableLogFile);
 
-            if (options.MaxParamterColumnWidth.HasValue)
-                config.SummaryStyle = SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParamterColumnWidth.Value);
+            if (options.MaxParameterColumnWidth.HasValue)
+                config.SummaryStyle = SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParameterColumnWidth.Value);
 
             return config;
         }
