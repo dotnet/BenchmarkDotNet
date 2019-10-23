@@ -24,6 +24,7 @@
     <NoWarn>NU1701;1701</NoWarn>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="2.2.0" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Threading.Tasks" />
