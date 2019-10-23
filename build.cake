@@ -8,7 +8,7 @@ var skipTests = Argument("SkipTests", false);
 // GLOBAL VARIABLES
 var toolsDirectory = "./tools/";
 var docfxExe = toolsDirectory + "docfx/docfx.exe";
-var docfxVersion = "2.42.1";
+var docfxVersion = "2.46";
 var changelogDir = "./docs/changelog/";
 var changelogGenDir = "./docs/_changelog/";
 var bdnAllVersions = new string[] {
