@@ -3,6 +3,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Analysers
 {
@@ -18,7 +19,9 @@ namespace BenchmarkDotNet.Analysers
                                               .Select(t => t.ColumnName)
                                               .Distinct()
                                               .ToArray();
-
+            if (columns.IsEmpty())
+                yield break;
+            
             var columnNames = string.Join(", ", columns);
 
             foreach (var benchmarkCase in summary.BenchmarksCases)
