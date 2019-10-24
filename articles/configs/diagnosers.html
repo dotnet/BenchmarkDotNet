@@ -8,7 +8,7 @@
     <title>Diagnosers | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Diagnosers | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.40.10.0">
+    <meta name="generator" content="docfx 2.46.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -17,7 +17,7 @@
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="../toc.html">
     
-    <meta property="docfx:rel" content="../../">
+    
     
   
     <!-- Google Analytics -->
@@ -60,6 +60,9 @@
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
     <!-- /Yandex.Metrika counter -->
+    <!-- at the end of the HEAD -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
+    <link rel="stylesheet" href="../../styles/search.css">
   </head>
   <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
@@ -80,11 +83,9 @@
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
-              <form class="navbar-form navbar-right" role="search" id="search">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
-                </div>
-              </form>
+              <div class="navbar-right navbar-form">
+                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
+              </div>
             </div>
           </div>
         </nav>
@@ -97,16 +98,6 @@
           </div>
         </div>
       </header>
-      <div class="container body-content">
-        
-        <div id="search-results">
-          <div class="search-list"></div>
-          <div class="sr-items">
-            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
-          </div>
-          <ul id="pagination"></ul>
-        </div>
-      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -139,9 +130,15 @@ Please see Adam Sitnik's <a href="http://adamsitnik.com/Hardware-Counters-Diagno
 It allows you to disassemble the benchmarked code to asm, IL and C#/F#.
 Please see Adam Sitnik's <a href="http://adamsitnik.com/Disassembly-Diagnoser/">blog post</a> for all the details.</li>
 <li>ETW Profiler (<code>EtwProfiler</code>).
-It allows you to not only benchmark, but also profile the code. It's using TraceEvent, which internally uses ETW and exports all the information to a trace file. The trace file contains all of the stack traces captured by the profiler, PDBs to resolve symbols for both native and managed code and captured GC, JIT and CLR events. Please use one of the free tools: PerfView or Windows Performance Analyzer to analyze and visualize the data from trace file. You can find this diagnoser in a separate package with diagnosers for Windows (<code>BenchmarkDotNet.Diagnostics.Windows</code>): <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet"></a></li>
+It allows you to not only benchmark, but also profile the code. It's using TraceEvent, which internally uses ETW and exports all the information to a trace file. The trace file contains all of the stack traces captured by the profiler, PDBs to resolve symbols for both native and managed code and captured GC, JIT and CLR events. Please use one of the free tools: PerfView or Windows Performance Analyzer to analyze and visualize the data from trace file. You can find this diagnoser in a separate package with diagnosers for Windows (<code>BenchmarkDotNet.Diagnostics.Windows</code>): <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet"></a>
+Please see Adam Sitnik's <a href="https://adamsitnik.com/ETW-Profiler/">blog post</a> for all the details.</li>
 <li>Concurrency Visualizer Profiler (<code>ConcurrencyVisualizerProfiler</code>)
-It uses <code>EtwProfiler</code> to profile the code using ETW and create not only <code>.etl</code> file but also a CVTrace file which can be opened by Concurrency Visualizer plugin from Visual Studio.</li>
+It uses <code>EtwProfiler</code> to profile the code using ETW and create not only <code>.etl</code> file but also a CVTrace file which can be opened by Concurrency Visualizer plugin from Visual Studio.
+Please see Adam Sitnik's <a href="https://adamsitnik.com/ConcurrencyVisualizer-Profiler/">blog post</a> for all the details.</li>
+<li>Native Memory Profiler (<code>NativeMemoryProfiler</code>)
+It uses <code>EtwProfiler</code> to profile the code using ETW and adds the extra columns <code>Allocated native memory</code> and <code>Native memory leak</code>.
+Please see Wojciech Nagórski's <a href="https://wojciechnagorski.com/2019/08/analyzing-native-memory-allocation-with-benchmarkdotnet/">blog post</a> for all the details.</li>
+<li>Threading Diagnoser (<code>ThreadingDiagnoser</code>) - .NET Core 3.0+ diagnoser that reports some Threading statistics.</li>
 </ul>
 <h2 id="usage">Usage</h2>
 <p>Below is a sample output from the <code>GC and Memory Allocation</code> diagnoser, note the extra columns on the right-hand side (&quot;Gen 0&quot;, &quot;Gen 1&quot;, &quot;Gen 2&quot; and &quot;Allocated&quot;):</p>
@@ -157,6 +154,7 @@ It uses <code>EtwProfiler</code> to profile the code using ETW and create not on
         Add(MemoryDiagnoser.Default);
         Add(new InliningDiagnoser());
         Add(new EtwProfiler());
+        Add(ThreadingDiagnoser.Default);
     }
 }
 </code></pre>
@@ -166,8 +164,10 @@ It uses <code>EtwProfiler</code> to profile the code using ETW and create not on
 [TailCallDiagnoser]
 [EtwProfiler]
 [ConcurrencyVisualizerProfiler]
+[NativeMemoryProfiler]
+[ThreadingDiagnoser]
 </code></pre>
-<p>In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on.</p>
+<p>In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on. The column Gen X means number of GC collections per 1000 operations for that generation.</p>
 <h2 id="restrictions">Restrictions</h2>
 <ul>
 <li>In order to not affect main results we perform a separate run if any diagnoser is used. That's why it might take more time to execute benchmarks.</li>
@@ -178,6 +178,11 @@ It uses <code>EtwProfiler</code> to profile the code using ETW and create not on
 <li>MemoryDiagnoser is <code>99.5%</code> accurate about allocated memory when using default settings or Job.ShortRun (or any longer job than it).</li>
 </ul>
 </li>
+<li>Threading Diagnoser:
+<ul>
+<li>Works only for .NET Core 3.0+</li>
+</ul>
+</li>
 <li>HardwareCounters:
 <ul>
 <li>Windows 8+ only (we plan to add Unix support in the future)</li>
@@ -186,7 +191,7 @@ It uses <code>EtwProfiler</code> to profile the code using ETW and create not on
 <li>No <code>InProcessToolchain</code> support (<a href="https://github.com/dotnet/BenchmarkDotNet/issues/394">#394</a>)</li>
 </ul>
 </li>
-<li>EtwProfiler, ConcurrencyVisualizerProfiler:
+<li>EtwProfiler, ConcurrencyVisualizerProfiler and NativeMemoryProfiler:
 <ul>
 <li>Windows only</li>
 <li>Requires running as Admin (ETW Kernel Session)</li>
@@ -218,7 +223,7 @@ using BenchmarkDotNet.Diagnosers;
 namespace BenchmarkDotNet.Samples
 {
     [HardwareCounters(
-        HardwareCounter.BranchMispredictions, 
+        HardwareCounter.BranchMispredictions,
         HardwareCounter.BranchInstructions)]
     public class IntroHardwareCounters
     {
@@ -365,10 +370,13 @@ namespace BenchmarkDotNet.Samples
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroDisassembly.cs">using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DryCoreJob, DryMonoJob, DryClrJob(Platform.X86)]
+    [DryJob(RuntimeMoniker.NetCoreApp21)]
+    [DryJob(RuntimeMoniker.Mono)]
+    [DryJob(RuntimeMoniker.Net461, Jit.LegacyJit, Platform.X86)]
     [DisassemblyDiagnoser]
     public class IntroDisassembly
     {
@@ -500,21 +508,21 @@ namespace BenchmarkDotNet.Samples
                 Add(Job.ShortRun.With(new MonoRuntime(name: &quot;Mono x86&quot;, customPath: @&quot;C:\Program Files (x86)\Mono\bin\mono.exe&quot;)).With(Platform.X86));
                 Add(Job.ShortRun.With(new MonoRuntime(name: &quot;Mono x64&quot;, customPath: @&quot;C:\Program Files\Mono\bin\mono.exe&quot;)).With(Platform.X64));
 
-                Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X86).With(Runtime.Clr));
-                Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X64).With(Runtime.Clr));
+                Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X86).With(ClrRuntime.Net461));
+                Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X64).With(ClrRuntime.Net461));
 
-                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Clr));
+                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(ClrRuntime.Net461));
 
                 // RyuJit for .NET Core 2.0
-                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp20));
+                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core20));
 
                 // RyuJit for .NET Core 2.1
-                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp21));
+                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core21));
 
                 Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3, printDiff: true)));
             }
         }
-        
+
         private Increment increment = new Increment();
 
         [Benchmark]
@@ -556,7 +564,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.CsProj;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -567,8 +574,8 @@ namespace BenchmarkDotNet.Samples
         {
             public JustDisassembly()
             {
-                Add(Job.Dry.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp20));
-                Add(Job.Dry.With(Jit.RyuJit).With(Platform.X64).With(Runtime.Core).With(CsProjCoreToolchain.NetCoreApp21));
+                Add(Job.Dry.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core20));
+                Add(Job.Dry.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core21));
 
                 Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3)));
             }
@@ -577,7 +584,7 @@ namespace BenchmarkDotNet.Samples
         [Benchmark]
         public void Foo()
         {
-            
+
         }
     }
 }
@@ -649,7 +656,148 @@ Tail call type: RecursiveLoop
 <li>The permanent link to this sample: <a class="xref" href="../samples/IntroTailcall.html">Sample: IntroTailcall</a></li>
 </ul>
 <hr>
-</article>
+<h2 id="sample-intronativememory">Sample: IntroNativeMemory</h2>
+<p>The <code>NativeMemoryProfiler</code> uses <code>EtwProfiler</code> to profile the code using ETW and adds the extra columns <code>Allocated native memory</code> and <code>Native memory leak</code> to the benchmark results table.</p>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroNativeMemory.cs">using System;
+using System.Diagnostics;
+using System.Drawing;
+using System.Runtime.InteropServices;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Diagnostics.Windows.Configs;
+
+namespace BenchmarkDotNet.Samples
+{
+    [ShortRunJob]
+    [NativeMemoryProfiler]
+    [MemoryDiagnoser]
+    public class IntroNativeMemory
+    {
+        [Benchmark]
+        public void BitmapWithLeaks()
+        {
+            var flag = new Bitmap(200, 100);
+            var graphics = Graphics.FromImage(flag);
+            var blackPen = new Pen(Color.Black, 3);
+            graphics.DrawLine(blackPen, 100, 100, 500, 100);
+        }
+
+        [Benchmark]
+        public void Bitmap()
+        {
+            using (var flag = new Bitmap(200, 100))
+            {
+                using (var graphics = Graphics.FromImage(flag))
+                {
+                    using (var blackPen = new Pen(Color.Black, 3))
+                    {
+                        graphics.DrawLine(blackPen, 100, 100, 500, 100);
+                    }
+                }
+            }
+        }
+
+        private const int Size = 20; // Greater value could cause System.OutOfMemoryException for test with memory leaks.
+        private int ArraySize = Size * Marshal.SizeOf(typeof(int));
+
+        [Benchmark]
+        public unsafe void AllocHGlobal()
+        {
+            IntPtr unmanagedHandle = Marshal.AllocHGlobal(ArraySize);
+            Span&lt;byte&gt; unmanaged = new Span&lt;byte&gt;(unmanagedHandle.ToPointer(), ArraySize);
+            Marshal.FreeHGlobal(unmanagedHandle);
+        }
+
+        [Benchmark]
+        public unsafe void AllocHGlobalWithLeaks()
+        {
+            IntPtr unmanagedHandle = Marshal.AllocHGlobal(ArraySize);
+            Span&lt;byte&gt; unmanaged = new Span&lt;byte&gt;(unmanagedHandle.ToPointer(), ArraySize);
+        }
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">Error</th>
+<th style="text-align: right;">StdDev</th>
+<th style="text-align: right;">Gen 0</th>
+<th style="text-align: right;">Gen 1</th>
+<th style="text-align: right;">Gen 2</th>
+<th style="text-align: right;">Allocated</th>
+<th style="text-align: right;">Allocated native memory</th>
+<th style="text-align: right;">Native memory leak</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BitmapWithLeaks</td>
+<td style="text-align: right;">73,456.43 ns</td>
+<td style="text-align: right;">22,498.10 ns</td>
+<td style="text-align: right;">1,233.197 ns</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">177 B</td>
+<td style="text-align: right;">13183 B</td>
+<td style="text-align: right;">11615 B</td>
+</tr>
+<tr>
+<td>Bitmap</td>
+<td style="text-align: right;">91,590.08 ns</td>
+<td style="text-align: right;">101,468.12 ns</td>
+<td style="text-align: right;">5,561.810 ns</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">180 B</td>
+<td style="text-align: right;">12624 B</td>
+<td style="text-align: right;">-</td>
+</tr>
+<tr>
+<td>AllocHGlobal</td>
+<td style="text-align: right;">79.91 ns</td>
+<td style="text-align: right;">43.93 ns</td>
+<td style="text-align: right;">2.408 ns</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">80 B</td>
+<td style="text-align: right;">-</td>
+</tr>
+<tr>
+<td>AllocHGlobalWithLeaks</td>
+<td style="text-align: right;">103.50 ns</td>
+<td style="text-align: right;">153.21 ns</td>
+<td style="text-align: right;">8.398 ns</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">80 B</td>
+<td style="text-align: right;">80 B</td>
+</tr>
+</tbody>
+</table>
+<h3 id="profiling-memory-leaks">Profiling memory leaks</h3>
+<p>The BenchmarkDotNet repeats benchmarking function many times. Sometimes it can cause a memory overflow. In this case, the BenchmarkDotNet shows the message:</p>
+<pre><code class="lang-ini">OutOfMemoryException!
+BenchmarkDotNet continues to run additional iterations until desired accuracy level is achieved. It's possible only if the benchmark method doesn't have any side-effects.
+If your benchmark allocates memory and keeps it alive, you are creating a memory leak.
+You should redesign your benchmark and remove the side-effects. You can use `OperationsPerInvoke`, `IterationSetup` and `IterationCleanup` to do that.
+</code></pre>
+<p>In this case, you should try to reduce the number of invocation, by adding <code>[ShortRunJob]</code> attribute or using <code>Job.Short</code> for custom configuration.</p>
+<h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroNativeMemory.html">Sample: IntroNativeMemory</a></li>
+</ul>
+<hr>
+[!include[IntroThreadingDiagnoser](../samples/ThreadingDiagnoser.md)]</article>
           </div>
           
           <div class="hidden-sm col-md-2" role="complementary">
@@ -686,5 +834,14 @@ Tail call type: RecursiveLoop
     <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
     <script type="text/javascript" src="../../styles/docfx.js"></script>
     <script type="text/javascript" src="../../styles/main.js"></script>
-  </body>
+    <!-- at the end of the BODY -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script type="text/javascript">
+        docsearch({
+            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
+            indexName: 'benchmarkdotnet',
+            inputSelector: '#search-query',
+            debug: false // Set debug to true if you want to inspect the dropdown
+        });
+    </script>  </body>
 </html>

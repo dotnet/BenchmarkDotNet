@@ -8,7 +8,7 @@
     <title>Exporters | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Exporters | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.40.10.0">
+    <meta name="generator" content="docfx 2.46.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -17,7 +17,7 @@
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="../toc.html">
     
-    <meta property="docfx:rel" content="../../">
+    
     
   
     <!-- Google Analytics -->
@@ -60,6 +60,9 @@
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
     <!-- /Yandex.Metrika counter -->
+    <!-- at the end of the HEAD -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
+    <link rel="stylesheet" href="../../styles/search.css">
   </head>
   <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
@@ -80,11 +83,9 @@
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
-              <form class="navbar-form navbar-right" role="search" id="search">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
-                </div>
-              </form>
+              <div class="navbar-right navbar-form">
+                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
+              </div>
             </div>
           </div>
         </nav>
@@ -97,16 +98,6 @@
           </div>
         </div>
       </header>
-      <div class="container body-content">
-        
-        <div id="search-results">
-          <div class="search-list"></div>
-          <div class="sr-items">
-            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
-          </div>
-          <ul id="pagination"></ul>
-        </div>
-      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -189,7 +180,7 @@ using BenchmarkDotNet.Exporters.Json;
 namespace BenchmarkDotNet.Samples
 {
     // *** Attribute style ***
-    
+
     [DryJob]
     [JsonExporterAttribute.Brief]
     [JsonExporterAttribute.Full]
@@ -201,9 +192,9 @@ namespace BenchmarkDotNet.Samples
         [Benchmark] public void Sleep10() =&gt; Thread.Sleep(10);
         [Benchmark] public void Sleep20() =&gt; Thread.Sleep(20);
     }
-    
+
     // *** Object style ***
-    
+
     [Config(typeof(Config))]
     public class IntroJsonExportObjectStyle
     {
@@ -218,7 +209,7 @@ namespace BenchmarkDotNet.Samples
                 Add(JsonExporter.Custom(&quot;-custom&quot;, indentJson: true, excludeMeasurements: true));
             }
         }
-        
+
         [Benchmark] public void Sleep10() =&gt; Thread.Sleep(10);
         [Benchmark] public void Sleep20() =&gt; Thread.Sleep(20);
     }
@@ -477,9 +468,10 @@ namespace BenchmarkDotNet.Samples
 </ul>
 <hr>
 <h2 id="plots">Plots</h2>
-<p>You can install <a href="https://www.r-project.org/">R</a> to automatically get nice plots of your benchmark results.
+<p><a href="https://www.r-project.org/">You can install R</a> to automatically get nice plots of your benchmark results.
 First, make sure <code>Rscript.exe</code> or <code>Rscript</code> is in your path,
-or define an R_HOME environment variable pointing to the R installation directory (containing the <code>bin</code> directory).
+or define an R_HOME environment variable pointing to the R installation directory.<br>
+<em>eg: If <code>Rscript</code> is located in <code>/path/to/R/R-1.2.3/bin/Rscript</code>, then <code>R_HOME</code> must point to <code>/path/to/R/R-1.2.3/</code>, it <strong>should not</strong> point to <code>/path/to/R/R-1.2.3/bin</code></em><br>
 Use <code>RPlotExporter.Default</code> and <code>CsvMeasurementsExporter.Default</code> in your config,
 and the <code>BuildPlots.R</code> script in your bin directory will take care of the rest.</p>
 <p>Examples:</p>
@@ -616,5 +608,14 @@ Benchmark,...,&quot;37,647.6&quot;,&quot;32,717.9&quot;,&quot;21,640.9&quot;,&qu
     <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
     <script type="text/javascript" src="../../styles/docfx.js"></script>
     <script type="text/javascript" src="../../styles/main.js"></script>
-  </body>
+    <!-- at the end of the BODY -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script type="text/javascript">
+        docsearch({
+            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
+            indexName: 'benchmarkdotnet',
+            inputSelector: '#search-query',
+            debug: false // Set debug to true if you want to inspect the dropdown
+        });
+    </script>  </body>
 </html>

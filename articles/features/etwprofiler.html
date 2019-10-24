@@ -8,7 +8,7 @@
     <title>EtwProfiler | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="EtwProfiler | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.40.10.0">
+    <meta name="generator" content="docfx 2.46.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -17,7 +17,7 @@
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="../toc.html">
     
-    <meta property="docfx:rel" content="../../">
+    
     
   
     <!-- Google Analytics -->
@@ -60,6 +60,9 @@
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
     <!-- /Yandex.Metrika counter -->
+    <!-- at the end of the HEAD -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
+    <link rel="stylesheet" href="../../styles/search.css">
   </head>
   <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
@@ -80,11 +83,9 @@
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
-              <form class="navbar-form navbar-right" role="search" id="search">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
-                </div>
-              </form>
+              <div class="navbar-right navbar-form">
+                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
+              </div>
             </div>
           </div>
         </nav>
@@ -97,16 +98,6 @@
           </div>
         </div>
       </header>
-      <div class="container body-content">
-        
-        <div id="search-results">
-          <div class="search-list"></div>
-          <div class="sr-items">
-            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
-          </div>
-          <ul id="pagination"></ul>
-        </div>
-      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -142,7 +133,9 @@
 <ul>
 <li>Use the new attribute (apply it on a class that contains Benchmarks):</li>
 </ul>
-<pre><code class="lang-cs">[EtwProfiler]
+<pre><code class="lang-cs">using BenchmarkDotNet.Diagnostics.Windows.Configs;
+
+[EtwProfiler]
 public class TheClassThatContainsBenchmarks { /* benchmarks go here */ }
 </code></pre>
 <ul>
@@ -150,7 +143,7 @@ public class TheClassThatContainsBenchmarks { /* benchmarks go here */ }
 </ul>
 <pre><code class="lang-cs">class Program
 {
-    static void Main(string[] args) 
+    static void Main(string[] args)
         =&gt; BenchmarkSwitcher
             .FromAssembly(typeof(Program).Assembly)
             .Run(args,
@@ -166,7 +159,7 @@ public class TheClassThatContainsBenchmarks { /* benchmarks go here */ }
 <ul>
 <li><code>performExtraBenchmarksRun</code> - if set to true, benchmarks will be executed one more time with the profiler attached. If set to false, there will be no extra run but the results will contain overhead. True by default.</li>
 <li><code>bufferSizeInMb</code> - ETW session buffer size, in MB. 256 by default.</li>
-<li><code>intervalSelectors</code> - interval per harwdare counter, if not provided then default values will be used.</li>
+<li><code>intervalSelectors</code> - interval per hardware counter, if not provided then default values will be used.</li>
 <li><code>kernelKeywords</code> - kernel session keywords, ImageLoad (for native stack frames) and Profile (for CPU Stacks) are the defaults.</li>
 <li><code>providers</code> - providers that should be enabled, if not provided then default values will be used.</li>
 </ul>
@@ -224,5 +217,14 @@ public class TheClassThatContainsBenchmarks { /* benchmarks go here */ }
     <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
     <script type="text/javascript" src="../../styles/docfx.js"></script>
     <script type="text/javascript" src="../../styles/main.js"></script>
-  </body>
+    <!-- at the end of the BODY -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script type="text/javascript">
+        docsearch({
+            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
+            indexName: 'benchmarkdotnet',
+            inputSelector: '#search-query',
+            debug: false // Set debug to true if you want to inspect the dropdown
+        });
+    </script>  </body>
 </html>

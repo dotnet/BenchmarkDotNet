@@ -8,7 +8,7 @@
     <title>Sample: IntroPowerPlan | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroPowerPlan | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.40.10.0">
+    <meta name="generator" content="docfx 2.46.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -17,7 +17,7 @@
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="../toc.html">
     
-    <meta property="docfx:rel" content="../../">
+    
     
   
     <!-- Google Analytics -->
@@ -60,6 +60,9 @@
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
     <!-- /Yandex.Metrika counter -->
+    <!-- at the end of the HEAD -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
+    <link rel="stylesheet" href="../../styles/search.css">
   </head>
   <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
@@ -80,11 +83,9 @@
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
-              <form class="navbar-form navbar-right" role="search" id="search">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
-                </div>
-              </form>
+              <div class="navbar-right navbar-form">
+                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
+              </div>
             </div>
           </div>
         </nav>
@@ -97,16 +98,6 @@
           </div>
         </div>
       </header>
-      <div class="container body-content">
-        
-        <div id="search-results">
-          <div class="search-list"></div>
-          <div class="sr-items">
-            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
-          </div>
-          <ul id="pagination"></ul>
-        </div>
-      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -120,12 +111,24 @@
             <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Samples.IntroPowerPlan">
 <h2 id="sample-intropowerplan">Sample: IntroPowerPlan</h2>
 
-<p>This sample shows how we can turn off changing power plans.</p>
+<p>This sample shows how we can manipulate with power plans. In BenchmarkDotNet we could change power plan in two ways. The first one is to set one from the list:</p>
+<ul>
+<li>PowerSaver, guid: a1841308-3541-4fab-bc81-f71556f20b4a</li>
+<li>Balanced, guid: 381b4222-f694-41f0-9685-ff5bb260df2e</li>
+<li>High-Performance, guid: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c (the default one)</li>
+<li>Ultimate Performance, guid: e9a42b02-d5df-448d-aa00-03f14749eb61</li>
+<li>UserPowerPlan (a current power plan set in computer)
+The second one rely on guid string. We could easily found currently set guids with cmd command</li>
+</ul>
+<pre><code class="lang-cmd">powercfg /list
+</code></pre>
+<p>If we set power plans in two ways at the same time, the second one will be used.</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroPowerPlan.cs">using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using System;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -136,8 +139,12 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                Add(Job.MediumRun.WithPowerPlan(PowerPlan.HighPerformance));
+                Add(Job.MediumRun.WithPowerPlan(new Guid(&quot;e9a42b02-d5df-448d-aa00-03f14749eb61&quot;)));
+                Add(Job.MediumRun.WithPowerPlan(PowerPlan.UltimatePerformance));
                 Add(Job.MediumRun.WithPowerPlan(PowerPlan.UserPowerPlan));
+                Add(Job.MediumRun.WithPowerPlan(PowerPlan.HighPerformance));
+                Add(Job.MediumRun.WithPowerPlan(PowerPlan.Balanced));
+                Add(Job.MediumRun.WithPowerPlan(PowerPlan.PowerSaver));
             }
         }
 
@@ -201,5 +208,14 @@ namespace BenchmarkDotNet.Samples
     <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
     <script type="text/javascript" src="../../styles/docfx.js"></script>
     <script type="text/javascript" src="../../styles/main.js"></script>
-  </body>
+    <!-- at the end of the BODY -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script type="text/javascript">
+        docsearch({
+            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
+            indexName: 'benchmarkdotnet',
+            inputSelector: '#search-query',
+            debug: false // Set debug to true if you want to inspect the dropdown
+        });
+    </script>  </body>
 </html>

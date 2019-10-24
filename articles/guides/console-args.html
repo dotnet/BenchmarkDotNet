@@ -8,7 +8,7 @@
     <title>How to use console arguments | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="How to use console arguments | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.40.10.0">
+    <meta name="generator" content="docfx 2.46.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -17,7 +17,7 @@
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="../toc.html">
     
-    <meta property="docfx:rel" content="../../">
+    
     
   
     <!-- Google Analytics -->
@@ -60,6 +60,9 @@
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
     <!-- /Yandex.Metrika counter -->
+    <!-- at the end of the HEAD -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
+    <link rel="stylesheet" href="../../styles/search.css">
   </head>
   <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
@@ -80,11 +83,9 @@
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
-              <form class="navbar-form navbar-right" role="search" id="search">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
-                </div>
-              </form>
+              <div class="navbar-right navbar-form">
+                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
+              </div>
             </div>
           </div>
         </nav>
@@ -97,16 +98,6 @@
           </div>
         </div>
       </header>
-      <div class="container body-content">
-        
-        <div id="search-results">
-          <div class="search-list"></div>
-          <div class="sr-items">
-            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
-          </div>
-          <ul id="pagination"></ul>
-        </div>
-      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -218,7 +209,7 @@ BenchmarkDotNet.Samples.IntroSetupCleanupTarget.BenchmarkD
 <p>The <code>--runtimes</code> or just <code>-r</code> allows you to run the benchmarks for selected Runtimes. Available options are:</p>
 <ul>
 <li>Clr - BDN will either use Roslyn (if you run it as .NET app) or latest installed .NET SDK to build the benchmarks (if you run it as .NET Core app)</li>
-<li>Core - if you run it as .NET Core app, BDN will use the same target framework moniker, if you run it as .NET app it's going to use netcoreapp2.0</li>
+<li>Core - if you run it as .NET Core app, BDN will use the same target framework moniker, if you run it as .NET app it's going to use netcoreapp2.1</li>
 <li>Mono - it's going to use the Mono from <code>$Path</code>, you can override  it with <code>--monoPath</code></li>
 <li>CoreRT - it's going to use latest CoreRT. Can be customized with additional options: <code>--ilcPath</code>, <code>--coreRtVersion</code></li>
 <li>net46, net461, net462, net47, net471, net472 - to build and run benchmarks against specific .NET framework version</li>
@@ -281,7 +272,7 @@ static IConfig GetGlobalConfig()
 <li><code>-e</code>, <code>--exporters</code> GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML</li>
 <li><code>-i</code>, <code>--inProcess</code> (Default: false) Run benchmarks in Process</li>
 <li><code>-a</code>, <code>--artifacts</code> Valid path to accessible directory</li>
-<li><code>--outliers</code> (Default: OnlyUpper) None/OnlyUpper/OnlyLower/All</li>
+<li><code>--outliers</code> (Default: RemoveUpper) DontRemove/RemoveUpper/RemoveLower/RemoveAll</li>
 <li><code>--affinity</code> Affinity mask to set for the benchmark process</li>
 <li><code>--allStats</code> (Default: false) Displays all statistics (min, max &amp; more)</li>
 <li><code>--attribute</code> Run all methods with given attribute (applied to class or method)</li>
@@ -294,6 +285,7 @@ static IConfig GetGlobalConfig()
 <li><code>--version</code> Display version information.</li>
 <li><code>--keepFiles</code> Determines if all auto-generated files should be kept or removed after running the benchmarks.</li>
 <li><code>--noOverwrite</code> Determines if the exported result files should not be overwritten.</li>
+<li><code>--disableLogFile</code> Disables the logfile.</li>
 </ul>
 </article>
           </div>
@@ -332,5 +324,14 @@ static IConfig GetGlobalConfig()
     <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
     <script type="text/javascript" src="../../styles/docfx.js"></script>
     <script type="text/javascript" src="../../styles/main.js"></script>
-  </body>
+    <!-- at the end of the BODY -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script type="text/javascript">
+        docsearch({
+            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
+            indexName: 'benchmarkdotnet',
+            inputSelector: '#search-query',
+            debug: false // Set debug to true if you want to inspect the dropdown
+        });
+    </script>  </body>
 </html>

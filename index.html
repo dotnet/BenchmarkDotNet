@@ -8,7 +8,7 @@
     <title>Showtime | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Showtime | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.40.10.0">
+    <meta name="generator" content="docfx 2.46.0.0">
     
     <link rel="shortcut icon" href="logo/icon-32.png">
     <link rel="stylesheet" href="styles/docfx.vendor.css">
@@ -17,7 +17,7 @@
     <meta property="docfx:navrel" content="toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
-    <meta property="docfx:rel" content="">
+    
     
   
     <!-- Google Analytics -->
@@ -60,6 +60,9 @@
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
     <!-- /Yandex.Metrika counter -->
+    <!-- at the end of the HEAD -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
+    <link rel="stylesheet" href="styles/search.css">
   </head>
   <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
@@ -80,11 +83,9 @@
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
-              <form class="navbar-form navbar-right" role="search" id="search">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
-                </div>
-              </form>
+              <div class="navbar-right navbar-form">
+                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
+              </div>
             </div>
           </div>
         </nav>
@@ -97,16 +98,6 @@
           </div>
         </div>
       </header>
-      <div class="container body-content">
-        
-        <div id="search-results">
-          <div class="search-list"></div>
-          <div class="sr-items">
-            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
-          </div>
-          <ul id="pagination"></ul>
-        </div>
-      </div>
       <div role="main" class="container body-content hide-when-search">
         <div class="article row grid">
           <div class="col-md-10">
@@ -226,7 +217,7 @@ You can export the data in different formats like (CSV, XML, JSON, and so on) or
 <li><strong>Execution control:</strong> BenchmarkDotNet tries to choose the best possible way to evaluate performance, but you can also manually control amount of iterations, switch between cold start and warmed state, set the accuracy level, tune GC parameters, change environment variables, and more</li>
 <li><strong>Statistics:</strong> by default, you will see the most important statistics like mean and standard deviation; but you can also manually ask for min/max values, confidence intervals, skewness, kurtosis, quartile, percentiles, or define own metrics</li>
 <li><strong>Comparing environments:</strong> <a href="http://benchmarkdotnet.org/Configs/Jobs.htm">Easy way</a> to compare different environments (x86 vs x64, LegacyJit vs RyuJit, Mono vs .NET Core, and so on)</li>
-<li><strong>Relative performance:</strong> you can <a href="(http://benchmarkdotnet.org/Advanced/Baseline.htm)">easily</a> evaluate difference between different methods of environments</li>
+<li><strong>Relative performance:</strong> you can <a href="http://benchmarkdotnet.org/Advanced/Baseline.htm">easily</a> evaluate difference between different methods of environments</li>
 <li><strong>Memory diagnostics:</strong> the library not only measure performance of your code, but also prints information about memory traffic and amount of GC collections</li>
 <li><strong>Disassembly diagnostics:</strong> you can ask for an assembly listing with the help of single additional attribute</li>
 <li><strong>Parametrization:</strong> performance can be evaluated for different sets of input <a href="http://benchmarkdotnet.org/Advanced/Params.htm">parameters</a> like in popular unit test frameworks</li>
@@ -334,5 +325,14 @@ For more information see the <a href="https://dotnetfoundation.org/code-of-condu
     <script type="text/javascript" src="styles/docfx.vendor.js"></script>
     <script type="text/javascript" src="styles/docfx.js"></script>
     <script type="text/javascript" src="styles/main.js"></script>
-  </body>
+    <!-- at the end of the BODY -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script type="text/javascript">
+        docsearch({
+            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
+            indexName: 'benchmarkdotnet',
+            inputSelector: '#search-query',
+            debug: false // Set debug to true if you want to inspect the dropdown
+        });
+    </script>  </body>
 </html>

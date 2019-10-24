@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class DryJobAttribute
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.40.10.0">
+    <meta name="generator" content="docfx 2.46.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -19,7 +19,7 @@
     <meta property="docfx:navrel" content="../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
-    <meta property="docfx:rel" content="../">
+    
     
   
     <!-- Google Analytics -->
@@ -62,6 +62,9 @@
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
     <!-- /Yandex.Metrika counter -->
+    <!-- at the end of the HEAD -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
+    <link rel="stylesheet" href="../styles/search.css">
   </head>
   <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
@@ -82,11 +85,9 @@
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
-              <form class="navbar-form navbar-right" role="search" id="search">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
-                </div>
-              </form>
+              <div class="navbar-right navbar-form">
+                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
+              </div>
             </div>
           </div>
         </nav>
@@ -99,16 +100,6 @@
           </div>
         </div>
       </header>
-      <div class="container body-content">
-        
-        <div id="search-results">
-          <div class="search-list"></div>
-          <div class="sr-items">
-            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
-          </div>
-          <ul id="pagination"></ul>
-        </div>
-      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -273,7 +264,8 @@
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Attributes_DryJobAttribute_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class DryJobAttribute : JobConfigBaseAttribute, IConfigSource</code></pre>
+    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class, AllowMultiple = true)]
+public class DryJobAttribute : JobConfigBaseAttribute, IConfigSource</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -287,6 +279,74 @@
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public DryJobAttribute()</code></pre>
   </div>
+  
+  
+  <a id="BenchmarkDotNet_Attributes_DryJobAttribute__ctor_" data-uid="BenchmarkDotNet.Attributes.DryJobAttribute.#ctor*"></a>
+  <h4 id="BenchmarkDotNet_Attributes_DryJobAttribute__ctor_BenchmarkDotNet_Jobs_RuntimeMoniker_" data-uid="BenchmarkDotNet.Attributes.DryJobAttribute.#ctor(BenchmarkDotNet.Jobs.RuntimeMoniker)">DryJobAttribute(RuntimeMoniker)</h4>
+  <div class="markdown level1 summary"><p>defines a new Dry Job that targets specified Framework</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DryJobAttribute(RuntimeMoniker runtimeMoniker)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">BenchmarkDotNet.Jobs.RuntimeMoniker</span></td>
+        <td><span class="parametername">runtimeMoniker</span></td>
+        <td><p>Target Framework to test.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Attributes_DryJobAttribute__ctor_" data-uid="BenchmarkDotNet.Attributes.DryJobAttribute.#ctor*"></a>
+  <h4 id="BenchmarkDotNet_Attributes_DryJobAttribute__ctor_BenchmarkDotNet_Jobs_RuntimeMoniker_BenchmarkDotNet_Environments_Jit_BenchmarkDotNet_Environments_Platform_" data-uid="BenchmarkDotNet.Attributes.DryJobAttribute.#ctor(BenchmarkDotNet.Jobs.RuntimeMoniker,BenchmarkDotNet.Environments.Jit,BenchmarkDotNet.Environments.Platform)">DryJobAttribute(RuntimeMoniker, Jit, Platform)</h4>
+  <div class="markdown level1 summary"><p>defines a new Dry Job that targets specified Framework, JIT and Platform</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DryJobAttribute(RuntimeMoniker runtimeMoniker, Jit jit, Platform platform)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">BenchmarkDotNet.Jobs.RuntimeMoniker</span></td>
+        <td><span class="parametername">runtimeMoniker</span></td>
+        <td><p>Target Framework to test.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Environments.Jit.html">Jit</a></td>
+        <td><span class="parametername">jit</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Environments.Platform.html">Platform</a></td>
+        <td><span class="parametername">platform</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="BenchmarkDotNet.Configs.IConfigSource.html">IConfigSource</a>
@@ -325,5 +385,14 @@
     <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
     <script type="text/javascript" src="../styles/docfx.js"></script>
     <script type="text/javascript" src="../styles/main.js"></script>
-  </body>
+    <!-- at the end of the BODY -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script type="text/javascript">
+        docsearch({
+            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
+            indexName: 'benchmarkdotnet',
+            inputSelector: '#search-query',
+            debug: false // Set debug to true if you want to inspect the dropdown
+        });
+    </script>  </body>
 </html>

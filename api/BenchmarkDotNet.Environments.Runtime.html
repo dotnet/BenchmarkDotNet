@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Runtime
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.40.10.0">
+    <meta name="generator" content="docfx 2.46.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -19,7 +19,7 @@
     <meta property="docfx:navrel" content="../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
-    <meta property="docfx:rel" content="../">
+    
     
   
     <!-- Google Analytics -->
@@ -62,6 +62,9 @@
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
     <!-- /Yandex.Metrika counter -->
+    <!-- at the end of the HEAD -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
+    <link rel="stylesheet" href="../styles/search.css">
   </head>
   <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
@@ -82,11 +85,9 @@
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
-              <form class="navbar-form navbar-right" role="search" id="search">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
-                </div>
-              </form>
+              <div class="navbar-right navbar-form">
+                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
+              </div>
             </div>
           </div>
         </nav>
@@ -99,16 +100,6 @@
           </div>
         </div>
       </header>
-      <div class="container body-content">
-        
-        <div id="search-results">
-          <div class="search-list"></div>
-          <div class="sr-items">
-            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
-          </div>
-          <ul id="pagination"></ul>
-        </div>
-      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -165,12 +156,12 @@
   
   
   <a id="BenchmarkDotNet_Environments_Runtime__ctor_" data-uid="BenchmarkDotNet.Environments.Runtime.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Environments_Runtime__ctor_System_String_" data-uid="BenchmarkDotNet.Environments.Runtime.#ctor(System.String)">Runtime(String)</h4>
+  <h4 id="BenchmarkDotNet_Environments_Runtime__ctor_BenchmarkDotNet_Jobs_RuntimeMoniker_System_String_System_String_" data-uid="BenchmarkDotNet.Environments.Runtime.#ctor(BenchmarkDotNet.Jobs.RuntimeMoniker,System.String,System.String)">Runtime(RuntimeMoniker, String, String)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected Runtime(string name)</code></pre>
+    <pre><code class="lang-csharp hljs">protected Runtime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -183,113 +174,18 @@
     </thead>
     <tbody>
       <tr>
+        <td><span class="xref">BenchmarkDotNet.Jobs.RuntimeMoniker</span></td>
+        <td><span class="parametername">runtimeMoniker</span></td>
+        <td></td>
+      </tr>
+      <tr>
         <td><span class="xref">System.String</span></td>
-        <td><span class="parametername">name</span></td>
+        <td><span class="parametername">msBuildMoniker</span></td>
         <td></td>
       </tr>
-    </tbody>
-  </table>
-  <h3 id="fields">Fields
-  </h3>
-  
-  
-  <h4 id="BenchmarkDotNet_Environments_Runtime_Clr" data-uid="BenchmarkDotNet.Environments.Runtime.Clr">Clr</h4>
-  <div class="markdown level1 summary"><p>Full .NET Framework (Windows only)</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static readonly Runtime Clr</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
       <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <h4 id="BenchmarkDotNet_Environments_Runtime_Core" data-uid="BenchmarkDotNet.Environments.Runtime.Core">Core</h4>
-  <div class="markdown level1 summary"><p>Cross-platform Core CLR runtime
-See also: <a href="https://docs.microsoft.com/en-us/dotnet/">https://docs.microsoft.com/en-us/dotnet/</a></p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static readonly Runtime Core</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <h4 id="BenchmarkDotNet_Environments_Runtime_CoreRT" data-uid="BenchmarkDotNet.Environments.Runtime.CoreRT">CoreRT</h4>
-  <div class="markdown level1 summary"><p>Cross-platform .NET Core runtime optimized for ahead of time compilation
-See also: <a href="https://github.com/dotnet/corert">https://github.com/dotnet/corert</a></p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static readonly Runtime CoreRT</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <h4 id="BenchmarkDotNet_Environments_Runtime_Mono" data-uid="BenchmarkDotNet.Environments.Runtime.Mono">Mono</h4>
-  <div class="markdown level1 summary"><p>Mono
-See also: <a href="http://www.mono-project.com/">http://www.mono-project.com/</a></p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static readonly Runtime Mono</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a></td>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">displayName</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -298,9 +194,36 @@ See also: <a href="http://www.mono-project.com/">http://www.mono-project.com/</a
   </h3>
   
   
+  <a id="BenchmarkDotNet_Environments_Runtime_MsBuildMoniker_" data-uid="BenchmarkDotNet.Environments.Runtime.MsBuildMoniker*"></a>
+  <h4 id="BenchmarkDotNet_Environments_Runtime_MsBuildMoniker" data-uid="BenchmarkDotNet.Environments.Runtime.MsBuildMoniker">MsBuildMoniker</h4>
+  <div class="markdown level1 summary"><p>MsBuild Target Framework Moniker, example: net461, netcoreapp2.1</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string MsBuildMoniker { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Environments_Runtime_Name_" data-uid="BenchmarkDotNet.Environments.Runtime.Name*"></a>
   <h4 id="BenchmarkDotNet_Environments_Runtime_Name" data-uid="BenchmarkDotNet.Environments.Runtime.Name">Name</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Display name</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -317,6 +240,32 @@ See also: <a href="http://www.mono-project.com/">http://www.mono-project.com/</a
     <tbody>
       <tr>
         <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_Runtime_RuntimeMoniker_" data-uid="BenchmarkDotNet.Environments.Runtime.RuntimeMoniker*"></a>
+  <h4 id="BenchmarkDotNet_Environments_Runtime_RuntimeMoniker" data-uid="BenchmarkDotNet.Environments.Runtime.RuntimeMoniker">RuntimeMoniker</h4>
+  <div class="markdown level1 summary"><p>Target Framework Moniker</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RuntimeMoniker RuntimeMoniker { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">BenchmarkDotNet.Jobs.RuntimeMoniker</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -501,5 +450,14 @@ See also: <a href="http://www.mono-project.com/">http://www.mono-project.com/</a
     <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
     <script type="text/javascript" src="../styles/docfx.js"></script>
     <script type="text/javascript" src="../styles/main.js"></script>
-  </body>
+    <!-- at the end of the BODY -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script type="text/javascript">
+        docsearch({
+            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
+            indexName: 'benchmarkdotnet',
+            inputSelector: '#search-query',
+            debug: false // Set debug to true if you want to inspect the dropdown
+        });
+    </script>  </body>
 </html>

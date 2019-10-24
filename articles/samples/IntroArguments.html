@@ -8,7 +8,7 @@
     <title>Sample: IntroArguments | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroArguments | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.40.10.0">
+    <meta name="generator" content="docfx 2.46.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -17,7 +17,7 @@
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="../toc.html">
     
-    <meta property="docfx:rel" content="../../">
+    
     
   
     <!-- Google Analytics -->
@@ -60,6 +60,9 @@
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
     <!-- /Yandex.Metrika counter -->
+    <!-- at the end of the HEAD -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
+    <link rel="stylesheet" href="../../styles/search.css">
   </head>
   <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
@@ -80,11 +83,9 @@
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
-              <form class="navbar-form navbar-right" role="search" id="search">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
-                </div>
-              </form>
+              <div class="navbar-right navbar-form">
+                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
+              </div>
             </div>
           </div>
         </nav>
@@ -97,16 +98,6 @@
           </div>
         </div>
       </header>
-      <div class="container body-content">
-        
-        <div id="search-results">
-          <div class="search-list"></div>
-          <div class="sr-items">
-            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
-          </div>
-          <ul id="pagination"></ul>
-        </div>
-      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -123,13 +114,8 @@
 <p>As an alternative to using <a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a>,
 you can specify arguments for your benchmarks.
 There are several ways to do it (described below).</p>
-<div class="IMPORTANT">
-<h5>Important</h5>
-<p><code>InProcessToolchain</code> does not support Arguments (yet!).
-See <a href="https://github.com/dotnet/BenchmarkDotNet/issues/687">#687</a> for more details.</p>
-</div>
 <p>The <a href="xref:BenchmarkDotNet.Attributes.ArgumentsAttribute"><code>[Arguments]</code></a> allows you to provide a set of values.
-Every value must be a compile-time constant (it's C# lanugage limitation for attributes in general).
+Every value must be a compile-time constant (it's C# language limitation for attributes in general).
 You can also combine
 <a href="xref:BenchmarkDotNet.Attributes.ArgumentsAttribute"><code>[Arguments]</code></a> with
 <a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a>.
@@ -169,7 +155,7 @@ namespace BenchmarkDotNet.Samples
 | Benchmark |                 True | 100 | 10 | 115.3 ms | 0.1375 ms | 0.1286 ms |
 | Benchmark |                 True | 100 | 20 | 125.3 ms | 0.1212 ms | 0.1134 ms |
 | Benchmark |                 True | 200 | 10 | 215.4 ms | 0.0779 ms | 0.0691 ms |
-| Benchmark |                 True | 200 | 20 | 225.4 ms | 0.0775 ms | 0.0725 ms | 
+| Benchmark |                 True | 200 | 20 | 225.4 ms | 0.0775 ms | 0.0725 ms |
 </code></pre>
 <h3 id="links">Links</h3>
 <ul>
@@ -214,5 +200,14 @@ namespace BenchmarkDotNet.Samples
     <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
     <script type="text/javascript" src="../../styles/docfx.js"></script>
     <script type="text/javascript" src="../../styles/main.js"></script>
-  </body>
+    <!-- at the end of the BODY -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script type="text/javascript">
+        docsearch({
+            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
+            indexName: 'benchmarkdotnet',
+            inputSelector: '#search-query',
+            debug: false // Set debug to true if you want to inspect the dropdown
+        });
+    </script>  </body>
 </html>

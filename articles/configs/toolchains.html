@@ -8,7 +8,7 @@
     <title>Toolchains | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Toolchains | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.40.10.0">
+    <meta name="generator" content="docfx 2.46.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -17,7 +17,7 @@
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="../toc.html">
     
-    <meta property="docfx:rel" content="../../">
+    
     
   
     <!-- Google Analytics -->
@@ -60,6 +60,9 @@
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
     <!-- /Yandex.Metrika counter -->
+    <!-- at the end of the HEAD -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
+    <link rel="stylesheet" href="../../styles/search.css">
   </head>
   <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
@@ -80,11 +83,9 @@
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
-              <form class="navbar-form navbar-right" role="search" id="search">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
-                </div>
-              </form>
+              <div class="navbar-right navbar-form">
+                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
+              </div>
             </div>
           </div>
         </nav>
@@ -97,16 +98,6 @@
           </div>
         </div>
       </header>
-      <div class="container body-content">
-        
-        <div id="search-results">
-          <div class="search-list"></div>
-          <div class="sr-items">
-            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
-          </div>
-          <ul id="pagination"></ul>
-        </div>
-      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -120,47 +111,77 @@
             <article class="content wrap" id="_content" data-uid="docs.toolchains">
 <h1 id="toolchains">Toolchains</h1>
 
-<p>In BenchmarkDotNet we generate, build and execute new console app per every benchmark. A <strong>toolchain</strong> contains generator, builder, and executor.</p>
-<p>When you run your benchmarks without specifying the toolchain in an explicit way, we use the default one. It works OOTB, you don't need to worry about anything.</p>
-<p>We use Roslyn for classic .NET and Mono, and <code>dotnet cli</code> for .NET Core and CoreRT.</p>
+<p>To achieve process-level isolation, BenchmarkDotNet generates, builds and executes a new console app per every benchmark. A <strong>toolchain</strong> contains generator, builder, and executor.</p>
+<p>When you run your benchmarks without specifying the toolchain in an explicit way, the default one is used:</p>
+<ul>
+<li>Roslyn for Full .NET Framework and Mono</li>
+<li>dotnet cli for .NET Core and CoreRT</li>
+</ul>
 <h2 id="multiple-frameworks-support">Multiple frameworks support</h2>
-<p>You can target multiple frameworks with single, modern csproj file:</p>
-<pre><code class="lang-xml">&lt;TargetFrameworks&gt;netcoreapp2.0;net462&lt;/TargetFrameworks&gt;
+<p>If you want to test multiple frameworks, your project file <strong>MUST target all of them</strong> and you <strong>MUST install the corresponding SDKs</strong>:</p>
+<pre><code class="lang-xml">&lt;TargetFrameworks&gt;netcoreapp3.0;netcoreapp2.1;net48&lt;/TargetFrameworks&gt;
 </code></pre>
-<p>BenchmarkDotNet allows you to take full advantage of that. With single config, we can execute the benchmarks for all the frameworks that you have listed in your csproj file.</p>
-<p>If you specify <code>Runtime</code> in explicit way, we just choose the right toolchain for you.</p>
-<pre><code class="lang-cs">[ClrJob, MonoJob, CoreJob, CoreRtJob]
-public class Algo_Md5VsSha256
+<p>If you run your benchmarks without specifying any custom settings, BenchmarkDotNet is going to run the benchmarks <strong>using the same framework as the host process</strong>:</p>
+<pre><code class="lang-cmd">dotnet run -c Release -f netcoreapp2.1 # is going to run the benchmarks using .NET Core 2.1
+dotnet run -c Release -f netcoreapp3.0 # is going to run the benchmarks using .NET Core 3.0
+dotnet run -c Release -f net48         # is going to run the benchmarks using .NET 4.8
+mono $pathToExe                        # is going to run the benchmarks using Mono from your PATH
+</code></pre>
+<p>To run the benchmarks for multiple runtimes with a single command, you need to specify the target framework moniker names via <code>--runtimes|-r</code> console argument:</p>
+<pre><code class="lang-cmd">dotnet run -c Release -f netcoreapp2.1 --runtimes netcoreapp2.1 netcoreapp3.0 # is going to run the benchmarks using .NET Core 2.1 and .NET Core 3.0
+dotnet run -c Release -f netcoreapp2.1 --runtimes netcoreapp2.1 net48         # is going to run the benchmarks using .NET Core 2.1 and .NET 4.8
+</code></pre>
+<p>What is going to happen if you provide multiple Full .NET Framework monikers? Let's say:</p>
+<pre><code class="lang-cmd">dotnet run -c Release -f net461 net472 net48
+</code></pre>
+<p>Full .NET Framework always runs every .NET executable using the latest .NET Framework available on a given machine. If you try to run the benchmarks for a few .NET TFMs, they are all going to be executed using the latest .NET Framework from your machine. The only difference is that they are all going to have different features enabled depending on target version they were compiled for. You can read more about this <a href="https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/version-compatibility">here</a> and <a href="https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/application-compatibility">here</a>. This is <strong>.NET Framework behavior which can not be controlled by BenchmarkDotNet or any other tool</strong>.</p>
+<p><strong>Note:</strong> Console arguments support works only if you pass the <code>args</code> to <code>BenchmarkSwitcher</code>:</p>
+<pre><code class="lang-cs">class Program
 {
-    // the benchmarks are going to be executed for classic .NET, Mono (default path), .NET Core and CoreRT (latest version)
+    static void Main(string[] args) 
+        =&gt; BenchmarkSwitcher
+            .FromAssembly(typeof(Program).Assembly)
+            .Run(args); // crucial to make it work
 }
 </code></pre>
-<h3 id="tfm">TFM</h3>
-<p>At some point of time we need to choose the target framework moniker (TFM).</p>
-<p>When you are running your app with benchmark as .NET Core app, we just check the version of the <code>System.Runtime.dll</code> which allows us to decide which version of .NET Core you are using.</p>
-<p>But when you are running your project as classic .NET (.NET 4.6.2 for example), we don't know which TFM to choose for your .NET Core Runtime, so we use the default one - <strong>netcoreapp2.0</strong>.</p>
-<p>If the default <code>netcoreapp2.0</code> is not OK for you, you must configure the toolchains in explicit way:</p>
-<pre><code class="lang-cs">public class MultipleRuntimes : ManualConfig
-{
-    public MultipleRuntimes()
-    {
-        Add(Job.Default.With(CsProjCoreToolchain.NetCoreApp21)); // .NET Core 2.1
+<p>You can achieve the same thing using <code>[SimpleJobAttribute]</code>:</p>
+<pre><code class="lang-cs">using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 
-        Add(Job.Default.With(CsProjClassicNetToolchain.Net462)); // NET 4.6.2
+namespace BenchmarkDotNet.Samples
+{
+    [SimpleJob(RuntimeMoniker.Net48)]
+    [SimpleJob(RuntimeMoniker.Mono)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp21)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp30)]
+    public class TheClassWithBenchmarks
+</code></pre>
+<p>Or using a custom config:</p>
+<pre><code class="lang-cs">using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Running;
+
+namespace BenchmarkDotNet.Samples
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var config = DefaultConfig.Instance
+                .With(Job.Default.With(CoreRuntime.Core21))
+                .With(Job.Default.With(CoreRuntime.Core30))
+                .With(Job.Default.With(ClrRuntime.Net48))
+                .With(Job.Default.With(MonoRuntime.Default));
+
+            BenchmarkSwitcher
+                .FromAssembly(typeof(Program).Assembly)
+                .Run(args, config);
+        }
     }
 }
-
-[Config(typeof(MultipleRuntimes))]
-public class TypeWithBenchmarks
-{
-}
 </code></pre>
-<p>After doing this, you can run your benchmarks via:</p>
-<ul>
-<li><code>dotnet run -c Release -f net462</code></li>
-<li><code>dotnet run -c Release -f netcoreapp2.0</code></li>
-</ul>
-<p>And they are going to be executed for both runtimes.</p>
+<p>The recommended way of running the benchmarks for multiple runtimes is to use the <code>--runtimes</code> console line argument. By using the console line argument you don't need to edit the source code anytime you want to change the list of runtimes. Moreover, if you share the source code of the benchmark other people can run it even if they don't have the exact same framework version installed.</p>
 <h2 id="custom-net-core-runtime">Custom .NET Core Runtime</h2>
 <p>We can run your benchmarks for custom <code>&lt;RuntimeFrameworkVersion&gt;</code> if you want. All you need to do is to create custom toolchain by calling <code>CsProjCoreToolchain.From</code> method, which accepts <code>NetCoreAppSettings</code>.</p>
 <pre><code class="lang-cs">public class MyConfig : ManualConfig
@@ -182,7 +203,7 @@ public class TypeWithBenchmarks
     .FromAssembly(typeof(Program).Assembly)
     .Run(args, 
         DefaultConfig.Instance.With(
-            Job.ShortRun.With(new ClrRuntime(version: &quot;4.0&quot;))));
+            Job.ShortRun.With(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: &quot;4.0&quot;))));
 </code></pre>
 <p>This sends the provided version as a <code>COMPLUS_Version</code> env var to the benchmarked process.</p>
 <h2 id="custom-dotnet-cli-path">Custom dotnet cli path</h2>
@@ -223,7 +244,7 @@ Jit=RyuJit
 <h2 id="sample-introinprocess">Sample: IntroInProcess</h2>
 <p>InProcessEmitToolchain is our toolchain which does not generate any new executable.
 It emits IL on the fly and runs it from within the process itself.
-It can be usefull if want to run the benchmarks very fast or if you want to run them for framework which we don't support.
+It can be useful if want to run the benchmarks very fast or if you want to run them for framework which we don't support.
 An example could be a local build of CoreCLR.</p>
 <h3 id="usage">Usage</h3>
 <pre><code class="lang-cs">[InProcessAttribute]
@@ -356,20 +377,20 @@ namespace BenchmarkDotNet.Samples
 <li>CoreRT is a flavor of .NET Core. Which means that:
 <ul>
 <li>you have to target .NET Core to be able to build CoreRT benchmarks (<code>&lt;TargetFramework&gt;netcoreapp2.1&lt;/TargetFramework&gt;</code> in the .csproj file)</li>
-<li>you have to specify the CoreRT runtime in an explicit way, either by using <code>[CoreRtJob]</code> attribute or by using the fluent Job config API <code>Job.ShortRun.With(Runtime.CoreRT)</code></li>
+<li>you have to specify the CoreRT runtime in an explicit way, either by using <code>[SimpleJob]</code> attribute or by using the fluent Job config API <code>Job.ShortRun.With(CoreRtRuntime.$version)</code></li>
 <li>to run CoreRT benchmark you run the app as a .NET Core/.NET process (<code>dotnet run -c Release -f netcoreapp2.1</code>) and BenchmarkDotNet does all the CoreRT compilation for you. If you want to check what files are generated you need to apply <code>[KeepBenchmarkFiles]</code> attribute to the class which defines benchmarks.</li>
 </ul>
 </li>
 </ul>
 <p>By default BenchmarkDotNet uses the latest version of <code>Microsoft.DotNet.ILCompiler</code> to build the CoreRT benchmark according to <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project">this instructions</a>.</p>
 <pre><code class="lang-cs">var config = DefaultConfig.Instance
-    .With(Job.Default.With(Runtime.CoreRT)); // uses the latest CoreRT version
+    .With(Job.Default.With(CoreRtRuntime.CoreRt21)); // compiles the benchmarks as netcoreapp2.1 and uses the latest CoreRT to build a native app
 
 BenchmarkSwitcher
     .FromAssembly(typeof(Program).Assembly)
     .Run(args, config);
 </code></pre>
-<pre><code class="lang-cs">[CoreRtJob] // uses the latest CoreRT version
+<pre><code class="lang-cs">[SimpleJob(RuntimeMoniker.CoreRt21)] // compiles the benchmarks as netcoreapp2.1 and uses the latest CoreRT to build a native app
 public class TheTypeWithBenchmarks
 {
    [Benchmark] // the benchmarks go here
@@ -379,20 +400,20 @@ public class TheTypeWithBenchmarks
 <p>If you want to benchmark some particular version of CoreRT you have to specify it in an explicit way:</p>
 <pre><code class="lang-cs">var config = DefaultConfig.Instance
     .With(Job.ShortRun
-        .With(Runtime.CoreRT)
         .With(CoreRtToolchain.CreateBuilder()
             .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: &quot;1.0.0-alpha-26412-02&quot;) // the version goes here
             .DisplayName(&quot;CoreRT NuGet&quot;)
+            .TargetFrameworkMoniker(&quot;netcoreapp2.1&quot;)
             .ToToolchain()));
 </code></pre>
 <h3 id="compiling-source-to-native-code-using-the-ilcompiler-you-built">Compiling source to native code using the ILCompiler you built</h3>
 <p>If you are an CoreRT contributor and you want to benchmark your local build of CoreRT you have to provide necessary info (IlcPath):</p>
 <pre><code class="lang-cs">var config = DefaultConfig.Instance
     .With(Job.ShortRun
-        .With(Runtime.CoreRT)
         .With(CoreRtToolchain.CreateBuilder()
             .UseCoreRtLocal(@&quot;C:\Projects\corert\bin\Windows_NT.x64.Release&quot;) // IlcPath
             .DisplayName(&quot;Core RT RyuJit&quot;)
+            .TargetFrameworkMoniker(&quot;netcoreapp2.1&quot;)
             .ToToolchain()));
 </code></pre>
 <p>BenchmarkDotNet is going to follow <a href="https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built">these instructrions</a> to get it working for you.</p>
@@ -402,12 +423,14 @@ public class TheTypeWithBenchmarks
 </blockquote>
 <p>If you want to test <a href="https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#using-cpp-code-generator">CPP Code Generator</a> you have to use <code>UseCppCodeGenerator</code> method:</p>
 <pre><code class="lang-cs">var config = DefaultConfig.Instance
-    .With(Job.CoreRT.With(
-        CoreRtToolchain.CreateBuilder()
-            .UseCoreRtLocal(@&quot;C:\Projects\corert\bin\Windows_NT.x64.Release&quot;) // IlcPath
-            .UseCppCodeGenerator() // ENABLE IT
-            .DisplayName(&quot;CPP&quot;)
-            .ToToolchain()));
+    .With(Job.Default
+        .With(
+            CoreRtToolchain.CreateBuilder()
+                .UseCoreRtLocal(@&quot;C:\Projects\corert\bin\Windows_NT.x64.Release&quot;) // IlcPath
+                .UseCppCodeGenerator() // ENABLE IT
+                .TargetFrameworkMoniker(&quot;netcoreapp2.1&quot;)
+                .DisplayName(&quot;CPP&quot;)
+                .ToToolchain()));
 </code></pre>
 <p><strong>Note</strong>: You might get some <code>The method or operation is not implemented.</code> errors as of today if the code that you are trying to benchmark is using some features that are not implemented by CoreRT/transpiler yet...</p>
 </article>
@@ -447,5 +470,14 @@ public class TheTypeWithBenchmarks
     <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
     <script type="text/javascript" src="../../styles/docfx.js"></script>
     <script type="text/javascript" src="../../styles/main.js"></script>
-  </body>
+    <!-- at the end of the BODY -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script type="text/javascript">
+        docsearch({
+            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
+            indexName: 'benchmarkdotnet',
+            inputSelector: '#search-query',
+            debug: false // Set debug to true if you want to inspect the dropdown
+        });
+    </script>  </body>
 </html>

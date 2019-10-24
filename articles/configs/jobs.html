@@ -8,7 +8,7 @@
     <title>Jobs | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Jobs | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.40.10.0">
+    <meta name="generator" content="docfx 2.46.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -17,7 +17,7 @@
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="../toc.html">
     
-    <meta property="docfx:rel" content="../../">
+    
     
   
     <!-- Google Analytics -->
@@ -60,6 +60,9 @@
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
     <!-- /Yandex.Metrika counter -->
+    <!-- at the end of the HEAD -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
+    <link rel="stylesheet" href="../../styles/search.css">
   </head>
   <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
@@ -80,11 +83,9 @@
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
-              <form class="navbar-form navbar-right" role="search" id="search">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
-                </div>
-              </form>
+              <div class="navbar-right navbar-form">
+                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
+              </div>
             </div>
           </div>
         </nav>
@@ -97,16 +98,6 @@
           </div>
         </div>
       </header>
-      <div class="container body-content">
-        
-        <div id="search-results">
-          <div class="search-list"></div>
-          <div class="sr-items">
-            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
-          </div>
-          <ul id="pagination"></ul>
-        </div>
-      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -185,7 +176,7 @@
 <li><code>MinIterationTime</code>: Minimum time of a single iteration. Unlike <code>Run.IterationTime</code>, this characteristic specifies only the lower limit. In case of need, BenchmarkDotNet can increase this value.</li>
 <li><code>MinInvokeCount</code>:  Minimum about of target method invocation. Default value if <code>4</code> but you can decrease this value for cases when single invocations takes a lot of time.</li>
 <li><code>EvaluateOverhead</code>: if you benchmark method takes nanoseconds, BenchmarkDotNet overhead can significantly affect measurements. If this characterics is enable, the overhead will be evaluated and subtracted from the result measurements. Default value is <code>true</code>.</li>
-<li><code>WithOutlierMode</code>: sometimes you could have outliers in your measurements. Usually these are unexpected outliers which arose because of other processes activities. By default (<code>OutlierMode.OnlyUpper</code>), all upper outliers (which is larger than Q3) will be removed from the result measurements. However, some of benchmarks have <em>expected</em> outliers. In these situation, you expect that some of invocation can produce outliers measurements (e.g. in case of network activities, cache operations, and so on). If you want to see result statistics with these outliers, you should use <code>OutlierMode.None</code>. If you can also choose <code>OutlierMode.OnlyLower</code> (outliers which are smaller than Q1 will be removed) or <code>OutlierMode.All</code> (all outliers will be removed). See also: <a class="xref" href="../../api/BenchmarkDotNet.Mathematics.OutlierMode.html">OutlierMode</a></li>
+<li><code>WithOutlierMode</code>: sometimes you could have outliers in your measurements. Usually these are unexpected outliers which arose because of other processes activities. By default (<code>OutlierMode.RemoveUpper</code>), all upper outliers (which is larger than Q3) will be removed from the result measurements. However, some of benchmarks have <em>expected</em> outliers. In these situation, you expect that some of invocation can produce outliers measurements (e.g. in case of network activities, cache operations, and so on). If you want to see result statistics with these outliers, you should use <code>OutlierMode.DontRemove</code>. If you can also choose <code>OutlierMode.RemoveLower</code> (outliers which are smaller than Q1 will be removed) or <code>OutlierMode.RemoveAll</code> (all outliers will be removed). See also: <a class="xref" href="../../api/BenchmarkDotNet.Mathematics.OutlierMode.html">OutlierMode</a></li>
 <li><code>AnalyzeLaunchVariance</code>: this characteristic makes sense only if <code>Run.LaunchCount</code> is default. If this mode is enabled and, BenchmarkDotNet will try to perform several launches and detect if there is a veriance between launches. If this mode is disable, only one launch will be performed.</li>
 </ul>
 <h3 id="infrastructure">Infrastructure</h3>
@@ -393,5 +384,14 @@ namespace BenchmarkDotNet.Samples
     <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
     <script type="text/javascript" src="../../styles/docfx.js"></script>
     <script type="text/javascript" src="../../styles/main.js"></script>
-  </body>
+    <!-- at the end of the BODY -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script type="text/javascript">
+        docsearch({
+            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
+            indexName: 'benchmarkdotnet',
+            inputSelector: '#search-query',
+            debug: false // Set debug to true if you want to inspect the dropdown
+        });
+    </script>  </body>
 </html>

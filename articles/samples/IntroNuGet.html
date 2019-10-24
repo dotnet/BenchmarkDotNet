@@ -8,7 +8,7 @@
     <title>Sample: IntroNuGet | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroNuGet | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.40.10.0">
+    <meta name="generator" content="docfx 2.46.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -17,7 +17,7 @@
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="../toc.html">
     
-    <meta property="docfx:rel" content="../../">
+    
     
   
     <!-- Google Analytics -->
@@ -60,6 +60,9 @@
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
     <!-- /Yandex.Metrika counter -->
+    <!-- at the end of the HEAD -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
+    <link rel="stylesheet" href="../../styles/search.css">
   </head>
   <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
@@ -80,11 +83,9 @@
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
-              <form class="navbar-form navbar-right" role="search" id="search">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
-                </div>
-              </form>
+              <div class="navbar-right navbar-form">
+                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
+              </div>
             </div>
           </div>
         </nav>
@@ -97,16 +98,6 @@
           </div>
         </div>
       </header>
-      <div class="container body-content">
-        
-        <div id="search-results">
-          <div class="search-list"></div>
-          <div class="sr-items">
-            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
-          </div>
-          <ul id="pagination"></ul>
-        </div>
-      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -124,12 +115,9 @@
 It allows comparing different versions of the same package (if there are no breaking changes in API).</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroNuGet.cs">using System;
-using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.CsProj;
 using Newtonsoft.Json;
 
 namespace BenchmarkDotNet.Samples
@@ -144,14 +132,15 @@ namespace BenchmarkDotNet.Samples
     public class IntroNuGet
     {
         // Specify jobs with different versions of the same NuGet package to benchmark.
-        // The NuGet versions referenced on these jobs must be greater or equal to the 
+        // The NuGet versions referenced on these jobs must be greater or equal to the
         // same NuGet version referenced in this benchmark project.
         // Example: This benchmark project references Newtonsoft.Json 9.0.1
         private class Config : ManualConfig
         {
             public Config()
             {
-                var baseJob = Job.MediumRun.With(CsProjCoreToolchain.Current.Value);
+                var baseJob = Job.MediumRun;
+
                 Add(baseJob.WithNuGet(&quot;Newtonsoft.Json&quot;, &quot;11.0.2&quot;).WithId(&quot;11.0.2&quot;));
                 Add(baseJob.WithNuGet(&quot;Newtonsoft.Json&quot;, &quot;11.0.1&quot;).WithId(&quot;11.0.1&quot;));
                 Add(baseJob.WithNuGet(&quot;Newtonsoft.Json&quot;, &quot;10.0.3&quot;).WithId(&quot;10.0.3&quot;));
@@ -272,5 +261,14 @@ namespace BenchmarkDotNet.Samples
     <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
     <script type="text/javascript" src="../../styles/docfx.js"></script>
     <script type="text/javascript" src="../../styles/main.js"></script>
-  </body>
+    <!-- at the end of the BODY -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script type="text/javascript">
+        docsearch({
+            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
+            indexName: 'benchmarkdotnet',
+            inputSelector: '#search-query',
+            debug: false // Set debug to true if you want to inspect the dropdown
+        });
+    </script>  </body>
 </html>

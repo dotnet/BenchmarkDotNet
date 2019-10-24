@@ -632,7 +632,6 @@ body .toc{
   overflow: hidden;
   padding-bottom: 10px;
   height: calc(100% - 100px);
-  margin-right: -20px;
 }
 .affix ul > li > a:before {
   color: #cccccc;

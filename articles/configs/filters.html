@@ -8,7 +8,7 @@
     <title>Filters | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Filters | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.40.10.0">
+    <meta name="generator" content="docfx 2.46.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -17,7 +17,7 @@
     <meta property="docfx:navrel" content="../../toc.html">
     <meta property="docfx:tocrel" content="../toc.html">
     
-    <meta property="docfx:rel" content="../../">
+    
     
   
     <!-- Google Analytics -->
@@ -60,6 +60,9 @@
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
     <!-- /Yandex.Metrika counter -->
+    <!-- at the end of the HEAD -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
+    <link rel="stylesheet" href="../../styles/search.css">
   </head>
   <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
@@ -80,11 +83,9 @@
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
-              <form class="navbar-form navbar-right" role="search" id="search">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
-                </div>
-              </form>
+              <div class="navbar-right navbar-form">
+                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
+              </div>
             </div>
           </div>
         </nav>
@@ -97,16 +98,6 @@
           </div>
         </div>
       </header>
-      <div class="container body-content">
-        
-        <div id="search-results">
-          <div class="search-list"></div>
-          <div class="sr-items">
-            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
-          </div>
-          <ul id="pagination"></ul>
-        </div>
-      </div>
       <div role="main" class="container body-content hide-when-search">
         
         <div class="sidenav hide-when-search">
@@ -209,12 +200,12 @@ namespace BenchmarkDotNet.Samples
                     new NameFilter(name =&gt; name.Contains(&quot;A&quot;)),
                     new NameFilter(name =&gt; name.Contains(&quot;1&quot;))
                 ));
-                
+
                 // benchmark with names with length &lt; 3
                 Add(new NameFilter(name =&gt; name.Length &lt; 3));
             }
         }
-    
+
         [Benchmark] public void A1() =&gt; Thread.Sleep(10); // Will be benchmarked
         [Benchmark] public void A2() =&gt; Thread.Sleep(10); // Will be benchmarked
         [Benchmark] public void A3() =&gt; Thread.Sleep(10); // Will be benchmarked
@@ -250,7 +241,7 @@ namespace BenchmarkDotNet.Samples
         [Benchmark]
         [BenchmarkCategory(&quot;A&quot;, &quot;1&quot;)]
         public void A1() =&gt; Thread.Sleep(10); // Will be benchmarked
-        
+
         [Benchmark]
         [BenchmarkCategory(&quot;A&quot;, &quot;2&quot;)]
         public void A2() =&gt; Thread.Sleep(10); // Will be benchmarked
@@ -258,7 +249,7 @@ namespace BenchmarkDotNet.Samples
         [Benchmark]
         [BenchmarkCategory(&quot;B&quot;, &quot;1&quot;)]
         public void B1() =&gt; Thread.Sleep(10); // Will be benchmarked
-        
+
         [Benchmark]
         [BenchmarkCategory(&quot;B&quot;, &quot;2&quot;)]
         public void B2() =&gt; Thread.Sleep(10);
@@ -283,14 +274,14 @@ using BenchmarkDotNet.Attributes;
 namespace BenchmarkDotNet.Samples
 {
     // Run BenchmarkSwitcher with arguments: &quot;--join --category=IntroJoinA&quot;
-    
+
     [DryJob]
     public class IntroJoin1
     {
         [Benchmark]
         [BenchmarkCategory(&quot;IntroJoinA&quot;)]
         public void A() =&gt; Thread.Sleep(10);
-        
+
         [Benchmark]
         [BenchmarkCategory(&quot;IntroJoinB&quot;)]
         public void B() =&gt; Thread.Sleep(10);
@@ -302,7 +293,7 @@ namespace BenchmarkDotNet.Samples
         [Benchmark]
         [BenchmarkCategory(&quot;IntroJoinA&quot;)]
         public void A() =&gt; Thread.Sleep(10);
-        
+
         [Benchmark]
         [BenchmarkCategory(&quot;IntroJoinB&quot;)]
         public void B() =&gt; Thread.Sleep(10);
@@ -360,5 +351,14 @@ namespace BenchmarkDotNet.Samples
     <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
     <script type="text/javascript" src="../../styles/docfx.js"></script>
     <script type="text/javascript" src="../../styles/main.js"></script>
-  </body>
+    <!-- at the end of the BODY -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script type="text/javascript">
+        docsearch({
+            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
+            indexName: 'benchmarkdotnet',
+            inputSelector: '#search-query',
+            debug: false // Set debug to true if you want to inspect the dropdown
+        });
+    </script>  </body>
 </html>
