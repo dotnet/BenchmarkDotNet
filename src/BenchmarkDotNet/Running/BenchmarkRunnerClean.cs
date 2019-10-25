@@ -54,8 +54,10 @@ namespace BenchmarkDotNet.Running
                     return new [] { Summary.ValidationFailed(title, resultsFolderPath, logFilePath, validationErrors) };
 
                 var benchmarksToRunCount = supportedBenchmarks.Sum(benchmarkInfo => benchmarkInfo.BenchmarksCases.Length);
+                BenchmarkDotNetEventSource.Instance.SetSelectedBenchmarkCount(benchmarksToRunCount);
                 compositeLogger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
                 compositeLogger.WriteLineHeader($"// ***** Found {benchmarksToRunCount} benchmark(s) in total *****");
+
                 var globalChronometer = Chronometer.Start();
 
                 var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
@@ -138,6 +140,8 @@ namespace BenchmarkDotNet.Running
                 foreach (var benchmark in benchmarks)
                 {
                     powerManagementApplier.ApplyPerformancePlan(benchmark.Job.Environment.PowerPlanMode);
+
+                    BenchmarkDotNetEventSource.Instance.IncrementExecutedBenchmarkCount();
 
                     var info = buildResults[benchmark];
                     var buildResult = info.buildResult;

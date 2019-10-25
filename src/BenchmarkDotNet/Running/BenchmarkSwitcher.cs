@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
@@ -65,6 +66,7 @@ namespace BenchmarkDotNet.Running
         [MethodImpl(MethodImplOptions.NoInlining)]
         private IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[] args, IConfig config)
         {
+            BenchmarkDotNetEventSource.Initialize();
             var logger = config.GetNonNullCompositeLogger();
             var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args, logger, config);
             if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
