@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Tests.Configs
         }
 
         [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers and disassembler only for Windows. This test is disabled for .NET Core because CoreRT compiler goes crazy when some dependency has reference to TraceEvent...")]
-        public void WhenUserDefinesHardwareCountersAndUsesDissasemblyDiagnoserWeAddInstructionPointerExporter()
+        public void WhenUserDefinesHardwareCountersAndUsesDisassemblyDiagnoserWeAddInstructionPointerExporter()
         {
             var mutable = ManualConfig.CreateEmpty();
 
@@ -205,9 +205,9 @@ namespace BenchmarkDotNet.Tests.Configs
         public void WhenTwoConfigsAreAddedTheRegularJobsAreJustAdded()
         {
             var configWithClrJob = CreateConfigFromJobs(Job.Default.With(CoreRuntime.Core21));
-            var cofingWithCoreJob = CreateConfigFromJobs(Job.Default.With(ClrRuntime.Net461));
+            var configWithCoreJob = CreateConfigFromJobs(Job.Default.With(ClrRuntime.Net461));
 
-            foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithClrJob, cofingWithCoreJob))
+            foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithClrJob, configWithCoreJob))
             {
                 var runnableJobs = added.GetJobs();
 

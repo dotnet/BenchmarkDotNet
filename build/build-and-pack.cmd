@@ -13,3 +13,4 @@ dotnet pack .\src\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj
 rmdir artifacts /s /q
 mkdir artifacts
 for /R %%x in (BenchmarkDotNet*.*nupkg) do copy "%%x" "artifacts/" /Y
+nuget pack .\templates\BenchmarkDotNet.Templates.nuspec -OutputDirectory artifacts

@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Configs
             var uniqueHardwareCounters = source.GetHardwareCounters().ToImmutableHashSet();
             var uniqueDiagnosers = GetDiagnosers(source.GetDiagnosers(), uniqueHardwareCounters);
             var uniqueExporters = GetExporters(source.GetExporters(), uniqueDiagnosers);
-            var unqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);
+            var uniqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);
 
             var uniqueValidators = GetValidators(source.GetValidators(), MandatoryValidators, source.Options);
 
@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Configs
                 uniqueHardwareCounters,
                 uniqueDiagnosers,
                 uniqueExporters,
-                unqueAnalyzers,
+                uniqueAnalyzers,
                 uniqueValidators,
                 uniqueFilters,
                 uniqueRules,
@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Configs
             );
         }
 
-        private static ImmutableHashSet<IDiagnoser> GetDiagnosers(IEnumerable<IDiagnoser> diagnosers, ImmutableHashSet<HardwareCounter> uniqueHardwareCoutners)
+        private static ImmutableHashSet<IDiagnoser> GetDiagnosers(IEnumerable<IDiagnoser> diagnosers, ImmutableHashSet<HardwareCounter> uniqueHardwareCounters)
         {
             var builder = ImmutableHashSet.CreateBuilder(new TypeComparer<IDiagnoser>());
 
@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Configs
                 if (!builder.Contains(diagnoser))
                     builder.Add(diagnoser);
 
-            if (!uniqueHardwareCoutners.IsEmpty && !diagnosers.OfType<IHardwareCountersDiagnoser>().Any())
+            if (!uniqueHardwareCounters.IsEmpty && !diagnosers.OfType<IHardwareCountersDiagnoser>().Any())
             {
                 // if users define hardware counters via [HardwareCounters] we need to dynamically load the right diagnoser
                 var hardwareCountersDiagnoser = DiagnosersLoader.GetImplementation<IHardwareCountersDiagnoser>();

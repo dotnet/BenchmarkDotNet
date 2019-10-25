@@ -14,13 +14,13 @@ namespace BenchmarkDotNet.Parameters
         [PublicAPI] public ParameterDefinition Definition { get; }
 
         private readonly object value;
-        private readonly int maxParamterColumnWidth;
+        private readonly int maxParameterColumnWidth;
 
         public ParameterInstance(ParameterDefinition definition, object value, SummaryStyle summaryStyle)
         {
             Definition = definition;
             this.value = value;
-            maxParamterColumnWidth = summaryStyle?.MaxParamterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
+            maxParameterColumnWidth = summaryStyle?.MaxParameterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
         }
 
         public string Name => Definition.Name;
@@ -40,13 +40,13 @@ namespace BenchmarkDotNet.Parameters
                 case null:
                     return NullParameterTextRepresentation;
                 case IParam parameter:
-                    return Trim(parameter.DisplayText, maxParamterColumnWidth);
+                    return Trim(parameter.DisplayText, maxParameterColumnWidth);
                 // no trimming for types!
                 case Type type:
                     return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).GetDisplayName()}?" : type.GetDisplayName();
             }
 
-            return Trim(value.ToString(), maxParamterColumnWidth);
+            return Trim(value.ToString(), maxParameterColumnWidth);
         }
 
         public override string ToString() => ToDisplayText();

@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Reports
         public bool PrintUnitsInHeader { get; }
         public bool PrintUnitsInContent { get; }
         public bool PrintZeroValuesInContent { get; }
-        public int MaxParamterColumnWidth { get; }
+        public int MaxParameterColumnWidth { get; }
         public SizeUnit SizeUnit { get; }
         public TimeUnit TimeUnit { get; }
 
@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Reports
             SizeUnit = sizeUnit;
             TimeUnit = timeUnit;
             PrintZeroValuesInContent = printZeroValuesInContent;
-            MaxParamterColumnWidth = maxParameterColumnWidth;
+            MaxParameterColumnWidth = maxParameterColumnWidth;
         }
 
         public SummaryStyle WithTimeUnit(TimeUnit timeUnit)
@@ -39,8 +39,8 @@ namespace BenchmarkDotNet.Reports
         public SummaryStyle WithZeroMetricValuesInContent()
             => new SummaryStyle(PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, printZeroValuesInContent: true);
 
-        public SummaryStyle WithMaxParameterColumnWidth(int maxParamterColumnWidth)
-            => new SummaryStyle(PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, maxParamterColumnWidth);
+        public SummaryStyle WithMaxParameterColumnWidth(int maxParameterColumnWidth)
+            => new SummaryStyle(PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, maxParameterColumnWidth);
 
         public bool Equals(SummaryStyle other)
         {
@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Reports
                 && PrintZeroValuesInContent == other.PrintZeroValuesInContent
                 && Equals(SizeUnit, other.SizeUnit)
                 && Equals(TimeUnit, other.TimeUnit)
-                && MaxParamterColumnWidth == other.MaxParamterColumnWidth;
+                && MaxParameterColumnWidth == other.MaxParameterColumnWidth;
         }
 
         public override bool Equals(object obj) => obj is SummaryStyle summary && Equals(summary);
@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Reports
                 hashCode = (hashCode * 397) ^ PrintZeroValuesInContent.GetHashCode();
                 hashCode = (hashCode * 397) ^ (SizeUnit != null ? SizeUnit.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (TimeUnit != null ? TimeUnit.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ MaxParamterColumnWidth;
+                hashCode = (hashCode * 397) ^ MaxParameterColumnWidth;
                 return hashCode;
             }
         }

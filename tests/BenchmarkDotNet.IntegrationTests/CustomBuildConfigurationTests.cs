@@ -6,9 +6,9 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class CustomBuildConfiguraitonTests : BenchmarkTestExecutor
+    public class CustomBuildConfigurationTests : BenchmarkTestExecutor
     {
-        public CustomBuildConfiguraitonTests(ITestOutputHelper output) : base(output)
+        public CustomBuildConfigurationTests(ITestOutputHelper output) : base(output)
         {
         }
 
@@ -19,10 +19,10 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var config = CreateSimpleConfig(job: jobWithCustomConfiguration);
 
-            CanExecute<CustomBuildConfiguraiton>(config);
+            CanExecute<CustomBuildConfiguration>(config);
         }
 
-        public class CustomBuildConfiguraiton
+        public class CustomBuildConfiguration
         {
             [Benchmark]
             public void Benchmark()

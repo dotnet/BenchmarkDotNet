@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>BenchmarkDotNet.Templates</id>
-    <version>0.11.5</version>
+    <version>0.12.0</version>
     <description>BenchmarkDotnet templates.</description>
     <authors>.NET Foundation and contributors</authors>
     <copyright>.NET Foundation and contributors</copyright>
