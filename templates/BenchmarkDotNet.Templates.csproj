@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\build\common.props" />
+  <PropertyGroup>
+    <PackageType>Template</PackageType>
+    <PackageId>BenchmarkDotNet.Templates</PackageId>
+    <Title>BenchmarkDotNet Templates</Title>
+    <Description>BenchmarkDotNet Templates</Description>
+    <PackageTags>benchmark;benchmarking;performance;templates;dotnet-new</PackageTags>
+    <TargetFramework>netstandard2.0</TargetFramework>
+
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+
+    <SignAssembly>false</SignAssembly>
+    <PublicSign>false</PublicSign>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
+    <Compile Remove="**\*" />
+    <None Remove="*.bat;.sh" />
+  </ItemGroup>
+</Project>
