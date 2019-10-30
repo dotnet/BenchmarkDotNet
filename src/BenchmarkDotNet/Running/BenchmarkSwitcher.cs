@@ -13,8 +13,7 @@ using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
-{
-    public class BenchmarkSwitcher
+{    public class BenchmarkSwitcher
     {
         private readonly IUserInteraction userInteraction = new UserInteraction();
         private readonly List<Type> types = new List<Type>();
@@ -65,7 +64,7 @@ namespace BenchmarkDotNet.Running
         [MethodImpl(MethodImplOptions.NoInlining)]
         private IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[] args, IConfig config)
         {
-            var logger = config.GetNonNullCompositeLogger();
+            var logger = config.GetNonNullCompositeLogger();            
             var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args, logger, config);
             if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
                 return Array.Empty<Summary>();
@@ -90,7 +89,7 @@ namespace BenchmarkDotNet.Running
 
             if (options.ListBenchmarkCaseMode != ListBenchmarkCaseMode.Disabled)
             {
-                PrintList(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
+                BenchmarkCasesPrinter.PrintList(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
                 return Array.Empty<Summary>();
             }
 
@@ -108,17 +107,6 @@ namespace BenchmarkDotNet.Running
 
             return BenchmarkRunnerClean.Run(filteredBenchmarks);
         }
-
-        private static void PrintList(ILogger nonNullLogger, IConfig effectiveConfig, IReadOnlyList<Type> allAvailableTypesWithRunnableBenchmarks, CommandLineOptions options)
-        {
-            var printer = new BenchmarkCasesPrinter(options.ListBenchmarkCaseMode);
-
-            var testNames = TypeFilter.Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
-                .SelectMany(p => p.BenchmarksCases)
-                .Select(p => p.Descriptor.GetFilterName())
-                .Distinct();
-
-            printer.Print(testNames, nonNullLogger);
-        }
+               
     }
 }
