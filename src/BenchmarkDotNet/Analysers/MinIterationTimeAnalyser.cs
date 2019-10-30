@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Analysers
 {
     public class MinIterationTimeAnalyser : AnalyserBase
     {
-        private static readonly TimeInterval MinSufficientIterationTime = 100 * TimeInterval.Millisecond;
+        private static readonly TimeValue MinSufficientIterationTime = 100 * TimeValue.Millisecond;
 
         public override string Id => "MinIterationTime";
         public static readonly IAnalyser Default = new MinIterationTimeAnalyser();
@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Analysers
             var target = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).ToArray();
             if (target.IsEmpty())
                 yield break;
-            var minActualIterationTime = TimeInterval.FromNanoseconds(target.Min(m => m.Nanoseconds));
+            var minActualIterationTime = TimeValue.FromNanoseconds(target.Min(m => m.Nanoseconds));
             if (minActualIterationTime < MinSufficientIterationTime)
                 yield return CreateWarning($"The minimum observed iteration time is {minActualIterationTime} which is very small. It's recommended to increase it.", report);
         }

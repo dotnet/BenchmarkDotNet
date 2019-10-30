@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Analysers;
@@ -29,7 +30,10 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static IConfig With(this IConfig config, IOrderer provider) => config.With(m => m.Orderer = provider);
         [PublicAPI] public static IConfig With(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.Add(counters));
         [PublicAPI] public static IConfig With(this IConfig config, params IFilter[] filters) => config.With(c => c.Add(filters));
-        [PublicAPI] public static IConfig With(this IConfig config, Encoding encoding) => config.With(c => c.Encoding = encoding);
+
+        [Obsolete("To enable unicode support, use .With(ConsoleLogger.Unicode)")]
+        [PublicAPI] public static IConfig With(this IConfig config, Encoding encoding) => Equals(encoding, Encoding.Unicode) ? config.With(ConsoleLogger.Unicode) : config;
+        [PublicAPI] public static IConfig With(this IConfig config, CultureInfo cultureInfo) => config.With(c => c.CultureInfo = cultureInfo);
         [PublicAPI] public static IConfig With(this IConfig config, SummaryStyle summaryStyle) => config.With(c => c.SummaryStyle = summaryStyle);
 
         /// <summary>

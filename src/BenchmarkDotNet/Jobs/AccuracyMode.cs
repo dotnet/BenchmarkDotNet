@@ -9,8 +9,8 @@ namespace BenchmarkDotNet.Jobs
     public sealed class AccuracyMode : JobMode<AccuracyMode>
     {
         public static readonly Characteristic<double> MaxRelativeErrorCharacteristic = CreateCharacteristic<double>(nameof(MaxRelativeError));
-        public static readonly Characteristic<TimeInterval> MaxAbsoluteErrorCharacteristic = CreateCharacteristic<TimeInterval>(nameof(MaxAbsoluteError));
-        public static readonly Characteristic<TimeInterval> MinIterationTimeCharacteristic = CreateCharacteristic<TimeInterval>(nameof(MinIterationTime));
+        public static readonly Characteristic<TimeValue> MaxAbsoluteErrorCharacteristic = CreateCharacteristic<TimeValue>(nameof(MaxAbsoluteError));
+        public static readonly Characteristic<TimeValue> MinIterationTimeCharacteristic = CreateCharacteristic<TimeValue>(nameof(MinIterationTime));
         public static readonly Characteristic<int> MinInvokeCountCharacteristic = CreateCharacteristic<int>(nameof(MinInvokeCount));
         public static readonly Characteristic<bool> EvaluateOverheadCharacteristic = CreateCharacteristic<bool>(nameof(EvaluateOverhead));
         public static readonly Characteristic<OutlierMode> OutlierModeCharacteristic = CreateCharacteristic<OutlierMode>(nameof(OutlierMode));
@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Jobs
         /// Doesn't have a default value.
         /// <remarks>If <see cref="MaxRelativeError"/> is also provided, the smallest value is used as stop criteria.</remarks>
         /// </summary>
-        public TimeInterval MaxAbsoluteError
+        public TimeValue MaxAbsoluteError
         {
             get => MaxAbsoluteErrorCharacteristic[this];
             set => MaxAbsoluteErrorCharacteristic[this] = value;
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Jobs
         /// Minimum time of a single iteration. Unlike Run.IterationTime, this characteristic specifies only the lower limit. In case of need, BenchmarkDotNet can increase this value.
         /// The default value is 500 milliseconds.
         /// </summary>
-        public TimeInterval MinIterationTime
+        public TimeValue MinIterationTime
         {
             get => MinIterationTimeCharacteristic[this];
             set => MinIterationTimeCharacteristic[this] = value;

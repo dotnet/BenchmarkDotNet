@@ -17,17 +17,20 @@ namespace BenchmarkDotNet.Exporters
         {
             foreach (var report in summary.Reports)
             {
-                var runs = report.AllMeasurements;
-                var modeStages = runs.Select(it => (it.IterationMode, it.IterationStage)).Distinct();
+                var measurements = report.AllMeasurements;
+                var modeStages = measurements.Select(it => (it.IterationMode, it.IterationStage)).Distinct();
                 logger.WriteLineHeader($"*** {report.BenchmarkCase.DisplayInfo} ***");
                 logger.WriteLineHeader("* Raw *");
-                foreach (var run in runs)
-                    logger.WriteLineResult(run.ToStr(report.BenchmarkCase.Config.Encoding));
+                foreach (var measurement in measurements)
+                    logger.WriteLineResult(measurement.ToString());
                 foreach (var (mode, stage) in modeStages)
                 {
                     logger.WriteLine();
                     logger.WriteLineHeader($"* Statistics for {mode}{stage}");
-                    logger.WriteLineStatistic(runs.Where(it => it.Is(mode, stage)).GetStatistics().ToTimeStr(report.BenchmarkCase.Config.Encoding, calcHistogram: true));
+                    var statistics = measurements.Where(it => it.Is(mode, stage)).GetStatistics();
+                    var cultureInfo = summary.GetCultureInfo();
+                    var formatter = statistics.CreateNanosecondFormatter(cultureInfo);
+                    logger.WriteLineStatistic(statistics.ToString(cultureInfo, formatter, calcHistogram: true));
                 }
             }
         }

@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Horology
@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Horology
         [PublicAPI] public static readonly Frequency MHz = FrequencyUnit.MHz.ToFrequency();
         [PublicAPI] public static readonly Frequency GHz = FrequencyUnit.GHz.ToFrequency();
 
-        [PublicAPI, Pure] public TimeInterval ToResolution() => TimeInterval.Second / Hertz;
+        [PublicAPI, Pure] public TimeValue ToResolution() => TimeValue.Second / Hertz;
 
         [PublicAPI, Pure] public double ToHz() => this / Hz;
         [PublicAPI, Pure] public double ToKHz() => this / KHz;
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Horology
 
         [PublicAPI, Pure] public static bool TryParse(string s, FrequencyUnit unit, out Frequency freq)
         {
-            bool success = double.TryParse(s, NumberStyles.Any, HostEnvironmentInfo.MainCultureInfo, out double result);
+            bool success = double.TryParse(s, NumberStyles.Any, DefaultCultureInfo.Instance, out double result);
             freq = new Frequency(result, unit);
             return success;
         }

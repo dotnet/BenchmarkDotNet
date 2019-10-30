@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests
 {
-    // TODO: add decimal, typeof, CreateInstance, TimeInterval, IntPtr, IFormattable
+    // TODO: add decimal, typeof, CreateInstance, TimeValue, IntPtr, IFormattable
     public class SourceCodeHelperTests
     {
         private ITestOutputHelper output;

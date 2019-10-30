@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public ConfigOptions Options { get; set; }
         [PublicAPI] public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
         [PublicAPI] public string ArtifactsPath { get; set; }
-        [PublicAPI] public Encoding Encoding { get; set; }
+        [PublicAPI] public CultureInfo CultureInfo { get; set; }
         [PublicAPI] public IOrderer Orderer { get; set; }
         [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
 
@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Configs
             filters.AddRange(config.GetFilters());
             Orderer = config.Orderer ?? Orderer;
             ArtifactsPath = config.ArtifactsPath ?? ArtifactsPath;
-            Encoding = config.Encoding ?? Encoding;
+            CultureInfo = config.CultureInfo ?? CultureInfo;
             SummaryStyle = config.SummaryStyle ?? SummaryStyle;
             logicalGroupRules.AddRange(config.GetLogicalGroupRules());
             Options |= config.Options;

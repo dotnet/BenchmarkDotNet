@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.Tests.Reports
         private static Summary CreateSummary(IList<BenchmarkReport> reports)
         {
             HostEnvironmentInfo hostEnvironmentInfo = new HostEnvironmentInfoBuilder().Build();
-            return new Summary("MockSummary", reports.ToImmutableArray(), hostEnvironmentInfo, string.Empty, string.Empty, TimeSpan.FromMinutes(1.0), ImmutableArray<ValidationError>.Empty);
+            return new Summary("MockSummary", reports.ToImmutableArray(), hostEnvironmentInfo, string.Empty, string.Empty, TimeSpan.FromMinutes(1.0), TestCultureInfo.Instance, ImmutableArray<ValidationError>.Empty);
         }
 
         public class MockBenchmarkClass

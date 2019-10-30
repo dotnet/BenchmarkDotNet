@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Attributes
     [PublicAPI]
     public class MaxAbsoluteErrorAttribute : JobMutatorConfigBaseAttribute
     {
-        public MaxAbsoluteErrorAttribute(double nanoseconds) : base(Job.Default.WithMaxAbsoluteError(TimeInterval.FromNanoseconds(nanoseconds)))
+        public MaxAbsoluteErrorAttribute(double nanoseconds) : base(Job.Default.WithMaxAbsoluteError(TimeValue.FromNanoseconds(nanoseconds)))
         {
         }
     }

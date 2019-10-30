@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Helpers
                 return ToFolderName(type: type);
             if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)
                 return value.GetType().Name; // TODO
-            if (value is TimeInterval interval)
+            if (value is TimeValue interval)
                 return interval.Nanoseconds + "ns";
 
             return value.ToString();

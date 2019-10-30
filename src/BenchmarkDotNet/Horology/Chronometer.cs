@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Horology
         public static Frequency Frequency => BestClock.Frequency;
         public static long GetTimestamp() => BestClock.GetTimestamp();
         public static StartedClock Start() => BestClock.Start();
-        public static TimeInterval GetResolution() => BestClock.GetResolution();
+        public static TimeValue GetResolution() => BestClock.GetResolution();
 
         static Chronometer()
         {

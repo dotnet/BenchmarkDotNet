@@ -11,11 +11,11 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
             switch (unit)
             {
                 case ThresholdUnit.Ratio: return new RelativeThreshold(value);
-                case ThresholdUnit.Nanoseconds: return new AbsoluteTimeThreshold(TimeInterval.FromNanoseconds(value));
-                case ThresholdUnit.Microseconds: return new AbsoluteTimeThreshold(TimeInterval.FromMicroseconds(value));
-                case ThresholdUnit.Milliseconds: return new AbsoluteTimeThreshold(TimeInterval.FromMilliseconds(value));
-                case ThresholdUnit.Seconds: return new AbsoluteTimeThreshold(TimeInterval.FromSeconds(value));
-                case ThresholdUnit.Minutes: return new AbsoluteTimeThreshold(TimeInterval.FromMinutes(value));
+                case ThresholdUnit.Nanoseconds: return new AbsoluteTimeThreshold(TimeValue.FromNanoseconds(value));
+                case ThresholdUnit.Microseconds: return new AbsoluteTimeThreshold(TimeValue.FromMicroseconds(value));
+                case ThresholdUnit.Milliseconds: return new AbsoluteTimeThreshold(TimeValue.FromMilliseconds(value));
+                case ThresholdUnit.Seconds: return new AbsoluteTimeThreshold(TimeValue.FromSeconds(value));
+                case ThresholdUnit.Minutes: return new AbsoluteTimeThreshold(TimeValue.FromMinutes(value));
                 default: throw new ArgumentOutOfRangeException(nameof(unit), unit, null);
             }
         }
