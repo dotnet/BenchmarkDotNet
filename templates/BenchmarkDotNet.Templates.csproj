@@ -3,7 +3,7 @@
   <PropertyGroup>
     <PackageType>Template</PackageType>
     <PackageId>BenchmarkDotNet.Templates</PackageId>
-    <Title>BenchmarkDotNet Templates</Title>
+    <Title>BenchmarkDotNet project templates</Title>
     <Description>BenchmarkDotNet Templates</Description>
     <PackageTags>benchmark;benchmarking;performance;templates;dotnet-new</PackageTags>
     <TargetFramework>netstandard2.0</TargetFramework>
