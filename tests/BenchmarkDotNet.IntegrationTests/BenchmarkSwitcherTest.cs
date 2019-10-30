@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void WhenDisableLogFileWeDontWriteToFile()
         {
             var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().With(logger).With(ConfigOptions.DisableLogFile);
+            var config = ManualConfig.CreateEmpty().With(logger).With(ConfigOptions.DisableLogFile).With(Job.Dry);
             string logFilePath = null;
             try
             {
@@ -156,7 +156,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void EnsureLogFileIsWritten()
         {
             var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().With(logger);
+            var config = ManualConfig.CreateEmpty().With(logger).With(Job.Dry);
             string logFilePath = null;
             try
             {
