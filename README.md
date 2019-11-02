@@ -16,22 +16,21 @@
 <h3 align="center">
   <a href="#Features">Features</a>
   <span> · </span>
-  <a href="#FAQ">FAQ</a>
-  <span> · </span>
   <a href="https://benchmarkdotnet.org/articles/guides/getting-started.html">Getting started</a>
   <span> · </span>
   <a href="https://benchmarkdotnet.org/articles/overview.html">Documentation</a>
   <span> · </span>
-  <a href="https://aakinshin.net/prodotnetbenchmarking/">Pro .NET Benchmarking</a>
+  <a href="#learn-more-about-benchmarking">Learn more about benchmarking</a>
 </h3>
 
-**BenchmarkDotNet** helps you to transform some of your methods into benchmarks, track their performance on regular basis, and share reproducible performance experiments
-  (the overall experience is very similar to usual unit testing).
+**BenchmarkDotNet** helps you to transform methods into benchmarks, track their performance, and share reproducible measurement experiments.
+It's no harder than writing unit tests!
 Under the hood, it performs a lot of [magic](https://benchmarkdotnet.org/articles/guides/how-it-works.html) that guarantees reliable and precise results.
-BenchmarkDotNet doesn't just blindly run your code, *it helps you to conduct a qualitative performance investigation*:
-  you will get useful hints if something is wrong with your benchmark design or obtained measurements.
+BenchmarkDotNet protects you from popular benchmarking mistakes and warns you if something is wrong with your benchmark design or obtained measurements.
+The library is [adopted](#who-use-benchmarkdotnet) by 3000+ projects including .NET Core and supported by the [.NET Foundation](https://dotnetfoundation.org).
 
-It's easy to start writing benchmarks, here is an example (check out the [getting started](https://benchmarkdotnet.org/articles/guides/getting-started.html) page for a copy-pastable version):
+It's easy to start writing benchmarks, check out an example
+  (copy-pastable version is [here](https://benchmarkdotnet.org/articles/guides/getting-started.html)):
 
 ```cs
 [SimpleJob(RuntimeMoniker.Net472, baseline: true)]
@@ -63,8 +62,10 @@ public class Md5VsSha256
 }
 ```
 
-Once you execute these benchmarks (BenchmarkDotNet will automatically runs them on all the runtimes and aggregates the measurements),
-  you will get a summary table that contains the results in a compact and understandable form:
+BenchmarkDotNet automatically
+  runs the benchmarks on all the runtimes,
+  aggregates the measurements,
+  and prints a summary table with the most important information:
 
 ```md
 BenchmarkDotNet=v0.12.0, OS=Windows 10.0.17763.805 (1809/October2018Update/Redstone5)
@@ -100,10 +101,13 @@ Intel Core i7-7700K CPU 4.20GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cor
 
 ```
 
-In artifacts, you can also find detailed information about each iteration.
-You can export the data in different formats like (CSV, XML, JSON, and so on) or even generate beautiful plots:
+The measured data can be exported to different formats (md, html, csv, xml, json, etc.) including plots:
 
 ![](https://i.imgur.com/qAHMQ30.png)
+
+*Supported runtimes:* .NET Framework 4.6.1+, .NET Core 2.0+, Mono, CoreRT  
+*Supported languages:* C#, F#, Visual Basic  
+*Supported OS:* Windows, Linux, macOS
 
 ## Features
 
@@ -203,32 +207,25 @@ BenchmarkDotNet has a lot of excellent features for deep performance investigati
   You can also request for an assembly listing with the help of a single additional attribute.  
   [[DisassemblyDiagnoser]](https://benchmarkdotnet.org/articles/configs/diagnosers.html#sample-introdisassembly) generates the native listings and save them into the BenchmarkDotNet.Artifacts folder.
 
-## FAQ
+## Who use BenchmarkDotNet?
 
-* **Why do I need a special library for benchmarking?**  
-  Benchmarking is really hard (especially microbenchmarking), you can easily make a mistake during performance measurements.
-  BenchmarkDotNet will protect you from the common pitfalls (even if are an experienced developer) because it does all the dirty work for you:
-    it generates an isolated project per each benchmark method,
-    does several launches of this project,
-    run multiple iterations of the method (include warm-up), and so on.
-  Usually, you even shouldn't care about a number of iterations because BenchmarkDotNet chooses it automatically to achieve the requested level of precision.
-* **Who use BenchmarkDotNet?**  
-  Everyone!
-  BenchmarkDotNet is already adopted by more than [3000+](https://github.com/dotnet/BenchmarkDotNet/network/dependents?package_id=UGFja2FnZS0xNTY3MzExMzE%3D) projects including
-  [dotnet/performance](https://github.com/dotnet/performance) (official benchmarks used for testing the performance of all .NET Runtimes),
+Everyone!
+BenchmarkDotNet is already adopted by more than [3000+](https://github.com/dotnet/BenchmarkDotNet/network/dependents?package_id=UGFja2FnZS0xNTY3MzExMzE%3D) projects including
+  [dotnet/performance](https://github.com/dotnet/performance) (reference benchmarks for all .NET Runtimes),
   [CoreCLR](https://github.com/dotnet/coreclr/issues?utf8=✓&q=BenchmarkDotNet) (.NET Core Runtime),
   [CoreFX](https://github.com/dotnet/corefx/issues?utf8=✓&q=BenchmarkDotNet) (.NET Core Base Class Libraries),
   [Roslyn](https://github.com/dotnet/roslyn/search?q=BenchmarkDotNet&type=Issues&utf8=✓) (C# and Visual Basic compiler),
-  [KestrelHttpServer](https://github.com/aspnet/KestrelHttpServer/tree/master/benchmarks/Kestrel.Performance) (A cross platform web server for ASP.NET Core),
-  [SignalR](https://github.com/aspnet/SignalR/tree/master/benchmarks/Microsoft.AspNetCore.SignalR.Microbenchmarks),
+  [ASP.NET Core](https://github.com/aspnet/AspNetCore/tree/master/src/Servers/IIS/IIS/benchmarks),
+  [ML.NET](https://github.com/dotnet/machinelearning/tree/master/test/Microsoft.ML.Benchmarks),
   [EntityFrameworkCore](https://github.com/aspnet/EntityFrameworkCore/tree/master/benchmark),
+  [SignalR](https://github.com/aspnet/SignalR/tree/master/benchmarks/Microsoft.AspNetCore.SignalR.Microbenchmarks),
   [F#](https://github.com/fsharp/fsharp/blob/master/tests/scripts/array-perf/array-perf.fs),
   [Orleans](https://github.com/dotnet/orleans/tree/master/test/Benchmarks),
   [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json/tree/master/Src/Newtonsoft.Json.Tests/Benchmarks),
   [Elasticsearch.Net](https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/bool-queries.html#_perfomance_considerations),
   [Dapper](https://github.com/StackExchange/Dapper/tree/master/Dapper.Tests.Performance),
   [Expecto](https://github.com/haf/expecto/tree/master/Expecto.BenchmarkDotNet),
-  [Accord.NET Framework](https://github.com/accord-net/framework/tree/development/Tools/Performance),
+  [Accord.NET](https://github.com/accord-net/framework/tree/development/Tools/Performance),
   [ImageSharp](https://github.com/SixLabors/ImageSharp/tree/master/tests/ImageSharp.Benchmarks),
   [RavenDB](https://github.com/ravendb/ravendb/tree/v4.0/bench),
   [NodaTime](https://github.com/nodatime/nodatime/tree/master/src/NodaTime.Benchmarks),
@@ -238,28 +235,22 @@ BenchmarkDotNet has a lot of excellent features for deep performance investigati
   [Autofac](https://github.com/autofac/Autofac/tree/develop/bench/Autofac.Benchmarks),
   [Npgsql](https://github.com/npgsql/npgsql/tree/dev/test/Npgsql.Benchmarks),
   [Avalonia](https://github.com/AvaloniaUI/Avalonia/tree/master/tests/Avalonia.Benchmarks),
-  [dotnet/machinelearning](https://github.com/dotnet/machinelearning/tree/master/test/Microsoft.ML.Benchmarks),
-  [ASP.NET Core](https://github.com/aspnet/AspNetCore/tree/master/src/Servers/IIS/IIS/benchmarks),
   [ReactiveUI](https://github.com/reactiveui/ReactiveUI/tree/master/src/Benchmarks).  
-  Of course, it's not the full list:
-    on GitHub, you can find thousands of
-    [issues](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=created&type=Issues&utf8=✓) and
-    [commits](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=committer-date&type=Commits&utf8=✓)
-    that involve BenchmarkDotNet.
-  There are [hundreds of thousands of files](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=indexed&type=Code&utf8=✓)
-    which contain "BenchmarkDotNet".
-* **What technologies are supported?**  
-  *Supported runtimes:* .NET Framework (4.6.1+), .NET Core (2.0+), Mono, CoreRT  
-  *Supported languages:* C#, F#, Visual Basic  
-  *Supported OS:* Windows, Linux, macOS  
-* **Where I can find more information about benchmarking methodology?**  
-  It's a very good question because BenchmarkDotNet is not a silver bullet that magically makes all of your benchmarks correct and analyzes the measurements for you.
-  Even if you use this library, you still should know how to design the benchmark experiments and how to make correct conclusions based on the raw data.
-  If you want to know more about benchmarking methodology and good practices,
-    it's recommended to read a book by Andrey Akinshin (the BenchmarkDotNet project lead): ["Pro .NET Benchmarking"](https://aakinshin.net/prodotnetbenchmarking/).
-  Use this in-depth guide to correctly design benchmarks, measure key performance metrics of .NET applications, and analyze results.
-  This book presents dozens of case studies to help you understand complicated benchmarking topics.
-  You will avoid common pitfalls, control the accuracy of your measurements, and improve the performance of your software.
+On GitHub, you can find
+  2000+ [issues](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=created&type=Issues&utf8=✓),
+  1500+ [commits](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=committer-date&type=Commits&utf8=✓), and
+  350000+ [files](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=indexed&type=Code&utf8=✓)
+  that involve BenchmarkDotNet.
+
+## Learn more about benchmarking
+
+BenchmarkDotNet is not a silver bullet that magically makes all of your benchmarks correct and analyzes the measurements for you.
+Even if you use this library, you still should know how to design the benchmark experiments and how to make correct conclusions based on the raw data.
+If you want to know more about benchmarking methodology and good practices,
+  it's recommended to read a book by Andrey Akinshin (the BenchmarkDotNet project lead): ["Pro .NET Benchmarking"](https://aakinshin.net/prodotnetbenchmarking/).
+Use this in-depth guide to correctly design benchmarks, measure key performance metrics of .NET applications, and analyze results.
+This book presents dozens of case studies to help you understand complicated benchmarking topics.
+You will avoid common pitfalls, control the accuracy of your measurements, and improve the performance of your software.
 
 <div align="center">
   <a href="https://aakinshin.net/prodotnetbenchmarking/">
@@ -297,7 +288,3 @@ Let's build the best tool for benchmarking together!
 This project has adopted the code of conduct defined by the [Contributor Covenant](http://contributor-covenant.org/)
 to clarify expected behavior in our community.
 For more information, see the [.NET Foundation Code of Conduct](https://dotnetfoundation.org/code-of-conduct).
-
-## .NET Foundation
-
-This project is supported by the [.NET Foundation](https://dotnetfoundation.org).
