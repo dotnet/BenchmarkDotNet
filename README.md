@@ -8,7 +8,8 @@
 
   [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/)
   [![Downloads](https://img.shields.io/nuget/dt/benchmarkdotnet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/)
-  [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet.svg)](https://gitter.im/dotnet/BenchmarkDotNet)
+  ![Stars](https://img.shields.io/github/stars/dotnet/BenchmarkDotNet?color=brightgreen)
+  [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet?color=yellow)](https://gitter.im/dotnet/BenchmarkDotNet)
   [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
 </h3>
@@ -25,11 +26,12 @@
 
 **BenchmarkDotNet** helps you to transform methods into benchmarks, track their performance, and share reproducible measurement experiments.
 It's no harder than writing unit tests!
-Under the hood, it performs a lot of [magic](https://benchmarkdotnet.org/articles/guides/how-it-works.html) that guarantees reliable and precise results.
+Under the hood, it performs a lot of [magic](#Automation) that guarantees [reliable and precise](#Reliability) results.
 BenchmarkDotNet protects you from popular benchmarking mistakes and warns you if something is wrong with your benchmark design or obtained measurements.
-The library is [adopted](#who-use-benchmarkdotnet) by 3000+ projects including .NET Core and supported by the [.NET Foundation](https://dotnetfoundation.org).
+The results are presented in a [user-friendly](#Friendliness) form that highlights all the important facts about your experiment.
+The library is adopted by [3000+ projects](#who-use-benchmarkdotnet) including .NET Core and supported by the [.NET Foundation](https://dotnetfoundation.org).
 
-It's easy to start writing benchmarks, check out an example
+It's [easy](#Simplicity) to start writing benchmarks, check out an example
   (copy-pastable version is [here](https://benchmarkdotnet.org/articles/guides/getting-started.html)):
 
 ```cs
@@ -111,101 +113,125 @@ The measured data can be exported to different formats (md, html, csv, xml, json
 
 ## Features
 
-BenchmarkDotNet has a lot of excellent features for deep performance investigations!
+BenchmarkDotNet has tons of features that are essential in comprehensive performance investigations.
+Four aspects define the design of these features:
+  *simplicity*, *automation*, *reliability*, and *friendliness*.
 
-### Simple Automation
+### Simplicity
 
-* **Boilerplate generation**  
-  By default, BenchmarkDotNet generates an isolated project per each benchmark method,
-    detects the best number of method invocations,
-    performs the warmup iterations,
-    performs the actual iterations,
-    helps to you protect benchmarks from different JIT-optimizations (like dead code elimination or loop unrolling),
-    evaluate the call overhead,
-    and implement other benchmarking routines.
-  You can learn about the under-the-hood activities [here](https://benchmarkdotnet.org/articles/guides/how-it-works.html).
-* **Optimal precision level**  
+You shouldn't be an experience performance engineer if you want to write benchmarks.
+You can design very complicated performance experiments in the declarative style using simple APIs.
+
+For example, if you want to [parameterize](https://benchmarkdotnet.org/articles/features/parameterization.html) your benchmark,
+  mark a field or a property with `[Params(1, 2, 3)]`: BenchmarkDotNet will enumerate all of the specified values
+  and run benchmarks for each case.
+If you want to compare benchmarks with each other,
+  mark one of the benchmark as the [baseline](https://benchmarkdotnet.org/articles/features/baselines.html)
+  via `[Benchmark(baseline: true)]`: BenchmarkDotNet will compare it with all of the other benchmarks.
+If you want to compare performance in different environments, use [jobs](https://benchmarkdotnet.org/articles/configs/jobs.html).
+For example, you can run all the benchmarks on .NET Core 3.0 and Mono via
+  `[SimpleJob(RuntimeMoniker.NetCoreApp30)]` and `[SimpleJob(RuntimeMoniker.Mono)]`.
+
+If you don't like attributes, you can call most of the APIs via the fluent style and write code like this:
+
+```cs
+ManualConfig.CreateEmpty() // A configuration for our benchmarks
+    .With(Job.Default // Adding first job
+            .With(ClrRuntime.Net472) // .NET Framework 4.7.2
+            .With(Platform.X64) // Run as x64 application
+            .With(Jit.LegacyJit) // Use LegacyJIT instead of the default RyuJIT
+            .WithGcServer(true) // Use Server GC
+    ).With(Job.Default // Adding second job
+            .AsBaseline() // It will be marked as baseline
+            .WithEnvironmentVariable("Key", "Value") // Setting an environment variable
+            .WithWarmupCount(0) // Disable warm-up stage
+    );
+```
+
+If you prefer command-line experience, you can configure your benchmarks via
+  the [console arguments](https://benchmarkdotnet.org/articles/guides/console-args.html)
+  in any console application or use
+  [.NET Core command-line tool](https://benchmarkdotnet.org/articles/guides/global-dotnet-tool.html)
+  to run benchmarks from any dll:
+
+```sh
+dotnet benchmark MyAssembly.dll --runtimes net472 netcoreapp2.1 Mono
+```
+
+### Automation
+
+Reliable benchmarks always include a lot of boilerplate code.
+
+Let's think about what should you do in a typical case.
+First, you should perform a pilot experiment and determine the best number of method invocations.
+Next, you should execute several warm-up iterations and ensure that your benchmark achieved a steady state.
+After that, you should execute the main iterations and calculate some basic statistics.
+If you calculate some values in your benchmark, you should use it somehow to prevent the dead code elimination.
+If you use loops, you should care about an effect of the loop unrolling on your results
+  (which may depend on the processor architecture).
+Once you get results, you should check for some special properties of the obtained performance distribution
+  like multimodality or extremely high outliers.
+You should also evaluate the overhead of your infrastructure and deduct it from your results.
+If you want to test several environments, you should perform the measurements in each of them and manually aggregate the results.
+
+If you write this code from scratch, it's easy to make a mistake and spoil your measurements.
+Note that it's a shortened version of the full checklist that you should follow during benchmarking:
+  there are a lot of additional hidden pitfalls that should be handled appropriately.
+Fortunately, you shouldn't worry about it because
+  BenchmarkDotNet [will do](https://benchmarkdotnet.org/articles/guides/how-it-works.html) this boring and time-consuming stuff for you.
+
+Moreover, the library can help you with some advanced tasks that you may want to perform during the investigation.
+For example,
+  BenchmarkDotNet can measure the [managed](https://benchmarkdotnet.org/articles/configs/diagnosers.html#usage) and
+  [native](https://benchmarkdotnet.org/articles/samples/IntroNativeMemory.html) memory traffic
+  and print [disassembly listings](https://benchmarkdotnet.org/articles/configs/diagnosers.html#sample-introdisassembly) for your benchmarks.
+
+### Reliability
+
+A lot of hand-written benchmarks produce wrong numbers that lead to incorrect business decisions.
+BenchmarkDotNet protects you from most of the benchmarking pitfalls and allows achieving high measurement precision.
+
+You shouldn't worry about the perfect number of method invocation, the number of warm-up and actual iterations:
   BenchmarkDotNet tries to choose the best benchmarking parameters and
-    achieve a good trade-off between the measurement prevision and the total duration of all benchmark runs.
-  So, you shouldn't use any magic numbers (like "We should perform 100 iterations here"),
-    BenchmarkDotNet will do it for you based on the values of statistical metrics.
-  Of course, you can turn off all the magic and use explicit numbers if you want.
-* **Benchmark isolation**  
-  By default, each benchmark will be executed in its own separate process that guarantees proper benchmark isolation:
-    if one benchmark spoils the runtime environment, other benchmarks will not be affected.
-  Such infrastructure also allows easily to benchmark the same set of benchmarks on different runtimes.
-* **Result aggregation**  
-  BenchmarkDotNet will also collect all the measurements from different processes for you and aggregate them into a single report.
+  achieve a good trade-off between the measurement prevision and the total duration of all benchmark runs.
+So, you shouldn't use any magic numbers (like "We should perform 100 iterations here"),
+  the library will do it for you based on the values of statistical metrics.
 
-### Rich API
+BenchmarkDotNet also prevents benchmarking of non-optimized assemblies that was built using DEBUG mode because
+  the corresponding results will be unreliable.
+It will print a warning you if you have an attached debugger,
+  if you use hypervisor (HyperV, VMware, VirtualBox),
+  or if you have any other problems with the current environment.
 
-* **Tons of useful APIs**  
-  BenchmarkDotNet has thousands of different [APIs](https://benchmarkdotnet.org/api/index.html) that allows customizing everything!
-* **Different API styles**  
-  BenchmarkDotNet has several API styles, so you can choose the style that is most suitable for your use cases.
-  For example, if you want to execute a benchmark using .NET Core 3.0, you can express you with in different ways:  
-  *Attributes:* `[SimpleJob(RuntimeMoniker.NetCoreApp30)]`  
-  *Fluent API:* `BenchmarkRunner.Run<MyBench>(ManualConfig.CreateEmpty().With(Job.Default.With(CoreRuntime.Core30)))`  
-  *Command line:* `dotnet benchmark MyAssembly.dll --filter MyBench --runtime netcoreapp3.0`
-* **Parametrization**  
-  With the help of [parameterization](https://benchmarkdotnet.org/articles/features/parameterization.html),
-    you can run the same benchmark against different values of a specified parameter.
-* **Comparing environments**  
-  With the help of [jobs](https://benchmarkdotnet.org/articles/configs/jobs.html) you can easily compare different environments (like x86 vs. x64, LegacyJit vs. RyuJit, Mono vs .NET Core, and so on).
+During 6+ years of development, we faced dozens of different problems that may spoil your measurements.
+Inside BenchmarkDotNet, there are a lot of heuristics, checks, hacks, and tricks that help you to
+  increase the reliability of the results.
 
-### Detailed Reports
+### Friendliness
 
-* **Summary table**  
-  BenchmarkDotNet will generate a summary table that contains a lot of useful data about the executed benchmarks.
-  By default, it contains only the most important columns, but the column set can be [easily customized](https://benchmarkdotnet.org/articles/configs/columns.html).
-  The default column set is adaptive and depends on the benchmark definition and measured values.
-  For example, if you mark one of the benchmarks as a [baseline](https://benchmarkdotnet.org/articles/features/baselines.html),
-   you will get additional columns that will help you to compare all the benchmarks with the baseline.
-* **Environment information**  
-  When your share performance results, it's essential to share information about your environment.
-  To help you with that, BenchmarkDotNet automatically collects and prints
-    the exact version of your OS and processor;
-    amount of physical CPU, physical cores, and logic cores;
-    hypervisor title (if you use it);
-    frequency of the hardware timer;
-    the JIT-compiler version;
-    and other useful information about your current environment.
-* **Statistics metrics**  
-  BenchmarkDotNet has a powerful statistics engine that can
-    calculate different metrics (from mean and standard deviation to confidence intervals and skewness),
-    perform statistical tests (like [Mann–Whitney U test](https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test)),
-    build plain text histograms,
-    detect changepoints (e.g., using [ED-PELT](https://aakinshin.net/posts/edpelt/) algorithm).
-* **Export**  
-  We have several groups of [export formats](https://benchmarkdotnet.org/articles/configs/exporters.html):  
- *Human-readable summary:*
-   markdown (including GitHub, StackOverflow, Atlassian, and other flavors),
-   AsciiDoc,
-   html  
- *Machine-readable raw data:*
-   [csv](https://benchmarkdotnet.org/articles/configs/exporters.html#csv),
-   [json](https://benchmarkdotnet.org/articles/configs/exporters.html#sample-introexportjson),
-   [xml](https://benchmarkdotnet.org/articles/configs/exporters.html#sample-introexportxml)  
- *Images*:
-   [png plots](https://benchmarkdotnet.org/articles/configs/exporters.html#plots)
+Analysis of performance data is a time-consuming activity that requires attentiveness, knowledge, and experience.
+BenchmarkDotNet performs the main part of this analysis for you and presents results in a user-friendly form.
 
-### Powerful Diagnostics
+After the experiments, you get a summary table that contains a lot of useful data about the executed benchmarks.
+By default, it includes only the most important columns,
+  but they can be [easily customized](https://benchmarkdotnet.org/articles/configs/columns.html).
+The column set is adaptive and depends on the benchmark definition and measured values.
+For example, if you mark one of the benchmarks as a [baseline](https://benchmarkdotnet.org/articles/features/baselines.html),
+  you will get additional columns that will help you to compare all the benchmarks with the baseline.
+By default, it always shows the Mean column,
+  but if we detected a vast difference between the Mean and the Median values,
+  both columns will be presented.
 
-* **Environment diagnostics**  
-  BenchmarkDotNet prevents benchmarking of non-optimized assemblies (e.g., that was built using DEBUG mode) because
-    the corresponding results will be unreliable.
-  Also, it will print a warning you if you have an attached debugger, if you use hypervisor (like HyperV, VMware, or VirtualBox),
-    or if you have any other problems with the current environment.
-* **Measurement diagnostics**  
-  BenchmarkDotNet tries to find some unusual properties of your performance distributions and prints nice messages about it.
-  For example, it will warn you in case of multimodal distribution or high outliers.
-* **Memory diagnostics**  
-  You can annotate your benchmark class with special attributes and get useful information about memory.  
-  [[MemoryDiagnoser]](https://benchmarkdotnet.org/articles/configs/diagnosers.html#usage) measures the managed memory traffic and the number of GC collections.  
-  [[NativeMemoryProfiler]](https://benchmarkdotnet.org/articles/samples/IntroNativeMemory.html) measures the native memory traffic.
-* **Disassembly diagnostics**  
-  You can also request for an assembly listing with the help of a single additional attribute.  
-  [[DisassemblyDiagnoser]](https://benchmarkdotnet.org/articles/configs/diagnosers.html#sample-introdisassembly) generates the native listings and save them into the BenchmarkDotNet.Artifacts folder.
+BenchmarkDotNet tries to find some unusual properties of your performance distributions and prints nice messages about it.
+For example, it will warn you in case of multimodal distribution or high outliers.
+In this case, you can scroll the results up and check out ASCII-style histograms for each distribution
+  or generate beautiful png plots using `[RPlotExporter]`.
+
+BenchmarkDotNet doesn't overload you with data; it shows only the essential information depending on your results:
+  it allows you to keep summary small for primitive cases and extend it only for the complicated cases.
+Of course, you can request any additional statistics and visualizations manually.
+If you don't customize the summary view,
+  the default presentation will be as much user-friendly as possible. :)
 
 ## Who use BenchmarkDotNet?
 
