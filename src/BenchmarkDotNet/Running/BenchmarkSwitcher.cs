@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Running
         [MethodImpl(MethodImplOptions.NoInlining)]
         private IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[] args, IConfig config)
         {
-            var logger = config.GetNonNullCompositeLogger();            
+            var logger = config.GetNonNullCompositeLogger();
             var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args, logger, config);
             if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
                 return Array.Empty<Summary>();
