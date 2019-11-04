@@ -168,6 +168,5 @@ namespace BenchmarkDotNet.Running
                 return new[] { Summary.NothingToRun(e.Message, string.Empty, string.Empty) };
             }
         }
-
     }
 }
