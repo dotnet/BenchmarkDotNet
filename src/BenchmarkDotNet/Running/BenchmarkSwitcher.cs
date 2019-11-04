@@ -13,7 +13,8 @@ using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
-{    public class BenchmarkSwitcher
+{
+    public class BenchmarkSwitcher
     {
         private readonly IUserInteraction userInteraction = new UserInteraction();
         private readonly List<Type> types = new List<Type>();
