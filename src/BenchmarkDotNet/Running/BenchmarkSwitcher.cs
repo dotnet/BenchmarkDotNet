@@ -108,6 +108,5 @@ namespace BenchmarkDotNet.Running
 
             return BenchmarkRunnerClean.Run(filteredBenchmarks);
         }
-               
     }
 }
