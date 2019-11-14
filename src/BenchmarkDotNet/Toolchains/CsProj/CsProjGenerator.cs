@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         private const string DefaultSdkName = "Microsoft.NET.Sdk";
 
         private static readonly ImmutableArray<string> SettingsWeWantToCopy =
-            new[] { "NetCoreAppImplicitPackageVersion", "RuntimeFrameworkVersion", "PackageTargetFallback", "LangVersion", "UseWpf", "UseWindowsForms", "CopyLocalLockFileAssemblies", "PreserveCompilationContext" }.ToImmutableArray();
+            new[] { "NetCoreAppImplicitPackageVersion", "RuntimeFrameworkVersion", "PackageTargetFallback", "LangVersion", "UseWpf", "UseWindowsForms", "CopyLocalLockFileAssemblies", "PreserveCompilationContext", "UserSecretsId" }.ToImmutableArray();
 
         public string RuntimeFrameworkVersion { get; }
 
