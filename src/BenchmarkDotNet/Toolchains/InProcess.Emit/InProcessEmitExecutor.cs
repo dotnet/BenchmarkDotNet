@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 
             if (!runThread.Join((int)timeout.TotalMilliseconds))
                 throw new InvalidOperationException(
-                    $"Benchmark {executeParameters.BenchmarkCase.DisplayInfo} takes to long to run. " +
+                    $"Benchmark {executeParameters.BenchmarkCase.DisplayInfo} takes too long to run. " +
                     "Prefer to use out-of-process toolchains for long-running benchmarks.");
 
             return GetExecutionResult(
