@@ -7,7 +7,6 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Parameters;
 using CommandLine;
 using CommandLine.Text;
 using JetBrains.Annotations;
@@ -162,6 +161,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("maxWidth", Required = false, HelpText = "Max paramter column width, the default is 20.")]
         public int? MaxParameterColumnWidth { get; set; }
 
+        [Option("envVars", Required = false, HelpText = "Colon separated environment variables (key:value)")]
+        public IEnumerable<string> EnvironmentVariables { get; set; }
+
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
         [Usage(ApplicationAlias = "")]
@@ -190,6 +192,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations", longName, new CommandLineOptions { IterationTimeInMilliseconds = 250, MinIterationCount = 9, MaxIterationCount = 15});
                 yield return new Example("Run MannWhitney test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was provided as first.", longName,
                     new CommandLineOptions { Filters = new [] { "*"}, Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1" }, StatisticalTestThreshold = "5%" });
+                yield return new Example("Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2'", longName, 
+                    new CommandLineOptions { EnvironmentVariables = new[] { "ENV_VAR_KEY_1:value_1", "ENV_VAR_KEY_2:value_2" } });
             }
         }
 
