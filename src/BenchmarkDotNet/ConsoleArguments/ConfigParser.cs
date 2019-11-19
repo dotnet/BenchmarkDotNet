@@ -269,7 +269,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 baseJob = baseJob.With(options.EnvironmentVariables.Select(text =>
                 {
-                    var separated = text.Split(EnvVarKeyValueSeparator);
+                    var separated = text.Split(new [] { EnvVarKeyValueSeparator }, 2);
                     return new EnvironmentVariable(separated[0], separated[1]);
                 }).ToArray());
             }
