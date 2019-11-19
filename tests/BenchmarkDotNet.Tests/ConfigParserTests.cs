@@ -419,5 +419,26 @@ namespace BenchmarkDotNet.Tests
 
             Assert.Equal(customValue, parsedConfig.SummaryStyle.MaxParameterColumnWidth);
         }
+
+        [Fact]
+        public void UserCanSpecifyEnvironmentVariables()
+        {
+            const string key = "A_VERY_NICE_ENV_VAR";
+            const string value = "enabled";
+
+            var parsedConfig = ConfigParser.Parse(new[] { "--envVars", $"{key}:{value}" }, new OutputLogger(Output)).config;
+
+            var job = parsedConfig.GetJobs().Single();
+            var envVar = job.Environment.EnvironmentVariables.Single();
+
+            Assert.Equal(key, envVar.Key);
+            Assert.Equal(value, envVar.Value);
+        }
+
+        [Fact]
+        public void InvalidEnvVarAreRecognized()
+        {
+            Assert.False(ConfigParser.Parse(new[] { "--envVars", "INVALID_NO_SEPARATOR" }, new OutputLogger(Output)).isSuccess);
+        }
     }
 }
