@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
@@ -147,28 +148,23 @@ namespace BenchmarkDotNet.Engines
             int unrollFactor = data.UnrollFactor;
             long totalOperations = invokeCount * OperationsPerInvoke;
             bool isOverhead = data.IterationMode == IterationMode.Overhead;
+            bool isHack = BenchmarkName == "Hacky.Hack.InvokedInstead";
+            bool isActual = data.IterationStage == IterationStage.Actual;
             var action = isOverhead ? OverheadAction : WorkloadAction;
-
-            if(!isOverhead)
-                IterationSetupAction();
-
-            GcCollect();
-
-            if (EngineEventSource.Log.IsEnabled())
-                EngineEventSource.Log.IterationStart(data.IterationMode, data.IterationStage, totalOperations);
 
             // Measure
             var clock = Clock.Start();
-            action(invokeCount / unrollFactor);
+            do
+            {
+                if (!isOverhead)
+                    IterationSetupAction();
+
+                action(invokeCount / unrollFactor);
+
+                if (!isOverhead)
+                    IterationCleanupAction();
+            } while (!isOverhead && !isHack && isActual);
             var clockSpan = clock.GetElapsed();
-
-            if (EngineEventSource.Log.IsEnabled())
-                EngineEventSource.Log.IterationStop(data.IterationMode, data.IterationStage, totalOperations);
-
-            if(!isOverhead)
-                IterationCleanupAction();
-
-            GcCollect();
 
             // Results
             var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, clockSpan.GetNanoseconds(), Encoding);
