@@ -277,7 +277,7 @@ namespace BenchmarkDotNet.Jobs
         /// <param name="job"></param>
         /// <param name="nuGetReferences">A collection of NuGet dependencies</param>
         /// <returns></returns>
-        public static Job WithNuGet(this Job job, IReadOnlyCollection<NuGetReference> nuGetReferences) => job.WithCore(j => j.Infrastructure.NuGetReferences = nuGetReferences);
+        public static Job WithNuGet(this Job job, NuGetReferenceList nuGetReferences) => job.WithCore(j => j.Infrastructure.NuGetReferences = nuGetReferences);
 
         // Accuracy
         /// <summary>
