@@ -85,89 +85,16 @@ namespace BenchmarkDotNet.Running
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Type type, IConfig config, string[] args)
-        {
-            var logger = config.GetNonNullCompositeLogger();
-            var userInteraction = new UserInteraction();
-            var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args, logger, config);
-            if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
-                return null;
-
-            if (options.PrintInformation)
-            {
-                logger.WriteLine(HostEnvironmentInfo.GetInformation());
-                return null;
-            }
-
-            var effectiveConfig = ManualConfig.Union(config, parsedConfig);
-
-            var types = new List<Type>();
-            types.Add(type);
-            var (allTypesValid, allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(types, new List<Assembly>(), logger);
-            if (!allTypesValid) // there were some invalid and TypeFilter printed errors
-                return null;
-
-            if (allAvailableTypesWithRunnableBenchmarks.IsEmpty())
-            {
-                userInteraction.PrintNoBenchmarksError(logger);
-                return null;
-            }
-
-            if (options.ListBenchmarkCaseMode != ListBenchmarkCaseMode.Disabled)
-            {
-                BenchmarkCasesPrinter.PrintList(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
-                return null;
-            }
-
-            var benchmarks = options.UserProvidedFilters
-                           ? TypeFilter.Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
-                           : new BenchmarkRunInfo[] { BenchmarkConverter.TypeToBenchmarks(type, config) };
-
-            return BenchmarkRunnerClean.Run(benchmarks).Single();
-        }
+            => RunWithDirtyAssemblyResolveHelper(new[] { type }, Array.Empty<Assembly>(), config, args);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Assembly assembly, IConfig config, string[] args)
-        {
-            var logger = config.GetNonNullCompositeLogger();
-            var userInteraction = new UserInteraction();
-            var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args, logger, config);               
-            if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
-                return null;
+             => RunWithDirtyAssemblyResolveHelper(assembly.GetRunnableBenchmarks().ToArray(), new[] { assembly }, config, args);
 
-            if (options.PrintInformation)
-            {
-                logger.WriteLine(HostEnvironmentInfo.GetInformation());
-                return null;
-            }
-
-            var effectiveConfig = ManualConfig.Union(config, parsedConfig);
-            var (allTypesValid, allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(assembly.GetRunnableBenchmarks().ToArray(), new List<Assembly>{ assembly }, logger);
-            if (!allTypesValid) // there were some invalid and TypeFilter printed errors
-                return null;
-
-            if (allAvailableTypesWithRunnableBenchmarks.IsEmpty())
-            {
-                userInteraction.PrintNoBenchmarksError(logger);
-                return null;
-            }
-
-            if (options.ListBenchmarkCaseMode != ListBenchmarkCaseMode.Disabled)
-            {
-                BenchmarkCasesPrinter.PrintList(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
-                return null;
-            }
-
-            var benchmarks = options.UserProvidedFilters
-                           ? TypeFilter.Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
-                           : assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray();
-
-            return BenchmarkRunnerClean.Run(benchmarks).Single();
-        }
-       
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Type type, MethodInfo[] methods, IConfig config = null)
             => BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.MethodsToBenchmarks(type, methods, config) }).Single();
-
+        
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary[] RunWithDirtyAssemblyResolveHelper(Assembly assembly, IConfig config = null)
             => BenchmarkRunnerClean.Run(assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray());
@@ -213,5 +140,59 @@ namespace BenchmarkDotNet.Running
                 return new[] { Summary.NothingToRun(e.Message, string.Empty, string.Empty) };
             }
         }
+
+        private static Summary RunWithDirtyAssemblyResolveHelper(IEnumerable<Type> types, IEnumerable<Assembly> assemblies, IConfig config, string[] args)
+        {
+            var logger = config.GetNonNullCompositeLogger();
+            var userInteraction = new UserInteraction();
+            var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args, logger, config);
+            if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
+                return null;
+
+            if (options.PrintInformation)
+            {
+                logger.WriteLine(HostEnvironmentInfo.GetInformation());
+                return null;
+            }
+
+            var effectiveConfig = ManualConfig.Union(config, parsedConfig);
+            var (allTypesValid, allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(types, assemblies, logger);
+            
+            if (!allTypesValid) // there were some invalid and TypeFilter printed errors
+                return null;
+
+            if (allAvailableTypesWithRunnableBenchmarks.IsEmpty())
+            {
+                userInteraction.PrintNoBenchmarksError(logger);
+                return null;
+            }
+
+            if (options.ListBenchmarkCaseMode != ListBenchmarkCaseMode.Disabled)
+            {
+                BenchmarkCasesPrinter.PrintList(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
+                return null;
+            }
+
+            var BenchmarkRunInfos = new List<BenchmarkRunInfo[]>();
+
+            foreach (Type type in types)
+            {
+                var BenchmarkRunInfo = options.UserProvidedFilters
+                               ? TypeFilter.Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
+                               : new BenchmarkRunInfo[] { BenchmarkConverter.TypeToBenchmarks(type, config) };
+
+                BenchmarkRunInfos.Add(BenchmarkRunInfo);
+            }
+
+            Summary benchmark = BenchmarkRunnerClean.Run(BenchmarkRunInfos.First()).Single();
+
+            foreach (var BenchmarkRunInfo in BenchmarkRunInfos.Skip(1))
+            {
+                benchmark = BenchmarkRunnerClean.Run(BenchmarkRunInfo).Single();
+            }
+
+            return benchmark;
+        }
+
     }
 }
