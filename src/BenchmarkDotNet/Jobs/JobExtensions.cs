@@ -124,9 +124,6 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public static Job WithMaxWarmupCount(this Job job, int count) => job.WithCore(j => j.Run.MaxWarmupIterationCount = count);
 
-        [Obsolete("Please use WithIterationCount instead (rename)"), PublicAPI]
-        public static Job WithTargetCount(this Job job, int count) => job.WithCore(j => j.Run.IterationCount = count);
-
         /// <summary>
         /// How many target iterations should be performed.
         /// If specified, <see cref="RunMode.MinIterationCount"/> will be ignored.
@@ -317,20 +314,12 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public static Job WithOutlierMode(this Job job, OutlierMode value) => job.WithCore(j => j.Accuracy.OutlierMode = value);
 
-        [Obsolete("Please use the new WithOutlierMode instead")]
-        [PublicAPI]
-        public static Job WithRemoveOutliers(this Job job, bool value) =>
-            job.WithCore(j => j.Accuracy.OutlierMode = value ? OutlierMode.RemoveUpper : OutlierMode.DontRemove);
-
         [PublicAPI]
         public static Job WithAnalyzeLaunchVariance(this Job job, bool value) => job.WithCore(j => j.Accuracy.AnalyzeLaunchVariance = value);
 
         // Meta
         public static Job AsBaseline(this Job job) => job.WithCore(j => j.Meta.Baseline = true);
         public static Job WithBaseline(this Job job, bool value) => job.WithCore(j => j.Meta.Baseline = value);
-
-        [Obsolete("Please use the new WithBaseline instead"), PublicAPI]
-        public static Job WithIsBaseline(this Job job, bool value) => value ? job.AsBaseline() : job;
 
         /// <summary>
         /// mutator job should not be added to the config, but instead applied to other jobs in given config

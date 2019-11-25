@@ -7,22 +7,6 @@ namespace BenchmarkDotNet.Environments
 {
     public abstract class Runtime : IEquatable<Runtime>
     {
-        [Obsolete("Please use ClrRuntime.Net$Version instead", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)] // hide from intellisense
-        public static readonly Runtime Clr;
-
-        [Obsolete("Please use new MonoRuntime() instead", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly Runtime Mono;
-
-        [Obsolete("Please use CoreRuntime.Core$Version instead", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly Runtime Core;
-
-        [Obsolete("Please use CoreRtRuntime.CoreRt$Version instead", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly Runtime CoreRT;
-
         /// <summary>
         /// Display name
         /// </summary>

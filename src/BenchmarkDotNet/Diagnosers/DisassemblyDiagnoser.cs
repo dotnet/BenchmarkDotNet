@@ -11,7 +11,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Validators;
 
@@ -88,11 +88,8 @@ namespace BenchmarkDotNet.Diagnosers
                 if (!RuntimeInformation.IsWindows() && !ShouldUseMonoDisassembler(benchmark))
                     yield return new ValidationError(false, "No Disassembler support, only Mono is supported for non-Windows OS", benchmark);
 
-                if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic)
-#pragma warning disable 618
-                    && (benchmark.Job.Infrastructure.Toolchain is InProcessToolchain
-#pragma warning restore 618
-                        || benchmark.Job.Infrastructure.Toolchain is InProcessNoEmitToolchain))
+                if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic) 
+                    && (benchmark.Job.Infrastructure.Toolchain is InProcessNoEmitToolchain || benchmark.Job.Infrastructure.Toolchain is InProcessEmitToolchain))
                 {
                     yield return new ValidationError(true, "InProcessToolchain has no DisassemblyDiagnoser support", benchmark);
                 }

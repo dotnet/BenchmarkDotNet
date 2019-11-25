@@ -81,11 +81,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         }
 
         private static string ValidateToolchain(Job job, Characteristic characteristic) =>
-            job.Infrastructure.Toolchain is InProcessEmitToolchain
-            || job.Infrastructure.Toolchain is InProcessNoEmitToolchain
-#pragma warning disable 618
-            || job.Infrastructure.Toolchain is InProcessToolchain
-#pragma warning restore 618
+            job.Infrastructure.Toolchain is InProcessEmitToolchain || job.Infrastructure.Toolchain is InProcessNoEmitToolchain
                 ? null
                 : $"should be instance of {nameof(InProcessEmitToolchain)} or {nameof(InProcessNoEmitToolchain)}.";
 

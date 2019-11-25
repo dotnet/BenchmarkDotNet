@@ -16,10 +16,4 @@ namespace BenchmarkDotNet.Attributes
 
         public StatisticalTestColumnAttribute(bool showPValues = false) : this(StatisticalTestKind.MannWhitney, showPValues) {}
     }
-
-    [Obsolete("Use StatisticalTestAttribute")]
-    public class WelchTTestPValueColumnAttribute : StatisticalTestColumnAttribute
-    {
-        public WelchTTestPValueColumnAttribute() : base(StatisticalTestKind.Welch) { }
-    }
 }

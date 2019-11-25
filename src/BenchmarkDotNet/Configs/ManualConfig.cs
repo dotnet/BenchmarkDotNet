@@ -48,27 +48,6 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public IOrderer Orderer { get; set; }
         [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
 
-        [Obsolete("This property will soon be removed, please start using .Options instead")]
-        public bool KeepBenchmarkFiles
-        {
-            get => Options.IsSet(ConfigOptions.KeepBenchmarkFiles);
-            set => Options = Options.Set(value, ConfigOptions.KeepBenchmarkFiles);
-        }
-
-        [Obsolete("This property will soon be removed, please start using .Options instead")]
-        public bool SummaryPerType
-        {
-            get => !Options.IsSet(ConfigOptions.JoinSummary);
-            set => Options = Options.Set(!value, ConfigOptions.JoinSummary);
-        }
-
-        [Obsolete("This property will soon be removed, please start using .Options instead")]
-        public bool StopOnFirstError
-        {
-            get => Options.IsSet(ConfigOptions.StopOnFirstError);
-            set => Options = Options.Set(value, ConfigOptions.StopOnFirstError);
-        }
-
         public void Add(params IColumn[] newColumns) => columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
         public void Add(params IColumnProvider[] newColumnProviders) => columnProviders.AddRange(newColumnProviders);
         public void Add(params IExporter[] newExporters) => exporters.AddRange(newExporters);

@@ -136,20 +136,14 @@ namespace BenchmarkDotNet.Mathematics
         {
             switch (outlierMode)
             {
-#pragma warning disable 618
-                case OutlierMode.None:
                 case OutlierMode.DontRemove:
                     return false;
-                case OutlierMode.OnlyUpper:
                 case OutlierMode.RemoveUpper:
                     return value > upperFence;
-                case OutlierMode.OnlyLower:
                 case OutlierMode.RemoveLower:
                     return value < lowerFence;
-                case OutlierMode.All:
                 case OutlierMode.RemoveAll:
                     return value < lowerFence || value > upperFence;
-#pragma warning restore 618
                 default:
                     throw new ArgumentOutOfRangeException(nameof(outlierMode), outlierMode, null);
             }
