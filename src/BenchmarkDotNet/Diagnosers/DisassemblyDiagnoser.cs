@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Diagnosers
                 if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic) 
                     && (benchmark.Job.Infrastructure.Toolchain is InProcessNoEmitToolchain || benchmark.Job.Infrastructure.Toolchain is InProcessEmitToolchain))
                 {
-                    yield return new ValidationError(true, "InProcessToolchain has no DisassemblyDiagnoser support", benchmark);
+                    yield return new ValidationError(true, "InProcessToolchains have no DisassemblyDiagnoser support", benchmark);
                 }
             }
         }

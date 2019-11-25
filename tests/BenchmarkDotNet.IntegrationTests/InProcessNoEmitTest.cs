@@ -12,7 +12,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
-using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
@@ -61,15 +61,11 @@ namespace BenchmarkDotNet.IntegrationTests
             var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod, targetMethod, targetMethod);
 
             // Run mode
-            var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
-            TestInvoke(action, unrollFactor, false, null);
-            action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
+            var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), unrollFactor);
             TestInvoke(action, unrollFactor, false, null);
 
             // Idle mode
-            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
-            TestInvoke(action, unrollFactor, true, null);
-            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
+            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), unrollFactor);
             TestInvoke(action, unrollFactor, true, null);
 
             // GlobalSetup/GlobalCleanup
@@ -99,9 +95,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod);
 
             // Run mode
-            var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
-            TestInvoke(action, unrollFactor, false, expectedResult);
-            action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
+            var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), unrollFactor);
             TestInvoke(action, unrollFactor, false, expectedResult);
 
             // Idle mode
@@ -118,9 +112,7 @@ namespace BenchmarkDotNet.IntegrationTests
             else
                 idleExpected = GetDefault(expectedResult.GetType());
 
-            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
-            TestInvoke(action, unrollFactor, true, idleExpected);
-            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
+            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), unrollFactor);
             TestInvoke(action, unrollFactor, true, idleExpected);
         }
 
@@ -167,10 +159,10 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private IConfig CreateInProcessConfig(BenchmarkActionCodegen codegenMode, OutputLogger logger = null, IDiagnoser diagnoser = null)
+        private IConfig CreateInProcessConfig(OutputLogger logger = null, IDiagnoser diagnoser = null)
         {
             return new ManualConfig()
-                .With(Job.Dry.With(new InProcessToolchain(TimeSpan.Zero, codegenMode, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
+                .With(Job.Dry.With(new InProcessNoEmitToolchain(TimeSpan.Zero, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
                 .With(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
                 .With(DefaultColumnProviders.Instance);
         }
@@ -179,7 +171,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void InProcessBenchmarkAllCasesReflectionEmitSupported()
         {
             var logger = new OutputLogger(Output);
-            var config = CreateInProcessConfig(BenchmarkActionCodegen.ReflectionEmit, logger);
+            var config = CreateInProcessConfig(logger);
 
             try
             {
@@ -205,7 +197,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void InProcessBenchmarkAllCasesDelegateCombineSupported()
         {
             var logger = new OutputLogger(Output);
-            var config = CreateInProcessConfig(BenchmarkActionCodegen.DelegateCombine, logger);
+            var config = CreateInProcessConfig(logger);
 
             try
             {

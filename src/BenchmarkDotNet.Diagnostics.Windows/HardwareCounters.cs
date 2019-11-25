@@ -6,6 +6,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.Tracing.Session;
 
@@ -62,9 +63,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             foreach (var benchmark in validationParameters.Benchmarks)
             {
                 if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic)
-                    && (benchmark.Job.Infrastructure.Toolchain is InProcessToolchain || benchmark.Job.Infrastructure.Toolchain is InProcessEmitToolchain))
+                    && (benchmark.Job.Infrastructure.Toolchain is InProcessNoEmitToolchain || benchmark.Job.Infrastructure.Toolchain is InProcessEmitToolchain))
                 {
-                    yield return new ValidationError(true, "Hardware Counters and EtwProfiler are not supported for InProcessToolchain.", benchmark);
+                    yield return new ValidationError(true, "Hardware Counters and EtwProfiler are not supported for InProcessToolchains.", benchmark);
                 }
             }
         }
