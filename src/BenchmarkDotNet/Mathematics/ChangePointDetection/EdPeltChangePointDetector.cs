@@ -51,14 +51,10 @@ namespace BenchmarkDotNet.Mathematics.ChangePointDetection
 
             // Checking corner cases
             if (n <= 2)
-            {
                 return Array.Empty<int>();
-            }
 
             if (minDistance < 1 || minDistance > n)
-            {
                 throw new ArgumentOutOfRangeException(nameof(minDistance), $"{minDistance} should be in range from 1 to data.Length");
-            }
 
             // The penalty which we add to the final cost for each additional changepoint
             // Here we use the Modified Bayesian Information Criterion
@@ -83,10 +79,8 @@ namespace BenchmarkDotNet.Mathematics.ChangePointDetection
             var bestCost = new double[n + 1];
             bestCost[0] = -penalty;
             for (int currentTau = minDistance; currentTau < 2 * minDistance; currentTau++)
-            {
                 bestCost[currentTau] = Cost(0, currentTau);
-            }
-
+ 
             // `previousChangePointIndex` is an array of references to previous changepoints. If the current segment ends at
             // the position `i`, the previous segment ends at the position `previousChangePointIndex[i]`. It's a 1-based
             // array (`data[0]`..`data[n-1]` correspond to the `previousChangePointIndex[1]`..`previousChangePointIndex[n]`)
@@ -125,12 +119,8 @@ namespace BenchmarkDotNet.Mathematics.ChangePointDetection
                 double currentBestCost = bestCost[currentTau];
                 int newPreviousTausSize = 0;
                 for (int i = 0; i < previousTauLength; i++)
-                {
                     if (costForPreviousTau[i] < currentBestCost + penalty)
-                    {
                         previousTaus[newPreviousTausSize++] = previousTaus[i];
-                    }
-                }
 
                 // We add a new tau value that is located on the `minDistance` distance from the next `currentTau` value
                 previousTaus[newPreviousTausSize] = currentTau - minDistance + 1;
@@ -193,13 +183,9 @@ namespace BenchmarkDotNet.Mathematics.ChangePointDetection
                     tau++;
 
                     if (dataValue < t)
-                    {
                         nextValue += 2;
-                    }
                     else if (dataValue == t)
-                    {
                         nextValue++;
-                    }
 
                     partialSums[offset + tau] = nextValue;
                 } while (tau < n);
@@ -248,20 +234,16 @@ namespace BenchmarkDotNet.Mathematics.ChangePointDetection
         private static int WhichMin(double[] values, int length)
         {
             if (length == 0)
-            {
                 throw new InvalidOperationException("Array should contain elements");
-            }
 
             double minValue = values[0];
             int minIndex = 0;
             for (int i = 1; i < length; i++)
-            {
                 if (values[i] < minValue)
                 {
                     minValue = values[i];
                     minIndex = i;
                 }
-            }
 
             return minIndex;
         }
