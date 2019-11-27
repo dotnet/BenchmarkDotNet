@@ -12,11 +12,11 @@ using BenchmarkDotNet.Toolchains.Roslyn;
 
 namespace BenchmarkDotNet.Toolchains
 {
-    internal static class ToolchainExtensions
+    public static class ToolchainExtensions
     {
-        internal static IToolchain GetToolchain(this BenchmarkCase benchmarkCase) => GetToolchain(benchmarkCase.Job, benchmarkCase.Descriptor);
+        public static IToolchain GetToolchain(this BenchmarkCase benchmarkCase) => GetToolchain(benchmarkCase.Job, benchmarkCase.Descriptor);
 
-        internal static IToolchain GetToolchain(this Job job) => GetToolchain(job, null);
+        public static IToolchain GetToolchain(this Job job) => GetToolchain(job, null);
 
         private static IToolchain GetToolchain(Job job, Descriptor descriptor)
             => job.HasValue(InfrastructureMode.ToolchainCharacteristic)

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using BenchmarkDotNet.Loggers;
 
-namespace BenchmarkDotNet.Diagnostics.Windows
+namespace BenchmarkDotNet.Loggers
 {
     public class LogCapture : ILogger
     {
