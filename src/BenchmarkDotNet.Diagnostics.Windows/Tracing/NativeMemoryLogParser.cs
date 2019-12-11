@@ -184,7 +184,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                 var memoryAllocatedPerOperation = totalAllocation / totalOperation;
                 var memoryLeakPerOperation = nativeLeakSize / totalOperation;
 
-                logger.WriteLine($"Native memory allocated per single operation: {SizeValue.FromBytes(memoryAllocatedPerOperation).ToString(SizeUnit.B, DefaultCultureInfo.Instance)}");
+                logger.WriteLine($"Native memory allocated per single operation: {SizeValue.FromBytes(memoryAllocatedPerOperation).ToString(SizeUnit.B, benchmarkCase.Config.CultureInfo)}");
                 logger.WriteLine($"Count of allocated object: {countOfAllocatedObject / totalOperation}");
 
                 if (nativeLeakSize != 0)
