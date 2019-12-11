@@ -10,7 +10,7 @@ That's why BenchmarkDotNet prints only ASCII characters by default (`μ` will be
 If you want to display Unicode symbols in your terminal, you should use `[UnicodeConsoleLoggerAttribute]` (see usage examples below).
 
 > [!WARNING]
-> To use these feature, you should be sure that your terminal/text editor supports Unicode.
+> This feature works only with terminal(s)|text editor(s) that support Unicode.
 > On Windows, you may have some troubles with Unicode symbols
 >   if system default code page configured as non-English
 >   (in Control Panel + Regional and Language Options, Language for Non-Unicode Programs).
