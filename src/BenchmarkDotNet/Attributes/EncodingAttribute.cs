@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Attributes
                 return;
             }
 
-            if (Equals(encoding, Encoding.Unicode))
+            if (Equals(encoding, Encoding.ASCII))
             {
                 Config = ManualConfig.CreateEmpty();
                 return;
