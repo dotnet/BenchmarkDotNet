@@ -15,9 +15,19 @@ namespace BenchmarkDotNet.Attributes
 
         private EncodingAttribute(Encoding encoding)
         {
-            Config = Equals(encoding, Encoding.Unicode)
-                ? ManualConfig.CreateEmpty().With(ConsoleLogger.Unicode)
-                : ManualConfig.CreateEmpty();
+            if (Equals(encoding, Encoding.Unicode))
+            {
+                Config = ManualConfig.CreateEmpty().With(ConsoleLogger.Unicode);
+                return;
+            }
+
+            if (Equals(encoding, Encoding.Unicode))
+            {
+                Config = ManualConfig.CreateEmpty();
+                return;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(encoding), encoding.ToString(), "Only ASCII and Unicode encoding are supported");
         }
 
         [PublicAPI]
