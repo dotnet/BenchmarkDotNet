@@ -15,6 +15,7 @@ namespace BenchmarkDotNet.Exporters
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
+            var cultureInfo = summary.GetCultureInfo();
             foreach (var report in summary.Reports)
             {
                 var measurements = report.AllMeasurements;
@@ -28,7 +29,6 @@ namespace BenchmarkDotNet.Exporters
                     logger.WriteLine();
                     logger.WriteLineHeader($"* Statistics for {mode}{stage}");
                     var statistics = measurements.Where(it => it.Is(mode, stage)).GetStatistics();
-                    var cultureInfo = summary.GetCultureInfo();
                     var formatter = statistics.CreateNanosecondFormatter(cultureInfo);
                     logger.WriteLineStatistic(statistics.ToString(cultureInfo, formatter, calcHistogram: true));
                 }
