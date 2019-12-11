@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Helpers
 
             switch (value) {
                 case TimeInterval interval:
-                    return "new BenchmarkDotNet.Horology.TimeValue(" + ToSourceCode(interval.Nanoseconds) + ")";
+                    return "new BenchmarkDotNet.Horology.TimeInterval(" + ToSourceCode(interval.Nanoseconds) + ")";
                 case IntPtr ptr:
                     return $"new System.IntPtr({ptr})";
                 case IFormattable formattable:
