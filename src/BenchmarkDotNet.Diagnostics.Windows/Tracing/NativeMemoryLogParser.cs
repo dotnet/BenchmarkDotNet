@@ -189,7 +189,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
                 if (nativeLeakSize != 0)
                 {
-                    logger.WriteLine($"Native memory leak per single operation: {SizeValue.FromBytes(memoryLeakPerOperation).ToString(SizeUnit.B, DefaultCultureInfo.Instance)}");
+                    logger.WriteLine($"Native memory leak per single operation: {SizeValue.FromBytes(memoryLeakPerOperation).ToString(SizeUnit.B, benchmarkCase.Config.CultureInfo)}");
                 }
 
                 var heapInfoList = heaps.Select(h => new { Address = h.Key, h.Value.Count, types = h.Value.Values });
