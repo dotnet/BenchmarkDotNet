@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Horology
         [PublicAPI] public static readonly Frequency MHz = FrequencyUnit.MHz.ToFrequency();
         [PublicAPI] public static readonly Frequency GHz = FrequencyUnit.GHz.ToFrequency();
 
-        [PublicAPI, Pure] public TimeValue ToResolution() => TimeValue.Second / Hertz;
+        [PublicAPI, Pure] public TimeInterval ToResolution() => TimeInterval.Second / Hertz;
 
         [PublicAPI, Pure] public double ToHz() => this / Hz;
         [PublicAPI, Pure] public double ToKHz() => this / KHz;

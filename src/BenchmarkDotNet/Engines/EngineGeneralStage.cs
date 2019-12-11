@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Engines
 
         private readonly int? targetCount;
         private readonly double maxRelativeError;
-        private readonly TimeValue? maxAbsoluteError;
+        private readonly TimeInterval? maxAbsoluteError;
         private readonly OutlierMode outlierMode;
         private readonly int minIterationCount;
         private readonly int maxIterationCount;

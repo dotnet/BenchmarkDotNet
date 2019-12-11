@@ -7,12 +7,12 @@ namespace BenchmarkDotNet.Tests.Horology
 {
     public class TimeValueTests
     {
-        private static void Check(TimeUnit unit, Func<double, TimeValue> fromMethod, Func<TimeValue, double> toMethod)
+        private static void Check(TimeUnit unit, Func<double, TimeInterval> fromMethod, Func<TimeInterval, double> toMethod)
         {
             int[] values = { 1, 42, 10000 };
             foreach (int value in values)
             {
-                var timeValue = new TimeValue(value, unit);
+                var timeValue = new TimeInterval(value, unit);
                 AreEqual(timeValue, fromMethod(value));
                 AreEqual(toMethod(timeValue), value);
             }
@@ -21,48 +21,48 @@ namespace BenchmarkDotNet.Tests.Horology
         [Fact]
         public void ConversionTest()
         {
-            Check(TimeUnit.Nanosecond, TimeValue.FromNanoseconds, it => it.ToNanoseconds());
-            Check(TimeUnit.Microsecond, TimeValue.FromMicroseconds, it => it.ToMicroseconds());
-            Check(TimeUnit.Millisecond, TimeValue.FromMilliseconds, it => it.ToMilliseconds());
-            Check(TimeUnit.Second, TimeValue.FromSeconds, it => it.ToSeconds());
-            Check(TimeUnit.Minute, TimeValue.FromMinutes, it => it.ToMinutes());
-            Check(TimeUnit.Hour, TimeValue.FromHours, it => it.ToHours());
-            Check(TimeUnit.Day, TimeValue.FromDays, it => it.ToDays());
+            Check(TimeUnit.Nanosecond, TimeInterval.FromNanoseconds, it => it.ToNanoseconds());
+            Check(TimeUnit.Microsecond, TimeInterval.FromMicroseconds, it => it.ToMicroseconds());
+            Check(TimeUnit.Millisecond, TimeInterval.FromMilliseconds, it => it.ToMilliseconds());
+            Check(TimeUnit.Second, TimeInterval.FromSeconds, it => it.ToSeconds());
+            Check(TimeUnit.Minute, TimeInterval.FromMinutes, it => it.ToMinutes());
+            Check(TimeUnit.Hour, TimeInterval.FromHours, it => it.ToHours());
+            Check(TimeUnit.Day, TimeInterval.FromDays, it => it.ToDays());
         }
 
         [Fact]
         public void OperatorTest()
         {
-            AreEqual(TimeValue.Day / TimeValue.Hour, 24);
-            AreEqual(TimeValue.Day / 24.0, TimeValue.Hour);
-            AreEqual(TimeValue.Day / 24, TimeValue.Hour);
-            AreEqual(TimeValue.Hour * 24.0, TimeValue.Day);
-            AreEqual(TimeValue.Hour * 24, TimeValue.Day);
-            AreEqual(24.0 * TimeValue.Hour, TimeValue.Day);
-            AreEqual(24 * TimeValue.Hour, TimeValue.Day);
+            AreEqual(TimeInterval.Day / TimeInterval.Hour, 24);
+            AreEqual(TimeInterval.Day / 24.0, TimeInterval.Hour);
+            AreEqual(TimeInterval.Day / 24, TimeInterval.Hour);
+            AreEqual(TimeInterval.Hour * 24.0, TimeInterval.Day);
+            AreEqual(TimeInterval.Hour * 24, TimeInterval.Day);
+            AreEqual(24.0 * TimeInterval.Hour, TimeInterval.Day);
+            AreEqual(24 * TimeInterval.Hour, TimeInterval.Day);
 
-            AreEqual(TimeValue.Nanosecond * 1000, TimeValue.Microsecond);
-            AreEqual(TimeValue.Microsecond * 1000, TimeValue.Millisecond);
-            AreEqual(TimeValue.Millisecond * 1000, TimeValue.Second);
-            AreEqual(TimeValue.Second * 60, TimeValue.Minute);
-            AreEqual(TimeValue.Minute * 60, TimeValue.Hour);
-            AreEqual(TimeValue.Hour * 24, TimeValue.Day);
+            AreEqual(TimeInterval.Nanosecond * 1000, TimeInterval.Microsecond);
+            AreEqual(TimeInterval.Microsecond * 1000, TimeInterval.Millisecond);
+            AreEqual(TimeInterval.Millisecond * 1000, TimeInterval.Second);
+            AreEqual(TimeInterval.Second * 60, TimeInterval.Minute);
+            AreEqual(TimeInterval.Minute * 60, TimeInterval.Hour);
+            AreEqual(TimeInterval.Hour * 24, TimeInterval.Day);
 
-            Assert.True(TimeValue.Minute < TimeValue.Hour);
-            Assert.True(TimeValue.Minute <= TimeValue.Hour);
-            Assert.True(TimeValue.Minute * 60 <= TimeValue.Hour);
-            Assert.True(TimeValue.Hour > TimeValue.Minute);
-            Assert.True(TimeValue.Hour >= TimeValue.Minute);
-            Assert.True(TimeValue.Hour >= TimeValue.Minute * 60);
+            Assert.True(TimeInterval.Minute < TimeInterval.Hour);
+            Assert.True(TimeInterval.Minute <= TimeInterval.Hour);
+            Assert.True(TimeInterval.Minute * 60 <= TimeInterval.Hour);
+            Assert.True(TimeInterval.Hour > TimeInterval.Minute);
+            Assert.True(TimeInterval.Hour >= TimeInterval.Minute);
+            Assert.True(TimeInterval.Hour >= TimeInterval.Minute * 60);
 
-            Assert.False(TimeValue.Minute > TimeValue.Hour);
-            Assert.False(TimeValue.Minute >= TimeValue.Hour);
-            Assert.False(TimeValue.Hour < TimeValue.Minute);
-            Assert.False(TimeValue.Hour <= TimeValue.Minute);
+            Assert.False(TimeInterval.Minute > TimeInterval.Hour);
+            Assert.False(TimeInterval.Minute >= TimeInterval.Hour);
+            Assert.False(TimeInterval.Hour < TimeInterval.Minute);
+            Assert.False(TimeInterval.Hour <= TimeInterval.Minute);
         }
 
         [AssertionMethod]
-        private static void AreEqual(TimeValue expected, TimeValue actual) => AreEqual(expected.Nanoseconds, actual.Nanoseconds);
+        private static void AreEqual(TimeInterval expected, TimeInterval actual) => AreEqual(expected.Nanoseconds, actual.Nanoseconds);
 
         [AssertionMethod]
         private static void AreEqual(double expected, double actual) => Assert.Equal(expected, actual, 5);

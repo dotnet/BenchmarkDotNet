@@ -39,6 +39,6 @@ namespace BenchmarkDotNet.Engines
 
         public int UnrollFactor => TargetJob.ResolveValue(RunMode.UnrollFactorCharacteristic, DefaultResolver);
 
-        public TimeValue IterationTime => TargetJob.ResolveValue(RunMode.IterationTimeCharacteristic, DefaultResolver);
+        public TimeInterval IterationTime => TargetJob.ResolveValue(RunMode.IterationTimeCharacteristic, DefaultResolver);
     }
 }

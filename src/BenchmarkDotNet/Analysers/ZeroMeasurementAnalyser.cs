@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Analysers
 
         public static readonly IAnalyser Default = new ZeroMeasurementAnalyser();
 
-        private static readonly TimeValue FallbackCpuResolutionValue = TimeValue.FromNanoseconds(0.2d);
+        private static readonly TimeInterval FallbackCpuResolutionValue = TimeInterval.FromNanoseconds(0.2d);
 
         private ZeroMeasurementAnalyser() { }
 

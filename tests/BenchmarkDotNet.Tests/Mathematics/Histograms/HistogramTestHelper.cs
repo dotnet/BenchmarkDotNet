@@ -63,12 +63,12 @@ namespace BenchmarkDotNet.Tests.Mathematics.Histograms
             var s = new Statistics(histogram.GetAllValues());
             double mValue = MathHelper.CalculateMValue(s);
             var cultureInfo = TestCultureInfo.Instance;
-            var binSizeInterval = TimeValue.FromNanoseconds(histogram.BinSize);
+            var binSizeInterval = TimeInterval.FromNanoseconds(histogram.BinSize);
             output.WriteLine($"=== {title}:Short (BinSize={binSizeInterval.ToString(cultureInfo)}, mValue={mValue.ToString("0.##", cultureInfo)}) ===");
             output.WriteLine(histogram.ToString(histogram.CreateNanosecondFormatter(cultureInfo, "0.0000")));
             output.WriteLine($"=== {title}:Full (BinSize={binSizeInterval.ToString(cultureInfo)}, mValue={mValue.ToString("0.##", cultureInfo)}) ===");
             output.WriteLine(histogram.ToString(histogram.CreateNanosecondFormatter(cultureInfo, "0.0000"), full: true));
-            output.WriteLine("OUTLIERS: {0}", string.Join(", ", s.AllOutliers.Select(it => TimeValue.FromNanoseconds(it).ToString(cultureInfo))));
+            output.WriteLine("OUTLIERS: {0}", string.Join(", ", s.AllOutliers.Select(it => TimeInterval.FromNanoseconds(it).ToString(cultureInfo))));
         }
     }
 }

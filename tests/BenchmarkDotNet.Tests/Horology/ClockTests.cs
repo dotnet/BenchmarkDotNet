@@ -40,10 +40,10 @@ namespace BenchmarkDotNet.Tests.Horology
             var spans = startedClocks.Select(startedClock => startedClock.GetElapsed()).ToList();
             for (int i = 0; i < clocks.Count; i++)
             {
-                output.WriteLine(clocks[i].Title + ": " + TimeValue.FromSeconds(spans[i].GetSeconds()).ToString(TimeUnit.Second, TestCultureInfo.Instance));
+                output.WriteLine(clocks[i].Title + ": " + TimeInterval.FromSeconds(spans[i].GetSeconds()).ToString(TimeUnit.Second, TestCultureInfo.Instance));
                 var interval = spans[i].GetTimeValue();
-                Assert.True(interval > TimeValue.Millisecond);
-                Assert.True(interval < TimeValue.Hour);
+                Assert.True(interval > TimeInterval.Millisecond);
+                Assert.True(interval < TimeInterval.Hour);
             }
         }
 

@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Columns
             if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Size)
                 return SizeValue.FromBytes((long)metric.Value).ToString(style.SizeUnit, cultureInfo);
             if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Time)
-                return TimeValue.FromNanoseconds(metric.Value).ToString(style.TimeUnit, cultureInfo);
+                return TimeInterval.FromNanoseconds(metric.Value).ToString(style.TimeUnit, cultureInfo);
 
             return metric.Value.ToString(descriptor.NumberFormat, cultureInfo);
         }

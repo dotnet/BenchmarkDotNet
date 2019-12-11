@@ -28,31 +28,31 @@ namespace BenchmarkDotNet.Tests.Engine
         [Fact]
         public void AutoTest_SteadyState()
         {
-            AutoTest(data => TimeValue.Millisecond, MinIterationCount);
+            AutoTest(data => TimeInterval.Millisecond, MinIterationCount);
         }
 
         [Fact]
         public void AutoTest_InfiniteIncrease()
         {
-            AutoTest(data => TimeValue.Millisecond * data.Index, MaxIterationCount);
+            AutoTest(data => TimeInterval.Millisecond * data.Index, MaxIterationCount);
         }
 
         [Fact]
         public void AutoTest_Alternation()
         {
-            AutoTest(data => TimeValue.Millisecond * (data.Index % 2), MinIterationCount, MaxIterationCount);
+            AutoTest(data => TimeInterval.Millisecond * (data.Index % 2), MinIterationCount, MaxIterationCount);
         }
 
         [Fact]
         public void AutoTest_TenSteps()
         {
-            AutoTest(data => TimeValue.Millisecond * Math.Max(0, 10 - data.Index), 10, MaxIterationCount);
+            AutoTest(data => TimeInterval.Millisecond * Math.Max(0, 10 - data.Index), 10, MaxIterationCount);
         }
 
         [Fact]
         public void AutoTest_WithoutSteadyStateOverhead()
         {
-            AutoTest(data => TimeValue.Millisecond * data.Index, MaxOverheadIterationCount, mode: IterationMode.Overhead);
+            AutoTest(data => TimeInterval.Millisecond * data.Index, MaxOverheadIterationCount, mode: IterationMode.Overhead);
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.Equal(2, mergedJob.Run.MinWarmupIterationCount);
             Assert.Equal(4, mergedJob.Run.MaxWarmupIterationCount);
 
-            AutoTest(data => TimeValue.Millisecond * (data.Index % 2), 2, 4, job: mergedJob);
+            AutoTest(data => TimeInterval.Millisecond * (data.Index % 2), 2, 4, job: mergedJob);
         }
 
         [MinWarmupCount(2, forceAutoWarmup: true)]
@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Tests.Engine
             public void Method() { }
         }
 
-        private void AutoTest(Func<IterationData, TimeValue> measure, int min, int max = -1, IterationMode mode = IterationMode.Workload, Job job = null)
+        private void AutoTest(Func<IterationData, TimeInterval> measure, int min, int max = -1, IterationMode mode = IterationMode.Workload, Job job = null)
         {
             if (max == -1)
                 max = min;
@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.InRange(count, min, max);
         }
 
-        private EngineWarmupStage CreateStage(Job job, Func<IterationData, TimeValue> measure)
+        private EngineWarmupStage CreateStage(Job job, Func<IterationData, TimeInterval> measure)
         {
             var engine = new MockEngine(output, job, measure);
             return new EngineWarmupStage(engine);

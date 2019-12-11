@@ -13,10 +13,10 @@ namespace BenchmarkDotNet.Tests.Mocks
     public class MockEngine : IEngine
     {
         private readonly ITestOutputHelper output;
-        private readonly Func<IterationData, TimeValue> measure;
+        private readonly Func<IterationData, TimeInterval> measure;
 
         // ReSharper disable once NotNullMemberIsNotInitialized
-        public MockEngine(ITestOutputHelper output, Job job, Func<IterationData, TimeValue> measure)
+        public MockEngine(ITestOutputHelper output, Job job, Func<IterationData, TimeInterval> measure)
         {
             this.output = output;
             this.measure = measure;

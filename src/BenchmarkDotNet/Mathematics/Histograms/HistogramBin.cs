@@ -39,16 +39,16 @@ namespace BenchmarkDotNet.Mathematics.Histograms
             var unit = TimeUnit.GetBestTimeUnit(Values);
             var builder = new StringBuilder();
             builder.Append('[');
-            builder.Append(TimeValue.FromNanoseconds(Lower).ToString(unit, cultureInfo));
+            builder.Append(TimeInterval.FromNanoseconds(Lower).ToString(unit, cultureInfo));
             builder.Append(';');
-            builder.Append(TimeValue.FromNanoseconds(Upper).ToString(unit, cultureInfo));
+            builder.Append(TimeInterval.FromNanoseconds(Upper).ToString(unit, cultureInfo));
             builder.Append(' ');
             builder.Append('{');
             for (var i = 0; i < Values.Length; i++)
             {
                 if (i != 0)
                     builder.Append("; ");
-                builder.Append(TimeValue.FromNanoseconds(Values[i]).ToString(unit, cultureInfo));
+                builder.Append(TimeInterval.FromNanoseconds(Values[i]).ToString(unit, cultureInfo));
             }
             builder.Append('}');
             

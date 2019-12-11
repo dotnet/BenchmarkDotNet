@@ -249,7 +249,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.MaxWarmupIterationCount.HasValue)
                 baseJob = baseJob.WithMaxWarmupCount(options.MaxWarmupIterationCount.Value);
             if (options.IterationTimeInMilliseconds.HasValue)
-                baseJob = baseJob.WithIterationTime(TimeValue.FromMilliseconds(options.IterationTimeInMilliseconds.Value));
+                baseJob = baseJob.WithIterationTime(TimeInterval.FromMilliseconds(options.IterationTimeInMilliseconds.Value));
             if (options.IterationCount.HasValue)
                 baseJob = baseJob.WithIterationCount(options.IterationCount.Value);
             if (options.MinIterationCount.HasValue)

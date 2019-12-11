@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Reports
         /// <summary>
         /// Gets the average duration of one operation.
         /// </summary>
-        public TimeValue GetAverageTime() => TimeValue.FromNanoseconds(Nanoseconds / Operations);
+        public TimeInterval GetAverageTime() => TimeInterval.FromNanoseconds(Nanoseconds / Operations);
 
         public int CompareTo(Measurement other) => Nanoseconds.CompareTo(other.Nanoseconds);
 

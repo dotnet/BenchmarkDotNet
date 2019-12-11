@@ -151,7 +151,7 @@ namespace BenchmarkDotNet.Columns
             if (double.IsNaN(value))
                 return "NA";
             return UnitType == UnitType.Time
-                ? TimeValue.FromNanoseconds(value)
+                ? TimeInterval.FromNanoseconds(value)
                     .ToString(
                         style.TimeUnit,
                         style.CultureInfo,

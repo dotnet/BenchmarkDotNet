@@ -6,16 +6,16 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
 {
     public class AbsoluteTimeThreshold : AbsoluteThreshold, IEquatable<AbsoluteTimeThreshold>
     {
-        private readonly TimeValue timeValue;
+        private readonly TimeInterval timeInterval;
 
-        public AbsoluteTimeThreshold(TimeValue timeValue) : base(timeValue.Nanoseconds) => this.timeValue = timeValue;
+        public AbsoluteTimeThreshold(TimeInterval timeInterval) : base(timeInterval.Nanoseconds) => this.timeInterval = timeInterval;
 
-        public override string ToString() => timeValue.ToString(DefaultCultureInfo.Instance, format: "0.##");
+        public override string ToString() => timeInterval.ToString(DefaultCultureInfo.Instance, format: "0.##");
 
-        public bool Equals(AbsoluteTimeThreshold other) => other != null && timeValue.Equals(other.timeValue);
+        public bool Equals(AbsoluteTimeThreshold other) => other != null && timeInterval.Equals(other.timeInterval);
 
         public override bool Equals(object obj) => obj is AbsoluteTimeThreshold other && Equals(other);
 
-        public override int GetHashCode() => timeValue.GetHashCode();
+        public override int GetHashCode() => timeInterval.GetHashCode();
     }
 }

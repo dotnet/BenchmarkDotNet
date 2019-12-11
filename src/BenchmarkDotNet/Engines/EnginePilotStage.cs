@@ -11,10 +11,10 @@ namespace BenchmarkDotNet.Engines
         internal const long MaxInvokeCount = (long.MaxValue / 2 + 1) / 2;
 
         private readonly int unrollFactor;
-        private readonly TimeValue minIterationTime;
+        private readonly TimeInterval minIterationTime;
         private readonly int minInvokeCount;
         private readonly double maxRelativeError;
-        private readonly TimeValue? maxAbsoluteError;
+        private readonly TimeInterval? maxAbsoluteError;
         private readonly double targetIterationTime;
         private readonly double resolution;
 

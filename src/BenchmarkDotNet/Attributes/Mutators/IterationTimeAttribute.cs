@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Attributes
     [PublicAPI]
     public class IterationTimeAttribute : JobMutatorConfigBaseAttribute
     {
-        public IterationTimeAttribute(double milliseconds) : base(Job.Default.WithIterationTime(TimeValue.FromMilliseconds(milliseconds)))
+        public IterationTimeAttribute(double milliseconds) : base(Job.Default.WithIterationTime(TimeInterval.FromMilliseconds(milliseconds)))
         {
         }
     }

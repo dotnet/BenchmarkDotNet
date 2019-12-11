@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Environments
         /// The frequency of the timer as the number of ticks per second.
         /// </summary>
         [PublicAPI] public Frequency ChronometerFrequency { get; protected set; }
-        [PublicAPI] public TimeValue ChronometerResolution => ChronometerFrequency.ToResolution();
+        [PublicAPI] public TimeInterval ChronometerResolution => ChronometerFrequency.ToResolution();
 
         public HardwareTimerKind HardwareTimerKind { get; protected set; }
 

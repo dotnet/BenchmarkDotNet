@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Horology
             NanosecondAmount = nanosecondAmount;
         }
 
-        public TimeValue ToInterval(long value = 1) => new TimeValue(value, this);
+        public TimeInterval ToInterval(long value = 1) => new TimeInterval(value, this);
 
         [PublicAPI] public static readonly TimeUnit Nanosecond = new TimeUnit("ns", "Nanosecond", 1);
         [PublicAPI] public static readonly TimeUnit Microsecond = new TimeUnit("\u03BCs", "Microsecond", 1000);

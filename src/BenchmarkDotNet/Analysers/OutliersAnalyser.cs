@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Analysers
         [CanBeNull]
         private static string GetRangeMessage([NotNull] double[] values, CultureInfo cultureInfo)
         {
-            string Format(double value) => TimeValue.FromNanoseconds(value).ToString(cultureInfo, "N2");
+            string Format(double value) => TimeInterval.FromNanoseconds(value).ToString(cultureInfo, "N2");
             
             switch (values.Length) {
                 case 0:

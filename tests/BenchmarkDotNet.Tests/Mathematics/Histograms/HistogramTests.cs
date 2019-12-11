@@ -99,7 +99,7 @@ namespace BenchmarkDotNet.Tests.Mathematics.Histograms
             foreach (var rule in rules)
             {
                 var histogram = HistogramBuilder.Simple.Build(s, rule);
-                output.WriteLine($"!!!!! Rule = {rule}, BinSize = {TimeValue.FromNanoseconds(histogram.BinSize).ToString(TestCultureInfo.Instance)} !!!!!");
+                output.WriteLine($"!!!!! Rule = {rule}, BinSize = {TimeInterval.FromNanoseconds(histogram.BinSize).ToString(TestCultureInfo.Instance)} !!!!!");
                 output.WriteLine(histogram.ToString(histogram.CreateNanosecondFormatter()));
                 output.WriteLine("");
                 output.WriteLine("");

@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.Engines
         }
 
         /// <returns>the time it took to run the benchmark</returns>
-        private static TimeValue Jit(Engine engine, int jitIndex, int invokeCount, int unrollFactor)
+        private static TimeInterval Jit(Engine engine, int jitIndex, int invokeCount, int unrollFactor)
         {
             engine.Dummy1Action.Invoke();
 
@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Engines
 
             engine.WriteLine();
 
-            return TimeValue.FromNanoseconds(result.Nanoseconds);
+            return TimeInterval.FromNanoseconds(result.Nanoseconds);
         }
 
         private static Engine CreateMultiActionEngine(EngineParameters engineParameters)

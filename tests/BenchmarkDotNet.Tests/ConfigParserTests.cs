@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Tests
 
             Assert.Equal(launchCount, job.Run.LaunchCount);
             Assert.Equal(warmupCount, job.Run.WarmupCount);
-            Assert.Equal(TimeValue.FromMilliseconds(iterationTime), job.Run.IterationTime);
+            Assert.Equal(TimeInterval.FromMilliseconds(iterationTime), job.Run.IterationTime);
             Assert.Equal(iterationCount, job.Run.IterationCount);
         }
 

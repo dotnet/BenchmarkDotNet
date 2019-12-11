@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Helpers
                 return "System.Activator.CreateInstance<" + value.GetType().GetCorrectCSharpTypeName() + ">()";
 
             switch (value) {
-                case TimeValue interval:
+                case TimeInterval interval:
                     return "new BenchmarkDotNet.Horology.TimeValue(" + ToSourceCode(interval.Nanoseconds) + ")";
                 case IntPtr ptr:
                     return $"new System.IntPtr({ptr})";
@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Helpers
                 return true;
             if (type == typeof(Type))
                 return true;
-            if (type == typeof(TimeValue))
+            if (type == typeof(TimeInterval))
                 return true;
             if (type == typeof(IntPtr))
                 return true;

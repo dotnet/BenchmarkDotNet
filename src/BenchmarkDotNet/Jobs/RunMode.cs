@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<int> IterationCountCharacteristic = CreateCharacteristic<int>(nameof(IterationCount));
         public static readonly Characteristic<int> MinIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MinIterationCount));
         public static readonly Characteristic<int> MaxIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MaxIterationCount));
-        public static readonly Characteristic<TimeValue> IterationTimeCharacteristic = CreateCharacteristic<TimeValue>(nameof(IterationTime));
+        public static readonly Characteristic<TimeInterval> IterationTimeCharacteristic = CreateCharacteristic<TimeInterval>(nameof(IterationTime));
         public static readonly Characteristic<int> WarmupCountCharacteristic = CreateCharacteristic<int>(nameof(WarmupCount));
         public static readonly Characteristic<int> MinWarmupIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MinWarmupIterationCount));
         public static readonly Characteristic<int> MaxWarmupIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MaxWarmupIterationCount));
@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.Jobs
         /// Desired time of execution of an iteration. Used by Pilot stage to estimate the number of invocations per iteration.
         /// The default value is 500 milliseconds.
         /// </summary>
-        public TimeValue IterationTime
+        public TimeInterval IterationTime
         {
             get { return IterationTimeCharacteristic[this]; }
             set { IterationTimeCharacteristic[this] = value; }

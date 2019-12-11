@@ -20,26 +20,26 @@ namespace BenchmarkDotNet.Tests.Engine
 
         [Fact]
         public void AutoTest_BigResolution() => AutoTest(
-            TimeValue.Millisecond.ToFrequency(),
-            TimeValue.Millisecond,
+            TimeInterval.Millisecond.ToFrequency(),
+            TimeInterval.Millisecond,
             0.01,
             200);
 
         [Fact]
         public void AutoTest_ImpossibleResolution() => AutoTest(
-            TimeValue.Second.ToFrequency(),
-            TimeValue.Millisecond,
+            TimeInterval.Second.ToFrequency(),
+            TimeInterval.Millisecond,
             0,
             EnginePilotStage.MaxInvokeCount);
 
         [Fact]
         public void SpecificTest_Simple() => SpecificTest(
-            TimeValue.Millisecond * 100,
-            TimeValue.Millisecond,
+            TimeInterval.Millisecond * 100,
+            TimeInterval.Millisecond,
             64,
             128);
 
-        private void AutoTest(Frequency clockFrequency, TimeValue operationTime, double maxRelativeError, long minInvokeCount)
+        private void AutoTest(Frequency clockFrequency, TimeInterval operationTime, double maxRelativeError, long minInvokeCount)
         {
             var job = new Job
             {
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.InRange(invokeCount, minInvokeCount, MaxPossibleInvokeCount);
         }
 
-        private void SpecificTest(TimeValue iterationTime, TimeValue operationTime, long minInvokeCount, long maxInvokeCount)
+        private void SpecificTest(TimeInterval iterationTime, TimeInterval operationTime, long minInvokeCount, long maxInvokeCount)
         {
             var job = new Job
             {
@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.InRange(invokeCount, minInvokeCount, maxInvokeCount);
         }
 
-        private EnginePilotStage CreateStage(Job job, Func<IterationData, TimeValue> measure)
+        private EnginePilotStage CreateStage(Job job, Func<IterationData, TimeInterval> measure)
         {
             var engine = new MockEngine(output, job, measure);
             return new EnginePilotStage(engine);

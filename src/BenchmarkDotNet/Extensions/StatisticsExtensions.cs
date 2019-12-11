@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Extensions
         public static Func<double, string> CreateNanosecondFormatter(this Statistics s, CultureInfo cultureInfo, string format = "N3")
         {
             var timeUnit = TimeUnit.GetBestTimeUnit(s.Mean);
-            return x => TimeValue.FromNanoseconds(x).ToString(timeUnit, cultureInfo, format);
+            return x => TimeInterval.FromNanoseconds(x).ToString(timeUnit, cultureInfo, format);
         }
         
         [PublicAPI]

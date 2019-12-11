@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Tests
         public void ToFolderNameStructTest()
         {
             Assert.Equal("0-42", FolderNameHelper.ToFolderName(0.42m));
-            Assert.Equal("1234000000ns", FolderNameHelper.ToFolderName(TimeValue.FromSeconds(1.234)));
+            Assert.Equal("1234000000ns", FolderNameHelper.ToFolderName(TimeInterval.FromSeconds(1.234)));
         }
 
         [Theory]
