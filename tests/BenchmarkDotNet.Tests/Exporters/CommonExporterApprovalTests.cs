@@ -9,6 +9,7 @@ using ApprovalTests.Reporters;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Loggers;
@@ -57,7 +58,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             foreach (var exporter in exporters)
             {
                 PrintTitle(logger, exporter);
-                exporter.ExportToLog(MockFactory.CreateSummary(config), logger);
+                exporter.ExportToLog(MockFactory.CreateSummary(config.With(cultureInfo)), logger);
             }
 
             Approvals.Verify(logger.GetLog());

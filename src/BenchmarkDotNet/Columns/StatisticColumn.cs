@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -149,8 +151,13 @@ namespace BenchmarkDotNet.Columns
             if (double.IsNaN(value))
                 return "NA";
             return UnitType == UnitType.Time
-                   ? value.ToTimeStr(style.TimeUnit, config.Encoding, format, 1, style.PrintUnitsInContent)
-                   : value.ToStr(format);
+                ? TimeInterval.FromNanoseconds(value)
+                    .ToString(
+                        style.TimeUnit,
+                        style.CultureInfo,
+                        format,
+                        UnitPresentation.FromVisibility(style.PrintUnitsInContent))
+                : value.ToString(format, style.CultureInfo);
         }
 
         public override string ToString() => ColumnName;

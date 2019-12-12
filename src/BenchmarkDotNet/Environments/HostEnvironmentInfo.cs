@@ -21,8 +21,6 @@ namespace BenchmarkDotNet.Environments
     {
         public const string BenchmarkDotNetCaption = "BenchmarkDotNet";
 
-        public static readonly CultureInfo MainCultureInfo;
-
         // TODO: API to GlobalSetup the logger.
         /// <summary>
         /// Logger to use when there's no config available.
@@ -66,13 +64,7 @@ namespace BenchmarkDotNet.Environments
         public Lazy<ICollection<Antivirus>> AntivirusProducts { get; }
 
         public Lazy<VirtualMachineHypervisor> VirtualMachineHypervisor { get; protected set; }
-
-        static HostEnvironmentInfo()
-        {
-            MainCultureInfo = (CultureInfo)CultureInfo.InvariantCulture.Clone();
-            MainCultureInfo.NumberFormat.NumberDecimalSeparator = ".";
-        }
-
+        
         protected HostEnvironmentInfo()
         {
             BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
@@ -97,8 +89,9 @@ namespace BenchmarkDotNet.Environments
                 yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}, VM={vmName}";
 
             yield return CpuInfoFormatter.Format(CpuInfo.Value);
+            var cultureInfo = DefaultCultureInfo.Instance;
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
-                yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution}, Timer={HardwareTimerKind.ToString().ToUpper()}";
+                yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution.ToString(cultureInfo)}, Timer={HardwareTimerKind.ToString().ToUpper()}";
 
             if (RuntimeInformation.IsNetCore && IsDotNetCliInstalled())
                 yield return $".NET Core SDK={DotNetSdkVersion.Value}";

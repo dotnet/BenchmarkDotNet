@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
@@ -19,7 +21,7 @@ namespace BenchmarkDotNet.Reports
         [PublicAPI] public string LogFilePath { get; }
         [PublicAPI] public HostEnvironmentInfo HostEnvironmentInfo { get; }
         [PublicAPI] public TimeSpan TotalTime { get; }
-        [PublicAPI] public SummaryStyle Style { get; }
+        [PublicAPI, CanBeNull] public SummaryStyle Style { get; }
         [PublicAPI] public IOrderer Orderer { get; }
         [PublicAPI] public SummaryTable Table { get; }
         [PublicAPI] public string AllRuntimes { get; }
@@ -40,6 +42,7 @@ namespace BenchmarkDotNet.Reports
             string resultsDirectoryPath,
             string logFilePath,
             TimeSpan totalTime,
+            CultureInfo cultureInfo,
             ImmutableArray<ValidationError> validationErrors)
         {
             Title = title;
@@ -56,7 +59,7 @@ namespace BenchmarkDotNet.Reports
             BenchmarksCases = Orderer.GetSummaryOrder(reports.Select(report => report.BenchmarkCase).ToImmutableArray(), this).ToImmutableArray(); // we sort it first
             Reports = BenchmarksCases.Select(b => ReportMap[b]).ToImmutableArray(); // we use sorted collection to re-create reports list
             BaseliningStrategy = BaseliningStrategy.Create(BenchmarksCases);
-            Style = GetConfiguredSummaryStyleOrNull(BenchmarksCases);
+            Style = GetConfiguredSummaryStyleOrNull(BenchmarksCases)?.WithCultureInfo(cultureInfo);
             Table = GetTable(Style);
             AllRuntimes = BuildAllRuntimes(HostEnvironmentInfo, Reports);
         }
@@ -73,10 +76,10 @@ namespace BenchmarkDotNet.Reports
         public int GetNumberOfExecutedBenchmarks() => Reports.Count(report => report.ExecuteResults.Any(result => result.FoundExecutable));
 
         internal static Summary NothingToRun(string title, string resultsDirectoryPath, string logFilePath)
-            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, ImmutableArray<ValidationError>.Empty);
+            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, DefaultCultureInfo.Instance, ImmutableArray<ValidationError>.Empty);
 
         internal static Summary ValidationFailed(string title, string resultsDirectoryPath, string logFilePath, ImmutableArray<ValidationError> validationErrors)
-            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, validationErrors);
+            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, DefaultCultureInfo.Instance, validationErrors);
 
         internal static Summary Join(List<Summary> summaries, ClockSpan clockSpan)
             => new Summary(
@@ -86,6 +89,7 @@ namespace BenchmarkDotNet.Reports
                 summaries.First().ResultsDirectoryPath,
                 summaries.First().LogFilePath,
                 clockSpan.GetTimeSpan(),
+                summaries.First().GetCultureInfo(),
                 summaries.SelectMany(summary => summary.ValidationErrors).ToImmutableArray());
 
         internal static string BuildAllRuntimes(HostEnvironmentInfo hostEnvironmentInfo, IEnumerable<BenchmarkReport> reports)

@@ -18,6 +18,9 @@ namespace BenchmarkDotNet.IntegrationTests.ConfigPerAssembly
 
         private class Logger : ILogger
         {
+            public string Id => "TestLogger";
+            public int Priority => 0;
+
             public void Write(LogKind logKind, string text)
             {
                 IsActivated = true;

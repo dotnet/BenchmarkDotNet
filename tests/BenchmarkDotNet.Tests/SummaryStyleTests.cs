@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Columns;
+﻿using System.Globalization;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Reports;
@@ -13,6 +14,7 @@ namespace BenchmarkDotNet.Tests
         {
             var summaryStyle = new SummaryStyle
             (
+                cultureInfo: CultureInfo.InvariantCulture,
                 printUnitsInHeader: true,
                 printUnitsInContent: false,
                 printZeroValuesInContent: true,
@@ -22,6 +24,7 @@ namespace BenchmarkDotNet.Tests
 
             var config = ManualConfig.CreateEmpty().With(summaryStyle);
 
+            Assert.Equal(CultureInfo.InvariantCulture, config.SummaryStyle.CultureInfo);
             Assert.True(config.SummaryStyle.PrintUnitsInHeader);
             Assert.False(config.SummaryStyle.PrintUnitsInContent);
             Assert.True(config.SummaryStyle.PrintZeroValuesInContent);

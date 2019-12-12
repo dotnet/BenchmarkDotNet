@@ -1,34 +1,31 @@
 ﻿using System.Diagnostics;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using System.Text;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Samples
 {
     // *** Attribute Style ***
-
-    [EncodingAttribute.Unicode]
-    public class IntroEncoding
+    [UnicodeConsoleLogger]
+    public class IntroUnicode
     {
         [Benchmark]
         public long Foo()
         {
             long waitUntil = Stopwatch.GetTimestamp() + 1000;
             while (Stopwatch.GetTimestamp() < waitUntil) { }
-
             return waitUntil;
         }
     }
 
     // *** Object Style ***
-
     [Config(typeof(Config))]
-    public class IntroEncodingObjectStyle
+    public class IntroUnicodeObjectStyle
     {
         private class Config : ManualConfig
         {
-            public Config() => Encoding = Encoding.Unicode;
+            public Config() => Add(ConsoleLogger.Unicode);
         }
 
         [Benchmark]
@@ -36,21 +33,19 @@ namespace BenchmarkDotNet.Samples
         {
             long waitUntil = Stopwatch.GetTimestamp() + 1000;
             while (Stopwatch.GetTimestamp() < waitUntil) { }
-
             return waitUntil;
         }
     }
 
     // *** Fluent Config ***
-
-    public class IntroEncodingFluentConfig
+    public class IntroUnicodeFluentConfig
     {
         public static void Run()
         {
-            BenchmarkRunner.Run<IntroEncodingFluentConfig>(
+            BenchmarkRunner.Run<IntroUnicodeFluentConfig>(
                 ManualConfig
                     .Create(DefaultConfig.Instance)
-                    .With(Encoding.Unicode));
+                    .With(ConsoleLogger.Unicode));
         }
 
         [Benchmark]
@@ -58,7 +53,6 @@ namespace BenchmarkDotNet.Samples
         {
             long waitUntil = Stopwatch.GetTimestamp() + 1000;
             while (Stopwatch.GetTimestamp() < waitUntil) { }
-
             return waitUntil;
         }
     }

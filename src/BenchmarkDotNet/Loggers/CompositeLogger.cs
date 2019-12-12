@@ -8,6 +8,9 @@ namespace BenchmarkDotNet.Loggers
 
         internal CompositeLogger(ImmutableHashSet<ILogger> loggers) => this.loggers = loggers;
 
+        public string Id => nameof(CompositeLogger);
+        public int Priority => 0;
+
         public void Write(LogKind logKind, string text)
         {
             foreach (var logger in loggers)

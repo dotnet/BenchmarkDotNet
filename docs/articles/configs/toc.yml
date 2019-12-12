@@ -20,7 +20,5 @@
   href: filters.md
 - name: Orderers
   href: orderers.md
-- name: Encoding
-  href: encoding.md
 - name: ConfigOptions
   href: configoptions.md

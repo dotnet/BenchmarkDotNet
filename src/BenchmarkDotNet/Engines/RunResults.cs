@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
@@ -12,7 +11,6 @@ namespace BenchmarkDotNet.Engines
     public struct RunResults
     {
         private readonly OutlierMode outlierMode;
-        private readonly Encoding encoding;
 
         [CanBeNull, PublicAPI]
         public IReadOnlyList<Measurement> Overhead { get; }
@@ -28,11 +26,9 @@ namespace BenchmarkDotNet.Engines
                           [NotNull] IReadOnlyList<Measurement> workload,
                           OutlierMode outlierMode,
                           GcStats gcStats,
-                          ThreadingStats threadingStats,
-                          Encoding encoding)
+                          ThreadingStats threadingStats)
         {
             this.outlierMode = outlierMode;
-            this.encoding = encoding;
             Overhead = overhead;
             Workload = workload;
             GCStats = gcStats;
@@ -58,15 +54,14 @@ namespace BenchmarkDotNet.Engines
                     IterationStage.Result,
                     ++resultIndex,
                     measurement.Operations,
-                    value,
-                    encoding);
+                    value);
             }
         }
 
         public void Print(TextWriter outWriter)
         {
             foreach (var measurement in GetMeasurements())
-                outWriter.WriteLine(measurement.ToOutputLine());
+                outWriter.WriteLine(measurement.ToString());
 
             if (!GCStats.Equals(GcStats.Empty))
                 outWriter.WriteLine(GCStats.ToOutputLine());

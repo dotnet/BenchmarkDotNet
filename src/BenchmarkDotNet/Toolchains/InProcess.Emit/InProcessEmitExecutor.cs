@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -78,8 +79,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             return GetExecutionResult(
                 host.RunResults,
                 exitCode,
-                executeParameters.Logger,
-                executeParameters.BenchmarkCase.Config.Encoding);
+                executeParameters.Logger);
         }
 
         private int ExecuteCore(IHost host, ExecuteParameters parameters)
@@ -129,14 +129,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             return exitCode;
         }
 
-        private ExecuteResult GetExecutionResult(RunResults runResults, int exitCode, ILogger logger, Encoding encoding)
+        private ExecuteResult GetExecutionResult(RunResults runResults, int exitCode, ILogger logger)
         {
             if (exitCode != 0)
             {
                 return new ExecuteResult(true, exitCode, default, Array.Empty<string>(), Array.Empty<string>());
             }
 
-            var lines = runResults.GetMeasurements().Select(measurement => measurement.ToOutputLine()).ToList();
+            var lines = runResults.GetMeasurements().Select(measurement => measurement.ToString()).ToList();
             if (!runResults.GCStats.Equals(GcStats.Empty))
                 lines.Add(runResults.GCStats.ToOutputLine());
             if (!runResults.ThreadingStats.Equals(ThreadingStats.Empty))
