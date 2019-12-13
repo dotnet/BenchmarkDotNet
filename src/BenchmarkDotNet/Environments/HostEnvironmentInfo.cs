@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Environments
         public Lazy<ICollection<Antivirus>> AntivirusProducts { get; }
 
         public Lazy<VirtualMachineHypervisor> VirtualMachineHypervisor { get; protected set; }
-        
+
         protected HostEnvironmentInfo()
         {
             BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
@@ -84,9 +84,20 @@ namespace BenchmarkDotNet.Environments
         {
             string vmName = VirtualMachineHypervisor.Value?.Name;
             if (vmName == null)
-                yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}";
+            {
+                if (RuntimeInformation.IsRunningInContainer)
+                {
+                    yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}, Running in a container";
+                }
+                else
+                {
+                    yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}";
+                }
+            }
             else
+            {
                 yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}, VM={vmName}";
+            }
 
             yield return CpuInfoFormatter.Format(CpuInfo.Value);
             var cultureInfo = DefaultCultureInfo.Instance;
