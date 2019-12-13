@@ -83,21 +83,13 @@ namespace BenchmarkDotNet.Environments
         public override IEnumerable<string> ToFormattedString()
         {
             string vmName = VirtualMachineHypervisor.Value?.Name;
-            if (vmName == null)
-            {
-                if (RuntimeInformation.IsRunningInContainer)
-                {
-                    yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}, Running in a container";
-                }
-                else
-                {
-                    yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}";
-                }
-            }
-            else
-            {
+
+            if (!string.IsNullOrEmpty(vmName))
                 yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}, VM={vmName}";
-            }
+            else if (RuntimeInformation.IsRunningInContainer)
+                yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}, Running in a container";
+            else
+                yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}";
 
             yield return CpuInfoFormatter.Format(CpuInfo.Value);
             var cultureInfo = DefaultCultureInfo.Instance;
