@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Environments
             if (!string.IsNullOrEmpty(vmName))
                 yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}, VM={vmName}";
             else if (RuntimeInformation.IsRunningInContainer)
-                yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}, Running in a container";
+                yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value} (container)";
             else
                 yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}";
 
