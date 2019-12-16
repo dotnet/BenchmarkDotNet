@@ -307,10 +307,9 @@ namespace BenchmarkDotNet.Jobs
         /// <returns>The new job which doesn't have any environment variables</returns>
         public static Job WithoutEnvironmentVariables(this Job job) => job.WithEnvironmentVariables(Array.Empty<EnvironmentVariable>());
 
-        [Obsolete("This property will soon be removed, please start using WithArgument instead")]
-        public static Job With(this Job job, IReadOnlyList<Argument> arguments) => job.WithArgument(arguments);
-
-        public static Job WithArgument(this Job job, IReadOnlyList<Argument> arguments) => job.WithCore(j => j.Infrastructure.Arguments = arguments);
+        [Obsolete("This property will soon be removed, please start using .WithArguments() instead")]
+        public static Job With(this Job job, IReadOnlyList<Argument> arguments) => job.WithArguments(arguments);
+        public static Job WithArguments(this Job job, IReadOnlyList<Argument> arguments) => job.WithCore(j => j.Infrastructure.Arguments = arguments);
 
         /// <summary>
         /// Runs the job with a specific NuGet dependency which will be resolved during the Job build process
