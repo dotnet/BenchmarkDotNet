@@ -1,48 +1,66 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Columns
 {
-    public class FirstCallColumn : IColumn
+    public class FirstCallColumn : IStatisticColumn
     {
         public string Id => nameof(FirstCallColumn);
 
-        public string ColumnName => "First Call";
+        public string ColumnName => "FirstCall";
 
         public bool AlwaysShow => true;
 
-        public ColumnCategory Category => ColumnCategory.Custom;
+        public ColumnCategory Category => ColumnCategory.Statistics;
 
-        public int PriorityInCategory => -1;
+        public int PriorityInCategory => int.MinValue;
 
         public bool IsNumeric => true;
 
         public UnitType UnitType => UnitType.Time;
 
-        public string Legend => "Excution time of the first call (Jitting included)";
+        public string Legend => "Execution time of the first call (Jitting included)";
+
+        public List<double> GetAllValues(Summary summary, SummaryStyle style)
+            => summary.Reports
+                .Where(HasSingleCall)
+                .Select(r => GetFirstCall(r).Nanoseconds)
+                .Where(v => !double.IsNaN(v) && !double.IsInfinity(v))
+                .Select(v => v / style.TimeUnit.NanosecondAmount)
+                .ToList();
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
         {
-            if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase].Success || !summary[benchmarkCase].AllMeasurements.Any(IsFirstCall))
+            if (!summary.HasReport(benchmarkCase) || !HasSingleCall(summary[benchmarkCase]))
                 return "-";
 
-            var measurement = summary[benchmarkCase].AllMeasurements.Single(IsFirstCall);
+            var measurement = GetFirstCall(summary[benchmarkCase]);
 
-            return measurement.Nanoseconds.ToTimeStr(summary.Style.TimeUnit, benchmarkCase.Config.Encoding);
+            var style = summary.Style;
+            int precision = summary.DisplayPrecisionManager.GetPrecision(style, this, null);
+            string format = "N" + precision;
+
+            return measurement.Nanoseconds.ToTimeStr(style.TimeUnit, benchmarkCase.Config.Encoding, format, 1, style.PrintUnitsInContent);
         }
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);
 
-        public bool IsAvailable(Summary summary) => summary.Reports.Any(report => report.AllMeasurements.Any(IsFirstCall));
+        public bool IsAvailable(Summary summary) => summary.Reports.Any(HasSingleCall);
 
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
 
-        private static bool IsFirstCall(Measurement m)
-            => m.IterationStage == Engines.IterationStage.Jitting && m.IterationMode == Engines.IterationMode.Workload && m.Operations == 1;
+        private static bool HasSingleCall(BenchmarkReport report)
+            => report.AllMeasurements.Any(m => m.IterationMode == IterationMode.Workload && m.Operations == 1);
+
+        private static Measurement GetFirstCall(BenchmarkReport report)
+            => report.AllMeasurements
+                .Where(m => m.IterationMode == IterationMode.Workload && m.Operations == 1)
+                .OrderBy(m => m.IterationMode) // Jitting, Pilot, Warmup, Workload
+                .ThenBy(m => m.IterationIndex)
+                .First();
     }
 }
