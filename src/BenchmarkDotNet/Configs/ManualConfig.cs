@@ -200,9 +200,9 @@ namespace BenchmarkDotNet.Configs
             return this;
         }
 
-        [Obsolete("This property will soon be removed, please start using WithLogicalGroupRules instead.")]
-        public void Add(params BenchmarkLogicalGroupRule[] rules) => WithLogicalGroupRules(rules);
-        public ManualConfig WithLogicalGroupRules(params BenchmarkLogicalGroupRule[] rules)
+        [Obsolete("This property will soon be removed, please start using .AddLogicalGroupRules() instead.")]
+        public void Add(params BenchmarkLogicalGroupRule[] rules) => AddLogicalGroupRules(rules);
+        public ManualConfig AddLogicalGroupRules(params BenchmarkLogicalGroupRule[] rules)
         {
             logicalGroupRules.AddRange(rules);
             return this;

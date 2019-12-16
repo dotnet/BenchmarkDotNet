@@ -112,9 +112,9 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         [PublicAPI] public static ManualConfig WithSwitchingOptions(this IConfig config, bool value, ConfigOptions options) => config.With(m => m.WithSwitchingOptions(value, options));
 
-        [Obsolete("This property will soon be removed, please start using WithLogicalGroupRules instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.WithLogicalGroupRules(rules);
-        [PublicAPI] public static ManualConfig WithLogicalGroupRules(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.With(c => c.WithLogicalGroupRules(rules));
+        [Obsolete("This property will soon be removed, please start using .AddLogicalGroupRules() instead.")]
+        [PublicAPI] public static IConfig With(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.AddLogicalGroupRules(rules);
+        [PublicAPI] public static ManualConfig AddLogicalGroupRules(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.With(c => c.AddLogicalGroupRules(rules));
 
         public static ImmutableConfig CreateImmutableConfig(this IConfig config) => ImmutableConfigBuilder.Create(config);
 

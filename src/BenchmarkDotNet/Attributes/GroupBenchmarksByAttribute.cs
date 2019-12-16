@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Attributes
 
         public GroupBenchmarksByAttribute(params BenchmarkLogicalGroupRule[] rules)
         {
-            Config = ManualConfig.CreateEmpty().WithLogicalGroupRules(rules);
+            Config = ManualConfig.CreateEmpty().AddLogicalGroupRules(rules);
         }
     }
 }
