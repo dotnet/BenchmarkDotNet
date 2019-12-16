@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Engines
         [PublicAPI] public Action IterationSetupAction { get; }
         [PublicAPI] public Action IterationCleanupAction { get; }
         [PublicAPI] public IResolver Resolver { get; }
-        [PublicAPI] public Encoding Encoding { get; }
+        [PublicAPI] public CultureInfo CultureInfo { get; }
         [PublicAPI] public string BenchmarkName { get; }
 
         private IClock Clock { get; }
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Engines
             IResolver resolver,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeExtraStats, Encoding encoding, string benchmarkName)
+            bool includeExtraStats, string benchmarkName)
         {
 
             Host = host;
@@ -68,7 +68,6 @@ namespace BenchmarkDotNet.Engines
             BenchmarkName = benchmarkName;
 
             Resolver = resolver;
-            Encoding = encoding;
 
             Clock = targetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
             ForceAllocations = targetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
@@ -137,7 +136,7 @@ namespace BenchmarkDotNet.Engines
 
             var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
 
-            return new RunResults(idle, main, outlierMode, workGcHasDone, threadingStats, Encoding);
+            return new RunResults(idle, main, outlierMode, workGcHasDone, threadingStats);
         }
 
         public Measurement RunIteration(IterationData data)
@@ -171,8 +170,8 @@ namespace BenchmarkDotNet.Engines
             GcCollect();
 
             // Results
-            var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, clockSpan.GetNanoseconds(), Encoding);
-            WriteLine(measurement.ToOutputLine());
+            var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, clockSpan.GetNanoseconds());
+            WriteLine(measurement.ToString());
 
             return measurement;
         }

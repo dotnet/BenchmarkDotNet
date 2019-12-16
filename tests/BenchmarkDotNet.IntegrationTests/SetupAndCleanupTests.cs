@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests
         private const string SecondIterationCleanupCalled = SecondPrefix + "IterationCleanup";
         private const string SecondBenchmarkCalled = SecondPrefix + "Benchmark";
 
-        private const string OutputDelimeter = "===========================================================";
+        private const string OutputDelimiter = "===========================================================";
 
         private readonly string[] firstExpectedLogLines = {
             "// ### First Called: GlobalSetup",
@@ -83,9 +83,9 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = CreateSimpleConfig(logger, miniJob);
 
             CanExecute<Benchmarks>(config);
-            Output.WriteLine(OutputDelimeter);
-            Output.WriteLine(OutputDelimeter);
-            Output.WriteLine(OutputDelimeter);
+            Output.WriteLine(OutputDelimiter);
+            Output.WriteLine(OutputDelimiter);
+            Output.WriteLine(OutputDelimiter);
 
             var firstActualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(FirstPrefix)).ToArray();
             foreach (string line in firstActualLogLines)

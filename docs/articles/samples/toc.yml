@@ -32,8 +32,6 @@
   href: IntroDisassemblyDry.md
 - name: IntroDisassemblyRyuJit
   href: IntroDisassemblyRyuJit.md
-- name: IntroEncoding
-  href: IntroEncoding.md
 - name: IntroEnvVars
   href: IntroEnvVars.md
 - name: IntroExport
@@ -108,3 +106,5 @@
   href: IntroTagColumn.md
 - name: IntroTailcall
   href: IntroTailcall.md
+- name: IntroUnicode
+  href: IntroUnicode.md

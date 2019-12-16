@@ -119,4 +119,4 @@ In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on. The column Gen X means
 
 [!include[IntroNativeMemory](../samples/IntroNativeMemory.md)]
 
-[!include[IntroThreadingDiagnoser](../samples/ThreadingDiagnoser.md)]
+[!include[IntroThreadingDiagnoser](../samples/IntroThreadingDiagnoser.md)]

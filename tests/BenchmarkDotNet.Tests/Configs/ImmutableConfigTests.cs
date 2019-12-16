@@ -14,7 +14,7 @@ using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Validators;
 using Xunit;
 
-namespace BenchmarkDotNet.IntegrationTests
+namespace BenchmarkDotNet.Tests.Configs
 {
     public class ImmutableConfigTests
     {
@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers and disassembler only for Windows. This test is disabled for .NET Core because CoreRT compiler goes crazy when some dependency has reference to TraceEvent...")]
-        public void WhenUserDefinesHardwareCountersAndUsesDissasemblyDiagnoserWeAddInstructionPointerExporter()
+        public void WhenUserDefinesHardwareCountersAndUsesDisassemblyDiagnoserWeAddInstructionPointerExporter()
         {
             var mutable = ManualConfig.CreateEmpty();
 
@@ -150,9 +150,12 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var fromEmpty = ImmutableConfigBuilder.Create(ManualConfig.CreateEmpty());
             Assert.Contains(JitOptimizationsValidator.DontFailOnError, fromEmpty.GetValidators());
-
+            
+#if !DEBUG
+            // DefaultConfig.Instance doesn't include JitOptimizationsValidator.FailOnError in the DEBUG mode
             var fromDefault = ImmutableConfigBuilder.Create(DefaultConfig.Instance);
             Assert.Contains(JitOptimizationsValidator.FailOnError, fromDefault.GetValidators());
+#endif
         }
 
         [Fact]
@@ -202,9 +205,9 @@ namespace BenchmarkDotNet.IntegrationTests
         public void WhenTwoConfigsAreAddedTheRegularJobsAreJustAdded()
         {
             var configWithClrJob = CreateConfigFromJobs(Job.Default.WithRuntime(CoreRuntime.Core21));
-            var cofingWithCoreJob = CreateConfigFromJobs(Job.Default.WithRuntime(ClrRuntime.Net461));
+            var configWithCoreJob = CreateConfigFromJobs(Job.Default.WithRuntime(ClrRuntime.Net461));
 
-            foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithClrJob, cofingWithCoreJob))
+            foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithClrJob, configWithCoreJob))
             {
                 var runnableJobs = added.GetJobs();
 

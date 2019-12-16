@@ -71,6 +71,7 @@ namespace BenchmarkDotNet.Tests.Reports
                 string.Empty,
                 string.Empty,
                 TimeSpan.FromMinutes(1),
+                TestCultureInfo.Instance,
                 ImmutableArray<ValidationError>.Empty);
             MarkdownExporter.Default.ExportToLog(summary, logger);
             output.WriteLine(logger.GetLog());

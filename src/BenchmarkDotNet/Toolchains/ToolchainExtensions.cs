@@ -62,9 +62,9 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private static IToolchain GetToolchain(RuntimeMoniker targetFrameworkMoniker)
+        private static IToolchain GetToolchain(RuntimeMoniker runtimeMoniker)
         {
-            switch (targetFrameworkMoniker)
+            switch (runtimeMoniker)
             {
                 case RuntimeMoniker.Net461:
                     return CsProjClassicNetToolchain.Net461;
@@ -103,7 +103,7 @@ namespace BenchmarkDotNet.Toolchains
                 case RuntimeMoniker.CoreRt50:
                     return CoreRtToolchain.Core50;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(targetFrameworkMoniker), targetFrameworkMoniker, "Target Framework Moniker not supported");
+                    throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "RuntimeMoniker not supported");
             }
         }
     }

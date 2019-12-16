@@ -18,8 +18,8 @@ namespace BenchmarkDotNet.Environments
         public static readonly CoreRuntime Core31 = new CoreRuntime(RuntimeMoniker.NetCoreApp31, "netcoreapp3.1", ".NET Core 3.1");
         public static readonly CoreRuntime Core50 = new CoreRuntime(RuntimeMoniker.NetCoreApp50, "netcoreapp5.0", ".NET Core 5.0");
 
-        private CoreRuntime(RuntimeMoniker targetFrameworkMoniker, string msBuildMoniker, string displayName)
-            : base(targetFrameworkMoniker, msBuildMoniker, displayName)
+        private CoreRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
+            : base(runtimeMoniker, msBuildMoniker, displayName)
         {
         }
 

@@ -341,7 +341,7 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void SpecyfingInvalidStatisticalTestsThresholdMeansFailure()
+        public void SpecifyingInvalidStatisticalTestsThresholdMeansFailure()
         {
             Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "not a number" }, new OutputLogger(Output)).isSuccess);
             Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "1unknownUnit" }, new OutputLogger(Output)).isSuccess);
@@ -407,17 +407,38 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void UserCanSpecifyCustomMaxParamterColumnWidth()
+        public void UserCanSpecifyCustomMaxParameterColumnWidth()
         {
             const int customValue = 1234;
 
             var globalConfig = DefaultConfig.Instance;
 
-            Assert.NotEqual(customValue, globalConfig.SummaryStyle.MaxParamterColumnWidth);
+            Assert.NotEqual(customValue, globalConfig.SummaryStyle.MaxParameterColumnWidth);
 
             var parsedConfig = ConfigParser.Parse(new[] { "--maxWidth", customValue.ToString() }, new OutputLogger(Output), globalConfig).config;
 
-            Assert.Equal(customValue, parsedConfig.SummaryStyle.MaxParamterColumnWidth);
+            Assert.Equal(customValue, parsedConfig.SummaryStyle.MaxParameterColumnWidth);
+        }
+
+        [Fact]
+        public void UserCanSpecifyEnvironmentVariables()
+        {
+            const string key = "A_VERY_NICE_ENV_VAR";
+            const string value = "enabled";
+
+            var parsedConfig = ConfigParser.Parse(new[] { "--envVars", $"{key}:{value}" }, new OutputLogger(Output)).config;
+
+            var job = parsedConfig.GetJobs().Single();
+            var envVar = job.Environment.EnvironmentVariables.Single();
+
+            Assert.Equal(key, envVar.Key);
+            Assert.Equal(value, envVar.Value);
+        }
+
+        [Fact]
+        public void InvalidEnvVarAreRecognized()
+        {
+            Assert.False(ConfigParser.Parse(new[] { "--envVars", "INVALID_NO_SEPARATOR" }, new OutputLogger(Output)).isSuccess);
         }
     }
 }

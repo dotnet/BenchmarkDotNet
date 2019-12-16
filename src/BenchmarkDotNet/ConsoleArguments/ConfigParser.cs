@@ -32,6 +32,7 @@ namespace BenchmarkDotNet.ConsoleArguments
     public static class ConfigParser
     {
         private const int MinimumDisplayWidth = 80;
+        private const char EnvVarKeyValueSeparator = ':';
 
         private static readonly IReadOnlyDictionary<string, Job> AvailableJobs = new Dictionary<string, Job>(StringComparer.InvariantCultureIgnoreCase)
         {
@@ -164,6 +165,12 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return false;
             }
 
+            if (options.EnvironmentVariables.Any(envVar => envVar.IndexOf(EnvVarKeyValueSeparator) <= 0))
+            {
+                logger.WriteLineError($"Environment variable value must be separated from the key using '{EnvVarKeyValueSeparator}'. Use --help to see examples.");
+                return false;
+            }
+
             return true;
         }
 
@@ -214,8 +221,8 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.WithSwitchingOptions(options.StopOnFirstError, ConfigOptions.StopOnFirstError);
             config.WithSwitchingOptions(options.DisableLogFile, ConfigOptions.DisableLogFile);
 
-            if (options.MaxParamterColumnWidth.HasValue)
-                config.WithSummaryStyle(SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParamterColumnWidth.Value));
+            if (options.MaxParameterColumnWidth.HasValue)
+                config.WithSummaryStyle(SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParameterColumnWidth.Value));
 
             return config;
         }
@@ -256,6 +263,15 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithStrategy(options.RunStrategy.Value);
             if (options.RunOncePerIteration)
                 baseJob = baseJob.RunOncePerIteration();
+
+            if (options.EnvironmentVariables.Any())
+            {
+                baseJob = baseJob.With(options.EnvironmentVariables.Select(text =>
+                {
+                    var separated = text.Split(new [] { EnvVarKeyValueSeparator }, 2);
+                    return new EnvironmentVariable(separated[0], separated[1]);
+                }).ToArray());
+            }
 
             if (AvailableJobs.Values.Contains(baseJob)) // no custom settings
                 return baseJob;

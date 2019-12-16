@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
 {
-    public struct GcStats
+    public struct GcStats : IEquatable<GcStats>
     {
         internal const string ResultsLinePrefix = "GC: ";
 
@@ -221,6 +221,23 @@ namespace BenchmarkDotNet.Engines
             } while (result <= 0);
 
             return result;
+        }
+
+        public bool Equals(GcStats other) => Gen0Collections == other.Gen0Collections && Gen1Collections == other.Gen1Collections && Gen2Collections == other.Gen2Collections && AllocatedBytes == other.AllocatedBytes && TotalOperations == other.TotalOperations;
+
+        public override bool Equals(object obj) => obj is GcStats other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = Gen0Collections;
+                hashCode = (hashCode * 397) ^ Gen1Collections;
+                hashCode = (hashCode * 397) ^ Gen2Collections;
+                hashCode = (hashCode * 397) ^ AllocatedBytes.GetHashCode();
+                hashCode = (hashCode * 397) ^ TotalOperations.GetHashCode();
+                return hashCode;
+            }
         }
     }
 }

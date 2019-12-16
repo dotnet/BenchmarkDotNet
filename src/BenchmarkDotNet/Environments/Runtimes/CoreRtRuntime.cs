@@ -32,8 +32,8 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public static readonly CoreRtRuntime CoreRt50 = new CoreRtRuntime(RuntimeMoniker.CoreRt50, "netcoreapp5.0", "CoreRt 5.0");
 
-        private CoreRtRuntime(RuntimeMoniker targetFrameworkMoniker, string msBuildMoniker, string displayName)
-            : base(targetFrameworkMoniker, msBuildMoniker, displayName)
+        private CoreRtRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
+            : base(runtimeMoniker, msBuildMoniker, displayName)
         {
         }
 

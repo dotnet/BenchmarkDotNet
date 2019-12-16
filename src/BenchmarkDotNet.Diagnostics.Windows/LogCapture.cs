@@ -9,6 +9,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private readonly List<OutputLine> capturedOutput = new List<OutputLine>(100);
 
+        public string Id => nameof(LogCapture);
+        public int Priority => 0;
+
         public void Write(LogKind logKind, string text)
         {
             capturedOutput.Add(new OutputLine

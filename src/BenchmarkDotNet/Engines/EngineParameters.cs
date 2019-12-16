@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
@@ -27,8 +28,6 @@ namespace BenchmarkDotNet.Engines
         public Action IterationSetupAction { get; set; }
         public Action IterationCleanupAction { get; set; }
         public bool MeasureExtraStats { get; set; }
-
-        [PublicAPI] public Encoding Encoding { get; set; }
 
         [PublicAPI] public string BenchmarkName { get;  set; }
 

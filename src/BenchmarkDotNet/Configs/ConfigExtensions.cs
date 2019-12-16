@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Analysers;
@@ -62,9 +63,8 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static IConfig With(this IConfig config, params IFilter[] filters) => config.AddFilter(filters);
         [PublicAPI] public static ManualConfig AddFilter(this IConfig config, params IFilter[] filters) => config.With(c => c.AddFilter(filters));
 
-        [Obsolete("This property will soon be removed, please start using WithEncoding instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, Encoding encoding) => config.WithEncoding( encoding);
-        [PublicAPI] public static ManualConfig WithEncoding(this IConfig config, Encoding encoding) => config.With(c => c.WithEncoding(encoding));
+        [Obsolete("To enable unicode support, use .AddLogger(ConsoleLogger.Unicode)")]
+        [PublicAPI] public static IConfig With(this IConfig config, Encoding encoding) => Equals(encoding, Encoding.Unicode) ? config.AddLogger(ConsoleLogger.Unicode) : config;
 
         [Obsolete("This property will soon be removed, please start using WithSummaryStyle instead.")]
         [PublicAPI] public static IConfig With(this IConfig config, SummaryStyle summaryStyle) => config.WithSummaryStyle(summaryStyle);
@@ -73,6 +73,8 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static ManualConfig WithArtifactsPath(this IConfig config, string artifactsPath) => config.With(m => m.WithArtifactsPath(artifactsPath));
         [PublicAPI] public static ManualConfig WithUnionRule(this IConfig config, ConfigUnionRule unionRule) => config.With(m => m.WithUnionRule(unionRule));
 
+        [PublicAPI] public static ManualConfig WithCultureInfo(this IConfig config, CultureInfo cultureInfo) => config.With(m => m.CultureInfo = cultureInfo);
+        
         /// <summary>
         /// determines if all auto-generated files should be kept or removed after running the benchmarks
         /// </summary>

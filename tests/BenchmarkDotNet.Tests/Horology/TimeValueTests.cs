@@ -5,16 +5,16 @@ using Xunit;
 
 namespace BenchmarkDotNet.Tests.Horology
 {
-    public class TimeIntervalTests
+    public class TimeValueTests
     {
         private static void Check(TimeUnit unit, Func<double, TimeInterval> fromMethod, Func<TimeInterval, double> toMethod)
         {
             int[] values = { 1, 42, 10000 };
             foreach (int value in values)
             {
-                var timeInterval = new TimeInterval(value, unit);
-                AreEqual(timeInterval, fromMethod(value));
-                AreEqual(toMethod(timeInterval), value);
+                var timeValue = new TimeInterval(value, unit);
+                AreEqual(timeValue, fromMethod(value));
+                AreEqual(toMethod(timeValue), value);
             }
         }
 

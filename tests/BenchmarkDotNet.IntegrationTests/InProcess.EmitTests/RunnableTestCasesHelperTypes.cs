@@ -37,22 +37,22 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         public T Value;
     }
 
-    public struct CustomAwatiableStruct
+    public struct CustomAwaitableStruct
     {
         public CustomAwaiterStruct GetAwaiter() => new CustomAwaiterStruct();
     }
 
-    public struct CustomAwatiableStruct2
+    public struct CustomAwaitableStruct2
     {
         public CustomAwaiterClass GetAwaiter() => new CustomAwaiterClass();
     }
 
-    public struct CustomAwatiableClass
+    public struct CustomAwaitableClass
     {
         public CustomAwaiterStruct GetAwaiter() => new CustomAwaiterStruct();
     }
 
-    public struct CustomAwatiableClass2
+    public struct CustomAwaitableClass2
     {
         public CustomAwaiterClass GetAwaiter() => new CustomAwaiterClass();
     }

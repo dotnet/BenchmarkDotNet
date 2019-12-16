@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using System.Globalization;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -38,10 +38,8 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         string ArtifactsPath { get; }
 
-        /// <summary>
-        /// the default value is ASCII
-        /// </summary>
-        Encoding Encoding { get; }
+        [CanBeNull]
+        CultureInfo CultureInfo { get; }
 
         /// <summary>
         /// a set of custom flags that can enable/disable various settings
