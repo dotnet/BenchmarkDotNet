@@ -28,9 +28,9 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                Add(Job.ShortRun.With(new MonoRuntime(
+                AddJob(Job.ShortRun.WithRuntime(new MonoRuntime(
                     "Mono x64", @"C:\Program Files\Mono\bin\mono.exe")));
-                Add(Job.ShortRun.With(new MonoRuntime(
+                AddJob(Job.ShortRun.WithRuntime(new MonoRuntime(
                     "Mono x86", @"C:\Program Files (x86)\Mono\bin\mono.exe")));
             }
         }
@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Samples
                 var aot_compile_args  = "--aot=llvm";
                 var mono_bcl = $@"{mono_top_dir}\lib\mono\4.5";
                 var mono_bin = $@"{mono_top_dir}\bin\mono.exe";
-                Add(Job.ShortRun.With(new MonoRuntime(
+                AddJob(Job.ShortRun.WithRuntime(new MonoRuntime(
                     name, mono_bin, aot_compile_args, mono_bcl)));
             }
 
@@ -80,9 +80,9 @@ namespace BenchmarkDotNet.Samples
         {
             BenchmarkRunner.Run<IntroCustomMonoFluentConfig>(ManualConfig
                 .CreateEmpty()
-                .With(Job.ShortRun.With(new MonoRuntime(
+                .AddJob(Job.ShortRun.WithRuntime(new MonoRuntime(
                     "Mono x64", @"C:\Program Files\Mono\bin\mono.exe")))
-                .With(Job.ShortRun.With(new MonoRuntime(
+                .AddJob(Job.ShortRun.WithRuntime(new MonoRuntime(
                     "Mono x86", @"C:\Program Files (x86)\Mono\bin\mono.exe"))));
         }
 

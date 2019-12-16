@@ -23,13 +23,13 @@ namespace BenchmarkDotNet.Samples
                     ? Platform.X64
                     : Platform.X86;
 
-                Add(Job.MediumRun
+                AddJob(Job.MediumRun
                     .WithLaunchCount(1)
-                    .With(wrongPlatform)
-                    .With(InProcessEmitToolchain.Instance)
+                    .WithPlatform(wrongPlatform)
+                    .WithToolchain(InProcessEmitToolchain.Instance)
                     .WithId("InProcess"));
 
-                Add(InProcessValidator.DontFailOnError);
+                AddValidator(InProcessValidator.DontFailOnError);
             }
         }
 

@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Tests.Reports
         [Fact]
         public void NumericColumnIsRightJustified()
         {
-            var config = ManualConfig.Create(DefaultConfig.Instance).With(StatisticColumn.Mean);
+            var config = ManualConfig.Create(DefaultConfig.Instance).AddColumn(StatisticColumn.Mean);
             var summary = MockFactory.CreateSummary(config);
             var table = new SummaryTable(summary);
 
@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Tests.Reports
         [Fact]
         public void TextColumnIsLeftJustified()
         {
-            var config = ManualConfig.Create(DefaultConfig.Instance).With(new ParamColumn("Param"));
+            var config = ManualConfig.Create(DefaultConfig.Instance).AddColumn(new ParamColumn("Param"));
             var summary = MockFactory.CreateSummary(config);
             var table = new SummaryTable(summary);
 
@@ -68,8 +68,8 @@ namespace BenchmarkDotNet.Tests.Reports
         [Fact] // Issue #1070
         public void CustomOrdererIsSupported()
         {
-            var config = ManualConfig.Create(DefaultConfig.Instance);
-            config.Orderer = new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Alphabetical);
+            var config = ManualConfig.Create(DefaultConfig.Instance)
+                .WithOrderer(new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Alphabetical));
             var summary = MockFactory.CreateSummary(config);
             Assert.True(summary.Orderer is DefaultOrderer defaultOrderer &&
                         defaultOrderer.SummaryOrderPolicy == SummaryOrderPolicy.FastestToSlowest &&

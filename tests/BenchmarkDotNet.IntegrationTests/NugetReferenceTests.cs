@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var toolchain = RuntimeInformation.GetCurrentRuntime().GetToolchain(preferMsBuildToolchains: true);
 
-            var job = Job.Dry.With(toolchain).WithNuGet("Newtonsoft.Json", "11.0.2");
+            var job = Job.Dry.WithToolchain(toolchain).WithNuGet("Newtonsoft.Json", "11.0.2");
             var config = CreateSimpleConfig(job: job);
 
             CanExecute<WithCallToNewtonsoft>(config);
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var toolchain = RoslynToolchain.Instance;
 
-            var unsupportedJob = Job.Dry.With(toolchain).WithNuGet("Newtonsoft.Json", "11.0.2");
+            var unsupportedJob = Job.Dry.WithToolchain(toolchain).WithNuGet("Newtonsoft.Json", "11.0.2");
             var unsupportedJobConfig = CreateSimpleConfig(job: unsupportedJob);
             var unsupportedJobBenchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithCallToNewtonsoft), unsupportedJobConfig);
             var unsupportedJobLogger = new CompositeLogger(unsupportedJobConfig.GetLoggers().ToImmutableHashSet());
@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.False(toolchain.IsSupported(benchmarkCase, unsupportedJobLogger, BenchmarkRunnerClean.DefaultResolver));
             }
 
-            var supportedJob = Job.Dry.With(toolchain);
+            var supportedJob = Job.Dry.WithToolchain(toolchain);
             var supportedConfig = CreateSimpleConfig(job: supportedJob);
             var supportedBenchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithCallToNewtonsoft), supportedConfig);
             var supportedLogger = new CompositeLogger(supportedConfig.GetLoggers().ToImmutableHashSet());

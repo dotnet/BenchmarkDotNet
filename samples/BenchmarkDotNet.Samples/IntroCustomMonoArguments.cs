@@ -17,13 +17,13 @@ namespace BenchmarkDotNet.Samples
                 // optimizations to be turned off by prefixing the optimization
                 // name with a minus sign.
 
-                Add(Job.Default
-                    .With(MonoRuntime.Default)
-                    .With(new[] { new MonoArgument("--optimize=inline") })
+                AddJob(Job.Default
+                    .WithRuntime(MonoRuntime.Default)
+                    .WithArguments(new[] { new MonoArgument("--optimize=inline") })
                     .WithId("Inlining enabled"));
-                Add(Job.Default
-                    .With(MonoRuntime.Default)
-                    .With(new[] { new MonoArgument("--optimize=-inline") })
+                AddJob(Job.Default
+                    .WithRuntime(MonoRuntime.Default)
+                    .WithArguments(new[] { new MonoArgument("--optimize=-inline") })
                     .WithId("Inlining disabled"));
             }
         }

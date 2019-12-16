@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Attributes
 
         protected ValidatorConfigBaseAttribute(params IValidator[] validators)
         {
-            Config = ManualConfig.CreateEmpty().With(validators);
+            Config = ManualConfig.CreateEmpty().AddValidator(validators);
         }
 
         public IConfig Config { get; }

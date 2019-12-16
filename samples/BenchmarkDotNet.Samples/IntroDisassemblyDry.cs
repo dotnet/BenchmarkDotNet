@@ -13,10 +13,10 @@ namespace BenchmarkDotNet.Samples
         {
             public JustDisassembly()
             {
-                Add(Job.Dry.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core20));
-                Add(Job.Dry.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core21));
+                AddJob(Job.Dry.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core20));
+                AddJob(Job.Dry.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core21));
 
-                Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3)));
+                AddDiagnoser(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3)));
             }
         }
 

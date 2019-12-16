@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Attributes
     {
         public UnicodeConsoleLoggerAttribute()
         {
-            Config = ManualConfig.CreateEmpty().With(ConsoleLogger.Unicode);
+            Config = ManualConfig.CreateEmpty().AddLogger(ConsoleLogger.Unicode);
         }
         
         public IConfig Config { get; }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
@@ -26,7 +27,7 @@ namespace BenchmarkDotNet.Configs
         private readonly List<IAnalyser> analysers = new List<IAnalyser>();
         private readonly List<IValidator> validators = new List<IValidator>();
         private readonly List<Job> jobs = new List<Job>();
-        private readonly List<HardwareCounter> hardwareCounters = new List<HardwareCounter>();
+        private readonly HashSet<HardwareCounter> hardwareCounters = new HashSet<HardwareCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
         private readonly HashSet<BenchmarkLogicalGroupRule> logicalGroupRules = new HashSet<BenchmarkLogicalGroupRule>();
 
@@ -48,38 +49,151 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public IOrderer Orderer { get; set; }
         [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
 
-        [Obsolete("This property will soon be removed, please start using .Options instead")]
-        public bool KeepBenchmarkFiles
+        public ManualConfig WithOption(ConfigOptions option, bool value)
         {
-            get => Options.IsSet(ConfigOptions.KeepBenchmarkFiles);
-            set => Options = Options.Set(value, ConfigOptions.KeepBenchmarkFiles);
+            Options = Options.Set(value, option);
+            return this;
+        }
+        
+        public ManualConfig WithOptions(ConfigOptions options)
+        {
+            Options |= options;
+            return this;
         }
 
-        [Obsolete("This property will soon be removed, please start using .Options instead")]
-        public bool SummaryPerType
+        public ManualConfig WithUnionRule(ConfigUnionRule unionRule)
         {
-            get => !Options.IsSet(ConfigOptions.JoinSummary);
-            set => Options = Options.Set(!value, ConfigOptions.JoinSummary);
+            UnionRule = unionRule;
+            return this;
         }
 
-        [Obsolete("This property will soon be removed, please start using .Options instead")]
-        public bool StopOnFirstError
+        public ManualConfig WithArtifactsPath(string artifactsPath)
         {
-            get => Options.IsSet(ConfigOptions.StopOnFirstError);
-            set => Options = Options.Set(value, ConfigOptions.StopOnFirstError);
+            ArtifactsPath = artifactsPath;
+            return this;
         }
 
-        public void Add(params IColumn[] newColumns) => columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
-        public void Add(params IColumnProvider[] newColumnProviders) => columnProviders.AddRange(newColumnProviders);
-        public void Add(params IExporter[] newExporters) => exporters.AddRange(newExporters);
-        public void Add(params ILogger[] newLoggers) => loggers.AddRange(newLoggers);
-        public void Add(params IDiagnoser[] newDiagnosers) => diagnosers.AddRange(newDiagnosers);
-        public void Add(params IAnalyser[] newAnalysers) => analysers.AddRange(newAnalysers);
-        public void Add(params IValidator[] newValidators) => validators.AddRange(newValidators);
-        public void Add(params Job[] newJobs) => jobs.AddRange(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
-        public void Add(params HardwareCounter[] newHardwareCounters) => hardwareCounters.AddRange(newHardwareCounters);
-        public void Add(params IFilter[] newFilters) => filters.AddRange(newFilters);
-        public void Add(params BenchmarkLogicalGroupRule[] rules) => logicalGroupRules.AddRange(rules);
+        public ManualConfig WithSummaryStyle(SummaryStyle summaryStyle)
+        {
+            SummaryStyle = summaryStyle;
+            return this;
+        }
+
+        public ManualConfig WithOrderer(IOrderer orderer)
+        {
+            Orderer = orderer;
+            return this;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .AddColumn() instead.")]
+        public void Add(params IColumn[] newColumns) => AddColumn(newColumns);
+
+        public ManualConfig AddColumn(params IColumn[] newColumns)
+        {
+            columnProviders.AddRange(newColumns.Select(c => c.ToProvider()));
+            return this;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .AddColumnProvider() instead.")]
+        public void Add(params IColumnProvider[] newColumnProviders) => AddColumnProvider(newColumnProviders);
+
+        public ManualConfig AddColumnProvider(params IColumnProvider[] newColumnProviders)
+        {
+            columnProviders.AddRange(newColumnProviders);
+            return this;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .AddExporter() instead.")]
+        public void Add(params IExporter[] newExporters) => AddExporter(newExporters);
+
+        public ManualConfig AddExporter(params IExporter[] newExporters)
+        {
+            exporters.AddRange(newExporters);
+            return this;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .AddLogger() instead.")]
+        public void Add(params ILogger[] newLoggers) => AddLogger(newLoggers);
+
+        public ManualConfig AddLogger(params ILogger[] newLoggers)
+        {
+            loggers.AddRange(newLoggers);
+            return this;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .AddDiagnoser() instead.")]
+        public void Add(params IDiagnoser[] newDiagnosers) => AddDiagnoser(newDiagnosers);
+
+        public ManualConfig AddDiagnoser(params IDiagnoser[] newDiagnosers)
+        {
+            diagnosers.AddRange(newDiagnosers);
+            return this;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .AddAnalyser() instead.")]
+        public void Add(params IAnalyser[] newAnalysers) => AddAnalyser(newAnalysers);
+
+        public ManualConfig AddAnalyser(params IAnalyser[] newAnalysers)
+        {
+            analysers.AddRange(newAnalysers);
+            return this;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .AddValidator() instead.")]
+        public void Add(params IValidator[] newValidators) => AddValidator(newValidators);
+
+        public ManualConfig AddValidator(params IValidator[] newValidators)
+        {
+            validators.AddRange(newValidators);
+            return this;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .AddJob() instead.")]
+        public void Add(params Job[] newJobs) => AddJob(newJobs);
+
+        public ManualConfig AddJob(params Job[] newJobs)
+        {
+            jobs.AddRange(newJobs.Select(j => j.Freeze())); // DONTTOUCH: please DO NOT remove .Freeze() call.
+            return this;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using ..AddHardwareCounters()() instead.")]
+        public void Add(params HardwareCounter[] newHardwareCounters) => AddHardwareCounters(newHardwareCounters);
+        
+        public ManualConfig AddHardwareCounters(params HardwareCounter[] newHardwareCounters)
+        {
+            hardwareCounters.AddRange(newHardwareCounters);
+            return this;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .AddFilter() instead.")]
+        public void Add(params IFilter[] newFilters) => AddFilter(newFilters);
+        
+        public ManualConfig AddFilter(params IFilter[] newFilters)
+        {
+            filters.AddRange(newFilters);
+            return this;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .AddLogicalGroupRules() instead.")]
+        public void Add(params BenchmarkLogicalGroupRule[] rules) => AddLogicalGroupRules(rules);
+        
+        public ManualConfig AddLogicalGroupRules(params BenchmarkLogicalGroupRule[] rules)
+        {
+            logicalGroupRules.AddRange(rules);
+            return this;
+        }
 
         [PublicAPI]
         public void Add(IConfig config)
@@ -117,11 +231,11 @@ namespace BenchmarkDotNet.Configs
             {
                 case ConfigUnionRule.AlwaysUseLocal:
                     manualConfig.Add(localConfig);
-                    manualConfig.Add(globalConfig.GetFilters().ToArray()); // the filters should be merged anyway
+                    manualConfig.AddFilter(globalConfig.GetFilters().ToArray()); // the filters should be merged anyway
                     break;
                 case ConfigUnionRule.AlwaysUseGlobal:
                     manualConfig.Add(globalConfig);
-                    manualConfig.Add(localConfig.GetFilters().ToArray()); // the filters should be merged anyway
+                    manualConfig.AddFilter(localConfig.GetFilters().ToArray()); // the filters should be merged anyway
                     break;
                 case ConfigUnionRule.Union:
                     manualConfig.Add(globalConfig);

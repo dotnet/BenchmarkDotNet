@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Samples
     {
         private class Config : ManualConfig
         {
-            public Config() => Add(ConsoleLogger.Unicode);
+            public Config() => AddLogger(ConsoleLogger.Unicode);
         }
 
         [Benchmark]
@@ -43,9 +43,8 @@ namespace BenchmarkDotNet.Samples
         public static void Run()
         {
             BenchmarkRunner.Run<IntroUnicodeFluentConfig>(
-                ManualConfig
-                    .Create(DefaultConfig.Instance)
-                    .With(ConsoleLogger.Unicode));
+                DefaultConfig.Instance
+                    .AddLogger(ConsoleLogger.Unicode));
         }
 
         [Benchmark]

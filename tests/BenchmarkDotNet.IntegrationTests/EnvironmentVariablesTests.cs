@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void UserCanSpecifyEnvironmentVariables()
         {
             var variables = new [] { new EnvironmentVariable(Key, Value) };
-            var jobWithCustomConfiguration = JobExtensions.With(Job.Dry, variables);
+            var jobWithCustomConfiguration = Job.Dry.WithEnvironmentVariables(variables);
             var config = CreateSimpleConfig(job: jobWithCustomConfiguration);
 
             CanExecute<WithEnvironmentVariables>(config);

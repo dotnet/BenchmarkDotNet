@@ -25,12 +25,12 @@ namespace BenchmarkDotNet.Samples
             {
                 var baseJob = Job.MediumRun;
 
-                Add(baseJob.WithNuGet("Newtonsoft.Json", "11.0.2").WithId("11.0.2"));
-                Add(baseJob.WithNuGet("Newtonsoft.Json", "11.0.1").WithId("11.0.1"));
-                Add(baseJob.WithNuGet("Newtonsoft.Json", "10.0.3").WithId("10.0.3"));
-                Add(baseJob.WithNuGet("Newtonsoft.Json", "10.0.2").WithId("10.0.2"));
-                Add(baseJob.WithNuGet("Newtonsoft.Json", "10.0.1").WithId("10.0.1"));
-                Add(baseJob.WithNuGet("Newtonsoft.Json", "9.0.1").WithId("9.0.1"));
+                AddJob(baseJob.WithNuGet("Newtonsoft.Json", "11.0.2").WithId("11.0.2"));
+                AddJob(baseJob.WithNuGet("Newtonsoft.Json", "11.0.1").WithId("11.0.1"));
+                AddJob(baseJob.WithNuGet("Newtonsoft.Json", "10.0.3").WithId("10.0.3"));
+                AddJob(baseJob.WithNuGet("Newtonsoft.Json", "10.0.2").WithId("10.0.2"));
+                AddJob(baseJob.WithNuGet("Newtonsoft.Json", "10.0.1").WithId("10.0.1"));
+                AddJob(baseJob.WithNuGet("Newtonsoft.Json", "9.0.1").WithId("9.0.1"));
             }
         }
 

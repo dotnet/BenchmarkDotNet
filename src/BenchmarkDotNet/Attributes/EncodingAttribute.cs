@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Attributes
         {
             if (Equals(encoding, Encoding.Unicode))
             {
-                Config = ManualConfig.CreateEmpty().With(ConsoleLogger.Unicode);
+                Config = ManualConfig.CreateEmpty().AddLogger(ConsoleLogger.Unicode);
                 return;
             }
 

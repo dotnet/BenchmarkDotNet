@@ -81,11 +81,11 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, TailCallDiagnoser diagnoser) => ManualConfig.CreateEmpty()
-            .With(Job.Dry.With(jit).With(platform).With(runtime))
-            .With(DefaultConfig.Instance.GetLoggers().ToArray())
-            .With(DefaultColumnProviders.Instance)
-            .With(diagnoser)
-            .With(new OutputLogger(Output));
+            .AddJob(Job.Dry.WithJit(jit).WithPlatform(platform).WithRuntime(runtime))
+            .AddLogger(DefaultConfig.Instance.GetLoggers().ToArray())
+            .AddColumnProvider(DefaultColumnProviders.Instance)
+            .AddDiagnoser(diagnoser)
+            .AddLogger(new OutputLogger(Output));
     }
 }
 #endif
