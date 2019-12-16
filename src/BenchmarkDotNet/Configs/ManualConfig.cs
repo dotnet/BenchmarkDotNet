@@ -183,9 +183,10 @@ namespace BenchmarkDotNet.Configs
             return this;
         }
 
-        [Obsolete("This property will soon be removed, please start using AddHardwareCounter instead.")]
-        public void Add(params HardwareCounter[] newHardwareCounters) => AddHardwareCounter(newHardwareCounters);
-        public ManualConfig AddHardwareCounter(params HardwareCounter[] newHardwareCounters)
+        [Obsolete("This property will soon be removed, please start using .AddHardwareCounters() instead.")]
+        public void Add(params HardwareCounter[] newHardwareCounters) => AddHardwareCounters(newHardwareCounters);
+        
+        public ManualConfig AddHardwareCounters(params HardwareCounter[] newHardwareCounters)
         {
             hardwareCounters.AddRange(newHardwareCounters);
             return this;

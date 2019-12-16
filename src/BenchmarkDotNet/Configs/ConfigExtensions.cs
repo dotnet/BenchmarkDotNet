@@ -47,17 +47,17 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static IConfig With(this IConfig config, params IValidator[] validators) => config.AddValidator(validators);
         [PublicAPI] public static ManualConfig AddValidator(this IConfig config, params IValidator[] validators) => config.With(m => m.AddValidator(validators));
 
-        [Obsolete("This property will soon be removed, please start using AddJob instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, params Job[] jobs) => config.AddJob(jobs);
-        [PublicAPI] public static ManualConfig AddJob(this IConfig config, params Job[] jobs) => config.With(m => m.AddJob(jobs));
+        [Obsolete("This property will soon be removed, please start using .AddJob() instead.")]
+        [PublicAPI] public static IConfig With(this IConfig config, params Job[] jobs) => config.With(m => m.AddJob(jobs));
+        [PublicAPI] public static ManualConfig AddJob(this IConfig config, Job job) => config.With(m => m.AddJob(job));
 
         [Obsolete("This property will soon be removed, please start using WithOrderer instead.")]
         [PublicAPI] public static IConfig With(this IConfig config, IOrderer orderer) => config.WithOrderer(orderer);
         [PublicAPI] public static ManualConfig WithOrderer(this IConfig config, IOrderer orderer) => config.With(m => m.WithOrderer(orderer));
 
-        [Obsolete("This property will soon be removed, please start using AddHardwareCounter instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.AddHardwareCounter(counters));
-        [PublicAPI] public static ManualConfig AddHardwareCounter(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.AddHardwareCounter(counters));
+        [Obsolete("This property will soon be removed, please start using .AddHardwareCounters() instead.")]
+        [PublicAPI] public static IConfig With(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.AddHardwareCounters(counters));
+        [PublicAPI] public static ManualConfig AddHardwareCounters(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.AddHardwareCounters(counters));
 
         [Obsolete("This property will soon be removed, please start using AddFilter instead.")]
         [PublicAPI] public static IConfig With(this IConfig config, params IFilter[] filters) => config.AddFilter(filters);

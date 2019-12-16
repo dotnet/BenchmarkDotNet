@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Attributes
 
         public HardwareCountersAttribute(params HardwareCounter[] counters)
         {
-            Config = ManualConfig.CreateEmpty().AddHardwareCounter(counters);
+            Config = ManualConfig.CreateEmpty().AddHardwareCounters(counters);
         }
 
         public IConfig Config { get; }

@@ -49,8 +49,8 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.AddHardwareCounter(HardwareCounter.CacheMisses);
-            mutable.AddHardwareCounter(HardwareCounter.CacheMisses);
+            mutable.AddHardwareCounters(HardwareCounter.CacheMisses);
+            mutable.AddHardwareCounters(HardwareCounter.CacheMisses);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.AddHardwareCounter(HardwareCounter.CacheMisses);
+            mutable.AddHardwareCounters(HardwareCounter.CacheMisses);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.AddHardwareCounter(HardwareCounter.CacheMisses);
+            mutable.AddHardwareCounters(HardwareCounter.CacheMisses);
             mutable.AddDiagnoser(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.All));
 
             var final = ImmutableConfigBuilder.Create(mutable);

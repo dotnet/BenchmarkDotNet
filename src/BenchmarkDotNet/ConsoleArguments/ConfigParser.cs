@@ -188,7 +188,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             config.AddExporter(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
 
-            config.AddHardwareCounter(options.HardwareCounters
+            config.AddHardwareCounters(options.HardwareCounters
                 .Select(counterName => (HardwareCounter)Enum.Parse(typeof(HardwareCounter), counterName, ignoreCase: true))
                 .ToArray());
 
