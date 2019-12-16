@@ -31,14 +31,14 @@ namespace BenchmarkDotNet.Columns
 
         public List<double> GetAllValues(Summary summary, SummaryStyle style)
             => summary.Reports
-                .Where(HasSingleCall)
+                .Where(HasAnyRealWorkloads)
                 .Select(r => GetFirstCall(r).Nanoseconds)
                 .Where(v => !double.IsNaN(v) && !double.IsInfinity(v))
                 .ToList();
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
         {
-            if (!summary.HasReport(benchmarkCase) || !HasSingleCall(summary[benchmarkCase]))
+            if (!summary.HasReport(benchmarkCase) || !HasAnyRealWorkloads(summary[benchmarkCase]))
                 return "-";
 
             var measurement = GetFirstCall(summary[benchmarkCase]);
@@ -57,16 +57,16 @@ namespace BenchmarkDotNet.Columns
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);
 
-        public bool IsAvailable(Summary summary) => summary.Reports.Any(HasSingleCall);
+        public bool IsAvailable(Summary summary) => summary.Reports.Any(HasAnyRealWorkloads);
 
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
 
-        private static bool HasSingleCall(BenchmarkReport report)
-            => report.AllMeasurements.Any(m => m.IterationMode == IterationMode.Workload && m.Operations == 1);
+        private static bool HasAnyRealWorkloads(BenchmarkReport report)
+            => report.AllMeasurements.Any(m => m.IterationMode == IterationMode.Workload);
 
         private static Measurement GetFirstCall(BenchmarkReport report)
             => report.AllMeasurements
-                .Where(m => m.IterationMode == IterationMode.Workload && m.Operations == 1)
+                .Where(m => m.IterationMode == IterationMode.Workload)
                 .OrderBy(m => m.IterationMode) // Jitting, Pilot, Warmup, Workload
                 .ThenBy(m => m.IterationIndex)
                 .First();
