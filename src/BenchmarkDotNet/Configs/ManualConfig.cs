@@ -48,21 +48,15 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public IOrderer Orderer { get; set; }
         [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
 
+        public ManualConfig WithOption(ConfigOptions option, bool value)
+        {
+            Options = Options.Set(value, option);
+            return this;
+        }
+        
         public ManualConfig WithOptions(ConfigOptions options)
         {
             Options |= options;
-            return this;
-        }
-
-        public ManualConfig WithoutOptions(ConfigOptions options)
-        {
-            Options &= ~options;
-            return this;
-        }
-
-        public ManualConfig WithSwitchingOptions(bool value, ConfigOptions options)
-        {
-            Options = Options.Set(value, options);
             return this;
         }
 
@@ -88,27 +82,6 @@ namespace BenchmarkDotNet.Configs
         {
             Orderer = orderer;
             return this;
-        }
-
-        [Obsolete("This property will soon be removed, please start using .Options instead")]
-        public bool KeepBenchmarkFiles
-        {
-            get => Options.IsSet(ConfigOptions.KeepBenchmarkFiles);
-            set => WithSwitchingOptions(value, ConfigOptions.KeepBenchmarkFiles);
-        }
-
-        [Obsolete("This property will soon be removed, please start using .Options instead")]
-        public bool SummaryPerType
-        {
-            get => !Options.IsSet(ConfigOptions.JoinSummary);
-            set => WithSwitchingOptions(!value, ConfigOptions.JoinSummary);
-        }
-
-        [Obsolete("This property will soon be removed, please start using .Options instead")]
-        public bool StopOnFirstError
-        {
-            get => Options.IsSet(ConfigOptions.StopOnFirstError);
-            set => WithSwitchingOptions(value, ConfigOptions.StopOnFirstError);
         }
 
         [Obsolete("This property will soon be removed, please start using AddColumn instead.")]

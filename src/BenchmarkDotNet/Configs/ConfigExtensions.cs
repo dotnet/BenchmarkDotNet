@@ -78,18 +78,18 @@ namespace BenchmarkDotNet.Configs
         /// <summary>
         /// determines if all auto-generated files should be kept or removed after running the benchmarks
         /// </summary>
-        [PublicAPI] public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.WithSwitchingOptions(value, ConfigOptions.KeepBenchmarkFiles);
+        [PublicAPI] public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.WithOption(ConfigOptions.KeepBenchmarkFiles, value);
 
         /// <summary>
         /// determines if the exported result files should not be overwritten (be default they are overwritten)
         /// </summary>
 
-        [PublicAPI] public static IConfig DontOverwriteResults(this IConfig config, bool value = true) => config.WithSwitchingOptions(value, ConfigOptions.DontOverwriteResults);
+        [PublicAPI] public static IConfig DontOverwriteResults(this IConfig config, bool value = true) => config.WithOption(ConfigOptions.DontOverwriteResults, value);
 
         /// <summary>
         /// determines if benchmarking should be stopped after the first error (by default it's not)
         /// </summary>
-        [PublicAPI] public static IConfig StopOnFirstError(this IConfig config, bool value = true) => config.WithSwitchingOptions(value, ConfigOptions.StopOnFirstError);
+        [PublicAPI] public static IConfig StopOnFirstError(this IConfig config, bool value = true) => config.WithOption(ConfigOptions.StopOnFirstError, value);
 
         /// <summary>
         /// sets given options for the config
@@ -98,20 +98,15 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static IConfig With(this IConfig config, ConfigOptions options) => config.WithOptions(options);
         
         /// <summary>
+        /// sets given option to provided value
+        /// </summary>
+        [PublicAPI] public static ManualConfig WithOption(this IConfig config, ConfigOptions option, bool value) => config.With(m => m.WithOption(option, value));
+        
+        /// <summary>
         /// sets given options for the config
         /// </summary>
         [PublicAPI] public static ManualConfig WithOptions(this IConfig config, ConfigOptions options) => config.With(m => m.WithOptions(options));
         
-        /// <summary>
-        /// disables given options for the config
-        /// </summary>
-        [PublicAPI] public static ManualConfig WithoutOptions(this IConfig config, ConfigOptions options) => config.With(m => m.WithoutOptions(options));
-        
-        /// <summary>
-        /// sets given option to provided value
-        /// </summary>
-        [PublicAPI] public static ManualConfig WithSwitchingOptions(this IConfig config, bool value, ConfigOptions options) => config.With(m => m.WithSwitchingOptions(value, options));
-
         [Obsolete("This property will soon be removed, please start using .AddLogicalGroupRules() instead.")]
         [PublicAPI] public static IConfig With(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.AddLogicalGroupRules(rules);
         [PublicAPI] public static ManualConfig AddLogicalGroupRules(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.With(c => c.AddLogicalGroupRules(rules));

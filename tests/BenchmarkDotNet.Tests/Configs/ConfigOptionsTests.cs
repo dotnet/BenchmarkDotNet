@@ -71,21 +71,17 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var config = ManualConfig.Create(DefaultConfig.Instance);
 
-            config.WithSwitchingOptions(true, ConfigOptions.StopOnFirstError);
+            config.WithOption(ConfigOptions.StopOnFirstError, true);
             Assert.True(config.Options.IsSet(ConfigOptions.StopOnFirstError));
             Assert.True(config.Options.HasFlag(ConfigOptions.StopOnFirstError));
 
-            config.WithSwitchingOptions(false, ConfigOptions.StopOnFirstError);
+            config.WithOption(ConfigOptions.StopOnFirstError, false);
             Assert.False(config.Options.IsSet(ConfigOptions.StopOnFirstError));
             Assert.False(config.Options.HasFlag(ConfigOptions.StopOnFirstError));
 
             config.WithOptions(ConfigOptions.StopOnFirstError);
             Assert.True(config.Options.IsSet(ConfigOptions.StopOnFirstError));
             Assert.True(config.Options.HasFlag(ConfigOptions.StopOnFirstError));
-
-            config.WithoutOptions(ConfigOptions.StopOnFirstError);
-            Assert.False(config.Options.IsSet(ConfigOptions.StopOnFirstError));
-            Assert.False(config.Options.HasFlag(ConfigOptions.StopOnFirstError));
         }
     }
 }

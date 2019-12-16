@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Attributes
 
         public StopOnFirstErrorAttribute(bool value = true)
         {
-            Config = ManualConfig.CreateEmpty().WithSwitchingOptions(value, ConfigOptions.StopOnFirstError);
+            Config = ManualConfig.CreateEmpty().WithOption(ConfigOptions.StopOnFirstError, value);
         }
     }
 }
