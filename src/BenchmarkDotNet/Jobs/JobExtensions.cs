@@ -25,7 +25,6 @@ namespace BenchmarkDotNet.Jobs
         public static Job With(this Job job, Jit jit) => job.WithJit(jit);
         public static Job WithJit(this Job job, Jit jit) => job.WithCore(j => j.Environment.Jit = jit);
 
-
         [Obsolete("This property will soon be removed, please start using WithRuntime instead")]
         public static Job With(this Job job, Runtime runtime) => job.WithRuntime(runtime);
         public static Job WithRuntime(this Job job, Runtime runtime) => job.WithCore(j => j.Environment.Runtime = runtime);

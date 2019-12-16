@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void WhenDisableLogFileWeDontWriteToFile()
         {
             var logger = new OutputLogger(Output);
-            var config = ManualConfig.CreateEmpty().AddLogger(logger).With(ConfigOptions.DisableLogFile).With(Job.Dry);
+            var config = ManualConfig.CreateEmpty().AddLogger(logger).WithOptions(ConfigOptions.DisableLogFile).AddJob(Job.Dry);
 
             string logFilePath = null;
             try

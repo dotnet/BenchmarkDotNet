@@ -215,11 +215,11 @@ namespace BenchmarkDotNet.ConsoleArguments
             else
                 config.AddFilter(filters);
 
-            config.WithSwitchingOptions(options.Join, ConfigOptions.JoinSummary);
-            config.WithSwitchingOptions(options.KeepBenchmarkFiles, ConfigOptions.KeepBenchmarkFiles);
-            config.WithSwitchingOptions(options.DontOverwriteResults, ConfigOptions.DontOverwriteResults);
-            config.WithSwitchingOptions(options.StopOnFirstError, ConfigOptions.StopOnFirstError);
-            config.WithSwitchingOptions(options.DisableLogFile, ConfigOptions.DisableLogFile);
+            config.Options = config.Options.Set(options.Join, ConfigOptions.JoinSummary);
+            config.Options = config.Options.Set(options.KeepBenchmarkFiles, ConfigOptions.KeepBenchmarkFiles);
+            config.Options = config.Options.Set(options.DontOverwriteResults, ConfigOptions.DontOverwriteResults);
+            config.Options = config.Options.Set(options.StopOnFirstError, ConfigOptions.StopOnFirstError);
+            config.Options = config.Options.Set(options.DisableLogFile, ConfigOptions.DisableLogFile);
 
             if (options.MaxParameterColumnWidth.HasValue)
                 config.WithSummaryStyle(SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParameterColumnWidth.Value));
