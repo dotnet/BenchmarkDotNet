@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Samples
     {
         private class Config : ManualConfig
         {
-            public Config() => Add(ConsoleLogger.Unicode);
+            public Config() => AddLogger(ConsoleLogger.Unicode);
         }
 
         [Benchmark]

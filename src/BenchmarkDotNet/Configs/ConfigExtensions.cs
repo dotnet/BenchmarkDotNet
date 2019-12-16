@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -19,60 +20,59 @@ namespace BenchmarkDotNet.Configs
 {
     public static class ConfigExtensions
     {
-        [Obsolete("This property will soon be removed, please start using AddColumn instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, params IColumn[] columns) => config.AddColumn(columns);
+        [Obsolete("This method will soon be removed, please start using .AddColumn() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params IColumn[] columns) => config.AddColumn(columns);
         [PublicAPI] public static ManualConfig AddColumn(this IConfig config, params IColumn[] columns) => config.With(m => m.AddColumn(columns));
-
-        [Obsolete("This property will soon be removed, please start using AddColumnProvider instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, params IColumnProvider[] columnProviders) => config.AddColumnProvider(columnProviders);
+        
+        [Obsolete("This method will soon be removed, please start using .AddColumnProvider() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params IColumnProvider[] columnProviders) => config.AddColumnProvider(columnProviders);
         [PublicAPI] public static ManualConfig AddColumnProvider(this IConfig config, params IColumnProvider[] columnProviders) => config.With(m => m.AddColumnProvider(columnProviders));
 
-        [Obsolete("This property will soon be removed, please start using AddLogger instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, params ILogger[] loggers) => config.AddLogger(loggers);
+        [Obsolete("This method will soon be removed, please start using .AddLogger() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params ILogger[] loggers) => config.AddLogger(loggers);
         [PublicAPI] public static ManualConfig AddLogger(this IConfig config, params ILogger[] loggers) => config.With(m => m.AddLogger(loggers));
 
-        [Obsolete("This property will soon be removed, please start using AddExporter instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, params IExporter[] exporters) => config.AddExporter(exporters);
+        [Obsolete("This method will soon be removed, please start using .AddExporter() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params IExporter[] exporters) => config.AddExporter(exporters);
         [PublicAPI] public static ManualConfig AddExporter(this IConfig config, params IExporter[] exporters) => config.With(m => m.AddExporter(exporters));
 
-        [Obsolete("This property will soon be removed, please start using AddDiagnoser instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, params IDiagnoser[] diagnosers) => config.AddDiagnoser(diagnosers);
+        [Obsolete("This method will soon be removed, please start using .AddDiagnoser() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params IDiagnoser[] diagnosers) => config.AddDiagnoser(diagnosers);
         [PublicAPI] public static ManualConfig AddDiagnoser(this IConfig config, params IDiagnoser[] diagnosers) => config.With(m => m.AddDiagnoser(diagnosers));
 
-        [Obsolete("This property will soon be removed, please start using AddAnalyser instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, params IAnalyser[] analysers) => config.AddAnalyser(analysers);
+        [Obsolete("This method will soon be removed, please start using .AddAnalyser() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params IAnalyser[] analysers) => config.AddAnalyser(analysers);
         [PublicAPI] public static ManualConfig AddAnalyser(this IConfig config, params IAnalyser[] analysers) => config.With(m => m.AddAnalyser(analysers));
 
-        [Obsolete("This property will soon be removed, please start using AddValidator instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, params IValidator[] validators) => config.AddValidator(validators);
+        [Obsolete("This method will soon be removed, please start using .AddValidator() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params IValidator[] validators) => config.AddValidator(validators);
         [PublicAPI] public static ManualConfig AddValidator(this IConfig config, params IValidator[] validators) => config.With(m => m.AddValidator(validators));
 
-        [Obsolete("This property will soon be removed, please start using .AddJob() instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, params Job[] jobs) => config.With(m => m.AddJob(jobs));
+        [Obsolete("This method will soon be removed, please start using .AddJob() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params Job[] jobs) => config.With(m => m.AddJob(jobs));
         [PublicAPI] public static ManualConfig AddJob(this IConfig config, Job job) => config.With(m => m.AddJob(job));
 
-        [Obsolete("This property will soon be removed, please start using WithOrderer instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, IOrderer orderer) => config.WithOrderer(orderer);
+        [Obsolete("This method will soon be removed, please start using .WithOrderer() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, IOrderer orderer) => config.WithOrderer(orderer);
         [PublicAPI] public static ManualConfig WithOrderer(this IConfig config, IOrderer orderer) => config.With(m => m.WithOrderer(orderer));
 
-        [Obsolete("This property will soon be removed, please start using .AddHardwareCounters() instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.AddHardwareCounters(counters));
+        [Obsolete("This method will soon be removed, please start using .AddHardwareCounters() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.AddHardwareCounters(counters));
         [PublicAPI] public static ManualConfig AddHardwareCounters(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.AddHardwareCounters(counters));
 
-        [Obsolete("This property will soon be removed, please start using AddFilter instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, params IFilter[] filters) => config.AddFilter(filters);
+        [Obsolete("This method will soon be removed, please start using .AddFilter() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params IFilter[] filters) => config.AddFilter(filters);
         [PublicAPI] public static ManualConfig AddFilter(this IConfig config, params IFilter[] filters) => config.With(c => c.AddFilter(filters));
 
         [Obsolete("To enable unicode support, use .AddLogger(ConsoleLogger.Unicode)")]
-        [PublicAPI] public static IConfig With(this IConfig config, Encoding encoding) => Equals(encoding, Encoding.Unicode) ? config.AddLogger(ConsoleLogger.Unicode) : config;
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, Encoding encoding) => Equals(encoding, Encoding.Unicode) ? config.AddLogger(ConsoleLogger.Unicode) : config;
 
-        [Obsolete("This property will soon be removed, please start using WithSummaryStyle instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, SummaryStyle summaryStyle) => config.WithSummaryStyle(summaryStyle);
+        [Obsolete("This method will soon be removed, please start using .WithSummaryStyle() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, SummaryStyle summaryStyle) => config.WithSummaryStyle(summaryStyle);
         [PublicAPI] public static ManualConfig WithSummaryStyle(this IConfig config, SummaryStyle summaryStyle) => config.With(c => c.WithSummaryStyle(summaryStyle));
 
         [PublicAPI] public static ManualConfig WithArtifactsPath(this IConfig config, string artifactsPath) => config.With(m => m.WithArtifactsPath(artifactsPath));
         [PublicAPI] public static ManualConfig WithUnionRule(this IConfig config, ConfigUnionRule unionRule) => config.With(m => m.WithUnionRule(unionRule));
-
         [PublicAPI] public static ManualConfig WithCultureInfo(this IConfig config, CultureInfo cultureInfo) => config.With(m => m.CultureInfo = cultureInfo);
         
         /// <summary>
@@ -94,8 +94,8 @@ namespace BenchmarkDotNet.Configs
         /// <summary>
         /// sets given options for the config
         /// </summary>
-        [Obsolete("This property will soon be removed, please start using WithOptions instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, ConfigOptions options) => config.WithOptions(options);
+        [Obsolete("This method will soon be removed, please start using .WithOptions() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, ConfigOptions options) => config.WithOptions(options);
         
         /// <summary>
         /// sets given option to provided value
@@ -107,8 +107,8 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         [PublicAPI] public static ManualConfig WithOptions(this IConfig config, ConfigOptions options) => config.With(m => m.WithOptions(options));
         
-        [Obsolete("This property will soon be removed, please start using .AddLogicalGroupRules() instead.")]
-        [PublicAPI] public static IConfig With(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.AddLogicalGroupRules(rules);
+        [Obsolete("This method will soon be removed, please start using .AddLogicalGroupRules() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.AddLogicalGroupRules(rules);
         [PublicAPI] public static ManualConfig AddLogicalGroupRules(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.With(c => c.AddLogicalGroupRules(rules));
 
         public static ImmutableConfig CreateImmutableConfig(this IConfig config) => ImmutableConfigBuilder.Create(config);

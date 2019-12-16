@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
@@ -14,18 +15,21 @@ namespace BenchmarkDotNet.Jobs
 {
     public static class JobExtensions
     {
-        [Obsolete("This property will soon be removed, please start using WithPlatform instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .WithPlatform instead")]
         public static Job With(this Job job, Platform platform) => job.WithPlatform(platform);
         public static Job WithPlatform(this Job job, Platform platform) => job.WithCore(j => j.Environment.Platform = platform);
 
         public static Job WithId(this Job job, string id) => new Job(id, job);
 
         // Env
-        [Obsolete("This property will soon be removed, please start using WithJit instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .WithJit instead")]
         public static Job With(this Job job, Jit jit) => job.WithJit(jit);
         public static Job WithJit(this Job job, Jit jit) => job.WithCore(j => j.Environment.Jit = jit);
 
-        [Obsolete("This property will soon be removed, please start using WithRuntime instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .WithRuntime instead")]
         public static Job With(this Job job, Runtime runtime) => job.WithRuntime(runtime);
         public static Job WithRuntime(this Job job, Runtime runtime) => job.WithCore(j => j.Environment.Runtime = runtime);
 
@@ -99,8 +103,8 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithHeapAffinitizeMask(this Job job, int heapAffinitizeMask) =>
             job.WithCore(j => j.Environment.Gc.HeapAffinitizeMask = heapAffinitizeMask);
 
-        [Obsolete("This property will soon be removed, please start using WithGcMode instead")]
-        [PublicAPI]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .WithGcMode instead")]
         public static Job With(this Job job, GcMode gc) => job.WithGcMode(gc);
 
         [PublicAPI]
@@ -113,7 +117,8 @@ namespace BenchmarkDotNet.Jobs
         ///     ColdStart: should be used only for measuring cold start of the application or testing purpose.
         ///     Monitoring: no overhead evaluating, with several target iterations. Perfect for macrobenchmarks without a steady state with high variance.
         /// </summary>
-        [Obsolete("This property will soon be removed, please start using WithStrategy instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .WithStrategy instead")]
         public static Job With(this Job job, RunStrategy strategy) => job.WithCore(j => j.Run.RunStrategy = strategy);        // Run
         
         /// <summary>
@@ -145,9 +150,6 @@ namespace BenchmarkDotNet.Jobs
         /// The default value is 50
         /// </summary>
         public static Job WithMaxWarmupCount(this Job job, int count) => job.WithCore(j => j.Run.MaxWarmupIterationCount = count);
-
-        [Obsolete("Please use WithIterationCount instead (rename)"), PublicAPI]
-        public static Job WithTargetCount(this Job job, int count) => job.WithCore(j => j.Run.IterationCount = count);
 
         /// <summary>
         /// How many target iterations should be performed.
@@ -215,15 +217,19 @@ namespace BenchmarkDotNet.Jobs
         public static Job DontEnforcePowerPlan(this Job job) => job.WithCore(j => j.Environment.PowerPlanMode = Guid.Empty);
 
         // Infrastructure
-        [Obsolete("This property will soon be removed, please start using WithToolchain instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .WithToolchain instead")]
         public static Job With(this Job job, IToolchain toolchain) => job.WithToolchain(toolchain);
         public static Job WithToolchain(this Job job, IToolchain toolchain) => job.WithCore(j => j.Infrastructure.Toolchain = toolchain);
 
-        [Obsolete("This property will soon be removed, please start using WithClock instead")]
-        [PublicAPI] public static Job With(this Job job, IClock clock) => job.WithClock(clock);
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .WithClock instead")]
+        public static Job With(this Job job, IClock clock) => job.WithClock(clock);
         [PublicAPI] public static Job WithClock(this Job job, IClock clock) => job.WithCore(j => j.Infrastructure.Clock = clock);
-        [Obsolete("This property will soon be removed, please start using WithEngineFactory instead")]
-        [PublicAPI] public static Job With(this Job job, IEngineFactory engineFactory) => job.WithEngineFactory(engineFactory);
+        
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .WithEngineFactory instead")]
+        public static Job With(this Job job, IEngineFactory engineFactory) => job.WithEngineFactory(engineFactory);
         [PublicAPI] public static Job WithEngineFactory(this Job job, IEngineFactory engineFactory) => job.WithCore(j => j.Infrastructure.EngineFactory = engineFactory);
 
         public static Job WithCustomBuildConfiguration(this Job job, string buildConfiguration) =>
@@ -239,7 +245,8 @@ namespace BenchmarkDotNet.Jobs
         /// Throws an exception if <paramref name="environmentVariables"/> contains two variables with the same key.
         /// </exception>
         /// <returns>The new job with overriden environment variables</returns>
-        [Obsolete("This property will soon be removed, please start using WithEnvironmentVariables instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .WithEnvironmentVariables instead")]
         public static Job With(this Job job, IReadOnlyList<EnvironmentVariable> environmentVariables) => job.WithEnvironmentVariables(environmentVariables.ToArray());
         
         /// <summary>
@@ -272,7 +279,8 @@ namespace BenchmarkDotNet.Jobs
         /// <param name="job">The original job</param>
         /// <param name="environmentVariable">The new environment variable which should be added for the new job</param>
         /// <returns>The new job with additional environment variable</returns>
-        [Obsolete("This property will soon be removed, please start using WithEnvironmentVariable instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using .WithEnvironmentVariable instead")]
         public static Job With(this Job job, EnvironmentVariable environmentVariable)
             => job.WithEnvironmentVariable(environmentVariable);
 
@@ -306,7 +314,8 @@ namespace BenchmarkDotNet.Jobs
         /// <returns>The new job which doesn't have any environment variables</returns>
         public static Job WithoutEnvironmentVariables(this Job job) => job.WithEnvironmentVariables(Array.Empty<EnvironmentVariable>());
 
-        [Obsolete("This property will soon be removed, please start using .WithArguments() instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will soon be removed, please start using ..WithArguments() instead")]
         public static Job With(this Job job, IReadOnlyList<Argument> arguments) => job.WithArguments(arguments);
         public static Job WithArguments(this Job job, IReadOnlyList<Argument> arguments) => job.WithCore(j => j.Infrastructure.Arguments = arguments);
 
@@ -372,22 +381,14 @@ namespace BenchmarkDotNet.Jobs
         /// Specifies which outliers should be removed from the distribution
         /// </summary>
         public static Job WithOutlierMode(this Job job, OutlierMode value) => job.WithCore(j => j.Accuracy.OutlierMode = value);
-
-        [Obsolete("Please use the new WithOutlierMode instead")]
-        [PublicAPI]
-        public static Job WithRemoveOutliers(this Job job, bool value) =>
-            job.WithCore(j => j.Accuracy.OutlierMode = value ? OutlierMode.RemoveUpper : OutlierMode.DontRemove);
-
+        
         [PublicAPI]
         public static Job WithAnalyzeLaunchVariance(this Job job, bool value) => job.WithCore(j => j.Accuracy.AnalyzeLaunchVariance = value);
 
         // Meta
         public static Job AsBaseline(this Job job) => job.WithCore(j => j.Meta.Baseline = true);
         public static Job WithBaseline(this Job job, bool value) => job.WithCore(j => j.Meta.Baseline = value);
-
-        [Obsolete("Please use the new WithBaseline instead"), PublicAPI]
-        public static Job WithIsBaseline(this Job job, bool value) => value ? job.AsBaseline() : job;
-
+        
         /// <summary>
         /// mutator job should not be added to the config, but instead applied to other jobs in given config
         /// </summary>

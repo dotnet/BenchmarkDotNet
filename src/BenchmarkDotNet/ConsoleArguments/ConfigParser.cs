@@ -266,7 +266,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             if (options.EnvironmentVariables.Any())
             {
-                baseJob = baseJob.With(options.EnvironmentVariables.Select(text =>
+                baseJob = baseJob.WithEnvironmentVariables(options.EnvironmentVariables.Select(text =>
                 {
                     var separated = text.Split(new [] { EnvVarKeyValueSeparator }, 2);
                     return new EnvironmentVariable(separated[0], separated[1]);
