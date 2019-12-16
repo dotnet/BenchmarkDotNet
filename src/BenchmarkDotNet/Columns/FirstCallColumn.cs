@@ -11,6 +11,8 @@ namespace BenchmarkDotNet.Columns
 {
     public class FirstCallColumn : IStatisticColumn
     {
+        public static readonly IColumn Default = new FirstCallColumn();
+        
         public string Id => nameof(FirstCallColumn);
 
         public string ColumnName => "FirstCall";
@@ -32,7 +34,6 @@ namespace BenchmarkDotNet.Columns
                 .Where(HasSingleCall)
                 .Select(r => GetFirstCall(r).Nanoseconds)
                 .Where(v => !double.IsNaN(v) && !double.IsInfinity(v))
-                .Select(v => v / style.TimeUnit.NanosecondAmount)
                 .ToList();
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
