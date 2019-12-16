@@ -35,8 +35,6 @@ namespace BenchmarkDotNet.Samples
                 AddExporter(JsonExporter.FullCompressed);
                 AddExporter(JsonExporter.Custom("-custom", indentJson: true, excludeMeasurements: true));
             }
-
-
         }
 
         [Benchmark] public void Sleep10() => Thread.Sleep(10);
