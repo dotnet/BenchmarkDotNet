@@ -33,9 +33,9 @@ namespace BenchmarkDotNet.Columns
             switch (Kind)
             {
                 case StatisticalTestKind.Welch:
-                    return StatisticalTestHelper.CalculateTost(WelchTest.Instance, x, y, Threshold).ToStr(ShowPValues);
+                    return StatisticalTestHelper.CalculateTost(WelchTest.Instance, x, y, Threshold).ToString(ShowPValues);
                 case StatisticalTestKind.MannWhitney:
-                    return StatisticalTestHelper.CalculateTost(MannWhitneyTest.Instance, x, y, Threshold).ToStr(ShowPValues);
+                    return StatisticalTestHelper.CalculateTost(MannWhitneyTest.Instance, x, y, Threshold).ToString(ShowPValues);
                 default:
                     throw new ArgumentOutOfRangeException();
             }

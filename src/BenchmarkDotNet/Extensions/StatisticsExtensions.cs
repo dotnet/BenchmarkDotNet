@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.Globalization;
+using System.Text;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Mathematics.Histograms;
@@ -10,45 +12,93 @@ namespace BenchmarkDotNet.Extensions
     {
         private const string NullSummaryMessage = "<Empty statistic (N=0)>";
 
-        [PublicAPI]
-        public static string ToStr(this Statistics s)
+        public static Func<double, string> CreateNanosecondFormatter(this Statistics s, CultureInfo cultureInfo, string format = "N3")
         {
-            if (s == null)
-                return NullSummaryMessage;
-            var builder = new StringBuilder();
-            string errorPercent = (s.StandardError / s.Mean * 100).ToStr("0.00");
-            var ci = s.ConfidenceInterval;
-            string ciMarginPercent = (ci.Margin / s.Mean * 100).ToStr("0.00");
-            builder.AppendLine($"Mean = {s.Mean.ToStr()}, StdErr = {s.StandardError.ToStr()} ({errorPercent}%); N = {s.N}, StdDev = {s.StandardDeviation.ToStr()}");
-            builder.AppendLine($"Min = {s.Min.ToStr()}, Q1 = {s.Q1.ToStr()}, Median = {s.Median.ToStr()}, Q3 = {s.Q3.ToStr()}, Max = {s.Max.ToStr()}");
-            builder.AppendLine($"IQR = {s.InterquartileRange.ToStr()}, LowerFence = {s.LowerFence.ToStr()}, UpperFence = {s.UpperFence.ToStr()}");
-            builder.AppendLine($"ConfidenceInterval = {ci.ToStr()}, Margin = {ci.Margin.ToStr()} ({ciMarginPercent}% of Mean)");
-            builder.AppendLine($"Skewness = {s.Skewness.ToStr()}, Kurtosis = {s.Kurtosis.ToStr()}");
-            return builder.ToString();
+            var timeUnit = TimeUnit.GetBestTimeUnit(s.Mean);
+            return x => TimeInterval.FromNanoseconds(x).ToString(timeUnit, cultureInfo, format);
         }
-
+        
         [PublicAPI]
-        public static string ToTimeStr(this Statistics s, Encoding encoding, TimeUnit unit = null, bool calcHistogram = false)
+        public static string ToString(this Statistics s, CultureInfo cultureInfo, Func<double, string> formatter, bool calcHistogram = false)
         {
             if (s == null)
                 return NullSummaryMessage;
-            if (unit == null)
-                unit = TimeUnit.GetBestTimeUnit(s.Mean);
+
+            string listSeparator = cultureInfo.GetActualListSeparator();
+            
             var builder = new StringBuilder();
-            string errorPercent = (s.StandardError / s.Mean * 100).ToStr("0.00");
+            string errorPercent = (s.StandardError / s.Mean * 100).ToString("0.00", cultureInfo);
             var ci = s.ConfidenceInterval;
-            string ciMarginPercent = (ci.Margin / s.Mean * 100).ToStr("0.00");
+            string ciMarginPercent = (ci.Margin / s.Mean * 100).ToString("0.00", cultureInfo);
             double mValue = MathHelper.CalculateMValue(s);
-            builder.AppendLine($"Mean = {s.Mean.ToTimeStr(unit, encoding)}, StdErr = {s.StandardError.ToTimeStr(unit, encoding)} ({errorPercent}%); N = {s.N}, StdDev = {s.StandardDeviation.ToTimeStr(unit, encoding)}");
-            builder.AppendLine($"Min = {s.Min.ToTimeStr(unit, encoding)}, Q1 = {s.Q1.ToTimeStr(unit, encoding)}, Median = {s.Median.ToTimeStr(unit, encoding)}, Q3 = {s.Q3.ToTimeStr(unit, encoding)}, Max = {s.Max.ToTimeStr(unit, encoding)}");
-            builder.AppendLine($"IQR = {s.InterquartileRange.ToTimeStr(unit, encoding)}, LowerFence = {s.LowerFence.ToTimeStr(unit, encoding)}, UpperFence = {s.UpperFence.ToTimeStr(unit, encoding)}");
-            builder.AppendLine($"ConfidenceInterval = {s.ConfidenceInterval.ToTimeStr(encoding, unit)}, Margin = {ci.Margin.ToTimeStr(unit, encoding)} ({ciMarginPercent}% of Mean)");
-            builder.AppendLine($"Skewness = {s.Skewness.ToStr()}, Kurtosis = {s.Kurtosis.ToStr()}, MValue = {mValue.ToStr()}");
+
+            builder.Append("Mean = ");
+            builder.Append(formatter(s.Mean));
+            builder.Append(listSeparator);
+            builder.Append(" StdErr = ");
+            builder.Append(formatter(s.StandardError));
+            builder.Append(" (");
+            builder.Append(errorPercent);
+            builder.Append("%)");
+            builder.Append(listSeparator);
+            builder.Append(" N = ");
+            builder.Append(s.N.ToString(cultureInfo));
+            builder.Append(listSeparator);
+            builder.Append(" StdDev = ");
+            builder.Append(formatter(s.StandardDeviation));
+            builder.AppendLine();
+            
+            builder.Append("Min = ");
+            builder.Append(formatter(s.Min));
+            builder.Append(listSeparator);
+            builder.Append(" Q1 = ");
+            builder.Append(formatter(s.Q1));
+            builder.Append(listSeparator);
+            builder.Append(" Median = ");
+            builder.Append(formatter(s.Median));
+            builder.Append(listSeparator);
+            builder.Append(" Q3 = ");
+            builder.Append(formatter(s.Q3));
+            builder.Append(listSeparator);
+            builder.Append(" Max = ");
+            builder.Append(formatter(s.Max));
+            builder.AppendLine();
+            
+            builder.Append("IQR = ");
+            builder.Append(formatter(s.InterquartileRange));
+            builder.Append(listSeparator);
+            builder.Append(" LowerFence = ");
+            builder.Append(formatter(s.LowerFence));
+            builder.Append(listSeparator);
+            builder.Append(" UpperFence = ");
+            builder.Append(formatter(s.UpperFence));
+            builder.AppendLine();
+            
+            builder.Append("ConfidenceInterval = ");
+            builder.Append(s.ConfidenceInterval.ToString(formatter));
+            builder.Append(listSeparator);
+            builder.Append(" Margin = ");
+            builder.Append(formatter(ci.Margin));
+            builder.Append(" (");
+            builder.Append(ciMarginPercent);
+            builder.Append("% of Mean)");
+            builder.AppendLine();
+            
+            builder.Append("Skewness = ");
+            builder.Append(s.Skewness.ToString("0.##", cultureInfo));
+            builder.Append(listSeparator);
+            builder.Append(" Kurtosis = ");
+            builder.Append(s.Kurtosis.ToString("0.##", cultureInfo));
+            builder.Append(listSeparator);
+            builder.Append(" MValue = ");
+            builder.Append(mValue.ToString("0.##", cultureInfo));
+            builder.AppendLine();
+            
             if (calcHistogram)
             {
                 var histogram = HistogramBuilder.Adaptive.Build(s);
                 builder.AppendLine("-------------------- Histogram --------------------");
-                builder.AppendLine(histogram.ToTimeStr(encoding: encoding));
+                builder.AppendLine(histogram.ToString(formatter));
                 builder.AppendLine("---------------------------------------------------");
             }
             return builder.ToString().Trim();

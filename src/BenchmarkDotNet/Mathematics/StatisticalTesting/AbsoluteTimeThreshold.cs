@@ -1,4 +1,5 @@
 using System;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 
 namespace BenchmarkDotNet.Mathematics.StatisticalTesting
@@ -9,7 +10,7 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
 
         public AbsoluteTimeThreshold(TimeInterval timeInterval) : base(timeInterval.Nanoseconds) => this.timeInterval = timeInterval;
 
-        public override string ToString() => timeInterval.ToStr(format: "0.##");
+        public override string ToString() => timeInterval.ToString(DefaultCultureInfo.Instance, format: "0.##");
 
         public bool Equals(AbsoluteTimeThreshold other) => other != null && timeInterval.Equals(other.timeInterval);
 

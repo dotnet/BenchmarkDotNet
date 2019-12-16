@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace BenchmarkDotNet.Loggers
 {
@@ -11,11 +12,23 @@ namespace BenchmarkDotNet.Loggers
         private const ConsoleColor DefaultColor = ConsoleColor.Gray;
 
         public static readonly ILogger Default = new ConsoleLogger();
+        public static readonly ILogger Ascii = new ConsoleLogger(false);
+        public static readonly ILogger Unicode = new ConsoleLogger(true);
 
+        private readonly bool unicodeSupport;
         private readonly Dictionary<LogKind, ConsoleColor> colorScheme;
 
-        public ConsoleLogger(Dictionary<LogKind, ConsoleColor> colorScheme = null) => this.colorScheme = colorScheme ?? CreateColorfulScheme();
+        [PublicAPI]
+        public ConsoleLogger(bool unicodeSupport = false, Dictionary<LogKind, ConsoleColor> colorScheme = null)
+        {
+            this.unicodeSupport = unicodeSupport;
+            this.colorScheme = colorScheme ?? CreateColorfulScheme();
+        }
 
+        public string Id => nameof(ConsoleLogger);
+
+        public int Priority => unicodeSupport ? 1 : 0;
+        
         public void Write(LogKind logKind, string text) => Write(logKind, Console.Write, text);
 
         public void WriteLine() => Console.WriteLine();
@@ -26,6 +39,9 @@ namespace BenchmarkDotNet.Loggers
 
         private void Write(LogKind logKind, Action<string> write, string text)
         {
+            if (!unicodeSupport)
+                text = text.ToAscii();
+            
             var colorBefore = Console.ForegroundColor;
 
             try

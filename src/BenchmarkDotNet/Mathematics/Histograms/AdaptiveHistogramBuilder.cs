@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Mathematics.Histograms
@@ -29,7 +30,7 @@ namespace BenchmarkDotNet.Mathematics.Histograms
             const double adaptiveFactor = 0.02;
 
             if (binSize < eps)
-                throw new ArgumentException($"binSize ({binSize.ToStr()}) should be a positive number", nameof(binSize));
+                throw new ArgumentException($"binSize ({binSize.ToString("0.##", DefaultCultureInfo.Instance)}) should be a positive number", nameof(binSize));
             if (binSize < Resolution)
                 binSize = Resolution;
             binSize = NiceCeiling(binSize);
@@ -55,10 +56,10 @@ namespace BenchmarkDotNet.Mathematics.Histograms
                 {
                     var errorMessage = new StringBuilder();
                     errorMessage.AppendLine("Failed to run AdaptiveHistogramBuilder.BuildWithFixedBinSize");
-                    errorMessage.AppendLine("BinSize: " + binSize.ToStr("N12"));
+                    errorMessage.AppendLine("BinSize: " + binSize.ToString("N12", DefaultCultureInfo.Instance));
                     errorMessage.AppendLine("Values: ");
                     foreach (double value in list)
-                        errorMessage.AppendLine("  " + value.ToStr("N12"));
+                        errorMessage.AppendLine("  " + value.ToString("N12", DefaultCultureInfo.Instance));
                     throw new InvalidOperationException(errorMessage.ToString());
                 }
 

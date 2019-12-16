@@ -1,23 +1,23 @@
 ---
-uid: BenchmarkDotNet.Samples.IntroEncoding
+uid: BenchmarkDotNet.Samples.IntroUnicode
 ---
 
-## Sample: IntroEncoding
+## Sample: IntroUnicode
 
-BenchmarkDotNet currently supports two encodings for output - `ASCII` and `Unicode`.
-By default `ASCII` is set.
-`Unicode` allows to use special characters, like `μ` and `±`.
-*Encoding* allows you to set encoding in your benchmark.
+Some of the BenchmarkDotNet exporters use Unicode symbols that are not ASCII-compatible (e.g., `μ` or `±`).
+Unfortunately, some terminals are not supported such symbols.
+That's why BenchmarkDotNet prints only ASCII characters by default (`μ` will be replaced by `u`).
+If you want to display Unicode symbols in your terminal, you should use `[UnicodeConsoleLoggerAttribute]` (see usage examples below).
 
 > [!WARNING]
-> You should be sure that your terminal/text editor supports Unicode.
+> This feature works only with terminal(s)|text editor(s) that support Unicode.
 > On Windows, you may have some troubles with Unicode symbols
 >   if system default code page configured as non-English
 >   (in Control Panel + Regional and Language Options, Language for Non-Unicode Programs).
 
 ### Source code
 
-[!code-csharp[IntroEncoding.cs](../../../samples/BenchmarkDotNet.Samples/IntroEncoding.cs)]
+[!code-csharp[IntroUnicode.cs](../../../samples/BenchmarkDotNet.Samples/IntroUnicode.cs)]
 
 ### Output
 
@@ -40,9 +40,7 @@ Skewness = 0.12, Kurtosis = 1.56, MValue = 2
 
 ### Links
 
-* @docs.encoding
-* @BenchmarkDotNet.Attributes.EncodingAttribute
-* @BenchmarkDotNet.Helpers.MultiEncodingString
-* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroEncoding
+* @BenchmarkDotNet.Attributes.UnicodeConsoleLoggerAttribute
+* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroUnicode
 
 ---

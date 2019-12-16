@@ -292,13 +292,13 @@ namespace BenchmarkDotNet.Jobs
         /// Doesn't have a default value.
         /// <remarks>If <see cref="AccuracyMode.MaxRelativeError"/> is also provided, the smallest value is used as stop criteria.</remarks>
         /// </summary>
-        public static Job WithMaxAbsoluteError(this Job job, TimeInterval value) => job.WithCore(j => j.Accuracy.MaxAbsoluteError = value);
+        public static Job WithMaxAbsoluteError(this Job job, TimeInterval interval) => job.WithCore(j => j.Accuracy.MaxAbsoluteError = interval);
 
         /// <summary>
         /// Minimum time of a single iteration. Unlike Run.IterationTime, this characteristic specifies only the lower limit. In case of need, BenchmarkDotNet can increase this value.
         /// The default value is 500 milliseconds.
         /// </summary>
-        public static Job WithMinIterationTime(this Job job, TimeInterval value) => job.WithCore(j => j.Accuracy.MinIterationTime = value);
+        public static Job WithMinIterationTime(this Job job, TimeInterval interval) => job.WithCore(j => j.Accuracy.MinIterationTime = interval);
 
         /// <summary>
         /// Minimum count of benchmark invocations per iteration

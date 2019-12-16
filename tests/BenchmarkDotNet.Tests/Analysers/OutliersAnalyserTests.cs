@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
 using Xunit;
 using Xunit.Abstractions;
@@ -28,7 +30,7 @@ namespace BenchmarkDotNet.Tests.Analysers
         public void SimpleMessageTest(int actualOutliers, int allOutliers, string expectedMessage)
         {
             string actualMessage = OutliersAnalyser.GetMessage(
-                new double[actualOutliers], new double[allOutliers], Array.Empty<double>(), Array.Empty<double>());
+                new double[actualOutliers], new double[allOutliers], Array.Empty<double>(), Array.Empty<double>(), TestCultureInfo.Instance);
             Assert.Equal(expectedMessage, actualMessage);
         }
 
@@ -60,11 +62,12 @@ namespace BenchmarkDotNet.Tests.Analysers
                 values.Add(2500 + i * 100);
             values.Sort();
             var s = new Statistics(values);
-            string actualMessage = OutliersAnalyser.GetMessage(s.AllOutliers, s.AllOutliers, s.LowerOutliers, s.UpperOutliers);
+            var cultureInfo = TestCultureInfo.Instance;
+            string actualMessage = OutliersAnalyser.GetMessage(s.AllOutliers, s.AllOutliers, s.LowerOutliers, s.UpperOutliers, cultureInfo).ToAscii();
             output.WriteLine("Values   : " +
-                             string.Join(", ", values.Take(5).Select(x => x.ToTimeStr(format: "N2"))) +
+                             string.Join(", ", values.Take(5).Select(x =>  TimeInterval.FromNanoseconds(x).ToString(cultureInfo, "N2"))) +
                              ", ..., " +
-                             string.Join(", ", values.Skip(values.Count - 5).Select(x => x.ToTimeStr(format: "N2"))));
+                             string.Join(", ", values.Skip(values.Count - 5).Select(x => TimeInterval.FromNanoseconds(x).ToString(cultureInfo, "N2"))));
             output.WriteLine("Actual   : " + actualMessage);
             output.WriteLine("Expected : " + expectedMessage);
             Assert.Equal(expectedMessage, actualMessage);

@@ -52,6 +52,8 @@ namespace BenchmarkDotNet.Loggers
             this.colorScheme = colorScheme;
         }
 
+        public string Id => nameof(LinqPadLogger);
+        public int Priority => 0;
         public void Write(LogKind logKind, string text) => Write(logKind, Console.Write, text);
 
         public void WriteLine() => Console.WriteLine();

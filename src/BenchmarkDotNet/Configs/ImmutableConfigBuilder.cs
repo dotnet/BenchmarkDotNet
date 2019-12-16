@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Configs
                 uniqueRunnableJobs,
                 source.UnionRule,
                 source.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath,
-                source.Encoding,
+                source.CultureInfo,
                 source.Orderer ?? DefaultOrderer.Instance,
                 source.SummaryStyle,
                 source.Options

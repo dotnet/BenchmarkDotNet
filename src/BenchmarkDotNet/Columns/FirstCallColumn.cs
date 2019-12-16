@@ -2,6 +2,8 @@
 using System.Linq;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
@@ -44,7 +46,12 @@ namespace BenchmarkDotNet.Columns
             int precision = summary.DisplayPrecisionManager.GetPrecision(style, this, null);
             string format = "N" + precision;
 
-            return measurement.Nanoseconds.ToTimeStr(style.TimeUnit, benchmarkCase.Config.Encoding, format, 1, style.PrintUnitsInContent);
+            return TimeInterval.FromNanoseconds(measurement.Nanoseconds)
+                .ToString(
+                    style.TimeUnit,
+                    style.CultureInfo,
+                    format,
+                    UnitPresentation.FromVisibility(style.PrintUnitsInContent));
         }
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);

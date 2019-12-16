@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -25,5 +28,8 @@ namespace BenchmarkDotNet.Reports
             string logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
             return summary.BenchmarksCases.Where(b => summary.GetLogicalGroupKey(b) == logicalGroupKey);
         }
+
+        [NotNull, Pure]
+        public static CultureInfo GetCultureInfo([CanBeNull] this Summary summary) => summary?.Style?.CultureInfo ?? DefaultCultureInfo.Instance;
     }
 }
