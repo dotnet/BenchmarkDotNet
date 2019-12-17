@@ -2,7 +2,6 @@
 using Microsoft.Diagnostics.Runtime.Interop;
 using Microsoft.Diagnostics.RuntimeExt;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,10 +11,13 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using Iced.Intel;
+using Decoder = Iced.Intel.Decoder;
+using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace BenchmarkDotNet.Disassembler
 {
-    class Program
+    internal static class Program
     {
         static readonly string[] CallSeparator = { "call" };
         static readonly Dictionary<string, string[]> SourceFileCache = new Dictionary<string, string[]>();
@@ -36,7 +38,9 @@ namespace BenchmarkDotNet.Disassembler
 
             try
             {
-                Handle(options);
+                var methodsToExport = Disassemble(options);
+                
+                SaveToFile(methodsToExport, options.ResultsPath);
             }
             catch (OutOfMemoryException) // thrown by clrmd when pdb is missing or in invalid format
             {
@@ -55,14 +59,17 @@ namespace BenchmarkDotNet.Disassembler
             }
         }
 
-        static void Handle(Settings settings)
+        internal static DisassembledMethod[] Disassemble(Settings settings)
         {
             using (var dataTarget = DataTarget.AttachToProcess(
                 settings.ProcessId,
                 (uint)TimeSpan.FromMilliseconds(5000).TotalMilliseconds,
-                AttachFlag.Invasive))
+                AttachFlag.Passive)) 
             {
                 var runtime = dataTarget.ClrVersions.Single().CreateRuntime();
+
+                // Per https://github.com/microsoft/clrmd/issues/303
+                dataTarget.DataReader.Flush();
 
                 ConfigureSymbols(dataTarget);
 
@@ -71,17 +78,20 @@ namespace BenchmarkDotNet.Disassembler
                 var disassembledMethods = Disassemble(settings, runtime, state);
 
                 // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working
-                var methodsToExport = disassembledMethods.Where(method => 
+                return disassembledMethods.Where(method => 
                     disassembledMethods.Count == 1  // if there is only one method we want to return it (most probably benchmark got inlined)
                     || !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodName)).ToArray();
+            }
+        }
+        
+        private static void SaveToFile(DisassembledMethod[] disassembledMethods, string filePath)
+        {
+            using (var stream = new FileStream(filePath, FileMode.Append, FileAccess.Write))
+            using (var writer = XmlWriter.Create(stream))
+            {
+                var serializer = new XmlSerializer(typeof(DisassemblyResult));
 
-                using (var stream = new FileStream(settings.ResultsPath, FileMode.Append, FileAccess.Write))
-                using (var writer = XmlWriter.Create(stream))
-                {
-                    var serializer = new XmlSerializer(typeof(DisassemblyResult));
-
-                    serializer.Serialize(writer, new DisassemblyResult { Methods = methodsToExport });
-                }
+                serializer.Serialize(writer, new DisassemblyResult { Methods = disassembledMethods });
             }
         }
 
@@ -276,38 +286,38 @@ namespace BenchmarkDotNet.Disassembler
 
         static IEnumerable<Asm> GetAsm(ILToNativeMap map, State state, int depth, ClrMethod currentMethod)
         {
-            var disasmBuffer = new StringBuilder(512);
-            ulong disasmAddress = map.StartAddress;
-            while (true)
+            int length = (int)(map.EndAddress - map.StartAddress);
+            byte[] buffer = new byte[length];
+
+            if (!state.Runtime.DataTarget.ReadProcessMemory(map.StartAddress, buffer, buffer.Length, out int bytesRead))
+                yield break;
+
+            var formatter = new NasmFormatter();
+            formatter.Options.DigitSeparator = "`";
+            formatter.Options.FirstOperandCharIndex = 10;
+            var output = new StringBuilderFormatterOutput();
+            var decoder = Decoder.Create(IntPtr.Size * 8, new ByteArrayCodeReader(buffer, 0, bytesRead));
+            decoder.IP = map.StartAddress;
+
+            while (decoder.IP < map.StartAddress + (ulong)bytesRead)
             {
-                int hr = state.DebugControl.Disassemble(disasmAddress, 0,
-                    disasmBuffer, disasmBuffer.Capacity, out uint disasmSize,
-                    out ulong endOffset);
-                if (hr != 0)
-                    break;
+                decoder.Decode(out var instruction);
+                formatter.Format(instruction, output);
 
-                disasmBuffer.Replace("\n", string.Empty);
-
-                var textRepresentation = disasmBuffer.ToString();
-
-                string calledMethodName = null;
-
-                if (textRepresentation.Contains("call"))
-                    calledMethodName = TryEnqueueCalledMethod(textRepresentation, state, depth, currentMethod);
+                string textRepresentation = $"{instruction.IP:X16} {output.ToStringAndReset()}";
+                    
+                string calledMethodName = textRepresentation.Contains("call")
+                    ? TryEnqueueCalledMethod(textRepresentation, state, depth, currentMethod)
+                    : null;
 
                 yield return new Asm
                 {
-                    TextRepresentation = disasmBuffer.ToString(),
+                    TextRepresentation = textRepresentation,
                     Comment = calledMethodName,
-                    StartAddress = disasmAddress,
-                    EndAddress = endOffset,
-                    SizeInBytes = (uint)(endOffset - disasmAddress)
+                    StartAddress = instruction.IP,
+                    EndAddress = instruction.IP + (ulong)instruction.ByteLength,
+                    SizeInBytes = (uint)instruction.ByteLength
                 };
-
-                if (endOffset >= map.EndAddress)
-                    break;
-
-                disasmAddress = endOffset;
             }
         }
 
@@ -492,9 +502,9 @@ namespace BenchmarkDotNet.Disassembler
         }
     }
 
-    class Settings
+    internal class Settings
     {
-        private Settings(int processId, string typeName, string methodName, bool printAsm, bool printIL, bool printSource, bool printPrologAndEpilog, int recursiveDepth, string resultsPath)
+        internal Settings(int processId, string typeName, string methodName, bool printAsm, bool printIL, bool printSource, bool printPrologAndEpilog, int recursiveDepth, string resultsPath)
         {
             ProcessId = processId;
             TypeName = typeName;

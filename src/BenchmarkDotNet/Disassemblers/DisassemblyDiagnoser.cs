@@ -22,13 +22,15 @@ namespace BenchmarkDotNet.Diagnosers
         public DisassemblyDiagnoserConfig Config { get; }
 
         private readonly WindowsDisassembler windowsDisassembler;
+        private readonly LinuxDisassembler linuxDisassembler;
         private readonly MonoDisassembler monoDisassembler;
         private readonly Dictionary<BenchmarkCase, DisassemblyResult> results;
 
-        private DisassemblyDiagnoser(WindowsDisassembler windowsDisassembler, MonoDisassembler monoDisassembler, DisassemblyDiagnoserConfig config)
+        private DisassemblyDiagnoser(WindowsDisassembler windowsDisassembler, LinuxDisassembler linuxDisassembler, MonoDisassembler monoDisassembler, DisassemblyDiagnoserConfig config)
         {
             Config = config;
             this.windowsDisassembler = windowsDisassembler;
+            this.linuxDisassembler = linuxDisassembler;
             this.monoDisassembler = monoDisassembler;
 
             results = new Dictionary<BenchmarkCase, DisassemblyResult>();
@@ -36,7 +38,7 @@ namespace BenchmarkDotNet.Diagnosers
         }
 
         public static IConfigurableDiagnoser<DisassemblyDiagnoserConfig> Create(DisassemblyDiagnoserConfig config)
-            => new DisassemblyDiagnoser(new WindowsDisassembler(config), new MonoDisassembler(config), config);
+            => new DisassemblyDiagnoser(new WindowsDisassembler(config), new LinuxDisassembler(config), new MonoDisassembler(config), config);
 
         public IConfigurableDiagnoser<DisassemblyDiagnoserConfig> Configure(DisassemblyDiagnoserConfig config)
             => Create(config);
@@ -52,7 +54,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase)
         {
-            if (ShouldUseWindowsDisassembler(benchmarkCase))
+            if (ShouldUseWindowsDisassembler(benchmarkCase) || ShouldUseLinuxDisassembler(benchmarkCase))
                 return RunMode.NoOverhead;
             if (ShouldUseMonoDisassembler(benchmarkCase))
                 return RunMode.SeparateLogic;
@@ -68,6 +70,9 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 case HostSignal.AfterAll when ShouldUseWindowsDisassembler(benchmark):
                     results.Add(benchmark, windowsDisassembler.Disassemble(parameters));
+                    break;
+                case HostSignal.AfterAll when ShouldUseLinuxDisassembler(benchmark):
+                    results.Add(benchmark, linuxDisassembler.Disassemble(parameters));
                     break;
                 case HostSignal.SeparateLogic when ShouldUseMonoDisassembler(benchmark):
                     results.Add(benchmark, monoDisassembler.Disassemble(benchmark, benchmark.Job.Environment.Runtime as MonoRuntime));
@@ -85,14 +90,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             foreach (var benchmark in validationParameters.Benchmarks)
             {
-                if (!RuntimeInformation.IsWindows() && !ShouldUseMonoDisassembler(benchmark))
-                    yield return new ValidationError(false, "No Disassembler support, only Mono is supported for non-Windows OS", benchmark);
-
-                if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic)
-#pragma warning disable 618
-                    && (benchmark.Job.Infrastructure.Toolchain is InProcessToolchain
-#pragma warning restore 618
-                        || benchmark.Job.Infrastructure.Toolchain is InProcessNoEmitToolchain))
+                if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic) && benchmark.Job.Infrastructure.Toolchain is InProcessNoEmitToolchain)
                 {
                     yield return new ValidationError(true, "InProcessToolchain has no DisassemblyDiagnoser support", benchmark);
                 }
@@ -104,6 +102,9 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static bool ShouldUseWindowsDisassembler(BenchmarkCase benchmarkCase)
             => !(benchmarkCase.Job.Environment.Runtime is MonoRuntime) && RuntimeInformation.IsWindows();
+        
+        private static bool ShouldUseLinuxDisassembler(BenchmarkCase benchmarkCase)
+            => !(benchmarkCase.Job.Environment.Runtime is MonoRuntime) && RuntimeInformation.IsLinux();
 
         private static IEnumerable<IExporter> GetExporters(Dictionary<BenchmarkCase, DisassemblyResult> results, DisassemblyDiagnoserConfig config)
         {
