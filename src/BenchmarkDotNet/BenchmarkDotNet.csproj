@@ -41,6 +41,7 @@
     <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.Pdb.dll" />
     <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.Rocks.dll" />
     <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.dll" />
+    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Iced.dll" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj" />
