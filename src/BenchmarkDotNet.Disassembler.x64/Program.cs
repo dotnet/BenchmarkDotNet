@@ -298,14 +298,27 @@ namespace BenchmarkDotNet.Disassembler
             var output = new StringBuilderFormatterOutput();
             var decoder = Decoder.Create(IntPtr.Size * 8, new ByteArrayCodeReader(buffer, 0, bytesRead));
             decoder.IP = map.StartAddress;
+            var formattedOutput = new StringBuilder(100);
 
             while (decoder.IP < map.StartAddress + (ulong)bytesRead)
             {
                 decoder.Decode(out var instruction);
                 formatter.Format(instruction, output);
 
-                string textRepresentation = $"{instruction.IP:X16} {output.ToStringAndReset()}";
-                    
+                formattedOutput.Clear();
+                formattedOutput.Append(instruction.IP.ToString("X16"));
+                formattedOutput.Append(' ');
+                int instrLen = instruction.ByteLength;
+                int byteBaseIndex = (int)(instruction.IP - map.StartAddress);
+                for (int i = 0; i < instrLen; i++)
+                    formattedOutput.Append(buffer[byteBaseIndex + i].ToString("X2"));
+                for (int i = 0; i < 10 - instrLen; i++)
+                    formattedOutput.Append("  ");
+                formattedOutput.Append(' ');
+                formattedOutput.Append(output.ToStringAndReset());
+
+                string textRepresentation = formattedOutput.ToString();
+
                 string calledMethodName = textRepresentation.Contains("call")
                     ? TryEnqueueCalledMethod(textRepresentation, state, depth, currentMethod)
                     : null;
