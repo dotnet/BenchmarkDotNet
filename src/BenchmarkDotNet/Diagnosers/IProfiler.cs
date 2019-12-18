@@ -1,6 +1,6 @@
 ﻿namespace BenchmarkDotNet.Diagnosers
 {
-    public interface IProfiler : IDiagnoser
+    internal interface IProfiler : IDiagnoser
     {
         string ShortName { get; }
     }

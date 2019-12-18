@@ -5,19 +5,19 @@ using Microsoft.Diagnostics.Tracing.Parsers;
 
 namespace BenchmarkDotNet.Diagnosers 
 {
-    internal sealed class ListProfilesCommandHandler
+    internal sealed class EventPipeProfileMapper
     {
-        internal static IEnumerable<(EventPipeProfile profile, EventPipeProvider[] Providers)> DotNETRuntimeProfiles { get; } = new[]
+        internal static Dictionary<EventPipeProfile, EventPipeProvider[]> DotNetRuntimeProfiles { get; } = new Dictionary<EventPipeProfile, EventPipeProvider[]>
         {
             //Useful for tracking CPU usage and general .NET runtime information. This is the default option if no profile or providers are specified.
-            (EventPipeProfile.CpuSampling,
+            { EventPipeProfile.CpuSampling,
                 new[]
                 {
                     new EventPipeProvider("Microsoft-DotNETCore-SampleProfiler", EventLevel.Informational),
                     new EventPipeProvider("Microsoft-Windows-DotNETRuntime", EventLevel.Informational, (long) ClrTraceEventParser.Keywords.Default)
-                }),
+                }},
             //Tracks GC collections and samples object allocations.
-            (EventPipeProfile.GcVerbose,
+            {EventPipeProfile.GcVerbose,
                 new[]
                 {
                     new EventPipeProvider(
@@ -27,9 +27,9 @@ namespace BenchmarkDotNet.Diagnosers
                                   (long) ClrTraceEventParser.Keywords.GCHandle |
                                   (long) ClrTraceEventParser.Keywords.Exception
                     ),
-                }),
+                }},
             //Tracks GC collections only at very low overhead.
-            (EventPipeProfile.GcCollect,
+            {EventPipeProfile.GcCollect,
                 new[]
                 {
                     new EventPipeProvider(
@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Diagnosers
                         keywords: (long) ClrTraceEventParser.Keywords.GC |
                                   (long) ClrTraceEventParser.Keywords.Exception
                     )
-                }),
+                }},
         };
     }
 }

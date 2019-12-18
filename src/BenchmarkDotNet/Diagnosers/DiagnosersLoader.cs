@@ -53,16 +53,12 @@ namespace BenchmarkDotNet.Diagnosers
                 DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig())
             };
 
-        private static IDiagnoser[] LoadCore() 
-        {
-            List<IDiagnoser> result = new List<IDiagnoser>
+        private static IDiagnoser[] LoadCore()
+            => new IDiagnoser[]
             {
                 MemoryDiagnoser.Default,
                 EventPipeProfiler.Default,
             };
-
-            return result.ToArray();
-        }
 
         private static IDiagnoser[] LoadCoreOnWindows()
         {

@@ -16,7 +16,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using JetBrains.Annotations;
 using Microsoft.Diagnostics.NETCore.Client;
 using Microsoft.Diagnostics.Symbols;
 using Microsoft.Diagnostics.Tracing;
@@ -51,21 +50,15 @@ namespace BenchmarkDotNet.Diagnosers
 
             if (profile != null)
             {
-                var selectedProfile = ListProfilesCommandHandler.DotNETRuntimeProfiles.FirstOrDefault(p => p.profile == profile);
-                if (selectedProfile == default)
+                if (EventPipeProfileMapper.DotNetRuntimeProfiles.TryGetValue(profile.Value, out var selectedProfile))
                 {
-                    logger.WriteLine(LogKind.Error, $"Invalid profile name: {profile}");
+                    var newProvidersFromProfile = selectedProfile.Where(p => !eventPipeProviders.Any(r => r.Name.Equals(p.Name)));
+                    eventPipeProviders.AddRange(newProvidersFromProfile);
                 }
                 else
                 {
-                    var newProvidersFromProfile = selectedProfile.Providers.Where(p => !eventPipeProviders.Any(r => r.Name.Equals(p.Name)));
-                    eventPipeProviders.AddRange(newProvidersFromProfile);
+                    logger.WriteLine(LogKind.Error, $"Invalid profile name: {profile}");
                 }
-            }
-
-            foreach (var provider in eventPipeProviders)
-            {
-                logger.WriteLine(LogKind.Info, provider.Name);
             }
         }
 
@@ -73,7 +66,7 @@ namespace BenchmarkDotNet.Diagnosers
         
         private readonly List<EventPipeProvider> eventPipeProviders = new List<EventPipeProvider>
         {
-            new EventPipeProvider("BenchmarkDotNet.EngineEventSource", EventLevel.Informational, Int64.MaxValue) // mandatory provider to enable Engine events
+            new EventPipeProvider("BenchmarkDotNet.EngineEventSource", EventLevel.Informational, long.MaxValue) // mandatory provider to enable Engine events
         };
 
         private static readonly string LogSeparator = new string('-', 20);
@@ -94,61 +87,57 @@ namespace BenchmarkDotNet.Diagnosers
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
-            if (signal == HostSignal.BeforeAnythingElse)
-            {
-                var diagnosticsClient = new DiagnosticsClient(parameters.Process.Id);
+            if (signal != HostSignal.BeforeAnythingElse)
+                return;
 
-                EventPipeSession session;
+            var diagnosticsClient = new DiagnosticsClient(parameters.Process.Id);
+
+            EventPipeSession session;
+            try
+            {
+                session = diagnosticsClient.StartEventPipeSession(eventPipeProviders, true);
+            }
+            catch (DiagnosticsClientException e)
+            {
+                logger.WriteLine(LogKind.Error, $"Unable to start a tracing session: {e}");
+                return;
+            }
+            var fileName = ArtifactFileNameHelper.GetFilePath(parameters, DateTime.Now, "nettrace");
+            Path.GetDirectoryName(fileName).CreateIfNotExists();
+            benchmarkToTraceFile[parameters.BenchmarkCase] = fileName;
+
+            collectingTask = new Task(() =>
+            {
                 try
                 {
-                    session = diagnosticsClient.StartEventPipeSession(eventPipeProviders, true);
-                }
-                catch (DiagnosticsClientException e)
-                {
-                    logger.WriteLine(LogKind.Error, $"Unable to start a tracing session: {e}");
-                    return;
-                }
-                var fileName = ArtifactFileNameHelper.GetFilePath(parameters, DateTime.Now, "nettrace");
-                Path.GetDirectoryName(fileName).CreateIfNotExists();
-                benchmarkToTraceFile[parameters.BenchmarkCase] = fileName;
-
-                collectingTask = new Task(() =>
-                {
-                    try
+                    using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
                     {
-                        var stopwatch = new Stopwatch();
-                        stopwatch.Start();
+                        var buffer = new byte[16 * 1024];
 
-                        using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                        while (true)
                         {
-                            var buffer = new byte[16 * 1024];
-
-                            while (true)
-                            {
-                                int nBytesRead = session.EventStream.Read(buffer, 0, buffer.Length);
-                                if (nBytesRead <= 0)
-                                    break;
-                                fs.Write(buffer, 0, nBytesRead);
-                            }
+                            int nBytesRead = session.EventStream.Read(buffer, 0, buffer.Length);
+                            if (nBytesRead <= 0)
+                                break;
+                            fs.Write(buffer, 0, nBytesRead);
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        logger.WriteLine(LogKind.Error, $"An exception occurred during reading trace stream: {ex}");
-                    }
-                });
-                collectingTask.Start();
-            }
+                }
+                catch (Exception ex)
+                {
+                    logger.WriteLine(LogKind.Error, $"An exception occurred during reading trace stream: {ex}");
+                }
+            });
+            collectingTask.Start();
         }
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
             Task.WaitAll(collectingTask);
-          
-            if (!benchmarkToTraceFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
-                return Array.Empty<Metric>();
-            
-            ConvertToSpeedscope(results.BenchmarkCase, traceFilePath);
+
+            if (benchmarkToTraceFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
+                ConvertToSpeedscope(results.BenchmarkCase, traceFilePath);
+
             return Array.Empty<Metric>();
         }
         
@@ -157,11 +146,13 @@ namespace BenchmarkDotNet.Diagnosers
             resultLogger.WriteLine();
             resultLogger.WriteLineHeader(LogSeparator);
 
-            foreach (var line in logger.CapturedOutput)
-                resultLogger.Write(line.Kind, line.Text);
+            if (logger.CapturedOutput.Any())
+            {
+                foreach (var line in logger.CapturedOutput)
+                    resultLogger.Write(line.Kind, line.Text);
 
-            resultLogger.WriteLine();
-
+                resultLogger.WriteLine();
+            }
             if (!benchmarkToTraceFile.Any())
                 return;
 
@@ -226,7 +217,10 @@ namespace BenchmarkDotNet.Diagnosers
                     OnlyManagedCodeStacks = true // EventPipe currently only has managed code stacks.
                 };
 
-                var computer = new SampleProfilerThreadTimeComputer(eventLog, symbolReader);
+                var computer = new SampleProfilerThreadTimeComputer(eventLog, symbolReader)
+                {
+                    IncludeEventSourceEvents = false // SpeedScope handles only CPU samples, events are not supported
+                };
                 computer.GenerateThreadTimeStacks(stackSource);
 
                 SpeedScopeStackSourceWriter.WriteStackViewAsJson(stackSource, outputFilename);

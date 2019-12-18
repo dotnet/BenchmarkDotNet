@@ -39,9 +39,7 @@ namespace BenchmarkDotNet.Engines
 
         internal static readonly EngineEventSource Log = new EngineEventSource();
 
-        private EngineEventSource() : base(SourceName, EventSourceSettings.EtwSelfDescribingEventFormat)
-        {
-        }
+        private EngineEventSource() { }
 
         [Event(BenchmarkStartEventId, Level = EventLevel.Informational, Task = Tasks.Benchmark, Opcode = EventOpcode.Start)]
         internal void BenchmarkStart(string benchmarkName) => WriteEvent(BenchmarkStartEventId, benchmarkName);
