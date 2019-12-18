@@ -14,20 +14,9 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Diagnosers
 {
-    [SuppressMessage("ReSharper", "NotAccessedField.Local")] // TODO: use config fields
     internal class MonoDisassembler
     {
-        private readonly bool printAsm, printIL, printSource, printPrologAndEpilog;
-        private readonly int recursiveDepth;
-
-        internal MonoDisassembler(DisassemblyDiagnoserConfig config)
-        {
-            printIL = config.PrintIL;
-            printAsm = config.PrintAsm;
-            printSource = config.PrintSource;
-            printPrologAndEpilog = config.PrintPrologAndEpilog;
-            recursiveDepth = config.RecursiveDepth;
-        }
+        internal MonoDisassembler(DisassemblyDiagnoserConfig _) { }
 
         internal DisassemblyResult Disassemble(BenchmarkCase benchmarkCase, MonoRuntime mono)
         {

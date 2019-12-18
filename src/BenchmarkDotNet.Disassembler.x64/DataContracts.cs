@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
+#pragma warning disable CS3003 // I need ulong
 namespace BenchmarkDotNet.Disassembler
 {
     public class Code
@@ -14,11 +15,6 @@ namespace BenchmarkDotNet.Disassembler
     {
         public string FilePath { get; set; }
         public int LineNumber { get; set; }
-    }
-
-    public class IL : Code
-    {
-        public int Offset { get; set; }
     }
 
     public class Asm : Code
@@ -41,7 +37,6 @@ namespace BenchmarkDotNet.Disassembler
         [XmlArray("Instructions")]
         [XmlArrayItem(nameof(Code), typeof(Code))]
         [XmlArrayItem(nameof(Sharp), typeof(Sharp))]
-        [XmlArrayItem(nameof(IL), typeof(IL))]
         [XmlArrayItem(nameof(Asm), typeof(Asm))]
         public List<Code> Instructions { get; set; }
     }
@@ -87,3 +82,4 @@ namespace BenchmarkDotNet.Disassembler
         public const string DisassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
     }
 }
+#pragma warning restore CS3003 // Type is not CLS-compliant

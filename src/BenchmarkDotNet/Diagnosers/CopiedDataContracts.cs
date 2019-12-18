@@ -1,5 +1,4 @@
 ﻿using System.Xml.Serialization;
-using JetBrains.Annotations;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 #pragma warning disable CS3003 // I need ulong
@@ -16,11 +15,6 @@ namespace BenchmarkDotNet.Diagnosers
     {
         public string FilePath { get; set; }
         public int LineNumber { get; set; }
-    }
-
-    public class IL : Code
-    {
-        [PublicAPI] public int Offset { get; set; }
     }
 
     public class Asm : Code
@@ -43,7 +37,6 @@ namespace BenchmarkDotNet.Diagnosers
         [XmlArray("Instructions")]
         [XmlArrayItem(nameof(Code), typeof(Code))]
         [XmlArrayItem(nameof(Sharp), typeof(Sharp))]
-        [XmlArrayItem(nameof(IL), typeof(IL))]
         [XmlArrayItem(nameof(Asm), typeof(Asm))]
         public Code[] Instructions { get; set; }
     }

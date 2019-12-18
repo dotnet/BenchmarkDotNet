@@ -21,6 +21,5 @@
   <ItemGroup>
     <PackageReference Include="Iced" Version="1.4.0" />
     <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="1.1.57604" />
-    <PackageReference Include="Mono.Cecil" Version="0.11.1" />
   </ItemGroup>
 </Project>

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Interop;
 using Microsoft.Diagnostics.RuntimeExt;
-using Mono.Cecil;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +12,6 @@ using System.Xml;
 using System.Xml.Serialization;
 using Iced.Intel;
 using Decoder = Iced.Intel.Decoder;
-using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace BenchmarkDotNet.Disassembler
 {
@@ -133,26 +131,9 @@ namespace BenchmarkDotNet.Disassembler
         private static DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings)
         {
             var method = methodInfo.Method;
-            var assemblyDefinition = AssemblyDefinition.ReadAssembly(method.Type.Module.FileName);
-            if (assemblyDefinition == null)
-                return CreateEmpty(method, "Can't read assembly definition");
-
-            var typeDefinition = assemblyDefinition.MainModule.GetTypes().SingleOrDefault(type => type.MetadataToken.ToUInt32() == method.Type.MetadataToken);
-            if (typeDefinition == null)
-                return CreateEmpty(method, $"Can't find {method.Type.Name} in {assemblyDefinition.Name}");
-
-            var methodDefinition = typeDefinition.Methods.Single(m => m.MetadataToken.ToUInt32() == method.MetadataToken);
-            if (methodDefinition == null)
-                return CreateEmpty(method, $"Can't find {method.Name} of {typeDefinition.Name}");
-
-            // some methods have no implementation (abstract & CLR magic)
-            var ilInstructions = (ICollection<Instruction>)methodDefinition.Body?.Instructions ?? Array.Empty<Instruction>();
 
             if (method.NativeCode == ulong.MaxValue || method.ILOffsetMap == null)
             {
-                // we have no asm, so we are going to try to get the methods from IL
-                EnqueueAllCallsFromIL(state, ilInstructions, methodInfo.Depth);
-
                 if (method.NativeCode == ulong.MaxValue)
                     if (method.IsAbstract) return CreateEmpty(method, "Abstract method");
                     else if (method.IsVirtual) CreateEmpty(method, "Virtual method");
@@ -176,12 +157,6 @@ namespace BenchmarkDotNet.Disassembler
                 .OrderBy(ilOffset => ilOffset)
                 .ToArray();
 
-            if (mapByStartAddress.Length == 0 && settings.PrintIL)
-            {
-                // The method doesn't have an offset map. Just print the whole thing.
-                maps.Add(new Map { Instructions = GetIL(ilInstructions).ToList<Code>() });
-            }
-
             // maps with negative ILOffset are not always part of the prolog or epilog
             // so we don't exclude all maps with negative ILOffset
             // but only the first ones and the last ones if PrintPrologAndEpilog == false
@@ -198,8 +173,6 @@ namespace BenchmarkDotNet.Disassembler
                 var group = new List<Code>();
                 var map = mapByStartAddress[i];
 
-                var correspondingIL = Array.Empty<Instruction>();
-
                 if (map.ILOffset >= 0)
                 {
                     var ilOffsetIndex = Array.IndexOf(sortedUniqueILOffsets, map.ILOffset);
@@ -209,27 +182,16 @@ namespace BenchmarkDotNet.Disassembler
                     var nextMapILOffset = nextILOffsetIndex < sortedUniqueILOffsets.Length
                         ? sortedUniqueILOffsets[nextILOffsetIndex]
                         : int.MaxValue;
-
-                    correspondingIL = ilInstructions
-                        .Where(instr => instr.Offset >= map.ILOffset && instr.Offset < nextMapILOffset)
-                        .OrderBy(instr => instr.Offset) // just to make sure the Cecil instructions are also sorted in the right way
-                        .ToArray();
                 }
 
                 if (settings.PrintSource && map.ILOffset >= 0)
                     group.AddRange(GetSource(method, map));
-
-                if (settings.PrintIL && map.ILOffset >= 0)
-                    group.AddRange(GetIL(correspondingIL));
 
                 if (settings.PrintAsm)
                     group.AddRange(GetAsm(map, state, methodInfo.Depth, method));
 
                 maps.Add(new Map { Instructions = group });
             }
-
-            // after we read the asm we try to find some other methods which were not direct calls in asm
-            EnqueueAllCallsFromIL(state, ilInstructions, methodInfo.Depth);
 
             return new DisassembledMethod
             {
@@ -238,14 +200,6 @@ namespace BenchmarkDotNet.Disassembler
                 NativeCode = method.NativeCode
             };
         }
-
-        private static IEnumerable<IL> GetIL(ICollection<Instruction> instructions)
-            => instructions.Select(instruction 
-                => new IL
-                {
-                    TextRepresentation = instruction.ToString(),
-                    Offset = instruction.Offset
-                });
 
         private static IEnumerable<Sharp> GetSource(ClrMethod method, ILToNativeMap map)
         {
@@ -397,80 +351,6 @@ namespace BenchmarkDotNet.Disassembler
             return ulong.TryParse(addressPart, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out address);
         }
 
-        /// <summary>
-        /// for some calls we can not parse the method address from asm, so we just get it from IL
-        /// </summary>
-        private static void EnqueueAllCallsFromIL(State state, ICollection<Instruction> ilInstructions, int depth)
-        {
-            // let's try to enqueue all method calls that we can find in IL and were not printed yet
-            foreach (var callInstruction in ilInstructions.Where(instruction => instruction.Operand is MethodReference)) // todo: handle CallSite
-            {
-                var methodReference = (MethodReference)callInstruction.Operand;
-
-                var declaringType = 
-                    methodReference.DeclaringType.IsNested
-                        ? state.Runtime.Heap.GetTypeByName(methodReference.DeclaringType.FullName.Replace('/', '+')) // nested types contains `/` instead of `+` in the name..
-                        : state.Runtime.Heap.GetTypeByName(methodReference.DeclaringType.FullName);
-
-                if(declaringType == null)
-                    continue; // todo: eliminate Cecil vs ClrMD differences in searching by name
-
-                var calledMethod = GetMethod(methodReference, declaringType);
-                if (calledMethod != null && !state.HandledMethods.Contains(new MethodId(calledMethod.MetadataToken, declaringType.MetadataToken)))
-                    state.Todo.Enqueue(new MethodInfo(calledMethod, depth + 1));
-            }
-        }
-
-        private static ClrMethod GetMethod(MethodReference methodReference, ClrType declaringType)
-        {
-            var methodsWithSameToken = declaringType.Methods
-                .Where(method => method.MetadataToken == methodReference.MetadataToken.ToUInt32()).ToArray();
-
-            if (methodsWithSameToken.Length == 1) // the most common case
-                return methodsWithSameToken[0];
-            if (methodsWithSameToken.Length > 1 && methodReference.MetadataToken.ToUInt32() != default(UInt32))
-            {
-                var compiled = methodsWithSameToken.Where(method => method.CompilationType != MethodCompilationType.None).ToArray();
-                
-                if (compiled.Length != 1) // very rare case where two different methods have the same metadata token ;)
-                    return compiled.Single(method => method.Name == methodReference.Name);;
-                
-                // usually one is NGened, the other one is not compiled (looks like a ClrMD bug to me)
-                return compiled[0];
-            }
-
-            // comparing metadata tokens does not work correctly for some NGENed types like Random.Next, System.Threading.Monitor & more
-            // Mono.Cecil reports different metadata token value than ClrMD for the same method 
-            // so the last chance is to try to match them by... name (I don't like it, but I have no better idea for now)
-            var unifiedSignature = CecilNameToClrmdName(methodReference);
-
-            // the signature does not contain return type, so if there are few methods 
-            // with same name and arguments but different return type, we can do nothing
-            var methodsMatchingSignature = declaringType.Methods.Where(method => method.GetFullSignature() == unifiedSignature).ToArray();
-
-            // but if there is only one, we know that this is the method we are looking for
-            if (methodsMatchingSignature.Length == 1)
-                return methodsMatchingSignature[0];
-
-            return null;
-        }
-
-        private static string CecilNameToClrmdName(MethodReference method)
-        {
-            // Cecil returns sth like "System.Int32 System.Random::Next(System.Int32,System.Int32)"
-            // ClrMD expects sth like "System.Random.Next(Int32, Int32)
-            // this method does not handle generic method/types and nested types
-
-            return $"{method.DeclaringType.Namespace}.{method.DeclaringType.Name}.{method.Name}({string.Join(", ", method.Parameters.Select(CecilNameToClrmdName))})";
-        }
-
-        // Cecil returns sth like "Boolean&"
-        // ClrMD expects sth like "Boolean ByRef
-        private static string CecilNameToClrmdName(ParameterDefinition param) 
-            => param.ParameterType.IsByReference 
-                ? param.ParameterType.Name.Replace("&", string.Empty) + " ByRef"
-                : param.ParameterType.Name;
-
         private static Map[] EliminateDuplicates(List<Map> maps)
         {
             var unique = new HashSet<Code>(CodeComparer.Instance);
@@ -505,10 +385,6 @@ namespace BenchmarkDotNet.Disassembler
                         && sharpLeft.FilePath == sharpRight.FilePath
                         && sharpLeft.LineNumber == sharpRight.LineNumber;
 
-                if (x is IL ilLeft && y is IL ilRight)
-                    return ilLeft.TextRepresentation == ilRight.TextRepresentation
-                        && ilLeft.Offset == ilRight.Offset;
-
                 return false; // different types!
             }
 
@@ -518,13 +394,12 @@ namespace BenchmarkDotNet.Disassembler
 
     internal class Settings
     {
-        internal Settings(int processId, string typeName, string methodName, bool printAsm, bool printIL, bool printSource, bool printPrologAndEpilog, int recursiveDepth, string resultsPath)
+        internal Settings(int processId, string typeName, string methodName, bool printAsm,bool printSource, bool printPrologAndEpilog, int recursiveDepth, string resultsPath)
         {
             ProcessId = processId;
             TypeName = typeName;
             MethodName = methodName;
             PrintAsm = printAsm;
-            PrintIL = printIL;
             PrintSource = printSource;
             PrintPrologAndEpilog = printPrologAndEpilog;
             RecursiveDepth = methodName == DisassemblerConstants.DisassemblerEntryMethodName && recursiveDepth != int.MaxValue ? recursiveDepth + 1 : recursiveDepth;
@@ -535,7 +410,6 @@ namespace BenchmarkDotNet.Disassembler
         internal string TypeName { get; }
         internal string MethodName { get; }
         internal bool PrintAsm { get; }
-        internal bool PrintIL { get; }
         internal bool PrintSource { get; }
         internal bool PrintPrologAndEpilog { get; }
         internal int RecursiveDepth { get; }
@@ -547,11 +421,10 @@ namespace BenchmarkDotNet.Disassembler
                 typeName: args[1],
                 methodName: args[2],
                 printAsm: bool.Parse(args[3]),
-                printIL: bool.Parse(args[4]),
-                printSource: bool.Parse(args[5]),
-                printPrologAndEpilog: bool.Parse(args[6]),
-                recursiveDepth: int.Parse(args[7]),
-                resultsPath: args[8]
+                printSource: bool.Parse(args[4]),
+                printPrologAndEpilog: bool.Parse(args[5]),
+                recursiveDepth: int.Parse(args[6]),
+                resultsPath: args[7]
             );
     }
 
