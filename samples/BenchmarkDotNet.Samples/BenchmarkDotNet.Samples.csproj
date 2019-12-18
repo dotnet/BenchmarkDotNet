@@ -24,7 +24,4 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
-    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.NETCore\BenchmarkDotNet.Diagnostics.NETCore.csproj" />
-  </ItemGroup>
 </Project>

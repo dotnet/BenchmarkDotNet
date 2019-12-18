@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Diagnostics.Tracing;
 using JetBrains.Annotations;
-
+using System.Diagnostics.Tracing;
 namespace BenchmarkDotNet.Engines
 {
-    [EventSource(Name = "BenchmarkDotNet.EngineEventSource")]
+    [EventSource(Name = EngineEventSource.SourceName)]
     public class EngineEventSource : EventSource
     {
+        const string SourceName = "BenchmarkDotNet.EngineEventSource";
         [PublicAPI] public const int BenchmarkStartEventId = 1;
         [PublicAPI] public const int BenchmarkStopEventId = 2;
         [PublicAPI] public const int OverheadJittingStartEventId = 3;
@@ -38,7 +39,9 @@ namespace BenchmarkDotNet.Engines
 
         internal static readonly EngineEventSource Log = new EngineEventSource();
 
-        private EngineEventSource() { }
+        private EngineEventSource() : base(SourceName, EventSourceSettings.EtwSelfDescribingEventFormat)
+        {
+        }
 
         [Event(BenchmarkStartEventId, Level = EventLevel.Informational, Task = Tasks.Benchmark, Opcode = EventOpcode.Start)]
         internal void BenchmarkStart(string benchmarkName) => WriteEvent(BenchmarkStartEventId, benchmarkName);

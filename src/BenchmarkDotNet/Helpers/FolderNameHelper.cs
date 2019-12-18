@@ -1,13 +1,35 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
+using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains;
 using SimpleJson.Reflection;
 
 namespace BenchmarkDotNet.Helpers
 {
+    internal static class ArtifactFileNameHelper
+    {
+        public static string GetFilePath(DiagnoserActionParameters details, DateTime creationTime, string fileExtension)
+        {
+            string fileName = $@"{FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type)}.{FullNameProvider.GetMethodName(details.BenchmarkCase)}";
+
+            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
+            if (details.Config.GetJobs().Select(job => job.GetToolchain()).Distinct().Count() > 1)
+                fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
+
+            fileName += $"-{creationTime.ToString(BenchmarkRunnerClean.DateTimeFormat)}";
+
+            fileName = FolderNameHelper.ToFolderName(fileName);
+
+            return Path.Combine(details.Config.ArtifactsPath, $"{fileName}.{fileExtension}");
+        }
+    }
     public static class FolderNameHelper
     {
         public static string ToFolderName(object value)
