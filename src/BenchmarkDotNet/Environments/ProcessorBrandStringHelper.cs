@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
@@ -61,7 +62,7 @@ namespace BenchmarkDotNet.Environments
         {
             if (frequency == null)
                 return null;
-            return $"{frequency.Value.ToGHz().ToStr("N2")}GHz";
+            return $"{frequency.Value.ToGHz().ToString("N2", DefaultCultureInfo.Instance)}GHz";
         }
 
         /// <summary>

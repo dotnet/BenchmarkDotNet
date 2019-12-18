@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Reports
             }
 
             // Ensure we have all required data for styling
-            style = style ?? SummaryStyle.Default;
+            style = style ?? summary.Style ?? SummaryStyle.Default;
             if (style.TimeUnit == null)
             {
                 style = style.WithTimeUnit(TimeUnit.GetBestTimeUnit(summary.Reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean)

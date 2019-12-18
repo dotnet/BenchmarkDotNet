@@ -261,13 +261,16 @@ namespace BenchmarkDotNet.Disassembler
             }
         }
 
-        static string GetSmartPrefix(string sourceLine, int length)
+        private static string GetSmartPrefix(string sourceLine, int length)
         {
+            if (length <= 0)
+                return string.Empty;
             var prefix = new char[length];
             for (int i = 0; i < length; i++)
-                prefix[i] = sourceLine[i] == '\t' 
-                    ? sourceLine[i] 
-                    : ' ';
+            {
+                char sourceChar = i < sourceLine.Length ? sourceLine[i] : ' ';
+                prefix[i] = sourceChar == '\t' ? sourceChar : ' ';
+            }
             return new string(prefix);
         }
 

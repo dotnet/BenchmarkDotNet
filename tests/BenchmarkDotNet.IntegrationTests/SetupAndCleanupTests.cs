@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void AllSetupAndCleanupMethodRunsForSpecificBenchmark()
         {
             var logger = new OutputLogger(Output);
-            var miniJob = Job.Default.With(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
+            var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
             var config = CreateSimpleConfig(logger, miniJob);
 
             CanExecute<Benchmarks>(config);

@@ -69,9 +69,9 @@ namespace BenchmarkDotNet.Tests.Running
             const string version = "abcd";
 
             var config = ManualConfig.Create(DefaultConfig.Instance)
-                .With(Job.Default.With(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: version)))
-                .With(Job.Default.With(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "it's a different version")))
-                .With(Job.Default.With(ClrRuntime.GetCurrentVersion()));
+                .AddJob(Job.Default.WithRuntime(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: version)))
+                .AddJob(Job.Default.WithRuntime(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "it's a different version")))
+                .AddJob(Job.Default.WithRuntime(ClrRuntime.GetCurrentVersion()));
 
             var benchmarks1 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1), config);
             var benchmarks2 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain2), config);
@@ -93,8 +93,8 @@ namespace BenchmarkDotNet.Tests.Running
             var job2 = Job.Default.WithNuGet("AutoMapper", "7.0.1");
 
             var config = ManualConfig.Create(DefaultConfig.Instance)
-                .With(job1)
-                .With(job2);
+                .AddJob(job1)
+                .AddJob(job2);
 
             var benchmarks1 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1), config);
             var benchmarks2 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain2), config);
@@ -113,8 +113,8 @@ namespace BenchmarkDotNet.Tests.Running
         public void CustomNuGetJobsAreGroupedByPackageVersion()
         {
             var config = ManualConfig.Create(DefaultConfig.Instance)
-                .With(Job.Default.WithNuGet("AutoMapper", "7.0.1"))
-                .With(Job.Default.WithNuGet("AutoMapper", "7.0.0-alpha-0001"));
+                .AddJob(Job.Default.WithNuGet("AutoMapper", "7.0.1"))
+                .AddJob(Job.Default.WithNuGet("AutoMapper", "7.0.0-alpha-0001"));
 
             var benchmarks1 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1), config);
             var benchmarks2 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain2), config);

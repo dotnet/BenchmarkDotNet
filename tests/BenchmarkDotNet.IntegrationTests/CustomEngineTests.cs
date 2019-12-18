@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CustomEnginesAreSupported()
         {
             var config = ManualConfig.CreateEmpty()
-                .With(new Job(Job.Dry) { Infrastructure = { EngineFactory = new CustomFactory() } });
+                .AddJob(new Job(Job.Dry) { Infrastructure = { EngineFactory = new CustomFactory() } });
 
             var summary = CanExecute<SimpleBenchmark>(config, fullValidation: false);
 
@@ -79,7 +79,6 @@ namespace BenchmarkDotNet.IntegrationTests
                     new List<Measurement> { new Measurement(1, IterationMode.Overhead, IterationStage.Actual, 1, 1, 1) },
                     new List<Measurement> { new Measurement(1, IterationMode.Workload, IterationStage.Actual, 1, 1, 1) },
                     OutlierMode.DontRemove,
-                    default,
                     default,
                     default);
             }

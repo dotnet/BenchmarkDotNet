@@ -44,33 +44,33 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Fact]
         public void DryJobWithInProcessToolchainDoesNotEatExceptions()
-            => SourceExceptionMessageIsDisplayed<AlwaysThrow>(Job.Dry.With(InProcessEmitToolchain.Instance));
+            => SourceExceptionMessageIsDisplayed<AlwaysThrow>(Job.Dry.WithToolchain(InProcessEmitToolchain.Instance));
 
         [Fact]
         public void DryJobWithInProcessToolchainDoesNotEatExceptionsWhenIterationCleanupThrows()
-            => SourceExceptionMessageIsDisplayed<ThrowInBenchmarkAndInIterationCleanup>(Job.Dry.With(InProcessEmitToolchain.Instance));
+            => SourceExceptionMessageIsDisplayed<ThrowInBenchmarkAndInIterationCleanup>(Job.Dry.WithToolchain(InProcessEmitToolchain.Instance));
 
         [Fact]
         public void DryJobWithInProcessToolchainDoesNotEatExceptionsWhenGlobalCleanupThrows()
-            => SourceExceptionMessageIsDisplayed<ThrowInBenchmarkAndInGlobalCleanup>(Job.Dry.With(InProcessEmitToolchain.Instance));
+            => SourceExceptionMessageIsDisplayed<ThrowInBenchmarkAndInGlobalCleanup>(Job.Dry.WithToolchain(InProcessEmitToolchain.Instance));
 
         [Fact]
         public void DefaultJobWithInProcessToolchainDoesNotEatExceptions()
-            => SourceExceptionMessageIsDisplayed<AlwaysThrow>(Job.Default.With(InProcessEmitToolchain.Instance));
+            => SourceExceptionMessageIsDisplayed<AlwaysThrow>(Job.Default.WithToolchain(InProcessEmitToolchain.Instance));
 
         [Fact]
         public void DefaultJobWithInProcessToolchainDoesNotEatExceptionsWhenIterationCleanupThrows()
-            => SourceExceptionMessageIsDisplayed<ThrowInBenchmarkAndInIterationCleanup>(Job.Default.With(InProcessEmitToolchain.Instance));
+            => SourceExceptionMessageIsDisplayed<ThrowInBenchmarkAndInIterationCleanup>(Job.Default.WithToolchain(InProcessEmitToolchain.Instance));
 
         [Fact]
         public void DefaultJobWithInProcessToolchainDoesNotEatExceptionsWhenGlobalCleanupThrows()
-            => SourceExceptionMessageIsDisplayed<ThrowInBenchmarkAndInGlobalCleanup>(Job.Default.With(InProcessEmitToolchain.Instance));
+            => SourceExceptionMessageIsDisplayed<ThrowInBenchmarkAndInGlobalCleanup>(Job.Default.WithToolchain(InProcessEmitToolchain.Instance));
 
         [AssertionMethod]
         private void SourceExceptionMessageIsDisplayed<TBenchmark>(Job job)
         {
             var logger = new AccumulationLogger();
-            var config = ManualConfig.CreateEmpty().With(job).With(logger);
+            var config = ManualConfig.CreateEmpty().AddJob(job).AddLogger(logger);
 
             CanExecute<TBenchmark>(config, fullValidation: false); // we don't validate here because the report is expected to have no results
 

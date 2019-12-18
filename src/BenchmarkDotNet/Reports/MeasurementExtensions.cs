@@ -1,6 +1,4 @@
-﻿using System.Text;
-using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Engines;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Reports
@@ -14,15 +12,6 @@ namespace BenchmarkDotNet.Reports
         /// </summary>
         public static double GetOpsPerSecond(this Measurement report) =>
             report.Operations / (report.Nanoseconds / NanosecondsInSecond);
-
-        /// <summary>
-        /// Gets the average duration of one operation in nanoseconds.
-        /// </summary>
-        public static double GetAverageNanoseconds(this Measurement report) =>
-            report.Nanoseconds / report.Operations;
-
-        public static string ToStr(this Measurement run, Encoding encoding = null) =>
-            $"{run.IterationMode}{run.IterationStage} {run.IterationIndex}: {run.Operations} op, {run.Nanoseconds.ToStr()} ns, {run.GetAverageNanoseconds().ToTimeStr(encoding ?? Encoding.ASCII)}/op";
 
         public static bool Is(this Measurement measurement, IterationMode mode, IterationStage stage)
             => measurement.IterationMode == mode && measurement.IterationStage == stage;

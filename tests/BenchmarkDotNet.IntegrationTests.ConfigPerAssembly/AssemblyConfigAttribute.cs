@@ -13,11 +13,14 @@ namespace BenchmarkDotNet.IntegrationTests.ConfigPerAssembly
 
         public AssemblyConfigAttribute()
         {
-            Config = ManualConfig.CreateEmpty().With(new Logger());
+            Config = ManualConfig.CreateEmpty().AddLogger(new Logger());
         }
 
         private class Logger : ILogger
         {
+            public string Id => "TestLogger";
+            public int Priority => 0;
+
             public void Write(LogKind logKind, string text)
             {
                 IsActivated = true;

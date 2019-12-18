@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Attributes
     [Obsolete("Please use [DryJob(RuntimeMoniker.Mono)] instead.", false)]
     public class DryMonoJobAttribute : JobConfigBaseAttribute
     {
-        public DryMonoJobAttribute() : base(Job.Dry.With(MonoRuntime.Default))
+        public DryMonoJobAttribute() : base(Job.Dry.WithRuntime(MonoRuntime.Default))
         {
         }
     }

@@ -57,9 +57,10 @@
     <InformationalVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)$(PrereleaseLabel)</InformationalVersion>
     <PackageVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)$(PrereleaseLabel)</PackageVersion>
   </PropertyGroup>
-  <PropertyGroup>
-    <TargetFrameworkRootPath Condition="'$(TargetFrameworkRootPath)' == '' AND Exists('/Library/Frameworks/Mono.framework/Versions/Current')">/Library/Frameworks/Mono.framework/Versions/Current/lib/mono/xbuild-frameworks</TargetFrameworkRootPath>
-    <TargetFrameworkRootPath Condition="'$(TargetFrameworkRootPath)' == '' AND Exists('/usr/local/lib/mono/xbuild-frameworks')">/usr/local/lib/mono/xbuild-frameworks</TargetFrameworkRootPath>
-    <TargetFrameworkRootPath Condition="'$(TargetFrameworkRootPath)' == '' AND Exists('/usr/lib/mono/xbuild-frameworks')">/usr/lib/mono/xbuild-frameworks</TargetFrameworkRootPath>
-  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>

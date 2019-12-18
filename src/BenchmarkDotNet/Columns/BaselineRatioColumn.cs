@@ -50,12 +50,13 @@ namespace BenchmarkDotNet.Columns
             if (ratio == null)
                 return "NA";
 
+            var cultureInfo = summary.GetCultureInfo();
             switch (Metric)
             {
                 case RatioMetric.Mean:
-                    return IsNonBaselinesPrecise(summary, baseline, benchmarkCase) ? ratio.Mean.ToStr("N3") : ratio.Mean.ToStr("N2");
+                    return IsNonBaselinesPrecise(summary, baseline, benchmarkCase) ? ratio.Mean.ToString("N3", cultureInfo) : ratio.Mean.ToString("N2", cultureInfo);
                 case RatioMetric.StdDev:
-                    return ratio.StandardDeviation.ToStr("N2");
+                    return ratio.StandardDeviation.ToString("N2", cultureInfo);
                 default:
                     throw new NotSupportedException();
             }

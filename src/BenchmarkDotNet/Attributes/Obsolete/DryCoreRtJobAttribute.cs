@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Attributes
     [Obsolete("Please use [DryJob(RuntimeMoniker.CoreRt$)] instead.", false)]
     public class DryCoreRtJobAttribute : JobConfigBaseAttribute
     {
-        public DryCoreRtJobAttribute() : base(Job.Dry.With(CoreRtRuntime.GetCurrentVersion()))
+        public DryCoreRtJobAttribute() : base(Job.Dry.WithRuntime(CoreRtRuntime.GetCurrentVersion()))
         {
         }
     }

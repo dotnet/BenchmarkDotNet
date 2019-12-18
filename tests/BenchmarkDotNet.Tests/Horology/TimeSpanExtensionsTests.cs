@@ -1,4 +1,5 @@
 ﻿using System;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
 using Xunit;
@@ -10,7 +11,7 @@ namespace BenchmarkDotNet.Tests.Horology
         [AssertionMethod]
         private static void Check(string expected, TimeSpan time)
         {
-            Assert.Equal(expected, time.ToFormattedTotalTime());
+            Assert.Equal(expected, time.ToFormattedTotalTime(TestCultureInfo.Instance));
         }
 
         [Fact]

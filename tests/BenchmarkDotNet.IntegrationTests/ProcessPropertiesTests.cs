@@ -27,9 +27,9 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CustomAffinityCanBeSet()
         {
             var config = ManualConfig.CreateEmpty()
-                .With(Job.Dry.WithAffinity(CustomAffinity.Value))
-                .With(DefaultColumnProviders.Instance)
-                .With(new OutputLogger(Output));
+                .AddJob(Job.Dry.WithAffinity(CustomAffinity.Value))
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddLogger(new OutputLogger(Output));
 
             CanExecute<CustomAffinity>(config);
         }

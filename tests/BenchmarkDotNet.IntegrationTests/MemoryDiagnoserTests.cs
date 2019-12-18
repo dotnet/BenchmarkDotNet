@@ -287,15 +287,15 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private IConfig CreateConfig(IToolchain toolchain)
             => ManualConfig.CreateEmpty()
-                .With(Job.ShortRun
+                .AddJob(Job.ShortRun
                     .WithEvaluateOverhead(false) // no need to run idle for this test
                     .WithWarmupCount(0) // don't run warmup to save some time for our CI runs
                     .WithIterationCount(1) // single iteration is enough for us
                     .WithGcForce(false)
-                    .With(toolchain))
-                .With(DefaultColumnProviders.Instance)
-                .With(MemoryDiagnoser.Default)
-                .With(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
+                    .WithToolchain(toolchain))
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddDiagnoser(MemoryDiagnoser.Default)
+                .AddLogger(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
 
         // note: don't copy, never use in production systems (it should work but I am not 100% sure)
         private int CalculateRequiredSpace<T>()

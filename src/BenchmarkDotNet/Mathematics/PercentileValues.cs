@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
 
@@ -76,11 +78,26 @@ namespace BenchmarkDotNet.Mathematics
             P100 = Percentile(100);
         }
 
-        public string ToStr() => $"[P95: {P95.ToStr()}] [P0: {P0.ToStr()}]; [P50: {P50.ToStr()}]; [P100: {P100.ToStr()}]";
-        [PublicAPI] public string ToTimeStr(TimeUnit unit = null, Encoding encoding = null)
+        public override string ToString() => ToString(DefaultCultureInfo.Instance);
+
+        public string ToString(Func<double, string> formatter)
         {
-            encoding = encoding ?? Encoding.ASCII;
-            return $"[P95: {P95.ToTimeStr(unit, encoding)}] [P0: {P0.ToTimeStr(unit, encoding)}]; [P50: {P50.ToTimeStr(unit, encoding)}]; [P100: {P100.ToTimeStr(unit, encoding)})]";
+            var builder = new StringBuilder();
+            builder.Append("[P95: ");
+            builder.Append(formatter(P95));
+            builder.Append("]; [P0: ");
+            builder.Append(formatter(P0));
+            builder.Append("]; [P50: ");
+            builder.Append(formatter(P50));
+            builder.Append("]; [P100: ");
+            builder.Append(formatter(P100));
+            builder.Append("]");
+            return builder.ToString();
+        }
+
+        public string ToString([CanBeNull] CultureInfo cultureInfo, string format = "0.##")
+        {
+            return ToString(x => x.ToString(format, cultureInfo));
         }
     }
 }

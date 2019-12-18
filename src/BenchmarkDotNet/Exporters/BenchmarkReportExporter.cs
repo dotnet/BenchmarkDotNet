@@ -22,7 +22,12 @@ namespace BenchmarkDotNet.Exporters
                 if (resultRuns.IsEmpty())
                     logger.WriteLineError("There are not any results runs");
                 else
-                    logger.WriteLineStatistic(resultRuns.GetStatistics().ToTimeStr(report.BenchmarkCase.Config.Encoding, calcHistogram: true));
+                {
+                    var statistics = resultRuns.GetStatistics();
+                    var cultureInfo = summary.GetCultureInfo();
+                    var formatter = statistics.CreateNanosecondFormatter(cultureInfo);
+                    logger.WriteLineStatistic(statistics.ToString(cultureInfo, formatter, calcHistogram: true));
+                }
                 logger.WriteLine();
             }
         }

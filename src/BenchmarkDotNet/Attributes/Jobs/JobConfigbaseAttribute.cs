@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Attributes
         [PublicAPI]
         public JobConfigBaseAttribute() => Config = ManualConfig.CreateEmpty();
 
-        protected JobConfigBaseAttribute(Job job) => Config = ManualConfig.CreateEmpty().With(job);
+        protected JobConfigBaseAttribute(Job job) => Config = ManualConfig.CreateEmpty().AddJob(job);
 
         public IConfig Config { get; }
     }
