@@ -4,10 +4,8 @@ using Microsoft.Diagnostics.RuntimeExt;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using Iced.Intel;
@@ -17,7 +15,6 @@ namespace BenchmarkDotNet.Disassembler
 {
     internal static class Program
     {
-        static readonly string[] CallSeparator = { "call" };
         static readonly Dictionary<string, string[]> SourceFileCache = new Dictionary<string, string[]>();
 
         // the goals of the existence of this process: 
@@ -255,11 +252,9 @@ namespace BenchmarkDotNet.Disassembler
             {
                 decoder.Decode(out var instruction);
 
-
-                string calledMethodName = textRepresentation.Contains("call")
-                    ? TryEnqueueCalledMethod(textRepresentation, state, depth, currentMethod)
-                    : null;
                 string textRepresentation = GetTextRepresentation(instruction, state, map, buffer);
+
+                TryEnqueueCalledMethod(instruction, state, depth, currentMethod, out string calledMethodName);
 
                 yield return new Asm
                 {
@@ -291,6 +286,80 @@ namespace BenchmarkDotNet.Disassembler
             return output.ToString();
         }
 
+        private static void TryEnqueueCalledMethod(Instruction instruction, State state, int depth, ClrMethod currentMethod, out string calledMethodName)
+        {
+            calledMethodName = default;
+            ClrRuntime runtime = state.Runtime;
+
+            if (!TryGetCallAddress(instruction, runtime, out ulong address) || address <= ushort.MaxValue)
+                return;
+
+            calledMethodName = runtime.GetJitHelperFunctionName(address);
+            if (!string.IsNullOrEmpty(calledMethodName))
+            {
+                calledMethodName = $"JIT_{calledMethodName}";
+                return;
+            }
+
+            calledMethodName = runtime.GetMethodTableName(address);
+            if (!string.IsNullOrEmpty(calledMethodName))
+            {
+                calledMethodName = $"MT_{calledMethodName}";
+                return;
+            }
+
+            var method = runtime.GetMethodByAddress(address);
+            if (method is null)
+            {
+                calledMethodName = DisassemblerConstants.NotManagedMethod;
+                return;
+            }
+
+            if (method.NativeCode == currentMethod.NativeCode && method.GetFullSignature() == currentMethod.GetFullSignature())
+                return; // in case of call which is just a jump within the method
+
+            if (!state.HandledMethods.Contains(new MethodId(method.MetadataToken, method.Type.MetadataToken)))
+                state.Todo.Enqueue(new MethodInfo(method, depth + 1));
+
+            calledMethodName = method.GetFullSignature();
+        }
+
+        private static bool TryGetCallAddress(Instruction instruction, ClrRuntime runtime, out ulong address)
+        {
+            for (int i = 0; i < instruction.OpCount; i++)
+            {
+                switch (instruction.GetOpKind(i))
+                {
+                    case OpKind.NearBranch16:
+                    case OpKind.NearBranch32:
+                    case OpKind.NearBranch64:
+                        address = instruction.NearBranchTarget;
+                        return true;
+                    case OpKind.Immediate16:
+                    case OpKind.Immediate8to16:
+                    case OpKind.Immediate8to32:
+                    case OpKind.Immediate8to64:
+                    case OpKind.Immediate32to64:
+                    case OpKind.Immediate32 when runtime.PointerSize == 4:
+                    case OpKind.Immediate64:
+                        address = instruction.GetImmediate(i);
+                        return true;
+                    case OpKind.Memory64:
+                        address = instruction.MemoryAddress64;
+                        return true;
+                    case OpKind.Memory when instruction.IsIPRelativeMemoryOperand:
+                        address = instruction.IPRelativeMemoryAddress;
+                        return true;
+                    case OpKind.Memory:
+                        address = instruction.MemoryDisplacement;
+                        return true;
+                }
+            }
+
+            address = default;
+            return false;
+        }
+
         private static string ReadSourceLine(string file, int line)
         {
             if (!SourceFileCache.TryGetValue(file, out string[] contents))
@@ -305,48 +374,6 @@ namespace BenchmarkDotNet.Disassembler
             return line - 1 < contents.Length
                 ? contents[line - 1]
                 : null; // "nop" can have no corresponding c# code ;)
-        }
-
-        private static string TryEnqueueCalledMethod(string textRepresentation, State state, int depth, ClrMethod currentMethod)
-        {
-            if (!TryGetHexAddress(textRepresentation, out ulong address))
-                return null; // call    qword ptr [rax+20h] // needs further research
-
-            var method = state.Runtime.GetMethodByAddress(address);
-
-            if (method == null) // not managed method
-                return DisassemblerConstants.NotManagedMethod;
-
-            if (method.NativeCode == currentMethod.NativeCode && method.GetFullSignature() == currentMethod.GetFullSignature())
-                return null; // in case of call which is just a jump within the method
-
-            if (!state.HandledMethods.Contains(new MethodId(method.MetadataToken, method.Type.MetadataToken)))
-                state.Todo.Enqueue(new MethodInfo(method, depth + 1));
-
-            return method.GetFullSignature();
-        }
-
-        private static bool TryGetHexAddress(string textRepresentation, out ulong address)
-        {
-            // it's always "something call something addr`ess something"
-            // 00007ffe`16fb04e4 e897fbffff      call    00007ffe`16fb0080 // static or instance method call
-            // 000007fe`979171fb e800261b5e      call    mscorlib_ni+0x499800 (000007fe`f5ac9800) // managed implementation in mscorlib 
-            // 000007fe`979f666f 41ff13          call    qword ptr [r11] ds:000007fe`978e0050=000007fe978ed260
-            // 00007ffe`16fc0503 e81820615f      call    clr+0x2520 (00007ffe`765d2520) // native implementation in Clr
-            var rightPart = textRepresentation
-                .Split(CallSeparator, StringSplitOptions.RemoveEmptyEntries).Last() // take the right part
-                .Trim() // remove leading whitespaces
-                .Replace("`", string.Empty); // remove the magic delimiter
-
-            string addressPart;
-            if (rightPart.Contains('(') && rightPart.Contains(')'))
-                addressPart = rightPart.Substring(rightPart.LastIndexOf('(') + 1, rightPart.LastIndexOf(')') - rightPart.LastIndexOf('(') - 1);
-            else if (rightPart.Contains(':') && rightPart.Contains('='))
-                addressPart = rightPart.Substring(rightPart.LastIndexOf(':') + 1, rightPart.LastIndexOf('=') - rightPart.LastIndexOf(':') - 1);
-            else
-                addressPart = rightPart;
-
-            return ulong.TryParse(addressPart, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out address);
         }
 
         private static Map[] EliminateDuplicates(List<Map> maps)
