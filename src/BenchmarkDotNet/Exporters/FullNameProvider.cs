@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Exporters
             return $"{mainName}<{args}>";
         }
 
-        public static string GetMethodName(BenchmarkCase benchmarkCase)
+        internal static string GetMethodName(BenchmarkCase benchmarkCase)
         {
             var name = new StringBuilder(benchmarkCase.Descriptor.WorkloadMethod.Name);
 
