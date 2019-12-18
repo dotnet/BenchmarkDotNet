@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -49,7 +49,11 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<IAnalyser> Analysers => new IAnalyser[] { new DisassemblyAnalyzer(Results) };
 
-        public IEnumerable<Metric> ProcessResults(DiagnoserResults _) => Array.Empty<Metric>();
+        public IEnumerable<Metric> ProcessResults(DiagnoserResults diagnoserResults)
+        {
+            if (results.TryGetValue(diagnoserResults.BenchmarkCase, out var disassemblyResult))
+                yield return new Metric(NativeCodeSizeMetricDescriptor.Instance, SumNativeCodeSize(disassemblyResult));
+        }
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase)
         {
@@ -123,6 +127,22 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 yield return new PrettyGithubMarkdownDiffDisassemblyExporter(results);
             }
+        }
+
+        private static long SumNativeCodeSize(DisassemblyResult disassembly)
+            => disassembly.Methods.Sum(method => method.Maps.Sum(map => map.Instructions.OfType<Asm>().Sum(asm => asm.SizeInBytes)));
+
+        private class NativeCodeSizeMetricDescriptor : IMetricDescriptor
+        {
+            internal static readonly IMetricDescriptor Instance = new NativeCodeSizeMetricDescriptor();
+
+            public string Id => "Native Code Size";
+            public string DisplayName => "Code Size";
+            public string Legend => "Native code size of the disassembled method(s)";
+            public string NumberFormat => "N0";
+            public UnitType UnitType => UnitType.Size;
+            public string Unit => SizeUnit.B.Name;
+            public bool TheGreaterTheBetter => false;
         }
     }
 }
