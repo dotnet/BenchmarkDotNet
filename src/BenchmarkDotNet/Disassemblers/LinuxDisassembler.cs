@@ -24,11 +24,10 @@ namespace BenchmarkDotNet.Diagnosers
         public DisassemblyResult Disassemble(DiagnoserActionParameters parameters)
         {
             var settings = BuildDisassemblerSettings(parameters);
-            
-            var disassembledMethods =  Program.Disassemble(settings);
+
+            var disassembledMethods = Program.Disassemble(settings);
 
             return Map(disassembledMethods);
-
         }
 
         private Settings BuildDisassemblerSettings(DiagnoserActionParameters parameters)
@@ -46,22 +45,23 @@ namespace BenchmarkDotNet.Diagnosers
             );
         }
 
-        private static BenchmarkDotNet.Diagnosers.DisassemblyResult Map(BenchmarkDotNet.Disassembler.DisassembledMethod[] disassembledMethods)
+        // the contracts have 1:1 mapping and serializing and deserializing them is the simplest way to map them
+        private static DisassemblyResult Map(Disassembler.DisassembledMethod[] disassembledMethods)
         {
-            var result = new BenchmarkDotNet.Disassembler.DisassemblyResult()
+            var result = new Disassembler.DisassemblyResult()
             {
                 Methods = disassembledMethods
             };
 
-            var fromSerializer = new XmlSerializer(typeof(BenchmarkDotNet.Disassembler.DisassemblyResult));
-            var toSerializer  = new XmlSerializer(typeof(BenchmarkDotNet.Diagnosers.DisassemblyResult));
+            var fromSerializer = new XmlSerializer(typeof(Disassembler.DisassemblyResult));
+            var toSerializer  = new XmlSerializer(typeof(Diagnosers.DisassemblyResult));
             
             using (var stream = new MemoryStream())
             {
                 fromSerializer.Serialize(stream, result);
 
                 stream.Position = 0;
-                
+
                 return (DisassemblyResult)toSerializer.Deserialize(stream);
             }
         }

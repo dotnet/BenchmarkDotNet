@@ -73,14 +73,14 @@ namespace BenchmarkDotNet.Disassembler
 
                 ConfigureSymbols(dataTarget);
 
-                var state = new State(runtime, (IDebugControl)dataTarget.DebuggerInterface);
+                var state = new State(runtime);
 
                 var disassembledMethods = Disassemble(settings, runtime, state);
 
                 // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working
-                return disassembledMethods.Where(method => 
-                    disassembledMethods.Count == 1  // if there is only one method we want to return it (most probably benchmark got inlined)
-                    || !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodName)).ToArray();
+                return disassembledMethods.Length == 1
+                    ? disassembledMethods // if there is only one method we want to return it (most probably benchmark got inlined)
+                    : disassembledMethods.Where(method => !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodName)).ToArray();
             }
         }
         
@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Disassembler
             }
         }
 
-        static void ConfigureSymbols(DataTarget dataTarget)
+        private static void ConfigureSymbols(DataTarget dataTarget)
         {
             // code copied from https://github.com/Microsoft/clrmd/issues/34#issuecomment-161926535
             var symbols = dataTarget.DebuggerInterface as IDebugSymbols;
@@ -104,7 +104,7 @@ namespace BenchmarkDotNet.Disassembler
             control?.Execute(DEBUG_OUTCTL.NOT_LOGGED, ".reload", DEBUG_EXECUTE.NOT_LOGGED);
         }
 
-        static List<DisassembledMethod> Disassemble(Settings settings, ClrRuntime runtime, State state)
+        private static DisassembledMethod[] Disassemble(Settings settings, ClrRuntime runtime, State state)
         {
             var result = new List<DisassembledMethod>();
 
@@ -112,8 +112,8 @@ namespace BenchmarkDotNet.Disassembler
 
             state.Todo.Enqueue(
                 new MethodInfo(
-                    // benchmarks in BenchmarkDotNet are always parameterless, so check by name is enough as of today
-                    typeWithBenchmark.Methods.Single(method => method.IsPublic && method.Name == settings.MethodName && method.GetFullSignature().EndsWith("()")), 
+                    // the Disassembler Entry Method is always parameterless, so check by name is enough
+                    typeWithBenchmark.Methods.Single(method => method.IsPublic && method.Name == settings.MethodName), 
                     0)); 
 
             while (state.Todo.Count != 0)
@@ -127,10 +127,10 @@ namespace BenchmarkDotNet.Disassembler
                     result.Add(DisassembleMethod(method, state, settings));
             }
 
-            return result;
+            return result.ToArray();
         }
 
-        static DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings)
+        private static DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings)
         {
             var method = methodInfo.Method;
             var assemblyDefinition = AssemblyDefinition.ReadAssembly(method.Type.Module.FileName);
@@ -179,7 +179,7 @@ namespace BenchmarkDotNet.Disassembler
             if (mapByStartAddress.Length == 0 && settings.PrintIL)
             {
                 // The method doesn't have an offset map. Just print the whole thing.
-                maps.Add(CreateMap(GetIL(ilInstructions)));
+                maps.Add(new Map { Instructions = GetIL(ilInstructions).ToList<Code>() });
             }
 
             // maps with negative ILOffset are not always part of the prolog or epilog
@@ -239,9 +239,7 @@ namespace BenchmarkDotNet.Disassembler
             };
         }
 
-        static Map CreateMap(IEnumerable<Code> instructions) => new Map { Instructions = instructions.ToList()  };
-
-        static IEnumerable<IL> GetIL(ICollection<Instruction> instructions)
+        private static IEnumerable<IL> GetIL(ICollection<Instruction> instructions)
             => instructions.Select(instruction 
                 => new IL
                 {
@@ -249,7 +247,7 @@ namespace BenchmarkDotNet.Disassembler
                     Offset = instruction.Offset
                 });
 
-        static IEnumerable<Sharp> GetSource(ClrMethod method, ILToNativeMap map)
+        private static IEnumerable<Sharp> GetSource(ClrMethod method, ILToNativeMap map)
         {
             var sourceLocation = method.GetSourceLocation(map.ILOffset);
             if (sourceLocation == null)
@@ -284,7 +282,7 @@ namespace BenchmarkDotNet.Disassembler
             return new string(prefix);
         }
 
-        static IEnumerable<Asm> GetAsm(ILToNativeMap map, State state, int depth, ClrMethod currentMethod)
+        private static IEnumerable<Asm> GetAsm(ILToNativeMap map, State state, int depth, ClrMethod currentMethod)
         {
             int length = (int)(map.EndAddress - map.StartAddress);
             byte[] buffer = new byte[length];
@@ -298,26 +296,12 @@ namespace BenchmarkDotNet.Disassembler
             var output = new StringBuilderFormatterOutput();
             var decoder = Decoder.Create(IntPtr.Size * 8, new ByteArrayCodeReader(buffer, 0, bytesRead));
             decoder.IP = map.StartAddress;
-            var formattedOutput = new StringBuilder(100);
 
             while (decoder.IP < map.StartAddress + (ulong)bytesRead)
             {
                 decoder.Decode(out var instruction);
-                formatter.Format(instruction, output);
 
-                formattedOutput.Clear();
-                formattedOutput.Append(instruction.IP.ToString("X16"));
-                formattedOutput.Append(' ');
-                int instrLen = instruction.ByteLength;
-                int byteBaseIndex = (int)(instruction.IP - map.StartAddress);
-                for (int i = 0; i < instrLen; i++)
-                    formattedOutput.Append(buffer[byteBaseIndex + i].ToString("X2"));
-                for (int i = 0; i < 10 - instrLen; i++)
-                    formattedOutput.Append("  ");
-                formattedOutput.Append(' ');
-                formattedOutput.Append(output.ToStringAndReset());
-
-                string textRepresentation = formattedOutput.ToString();
+                string textRepresentation = GetTextRepresentation(instruction, formatter, output, map, buffer);
 
                 string calledMethodName = textRepresentation.Contains("call")
                     ? TryEnqueueCalledMethod(textRepresentation, state, depth, currentMethod)
@@ -334,7 +318,28 @@ namespace BenchmarkDotNet.Disassembler
             }
         }
 
-        static string ReadSourceLine(string file, int line)
+        private static string GetTextRepresentation(Iced.Intel.Instruction instruction, Formatter formatter, StringBuilderFormatterOutput output, ILToNativeMap map, byte[] buffer)
+        {
+            var formattedOutput = new StringBuilder(100);
+
+            formatter.Format(instruction, output);
+
+            formattedOutput.Append(instruction.IP.ToString("X16"));
+            formattedOutput.Append(' ');
+
+            int byteBaseIndex = (int)(instruction.IP - map.StartAddress);
+            for (int i = 0; i < instruction.ByteLength; i++)
+                formattedOutput.Append(buffer[byteBaseIndex + i].ToString("X2"));
+            for (int i = 0; i < 10 - instruction.ByteLength; i++)
+                formattedOutput.Append("  ");
+
+            formattedOutput.Append(' ');
+            formattedOutput.Append(output.ToStringAndReset());
+
+            return formattedOutput.ToString();
+        }
+
+        private static string ReadSourceLine(string file, int line)
         {
             if (!SourceFileCache.TryGetValue(file, out string[] contents))
             {
@@ -350,7 +355,7 @@ namespace BenchmarkDotNet.Disassembler
                 : null; // "nop" can have no corresponding c# code ;)
         }
 
-        static string TryEnqueueCalledMethod(string textRepresentation, State state, int depth, ClrMethod currentMethod)
+        private static string TryEnqueueCalledMethod(string textRepresentation, State state, int depth, ClrMethod currentMethod)
         {
             if (!TryGetHexAddress(textRepresentation, out ulong address))
                 return null; // call    qword ptr [rax+20h] // needs further research
@@ -369,7 +374,7 @@ namespace BenchmarkDotNet.Disassembler
             return method.GetFullSignature();
         }
 
-        static bool TryGetHexAddress(string textRepresentation, out ulong address)
+        private static bool TryGetHexAddress(string textRepresentation, out ulong address)
         {
             // it's always "something call something addr`ess something"
             // 00007ffe`16fb04e4 e897fbffff      call    00007ffe`16fb0080 // static or instance method call
@@ -381,7 +386,7 @@ namespace BenchmarkDotNet.Disassembler
                 .Trim() // remove leading whitespaces
                 .Replace("`", string.Empty); // remove the magic delimiter
 
-            string addressPart = string.Empty;
+            string addressPart;
             if (rightPart.Contains('(') && rightPart.Contains(')'))
                 addressPart = rightPart.Substring(rightPart.LastIndexOf('(') + 1, rightPart.LastIndexOf(')') - rightPart.LastIndexOf('(') - 1);
             else if (rightPart.Contains(':') && rightPart.Contains('='))
@@ -395,7 +400,7 @@ namespace BenchmarkDotNet.Disassembler
         /// <summary>
         /// for some calls we can not parse the method address from asm, so we just get it from IL
         /// </summary>
-        static void EnqueueAllCallsFromIL(State state, ICollection<Instruction> ilInstructions, int depth)
+        private static void EnqueueAllCallsFromIL(State state, ICollection<Instruction> ilInstructions, int depth)
         {
             // let's try to enqueue all method calls that we can find in IL and were not printed yet
             foreach (var callInstruction in ilInstructions.Where(instruction => instruction.Operand is MethodReference)) // todo: handle CallSite
@@ -416,7 +421,7 @@ namespace BenchmarkDotNet.Disassembler
             }
         }
 
-        static ClrMethod GetMethod(MethodReference methodReference, ClrType declaringType)
+        private static ClrMethod GetMethod(MethodReference methodReference, ClrType declaringType)
         {
             var methodsWithSameToken = declaringType.Methods
                 .Where(method => method.MetadataToken == methodReference.MetadataToken.ToUInt32()).ToArray();
@@ -450,8 +455,7 @@ namespace BenchmarkDotNet.Disassembler
             return null;
         }
 
-
-        static string CecilNameToClrmdName(MethodReference method)
+        private static string CecilNameToClrmdName(MethodReference method)
         {
             // Cecil returns sth like "System.Int32 System.Random::Next(System.Int32,System.Int32)"
             // ClrMD expects sth like "System.Random.Next(Int32, Int32)
@@ -462,12 +466,12 @@ namespace BenchmarkDotNet.Disassembler
 
         // Cecil returns sth like "Boolean&"
         // ClrMD expects sth like "Boolean ByRef
-        static string CecilNameToClrmdName(ParameterDefinition param) 
+        private static string CecilNameToClrmdName(ParameterDefinition param) 
             => param.ParameterType.IsByReference 
                 ? param.ParameterType.Name.Replace("&", string.Empty) + " ByRef"
                 : param.ParameterType.Name;
 
-        static Map[] EliminateDuplicates(List<Map> maps)
+        private static Map[] EliminateDuplicates(List<Map> maps)
         {
             var unique = new HashSet<Code>(CodeComparer.Instance);
 
@@ -479,18 +483,15 @@ namespace BenchmarkDotNet.Disassembler
             return maps.Where(map => map.Instructions.Any()).ToArray();
         }
 
-        static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
+        private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
             => DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, reason);
 
-        class CodeComparer : IEqualityComparer<Code>
+        private class CodeComparer : IEqualityComparer<Code>
         {
             internal static readonly IEqualityComparer<Code> Instance = new CodeComparer();
 
             public bool Equals(Code x, Code y)
             {
-                if (x.GetType() != y.GetType())
-                    return false;
-
                 // sometimes ClrMD reports same address range in two different ILToNativeMaps
                 // this happens usually for prolog and the instruction after prolog
                 // and for the epilog and last instruction before epilog
@@ -508,7 +509,7 @@ namespace BenchmarkDotNet.Disassembler
                     return ilLeft.TextRepresentation == ilRight.TextRepresentation
                         && ilLeft.Offset == ilRight.Offset;
 
-                throw new InvalidOperationException("Impossible");
+                return false; // different types!
             }
 
             public int GetHashCode(Code obj) => obj.TextRepresentation.GetHashCode();
@@ -556,16 +557,14 @@ namespace BenchmarkDotNet.Disassembler
 
     class State
     {
-        internal State(ClrRuntime runtime, IDebugControl debugControl)
+        internal State(ClrRuntime runtime)
         {
             Runtime = runtime;
-            DebugControl = debugControl;
             Todo = new Queue<MethodInfo>();
             HandledMethods = new HashSet<MethodId>();
         }
 
         internal ClrRuntime Runtime { get; }
-        internal IDebugControl DebugControl { get; }
         internal Queue<MethodInfo> Todo { get; }
         internal HashSet<MethodId> HandledMethods { get; }
     }

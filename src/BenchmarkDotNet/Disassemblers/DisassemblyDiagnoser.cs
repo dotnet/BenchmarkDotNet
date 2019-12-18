@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
@@ -11,7 +10,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Validators;
 
@@ -44,6 +42,7 @@ namespace BenchmarkDotNet.Diagnosers
             => Create(config);
 
         public IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> Results => results;
+
         public IEnumerable<string> Ids => new[] { nameof(DisassemblyDiagnoser) };
 
         public IEnumerable<IExporter> Exporters { get; }
@@ -88,6 +87,13 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
+            var currentPlatform = RuntimeInformation.GetCurrentPlatform();
+            if (currentPlatform != Platform.X64 && currentPlatform != Platform.X86)
+            {
+                yield return new ValidationError(true, $"{currentPlatform} is not supported (Iced library limitation)");
+                yield break;
+            }
+
             foreach (var benchmark in validationParameters.Benchmarks)
             {
                 if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic) && benchmark.Job.Infrastructure.Toolchain is InProcessNoEmitToolchain)
