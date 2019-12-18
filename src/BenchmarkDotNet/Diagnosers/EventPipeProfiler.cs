@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Diagnosers
         
         private readonly List<EventPipeProvider> eventPipeProviders = new List<EventPipeProvider>
         {
-            new EventPipeProvider("BenchmarkDotNet.EngineEventSource", EventLevel.Informational) // mandatory provider to enable Engine events
+            new EventPipeProvider("BenchmarkDotNet.EngineEventSource", EventLevel.Informational, Int64.MaxValue) // mandatory provider to enable Engine events
         };
 
         private static readonly string LogSeparator = new string('-', 20);
