@@ -71,7 +71,11 @@ namespace BenchmarkDotNet.Disassembler
 
                 ConfigureSymbols(dataTarget);
 
-                var state = new State(runtime);
+                var formatter = new NasmFormatter();
+                formatter.Options.DigitSeparator = "`";
+                formatter.Options.FirstOperandCharIndex = 10;
+
+                var state = new State(runtime, formatter);
 
                 var disassembledMethods = Disassemble(settings, runtime, state);
 
@@ -244,10 +248,6 @@ namespace BenchmarkDotNet.Disassembler
             if (!state.Runtime.DataTarget.ReadProcessMemory(map.StartAddress, buffer, buffer.Length, out int bytesRead))
                 yield break;
 
-            var formatter = new NasmFormatter();
-            formatter.Options.DigitSeparator = "`";
-            formatter.Options.FirstOperandCharIndex = 10;
-            var output = new StringBuilderFormatterOutput();
             var decoder = Decoder.Create(IntPtr.Size * 8, new ByteArrayCodeReader(buffer, 0, bytesRead));
             decoder.IP = map.StartAddress;
 
@@ -255,11 +255,11 @@ namespace BenchmarkDotNet.Disassembler
             {
                 decoder.Decode(out var instruction);
 
-                string textRepresentation = GetTextRepresentation(instruction, formatter, output, map, buffer);
 
                 string calledMethodName = textRepresentation.Contains("call")
                     ? TryEnqueueCalledMethod(textRepresentation, state, depth, currentMethod)
                     : null;
+                string textRepresentation = GetTextRepresentation(instruction, state, map, buffer);
 
                 yield return new Asm
                 {
@@ -272,25 +272,23 @@ namespace BenchmarkDotNet.Disassembler
             }
         }
 
-        private static string GetTextRepresentation(Iced.Intel.Instruction instruction, Formatter formatter, StringBuilderFormatterOutput output, ILToNativeMap map, byte[] buffer)
+        private static string GetTextRepresentation(Instruction instruction, State state, ILToNativeMap map, byte[] buffer)
         {
-            var formattedOutput = new StringBuilder(100);
+            var output = new StringBuilderFormatterOutput();
 
-            formatter.Format(instruction, output);
-
-            formattedOutput.Append(instruction.IP.ToString("X16"));
-            formattedOutput.Append(' ');
+            output.Write(instruction.IP.ToString("X16"), FormatterOutputTextKind.Text);
+            output.Write(" ", FormatterOutputTextKind.Text);
 
             int byteBaseIndex = (int)(instruction.IP - map.StartAddress);
             for (int i = 0; i < instruction.ByteLength; i++)
-                formattedOutput.Append(buffer[byteBaseIndex + i].ToString("X2"));
+                output.Write(buffer[byteBaseIndex + i].ToString("X2"), FormatterOutputTextKind.Text);
             for (int i = 0; i < 10 - instruction.ByteLength; i++)
-                formattedOutput.Append("  ");
+                output.Write("  ", FormatterOutputTextKind.Text);
 
-            formattedOutput.Append(' ');
-            formattedOutput.Append(output.ToStringAndReset());
+            output.Write(" ", FormatterOutputTextKind.Text);
+            state.Formatter.Format(instruction, output);
 
-            return formattedOutput.ToString();
+            return output.ToString();
         }
 
         private static string ReadSourceLine(string file, int line)
@@ -430,9 +428,10 @@ namespace BenchmarkDotNet.Disassembler
 
     class State
     {
-        internal State(ClrRuntime runtime)
+        internal State(ClrRuntime runtime, Formatter formatter)
         {
             Runtime = runtime;
+            Formatter = formatter;
             Todo = new Queue<MethodInfo>();
             HandledMethods = new HashSet<MethodId>();
         }
@@ -440,9 +439,10 @@ namespace BenchmarkDotNet.Disassembler
         internal ClrRuntime Runtime { get; }
         internal Queue<MethodInfo> Todo { get; }
         internal HashSet<MethodId> HandledMethods { get; }
+        internal Formatter Formatter { get; }
     }
 
-    struct MethodInfo // I am not using ValueTuple here (would be perfect) to keep the number of dependencies as low as possible
+    readonly struct MethodInfo // I am not using ValueTuple here (would be perfect) to keep the number of dependencies as low as possible
     {
         internal ClrMethod Method { get; }
         internal int Depth { get; }
@@ -454,7 +454,7 @@ namespace BenchmarkDotNet.Disassembler
         }
     }
 
-    struct MethodId : IEquatable<MethodId>
+    readonly struct MethodId : IEquatable<MethodId>
     {
         internal uint MethodMetadataTokenId { get; }
         internal uint TypeMetadataTokenId { get; }
