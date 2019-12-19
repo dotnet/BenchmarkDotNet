@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             var settings = BuildDisassemblerSettings(parameters);
 
-            var disassembledMethods = Program.Disassemble(settings);
+            var disassembledMethods = ClrMdDisassembler.AttachAndDisassemble(settings);
 
             return Map(disassembledMethods);
         }

@@ -15,8 +15,6 @@ namespace BenchmarkDotNet.Disassembler
 {
     internal static class Program
     {
-        static readonly Dictionary<string, string[]> SourceFileCache = new Dictionary<string, string[]>();
-
         // the goals of the existence of this process: 
         // 1. attach to benchmarked process
         // 2. disassemble the code
@@ -33,7 +31,7 @@ namespace BenchmarkDotNet.Disassembler
 
             try
             {
-                var methodsToExport = Disassemble(options);
+                var methodsToExport = ClrMdDisassembler.AttachAndDisassemble(options);
                 
                 SaveToFile(methodsToExport, options.ResultsPath);
             }
@@ -54,12 +52,26 @@ namespace BenchmarkDotNet.Disassembler
             }
         }
 
-        internal static DisassembledMethod[] Disassemble(Settings settings)
+        private static void SaveToFile(DisassembledMethod[] disassembledMethods, string filePath)
+        {
+            using (var stream = new FileStream(filePath, FileMode.Append, FileAccess.Write))
+            using (var writer = XmlWriter.Create(stream))
+            {
+                var serializer = new XmlSerializer(typeof(DisassemblyResult));
+
+                serializer.Serialize(writer, new DisassemblyResult { Methods = disassembledMethods });
+            }
+        }
+    }
+
+    internal static class ClrMdDisassembler
+    {
+        internal static DisassembledMethod[] AttachAndDisassemble(Settings settings)
         {
             using (var dataTarget = DataTarget.AttachToProcess(
                 settings.ProcessId,
                 (uint)TimeSpan.FromMilliseconds(5000).TotalMilliseconds,
-                AttachFlag.Passive)) 
+                AttachFlag.Passive))
             {
                 var runtime = dataTarget.ClrVersions.Single().CreateRuntime();
 
@@ -82,17 +94,6 @@ namespace BenchmarkDotNet.Disassembler
                     : disassembledMethods.Where(method => !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodName)).ToArray();
             }
         }
-        
-        private static void SaveToFile(DisassembledMethod[] disassembledMethods, string filePath)
-        {
-            using (var stream = new FileStream(filePath, FileMode.Append, FileAccess.Write))
-            using (var writer = XmlWriter.Create(stream))
-            {
-                var serializer = new XmlSerializer(typeof(DisassemblyResult));
-
-                serializer.Serialize(writer, new DisassemblyResult { Methods = disassembledMethods });
-            }
-        }
 
         private static void ConfigureSymbols(DataTarget dataTarget)
         {
@@ -112,8 +113,8 @@ namespace BenchmarkDotNet.Disassembler
             state.Todo.Enqueue(
                 new MethodInfo(
                     // the Disassembler Entry Method is always parameterless, so check by name is enough
-                    typeWithBenchmark.Methods.Single(method => method.IsPublic && method.Name == settings.MethodName), 
-                    0)); 
+                    typeWithBenchmark.Methods.Single(method => method.IsPublic && method.Name == settings.MethodName),
+                    0));
 
             while (state.Todo.Count != 0)
             {
@@ -122,7 +123,7 @@ namespace BenchmarkDotNet.Disassembler
                 if (!state.HandledMethods.Add(new MethodId(method.Method.MetadataToken, method.Method.Type.MetadataToken))) // add it now to avoid StackOverflow for recursive methods
                     continue; // already handled
 
-                if(settings.RecursiveDepth >= method.Depth)
+                if (settings.MaxDepth >= method.Depth)
                     result.Add(DisassembleMethod(method, state, settings));
             }
 
@@ -133,51 +134,25 @@ namespace BenchmarkDotNet.Disassembler
         {
             var method = methodInfo.Method;
 
-            if (method.NativeCode == ulong.MaxValue || method.ILOffsetMap == null)
-            {
-                if (method.NativeCode == ulong.MaxValue)
-                    if (method.IsAbstract) return CreateEmpty(method, "Abstract method");
-                    else if (method.IsVirtual) CreateEmpty(method, "Virtual method");
-                    else return CreateEmpty(method, "Method got most probably inlined");
+            if (method.NativeCode == ulong.MaxValue)
+                if (method.IsAbstract) return CreateEmpty(method, "Abstract method");
+                else if (method.IsVirtual) CreateEmpty(method, "Virtual method");
+                else return CreateEmpty(method, "Method got most probably inlined");
 
-                if (method.ILOffsetMap == null)
-                    return CreateEmpty(method, "No ILOffsetMap found");
-            }
+            if (method.ILOffsetMap == null)
+                return CreateEmpty(method, "No ILOffsetMap found");
 
             var maps = new List<Map>();
-
-            var mapByStartAddress = (from map in method.ILOffsetMap
-                                 where map.StartAddress <= map.EndAddress
-                                 orderby map.StartAddress // we need to print in the machine code order, not IL! #536
-                                 select map).ToArray();
-
-            var sortedUniqueILOffsets = method.ILOffsetMap
-                .Where(map => map.ILOffset >= 0 && map.StartAddress <= map.EndAddress)
-                .Select(map => map.ILOffset)
-                .Distinct() // there can be many maps with the same ILOffset
-                .OrderBy(ilOffset => ilOffset)
-                .ToArray();
-
-            foreach(var map in mapByStartAddress)
+            foreach (var map in method.ILOffsetMap.Where(map => map.StartAddress <= map.EndAddress)
+                .OrderBy(map => map.StartAddress)) // we need to print in the machine code order, not IL! #536
             {
                 var group = new List<Code>();
 
-                if (map.ILOffset >= 0)
-                {
-                    var ilOffsetIndex = Array.IndexOf(sortedUniqueILOffsets, map.ILOffset);
-                    var nextILOffsetIndex = ilOffsetIndex + 1;
-
-                    // method.GetILOffset(map.EndAddress); is not enough to get the endILOffset (it returns startILOffset)
-                    var nextMapILOffset = nextILOffsetIndex < sortedUniqueILOffsets.Length
-                        ? sortedUniqueILOffsets[nextILOffsetIndex]
-                        : int.MaxValue;
-                }
-
                 if (settings.PrintSource && map.ILOffset >= 0)
-                    group.AddRange(GetSource(method, map));
+                    group.AddRange(SourceCodeProvider.GetSource(method, map));
 
                 if (settings.PrintAsm)
-                    group.AddRange(GetAsm(map, state, methodInfo.Depth, method));
+                    group.AddRange(AsmProvider.GetAsm(map, state, methodInfo.Depth, method));
 
                 maps.Add(new Map { Instructions = group });
             }
@@ -190,42 +165,50 @@ namespace BenchmarkDotNet.Disassembler
             };
         }
 
-        private static IEnumerable<Sharp> GetSource(ClrMethod method, ILToNativeMap map)
+        private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
+            => DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, reason);
+
+        private static Map[] EliminateDuplicates(List<Map> maps)
         {
-            var sourceLocation = method.GetSourceLocation(map.ILOffset);
-            if (sourceLocation == null)
-                yield break;
+            var unique = new HashSet<Code>(CodeComparer.Instance);
 
-            for (int line = sourceLocation.LineNumber; line <= sourceLocation.LineNumberEnd; ++line)
-            {
-                var sourceLine = ReadSourceLine(sourceLocation.FilePath, line);
+            foreach (var map in maps)
+                for (int i = map.Instructions.Count - 1; i >= 0; i--)
+                    if (!unique.Add(map.Instructions[i]))
+                        map.Instructions.RemoveAt(i);
 
-                if (sourceLine != null)
-                {
-                    yield return new Sharp
-                    {
-                        TextRepresentation = sourceLine + Environment.NewLine + GetSmartPrefix(sourceLine, sourceLocation.ColStart - 1) + new string('^', sourceLocation.ColEnd - sourceLocation.ColStart),
-                        FilePath = sourceLocation.FilePath,
-                        LineNumber = line
-                    };
-                }
-            }
+            return maps.Where(map => map.Instructions.Any()).ToArray();
         }
 
-        private static string GetSmartPrefix(string sourceLine, int length)
+        private class CodeComparer : IEqualityComparer<Code>
         {
-            if (length <= 0)
-                return string.Empty;
-            var prefix = new char[length];
-            for (int i = 0; i < length; i++)
-            {
-                char sourceChar = i < sourceLine.Length ? sourceLine[i] : ' ';
-                prefix[i] = sourceChar == '\t' ? sourceChar : ' ';
-            }
-            return new string(prefix);
-        }
+            internal static readonly IEqualityComparer<Code> Instance = new CodeComparer();
 
-        private static IEnumerable<Asm> GetAsm(ILToNativeMap map, State state, int depth, ClrMethod currentMethod)
+            public bool Equals(Code x, Code y)
+            {
+                // sometimes ClrMD reports same address range in two different ILToNativeMaps
+                // this happens usually for prolog and the instruction after prolog
+                // and for the epilog and last instruction before epilog
+                if (x is Asm asmLeft && y is Asm asmRight)
+                    return asmLeft.StartAddress == asmRight.StartAddress && asmLeft.EndAddress == asmRight.EndAddress;
+
+                // sometimes some C# code lines are duplicated because the same line is the best match for multiple ILToNativeMaps
+                // we don't want to confuse the users, so this must also be removed
+                if (x is Sharp sharpLeft && y is Sharp sharpRight)
+                    return sharpLeft.TextRepresentation == sharpRight.TextRepresentation
+                        && sharpLeft.FilePath == sharpRight.FilePath
+                        && sharpLeft.LineNumber == sharpRight.LineNumber;
+
+                return false; // different types!
+            }
+
+            public int GetHashCode(Code obj) => obj.TextRepresentation.GetHashCode();
+        }
+    }
+
+    internal static class AsmProvider
+    {
+        internal static IEnumerable<Asm> GetAsm(ILToNativeMap map, State state, int depth, ClrMethod currentMethod)
         {
             int length = (int)(map.EndAddress - map.StartAddress);
             byte[] buffer = new byte[length];
@@ -304,7 +287,7 @@ namespace BenchmarkDotNet.Disassembler
             }
 
             if (method.NativeCode == currentMethod.NativeCode && method.GetFullSignature() == currentMethod.GetFullSignature())
-                return; // in case of call which is just a jump within the method
+                return; // in case of a call which is just a jump within the method
 
             if (!state.HandledMethods.Contains(new MethodId(method.MetadataToken, method.Type.MetadataToken)))
                 state.Todo.Enqueue(new MethodInfo(method, depth + 1));
@@ -347,12 +330,43 @@ namespace BenchmarkDotNet.Disassembler
             address = default;
             return false;
         }
+    }
+
+    internal static class SourceCodeProvider
+    {
+        private static readonly Dictionary<string, string[]> SourceFileCache = new Dictionary<string, string[]>();
+
+        internal static IEnumerable<Sharp> GetSource(ClrMethod method, ILToNativeMap map)
+        {
+            var sourceLocation = method.GetSourceLocation(map.ILOffset);
+            if (sourceLocation == null)
+                yield break;
+
+            for (int line = sourceLocation.LineNumber; line <= sourceLocation.LineNumberEnd; ++line)
+            {
+                var sourceLine = ReadSourceLine(sourceLocation.FilePath, line);
+                if (sourceLine == null)
+                    continue;
+
+                var text = sourceLine + Environment.NewLine 
+                    + GetSmartPrefix(sourceLine, sourceLocation.ColStart - 1) 
+                    + new string('^', sourceLocation.ColEnd - sourceLocation.ColStart);
+
+                yield return new Sharp
+                {
+                    TextRepresentation = text,
+                    FilePath = sourceLocation.FilePath,
+                    LineNumber = line
+                };
+            }
+        }
 
         private static string ReadSourceLine(string file, int line)
         {
             if (!SourceFileCache.TryGetValue(file, out string[] contents))
             {
-                if (!File.Exists(file)) // sometimes the symbols report some disk location from MS CI machine like "E:\A\_work\308\s\src\mscorlib\shared\System\Random.cs" for .NET Core 2.0
+                // sometimes the symbols report some disk location from MS CI machine like "E:\A\_work\308\s\src\mscorlib\shared\System\Random.cs" for .NET Core 2.0
+                if (!File.Exists(file)) 
                     return null;
 
                 contents = File.ReadAllLines(file);
@@ -364,44 +378,18 @@ namespace BenchmarkDotNet.Disassembler
                 : null; // "nop" can have no corresponding c# code ;)
         }
 
-        private static Map[] EliminateDuplicates(List<Map> maps)
+        private static string GetSmartPrefix(string sourceLine, int length)
         {
-            var unique = new HashSet<Code>(CodeComparer.Instance);
+            if (length <= 0)
+                return string.Empty;
 
-            foreach (var map in maps)
-                for (int i = map.Instructions.Count - 1; i >= 0; i--)
-                    if(!unique.Add(map.Instructions[i]))
-                        map.Instructions.RemoveAt(i);
-
-            return maps.Where(map => map.Instructions.Any()).ToArray();
-        }
-
-        private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
-            => DisassembledMethod.Empty(method.GetFullSignature(), method.NativeCode, reason);
-
-        private class CodeComparer : IEqualityComparer<Code>
-        {
-            internal static readonly IEqualityComparer<Code> Instance = new CodeComparer();
-
-            public bool Equals(Code x, Code y)
+            var prefix = new char[length];
+            for (int i = 0; i < length; i++)
             {
-                // sometimes ClrMD reports same address range in two different ILToNativeMaps
-                // this happens usually for prolog and the instruction after prolog
-                // and for the epilog and last instruction before epilog
-                if (x is Asm asmLeft && y is Asm asmRight)
-                    return asmLeft.StartAddress == asmRight.StartAddress && asmLeft.EndAddress == asmRight.EndAddress;
-
-                // sometimes some C# code lines are duplicated because the same line is the best match for multiple ILToNativeMaps
-                // we don't want to confuse the users, so this must also be removed
-                if (x is Sharp sharpLeft && y is Sharp sharpRight)
-                    return sharpLeft.TextRepresentation == sharpRight.TextRepresentation
-                        && sharpLeft.FilePath == sharpRight.FilePath
-                        && sharpLeft.LineNumber == sharpRight.LineNumber;
-
-                return false; // different types!
+                char sourceChar = i < sourceLine.Length ? sourceLine[i] : ' ';
+                prefix[i] = sourceChar == '\t' ? sourceChar : ' ';
             }
-
-            public int GetHashCode(Code obj) => obj.TextRepresentation.GetHashCode();
+            return new string(prefix);
         }
     }
 
@@ -414,7 +402,7 @@ namespace BenchmarkDotNet.Disassembler
             MethodName = methodName;
             PrintAsm = printAsm;
             PrintSource = printSource;
-            RecursiveDepth = methodName == DisassemblerConstants.DisassemblerEntryMethodName && recursiveDepth != int.MaxValue ? recursiveDepth + 1 : recursiveDepth;
+            MaxDepth = methodName == DisassemblerConstants.DisassemblerEntryMethodName && recursiveDepth != int.MaxValue ? recursiveDepth + 1 : recursiveDepth;
             ResultsPath = resultsPath;
         }
 
@@ -423,7 +411,7 @@ namespace BenchmarkDotNet.Disassembler
         internal string MethodName { get; }
         internal bool PrintAsm { get; }
         internal bool PrintSource { get; }
-        internal int RecursiveDepth { get; }
+        internal int MaxDepth { get; }
         internal string ResultsPath { get; }
 
         internal static Settings FromArgs(string[] args)
@@ -438,7 +426,7 @@ namespace BenchmarkDotNet.Disassembler
             );
     }
 
-    class State
+    internal class State
     {
         internal State(ClrRuntime runtime, Formatter formatter)
         {
