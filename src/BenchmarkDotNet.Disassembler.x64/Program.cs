@@ -139,12 +139,12 @@ namespace BenchmarkDotNet.Disassembler
                 else if (method.IsVirtual) CreateEmpty(method, "Virtual method");
                 else return CreateEmpty(method, "Method got most probably inlined");
 
-            if (method.ILOffsetMap == null)
-                return CreateEmpty(method, "No ILOffsetMap found");
+            if (!TryGetIlToNativeMap(method, out var ilToNativeMap))
+                return CreateEmpty(method, "No ILOffsetMap and no HotColdInfo found");
 
             var maps = new List<Map>();
-            foreach (var map in method.ILOffsetMap.Where(map => map.StartAddress <= map.EndAddress)
-                .OrderBy(map => map.StartAddress)) // we need to print in the machine code order, not IL! #536
+
+            foreach (var map in ilToNativeMap)
             {
                 var group = new List<Code>();
 
@@ -163,6 +163,33 @@ namespace BenchmarkDotNet.Disassembler
                 Name = method.GetFullSignature(),
                 NativeCode = method.NativeCode
             };
+        }
+
+        private static bool TryGetIlToNativeMap(ClrMethod method, out ILToNativeMap[] completeMap)
+        {
+            completeMap = method.ILOffsetMap?
+                .Where(map => map.StartAddress < map.EndAddress) // some maps have 0 length?
+                .OrderBy(map => map.StartAddress) // we need to print in the machine code order, not IL! #536
+                .ToArray();
+
+            if (completeMap == null || completeMap.Length == 0)
+            {
+                if (method.HotColdInfo is null)
+                {
+                    completeMap = default;
+                    return false;
+                }
+
+                var hotColdInfo = method.HotColdInfo;
+                completeMap = new[]
+                {
+                    new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 },
+                    new ILToNativeMap() { StartAddress = hotColdInfo.ColdStart, EndAddress = hotColdInfo.ColdStart + hotColdInfo.ColdSize, ILOffset = -1 }
+                };
+                return true;
+            }
+
+            return true;
         }
 
         private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
@@ -267,10 +294,7 @@ namespace BenchmarkDotNet.Disassembler
 
             calledMethodName = runtime.GetJitHelperFunctionName(address);
             if (!string.IsNullOrEmpty(calledMethodName))
-            {
-                calledMethodName = $"JIT_{calledMethodName}";
                 return;
-            }
 
             calledMethodName = runtime.GetMethodTableName(address);
             if (!string.IsNullOrEmpty(calledMethodName))
