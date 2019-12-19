@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Running
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Assembly assembly, IConfig config, string[] args)
-             => RunWithDirtyAssemblyResolveHelper(assembly.GetRunnableBenchmarks().ToArray(), new[] { assembly }, config, args);
+             => RunWithDirtyAssemblyResolveHelper(Array.Empty<Type>(), new[] { assembly }, config, args);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Type type, MethodInfo[] methods, IConfig config = null)
