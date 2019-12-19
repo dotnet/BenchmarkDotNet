@@ -54,7 +54,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 Static();
                 Instance();
                 Recursive();
-                Virtual();
 
                 Benchmark(true);
             }
@@ -69,8 +68,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (new Random(123).Next(0, 10) == 11) // never true, but JIT does not know it
                     Recursive();
             }
-
-            public virtual void Virtual() { }
 
             [MethodImpl(MethodImplOptions.NoInlining)] public void Benchmark(bool justAnOverload) { } // we need to test overloads (#562)
         }
@@ -90,7 +87,6 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Static)}()");
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Instance)}()");
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Recursive)}()");
-            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Virtual)}()");
         }
 
         public class Generic<T> where T : new()
