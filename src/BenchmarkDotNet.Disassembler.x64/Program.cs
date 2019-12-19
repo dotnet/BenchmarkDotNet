@@ -158,21 +158,9 @@ namespace BenchmarkDotNet.Disassembler
                 .OrderBy(ilOffset => ilOffset)
                 .ToArray();
 
-            // maps with negative ILOffset are not always part of the prolog or epilog
-            // so we don't exclude all maps with negative ILOffset
-            // but only the first ones and the last ones if PrintPrologAndEpilog == false
-            bool methodWithoutBody = method.ILOffsetMap.All(map => map.ILOffset < 0); // sth like [NoInlining] void Sample() { }
-            int startIndex = settings.PrintPrologAndEpilog || methodWithoutBody
-                ? 0 
-                : mapByStartAddress.TakeWhile(map => map.ILOffset < 0).Count();
-            int endIndex = settings.PrintPrologAndEpilog || methodWithoutBody
-                ? mapByStartAddress.Length
-                : mapByStartAddress.Length - mapByStartAddress.Reverse().TakeWhile(map => map.ILOffset < 0).Count();
-
-            for (int i = startIndex; i < endIndex; ++i)
+            foreach(var map in mapByStartAddress)
             {
                 var group = new List<Code>();
-                var map = mapByStartAddress[i];
 
                 if (map.ILOffset >= 0)
                 {
@@ -419,14 +407,13 @@ namespace BenchmarkDotNet.Disassembler
 
     internal class Settings
     {
-        internal Settings(int processId, string typeName, string methodName, bool printAsm,bool printSource, bool printPrologAndEpilog, int recursiveDepth, string resultsPath)
+        internal Settings(int processId, string typeName, string methodName, bool printAsm, bool printSource, int recursiveDepth, string resultsPath)
         {
             ProcessId = processId;
             TypeName = typeName;
             MethodName = methodName;
             PrintAsm = printAsm;
             PrintSource = printSource;
-            PrintPrologAndEpilog = printPrologAndEpilog;
             RecursiveDepth = methodName == DisassemblerConstants.DisassemblerEntryMethodName && recursiveDepth != int.MaxValue ? recursiveDepth + 1 : recursiveDepth;
             ResultsPath = resultsPath;
         }
@@ -436,7 +423,6 @@ namespace BenchmarkDotNet.Disassembler
         internal string MethodName { get; }
         internal bool PrintAsm { get; }
         internal bool PrintSource { get; }
-        internal bool PrintPrologAndEpilog { get; }
         internal int RecursiveDepth { get; }
         internal string ResultsPath { get; }
 
@@ -447,9 +433,8 @@ namespace BenchmarkDotNet.Disassembler
                 methodName: args[2],
                 printAsm: bool.Parse(args[3]),
                 printSource: bool.Parse(args[4]),
-                printPrologAndEpilog: bool.Parse(args[5]),
-                recursiveDepth: int.Parse(args[6]),
-                resultsPath: args[7]
+                recursiveDepth: int.Parse(args[5]),
+                resultsPath: args[6]
             );
     }
 
