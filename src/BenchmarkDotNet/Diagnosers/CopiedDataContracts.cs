@@ -7,6 +7,11 @@ namespace BenchmarkDotNet.Diagnosers
     // keep it in sync with src\BenchmarkDotNet.Disassembler.x64\DataContracts.cs!
     public class Code
     {
+        /// <summary>
+        /// The native start offset of this ASM representation
+        /// </summary>
+        public ulong StartAddress { get; set; }
+
         public string TextRepresentation { get; set; }
         public string Comment { get; set; }
     }
@@ -19,11 +24,6 @@ namespace BenchmarkDotNet.Diagnosers
 
     public class Asm : Code
     {
-        /// <summary>
-        /// The native start offset of this ASM representation
-        /// </summary>
-        public ulong StartAddress { get; set; }
-
         /// <summary>
         /// The native end offset of this ASM representation
         /// </summary>

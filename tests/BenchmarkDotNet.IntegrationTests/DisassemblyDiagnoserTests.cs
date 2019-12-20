@@ -21,9 +21,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         private const string WindowsOnly = "Disassembler supports only Windows";
 
-        public DisassemblyDiagnoserTests(ITestOutputHelper output) : base(output)
-        {
-        }
+        public DisassemblyDiagnoserTests(ITestOutputHelper output) : base(output) { }
 
         public static IEnumerable<object[]> GetAllJits()
             => new[]

@@ -7,6 +7,11 @@ namespace BenchmarkDotNet.Disassembler
 {
     public class Code
     {
+        /// <summary>
+        /// The native start offset of this ASM representation
+        /// </summary>
+        public ulong StartAddress { get; set; }
+
         public string TextRepresentation { get; set; }
         public string Comment { get; set; }
     }
@@ -19,11 +24,6 @@ namespace BenchmarkDotNet.Disassembler
 
     public class Asm : Code
     {
-        /// <summary>
-        /// The native start offset of this ASM representation
-        /// </summary>
-        public ulong StartAddress { get; set; }
-
         /// <summary>
         /// The native end offset of this ASM representation
         /// </summary>

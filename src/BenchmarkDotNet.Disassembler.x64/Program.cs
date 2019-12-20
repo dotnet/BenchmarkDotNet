@@ -134,28 +134,35 @@ namespace BenchmarkDotNet.Disassembler
         {
             var method = methodInfo.Method;
 
+            if (method.CompilationType == MethodCompilationType.None)
+                return CreateEmpty(method, "Native method");
+
             if (method.NativeCode == ulong.MaxValue)
                 if (method.IsAbstract) return CreateEmpty(method, "Abstract method");
                 else if (method.IsVirtual) CreateEmpty(method, "Virtual method");
                 else return CreateEmpty(method, "Method got most probably inlined");
 
-            if (!TryGetIlToNativeMap(method, out var ilToNativeMap))
-                return CreateEmpty(method, "No ILOffsetMap and no HotColdInfo found");
+            if ((method.ILOffsetMap is null || method.ILOffsetMap.Length == 0) && (method.HotColdInfo is null || method.HotColdInfo.HotStart == 0))
+                return CreateEmpty(method, $"No valid {nameof(method.ILOffsetMap)} and {nameof(method.HotColdInfo)}");
 
-            var maps = new List<Map>();
-
-            foreach (var map in ilToNativeMap)
+            var codes = new List<Code>();
+            if (settings.PrintSource && !(method.ILOffsetMap is null))
             {
-                var group = new List<Code>();
-
-                if (settings.PrintSource && map.ILOffset >= 0)
-                    group.AddRange(SourceCodeProvider.GetSource(method, map));
-
-                if (settings.PrintAsm)
-                    group.AddRange(AsmProvider.GetAsm(map, state, methodInfo.Depth, method));
-
-                maps.Add(new Map { Instructions = group });
+                // for getting C# code we always use the original ILOffsetMap
+                foreach (var map in method.ILOffsetMap.Where(map => map.StartAddress < map.EndAddress && map.ILOffset >= 0).OrderBy(map => map.StartAddress))
+                    codes.AddRange(SourceCodeProvider.GetSource(method, map));
             }
+
+            if (settings.PrintAsm)
+            {
+                // for getting ASM we try to use data from HotColdInfo if available (better for decoding)
+                foreach (var map in GetCompleteNativeMap(method))
+                    codes.AddRange(AsmProvider.GetAsm(map.StartAddress, (uint)(map.EndAddress - map.StartAddress), state, methodInfo.Depth, method));
+            }
+
+            List<Map> maps = settings.PrintAsm && settings.PrintSource
+                ? codes.GroupBy(code => code.StartAddress).OrderBy(group => group.Key).Select(group => new Map() { Instructions = group.ToList() }).ToList()
+                : new List<Map>() { new Map() { Instructions = codes } };
 
             return new DisassembledMethod
             {
@@ -165,33 +172,26 @@ namespace BenchmarkDotNet.Disassembler
             };
         }
 
-        private static bool TryGetIlToNativeMap(ClrMethod method, out ILToNativeMap[] completeMap)
+        private static ILToNativeMap[] GetCompleteNativeMap(ClrMethod method)
         {
-            completeMap = method.ILOffsetMap?
-                .Where(map => map.StartAddress < map.EndAddress) // some maps have 0 length?
-                .OrderBy(map => map.StartAddress) // we need to print in the machine code order, not IL! #536
-                .ToArray();
-
-            if (completeMap == null || completeMap.Length == 0)
+            // it's better to use one single map rather than few small ones
+            // it's simply easier to get next instruction when decoding ;)
+            var hotColdInfo = method.HotColdInfo;
+            if (!(hotColdInfo is null && hotColdInfo.HotSize > 0 && hotColdInfo.HotStart > 0))
             {
-                if (method.HotColdInfo is null || method.HotColdInfo.HotSize <= 0)
-                {
-                    completeMap = default;
-                    return false;
-                }
-
-                var hotColdInfo = method.HotColdInfo;
-                completeMap = hotColdInfo.ColdSize <= 0 // always true as of today ?
+                return hotColdInfo.ColdSize <= 0
                     ? new[] { new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 } }
                     : new[]
                       {
-                          new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 },
-                          new ILToNativeMap() { StartAddress = hotColdInfo.ColdStart, EndAddress = hotColdInfo.ColdStart + hotColdInfo.ColdSize, ILOffset = -1 }
+                            new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 },
+                            new ILToNativeMap() { StartAddress = hotColdInfo.ColdStart, EndAddress = hotColdInfo.ColdStart + hotColdInfo.ColdSize, ILOffset = -1 }
                       };
-                return true;
             }
 
-            return true;
+            return method.ILOffsetMap
+                    .Where(map => map.StartAddress < map.EndAddress) // some maps have 0 length?
+                    .OrderBy(map => map.StartAddress) // we need to print in the machine code order, not IL! #536
+                    .ToArray();
         }
 
         private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
@@ -237,28 +237,27 @@ namespace BenchmarkDotNet.Disassembler
 
     internal static class AsmProvider
     {
-        internal static IEnumerable<Asm> GetAsm(ILToNativeMap map, State state, int depth, ClrMethod currentMethod)
+        internal static IEnumerable<Asm> GetAsm(ulong startAddress, uint size, State state, int depth, ClrMethod currentMethod)
         {
-            byte[] buffer = new byte[((int)(map.EndAddress - map.StartAddress))];
-
-            if (!state.Runtime.DataTarget.ReadProcessMemory(map.StartAddress, buffer, buffer.Length, out int bytesRead))
+            byte[] code = new byte[size];
+            if (!state.Runtime.DataTarget.ReadProcessMemory(startAddress, code, code.Length, out int bytesRead) || bytesRead == 0)
                 yield break;
 
-            var decoder = Decoder.Create(IntPtr.Size * 8, new ByteArrayCodeReader(buffer, 0, bytesRead));
-            decoder.IP = map.StartAddress;
+            var decoder = Decoder.Create(IntPtr.Size * 8, new ByteArrayCodeReader(code, 0, bytesRead));
+            decoder.IP = startAddress;
 
-            while (decoder.IP < map.StartAddress + (ulong)bytesRead)
+            while (decoder.IP < startAddress + (ulong)bytesRead)
             {
                 decoder.Decode(out var instruction);
 
-                string textRepresentation = GetTextRepresentation(instruction, state, map, buffer);
+                string textRepresentation = GetTextRepresentation(instruction, state, startAddress, code);
 
-                TryEnqueueCalledMethod(instruction, state, depth, currentMethod, out string calledMethodName);
+                TryTranslateAddressToName(instruction, state, depth, currentMethod, out string name);
 
                 yield return new Asm
                 {
                     TextRepresentation = textRepresentation,
-                    Comment = calledMethodName,
+                    Comment = name,
                     StartAddress = instruction.IP,
                     EndAddress = instruction.IP + (ulong)instruction.ByteLength,
                     SizeInBytes = (uint)instruction.ByteLength
@@ -266,16 +265,16 @@ namespace BenchmarkDotNet.Disassembler
             }
         }
 
-        private static string GetTextRepresentation(Instruction instruction, State state, ILToNativeMap map, byte[] buffer)
+        private static string GetTextRepresentation(Instruction instruction, State state, ulong startAddress, byte[] code)
         {
             var output = new StringBuilderFormatterOutput();
 
             output.Write(instruction.IP.ToString("X16"), FormatterOutputTextKind.Text);
             output.Write(" ", FormatterOutputTextKind.Text);
 
-            int byteBaseIndex = (int)(instruction.IP - map.StartAddress);
+            int byteBaseIndex = (int)(instruction.IP - startAddress);
             for (int i = 0; i < instruction.ByteLength; i++)
-                output.Write(buffer[byteBaseIndex + i].ToString("X2"), FormatterOutputTextKind.Text);
+                output.Write(code[byteBaseIndex + i].ToString("X2"), FormatterOutputTextKind.Text);
             for (int i = 0; i < 10 - instruction.ByteLength; i++)
                 output.Write("  ", FormatterOutputTextKind.Text);
 
@@ -285,12 +284,12 @@ namespace BenchmarkDotNet.Disassembler
             return output.ToString();
         }
 
-        private static void TryEnqueueCalledMethod(Instruction instruction, State state, int depth, ClrMethod currentMethod, out string calledMethodName)
+        private static void TryTranslateAddressToName(Instruction instruction, State state, int depth, ClrMethod currentMethod, out string calledMethodName)
         {
             calledMethodName = default;
             ClrRuntime runtime = state.Runtime;
 
-            if (!TryGetCallAddress(instruction, runtime, out ulong address) || address <= ushort.MaxValue)
+            if (!TryGetAddress(instruction, runtime, out ulong address) || address <= ushort.MaxValue)
                 return;
 
             calledMethodName = runtime.GetJitHelperFunctionName(address);
@@ -306,10 +305,7 @@ namespace BenchmarkDotNet.Disassembler
 
             var method = runtime.GetMethodByAddress(address);
             if (method is null)
-            {
-                calledMethodName = DisassemblerConstants.NotManagedMethod;
                 return;
-            }
 
             if (method.NativeCode == currentMethod.NativeCode && method.GetFullSignature() == currentMethod.GetFullSignature())
                 return; // in case of a call which is just a jump within the method or a recursive call
@@ -322,7 +318,7 @@ namespace BenchmarkDotNet.Disassembler
                 calledMethodName = $"{method.Type.Name}.{method.GetFullSignature()}";
         }
 
-        private static bool TryGetCallAddress(Instruction instruction, ClrRuntime runtime, out ulong address)
+        private static bool TryGetAddress(Instruction instruction, ClrRuntime runtime, out ulong address)
         {
             for (int i = 0; i < instruction.OpCount; i++)
             {
@@ -382,6 +378,7 @@ namespace BenchmarkDotNet.Disassembler
                 yield return new Sharp
                 {
                     TextRepresentation = text,
+                    StartAddress = map.StartAddress,
                     FilePath = sourceLocation.FilePath,
                     LineNumber = line
                 };
