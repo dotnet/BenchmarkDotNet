@@ -174,18 +174,20 @@ namespace BenchmarkDotNet.Disassembler
 
             if (completeMap == null || completeMap.Length == 0)
             {
-                if (method.HotColdInfo is null)
+                if (method.HotColdInfo is null || method.HotColdInfo.HotSize <= 0)
                 {
                     completeMap = default;
                     return false;
                 }
 
                 var hotColdInfo = method.HotColdInfo;
-                completeMap = new[]
-                {
-                    new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 },
-                    new ILToNativeMap() { StartAddress = hotColdInfo.ColdStart, EndAddress = hotColdInfo.ColdStart + hotColdInfo.ColdSize, ILOffset = -1 }
-                };
+                completeMap = hotColdInfo.ColdSize <= 0 // always true as of today ?
+                    ? new[] { new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 } }
+                    : new[]
+                      {
+                          new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 },
+                          new ILToNativeMap() { StartAddress = hotColdInfo.ColdStart, EndAddress = hotColdInfo.ColdStart + hotColdInfo.ColdSize, ILOffset = -1 }
+                      };
                 return true;
             }
 
@@ -237,8 +239,7 @@ namespace BenchmarkDotNet.Disassembler
     {
         internal static IEnumerable<Asm> GetAsm(ILToNativeMap map, State state, int depth, ClrMethod currentMethod)
         {
-            int length = (int)(map.EndAddress - map.StartAddress);
-            byte[] buffer = new byte[length];
+            byte[] buffer = new byte[((int)(map.EndAddress - map.StartAddress))];
 
             if (!state.Runtime.DataTarget.ReadProcessMemory(map.StartAddress, buffer, buffer.Length, out int bytesRead))
                 yield break;
@@ -311,12 +312,14 @@ namespace BenchmarkDotNet.Disassembler
             }
 
             if (method.NativeCode == currentMethod.NativeCode && method.GetFullSignature() == currentMethod.GetFullSignature())
-                return; // in case of a call which is just a jump within the method
+                return; // in case of a call which is just a jump within the method or a recursive call
 
             if (!state.HandledMethods.Contains(new MethodId(method.MetadataToken, method.Type.MetadataToken)))
                 state.Todo.Enqueue(new MethodInfo(method, depth + 1));
 
             calledMethodName = method.GetFullSignature();
+            if (!calledMethodName.StartsWith(method.Type.Name, StringComparison.Ordinal))
+                calledMethodName = $"{method.Type.Name}.{method.GetFullSignature()}";
         }
 
         private static bool TryGetCallAddress(Instruction instruction, ClrRuntime runtime, out ulong address)
