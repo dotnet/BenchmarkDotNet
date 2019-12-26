@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
@@ -39,8 +41,9 @@ namespace BenchmarkDotNet.Analysers
                 yield break;
             }
 
+            var cultureInfo = summary.GetCultureInfo();
             if (allOutliers.Any())
-                yield return CreateHint(GetMessage(actualOutliers, allOutliers, statistics.LowerOutliers, statistics.UpperOutliers), report);
+                yield return CreateHint(GetMessage(actualOutliers, allOutliers, statistics.LowerOutliers, statistics.UpperOutliers, cultureInfo), report);
         }
 
         /// <summary>
@@ -52,7 +55,7 @@ namespace BenchmarkDotNet.Analysers
         /// <param name="upperOutliers">All upper outliers</param>
         /// <returns>The message</returns>
         [PublicAPI, NotNull, Pure]
-        public static string GetMessage(double[] actualOutliers, double[] allOutliers, double[] lowerOutliers, double[] upperOutliers)
+        public static string GetMessage(double[] actualOutliers, double[] allOutliers, double[] lowerOutliers, double[] upperOutliers, CultureInfo cultureInfo)
         {
             if (allOutliers.Length == 0)
                 return string.Empty;
@@ -63,7 +66,7 @@ namespace BenchmarkDotNet.Analysers
                 return $"{n} {words} {verb}";
             }
 
-            var rangeMessages = new List<string> { GetRangeMessage(lowerOutliers), GetRangeMessage(upperOutliers) };
+            var rangeMessages = new List<string> { GetRangeMessage(lowerOutliers, cultureInfo), GetRangeMessage(upperOutliers, cultureInfo) };
             rangeMessages.RemoveAll(string.IsNullOrEmpty);
             string rangeMessage = rangeMessages.Any()
                 ? " (" + string.Join(", ", rangeMessages) + ")"
@@ -77,17 +80,19 @@ namespace BenchmarkDotNet.Analysers
         }
 
         [CanBeNull]
-        private static string GetRangeMessage([NotNull] double[] values)
+        private static string GetRangeMessage([NotNull] double[] values, CultureInfo cultureInfo)
         {
+            string Format(double value) => TimeInterval.FromNanoseconds(value).ToString(cultureInfo, "N2");
+            
             switch (values.Length) {
                 case 0:
                     return null;
                 case 1:
-                    return values.First().ToTimeStr(format: "N2");
+                    return Format(values.First());
                 case 2:
-                    return values.Min().ToTimeStr(format: "N2") + ", " + values.Max().ToTimeStr(format: "N2");
+                    return Format(values.Min()) + ", " + Format(values.Max());
                 default:
-                    return values.Min().ToTimeStr(format: "N2") + ".." + values.Max().ToTimeStr(format: "N2");
+                    return Format(values.Min()) + ".." + Format(values.Max());
             }
         }
     }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
 
@@ -16,39 +18,11 @@ namespace BenchmarkDotNet.Mathematics.Histograms
 
         [PublicAPI, Pure, NotNull]
         public static IEnumerable<double> GetAllValues([NotNull] this Histogram histogram) => histogram.Bins.SelectMany(bin => bin.Values);
-
-        [PublicAPI, Pure]
-        public static string ToTimeStr(this Histogram histogram, TimeUnit unit = null, char binSymbol = '@', bool full = false, Encoding encoding = null, string format = "0.000")
+        
+        public static Func<double, string> CreateNanosecondFormatter(this Histogram histogram, CultureInfo cultureInfo = null, string format = "0.000")
         {
-            var bins = histogram.Bins;
-            int binCount = histogram.Bins.Length;
-            if (unit == null)
-                unit = TimeUnit.GetBestTimeUnit(bins.SelectMany(bin => bin.Values).ToArray());
-            if (encoding == null)
-                encoding = Encoding.ASCII;
-
-            var lower = new string[binCount];
-            var upper = new string[binCount];
-            for (int i = 0; i < binCount; i++)
-            {
-                lower[i] = bins[i].Lower.ToTimeStr(unit, encoding, format);
-                upper[i] = bins[i].Upper.ToTimeStr(unit, encoding, format);
-            }
-
-            int lowerWidth = lower.Max(it => it.Length);
-            int upperWidth = upper.Max(it => it.Length);
-
-            var builder = new StringBuilder();
-            for (int i = 0; i < binCount; i++)
-            {
-                string intervalStr = $"[{lower[i].PadLeft(lowerWidth)} ; {upper[i].PadLeft(upperWidth)})";
-                string barStr = full
-                    ? string.Join(", ", bins[i].Values.Select(it => it.ToTimeStr(unit, encoding, format)))
-                    : new string(binSymbol, bins[i].Count);
-                builder.AppendLine($"{intervalStr} | {barStr}");
-            }
-
-            return builder.ToString().Trim();
+            var timeUnit = TimeUnit.GetBestTimeUnit(histogram.Bins.SelectMany(bin => bin.Values).ToArray());
+            return value => TimeInterval.FromNanoseconds(value).ToString(timeUnit, cultureInfo, format);
         }
 
         [PublicAPI, Pure]

@@ -17,11 +17,11 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                Add(Job.Dry);
-                Add(ConsoleLogger.Default);
-                Add(TargetMethodColumn.Method, StatisticColumn.Max);
-                Add(RPlotExporter.Default, CsvExporter.Default);
-                Add(EnvironmentAnalyser.Default);
+                AddJob(Job.Dry);
+                AddLogger(ConsoleLogger.Default);
+                AddColumn(TargetMethodColumn.Method, StatisticColumn.Max);
+                AddExporter(RPlotExporter.Default, CsvExporter.Default);
+                AddAnalyser(EnvironmentAnalyser.Default);
                 UnionRule = ConfigUnionRule.AlwaysUseLocal;
             }
         }

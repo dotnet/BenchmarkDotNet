@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Linq;
-using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Horology
 {
     public class TimeUnit : IEquatable<TimeUnit>
     {
-        public MultiEncodingString Name { get; }
+        public string Name { get; }
 
         public string Description { get; }
         public long NanosecondAmount { get; }
 
-        private TimeUnit(MultiEncodingString name, string description, long nanosecondAmount)
+        private TimeUnit(string name, string description, long nanosecondAmount)
         {
             Name = name;
             Description = description;
@@ -22,7 +21,7 @@ namespace BenchmarkDotNet.Horology
         public TimeInterval ToInterval(long value = 1) => new TimeInterval(value, this);
 
         [PublicAPI] public static readonly TimeUnit Nanosecond = new TimeUnit("ns", "Nanosecond", 1);
-        [PublicAPI] public static readonly TimeUnit Microsecond = new TimeUnit(new MultiEncodingString("us", "\u03BCs"), "Microsecond", 1000);
+        [PublicAPI] public static readonly TimeUnit Microsecond = new TimeUnit("\u03BCs", "Microsecond", 1000);
         [PublicAPI] public static readonly TimeUnit Millisecond = new TimeUnit("ms", "Millisecond", 1000 * 1000);
         [PublicAPI] public static readonly TimeUnit Second = new TimeUnit("s", "Second", 1000 * 1000 * 1000);
         [PublicAPI] public static readonly TimeUnit Minute = new TimeUnit("m", "Minute", Second.NanosecondAmount * 60);

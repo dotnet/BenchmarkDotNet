@@ -28,9 +28,9 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         public void CanBenchmarkLocalCoreRtUsingRyuJit()
         {
             var config = ManualConfig.CreateEmpty()
-                .With(Job.Dry
-                    .With(CoreRtRuntime.CoreRt21)
-                    .With(
+                .AddJob(Job.Dry
+                    .WithRuntime(CoreRtRuntime.CoreRt21)
+                    .WithToolchain(
                         CoreRtToolchain.CreateBuilder()
                             .UseCoreRtLocal(IlcPath)
                             .ToToolchain()));
@@ -42,9 +42,9 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         public void CanBenchmarkLocalCoreRtUsingCppCodeGen()
         {
             var config = ManualConfig.CreateEmpty()
-                .With(Job.Dry
-                    .With(CoreRtRuntime.CoreRt21)
-                    .With(
+                .AddJob(Job.Dry
+                    .WithRuntime(CoreRtRuntime.CoreRt21)
+                    .WithToolchain(
                         CoreRtToolchain.CreateBuilder()
                             .UseCoreRtLocal(IlcPath)
                             .UseCppCodeGenerator() // https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#using-cpp-code-generator

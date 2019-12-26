@@ -17,10 +17,10 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
             FasterTestResult = fasterTestResult;
         }
 
-        public string ToStr(bool details) => details
-            ? ConclusionStr() + ": " + (SlowerTestResult?.PValueStr ?? "?") + "|" + (FasterTestResult?.PValueStr ?? "?")
-            : ConclusionStr();
+        public string ToString(bool details) => details
+            ? ConclusionString() + ": " + (SlowerTestResult?.PValueStr ?? "?") + "|" + (FasterTestResult?.PValueStr ?? "?")
+            : ConclusionString();
 
-        private string ConclusionStr() => Conclusion == EquivalenceTestConclusion.Unknown ? "?" : Conclusion.ToString();
+        private string ConclusionString() => Conclusion == EquivalenceTestConclusion.Unknown ? "?" : Conclusion.ToString();
     }
 }

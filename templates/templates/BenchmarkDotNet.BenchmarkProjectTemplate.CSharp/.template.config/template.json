@@ -1,6 +1,6 @@
 {
   "$schema": "http://json.schemastore.org/template",
-  "identity": "BenchmarkDotNet.BenchmarkProjectTemplate.VB",
+  "identity": "BenchmarkDotNet.BenchmarkProjectTemplate.CSharp",
   "name": "Benchmark Project",
   "shortName": "benchmark",
   "groupIdentity": "BenchmarkDotNet",
@@ -10,7 +10,7 @@
   ],
   "precedence": "3000",
   "tags": {
-    "language": "VB",
+    "language": "C#",
     "type": "project"
   },
   "description": "A project template for creating benchmarks.",
@@ -53,6 +53,13 @@
       "datatype": "bool",
       "description": "If specified, the project is set up as console app.",
       "defaultValue": "false"
+    },
+    "version": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "Version of BenchmarkDotNet that will be referenced.",
+      "defaultValue": "0.12.0",
+      "replaces": "$(BenchmarkDotNetVersion)"
     }
   },
   "sources": [
@@ -66,13 +73,13 @@
         {
           "condition": "(!config)",
           "exclude": [
-            "BenchmarkConfig.vb"
+            "BenchmarkConfig.cs"
           ]
         },
         {
           "condition": "(!consoleApp)",
           "exclude": [
-            "Program.vb"
+            "Program.cs"
           ]
         }
       ]
@@ -80,7 +87,7 @@
   ],
   "primaryOutputs": [
     {
-      "path": "_BenchmarkProjectName_.vbproj"
+      "path": "_BenchmarkProjectName_.csproj"
     }
   ],
   "postActions": [

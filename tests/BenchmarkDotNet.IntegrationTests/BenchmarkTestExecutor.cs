@@ -54,10 +54,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 config = CreateSimpleConfig();
 
             if (!config.GetLoggers().OfType<OutputLogger>().Any())
-                config = config.With(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default);
+                config = config.AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default);
 
             if (!config.GetColumnProviders().Any())
-                config = config.With(DefaultColumnProviders.Instance);
+                config = config.AddColumnProvider(DefaultColumnProviders.Instance);
 
             // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
             var summary = BenchmarkRunner.Run(type, BenchmarkConverter.GetFullConfig(type, config));
@@ -90,9 +90,9 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var baseConfig = job == null ? (IConfig)new SingleRunFastConfig() : new SingleJobConfig(job);
             return baseConfig
-                .With(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
-                .With(DefaultColumnProviders.Instance)
-                .With(DefaultConfig.Instance.GetAnalysers().ToArray());
+                .AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray());
         }
     }
 }

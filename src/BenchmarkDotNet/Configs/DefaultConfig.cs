@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Configs
 
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 
-        public Encoding Encoding => Encoding.ASCII;
+        public CultureInfo CultureInfo => null;
 
         public ConfigOptions Options => ConfigOptions.Default;
 

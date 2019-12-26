@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Mathematics.Histograms;
 using JetBrains.Annotations;
@@ -60,11 +62,13 @@ namespace BenchmarkDotNet.Tests.Mathematics.Histograms
         {
             var s = new Statistics(histogram.GetAllValues());
             double mValue = MathHelper.CalculateMValue(s);
-            output.WriteLine($"=== {title}:Short (BinSize={histogram.BinSize.ToTimeStr()}, mValue={mValue.ToStr()}) ===");
-            output.WriteLine(histogram.ToTimeStr(format: "0.0000"));
-            output.WriteLine($"=== {title}:Full (BinSize={histogram.BinSize.ToTimeStr()}, mValue={mValue.ToStr()}) ===");
-            output.WriteLine(histogram.ToTimeStr(full: true, format: "0.0000"));
-            output.WriteLine("OUTLIERS: ", string.Join(", ", s.AllOutliers.Select(it => it.ToTimeStr())));
+            var cultureInfo = TestCultureInfo.Instance;
+            var binSizeInterval = TimeInterval.FromNanoseconds(histogram.BinSize);
+            output.WriteLine($"=== {title}:Short (BinSize={binSizeInterval.ToString(cultureInfo)}, mValue={mValue.ToString("0.##", cultureInfo)}) ===");
+            output.WriteLine(histogram.ToString(histogram.CreateNanosecondFormatter(cultureInfo, "0.0000")));
+            output.WriteLine($"=== {title}:Full (BinSize={binSizeInterval.ToString(cultureInfo)}, mValue={mValue.ToString("0.##", cultureInfo)}) ===");
+            output.WriteLine(histogram.ToString(histogram.CreateNanosecondFormatter(cultureInfo, "0.0000"), full: true));
+            output.WriteLine("OUTLIERS: {0}", string.Join(", ", s.AllOutliers.Select(it => TimeInterval.FromNanoseconds(it).ToString(cultureInfo))));
         }
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -69,10 +71,10 @@ namespace BenchmarkDotNet.Exporters.Csv
 
             var columns = new List<MeasurementColumn>(Columns.Value)
             {
-                new MeasurementColumn("Gen_0", (_, report, __) => report.GcStats.Gen0Collections.ToString()),
-                new MeasurementColumn("Gen_1", (_, report, __) => report.GcStats.Gen1Collections.ToString()),
-                new MeasurementColumn("Gen_2", (_, report, __) => report.GcStats.Gen2Collections.ToString()),
-                new MeasurementColumn("Allocated_Bytes", (_, report, __) => report.GcStats.BytesAllocatedPerOperation.ToString())
+                new MeasurementColumn("Gen_0", (_, report, __) => report.GcStats.Gen0Collections.ToString(summary.GetCultureInfo())),
+                new MeasurementColumn("Gen_1", (_, report, __) => report.GcStats.Gen1Collections.ToString(summary.GetCultureInfo())),
+                new MeasurementColumn("Gen_2", (_, report, __) => report.GcStats.Gen2Collections.ToString(summary.GetCultureInfo())),
+                new MeasurementColumn("Allocated_Bytes", (_, report, __) => report.GcStats.BytesAllocatedPerOperation.ToString(summary.GetCultureInfo()))
             };
 
             return columns.ToArray();
@@ -102,9 +104,9 @@ namespace BenchmarkDotNet.Exporters.Csv
             columns.Add(new MeasurementColumn("Measurement_IterationMode", (summary, report, m) => m.IterationMode.ToString()));
             columns.Add(new MeasurementColumn("Measurement_IterationStage", (summary, report, m) => m.IterationStage.ToString()));
             columns.Add(new MeasurementColumn("Measurement_IterationIndex", (summary, report, m) => m.IterationIndex.ToString()));
-            columns.Add(new MeasurementColumn("Measurement_Nanoseconds", (summary, report, m) => m.Nanoseconds.ToStr()));
+            columns.Add(new MeasurementColumn("Measurement_Nanoseconds", (summary, report, m) => m.Nanoseconds.ToString("0.##", summary.GetCultureInfo())));
             columns.Add(new MeasurementColumn("Measurement_Operations", (summary, report, m) => m.Operations.ToString()));
-            columns.Add(new MeasurementColumn("Measurement_Value", (summary, report, m) => (m.Nanoseconds / m.Operations).ToStr()));
+            columns.Add(new MeasurementColumn("Measurement_Value", (summary, report, m) => (m.Nanoseconds / m.Operations).ToString("0.##", summary.GetCultureInfo())));
 
             return columns.ToArray();
         }

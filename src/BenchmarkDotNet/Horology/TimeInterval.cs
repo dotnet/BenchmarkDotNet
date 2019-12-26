@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Extensions;
+﻿using System.Globalization;
+using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Horology
@@ -49,7 +50,36 @@ namespace BenchmarkDotNet.Horology
         [Pure] public static bool operator <=(TimeInterval a, TimeInterval b) => a.Nanoseconds <= b.Nanoseconds;
         [Pure] public static bool operator >=(TimeInterval a, TimeInterval b) => a.Nanoseconds >= b.Nanoseconds;
 
-        [Pure] public string ToStr(TimeUnit timeUnit = null, string format = "N4") => Nanoseconds.ToTimeStr(timeUnit, format: format);
-        [Pure] public override string ToString() => ToStr();
+        [Pure, NotNull]
+        public string ToString(
+            [CanBeNull] CultureInfo cultureInfo,
+            [CanBeNull] string format = "N4",
+            [CanBeNull] UnitPresentation unitPresentation = null)
+        {
+            return ToString(null, cultureInfo, format, unitPresentation);
+        }
+
+        [Pure, NotNull]
+        public string ToString(
+            [CanBeNull] TimeUnit timeUnit,
+            [CanBeNull] CultureInfo cultureInfo,
+            [CanBeNull] string format = "N4",
+            [CanBeNull] UnitPresentation unitPresentation = null)
+        {
+            timeUnit = timeUnit ?? TimeUnit.GetBestTimeUnit(Nanoseconds);
+            cultureInfo = cultureInfo ?? DefaultCultureInfo.Instance;
+            format = format ?? "N4";
+            unitPresentation = unitPresentation ?? UnitPresentation.Default;
+            double unitValue = TimeUnit.Convert(Nanoseconds, TimeUnit.Nanosecond, timeUnit);
+            if (unitPresentation.IsVisible)
+            {
+                string unitName = timeUnit.Name.PadLeft(unitPresentation.MinUnitWidth);
+                return $"{unitValue.ToString(format, cultureInfo)} {unitName}";
+            }
+
+            return unitValue.ToString(format, cultureInfo);
+        }
+
+        [Pure] public override string ToString() => ToString(DefaultCultureInfo.Instance);
     }
 }

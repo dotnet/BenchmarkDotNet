@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Tests.Engine
         {
             const int explicitWarmupCount = 1;
 
-            var warmupCountEqualOne = DefaultConfig.Instance.With(Job.Default.WithWarmupCount(explicitWarmupCount));
+            var warmupCountEqualOne = DefaultConfig.Instance.AddJob(Job.Default.WithWarmupCount(explicitWarmupCount));
 
             var benchmarkRunInfo = BenchmarkConverter.TypeToBenchmarks(typeof(WithForceAutoWarmup), warmupCountEqualOne);
 

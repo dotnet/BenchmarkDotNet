@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Characteristics
             }
 
             private static string ToPresentation(object value)
-                => (value as IFormattable)?.ToString(null, HostEnvironmentInfo.MainCultureInfo)
+                => (value as IFormattable)?.ToString(null, DefaultCultureInfo.Instance)
                       ?? value?.ToString()
                       ?? "";
 

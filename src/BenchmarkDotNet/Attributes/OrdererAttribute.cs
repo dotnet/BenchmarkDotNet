@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Attributes
             SummaryOrderPolicy summaryOrderPolicy = SummaryOrderPolicy.Default,
             MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared)
         {
-            Config = ManualConfig.CreateEmpty().With(new DefaultOrderer(summaryOrderPolicy, methodOrderPolicy));
+            Config = ManualConfig.CreateEmpty().WithOrderer(new DefaultOrderer(summaryOrderPolicy, methodOrderPolicy));
         }
 
         public IConfig Config { get; }

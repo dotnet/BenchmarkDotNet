@@ -15,6 +15,8 @@ namespace BenchmarkDotNet.Loggers
         [PublicAPI]
         public StreamLogger(string filePath, bool append = false) => writer = new StreamWriter(filePath, append);
 
+        public string Id => nameof(StreamLogger);
+        public int Priority => 0;
         public void Write(LogKind logKind, string text) => writer.Write(text);
 
         public void WriteLine() => writer.WriteLine();

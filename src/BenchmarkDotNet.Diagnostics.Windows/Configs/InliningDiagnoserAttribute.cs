@@ -9,12 +9,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Configs
         /// <param name="filterByNamespace">only the methods from declaring type's namespace. Set to false if you want to see all Jit inlining events. True by default.</param>
         public InliningDiagnoserAttribute(bool logFailuresOnly = true, bool filterByNamespace = true)
         {
-            Config = ManualConfig.CreateEmpty().With(new InliningDiagnoser(logFailuresOnly, filterByNamespace));
+            Config = ManualConfig.CreateEmpty().AddDiagnoser(new InliningDiagnoser(logFailuresOnly, filterByNamespace));
         }
 
         public InliningDiagnoserAttribute(bool logFailuresOnly = true, string[] allowedNamespaces = null)
         {
-            Config = ManualConfig.CreateEmpty().With(new InliningDiagnoser(logFailuresOnly, allowedNamespaces));
+            Config = ManualConfig.CreateEmpty().AddDiagnoser(new InliningDiagnoser(logFailuresOnly, allowedNamespaces));
         }
 
         public IConfig Config { get; }
