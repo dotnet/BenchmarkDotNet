@@ -180,7 +180,7 @@ namespace BenchmarkDotNet.Running
 
             Summary benchmark = BenchmarkRunnerClean.Run(BenchmarkRunInfos).Single();
                       
-            var benchmarks = BenchmarkRunnerClean.Run(BenchmarkRunInfos));
+            var benchmarks = BenchmarkRunnerClean.Run(BenchmarkRunInfos);
           
             return benchmarks;
         }
