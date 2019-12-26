@@ -85,11 +85,11 @@ namespace BenchmarkDotNet.Running
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Type type, IConfig config, string[] args)
-            => RunWithDirtyAssemblyResolveHelper(new[] { type }, Array.Empty<Assembly>(), config, args);
+            => RunWithDirtyAssemblyResolveHelper(type , Array.Empty<Assembly>(), config, args);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Assembly assembly, IConfig config, string[] args)
-             => RunWithDirtyAssemblyResolveHelper(assembly.GetRunnableBenchmarks().ToArray(), new[] { assembly }, config, args);
+             => RunWithDirtyAssemblyResolveHelper(assembly.GetRunnableBenchmarks(), new[] { assembly }, config, args);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Type type, MethodInfo[] methods, IConfig config = null)
@@ -141,10 +141,9 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static Summary RunWithDirtyAssemblyResolveHelper(IEnumerable<Type> types, IEnumerable<Assembly> assemblies, IConfig config, string[] args)
+        private static Summary[] RunWithDirtyAssemblyResolveHelper(Type type, IEnumerable<Assembly> assemblies, IConfig config, string[] args)
         {
             var logger = config.GetNonNullCompositeLogger();
-            var userInteraction = new UserInteraction();
             var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args, logger, config);
             if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
                 return null;
@@ -163,6 +162,7 @@ namespace BenchmarkDotNet.Running
 
             if (allAvailableTypesWithRunnableBenchmarks.IsEmpty())
             {
+                var userInteraction = new UserInteraction();
                 userInteraction.PrintNoBenchmarksError(logger);
                 return null;
             }
@@ -172,26 +172,17 @@ namespace BenchmarkDotNet.Running
                 BenchmarkCasesPrinter.PrintList(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
                 return null;
             }
+                      
+            var BenchmarkRunInfos = options.UserProvidedFilters
+                            ? TypeFilter.Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
+                            : new BenchmarkRunInfo[] { BenchmarkConverter.TypeToBenchmarks(type, config) };
+                     
 
-            var BenchmarkRunInfos = new List<BenchmarkRunInfo[]>();
-
-            foreach (Type type in types)
-            {
-                var BenchmarkRunInfo = options.UserProvidedFilters
-                               ? TypeFilter.Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
-                               : new BenchmarkRunInfo[] { BenchmarkConverter.TypeToBenchmarks(type, config) };
-
-                BenchmarkRunInfos.Add(BenchmarkRunInfo);
-            }
-
-            Summary benchmark = BenchmarkRunnerClean.Run(BenchmarkRunInfos.First()).Single();
-
-            foreach (var BenchmarkRunInfo in BenchmarkRunInfos.Skip(1))
-            {
-                benchmark = BenchmarkRunnerClean.Run(BenchmarkRunInfo).Single();
-            }
-
-            return benchmark;
+            Summary benchmark = BenchmarkRunnerClean.Run(BenchmarkRunInfos).Single();
+                      
+            var benchmarks = BenchmarkRunnerClean.Run(BenchmarkRunInfos));
+          
+            return benchmarks;
         }
 
     }
