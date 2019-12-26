@@ -33,18 +33,18 @@ namespace BenchmarkDotNet.Attributes
         private static Job GetJob(RuntimeMoniker runtimeMoniker, Jit? jit, Platform? platform)
         {
             var runtime = runtimeMoniker.GetRuntime();
-            var baseJob = Job.Dry.With(runtime).WithId($"Dry-{runtime.Name}");
+            var baseJob = Job.Dry.WithRuntime(runtime).WithId($"Dry-{runtime.Name}");
             var id = baseJob.Id;
 
             if (jit.HasValue)
             {
-                baseJob = baseJob.With(jit.Value);
+                baseJob = baseJob.WithJit(jit.Value);
                 id += "-" + jit.Value;
             }
 
             if (platform.HasValue)
             {
-                baseJob = baseJob.With(platform.Value);
+                baseJob = baseJob.WithPlatform(platform.Value);
                 id += "-" + platform.Value;
             }
 

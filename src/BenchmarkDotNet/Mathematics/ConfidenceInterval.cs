@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Mathematics
@@ -147,9 +147,23 @@ namespace BenchmarkDotNet.Mathematics
 
         private string GetLevelHint(bool showLevel = true) => showLevel ? $" (CI {Level.ToPercentStr()})" : "";
 
-        public string ToStr(bool showLevel = true) => $"[{Lower.ToStr()}; {Upper.ToStr()}]{GetLevelHint(showLevel)}";
+        public override string ToString() => ToString(DefaultCultureInfo.Instance);
 
-        public string ToTimeStr(Encoding encoding, TimeUnit unit = null, bool showLevel = true) =>
-            $"[{Lower.ToTimeStr(unit, encoding)}; {Upper.ToTimeStr(unit, encoding)}]{GetLevelHint(showLevel)}";
+        public string ToString(CultureInfo cultureInfo, string format = "0.##", bool showLevel = true)
+        {
+            return ToString(x => x.ToString(format, cultureInfo), showLevel);
+        }
+
+        public string ToString(Func<double, string> formatter, bool showLevel = true)
+        {
+            var builder = new StringBuilder();
+            builder.Append('[');
+            builder.Append(formatter(Lower));
+            builder.Append("; ");
+            builder.Append(formatter(Upper));
+            builder.Append("]");
+            builder.Append(GetLevelHint(showLevel));
+            return builder.ToString();
+        }
     }
 }

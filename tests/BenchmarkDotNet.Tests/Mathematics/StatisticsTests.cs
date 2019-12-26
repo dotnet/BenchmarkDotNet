@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Mathematics;
 using Xunit;
 using Xunit.Abstractions;
@@ -29,8 +30,8 @@ namespace BenchmarkDotNet.Tests.Mathematics
             output.WriteLine("InterquartileRange = " + summary.InterquartileRange);
             output.WriteLine("StandardDeviation = " + summary.StandardDeviation);
             output.WriteLine("Outlier = [" + string.Join("; ", summary.AllOutliers) + "]");
-            output.WriteLine("CI = " + summary.ConfidenceInterval.ToStr());
-            output.WriteLine("Percentiles = " + summary.Percentiles.ToStr());
+            output.WriteLine("CI = " + summary.ConfidenceInterval.ToString(TestCultureInfo.Instance));
+            output.WriteLine("Percentiles = " + summary.Percentiles.ToString(TestCultureInfo.Instance));
         }
 
         [Fact]

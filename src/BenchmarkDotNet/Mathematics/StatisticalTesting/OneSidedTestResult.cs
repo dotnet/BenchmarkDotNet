@@ -1,4 +1,6 @@
+using System.Globalization;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Mathematics.StatisticalTesting
 {
@@ -22,6 +24,6 @@ namespace BenchmarkDotNet.Mathematics.StatisticalTesting
             ? "True difference in means is greater than zero"
             : $"True difference in means > {Threshold}";
 
-        public string PValueStr => PValue.ToStr("N4");
+        public string PValueStr => PValue.ToString("N4", DefaultCultureInfo.Instance);
     }
 }

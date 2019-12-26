@@ -14,9 +14,9 @@ namespace BenchmarkDotNet.Tests.Horology
             int[] values = { 1, 42, 10000 };
             foreach (int value in values)
             {
-                var timeInterval = new Frequency(value, unit);
-                AreEqual(timeInterval, fromMethod(value));
-                AreEqual(toMethod(timeInterval), value);
+                var frequency = new Frequency(value, unit);
+                AreEqual(frequency, fromMethod(value));
+                AreEqual(toMethod(frequency), value);
             }
         }
 

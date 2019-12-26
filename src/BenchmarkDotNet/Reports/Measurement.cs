@@ -1,20 +1,26 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Reports
 {
     /// <summary>
-    /// The basic captured statistics for a benchmark.
+    /// The basic captured statistics for a benchmark
     /// </summary>
     public struct Measurement : IComparable<Measurement>
     {
-        private static Measurement Error (Encoding encoding) => new Measurement(-1, IterationMode.Unknown, IterationStage.Unknown, 0, 0, 0, encoding);
+        // We always use the same CultureInfo to simplify string conversions (ToString and Parse)
+        private static readonly CultureInfo MainCultureInfo = DefaultCultureInfo.Instance;
+
+        private const string NsSymbol = "ns";
+        private const string OpSymbol = "op";
+
+        private static Measurement Error() => new Measurement(-1, IterationMode.Unknown, IterationStage.Unknown, 0, 0, 0);
 
         private static readonly int IterationInfoNameMaxWidth
             = Enum.GetNames(typeof(IterationMode)).Max(text => text.Length) + Enum.GetNames(typeof(IterationStage)).Max(text => text.Length);
@@ -26,9 +32,6 @@ namespace BenchmarkDotNet.Reports
         public int LaunchIndex { get; }
 
         public int IterationIndex { get; }
-
-        [PublicAPI]
-        public Encoding Encoding { get; }
 
         /// <summary>
         /// Gets the number of operations performed.
@@ -49,10 +52,8 @@ namespace BenchmarkDotNet.Reports
         /// <param name="iterationIndex"></param>
         /// <param name="operations">The number of operations performed.</param>
         /// <param name="nanoseconds">The total number of nanoseconds it took to perform all operations.</param>
-        /// <param name="encoding">encoding to display value.</param>
-        public Measurement(int launchIndex, IterationMode iterationMode, IterationStage iterationStage, int iterationIndex, long operations, double nanoseconds, Encoding encoding = null)
+        public Measurement(int launchIndex, IterationMode iterationMode, IterationStage iterationStage, int iterationIndex, long operations, double nanoseconds)
         {
-            Encoding = encoding;
             Operations = operations;
             Nanoseconds = nanoseconds;
             LaunchIndex = launchIndex;
@@ -61,19 +62,44 @@ namespace BenchmarkDotNet.Reports
             IterationIndex = iterationIndex;
         }
 
-        public string ToOutputLine()
+        private static IterationMode ParseIterationMode(string name) => Enum.TryParse(name, out IterationMode mode) ? mode : IterationMode.Unknown;
+
+        private static IterationStage ParseIterationStage(string name) => Enum.TryParse(name, out IterationStage stage) ? stage : IterationStage.Unknown;
+
+        /// <summary>
+        /// Gets the average duration of one operation.
+        /// </summary>
+        public TimeInterval GetAverageTime() => TimeInterval.FromNanoseconds(Nanoseconds / Operations);
+
+        public int CompareTo(Measurement other) => Nanoseconds.CompareTo(other.Nanoseconds);
+
+        public override string ToString()
         {
-            string alignedIterationInfo = (IterationMode.ToString() + IterationStage).PadRight(IterationInfoNameMaxWidth, ' ');
+            var builder = new StringBuilder();
+
+            builder.Append((IterationMode.ToString() + IterationStage).PadRight(IterationInfoNameMaxWidth, ' '));
+            builder.Append(' ');
 
             // Usually, a benchmarks takes more than 10 iterations (rarely more than 99)
             // PadLeft(2, ' ') looks like a good trade-off between alignment and amount of characters
-            string alignedIterationIndex = IterationIndex.ToString().PadLeft(2, ' ');
+            builder.Append(IterationIndex.ToString(MainCultureInfo).PadLeft(2, ' '));
+            builder.Append(": ");
 
-            return $"{alignedIterationInfo} {alignedIterationIndex}: {GetDisplayValue()}";
+            builder.Append(Operations.ToString(MainCultureInfo));
+            builder.Append(' ');
+            builder.Append(OpSymbol);
+            builder.Append(", ");
+
+            builder.Append(Nanoseconds.ToString("0.00", MainCultureInfo));
+            builder.Append(' ');
+            builder.Append(NsSymbol);
+            builder.Append(", ");
+
+            builder.Append(GetAverageTime().ToString(MainCultureInfo));
+            builder.Append("/op");
+
+            return builder.ToString();
         }
-
-        private string GetDisplayValue() => $"{Operations} op, {Nanoseconds.ToStr("0.00")} ns, {GetAverageTime()}";
-        private string GetAverageTime() => $"{(Nanoseconds / Operations).ToTimeStr(Encoding)}/op";
 
         /// <summary>
         /// Parses the benchmark statistics from the plain text line.
@@ -88,15 +114,12 @@ namespace BenchmarkDotNet.Reports
         /// <param name="logger">The logger to write any diagnostic messages to.</param>
         /// <param name="line">The line to parse.</param>
         /// <param name="processIndex"></param>
-        /// <param name="encoding">encoding to display value</param>
         /// <returns>An instance of <see cref="Measurement"/> if parsed successfully. <c>Null</c> in case of any trouble.</returns>
-        public static Measurement Parse(ILogger logger, string line, int processIndex, Encoding encoding = null)
+        // ReSharper disable once UnusedParameter.Global
+        public static Measurement Parse(ILogger logger, string line, int processIndex)
         {
-            if (encoding == null)
-                encoding = Encoding.ASCII;
-
             if (line == null || line.StartsWith(GcStats.ResultsLinePrefix))
-                return Error(encoding);
+                return Error();
 
             try
             {
@@ -115,7 +138,6 @@ namespace BenchmarkDotNet.Reports
                 string iterationModeStr = iterationInfoSplit[0].Substring(0, iterationStageIndex);
                 string iterationStageStr = iterationInfoSplit[0].Substring(iterationStageIndex);
 
-
                 var iterationMode = ParseIterationMode(iterationModeStr);
                 var iterationStage = ParseIterationStage(iterationStageStr);
                 int.TryParse(iterationInfoSplit[1], out int iterationIndex);
@@ -131,15 +153,15 @@ namespace BenchmarkDotNet.Reports
                     string unit = measurementSplit[1];
                     switch (unit)
                     {
-                        case "ns":
-                            ns = double.Parse(value, HostEnvironmentInfo.MainCultureInfo);
+                        case NsSymbol:
+                            ns = double.Parse(value, MainCultureInfo);
                             break;
-                        case "op":
-                            op = long.Parse(value);
+                        case OpSymbol:
+                            op = long.Parse(value, MainCultureInfo);
                             break;
                     }
                 }
-                return new Measurement(processIndex, iterationMode, iterationStage, iterationIndex, op, ns, encoding);
+                return new Measurement(processIndex, iterationMode, iterationStage, iterationIndex, op, ns);
             }
             catch (Exception)
             {
@@ -147,16 +169,8 @@ namespace BenchmarkDotNet.Reports
                 logger.WriteLineError("Parse error in the following line:");
                 logger.WriteLineError(line);
 #endif
-                return Error(encoding);
+                return Error();
             }
         }
-
-        private static IterationMode ParseIterationMode(string name) => Enum.TryParse(name, out IterationMode mode) ? mode : IterationMode.Unknown;
-
-        private static IterationStage ParseIterationStage(string name) => Enum.TryParse(name, out IterationStage stage) ? stage : IterationStage.Unknown;
-
-        public int CompareTo(Measurement other) => Nanoseconds.CompareTo(other.Nanoseconds);
-
-        public override string ToString() => $"#{LaunchIndex}/{IterationMode} {IterationIndex}: {Operations} op, {Nanoseconds.ToTimeStr(Encoding)}";
     }
 }

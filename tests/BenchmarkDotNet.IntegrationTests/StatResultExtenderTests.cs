@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 StatisticColumn.P95,
                 StatisticColumn.P95
             };
-            var config = ManualConfig.CreateEmpty().With(CreateJob()).With(logger).With(columns);
+            var config = ManualConfig.CreateEmpty().AddJob(CreateJob()).AddLogger(logger).AddColumn(columns);
             var summary = CanExecute<Benchmarks>(config);
 
             var table = summary.Table;

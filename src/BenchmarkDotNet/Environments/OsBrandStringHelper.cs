@@ -10,6 +10,7 @@ namespace BenchmarkDotNet.Environments
     public class OsBrandStringHelper
     {
         // See https://en.wikipedia.org/wiki/Ver_(command)
+        // See https://docs.microsoft.com/en-us/windows/release-information/
         private static readonly Dictionary<string, string> WindowsBrandVersions = new Dictionary<string, string>
         {
             { "1.04", "1.0" },
@@ -92,7 +93,8 @@ namespace BenchmarkDotNet.Environments
             { "10.0.15063", "10 Redstone 2 [1703, Creators Update]" },
             { "10.0.16299", "10 Redstone 3 [1709, Fall Creators Update]" },
             { "10.0.17134", "10 Redstone 4 [1803, April 2018 Update]" },
-            { "10.0.17763", "10 Redstone 5 [1809, October 2018 Update]" }
+            { "10.0.17763", "10 Redstone 5 [1809, October 2018 Update]" },
+            { "10.0.18362", "10 19H1 [1903, May 2019 Update]" }
         };
 
         private class Windows10Version

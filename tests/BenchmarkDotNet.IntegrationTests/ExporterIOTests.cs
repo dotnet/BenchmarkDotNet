@@ -5,6 +5,7 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -100,7 +101,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
-            var joinConfig = ManualConfig.CreateEmpty().With(ConfigOptions.JoinSummary);
+            var joinConfig = ManualConfig.CreateEmpty().WithOptions(ConfigOptions.JoinSummary);
             var mockSummary = GetMockSummary(resultsDirectoryPath, joinConfig, typeof(ClassA), typeof(ClassB));
             var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, mockSummary.Title)}-report.txt";
             string actualFilePath = null;
@@ -127,6 +128,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 resultsDirectoryPath: resultsDirectoryPath,
                 logFilePath: string.Empty,
                 totalTime: System.TimeSpan.Zero,
+                cultureInfo: TestCultureInfo.Instance,
                 validationErrors: ImmutableArray<ValidationError>.Empty
             );
         }

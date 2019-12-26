@@ -28,11 +28,12 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                Add(JsonExporter.Brief);
-                Add(JsonExporter.Full);
-                Add(JsonExporter.BriefCompressed);
-                Add(JsonExporter.FullCompressed);
-                Add(JsonExporter.Custom("-custom", indentJson: true, excludeMeasurements: true));
+                AddExporter(JsonExporter.Brief);
+                AddExporter(JsonExporter.Brief);
+                AddExporter(JsonExporter.Full);
+                AddExporter(JsonExporter.BriefCompressed);
+                AddExporter(JsonExporter.FullCompressed);
+                AddExporter(JsonExporter.Custom("-custom", indentJson: true, excludeMeasurements: true));
             }
         }
 

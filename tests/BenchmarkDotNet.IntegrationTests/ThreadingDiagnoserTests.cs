@@ -129,12 +129,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private IConfig CreateConfig(IToolchain toolchain)
             => ManualConfig.CreateEmpty()
-                .With(Job.ShortRun
+                .AddJob(Job.ShortRun
                     .WithEvaluateOverhead(false) // no need to run idle for this test
                     .WithWarmupCount(0) // don't run warmup to save some time for our CI runs
                     .WithIterationCount(1) // single iteration is enough for us
                     .WithGcForce(false)
-                    .With(toolchain))
+                    .WithToolchain(toolchain))
                 .With(DefaultColumnProviders.Instance)
                 .With(ThreadingDiagnoser.Default)
                 .With(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread

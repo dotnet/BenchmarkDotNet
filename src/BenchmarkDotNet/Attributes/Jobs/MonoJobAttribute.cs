@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
     public class MonoJobAttribute : JobConfigBaseAttribute
     {
-        public MonoJobAttribute(bool baseline = false) : base(Job.Default.With(MonoRuntime.Default).WithBaseline(baseline))
+        public MonoJobAttribute(bool baseline = false) : base(Job.Default.WithRuntime(MonoRuntime.Default).WithBaseline(baseline))
         {
         }
 

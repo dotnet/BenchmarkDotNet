@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Exporters.Csv
 {
@@ -17,7 +18,7 @@ namespace BenchmarkDotNet.Exporters.Csv
                 case CsvSeparator.Semicolon:
                     return ";";
                 case CsvSeparator.CurrentCulture:
-                    return CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+                    return CultureInfo.CurrentCulture.GetActualListSeparator();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(separator));
             }

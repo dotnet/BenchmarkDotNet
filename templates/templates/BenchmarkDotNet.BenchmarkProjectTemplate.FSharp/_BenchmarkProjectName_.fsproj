@@ -18,14 +18,14 @@
     <Tailcalls>true</Tailcalls>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
-    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.11.5" Condition="'$(OS)' == 'Windows_NT'"/>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="$(BenchmarkName).fs" />
+    <PackageReference Include="BenchmarkDotNet" Version="$(BenchmarkDotNetVersion)" />
+    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="$(BenchmarkDotNetVersion)" Condition="'$(OS)' == 'Windows_NT'"/>
   </ItemGroup>
   <ItemGroup Condition="'$(config)' == true">
     <Compile Include="BenchmarkConfig.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(BenchmarkName).fs" />
   </ItemGroup>
   <ItemGroup Condition="'$(consoleApp)' == true">
     <Compile Include="Program.fs" />

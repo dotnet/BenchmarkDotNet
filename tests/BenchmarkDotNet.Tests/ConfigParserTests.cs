@@ -396,7 +396,7 @@ namespace BenchmarkDotNet.Tests
         public void UserCanSpecifyCustomDefaultJobAndOverwriteItsSettingsViaConsoleArgs()
         {
             var globalConfig = DefaultConfig.Instance
-                .With(Job.Default
+                .AddJob(Job.Default
                     .WithWarmupCount(1)
                     .AsDefault());
 
@@ -418,6 +418,27 @@ namespace BenchmarkDotNet.Tests
             var parsedConfig = ConfigParser.Parse(new[] { "--maxWidth", customValue.ToString() }, new OutputLogger(Output), globalConfig).config;
 
             Assert.Equal(customValue, parsedConfig.SummaryStyle.MaxParameterColumnWidth);
+        }
+
+        [Fact]
+        public void UserCanSpecifyEnvironmentVariables()
+        {
+            const string key = "A_VERY_NICE_ENV_VAR";
+            const string value = "enabled";
+
+            var parsedConfig = ConfigParser.Parse(new[] { "--envVars", $"{key}:{value}" }, new OutputLogger(Output)).config;
+
+            var job = parsedConfig.GetJobs().Single();
+            var envVar = job.Environment.EnvironmentVariables.Single();
+
+            Assert.Equal(key, envVar.Key);
+            Assert.Equal(value, envVar.Value);
+        }
+
+        [Fact]
+        public void InvalidEnvVarAreRecognized()
+        {
+            Assert.False(ConfigParser.Parse(new[] { "--envVars", "INVALID_NO_SEPARATOR" }, new OutputLogger(Output)).isSuccess);
         }
     }
 }

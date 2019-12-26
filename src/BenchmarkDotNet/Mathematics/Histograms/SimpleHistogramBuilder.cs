@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Mathematics.Histograms
@@ -18,14 +19,14 @@ namespace BenchmarkDotNet.Mathematics.Histograms
         [PublicAPI, Pure]
         public Histogram BuildWithFixedBinSize(IEnumerable<double> values, double binSize)
         {
-                if (binSize < 1e-9)
-                    throw new ArgumentException($"binSize ({binSize.ToStr()}) should be a positive number", nameof(binSize));
+            if (binSize < 1e-9)
+                throw new ArgumentException($"binSize ({binSize.ToString("0.##", DefaultCultureInfo.Instance)}) should be a positive number", nameof(binSize));
 
-                var list = values.ToList();
-                if (list.IsEmpty())
-                    throw new ArgumentException("Values should be non-empty", nameof(values));
+            var list = values.ToList();
+            if (list.IsEmpty())
+                throw new ArgumentException("Values should be non-empty", nameof(values));
 
-                list.Sort();
+            list.Sort();
 
             int firstBin = GetBinIndex(list.First(), binSize);
             int lastBin = GetBinIndex(list.Last(), binSize);
