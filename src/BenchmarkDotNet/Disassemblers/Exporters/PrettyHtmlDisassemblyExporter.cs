@@ -1,21 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
-namespace BenchmarkDotNet.Exporters
+namespace BenchmarkDotNet.Disassemblers.Exporters
 {
-    public class PrettyHtmlDisassemblyExporter : ExporterBase
+    internal class PrettyHtmlDisassemblyExporter : ExporterBase
     {
         private static readonly Lazy<string> HighlightingLabelsScript = new Lazy<string>(() => ResourceHelper.LoadTemplate("highlightingLabelsScript.js"));
 
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
-        public PrettyHtmlDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
+        internal PrettyHtmlDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
 
         protected override string FileExtension => "html";
         protected override string FileCaption => "asm.pretty";

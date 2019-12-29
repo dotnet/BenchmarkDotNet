@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -15,7 +16,7 @@ using BenchmarkDotNet.Properties;
 using JetBrains.Annotations;
 using RuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;
 
-namespace BenchmarkDotNet.Diagnosers
+namespace BenchmarkDotNet.Disassemblers
 {
     [PublicAPI]
     public class WindowsDisassembler

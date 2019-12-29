@@ -11,7 +11,7 @@ using System.Xml.Serialization;
 using Iced.Intel;
 using Decoder = Iced.Intel.Decoder;
 
-namespace BenchmarkDotNet.Disassembler
+namespace BenchmarkDotNet.Disassemblers
 {
     internal static class Program
     {

@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
-namespace BenchmarkDotNet.Exporters
+namespace BenchmarkDotNet.Disassemblers.Exporters
 {
-    public class CombinedDisassemblyExporter : ExporterBase
+    internal class CombinedDisassemblyExporter : ExporterBase
     {
         internal const string CssDefinition = @"
 <style type=""text/css"">
@@ -20,10 +20,7 @@ namespace BenchmarkDotNet.Exporters
 
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
-        public CombinedDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results)
-        {
-            this.results = results;
-        }
+        internal CombinedDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
 
         protected override string FileExtension => "html";
         protected override string FileCaption => "disassembly-report";

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -19,9 +20,9 @@ namespace BenchmarkDotNet.Exporters
 </style>";
 
         private readonly IHardwareCountersDiagnoser hardwareCountersDiagnoser;
-        private readonly IDisassemblyDiagnoser disassemblyDiagnoser;
+        private readonly DisassemblyDiagnoser disassemblyDiagnoser;
 
-        internal InstructionPointerExporter(IHardwareCountersDiagnoser hardwareCountersDiagnoser, IDisassemblyDiagnoser disassemblyDiagnoser)
+        internal InstructionPointerExporter(IHardwareCountersDiagnoser hardwareCountersDiagnoser, DisassemblyDiagnoser disassemblyDiagnoser)
         {
             this.hardwareCountersDiagnoser = hardwareCountersDiagnoser;
             this.disassemblyDiagnoser = disassemblyDiagnoser;
@@ -112,7 +113,7 @@ namespace BenchmarkDotNet.Exporters
 
                 foreach (var map in method.Maps)
                 {
-                    var codeWithCounters = new List<CodeWithCounters>(map.Instructions.Length);
+                    var codeWithCounters = new List<CodeWithCounters>(map.Instructions.Count);
 
                     foreach (var instruction in map.Instructions)
                     {
@@ -250,7 +251,7 @@ namespace BenchmarkDotNet.Exporters
 
         private class CodeWithCounters
         {
-            internal Diagnosers.Code Code { get; set; }
+            internal Disassemblers.Code Code { get; set; }
             internal IReadOnlyDictionary<HardwareCounter, ulong> SumPerCounter { get; set; }
         }
 

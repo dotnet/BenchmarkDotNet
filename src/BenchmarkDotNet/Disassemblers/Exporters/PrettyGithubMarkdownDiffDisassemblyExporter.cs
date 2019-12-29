@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
-namespace BenchmarkDotNet.Exporters
+namespace BenchmarkDotNet.Disassemblers.Exporters
 {
-    public class PrettyGithubMarkdownDiffDisassemblyExporter : ExporterBase
+    internal class PrettyGithubMarkdownDiffDisassemblyExporter : ExporterBase
     {
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
         protected override string FileExtension => "md";
         protected override string FileCaption => "asm.pretty.diff";
 
-        public PrettyGithubMarkdownDiffDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
+        internal PrettyGithubMarkdownDiffDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {

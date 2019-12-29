@@ -1,18 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
-namespace BenchmarkDotNet.Exporters
+namespace BenchmarkDotNet.Disassemblers.Exporters
 {
-    public class RawDisassemblyExporter : ExporterBase
+    internal class RawDisassemblyExporter : ExporterBase
     {
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
-        public RawDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
+        internal RawDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
 
         protected override string FileExtension => "html";
         protected override string FileCaption => "asm.raw";

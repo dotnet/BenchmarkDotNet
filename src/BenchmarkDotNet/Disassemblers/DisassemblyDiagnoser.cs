@@ -2,6 +2,8 @@
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Disassemblers;
+using BenchmarkDotNet.Disassemblers.Exporters;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -15,7 +17,7 @@ using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnosers
 {
-    public class DisassemblyDiagnoser : IDisassemblyDiagnoser
+    public class DisassemblyDiagnoser : IDiagnoser
     {
         public DisassemblyDiagnoserConfig Config { get; }
 
@@ -35,11 +37,8 @@ namespace BenchmarkDotNet.Diagnosers
             Exporters = GetExporters(results, config);
         }
 
-        public static IConfigurableDiagnoser<DisassemblyDiagnoserConfig> Create(DisassemblyDiagnoserConfig config)
+        public static DisassemblyDiagnoser Create(DisassemblyDiagnoserConfig config)
             => new DisassemblyDiagnoser(new WindowsDisassembler(config), new LinuxDisassembler(config), new MonoDisassembler(config), config);
-
-        public IConfigurableDiagnoser<DisassemblyDiagnoserConfig> Configure(DisassemblyDiagnoserConfig config)
-            => Create(config);
 
         public IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> Results => results;
 

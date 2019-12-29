@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Single(final.GetDiagnosers().OfType<IHardwareCountersDiagnoser>());
         }
 
-        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers and disassembler only for Windows. This test is disabled for .NET Core because CoreRT compiler goes crazy when some dependency has reference to TraceEvent...")]
+        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because CoreRT compiler goes crazy when some dependency has reference to TraceEvent...")]
         public void WhenUserDefinesHardwareCountersAndUsesDisassemblyDiagnoserWeAddInstructionPointerExporter()
         {
             var mutable = ManualConfig.CreateEmpty();
@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Tests.Configs
             var final = ImmutableConfigBuilder.Create(mutable);
 
             Assert.Single(final.GetDiagnosers().OfType<IHardwareCountersDiagnoser>());
-            Assert.Single(final.GetDiagnosers().OfType<IDisassemblyDiagnoser>());
+            Assert.Single(final.GetDiagnosers().OfType<DisassemblyDiagnoser>());
             Assert.Single(final.GetExporters().OfType<InstructionPointerExporter>());
         }
 

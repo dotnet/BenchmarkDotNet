@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 
 #pragma warning disable CS3003 // I need ulong
-namespace BenchmarkDotNet.Disassembler
+namespace BenchmarkDotNet.Disassemblers
 {
     public class Code
     {
         /// <summary>
-        /// The native start offset of this ASM representation
+        /// The native start offset
         /// </summary>
         public ulong StartAddress { get; set; }
 

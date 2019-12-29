@@ -6,6 +6,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Xunit;
@@ -75,7 +76,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, Runtime runtime)
         {
-            var disassemblyDiagnoser = (IDisassemblyDiagnoser)DisassemblyDiagnoser.Create(
+            var disassemblyDiagnoser = DisassemblyDiagnoser.Create(
                 new DisassemblyDiagnoserConfig(printAsm: true, printSource: true, recursiveDepth: 3));
 
             CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.ColdStart));
@@ -98,7 +99,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleGenericTypes(Jit jit, Platform platform, Runtime runtime)
         {
-            var disassemblyDiagnoser = (IDisassemblyDiagnoser)DisassemblyDiagnoser.Create(
+            var disassemblyDiagnoser = DisassemblyDiagnoser.Create(
                 new DisassemblyDiagnoserConfig(printAsm: true, printSource: true, recursiveDepth: 3));
 
             CanExecute<Generic<int>>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.Monitoring));
@@ -118,7 +119,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleInlinableBenchmarks(Jit jit, Platform platform, Runtime runtime)
         {
-            var disassemblyDiagnoser = (IDisassemblyDiagnoser)DisassemblyDiagnoser.Create(
+            var disassemblyDiagnoser = DisassemblyDiagnoser.Create(
                 new DisassemblyDiagnoserConfig(printAsm: true, printSource: true, recursiveDepth: 3));
 
             CanExecute<WithInlineable>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.Monitoring));
@@ -139,7 +140,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddDiagnoser(disassemblyDiagnoser)
                 .AddLogger(new OutputLogger(Output));
 
-        private void AssertDisassembled(IDisassemblyDiagnoser diagnoser, string methodSignature)
+        private void AssertDisassembled(DisassemblyDiagnoser diagnoser, string methodSignature)
         {
             Assert.True(diagnoser.Results.Single().Value
                 .Methods.Any(method => method.Name.EndsWith(methodSignature) && method.Maps.Any(map => map.Instructions.Any())),
