@@ -103,6 +103,16 @@ namespace BenchmarkDotNet.Diagnosers
                 {
                     yield return new ValidationError(true, "InProcessToolchain has no DisassemblyDiagnoser support", benchmark);
                 }
+
+                if (ShouldUseLinuxDisassembler(benchmark))
+                {
+                    var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance);
+
+                    if (runtime.RuntimeMoniker < RuntimeMoniker.NetCoreApp30)
+                    {
+                        yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} supports only .NET Core 3.0+", benchmark);
+                    }
+                }
             }
         }
 
