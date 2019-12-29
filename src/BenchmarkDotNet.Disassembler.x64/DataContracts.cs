@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-#pragma warning disable CS3003 // I need ulong
+#pragma warning disable CS3001 // Argument type 'ulong' is not CLS-compliant
+#pragma warning disable CS3003 // Type is not CLS-compliant
+#pragma warning disable CS1591 // XML comments for public types...
 namespace BenchmarkDotNet.Disassemblers
 {
     public class Code
@@ -82,4 +84,6 @@ namespace BenchmarkDotNet.Disassemblers
         public const string DisassemblerEntryMethodName = "__ForDisassemblyDiagnoser__";
     }
 }
+#pragma warning restore CS1591 // XML comments for public types...
 #pragma warning restore CS3003 // Type is not CLS-compliant
+#pragma warning restore CS3001 // Argument type 'ulong' is not CLS-compliant
