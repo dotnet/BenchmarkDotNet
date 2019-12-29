@@ -135,7 +135,7 @@ namespace BenchmarkDotNet.Disassembler
             var method = methodInfo.Method;
 
             if (method.CompilationType == MethodCompilationType.None)
-                return CreateEmpty(method, "Native method");
+                return CreateEmpty(method, "Extern method");
 
             if (method.NativeCode == ulong.MaxValue)
                 if (method.IsAbstract) return CreateEmpty(method, "Abstract method");
@@ -177,7 +177,7 @@ namespace BenchmarkDotNet.Disassembler
             // it's better to use one single map rather than few small ones
             // it's simply easier to get next instruction when decoding ;)
             var hotColdInfo = method.HotColdInfo;
-            if (!(hotColdInfo is null && hotColdInfo.HotSize > 0 && hotColdInfo.HotStart > 0))
+            if (!(hotColdInfo is null) && hotColdInfo.HotSize > 0 && hotColdInfo.HotStart > 0)
             {
                 return hotColdInfo.ColdSize <= 0
                     ? new[] { new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 } }
