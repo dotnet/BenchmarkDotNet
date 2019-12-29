@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -63,7 +62,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
 
                         if (!string.IsNullOrEmpty(instruction.Comment) && methodNameToNativeCode.TryGetValue(instruction.Comment, out ulong id))
                         {
-                            logger.WriteLine($"<td><a href=\"#{id}\">{GetShortName(instruction.Comment)}</a></td>");
+                            logger.WriteLine($"<td><a href=\"#{id}\">{instruction.Comment}</a></td>");
                         }
                         else
                         {
@@ -97,37 +96,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             logger.WriteLine("</tbody></table>");
         }
 
-        private static string GetShortName(string fullMethodSignature)
-        {
-            int bracketIndex = fullMethodSignature.IndexOf('(');
-            string withoutArguments = fullMethodSignature.Remove(bracketIndex);
-            int methodNameIndex = withoutArguments.LastIndexOf('.') + 1;
-
-            return withoutArguments.Substring(methodNameIndex);
-        }
-
-        // we want to get sth like "00007ffb`a90f4560"
-        internal static string FormatMethodAddress(ulong nativeCode)
-        {
-            if(nativeCode == default)
-                return string.Empty;
-
-            var buffer = new StringBuilder(nativeCode.ToString("x"));
-
-            if (buffer.Length > 8) // 64 bit address
-            {
-                buffer.Insert(buffer.Length - 8, '`');
-
-                while (buffer.Length < 8 + 1 + 8)
-                    buffer.Insert(0, '0');
-            }
-            else // 32 bit
-            {
-                while (buffer.Length < 8)
-                    buffer.Insert(0, '0');
-            }
-
-            return buffer.ToString();
-        }
+        // we want to get sth like "00007FFC78921AB0"
+        internal static string FormatMethodAddress(ulong nativeCode) => nativeCode == default ? string.Empty : nativeCode.ToString("X16");
     }
 }

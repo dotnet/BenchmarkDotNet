@@ -80,9 +80,9 @@ namespace BenchmarkDotNet.Disassemblers
 
                 ConfigureSymbols(dataTarget);
 
-                var formatter = new NasmFormatter();
-                formatter.Options.DigitSeparator = "`";
+                var formatter = new MasmFormatter();
                 formatter.Options.FirstOperandCharIndex = 10;
+                formatter.Options.HexSuffix = default;
 
                 var state = new State(runtime, formatter);
 

@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                         targetingSameMethod.ToArray(),
                         logger,
                         targetingSameMethod.First().Descriptor.DisplayInfo,
-                        benchmark => GetImportantInfo(summary[benchmark]));
+                        benchmark => summary[benchmark].GetRuntimeInfo());
                 }
             }
             else // different methods, same JIT
@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                     summary.BenchmarksCases.Where(benchmark => results.ContainsKey(benchmark)).ToArray(),
                     logger,
                     summary.Title,
-                    benchmark => $"{benchmark.Descriptor.WorkloadMethod.Name} {GetImportantInfo(summary[benchmark])}");
+                    benchmark => $"{benchmark.Descriptor.WorkloadMethod.Name} {summary[benchmark].GetRuntimeInfo()}");
             }
 
             logger.WriteLine("</body>");
@@ -112,7 +112,5 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             logger.WriteLine("</tbody>");
             logger.WriteLine("</table>");
         }
-
-        private static string GetImportantInfo(BenchmarkReport benchmarkReport) => benchmarkReport.GetRuntimeInfo();
     }
 }
