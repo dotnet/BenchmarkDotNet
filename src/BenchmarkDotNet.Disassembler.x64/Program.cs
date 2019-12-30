@@ -304,6 +304,12 @@ namespace BenchmarkDotNet.Disassemblers
             }
 
             var method = runtime.GetMethodByAddress(address);
+            if (method is null && (address & ((uint)runtime.PointerSize - 1)) == 0)
+            {
+                if (runtime.ReadPointer(address, out ulong newAddress) && newAddress > ushort.MaxValue)
+                    method = runtime.GetMethodByAddress(newAddress);
+            }
+
             if (method is null)
                 return;
 
