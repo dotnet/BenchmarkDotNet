@@ -14,8 +14,9 @@
     <RootNamespace>BenchmarkDotNet.Disassembler</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\ClrSourceExtensions.cs" Link="ClrSourceExtensions.cs" />
     <Compile Include="..\BenchmarkDotNet.Disassembler.x64\DataContracts.cs" Link="DataContracts.cs" />
+    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\ClrMdDisassembler.cs" Link="ClrMdDisassembler.cs" />
+    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\SourceCodeProvider.cs" Link="SourceCodeProvider.cs" />
     <Compile Include="..\BenchmarkDotNet.Disassembler.x64\Program.cs" Link="Program.cs" />
   </ItemGroup>
   <ItemGroup>

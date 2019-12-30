@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 // this method should return a IHardwareCountersDiagnoser when we implement Hardware Counters for Unix
                 MemoryDiagnoser.Default,
-                DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig())
+                new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig())
             };
 
         private static IDiagnoser[] LoadClassic()
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Diagnosers
                     return new[]
                     {
                         MemoryDiagnoser.Default,
-                        DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()),
+                        new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig()),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.PmcDiagnoser"),
                         CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.EtwProfiler"),
@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Diagnosers
             return new IDiagnoser[]
             {
                 MemoryDiagnoser.Default,
-                DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig())
+                new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig())
             };
         }
 

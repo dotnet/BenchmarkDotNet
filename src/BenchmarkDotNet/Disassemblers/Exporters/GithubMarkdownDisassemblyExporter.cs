@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -7,14 +8,19 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Disassemblers.Exporters
 {
-    internal class PrettyGithubMarkdownDisassemblyExporter : ExporterBase
+    internal class GithubMarkdownDisassemblyExporter : ExporterBase
     {
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
+        private readonly DisassemblyDiagnoserConfig config;
 
-        internal PrettyGithubMarkdownDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
+        internal GithubMarkdownDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results, DisassemblyDiagnoserConfig config)
+        {
+            this.results = results;
+            this.config = config;
+        }
 
         protected override string FileExtension => "md";
-        protected override string FileCaption => "asm.pretty";
+        protected override string FileCaption => "asm";
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
@@ -25,7 +31,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             }
         }
 
-        internal static void Export(ILogger logger, DisassemblyResult disassemblyResult, bool quotingCode = true)
+        internal void Export(ILogger logger, DisassemblyResult disassemblyResult, bool quotingCode = true)
         {
             int methodIndex = 0;
             foreach (var method in disassemblyResult.Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
@@ -37,24 +43,28 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
 
                 logger.WriteLine($"; {method.Name}");
 
-                var pretty = DisassemblyPrettifier.Prettify(method, $"M{methodIndex++:00}");
+                var pretty = DisassemblyPrettifier.Prettify(method, disassemblyResult, config, $"M{methodIndex++:00}");
 
-                uint totalSizeInBytes = 0;
+                ulong totalSizeInBytes = 0;
                 foreach (var element in pretty)
                 {
                     if (element is DisassemblyPrettifier.Label label)
                     {
                         logger.WriteLine($"{label.TextRepresentation}:");
-
-                        continue;
                     }
-                    if (element.Source is Asm asm)
+                    else if (element.Source is Sharp sharp)
                     {
-                        totalSizeInBytes += asm.SizeInBytes;
+                        logger.WriteLine($"; {sharp.Text.Replace("\n", "\n; ")}"); // they are multiline and we need to add ; for each line
                     }
+                    else if (element.Source is Asm asm)
+                    {
+                        checked
+                        {
+                            totalSizeInBytes += (uint)asm.Instruction.ByteLength;
+                        }
 
-                    string prefix = "       ";
-                    logger.WriteLine($"{prefix}{element.TextRepresentation.Replace("\n", "\n" + prefix)}");
+                        logger.WriteLine($"       {element.TextRepresentation}");
+                    }
                 }
 
                 logger.WriteLine($"; Total bytes of code {totalSizeInBytes}");

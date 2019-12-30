@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
@@ -14,11 +15,16 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
     internal class PrettyGithubMarkdownDiffDisassemblyExporter : ExporterBase
     {
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
+        private readonly DisassemblyDiagnoserConfig config;
 
         protected override string FileExtension => "md";
         protected override string FileCaption => "asm.pretty.diff";
 
-        internal PrettyGithubMarkdownDiffDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
+        internal PrettyGithubMarkdownDiffDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results, DisassemblyDiagnoserConfig config)
+        {
+            this.results = results;
+            this.config = config;
+        }
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
@@ -77,7 +83,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             {
                 using (var streamLogger = new StreamLogger(stream))
                 {
-                    PrettyGithubMarkdownDisassemblyExporter.Export(streamLogger, disassemblyResult, quotingCode: false);
+                    //PrettyGithubMarkdownDisassemblyExporter.Export(streamLogger, disassemblyResult, quotingCode: false);
                 }
             }
 

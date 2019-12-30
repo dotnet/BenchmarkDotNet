@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Samples
                 // RyuJit for .NET Core 2.1
                 AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core21));
 
-                AddDiagnoser(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, recursiveDepth: 3, printDiff: true)));
+                AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(printAsm: true, recursiveDepth: 3, printDiff: true)));
             }
         }
 

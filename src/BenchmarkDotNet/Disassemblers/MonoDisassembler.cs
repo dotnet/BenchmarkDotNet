@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Disassemblers
         {
             internal static DisassemblyResult Parse([ItemCanBeNull] IReadOnlyList<string> input, string methodName, string commandLine)
             {
-                var instructions = new List<Code>();
+                var instructions = new List<SourceCode>();
 
                 const string windowsHeader = "Disassembly of section .text:";
                 const string macOSXHeader = "(__TEXT,__text) section";
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Disassemblers
                         new DisassembledMethod
                         {
                             Name = methodName,
-                            Maps = new[] { new Map { Instructions = instructions } },
+                            Maps = new[] { new Map { SourceCodes = instructions } },
                             CommandLine = commandLine
                         }
                     }
@@ -113,9 +113,9 @@ namespace BenchmarkDotNet.Disassemblers
                             Name = methodName,
                             Maps = new[] { new Map
                             {
-                                Instructions = input
+                                SourceCodes = input
                                     .Where(line => !string.IsNullOrWhiteSpace(line))
-                                    .Select(line => new Code { TextRepresentation = line })
+                                    .Select(line => new SourceCode { TextRepresentation = line })
                                     .ToList()
                             } },
                             CommandLine = commandLine
@@ -129,14 +129,14 @@ namespace BenchmarkDotNet.Disassemblers
             //line example 2: 0000000000000000	subq	$0x28, %rsp
             private static readonly Regex InstructionRegex = new Regex(@"\s*(?<address>[0-9a-f]+)(\:\s+([0-9a-f]{2}\s+)+)?\s+(?<instruction>.*)\s*", RegexOptions.Compiled);
 
-            private static bool TryParseInstruction(string line, out Code instruction)
+            private static bool TryParseInstruction(string line, out SourceCode instruction)
             {
                 instruction = null;
                 var match = InstructionRegex.Match(line);
                 if (!match.Success)
                     return false;
 
-                instruction = new Code { TextRepresentation = match.Groups["instruction"].ToString() };
+                instruction = new SourceCode { TextRepresentation = match.Groups["instruction"].ToString() };
                 return true;
             }
         }

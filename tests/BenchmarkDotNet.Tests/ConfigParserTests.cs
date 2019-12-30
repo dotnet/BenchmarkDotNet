@@ -380,7 +380,7 @@ namespace BenchmarkDotNet.Tests
 
             var diagnoser = config.GetDiagnosers().OfType<DisassemblyDiagnoser>().Single();
 
-            Assert.Equal(depth, diagnoser.Config.RecursiveDepth);
+            Assert.Equal(depth, diagnoser.Config.MaxDepth);
         }
 
         [Fact]

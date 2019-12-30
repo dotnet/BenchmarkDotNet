@@ -1,5 +1,4 @@
-﻿using Iced.Intel;
-using System;
+﻿using BenchmarkDotNet.Diagnosers;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -11,9 +10,9 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         internal class Element
         {
             internal string TextRepresentation { get; }
-            internal Code Source { get; }
+            internal SourceCode Source { get; }
 
-            public Element(string textRepresentation, Code source)
+            public Element(string textRepresentation, SourceCode source)
             {
                 TextRepresentation = textRepresentation;
                 Source = source;
@@ -24,67 +23,71 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         {
             internal string Id { get; }
 
-            public Reference(string textRepresentation, string id, Code source) : base(textRepresentation, source) => Id = id;
+            public Reference(string textRepresentation, string id, SourceCode source) : base(textRepresentation, source) => Id = id;
         }
 
         internal class Label : Element
         {
             internal string Id { get; }
 
-            public Label(string textRepresentation, string id) : base(textRepresentation, null) => Id = id;
+            public Label(string label) : base(label, null) => Id = label;
         }
 
-        internal static IReadOnlyList<Element> Prettify(DisassembledMethod method, string labelPrefix)
+        internal static IReadOnlyList<Element> Prettify(DisassembledMethod method, DisassemblyResult disassemblyResult, DisassemblyDiagnoserConfig config, string labelPrefix)
         {
-            var asmInstructions = method.Maps.SelectMany(map => map.Instructions.OfType<Asm>()).ToArray();
-            var jumpAndCallAddresses = asmInstructions
-                .Where(asm => AsmProvider.TryGetAddress(asm.Instruction, method.PointerSize, out _))
-                .Select(asm => AsmProvider.TryGetAddress(asm.Instruction, method.PointerSize, out ulong address) ? address : default)
-                .Distinct()
-                .ToImmutableHashSet();
+            var asmInstructions = method.Maps.SelectMany(map => map.SourceCodes.OfType<Asm>()).ToArray();
 
+            // first of all, we search of referenced addresses (jump|calls)
+            var referencedAddresses = new HashSet<ulong>();
+            foreach (var asm in asmInstructions)
+                if (ClrMdDisassembler.TryGetReferencedAddress(asm.Instruction, disassemblyResult.PointerSize, out ulong referencedAddress))
+                    referencedAddresses.Add(referencedAddress);
+
+            // for every IP that is referenced, we emit a uinque label
             var addressesToLabels = new Dictionary<ulong, string>();
             int currentLabelIndex = 0;
             foreach (var instruction in asmInstructions)
-                if (jumpAndCallAddresses.Contains(instruction.StartAddress) && !addressesToLabels.ContainsKey(instruction.StartAddress))
-                    addressesToLabels.Add(instruction.StartAddress, $"{labelPrefix}_L{currentLabelIndex++:00}");
+                if (referencedAddresses.Contains(instruction.InstructionPointer) && !addressesToLabels.ContainsKey(instruction.InstructionPointer))
+                    addressesToLabels.Add(instruction.InstructionPointer, $"{labelPrefix}_L{currentLabelIndex++:00}");
 
             var prettified = new List<Element>();
-            var formatter = ClrMdDisassembler.CreateFormatter();
-            var formatterOutput = new StringBuilderFormatterOutput();
             foreach (var map in method.Maps)
-                foreach (var instruction in map.Instructions)
+                foreach (var instruction in map.SourceCodes)
                 {
+                    if (instruction is Sharp sharp)
+                    {
+                        prettified.Add(new Element(sharp.Text, sharp));
+                        continue;
+                    }
                     if (!(instruction is Asm asm))
                     {
-                        prettified.Add(new Element(instruction.TextRepresentation, instruction));
                         continue;
                     }
 
-                    if (addressesToLabels.TryGetValue(instruction.StartAddress, out string label))
+                    // this IP is referenced by some jump|call, so we add a label
+                    if (addressesToLabels.TryGetValue(asm.InstructionPointer, out string label))
                     {
-                        prettified.Add(new Label(label, label));
+                        prettified.Add(new Label(label));
                     }
 
-                    if (AsmProvider.TryGetAddress(asm.Instruction, method.PointerSize, out ulong jumpAddress))
+                    if (ClrMdDisassembler.TryGetReferencedAddress(asm.Instruction, disassemblyResult.PointerSize, out ulong referencedAddress))
                     {
-                        if (addressesToLabels.TryGetValue(jumpAddress, out string translated)) // jump or a call within same method
+                        // jump or a call within same method
+                        if (addressesToLabels.TryGetValue(referencedAddress, out string translated))
                         {
-                            formatter.FormatMnemonic(asm.Instruction, formatterOutput);
-                            prettified.Add(new Reference($"{formatterOutput.ToStringAndReset().PadRight(ClrMdDisassembler.FirstOperandCharIndex - 1)} {translated}", translated, asm));
+                            prettified.Add(new Reference(InstructionFormatter.Format(asm.Instruction, config, disassemblyResult.PointerSize, addressesToLabels), translated, asm));
                             continue;
                         }
 
-                        if (!string.IsNullOrEmpty(asm.Comment)) // call (Comment contains method name)
+                        // call to a known method
+                        if (disassemblyResult.AddressToNameMapping.ContainsKey(referencedAddress))
                         {
-                            formatter.FormatMnemonic(asm.Instruction, formatterOutput);
-                            prettified.Add(new Element($"{formatterOutput.ToStringAndReset().PadRight(ClrMdDisassembler.FirstOperandCharIndex - 1)} {asm.Comment}", asm));
+                            prettified.Add(new Element(InstructionFormatter.Format(asm.Instruction, config, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping), asm));
                             continue;
                         }
                     }
 
-                    formatter.Format(asm.Instruction, formatterOutput);
-                    prettified.Add(new Element(formatterOutput.ToStringAndReset(), asm));
+                    prettified.Add(new Element(InstructionFormatter.Format(asm.Instruction, config, disassemblyResult.PointerSize, ImmutableDictionary<ulong, string>.Empty), asm));
                 }
 
             return prettified;

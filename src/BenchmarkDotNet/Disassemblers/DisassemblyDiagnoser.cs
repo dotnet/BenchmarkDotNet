@@ -19,26 +19,23 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class DisassemblyDiagnoser : IDiagnoser
     {
-        public DisassemblyDiagnoserConfig Config { get; }
-
         private readonly WindowsDisassembler windowsDisassembler;
         private readonly LinuxDisassembler linuxDisassembler;
         private readonly MonoDisassembler monoDisassembler;
         private readonly Dictionary<BenchmarkCase, DisassemblyResult> results;
 
-        private DisassemblyDiagnoser(WindowsDisassembler windowsDisassembler, LinuxDisassembler linuxDisassembler, MonoDisassembler monoDisassembler, DisassemblyDiagnoserConfig config)
+        public DisassemblyDiagnoser(DisassemblyDiagnoserConfig config)
         {
             Config = config;
-            this.windowsDisassembler = windowsDisassembler;
-            this.linuxDisassembler = linuxDisassembler;
-            this.monoDisassembler = monoDisassembler;
+            windowsDisassembler = new WindowsDisassembler(config);
+            linuxDisassembler = new LinuxDisassembler(config);
+            monoDisassembler = new MonoDisassembler(config);
 
             results = new Dictionary<BenchmarkCase, DisassemblyResult>();
             Exporters = GetExporters(results, config);
         }
 
-        public static DisassemblyDiagnoser Create(DisassemblyDiagnoserConfig config)
-            => new DisassemblyDiagnoser(new WindowsDisassembler(config), new LinuxDisassembler(config), new MonoDisassembler(config), config);
+        public DisassemblyDiagnoserConfig Config { get; }
 
         public IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> Results => results;
 
@@ -46,7 +43,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<IExporter> Exporters { get; }
 
-        public IEnumerable<IAnalyser> Analysers => new IAnalyser[] { new DisassemblyAnalyzer(Results) };
+        public IEnumerable<IAnalyser> Analysers => new IAnalyser[] { new DisassemblyAnalyzer(results) };
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults diagnoserResults)
         {
@@ -127,19 +124,26 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static IEnumerable<IExporter> GetExporters(Dictionary<BenchmarkCase, DisassemblyResult> results, DisassemblyDiagnoserConfig config)
         {
-            yield return new CombinedDisassemblyExporter(results);
-            yield return new RawDisassemblyExporter(results);
-            yield return new PrettyHtmlDisassemblyExporter(results);
-            yield return new PrettyGithubMarkdownDisassemblyExporter(results);
-
-            if (config.PrintDiff)
+            if (config.ExportGithubMarkdown)
             {
-                yield return new PrettyGithubMarkdownDiffDisassemblyExporter(results);
+                yield return new GithubMarkdownDisassemblyExporter(results, config);
+            }
+            if (config.ExportHtml)
+            {
+                yield return new HtmlDisassemblyExporter(results, config);
+            }
+            if (config.ExportCombinedDisassemblyReport)
+            {
+                yield return new CombinedDisassemblyExporter(results, config);
+            }
+            if (config.ExportDiff)
+            {
+                yield return new PrettyGithubMarkdownDiffDisassemblyExporter(results, config);
             }
         }
 
         private static long SumNativeCodeSize(DisassemblyResult disassembly)
-            => disassembly.Methods.Sum(method => method.Maps.Sum(map => map.Instructions.OfType<Asm>().Sum(asm => asm.SizeInBytes)));
+            => disassembly.Methods.Sum(method => method.Maps.Sum(map => map.SourceCodes.OfType<Asm>().Sum(asm => asm.Instruction.ByteLength)));
 
         private class NativeCodeSizeMetricDescriptor : IMetricDescriptor
         {

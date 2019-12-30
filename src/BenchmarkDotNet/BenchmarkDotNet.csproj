@@ -42,8 +42,8 @@
     <ProjectReference Include="..\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\ClrSourceExtensions.cs" Link="Disassemblers\ClrSourceExtensions.cs" />
     <Compile Include="..\BenchmarkDotNet.Disassembler.x64\DataContracts.cs" Link="Disassemblers\DataContracts.cs" />
-    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\Program.cs" Link="Disassemblers\Program.cs" />
+    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\SourceCodeProvider.cs" Link="Disassemblers\SourceCodeProvider.cs" />
+    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\ClrMdDisassembler.cs" Link="Disassemblers\ClrMdDisassembler.cs" />
   </ItemGroup>
 </Project>

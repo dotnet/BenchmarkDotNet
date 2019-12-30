@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -12,15 +13,20 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
     {
         internal const string CssDefinition = @"
 <style type=""text/css"">
-	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
-	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: left; }
-	tr { background-color: #fff; border-top: 1px solid #ccc; }
-	tr:nth-child(even) { background: #f8f8f8; }
+    table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+    td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: left; }
+    tr { background-color: #fff; border-top: 1px solid #ccc; }
+    tr:nth-child(even) { background: #f8f8f8; }
 </style>";
 
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
+        private readonly DisassemblyDiagnoserConfig config;
 
-        internal CombinedDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
+        internal CombinedDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results, DisassemblyDiagnoserConfig config)
+        {
+            this.results = results;
+            this.config = config;
+        }
 
         protected override string FileExtension => "html";
         protected override string FileCaption => "disassembly-report";
@@ -30,7 +36,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             var benchmarksByTarget = summary.BenchmarksCases
                 .Where(benchmark => results.ContainsKey(benchmark))
                 .GroupBy(benchmark => benchmark.Descriptor.WorkloadMethod)
-                .ToList();
+                .ToArray();
 
             logger.WriteLine("<!DOCTYPE html>");
             logger.WriteLine("<html lang='en'>");
@@ -83,14 +89,15 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             logger.WriteLine("<tr>");
             foreach (var benchmark in benchmarksCase)
             {
+                var disassemblyResult = results[benchmark];
                 logger.WriteLine("<td style=\"vertical-align:top;\"><pre><code>");
-                foreach (var method in results[benchmark].Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
+                foreach (var method in disassemblyResult.Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
                 {
                     logger.WriteLine(method.Name);
 
                     foreach (var map in method.Maps)
-                        foreach (var instruction in map.Instructions)
-                            logger.WriteLine(instruction.TextRepresentation);
+                        foreach (var sourceCode in map.SourceCodes)
+                            logger.WriteLine(CodeFormatter.Format(sourceCode, config, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping));
 
                     logger.WriteLine();
                 }
