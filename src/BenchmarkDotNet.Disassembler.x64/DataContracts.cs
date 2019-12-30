@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Iced.Intel;
+using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
@@ -7,6 +8,7 @@ using System.Xml.Serialization;
 #pragma warning disable CS1591 // XML comments for public types...
 namespace BenchmarkDotNet.Disassemblers
 {
+    [XmlType("UniqueTypeName")] // avoid type conflict name with Iced.Code
     public class Code
     {
         /// <summary>
@@ -32,6 +34,8 @@ namespace BenchmarkDotNet.Disassemblers
         public ulong EndAddress { get; set; }
         
         public uint SizeInBytes { get; set; }
+
+        public Instruction Instruction { get; set; }
     }
 
     public class Map
@@ -54,6 +58,8 @@ namespace BenchmarkDotNet.Disassemblers
         public Map[] Maps { get; set; }
         
         public string CommandLine { get; set; }
+
+        public uint PointerSize { get; set; }
 
         public static DisassembledMethod Empty(string fullSignature, ulong nativeCode, string problem)
             => new DisassembledMethod

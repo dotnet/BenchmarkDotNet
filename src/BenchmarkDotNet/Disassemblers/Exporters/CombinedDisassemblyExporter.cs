@@ -86,7 +86,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                 logger.WriteLine("<td style=\"vertical-align:top;\"><pre><code>");
                 foreach (var method in results[benchmark].Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
                 {
-                    logger.WriteLine($"{RawDisassemblyExporter.FormatMethodAddress(method.NativeCode)} {method.Name}");
+                    logger.WriteLine(method.Name);
 
                     foreach (var map in method.Maps)
                         foreach (var instruction in map.Instructions)

@@ -66,6 +66,8 @@ namespace BenchmarkDotNet.Disassemblers
 
     internal static class ClrMdDisassembler
     {
+        internal const int FirstOperandCharIndex = 10;
+
         internal static DisassembledMethod[] AttachAndDisassemble(Settings settings)
         {
             using (var dataTarget = DataTarget.AttachToProcess(
@@ -80,9 +82,7 @@ namespace BenchmarkDotNet.Disassemblers
 
                 ConfigureSymbols(dataTarget);
 
-                var formatter = new MasmFormatter();
-                formatter.Options.FirstOperandCharIndex = 10;
-                formatter.Options.HexSuffix = default;
+                var formatter = CreateFormatter();
 
                 var state = new State(runtime, formatter);
 
@@ -93,6 +93,15 @@ namespace BenchmarkDotNet.Disassemblers
                     ? disassembledMethods // if there is only one method we want to return it (most probably benchmark got inlined)
                     : disassembledMethods.Where(method => !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodName)).ToArray();
             }
+        }
+
+        internal static Formatter CreateFormatter()
+        {
+            var formatter = new MasmFormatter();
+            formatter.Options.FirstOperandCharIndex = FirstOperandCharIndex;
+            formatter.Options.HexSuffix = default;
+            formatter.Options.TabSize = 0; // use spaces
+            return formatter;
         }
 
         private static void ConfigureSymbols(DataTarget dataTarget)
@@ -168,7 +177,8 @@ namespace BenchmarkDotNet.Disassemblers
             {
                 Maps = EliminateDuplicates(maps),
                 Name = method.GetFullSignature(),
-                NativeCode = method.NativeCode
+                NativeCode = method.NativeCode,
+                PointerSize = (uint)state.Runtime.PointerSize
             };
         }
 
@@ -260,7 +270,8 @@ namespace BenchmarkDotNet.Disassemblers
                     Comment = name,
                     StartAddress = instruction.IP,
                     EndAddress = instruction.IP + (ulong)instruction.ByteLength,
-                    SizeInBytes = (uint)instruction.ByteLength
+                    SizeInBytes = (uint)instruction.ByteLength,
+                    Instruction = instruction
                 };
             }
         }
@@ -289,7 +300,7 @@ namespace BenchmarkDotNet.Disassemblers
             calledMethodName = default;
             ClrRuntime runtime = state.Runtime;
 
-            if (!TryGetAddress(instruction, runtime, out ulong address) || address <= ushort.MaxValue)
+            if (!TryGetAddress(instruction, (uint)runtime.PointerSize, out ulong address) || address <= ushort.MaxValue)
                 return;
 
             calledMethodName = runtime.GetJitHelperFunctionName(address);
@@ -324,7 +335,7 @@ namespace BenchmarkDotNet.Disassemblers
                 calledMethodName = $"{method.Type.Name}.{method.GetFullSignature()}";
         }
 
-        private static bool TryGetAddress(Instruction instruction, ClrRuntime runtime, out ulong address)
+        internal static bool TryGetAddress(Instruction instruction, uint pointerSize, out ulong address)
         {
             for (int i = 0; i < instruction.OpCount; i++)
             {
@@ -340,7 +351,7 @@ namespace BenchmarkDotNet.Disassemblers
                     case OpKind.Immediate8to32:
                     case OpKind.Immediate8to64:
                     case OpKind.Immediate32to64:
-                    case OpKind.Immediate32 when runtime.PointerSize == 4:
+                    case OpKind.Immediate32 when pointerSize == 4:
                     case OpKind.Immediate64:
                         address = instruction.GetImmediate(i);
                         return true;

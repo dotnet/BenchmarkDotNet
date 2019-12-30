@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             {
                 // I am using NativeCode as the id to avoid any problems with special characters like <> in html ;)
                 logger.WriteLine(
-                    $"<tr><th colspan=\"2\" id=\"{method.NativeCode}\" style=\"text-align: left;\">{FormatMethodAddress(method.NativeCode)} {method.Name}</th><th></th></tr>");
+                    $"<tr><th colspan=\"2\" id=\"{method.NativeCode}\" style=\"text-align: left;\">{method.Name}</th><th></th></tr>");
 
                 // there is no need to distinguish the maps visually if there is only one type of code
                 bool diffTheMaps = method.Maps.SelectMany(map => map.Instructions).Select(ins => ins.GetType()).Distinct().Count() > 1;
@@ -95,8 +95,5 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
 
             logger.WriteLine("</tbody></table>");
         }
-
-        // we want to get sth like "00007FFC78921AB0"
-        internal static string FormatMethodAddress(ulong nativeCode) => nativeCode == default ? string.Empty : nativeCode.ToString("X16");
     }
 }
