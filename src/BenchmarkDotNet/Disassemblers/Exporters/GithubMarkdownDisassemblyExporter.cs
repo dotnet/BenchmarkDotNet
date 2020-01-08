@@ -27,11 +27,12 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             foreach (var benchmarkCase in summary.BenchmarksCases.Where(results.ContainsKey))
             {
                 logger.WriteLine($"## {summary[benchmarkCase].GetRuntimeInfo()}");
-                Export(logger, results[benchmarkCase]);
+
+                Export(logger, results[benchmarkCase], config);
             }
         }
 
-        internal void Export(ILogger logger, DisassemblyResult disassemblyResult, bool quotingCode = true)
+        internal static void Export(ILogger logger, DisassemblyResult disassemblyResult, DisassemblyDiagnoserConfig config, bool quotingCode = true)
         {
             int methodIndex = 0;
             foreach (var method in disassemblyResult.Methods.Where(method => string.IsNullOrEmpty(method.Problem)))

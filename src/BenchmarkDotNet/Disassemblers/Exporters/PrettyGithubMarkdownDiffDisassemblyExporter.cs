@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             }
         }
 
-        private static string SaveDisassemblyResult(Summary summary, DisassemblyResult disassemblyResult)
+        private string SaveDisassemblyResult(Summary summary, DisassemblyResult disassemblyResult)
         {
             string filePath = $"{Path.Combine(summary.ResultsDirectoryPath, Guid.NewGuid().ToString())}-diff.temp";
 
@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             {
                 using (var streamLogger = new StreamLogger(stream))
                 {
-                    //PrettyGithubMarkdownDisassemblyExporter.Export(streamLogger, disassemblyResult, quotingCode: false);
+                    GithubMarkdownDisassemblyExporter.Export(streamLogger, disassemblyResult, config, quotingCode: false);
                 }
             }
 
