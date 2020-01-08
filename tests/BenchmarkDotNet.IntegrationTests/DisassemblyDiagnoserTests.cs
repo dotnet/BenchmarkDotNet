@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, Runtime runtime)
         {
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
-                new DisassemblyDiagnoserConfig(printAsm: true, printSource: true, recursiveDepth: 3));
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
             CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.ColdStart));
 
@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CanDisassembleGenericTypes(Jit jit, Platform platform, Runtime runtime)
         {
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
-                new DisassemblyDiagnoserConfig(printAsm: true, printSource: true, recursiveDepth: 3));
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
             CanExecute<Generic<int>>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.Monitoring));
 
@@ -120,7 +120,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CanDisassembleInlinableBenchmarks(Jit jit, Platform platform, Runtime runtime)
         {
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
-                new DisassemblyDiagnoserConfig(printAsm: true, printSource: true, recursiveDepth: 3));
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
             CanExecute<WithInlineable>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.Monitoring));
 

@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Tests.Configs
             var mutable = ManualConfig.CreateEmpty();
 
             mutable.AddHardwareCounters(HardwareCounter.CacheMisses);
-            mutable.AddDiagnoser(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.All));
+            mutable.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig()));
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -90,8 +90,8 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.AddDiagnoser(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.All));
-            mutable.AddDiagnoser(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.Asm));
+            mutable.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig()));
+            mutable.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig()));
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
