@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Disassemblers
         {
             internal static DisassemblyResult Parse([ItemCanBeNull] IReadOnlyList<string> input, string methodName, string commandLine)
             {
-                var instructions = new List<SourceCode>();
+                var instructions = new List<MonoCode>();
 
                 const string windowsHeader = "Disassembly of section .text:";
                 const string macOSXHeader = "(__TEXT,__text) section";
@@ -84,7 +84,7 @@ namespace BenchmarkDotNet.Disassemblers
                     if (TryParseInstruction(line, out var instruction))
                         instructions.Add(instruction);
 
-                while (instructions.Any() && instructions.Last().TextRepresentation == "nop")
+                while (instructions.Any() && instructions.Last().Text == "nop")
                     instructions.RemoveAt(instructions.Count - 1);
 
                 return new DisassemblyResult
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Disassemblers
                         new DisassembledMethod
                         {
                             Name = methodName,
-                            Maps = new[] { new Map { SourceCodes = instructions } },
+                            Maps = new[] { new Map { SourceCodes = instructions.ToArray() } },
                             CommandLine = commandLine
                         }
                     }
@@ -115,8 +115,8 @@ namespace BenchmarkDotNet.Disassemblers
                             {
                                 SourceCodes = input
                                     .Where(line => !string.IsNullOrWhiteSpace(line))
-                                    .Select(line => new SourceCode { TextRepresentation = line })
-                                    .ToList()
+                                    .Select(line => new MonoCode { Text = line })
+                                    .ToArray()
                             } },
                             CommandLine = commandLine
                         }
@@ -129,14 +129,14 @@ namespace BenchmarkDotNet.Disassemblers
             //line example 2: 0000000000000000	subq	$0x28, %rsp
             private static readonly Regex InstructionRegex = new Regex(@"\s*(?<address>[0-9a-f]+)(\:\s+([0-9a-f]{2}\s+)+)?\s+(?<instruction>.*)\s*", RegexOptions.Compiled);
 
-            private static bool TryParseInstruction(string line, out SourceCode instruction)
+            private static bool TryParseInstruction(string line, out MonoCode instruction)
             {
                 instruction = null;
                 var match = InstructionRegex.Match(line);
                 if (!match.Success)
                     return false;
 
-                instruction = new SourceCode { TextRepresentation = match.Groups["instruction"].ToString() };
+                instruction = new MonoCode { Text = match.Groups["instruction"].ToString() };
                 return true;
             }
         }

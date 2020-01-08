@@ -16,6 +16,8 @@ namespace BenchmarkDotNet.Disassemblers
                     return InstructionFormatter.Format(asm.Instruction, config, pointerSize, addressesMapping);
                 case Sharp sharp:
                     return sharp.Text;
+                case MonoCode mono:
+                    return mono.Text;
                 default:
                     throw new NotSupportedException();
             }

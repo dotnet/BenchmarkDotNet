@@ -10,7 +10,7 @@ using System.Xml.Serialization;
 #pragma warning disable CS1591 // XML comments for public types...
 namespace BenchmarkDotNet.Disassemblers
 {
-    public class SourceCode
+    public abstract class SourceCode
     {
         public ulong InstructionPointer { get; set; }
     }
@@ -25,6 +25,11 @@ namespace BenchmarkDotNet.Disassemblers
     public class Asm : SourceCode
     {
         public Instruction Instruction { get; set; }
+    }
+
+    public class MonoCode : SourceCode
+    {
+        public string Text { get; set; }
     }
 
     public class Map

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Disassemblers;
 using Xunit;
 
@@ -51,29 +50,29 @@ chmarkDotNet_Samples_CPU_Cpu_Atomics_NoLock:
                         {
                             new Map()
                             {
-                                SourceCodes = new System.Collections.Generic.List<Disassemblers.SourceCode>
+                                SourceCodes = new MonoCode[]
                                 {
-                                    new Disassemblers.SourceCode { TextRepresentation = "subq\t$0x8, %rsp" },
+                                    new MonoCode { Text = "subq\t$0x8, %rsp" },
 
-                                    new Disassemblers.SourceCode { TextRepresentation = "movq\t%r15, (%rsp)" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "movq\t%rdi, %r15" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "movslq\t0x18(%r15), %rax" },
+                                    new MonoCode { Text = "movq\t%r15, (%rsp)" },
+                                    new MonoCode { Text = "movq\t%rdi, %r15" },
+                                    new MonoCode { Text = "movslq\t0x18(%r15), %rax" },
 
-                                    new Disassemblers.SourceCode { TextRepresentation = "incl\t%eax" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "movl\t%eax, 0x18(%r15)" },
+                                    new MonoCode { Text = "incl\t%eax" },
+                                    new MonoCode { Text = "movl\t%eax, 0x18(%r15)" },
 
-                                    new Disassemblers.SourceCode { TextRepresentation = "incl\t%eax" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "movl\t%eax, 0x18(%r15)" },
+                                    new MonoCode { Text = "incl\t%eax" },
+                                    new MonoCode { Text = "movl\t%eax, 0x18(%r15)" },
 
-                                    new Disassemblers.SourceCode { TextRepresentation = "incl\t%eax" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "movl\t%eax, 0x18(%r15)" },
+                                    new MonoCode { Text = "incl\t%eax" },
+                                    new MonoCode { Text = "movl\t%eax, 0x18(%r15)" },
 
-                                    new Disassemblers.SourceCode { TextRepresentation = "incl\t%eax" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "movl\t%eax, 0x18(%r15)" },
+                                    new MonoCode { Text = "incl\t%eax" },
+                                    new MonoCode { Text = "movl\t%eax, 0x18(%r15)" },
 
-                                    new Disassemblers.SourceCode { TextRepresentation = "movq\t(%rsp), %r15" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "addq\t$0x8, %rsp" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "retq" }
+                                    new MonoCode { Text = "movq\t(%rsp), %r15" },
+                                    new MonoCode { Text = "addq\t$0x8, %rsp" },
+                                    new MonoCode { Text = "retq" }
                                 }
                             }
                         }
@@ -153,37 +152,37 @@ Disassembly of section .text:
                         {
                             new Map()
                             {
-                                SourceCodes = new System.Collections.Generic.List<Disassemblers.SourceCode>
+                                SourceCodes = new SourceCode[]
                                 {
-                                    new Disassemblers.SourceCode { TextRepresentation = "sub    $0x28,%rsp" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "mov    %rsi,(%rsp)" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "mov    %r14,0x8(%rsp)" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "mov    %r15,0x10(%rsp)" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "xor    %r15d,%r15d" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "xor    %r14d,%r14d" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "jmp    37 <chmarkDotNet_Samples_My_NoLock+0x37>" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "lea    0x0(%rsp),%rsp" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "nop" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "mov    %r15,%rax" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "mov    %r14,%rcx" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "mov    $0x2,%edx" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "imul   %edx,%ecx" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "mov    %rax,%r15" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "add    %ecx,%r15d" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "inc    %r14d" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "cmp    $0xd,%r14d" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "setl   %sil" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "movzbq %sil,%rsi" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "mov    %rsi,%rax" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "test   %eax,%eax" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "jne    20 <chmarkDotNet_Samples_My_NoLock+0x20>" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "mov    %r15d,0x18(%rsp)" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "mov    %r15,%rax" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "mov    (%rsp),%rsi" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "mov    0x8(%rsp),%r14" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "mov    0x10(%rsp),%r15" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "add    $0x28,%rsp" },
-                                    new Disassemblers.SourceCode { TextRepresentation = "retq" },
+                                    new MonoCode { Text = "sub    $0x28,%rsp" },
+                                    new MonoCode { Text = "mov    %rsi,(%rsp)" },
+                                    new MonoCode { Text = "mov    %r14,0x8(%rsp)" },
+                                    new MonoCode { Text = "mov    %r15,0x10(%rsp)" },
+                                    new MonoCode { Text = "xor    %r15d,%r15d" },
+                                    new MonoCode { Text = "xor    %r14d,%r14d" },
+                                    new MonoCode { Text = "jmp    37 <chmarkDotNet_Samples_My_NoLock+0x37>" },
+                                    new MonoCode { Text = "lea    0x0(%rsp),%rsp" },
+                                    new MonoCode { Text = "nop" },
+                                    new MonoCode { Text = "mov    %r15,%rax" },
+                                    new MonoCode { Text = "mov    %r14,%rcx" },
+                                    new MonoCode { Text = "mov    $0x2,%edx" },
+                                    new MonoCode { Text = "imul   %edx,%ecx" },
+                                    new MonoCode { Text = "mov    %rax,%r15" },
+                                    new MonoCode { Text = "add    %ecx,%r15d" },
+                                    new MonoCode { Text = "inc    %r14d" },
+                                    new MonoCode { Text = "cmp    $0xd,%r14d" },
+                                    new MonoCode { Text = "setl   %sil" },
+                                    new MonoCode { Text = "movzbq %sil,%rsi" },
+                                    new MonoCode { Text = "mov    %rsi,%rax" },
+                                    new MonoCode { Text = "test   %eax,%eax" },
+                                    new MonoCode { Text = "jne    20 <chmarkDotNet_Samples_My_NoLock+0x20>" },
+                                    new MonoCode { Text = "mov    %r15d,0x18(%rsp)" },
+                                    new MonoCode { Text = "mov    %r15,%rax" },
+                                    new MonoCode { Text = "mov    (%rsp),%rsi" },
+                                    new MonoCode { Text = "mov    0x8(%rsp),%r14" },
+                                    new MonoCode { Text = "mov    0x10(%rsp),%r15" },
+                                    new MonoCode { Text = "add    $0x28,%rsp" },
+                                    new MonoCode { Text = "retq" },
                                 }
                             }
                         }
@@ -226,8 +225,8 @@ operable program or batch file.
                                 SourceCodes = input
                                     .Split('\r', '\n')
                                     .Where(line => !string.IsNullOrWhiteSpace(line))
-                                    .Select(line => new Disassemblers.SourceCode { TextRepresentation = line })
-                                    .ToList()
+                                    .Select(line => new MonoCode{ Text = line })
+                                    .ToArray()
                             }
                         }
                     }
@@ -262,8 +261,8 @@ operable program or batch file.
                                 SourceCodes = input
                                     .Split('\r', '\n')
                                     .Where(line => !string.IsNullOrWhiteSpace(line))
-                                    .Select(line => new Disassemblers.SourceCode { TextRepresentation = line })
-                                    .ToList()
+                                    .Select(line => new MonoCode { Text = line })
+                                    .ToArray()
                             }
                         }
                     }
@@ -288,8 +287,8 @@ operable program or batch file.
             Assert.Equal(expected.Methods[0].Maps[0].SourceCodes.Length, disassemblyResult.Methods[0].Maps[0].SourceCodes.Length);
 
             for (int i = 0; i < expected.Methods[0].Maps[0].SourceCodes.Length; i++)
-                Assert.Equal(expected.Methods[0].Maps[0].SourceCodes[i].TextRepresentation,
-                    disassemblyResult.Methods[0].Maps[0].SourceCodes[i].TextRepresentation);
+                Assert.Equal(((MonoCode)expected.Methods[0].Maps[0].SourceCodes[i]).Text,
+                    ((MonoCode)disassemblyResult.Methods[0].Maps[0].SourceCodes[i]).Text);
 
             Assert.Equal(expected.Errors.Length, disassemblyResult.Errors.Length);
             for (int i = 0; i < expected.Errors.Length; i++)

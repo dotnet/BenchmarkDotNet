@@ -57,37 +57,38 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                     if (instruction is Sharp sharp)
                     {
                         prettified.Add(new Element(sharp.Text, sharp));
-                        continue;
                     }
-                    if (!(instruction is Asm asm))
+                    else if (instruction is MonoCode mono)
                     {
-                        continue;
+                        prettified.Add(new Element(mono.Text, mono));
                     }
-
-                    // this IP is referenced by some jump|call, so we add a label
-                    if (addressesToLabels.TryGetValue(asm.InstructionPointer, out string label))
+                    else if (instruction is Asm asm)
                     {
-                        prettified.Add(new Label(label));
-                    }
-
-                    if (ClrMdDisassembler.TryGetReferencedAddress(asm.Instruction, disassemblyResult.PointerSize, out ulong referencedAddress))
-                    {
-                        // jump or a call within same method
-                        if (addressesToLabels.TryGetValue(referencedAddress, out string translated))
+                        // this IP is referenced by some jump|call, so we add a label
+                        if (addressesToLabels.TryGetValue(asm.InstructionPointer, out string label))
                         {
-                            prettified.Add(new Reference(InstructionFormatter.Format(asm.Instruction, config, disassemblyResult.PointerSize, addressesToLabels), translated, asm));
-                            continue;
+                            prettified.Add(new Label(label));
                         }
 
-                        // call to a known method
-                        if (disassemblyResult.AddressToNameMapping.ContainsKey(referencedAddress))
+                        if (ClrMdDisassembler.TryGetReferencedAddress(asm.Instruction, disassemblyResult.PointerSize, out ulong referencedAddress))
                         {
-                            prettified.Add(new Element(InstructionFormatter.Format(asm.Instruction, config, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping), asm));
-                            continue;
-                        }
-                    }
+                            // jump or a call within same method
+                            if (addressesToLabels.TryGetValue(referencedAddress, out string translated))
+                            {
+                                prettified.Add(new Reference(InstructionFormatter.Format(asm.Instruction, config, disassemblyResult.PointerSize, addressesToLabels), translated, asm));
+                                continue;
+                            }
 
-                    prettified.Add(new Element(InstructionFormatter.Format(asm.Instruction, config, disassemblyResult.PointerSize, ImmutableDictionary<ulong, string>.Empty), asm));
+                            // call to a known method
+                            if (disassemblyResult.AddressToNameMapping.ContainsKey(referencedAddress))
+                            {
+                                prettified.Add(new Element(InstructionFormatter.Format(asm.Instruction, config, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping), asm));
+                                continue;
+                            }
+                        }
+
+                        prettified.Add(new Element(InstructionFormatter.Format(asm.Instruction, config, disassemblyResult.PointerSize, ImmutableDictionary<ulong, string>.Empty), asm));
+                    }
                 }
 
             return prettified;
