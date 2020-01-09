@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
@@ -7,6 +8,7 @@ using BenchmarkDotNet.Disassemblers.Exporters;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -19,6 +21,8 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class DisassemblyDiagnoser : IDiagnoser
     {
+        private static readonly Lazy<string> ptrace_scope = new Lazy<string>(() => ProcessHelper.RunAndReadOutput("cat", "/proc/sys/kernel/yama/ptrace_scope").Trim());
+
         private readonly WindowsDisassembler windowsDisassembler;
         private readonly LinuxDisassembler linuxDisassembler;
         private readonly MonoDisassembler monoDisassembler;
@@ -108,6 +112,15 @@ namespace BenchmarkDotNet.Diagnosers
                     if (runtime.RuntimeMoniker < RuntimeMoniker.NetCoreApp30)
                     {
                         yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} supports only .NET Core 3.0+", benchmark);
+                    }
+
+                    if (ptrace_scope.Value == "2")
+                    {
+                        yield return new ValidationError(false, $"ptrace_scope is set to 2, {nameof(DisassemblyDiagnoser)} is going to work only if you run as sudo");
+                    }
+                    else if (ptrace_scope.Value == "3")
+                    {
+                        yield return new ValidationError(true, $"ptrace_scope is set to 3, {nameof(DisassemblyDiagnoser)} is not going to work");
                     }
                 }
             }
