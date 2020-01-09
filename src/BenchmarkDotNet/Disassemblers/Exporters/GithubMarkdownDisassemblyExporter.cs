@@ -66,6 +66,10 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
 
                         logger.WriteLine($"       {element.TextRepresentation}");
                     }
+                    else if (element.Source is MonoCode mono)
+                    {
+                        logger.WriteLine(mono.Text);
+                    }
                 }
 
                 logger.WriteLine($"; Total bytes of code {totalSizeInBytes}");

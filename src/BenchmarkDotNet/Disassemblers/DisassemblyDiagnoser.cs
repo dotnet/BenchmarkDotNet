@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
             if (config.ExportDiff)
             {
-                yield return new PrettyGithubMarkdownDiffDisassemblyExporter(results, config);
+                yield return new GithubMarkdownDiffDisassemblyExporter(results, config);
             }
         }
 

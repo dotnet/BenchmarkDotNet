@@ -12,7 +12,7 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Disassemblers.Exporters
 {
-    internal class PrettyGithubMarkdownDiffDisassemblyExporter : ExporterBase
+    internal class GithubMarkdownDiffDisassemblyExporter : ExporterBase
     {
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
         private readonly DisassemblyDiagnoserConfig config;
@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
         protected override string FileExtension => "md";
         protected override string FileCaption => "asm.pretty.diff";
 
-        internal PrettyGithubMarkdownDiffDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results, DisassemblyDiagnoserConfig config)
+        internal GithubMarkdownDiffDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results, DisassemblyDiagnoserConfig config)
         {
             this.results = results;
             this.config = config;
