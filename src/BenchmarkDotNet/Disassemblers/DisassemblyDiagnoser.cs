@@ -86,8 +86,8 @@ namespace BenchmarkDotNet.Diagnosers
         public void DisplayResults(ILogger logger)
             => logger.WriteInfo(
                 results.Any()
-                    ? "The results were exported to \".\\BenchmarkDotNet.Artifacts\\results\\*-disassembly-report.html\""
-                    : "No results were exported");
+                    ? "Disassembled benchmarks got exported to \".\\BenchmarkDotNet.Artifacts\\results\\*asm.md\""
+                    : "No benchmarks were disassembled");
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
