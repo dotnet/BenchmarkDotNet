@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Parameters
 
         public object Value { get; }
 
-        public string DisplayText => Value.ToString();
+        public string DisplayText => Value is Array array ? $"Array[{array.Length}]" : Value.ToString();
 
         public string ToSourceCode()
         {
@@ -115,7 +115,7 @@ namespace BenchmarkDotNet.Parameters
 
         public object Value { get; }
 
-        public string DisplayText => Value.ToString();
+        public string DisplayText => Value is Array array ? $"Array[{array.Length}]" : Value.ToString();
 
         public string ToSourceCode()
         {
