@@ -192,6 +192,7 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("<tbody>");
             var disassemblyResult = disassemblyDiagnoser.Results[benchmarkCase];
             var config = disassemblyDiagnoser.Config;
+            var formatterWithSymbols = config.GetFormatterWithSymbolSolver(disassemblyResult.AddressToNameMapping);
             foreach (var method in model.Where(data => data.HasCounters))
             {
                 logger.WriteLine($"<tr><th colspan=\"{columnsCount}\">{method.Method.Name}</th></tr>");
@@ -218,7 +219,7 @@ namespace BenchmarkDotNet.Exporters
                         else
                             logger.Write("<td>");
 
-                        string formatted = CodeFormatter.Format(instruction.Code, config, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping);
+                        string formatted = CodeFormatter.Format(instruction.Code, formatterWithSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize);
                         logger.WriteLine($"<pre><code>{formatted}</pre></code></td></tr>");
                     }
 

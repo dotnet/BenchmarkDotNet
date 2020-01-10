@@ -95,9 +95,11 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                 {
                     logger.WriteLine(method.Name);
 
+                    var formatter = config.GetFormatterWithSymbolSolver(disassemblyResult.AddressToNameMapping);
+
                     foreach (var map in method.Maps)
                         foreach (var sourceCode in map.SourceCodes)
-                            logger.WriteLine(CodeFormatter.Format(sourceCode, config, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping));
+                            logger.WriteLine(CodeFormatter.Format(sourceCode, formatter, config.PrintInstructionAddresses, disassemblyResult.PointerSize));
 
                     logger.WriteLine();
                 }
