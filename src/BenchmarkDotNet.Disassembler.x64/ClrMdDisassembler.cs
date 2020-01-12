@@ -83,7 +83,9 @@ namespace BenchmarkDotNet.Disassemblers
             if ((method.ILOffsetMap is null || method.ILOffsetMap.Length == 0) && (method.HotColdInfo is null || method.HotColdInfo.HotStart == 0 || method.HotColdInfo.HotSize == 0))
             {
                 if (method.IsPInvoke)
-                    return CreateEmpty(method, "PInvoke");
+                    return CreateEmpty(method, "PInvoke method");
+                if (method.IL is null || method.IL.Length == 0)
+                    return CreateEmpty(method, "Extern method");
                 if (method.CompilationType == MethodCompilationType.None)
                     return CreateEmpty(method, "Method was not JITted yet.");
 
@@ -153,10 +155,10 @@ namespace BenchmarkDotNet.Disassemblers
             if (state.AddressToNameMapping.ContainsKey(address))
                 return;
 
-            var jitHelperFunctioName = runtime.GetJitHelperFunctionName(address);
-            if (!string.IsNullOrEmpty(jitHelperFunctioName))
+            var jitHelperFunctionName = runtime.GetJitHelperFunctionName(address);
+            if (!string.IsNullOrEmpty(jitHelperFunctionName))
             {
-                state.AddressToNameMapping.Add(address, jitHelperFunctioName);
+                state.AddressToNameMapping.Add(address, jitHelperFunctionName);
                 return;
             }
 
