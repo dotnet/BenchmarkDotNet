@@ -50,6 +50,9 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                 if (referencedAddresses.Contains(instruction.InstructionPointer) && !addressesToLabels.ContainsKey(instruction.InstructionPointer))
                     addressesToLabels.Add(instruction.InstructionPointer, $"{labelPrefix}_L{currentLabelIndex++:00}");
 
+            var formatterWithLabelsSymbols = config.GetFormatterWithSymbolSolver(addressesToLabels);
+            var formatterWithGlobalSymbols = config.GetFormatterWithSymbolSolver(disassemblyResult.AddressToNameMapping);
+
             var prettified = new List<Element>();
             foreach (var map in method.Maps)
                 foreach (var instruction in map.SourceCodes)
@@ -75,19 +78,19 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                             // jump or a call within same method
                             if (addressesToLabels.TryGetValue(referencedAddress, out string translated))
                             {
-                                prettified.Add(new Reference(InstructionFormatter.Format(asm.Instruction, config, disassemblyResult.PointerSize, addressesToLabels), translated, asm));
+                                prettified.Add(new Reference(InstructionFormatter.Format(asm.Instruction, formatterWithLabelsSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize), translated, asm));
                                 continue;
                             }
 
                             // call to a known method
                             if (disassemblyResult.AddressToNameMapping.ContainsKey(referencedAddress))
                             {
-                                prettified.Add(new Element(InstructionFormatter.Format(asm.Instruction, config, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping), asm));
+                                prettified.Add(new Element(InstructionFormatter.Format(asm.Instruction, formatterWithGlobalSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize), asm));
                                 continue;
                             }
                         }
 
-                        prettified.Add(new Element(InstructionFormatter.Format(asm.Instruction, config, disassemblyResult.PointerSize, ImmutableDictionary<ulong, string>.Empty), asm));
+                        prettified.Add(new Element(InstructionFormatter.Format(asm.Instruction, formatterWithGlobalSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize), asm));
                     }
                 }
 

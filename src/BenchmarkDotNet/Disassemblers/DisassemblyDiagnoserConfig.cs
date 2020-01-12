@@ -1,5 +1,8 @@
-﻿using Iced.Intel;
+﻿using BenchmarkDotNet.Disassemblers.Exporters;
+using Iced.Intel;
 using JetBrains.Annotations;
+using System;
+using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -37,11 +40,13 @@ namespace BenchmarkDotNet.Diagnosers
         public bool PrintSource { get; }
         public bool PrintInstructionAddresses { get; }
         public int MaxDepth { get; }
-        public Formatter Formatter { get; }
         public bool ExportGithubMarkdown { get; }
         public bool ExportHtml { get; }
         public bool ExportCombinedDisassemblyReport { get; }
         public bool ExportDiff { get; }
+
+        // it's private to make sure that GetFormatterWithSymbolSolver is always used
+        private Formatter Formatter { get; }
 
         private static Formatter CreateDefaultFormatter()
         {
@@ -50,6 +55,29 @@ namespace BenchmarkDotNet.Diagnosers
             formatter.Options.HexSuffix = default; // don't print "h" at the end of every hex address
             formatter.Options.TabSize = 0; // use spaces
             return formatter;
+        }
+
+        // user can specify a formatter without symbol solver
+        // so we need to clone the formatter with settings and provide our symbols solver
+        internal Formatter GetFormatterWithSymbolSolver(IReadOnlyDictionary<ulong, string> addressToNameMapping)
+        {
+            var symbolSolver = new SymbolResolver(addressToNameMapping);
+
+            switch(Formatter)
+            {
+                case MasmFormatter masmFormatter:
+                    return new MasmFormatter(masmFormatter.MasmOptions, symbolSolver);
+                case NasmFormatter nasmFormatter:
+                    return new NasmFormatter(nasmFormatter.NasmOptions, symbolSolver);
+                case GasFormatter gasFormatter:
+                    return new GasFormatter(gasFormatter.GasOptions, symbolSolver);
+                case IntelFormatter intelFormatter:
+                    return new IntelFormatter(intelFormatter.IntelOptions, symbolSolver);
+                default:
+                    // we don't know how to translate it so we just return the original one
+                    // it's better not to solve symbols rather than throw exception ;)
+                    return Formatter;
+            }
         }
     }
 }
