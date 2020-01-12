@@ -80,16 +80,15 @@ namespace BenchmarkDotNet.Disassemblers
         {
             var method = methodInfo.Method;
 
-            if (method.CompilationType == MethodCompilationType.None)
-                return CreateEmpty(method, "Extern method");
+            if ((method.ILOffsetMap is null || method.ILOffsetMap.Length == 0) && (method.HotColdInfo is null || method.HotColdInfo.HotStart == 0 || method.HotColdInfo.HotSize == 0))
+            {
+                if (method.IsPInvoke)
+                    return CreateEmpty(method, "PInvoke");
+                if (method.CompilationType == MethodCompilationType.None)
+                    return CreateEmpty(method, "Method was not JITted yet.");
 
-            if (method.NativeCode == ulong.MaxValue)
-                if (method.IsAbstract) return CreateEmpty(method, "Abstract method");
-                else if (method.IsVirtual) CreateEmpty(method, "Virtual method");
-                else return CreateEmpty(method, "Method got most probably inlined");
-
-            if ((method.ILOffsetMap is null || method.ILOffsetMap.Length == 0) && (method.HotColdInfo is null || method.HotColdInfo.HotStart == 0))
                 return CreateEmpty(method, $"No valid {nameof(method.ILOffsetMap)} and {nameof(method.HotColdInfo)}");
+            }
 
             var codes = new List<SourceCode>();
             if (settings.PrintSource && !(method.ILOffsetMap is null))
@@ -185,7 +184,7 @@ namespace BenchmarkDotNet.Disassemblers
                 state.Todo.Enqueue(new MethodInfo(method, depth + 1));
 
             var methodName = method.GetFullSignature();
-            if (!methodName.StartsWith(method.Type.Name, StringComparison.Ordinal))
+            if (!methodName.Any(c => c == '.')) // the method name does not contain namespace and type name
                 methodName = $"{method.Type.Name}.{method.GetFullSignature()}";
             state.AddressToNameMapping.Add(address, methodName);
         }
