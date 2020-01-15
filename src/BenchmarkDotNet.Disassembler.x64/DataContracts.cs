@@ -146,9 +146,9 @@ namespace BenchmarkDotNet.Disassemblers
 
         private sealed class ClrMethodComparer : IEqualityComparer<ClrMethod>
         {
-            public bool Equals(ClrMethod x, ClrMethod y) => x.MetadataToken == y.MetadataToken && x.Type.MetadataToken == y.Type.MetadataToken;
+            public bool Equals(ClrMethod x, ClrMethod y) => x.NativeCode == y.NativeCode;
 
-            public int GetHashCode(ClrMethod obj) => (int)(obj.MetadataToken ^ obj.Type.MetadataToken);
+            public int GetHashCode(ClrMethod obj) => (int)obj.NativeCode;
         }
     }
 
