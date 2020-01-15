@@ -169,6 +169,13 @@ namespace BenchmarkDotNet.Disassemblers
                 return;
             }
 
+            var methodDescriptor = runtime.GetMethodByHandle(address);
+            if (!(methodDescriptor is null))
+            {
+                state.AddressToNameMapping.Add(address, $"MD_{methodDescriptor.GetFullSignature()}");
+                return;
+            }
+
             var method = runtime.GetMethodByAddress(address);
             if (method is null && (address & ((uint)runtime.PointerSize - 1)) == 0)
             {
