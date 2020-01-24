@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Code
     internal static class ArrayParam
     {
         public static string GetDisplayString(Array array)
-            => $"{array.GetType().GetElementType().Name}[{array.Length}]";
+            => $"{array.GetType().GetElementType().GetDisplayName()}[{array.Length}]";
     }
 
     public class ArrayParam<T> : IParam
