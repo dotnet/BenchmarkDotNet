@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -34,20 +35,25 @@ namespace BenchmarkDotNet.Parameters
                 ? parameter.ToSourceCode()
                 : SourceCodeHelper.ToSourceCode(value);
 
-        public string ToDisplayText()
+        public string ToDisplayText(CultureInfo cultureInfo)
         {
-            switch (value) {
+            switch (value)
+            {
                 case null:
                     return NullParameterTextRepresentation;
                 case IParam parameter:
                     return Trim(parameter.DisplayText, maxParameterColumnWidth);
+                case IFormattable formattable:
+                    return Trim(formattable.ToString(null, cultureInfo), maxParameterColumnWidth);
                 // no trimming for types!
                 case Type type:
                     return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).GetDisplayName()}?" : type.GetDisplayName();
+                default:
+                    return Trim(value.ToString(), maxParameterColumnWidth);
             }
-
-            return Trim(value.ToString(), maxParameterColumnWidth);
         }
+
+        public string ToDisplayText() => ToDisplayText(CultureInfo.CurrentCulture);
 
         public override string ToString() => ToDisplayText();
 
