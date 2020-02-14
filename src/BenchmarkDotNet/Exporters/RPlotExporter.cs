@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Exporters
                         {
                             if (!string.IsNullOrWhiteSpace(args.Data))
                             {
-                                output.Append(args.Data);
+                                output.AppendLine(args.Data);
                             }
                         }
                     };
@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Exporters
                         {
                             if (!string.IsNullOrWhiteSpace(args.Data))
                             {
-                                output.Append(args.Data);
+                                output.AppendLine(args.Data);
                             }
                         }
                     };
