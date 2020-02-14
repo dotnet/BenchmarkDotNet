@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
@@ -58,10 +59,44 @@ namespace BenchmarkDotNet.Exporters
             };
             using (var process = Process.Start(start))
             {
-                string output = process?.StandardOutput.ReadToEnd() ?? "";
-                string error = process?.StandardError.ReadToEnd() ?? "";
-                File.WriteAllText(logFullPath, output + Environment.NewLine + error);
+                StringBuilder output = new StringBuilder();
+                StringBuilder error = new StringBuilder();
+                if (process != null)
+                {
+                    process.OutputDataReceived += (sender, args) =>
+                    {
+                        lock (output)
+                        {
+                            if (!string.IsNullOrWhiteSpace(args.Data))
+                            {
+                                output.Append(args.Data);
+                            }
+                        }
+                    };
+                    process.ErrorDataReceived += (sender, args) =>
+                    {
+                        lock (error)
+                        {
+                            if (!string.IsNullOrWhiteSpace(args.Data))
+                            {
+                                output.Append(args.Data);
+                            }
+                        }
+                    };
+                }
+                
+                process?.BeginOutputReadLine();
+                process?.BeginErrorReadLine();
+                
+                // When large R scripts are generated then ran, ReadToEnd()
+                // causes the stdout and stderr buffers to become full,
+                // which causes R to hang.
+                // To avoid this, use events with a buffer rather than ReadToEnd()
+                // string output = process?.StandardOutput.ReadToEnd() ?? "";
+                // string error = process?.StandardError.ReadToEnd() ?? "";
                 process?.WaitForExit();
+                
+                File.WriteAllText(logFullPath, output + Environment.NewLine + error);
             }
 
             yield return $"*{ImageExtension}";
