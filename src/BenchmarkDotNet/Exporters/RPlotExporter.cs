@@ -57,46 +57,20 @@ namespace BenchmarkDotNet.Exporters
                 WorkingDirectory = summary.ResultsDirectoryPath,
                 Arguments = $"\"{scriptFullPath}\" \"{csvFullPath}\""
             };
-            using (var process = Process.Start(start))
+            using (var process = new Process {StartInfo = start})
+            using (AsyncProcessOutputReader reader = new AsyncProcessOutputReader(process))
             {
-                StringBuilder output = new StringBuilder();
-                StringBuilder error = new StringBuilder();
-                if (process != null)
-                {
-                    process.OutputDataReceived += (sender, args) =>
-                    {
-                        lock (output)
-                        {
-                            if (!string.IsNullOrWhiteSpace(args.Data))
-                            {
-                                output.AppendLine(args.Data);
-                            }
-                        }
-                    };
-                    process.ErrorDataReceived += (sender, args) =>
-                    {
-                        lock (error)
-                        {
-                            if (!string.IsNullOrWhiteSpace(args.Data))
-                            {
-                                output.AppendLine(args.Data);
-                            }
-                        }
-                    };
-                }
-                
-                process?.BeginOutputReadLine();
-                process?.BeginErrorReadLine();
-                
                 // When large R scripts are generated then ran, ReadToEnd()
                 // causes the stdout and stderr buffers to become full,
-                // which causes R to hang.
-                // To avoid this, use events with a buffer rather than ReadToEnd()
-                // string output = process?.StandardOutput.ReadToEnd() ?? "";
-                // string error = process?.StandardError.ReadToEnd() ?? "";
-                process?.WaitForExit();
-                
-                File.WriteAllText(logFullPath, output + Environment.NewLine + error);
+                // which causes R to hang. To avoid this, use
+                // AsyncProcessOutputReader to cache the log contents
+                // then write to disk rather than Process.Standard*.ReadToEnd().
+                process.Start();
+                reader.BeginRead();
+                process.WaitForExit();
+                reader.StopRead();
+                File.WriteAllLines(logFullPath, reader.GetOutputLines());
+                File.AppendAllLines(logFullPath, reader.GetErrorLines());
             }
 
             yield return $"*{ImageExtension}";
