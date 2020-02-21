@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.IntegrationTests
 //            Verify(Runtime.Mono, jit, platform, expectedText);
 //        }
 
-        [Theory]
+        [TheorySkipOnArm("It is not supported by ARM")]
         [InlineData(Jit.LegacyJit, Platform.X86, ToolchainSupportsOnlyRyuJit)]
         [InlineData(Jit.LegacyJit, Platform.X64, ToolchainSupportsOnlyRyuJit)]
         [InlineData(Jit.RyuJit, Platform.X64, OkCaption)]

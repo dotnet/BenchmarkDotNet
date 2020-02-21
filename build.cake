@@ -96,7 +96,10 @@ Task("Restore")
     .IsDependentOn("Clean")
     .Does(() =>
     {
-        DotNetCoreRestore(solutionFile);
+        DotNetCoreRestore(solutionFile, new DotNetCoreRestoreSettings
+		{
+			DisableParallel = true // Workaround for restore timeouts
+		});
     });
 
 Task("Build")
