@@ -59,16 +59,22 @@ namespace BenchmarkDotNet.Running
             // we need to keep the logic that uses it in a separate method and create DirtyAssemblyResolveHelper first
             // so it can ignore the version mismatch ;)
             using (DirtyAssemblyResolveHelper.Create())
-                return RunWithDirtyAssemblyResolveHelper(args ?? Array.Empty<string>(), config ?? DefaultConfig.Instance);
+                return RunWithDirtyAssemblyResolveHelper(args, config);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[] args, IConfig config)
         {
-            var logger = config.GetNonNullCompositeLogger();
-            var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args, logger, config);
+            var notNullArgs = args ?? Array.Empty<string>();
+            var notNullConfig = config ?? DefaultConfig.Instance;
+            
+            var logger = notNullConfig.GetNonNullCompositeLogger();
+            var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(notNullArgs, logger, notNullConfig);
             if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
                 return Array.Empty<Summary>();
+
+            if (args == null && Environment.GetCommandLineArgs().Length > 1) // The first element is the executable file name
+                logger.WriteLineHint("You haven't passed command line arguments to BenchmarkSwitcher.Run method. Running with default configuration.");
 
             if (options.PrintInformation)
             {
@@ -76,7 +82,7 @@ namespace BenchmarkDotNet.Running
                 return Array.Empty<Summary>();
             }
 
-            var effectiveConfig = ManualConfig.Union(config, parsedConfig);
+            var effectiveConfig = ManualConfig.Union(notNullConfig, parsedConfig);
 
             var (allTypesValid, allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(types, assemblies, logger);
             if (!allTypesValid) // there were some invalid and TypeFilter printed errors
