@@ -44,6 +44,18 @@ namespace BenchmarkDotNet.Attributes
             bool baseline = false
         ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, null, baseline, runtimeMoniker)) { }
 
+        [PublicAPI]
+        public SimpleJobAttribute(
+            RunStrategy runStrategy,
+            RuntimeMoniker runtimeMoniker,
+            int launchCount = DefaultValue,
+            int warmupCount = DefaultValue,
+            int targetCount = DefaultValue,
+            int invocationCount = DefaultValue,
+            string id = null,
+            bool baseline = false
+        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, runStrategy, baseline, runtimeMoniker)) { }
+
         private static Job CreateJob(string id, int launchCount, int warmupCount, int targetCount, int invocationCount, RunStrategy? runStrategy,
             bool baseline, RuntimeMoniker runtimeMoniker = RuntimeMoniker.HostProcess)
         {

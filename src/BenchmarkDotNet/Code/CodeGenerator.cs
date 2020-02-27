@@ -149,7 +149,7 @@ namespace BenchmarkDotNet.Code
         {
             var method = descriptor.WorkloadMethod;
 
-            if (method.ReturnType == typeof(Task))
+            if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask))
             {
                 return new TaskDeclarationsProvider(descriptor);
             }

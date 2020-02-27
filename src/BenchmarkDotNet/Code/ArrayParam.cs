@@ -7,6 +7,12 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Code
 {
+    internal static class ArrayParam
+    {
+        public static string GetDisplayString(Array array)
+            => $"{array.GetType().GetElementType().GetDisplayName()}[{array.Length}]";
+    }
+
     public class ArrayParam<T> : IParam
     {
         private readonly T[] array;
@@ -20,7 +26,7 @@ namespace BenchmarkDotNet.Code
 
         public object Value => array;
 
-        public string DisplayText => $"Array[{array.Length}]";
+        public string DisplayText => ArrayParam.GetDisplayString(array);
 
         public string ToSourceCode()
             => $"new {typeof(T).GetCorrectCSharpTypeName()}[] {{ {string.Join(", ", array.Select(item => toSourceCode?.Invoke(item) ?? SourceCodeHelper.ToSourceCode(item)))} }}";
