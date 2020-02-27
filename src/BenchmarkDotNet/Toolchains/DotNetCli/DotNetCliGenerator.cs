@@ -10,6 +10,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public abstract class DotNetCliGenerator : GeneratorBase
     {
+        private static readonly string[] ProjectExtensions = { ".csproj", ".fsproj", ".vbroj" };
+
         [PublicAPI] public string TargetFrameworkMoniker { get; }
 
         [PublicAPI] public string CliPath { get; }
@@ -103,6 +105,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private static bool IsRootProjectFolder(DirectoryInfo directoryInfo)
             => directoryInfo
                 .GetFileSystemInfos()
-                .Any(fileInfo => fileInfo.Extension == ".csproj");
+                .Any(fileInfo => ProjectExtensions.Contains(fileInfo.Extension));
     }
 }

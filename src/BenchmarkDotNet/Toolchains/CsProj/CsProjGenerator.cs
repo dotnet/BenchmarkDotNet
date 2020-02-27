@@ -140,14 +140,11 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI]
         protected virtual FileInfo GetProjectFilePath(Type benchmarkTarget, ILogger logger)
         {
-            if (!GetSolutionRootDirectory(out var rootDirectory))
+            if (!GetSolutionRootDirectory(out var rootDirectory) && !GetProjectRootDirectory(out rootDirectory))
             {
-                if (!GetProjectRootDirectory(out rootDirectory))
-                {
-                    logger.WriteLineError(
-                        $"Unable to find .sln or .csproj file. Will use current directory {Directory.GetCurrentDirectory()} to search for project file. If you don't use .sln file on purpose it should not be a problem.");
-                    rootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
-                }
+                logger.WriteLineError(
+                    $"Unable to find .sln or .csproj file. Will use current directory {Directory.GetCurrentDirectory()} to search for project file. If you don't use .sln file on purpose it should not be a problem.");
+                rootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
             }
 
             // important assumption! project's file name === output dll name
