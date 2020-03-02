@@ -69,5 +69,11 @@ namespace BenchmarkDotNet.Jobs
             get => NuGetReferencesCharacteristic[this];
             set => NuGetReferencesCharacteristic[this] = value;
         }
+
+        public bool TryGetToolchain(out IToolchain toolchain)
+        {
+            toolchain = HasValue(ToolchainCharacteristic) ? Toolchain : default;
+            return toolchain != default;
+        }
     }
 }
