@@ -74,6 +74,8 @@ namespace BenchmarkDotNet.Code
 
             if (buildPartition.IsCoreRT)
                 extraDefines.Add("#define CORERT");
+            else if (buildPartition.IsNetFramework)
+                extraDefines.Add("#define NETFRAMEWORK");
 
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
                 .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
