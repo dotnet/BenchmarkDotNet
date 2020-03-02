@@ -9,6 +9,7 @@ using ApprovalTests.Reporters;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Loggers;
@@ -57,7 +58,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             foreach (var exporter in exporters)
             {
                 PrintTitle(logger, exporter);
-                exporter.ExportToLog(MockFactory.CreateSummary(config), logger);
+                exporter.ExportToLog(MockFactory.CreateSummary(config.WithCultureInfo(cultureInfo)), logger);
             }
 
             Approvals.Verify(logger.GetLog());
@@ -99,9 +100,9 @@ namespace BenchmarkDotNet.Tests.Exporters
         }
 
         private static readonly IConfig config = ManualConfig.Create(DefaultConfig.Instance)
-            .With(StatisticColumn.Mean)
-            .With(StatisticColumn.StdDev)
-            .With(StatisticColumn.P67);
+            .AddColumn(StatisticColumn.Mean)
+            .AddColumn(StatisticColumn.StdDev)
+            .AddColumn(StatisticColumn.P67);
 
         public void Dispose()
         {

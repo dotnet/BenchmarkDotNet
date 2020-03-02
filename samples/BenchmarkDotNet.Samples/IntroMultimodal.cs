@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Samples
     {
         private readonly Random rnd = new Random(42);
 
-        private void Multimodal(int n) 
+        private void Multimodal(int n)
             => Thread.Sleep((rnd.Next(n) + 1) * 100);
 
         [Benchmark] public void Unimodal() => Multimodal(1);

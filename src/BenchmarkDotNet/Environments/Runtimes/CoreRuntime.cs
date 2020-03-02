@@ -11,15 +11,15 @@ namespace BenchmarkDotNet.Environments
 {
     public class CoreRuntime : Runtime
     {
-        public static readonly CoreRuntime Core20 = new CoreRuntime(TargetFrameworkMoniker.NetCoreApp20, "netcoreapp2.0", ".NET Core 2.0");
-        public static readonly CoreRuntime Core21 = new CoreRuntime(TargetFrameworkMoniker.NetCoreApp21, "netcoreapp2.1", ".NET Core 2.1");
-        public static readonly CoreRuntime Core22 = new CoreRuntime(TargetFrameworkMoniker.NetCoreApp22, "netcoreapp2.2", ".NET Core 2.2");
-        public static readonly CoreRuntime Core30 = new CoreRuntime(TargetFrameworkMoniker.NetCoreApp30, "netcoreapp3.0", ".NET Core 3.0");
-        public static readonly CoreRuntime Core31 = new CoreRuntime(TargetFrameworkMoniker.NetCoreApp31, "netcoreapp3.1", ".NET Core 3.1");
-        public static readonly CoreRuntime Core50 = new CoreRuntime(TargetFrameworkMoniker.NetCoreApp50, "netcoreapp5.0", ".NET Core 5.0");
+        public static readonly CoreRuntime Core20 = new CoreRuntime(RuntimeMoniker.NetCoreApp20, "netcoreapp2.0", ".NET Core 2.0");
+        public static readonly CoreRuntime Core21 = new CoreRuntime(RuntimeMoniker.NetCoreApp21, "netcoreapp2.1", ".NET Core 2.1");
+        public static readonly CoreRuntime Core22 = new CoreRuntime(RuntimeMoniker.NetCoreApp22, "netcoreapp2.2", ".NET Core 2.2");
+        public static readonly CoreRuntime Core30 = new CoreRuntime(RuntimeMoniker.NetCoreApp30, "netcoreapp3.0", ".NET Core 3.0");
+        public static readonly CoreRuntime Core31 = new CoreRuntime(RuntimeMoniker.NetCoreApp31, "netcoreapp3.1", ".NET Core 3.1");
+        public static readonly CoreRuntime Core50 = new CoreRuntime(RuntimeMoniker.NetCoreApp50, "netcoreapp5.0", ".NET Core 5.0");
 
-        private CoreRuntime(TargetFrameworkMoniker targetFrameworkMoniker, string msBuildMoniker, string displayName)
-            : base(targetFrameworkMoniker, msBuildMoniker, displayName)
+        private CoreRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
+            : base(runtimeMoniker, msBuildMoniker, displayName)
         {
         }
 
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Environments
             if (string.IsNullOrEmpty(msBuildMoniker)) throw new ArgumentNullException(nameof(msBuildMoniker));
             if (string.IsNullOrEmpty(displayName)) throw new ArgumentNullException(nameof(displayName));
 
-            return new CoreRuntime(TargetFrameworkMoniker.NotRecognized, msBuildMoniker, displayName);
+            return new CoreRuntime(RuntimeMoniker.NotRecognized, msBuildMoniker, displayName);
         }
 
         internal static CoreRuntime GetCurrentVersion()
@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.Environments
 
             if (RuntimeInformation.IsRunningInContainer)
             {
-                return Version.TryParse(Environment.GetEnvironmentVariable("DOTNET_VERSION"), out version) 
+                return Version.TryParse(Environment.GetEnvironmentVariable("DOTNET_VERSION"), out version)
                     || Version.TryParse(Environment.GetEnvironmentVariable("ASPNETCORE_VERSION"), out version);
             }
 
@@ -115,7 +115,7 @@ namespace BenchmarkDotNet.Environments
             return false;
         }
 
-        // sample input: 
+        // sample input:
         // 2.0: 4.6.26614.01 @BuiltBy: dlab14-DDVSOWINAGE018 @Commit: a536e7eec55c538c94639cefe295aa672996bf9b, Microsoft .NET Framework
         // 2.1: 4.6.27817.01 @BuiltBy: dlab14-DDVSOWINAGE101 @Branch: release/2.1 @SrcCode: https://github.com/dotnet/coreclr/tree/6f78fbb3f964b4f407a2efb713a186384a167e5c, Microsoft .NET Framework
         // 2.2: 4.6.27817.03 @BuiltBy: dlab14-DDVSOWINAGE101 @Branch: release/2.2 @SrcCode: https://github.com/dotnet/coreclr/tree/ce1d090d33b400a25620c0145046471495067cc7, Microsoft .NET Framework

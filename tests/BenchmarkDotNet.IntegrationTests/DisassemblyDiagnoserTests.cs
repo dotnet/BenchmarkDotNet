@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             [Benchmark] public void JustReturn() { }
         }
-        
+
         [TheoryWindowsOnly(WindowsOnly)]
         [MemberData(nameof(GetAllJits))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
@@ -136,11 +136,14 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, IDiagnoser disassemblyDiagnoser, RunStrategy runStrategy)
             => ManualConfig.CreateEmpty()
-                .With(Job.Dry.With(jit).With(platform).With(runtime).With(runStrategy))
-                .With(DefaultConfig.Instance.GetLoggers().ToArray())
-                .With(DefaultColumnProviders.Instance)
-                .With(disassemblyDiagnoser)
-                .With(new OutputLogger(Output));
+                .AddJob(Job.Dry.WithJit(jit)
+                    .WithPlatform(platform)
+                    .WithRuntime(runtime)
+                    .WithStrategy(runStrategy))
+                .AddLogger(DefaultConfig.Instance.GetLoggers().ToArray())
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddDiagnoser(disassemblyDiagnoser)
+                .AddLogger(new OutputLogger(Output));
 
         private void AssertDisassembled(IDisassemblyDiagnoser diagnoser, string methodSignature)
         {

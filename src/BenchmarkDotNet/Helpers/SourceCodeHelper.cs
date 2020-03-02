@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Helpers
                 return "typeof(" + type.GetCorrectCSharpTypeName() + ")";
             if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)
                 return "System.Activator.CreateInstance<" + value.GetType().GetCorrectCSharpTypeName() + ">()";
-            
+
             switch (value) {
                 case TimeInterval interval:
                     return "new BenchmarkDotNet.Horology.TimeInterval(" + ToSourceCode(interval.Nanoseconds) + ")";
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Helpers
             return value.ToString();
         }
 
-        public static bool IsCompilationTimeConstant(object value) 
+        public static bool IsCompilationTimeConstant(object value)
             => value == null || IsCompilationTimeConstant(value.GetType());
 
         public static bool IsCompilationTimeConstant(Type type)
@@ -109,7 +109,7 @@ namespace BenchmarkDotNet.Helpers
                 return "System.Double.MaxValue";
             if (value == double.MinValue)
                 return "System.Double.MinValue";
-            
+
             return value.ToString("G", CultureInfo.InvariantCulture) + "d";
         }
 
@@ -127,7 +127,7 @@ namespace BenchmarkDotNet.Helpers
                 return "System.Single.MaxValue";
             if (value == float.MinValue)
                 return "System.Single.MinValue";
-            
+
             return value.ToString("G", CultureInfo.InvariantCulture) + "f";
         }
 

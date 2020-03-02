@@ -179,7 +179,7 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Equal("NewId", j.Id); // id set
 
             j = j.Freeze()
-                .With(Platform.X64)
+                .WithPlatform(Platform.X64)
                 .WithLaunchCount(2);
 
             Assert.Equal("NewId", j.Id); // id not lost
@@ -225,7 +225,7 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Equal("MyId", j.Id);
             Assert.Equal("MyId", j.Environment.Id);
 
-            j = j.With(Jit.RyuJit);  // custom id will flow
+            j = j.WithJit(Jit.RyuJit);  // custom id will flow
             Assert.Equal("MyId", j.Id);
         }
 
@@ -238,7 +238,7 @@ namespace BenchmarkDotNet.Tests.Configs
 
             Assert.Equal(id, jobWithId.Id);
 
-            var shouldHaveSameId = jobWithId.With(Jit.RyuJit);
+            var shouldHaveSameId = jobWithId.WithJit(Jit.RyuJit);
 
             Assert.Equal(id, shouldHaveSameId.Id);
         }
@@ -248,16 +248,16 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var predefinedJob = Job.Default;
 
-            var customJob = predefinedJob.With(Jit.RyuJit);
+            var customJob = predefinedJob.WithJit(Jit.RyuJit);
 
             Assert.NotEqual(predefinedJob.Id, customJob.Id);
         }
-        
+
         [Fact]
         public static void BaselineDoesntChangeId()
         {
             const string id = "theId";
-            
+
             var predefinedJob = Job.Default;
             var customJob = predefinedJob.AsBaseline();
             Assert.Equal(predefinedJob.Id, customJob.Id);
@@ -288,7 +288,7 @@ namespace BenchmarkDotNet.Tests.Configs
             // filter by properties
             j.Environment.Apply(
                 new Job()
-                    .With(Jit.RyuJit)
+                    .WithJit(Jit.RyuJit)
                     .WithGcAllowVeryLargeObjects(true)
                     .WithIterationCount(3)
                     .WithLaunchCount(22));
@@ -399,19 +399,19 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Throws<ArgumentException>(() => a[j] = new CharacteristicSet()); // not assignable;
             Assert.Throws<ArgumentException>(() => a[j] = 123); // not assignable;
         }
-        
+
         [Fact]
         public static void MutatorAppliedToOtherJobOverwritesOnlyTheConfiguredSettings()
         {
-            var jobBefore = Job.Default.With(CoreRuntime.Core30); // this is a default job with Runtime set to Core
+            var jobBefore = Job.Default.WithRuntime(CoreRuntime.Core30); // this is a default job with Runtime set to Core
             var copy = jobBefore.UnfreezeCopy();
-            
+
             Assert.False(copy.HasValue(RunMode.MaxIterationCountCharacteristic));
 
             var mutator = Job.Default.WithMaxIterationCount(20);
 
             copy.Apply(mutator);
-            
+
             Assert.True(copy.HasValue(RunMode.MaxIterationCountCharacteristic));
             Assert.Equal(20, copy.Run.MaxIterationCount);
             Assert.False(jobBefore.HasValue(RunMode.MaxIterationCountCharacteristic));
@@ -441,7 +441,7 @@ namespace BenchmarkDotNet.Tests.Configs
         }
 
         [Fact]
-        public static void WithNuGet() 
+        public static void WithNuGet()
         {
             var j = new Job("SomeId");
 
@@ -449,7 +449,7 @@ namespace BenchmarkDotNet.Tests.Configs
 
             j = j.Freeze().WithNuGet("Newtonsoft.Json");
             Assert.Equal(1, j.Infrastructure.NuGetReferences.Count);
-            
+
             j = j.WithNuGet("AutoMapper", "7.0.1");
             Assert.Collection(j.Infrastructure.NuGetReferences,
                 reference => Assert.Equal(new NuGetReference("AutoMapper", "7.0.1"), reference),
@@ -477,7 +477,7 @@ namespace BenchmarkDotNet.Tests.Configs
         private static bool IsSubclassOfobModeOfItself(Type type)
         {
             Type jobModeOfT;
-            
+
             try
             {
                 jobModeOfT = typeof(JobMode<>).MakeGenericType(type);
@@ -486,7 +486,7 @@ namespace BenchmarkDotNet.Tests.Configs
             {
                 return false;
             }
-            
+
             return type.IsSubclassOf(jobModeOfT);
         }
     }

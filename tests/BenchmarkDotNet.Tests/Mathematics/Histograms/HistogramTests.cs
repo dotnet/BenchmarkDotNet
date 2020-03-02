@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Mathematics.Histograms;
 using Xunit;
@@ -80,11 +80,11 @@ namespace BenchmarkDotNet.Tests.Mathematics.Histograms
         private void PrintHistogram(string title, Histogram histogram)
         {
             output.WriteLine($"=== {title}:Short ===");
-            output.WriteLine(histogram.ToTimeStr());
+            output.WriteLine(histogram.ToString(histogram.CreateNanosecondFormatter()));
             output.WriteLine($"=== {title}:Full ===");
-            output.WriteLine(histogram.ToTimeStr(full: true));
+            output.WriteLine(histogram.ToString(histogram.CreateNanosecondFormatter()));
         }
-        
+
         [Theory]
         [InlineData(new[] { 1.0, 2.0, 3.0 })]
         [InlineData(new[] { 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 })]
@@ -99,8 +99,8 @@ namespace BenchmarkDotNet.Tests.Mathematics.Histograms
             foreach (var rule in rules)
             {
                 var histogram = HistogramBuilder.Simple.Build(s, rule);
-                output.WriteLine($"!!!!! Rule = {rule}, BinSize = {histogram.BinSize.ToTimeStr()} !!!!!");
-                output.WriteLine(histogram.ToTimeStr());
+                output.WriteLine($"!!!!! Rule = {rule}, BinSize = {TimeInterval.FromNanoseconds(histogram.BinSize).ToString(TestCultureInfo.Instance)} !!!!!");
+                output.WriteLine(histogram.ToString(histogram.CreateNanosecondFormatter()));
                 output.WriteLine("");
                 output.WriteLine("");
             }

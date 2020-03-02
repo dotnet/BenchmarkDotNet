@@ -9,6 +9,6 @@ namespace BenchmarkDotNet.Attributes
     {
         public IConfig Config { get; }
 
-        public ThreadingDiagnoserAttribute() => Config = ManualConfig.CreateEmpty().With(ThreadingDiagnoser.Default);
+        public ThreadingDiagnoserAttribute() => Config = ManualConfig.CreateEmpty().AddDiagnoser(ThreadingDiagnoser.Default);
     }
 }

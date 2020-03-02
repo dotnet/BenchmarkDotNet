@@ -13,13 +13,13 @@ namespace BenchmarkDotNet.Jobs
         [PublicAPI] public static readonly Characteristic<MetaMode> MetaCharacteristic = CreateCharacteristic<MetaMode>(nameof(Meta));
 
         // Env
-        [Obsolete("Please use Job.Default.With(ClrRuntime.Net$Version) instead", true)]
+        [Obsolete("Please use Job.Default.WithRuntime(ClrRuntime.Net$Version) instead", true)]
         public static readonly Job Clr;
-        [Obsolete("Please use Job.Default.With(CoreRuntime.Core$Version) instead", true)]
+        [Obsolete("Please use Job.Default.WithRuntime(CoreRuntime.Core$Version) instead", true)]
         public static readonly Job Core;
-        [Obsolete("Please use Job.Default.With(MonoRuntime.Default) instead", true)]
+        [Obsolete("Please use Job.Default.WithRuntime(MonoRuntime.Default) instead", true)]
         public static readonly Job Mono;
-        [Obsolete("Please use Job.Default.With(CoreRtRuntime.CoreRt$Version) instead", true)]
+        [Obsolete("Please use Job.Default.WithRuntime(CoreRtRuntime.CoreRt$Version) instead", true)]
         public static readonly Job CoreRT;
 
         public static readonly Job LegacyJitX86 = new Job(nameof(LegacyJitX86), EnvironmentMode.LegacyJitX86).Freeze();
@@ -30,13 +30,13 @@ namespace BenchmarkDotNet.Jobs
         // Run
         public static readonly Job Dry = new Job(nameof(Dry), RunMode.Dry).Freeze();
 
-        [Obsolete("Please use Job.Dry.With(ClrRuntime.Net$Version) instead", true)]
+        [Obsolete("Please use Job.Dry.WithRuntime(ClrRuntime.Net$Version) instead", true)]
         public static readonly Job DryClr;
-        [Obsolete("Please use Job.Dry.With(CoreRuntime.Core$Version) instead", true)]
+        [Obsolete("Please use Job.Dry.WithRuntime(CoreRuntime.Core$Version) instead", true)]
         public static readonly Job DryCore;
-        [Obsolete("Please use Job.Dry.With(MonoRuntime.Default) instead", true)]
+        [Obsolete("Please use Job.Dry.WithRuntime(MonoRuntime.Default) instead", true)]
         public static readonly Job DryMono;
-        [Obsolete("Please use Job.Dry.With(CoreRtRuntime.CoreRt$Version) instead", true)]
+        [Obsolete("Please use Job.Dry.WithRuntime(CoreRtRuntime.CoreRt$Version) instead", true)]
         public static readonly Job DryCoreRT;
 
         public static readonly Job ShortRun = new Job(nameof(ShortRun), RunMode.Short).Freeze();

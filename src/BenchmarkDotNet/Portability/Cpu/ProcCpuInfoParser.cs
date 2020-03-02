@@ -15,12 +15,12 @@ namespace BenchmarkDotNet.Portability.Cpu
             var logicalCores = SectionsHelper.ParseSections(content, ':');
             var processorModelNames = new HashSet<string>();
             var processorsToPhysicalCoreCount = new Dictionary<string, int>();
-            
+
             int logicalCoreCount = 0;
             var nominalFrequency = Frequency.Zero;
             var minFrequency = Frequency.Zero;
             var maxFrequency = Frequency.Zero;
-            
+
             foreach (var logicalCore in logicalCores)
             {
                 if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.PhysicalId, out string physicalId) &&
@@ -35,13 +35,13 @@ namespace BenchmarkDotNet.Portability.Cpu
                     nominalFrequency = ParseFrequencyFromBrandString(modelName);
                     logicalCoreCount++;
                 }
-                
+
                 if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.MinFrequency, out string minCpuFreqValue)
                     && Frequency.TryParseMHz(minCpuFreqValue, out var minCpuFreq))
                 {
                     minFrequency = minCpuFreq;
                 }
-                
+
                 if (logicalCore.TryGetValue(ProcCpuInfoKeyNames.MaxFrequency, out string maxCpuFreqValue)
                      && Frequency.TryParseMHz(maxCpuFreqValue, out var maxCpuFreq))
                 {

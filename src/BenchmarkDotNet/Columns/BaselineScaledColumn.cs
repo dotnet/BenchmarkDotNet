@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Columns
 {
-    [Obsolete("Use BaselineRatioColumn"), PublicAPI]    
+    [Obsolete("Use BaselineRatioColumn"), PublicAPI]
     public class BaselineScaledColumn : BaselineCustomColumn
     {
         public enum ScaledKind
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Columns
                 switch (Kind)
                 {
                     case ScaledKind.Mean:
-                        return "Scaled";                    
+                        return "Scaled";
                     default:
                         throw new NotSupportedException();
                 }
@@ -45,10 +45,11 @@ namespace BenchmarkDotNet.Columns
         {
             double mean = isBaseline ? 1 : Statistics.DivMean(current, baseline);
 
+            var cultureInfo = summary.Style.CultureInfo;
             switch (Kind)
             {
                 case ScaledKind.Mean:
-                    return IsNonBaselinesPrecise(summary, baseline, benchmarkCase) ? mean.ToStr("N3") : mean.ToStr("N2");
+                    return IsNonBaselinesPrecise(summary, baseline, benchmarkCase) ? mean.ToString("N3", cultureInfo) : mean.ToString("N2", cultureInfo);
                 default:
                     throw new NotSupportedException();
             }

@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Order
         public MethodOrderPolicy MethodOrderPolicy { get; }
 
         public DefaultOrderer(
-            SummaryOrderPolicy summaryOrderPolicy = SummaryOrderPolicy.Default, 
+            SummaryOrderPolicy summaryOrderPolicy = SummaryOrderPolicy.Default,
             MethodOrderPolicy methodOrderPolicy = MethodOrderPolicy.Declared)
         {
             SummaryOrderPolicy = summaryOrderPolicy;
@@ -50,9 +50,9 @@ namespace BenchmarkDotNet.Order
             foreach (var benchmark in GetSummaryOrderForGroup(logicalGroup.ToImmutableArray(), summary))
                 yield return benchmark;
         }
-        
+
         protected virtual IEnumerable<BenchmarkCase> GetSummaryOrderForGroup(ImmutableArray<BenchmarkCase> benchmarksCase, Summary summary)
-        {            
+        {
             switch (SummaryOrderPolicy)
             {
                 case SummaryOrderPolicy.FastestToSlowest:
@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.Order
             {
                 rules.Add(BenchmarkLogicalGroupRule.ByMethod);
                 rules.Add(BenchmarkLogicalGroupRule.ByParams);
-            }            
+            }
             if (hasDescriptorBaselines)
             {
                 rules.Add(BenchmarkLogicalGroupRule.ByJob);
@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Order
                 rules.Remove(BenchmarkLogicalGroupRule.ByJob);
             }
 
-            var keys = new List<string>();            
+            var keys = new List<string>();
             if (rules.Contains(BenchmarkLogicalGroupRule.ByMethod))
                 keys.Add(benchmarkCase.Descriptor.DisplayInfo);
             if (rules.Contains(BenchmarkLogicalGroupRule.ByJob))

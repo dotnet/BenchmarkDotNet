@@ -21,7 +21,8 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                Add(StatisticColumn.P0,
+                AddColumn(
+                    StatisticColumn.P0,
                     StatisticColumn.P25,
                     StatisticColumn.P50,
                     StatisticColumn.P67,

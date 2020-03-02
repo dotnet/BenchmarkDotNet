@@ -10,6 +10,14 @@ namespace BenchmarkDotNet.Exporters
 {
     public class CombinedDisassemblyExporter : ExporterBase
     {
+        internal const string CssDefinition = @"
+<style type=""text/css"">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: left; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>";
+
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
         public CombinedDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results)
@@ -32,7 +40,7 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("<head>");
             logger.WriteLine("<meta charset='utf-8' />");
             logger.WriteLine($"<title>DisassemblyDiagnoser Output {summary.Title}</title>");
-            logger.WriteLine(HtmlExporter.CssDefinition);
+            logger.WriteLine(CssDefinition);
             logger.WriteLine("</head>");
 
             logger.WriteLine("<body>");
@@ -42,18 +50,18 @@ namespace BenchmarkDotNet.Exporters
                 foreach (var targetingSameMethod in benchmarksByTarget)
                 {
                     PrintTable(
-                        targetingSameMethod.ToArray(), 
-                        logger, 
-                        targetingSameMethod.First().Descriptor.DisplayInfo, 
+                        targetingSameMethod.ToArray(),
+                        logger,
+                        targetingSameMethod.First().Descriptor.DisplayInfo,
                         benchmark => GetImportantInfo(summary[benchmark]));
                 }
             }
             else // different methods, same JIT
             {
                 PrintTable(
-                    summary.BenchmarksCases.Where(benchmark => results.ContainsKey(benchmark)).ToArray(), 
-                    logger, 
-                    summary.Title, 
+                    summary.BenchmarksCases.Where(benchmark => results.ContainsKey(benchmark)).ToArray(),
+                    logger,
+                    summary.Title,
                     benchmark => $"{benchmark.Descriptor.WorkloadMethod.Name} {GetImportantInfo(summary[benchmark])}");
             }
 
@@ -73,7 +81,7 @@ namespace BenchmarkDotNet.Exporters
             }
             logger.WriteLine("</tr>");
             logger.WriteLine("</thead>");
-            
+
             logger.WriteLine("<tbody>");
             logger.WriteLine("<tr>");
             foreach (var benchmark in benchmarksCase)

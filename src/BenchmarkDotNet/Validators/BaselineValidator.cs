@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Validators
             var benchmarkLogicalGroups = allBenchmarks
                 .Select(benchmark => orderProvider.GetLogicalGroupKey(allBenchmarks, benchmark))
                 .ToArray();
-            
+
             var logicalGroups = benchmarkLogicalGroups.Distinct().ToArray();
             foreach (string logicalGroup in logicalGroups)
             {
@@ -29,17 +29,17 @@ namespace BenchmarkDotNet.Validators
                 int jobBaselineCount = benchmarks.Select(b => b.Job).Distinct().Count(it => it.Meta.Baseline);
                 string className = benchmarks.First().Descriptor.Type.Name;
 
-                if (methodBaselineCount > 1) 
+                if (methodBaselineCount > 1)
                     yield return CreateError("benchmark method", "Baseline = true", logicalGroup, className, methodBaselineCount.ToString());
 
-                if (jobBaselineCount > 1) 
+                if (jobBaselineCount > 1)
                     yield return CreateError("job", "Baseline = true", logicalGroup, className, jobBaselineCount.ToString());
             }
         }
 
-        private ValidationError CreateError(string subject, string property, string groupName, string className, string actual) => 
+        private ValidationError CreateError(string subject, string property, string groupName, string className, string actual) =>
             new ValidationError(
-                TreatsWarningsAsErrors, 
+                TreatsWarningsAsErrors,
                 $"Only 1 {subject} in a group can have \"{property}\" applied to it, group {groupName} in class {className} has {actual}");
     }
 }

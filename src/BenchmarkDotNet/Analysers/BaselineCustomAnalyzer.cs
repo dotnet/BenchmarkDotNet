@@ -3,6 +3,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Analysers
 {
@@ -18,8 +19,10 @@ namespace BenchmarkDotNet.Analysers
                                               .Select(t => t.ColumnName)
                                               .Distinct()
                                               .ToArray();
-
-            var columNames = string.Join(", ", columns);
+            if (columns.IsEmpty())
+                yield break;
+            
+            var columnNames = string.Join(", ", columns);
 
             foreach (var benchmarkCase in summary.BenchmarksCases)
             {
@@ -29,7 +32,7 @@ namespace BenchmarkDotNet.Analysers
                     continue;
 
                 var message = "A question mark '?' symbol indicates that it was not possible to compute the " +
-                                $"({columNames}) column(s) because the baseline value is too close to zero.";
+                                $"({columnNames}) column(s) because the baseline value is too close to zero.";
 
                 yield return Conclusion.CreateWarning(Id, message);
             }

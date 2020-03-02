@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
 
@@ -30,12 +32,27 @@ namespace BenchmarkDotNet.Mathematics.Histograms
             Math.Max(bin1.Upper, bin2.Upper),
             bin1.Values.Union(bin2.Values).OrderBy(value => value).ToArray());
 
-        public override string ToString() => ToString(Encoding.ASCII);
+        public override string ToString() => ToString(DefaultCultureInfo.Instance);
 
-        [PublicAPI] public string ToString(Encoding encoding)
+        [PublicAPI] public string ToString(CultureInfo cultureInfo)
         {
             var unit = TimeUnit.GetBestTimeUnit(Values);
-            return $"[{Lower.ToTimeStr(unit, encoding)};{Upper.ToTimeStr(unit, encoding)}) {{{string.Join("; ", Values.Select(v => v.ToTimeStr(unit, encoding)))}}}";
+            var builder = new StringBuilder();
+            builder.Append('[');
+            builder.Append(TimeInterval.FromNanoseconds(Lower).ToString(unit, cultureInfo));
+            builder.Append(';');
+            builder.Append(TimeInterval.FromNanoseconds(Upper).ToString(unit, cultureInfo));
+            builder.Append(' ');
+            builder.Append('{');
+            for (var i = 0; i < Values.Length; i++)
+            {
+                if (i != 0)
+                    builder.Append("; ");
+                builder.Append(TimeInterval.FromNanoseconds(Values[i]).ToString(unit, cultureInfo));
+            }
+            builder.Append('}');
+            
+            return builder.ToString();
         }
     }
 }

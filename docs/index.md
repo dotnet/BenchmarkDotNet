@@ -158,7 +158,7 @@ The library is used by a large number of projects for performance discussions or
 
 * [CoreCLR](https://github.com/dotnet/coreclr/issues?utf8=✓&q=BenchmarkDotNet) (.NET Core runtime)
 * [CoreFX](https://github.com/dotnet/corefx/issues?utf8=✓&q=BenchmarkDotNet) (.NET Core foundational libraries;
-  see also [official benchmarking guide](https://github.com/dotnet/corefx/blob/master/Documentation/project-docs/benchmarking.md)),
+  see also [official benchmarking guide](https://github.com/dotnet/performance/blob/master/docs/benchmarking-workflow-corefx.md)),
 * [Roslyn](https://github.com/dotnet/roslyn/search?q=BenchmarkDotNet&type=Issues&utf8=✓) (C# and Visual Basic compiler)
 * [KestrelHttpServer](https://github.com/aspnet/KestrelHttpServer/tree/dev/benchmarks/Kestrel.Performance) (A cross platform web server for ASP.NET Core)
 * [SignalR](https://github.com/aspnet/SignalR/tree/dev/benchmarks/Microsoft.AspNetCore.SignalR.Microbenchmarks)

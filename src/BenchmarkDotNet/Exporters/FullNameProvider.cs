@@ -12,7 +12,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public static class FullNameProvider 
+    public static class FullNameProvider
     {
         private static readonly IReadOnlyDictionary<Type, string> Aliases = new Dictionary<Type, string>
         {
@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Exporters
             { typeof(bool?), "bool?" },
             { typeof(char?), "char?" }
         };
-        
+
         [PublicAPI("used by the dotnet/performance repository")]
         public static string GetBenchmarkName(BenchmarkCase benchmarkCase)
         {
@@ -116,14 +116,14 @@ namespace BenchmarkDotNet.Exporters
                 parametersBuilder.Append(methodArguments[i].Name).Append(':').Append(' ');
                 parametersBuilder.Append(GetArgument(benchmarkParameters.GetArgument(methodArguments[i].Name).Value, methodArguments[i].ParameterType));
             }
-            
+
             for (int i = 0; i < benchmarkParams.Length; i++)
             {
                 var parameter = benchmarkParams[i];
-                
+
                 if (methodArguments.Length > 0 || i > 0)
                     parametersBuilder.Append(", ");
-                
+
                 parametersBuilder.Append(parameter.Name).Append(':').Append(' ');
                 parametersBuilder.Append(GetArgument(parameter.Value, parameter.Value?.GetType()));
             }
@@ -194,7 +194,7 @@ namespace BenchmarkDotNet.Exporters
 
             if (type.IsNullable())
                 return $"{GetTypeArgumentName(Nullable.GetUnderlyingType(type))}?";
-            
+
             if (!string.IsNullOrEmpty(type.Namespace))
                 return $"{type.Namespace}.{GetTypeName(type)}";
 

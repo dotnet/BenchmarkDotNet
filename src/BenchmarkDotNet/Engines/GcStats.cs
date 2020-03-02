@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
 {
-    public struct GcStats
+    public struct GcStats : IEquatable<GcStats>
     {
         internal const string ResultsLinePrefix = "GC: ";
 
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Engines
             get
             {
                 bool excludeAllocationQuantumSideEffects = !RuntimeInformation.IsNetCore
-                    || RuntimeInformation.GetCurrentRuntime().TargetFrameworkMoniker == TargetFrameworkMoniker.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
+                    || RuntimeInformation.GetCurrentRuntime().RuntimeMoniker == RuntimeMoniker.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
 
                 return GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects) == 0
                     ? 0
@@ -106,7 +106,7 @@ namespace BenchmarkDotNet.Engines
         public static GcStats ReadInitial()
         {
             // this will force GC.Collect, so we want to do this before collecting collections counts
-            long allocatedBytes = GetAllocatedBytes(); 
+            long allocatedBytes = GetAllocatedBytes();
 
             return new GcStats(
                 GC.CollectionCount(0),
@@ -123,9 +123,9 @@ namespace BenchmarkDotNet.Engines
                 GC.CollectionCount(1),
                 GC.CollectionCount(2),
 
-                // this will force GC.Collect, so we want to do this after collecting collections counts 
+                // this will force GC.Collect, so we want to do this after collecting collections counts
                 // to exclude this single full forced collection from results
-                GetAllocatedBytes(), 
+                GetAllocatedBytes(),
                 0);
         }
 
@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.Engines
             if (RuntimeInformation.IsMono) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
                 return 0;
 
-            // "This instance Int64 property returns the number of bytes that have been allocated by a specific 
+            // "This instance Int64 property returns the number of bytes that have been allocated by a specific
             // AppDomain. The number is accurate as of the last garbage collection." - CLR via C#
             // so we enforce GC.Collect here just to make sure we get accurate results
             GC.Collect();
@@ -171,7 +171,7 @@ namespace BenchmarkDotNet.Engines
             return method != null ? (Func<bool, long>)method.CreateDelegate(typeof(Func<bool, long>)) : null;
         }
 
-        public string ToOutputLine() 
+        public string ToOutputLine()
             => $"{ResultsLinePrefix} {Gen0Collections} {Gen1Collections} {Gen2Collections} {AllocatedBytes} {TotalOperations}";
 
         public static GcStats Parse(string line)
@@ -221,6 +221,23 @@ namespace BenchmarkDotNet.Engines
             } while (result <= 0);
 
             return result;
+        }
+
+        public bool Equals(GcStats other) => Gen0Collections == other.Gen0Collections && Gen1Collections == other.Gen1Collections && Gen2Collections == other.Gen2Collections && AllocatedBytes == other.AllocatedBytes && TotalOperations == other.TotalOperations;
+
+        public override bool Equals(object obj) => obj is GcStats other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = Gen0Collections;
+                hashCode = (hashCode * 397) ^ Gen1Collections;
+                hashCode = (hashCode * 397) ^ Gen2Collections;
+                hashCode = (hashCode * 397) ^ AllocatedBytes.GetHashCode();
+                hashCode = (hashCode * 397) ^ TotalOperations.GetHashCode();
+                return hashCode;
+            }
         }
     }
 }

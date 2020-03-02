@@ -64,7 +64,6 @@ namespace BenchmarkDotNet.Code
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
                     .Replace("$Ref$", provider.UseRefKeyword ? "ref" : null)
                     .Replace("$MeasureExtraStats$", buildInfo.Config.HasExtraStatsDiagnoser() ? "true" : "false")
-                    .Replace("$Encoding$", buildInfo.Config.Encoding.ToTemplateString())
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
                     .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments)).ToString();
 
@@ -75,6 +74,8 @@ namespace BenchmarkDotNet.Code
 
             if (buildPartition.IsCoreRT)
                 extraDefines.Add("#define CORERT");
+            else if (buildPartition.IsNetFramework)
+                extraDefines.Add("#define NETFRAMEWORK");
 
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
                 .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
@@ -100,9 +101,9 @@ namespace BenchmarkDotNet.Code
 
             if (benchmarkDotNetLocation != null && benchmarkDotNetLocation.IndexOf("LINQPAD", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                /* "LINQPad normally puts the compiled query into a different folder than the referenced assemblies 
+                /* "LINQPad normally puts the compiled query into a different folder than the referenced assemblies
                  * - this allows for optimizations to reduce file I/O, which is important in the scratchpad scenario"
-                 * 
+                 *
                  * so in case we detect we are running from LINQPad, we give a hint to assembly loading to search also in this folder
                  */
 
@@ -150,7 +151,7 @@ namespace BenchmarkDotNet.Code
         {
             var method = descriptor.WorkloadMethod;
 
-            if (method.ReturnType == typeof(Task))
+            if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask))
             {
                 return new TaskDeclarationsProvider(descriptor);
             }
@@ -217,7 +218,7 @@ namespace BenchmarkDotNet.Code
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
                     .Select((parameter, index) => $"{GetParameterModifier(parameter)} arg{index}"));
 
-        private static string GetExtraAttributes(Descriptor descriptor) 
+        private static string GetExtraAttributes(Descriptor descriptor)
             => descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any() ? "[System.STAThreadAttribute]" : string.Empty;
 
         private static string GetEngineFactoryTypeName(BenchmarkCase benchmarkCase)

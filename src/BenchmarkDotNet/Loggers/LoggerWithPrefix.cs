@@ -15,13 +15,17 @@ namespace BenchmarkDotNet.Loggers
         {
             Logger = logger;
             Prefix = prefix;
+            Id = nameof(LoggerWithPrefix) + "." + Logger.Id + "." + Prefix;
         }
+
+        public string Id { get; }
+        public int Priority => Logger.Priority;
 
         public void Write(LogKind logKind, string text)
         {
             var lines = text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             WriteSimple(logKind, lines[0]);
-            
+
             for (int i = 1; i < lines.Length; i++)
             {
                 WriteLine();

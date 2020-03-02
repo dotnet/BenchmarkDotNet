@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
@@ -29,9 +29,9 @@ namespace BenchmarkDotNet.Engines
         [PublicAPI] public Action IterationSetupAction { get; }
         [PublicAPI] public Action IterationCleanupAction { get; }
         [PublicAPI] public IResolver Resolver { get; }
-        [PublicAPI] public Encoding Encoding { get; }
+        [PublicAPI] public CultureInfo CultureInfo { get; }
         [PublicAPI] public string BenchmarkName { get; }
-        
+
         private IClock Clock { get; }
         private bool ForceAllocations { get; }
         private int UnrollFactor { get; }
@@ -49,9 +49,9 @@ namespace BenchmarkDotNet.Engines
             IResolver resolver,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeExtraStats, Encoding encoding, string benchmarkName)
+            bool includeExtraStats, string benchmarkName)
         {
-            
+
             Host = host;
             OverheadAction = overheadAction;
             Dummy1Action = dummy1Action;
@@ -68,7 +68,6 @@ namespace BenchmarkDotNet.Engines
             BenchmarkName = benchmarkName;
 
             Resolver = resolver;
-            Encoding = encoding;
 
             Clock = targetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
             ForceAllocations = targetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
@@ -102,7 +101,7 @@ namespace BenchmarkDotNet.Engines
         {
             long invokeCount = InvocationCount;
             IReadOnlyList<Measurement> idle = null;
-            
+
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.BenchmarkStart(BenchmarkName);
 
@@ -128,16 +127,16 @@ namespace BenchmarkDotNet.Engines
 
             Host.AfterMainRun();
 
-            (GcStats workGcHasDone, ThreadingStats threadingStats) = includeExtraStats 
+            (GcStats workGcHasDone, ThreadingStats threadingStats) = includeExtraStats
                 ? GetExtraStats(new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor))
                 : (GcStats.Empty, ThreadingStats.Empty);
-            
+
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.BenchmarkStop(BenchmarkName);
 
             var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
 
-            return new RunResults(idle, main, outlierMode, workGcHasDone, threadingStats, Encoding);
+            return new RunResults(idle, main, outlierMode, workGcHasDone, threadingStats);
         }
 
         public Measurement RunIteration(IterationData data)
@@ -171,8 +170,8 @@ namespace BenchmarkDotNet.Engines
             GcCollect();
 
             // Results
-            var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, clockSpan.GetNanoseconds(), Encoding);
-            WriteLine(measurement.ToOutputLine());
+            var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, clockSpan.GetNanoseconds());
+            WriteLine(measurement.ToString());
 
             return measurement;
         }
@@ -194,7 +193,7 @@ namespace BenchmarkDotNet.Engines
             var finalGcStats = GcStats.ReadFinal();
             var finalThreadingStats = ThreadingStats.ReadFinal();
 
-            IterationCleanupAction(); // we run iteration cleanup after collecting GC stats 
+            IterationCleanupAction(); // we run iteration cleanup after collecting GC stats
 
             GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
             ThreadingStats threadingStats = (finalThreadingStats - initialThreadingStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
@@ -244,12 +243,12 @@ namespace BenchmarkDotNet.Engines
                     { HostSignal.AfterAll, "// AfterAll" }
                 };
 
-            private static readonly Dictionary<string, HostSignal> MessagesToSignals 
+            private static readonly Dictionary<string, HostSignal> MessagesToSignals
                 = SignalsToMessages.ToDictionary(p => p.Value, p => p.Key);
 
             public static string ToMessage(HostSignal signal) => SignalsToMessages[signal];
 
-            public static bool TryGetSignal(string message, out HostSignal signal) 
+            public static bool TryGetSignal(string message, out HostSignal signal)
                 => MessagesToSignals.TryGetValue(message, out signal);
         }
     }

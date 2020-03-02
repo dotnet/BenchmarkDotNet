@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Configs
     {
         public NativeMemoryProfilerAttribute()
         {
-            Config = ManualConfig.CreateEmpty().With(new NativeMemoryProfiler());
+            Config = ManualConfig.CreateEmpty().AddDiagnoser(new NativeMemoryProfiler());
         }
 
         public IConfig Config { get; }

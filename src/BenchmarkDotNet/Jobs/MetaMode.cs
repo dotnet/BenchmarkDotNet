@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Jobs
             get => BaselineCharacteristic[this];
             set => BaselineCharacteristic[this] = value;
         }
-        
+
         /// <summary>
         /// mutator job should not be added to the config, but instead applied to other jobs in given config
         /// </summary>
@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Jobs
             get => IsMutatorCharacteristic[this];
             set => IsMutatorCharacteristic[this] = value;
         }
-        
+
         /// <summary>
         /// set to true if you want to specify custom default settings for default job used by console arguments parser
         /// </summary>

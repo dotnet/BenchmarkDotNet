@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Configs
         /// <param name="bufferSizeInMb">ETW session buffer size, in MB. 256 by default</param>
         public EtwProfilerAttribute(bool performExtraBenchmarksRun = true, int bufferSizeInMb = 256)
         {
-            Config = ManualConfig.CreateEmpty().With(new EtwProfiler(new EtwProfilerConfig(performExtraBenchmarksRun, bufferSizeInMb)));
+            Config = ManualConfig.CreateEmpty().AddDiagnoser(new EtwProfiler(new EtwProfilerConfig(performExtraBenchmarksRun, bufferSizeInMb)));
         }
 
         public IConfig Config { get; }

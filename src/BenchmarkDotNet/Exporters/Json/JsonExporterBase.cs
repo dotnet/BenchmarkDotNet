@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.Exporters.Json
                 {
                     data.Add("Memory", report.GcStats);
                 }
-                
+
                 if (ExcludeMeasurements == false)
                 {
                     // We construct Measurements manually, so that we can have the IterationMode enum as text, rather than an integer

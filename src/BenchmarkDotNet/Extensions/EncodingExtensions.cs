@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Extensions
             {
                 case UnicodeEncoding u:
                     return result + u.EncodingName;
-                default: 
+                default:
                     return result + "ASCII";
             }
         }

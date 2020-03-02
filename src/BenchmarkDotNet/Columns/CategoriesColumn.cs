@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Columns
     public class CategoriesColumn : IColumn
     {
         public static readonly IColumn Default = new CategoriesColumn();
-        
+
         public string Id => nameof(CategoriesColumn);
         public string ColumnName => "Categories";
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => string.Join(",", benchmarkCase.Descriptor.Categories);

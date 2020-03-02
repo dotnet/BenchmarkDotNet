@@ -35,10 +35,10 @@ namespace BenchmarkDotNet.Validators
                         yield return new ValidationError(true, message, benchmark);
                     }
                 }
-                
+
                 foreach (var validationError in ValidateMinMax(run, resolver, benchmark, RunMode.MinIterationCountCharacteristic, RunMode.MaxIterationCountCharacteristic))
                     yield return validationError;
-                
+
                 foreach (var validationError in ValidateMinMax(run, resolver, benchmark, RunMode.MinWarmupIterationCountCharacteristic, RunMode.MaxWarmupIterationCountCharacteristic))
                     yield return validationError;
             }
@@ -48,10 +48,10 @@ namespace BenchmarkDotNet.Validators
             Characteristic<int> minCharacteristic, Characteristic<int> maxCharacteristic)
         {
             string GetName(Characteristic characteristic) => $"{characteristic.DeclaringType.Name}.{characteristic.Id}";
-            
+
             int minCount = run.ResolveValue(minCharacteristic, resolver);
             int maxCount = run.ResolveValue(maxCharacteristic, resolver);
-            
+
             if (minCount <= 0)
                 yield return new ValidationError(true, $"{GetName(minCharacteristic)} must be greater than zero (was {minCount})", benchmark);
 

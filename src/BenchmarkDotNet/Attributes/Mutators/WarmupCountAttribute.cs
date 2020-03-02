@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Jobs;
 using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Attributes 
+namespace BenchmarkDotNet.Attributes
 {
     /// <summary>
     /// How many warmup iterations should be performed.

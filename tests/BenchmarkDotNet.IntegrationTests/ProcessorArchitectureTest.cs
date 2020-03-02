@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void SpecifiedProccesorArchitectureMustBeRespected()
+        public void SpecifiedProcessorArchitectureMustBeRespected()
         {
 #if !CORE // dotnet cli does not support x86 compilation so far, so I disable this test
             Verify(Platform.X86, typeof(X86Benchmark), X86FailedCaption);
@@ -37,8 +37,8 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
 
             var config = ManualConfig.CreateEmpty()
-                    .With(Job.Dry.With(platform))
-                    .With(logger); // make sure we get an output in the TestRunner log
+                    .AddJob(Job.Dry.WithPlatform(platform))
+                    .AddLogger(logger); // make sure we get an output in the TestRunner log
 
             CanExecute(benchmark, config);
 

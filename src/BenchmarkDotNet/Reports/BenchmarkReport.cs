@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Reports
 
         [CanBeNull]
         public Statistics ResultStatistics => resultStatistics ?? (resultStatistics = GetResultRuns().Any()
-            ? new Statistics(GetResultRuns().Select(r => r.GetAverageNanoseconds()))
+            ? new Statistics(GetResultRuns().Select(r => r.GetAverageTime().Nanoseconds))
             : null);
 
         private Statistics resultStatistics;
@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Reports
             BuildResult buildResult,
             IReadOnlyList<ExecuteResult> executeResults,
             IReadOnlyList<Measurement> allMeasurements,
-            GcStats gcStats, 
+            GcStats gcStats,
             IReadOnlyList<Metric> metrics)
         {
             Success = success;

@@ -241,7 +241,7 @@ operable program or batch file.
 
             Check(input, expected, "Foo");
         }
-        
+
         [Fact]
         public void CanParseInvalidMonoDisassemblyOutput()
         {
@@ -289,7 +289,7 @@ operable program or batch file.
             for (int i = 0; i < expected.Methods[0].Maps[0].Instructions.Length; i++)
                 Assert.Equal(expected.Methods[0].Maps[0].Instructions[i].TextRepresentation,
                     disassemblyResult.Methods[0].Maps[0].Instructions[i].TextRepresentation);
-            
+
             Assert.Equal(expected.Errors.Length, disassemblyResult.Errors.Length);
             for (int i = 0; i < expected.Errors.Length; i++)
                 Assert.Equal(expected.Errors[i].Replace("\r", "").Replace("\n", ""), disassemblyResult.Errors[i].Replace("\r", "").Replace("\n", ""));

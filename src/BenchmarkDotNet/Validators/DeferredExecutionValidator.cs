@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Validators
         public static readonly IValidator FailOnError = new DeferredExecutionValidator(true);
 
         private DeferredExecutionValidator(bool failOnError) => TreatsWarningsAsErrors = failOnError;
-        
+
         public bool TreatsWarningsAsErrors { get; }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
@@ -30,10 +30,10 @@ namespace BenchmarkDotNet.Validators
         {
             if (returnType.IsByRef && !returnType.IsGenericType)
                 return IsDeferredExecution(returnType.GetElementType());
-            
+
             if (returnType.IsGenericType && (returnType.GetGenericTypeDefinition() == typeof(Task<>) || returnType.GetGenericTypeDefinition() == typeof(ValueTask<>)))
                 return IsDeferredExecution(returnType.GetGenericArguments().Single());
-            
+
             if (returnType == typeof(IEnumerable) || returnType == typeof(IQueryable))
                 return true;
 

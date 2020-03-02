@@ -55,9 +55,8 @@ namespace BenchmarkDotNet.Helpers
 
         private static int? GetReleaseNumberFromWindowsRegistry()
         {
-            using (var ndpKey = RegistryKey
-                .OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
-                .OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\"))
+            using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+            using (var ndpKey = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\"))
             {
                 if (ndpKey == null)
                     return null;
@@ -74,7 +73,7 @@ namespace BenchmarkDotNet.Helpers
                        .FirstOrDefault(v => releaseNumber >= v.minReleaseNumber && IsDeveloperPackInstalled(v.version))
                        .version;
         }
-        
+
         // Reference Assemblies exists when Developer Pack is installed
         private static bool IsDeveloperPackInstalled(string version) => Directory.Exists(Path.Combine(
             ProgramFilesX86DirectoryPath, @"Reference Assemblies\Microsoft\Framework\.NETFramework", 'v' + version));

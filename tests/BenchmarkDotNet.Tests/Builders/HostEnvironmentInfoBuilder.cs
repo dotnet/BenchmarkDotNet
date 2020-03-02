@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Tests.Builders
         public MockHostEnvironmentInfo(
             string architecture, string benchmarkDotNetVersion, Frequency chronometerFrequency, string configuration, string dotNetSdkVersion,
             HardwareTimerKind hardwareTimerKind, bool hasAttachedDebugger, bool hasRyuJit, bool isConcurrentGC, bool isServerGC,
-            string jitInfo, string jitModules, string osVersion, CpuInfo cpuInfo, 
+            string jitInfo, string jitModules, string osVersion, CpuInfo cpuInfo,
             string runtimeVersion, VirtualMachineHypervisor virtualMachineHypervisor)
         {
             Architecture = architecture;

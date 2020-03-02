@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     : DotNetCliCommandResult.Failure(stopwatch.Elapsed, outputReader.GetOutputText(), outputReader.GetErrorText());
             }
         }
-        
+
         internal static string GetDotNetSdkVersion()
         {
             using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version") })

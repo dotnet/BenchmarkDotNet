@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Attributes
         /// <param name="printDiff">Diff will be printed. False by default.</param>
         public DisassemblyDiagnoserAttribute(bool printAsm = true, bool printIL = false, bool printSource = false, bool printPrologAndEpilog = false, int recursiveDepth = 1, bool printDiff = false)
         {
-            Config = ManualConfig.CreateEmpty().With(
+            Config = ManualConfig.CreateEmpty().AddDiagnoser(
                 DisassemblyDiagnoser.Create(
                     new DisassemblyDiagnoserConfig(printAsm, printIL, printSource, printPrologAndEpilog, recursiveDepth, printDiff)));
         }

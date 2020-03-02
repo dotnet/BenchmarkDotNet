@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<int> WarmupCountCharacteristic = CreateCharacteristic<int>(nameof(WarmupCount));
         public static readonly Characteristic<int> MinWarmupIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MinWarmupIterationCount));
         public static readonly Characteristic<int> MaxWarmupIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MaxWarmupIterationCount));
-        
+
         public static readonly RunMode Dry = new RunMode(nameof(Dry))
         {
             LaunchCount = 1,
@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.Jobs
             get { return UnrollFactorCharacteristic[this]; }
             set { UnrollFactorCharacteristic[this] = value; }
         }
-        
+
         /// <summary>
         /// Minimum count of target iterations that should be performed
         /// The default value is 15
@@ -160,7 +160,7 @@ namespace BenchmarkDotNet.Jobs
             get { return MaxIterationCountCharacteristic[this]; }
             set { MaxIterationCountCharacteristic[this] = value; }
         }
-        
+
         /// <summary>
         /// Minimum count of warmup iterations that should be performed
         /// The default value is 6

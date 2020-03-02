@@ -6,6 +6,8 @@
 
         private NullLogger() { }
 
+        public string Id => nameof(NullLogger);
+        public int Priority => 0;
         public void Write(LogKind logKind, string text) { }
 
         public void WriteLine() { }

@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using JetBrains.Annotations;
 
@@ -32,8 +33,31 @@ namespace BenchmarkDotNet.Attributes
             bool baseline = false
         ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, runStrategy, baseline)) { }
 
+        [PublicAPI]
+        public SimpleJobAttribute(
+            RuntimeMoniker runtimeMoniker,
+            int launchCount = DefaultValue,
+            int warmupCount = DefaultValue,
+            int targetCount = DefaultValue,
+            int invocationCount = DefaultValue,
+            string id = null,
+            bool baseline = false
+        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, null, baseline, runtimeMoniker)) { }
+
+        [PublicAPI]
+        public SimpleJobAttribute(
+            RunStrategy runStrategy,
+            RuntimeMoniker runtimeMoniker,
+            int launchCount = DefaultValue,
+            int warmupCount = DefaultValue,
+            int targetCount = DefaultValue,
+            int invocationCount = DefaultValue,
+            string id = null,
+            bool baseline = false
+        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, runStrategy, baseline, runtimeMoniker)) { }
+
         private static Job CreateJob(string id, int launchCount, int warmupCount, int targetCount, int invocationCount, RunStrategy? runStrategy,
-            bool baseline)
+            bool baseline, RuntimeMoniker runtimeMoniker = RuntimeMoniker.HostProcess)
         {
             var job = new Job(id);
             if (launchCount != DefaultValue)
@@ -54,6 +78,8 @@ namespace BenchmarkDotNet.Attributes
                 job.Run.RunStrategy = runStrategy.Value;
             if (baseline)
                 job.Meta.Baseline = true;
+            if (runtimeMoniker != RuntimeMoniker.HostProcess)
+                job.Environment.Runtime = runtimeMoniker.GetRuntime();
 
             return job.Freeze();
         }

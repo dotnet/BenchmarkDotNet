@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Tests.Horology
             Assert.Equal(2000000000, span.GetNanoseconds(), 2);
             Assert.Equal(20000000L, span.GetDateTimeTicks());
             Assert.Equal(2, span.GetTimeSpan().TotalSeconds, 5);
-            Assert.Equal(2, span.GetTimeInterval().ToSeconds(), 5);
+            Assert.Equal(2, span.GetTimeValue().ToSeconds(), 5);
         }
 
         [Fact]
@@ -40,8 +40,8 @@ namespace BenchmarkDotNet.Tests.Horology
             var spans = startedClocks.Select(startedClock => startedClock.GetElapsed()).ToList();
             for (int i = 0; i < clocks.Count; i++)
             {
-                output.WriteLine(clocks[i].Title + ": " + spans[i].GetSeconds().ToTimeStr(TimeUnit.Second));
-                var interval = spans[i].GetTimeInterval();
+                output.WriteLine(clocks[i].Title + ": " + TimeInterval.FromSeconds(spans[i].GetSeconds()).ToString(TimeUnit.Second, TestCultureInfo.Instance));
+                var interval = spans[i].GetTimeValue();
                 Assert.True(interval > TimeInterval.Millisecond);
                 Assert.True(interval < TimeInterval.Hour);
             }
@@ -73,10 +73,10 @@ namespace BenchmarkDotNet.Tests.Horology
             output.WriteLine($"clockStarted                         = {clockStarted}");
             output.WriteLine($"clockElapsed                         = {clockElapsed}");
             output.WriteLine($"chronometerElapsed                   = {chronometerElapsed}");
-            output.WriteLine($"chronometerElapsed.GetTimeInterval() = {chronometerElapsed.GetTimeInterval()}");
-            output.WriteLine($"clockElapsed.GetTimeInterval()       = {clockElapsed.GetTimeInterval()}");
+            output.WriteLine($"chronometerElapsed.GetTimeValue()    = {chronometerElapsed.GetTimeValue()}");
+            output.WriteLine($"clockElapsed.GetTimeValue()          = {clockElapsed.GetTimeValue()}");
             output.WriteLine("-----");
-            Assert.True(chronometerElapsed.GetTimeInterval() >= clockElapsed.GetTimeInterval());
+            Assert.True(chronometerElapsed.GetTimeValue() >= clockElapsed.GetTimeValue());
 
             output.WriteLine($"Chronometer.GetResolution().Nanoseconds = {Chronometer.GetResolution().Nanoseconds}");
             output.WriteLine($"clock.GetResolution().Nanoseconds       = {clock.GetResolution().Nanoseconds}");

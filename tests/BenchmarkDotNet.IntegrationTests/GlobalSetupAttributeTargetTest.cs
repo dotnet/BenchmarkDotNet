@@ -24,12 +24,12 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = CreateSimpleConfig(logger);
 
             CanExecute<GlobalSetupAttributeTargetBenchmarks>(config);
-            
+
             string log = logger.GetLog();
 
             Assert.Contains(BaselineGlobalSetupCalled + Environment.NewLine, log);
             Assert.True(
-                log.IndexOf(BaselineGlobalSetupCalled + Environment.NewLine) < 
+                log.IndexOf(BaselineGlobalSetupCalled + Environment.NewLine) <
                 log.IndexOf(BaselineBenchmarkCalled + Environment.NewLine));
 
             Assert.Contains(FirstGlobalSetupCalled + Environment.NewLine, log);
@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 Console.WriteLine(FirstBenchmarkCalled);
             }
-            
+
             [GlobalSetup(Target = nameof(Benchmark2))]
             public void GlobalSetup2()
             {
