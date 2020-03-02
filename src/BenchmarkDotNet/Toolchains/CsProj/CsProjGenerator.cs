@@ -140,11 +140,11 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI]
         protected virtual FileInfo GetProjectFilePath(Type benchmarkTarget, ILogger logger)
         {
-            if (!GetSolutionRootDirectory(out var solutionRootDirectory))
+            if (!GetSolutionRootDirectory(out var rootDirectory) && !GetProjectRootDirectory(out rootDirectory))
             {
                 logger.WriteLineError(
-                    $"Unable to find .sln file. Will use current directory {Directory.GetCurrentDirectory()} to search for project file. If you don't use .sln file on purpose it should not be a problem.");
-                solutionRootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
+                    $"Unable to find .sln or .csproj file. Will use current directory {Directory.GetCurrentDirectory()} to search for project file. If you don't use .sln file on purpose it should not be a problem.");
+                rootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
             }
 
             // important assumption! project's file name === output dll name
@@ -153,14 +153,14 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             // I was afraid of using .GetFiles with some smart search pattern due to the fact that the method was designed for Windows
             // and now .NET is cross platform so who knows if the pattern would be supported for other OSes
             var possibleNames = new HashSet<string> { $"{projectName}.csproj", $"{projectName}.fsproj", $"{projectName}.vbproj" };
-            var projectFile = solutionRootDirectory
+            var projectFile = rootDirectory
                 .EnumerateFiles("*.*", SearchOption.AllDirectories)
                 .FirstOrDefault(file => possibleNames.Contains(file.Name));
 
             if (projectFile == default(FileInfo))
             {
                 throw new NotSupportedException(
-                    $"Unable to find {projectName} in {solutionRootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj");
+                    $"Unable to find {projectName} in {rootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj");
             }
             return projectFile;
         }
