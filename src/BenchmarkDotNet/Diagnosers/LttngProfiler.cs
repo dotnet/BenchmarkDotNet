@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Diagnosers
         private bool TryInstallPerfCollect(ValidationParameters validationParameters)
         {
             var scriptInstallationDirectory = new DirectoryInfo(validationParameters.Config.ArtifactsPath).CreateIfNotExists();
-            
+
             var perfCollectFile = scriptInstallationDirectory.GetFiles(PerfCollectFileName).SingleOrDefault();
             if (perfCollectFile != default)
             {
@@ -160,7 +160,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             if (WaitForSignal(logger, "// Collection with perfcollect stopped"))
             {
-                benchmarkToTraceFile[parameters.BenchmarkCase] = TraceFileHelper.GetFilePath(parameters.BenchmarkCase, parameters.Config, creationTime, ".trace.zip");
+                benchmarkToTraceFile[parameters.BenchmarkCase] = new FileInfo(ArtifactFileNameHelper.GetFilePath(parameters, creationTime, ".trace.zip"));
 
                 CleanupPerfCollectProcess(logger);
             }
@@ -168,7 +168,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         private Process CreatePerfCollectProcess(DiagnoserActionParameters parameters, FileInfo perfCollectFile)
         {
-            var traceName = TraceFileHelper.GetFilePath(parameters.BenchmarkCase, parameters.Config, creationTime, fileExtension: null).Name;
+            var traceName = new FileInfo(ArtifactFileNameHelper.GetFilePath(parameters, creationTime, fileExtension: null)).Name;
             // todo: escape characters bash does not like ' ', '(' etc
 
             var start = new ProcessStartInfo
