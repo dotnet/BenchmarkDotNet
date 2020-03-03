@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.Tracing.Parsers;
 
@@ -15,6 +15,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         protected override ulong EventType => (ulong)ClrTraceEventParser.Keywords.JitTracing;
 
         protected override string SessionNamePrefix => "JitTracing";
+
+        public override RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
 
         public abstract IEnumerable<string> Ids { get; }
 

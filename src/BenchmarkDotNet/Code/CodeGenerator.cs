@@ -73,6 +73,8 @@ namespace BenchmarkDotNet.Code
 
             if (buildPartition.IsCoreRT)
                 extraDefines.Add("#define CORERT");
+            else if (buildPartition.IsNetFramework)
+                extraDefines.Add("#define NETFRAMEWORK");
 
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
                 .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
@@ -148,7 +150,7 @@ namespace BenchmarkDotNet.Code
         {
             var method = descriptor.WorkloadMethod;
 
-            if (method.ReturnType == typeof(Task))
+            if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask))
             {
                 return new TaskDeclarationsProvider(descriptor);
             }

@@ -7,8 +7,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Extensions;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
@@ -104,8 +103,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             Details = details;
             Config = config;
-            FilePath = EnsureFolderExists(GetFilePath(details, creationTime));
-
+            FilePath = ArtifactFileNameHelper.GetFilePath(details, creationTime, FileExtension);
+            Path.GetDirectoryName(FilePath).CreateIfNotExists();
             TraceEventSession = new TraceEventSession(sessionName, FilePath)
             {
                 BufferSizeMB = config.BufferSizeInMb,
@@ -131,30 +130,5 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private void OnConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e) => Stop();
 
         private void OnProcessExit(object sender, EventArgs e) => Stop();
-
-        private string GetFilePath(DiagnoserActionParameters details, DateTime creationTime)
-        {
-            string fileName = $@"{FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type)}.{FullNameProvider.GetMethodName(details.BenchmarkCase)}";
-
-            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
-            if (details.Config.GetJobs().Select(job => job.GetToolchain()).Distinct().Count() > 1)
-                fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
-
-            fileName += $"-{creationTime.ToString(BenchmarkRunnerClean.DateTimeFormat)}";
-
-            fileName = FolderNameHelper.ToFolderName(fileName);
-
-            return Path.Combine(details.Config.ArtifactsPath, $"{fileName}{FileExtension}");
-        }
-
-        private string EnsureFolderExists(string filePath)
-        {
-            string directoryPath = Path.GetDirectoryName(filePath);
-
-            if (!Directory.Exists(directoryPath))
-                Directory.CreateDirectory(directoryPath);
-
-            return filePath;
-        }
     }
 }
