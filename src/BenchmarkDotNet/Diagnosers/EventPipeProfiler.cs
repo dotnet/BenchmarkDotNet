@@ -63,10 +63,10 @@ namespace BenchmarkDotNet.Diagnosers
         }
 
         private readonly Dictionary<BenchmarkCase, string> benchmarkToTraceFile = new Dictionary<BenchmarkCase, string>();
-        
+
         private readonly List<EventPipeProvider> eventPipeProviders = new List<EventPipeProvider>
         {
-            new EventPipeProvider("BenchmarkDotNet.EngineEventSource", EventLevel.Informational, long.MaxValue) // mandatory provider to enable Engine events
+            new EventPipeProvider(EngineEventSource.SourceName, EventLevel.Informational, long.MaxValue) // mandatory provider to enable Engine events
         };
 
         private static readonly string LogSeparator = new string('-', 20);
