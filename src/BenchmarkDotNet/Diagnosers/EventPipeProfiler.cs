@@ -43,30 +43,17 @@ namespace BenchmarkDotNet.Diagnosers
         /// <param name="profile">A named pre-defined set of provider configurations that allows common tracing scenarios to be specified succinctly.</param>
         /// <param name="providers">A list of EventPipe providers to be enabled.</param>
         public EventPipeProfiler(EventPipeProfile? profile = null, IReadOnlyCollection<EventPipeProvider> providers = null)
+        public EventPipeProfiler(EventPipeProfile profile = EventPipeProfile.CpuSampling, IReadOnlyCollection<EventPipeProvider> providers = null, bool performExtraBenchmarksRun = true)
         {
-            if (profile == null && (providers == null || !providers.Any()))
-            {
-                logger.WriteLine(LogKind.Info, "No profile or providers specified, defaulting to trace profile 'CpuSampling'");
-                profile = EventPipeProfile.CpuSampling;
-            }
 
             if (providers != null)
             {
                 eventPipeProviders.AddRange(providers);
             }
 
-            if (profile != null)
-            {
-                if (EventPipeProfileMapper.DotNetRuntimeProfiles.TryGetValue(profile.Value, out var selectedProfile))
-                {
-                    var newProvidersFromProfile = selectedProfile.Where(p => !eventPipeProviders.Any(r => r.Name.Equals(p.Name)));
-                    eventPipeProviders.AddRange(newProvidersFromProfile);
-                }
-                else
-                {
-                    logger.WriteLine(LogKind.Error, $"Invalid profile name: {profile}");
-                }
-            }
+            var selectedProfile = EventPipeProfileMapper.DotNetRuntimeProfiles[profile];
+            var newProvidersFromProfile = selectedProfile.Where(p => !eventPipeProviders.Any(r => r.Name.Equals(p.Name)));
+            eventPipeProviders.AddRange(newProvidersFromProfile);
         }
 
         public string ShortName => "EP";
@@ -99,16 +86,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             var diagnosticsClient = new DiagnosticsClient(parameters.Process.Id);
 
-            EventPipeSession session;
-            try
-            {
-                session = diagnosticsClient.StartEventPipeSession(eventPipeProviders, true);
-            }
-            catch (DiagnosticsClientException e)
-            {
-                logger.WriteLine(LogKind.Error, $"Unable to start a tracing session: {e}");
-                return;
-            }
+            EventPipeSession session = diagnosticsClient.StartEventPipeSession(eventPipeProviders, true);
 
             var fileName = ArtifactFileNameHelper.GetFilePath(parameters, DateTime.Now, "nettrace").EnsureFolderExists();
             benchmarkToTraceFile[parameters.BenchmarkCase] = fileName;
