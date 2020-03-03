@@ -15,11 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Diagnostics
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.IntegrationTests.CustomPaths", "tests\BenchmarkDotNet.IntegrationTests.CustomPaths\BenchmarkDotNet.IntegrationTests.CustomPaths.csproj", "{0031728E-A5D4-47C1-9C1A-6C859A765C9D}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BenchmarkDotNet.Samples.FSharp", "samples\BenchmarkDotNet.Samples.FSharp\BenchmarkDotNet.Samples.FSharp.fsproj", "{A329F00E-4B9D-4BC6-B688-92698D773CBF}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "BenchmarkDotNet.Samples.FSharp", "samples\BenchmarkDotNet.Samples.FSharp\BenchmarkDotNet.Samples.FSharp.fsproj", "{A329F00E-4B9D-4BC6-B688-92698D773CBF}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BenchmarkDotNet.IntegrationTests.FSharp", "tests\BenchmarkDotNet.IntegrationTests.FSharp\BenchmarkDotNet.IntegrationTests.FSharp.fsproj", "{367FAFE1-A1C8-4AA1-9334-F4762E128DBB}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "BenchmarkDotNet.IntegrationTests.FSharp", "tests\BenchmarkDotNet.IntegrationTests.FSharp\BenchmarkDotNet.IntegrationTests.FSharp.fsproj", "{367FAFE1-A1C8-4AA1-9334-F4762E128DBB}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BenchmarkDotNet.IntegrationTests.VisualBasic", "tests\BenchmarkDotNet.IntegrationTests.VisualBasic\BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj", "{D8803ECA-4ABF-45B8-BD1D-7C637416C448}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "BenchmarkDotNet.IntegrationTests.VisualBasic", "tests\BenchmarkDotNet.IntegrationTests.VisualBasic\BenchmarkDotNet.IntegrationTests.VisualBasic.vbproj", "{D8803ECA-4ABF-45B8-BD1D-7C637416C448}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.IntegrationTests.DisabledOptimizations", "tests\BenchmarkDotNet.IntegrationTests.DisabledOptimizations\BenchmarkDotNet.IntegrationTests.DisabledOptimizations.csproj", "{AC2188E5-A140-43E2-8A76-4BDABFE30ABA}"
 EndProject
@@ -37,17 +37,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Disassemble
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Disassembler.x86", "src\BenchmarkDotNet.Disassembler.x86\BenchmarkDotNet.Disassembler.x86.csproj", "{D189AAB3-46B4-4437-8E9C-72F021AB2B6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests.ManualRunning", "tests\BenchmarkDotNet.IntegrationTests.ManualRunning\BenchmarkDotNet.IntegrationTests.ManualRunning.csproj", "{9816D316-95C4-42E6-9E7B-A256C7E5D4BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.IntegrationTests.ManualRunning", "tests\BenchmarkDotNet.IntegrationTests.ManualRunning\BenchmarkDotNet.IntegrationTests.ManualRunning.csproj", "{9816D316-95C4-42E6-9E7B-A256C7E5D4BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.Tool", "src\BenchmarkDotNet.Tool\BenchmarkDotNet.Tool.csproj", "{1336CAFF-5321-495E-BAFA-AB4DC6BF791C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Tool", "src\BenchmarkDotNet.Tool\BenchmarkDotNet.Tool.csproj", "{1336CAFF-5321-495E-BAFA-AB4DC6BF791C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.IntegrationTests.Static", "tests\BenchmarkDotNet.IntegrationTests.Static\BenchmarkDotNet.IntegrationTests.Static.csproj", "{B4405781-40D3-42B8-B168-00E711FABA15}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.IntegrationTests.Static", "tests\BenchmarkDotNet.IntegrationTests.Static\BenchmarkDotNet.IntegrationTests.Static.csproj", "{B4405781-40D3-42B8-B168-00E711FABA15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.Annotations", "src\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj", "{D9F5065B-6190-431B-850C-117E3D64AB33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Annotations", "src\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj", "{D9F5065B-6190-431B-850C-117E3D64AB33}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{63B94FD6-3F3D-4E04-9727-48E86AC4384C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkDotNet.Templates", "templates\BenchmarkDotNet.Templates.csproj", "{B620D10A-CD8E-4A34-8B27-FD6257E63AD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Templates", "templates\BenchmarkDotNet.Templates.csproj", "{B620D10A-CD8E-4A34-8B27-FD6257E63AD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
