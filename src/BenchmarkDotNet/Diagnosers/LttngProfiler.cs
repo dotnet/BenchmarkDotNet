@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -28,9 +27,6 @@ namespace BenchmarkDotNet.Diagnosers
         private readonly LttngProfilerConfig config;
         private readonly DateTime creationTime = DateTime.Now;
         private readonly Dictionary<BenchmarkCase, FileInfo> benchmarkToTraceFile = new Dictionary<BenchmarkCase, FileInfo>();
-
-        private Process perfCollectProcess;
-        private ManualResetEventSlim signal = new ManualResetEventSlim();
 
         [PublicAPI]
         public LttngProfiler(LttngProfilerConfig config) => this.config = config;
@@ -115,7 +111,7 @@ namespace BenchmarkDotNet.Diagnosers
                 }
 
                 logger.WriteLineError("Failed to install perfcollect");
-                foreach(var outputLine in output)
+                foreach (var outputLine in output)
                 {
                     logger.WriteLine(outputLine);
                 }
@@ -133,38 +129,17 @@ namespace BenchmarkDotNet.Diagnosers
         {
             var perfCollectFile = new FileInfo(Directory.GetFiles(parameters.Config.ArtifactsPath, PerfCollectFileName).Single());
 
-            perfCollectProcess = CreatePerfCollectProcess(parameters, perfCollectFile);
-
-            var logger = parameters.Config.GetCompositeLogger();
-
-            perfCollectProcess.OutputDataReceived += OnOutputDataReceived;
-
-            signal.Reset();
-
-            perfCollectProcess.Start();
-            perfCollectProcess.BeginOutputReadLine();
-
-            WaitForSignal(logger, "// Collection with perfcollect started"); // wait until the script starts the actual collection
+            ExecutePerfCollectCommand(parameters, perfCollectFile, "start");
         }
 
         private void Stop(DiagnoserActionParameters parameters)
         {
-            if (perfCollectProcess == null)
-            {
-                return;
-            }
+            var perfCollectFile = new FileInfo(Directory.GetFiles(parameters.Config.ArtifactsPath, PerfCollectFileName).Single());
 
-            var logger = parameters.Config.GetCompositeLogger();
-
-            if (WaitForSignal(logger, "// Collection with perfcollect stopped"))
-            {
-                benchmarkToTraceFile[parameters.BenchmarkCase] = new FileInfo(ArtifactFileNameHelper.GetFilePath(parameters, creationTime, ".trace.zip"));
-
-                CleanupPerfCollectProcess(logger);
-            }
+            ExecutePerfCollectCommand(parameters, perfCollectFile, "stop");
         }
 
-        private Process CreatePerfCollectProcess(DiagnoserActionParameters parameters, FileInfo perfCollectFile)
+        private void ExecutePerfCollectCommand(DiagnoserActionParameters parameters, FileInfo perfCollectFile, string command)
         {
             var traceName = new FileInfo(ArtifactFileNameHelper.GetFilePath(parameters, creationTime, fileExtension: null)).Name;
             // todo: escape characters bash does not like ' ', '(' etc
@@ -172,62 +147,35 @@ namespace BenchmarkDotNet.Diagnosers
             var start = new ProcessStartInfo
             {
                 FileName = perfCollectFile.FullName,
-                Arguments = $"collect {traceName} -pid {parameters.Process.Id}",
+                Arguments = $"{command} {traceName} -pid {parameters.Process.Id}",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,
                 WorkingDirectory = perfCollectFile.Directory.FullName
             };
 
-            return new Process { StartInfo = start };
-        }
-
-        private void OnOutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            if (e.Data?.IndexOf("Collection started", StringComparison.OrdinalIgnoreCase) >= 0)
-                signal.Set();
-            else if (e.Data?.IndexOf("Trace saved", StringComparison.OrdinalIgnoreCase) >= 0)
-                signal.Set();
-            else if (e.Data?.IndexOf("This script must be run as root", StringComparison.OrdinalIgnoreCase) >= 0)
-                Environment.FailFast("To use LttngProfiler you must run as root."); // should never happen, ensured by Validate()
-        }
-
-        private bool WaitForSignal(ILogger logger, string message)
-        {
-            if (signal.Wait(config.Timeout))
+            using (var perfCollectProcess = new Process { StartInfo = start })
             {
-                signal.Reset();
+                perfCollectProcess.Start();
 
-                logger.WriteLineInfo(message);
-
-                return true;
-            }
-
-            logger.WriteLineError($"The perfcollect script did not start/finish in {config.Timeout.TotalSeconds}s.");
-            logger.WriteLineInfo("You can create LttngProfiler providing LttngProfilerConfig with custom timeout value.");
-
-            CleanupPerfCollectProcess(logger);
-
-            return false;
-        }
-
-        private void CleanupPerfCollectProcess(ILogger logger)
-        {
-            logger.Flush(); // flush recently logged message to disk
-
-            try
-            {
-                perfCollectProcess.OutputDataReceived -= OnOutputDataReceived;
-
-                if (!perfCollectProcess.HasExited)
+                if (!perfCollectProcess.WaitForExit((int)config.Timeout.TotalMilliseconds))
                 {
-                    perfCollectProcess.KillTree(); // kill the entire process tree
+                    var logger = parameters.Config.GetCompositeLogger();
+
+                    logger.WriteLineError($"The perfcollect script did not start/stop in {config.Timeout.TotalSeconds}s.");
+                    logger.WriteLineInfo("You can create LttngProfiler providing LttngProfilerConfig with custom timeout value.");
+
+                    logger.Flush(); // flush recently logged message to disk
+
+                    if (!perfCollectProcess.HasExited)
+                    {
+                        perfCollectProcess.KillTree(); // kill the entire process tree
+                    }
                 }
-            }
-            finally
-            {
-                perfCollectProcess.Dispose();
-                perfCollectProcess = null;
+                else if (command == "stop")
+                {
+                    benchmarkToTraceFile[parameters.BenchmarkCase] = new FileInfo(ArtifactFileNameHelper.GetFilePath(parameters, creationTime, ".trace.zip"));
+                }
             }
         }
     }
