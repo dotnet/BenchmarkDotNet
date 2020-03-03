@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Jobs
         {
             string presentation = CharacteristicSetPresenter.Display.ToPresentation(job);
             if (presentation == "")
-                return "DefaultJob";            
+                return "DefaultJob";
             int seed = presentation.GetHashCode();
             var random = new Random(seed);
             string id = "";

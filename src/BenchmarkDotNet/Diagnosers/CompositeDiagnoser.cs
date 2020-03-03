@@ -19,14 +19,14 @@ namespace BenchmarkDotNet.Diagnosers
 
         public CompositeDiagnoser(ImmutableHashSet<IDiagnoser> diagnosers)
             => this.diagnosers = diagnosers;
-        
+
         public RunMode GetRunMode(BenchmarkCase benchmarkCase)
             => throw new InvalidOperationException("Should never be called for Composite Diagnoser");
 
         public IEnumerable<string> Ids
             => diagnosers.SelectMany(d => d.Ids);
 
-        public IEnumerable<IExporter> Exporters 
+        public IEnumerable<IExporter> Exporters
             => diagnosers.SelectMany(diagnoser => diagnoser.Exporters);
 
         public IEnumerable<IAnalyser> Analysers
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) 
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => diagnosers.SelectMany(diagnoser => diagnoser.Validate(validationParameters));
     }
 }

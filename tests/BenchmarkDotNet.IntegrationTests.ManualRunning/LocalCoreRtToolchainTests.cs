@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using Xunit;
@@ -13,7 +14,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
     /// then update the hardcoded path
     /// and run following command from console:
     /// dotnet test -c Release -f netcoreapp2.1 --filter "FullyQualifiedName~BenchmarkDotNet.IntegrationTests.ManualRunning.LocalCoreRtToolchainTests"
-    /// 
+    ///
     /// in perfect world we would do this OOB for you, but building CoreRT
     /// so it's not part of our CI jobs
     /// </summary>
@@ -27,10 +28,12 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         public void CanBenchmarkLocalCoreRtUsingRyuJit()
         {
             var config = ManualConfig.CreateEmpty()
-                .With(Job.DryCoreRT.With(
-                    CoreRtToolchain.CreateBuilder()
-                        .UseCoreRtLocal(IlcPath)
-                        .ToToolchain()));
+                .AddJob(Job.Dry
+                    .WithRuntime(CoreRtRuntime.CoreRt21)
+                    .WithToolchain(
+                        CoreRtToolchain.CreateBuilder()
+                            .UseCoreRtLocal(IlcPath)
+                            .ToToolchain()));
 
             CanExecute<CoreRtBenchmark>(config);
         }
@@ -39,11 +42,13 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         public void CanBenchmarkLocalCoreRtUsingCppCodeGen()
         {
             var config = ManualConfig.CreateEmpty()
-                .With(Job.DryCoreRT.With(
-                    CoreRtToolchain.CreateBuilder()
-                        .UseCoreRtLocal(IlcPath)
-                        .UseCppCodeGenerator() // https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#using-cpp-code-generator
-                        .ToToolchain()));
+                .AddJob(Job.Dry
+                    .WithRuntime(CoreRtRuntime.CoreRt21)
+                    .WithToolchain(
+                        CoreRtToolchain.CreateBuilder()
+                            .UseCoreRtLocal(IlcPath)
+                            .UseCppCodeGenerator() // https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#using-cpp-code-generator
+                            .ToToolchain()));
 
             CanExecute<CoreRtBenchmark>(config);
         }

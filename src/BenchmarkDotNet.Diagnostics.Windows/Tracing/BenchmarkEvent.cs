@@ -3,12 +3,12 @@ using System.Diagnostics;
 using System.Text;
 using Microsoft.Diagnostics.Tracing;
 
-namespace BenchmarkDotNet.Diagnostics.Windows.Tracing 
+namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 {
     public sealed class BenchmarkEvent : TraceEvent
     {
         public string BenchmarkName => GetUnicodeStringAt(0);
-        
+
         private event Action<BenchmarkEvent> target;
 
         internal BenchmarkEvent(Action<BenchmarkEvent> target, int eventID, int task, string taskName, Guid taskGuid, int opcode, string opcodeName, Guid providerGuid, string providerName)
@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             Prefix(sb);
             XmlAttrib(sb, nameof(BenchmarkName), BenchmarkName);
             sb.Append("/>");
-            
+
             return sb;
         }
 

@@ -13,10 +13,10 @@ namespace BenchmarkDotNet.Validators
         /// <summary>
         /// returns true if any of the validators has TreatsWarningsAsErrors == true
         /// </summary>
-        public bool TreatsWarningsAsErrors 
+        public bool TreatsWarningsAsErrors
             => validators.Any(validator => validator.TreatsWarningsAsErrors);
 
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) 
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => validators.SelectMany(validator => validator.Validate(validationParameters)).Distinct();
     }
 }

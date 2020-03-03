@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Diagnosers
             Legend = $"Hardware counter '{counter.Name}' per single operation";
             TheGreaterTheBetter = counter.Counter.TheGreaterTheBetter();
         }
-        
+
         public string Id { get; }
         public string DisplayName { get; }
         public string Legend { get; }

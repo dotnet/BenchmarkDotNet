@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             session.Source.Clr.MethodInliningSucceeded += jitData =>
             {
                 // Inliner = the parent method (the inliner calls the inlinee)
-                // Inlinee = the method that is going to be "inlined" inside the inliner (it's caller)                
+                // Inlinee = the method that is going to be "inlined" inside the inliner (it's caller)
                 if (StatsPerProcess.TryGetValue(jitData.ProcessID, out _))
                 {
                     var shouldPrint = !logFailuresOnly
@@ -96,10 +96,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 }
             };
         }
-        
+
         private bool ShouldPrintEventInfo(string inlinerNamespace, string inlineeNamespace)
-            => !filterByNamespace || 
-                (allowedNamespaces?.Any(x=> inlineeNamespace.StartsWith(x) || inlinerNamespace.StartsWith(x)) 
+            => !filterByNamespace ||
+                (allowedNamespaces?.Any(x=> inlineeNamespace.StartsWith(x) || inlinerNamespace.StartsWith(x))
                     ?? (inlinerNamespace.StartsWith(defaultNamespace)) || inlineeNamespace.StartsWith(defaultNamespace));
     }
 }

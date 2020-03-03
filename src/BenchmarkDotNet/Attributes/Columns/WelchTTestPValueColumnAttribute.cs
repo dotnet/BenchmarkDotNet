@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Attributes
             : base(StatisticalTestColumn.Create(testKind, Threshold.Create(thresholdUnit, value), showPValues)) { }
 
         public StatisticalTestColumnAttribute(StatisticalTestKind testKind, bool showPValues = false) : this(testKind, ThresholdUnit.Ratio, 0.1, showPValues) { }
-        
+
         public StatisticalTestColumnAttribute(bool showPValues = false) : this(StatisticalTestKind.MannWhitney, showPValues) {}
     }
 

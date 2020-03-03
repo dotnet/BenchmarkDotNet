@@ -97,7 +97,7 @@ namespace BenchmarkDotNet.Engines
         [PublicAPI]
         public void Consume<T>(T objectValue) where T : class // class constraint prevents from boxing structs
             => Volatile.Write(ref objectHolder, objectValue);
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Consume<T>(in T value)
         {
@@ -130,7 +130,7 @@ namespace BenchmarkDotNet.Engines
             else
                 ValueTypesConsumer(value); // non-primitive value types
         }
-        
+
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void ValueTypesConsumer<T>(in T _) { }
 

@@ -30,8 +30,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 executeParameters.Logger.WriteLineError($"Did not find {executeParameters.BuildResult.ArtifactsPaths.ExecutablePath}, but the folder contained:");
                 foreach (var file in new DirectoryInfo(executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
                     executeParameters.Logger.WriteLineError(file.Name);
-                
-                return new ExecuteResult(false, -1, Array.Empty<string>(), Array.Empty<string>());
+
+                return new ExecuteResult(false, -1, default, Array.Empty<string>(), Array.Empty<string>());
             }
 
             try
@@ -39,16 +39,16 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return Execute(
                     executeParameters.BenchmarkCase,
                     executeParameters.BenchmarkId,
-                    executeParameters.Logger, 
-                    executeParameters.BuildResult.ArtifactsPaths, 
-                    executeParameters.Diagnoser, 
-                    Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath), 
+                    executeParameters.Logger,
+                    executeParameters.BuildResult.ArtifactsPaths,
+                    executeParameters.Diagnoser,
+                    Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath),
                     executeParameters.Resolver);
             }
             finally
             {
                 executeParameters.Diagnoser?.Handle(
-                    HostSignal.AfterProcessExit, 
+                    HostSignal.AfterProcessExit,
                     new DiagnoserActionParameters(null, executeParameters.BenchmarkCase, executeParameters.BenchmarkId));
             }
         }
@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 if (process.ExitCode == 0)
                 {
-                    return new ExecuteResult(true, process.ExitCode, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
+                    return new ExecuteResult(true, process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
                 }
 
                 if (!string.IsNullOrEmpty(standardError))
@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     logger.WriteError(standardError);
                 }
 
-                return new ExecuteResult(true, process.ExitCode, Array.Empty<string>(), Array.Empty<string>());
+                return new ExecuteResult(true, process.ExitCode, process.Id, Array.Empty<string>(), Array.Empty<string>());
             }
         }
     }

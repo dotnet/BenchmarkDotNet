@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Tests.Reports
         [Fact]
         public void NumericColumnIsRightJustified()
         {
-            var config = ManualConfig.Create(DefaultConfig.Instance).With(StatisticColumn.Mean);
+            var config = ManualConfig.Create(DefaultConfig.Instance).AddColumn(StatisticColumn.Mean);
             var summary = MockFactory.CreateSummary(config);
             var table = new SummaryTable(summary);
 
@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Tests.Reports
         [Fact]
         public void TextColumnIsLeftJustified()
         {
-            var config = ManualConfig.Create(DefaultConfig.Instance).With(new ParamColumn("Param"));
+            var config = ManualConfig.Create(DefaultConfig.Instance).AddColumn(new ParamColumn("Param"));
             var summary = MockFactory.CreateSummary(config);
             var table = new SummaryTable(summary);
 
@@ -68,12 +68,45 @@ namespace BenchmarkDotNet.Tests.Reports
         [Fact] // Issue #1070
         public void CustomOrdererIsSupported()
         {
-            var config = ManualConfig.Create(DefaultConfig.Instance);
-            config.Orderer = new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Alphabetical);
+            var config = ManualConfig.Create(DefaultConfig.Instance)
+                .WithOrderer(new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Alphabetical));
             var summary = MockFactory.CreateSummary(config);
-            Assert.True(summary.Orderer is DefaultOrderer defaultOrderer && 
+            Assert.True(summary.Orderer is DefaultOrderer defaultOrderer &&
                         defaultOrderer.SummaryOrderPolicy == SummaryOrderPolicy.FastestToSlowest &&
                         defaultOrderer.MethodOrderPolicy == MethodOrderPolicy.Alphabetical);
+        }
+
+        [Fact] // Issue #1168
+        public void ZeroValueInMetricColumnIsDashedByDefault()
+        {
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var metrics = new[] { new Metric(new FakeMetricDescriptor("metric1", "some legend", "0.0"), 0.0) };
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary);
+            var actual = table.Columns.First(c => c.Header == "metric1").Content;
+
+            // assert
+            Assert.True(actual.All(value => "-" == value));
+        }
+
+        [Fact] // Issue #1168
+        public void ZeroValueInMetricColumnIsNotDashedWithCustomStyle()
+        {
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+            var metrics = new[] { new Metric(new FakeMetricDescriptor("metric1", "some legend", "0.0"), 0.0) };
+            var style = config.SummaryStyle.WithZeroMetricValuesInContent();
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary, style);
+            var actual = table.Columns.First(c => c.Header == "metric1").Content;
+
+            // assert
+            Assert.True(actual.All(value => "0.0" == value));
         }
     }
 }

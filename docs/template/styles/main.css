@@ -3,6 +3,14 @@
   height: 50px;  
 }
 
+/* Template customization */
+@media (min-width:1300px){.container{width:1270px!important}}
+@media (min-width:1400px){.container{width:1370px!important}}
+@media (min-width:1500px){.container{width:1470px!important}}
+@media (min-width:1600px){.container{width:1570px!important}}
+@media (min-width:1700px){.container{width:1670px!important}}
+@media (min-width:1800px){.container{width:1770px!important}}
+
 /*
 Visual Studio-like style based on original C# coloring by Jason Diamond <jason@diamond.name>
 Source: https://github.com/isagalaev/highlight.js/blob/master/src/styles/vs.css

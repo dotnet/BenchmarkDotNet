@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 return false;
             }
 
-            if (benchmarkCase.Job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic) 
+            if (benchmarkCase.Job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic)
                 && benchmarkCase.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver) != InfrastructureMode.ReleaseConfigurationName)
             {
                 logger.WriteLineError("The Roslyn toolchain does not allow to rebuild source project, so defining custom build configuration makes no sense");

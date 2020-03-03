@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Tests.XUnit
         // ReSharper disable once VirtualMemberCallInConstructor
         public FactWindowsOnlyAttribute(string nonWindowsSkipReason)
         {
-            if (!RuntimeInformation.IsWindows())                
+            if (!RuntimeInformation.IsWindows())
                 Skip = nonWindowsSkipReason;
         }
     }

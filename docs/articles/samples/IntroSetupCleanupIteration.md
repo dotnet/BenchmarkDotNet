@@ -20,7 +20,7 @@ This attribute has the same set of constraint with `[IterationSetup]`: it's not 
 
 [!code-csharp[IntroSetupCleanupIteration.cs](../../../samples/BenchmarkDotNet.Samples/IntroSetupCleanupIteration.cs)]
 
-### THe order of method calls
+### The order of method calls
 
 ```cs
 // GlobalSetup

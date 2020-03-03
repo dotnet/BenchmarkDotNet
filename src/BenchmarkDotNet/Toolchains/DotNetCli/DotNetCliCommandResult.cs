@@ -3,7 +3,7 @@ using System.IO;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Toolchains.DotNetCli 
+namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     public struct DotNetCliCommandResult
     {

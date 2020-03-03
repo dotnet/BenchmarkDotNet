@@ -7,8 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -63,8 +62,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$PassArguments$", passArguments)
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
                     .Replace("$Ref$", provider.UseRefKeyword ? "ref" : null)
-                    .Replace("$MeasureGcStats$", buildInfo.Config.HasMemoryDiagnoser() ? "true" : "false")
-                    .Replace("$Encoding$", buildInfo.Config.Encoding.ToTemplateString())
+                    .Replace("$MeasureExtraStats$", buildInfo.Config.HasExtraStatsDiagnoser() ? "true" : "false")
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
                     .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments)).ToString();
 
@@ -75,6 +73,8 @@ namespace BenchmarkDotNet.Code
 
             if (buildPartition.IsCoreRT)
                 extraDefines.Add("#define CORERT");
+            else if (buildPartition.IsNetFramework)
+                extraDefines.Add("#define NETFRAMEWORK");
 
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
                 .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
@@ -98,11 +98,11 @@ namespace BenchmarkDotNet.Code
         {
             string benchmarkDotNetLocation = Path.GetDirectoryName(typeof(CodeGenerator).GetTypeInfo().Assembly.Location);
 
-            if (benchmarkDotNetLocation != null && benchmarkDotNetLocation.ToUpper().Contains("LINQPAD"))
+            if (benchmarkDotNetLocation != null && benchmarkDotNetLocation.IndexOf("LINQPAD", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                /* "LINQPad normally puts the compiled query into a different folder than the referenced assemblies 
+                /* "LINQPad normally puts the compiled query into a different folder than the referenced assemblies
                  * - this allows for optimizations to reduce file I/O, which is important in the scratchpad scenario"
-                 * 
+                 *
                  * so in case we detect we are running from LINQPad, we give a hint to assembly loading to search also in this folder
                  */
 
@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.Code
         {
             var method = descriptor.WorkloadMethod;
 
-            if (method.ReturnType == typeof(Task))
+            if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask))
             {
                 return new TaskDeclarationsProvider(descriptor);
             }
@@ -217,7 +217,7 @@ namespace BenchmarkDotNet.Code
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
                     .Select((parameter, index) => $"{GetParameterModifier(parameter)} arg{index}"));
 
-        private static string GetExtraAttributes(Descriptor descriptor) 
+        private static string GetExtraAttributes(Descriptor descriptor)
             => descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any() ? "[System.STAThreadAttribute]" : string.Empty;
 
         private static string GetEngineFactoryTypeName(BenchmarkCase benchmarkCase)

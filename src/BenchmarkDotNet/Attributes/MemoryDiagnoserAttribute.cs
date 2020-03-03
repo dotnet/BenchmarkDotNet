@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Attributes
 
         public MemoryDiagnoserAttribute()
         {
-            Config = ManualConfig.CreateEmpty().With(MemoryDiagnoser.Default);
+            Config = ManualConfig.CreateEmpty().AddDiagnoser(MemoryDiagnoser.Default);
         }
     }
 }

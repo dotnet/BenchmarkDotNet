@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Text;
-
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.CoreRt;
-using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Validators;
 
@@ -34,7 +28,7 @@ namespace BenchmarkDotNet.Configs
             => new[]
             {
                 Job.Default
-                    .With(
+                    .WithToolchain(
                         new InProcessEmitToolchain(
                             TimeSpan.FromHours(1), // 1h should be enough to debug the benchmark
                             true))
@@ -51,25 +45,8 @@ namespace BenchmarkDotNet.Configs
             => new[]
             {
                 Job.Default
-                    .With(GetToolchainThatGeneratesProjectFile())
-                    .WithCustomBuildConfiguration("Debug") // will do `-c Debug everywhere` 
+                    .WithCustomBuildConfiguration("Debug") // will do `-c Debug everywhere`
             };
-
-        private IToolchain GetToolchainThatGeneratesProjectFile()
-        {
-            switch (RuntimeInformation.GetCurrentRuntime())
-            {
-                case ClrRuntime _:
-                case MonoRuntime _:
-                    return CsProjClassicNetToolchain.Current.Value;
-                case CoreRuntime _:
-                    return CsProjCoreToolchain.Current.Value;
-                case CoreRtRuntime _:
-                    return CoreRtToolchain.LatestMyGetBuild;
-                default:
-                    throw new NotSupportedException("Runtime not supported!");
-            }
-        }
     }
 
     public abstract class DebugConfig : IConfig
@@ -89,7 +66,7 @@ namespace BenchmarkDotNet.Configs
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
         public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
-        public Encoding Encoding => Encoding.ASCII;
+        public CultureInfo CultureInfo => null;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
 
         public ConfigOptions Options => ConfigOptions.KeepBenchmarkFiles | ConfigOptions.DisableOptimizationsValidator;

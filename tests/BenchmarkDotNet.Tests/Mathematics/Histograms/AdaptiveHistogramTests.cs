@@ -295,7 +295,7 @@ namespace BenchmarkDotNet.Tests.Mathematics.Histograms
             };
             HistogramTestHelper.DoHistogramTest(output, HistogramBuilder.Adaptive, values, 0.0001, new[] { values });
         }
-        
+
         /// <summary>
         /// <see cref="https://github.com/dotnet/BenchmarkDotNet/issues/870"/>
         /// </summary>

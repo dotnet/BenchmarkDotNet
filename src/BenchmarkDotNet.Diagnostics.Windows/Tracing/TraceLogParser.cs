@@ -14,13 +14,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
     {
         private readonly Dictionary<int, ProcessMetrics> processIdToData = new Dictionary<int, ProcessMetrics>();
         private readonly Dictionary<int, int> profileSourceIdToInterval = new Dictionary<int, int>();
-        
+
         public static IEnumerable<Metric> Parse(string etlFilePath, PreciseMachineCounter[] counters)
         {
             using (var traceLog = new TraceLog(TraceLog.CreateFromEventTraceLogFile(etlFilePath)))
             {
                 var traceLogEventSource = traceLog.Events.GetSource();
-                
+
                 return new TraceLogParser().Parse(traceLogEventSource, counters);
             }
         }
@@ -32,17 +32,17 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
             bdnEventsParser.OverheadActualStart += OnOverheadActualStart;
             bdnEventsParser.OverheadActualStop += OnOverheadActualStop;
-            
+
             bdnEventsParser.WorkloadActualStart += OnWorkloadActualStart;
             bdnEventsParser.WorkloadActualStop += OnWorkloadActualStop;
-            
+
             kernelEventsParser.PerfInfoCollectionStart += OnPmcIntervalChange;
             kernelEventsParser.PerfInfoPMCSample += OnPmcEvent;
 
             traceLogEventSource.Process();
 
             var benchmarkedProcessData = processIdToData.Values.Single(x => x.HasBenchmarkEvents);
-            
+
             return benchmarkedProcessData.CalculateMetrics(profileSourceIdToInterval, counters);
         }
 
@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             // if given process did not emit Benchmarking events before, we don't care about it
             if (!processIdToData.ContainsKey(data.ProcessID))
                 return;
-            
+
             processIdToData[data.ProcessID].HandleNewSample(data.TimeStampRelativeMSec, data.InstructionPointer, data.ProfileSource);
         }
     }
@@ -86,7 +86,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
         private readonly List<double> overheadTimestamps = new List<double>(20);
         private readonly List<double> workloadTimestamps = new List<double>(20);
         private long? totalOperationsPerIteration;
-        
+
         private readonly List<(double timeStamp, ulong instructionPointer, int profileSource)> samples = new List<(double timeStamp, ulong instructionPointer, int profileSource)>();
 
         public bool HasBenchmarkEvents => overheadTimestamps.Any() || workloadTimestamps.Any();
@@ -131,14 +131,14 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             return workloadTotalPerCounter.Select(perCounter =>
             {
                 var pmc = counters.Single(counter => counter.ProfileSourceId == perCounter.Key);
-                
+
                 overheadTotalPerCounter.TryGetValue(perCounter.Key, out var overhead);
-                
-                double result = (perCounter.Value / (double) workloadIterations.Length - overhead / (double) overheadIterations.Length) 
+
+                double result = (perCounter.Value / (double) workloadIterations.Length - overhead / (double) overheadIterations.Length)
                                     / totalOperationsPerIteration.Value; // result = (avg(workload) - avg(overhead))/op
 
                 return new Metric(new PmcMetricDescriptor(pmc), result);
-            }); 
+            });
         }
 
         private IterationData[] CreateIterationData(List<double> startStopTimeStamps)
@@ -177,7 +177,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
         private static Dictionary<int, ulong> Sum(IterationData[] iterations)
         {
             var totalPerCounter = new Dictionary<int, ulong>();
-            
+
             foreach (var iteration in iterations)
             {
                 foreach (var idToCount in iteration.ProfileSourceIdToCount)
@@ -211,11 +211,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
         {
             if (!(StartTimestamp <= timeStamp && timeStamp <= StopTimestamp))
                 return false;
-            
+
             checked
             {
                 ProfileSourceIdToCount.TryGetValue(profileSource, out ulong existing);
-                ProfileSourceIdToCount[profileSource] = existing + (ulong)interval;                
+                ProfileSourceIdToCount[profileSource] = existing + (ulong)interval;
             }
 
             return true;

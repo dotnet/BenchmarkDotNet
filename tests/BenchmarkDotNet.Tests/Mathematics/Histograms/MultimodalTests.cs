@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Tests.Mathematics.Histograms
                 var values = new double[n];
                 for (int i = 0; i < n; i++)
                     values[i] = random.NextGaussian(50, 3);
-                
+
                 var s = new Statistics(values);
                 var histogram = HistogramBuilder.Adaptive.Build(s);
                 output.Print($"n={n}", histogram);

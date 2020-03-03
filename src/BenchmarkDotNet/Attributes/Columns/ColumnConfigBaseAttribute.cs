@@ -4,7 +4,7 @@ using BenchmarkDotNet.Configs;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Attributes
-{    
+{
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
     public abstract class ColumnConfigBaseAttribute : Attribute, IConfigSource
     {
@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Attributes
 
         protected ColumnConfigBaseAttribute(params IColumn[] columns)
         {
-            Config = ManualConfig.CreateEmpty().With(columns);
+            Config = ManualConfig.CreateEmpty().AddColumn(columns);
         }
 
         public IConfig Config { get; }

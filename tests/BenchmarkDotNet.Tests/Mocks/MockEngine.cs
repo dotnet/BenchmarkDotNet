@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             this.measure = measure;
             TargetJob = job;
         }
-        
+
         public void Dispose() => GlobalSetupAction?.Invoke();
 
         [UsedImplicitly]
@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Tests.Mocks
         {
             double nanoseconds = measure(data).Nanoseconds;
             var measurement = new Measurement(1, data.IterationMode, data.IterationStage, data.Index, data.InvokeCount * OperationsPerInvoke, nanoseconds);
-            WriteLine(measurement.ToOutputLine());
+            WriteLine(measurement.ToString());
             return measurement;
         }
 

@@ -10,6 +10,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Parameters;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Running
 {
@@ -22,7 +23,7 @@ namespace BenchmarkDotNet.Running
 
             // We should check all methods including private to notify users about private methods with the [Benchmark] attribute
             var bindingFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-            
+
             var fullConfig = GetFullConfig(type, config);
             var allMethods = type.GetMethods(bindingFlags);
             return MethodsToBenchmarksWithFullConfig(type, allMethods, fullConfig);
@@ -50,7 +51,7 @@ namespace BenchmarkDotNet.Running
             var targetMethods = benchmarkMethods.Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
 
             var parameterDefinitions = GetParameterDefinitions(containingType);
-            var parameterInstancesList = parameterDefinitions.Expand();
+            var parameterInstancesList = parameterDefinitions.Expand(immutableConfig.SummaryStyle);
 
             var jobs = immutableConfig.GetJobs();
 
@@ -59,7 +60,7 @@ namespace BenchmarkDotNet.Running
             var benchmarks = new List<BenchmarkCase>();
             foreach (var target in targets)
             {
-                var argumentsDefinitions = GetArgumentsDefinitions(target.WorkloadMethod, target.Type).ToArray();
+                var argumentsDefinitions = GetArgumentsDefinitions(target.WorkloadMethod, target.Type, immutableConfig.SummaryStyle).ToArray();
 
                 var parameterInstances =
                     (from parameterInstance in parameterInstancesList
@@ -90,11 +91,11 @@ namespace BenchmarkDotNet.Running
                 var allAttributes = typeAttributes.Concat(assemblyAttributes);
                 var configs = allAttributes.Select(attribute => attribute.Config)
                     .OrderBy(c => c.GetJobs().Count(job => job.Meta.IsMutator)); // configs with mutators must be the ones applied at the end
-                
+
                 foreach (var configFromAttribute in configs)
                     config = ManualConfig.Union(config, configFromAttribute);
             }
-            
+
             return ImmutableConfigBuilder.Create(config);
         }
 
@@ -174,7 +175,8 @@ namespace BenchmarkDotNet.Running
                         member.Name,
                         member.IsStatic,
                         getValidValues(member.Attribute, member.ParameterType),
-                        false));
+                        false,
+                        member.ParameterType));
             }
 
             var paramsDefinitions = GetDefinitions<ParamsAttribute>((attribute, parameterType) => GetValidValues(attribute.Values, parameterType));
@@ -192,10 +194,10 @@ namespace BenchmarkDotNet.Running
             return new ParameterDefinitions(definitions);
         }
 
-        private static IEnumerable<ParameterInstances> GetArgumentsDefinitions(MethodInfo benchmark, Type target)
+        private static IEnumerable<ParameterInstances> GetArgumentsDefinitions(MethodInfo benchmark, Type target, SummaryStyle summaryStyle)
         {
             var parameterDefinitions = benchmark.GetParameters()
-                .Select(parameter => new ParameterDefinition(parameter.Name, false, Array.Empty<object>(), true))
+                .Select(parameter => new ParameterDefinition(parameter.Name, false, Array.Empty<object>(), true, parameter.ParameterType))
                 .ToArray();
 
             if (parameterDefinitions.IsEmpty())
@@ -210,7 +212,15 @@ namespace BenchmarkDotNet.Running
                     throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of defined arguments provided with [Arguments]! {argumentsAttribute.Values.Length} instead of {parameterDefinitions.Length}.");
 
                 yield return new ParameterInstances(
-                    argumentsAttribute.Values.Select((value, index) => new ParameterInstance(parameterDefinitions[index], Map(value))).ToArray());
+                    argumentsAttribute
+                        .Values
+                        .Select((value, index) =>
+                            { 
+                                var definition = parameterDefinitions[index];
+                                var type = definition.ParameterType;
+                                return new ParameterInstance(definition, Map(value, type), summaryStyle);
+                            })
+                        .ToArray());
             }
 
             if (!benchmark.HasAttribute<ArgumentsSourceAttribute>())
@@ -220,7 +230,7 @@ namespace BenchmarkDotNet.Running
 
             var valuesInfo = GetValidValuesForParamsSource(target, argumentsSourceAttribute.Name);
             for (int sourceIndex = 0; sourceIndex < valuesInfo.values.Length; sourceIndex++)
-                yield return SmartParamBuilder.CreateForArguments(benchmark, parameterDefinitions, valuesInfo, sourceIndex);
+                yield return SmartParamBuilder.CreateForArguments(benchmark, parameterDefinitions, valuesInfo, sourceIndex, summaryStyle);
         }
 
         private static string[] GetCategories(MethodInfo method)
@@ -238,7 +248,7 @@ namespace BenchmarkDotNet.Running
             return attributes.SelectMany(attr => attr.Categories).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
         }
 
-        private static ImmutableArray<BenchmarkCase> GetFilteredBenchmarks(IList<BenchmarkCase> benchmarks, IList<IFilter> filters) 
+        private static ImmutableArray<BenchmarkCase> GetFilteredBenchmarks(IList<BenchmarkCase> benchmarks, IList<IFilter> filters)
             => benchmarks.Where(benchmark => filters.All(filter => filter.Predicate(benchmark))).ToImmutableArray();
 
         private static void AssertMethodHasCorrectSignature(string methodType, MethodInfo methodInfo)
@@ -276,15 +286,28 @@ namespace BenchmarkDotNet.Running
                 return new object[] { null };
             }
 
-            return values?.Select(Map).ToArray();
+            return values?.Select(value => Map(value, parameterType)).ToArray();
         }
 
-        private static object Map(object providedValue)
+        private static object Map(object providedValue, Type type)
         {
             if (providedValue == null)
                 return null;
 
-            return providedValue.GetType().IsArray ? ArrayParam<IParam>.FromObject(providedValue) : providedValue;
+            if (providedValue.GetType().IsArray)
+            {
+                return ArrayParam<IParam>.FromObject(providedValue);
+            }
+            // Usually providedValue contains all needed type information,
+            // but in case of F# enum types in attributes are erased.
+            // We can to restore them from types of arguments and fields.
+            // See also:
+            // https://github.com/dotnet/fsharp/issues/995
+            else if (providedValue.GetType().IsEnum || type.IsEnum)
+            {
+                return EnumParam.FromObject(providedValue, type);
+            }            
+            return providedValue;
         }
 
         private static (MemberInfo source, object[] values) GetValidValuesForParamsSource(Type parentType, string sourceName)

@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Samples
         [Benchmark]
         [BenchmarkCategory("A", "1")]
         public void A1() => Thread.Sleep(10); // Will be benchmarked
-        
+
         [Benchmark]
         [BenchmarkCategory("A", "2")]
         public void A2() => Thread.Sleep(10); // Will be benchmarked
@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Samples
         [Benchmark]
         [BenchmarkCategory("B", "1")]
         public void B1() => Thread.Sleep(10); // Will be benchmarked
-        
+
         [Benchmark]
         [BenchmarkCategory("B", "2")]
         public void B2() => Thread.Sleep(10);

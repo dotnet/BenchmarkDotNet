@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             : this(processorName, null, null, null, nominalFrequency, null, null)
         {
         }
-        
+
         public CpuInfo(string processorName,
                        int? physicalProcessorCount,
                        int? physicalCoreCount,

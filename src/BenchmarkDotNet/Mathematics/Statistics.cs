@@ -91,14 +91,20 @@ namespace BenchmarkDotNet.Mathematics
         {
             switch (outlierMode)
             {
+#pragma warning disable 618
                 case OutlierMode.None:
+                case OutlierMode.DontRemove:
                     return false;
                 case OutlierMode.OnlyUpper:
+                case OutlierMode.RemoveUpper:
                     return IsUpperOutlier(value);
                 case OutlierMode.OnlyLower:
+                case OutlierMode.RemoveLower:
                     return IsLowerOutlier(value);
                 case OutlierMode.All:
+                case OutlierMode.RemoveAll:
                     return IsOutlier(value);
+#pragma warning restore 618
                 default:
                     throw new ArgumentOutOfRangeException(nameof(outlierMode), outlierMode, null);
             }
@@ -109,14 +115,20 @@ namespace BenchmarkDotNet.Mathematics
         {
             switch (outlierMode)
             {
+#pragma warning disable 618
                 case OutlierMode.None:
+                case OutlierMode.DontRemove:
                     return Array.Empty<double>();
                 case OutlierMode.OnlyUpper:
+                case OutlierMode.RemoveUpper:
                     return UpperOutliers;
                 case OutlierMode.OnlyLower:
+                case OutlierMode.RemoveLower:
                     return LowerOutliers;
                 case OutlierMode.All:
+                case OutlierMode.RemoveAll:
                     return AllOutliers;
+#pragma warning restore 618
                 default:
                     throw new ArgumentOutOfRangeException(nameof(outlierMode), outlierMode, null);
             }
@@ -142,17 +154,17 @@ namespace BenchmarkDotNet.Mathematics
 
         /// <summary>
         /// Statistics for [1/X]. If Min is less then or equal to 0, returns null.
-        /// </summary>        
+        /// </summary>
         public Statistics Invert() => CanBeInverted() ? new Statistics(SortedValues.Select(x => 1 / x)) : null;
 
         /// <summary>
         /// Mean for [X*Y].
-        /// </summary>        
+        /// </summary>
         public static double MulMean(Statistics x, Statistics y) => x.Mean * y.Mean;
 
         /// <summary>
         /// Mean for [X/Y].
-        /// </summary>        
+        /// </summary>
         public static double DivMean([CanBeNull] Statistics x, [CanBeNull] Statistics y)
         {
             if (x == null || y == null)

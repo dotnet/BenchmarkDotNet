@@ -71,6 +71,7 @@ namespace BenchmarkDotNet.Tests.Reports
                 string.Empty,
                 string.Empty,
                 TimeSpan.FromMinutes(1),
+                TestCultureInfo.Instance,
                 ImmutableArray<ValidationError>.Empty);
             MarkdownExporter.Default.ExportToLog(summary, logger);
             output.WriteLine(logger.GetLog());
@@ -80,7 +81,7 @@ namespace BenchmarkDotNet.Tests.Reports
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, int measurementValue)
         {
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
-            var executeResult = new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
+            var executeResult = new ExecuteResult(true, 0, default, Array.Empty<string>(), Array.Empty<string>());
             var measurements = new List<Measurement>
                 {
                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, measurementValue),

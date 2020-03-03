@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Validators
                          .Select(benchmark => new ValidationError(true, $"Generic class {benchmark.Descriptor.Type.GetDisplayName()} has non public generic argument(s)"));
 
         private static IEnumerable<ValidationError> ValidateBindingModifiers(IEnumerable<BenchmarkCase> benchmarks)
-            => benchmarks.Where(x => x.Descriptor.WorkloadMethod.IsStatic && !x.Job.GetToolchain().IsInProcess)
+            => benchmarks.Where(x => x.Descriptor.WorkloadMethod.IsStatic && !x.GetToolchain().IsInProcess)
                           .Distinct(BenchmarkMethodEqualityComparer.Instance)
                           .Select(benchmark
                               => new ValidationError(
@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Validators
                                   $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is static. Benchmarks MUST be instance methods, static methods are not supported.",
                                   benchmark
                               ));
-                
+
         private static bool IsValidCSharpIdentifier(string identifier) // F# allows to use whitespaces as names #479
             => !string.IsNullOrEmpty(identifier)
                && (char.IsLetter(identifier[0]) || identifier[0] == Underscore) // An identifier must start with a letter or an underscore

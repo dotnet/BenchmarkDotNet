@@ -37,22 +37,18 @@ namespace BenchmarkDotNet.Portability
         /// <summary>
         /// "The north star for CoreRT is to be a flavor of .NET Core" -> CoreRT reports .NET Core everywhere
         /// </summary>
-        public static bool IsCoreRT 
-            => FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase) 
+        public static bool IsCoreRT
+            => FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase)
                && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
 
-        public static bool InDocker => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
-                
+        public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
+
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
         internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
-        internal static string GetArchitecture() => Is64BitPlatform() ? "64bit" : "32bit";
+        internal static string GetArchitecture() => GetCurrentPlatform().ToString();
 
-        private static string DockerSdkVersion => Environment.GetEnvironmentVariable("DOTNET_VERSION");
-
-        private static string DockerAspnetSdkVersion => Environment.GetEnvironmentVariable("ASPNETCORE_VERSION");
-        
         internal static bool IsWindows() => IsOSPlatform(OSPlatform.Windows);
 
         internal static bool IsLinux() => IsOSPlatform(OSPlatform.Linux);
@@ -88,9 +84,8 @@ namespace BenchmarkDotNet.Portability
             {
                 try
                 {
-                    using (var ndpKey = RegistryKey
-                        .OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
-                        .OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion"))
+                    using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+                    using (var ndpKey = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion"))
                     {
                         if (ndpKey == null)
                             return null;
@@ -120,20 +115,6 @@ namespace BenchmarkDotNet.Portability
             return null;
         }
 
-        internal static string GetNetCoreVersion() => InDocker ? GetDockerNetCoreVersion() : GetBaseNetCoreVersion();
-
-        private static string GetDockerNetCoreVersion() => string.IsNullOrEmpty(DockerSdkVersion) ? DockerAspnetSdkVersion : DockerSdkVersion;
-
-        private static string GetBaseNetCoreVersion()
-        {
-            var assembly = typeof(GCSettings).GetTypeInfo().Assembly;
-            var assemblyPath = assembly.CodeBase.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
-            int netCoreAppIndex = Array.IndexOf(assemblyPath, "Microsoft.NETCore.App");
-            if (netCoreAppIndex > 0 && netCoreAppIndex < assemblyPath.Length - 2)
-                return assemblyPath[netCoreAppIndex + 1];
-            return null;            
-        }
-        
         internal static string GetRuntimeVersion()
         {
             if (IsMono)
@@ -164,7 +145,7 @@ namespace BenchmarkDotNet.Portability
             }
             else if (IsNetCore)
             {
-                string runtimeVersion = GetNetCoreVersion() ?? "?";
+                string runtimeVersion = CoreRuntime.TryGetVersion(out var version) ? version.ToString() : "?";
 
                 var coreclrAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
                 var corefxAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(Regex).GetTypeInfo().Assembly.Location);
@@ -183,15 +164,15 @@ namespace BenchmarkDotNet.Portability
         {
             //do not change the order of conditions because it may cause incorrect determination of runtime
             if (IsMono)
-                return Runtime.Mono;
+                return MonoRuntime.Default;
             if (IsFullFramework)
-                return Runtime.Clr;
+                return ClrRuntime.GetCurrentVersion();
             if (IsNetCore)
-                return Runtime.Core;
+                return CoreRuntime.GetCurrentVersion();
             if (IsCoreRT)
-                return Runtime.CoreRT;
-            
-            throw new NotSupportedException("Unknown .NET Framework"); // todo: adam sitnik fix it
+                return CoreRtRuntime.GetCurrentVersion();
+
+            throw new NotSupportedException("Unknown .NET Runtime");
         }
 
         public static Platform GetCurrentPlatform()
@@ -291,19 +272,18 @@ namespace BenchmarkDotNet.Portability
             {
                 try
                 {
-                    var wmi = new ManagementObjectSearcher(@"root\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
-                    var data = wmi.Get();
-
-                    foreach (var o in data)
-                    {
-                        var av = (ManagementObject) o;
-                        if (av != null)
+                    using (var wmi = new ManagementObjectSearcher(@"root\SecurityCenter2", "SELECT * FROM AntiVirusProduct"))
+                    using (var data = wmi.Get())
+                        foreach (var o in data)
                         {
-                            string name = av["displayName"].ToString();
-                            string path = av["pathToSignedProductExe"].ToString();
-                            products.Add(new Antivirus(name, path));
+                            var av = (ManagementObject) o;
+                            if (av != null)
+                            {
+                                string name = av["displayName"].ToString();
+                                string path = av["pathToSignedProductExe"].ToString();
+                                products.Add(new Antivirus(name, path));
+                            }
                         }
-                    }
                 }
                 catch
                 {
