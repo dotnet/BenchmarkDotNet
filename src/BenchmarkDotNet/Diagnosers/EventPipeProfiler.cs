@@ -127,15 +127,9 @@ namespace BenchmarkDotNet.Diagnosers
             resultLogger.WriteLineInfo(benchmarkToTraceFile.Values.First());
         }
 
-        private static ImmutableHashSet<EventPipeProvider> MapToProviders(EventPipeProfile profile, IReadOnlyCollection<EventPipeProvider> providers)
+        internal static ImmutableHashSet<EventPipeProvider> MapToProviders(EventPipeProfile profile, IReadOnlyCollection<EventPipeProvider> providers)
         {
-            var uniqueProviders = ImmutableHashSet.CreateBuilder<EventPipeProvider>();
-
-            var selectedProfile = EventPipeProfileMapper.DotNetRuntimeProfiles[profile];
-            foreach (var provider in selectedProfile)
-            {
-                uniqueProviders.Add(provider);
-            }
+            var uniqueProviders = ImmutableHashSet.CreateBuilder<EventPipeProvider>(EventPipeProviderEqualityComparer.Instance);
 
             if (providers != null)
             {
@@ -145,9 +139,24 @@ namespace BenchmarkDotNet.Diagnosers
                 }
             }
 
+            var selectedProfile = EventPipeProfileMapper.DotNetRuntimeProfiles[profile];
+            foreach (var provider in selectedProfile)
+            {
+                uniqueProviders.Add(provider);
+            }
+
             // mandatory provider to enable Engine events
             uniqueProviders.Add(new EventPipeProvider(EngineEventSource.SourceName, EventLevel.Informational, long.MaxValue));
             return uniqueProviders.ToImmutable();
+        }
+
+        private sealed class EventPipeProviderEqualityComparer : IEqualityComparer<EventPipeProvider>
+        {
+            internal static readonly IEqualityComparer<EventPipeProvider> Instance = new EventPipeProviderEqualityComparer();
+
+            public bool Equals(EventPipeProvider x, EventPipeProvider y) => x.Name.Equals(y.Name);
+
+            public int GetHashCode(EventPipeProvider obj) => obj.Name.GetHashCode();
         }
     }
 }
