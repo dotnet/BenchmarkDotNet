@@ -85,6 +85,19 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.ExtraRun;
 
+        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
+        {
+            foreach (var benchmark in validationParameters.Benchmarks)
+            {
+                var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance);
+
+                if (runtime.RuntimeMoniker < RuntimeMoniker.NetCoreApp30)
+                {
+                    yield return new ValidationError(true, $"{nameof(EventPipeProfiler)} supports only .NET Core 3.0+", benchmark);
+                }
+            }
+        }
+
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
             if (signal != HostSignal.BeforeAnythingElse)
@@ -106,29 +119,30 @@ namespace BenchmarkDotNet.Diagnosers
             var fileName = ArtifactFileNameHelper.GetFilePath(parameters, DateTime.Now, "nettrace").EnsureFolderExists();
             benchmarkToTraceFile[parameters.BenchmarkCase] = fileName;
 
-            collectingTask = new Task(() =>
-            {
-                try
-                {
-                    using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
-                    {
-                        var buffer = new byte[16 * 1024];
+            collectingTask = Task.Run(() => CopyEventStreamToFile(session, fileName, logger));
+        }
 
-                        while (true)
-                        {
-                            int nBytesRead = session.EventStream.Read(buffer, 0, buffer.Length);
-                            if (nBytesRead <= 0)
-                                break;
-                            fs.Write(buffer, 0, nBytesRead);
-                        }
-                    }
-                }
-                catch (Exception ex)
+        private static void CopyEventStreamToFile(EventPipeSession session, string fileName, LogCapture logger)
+        {
+            try
+            {
+                using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
                 {
-                    logger.WriteLine(LogKind.Error, $"An exception occurred during reading trace stream: {ex}");
+                    byte[] buffer = new byte[16 * 1024];
+                    int bytesRead = 0;
+
+                    while ((bytesRead = session.EventStream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        fs.Write(buffer, 0, bytesRead);
+                    }
+
+                    fs.Flush();
                 }
-            });
-            collectingTask.Start();
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLine(LogKind.Error, $"An exception occurred during reading trace stream: {ex}");
+            }
         }
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
@@ -162,19 +176,6 @@ namespace BenchmarkDotNet.Diagnosers
             resultLogger.WriteLineInfo(benchmarkToTraceFile.Values.First());
 
             resultLogger.WriteLineHeader(logSeparator);
-        }
-
-        public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
-        {
-            foreach (var benchmark in validationParameters.Benchmarks)
-            {
-                var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance);
-
-                if (runtime.RuntimeMoniker < RuntimeMoniker.NetCoreApp30)
-                {
-                    yield return new ValidationError(true, $"{nameof(EventPipeProfiler)} supports only .NET Core 3.0+", benchmark);
-                }
-            }
         }
 
         private void ConvertToSpeedscope(BenchmarkCase benchmarkCase, string traceFilePath)
