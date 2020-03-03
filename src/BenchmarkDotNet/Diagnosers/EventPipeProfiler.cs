@@ -31,20 +31,21 @@ namespace BenchmarkDotNet.Diagnosers
         };
 
         private readonly LogCapture logger = new LogCapture();
-
+        private readonly bool performExtraBenchmarksRun;
         private Task collectingTask;
 
         // parameterless constructor required by DiagnosersLoader to support creating this profiler via console line args
         public EventPipeProfiler() { }
 
         /// <summary>
-        /// Creates new instance of EventPipeProfiler
+        /// Creates a new instance of EventPipeProfiler
         /// </summary>
         /// <param name="profile">A named pre-defined set of provider configurations that allows common tracing scenarios to be specified succinctly.</param>
         /// <param name="providers">A list of EventPipe providers to be enabled.</param>
-        public EventPipeProfiler(EventPipeProfile? profile = null, IReadOnlyCollection<EventPipeProvider> providers = null)
+        /// /// <param name="performExtraBenchmarksRun">if set to true, benchmarks will be executed one more time with the profiler attached. If set to false, there will be no extra run but the results will contain overhead. True by default.</param>
         public EventPipeProfiler(EventPipeProfile profile = EventPipeProfile.CpuSampling, IReadOnlyCollection<EventPipeProvider> providers = null, bool performExtraBenchmarksRun = true)
         {
+            this.performExtraBenchmarksRun = performExtraBenchmarksRun;
 
             if (providers != null)
             {
@@ -64,7 +65,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
 
-        public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.ExtraRun;
+        public RunMode GetRunMode(BenchmarkCase benchmarkCase) => performExtraBenchmarksRun ? RunMode.ExtraRun : RunMode.NoOverhead;
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
