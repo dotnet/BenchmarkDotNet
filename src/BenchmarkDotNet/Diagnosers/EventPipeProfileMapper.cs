@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Diagnosers
     {
         private const string DotNetRuntimeProviderName = "Microsoft-Windows-DotNETRuntime";
 
-        internal static IReadOnlyDictionary<EventPipeProfile, EventPipeProvider[]> DotNetRuntimeProfiles { get; } = new Dictionary<EventPipeProfile, EventPipeProvider[]>
+        internal static IReadOnlyDictionary<EventPipeProfile, IReadOnlyList<EventPipeProvider>> DotNetRuntimeProfiles { get; } = new Dictionary<EventPipeProfile, IReadOnlyList<EventPipeProvider>>
         {
             { EventPipeProfile.CpuSampling,
                 new[]

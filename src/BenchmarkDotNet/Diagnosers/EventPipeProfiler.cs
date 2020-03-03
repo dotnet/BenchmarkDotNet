@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
@@ -24,37 +25,26 @@ namespace BenchmarkDotNet.Diagnosers
         public static readonly EventPipeProfiler Default = new EventPipeProfiler();
 
         private readonly Dictionary<BenchmarkCase, string> benchmarkToTraceFile = new Dictionary<BenchmarkCase, string>();
-
-        private readonly List<EventPipeProvider> eventPipeProviders = new List<EventPipeProvider>
-        {
-            new EventPipeProvider(EngineEventSource.SourceName, EventLevel.Informational, long.MaxValue) // mandatory provider to enable Engine events
-        };
-
+        private readonly ImmutableHashSet<EventPipeProvider> eventPipeProviders;
         private readonly LogCapture logger = new LogCapture();
         private readonly bool performExtraBenchmarksRun;
+
         private Task collectingTask;
 
         // parameterless constructor required by DiagnosersLoader to support creating this profiler via console line args
-        public EventPipeProfiler() { }
+        // we use performExtraBenchmarksRun = false for better first user experience
+        public EventPipeProfiler() :this(profile: EventPipeProfile.CpuSampling, performExtraBenchmarksRun: false) { }
 
         /// <summary>
         /// Creates a new instance of EventPipeProfiler
         /// </summary>
         /// <param name="profile">A named pre-defined set of provider configurations that allows common tracing scenarios to be specified succinctly.</param>
         /// <param name="providers">A list of EventPipe providers to be enabled.</param>
-        /// /// <param name="performExtraBenchmarksRun">if set to true, benchmarks will be executed one more time with the profiler attached. If set to false, there will be no extra run but the results will contain overhead. True by default.</param>
+        /// <param name="performExtraBenchmarksRun">if set to true, benchmarks will be executed one more time with the profiler attached. If set to false, there will be no extra run but the results will contain overhead. True by default.</param>
         public EventPipeProfiler(EventPipeProfile profile = EventPipeProfile.CpuSampling, IReadOnlyCollection<EventPipeProvider> providers = null, bool performExtraBenchmarksRun = true)
         {
             this.performExtraBenchmarksRun = performExtraBenchmarksRun;
-
-            if (providers != null)
-            {
-                eventPipeProviders.AddRange(providers);
-            }
-
-            var selectedProfile = EventPipeProfileMapper.DotNetRuntimeProfiles[profile];
-            var newProvidersFromProfile = selectedProfile.Where(p => !eventPipeProviders.Any(r => r.Name.Equals(p.Name)));
-            eventPipeProviders.AddRange(newProvidersFromProfile);
+            eventPipeProviders = MapToProviders(profile, providers);
         }
 
         public string ShortName => "EP";
@@ -150,6 +140,29 @@ namespace BenchmarkDotNet.Diagnosers
             resultLogger.WriteLineInfo(benchmarkToTraceFile.Values.First());
 
             resultLogger.WriteLineHeader(logSeparator);
+        }
+
+        private static ImmutableHashSet<EventPipeProvider> MapToProviders(EventPipeProfile profile, IReadOnlyCollection<EventPipeProvider> providers)
+        {
+            var uniqueProviders = ImmutableHashSet.CreateBuilder<EventPipeProvider>();
+
+            var selectedProfile = EventPipeProfileMapper.DotNetRuntimeProfiles[profile];
+            foreach (var provider in selectedProfile)
+            {
+                uniqueProviders.Add(provider);
+            }
+
+            if (providers != null)
+            {
+                foreach (var userProvidedProfile in providers)
+                {
+                    uniqueProviders.Add(userProvidedProfile);
+                }
+            }
+
+            // mandatory provider to enable Engine events
+            uniqueProviders.Add(new EventPipeProvider(EngineEventSource.SourceName, EventLevel.Informational, long.MaxValue));
+            return uniqueProviders.ToImmutable();
         }
     }
 }
