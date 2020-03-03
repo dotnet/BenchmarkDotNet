@@ -27,6 +27,19 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class EventPipeProfiler : IProfiler
     {
+        public static readonly EventPipeProfiler Default = new EventPipeProfiler();
+
+        private readonly Dictionary<BenchmarkCase, string> benchmarkToTraceFile = new Dictionary<BenchmarkCase, string>();
+
+        private readonly List<EventPipeProvider> eventPipeProviders = new List<EventPipeProvider>
+        {
+            new EventPipeProvider(EngineEventSource.SourceName, EventLevel.Informational, long.MaxValue) // mandatory provider to enable Engine events
+        };
+
+        private readonly LogCapture logger = new LogCapture();
+
+        private Task collectingTask;
+
         // parameterless constructor required by DiagnosersLoader to support creating this profiler via console line args
         public EventPipeProfiler() { }
 
@@ -62,21 +75,6 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        private readonly Dictionary<BenchmarkCase, string> benchmarkToTraceFile = new Dictionary<BenchmarkCase, string>();
-
-        private readonly List<EventPipeProvider> eventPipeProviders = new List<EventPipeProvider>
-        {
-            new EventPipeProvider(EngineEventSource.SourceName, EventLevel.Informational, long.MaxValue) // mandatory provider to enable Engine events
-        };
-
-        private static readonly string LogSeparator = new string('-', 20);
-
-        public static readonly EventPipeProfiler Default = new EventPipeProfiler();
-
-        private readonly LogCapture logger = new LogCapture();
-
-        private Task collectingTask;
-
         public IEnumerable<string> Ids => new[] { nameof(EventPipeProfiler) };
 
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
@@ -102,8 +100,7 @@ namespace BenchmarkDotNet.Diagnosers
                 logger.WriteLine(LogKind.Error, $"Unable to start a tracing session: {e}");
                 return;
             }
-            var fileName = ArtifactFileNameHelper.GetFilePath(parameters, DateTime.Now, "nettrace");
-            Path.GetDirectoryName(fileName).CreateIfNotExists();
+            var fileName = ArtifactFileNameHelper.GetFilePath(parameters, DateTime.Now, "nettrace").EnsureFolderExists();
             benchmarkToTraceFile[parameters.BenchmarkCase] = fileName;
 
             collectingTask = new Task(() =>
@@ -140,11 +137,13 @@ namespace BenchmarkDotNet.Diagnosers
 
             return Array.Empty<Metric>();
         }
-        
+
         public void DisplayResults(ILogger resultLogger)
         {
+            const string logSeparator = "--------------------";
+
             resultLogger.WriteLine();
-            resultLogger.WriteLineHeader(LogSeparator);
+            resultLogger.WriteLineHeader(logSeparator);
 
             if (logger.CapturedOutput.Any())
             {
@@ -159,7 +158,7 @@ namespace BenchmarkDotNet.Diagnosers
             resultLogger.WriteLineInfo($"Exported {benchmarkToTraceFile.Count} trace file(s). Example:");
             resultLogger.WriteLineInfo(benchmarkToTraceFile.Values.First());
 
-            resultLogger.WriteLineHeader(LogSeparator);
+            resultLogger.WriteLineHeader(logSeparator);
         }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
