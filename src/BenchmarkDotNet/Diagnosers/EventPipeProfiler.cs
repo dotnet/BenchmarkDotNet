@@ -98,6 +98,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             try
             {
+                using (session)
                 using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
                 {
                     byte[] buffer = new byte[16 * 1024];
