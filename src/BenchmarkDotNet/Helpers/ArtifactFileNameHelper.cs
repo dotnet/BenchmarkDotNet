@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Helpers
 {
     internal static class ArtifactFileNameHelper
     {
-        public static string GetFilePath(DiagnoserActionParameters details, DateTime creationTime, string fileExtension)
+        internal static string GetFilePath(DiagnoserActionParameters details, DateTime creationTime, string fileExtension)
         {
             string fileName = $@"{FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type)}.{FullNameProvider.GetMethodName(details.BenchmarkCase)}";
 

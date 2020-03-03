@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Diagnosers
 {
     internal sealed class EventPipeProfileMapper
     {
-        internal static Dictionary<EventPipeProfile, EventPipeProvider[]> DotNetRuntimeProfiles { get; } = new Dictionary<EventPipeProfile, EventPipeProvider[]>
+        internal static IReadOnlyDictionary<EventPipeProfile, EventPipeProvider[]> DotNetRuntimeProfiles { get; } = new Dictionary<EventPipeProfile, EventPipeProvider[]>
         {
             //Useful for tracking CPU usage and general .NET runtime information. This is the default option if no profile or providers are specified.
             { EventPipeProfile.CpuSampling,
