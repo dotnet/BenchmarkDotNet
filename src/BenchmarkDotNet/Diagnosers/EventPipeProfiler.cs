@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Collections.Immutable;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
@@ -17,65 +17,36 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.NETCore.Client;
-using Microsoft.Diagnostics.Symbols;
-using Microsoft.Diagnostics.Tracing;
-using Microsoft.Diagnostics.Tracing.Etlx;
-using Microsoft.Diagnostics.Tracing.Stacks;
-using Microsoft.Diagnostics.Tracing.Stacks.Formats;
 
 namespace BenchmarkDotNet.Diagnosers
 {
     public class EventPipeProfiler : IProfiler
     {
+        public static readonly EventPipeProfiler Default = new EventPipeProfiler();
+
+        private readonly Dictionary<BenchmarkCase, string> benchmarkToTraceFile = new Dictionary<BenchmarkCase, string>();
+        private readonly ImmutableHashSet<EventPipeProvider> eventPipeProviders;
+        private readonly bool performExtraBenchmarksRun;
+
+        private Task collectingTask;
+
         // parameterless constructor required by DiagnosersLoader to support creating this profiler via console line args
-        public EventPipeProfiler() { }
+        // we use performExtraBenchmarksRun = false for better first user experience
+        public EventPipeProfiler() :this(profile: EventPipeProfile.CpuSampling, performExtraBenchmarksRun: false) { }
 
         /// <summary>
-        /// Creates new instance of EventPipeProfiler
+        /// Creates a new instance of EventPipeProfiler
         /// </summary>
         /// <param name="profile">A named pre-defined set of provider configurations that allows common tracing scenarios to be specified succinctly.</param>
         /// <param name="providers">A list of EventPipe providers to be enabled.</param>
-        public EventPipeProfiler(EventPipeProfile? profile = null, IReadOnlyCollection<EventPipeProvider> providers = null)
+        /// <param name="performExtraBenchmarksRun">if set to true, benchmarks will be executed one more time with the profiler attached. If set to false, there will be no extra run but the results will contain overhead. True by default.</param>
+        public EventPipeProfiler(EventPipeProfile profile = EventPipeProfile.CpuSampling, IReadOnlyCollection<EventPipeProvider> providers = null, bool performExtraBenchmarksRun = true)
         {
-            if (profile == null && (providers == null || !providers.Any()))
-            {
-                logger.WriteLine(LogKind.Info, "No profile or providers specified, defaulting to trace profile 'CpuSampling'");
-                profile = EventPipeProfile.CpuSampling;
-            }
-
-            if (providers != null)
-            {
-                eventPipeProviders.AddRange(providers);
-            }
-
-            if (profile != null)
-            {
-                if (EventPipeProfileMapper.DotNetRuntimeProfiles.TryGetValue(profile.Value, out var selectedProfile))
-                {
-                    var newProvidersFromProfile = selectedProfile.Where(p => !eventPipeProviders.Any(r => r.Name.Equals(p.Name)));
-                    eventPipeProviders.AddRange(newProvidersFromProfile);
-                }
-                else
-                {
-                    logger.WriteLine(LogKind.Error, $"Invalid profile name: {profile}");
-                }
-            }
+            this.performExtraBenchmarksRun = performExtraBenchmarksRun;
+            eventPipeProviders = MapToProviders(profile, providers);
         }
 
-        private readonly Dictionary<BenchmarkCase, string> benchmarkToTraceFile = new Dictionary<BenchmarkCase, string>();
-        
-        private readonly List<EventPipeProvider> eventPipeProviders = new List<EventPipeProvider>
-        {
-            new EventPipeProvider("BenchmarkDotNet.EngineEventSource", EventLevel.Informational, long.MaxValue) // mandatory provider to enable Engine events
-        };
-
-        private static readonly string LogSeparator = new string('-', 20);
-
-        public static readonly EventPipeProfiler Default = new EventPipeProfiler();
-
-        private readonly LogCapture logger = new LogCapture();
-
-        private Task collectingTask;
+        public string ShortName => "EP";
 
         public IEnumerable<string> Ids => new[] { nameof(EventPipeProfiler) };
 
@@ -83,84 +54,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
 
-        public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.ExtraRun;
-
-        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
-        {
-            if (signal != HostSignal.BeforeAnythingElse)
-                return;
-
-            var diagnosticsClient = new DiagnosticsClient(parameters.Process.Id);
-
-            EventPipeSession session;
-            try
-            {
-                session = diagnosticsClient.StartEventPipeSession(eventPipeProviders, true);
-            }
-            catch (DiagnosticsClientException e)
-            {
-                logger.WriteLine(LogKind.Error, $"Unable to start a tracing session: {e}");
-                return;
-            }
-            var fileName = ArtifactFileNameHelper.GetFilePath(parameters, DateTime.Now, "nettrace");
-            Path.GetDirectoryName(fileName).CreateIfNotExists();
-            benchmarkToTraceFile[parameters.BenchmarkCase] = fileName;
-
-            collectingTask = new Task(() =>
-            {
-                try
-                {
-                    using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
-                    {
-                        var buffer = new byte[16 * 1024];
-
-                        while (true)
-                        {
-                            int nBytesRead = session.EventStream.Read(buffer, 0, buffer.Length);
-                            if (nBytesRead <= 0)
-                                break;
-                            fs.Write(buffer, 0, nBytesRead);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    logger.WriteLine(LogKind.Error, $"An exception occurred during reading trace stream: {ex}");
-                }
-            });
-            collectingTask.Start();
-        }
-
-        public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
-        {
-            Task.WaitAll(collectingTask);
-
-            if (benchmarkToTraceFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
-                ConvertToSpeedscope(results.BenchmarkCase, traceFilePath);
-
-            return Array.Empty<Metric>();
-        }
-        
-        public void DisplayResults(ILogger resultLogger)
-        {
-            resultLogger.WriteLine();
-            resultLogger.WriteLineHeader(LogSeparator);
-
-            if (logger.CapturedOutput.Any())
-            {
-                foreach (var line in logger.CapturedOutput)
-                    resultLogger.Write(line.Kind, line.Text);
-
-                resultLogger.WriteLine();
-            }
-            if (!benchmarkToTraceFile.Any())
-                return;
-
-            resultLogger.WriteLineInfo($"Exported {benchmarkToTraceFile.Count} trace file(s). Example:");
-            resultLogger.WriteLineInfo(benchmarkToTraceFile.Values.First());
-
-            resultLogger.WriteLineHeader(LogSeparator);
-        }
+        public RunMode GetRunMode(BenchmarkCase benchmarkCase) => performExtraBenchmarksRun ? RunMode.ExtraRun : RunMode.NoOverhead;
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
@@ -175,61 +69,94 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        public string ShortName => "EventPipe";
-
-        private void ConvertToSpeedscope(BenchmarkCase benchmarkCase, string traceFilePath)
+        public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
-            var speedscopeFileName = Path.ChangeExtension(traceFilePath, "speedscope.json");
+            if (signal != HostSignal.BeforeAnythingElse)
+                return;
 
+            var diagnosticsClient = new DiagnosticsClient(parameters.Process.Id);
+
+            EventPipeSession session = diagnosticsClient.StartEventPipeSession(eventPipeProviders, true);
+
+            var fileName = ArtifactFileNameHelper.GetFilePath(parameters, DateTime.Now, "nettrace").EnsureFolderExists();
+            benchmarkToTraceFile[parameters.BenchmarkCase] = fileName;
+
+            collectingTask = Task.Run(() => CopyEventStreamToFile(session, fileName, parameters.Config.GetCompositeLogger()));
+        }
+
+        private static void CopyEventStreamToFile(EventPipeSession session, string fileName, ILogger logger)
+        {
             try
             {
-                ConvertToSpeedscope(traceFilePath, speedscopeFileName);
-                benchmarkToTraceFile[benchmarkCase] = speedscopeFileName;
+                using (session)
+                using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                {
+                    byte[] buffer = new byte[16 * 1024];
+                    int bytesRead = 0;
+
+                    while ((bytesRead = session.EventStream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        fs.Write(buffer, 0, bytesRead);
+                    }
+
+                    fs.Flush();
+                }
             }
-            // Below comment come from https://github.com/dotnet/diagnostics/blob/2c23d3265dd8f642a8d6cf4bb8a135a5ff8b00c2/src/Tools/dotnet-trace/TraceFileFormatConverter.cs#L42
-            // TODO: On a broken/truncated trace, the exception we get from TraceEvent is a plain System.Exception type because it gets caught and rethrown inside TraceEvent.
-            // We should probably modify TraceEvent to throw a better exception.
             catch (Exception ex)
             {
-                if (ex.ToString().Contains("Read past end of stream."))
-                {
-                    logger.WriteLine(LogKind.Info,
-                        "Detected a potentially broken trace. Continuing with best-efforts to convert the trace, but resulting speedscope file may contain broken stacks as a result.");
-                    ConvertToSpeedscope(traceFilePath, speedscopeFileName, true);
-                    benchmarkToTraceFile[benchmarkCase] = speedscopeFileName;
-                }
-                else
-                {
-                    logger.WriteLine(LogKind.Error, $"An exception occurred during converting {traceFilePath} file to speedscope format: {ex}");
-                }
+                logger.WriteLine(LogKind.Error, $"An exception occurred during reading trace stream: {ex}");
             }
         }
 
-        // Method copied from https://github.com/dotnet/diagnostics/blob/2c23d3265dd8f642a8d6cf4bb8a135a5ff8b00c2/src/Tools/dotnet-trace/TraceFileFormatConverter.cs#L64
-        private static void ConvertToSpeedscope(string fileToConvert, string outputFilename, bool continueOnError = false)
+        public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
-            var etlxFilePath = TraceLog.CreateFromEventPipeDataFile(fileToConvert, null, new TraceLogOptions() { ContinueOnError = continueOnError });
-            using (var symbolReader = new SymbolReader(System.IO.TextWriter.Null) { SymbolPath = SymbolPath.MicrosoftSymbolServerPath })
-            using (var eventLog = new TraceLog(etlxFilePath))
+            Task.WaitAll(collectingTask);
+
+            if (benchmarkToTraceFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
+                benchmarkToTraceFile[results.BenchmarkCase] = SpeedScopeExporter.Convert(traceFilePath, results.BenchmarkCase.Config.GetCompositeLogger());
+
+            return Array.Empty<Metric>();
+        }
+
+        public void DisplayResults(ILogger resultLogger)
+        {
+            if (!benchmarkToTraceFile.Any())
+                return;
+
+            resultLogger.WriteLineInfo($"Exported {benchmarkToTraceFile.Count} trace file(s). Example:");
+            resultLogger.WriteLineInfo(benchmarkToTraceFile.Values.First());
+        }
+
+        internal static ImmutableHashSet<EventPipeProvider> MapToProviders(EventPipeProfile profile, IReadOnlyCollection<EventPipeProvider> providers)
+        {
+            var uniqueProviders = ImmutableHashSet.CreateBuilder<EventPipeProvider>(EventPipeProviderEqualityComparer.Instance);
+
+            if (providers != null)
             {
-                var stackSource = new MutableTraceEventStackSource(eventLog)
+                foreach (var userProvidedProfile in providers)
                 {
-                    OnlyManagedCodeStacks = true // EventPipe currently only has managed code stacks.
-                };
-
-                var computer = new SampleProfilerThreadTimeComputer(eventLog, symbolReader)
-                {
-                    IncludeEventSourceEvents = false // SpeedScope handles only CPU samples, events are not supported
-                };
-                computer.GenerateThreadTimeStacks(stackSource);
-
-                SpeedScopeStackSourceWriter.WriteStackViewAsJson(stackSource, outputFilename);
+                    uniqueProviders.Add(userProvidedProfile);
+                }
             }
 
-            if (File.Exists(etlxFilePath))
+            var selectedProfile = EventPipeProfileMapper.DotNetRuntimeProfiles[profile];
+            foreach (var provider in selectedProfile)
             {
-                File.Delete(etlxFilePath);
+                uniqueProviders.Add(provider);
             }
+
+            // mandatory provider to enable Engine events
+            uniqueProviders.Add(new EventPipeProvider(EngineEventSource.SourceName, EventLevel.Informational, long.MaxValue));
+            return uniqueProviders.ToImmutable();
+        }
+
+        private sealed class EventPipeProviderEqualityComparer : IEqualityComparer<EventPipeProvider>
+        {
+            internal static readonly IEqualityComparer<EventPipeProvider> Instance = new EventPipeProviderEqualityComparer();
+
+            public bool Equals(EventPipeProvider x, EventPipeProvider y) => x.Name.Equals(y.Name);
+
+            public int GetHashCode(EventPipeProvider obj) => obj.Name.GetHashCode();
         }
     }
 }

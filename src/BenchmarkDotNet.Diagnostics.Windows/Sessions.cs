@@ -103,8 +103,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             Details = details;
             Config = config;
-            FilePath = ArtifactFileNameHelper.GetFilePath(details, creationTime, FileExtension);
-            Path.GetDirectoryName(FilePath).CreateIfNotExists();
+            FilePath = ArtifactFileNameHelper.GetFilePath(details, creationTime, FileExtension).EnsureFolderExists();
             TraceEventSession = new TraceEventSession(sessionName, FilePath)
             {
                 BufferSizeMB = config.BufferSizeInMb,
