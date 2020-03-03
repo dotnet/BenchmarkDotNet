@@ -15,6 +15,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.4.3" />
+    <PackageReference Include="Iced" Version="1.4.0" />
+    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="1.1.57604" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="2.1.0" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.5.0" />
     <PackageReference Include="System.Management" Version="4.5.0" />
@@ -36,12 +38,14 @@
     <EmbeddedResource Include="Disassemblers\net461\win7-x86\BenchmarkDotNet.Disassembler.x86.exe" />
     <EmbeddedResource Include="Disassemblers\net461\win7-x64\BenchmarkDotNet.Disassembler.x64.exe" />
     <EmbeddedResource Include="Disassemblers\net461\win7-x64\Microsoft.Diagnostics.Runtime.dll" />
-    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.Mdb.dll" />
-    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.Pdb.dll" />
-    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.Rocks.dll" />
-    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Mono.Cecil.dll" />
+    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Iced.dll" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\DataContracts.cs" Link="Disassemblers\DataContracts.cs" />
+    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\SourceCodeProvider.cs" Link="Disassemblers\SourceCodeProvider.cs" />
+    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\ClrMdDisassembler.cs" Link="Disassemblers\ClrMdDisassembler.cs" />
   </ItemGroup>
 </Project>

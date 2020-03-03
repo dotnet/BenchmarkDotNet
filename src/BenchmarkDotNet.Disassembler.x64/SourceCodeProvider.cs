@@ -5,12 +5,75 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Microsoft.Diagnostics.RuntimeExt
+namespace BenchmarkDotNet.Disassemblers
 {
+    internal static class SourceCodeProvider
+    {
+        private static readonly Dictionary<string, string[]> SourceFileCache = new Dictionary<string, string[]>();
+
+        internal static IEnumerable<Sharp> GetSource(ClrMethod method, ILToNativeMap map)
+        {
+            var sourceLocation = method.GetSourceLocation(map.ILOffset);
+            if (sourceLocation == null)
+                yield break;
+
+            for (int line = sourceLocation.LineNumber; line <= sourceLocation.LineNumberEnd; ++line)
+            {
+                var sourceLine = ReadSourceLine(sourceLocation.FilePath, line);
+                if (sourceLine == null)
+                    continue;
+
+                var text = sourceLine + Environment.NewLine
+                    + GetSmartPrefix(sourceLine, sourceLocation.ColStart - 1)
+                    + new string('^', sourceLocation.ColEnd - sourceLocation.ColStart);
+
+                yield return new Sharp
+                {
+                    Text = text,
+                    InstructionPointer = map.StartAddress,
+                    FilePath = sourceLocation.FilePath,
+                    LineNumber = line
+                };
+            }
+        }
+
+        private static string ReadSourceLine(string file, int line)
+        {
+            if (!SourceFileCache.TryGetValue(file, out string[] contents))
+            {
+                // sometimes the symbols report some disk location from MS CI machine like "E:\A\_work\308\s\src\mscorlib\shared\System\Random.cs" for .NET Core 2.0
+                if (!File.Exists(file))
+                    return null;
+
+                contents = File.ReadAllLines(file);
+                SourceFileCache.Add(file, contents);
+            }
+
+            return line - 1 < contents.Length
+                ? contents[line - 1]
+                : null; // "nop" can have no corresponding c# code ;)
+        }
+
+        private static string GetSmartPrefix(string sourceLine, int length)
+        {
+            if (length <= 0)
+                return string.Empty;
+
+            var prefix = new char[length];
+            for (int i = 0; i < length; i++)
+            {
+                char sourceChar = i < sourceLine.Length ? sourceLine[i] : ' ';
+                prefix[i] = sourceChar == '\t' ? sourceChar : ' ';
+            }
+            return new string(prefix);
+        }
+    }
+
+
     // This is taken from the Samples\FileAndLineNumbers projects from microsoft/clrmd,
     // and replaces the previously-available SourceLocation functionality.
 
-    public class SourceLocation
+    internal class SourceLocation
     {
         public string FilePath;
         public int LineNumber;
@@ -19,14 +82,14 @@ namespace Microsoft.Diagnostics.RuntimeExt
         public int ColEnd;
     }
 
-    public static class ClrSourceExtensions
+    internal static class ClrSourceExtensions
     {
         // TODO Not sure we want this to be a shared dictionary, especially without
         //      any synchronization. Probably want to put this hanging off the Context
         //      somewhere, or inside SymbolCache.
         private static readonly Dictionary<PdbInfo, PdbReader> s_pdbReaders = new Dictionary<PdbInfo, PdbReader>();
 
-        public static SourceLocation GetSourceLocation(this ClrMethod method, int ilOffset)
+        internal static SourceLocation GetSourceLocation(this ClrMethod method, int ilOffset)
         {
             PdbReader reader = GetReaderForMethod(method);
             if (reader == null)
@@ -36,7 +99,7 @@ namespace Microsoft.Diagnostics.RuntimeExt
             return FindNearestLine(function, ilOffset);
         }
 
-        public static SourceLocation GetSourceLocation(this ClrStackFrame frame)
+        internal static SourceLocation GetSourceLocation(this ClrStackFrame frame)
         {
             PdbReader reader = GetReaderForMethod(frame.Method);
             if (reader == null)

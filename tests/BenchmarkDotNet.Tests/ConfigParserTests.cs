@@ -380,8 +380,7 @@ namespace BenchmarkDotNet.Tests
 
             var diagnoser = config.GetDiagnosers().OfType<DisassemblyDiagnoser>().Single();
 
-            Assert.Equal(depth, diagnoser.Config.RecursiveDepth);
-            Assert.True(diagnoser.Config.PrintPrologAndEpilog); // we want this option to be enabled by default for command line users
+            Assert.Equal(depth, diagnoser.Config.MaxDepth);
         }
 
         [Fact]

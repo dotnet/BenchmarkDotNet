@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,7 +17,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         // Make the Diagnosers lazy-loaded, so they are only instantiated if needed
         private static readonly Lazy<IDiagnoser[]> LazyLoadedDiagnosers
-            = new Lazy<IDiagnoser[]>(LoadDiagnosers, LazyThreadSafetyMode.ExecutionAndPublication);
+            = new Lazy<IDiagnoser[]>(() => LoadDiagnosers().ToArray(), LazyThreadSafetyMode.ExecutionAndPublication);
 
         internal static IDiagnoser GetImplementation<TDiagnoser>() where TDiagnoser : IDiagnoser
             => LazyLoadedDiagnosers.Value
@@ -32,63 +31,22 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static IDiagnoser GetUnresolvedDiagnoser<TDiagnoser>() => new UnresolvedDiagnoser(typeof(TDiagnoser));
 
-        private static IDiagnoser[] LoadDiagnosers()
+        private static IEnumerable<IDiagnoser> LoadDiagnosers()
         {
-            if (RuntimeInformation.IsMono)
-                return LoadMono();
-            if (RuntimeInformation.IsFullFramework)
-                return LoadClassic();
+            yield return MemoryDiagnoser.Default;
+            yield return new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig());
 
-            if (RuntimeInformation.IsWindows())
-                return LoadCoreOnWindows();
+            if (RuntimeInformation.IsNetCore)
+                yield return EventPipeProfiler.Default;
 
-            return LoadCore();
+            if (!RuntimeInformation.IsWindows())
+                yield break;
+
+            foreach (var windowsDiagnoser in LoadWindowsDiagnosers())
+                yield return windowsDiagnoser;
         }
 
-        private static IDiagnoser[] LoadMono()
-            => new IDiagnoser[]
-            {
-                // this method should return a IHardwareCountersDiagnoser when we implement Hardware Counters for Unix
-                MemoryDiagnoser.Default,
-                DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig())
-            };
-
-        private static IDiagnoser[] LoadCore()
-            => new IDiagnoser[]
-            {
-                MemoryDiagnoser.Default,
-                EventPipeProfiler.Default,
-            };
-
-        private static IDiagnoser[] LoadCoreOnWindows()
-        {
-            List<IDiagnoser> result = new List<IDiagnoser>
-            {
-                MemoryDiagnoser.Default,
-                EventPipeProfiler.Default,
-                DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig()),
-            };
-
-            // For .Net Core we can try to load `BenchmarkDotNet.Diagnostics.Windows` on Windows because it's using a .NET Standard compatible EventTrace lib now
-            LoadWindowsDiagnosers(result);
-
-            return result.ToArray();
-        }
-
-        private static IDiagnoser[] LoadClassic()
-        {
-            List<IDiagnoser> result = new List<IDiagnoser>
-            {
-                MemoryDiagnoser.Default, 
-                DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig())
-            };
-
-            LoadWindowsDiagnosers(result);
-            
-            return result.ToArray();
-        }
-
-        private static void LoadWindowsDiagnosers(List<IDiagnoser> result)
+        private static IDiagnoser[] LoadWindowsDiagnosers()
         {
             try
             {
@@ -103,19 +61,24 @@ namespace BenchmarkDotNet.Diagnosers
                         Environment.NewLine +
                         $"Does not match: {Path.GetFileName(benchmarkDotNetAssembly.Location)} version {benchmarkDotNetAssembly.GetName().Version}";
                     ConsoleLogger.Default.WriteLineError(errorMsg);
+
+                    return Array.Empty<IDiagnoser>();
                 }
-                else
+
+                return new[]
                 {
-                    result.Add(CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"));
-                    result.Add(CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.PmcDiagnoser"));
-                    result.Add(CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.EtwProfiler"));
-                    result.Add(CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.ConcurrencyVisualizerProfiler"));
-                    result.Add(CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.NativeMemoryProfiler"));
-                }
+                    CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
+                    CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.PmcDiagnoser"),
+                    CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.EtwProfiler"),
+                    CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.ConcurrencyVisualizerProfiler"),
+                    CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.NativeMemoryProfiler")
+                };
             }
             catch (Exception ex) // we're loading a plug-in, better to be safe rather than sorry
             {
                 ConsoleLogger.Default.WriteLineError($"Error loading {WindowsDiagnosticAssemblyFileName}: {ex.GetType().Name} - {ex.Message}");
+
+                return Array.Empty<IDiagnoser>();
             }
         }
 

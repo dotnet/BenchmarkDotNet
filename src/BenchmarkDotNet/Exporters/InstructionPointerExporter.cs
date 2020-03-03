@@ -2,13 +2,14 @@
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Exporters
 {
-    public class InstructionPointerExporter : IExporter
+    internal class InstructionPointerExporter : IExporter
     {
         internal const string CssStyle = @"
 <style type=""text/css"">
@@ -19,9 +20,9 @@ namespace BenchmarkDotNet.Exporters
 </style>";
 
         private readonly IHardwareCountersDiagnoser hardwareCountersDiagnoser;
-        private readonly IDisassemblyDiagnoser disassemblyDiagnoser;
+        private readonly DisassemblyDiagnoser disassemblyDiagnoser;
 
-        internal InstructionPointerExporter(IHardwareCountersDiagnoser hardwareCountersDiagnoser, IDisassemblyDiagnoser disassemblyDiagnoser)
+        internal InstructionPointerExporter(IHardwareCountersDiagnoser hardwareCountersDiagnoser, DisassemblyDiagnoser disassemblyDiagnoser)
         {
             this.hardwareCountersDiagnoser = hardwareCountersDiagnoser;
             this.disassemblyDiagnoser = disassemblyDiagnoser;
@@ -43,7 +44,7 @@ namespace BenchmarkDotNet.Exporters
             }
         }
 
-        private static string Export(Summary summary, BenchmarkCase benchmarkCase, DisassemblyResult disassemblyResult, PmcStats pmcStats)
+        private string Export(Summary summary, BenchmarkCase benchmarkCase, DisassemblyResult disassemblyResult, PmcStats pmcStats)
         {
             string filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmarkCase.Descriptor.WorkloadMethod.Name)}-{benchmarkCase.Job.Environment.Jit}-{benchmarkCase.Job.Environment.Platform}-instructionPointer.html";
             if (File.Exists(filePath))
@@ -73,7 +74,7 @@ namespace BenchmarkDotNet.Exporters
             IEnumerable<ulong> Range(Asm asm)
             {
                 // most probably asm.StartAddress would be enough, but I don't want to miss any edge case
-                for (ulong instructionPointer = asm.StartAddress; instructionPointer < asm.EndAddress; instructionPointer++)
+                for (ulong instructionPointer = asm.InstructionPointer; instructionPointer < asm.InstructionPointer + (ulong)asm.Instruction.ByteLength; instructionPointer++)
                     yield return instructionPointer;
             }
 
@@ -81,7 +82,7 @@ namespace BenchmarkDotNet.Exporters
                 disassemblyResult
                     .Methods
                     .SelectMany(method => method.Maps)
-                    .SelectMany(map => map.Instructions)
+                    .SelectMany(map => map.SourceCodes)
                     .OfType<Asm>()
                     .SelectMany(Range)
                     .Distinct());
@@ -112,9 +113,9 @@ namespace BenchmarkDotNet.Exporters
 
                 foreach (var map in method.Maps)
                 {
-                    var codeWithCounters = new List<CodeWithCounters>(map.Instructions.Length);
+                    var codeWithCounters = new List<CodeWithCounters>(map.SourceCodes.Length);
 
-                    foreach (var instruction in map.Instructions)
+                    foreach (var instruction in map.SourceCodes)
                     {
                         var totalsPerCounter = pmcStats.Counters.Keys.ToDictionary(key => key, _ => default(ulong));
 
@@ -123,7 +124,7 @@ namespace BenchmarkDotNet.Exporters
                             foreach (var hardwareCounter in pmcStats.Counters)
                             {
                                 // most probably asm.StartAddress would be enough, but I don't want to miss any edge case
-                                for (ulong instructionPointer = asm.StartAddress; instructionPointer < asm.EndAddress; instructionPointer++)
+                                for (ulong instructionPointer = asm.InstructionPointer; instructionPointer < asm.InstructionPointer + (ulong)asm.Instruction.ByteLength; instructionPointer++)
                                     if (hardwareCounter.Value.PerInstructionPointer.TryGetValue(instructionPointer, out ulong value))
                                         totalsPerCounter[hardwareCounter.Key] = totalsPerCounter[hardwareCounter.Key] + value;
                             }
@@ -162,9 +163,9 @@ namespace BenchmarkDotNet.Exporters
             return model;
         }
 
-        private static void Export(ILogger logger, BenchmarkCase benchmarkCase, Dictionary<HardwareCounter, (ulong withoutNoise, ulong total)> totals, IReadOnlyList<MethodWithCounters> model, HardwareCounter[] hardwareCounters)
+        private void Export(ILogger logger, BenchmarkCase benchmarkCase, Dictionary<HardwareCounter, (ulong withoutNoise, ulong total)> totals, IReadOnlyList<MethodWithCounters> model, HardwareCounter[] hardwareCounters)
         {
-            int columnsCount = hardwareCounters.Length + 2;
+            int columnsCount = hardwareCounters.Length + 1;
 
             logger.WriteLine("<!DOCTYPE html><html lang='en'><head><meta charset='utf-8' />");
             logger.WriteLine($"<title>Combined Output of DisassemblyDiagnoser and HardwareCounters {benchmarkCase.DisplayInfo}</title>");
@@ -186,9 +187,12 @@ namespace BenchmarkDotNet.Exporters
             foreach (var hardwareCounter in hardwareCounters)
                 logger.WriteLine($"<th>{hardwareCounter.ToShortName()}</th>");
 
-            logger.WriteLine("<th></th><th></th></tr></thead>");
+            logger.WriteLine("<th></th></tr></thead>");
 
             logger.WriteLine("<tbody>");
+            var disassemblyResult = disassemblyDiagnoser.Results[benchmarkCase];
+            var config = disassemblyDiagnoser.Config;
+            var formatterWithSymbols = config.GetFormatterWithSymbolSolver(disassemblyResult.AddressToNameMapping);
             foreach (var method in model.Where(data => data.HasCounters))
             {
                 logger.WriteLine($"<tr><th colspan=\"{columnsCount}\">{method.Method.Name}</th></tr>");
@@ -215,9 +219,8 @@ namespace BenchmarkDotNet.Exporters
                         else
                             logger.Write("<td>");
 
-                        logger.WriteLine($"<pre><code>{instruction.Code.TextRepresentation}</pre></code></td>");
-                        logger.WriteLine($"<td>{instruction.Code.Comment}</td>");
-                        logger.WriteLine("</tr>");
+                        string formatted = CodeFormatter.Format(instruction.Code, formatterWithSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize);
+                        logger.WriteLine($"<pre><code>{formatted}</pre></code></td></tr>");
                     }
 
                     evenMap = !evenMap;
@@ -233,7 +236,7 @@ namespace BenchmarkDotNet.Exporters
                         ? $"<td class=\"perMethod\" title=\"{forMethod} of {totalWithoutNoise}\">{(double) forMethod / totalWithoutNoise:P}</td>"
                         : "<td  class=\"perMethod\">-</td>");
                 }
-                logger.WriteLine("<td></td><td></td></tr>");
+                logger.WriteLine("<td></td></tr>");
                 logger.WriteLine($"<tr><td colspan=\"{columnsCount}\"></td></tr>");
             }
 
@@ -250,7 +253,7 @@ namespace BenchmarkDotNet.Exporters
 
         private class CodeWithCounters
         {
-            internal Diagnosers.Code Code { get; set; }
+            internal SourceCode Code { get; set; }
             internal IReadOnlyDictionary<HardwareCounter, ulong> SumPerCounter { get; set; }
         }
 

@@ -2,27 +2,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
-namespace BenchmarkDotNet.Exporters
+namespace BenchmarkDotNet.Disassemblers.Exporters
 {
-    public class CombinedDisassemblyExporter : ExporterBase
+    internal class CombinedDisassemblyExporter : ExporterBase
     {
         internal const string CssDefinition = @"
 <style type=""text/css"">
-	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
-	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: left; }
-	tr { background-color: #fff; border-top: 1px solid #ccc; }
-	tr:nth-child(even) { background: #f8f8f8; }
+    table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+    td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: left; }
+    tr { background-color: #fff; border-top: 1px solid #ccc; }
+    tr:nth-child(even) { background: #f8f8f8; }
 </style>";
 
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
+        private readonly DisassemblyDiagnoserConfig config;
 
-        public CombinedDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results)
+        internal CombinedDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results, DisassemblyDiagnoserConfig config)
         {
             this.results = results;
+            this.config = config;
         }
 
         protected override string FileExtension => "html";
@@ -33,7 +36,7 @@ namespace BenchmarkDotNet.Exporters
             var benchmarksByTarget = summary.BenchmarksCases
                 .Where(benchmark => results.ContainsKey(benchmark))
                 .GroupBy(benchmark => benchmark.Descriptor.WorkloadMethod)
-                .ToList();
+                .ToArray();
 
             logger.WriteLine("<!DOCTYPE html>");
             logger.WriteLine("<html lang='en'>");
@@ -53,7 +56,7 @@ namespace BenchmarkDotNet.Exporters
                         targetingSameMethod.ToArray(),
                         logger,
                         targetingSameMethod.First().Descriptor.DisplayInfo,
-                        benchmark => GetImportantInfo(summary[benchmark]));
+                        benchmark => summary[benchmark].GetRuntimeInfo());
                 }
             }
             else // different methods, same JIT
@@ -62,7 +65,7 @@ namespace BenchmarkDotNet.Exporters
                     summary.BenchmarksCases.Where(benchmark => results.ContainsKey(benchmark)).ToArray(),
                     logger,
                     summary.Title,
-                    benchmark => $"{benchmark.Descriptor.WorkloadMethod.Name} {GetImportantInfo(summary[benchmark])}");
+                    benchmark => $"{benchmark.Descriptor.WorkloadMethod.Name} {summary[benchmark].GetRuntimeInfo()}");
             }
 
             logger.WriteLine("</body>");
@@ -86,14 +89,17 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("<tr>");
             foreach (var benchmark in benchmarksCase)
             {
+                var disassemblyResult = results[benchmark];
                 logger.WriteLine("<td style=\"vertical-align:top;\"><pre><code>");
-                foreach (var method in results[benchmark].Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
+                foreach (var method in disassemblyResult.Methods.Where(method => string.IsNullOrEmpty(method.Problem)))
                 {
-                    logger.WriteLine($"{RawDisassemblyExporter.FormatMethodAddress(method.NativeCode)} {method.Name}");
+                    logger.WriteLine(method.Name);
+
+                    var formatter = config.GetFormatterWithSymbolSolver(disassemblyResult.AddressToNameMapping);
 
                     foreach (var map in method.Maps)
-                        foreach (var instruction in map.Instructions)
-                            logger.WriteLine(instruction.TextRepresentation);
+                        foreach (var sourceCode in map.SourceCodes)
+                            logger.WriteLine(CodeFormatter.Format(sourceCode, formatter, config.PrintInstructionAddresses, disassemblyResult.PointerSize));
 
                     logger.WriteLine();
                 }
@@ -115,7 +121,5 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("</tbody>");
             logger.WriteLine("</table>");
         }
-
-        private static string GetImportantInfo(BenchmarkReport benchmarkReport) => benchmarkReport.GetRuntimeInfo();
     }
 }

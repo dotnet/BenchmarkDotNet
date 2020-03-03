@@ -4,15 +4,15 @@ using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
-namespace BenchmarkDotNet.Diagnosers
+namespace BenchmarkDotNet.Disassemblers
 {
-    public class DisassemblyAnalyzer : IAnalyser
+    internal class DisassemblyAnalyzer : IAnalyser
     {
         public string Id => "Disassembly";
 
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
 
-        public DisassemblyAnalyzer(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
+        internal DisassemblyAnalyzer(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
 
         public IEnumerable<Conclusion> Analyse(Summary summary)
             => from pair in results

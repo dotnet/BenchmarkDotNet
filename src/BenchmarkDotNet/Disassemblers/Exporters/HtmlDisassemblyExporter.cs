@@ -2,23 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
-namespace BenchmarkDotNet.Exporters
+namespace BenchmarkDotNet.Disassemblers.Exporters
 {
-    public class PrettyHtmlDisassemblyExporter : ExporterBase
+    internal class HtmlDisassemblyExporter : ExporterBase
     {
         private static readonly Lazy<string> HighlightingLabelsScript = new Lazy<string>(() => ResourceHelper.LoadTemplate("highlightingLabelsScript.js"));
 
         private readonly IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results;
+        private readonly DisassemblyDiagnoserConfig config;
 
-        public PrettyHtmlDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results) => this.results = results;
+        internal HtmlDisassemblyExporter(IReadOnlyDictionary<BenchmarkCase, DisassemblyResult> results, DisassemblyDiagnoserConfig config)
+        {
+            this.results = results;
+            this.config = config;
+        }
 
         protected override string FileExtension => "html";
-        protected override string FileCaption => "asm.pretty";
+        protected override string FileCaption => "asm";
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
@@ -43,7 +49,7 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("</body></html>");
         }
 
-        private static void Export(ILogger logger, Summary summary, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase, ref int referenceIndex)
+        private void Export(ILogger logger, Summary summary, DisassemblyResult disassemblyResult, BenchmarkCase benchmarkCase, ref int referenceIndex)
         {
             logger.WriteLine($"<h2>{summary[benchmarkCase].GetRuntimeInfo()}</h2>");
             logger.WriteLine("<table><tbody>");
@@ -54,7 +60,7 @@ namespace BenchmarkDotNet.Exporters
                 referenceIndex++;
                 logger.WriteLine($"<tr><th colspan=\"2\" style=\"text-align: left;\">{method.Name}</th><th></th></tr>");
 
-                var pretty = DisassemblyPrettifier.Prettify(method, $"M{methodIndex++:00}");
+                var pretty = DisassemblyPrettifier.Prettify(method, disassemblyResult, config, $"M{methodIndex++:00}");
 
                 bool even = false, diffTheLabels = pretty.Count > 1;
                 foreach (var element in pretty)
@@ -73,12 +79,10 @@ namespace BenchmarkDotNet.Exporters
                     logger.WriteLine($"<tr class=\"{(even && diffTheLabels ? "evenMap" : string.Empty)}\">");
                     logger.Write("<td></td>");
 
-                    string tooltip = element.Source is Asm asm ? $"title=\"{asm.TextRepresentation}\"" : null;
-
                     if (element is DisassemblyPrettifier.Reference reference)
-                        logger.WriteLine($"<td id=\"{referenceIndex}\" class=\"reference\" data-reference=\"{referenceIndex}_{reference.Id}\" {tooltip}><a href=\"#{referenceIndex}_{reference.Id}\"><pre><code>{reference.TextRepresentation}</pre></code></a></td>");
+                        logger.WriteLine($"<td id=\"{referenceIndex}\" class=\"reference\" data-reference=\"{referenceIndex}_{reference.Id}\"><a href=\"#{referenceIndex}_{reference.Id}\"><pre><code>{reference.TextRepresentation}</pre></code></a></td>");
                     else
-                        logger.WriteLine($"<td {tooltip}><pre><code>{element.TextRepresentation}</pre></code></td>");
+                        logger.WriteLine($"<td><pre><code>{element.TextRepresentation}</pre></code></td>");
 
                     logger.Write("</tr>");
                 }

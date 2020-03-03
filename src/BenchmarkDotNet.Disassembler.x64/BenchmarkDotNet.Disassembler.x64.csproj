@@ -14,7 +14,7 @@
     <RootNamespace>BenchmarkDotNet.Disassembler</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="0.9.180305.1" />
-    <PackageReference Include="Mono.Cecil" Version="0.10.1" />
+    <PackageReference Include="Iced" Version="1.4.0" />
+    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="1.1.57604" />
   </ItemGroup>
 </Project>

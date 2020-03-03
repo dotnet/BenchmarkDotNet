@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -12,22 +12,11 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Diagnosers
+namespace BenchmarkDotNet.Disassemblers
 {
-    [SuppressMessage("ReSharper", "NotAccessedField.Local")] // TODO: use config fields
     internal class MonoDisassembler
     {
-        private readonly bool printAsm, printIL, printSource, printPrologAndEpilog;
-        private readonly int recursiveDepth;
-
-        internal MonoDisassembler(DisassemblyDiagnoserConfig config)
-        {
-            printIL = config.PrintIL;
-            printAsm = config.PrintAsm;
-            printSource = config.PrintSource;
-            printPrologAndEpilog = config.PrintPrologAndEpilog;
-            recursiveDepth = config.RecursiveDepth;
-        }
+        internal MonoDisassembler(DisassemblyDiagnoserConfig _) { }
 
         internal DisassemblyResult Disassemble(BenchmarkCase benchmarkCase, MonoRuntime mono)
         {
@@ -63,7 +52,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             internal static DisassemblyResult Parse([ItemCanBeNull] IReadOnlyList<string> input, string methodName, string commandLine)
             {
-                var instructions = new List<Code>();
+                var instructions = new List<MonoCode>();
 
                 const string windowsHeader = "Disassembly of section .text:";
                 const string macOSXHeader = "(__TEXT,__text) section";
@@ -95,7 +84,7 @@ namespace BenchmarkDotNet.Diagnosers
                     if (TryParseInstruction(line, out var instruction))
                         instructions.Add(instruction);
 
-                while (instructions.Any() && instructions.Last().TextRepresentation == "nop")
+                while (instructions.Any() && instructions.Last().Text == "nop")
                     instructions.RemoveAt(instructions.Count - 1);
 
                 return new DisassemblyResult
@@ -105,7 +94,7 @@ namespace BenchmarkDotNet.Diagnosers
                         new DisassembledMethod
                         {
                             Name = methodName,
-                            Maps = new[] { new Map { Instructions = instructions.ToArray() } },
+                            Maps = new[] { new Map { SourceCodes = instructions.ToArray() } },
                             CommandLine = commandLine
                         }
                     }
@@ -124,9 +113,9 @@ namespace BenchmarkDotNet.Diagnosers
                             Name = methodName,
                             Maps = new[] { new Map
                             {
-                                Instructions = input
+                                SourceCodes = input
                                     .Where(line => !string.IsNullOrWhiteSpace(line))
-                                    .Select(line => new Code { TextRepresentation = line })
+                                    .Select(line => new MonoCode { Text = line })
                                     .ToArray()
                             } },
                             CommandLine = commandLine
@@ -138,16 +127,16 @@ namespace BenchmarkDotNet.Diagnosers
 
             //line example 1:  0:	48 83 ec 28          	sub    $0x28,%rsp
             //line example 2: 0000000000000000	subq	$0x28, %rsp
-            private static readonly Regex InstructionRegex = new Regex(@"\s*(?<address>[0-9a-f]+)(\:\s+([0-9a-f]{2}\s+)+)?\s+(?<instruction>.*)\s*");
+            private static readonly Regex InstructionRegex = new Regex(@"\s*(?<address>[0-9a-f]+)(\:\s+([0-9a-f]{2}\s+)+)?\s+(?<instruction>.*)\s*", RegexOptions.Compiled);
 
-            private static bool TryParseInstruction(string line, out Code instruction)
+            private static bool TryParseInstruction(string line, out MonoCode instruction)
             {
                 instruction = null;
                 var match = InstructionRegex.Match(line);
                 if (!match.Success)
                     return false;
 
-                instruction = new Code { TextRepresentation = match.Groups["instruction"].ToString() };
+                instruction = new MonoCode { Text = match.Groups["instruction"].ToString() };
                 return true;
             }
         }
