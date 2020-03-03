@@ -75,6 +75,8 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
+        public string ShortName => "EP";
+
         public IEnumerable<string> Ids => new[] { nameof(EventPipeProfiler) };
 
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
@@ -100,6 +102,7 @@ namespace BenchmarkDotNet.Diagnosers
                 logger.WriteLine(LogKind.Error, $"Unable to start a tracing session: {e}");
                 return;
             }
+
             var fileName = ArtifactFileNameHelper.GetFilePath(parameters, DateTime.Now, "nettrace").EnsureFolderExists();
             benchmarkToTraceFile[parameters.BenchmarkCase] = fileName;
 
@@ -173,8 +176,6 @@ namespace BenchmarkDotNet.Diagnosers
                 }
             }
         }
-
-        public string ShortName => "EventPipe";
 
         private void ConvertToSpeedscope(BenchmarkCase benchmarkCase, string traceFilePath)
         {
