@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
@@ -23,6 +22,7 @@ namespace BenchmarkDotNet.Diagnosers
     {
         private const int SuccesExitCode = 0;
         private const string PerfCollectFileName = "perfcollect";
+
         public static readonly IDiagnoser Default = new LttngProfiler(new LttngProfilerConfig(performExtraBenchmarksRun: false));
 
         private readonly LttngProfilerConfig config;
@@ -97,11 +97,9 @@ namespace BenchmarkDotNet.Diagnosers
 
             var logger = validationParameters.Config.GetCompositeLogger();
             perfCollectFile = new FileInfo(Path.Combine(scriptInstallationDirectory.FullName, PerfCollectFileName));
-            using (var client = new WebClient())
-            {
-                logger.WriteLineInfo($"// Downloading perfcollect: {perfCollectFile.FullName}");
-                client.DownloadFile("https://aka.ms/perfcollect", perfCollectFile.FullName);
-            }
+
+            string script = ResourceHelper.LoadTemplate(PerfCollectFileName);
+            File.WriteAllText(perfCollectFile.FullName, script);
 
             if (Mono.Unix.Native.Syscall.chmod(perfCollectFile.FullName, Mono.Unix.Native.FilePermissions.S_IXUSR) != SuccesExitCode)
             {
