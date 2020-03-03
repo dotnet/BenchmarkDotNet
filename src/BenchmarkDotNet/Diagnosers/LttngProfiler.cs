@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             if (validationParameters.Benchmarks.Any() && !TryInstallPerfCollect(validationParameters))
             {
-                yield return new ValidationError(true, "Failed to install perfcollect script. Please follow the instructions from https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/linux-performance-tracing.md#preparing-your-machine");
+                yield return new ValidationError(true, "Failed to install perfcollect script. Please follow the instructions from https://github.com/dotnet/runtime/blob/master/docs/project/linux-performance-tracing.md");
             }
         }
 
