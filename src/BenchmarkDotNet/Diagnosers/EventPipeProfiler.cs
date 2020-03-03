@@ -26,7 +26,6 @@ namespace BenchmarkDotNet.Diagnosers
 
         private readonly Dictionary<BenchmarkCase, string> benchmarkToTraceFile = new Dictionary<BenchmarkCase, string>();
         private readonly ImmutableHashSet<EventPipeProvider> eventPipeProviders;
-        private readonly LogCapture logger = new LogCapture();
         private readonly bool performExtraBenchmarksRun;
 
         private Task collectingTask;
@@ -82,10 +81,10 @@ namespace BenchmarkDotNet.Diagnosers
             var fileName = ArtifactFileNameHelper.GetFilePath(parameters, DateTime.Now, "nettrace").EnsureFolderExists();
             benchmarkToTraceFile[parameters.BenchmarkCase] = fileName;
 
-            collectingTask = Task.Run(() => CopyEventStreamToFile(session, fileName, logger));
+            collectingTask = Task.Run(() => CopyEventStreamToFile(session, fileName, parameters.Config.GetCompositeLogger()));
         }
 
-        private static void CopyEventStreamToFile(EventPipeSession session, string fileName, LogCapture logger)
+        private static void CopyEventStreamToFile(EventPipeSession session, string fileName, ILogger logger)
         {
             try
             {
@@ -114,32 +113,18 @@ namespace BenchmarkDotNet.Diagnosers
             Task.WaitAll(collectingTask);
 
             if (benchmarkToTraceFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
-                benchmarkToTraceFile[results.BenchmarkCase] = SpeedScopeExporter.Convert(traceFilePath, logger);
+                benchmarkToTraceFile[results.BenchmarkCase] = SpeedScopeExporter.Convert(traceFilePath, results.BenchmarkCase.Config.GetCompositeLogger());
 
             return Array.Empty<Metric>();
         }
 
         public void DisplayResults(ILogger resultLogger)
         {
-            const string logSeparator = "--------------------";
-
-            resultLogger.WriteLine();
-            resultLogger.WriteLineHeader(logSeparator);
-
-            if (logger.CapturedOutput.Any())
-            {
-                foreach (var line in logger.CapturedOutput)
-                    resultLogger.Write(line.Kind, line.Text);
-
-                resultLogger.WriteLine();
-            }
             if (!benchmarkToTraceFile.Any())
                 return;
 
             resultLogger.WriteLineInfo($"Exported {benchmarkToTraceFile.Count} trace file(s). Example:");
             resultLogger.WriteLineInfo(benchmarkToTraceFile.Values.First());
-
-            resultLogger.WriteLineHeader(logSeparator);
         }
 
         private static ImmutableHashSet<EventPipeProvider> MapToProviders(EventPipeProfile profile, IReadOnlyCollection<EventPipeProvider> providers)

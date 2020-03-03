@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Diagnosers
 {
     internal static class SpeedScopeExporter
     {
-        internal static string Convert(string traceFilePath, LogCapture logger)
+        internal static string Convert(string traceFilePath, ILogger logger)
         {
             var speedscopeFileName = Path.ChangeExtension(traceFilePath, "speedscope.json");
 
