@@ -17,7 +17,9 @@
 	
     <UseSharedCompilation>false</UseSharedCompilation>
     <SuppressNETCoreSdkPreviewMessage>True</SuppressNETCoreSdkPreviewMessage>
-
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="Exists('$(SolutionDir)CodingStyle.ruleset')">
     <CodeAnalysisRuleSet>$(SolutionDir)CodingStyle.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
@@ -65,14 +67,16 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.4">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-
+  <Choose>
+    <When Condition="Exists('$(SolutionDir)CodingStyle.ruleset')">
+      <ItemGroup >
+        <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.4">
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+      </ItemGroup>
+    </When>
+  </Choose>
 </Project>
