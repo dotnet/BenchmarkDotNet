@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
@@ -12,8 +11,6 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
-using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.XUnit;
@@ -25,6 +22,10 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 using Xunit;
 using Xunit.Abstractions;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Extensions;
+using Perfolizer.Horology;
+using Perfolizer.Mathematics.SignificanceTesting;
+using Perfolizer.Mathematics.Thresholds;
 
 namespace BenchmarkDotNet.Tests
 {

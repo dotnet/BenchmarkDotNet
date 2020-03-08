@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
-using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.SignificanceTesting;
+using Perfolizer.Mathematics.Thresholds;
 
 namespace BenchmarkDotNet.Mathematics
 {

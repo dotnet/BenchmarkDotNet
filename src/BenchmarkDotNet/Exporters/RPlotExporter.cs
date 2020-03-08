@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;

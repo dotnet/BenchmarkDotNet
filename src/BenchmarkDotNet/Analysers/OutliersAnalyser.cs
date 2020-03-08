@@ -3,10 +3,10 @@ using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Analysers
 {

@@ -1,8 +1,8 @@
 ﻿using System;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Mocks;
+using Perfolizer.Horology;
 using Xunit;
 using Xunit.Abstractions;
 

@@ -1,9 +1,7 @@
 ﻿using System.Linq;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Columns
 {

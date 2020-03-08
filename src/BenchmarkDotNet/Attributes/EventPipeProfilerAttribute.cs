@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using Microsoft.Diagnostics.NETCore.Client;
 
 namespace BenchmarkDotNet.Attributes 
 {

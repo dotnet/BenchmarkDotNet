@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.Multimodality;
 
 namespace BenchmarkDotNet.Analysers
 {
@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Analysers
             if (statistics == null || statistics.N < EngineResolver.DefaultMinWorkloadIterationCount)
                 yield break;
 
-            double mValue = MathHelper.CalculateMValue(statistics);
+            double mValue = MValueCalculator.Calculate(statistics.OriginalValues);
             if (mValue > 4.2)
                 yield return Create("is multimodal", mValue, report, summary.Style.CultureInfo);
             else if (mValue > 3.2)

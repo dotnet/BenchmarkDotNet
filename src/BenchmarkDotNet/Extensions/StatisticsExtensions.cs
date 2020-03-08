@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Globalization;
 using System.Text;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Mathematics.Histograms;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
+using Perfolizer.Mathematics.Histograms;
+using Perfolizer.Mathematics.Multimodality;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -30,7 +31,7 @@ namespace BenchmarkDotNet.Extensions
             string errorPercent = (s.StandardError / s.Mean * 100).ToString("0.00", cultureInfo);
             var ci = s.ConfidenceInterval;
             string ciMarginPercent = (ci.Margin / s.Mean * 100).ToString("0.00", cultureInfo);
-            double mValue = MathHelper.CalculateMValue(s);
+            double mValue = MValueCalculator.Calculate(s.OriginalValues);
 
             builder.Append("Mean = ");
             builder.Append(formatter(s.Mean));
@@ -96,7 +97,7 @@ namespace BenchmarkDotNet.Extensions
             
             if (calcHistogram)
             {
-                var histogram = HistogramBuilder.Adaptive.Build(s);
+                var histogram = HistogramBuilder.Adaptive.Build(s.OriginalValues);
                 builder.AppendLine("-------------------- Histogram --------------------");
                 builder.AppendLine(histogram.ToString(formatter));
                 builder.AppendLine("---------------------------------------------------");

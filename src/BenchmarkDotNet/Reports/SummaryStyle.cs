@@ -2,8 +2,8 @@
 using System.Globalization;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 // ReSharper disable MemberCanBePrivate.Global
 

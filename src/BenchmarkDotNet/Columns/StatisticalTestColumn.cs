@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using Perfolizer.Mathematics.SignificanceTesting;
+using Perfolizer.Mathematics.Thresholds;
 
 namespace BenchmarkDotNet.Columns
 {

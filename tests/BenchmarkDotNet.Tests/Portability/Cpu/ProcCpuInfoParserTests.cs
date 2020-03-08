@@ -1,6 +1,5 @@
-﻿using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Portability.Cpu;
-using BenchmarkDotNet.Tests.Environments;
+﻿using BenchmarkDotNet.Portability.Cpu;
+using Perfolizer.Horology;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Portability.Cpu

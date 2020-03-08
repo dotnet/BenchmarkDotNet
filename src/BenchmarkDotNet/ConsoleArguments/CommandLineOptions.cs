@@ -10,6 +10,7 @@ using BenchmarkDotNet.Mathematics;
 using CommandLine;
 using CommandLine.Text;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Text;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;

@@ -3,7 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Horology;
+using Perfolizer.Horology;
 using SimpleJson.Reflection;
 
 namespace BenchmarkDotNet.Helpers
