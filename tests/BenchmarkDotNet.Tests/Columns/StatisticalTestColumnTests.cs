@@ -2,7 +2,8 @@
 using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Mathematics.StatisticalTesting;
+using Perfolizer.Mathematics.SignificanceTesting;
+using Perfolizer.Mathematics.Thresholds;
 using BenchmarkDotNet.Reports;
 using Xunit;
 

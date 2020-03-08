@@ -1,7 +1,6 @@
 ﻿using BenchmarkDotNet.Disassemblers.Exporters;
 using Iced.Intel;
 using JetBrains.Annotations;
-using System;
 using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Diagnosers

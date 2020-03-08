@@ -12,7 +12,6 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
@@ -21,6 +20,7 @@ using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
+using Perfolizer.Horology;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
 namespace BenchmarkDotNet.Running

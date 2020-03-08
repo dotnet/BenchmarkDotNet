@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Horology;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Jobs
 {

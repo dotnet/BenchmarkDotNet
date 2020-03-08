@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.Attributes
 {

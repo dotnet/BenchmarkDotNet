@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
+using Perfolizer.Common;
+using Perfolizer.Horology;
+using Perfolizer.Mathematics.Common;
+using Perfolizer.Mathematics.Multimodality;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -66,7 +68,7 @@ namespace BenchmarkDotNet.Columns
         /// See http://www.brendangregg.com/FrequencyTrails/modes.html
         /// </summary>
         public static readonly IColumn MValue = new StatisticColumn("MValue", "Modal value, see http://www.brendangregg.com/FrequencyTrails/modes.html",
-            MathHelper.CalculateMValue, Priority.Additional, UnitType.Dimensionless);
+            s => MValueCalculator.Calculate(s.OriginalValues), Priority.Additional, UnitType.Dimensionless);
 
         public static readonly IColumn Iterations = new StatisticColumn("Iterations", "Number of target iterations",
             s => s.N, Priority.Additional, UnitType.Dimensionless);

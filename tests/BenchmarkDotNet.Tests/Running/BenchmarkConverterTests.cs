@@ -5,6 +5,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Running;
+using Perfolizer.Mathematics.OutlierDetection;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Running

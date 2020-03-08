@@ -1,6 +1,6 @@
 using System;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Engines
 {

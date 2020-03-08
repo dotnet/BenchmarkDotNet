@@ -2,6 +2,7 @@ using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Mathematics;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.Samples
 {

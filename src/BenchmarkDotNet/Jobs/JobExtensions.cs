@@ -5,11 +5,12 @@ using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.Jobs
 {

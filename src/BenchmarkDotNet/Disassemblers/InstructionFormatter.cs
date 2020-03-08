@@ -1,8 +1,5 @@
-﻿using BenchmarkDotNet.Diagnosers;
-using Iced.Intel;
+﻿using Iced.Intel;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BenchmarkDotNet.Disassemblers
 {

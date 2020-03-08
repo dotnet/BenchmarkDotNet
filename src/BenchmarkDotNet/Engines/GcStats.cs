@@ -2,7 +2,6 @@
 using System.Reflection;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines

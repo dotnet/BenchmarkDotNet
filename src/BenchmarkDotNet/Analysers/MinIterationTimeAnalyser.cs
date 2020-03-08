@@ -2,8 +2,8 @@
 using System.Linq;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Reports;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Analysers
 {
