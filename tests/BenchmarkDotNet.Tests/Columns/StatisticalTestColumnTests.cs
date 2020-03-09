@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Mathematics.StatisticalTesting;
+using BenchmarkDotNet.Reports;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Columns
@@ -59,8 +61,10 @@ namespace BenchmarkDotNet.Tests.Columns
         {
             var sut = new StatisticalTestColumn(statisticalTestKind, Threshold.Create(thresholdUnit, thresholdValue));
 
-            Assert.Equal(expectedResult, sut.GetValue(null, null, new Statistics(baseline), new Statistics(current), isBaseline: true));
-            Assert.Equal(expectedResult, sut.GetValue(null, null, new Statistics(baseline), new Statistics(current), isBaseline: false));
+            var emptyMetrics = new Dictionary<string, Metric>();
+
+            Assert.Equal(expectedResult, sut.GetValue(null, null, new Statistics(baseline), emptyMetrics, new Statistics(current), emptyMetrics, isBaseline: true));
+            Assert.Equal(expectedResult, sut.GetValue(null, null, new Statistics(baseline), emptyMetrics, new Statistics(current), emptyMetrics, isBaseline: false));
         }
     }
 }
