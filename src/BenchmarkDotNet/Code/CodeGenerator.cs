@@ -234,11 +234,20 @@ namespace BenchmarkDotNet.Code
         }
 
         private static string GetParameterModifier(ParameterInfo parameterInfo)
-            => parameterInfo.ParameterType.IsByRef
-                ? "ref"
-                : parameterInfo.IsOut
-                    ? "out"
-                    : string.Empty;
+        {
+            if (!parameterInfo.ParameterType.IsByRef)
+                return string.Empty;
+
+            // From https://stackoverflow.com/a/38110036/5852046 :
+            // "If you don't do the IsByRef check for out parameters, then you'll incorrectly get members decorated with the
+            // [Out] attribute from System.Runtime.InteropServices but which aren't actually C# out parameters."
+            if (parameterInfo.IsOut)
+                return "out";
+            else if (parameterInfo.IsIn)
+                return "in";
+            else
+                return "ref";
+        }
 
         /// <summary>
         /// for CoreRT we can't use reflection to load type and run a method, so we simply generate a switch for all types..
