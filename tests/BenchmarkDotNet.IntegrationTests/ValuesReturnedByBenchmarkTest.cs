@@ -53,6 +53,9 @@ namespace BenchmarkDotNet.IntegrationTests
             public ref int ReturnByRef() => ref field;
 
             [Benchmark]
+            public ref readonly int ReturnByReadonlyRef() => ref field;
+
+            [Benchmark]
             public Span<byte> ReturnStackOnlyType() => new Span<byte>(Array.Empty<byte>());
 
             [Benchmark]
