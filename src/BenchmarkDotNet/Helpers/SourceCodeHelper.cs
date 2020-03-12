@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using BenchmarkDotNet.Extensions;
@@ -95,6 +96,7 @@ namespace BenchmarkDotNet.Helpers
             return false;
         }
 
+        [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
         private static string ToSourceCode(double value)
         {
             if (double.IsNaN(value))
@@ -113,6 +115,7 @@ namespace BenchmarkDotNet.Helpers
             return value.ToString("G", CultureInfo.InvariantCulture) + "d";
         }
 
+        [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
         private static string ToSourceCode(float value)
         {
             if (float.IsNaN(value))

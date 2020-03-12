@@ -111,7 +111,7 @@ namespace BenchmarkDotNet.Disassemblers
 
             Map[] maps = settings.PrintSource
                 ? codes.GroupBy(code => code.InstructionPointer).OrderBy(group => group.Key).Select(group => new Map() { SourceCodes = group.ToArray() }).ToArray()
-                : new [] { new Map() { SourceCodes = codes.ToArray() } };
+                : new[] { new Map() { SourceCodes = codes.ToArray() } };
 
             return new DisassembledMethod
             {

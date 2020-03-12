@@ -6,6 +6,7 @@
     <Rule Id="CA1028" Action="None" /> <!-- Enum storage should be Int32 -->
     <Rule Id="CA1030" Action="None" /> <!-- Use events where appropriate -->
     <Rule Id="CA1031" Action="None" /> <!-- Do not catch general exception types -->
+    <Rule Id="CA1032" Action="None" /> <!-- Implement standard exception constructors -->
     <Rule Id="CA1034" Action="None" /> <!-- Nested types should not be visible -->
     <Rule Id="CA1036" Action="None" /> <!-- Overload comparison operators when implementing System.IComparable -->
     <Rule Id="CA1043" Action="None" /> <!-- Use integral or string argument for indexers -->
@@ -18,6 +19,7 @@
     <Rule Id="CA1058" Action="None" /> <!-- Types should not extend certain base types -->
     <Rule Id="CA1061" Action="None" /> <!-- Do not hide base class methods -->
     <Rule Id="CA1062" Action="None" /> <!-- Validate arguments of public methods -->
+    <Rule Id="CA1063" Action="None" /> <!-- Implement IDisposable correctly -->
     <Rule Id="CA1064" Action="None" /> <!-- Exceptions should be public -->
     <Rule Id="CA1065" Action="None" /> <!-- Do not raise exceptions in unexpected locations -->
     <Rule Id="CA1066" Action="None" /> <!-- Type should implement IEquatable -->
@@ -37,8 +39,10 @@
     <Rule Id="CA1717" Action="None" /> <!-- Only FlagsAttribute enums should have plural names -->
     <Rule Id="CA1720" Action="None" /> <!-- Identifier contains type name -->
     <Rule Id="CA1721" Action="None" /> <!-- Property names should not match get methods -->
+    <Rule Id="CA1724" Action="None" /> <!-- Type names should not match namespaces -->
     <Rule Id="CA1801" Action="None" /> <!-- Review unused parameters -->
     <Rule Id="CA1806" Action="None" /> <!-- Do not ignore method results -->
+    <Rule Id="CA1810" Action="None" /> <!-- Initialize reference type static fields inline -->
     <Rule Id="CA1812" Action="None" /> <!-- Avoid uninstantiated internal classes -->
     <Rule Id="CA1814" Action="None" /> <!-- Prefer jagged arrays over multidimensional -->
     <Rule Id="CA1815" Action="None" /> <!-- Override equals and operator equals on value types -->
@@ -46,6 +50,10 @@
     <Rule Id="CA1819" Action="None" /> <!-- Properties should not return arrays -->
     <Rule Id="CA1820" Action="None" /> <!-- Test for empty strings using string length -->
     <Rule Id="CA1822" Action="None" /> <!-- Mark members as static -->
+    <Rule Id="CA1826" Action="None" /> <!-- Do not use Enumerable methods on indexable collections. Instead use the collection directly -->
+    <Rule Id="CA2208" Action="None" /> <!-- Instantiate argument exceptions correctly -->
+    <Rule Id="CA2000" Action="None" /> <!-- Dispose objects before losing scope -->
+    <Rule Id="CA2008" Action="None" /> <!-- Do not create tasks without passing a TaskScheduler -->
     <Rule Id="CA2010" Action="None" /> <!-- Always consume the value returned by methods marked with PreserveSigAttribute -->
     <Rule Id="CA2100" Action="None" /> <!-- Review SQL queries for security vulnerabilities -->
     <Rule Id="CA2101" Action="None" /> <!-- Specify marshaling for P/Invoke string arguments -->
@@ -89,6 +97,7 @@
     <Rule Id="SA1110" Action="None" /> <!-- Opening parenthesis or bracket should be on declaration line -->
     <Rule Id="SA1111" Action="None" /> <!-- Closing parenthesis should be on line of last parameter -->
     <Rule Id="SA1114" Action="None" /> <!-- Parameter list should follow declaration -->
+    <Rule Id="SA1115" Action="None" /> <!-- The parameter should begin on the line after the previous parameter -->
     <Rule Id="SA1116" Action="None" /> <!-- Split parameters should start on line after declaration -->
     <Rule Id="SA1117" Action="None" /> <!-- Parameters should be on same line or separate lines -->
     <Rule Id="SA1118" Action="None" /> <!-- Parameter should not span multiple lines -->
@@ -115,6 +124,7 @@
     <Rule Id="SA1202" Action="None" /> <!-- Elements should be ordered by access -->
     <Rule Id="SA1203" Action="None" /> <!-- Constants should appear before fields -->
     <Rule Id="SA1204" Action="None" /> <!-- Static elements should appear before instance elements -->
+    <Rule Id="SA1206" Action="None" /> <!-- The 'static' modifier should appear before 'new' -->
     <Rule Id="SA1208" Action="None" /> <!-- Using directive ordering -->
     <Rule Id="SA1209" Action="None" /> <!-- Using alias directives should be placed after all using namespace directives -->
     <Rule Id="SA1210" Action="None" /> <!-- Using directives should be ordered alphabetically by the namespaces -->

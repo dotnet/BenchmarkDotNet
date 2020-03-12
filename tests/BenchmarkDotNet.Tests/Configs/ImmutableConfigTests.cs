@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var fromEmpty = ImmutableConfigBuilder.Create(ManualConfig.CreateEmpty());
             Assert.Contains(JitOptimizationsValidator.DontFailOnError, fromEmpty.GetValidators());
-            
+
 #if !DEBUG
             // DefaultConfig.Instance doesn't include JitOptimizationsValidator.FailOnError in the DEBUG mode
             var fromDefault = ImmutableConfigBuilder.Create(DefaultConfig.Instance);
@@ -304,7 +304,7 @@ namespace BenchmarkDotNet.Tests.Configs
             var leftAddedToTheRight = ManualConfig.Create(right);
             leftAddedToTheRight.Add(left);
 
-            return new []{ rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig() };
+            return new[]{ rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig() };
         }
 
         public class TestExporter : IExporter, IExporterDependencies

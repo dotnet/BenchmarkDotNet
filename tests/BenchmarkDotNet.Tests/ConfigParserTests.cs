@@ -22,7 +22,6 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 using Xunit;
 using Xunit.Abstractions;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Extensions;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.SignificanceTesting;
 using Perfolizer.Mathematics.Thresholds;

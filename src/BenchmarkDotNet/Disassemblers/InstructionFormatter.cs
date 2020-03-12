@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Disassemblers
     {
         internal static string Format(SourceCode sourceCode, Formatter formatter, bool printInstructionAddresses, uint pointerSize)
         {
-            switch(sourceCode)
+            switch (sourceCode)
             {
                 case Asm asm:
                     return InstructionFormatter.Format(asm.Instruction, formatter, printInstructionAddresses, pointerSize);

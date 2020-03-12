@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Analysers
                                               .ToArray();
             if (columns.IsEmpty())
                 yield break;
-            
+
             var columnNames = string.Join(", ", columns);
 
             foreach (var benchmarkCase in summary.BenchmarksCases)

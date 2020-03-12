@@ -175,7 +175,7 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("<body>");
 
             logger.WriteLine("<!-- Generated with BenchmarkDotNet ");
-            foreach(var total in totals)
+            foreach (var total in totals)
             {
                 // this stats are mostly for me, the maintainer, who wants to know if removing noise makes any sense
                 logger.WriteLine($"For {total.Key} we have {total.Value.total} in total, {total.Value.withoutNoise} without noise");

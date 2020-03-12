@@ -36,6 +36,6 @@ namespace BenchmarkDotNet.Samples
             ShouldGetInlined(); ShouldGetInlined(); ShouldGetInlined();
         }
 
-        void ShouldGetInlined() { }
+        private void ShouldGetInlined() { }
     }
 }

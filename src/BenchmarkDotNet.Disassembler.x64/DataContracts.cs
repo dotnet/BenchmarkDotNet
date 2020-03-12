@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Disassemblers
         public string Problem { get; set; }
 
         public Map[] Maps { get; set; }
-        
+
         public string CommandLine { get; set; }
 
         public static DisassembledMethod Empty(string fullSignature, ulong nativeCode, string problem)
@@ -70,17 +70,17 @@ namespace BenchmarkDotNet.Disassemblers
         public MutablePair[] SerializedAddressToNameMapping { get; set; }
         public uint PointerSize { get; set; }
 
-        [XmlIgnore()] // XmlSerializer does not support dictionaries ;)
+        [XmlIgnore] // XmlSerializer does not support dictionaries ;)
         public Dictionary<ulong, string> AddressToNameMapping
             => _addressToNameMapping ?? (_addressToNameMapping = SerializedAddressToNameMapping.ToDictionary(x => x.Key, x => x.Value));
 
-        [XmlIgnore()]
+        [XmlIgnore]
         private Dictionary<ulong, string> _addressToNameMapping;
 
         public DisassemblyResult()
         {
-            Methods = new DisassembledMethod[0];
-            Errors = new string[0];
+            Methods = Array.Empty<DisassembledMethod>();
+            Errors = Array.Empty<string>();
         }
 
         // KeyValuePair is not serializable, because it has read-only properties

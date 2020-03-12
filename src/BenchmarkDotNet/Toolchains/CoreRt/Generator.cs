@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -41,6 +42,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 
         private readonly string coreRtVersion;
         private readonly bool useCppCodeGenerator;
+        [SuppressMessage("ReSharper", "NotAccessedField.Local")]
         private readonly string targetFrameworkMoniker;
         private readonly string runtimeIdentifier;
         private readonly IReadOnlyDictionary<string, string> feeds;
@@ -201,7 +203,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 </Directives>
 ";
 
-            File.WriteAllText(Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath), "rd.xml"), content);
+            string directoryName = Path.GetDirectoryName(artifactsPaths.ProjectFilePath);
+            if (directoryName != null)
+                File.WriteAllText(Path.Combine(directoryName, "rd.xml"), content);
+            else
+                throw new InvalidOperationException($"Can't get directory of projectFilePath ('{artifactsPaths.ProjectFilePath}')");
         }
     }
 }

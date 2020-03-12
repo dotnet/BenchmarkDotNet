@@ -162,7 +162,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]
             public void Benchmark()
             {
-                if(Field != null) { throw new Exception("Field should be initialized in ctor with 1 and then set to null by Engine"); }
+                if (Field != null) { throw new Exception("Field should be initialized in ctor with 1 and then set to null by Engine"); }
             }
         }
 
@@ -212,7 +212,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new InvalidOperationException("Incorrect array length");
 
                 for (int i = 0; i < 3; i++)
-                    if(Array[i] != i)
+                    if (Array[i] != i)
                         throw new InvalidOperationException($"Incorrect array element at index {i}, was {Array[i]} instead of {i}");
             }
         }

@@ -5,7 +5,6 @@ using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
 using JetBrains.Annotations;
@@ -121,7 +120,7 @@ namespace BenchmarkDotNet.Jobs
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will soon be removed, please start using .WithStrategy instead")]
         public static Job With(this Job job, RunStrategy strategy) => job.WithCore(j => j.Run.RunStrategy = strategy);        // Run
-        
+
         /// <summary>
         /// Available values: Throughput, ColdStart and Monitoring.
         ///     Throughput: default strategy which allows to get good precision level.
@@ -227,7 +226,7 @@ namespace BenchmarkDotNet.Jobs
         [Obsolete("This method will soon be removed, please start using .WithClock instead")]
         public static Job With(this Job job, IClock clock) => job.WithClock(clock);
         [PublicAPI] public static Job WithClock(this Job job, IClock clock) => job.WithCore(j => j.Infrastructure.Clock = clock);
-        
+
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will soon be removed, please start using .WithEngineFactory instead")]
         public static Job With(this Job job, IEngineFactory engineFactory) => job.WithEngineFactory(engineFactory);
@@ -249,7 +248,7 @@ namespace BenchmarkDotNet.Jobs
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will soon be removed, please start using .WithEnvironmentVariables instead")]
         public static Job With(this Job job, IReadOnlyList<EnvironmentVariable> environmentVariables) => job.WithEnvironmentVariables(environmentVariables.ToArray());
-        
+
         /// <summary>
         /// Creates a new job based on the given job with specified environment variables.
         /// It overrides the whole list of environment variables which were defined in the original job.
@@ -382,14 +381,14 @@ namespace BenchmarkDotNet.Jobs
         /// Specifies which outliers should be removed from the distribution
         /// </summary>
         public static Job WithOutlierMode(this Job job, OutlierMode value) => job.WithCore(j => j.Accuracy.OutlierMode = value);
-        
+
         [PublicAPI]
         public static Job WithAnalyzeLaunchVariance(this Job job, bool value) => job.WithCore(j => j.Accuracy.AnalyzeLaunchVariance = value);
 
         // Meta
         public static Job AsBaseline(this Job job) => job.WithCore(j => j.Meta.Baseline = true);
         public static Job WithBaseline(this Job job, bool value) => job.WithCore(j => j.Meta.Baseline = value);
-        
+
         /// <summary>
         /// mutator job should not be added to the config, but instead applied to other jobs in given config
         /// </summary>

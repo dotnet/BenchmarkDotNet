@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Engines
                 throw new ArgumentNullException(nameof(engineParameters.OverheadActionNoUnroll));
             if (engineParameters.OverheadActionUnroll == null)
                 throw new ArgumentNullException(nameof(engineParameters.OverheadActionUnroll));
-            if(engineParameters.TargetJob == null)
+            if (engineParameters.TargetJob == null)
                 throw new ArgumentNullException(nameof(engineParameters.TargetJob));
 
             engineParameters.GlobalSetupAction?.Invoke(); // whatever the settings are, we MUST call global setup here, the global cleanup is part of Engine's Dispose

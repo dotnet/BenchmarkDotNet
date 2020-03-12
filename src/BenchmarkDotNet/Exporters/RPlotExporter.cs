@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Exporters
             lock (BuildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
-            if(!TryFindRScript(consoleLogger, out string rscriptPath))
+            if (!TryFindRScript(consoleLogger, out string rscriptPath))
             {
                 yield break;
             }

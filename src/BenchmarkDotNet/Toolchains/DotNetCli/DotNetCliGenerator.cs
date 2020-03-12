@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             => directoryInfo
                 .GetFileSystemInfos()
                 .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
-        
+
         private static bool IsRootProjectFolder(DirectoryInfo directoryInfo)
             => directoryInfo
                 .GetFileSystemInfos()

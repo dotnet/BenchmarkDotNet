@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Mathematics;
 using Perfolizer.Mathematics.Common;
 using Xunit;

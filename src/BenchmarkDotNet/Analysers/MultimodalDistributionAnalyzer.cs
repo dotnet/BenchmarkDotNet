@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Perfolizer.Mathematics.Multimodality;

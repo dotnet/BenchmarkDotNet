@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Toolchains
                     return RoslynToolchain.Instance;
 
                 case MonoRuntime mono:
-                    if(!string.IsNullOrEmpty(mono.AotArgs))
+                    if (!string.IsNullOrEmpty(mono.AotArgs))
                         return MonoAotToolchain.Instance;
 
                     return RoslynToolchain.Instance;

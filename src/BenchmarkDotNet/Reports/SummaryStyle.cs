@@ -51,14 +51,14 @@ namespace BenchmarkDotNet.Reports
 
         public SummaryStyle WithCultureInfo(CultureInfo cultureInfo)
             => new SummaryStyle(cultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth);
-        
+
         public bool Equals(SummaryStyle other)
         {
             if (ReferenceEquals(null, other))
                 return false;
             if (ReferenceEquals(this, other))
                 return true;
-            return Equals(CultureInfo, other.CultureInfo) 
+            return Equals(CultureInfo, other.CultureInfo)
                    && PrintUnitsInHeader == other.PrintUnitsInHeader
                    && PrintUnitsInContent == other.PrintUnitsInContent
                    && PrintZeroValuesInContent == other.PrintZeroValuesInContent

@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertAllocations(toolchain, typeof(AccurateAllocations), new Dictionary<string, long>
             {
                 { nameof(AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
-                { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + + objectAllocationOverhead + arraySizeOverhead },
+                { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead },
 
                 { nameof(AccurateAllocations.AllocateTask), CalculateRequiredSpace<Task<int>>() },
             });

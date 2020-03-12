@@ -15,7 +15,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.CoreRt;
@@ -270,7 +269,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 baseJob = baseJob.WithEnvironmentVariables(options.EnvironmentVariables.Select(text =>
                 {
-                    var separated = text.Split(new [] { EnvVarKeyValueSeparator }, 2);
+                    var separated = text.Split(new[] { EnvVarKeyValueSeparator }, 2);
                     return new EnvironmentVariable(separated[0], separated[1]);
                 }).ToArray());
             }

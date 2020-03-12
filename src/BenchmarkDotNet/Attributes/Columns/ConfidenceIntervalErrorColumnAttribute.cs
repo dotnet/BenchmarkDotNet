@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Mathematics;
 using JetBrains.Annotations;
 using Perfolizer.Mathematics.Common;
 

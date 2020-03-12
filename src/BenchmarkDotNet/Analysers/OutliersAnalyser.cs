@@ -53,6 +53,7 @@ namespace BenchmarkDotNet.Analysers
         /// <param name="allOutliers">All outliers which present in the distribution (lower and upper)</param>
         /// <param name="lowerOutliers">All lower outliers</param>
         /// <param name="upperOutliers">All upper outliers</param>
+        /// <param name="cultureInfo">CultureInfo</param>
         /// <returns>The message</returns>
         [PublicAPI, NotNull, Pure]
         public static string GetMessage(double[] actualOutliers, double[] allOutliers, double[] lowerOutliers, double[] upperOutliers, CultureInfo cultureInfo)
@@ -83,7 +84,7 @@ namespace BenchmarkDotNet.Analysers
         private static string GetRangeMessage([NotNull] double[] values, CultureInfo cultureInfo)
         {
             string Format(double value) => TimeInterval.FromNanoseconds(value).ToString(cultureInfo, "N2");
-            
+
             switch (values.Length) {
                 case 0:
                     return null;

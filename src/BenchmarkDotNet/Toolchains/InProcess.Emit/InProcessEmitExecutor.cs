@@ -76,8 +76,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 
             return GetExecutionResult(
                 host.RunResults,
-                exitCode,
-                executeParameters.Logger);
+                exitCode);
         }
 
         private int ExecuteCore(IHost host, ExecuteParameters parameters)
@@ -127,7 +126,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             return exitCode;
         }
 
-        private ExecuteResult GetExecutionResult(RunResults runResults, int exitCode, ILogger logger)
+        private ExecuteResult GetExecutionResult(RunResults runResults, int exitCode)
         {
             if (exitCode != 0)
             {

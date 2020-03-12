@@ -17,8 +17,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class ConsumingCustomAttributes
         {
-            const int ExpectedNumber = 123;
-            const string ExpectedText = "expectedTest";
+            private const int ExpectedNumber = 123;
+            private const string ExpectedText = "expectedTest";
 
             [CustomParams(ExpectedNumber)]
             public int Number;
@@ -34,18 +34,18 @@ namespace BenchmarkDotNet.IntegrationTests
             [CustomBenchmark]
             public void Benchmark()
             {
-                if(ExpectedNumber != Number || ExpectedText != Text)
+                if (ExpectedNumber != Number || ExpectedText != Text)
                     throw new Exception("Custom attributes were not applied!");
             }
         }
 
-        class CustomParamsAttribute : ParamsAttribute
+        private class CustomParamsAttribute : ParamsAttribute
         {
             public CustomParamsAttribute(params object[] values) : base(values) { }
         }
 
-        class CustomBenchmarkAttribute : BenchmarkAttribute { }
+        private class CustomBenchmarkAttribute : BenchmarkAttribute { }
 
-        class CustomGlobalSetupAttribute : GlobalSetupAttribute { }
+        private class CustomGlobalSetupAttribute : GlobalSetupAttribute { }
     }
 }

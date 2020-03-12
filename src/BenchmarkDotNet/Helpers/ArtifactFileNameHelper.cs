@@ -7,7 +7,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
 
-namespace BenchmarkDotNet.Helpers 
+namespace BenchmarkDotNet.Helpers
 {
     internal static class ArtifactFileNameHelper
     {

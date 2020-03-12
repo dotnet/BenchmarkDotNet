@@ -2,7 +2,7 @@ using System;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 
-namespace BenchmarkDotNet.Attributes 
+namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class EventPipeProfilerAttribute : Attribute, IConfigSource

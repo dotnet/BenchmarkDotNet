@@ -8,14 +8,14 @@ namespace BenchmarkDotNet.Disassemblers
 {
     internal static class Program
     {
-        // the goals of the existence of this process: 
+        // the goals of the existence of this process:
         // 1. attach to benchmarked process
         // 2. disassemble the code
         // 3. save it to xml file
         // 4. detach & shut down
         //
         // requirements: must not have any dependencies to BenchmarkDotNet itself, KISS
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var options = Settings.FromArgs(args);
 
@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Disassemblers
             try
             {
                 var methodsToExport = ClrMdDisassembler.AttachAndDisassemble(options);
-                
+
                 SaveToFile(methodsToExport, options.ResultsPath);
             }
             catch (OutOfMemoryException) // thrown by clrmd when pdb is missing or in invalid format

@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     internal static class MsBuildErrorMapper
     {
-        private static readonly (Regex regex, Func<Match, string> translation)[] rules = new (Regex rule, Func<Match, string> translation)[]
+        private static readonly (Regex regex, Func<Match, string> translation)[] Rules = new (Regex rule, Func<Match, string> translation)[]
         {
             (
                 new Regex("warning NU1702: ProjectReference '(.*)' was resolved using '(.*)' instead of the project target framework '(.*)'. This project may not be fully compatible with your project.",
@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
 
             foreach (var errorLine in buildResult.ErrorMessage.Split('\r', '\n').Where(line => !string.IsNullOrEmpty(line)))
-            foreach (var rule in rules)
+            foreach (var rule in Rules)
             {
                 var match = rule.regex.Match(errorLine);
                 if (match.Success)

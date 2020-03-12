@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     $"Benchmark {executeParameters.BenchmarkCase.DisplayInfo} takes too long to run. " +
                     "Prefer to use out-of-process toolchains for long-running benchmarks.");
 
-            return GetExecutionResult(host.RunResults, exitCode, executeParameters.Logger);
+            return GetExecutionResult(host.RunResults, exitCode);
         }
 
         private int ExecuteCore(IHost host, ExecuteParameters parameters)
@@ -121,7 +121,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             return exitCode;
         }
 
-        private ExecuteResult GetExecutionResult(RunResults runResults, int exitCode, ILogger logger)
+        private ExecuteResult GetExecutionResult(RunResults runResults, int exitCode)
         {
             if (exitCode != 0)
             {

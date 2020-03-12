@@ -9,7 +9,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Mathematics;
 using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.IntegrationTests

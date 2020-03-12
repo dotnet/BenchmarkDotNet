@@ -175,7 +175,7 @@ namespace BenchmarkDotNet.Engines
 
         public static GcStats Parse(string line)
         {
-            if(!line.StartsWith(ResultsLinePrefix))
+            if (!line.StartsWith(ResultsLinePrefix))
                 throw new NotSupportedException($"Line must start with {ResultsLinePrefix}");
 
             var measurementSplit = line.Remove(0, ResultsLinePrefix.Length).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);

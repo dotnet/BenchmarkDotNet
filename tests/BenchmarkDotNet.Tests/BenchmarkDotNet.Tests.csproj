@@ -7,6 +7,7 @@
     <PackageId>BenchmarkDotNet.Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);NU1701;1701;CA1018;CA2007</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json">
@@ -20,9 +21,6 @@
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="ApprovalTests" Version="3.0.13" />
   </ItemGroup>
-  <PropertyGroup>
-    <NoWarn>NU1701;1701</NoWarn>
-  </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="2.2.0" />

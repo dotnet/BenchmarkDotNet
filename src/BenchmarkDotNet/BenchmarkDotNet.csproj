@@ -4,7 +4,7 @@
     <AssemblyTitle>BenchmarkDotNet</AssemblyTitle>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <NoWarn>$(NoWarn);1701;1702;1705;1591;3005;NU1702</NoWarn>
+    <NoWarn>$(NoWarn);1701;1702;1705;1591;3005;NU1702;CS3001;CS3003</NoWarn>
     <AssemblyName>BenchmarkDotNet</AssemblyName>
     <PackageId>BenchmarkDotNet</PackageId>
     <RootNamespace>BenchmarkDotNet</RootNamespace>

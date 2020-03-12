@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.IntegrationTests.Diagnosers
 
             var metrics = sut.CalculateMetrics(
                 new Dictionary<int, int> { {profileSourceId, interval }},
-                new []{ new PreciseMachineCounter(profileSourceId, "test", HardwareCounter.InstructionRetired, interval), });
+                new[]{ new PreciseMachineCounter(profileSourceId, "test", HardwareCounter.InstructionRetired, interval), });
 
             const ulong expected = (4 * interval - interval) / totalOperations; // every workload was 4 events, the overhead was one and totalOperations times per iteration
 

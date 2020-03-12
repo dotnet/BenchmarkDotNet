@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.Tracing.Session;

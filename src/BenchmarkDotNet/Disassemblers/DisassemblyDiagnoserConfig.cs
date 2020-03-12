@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             var symbolSolver = new SymbolResolver(addressToNameMapping);
 
-            switch(Formatter)
+            switch (Formatter)
             {
                 case MasmFormatter masmFormatter:
                     return new MasmFormatter(masmFormatter.MasmOptions, symbolSolver);

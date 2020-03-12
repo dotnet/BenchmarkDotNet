@@ -47,11 +47,11 @@ namespace BenchmarkDotNet.Running
 
                 var supportedBenchmarks = GetSupportedBenchmarks(benchmarkRunInfos, compositeLogger, resolver);
                 if (!supportedBenchmarks.Any(benchmarks => benchmarks.BenchmarksCases.Any()))
-                    return new [] { Summary.NothingToRun(title, resultsFolderPath, logFilePath) };
+                    return new[] { Summary.NothingToRun(title, resultsFolderPath, logFilePath) };
 
                 var validationErrors = Validate(supportedBenchmarks, compositeLogger);
                 if (validationErrors.Any(validationError => validationError.IsCritical))
-                    return new [] { Summary.ValidationFailed(title, resultsFolderPath, logFilePath, validationErrors) };
+                    return new[] { Summary.ValidationFailed(title, resultsFolderPath, logFilePath, validationErrors) };
 
                 var benchmarksToRunCount = supportedBenchmarks.Sum(benchmarkInfo => benchmarkInfo.BenchmarksCases.Length);
                 compositeLogger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
@@ -196,7 +196,7 @@ namespace BenchmarkDotNet.Running
         private static void PrintSummary(ILogger logger, ImmutableConfig config, Summary summary)
         {
             var cultureInfo = config.CultureInfo ?? DefaultCultureInfo.Instance;
-            
+
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.WriteLine();
 
@@ -284,7 +284,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build   *****");
 
             foreach (var buildPartition in buildPartitions)
-                if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess && !buildResults[buildPartition].TryToExplainFailureReason(out var reason))
+                if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess && !buildResults[buildPartition].TryToExplainFailureReason(out string _))
                     buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, buildLogger);
 
             logger.WriteLineHeader($"// ***** Done, took {globalChronometer.GetElapsed().GetTimeSpan().ToFormattedTotalTime(DefaultCultureInfo.Instance)}   *****");

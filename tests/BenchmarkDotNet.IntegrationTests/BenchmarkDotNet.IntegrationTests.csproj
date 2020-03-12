@@ -11,6 +11,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <NoWarn>$(NoWarn);CA2007</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json">

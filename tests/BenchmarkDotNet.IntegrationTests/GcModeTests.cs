@@ -131,8 +131,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
     public class AvoidForcingGarbageCollection
     {
-        int initialCollectionCountGen1;
-        int initialCollectionCountGen2;
+        private int initialCollectionCountGen1;
+        private int initialCollectionCountGen2;
 
         [GlobalSetup]
         public void GlobalSetup()

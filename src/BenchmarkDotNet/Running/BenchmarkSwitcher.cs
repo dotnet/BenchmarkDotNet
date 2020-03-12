@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -30,11 +31,15 @@ namespace BenchmarkDotNet.Running
 
         [PublicAPI] public BenchmarkSwitcher With(Type type) { types.Add(type); return this; }
 
-        [PublicAPI] public BenchmarkSwitcher With(Type[] types) { this.types.AddRange(types); return this; }
+        [PublicAPI]
+        [SuppressMessage("ReSharper", "ParameterHidesMember")]
+        public BenchmarkSwitcher With(Type[] types) { this.types.AddRange(types); return this; }
 
         [PublicAPI] public BenchmarkSwitcher With(Assembly assembly) { assemblies.Add(assembly); return this; }
 
-        [PublicAPI] public BenchmarkSwitcher With(Assembly[] assemblies) { this.assemblies.AddRange(assemblies); return this; }
+        [PublicAPI]
+        [SuppressMessage("ReSharper", "ParameterHidesMember")]
+        public BenchmarkSwitcher With(Assembly[] assemblies) { this.assemblies.AddRange(assemblies); return this; }
 
         [PublicAPI] public static BenchmarkSwitcher FromTypes(Type[] types) => new BenchmarkSwitcher(types);
 
@@ -67,7 +72,7 @@ namespace BenchmarkDotNet.Running
         {
             var notNullArgs = args ?? Array.Empty<string>();
             var notNullConfig = config ?? DefaultConfig.Instance;
-            
+
             var logger = notNullConfig.GetNonNullCompositeLogger();
             var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(notNullArgs, logger, notNullConfig);
             if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error

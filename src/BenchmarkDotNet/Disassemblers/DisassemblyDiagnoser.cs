@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static bool ShouldUseWindowsDisassembler(BenchmarkCase benchmarkCase)
             => !(benchmarkCase.Job.Environment.Runtime is MonoRuntime) && RuntimeInformation.IsWindows();
-        
+
         private static bool ShouldUseLinuxDisassembler(BenchmarkCase benchmarkCase)
             => !(benchmarkCase.Job.Environment.Runtime is MonoRuntime) && RuntimeInformation.IsLinux();
 
