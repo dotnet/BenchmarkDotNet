@@ -47,6 +47,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$WorkloadTypeName$", provider.WorkloadTypeName)
                     .Replace("$WorkloadMethodDelegate$", provider.WorkloadMethodDelegate(passArguments))
                     .Replace("$WorkloadMethodReturnType$", provider.WorkloadMethodReturnTypeName)
+                    .Replace("$WorkloadMethodReturnTypeModifiers$", provider.WorkloadMethodReturnTypeModifiers)
                     .Replace("$OverheadMethodReturnTypeName$", provider.OverheadMethodReturnTypeName)
                     .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)
                     .Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName)
@@ -61,7 +62,6 @@ namespace BenchmarkDotNet.Code
                     .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark)).Replace("$LoadArguments$", GetLoadArguments(benchmark))
                     .Replace("$PassArguments$", passArguments)
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
-                    .Replace("$Ref$", provider.UseRefKeyword ? "ref" : null)
                     .Replace("$MeasureExtraStats$", buildInfo.Config.HasExtraStatsDiagnoser() ? "true" : "false")
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
                     .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments)).ToString();
@@ -174,7 +174,11 @@ namespace BenchmarkDotNet.Code
 
             if (method.ReturnType.IsByRef)
             {
-                return new ByRefDeclarationsProvider(descriptor);
+                // System.Runtime.CompilerServices.IsReadOnlyAttribute is part of .NET Standard 2.1, we can't use it here..
+                if (method.ReturnParameter.GetCustomAttributes().Any(attribute => attribute.GetType().Name == "IsReadOnlyAttribute"))
+                    return new ByReadOnlyRefDeclarationsProvider(descriptor);
+                else
+                    return new ByRefDeclarationsProvider(descriptor);
             }
 
             return new NonVoidDeclarationsProvider(descriptor);
@@ -234,11 +238,20 @@ namespace BenchmarkDotNet.Code
         }
 
         private static string GetParameterModifier(ParameterInfo parameterInfo)
-            => parameterInfo.ParameterType.IsByRef
-                ? "ref"
-                : parameterInfo.IsOut
-                    ? "out"
-                    : string.Empty;
+        {
+            if (!parameterInfo.ParameterType.IsByRef)
+                return string.Empty;
+
+            // From https://stackoverflow.com/a/38110036/5852046 :
+            // "If you don't do the IsByRef check for out parameters, then you'll incorrectly get members decorated with the
+            // [Out] attribute from System.Runtime.InteropServices but which aren't actually C# out parameters."
+            if (parameterInfo.IsOut)
+                return "out";
+            else if (parameterInfo.IsIn)
+                return "in";
+            else
+                return "ref";
+        }
 
         /// <summary>
         /// for CoreRT we can't use reflection to load type and run a method, so we simply generate a switch for all types..
