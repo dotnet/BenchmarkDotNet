@@ -1,5 +1,4 @@
-﻿using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Parameters;
+﻿using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 using System;
 using System.Collections.Generic;

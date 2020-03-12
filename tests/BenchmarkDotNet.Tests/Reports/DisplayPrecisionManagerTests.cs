@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Xunit;

@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
-    [Obsolete]
+    [Obsolete("Don't use it")]
     public class EncodingAttribute : Attribute, IConfigSource
     {
         public IConfig Config { get; }
@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Attributes
         {
             if (Equals(encoding, Encoding.Unicode))
             {
-                Config = ManualConfig.CreateEmpty().With(ConsoleLogger.Unicode);
+                Config = ManualConfig.CreateEmpty().AddLogger(ConsoleLogger.Unicode);
                 return;
             }
 

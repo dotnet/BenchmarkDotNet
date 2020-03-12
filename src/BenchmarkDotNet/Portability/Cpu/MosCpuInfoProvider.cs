@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
-using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Portability.Cpu
 {

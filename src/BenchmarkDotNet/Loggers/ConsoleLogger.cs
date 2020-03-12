@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
-using Microsoft.CodeAnalysis.Operations;
 
 namespace BenchmarkDotNet.Loggers
 {
@@ -28,7 +27,7 @@ namespace BenchmarkDotNet.Loggers
         public string Id => nameof(ConsoleLogger);
 
         public int Priority => unicodeSupport ? 1 : 0;
-        
+
         public void Write(LogKind logKind, string text) => Write(logKind, Console.Write, text);
 
         public void WriteLine() => Console.WriteLine();
@@ -41,7 +40,7 @@ namespace BenchmarkDotNet.Loggers
         {
             if (!unicodeSupport)
                 text = text.ToAscii();
-            
+
             var colorBefore = Console.ForegroundColor;
 
             try

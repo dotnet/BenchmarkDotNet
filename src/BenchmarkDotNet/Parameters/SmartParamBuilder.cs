@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Code;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
@@ -81,7 +80,7 @@ namespace BenchmarkDotNet.Parameters
 
         public object Value { get; }
 
-        public string DisplayText => Value.ToString();
+        public string DisplayText => Value is Array array ? ArrayParam.GetDisplayString(array) : Value.ToString();
 
         public string ToSourceCode()
         {
@@ -115,7 +114,7 @@ namespace BenchmarkDotNet.Parameters
 
         public object Value { get; }
 
-        public string DisplayText => Value.ToString();
+        public string DisplayText => Value is Array array ? ArrayParam.GetDisplayString(array) : Value.ToString();
 
         public string ToSourceCode()
         {

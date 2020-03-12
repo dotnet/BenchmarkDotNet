@@ -3,11 +3,11 @@ using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DisassemblyDiagnoser(printAsm: true, printSource: true)]
+    [DisassemblyDiagnoser(printSource: true)]
     [RyuJitX64Job]
     public class IntroDisassemblyRyuJit
     {
-        int[] field = Enumerable.Range(0, 100).ToArray();
+        private int[] field = Enumerable.Range(0, 100).ToArray();
 
         [Benchmark]
         public int SumLocal()

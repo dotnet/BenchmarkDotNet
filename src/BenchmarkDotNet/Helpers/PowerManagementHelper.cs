@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace BenchmarkDotNet.Helpers
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal class PowerManagementHelper
     {
         private const uint ErrorMoreData = 234;

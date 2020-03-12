@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -64,7 +63,7 @@ namespace BenchmarkDotNet.Exporters.Json
                 };
 
                 // We show MemoryDiagnoser's results only if it is being used
-                if(report.BenchmarkCase.Config.HasMemoryDiagnoser())
+                if (report.BenchmarkCase.Config.HasMemoryDiagnoser())
                 {
                     data.Add("Memory", report.GcStats);
                 }

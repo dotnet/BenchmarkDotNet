@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Attributes
 
         protected FilterConfigBaseAttribute(params IFilter[] filters)
         {
-            Config = ManualConfig.CreateEmpty().With(filters);
+            Config = ManualConfig.CreateEmpty().AddFilter(filters);
         }
 
         public IConfig Config { get; }

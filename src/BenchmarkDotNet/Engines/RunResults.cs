@@ -5,6 +5,7 @@ using System.Linq;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.Engines
 {

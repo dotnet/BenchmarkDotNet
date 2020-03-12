@@ -21,9 +21,9 @@ namespace BenchmarkDotNet.IntegrationTests
                 return;
 
             var config = ManualConfig.CreateEmpty()
-                .With(Job.Dry
-                    .With(CoreRtRuntime.GetCurrentVersion())
-                    .With(CoreRtToolchain.CreateBuilder()
+                .AddJob(Job.Dry
+                    .WithRuntime(CoreRtRuntime.GetCurrentVersion())
+                    .WithToolchain(CoreRtToolchain.CreateBuilder()
                         .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-*") // we test against latest version to make sure we support latest version and avoid issues like #1055
                         .ToToolchain()));
 

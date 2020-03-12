@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;

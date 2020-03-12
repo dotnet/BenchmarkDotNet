@@ -2,9 +2,9 @@
 using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -68,6 +68,12 @@ namespace BenchmarkDotNet.Jobs
         {
             get => NuGetReferencesCharacteristic[this];
             set => NuGetReferencesCharacteristic[this] = value;
+        }
+
+        public bool TryGetToolchain(out IToolchain toolchain)
+        {
+            toolchain = HasValue(ToolchainCharacteristic) ? Toolchain : default;
+            return toolchain != default;
         }
     }
 }

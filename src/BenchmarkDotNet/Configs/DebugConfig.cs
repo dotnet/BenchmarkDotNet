@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Configs
             => new[]
             {
                 Job.Default
-                    .With(
+                    .WithToolchain(
                         new InProcessEmitToolchain(
                             TimeSpan.FromHours(1), // 1h should be enough to debug the benchmark
                             true))

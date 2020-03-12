@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void Test()
         {
             var testExporter = new TestExporter();
-            var config = CreateSimpleConfig().With(testExporter);
+            var config = CreateSimpleConfig().AddExporter(testExporter);
 
             CanExecute<BaselineRatioResultExtenderNoBaseline>(config);
 

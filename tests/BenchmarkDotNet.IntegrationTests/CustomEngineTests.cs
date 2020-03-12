@@ -9,7 +9,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Mathematics;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CustomEnginesAreSupported()
         {
             var config = ManualConfig.CreateEmpty()
-                .With(new Job(Job.Dry) { Infrastructure = { EngineFactory = new CustomFactory() } });
+                .AddJob(new Job(Job.Dry) { Infrastructure = { EngineFactory = new CustomFactory() } });
 
             var summary = CanExecute<SimpleBenchmark>(config, fullValidation: false);
 

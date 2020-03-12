@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
@@ -12,8 +11,6 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
-using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.XUnit;
@@ -25,6 +22,9 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 using Xunit;
 using Xunit.Abstractions;
 using BenchmarkDotNet.Portability;
+using Perfolizer.Horology;
+using Perfolizer.Mathematics.SignificanceTesting;
+using Perfolizer.Mathematics.Thresholds;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -380,8 +380,7 @@ namespace BenchmarkDotNet.Tests
 
             var diagnoser = config.GetDiagnosers().OfType<DisassemblyDiagnoser>().Single();
 
-            Assert.Equal(depth, diagnoser.Config.RecursiveDepth);
-            Assert.True(diagnoser.Config.PrintPrologAndEpilog); // we want this option to be enabled by default for command line users
+            Assert.Equal(depth, diagnoser.Config.MaxDepth);
         }
 
         [Fact]
@@ -396,7 +395,7 @@ namespace BenchmarkDotNet.Tests
         public void UserCanSpecifyCustomDefaultJobAndOverwriteItsSettingsViaConsoleArgs()
         {
             var globalConfig = DefaultConfig.Instance
-                .With(Job.Default
+                .AddJob(Job.Default
                     .WithWarmupCount(1)
                     .AsDefault());
 

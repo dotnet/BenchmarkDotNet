@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Exporters
 
         public void ExportToLog(Summary summary, ILogger logger)
         {
-            if(summary.GetColumns().IsNullOrEmpty())
+            if (summary.GetColumns().IsNullOrEmpty())
                 logger.WriteLineHint("You haven't configured any columns, your results will be empty");
 
             foreach (var exporter in exporters)

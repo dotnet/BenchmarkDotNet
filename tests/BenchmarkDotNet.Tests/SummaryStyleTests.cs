@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Reports;
+using Perfolizer.Horology;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests
@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Tests
                 timeUnit: TimeUnit.Millisecond
             );
 
-            var config = ManualConfig.CreateEmpty().With(summaryStyle);
+            var config = ManualConfig.CreateEmpty().WithSummaryStyle(summaryStyle);
 
             Assert.Equal(CultureInfo.InvariantCulture, config.SummaryStyle.CultureInfo);
             Assert.True(config.SummaryStyle.PrintUnitsInHeader);

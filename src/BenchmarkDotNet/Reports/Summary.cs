@@ -6,11 +6,11 @@ using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Reports
 
         internal static Summary Join(List<Summary> summaries, ClockSpan clockSpan)
             => new Summary(
-                $"BenchmarkRun-joined-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}",
+                $"BenchmarkRun-joined-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}",
                 summaries.SelectMany(summary => summary.Reports).ToImmutableArray(),
                 HostEnvironmentInfo.GetCurrent(),
                 summaries.First().ResultsDirectoryPath,

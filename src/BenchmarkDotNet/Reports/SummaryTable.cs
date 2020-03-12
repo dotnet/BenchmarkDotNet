@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Reports
 {

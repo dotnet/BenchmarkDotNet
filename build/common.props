@@ -14,9 +14,10 @@
 
     <CLSCompliant>true</CLSCompliant>
     <ComVisible>false</ComVisible>
-	
+
     <UseSharedCompilation>false</UseSharedCompilation>
     <SuppressNETCoreSdkPreviewMessage>True</SuppressNETCoreSdkPreviewMessage>
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodingStyle.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' And $(TargetFramework.StartsWith('net4')) ">
@@ -34,7 +35,7 @@
   </PropertyGroup>
   
   <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' AND '$(IsFsharp)' != 'true' ">
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
     
     <Major>0</Major>
     <Minor>12</Minor>
@@ -61,6 +62,15 @@
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup >
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.4">
+      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
 </Project>

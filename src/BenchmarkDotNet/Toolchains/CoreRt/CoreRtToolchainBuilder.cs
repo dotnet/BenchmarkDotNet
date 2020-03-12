@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
@@ -14,7 +15,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         private bool useCppCodeGenerator;
         private string packagesRestorePath;
         // we set those default values on purpose https://github.com/dotnet/BenchmarkDotNet/pull/1057#issuecomment-461832612
-        private bool rootAllApplicationAssemblies = false;
+        private bool rootAllApplicationAssemblies;
         private bool ilcGenerateCompleteTypeMetadata = true;
         private bool ilcGenerateStackTraceData = true;
 
@@ -75,6 +76,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         /// The directory to restore packages to (optional).
         /// </summary>
         [PublicAPI]
+        [SuppressMessage("ReSharper", "ParameterHidesMember")]
         public CoreRtToolchainBuilder PackagesRestorePath(string packagesRestorePath)
         {
             this.packagesRestorePath = packagesRestorePath;

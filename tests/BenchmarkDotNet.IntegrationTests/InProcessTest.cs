@@ -17,6 +17,8 @@ using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
 
+#pragma warning disable CS0618
+
 namespace BenchmarkDotNet.IntegrationTests
 {
     public class InProcessTest : BenchmarkTestExecutor
@@ -170,9 +172,9 @@ namespace BenchmarkDotNet.IntegrationTests
         private IConfig CreateInProcessConfig(BenchmarkActionCodegen codegenMode, OutputLogger logger = null, IDiagnoser diagnoser = null)
         {
             return new ManualConfig()
-                .With(Job.Dry.With(new InProcessToolchain(TimeSpan.Zero, codegenMode, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
-                .With(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
-                .With(DefaultColumnProviders.Instance);
+                .AddJob(Job.Dry.WithToolchain(new InProcessToolchain(TimeSpan.Zero, codegenMode, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
+                .AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
+                .AddColumnProvider(DefaultColumnProviders.Instance);
         }
 
         [Fact]

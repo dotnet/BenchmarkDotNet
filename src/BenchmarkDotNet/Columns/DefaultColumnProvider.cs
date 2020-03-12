@@ -5,6 +5,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.Common;
 
 namespace BenchmarkDotNet.Columns
 {

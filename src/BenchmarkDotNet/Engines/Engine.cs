@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -148,7 +148,7 @@ namespace BenchmarkDotNet.Engines
             bool isOverhead = data.IterationMode == IterationMode.Overhead;
             var action = isOverhead ? OverheadAction : WorkloadAction;
 
-            if(!isOverhead)
+            if (!isOverhead)
                 IterationSetupAction();
 
             GcCollect();
@@ -164,7 +164,7 @@ namespace BenchmarkDotNet.Engines
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStop(data.IterationMode, data.IterationStage, totalOperations);
 
-            if(!isOverhead)
+            if (!isOverhead)
                 IterationCleanupAction();
 
             GcCollect();

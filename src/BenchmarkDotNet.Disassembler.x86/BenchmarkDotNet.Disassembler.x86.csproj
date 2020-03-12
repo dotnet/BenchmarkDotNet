@@ -14,12 +14,13 @@
     <RootNamespace>BenchmarkDotNet.Disassembler</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\ClrSourceExtensions.cs" Link="ClrSourceExtensions.cs" />
     <Compile Include="..\BenchmarkDotNet.Disassembler.x64\DataContracts.cs" Link="DataContracts.cs" />
+    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\ClrMdDisassembler.cs" Link="ClrMdDisassembler.cs" />
+    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\SourceCodeProvider.cs" Link="SourceCodeProvider.cs" />
     <Compile Include="..\BenchmarkDotNet.Disassembler.x64\Program.cs" Link="Program.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="0.9.180305.1" />
-    <PackageReference Include="Mono.Cecil" Version="0.10.1" />
+    <PackageReference Include="Iced" Version="1.4.0" />
+    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="1.1.57604" />
   </ItemGroup>
 </Project>

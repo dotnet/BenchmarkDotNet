@@ -23,8 +23,8 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(DefaultColumnProviders.Job);
-            mutable.Add(DefaultColumnProviders.Job);
+            mutable.AddColumnProvider(DefaultColumnProviders.Job);
+            mutable.AddColumnProvider(DefaultColumnProviders.Job);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -36,8 +36,8 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(ConsoleLogger.Default);
-            mutable.Add(ConsoleLogger.Default);
+            mutable.AddLogger(ConsoleLogger.Default);
+            mutable.AddLogger(ConsoleLogger.Default);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -49,8 +49,8 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(HardwareCounter.CacheMisses);
-            mutable.Add(HardwareCounter.CacheMisses);
+            mutable.AddHardwareCounters(HardwareCounter.CacheMisses);
+            mutable.AddHardwareCounters(HardwareCounter.CacheMisses);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(HardwareCounter.CacheMisses);
+            mutable.AddHardwareCounters(HardwareCounter.CacheMisses);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -70,18 +70,18 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Single(final.GetDiagnosers().OfType<IHardwareCountersDiagnoser>());
         }
 
-        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers and disassembler only for Windows. This test is disabled for .NET Core because CoreRT compiler goes crazy when some dependency has reference to TraceEvent...")]
+        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because CoreRT compiler goes crazy when some dependency has reference to TraceEvent...")]
         public void WhenUserDefinesHardwareCountersAndUsesDisassemblyDiagnoserWeAddInstructionPointerExporter()
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(HardwareCounter.CacheMisses);
-            mutable.Add(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.All));
+            mutable.AddHardwareCounters(HardwareCounter.CacheMisses);
+            mutable.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig()));
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
             Assert.Single(final.GetDiagnosers().OfType<IHardwareCountersDiagnoser>());
-            Assert.Single(final.GetDiagnosers().OfType<IDisassemblyDiagnoser>());
+            Assert.Single(final.GetDiagnosers().OfType<DisassemblyDiagnoser>());
             Assert.Single(final.GetExporters().OfType<InstructionPointerExporter>());
         }
 
@@ -90,8 +90,8 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.All));
-            mutable.Add(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.Asm));
+            mutable.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig()));
+            mutable.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig()));
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -103,8 +103,8 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(MarkdownExporter.GitHub);
-            mutable.Add(MarkdownExporter.GitHub);
+            mutable.AddExporter(MarkdownExporter.GitHub);
+            mutable.AddExporter(MarkdownExporter.GitHub);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -116,8 +116,8 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(OutliersAnalyser.Default);
-            mutable.Add(OutliersAnalyser.Default);
+            mutable.AddAnalyser(OutliersAnalyser.Default);
+            mutable.AddAnalyser(OutliersAnalyser.Default);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -129,8 +129,8 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(JitOptimizationsValidator.DontFailOnError);
-            mutable.Add(JitOptimizationsValidator.FailOnError);
+            mutable.AddValidator(JitOptimizationsValidator.DontFailOnError);
+            mutable.AddValidator(JitOptimizationsValidator.FailOnError);
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var fromEmpty = ImmutableConfigBuilder.Create(ManualConfig.CreateEmpty());
             Assert.Contains(JitOptimizationsValidator.DontFailOnError, fromEmpty.GetValidators());
-            
+
 #if !DEBUG
             // DefaultConfig.Instance doesn't include JitOptimizationsValidator.FailOnError in the DEBUG mode
             var fromDefault = ImmutableConfigBuilder.Create(DefaultConfig.Instance);
@@ -161,14 +161,14 @@ namespace BenchmarkDotNet.Tests.Configs
         [Fact]
         public void JitOptimizationsValidatorIsMandatoryCanBeDisabledOnDemand()
         {
-            var disabled = ImmutableConfigBuilder.Create(ManualConfig.CreateEmpty().With(ConfigOptions.DisableOptimizationsValidator));
+            var disabled = ImmutableConfigBuilder.Create(ManualConfig.CreateEmpty().WithOptions(ConfigOptions.DisableOptimizationsValidator));
 
             Assert.DoesNotContain(JitOptimizationsValidator.FailOnError, disabled.GetValidators());
             Assert.DoesNotContain(JitOptimizationsValidator.DontFailOnError, disabled.GetValidators());
 
             var enabledThenDisabled = ImmutableConfigBuilder.Create(ManualConfig.CreateEmpty()
-                .With(JitOptimizationsValidator.FailOnError) // we enable it first (to mimic few configs merge)
-                .With(ConfigOptions.DisableOptimizationsValidator)); // then disable
+                .AddValidator(JitOptimizationsValidator.FailOnError) // we enable it first (to mimic few configs merge)
+                .WithOptions(ConfigOptions.DisableOptimizationsValidator)); // then disable
 
             Assert.DoesNotContain(JitOptimizationsValidator.FailOnError, enabledThenDisabled.GetValidators());
             Assert.DoesNotContain(JitOptimizationsValidator.DontFailOnError, enabledThenDisabled.GetValidators());
@@ -179,7 +179,7 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(TestExporter.Default);
+            mutable.AddExporter(TestExporter.Default);
 
             var exporters = ImmutableConfigBuilder.Create(mutable).GetExporters().ToArray();
 
@@ -192,8 +192,8 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.Add(TestExporter.Default);
-            mutable.Add(TestExporterDependency.Default);
+            mutable.AddExporter(TestExporter.Default);
+            mutable.AddExporter(TestExporterDependency.Default);
 
             var exporters = ImmutableConfigBuilder.Create(mutable).GetExporters().ToArray();
 
@@ -204,8 +204,8 @@ namespace BenchmarkDotNet.Tests.Configs
         [Fact]
         public void WhenTwoConfigsAreAddedTheRegularJobsAreJustAdded()
         {
-            var configWithClrJob = CreateConfigFromJobs(Job.Default.With(CoreRuntime.Core21));
-            var configWithCoreJob = CreateConfigFromJobs(Job.Default.With(ClrRuntime.Net461));
+            var configWithClrJob = CreateConfigFromJobs(Job.Default.WithRuntime(CoreRuntime.Core21));
+            var configWithCoreJob = CreateConfigFromJobs(Job.Default.WithRuntime(ClrRuntime.Net461));
 
             foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithClrJob, configWithCoreJob))
             {
@@ -223,8 +223,8 @@ namespace BenchmarkDotNet.Tests.Configs
             const int warmupCount = 2;
             var configWithMutatorJob = CreateConfigFromJobs(Job.Default.WithWarmupCount(warmupCount).AsMutator());
             var configWithTwoStandardJobs = CreateConfigFromJobs(
-                Job.Default.With(ClrRuntime.Net461),
-                Job.Default.With(CoreRuntime.Core21));
+                Job.Default.WithRuntime(ClrRuntime.Net461),
+                Job.Default.WithRuntime(CoreRuntime.Core21));
 
             foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithTwoStandardJobs, configWithMutatorJob))
             {
@@ -291,7 +291,7 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var config = ManualConfig.CreateEmpty();
 
-            config.Add(jobs);
+            config.AddJob(jobs);
 
             return config;
         }
@@ -304,7 +304,7 @@ namespace BenchmarkDotNet.Tests.Configs
             var leftAddedToTheRight = ManualConfig.Create(right);
             leftAddedToTheRight.Add(left);
 
-            return new []{ rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig() };
+            return new[]{ rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig() };
         }
 
         public class TestExporter : IExporter, IExporterDependencies

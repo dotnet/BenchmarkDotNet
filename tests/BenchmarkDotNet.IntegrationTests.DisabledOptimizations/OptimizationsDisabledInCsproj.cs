@@ -9,9 +9,9 @@ namespace BenchmarkDotNet.IntegrationTests.DisabledOptimizations
     {
         public JitOptimizationsValidatorConfig()
         {
-            Add(Job.Dry);
-            Add(Loggers.ConsoleLogger.Default);
-            Add(JitOptimizationsValidator.DontFailOnError);
+            AddJob(Job.Dry);
+            AddLogger(Loggers.ConsoleLogger.Default);
+            AddValidator(JitOptimizationsValidator.DontFailOnError);
         }
     }
 
