@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Columns
 
         public UnitType UnitType => UnitType.Time;
 
-        public string Legend => "Execution time of the first call (Jitting included)";
+        public string Legend => "Execution time of the first call";
 
         public List<double> GetAllValues(Summary summary, SummaryStyle style)
             => summary.Reports
