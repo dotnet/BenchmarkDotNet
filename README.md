@@ -105,7 +105,7 @@ Intel Core i7-7700K CPU 4.20GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cor
 
 The measured data can be exported to different formats (md, html, csv, xml, json, etc.) including plots:
 
-![](https://i.imgur.com/qAHMQ30.png)
+![](docs/images/v0.12.0/rplot.png)
 
 *Supported runtimes:* .NET Framework 4.6.1+, .NET Core 2.0+, Mono, CoreRT  
 *Supported languages:* C#, F#, Visual Basic  

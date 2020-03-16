@@ -45,8 +45,11 @@ using BenchmarkDotNet.Running;
 
 namespace MyBenchmarks
 {
-    [ClrJob(baseline: true), CoreJob, MonoJob, CoreRtJob]
-    [RPlotExporter, RankColumn]
+    [SimpleJob(RuntimeMoniker.Net472, baseline: true)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp30)]
+    [SimpleJob(RuntimeMoniker.CoreRt30)]
+    [SimpleJob(RuntimeMoniker.Mono)]
+    [RPlotExporter]
     public class Md5VsSha256
     {
         private SHA256 sha256 = SHA256.Create();
@@ -83,44 +86,43 @@ namespace MyBenchmarks
 BenchmarkDotNet allows designing a performance experiment in a user-friendly declarative way.
 At the end of an experiment, it will generate a summary table which contains only important data in a compact and understandable form:
 
-```
-BenchmarkDotNet=v0.11.0, OS=Windows 10.0.16299.309 (1709/FallCreatorsUpdate/Redstone3)
-Intel Xeon CPU E5-1650 v4 3.60GHz, 1 CPU, 12 logical and 6 physical cores
-Frequency=3507504 Hz, Resolution=285.1030 ns, Timer=TSC
-.NET Core SDK=2.1.300-preview1-008174
-  [Host]     : .NET Core 2.1.0-preview1-26216-03 (CoreCLR 4.6.26216.04, CoreFX 4.6.26216.02), 64bit RyuJIT
-  Job-HKEEXO : .NET Framework 4.7.1 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2633.0
-  Core       : .NET Core 2.1.0-preview1-26216-03 (CoreCLR 4.6.26216.04, CoreFX 4.6.26216.02), 64bit RyuJIT
-  CoreRT     : .NET CoreRT 1.0.26414.01, 64bit AOT
-  Mono       : Mono 5.10.0 (Visual Studio), 64bit 
+```text
+BenchmarkDotNet=v0.12.0, OS=Windows 10.0.17763.805 (1809/October2018Update/Redstone5)
+Intel Core i7-7700K CPU 4.20GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cores
+  [Host]       : .NET Framework 4.7.2 (4.7.3468.0), X64 RyuJIT
+  Net472       : .NET Framework 4.7.2 (4.7.3468.0), X64 RyuJIT
+  NetCoreApp30 : .NET Core 3.0.0 (CoreCLR 4.700.19.46205, CoreFX 4.700.19.46214), X64 RyuJIT
+  CoreRt30     : .NET CoreRT 1.0.28231.02 @Commit: 741d61493c560ba96e8151f9e56876d4d3828489, X64 AOT
+  Mono         : Mono 6.4.0 (Visual Studio), X64
 
-| Method | Runtime |     N |       Mean |     Error |    StdDev | Ratio | Rank |
-|------- |-------- |------ |-----------:|----------:|----------:|------:|-----:|
-| Sha256 |     Clr |  1000 |   8.009 us | 0.0370 us | 0.0346 us |  1.00 |    3 |
-| Sha256 |    Core |  1000 |   4.447 us | 0.0117 us | 0.0110 us |  0.56 |    2 |
-| Sha256 |  CoreRT |  1000 |   4.321 us | 0.0139 us | 0.0130 us |  0.54 |    1 |
-| Sha256 |    Mono |  1000 |  14.924 us | 0.0574 us | 0.0479 us |  1.86 |    4 |
-|        |         |       |            |           |           |       |      |
-|    Md5 |     Clr |  1000 |   3.051 us | 0.0604 us | 0.0742 us |  1.00 |    3 |
-|    Md5 |    Core |  1000 |   2.004 us | 0.0058 us | 0.0054 us |  0.66 |    2 |
-|    Md5 |  CoreRT |  1000 |   1.892 us | 0.0087 us | 0.0077 us |  0.62 |    1 |
-|    Md5 |    Mono |  1000 |   3.878 us | 0.0181 us | 0.0170 us |  1.27 |    4 |
-|        |         |       |            |           |           |       |      |
-| Sha256 |     Clr | 10000 |  75.780 us | 1.0445 us | 0.9771 us |  1.00 |    3 |
-| Sha256 |    Core | 10000 |  41.134 us | 0.2185 us | 0.1937 us |  0.54 |    2 |
-| Sha256 |  CoreRT | 10000 |  40.895 us | 0.0804 us | 0.0628 us |  0.54 |    1 |
-| Sha256 |    Mono | 10000 | 141.377 us | 0.5598 us | 0.5236 us |  1.87 |    4 |
-|        |         |       |            |           |           |       |      |
-|    Md5 |     Clr | 10000 |  18.575 us | 0.0727 us | 0.0644 us |  1.00 |    3 |
-|    Md5 |    Core | 10000 |  17.562 us | 0.0436 us | 0.0408 us |  0.95 |    2 |
-|    Md5 |  CoreRT | 10000 |  17.447 us | 0.0293 us | 0.0244 us |  0.94 |    1 |
-|    Md5 |    Mono | 10000 |  34.500 us | 0.1553 us | 0.1452 us |  1.86 |    4 |
+
+| Method |       Runtime |     N |       Mean |     Error |    StdDev | Ratio |
+|------- |-------------- |------ |-----------:|----------:|----------:|------:|
+| Sha256 |    .NET 4.7.2 |  1000 |   7.735 us | 0.1913 us | 0.4034 us |  1.00 |
+| Sha256 | .NET Core 3.0 |  1000 |   3.989 us | 0.0796 us | 0.0745 us |  0.50 |
+| Sha256 |    CoreRt 3.0 |  1000 |   4.091 us | 0.0811 us | 0.1562 us |  0.53 |
+| Sha256 |          Mono |  1000 |  13.117 us | 0.2485 us | 0.5019 us |  1.70 |
+|        |               |       |            |           |           |       |
+|    Md5 |    .NET 4.7.2 |  1000 |   2.872 us | 0.0552 us | 0.0737 us |  1.00 |
+|    Md5 | .NET Core 3.0 |  1000 |   1.848 us | 0.0348 us | 0.0326 us |  0.64 |
+|    Md5 |    CoreRt 3.0 |  1000 |   1.817 us | 0.0359 us | 0.0427 us |  0.63 |
+|    Md5 |          Mono |  1000 |   3.574 us | 0.0678 us | 0.0753 us |  1.24 |
+|        |               |       |            |           |           |       |
+| Sha256 |    .NET 4.7.2 | 10000 |  74.509 us | 1.5787 us | 4.6052 us |  1.00 |
+| Sha256 | .NET Core 3.0 | 10000 |  36.049 us | 0.7151 us | 1.0025 us |  0.49 |
+| Sha256 |    CoreRt 3.0 | 10000 |  36.253 us | 0.7076 us | 0.7571 us |  0.49 |
+| Sha256 |          Mono | 10000 | 116.350 us | 2.2555 us | 3.0110 us |  1.58 |
+|        |               |       |            |           |           |       |
+|    Md5 |    .NET 4.7.2 | 10000 |  17.308 us | 0.3361 us | 0.4250 us |  1.00 |
+|    Md5 | .NET Core 3.0 | 10000 |  15.726 us | 0.2064 us | 0.1930 us |  0.90 |
+|    Md5 |    CoreRt 3.0 | 10000 |  15.627 us | 0.2631 us | 0.2461 us |  0.89 |
+|    Md5 |          Mono | 10000 |  30.205 us | 0.5868 us | 0.6522 us |  1.74 |
 ```
 
 In artifacts, you can also find detailed information about each iteration.
 You can export the data in different formats like (CSV, XML, JSON, and so on) or even generate beautiful plots:
 
-![](images/rplot.png)
+![](images/v0.12.0/rplot.png)
 
 ## Main features
 
