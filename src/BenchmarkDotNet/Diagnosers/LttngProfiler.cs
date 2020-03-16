@@ -103,7 +103,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
             else
             {
-                (int exitCode, var output) = ProcessHelper.RunAndReadOutputLineByLine(perfCollectFile.FullName, "install", perfCollectFile.Directory.FullName, null, includeErrors: true, logger);
+                (int exitCode, var output) = ProcessHelper.RunAndReadOutputLineByLine(perfCollectFile.FullName, "install -force", perfCollectFile.Directory.FullName, null, includeErrors: true, logger);
 
                 if (exitCode == SuccesExitCode)
                 {

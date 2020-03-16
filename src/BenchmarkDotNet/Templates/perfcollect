@@ -624,6 +624,9 @@ declare -a LTTng_Kernel_ProcessLifetime=(
 ## Global Variables
 ######################################
 
+# Install without waiting for standard input
+forceInstall=0
+
 # Declare an array of events to collect.
 declare -a eventsToCollect
 
@@ -953,14 +956,17 @@ InstallLTTng_RHEL()
 
     packageRepo="https://packages.efficios.com/repo.files/EfficiOS-RHEL7-x86-64.repo"
 
-    # Prompt for confirmation, since we need to add a new repository.
-    BlueText
-    echo "LTTng installation requires that a new package repo be added to your yum configuration."
-    echo "The package repo url is: $packageRepo"
-    echo ""
-    read -p "Would you like to add the LTTng package repo to your YUM configuration? [Y/N]" resp
-    ResetText
-    if [ "$resp" == "Y" ] || [ "$resp" == "y" ]
+    if [ "$forceInstall" != 1 ]
+    then 
+        # Prompt for confirmation, since we need to add a new repository.
+        BlueText
+        echo "LTTng installation requires that a new package repo be added to your yum configuration."
+        echo "The package repo url is: $packageRepo"
+        echo ""
+        read -p "Would you like to add the LTTng package repo to your YUM configuration? [Y/N]" resp
+        ResetText
+    fi
+    if [ "$resp" == "Y" ] || [ "$resp" == "y" ] || [ "$forceInstall" == 1 ]
     then
         # Make sure that wget is installed.
         BlueText
@@ -999,14 +1005,17 @@ InstallLTTng_SUSE()
     # Package repo url
     packageRepo="http://download.opensuse.org/repositories/devel:/tools:/lttng/openSUSE_13.2/devel:tools:lttng.repo"
 
-    # Prompt for confirmation, since we need to add a new repository.
-    BlueText
-    echo "LTTng installation requires that a new package repo be added to your zypper configuration."
-    echo "The package repo url is: $packageRepo"
-    echo ""
-    read -p "Would you like to add the LTTng package repo to your zypper configuration? [Y/N]" resp
-    ResetText
-    if [ "$resp" == "Y" ] || [ "$resp" == "y" ]
+    if [ "$forceInstall" != 1 ]
+    then
+        # Prompt for confirmation, since we need to add a new repository.
+        BlueText
+        echo "LTTng installation requires that a new package repo be added to your zypper configuration."
+        echo "The package repo url is: $packageRepo"
+        echo ""
+        read -p "Would you like to add the LTTng package repo to your zypper configuration? [Y/N]" resp
+        ResetText
+    fi
+    if [ "$resp" == "Y" ] || [ "$resp" == "y" ] || [ "$forceInstall" == 1 ]
     then
 
         # Add package repo.
@@ -1028,27 +1037,6 @@ InstallLTTng_Ubuntu()
 {
     # Disallow non-root users.
     EnsureRoot
-
-    # Add the PPA feed as a repository.
-    BlueText
-    echo "LTTng can be installed using default Ubuntu packages via the Ubuntu package feeds or using the latest"
-    echo "stable package feed published by LTTng (PPA feed).  It is recommended that LTTng be installed using the PPA feed."
-    echo ""
-    ResetText
-    echo "    If you select yes, then the LTTng PPA feed will be added to your apt configuration."
-    echo "    If you select no, then LTTng will be installed from an existing feed (either default Ubuntu or PPA if previously added."
-    echo ""
-    BlueText
-    read -p "Would you like to add the LTTng PPA feed to your apt configuration? [Y/N]" resp
-    ResetText
-    if [ "$resp" == "Y" ] || [ "$resp" == "y" ]
-    then
-        BlueText
-        echo "Adding LTTng PPA feed and running apt-get update."
-        ResetText
-        apt-add-repository ppa:lttng/ppa
-        apt-get update
-    fi
 
     # Install packages.
     BlueText
@@ -1295,7 +1283,7 @@ CreateLTTngSession()
     fi
 
     lttngSessionName=`echo $output | grep -o "Session.*created." | sed 's/\(Session \| created.\)//g'`
-    lttngTraceDir=`echo $output | grep -o "Traces.*" | sed 's/\(Traces will be written in \|\)//g'`
+    lttngTraceDir=`echo $output | grep -o "Traces.*" | sed 's/\(Traces will be written in \|\)//g' | sed 's/\(Traces will be output to \|\)//g'`
 }
 
 SetupLTTngSession()
@@ -1717,8 +1705,9 @@ PrintUsage()
     echo "livetrace:"
     echo "    Print EventSource events directly to the console.  Root privileges not required."
     echo ""
-    echo "install:"
+    echo "install options:"
     echo "    Useful for first-time setup.  Installs/upgrades perf_event and LTTng."
+    echo "    -force    : Force installation of required packages without prompt"
     echo ""
 }
 
@@ -1949,6 +1938,10 @@ DoView()
 # Install perf if requested.  Do this before all other validation.
 if [ "$1" == "install" ]
 then
+    if [ "$2" == "-force" ]
+    then 
+        forceInstall=1
+    fi
     InstallPerf
     InstallLTTng
     exit 0
