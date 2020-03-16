@@ -120,7 +120,7 @@ Frequency=3507504 Hz, Resolution=285.1030 ns, Timer=TSC
 In artifacts, you can also find detailed information about each iteration.
 You can export the data in different formats like (CSV, XML, JSON, and so on) or even generate beautiful plots:
 
-![](images/rplot.png)
+![](images/v0.12/rplot.png)
 
 ## Main features
 
