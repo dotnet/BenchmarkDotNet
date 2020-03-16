@@ -122,7 +122,7 @@ Intel Core i7-7700K CPU 4.20GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cor
 In artifacts, you can also find detailed information about each iteration.
 You can export the data in different formats like (CSV, XML, JSON, and so on) or even generate beautiful plots:
 
-![](images/v0.12/rplot.png)
+![](images/v0.12.0/rplot.png)
 
 ## Main features
 

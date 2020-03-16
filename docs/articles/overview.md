@@ -173,7 +173,7 @@ public class Md5VsSha256
 
 If you have installed R, `RPlotExporter` will generate a lot of nice plots:
 
-![](../images/v0.12/rplot.png)
+![](../images/v0.12.0/rplot.png)
 
 Read more:  [Exporters](configs/exporters.md)
 
