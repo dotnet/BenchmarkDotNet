@@ -16,50 +16,77 @@ namespace BenchmarkDotNet.Loggers
 
         private readonly bool unicodeSupport;
         private readonly Dictionary<LogKind, ConsoleColor> colorScheme;
+        private readonly Dictionary<LogKind, string> logKindAbbreviations;
+
+        private bool newLine = true;
 
         [PublicAPI]
         public ConsoleLogger(bool unicodeSupport = false, Dictionary<LogKind, ConsoleColor> colorScheme = null)
         {
             this.unicodeSupport = unicodeSupport;
             this.colorScheme = colorScheme ?? CreateColorfulScheme();
+            this.logKindAbbreviations = CreateLogKindAbbreviations();
         }
 
         public string Id => nameof(ConsoleLogger);
 
         public int Priority => unicodeSupport ? 1 : 0;
 
-        public void Write(LogKind logKind, string text) => Write(logKind, Console.Write, text);
+        public void Write(LogKind logKind, string text) {
+            if (newLine)
+                WriteAbbreviation(logKind);
+            newLine = false;
+            WriteText(Console.Write, text);
+        }
 
-        public void WriteLine() => Console.WriteLine();
+        public void WriteLine() {
+            Console.WriteLine();
+            newLine = true;
+        }
 
-        public void WriteLine(LogKind logKind, string text) => Write(logKind, Console.WriteLine, text);
+        public void WriteLine(LogKind logKind, string text) {
+            if (newLine)
+                WriteAbbreviation(logKind);
+            WriteText(Console.WriteLine, text);
+            newLine = true;
+        }
 
         public void Flush() { }
 
-        private void Write(LogKind logKind, Action<string> write, string text)
+        private void WriteAbbreviation(LogKind logKind)
         {
-            if (!unicodeSupport)
-                text = text.ToAscii();
-
             var colorBefore = Console.ForegroundColor;
 
+            Console.Write("[");
             try
             {
                 var color = GetColor(logKind);
                 if (color != Console.ForegroundColor && color != Console.BackgroundColor)
                     Console.ForegroundColor = color;
-
-                write(text);
+                var abbreviation = Getabbreviation(logKind);
+                Console.Write(abbreviation);
             }
             finally
             {
                 if (colorBefore != Console.ForegroundColor && colorBefore != Console.BackgroundColor)
                     Console.ForegroundColor = colorBefore;
             }
+            Console.Write("] ");
+        }
+
+        private void WriteText(Action<string> write, string text)
+        {
+            if (!unicodeSupport)
+                text = text.ToAscii();
+
+            write(text);
         }
 
         private ConsoleColor GetColor(LogKind logKind) =>
             colorScheme.ContainsKey(logKind) ? colorScheme[logKind] : DefaultColor;
+
+        private string Getabbreviation(LogKind logKind) =>
+            logKindAbbreviations.ContainsKey(logKind) ? logKindAbbreviations[logKind] : "UKN";
 
         private static Dictionary<LogKind, ConsoleColor> CreateColorfulScheme() =>
             new Dictionary<LogKind, ConsoleColor>
@@ -72,6 +99,19 @@ namespace BenchmarkDotNet.Loggers
                 { LogKind.Info, ConsoleColor.DarkYellow },
                 { LogKind.Error, ConsoleColor.Red },
                 { LogKind.Hint, ConsoleColor.DarkCyan }
+            };
+
+        private static Dictionary<LogKind, string> CreateLogKindAbbreviations() =>
+            new Dictionary<LogKind, string>
+            {
+                { LogKind.Default, "DEF" },
+                { LogKind.Help, "HLP" },
+                { LogKind.Header, "HDR" },
+                { LogKind.Result, "RES" },
+                { LogKind.Statistic, "STA" },
+                { LogKind.Info, "INF" },
+                { LogKind.Error, "ERR" },
+                { LogKind.Hint, "HNT" }
             };
 
         [PublicAPI]
