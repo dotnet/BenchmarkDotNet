@@ -298,7 +298,7 @@ Read more:  [Diagnosers](configs/diagnosers.md)
 
 ## BenchmarkRunner
 
-There are several ways to run your benchmarks: you can use existed class, run a benchmark based on code from internet or based on source code:
+There are several ways to run your benchmarks: you can use an existing class, run a benchmark based on code from internet or based on source code:
 
 ```cs
 var summary = BenchmarkRunner.Run<MyBenchmarkClass>();
