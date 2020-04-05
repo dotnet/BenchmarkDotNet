@@ -35,7 +35,7 @@ The current Diagnosers are:
   Please see Wojciech Nagórski's [blog post](https://wojciechnagorski.com/2019/08/analyzing-native-memory-allocation-with-benchmarkdotnet/) for all the details.
 - Event Pipe Profiler (`EventPipeProfiler`).
   It is a cross-platform profiler that allows profile .NET code on every platform - Windows, Linux, macOS.
-  Please see Wojciech Nagórski's [blog post](http://localhost:1313/2020/04/cross-platform-profiling-.net-code-with-benchmarkdotnet/) for all the details.
+  Please see Wojciech Nagórski's [blog post](https://wojciechnagorski.com/2020/04/cross-platform-profiling-.net-code-with-benchmarkdotnet/) for all the details.
 - Threading Diagnoser (`ThreadingDiagnoser`) - .NET Core 3.0+ diagnoser that reports some Threading statistics.
 
 ## Usage
