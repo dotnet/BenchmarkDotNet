@@ -19,7 +19,7 @@
     <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="1.1.57604" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="2.1.0" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.5.0" />
-    <PackageReference Include="Perfolizer" Version="0.2.0" />
+    <PackageReference Include="Perfolizer" Version="0.2.1" />
     <PackageReference Include="System.Management" Version="4.5.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
