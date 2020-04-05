@@ -35,7 +35,7 @@ std.error <- function(x) sqrt(var(x)/length(x))
 cummean <- function(x) cumsum(x)/(1:length(x))
 BenchmarkDotNetVersionGrob <- textGrob(BenchmarkDotNetVersion, gp = gpar(fontface=3, fontsize=10), hjust=1, x=1)
 nicePlot <- function(p) grid.arrange(p, bottom = BenchmarkDotNetVersionGrob)
-printNice <- function(p) print(nicePlot(p))
+printNice <- function(p) {} # print(nicePlot(p))
 ggsaveNice <- function(fileName, p, ...) {
   cat(paste0("*** Plot: ", fileName, " ***\n"))
   ggsave(fileName, plot = nicePlot(p), ...)
