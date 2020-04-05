@@ -1,6 +1,6 @@
 BenchmarkDotNetVersion <- "$BenchmarkDotNetVersion$ "
 dir.create(Sys.getenv("R_LIBS_USER"), recursive = TRUE, showWarnings = FALSE)
-list.of.packages <- c("ggplot2", "dplyr", "gdata", "tidyr", "grid", "gridExtra", "Rcpp")
+list.of.packages <- c("ggplot2", "dplyr", "gdata", "tidyr", "grid", "gridExtra", "Rcpp", "R.devices")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages, lib = Sys.getenv("R_LIBS_USER"), repos = "https://cran.rstudio.com/")
 library(ggplot2)
@@ -9,6 +9,7 @@ library(gdata)
 library(tidyr)
 library(grid)
 library(gridExtra)
+library(R.devices)
 
 isEmpty <- function(val){
    is.null(val) | val == ""
@@ -38,7 +39,8 @@ nicePlot <- function(p) grid.arrange(p, bottom = BenchmarkDotNetVersionGrob)
 printNice <- function(p) {} # print(nicePlot(p))
 ggsaveNice <- function(fileName, p, ...) {
   cat(paste0("*** Plot: ", fileName, " ***\n"))
-  ggsave(fileName, plot = nicePlot(p), ...)
+  # See https://stackoverflow.com/a/51655831/184842
+  suppressGraphics(ggsave(fileName, plot = nicePlot(p), ...))
   cat("------------------------------\n")
 }
 
