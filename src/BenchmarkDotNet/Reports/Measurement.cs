@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Reports
             builder.Append(NsSymbol);
             builder.Append(", ");
 
-            builder.Append(GetAverageTime().ToString(MainCultureInfo));
+            builder.Append(GetAverageTime().ToString(MainCultureInfo).ToAscii());
             builder.Append("/op");
 
             return builder.ToString();

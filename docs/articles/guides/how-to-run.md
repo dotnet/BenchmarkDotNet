@@ -1,3 +1,7 @@
+---
+uid: docs.how-to-run
+---
+
 # How to run your benchmarks
 
 There are several ways to run your benchmarks:

@@ -48,6 +48,7 @@ namespace BenchmarkDotNet.Tests.Environments
         [Theory]
         [InlineData("macOS 10.12.6 (16G29)", "Darwin 16.7.0", "macOS Sierra 10.12.6 (16G29) [Darwin 16.7.0]")]
         [InlineData("macOS 10.13.4 (17E199)", "Darwin 17.5.0", "macOS High Sierra 10.13.4 (17E199) [Darwin 17.5.0]")]
+        [InlineData("macOS 10.15.4 (19E266)", "Darwin 19.4.0", "macOS Catalina 10.15.4 (19E266) [Darwin 19.4.0]")]
         public void MacOSXIsPrettified(string systemVersion, string kernelVersion, string prettifiedName)
             => Check(OsBrandStringHelper.PrettifyMacOSX(systemVersion, kernelVersion), prettifiedName);
     }

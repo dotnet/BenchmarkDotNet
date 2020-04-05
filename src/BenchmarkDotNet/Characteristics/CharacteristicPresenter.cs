@@ -21,9 +21,14 @@ namespace BenchmarkDotNet.Characteristics
         private class DefaultCharacteristicPresenter : CharacteristicPresenter
         {
             public override string ToPresentation(CharacteristicObject obj, Characteristic characteristic)
-                => obj.HasValue(characteristic)
+            {
+                if (characteristic == CharacteristicObject.IdCharacteristic && obj is Job job)
+                    return job.ResolvedId;
+
+                return obj.HasValue(characteristic)
                     ? ToPresentation(characteristic[obj], characteristic)
                     : "Default";
+            }
 
             public override string ToPresentation(object value, Characteristic characteristic)
             {
