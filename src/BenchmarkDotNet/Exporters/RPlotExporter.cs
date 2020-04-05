@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Exporters
         {
             const string scriptFileName = "BuildPlots.R";
             const string logFileName = "BuildPlots.log";
-            yield return scriptFileName;
+            yield return Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
 
             string csvFullPath = CsvMeasurementsExporter.Default.GetArtifactFullName(summary);
             string scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Exporters
                 File.AppendAllLines(logFullPath, reader.GetErrorLines());
             }
 
-            yield return $"*{ImageExtension}";
+            yield return Path.Combine(summary.ResultsDirectoryPath, $"*{ImageExtension}");
         }
 
         public void ExportToLog(Summary summary, ILogger logger)
