@@ -34,6 +34,10 @@
   href: IntroDisassemblyRyuJit.md
 - name: IntroEnvVars
   href: IntroEnvVars.md
+- name: IntroEventPipeProfiler
+  href: IntroEventPipeProfiler.md
+- name: IntroEventPipeProfilerAdvanced
+  href: IntroEventPipeProfilerAdvanced.md
 - name: IntroExport
   href: IntroExport.md
 - name: IntroExportJson
