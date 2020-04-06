@@ -8,7 +8,7 @@
     <title>Configs | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Configs | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -173,7 +173,7 @@ namespace BenchmarkDotNet.Samples
                 var jobs = jits
                     .Select(jit =&gt; new Job(Job.Dry) { Environment = { Jit = jit, Platform = Platform.X64 } })
                     .ToArray();
-                Config = ManualConfig.CreateEmpty().With(jobs);
+                Config = ManualConfig.CreateEmpty().AddJob(jobs);
             }
         }
 
@@ -211,11 +211,11 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                Add(Job.Dry);
-                Add(ConsoleLogger.Default);
-                Add(TargetMethodColumn.Method, StatisticColumn.Max);
-                Add(RPlotExporter.Default, CsvExporter.Default);
-                Add(EnvironmentAnalyser.Default);
+                AddJob(Job.Dry);
+                AddLogger(ConsoleLogger.Default);
+                AddColumn(TargetMethodColumn.Method, StatisticColumn.Max);
+                AddExporter(RPlotExporter.Default, CsvExporter.Default);
+                AddAnalyser(EnvironmentAnalyser.Default);
                 UnionRule = ConfigUnionRule.AlwaysUseLocal;
             }
         }
@@ -275,9 +275,9 @@ namespace BenchmarkDotNet.Samples
             BenchmarkRunner
                 .Run&lt;Algo_Md5VsSha256&gt;(
                     DefaultConfig.Instance
-                        .With(Job.Default.With(ClrRuntime.Net461))
-                        .With(Job.Default.With(CoreRuntime.Core21))
-                        .With(ExecutionValidator.FailOnError));
+                        .AddJob(Job.Default.WithRuntime(ClrRuntime.Net461))
+                        .AddJob(Job.Default.WithRuntime(CoreRuntime.Core21))
+                        .AddValidator(ExecutionValidator.FailOnError));
         }
     }
 }
@@ -314,7 +314,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

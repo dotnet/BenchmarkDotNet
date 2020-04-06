@@ -4,6 +4,7 @@
     <div class="sidefilter">
       <form class="toc-filter">
         <span class="glyphicon glyphicon-filter filter-icon"></span>
+        <span class="glyphicon glyphicon-remove clear-icon" id="toc_filter_clear"></span>
         <input type="text" id="toc_filter_input" placeholder="Enter here to filter..." onkeypress="if(event.keyCode==13) {return false;}">
       </form>
     </div>
@@ -47,7 +48,7 @@
                               <a href="guides/troubleshooting.html" name="" title="Troubleshooting">Troubleshooting</a>
                           </li>
                           <li>
-                              <a href="guides/global-dotnet-tool.html" name="" title="BenchmarkDotNet as global dotnet tool">BenchmarkDotNet as global dotnet tool</a>
+                              <a href="guides/tool.html" name="" title="Command-line tool">Command-line tool</a>
                           </li>
                           <li>
                               <a href="guides/dotnet-new-templates.html" name="" title="BenchmarkDotNet templates">BenchmarkDotNet templates</a>
@@ -76,6 +77,9 @@
                           </li>
                           <li>
                               <a href="features/etwprofiler.html" name="" title="EtwProfiler">EtwProfiler</a>
+                          </li>
+                          <li>
+                              <a href="features/event-pipe-profiler.html" name="" title="EventPipeProfiler">EventPipeProfiler</a>
                           </li>
                     </ul>
                 </li>
@@ -116,9 +120,6 @@
                           </li>
                           <li>
                               <a href="configs/orderers.html" name="" title="Orderers">Orderers</a>
-                          </li>
-                          <li>
-                              <a href="configs/encoding.html" name="" title="Encoding">Encoding</a>
                           </li>
                           <li>
                               <a href="configs/configoptions.html" name="" title="ConfigOptions">ConfigOptions</a>
@@ -182,10 +183,13 @@
                               <a href="samples/IntroDisassemblyRyuJit.html" name="" title="IntroDisassemblyRyuJit">IntroDisassemblyRyuJit</a>
                           </li>
                           <li>
-                              <a href="samples/IntroEncoding.html" name="" title="IntroEncoding">IntroEncoding</a>
+                              <a href="samples/IntroEnvVars.html" name="" title="IntroEnvVars">IntroEnvVars</a>
                           </li>
                           <li>
-                              <a href="samples/IntroEnvVars.html" name="" title="IntroEnvVars">IntroEnvVars</a>
+                              <a href="samples/IntroEventPipeProfiler.html" name="" title="IntroEventPipeProfiler">IntroEventPipeProfiler</a>
+                          </li>
+                          <li>
+                              <a href="samples/IntroEventPipeProfilerAdvanced.html" name="" title="IntroEventPipeProfilerAdvanced">IntroEventPipeProfilerAdvanced</a>
                           </li>
                           <li>
                               <a href="samples/IntroExport.html" name="" title="IntroExport">IntroExport</a>
@@ -294,6 +298,9 @@
                           </li>
                           <li>
                               <a href="samples/IntroTailcall.html" name="" title="IntroTailcall">IntroTailcall</a>
+                          </li>
+                          <li>
+                              <a href="samples/IntroUnicode.html" name="" title="IntroUnicode">IntroUnicode</a>
                           </li>
                     </ul>
                 </li>

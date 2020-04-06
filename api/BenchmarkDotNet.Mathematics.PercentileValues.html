@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class PercentileValues
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -141,9 +141,6 @@
     </div>
     <div>
       <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
     </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Mathematics.html">BenchmarkDotNet.Mathematics</a></h6>
@@ -425,14 +422,58 @@
   </table>
   
   
-  <a id="BenchmarkDotNet_Mathematics_PercentileValues_ToStr_" data-uid="BenchmarkDotNet.Mathematics.PercentileValues.ToStr*"></a>
-  <h4 id="BenchmarkDotNet_Mathematics_PercentileValues_ToStr" data-uid="BenchmarkDotNet.Mathematics.PercentileValues.ToStr">ToStr()</h4>
+  <a id="BenchmarkDotNet_Mathematics_PercentileValues_ToString_" data-uid="BenchmarkDotNet.Mathematics.PercentileValues.ToString*"></a>
+  <h4 id="BenchmarkDotNet_Mathematics_PercentileValues_ToString" data-uid="BenchmarkDotNet.Mathematics.PercentileValues.ToString">ToString()</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string ToStr()</code></pre>
+    <pre><code class="lang-csharp hljs">public override string ToString()</code></pre>
   </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.Object.ToString()</span></div>
+  
+  
+  <a id="BenchmarkDotNet_Mathematics_PercentileValues_ToString_" data-uid="BenchmarkDotNet.Mathematics.PercentileValues.ToString*"></a>
+  <h4 id="BenchmarkDotNet_Mathematics_PercentileValues_ToString_System_Func_System_Double_System_String__" data-uid="BenchmarkDotNet.Mathematics.PercentileValues.ToString(System.Func{System.Double,System.String})">ToString(Func&lt;Double, String&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string ToString(Func&lt;double, string&gt; formatter)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Func</span>&lt;<span class="xref">System.Double</span>, <span class="xref">System.String</span>&gt;</td>
+        <td><span class="parametername">formatter</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
@@ -450,13 +491,13 @@
   </table>
   
   
-  <a id="BenchmarkDotNet_Mathematics_PercentileValues_ToTimeStr_" data-uid="BenchmarkDotNet.Mathematics.PercentileValues.ToTimeStr*"></a>
-  <h4 id="BenchmarkDotNet_Mathematics_PercentileValues_ToTimeStr_BenchmarkDotNet_Horology_TimeUnit_System_Text_Encoding_" data-uid="BenchmarkDotNet.Mathematics.PercentileValues.ToTimeStr(BenchmarkDotNet.Horology.TimeUnit,System.Text.Encoding)">ToTimeStr(TimeUnit, Encoding)</h4>
+  <a id="BenchmarkDotNet_Mathematics_PercentileValues_ToString_" data-uid="BenchmarkDotNet.Mathematics.PercentileValues.ToString*"></a>
+  <h4 id="BenchmarkDotNet_Mathematics_PercentileValues_ToString_System_Globalization_CultureInfo_System_String_" data-uid="BenchmarkDotNet.Mathematics.PercentileValues.ToString(System.Globalization.CultureInfo,System.String)">ToString(CultureInfo, String)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string ToTimeStr(TimeUnit unit = null, Encoding encoding = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public string ToString(CultureInfo cultureInfo, string format = &quot;0.##&quot;)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -469,13 +510,13 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Horology.TimeUnit.html">TimeUnit</a></td>
-        <td><span class="parametername">unit</span></td>
+        <td><span class="xref">System.Globalization.CultureInfo</span></td>
+        <td><span class="parametername">cultureInfo</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Text.Encoding</span></td>
-        <td><span class="parametername">encoding</span></td>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">format</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -519,7 +560,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

@@ -8,7 +8,7 @@
     <title>Sample: IntroDisassemblyAllJits | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroDisassemblyAllJits | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -123,7 +123,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.CsProj;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -134,21 +133,21 @@ namespace BenchmarkDotNet.Samples
         {
             public MultipleJits()
             {
-                Add(Job.ShortRun.With(new MonoRuntime(name: &quot;Mono x86&quot;, customPath: @&quot;C:\Program Files (x86)\Mono\bin\mono.exe&quot;)).With(Platform.X86));
-                Add(Job.ShortRun.With(new MonoRuntime(name: &quot;Mono x64&quot;, customPath: @&quot;C:\Program Files\Mono\bin\mono.exe&quot;)).With(Platform.X64));
+                AddJob(Job.ShortRun.WithPlatform(Platform.X86).WithRuntime(new MonoRuntime(name: &quot;Mono x86&quot;, customPath: @&quot;C:\Program Files (x86)\Mono\bin\mono.exe&quot;)));
+                AddJob(Job.ShortRun.WithPlatform(Platform.X64).WithRuntime(new MonoRuntime(name: &quot;Mono x64&quot;, customPath: @&quot;C:\Program Files\Mono\bin\mono.exe&quot;)));
 
-                Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X86).With(ClrRuntime.Net461));
-                Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X64).With(ClrRuntime.Net461));
+                AddJob(Job.ShortRun.WithJit(Jit.LegacyJit).WithPlatform(Platform.X86).WithRuntime(ClrRuntime.Net461));
+                AddJob(Job.ShortRun.WithJit(Jit.LegacyJit).WithPlatform(Platform.X64).WithRuntime(ClrRuntime.Net461));
 
-                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(ClrRuntime.Net461));
+                AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(ClrRuntime.Net461));
 
                 // RyuJit for .NET Core 2.0
-                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core20));
+                AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core20));
 
                 // RyuJit for .NET Core 2.1
-                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core21));
+                AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core21));
 
-                Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3, printDiff: true)));
+                AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(maxDepth: 3, exportDiff: true)));
             }
         }
 
@@ -210,7 +209,7 @@ The file was too big to embed it in this doc page.</p>
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

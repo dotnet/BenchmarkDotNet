@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class DisassemblyDiagnoserAttribute
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -268,12 +268,12 @@ public class DisassemblyDiagnoserAttribute : Attribute, IConfigSource</code></pr
   
   
   <a id="BenchmarkDotNet_Attributes_DisassemblyDiagnoserAttribute__ctor_" data-uid="BenchmarkDotNet.Attributes.DisassemblyDiagnoserAttribute.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Attributes_DisassemblyDiagnoserAttribute__ctor_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Int32_System_Boolean_" data-uid="BenchmarkDotNet.Attributes.DisassemblyDiagnoserAttribute.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Int32,System.Boolean)">DisassemblyDiagnoserAttribute(Boolean, Boolean, Boolean, Boolean, Int32, Boolean)</h4>
+  <h4 id="BenchmarkDotNet_Attributes_DisassemblyDiagnoserAttribute__ctor_System_Int32_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Boolean_" data-uid="BenchmarkDotNet.Attributes.DisassemblyDiagnoserAttribute.#ctor(System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">DisassemblyDiagnoserAttribute(Int32, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DisassemblyDiagnoserAttribute(bool printAsm = true, bool printIL = false, bool printSource = false, bool printPrologAndEpilog = false, int recursiveDepth = 1, bool printDiff = false)</code></pre>
+    <pre><code class="lang-csharp hljs">public DisassemblyDiagnoserAttribute(int maxDepth = 1, bool printSource = false, bool printInstructionAddresses = false, bool exportGithubMarkdown = true, bool exportHtml = false, bool exportCombinedDisassemblyReport = false, bool exportDiff = false)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -286,39 +286,45 @@ public class DisassemblyDiagnoserAttribute : Attribute, IConfigSource</code></pr
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">printAsm</span></td>
-        <td><p>ASM will be printed. True by default.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">printIL</span></td>
-        <td><p>IL will be printed. False by default.</p>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">maxDepth</span></td>
+        <td><p>Includes called methods to given level. 1 by default, indexed from 1. To print just the benchmark set it to 0.</p>
 </td>
       </tr>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
         <td><span class="parametername">printSource</span></td>
-        <td><p>C# source code will be printed. False by default.</p>
+        <td><p>C#|F#|VB source code will be printed. False by default.</p>
 </td>
       </tr>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">printPrologAndEpilog</span></td>
-        <td><p>ASM for prolog and epilog will be printed. False by default.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">recursiveDepth</span></td>
-        <td><p>Includes called methods to given level. 1 by default, indexed from 1. To print just benchmark set to 0</p>
+        <td><span class="parametername">printInstructionAddresses</span></td>
+        <td><p>Print instruction addresses. False by default</p>
 </td>
       </tr>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">printDiff</span></td>
-        <td><p>Diff will be printed. False by default.</p>
+        <td><span class="parametername">exportGithubMarkdown</span></td>
+        <td><p>Exports to GitHub markdown. True by default.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">exportHtml</span></td>
+        <td><p>Exports to HTML with clickable links. False by default.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">exportCombinedDisassemblyReport</span></td>
+        <td><p>Exports all benchmarks to a single HTML report. Makes it easy to compare different runtimes or methods (each becomes a column in HTML table).</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">exportDiff</span></td>
+        <td><p>Exports a diff. False by default.</p>
 </td>
       </tr>
     </tbody>
@@ -378,7 +384,7 @@ public class DisassemblyDiagnoserAttribute : Attribute, IConfigSource</code></pr
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

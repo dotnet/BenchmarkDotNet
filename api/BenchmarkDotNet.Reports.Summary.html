@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Summary
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -157,12 +157,12 @@
   
   
   <a id="BenchmarkDotNet_Reports_Summary__ctor_" data-uid="BenchmarkDotNet.Reports.Summary.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary__ctor_System_String_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Reports_BenchmarkReport__BenchmarkDotNet_Environments_HostEnvironmentInfo_System_String_System_String_System_TimeSpan_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Validators_ValidationError__" data-uid="BenchmarkDotNet.Reports.Summary.#ctor(System.String,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Reports.BenchmarkReport},BenchmarkDotNet.Environments.HostEnvironmentInfo,System.String,System.String,System.TimeSpan,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Validators.ValidationError})">Summary(String, ImmutableArray&lt;BenchmarkReport&gt;, HostEnvironmentInfo, String, String, TimeSpan, ImmutableArray&lt;ValidationError&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Reports_Summary__ctor_System_String_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Reports_BenchmarkReport__BenchmarkDotNet_Environments_HostEnvironmentInfo_System_String_System_String_System_TimeSpan_System_Globalization_CultureInfo_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Validators_ValidationError__" data-uid="BenchmarkDotNet.Reports.Summary.#ctor(System.String,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Reports.BenchmarkReport},BenchmarkDotNet.Environments.HostEnvironmentInfo,System.String,System.String,System.TimeSpan,System.Globalization.CultureInfo,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Validators.ValidationError})">Summary(String, ImmutableArray&lt;BenchmarkReport&gt;, HostEnvironmentInfo, String, String, TimeSpan, CultureInfo, ImmutableArray&lt;ValidationError&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Summary(string title, ImmutableArray&lt;BenchmarkReport&gt; reports, HostEnvironmentInfo hostEnvironmentInfo, string resultsDirectoryPath, string logFilePath, TimeSpan totalTime, ImmutableArray&lt;ValidationError&gt; validationErrors)</code></pre>
+    <pre><code class="lang-csharp hljs">public Summary(string title, ImmutableArray&lt;BenchmarkReport&gt; reports, HostEnvironmentInfo hostEnvironmentInfo, string resultsDirectoryPath, string logFilePath, TimeSpan totalTime, CultureInfo cultureInfo, ImmutableArray&lt;ValidationError&gt; validationErrors)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -202,6 +202,11 @@
       <tr>
         <td><span class="xref">System.TimeSpan</span></td>
         <td><span class="parametername">totalTime</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Globalization.CultureInfo</span></td>
+        <td><span class="parametername">cultureInfo</span></td>
         <td></td>
       </tr>
       <tr>
@@ -856,6 +861,9 @@
   <div>
       <a class="xref" href="BenchmarkDotNet.Reports.SummaryExtensions.html#BenchmarkDotNet_Reports_SummaryExtensions_GetLogicalGroupForBenchmark_BenchmarkDotNet_Reports_Summary_BenchmarkDotNet_Running_BenchmarkCase_">SummaryExtensions.GetLogicalGroupForBenchmark(Summary, BenchmarkCase)</a>
   </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Reports.SummaryExtensions.html#BenchmarkDotNet_Reports_SummaryExtensions_GetCultureInfo_BenchmarkDotNet_Reports_Summary_">SummaryExtensions.GetCultureInfo(Summary)</a>
+  </div>
 </article>
           </div>
           
@@ -880,7 +888,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

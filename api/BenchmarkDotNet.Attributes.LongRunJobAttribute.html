@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class LongRunJobAttribute
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -132,6 +132,9 @@
     <h5>Inherited Members</h5>
     <div>
       <a class="xref" href="BenchmarkDotNet.Attributes.JobConfigBaseAttribute.html#BenchmarkDotNet_Attributes_JobConfigBaseAttribute_Config">JobConfigBaseAttribute.Config</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Attributes.JobConfigBaseAttribute.html#BenchmarkDotNet_Attributes_JobConfigBaseAttribute_GetJob_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Jobs_RuntimeMoniker_System_Nullable_BenchmarkDotNet_Environments_Jit__System_Nullable_BenchmarkDotNet_Environments_Platform__">JobConfigBaseAttribute.GetJob(Job, RuntimeMoniker, Nullable&lt;Jit&gt;, Nullable&lt;Platform&gt;)</a>
     </div>
     <div>
       <span class="xref">System.Attribute.Equals(System.Object)</span>
@@ -264,7 +267,8 @@
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Attributes_LongRunJobAttribute_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class LongRunJobAttribute : JobConfigBaseAttribute, IConfigSource</code></pre>
+    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class, AllowMultiple = true)]
+public class LongRunJobAttribute : JobConfigBaseAttribute, IConfigSource</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -278,6 +282,76 @@
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public LongRunJobAttribute()</code></pre>
   </div>
+  
+  
+  <a id="BenchmarkDotNet_Attributes_LongRunJobAttribute__ctor_" data-uid="BenchmarkDotNet.Attributes.LongRunJobAttribute.#ctor*"></a>
+  <h4 id="BenchmarkDotNet_Attributes_LongRunJobAttribute__ctor_BenchmarkDotNet_Jobs_RuntimeMoniker_" data-uid="BenchmarkDotNet.Attributes.LongRunJobAttribute.#ctor(BenchmarkDotNet.Jobs.RuntimeMoniker)">LongRunJobAttribute(RuntimeMoniker)</h4>
+  <div class="markdown level1 summary"><p>defines a new LongRun Job that targets specified Framework</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public LongRunJobAttribute(RuntimeMoniker runtimeMoniker)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.RuntimeMoniker.html">RuntimeMoniker</a></td>
+        <td><span class="parametername">runtimeMoniker</span></td>
+        <td><p>Target Framework to test.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Attributes_LongRunJobAttribute__ctor_" data-uid="BenchmarkDotNet.Attributes.LongRunJobAttribute.#ctor*"></a>
+  <h4 id="BenchmarkDotNet_Attributes_LongRunJobAttribute__ctor_BenchmarkDotNet_Jobs_RuntimeMoniker_BenchmarkDotNet_Environments_Jit_BenchmarkDotNet_Environments_Platform_" data-uid="BenchmarkDotNet.Attributes.LongRunJobAttribute.#ctor(BenchmarkDotNet.Jobs.RuntimeMoniker,BenchmarkDotNet.Environments.Jit,BenchmarkDotNet.Environments.Platform)">LongRunJobAttribute(RuntimeMoniker, Jit, Platform)</h4>
+  <div class="markdown level1 summary"><p>defines a new LongRun Job that targets specified Framework, JIT and Platform</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public LongRunJobAttribute(RuntimeMoniker runtimeMoniker, Jit jit, Platform platform)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.RuntimeMoniker.html">RuntimeMoniker</a></td>
+        <td><span class="parametername">runtimeMoniker</span></td>
+        <td><p>Target Framework to test.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Environments.Jit.html">Jit</a></td>
+        <td><span class="parametername">jit</span></td>
+        <td><p>Jit to test.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Environments.Platform.html">Platform</a></td>
+        <td><span class="parametername">platform</span></td>
+        <td><p>Platform to test.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="BenchmarkDotNet.Configs.IConfigSource.html">IConfigSource</a>
@@ -306,7 +380,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

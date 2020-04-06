@@ -8,7 +8,7 @@
     <title>Sample: IntroDisassembly | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroDisassembly | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -113,24 +113,35 @@
 
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroDisassembly.cs">using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
+using System.Linq;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DryJob(RuntimeMoniker.NetCoreApp21)]
-    [DryJob(RuntimeMoniker.Mono)]
-    [DryJob(RuntimeMoniker.Net461, Jit.LegacyJit, Platform.X86)]
     [DisassemblyDiagnoser]
     public class IntroDisassembly
     {
+        private int[] field = Enumerable.Range(0, 100).ToArray();
+
         [Benchmark]
-        public double Sum()
+        public int SumLocal()
         {
-            double res = 0;
-            for (int i = 0; i &lt; 64; i++)
-                res += i;
-            return res;
+            var local = field; // we use local variable that points to the field
+
+            int sum = 0;
+            for (int i = 0; i &lt; local.Length; i++)
+                sum += local[i];
+
+            return sum;
+        }
+
+        [Benchmark]
+        public int SumField()
+        {
+            int sum = 0;
+            for (int i = 0; i &lt; field.Length; i++)
+                sum += field[i];
+
+            return sum;
         }
     }
 }
@@ -252,7 +263,7 @@ retq
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

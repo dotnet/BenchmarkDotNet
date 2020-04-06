@@ -8,7 +8,7 @@
     <title>Diagnosers | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Diagnosers | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -138,6 +138,9 @@ Please see Adam Sitnik's <a href="https://adamsitnik.com/ConcurrencyVisualizer-P
 <li>Native Memory Profiler (<code>NativeMemoryProfiler</code>)
 It uses <code>EtwProfiler</code> to profile the code using ETW and adds the extra columns <code>Allocated native memory</code> and <code>Native memory leak</code>.
 Please see Wojciech Nagórski's <a href="https://wojciechnagorski.com/2019/08/analyzing-native-memory-allocation-with-benchmarkdotnet/">blog post</a> for all the details.</li>
+<li>Event Pipe Profiler (<code>EventPipeProfiler</code>).
+It is a cross-platform profiler that allows profile .NET code on every platform - Windows, Linux, macOS.
+Please see Wojciech Nagórski's <a href="https://wojciechnagorski.com/2020/04/cross-platform-profiling-.net-code-with-benchmarkdotnet/">blog post</a> for all the details.</li>
 <li>Threading Diagnoser (<code>ThreadingDiagnoser</code>) - .NET Core 3.0+ diagnoser that reports some Threading statistics.</li>
 </ul>
 <h2 id="usage">Usage</h2>
@@ -328,11 +331,11 @@ using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DisassemblyDiagnoser(printAsm: true, printSource: true)]
+    [DisassemblyDiagnoser(printSource: true)]
     [RyuJitX64Job]
     public class IntroDisassemblyRyuJit
     {
-        int[] field = Enumerable.Range(0, 100).ToArray();
+        private int[] field = Enumerable.Range(0, 100).ToArray();
 
         [Benchmark]
         public int SumLocal()
@@ -369,24 +372,35 @@ namespace BenchmarkDotNet.Samples
 <h2 id="sample-introdisassembly">Sample: IntroDisassembly</h2>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroDisassembly.cs">using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
+using System.Linq;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DryJob(RuntimeMoniker.NetCoreApp21)]
-    [DryJob(RuntimeMoniker.Mono)]
-    [DryJob(RuntimeMoniker.Net461, Jit.LegacyJit, Platform.X86)]
     [DisassemblyDiagnoser]
     public class IntroDisassembly
     {
+        private int[] field = Enumerable.Range(0, 100).ToArray();
+
         [Benchmark]
-        public double Sum()
+        public int SumLocal()
         {
-            double res = 0;
-            for (int i = 0; i &lt; 64; i++)
-                res += i;
-            return res;
+            var local = field; // we use local variable that points to the field
+
+            int sum = 0;
+            for (int i = 0; i &lt; local.Length; i++)
+                sum += local[i];
+
+            return sum;
+        }
+
+        [Benchmark]
+        public int SumField()
+        {
+            int sum = 0;
+            for (int i = 0; i &lt; field.Length; i++)
+                sum += field[i];
+
+            return sum;
         }
     }
 }
@@ -494,7 +508,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.CsProj;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -505,21 +518,21 @@ namespace BenchmarkDotNet.Samples
         {
             public MultipleJits()
             {
-                Add(Job.ShortRun.With(new MonoRuntime(name: &quot;Mono x86&quot;, customPath: @&quot;C:\Program Files (x86)\Mono\bin\mono.exe&quot;)).With(Platform.X86));
-                Add(Job.ShortRun.With(new MonoRuntime(name: &quot;Mono x64&quot;, customPath: @&quot;C:\Program Files\Mono\bin\mono.exe&quot;)).With(Platform.X64));
+                AddJob(Job.ShortRun.WithPlatform(Platform.X86).WithRuntime(new MonoRuntime(name: &quot;Mono x86&quot;, customPath: @&quot;C:\Program Files (x86)\Mono\bin\mono.exe&quot;)));
+                AddJob(Job.ShortRun.WithPlatform(Platform.X64).WithRuntime(new MonoRuntime(name: &quot;Mono x64&quot;, customPath: @&quot;C:\Program Files\Mono\bin\mono.exe&quot;)));
 
-                Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X86).With(ClrRuntime.Net461));
-                Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X64).With(ClrRuntime.Net461));
+                AddJob(Job.ShortRun.WithJit(Jit.LegacyJit).WithPlatform(Platform.X86).WithRuntime(ClrRuntime.Net461));
+                AddJob(Job.ShortRun.WithJit(Jit.LegacyJit).WithPlatform(Platform.X64).WithRuntime(ClrRuntime.Net461));
 
-                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(ClrRuntime.Net461));
+                AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(ClrRuntime.Net461));
 
                 // RyuJit for .NET Core 2.0
-                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core20));
+                AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core20));
 
                 // RyuJit for .NET Core 2.1
-                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core21));
+                AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core21));
 
-                Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3, printDiff: true)));
+                AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(maxDepth: 3, exportDiff: true)));
             }
         }
 
@@ -574,10 +587,10 @@ namespace BenchmarkDotNet.Samples
         {
             public JustDisassembly()
             {
-                Add(Job.Dry.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core20));
-                Add(Job.Dry.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core21));
+                AddJob(Job.Dry.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core20));
+                AddJob(Job.Dry.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core21));
 
-                Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3)));
+                AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(maxDepth: 3)));
             }
         }
 
@@ -660,7 +673,6 @@ Tail call type: RecursiveLoop
 <p>The <code>NativeMemoryProfiler</code> uses <code>EtwProfiler</code> to profile the code using ETW and adds the extra columns <code>Allocated native memory</code> and <code>Native memory leak</code> to the benchmark results table.</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroNativeMemory.cs">using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
@@ -797,7 +809,62 @@ You should redesign your benchmark and remove the side-effects. You can use `Ope
 <li>The permanent link to this sample: <a class="xref" href="../samples/IntroNativeMemory.html">Sample: IntroNativeMemory</a></li>
 </ul>
 <hr>
-[!include[IntroThreadingDiagnoser](../samples/ThreadingDiagnoser.md)]</article>
+<h2 id="sample-introthreadingdiagnoser">Sample: IntroThreadingDiagnoser</h2>
+<p>The <code>ThreadingDiagnoser</code> uses new APIs <a href="https://github.com/dotnet/corefx/issues/35500">exposed</a> in .NET Core 3.0 to report:</p>
+<ul>
+<li>Completed Work Items: The number of work items that have been processed in ThreadPool (per single operation)</li>
+<li>Lock Contentions: The number of times there <strong>was contention</strong> upon trying to take a Monitor's lock (per single operation)</li>
+</ul>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroThreadingDiagnoser.cs">using BenchmarkDotNet.Attributes;
+using System.Threading;
+
+namespace BenchmarkDotNet.Samples
+{
+    [ThreadingDiagnoser] // ENABLE the diagnoser
+    public class IntroThreadingDiagnoser
+    {
+        [Benchmark]
+        public void CompleteOneWorkItem()
+        {
+            ManualResetEvent done = new ManualResetEvent(initialState: false);
+
+            ThreadPool.QueueUserWorkItem(m =&gt; (m as ManualResetEvent).Set(), done);
+
+            done.WaitOne();
+        }
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">StdDev</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">Completed Work Items</th>
+<th style="text-align: right;">Lock Contentions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CompleteOneWorkItem</td>
+<td style="text-align: right;">8,073.5519 ns</td>
+<td style="text-align: right;">69.7261 ns</td>
+<td style="text-align: right;">8,111.6074 ns</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroThreadingDiagnoser.html">Sample: IntroThreadingDiagnoser</a></li>
+</ul>
+<hr>
+</article>
           </div>
           
           <div class="hidden-sm col-md-2" role="complementary">
@@ -824,7 +891,7 @@ You should redesign your benchmark and remove the side-effects. You can use `Ope
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

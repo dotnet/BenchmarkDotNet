@@ -8,7 +8,7 @@
     <title>Sample: IntroNuGet | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroNuGet | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -141,12 +141,12 @@ namespace BenchmarkDotNet.Samples
             {
                 var baseJob = Job.MediumRun;
 
-                Add(baseJob.WithNuGet(&quot;Newtonsoft.Json&quot;, &quot;11.0.2&quot;).WithId(&quot;11.0.2&quot;));
-                Add(baseJob.WithNuGet(&quot;Newtonsoft.Json&quot;, &quot;11.0.1&quot;).WithId(&quot;11.0.1&quot;));
-                Add(baseJob.WithNuGet(&quot;Newtonsoft.Json&quot;, &quot;10.0.3&quot;).WithId(&quot;10.0.3&quot;));
-                Add(baseJob.WithNuGet(&quot;Newtonsoft.Json&quot;, &quot;10.0.2&quot;).WithId(&quot;10.0.2&quot;));
-                Add(baseJob.WithNuGet(&quot;Newtonsoft.Json&quot;, &quot;10.0.1&quot;).WithId(&quot;10.0.1&quot;));
-                Add(baseJob.WithNuGet(&quot;Newtonsoft.Json&quot;, &quot;9.0.1&quot;).WithId(&quot;9.0.1&quot;));
+                AddJob(baseJob.WithNuGet(&quot;Newtonsoft.Json&quot;, &quot;11.0.2&quot;).WithId(&quot;11.0.2&quot;));
+                AddJob(baseJob.WithNuGet(&quot;Newtonsoft.Json&quot;, &quot;11.0.1&quot;).WithId(&quot;11.0.1&quot;));
+                AddJob(baseJob.WithNuGet(&quot;Newtonsoft.Json&quot;, &quot;10.0.3&quot;).WithId(&quot;10.0.3&quot;));
+                AddJob(baseJob.WithNuGet(&quot;Newtonsoft.Json&quot;, &quot;10.0.2&quot;).WithId(&quot;10.0.2&quot;));
+                AddJob(baseJob.WithNuGet(&quot;Newtonsoft.Json&quot;, &quot;10.0.1&quot;).WithId(&quot;10.0.1&quot;));
+                AddJob(baseJob.WithNuGet(&quot;Newtonsoft.Json&quot;, &quot;9.0.1&quot;).WithId(&quot;9.0.1&quot;));
             }
         }
 
@@ -251,7 +251,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

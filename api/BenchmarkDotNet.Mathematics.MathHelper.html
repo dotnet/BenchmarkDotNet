@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class MathHelper
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -156,48 +156,6 @@
   </h3>
   
   
-  <a id="BenchmarkDotNet_Mathematics_MathHelper_CalculateMValue_" data-uid="BenchmarkDotNet.Mathematics.MathHelper.CalculateMValue*"></a>
-  <h4 id="BenchmarkDotNet_Mathematics_MathHelper_CalculateMValue_BenchmarkDotNet_Mathematics_Statistics_" data-uid="BenchmarkDotNet.Mathematics.MathHelper.CalculateMValue(BenchmarkDotNet.Mathematics.Statistics)">CalculateMValue(Statistics)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static double CalculateMValue(Statistics originalStatistics)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Mathematics.Statistics.html">Statistics</a></td>
-        <td><span class="parametername">originalStatistics</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Double</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
   <a id="BenchmarkDotNet_Mathematics_MathHelper_Clamp_" data-uid="BenchmarkDotNet.Mathematics.MathHelper.Clamp*"></a>
   <h4 id="BenchmarkDotNet_Mathematics_MathHelper_Clamp_System_Int32_System_Int32_System_Int32_" data-uid="BenchmarkDotNet.Mathematics.MathHelper.Clamp(System.Int32,System.Int32,System.Int32)">Clamp(Int32, Int32, Int32)</h4>
   <div class="markdown level1 summary"></div>
@@ -248,202 +206,6 @@
       </tr>
     </tbody>
   </table>
-  
-  
-  <a id="BenchmarkDotNet_Mathematics_MathHelper_Gauss_" data-uid="BenchmarkDotNet.Mathematics.MathHelper.Gauss*"></a>
-  <h4 id="BenchmarkDotNet_Mathematics_MathHelper_Gauss_System_Double_" data-uid="BenchmarkDotNet.Mathematics.MathHelper.Gauss(System.Double)">Gauss(Double)</h4>
-  <div class="markdown level1 summary"><p>ACM Algorithm 209: Gauss</p>
-<p>Calculates $(1/\sqrt{2\pi}) \int_{-\infty}^x e^{-u^2 / 2} du$
-by means of polynomial approximations due to A. M. Murray of Aberdeen University;</p>
-<p>See: <a href="http://dl.acm.org/citation.cfm?id=367664">http://dl.acm.org/citation.cfm?id=367664</a></p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static double Gauss(double x)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Double</span></td>
-        <td><span class="parametername">x</span></td>
-        <td><p>-infinity..+infinity</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Double</span></td>
-        <td><p>Area under the Standard Normal Curve from -infinity to x</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Mathematics_MathHelper_InverseStudent_" data-uid="BenchmarkDotNet.Mathematics.MathHelper.InverseStudent*"></a>
-  <h4 id="BenchmarkDotNet_Mathematics_MathHelper_InverseStudent_System_Double_System_Double_" data-uid="BenchmarkDotNet.Mathematics.MathHelper.InverseStudent(System.Double,System.Double)">InverseStudent(Double, Double)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static double InverseStudent(double p, double n)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Double</span></td>
-        <td><span class="parametername">p</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Double</span></td>
-        <td><span class="parametername">n</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Double</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Mathematics_MathHelper_StudentOneTail_" data-uid="BenchmarkDotNet.Mathematics.MathHelper.StudentOneTail*"></a>
-  <h4 id="BenchmarkDotNet_Mathematics_MathHelper_StudentOneTail_System_Double_System_Double_" data-uid="BenchmarkDotNet.Mathematics.MathHelper.StudentOneTail(System.Double,System.Double)">StudentOneTail(Double, Double)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static double StudentOneTail(double t, double n)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Double</span></td>
-        <td><span class="parametername">t</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Double</span></td>
-        <td><span class="parametername">n</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Double</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Mathematics_MathHelper_StudentTwoTail_" data-uid="BenchmarkDotNet.Mathematics.MathHelper.StudentTwoTail*"></a>
-  <h4 id="BenchmarkDotNet_Mathematics_MathHelper_StudentTwoTail_System_Double_System_Double_" data-uid="BenchmarkDotNet.Mathematics.MathHelper.StudentTwoTail(System.Double,System.Double)">StudentTwoTail(Double, Double)</h4>
-  <div class="markdown level1 summary"><p>ACM Algorithm 395: Student's t-distribution</p>
-<p>Evaluates the two-tail probability P(t|n) that t is exceeded
-in magnitude for Student's t-distribution with n degrees of freedom.</p>
-<p><a href="http://dl.acm.org/citation.cfm?id=355599">http://dl.acm.org/citation.cfm?id=355599</a></p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static double StudentTwoTail(double t, double n)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Double</span></td>
-        <td><span class="parametername">t</span></td>
-        <td><p>t-value, t &gt; 0</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Double</span></td>
-        <td><span class="parametername">n</span></td>
-        <td><p>Degree of freedom, n &gt;= 1</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Double</span></td>
-        <td><p>2-tail p-value</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
 </article>
           </div>
           
@@ -468,7 +230,7 @@ in magnitude for Student's t-distribution with n degrees of freedom.</p>
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

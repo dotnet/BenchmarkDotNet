@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Struct RunResults
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -149,12 +149,12 @@
   
   
   <a id="BenchmarkDotNet_Engines_RunResults__ctor_" data-uid="BenchmarkDotNet.Engines.RunResults.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Engines_RunResults__ctor_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Reports_Measurement__System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Reports_Measurement__BenchmarkDotNet_Mathematics_OutlierMode_BenchmarkDotNet_Engines_GcStats_BenchmarkDotNet_Engines_ThreadingStats_System_Text_Encoding_" data-uid="BenchmarkDotNet.Engines.RunResults.#ctor(System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Reports.Measurement},System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Reports.Measurement},BenchmarkDotNet.Mathematics.OutlierMode,BenchmarkDotNet.Engines.GcStats,BenchmarkDotNet.Engines.ThreadingStats,System.Text.Encoding)">RunResults(IReadOnlyList&lt;Measurement&gt;, IReadOnlyList&lt;Measurement&gt;, OutlierMode, GcStats, ThreadingStats, Encoding)</h4>
+  <h4 id="BenchmarkDotNet_Engines_RunResults__ctor_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Reports_Measurement__System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Reports_Measurement__Perfolizer_Mathematics_OutlierDetection_OutlierMode_BenchmarkDotNet_Engines_GcStats_BenchmarkDotNet_Engines_ThreadingStats_" data-uid="BenchmarkDotNet.Engines.RunResults.#ctor(System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Reports.Measurement},System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Reports.Measurement},Perfolizer.Mathematics.OutlierDetection.OutlierMode,BenchmarkDotNet.Engines.GcStats,BenchmarkDotNet.Engines.ThreadingStats)">RunResults(IReadOnlyList&lt;Measurement&gt;, IReadOnlyList&lt;Measurement&gt;, OutlierMode, GcStats, ThreadingStats)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public RunResults(IReadOnlyList&lt;Measurement&gt; overhead, IReadOnlyList&lt;Measurement&gt; workload, OutlierMode outlierMode, GcStats gcStats, ThreadingStats threadingStats, Encoding encoding)</code></pre>
+    <pre><code class="lang-csharp hljs">public RunResults(IReadOnlyList&lt;Measurement&gt; overhead, IReadOnlyList&lt;Measurement&gt; workload, OutlierMode outlierMode, GcStats gcStats, ThreadingStats threadingStats)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -177,7 +177,7 @@
         <td></td>
       </tr>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Mathematics.OutlierMode.html">OutlierMode</a></td>
+        <td><span class="xref">Perfolizer.Mathematics.OutlierDetection.OutlierMode</span></td>
         <td><span class="parametername">outlierMode</span></td>
         <td></td>
       </tr>
@@ -189,11 +189,6 @@
       <tr>
         <td><a class="xref" href="BenchmarkDotNet.Engines.ThreadingStats.html">ThreadingStats</a></td>
         <td><span class="parametername">threadingStats</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Text.Encoding</span></td>
-        <td><span class="parametername">encoding</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -378,7 +373,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

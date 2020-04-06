@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class DeadCodeEliminationHelper
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -242,6 +242,51 @@ will not get eliminated by the dead code elimination</p>
       </tr>
     </tbody>
   </table>
+  
+  
+  <a id="BenchmarkDotNet_Engines_DeadCodeEliminationHelper_KeepAliveWithoutBoxingReadonly_" data-uid="BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly*"></a>
+  <h4 id="BenchmarkDotNet_Engines_DeadCodeEliminationHelper_KeepAliveWithoutBoxingReadonly__1___0__" data-uid="BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly``1(``0@)">KeepAliveWithoutBoxingReadonly&lt;T&gt;(T)</h4>
+  <div class="markdown level1 summary"><p>This method can't get inlined, so any value send to it
+will not get eliminated by the dead code elimination
+it's not called KeepAliveWithoutBoxing because compiler would not be able to diff <code>ref</code> and <code>in</code></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void KeepAliveWithoutBoxingReadonly&lt;T&gt;(in T value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">T</span></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
 </article>
           </div>
           
@@ -266,7 +311,7 @@ will not get eliminated by the dead code elimination</p>
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

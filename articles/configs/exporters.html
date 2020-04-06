@@ -8,7 +8,7 @@
     <title>Exporters | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Exporters | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -202,11 +202,12 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                Add(JsonExporter.Brief);
-                Add(JsonExporter.Full);
-                Add(JsonExporter.BriefCompressed);
-                Add(JsonExporter.FullCompressed);
-                Add(JsonExporter.Custom(&quot;-custom&quot;, indentJson: true, excludeMeasurements: true));
+                AddExporter(JsonExporter.Brief);
+                AddExporter(JsonExporter.Brief);
+                AddExporter(JsonExporter.Full);
+                AddExporter(JsonExporter.BriefCompressed);
+                AddExporter(JsonExporter.FullCompressed);
+                AddExporter(JsonExporter.Custom(&quot;-custom&quot;, indentJson: true, excludeMeasurements: true));
             }
         }
 
@@ -598,7 +599,7 @@ Benchmark,...,&quot;37,647.6&quot;,&quot;32,717.9&quot;,&quot;21,640.9&quot;,&qu
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

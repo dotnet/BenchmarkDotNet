@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ConsoleLogger
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -161,12 +161,12 @@
   
   
   <a id="BenchmarkDotNet_Loggers_ConsoleLogger__ctor_" data-uid="BenchmarkDotNet.Loggers.ConsoleLogger.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Loggers_ConsoleLogger__ctor_System_Collections_Generic_Dictionary_BenchmarkDotNet_Loggers_LogKind_System_ConsoleColor__" data-uid="BenchmarkDotNet.Loggers.ConsoleLogger.#ctor(System.Collections.Generic.Dictionary{BenchmarkDotNet.Loggers.LogKind,System.ConsoleColor})">ConsoleLogger(Dictionary&lt;LogKind, ConsoleColor&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Loggers_ConsoleLogger__ctor_System_Boolean_System_Collections_Generic_Dictionary_BenchmarkDotNet_Loggers_LogKind_System_ConsoleColor__" data-uid="BenchmarkDotNet.Loggers.ConsoleLogger.#ctor(System.Boolean,System.Collections.Generic.Dictionary{BenchmarkDotNet.Loggers.LogKind,System.ConsoleColor})">ConsoleLogger(Boolean, Dictionary&lt;LogKind, ConsoleColor&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ConsoleLogger(Dictionary&lt;LogKind, ConsoleColor&gt; colorScheme = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public ConsoleLogger(bool unicodeSupport = false, Dictionary&lt;LogKind, ConsoleColor&gt; colorScheme = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -179,6 +179,11 @@
     </thead>
     <tbody>
       <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">unicodeSupport</span></td>
+        <td></td>
+      </tr>
+      <tr>
         <td><span class="xref">System.Collections.Generic.Dictionary</span>&lt;<a class="xref" href="BenchmarkDotNet.Loggers.LogKind.html">LogKind</a>, <span class="xref">System.ConsoleColor</span>&gt;</td>
         <td><span class="parametername">colorScheme</span></td>
         <td></td>
@@ -187,6 +192,30 @@
   </table>
   <h3 id="fields">Fields
   </h3>
+  
+  
+  <h4 id="BenchmarkDotNet_Loggers_ConsoleLogger_Ascii" data-uid="BenchmarkDotNet.Loggers.ConsoleLogger.Ascii">Ascii</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly ILogger Ascii</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <h4 id="BenchmarkDotNet_Loggers_ConsoleLogger_Default" data-uid="BenchmarkDotNet.Loggers.ConsoleLogger.Default">Default</h4>
@@ -207,6 +236,82 @@
     <tbody>
       <tr>
         <td><a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="BenchmarkDotNet_Loggers_ConsoleLogger_Unicode" data-uid="BenchmarkDotNet.Loggers.ConsoleLogger.Unicode">Unicode</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly ILogger Unicode</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="BenchmarkDotNet_Loggers_ConsoleLogger_Id_" data-uid="BenchmarkDotNet.Loggers.ConsoleLogger.Id*"></a>
+  <h4 id="BenchmarkDotNet_Loggers_ConsoleLogger_Id" data-uid="BenchmarkDotNet.Loggers.ConsoleLogger.Id">Id</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Id { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Loggers_ConsoleLogger_Priority_" data-uid="BenchmarkDotNet.Loggers.ConsoleLogger.Priority*"></a>
+  <h4 id="BenchmarkDotNet_Loggers_ConsoleLogger_Priority" data-uid="BenchmarkDotNet.Loggers.ConsoleLogger.Priority">Priority</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Priority { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -399,7 +504,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

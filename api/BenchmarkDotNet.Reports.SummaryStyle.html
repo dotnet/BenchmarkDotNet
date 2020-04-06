@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class SummaryStyle
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -155,12 +155,12 @@
   
   
   <a id="BenchmarkDotNet_Reports_SummaryStyle__ctor_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Reports_SummaryStyle__ctor_System_Boolean_BenchmarkDotNet_Columns_SizeUnit_BenchmarkDotNet_Horology_TimeUnit_System_Boolean_System_Boolean_System_Int32_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Boolean,BenchmarkDotNet.Columns.SizeUnit,BenchmarkDotNet.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32)">SummaryStyle(Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Int32)</h4>
+  <h4 id="BenchmarkDotNet_Reports_SummaryStyle__ctor_System_Globalization_CultureInfo_System_Boolean_BenchmarkDotNet_Columns_SizeUnit_Perfolizer_Horology_TimeUnit_System_Boolean_System_Boolean_System_Int32_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32)">SummaryStyle(CultureInfo, Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Int32)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public SummaryStyle(bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true, bool printZeroValuesInContent = false, int maxParameterColumnWidth = 20)</code></pre>
+    <pre><code class="lang-csharp hljs">public SummaryStyle(CultureInfo cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true, bool printZeroValuesInContent = false, int maxParameterColumnWidth = 20)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -173,6 +173,11 @@
     </thead>
     <tbody>
       <tr>
+        <td><span class="xref">System.Globalization.CultureInfo</span></td>
+        <td><span class="parametername">cultureInfo</span></td>
+        <td></td>
+      </tr>
+      <tr>
         <td><span class="xref">System.Boolean</span></td>
         <td><span class="parametername">printUnitsInHeader</span></td>
         <td></td>
@@ -183,7 +188,7 @@
         <td></td>
       </tr>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Horology.TimeUnit.html">TimeUnit</a></td>
+        <td><span class="xref">Perfolizer.Horology.TimeUnit</span></td>
         <td><span class="parametername">timeUnit</span></td>
         <td></td>
       </tr>
@@ -232,6 +237,31 @@
   </table>
   <h3 id="properties">Properties
   </h3>
+  
+  
+  <a id="BenchmarkDotNet_Reports_SummaryStyle_CultureInfo_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.CultureInfo*"></a>
+  <h4 id="BenchmarkDotNet_Reports_SummaryStyle_CultureInfo" data-uid="BenchmarkDotNet.Reports.SummaryStyle.CultureInfo">CultureInfo</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CultureInfo CultureInfo { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Globalization.CultureInfo</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="BenchmarkDotNet_Reports_SummaryStyle_MaxParameterColumnWidth_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.MaxParameterColumnWidth*"></a>
@@ -377,7 +407,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Horology.TimeUnit.html">TimeUnit</a></td>
+        <td><span class="xref">Perfolizer.Horology.TimeUnit</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -499,6 +529,48 @@
   <div><span class="xref">System.Object.GetHashCode()</span></div>
   
   
+  <a id="BenchmarkDotNet_Reports_SummaryStyle_WithCultureInfo_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.WithCultureInfo*"></a>
+  <h4 id="BenchmarkDotNet_Reports_SummaryStyle_WithCultureInfo_System_Globalization_CultureInfo_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.WithCultureInfo(System.Globalization.CultureInfo)">WithCultureInfo(CultureInfo)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SummaryStyle WithCultureInfo(CultureInfo cultureInfo)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Globalization.CultureInfo</span></td>
+        <td><span class="parametername">cultureInfo</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Reports_SummaryStyle_WithMaxParameterColumnWidth_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.WithMaxParameterColumnWidth*"></a>
   <h4 id="BenchmarkDotNet_Reports_SummaryStyle_WithMaxParameterColumnWidth_System_Int32_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.WithMaxParameterColumnWidth(System.Int32)">WithMaxParameterColumnWidth(Int32)</h4>
   <div class="markdown level1 summary"></div>
@@ -584,7 +656,7 @@
   
   
   <a id="BenchmarkDotNet_Reports_SummaryStyle_WithTimeUnit_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.WithTimeUnit*"></a>
-  <h4 id="BenchmarkDotNet_Reports_SummaryStyle_WithTimeUnit_BenchmarkDotNet_Horology_TimeUnit_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.WithTimeUnit(BenchmarkDotNet.Horology.TimeUnit)">WithTimeUnit(TimeUnit)</h4>
+  <h4 id="BenchmarkDotNet_Reports_SummaryStyle_WithTimeUnit_Perfolizer_Horology_TimeUnit_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.WithTimeUnit(Perfolizer.Horology.TimeUnit)">WithTimeUnit(TimeUnit)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -602,7 +674,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Horology.TimeUnit.html">TimeUnit</a></td>
+        <td><span class="xref">Perfolizer.Horology.TimeUnit</span></td>
         <td><span class="parametername">timeUnit</span></td>
         <td></td>
       </tr>
@@ -772,7 +844,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

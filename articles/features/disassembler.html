@@ -8,7 +8,7 @@
     <title>Disassembler | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Disassembler | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -150,24 +150,35 @@ If you don't have it, you will get a warning like follows:</p>
 <h2 id="sample-introdisassembly">Sample: IntroDisassembly</h2>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroDisassembly.cs">using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
+using System.Linq;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DryJob(RuntimeMoniker.NetCoreApp21)]
-    [DryJob(RuntimeMoniker.Mono)]
-    [DryJob(RuntimeMoniker.Net461, Jit.LegacyJit, Platform.X86)]
     [DisassemblyDiagnoser]
     public class IntroDisassembly
     {
+        private int[] field = Enumerable.Range(0, 100).ToArray();
+
         [Benchmark]
-        public double Sum()
+        public int SumLocal()
         {
-            double res = 0;
-            for (int i = 0; i &lt; 64; i++)
-                res += i;
-            return res;
+            var local = field; // we use local variable that points to the field
+
+            int sum = 0;
+            for (int i = 0; i &lt; local.Length; i++)
+                sum += local[i];
+
+            return sum;
+        }
+
+        [Benchmark]
+        public int SumField()
+        {
+            int sum = 0;
+            for (int i = 0; i &lt; field.Length; i++)
+                sum += field[i];
+
+            return sum;
         }
     }
 }
@@ -269,11 +280,11 @@ using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DisassemblyDiagnoser(printAsm: true, printSource: true)]
+    [DisassemblyDiagnoser(printSource: true)]
     [RyuJitX64Job]
     public class IntroDisassemblyRyuJit
     {
-        int[] field = Enumerable.Range(0, 100).ToArray();
+        private int[] field = Enumerable.Range(0, 100).ToArray();
 
         [Benchmark]
         public int SumLocal()
@@ -320,7 +331,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.CsProj;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -331,21 +341,21 @@ namespace BenchmarkDotNet.Samples
         {
             public MultipleJits()
             {
-                Add(Job.ShortRun.With(new MonoRuntime(name: &quot;Mono x86&quot;, customPath: @&quot;C:\Program Files (x86)\Mono\bin\mono.exe&quot;)).With(Platform.X86));
-                Add(Job.ShortRun.With(new MonoRuntime(name: &quot;Mono x64&quot;, customPath: @&quot;C:\Program Files\Mono\bin\mono.exe&quot;)).With(Platform.X64));
+                AddJob(Job.ShortRun.WithPlatform(Platform.X86).WithRuntime(new MonoRuntime(name: &quot;Mono x86&quot;, customPath: @&quot;C:\Program Files (x86)\Mono\bin\mono.exe&quot;)));
+                AddJob(Job.ShortRun.WithPlatform(Platform.X64).WithRuntime(new MonoRuntime(name: &quot;Mono x64&quot;, customPath: @&quot;C:\Program Files\Mono\bin\mono.exe&quot;)));
 
-                Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X86).With(ClrRuntime.Net461));
-                Add(Job.ShortRun.With(Jit.LegacyJit).With(Platform.X64).With(ClrRuntime.Net461));
+                AddJob(Job.ShortRun.WithJit(Jit.LegacyJit).WithPlatform(Platform.X86).WithRuntime(ClrRuntime.Net461));
+                AddJob(Job.ShortRun.WithJit(Jit.LegacyJit).WithPlatform(Platform.X64).WithRuntime(ClrRuntime.Net461));
 
-                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(ClrRuntime.Net461));
+                AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(ClrRuntime.Net461));
 
                 // RyuJit for .NET Core 2.0
-                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core20));
+                AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core20));
 
                 // RyuJit for .NET Core 2.1
-                Add(Job.ShortRun.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core21));
+                AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core21));
 
-                Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3, printDiff: true)));
+                AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(maxDepth: 3, exportDiff: true)));
             }
         }
 
@@ -400,10 +410,10 @@ namespace BenchmarkDotNet.Samples
         {
             public JustDisassembly()
             {
-                Add(Job.Dry.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core20));
-                Add(Job.Dry.With(Jit.RyuJit).With(Platform.X64).With(CoreRuntime.Core21));
+                AddJob(Job.Dry.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core20));
+                AddJob(Job.Dry.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core21));
 
-                Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(printAsm: true, printPrologAndEpilog: true, recursiveDepth: 3)));
+                AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(maxDepth: 3)));
             }
         }
 
@@ -448,7 +458,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

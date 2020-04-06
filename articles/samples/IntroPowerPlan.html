@@ -8,7 +8,7 @@
     <title>Sample: IntroPowerPlan | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroPowerPlan | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -139,12 +139,12 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                Add(Job.MediumRun.WithPowerPlan(new Guid(&quot;e9a42b02-d5df-448d-aa00-03f14749eb61&quot;)));
-                Add(Job.MediumRun.WithPowerPlan(PowerPlan.UltimatePerformance));
-                Add(Job.MediumRun.WithPowerPlan(PowerPlan.UserPowerPlan));
-                Add(Job.MediumRun.WithPowerPlan(PowerPlan.HighPerformance));
-                Add(Job.MediumRun.WithPowerPlan(PowerPlan.Balanced));
-                Add(Job.MediumRun.WithPowerPlan(PowerPlan.PowerSaver));
+                AddJob(Job.MediumRun.WithPowerPlan(new Guid(&quot;e9a42b02-d5df-448d-aa00-03f14749eb61&quot;)));
+                AddJob(Job.MediumRun.WithPowerPlan(PowerPlan.UltimatePerformance));
+                AddJob(Job.MediumRun.WithPowerPlan(PowerPlan.UserPowerPlan));
+                AddJob(Job.MediumRun.WithPowerPlan(PowerPlan.HighPerformance));
+                AddJob(Job.MediumRun.WithPowerPlan(PowerPlan.Balanced));
+                AddJob(Job.MediumRun.WithPowerPlan(PowerPlan.PowerSaver));
             }
         }
 
@@ -198,7 +198,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

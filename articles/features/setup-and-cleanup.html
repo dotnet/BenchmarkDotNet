@@ -8,7 +8,7 @@
     <title>Setup And Cleanup | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Setup And Cleanup | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -113,16 +113,16 @@
 
 <p>Sometimes we want to write some logic which should be executed <em>before</em> or <em>after</em> a benchmark, but we don't want to measure it.
 For this purpose, BenchmarkDotNet provides a set of attributes:
-<a href="xref:BenchmarkDotNet.Attributes.GlobalSetupAttribute"><code>[GlobalSetup]</code></a>,
-<a href="xref:BenchmarkDotNet.Attributes.GlobalCleanupAttribute"><code>[GlobalCleanup]</code></a>,
-<a href="xref:BenchmarkDotNet.Attributes.IterationSetupAttribute"><code>[IterationSetup]</code></a>,
-<a href="xref:BenchmarkDotNet.Attributes.IterationCleanupAttribute"><code>[IterationCleanup]</code></a>.</p>
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.GlobalSetupAttribute.html"><code>[GlobalSetup]</code></a>,
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.GlobalCleanupAttribute.html"><code>[GlobalCleanup]</code></a>,
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.IterationSetupAttribute.html"><code>[IterationSetup]</code></a>,
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.IterationCleanupAttribute.html"><code>[IterationCleanup]</code></a>.</p>
 <hr>
 <h2 id="sample-introsetupcleanupglobal">Sample: IntroSetupCleanupGlobal</h2>
-<p>A method which is marked by the <a href="xref:BenchmarkDotNet.Attributes.GlobalSetupAttribute"><code>[GlobalSetup]</code></a>
+<p>A method which is marked by the <a class="xref" href="../../api/BenchmarkDotNet.Attributes.GlobalSetupAttribute.html"><code>[GlobalSetup]</code></a>
 attribute will be executed only once per a benchmarked method
 after initialization of benchmark parameters and before all the benchmark method invocations.
-A method which is marked by the <a href="xref:BenchmarkDotNet.Attributes.GlobalCleanupAttribute"><code>[GlobalCleanup]</code></a>
+A method which is marked by the <a class="xref" href="../../api/BenchmarkDotNet.Attributes.GlobalCleanupAttribute.html"><code>[GlobalCleanup]</code></a>
 attribute will be executed only once per a benchmarked method
 after all the benchmark method invocations.
 If you are using some unmanaged resources (e.g., which were created in the <code>GlobalSetup</code> method),
@@ -168,16 +168,16 @@ namespace BenchmarkDotNet.Samples
 </ul>
 <hr>
 <h2 id="sample-introsetupcleanupiteration">Sample: IntroSetupCleanupIteration</h2>
-<p>A method which is marked by the <a href="xref:BenchmarkDotNet.Attributes.IterationSetupAttribute"><code>[IterationSetup]</code></a>
+<p>A method which is marked by the <a class="xref" href="../../api/BenchmarkDotNet.Attributes.IterationSetupAttribute.html"><code>[IterationSetup]</code></a>
 attribute will be executed exactly once <em>before each benchmark invocation</em> (we have changed that in 0.11.0).
 It's not recommended to use this attribute in microbenchmarks because it can spoil the results.
 However, if you are writing a macrobenchmark (e.g. a benchmark which takes at least 100ms) and
 you want to prepare some data before each invocation,
-<a href="xref:BenchmarkDotNet.Attributes.IterationSetupAttribute"><code>[IterationSetup]</code></a> can be useful.</p>
-<p>A method which is marked by the <a href="xref:BenchmarkDotNet.Attributes.IterationCleanupAttribute"><code>[IterationCleanup]</code></a>
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.IterationSetupAttribute.html"><code>[IterationSetup]</code></a> can be useful.</p>
+<p>A method which is marked by the <a class="xref" href="../../api/BenchmarkDotNet.Attributes.IterationCleanupAttribute.html"><code>[IterationCleanup]</code></a>
 attribute will be executed exactly once <em>after each invocation</em>.
 This attribute has the same set of constraint with <code>[IterationSetup]</code>: it's not recommended to use
-<a href="xref:BenchmarkDotNet.Attributes.IterationCleanupAttribute"><code>[IterationCleanup]</code></a> in microbenchmarks.</p>
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.IterationCleanupAttribute.html"><code>[IterationCleanup]</code></a> in microbenchmarks.</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroSetupCleanupIteration.cs">using System;
 using BenchmarkDotNet.Attributes;
@@ -335,7 +335,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

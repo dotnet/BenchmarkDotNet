@@ -8,7 +8,7 @@
     <title>Parameterization | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Parameterization | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -114,7 +114,7 @@
 <hr>
 <h2 id="sample-introparams">Sample: IntroParams</h2>
 <p>You can mark one or several fields or properties in your class by
-the <a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a> attribute.
+the <a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAttribute.html"><code>[Params]</code></a> attribute.
 In this attribute, you can specify set of values.
 Every value must be a compile-time constant.
 As a result, you will get results for each combination of params values.</p>
@@ -152,9 +152,9 @@ namespace BenchmarkDotNet.Samples
 <hr>
 <h2 id="sample-introparamssource">Sample: IntroParamsSource</h2>
 <p>In case you want to use a lot of values, you should use
-<a href="xref:BenchmarkDotNet.Attributes.ParamsSourceAttribute"><code>[ParamsSource]</code></a>
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsSourceAttribute.html"><code>[ParamsSource]</code></a>
 You can mark one or several fields or properties in your class by the
-<a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a> attribute.
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAttribute.html"><code>[Params]</code></a> attribute.
 In this attribute, you have to specify the name of public method/property which is going to provide the values
 (something that implements <code>IEnumerable</code>).
 The source must be within benchmarked type!</p>
@@ -265,14 +265,14 @@ namespace BenchmarkDotNet.Samples
 </ul>
 <hr>
 <h2 id="sample-introarguments">Sample: IntroArguments</h2>
-<p>As an alternative to using <a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a>,
+<p>As an alternative to using <a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAttribute.html"><code>[Params]</code></a>,
 you can specify arguments for your benchmarks.
 There are several ways to do it (described below).</p>
-<p>The <a href="xref:BenchmarkDotNet.Attributes.ArgumentsAttribute"><code>[Arguments]</code></a> allows you to provide a set of values.
+<p>The <a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsAttribute.html"><code>[Arguments]</code></a> allows you to provide a set of values.
 Every value must be a compile-time constant (it's C# language limitation for attributes in general).
 You can also combine
-<a href="xref:BenchmarkDotNet.Attributes.ArgumentsAttribute"><code>[Arguments]</code></a> with
-<a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a>.
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsAttribute.html"><code>[Arguments]</code></a> with
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAttribute.html"><code>[Params]</code></a>.
 As a result, you will get results for each combination of params values.</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroArguments.cs">using System.Threading;
@@ -319,9 +319,9 @@ namespace BenchmarkDotNet.Samples
 <hr>
 <h2 id="sample-introargumentssource">Sample: IntroArgumentsSource</h2>
 <p>In case you want to use a lot of values, you should use
-<a href="xref:BenchmarkDotNet.Attributes.ArgumentsSourceAttribute"><code>[ArgumentsSource]</code></a>.</p>
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html"><code>[ArgumentsSource]</code></a>.</p>
 <p>You can mark one or several fields or properties in your class by the
-<a href="xref:BenchmarkDotNet.Attributes.ArgumentsSourceAttribute"><code>[ArgumentsSource]</code></a> attribute.
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html"><code>[ArgumentsSource]</code></a> attribute.
 In this attribute, you have to specify the name of public method/property which is going to provide the values
 (something that implements <code>IEnumerable</code>).
 The source must be within benchmarked type!</p>
@@ -499,7 +499,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

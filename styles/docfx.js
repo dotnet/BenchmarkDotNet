@@ -434,20 +434,39 @@ $(function () {
     }
 
     function registerTocEvents() {
+      var tocFilterInput = $('#toc_filter_input');
+      var tocFilterClearButton = $('#toc_filter_clear');
+        
       $('.toc .nav > li > .expand-stub').click(function (e) {
         $(e.target).parent().toggleClass(expanded);
       });
       $('.toc .nav > li > .expand-stub + a:not([href])').click(function (e) {
         $(e.target).parent().toggleClass(expanded);
       });
-      $('#toc_filter_input').on('input', function (e) {
+      tocFilterInput.on('input', function (e) {
         var val = this.value;
+        //Save filter string to local session storage
+        if (typeof(Storage) !== "undefined") {
+          sessionStorage.filterString = val;
+        }
         if (val === '') {
           // Clear 'filtered' class
           $('#toc li').removeClass(filtered).removeClass(hide);
+          tocFilterClearButton.fadeOut();
           return;
         }
+        tocFilterClearButton.fadeIn();
 
+        // set all parent nodes status
+        $('#toc li>a').filter(function (i, e) {
+          return $(e).siblings().length > 0
+        }).each(function (i, anchor) {
+          var parent = $(anchor).parent();
+          parent.addClass(hide);
+          parent.removeClass(show);
+          parent.removeClass(filtered);
+        })
+        
         // Get leaf nodes
         $('#toc li>a').filter(function (i, e) {
           return $(e).siblings().length === 0
@@ -488,6 +507,22 @@ $(function () {
           return false;
         }
       });
+      
+      // toc filter clear button
+      tocFilterClearButton.hide();
+      tocFilterClearButton.on("click", function(e){
+        tocFilterInput.val("");
+        tocFilterInput.trigger('input');
+        if (typeof(Storage) !== "undefined") {
+          sessionStorage.filterString = "";
+        }
+      });
+
+      //Set toc filter from local session storage on page load
+      if (typeof(Storage) !== "undefined") {
+        tocFilterInput.val(sessionStorage.filterString);
+        tocFilterInput.trigger('input');
+      }
     }
 
     function loadToc() {
@@ -1137,7 +1172,7 @@ $(function () {
 
     $(window).on('hashchange', scrollToCurrent);
 
-    $(window).load(function () {
+    $(window).on('load', function () {
         // scroll to the anchor if present, offset by the header
         scrollToCurrent();
     });

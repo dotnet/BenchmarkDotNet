@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class BaselineScaledColumn
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -391,6 +391,82 @@ public class BaselineScaledColumn : BaselineCustomColumn, IColumn</code></pre>
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="BenchmarkDotNet.Columns.BaselineCustomColumn.html#BenchmarkDotNet_Columns_BaselineCustomColumn_UnitType">BaselineCustomColumn.UnitType</a></div>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="BenchmarkDotNet_Columns_BaselineScaledColumn_GetValue_" data-uid="BenchmarkDotNet.Columns.BaselineScaledColumn.GetValue*"></a>
+  <h4 id="BenchmarkDotNet_Columns_BaselineScaledColumn_GetValue_BenchmarkDotNet_Reports_Summary_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Mathematics_Statistics_System_Collections_Generic_IReadOnlyDictionary_System_String_BenchmarkDotNet_Reports_Metric__BenchmarkDotNet_Mathematics_Statistics_System_Collections_Generic_IReadOnlyDictionary_System_String_BenchmarkDotNet_Reports_Metric__System_Boolean_" data-uid="BenchmarkDotNet.Columns.BaselineScaledColumn.GetValue(BenchmarkDotNet.Reports.Summary,BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Mathematics.Statistics,System.Collections.Generic.IReadOnlyDictionary{System.String,BenchmarkDotNet.Reports.Metric},BenchmarkDotNet.Mathematics.Statistics,System.Collections.Generic.IReadOnlyDictionary{System.String,BenchmarkDotNet.Reports.Metric},System.Boolean)">GetValue(Summary, BenchmarkCase, Statistics, IReadOnlyDictionary&lt;String, Metric&gt;, Statistics, IReadOnlyDictionary&lt;String, Metric&gt;, Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, IReadOnlyDictionary&lt;string, Metric&gt; baselineMetrics, Statistics current, IReadOnlyDictionary&lt;string, Metric&gt; currentMetrics, bool isBaseline)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Reports.Summary.html">Summary</a></td>
+        <td><span class="parametername">summary</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></td>
+        <td><span class="parametername">benchmarkCase</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Mathematics.Statistics.html">Statistics</a></td>
+        <td><span class="parametername">baseline</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.IReadOnlyDictionary</span>&lt;<span class="xref">System.String</span>, <a class="xref" href="BenchmarkDotNet.Reports.Metric.html">Metric</a>&gt;</td>
+        <td><span class="parametername">baselineMetrics</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Mathematics.Statistics.html">Statistics</a></td>
+        <td><span class="parametername">current</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.IReadOnlyDictionary</span>&lt;<span class="xref">System.String</span>, <a class="xref" href="BenchmarkDotNet.Reports.Metric.html">Metric</a>&gt;</td>
+        <td><span class="parametername">currentMetrics</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">isBaseline</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="BenchmarkDotNet.Columns.BaselineCustomColumn.html#BenchmarkDotNet_Columns_BaselineCustomColumn_GetValue_BenchmarkDotNet_Reports_Summary_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Mathematics_Statistics_System_Collections_Generic_IReadOnlyDictionary_System_String_BenchmarkDotNet_Reports_Metric__BenchmarkDotNet_Mathematics_Statistics_System_Collections_Generic_IReadOnlyDictionary_System_String_BenchmarkDotNet_Reports_Metric__System_Boolean_">BaselineCustomColumn.GetValue(Summary, BenchmarkCase, Statistics, IReadOnlyDictionary&lt;String, Metric&gt;, Statistics, IReadOnlyDictionary&lt;String, Metric&gt;, Boolean)</a></div>
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="BenchmarkDotNet.Columns.IColumn.html">IColumn</a>
@@ -423,7 +499,7 @@ public class BaselineScaledColumn : BaselineCustomColumn, IColumn</code></pre>
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

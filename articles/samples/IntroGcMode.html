@@ -8,7 +8,7 @@
     <title>Sample: IntroGcMode | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroGcMode | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -129,10 +129,10 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                Add(Job.MediumRun.WithGcServer(true).WithGcForce(true).WithId(&quot;ServerForce&quot;));
-                Add(Job.MediumRun.WithGcServer(true).WithGcForce(false).WithId(&quot;Server&quot;));
-                Add(Job.MediumRun.WithGcServer(false).WithGcForce(true).WithId(&quot;Workstation&quot;));
-                Add(Job.MediumRun.WithGcServer(false).WithGcForce(false).WithId(&quot;WorkstationForce&quot;));
+                AddJob(Job.MediumRun.WithGcServer(true).WithGcForce(true).WithId(&quot;ServerForce&quot;));
+                AddJob(Job.MediumRun.WithGcServer(true).WithGcForce(false).WithId(&quot;Server&quot;));
+                AddJob(Job.MediumRun.WithGcServer(false).WithGcForce(true).WithId(&quot;Workstation&quot;));
+                AddJob(Job.MediumRun.WithGcServer(false).WithGcForce(false).WithId(&quot;WorkstationForce&quot;));
             }
         }
 
@@ -189,7 +189,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

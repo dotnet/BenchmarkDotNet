@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class SimpleJobAttribute
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -132,6 +132,9 @@
     <h5>Inherited Members</h5>
     <div>
       <a class="xref" href="BenchmarkDotNet.Attributes.JobConfigBaseAttribute.html#BenchmarkDotNet_Attributes_JobConfigBaseAttribute_Config">JobConfigBaseAttribute.Config</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Attributes.JobConfigBaseAttribute.html#BenchmarkDotNet_Attributes_JobConfigBaseAttribute_GetJob_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Jobs_RuntimeMoniker_System_Nullable_BenchmarkDotNet_Environments_Jit__System_Nullable_BenchmarkDotNet_Environments_Platform__">JobConfigBaseAttribute.GetJob(Job, RuntimeMoniker, Nullable&lt;Jit&gt;, Nullable&lt;Platform&gt;)</a>
     </div>
     <div>
       <span class="xref">System.Attribute.Equals(System.Object)</span>
@@ -272,6 +275,68 @@ public class SimpleJobAttribute : JobConfigBaseAttribute, IConfigSource</code></
   
   
   <a id="BenchmarkDotNet_Attributes_SimpleJobAttribute__ctor_" data-uid="BenchmarkDotNet.Attributes.SimpleJobAttribute.#ctor*"></a>
+  <h4 id="BenchmarkDotNet_Attributes_SimpleJobAttribute__ctor_BenchmarkDotNet_Engines_RunStrategy_BenchmarkDotNet_Jobs_RuntimeMoniker_System_Int32_System_Int32_System_Int32_System_Int32_System_String_System_Boolean_" data-uid="BenchmarkDotNet.Attributes.SimpleJobAttribute.#ctor(BenchmarkDotNet.Engines.RunStrategy,BenchmarkDotNet.Jobs.RuntimeMoniker,System.Int32,System.Int32,System.Int32,System.Int32,System.String,System.Boolean)">SimpleJobAttribute(RunStrategy, RuntimeMoniker, Int32, Int32, Int32, Int32, String, Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SimpleJobAttribute(RunStrategy runStrategy, RuntimeMoniker runtimeMoniker, int launchCount = -1, int warmupCount = -1, int targetCount = -1, int invocationCount = -1, string id = null, bool baseline = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Engines.RunStrategy.html">RunStrategy</a></td>
+        <td><span class="parametername">runStrategy</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.RuntimeMoniker.html">RuntimeMoniker</a></td>
+        <td><span class="parametername">runtimeMoniker</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">launchCount</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">warmupCount</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">targetCount</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">invocationCount</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">id</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">baseline</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Attributes_SimpleJobAttribute__ctor_" data-uid="BenchmarkDotNet.Attributes.SimpleJobAttribute.#ctor*"></a>
   <h4 id="BenchmarkDotNet_Attributes_SimpleJobAttribute__ctor_BenchmarkDotNet_Engines_RunStrategy_System_Int32_System_Int32_System_Int32_System_Int32_System_String_System_Boolean_" data-uid="BenchmarkDotNet.Attributes.SimpleJobAttribute.#ctor(BenchmarkDotNet.Engines.RunStrategy,System.Int32,System.Int32,System.Int32,System.Int32,System.String,System.Boolean)">SimpleJobAttribute(RunStrategy, Int32, Int32, Int32, Int32, String, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
@@ -347,7 +412,7 @@ public class SimpleJobAttribute : JobConfigBaseAttribute, IConfigSource</code></
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">BenchmarkDotNet.Jobs.RuntimeMoniker</span></td>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.RuntimeMoniker.html">RuntimeMoniker</a></td>
         <td><span class="parametername">runtimeMoniker</span></td>
         <td></td>
       </tr>
@@ -463,7 +528,7 @@ public class SimpleJobAttribute : JobConfigBaseAttribute, IConfigSource</code></
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

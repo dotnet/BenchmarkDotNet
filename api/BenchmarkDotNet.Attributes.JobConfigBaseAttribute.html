@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class JobConfigBaseAttribute
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -348,6 +348,65 @@ public class JobConfigBaseAttribute : Attribute, IConfigSource</code></pre>
       </tr>
     </tbody>
   </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="BenchmarkDotNet_Attributes_JobConfigBaseAttribute_GetJob_" data-uid="BenchmarkDotNet.Attributes.JobConfigBaseAttribute.GetJob*"></a>
+  <h4 id="BenchmarkDotNet_Attributes_JobConfigBaseAttribute_GetJob_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Jobs_RuntimeMoniker_System_Nullable_BenchmarkDotNet_Environments_Jit__System_Nullable_BenchmarkDotNet_Environments_Platform__" data-uid="BenchmarkDotNet.Attributes.JobConfigBaseAttribute.GetJob(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Jobs.RuntimeMoniker,System.Nullable{BenchmarkDotNet.Environments.Jit},System.Nullable{BenchmarkDotNet.Environments.Platform})">GetJob(Job, RuntimeMoniker, Nullable&lt;Jit&gt;, Nullable&lt;Platform&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected static Job GetJob(Job sourceJob, RuntimeMoniker runtimeMoniker, Jit? jit, Platform? platform)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td><span class="parametername">sourceJob</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.RuntimeMoniker.html">RuntimeMoniker</a></td>
+        <td><span class="parametername">runtimeMoniker</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Nullable</span>&lt;<a class="xref" href="BenchmarkDotNet.Environments.Jit.html">Jit</a>&gt;</td>
+        <td><span class="parametername">jit</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Nullable</span>&lt;<a class="xref" href="BenchmarkDotNet.Environments.Platform.html">Platform</a>&gt;</td>
+        <td><span class="parametername">platform</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="BenchmarkDotNet.Configs.IConfigSource.html">IConfigSource</a>
@@ -376,7 +435,7 @@ public class JobConfigBaseAttribute : Attribute, IConfigSource</code></pre>
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

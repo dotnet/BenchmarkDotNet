@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class JobExtensions
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -375,554 +375,6 @@
   </table>
   
   
-  <a id="BenchmarkDotNet_Jobs_JobExtensions_With_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_With_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Engines_IEngineFactory_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Engines.IEngineFactory)">With(Job, IEngineFactory)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job With(this Job job, IEngineFactory engineFactory)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td><span class="parametername">job</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Engines.IEngineFactory.html">IEngineFactory</a></td>
-        <td><span class="parametername">engineFactory</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Jobs_JobExtensions_With_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_With_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Engines_RunStrategy_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Engines.RunStrategy)">With(Job, RunStrategy)</h4>
-  <div class="markdown level1 summary"><p>Available values: Throughput and ColdStart.
-Throughput: default strategy which allows to get good precision level.
-ColdStart: should be used only for measuring cold start of the application or testing purpose.
-Monitoring: no overhead evaluating, with several target iterations. Perfect for macrobenchmarks without a steady state with high variance.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job With(this Job job, RunStrategy strategy)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td><span class="parametername">job</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Engines.RunStrategy.html">RunStrategy</a></td>
-        <td><span class="parametername">strategy</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Jobs_JobExtensions_With_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_With_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Environments_Jit_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Environments.Jit)">With(Job, Jit)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job With(this Job job, Jit jit)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td><span class="parametername">job</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Environments.Jit.html">Jit</a></td>
-        <td><span class="parametername">jit</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Jobs_JobExtensions_With_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_With_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Environments_Platform_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Environments.Platform)">With(Job, Platform)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job With(this Job job, Platform platform)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td><span class="parametername">job</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Environments.Platform.html">Platform</a></td>
-        <td><span class="parametername">platform</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Jobs_JobExtensions_With_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_With_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Environments_Runtime_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Environments.Runtime)">With(Job, Runtime)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job With(this Job job, Runtime runtime)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td><span class="parametername">job</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a></td>
-        <td><span class="parametername">runtime</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Jobs_JobExtensions_With_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_With_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Horology_IClock_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Horology.IClock)">With(Job, IClock)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job With(this Job job, IClock clock)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td><span class="parametername">job</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Horology.IClock.html">IClock</a></td>
-        <td><span class="parametername">clock</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Jobs_JobExtensions_With_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_With_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Jobs_EnvironmentVariable_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Jobs.EnvironmentVariable)">With(Job, EnvironmentVariable)</h4>
-  <div class="markdown level1 summary"><p>Creates a new job based on the given job with additional environment variable.
-All existed environment variables of the original job will be copied to the new one.
-If the original job already contains an environment variable with the same key, it will be overriden.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job With(this Job job, EnvironmentVariable environmentVariable)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td><span class="parametername">job</span></td>
-        <td><p>The original job</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a></td>
-        <td><span class="parametername">environmentVariable</span></td>
-        <td><p>The new environment variable which should be added for the new job</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td><p>The new job with additional environment variable</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Jobs_JobExtensions_With_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_With_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Jobs_GcMode_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Jobs.GcMode)">With(Job, GcMode)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job With(this Job job, GcMode gc)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td><span class="parametername">job</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.GcMode.html">GcMode</a></td>
-        <td><span class="parametername">gc</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Jobs_JobExtensions_With_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_With_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Toolchains_IToolchain_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Toolchains.IToolchain)">With(Job, IToolchain)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job With(this Job job, IToolchain toolchain)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td><span class="parametername">job</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a></td>
-        <td><span class="parametername">toolchain</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Jobs_JobExtensions_With_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_With_BenchmarkDotNet_Jobs_Job_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Jobs_Argument__" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With(BenchmarkDotNet.Jobs.Job,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.Argument})">With(Job, IReadOnlyList&lt;Argument&gt;)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job With(this Job job, IReadOnlyList&lt;Argument&gt; arguments)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td><span class="parametername">job</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.Argument.html">Argument</a>&gt;</td>
-        <td><span class="parametername">arguments</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Jobs_JobExtensions_With_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_With_BenchmarkDotNet_Jobs_Job_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Jobs_EnvironmentVariable__" data-uid="BenchmarkDotNet.Jobs.JobExtensions.With(BenchmarkDotNet.Jobs.Job,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable})">With(Job, IReadOnlyList&lt;EnvironmentVariable&gt;)</h4>
-  <div class="markdown level1 summary"><p>Creates a new job based on the given job with specified environment variables.
-It overrides the whole list of environment variables which were defined in the original job.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job With(this Job job, IReadOnlyList&lt;EnvironmentVariable&gt; environmentVariables)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td><span class="parametername">job</span></td>
-        <td><p>The original job</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>&gt;</td>
-        <td><span class="parametername">environmentVariables</span></td>
-        <td><p>The environment variables for the new job</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td><p>The new job with overriden environment variables</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="exceptions">Exceptions</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Condition</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.InvalidOperationException</span></td>
-        <td><p>Throws an exception if <code data-dev-comment-type="paramref" class="paramref">environmentVariables</code> contains two variables with the same key.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
   <a id="BenchmarkDotNet_Jobs_JobExtensions_WithAffinity_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithAffinity*"></a>
   <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithAffinity_BenchmarkDotNet_Jobs_Job_System_IntPtr_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithAffinity(BenchmarkDotNet.Jobs.Job,System.IntPtr)">WithAffinity(Job, IntPtr)</h4>
   <div class="markdown level1 summary"><p>ProcessorAffinity for the benchmark process.
@@ -1019,6 +471,53 @@ See also: <a href="https://msdn.microsoft.com/library/system.diagnostics.process
   </table>
   
   
+  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithArguments_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithArguments*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithArguments_BenchmarkDotNet_Jobs_Job_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Jobs_Argument__" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithArguments(BenchmarkDotNet.Jobs.Job,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.Argument})">WithArguments(Job, IReadOnlyList&lt;Argument&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Job WithArguments(this Job job, IReadOnlyList&lt;Argument&gt; arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td><span class="parametername">job</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.Argument.html">Argument</a>&gt;</td>
+        <td><span class="parametername">arguments</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Jobs_JobExtensions_WithBaseline_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithBaseline*"></a>
   <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithBaseline_BenchmarkDotNet_Jobs_Job_System_Boolean_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithBaseline(BenchmarkDotNet.Jobs.Job,System.Boolean)">WithBaseline(Job, Boolean)</h4>
   <div class="markdown level1 summary"></div>
@@ -1045,6 +544,53 @@ See also: <a href="https://msdn.microsoft.com/library/system.diagnostics.process
       <tr>
         <td><span class="xref">System.Boolean</span></td>
         <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithClock_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithClock*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithClock_BenchmarkDotNet_Jobs_Job_Perfolizer_Horology_IClock_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithClock(BenchmarkDotNet.Jobs.Job,Perfolizer.Horology.IClock)">WithClock(Job, IClock)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Job WithClock(this Job job, IClock clock)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td><span class="parametername">job</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">Perfolizer.Horology.IClock</span></td>
+        <td><span class="parametername">clock</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -1113,6 +659,106 @@ See also: <a href="https://msdn.microsoft.com/library/system.diagnostics.process
   </table>
   
   
+  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithEngineFactory_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithEngineFactory*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithEngineFactory_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Engines_IEngineFactory_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithEngineFactory(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Engines.IEngineFactory)">WithEngineFactory(Job, IEngineFactory)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Job WithEngineFactory(this Job job, IEngineFactory engineFactory)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td><span class="parametername">job</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Engines.IEngineFactory.html">IEngineFactory</a></td>
+        <td><span class="parametername">engineFactory</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithEnvironmentVariable_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithEnvironmentVariable*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithEnvironmentVariable_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Jobs_EnvironmentVariable_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithEnvironmentVariable(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Jobs.EnvironmentVariable)">WithEnvironmentVariable(Job, EnvironmentVariable)</h4>
+  <div class="markdown level1 summary"><p>Creates a new job based on the given job with additional environment variable.
+All existed environment variables of the original job will be copied to the new one.
+If the original job already contains an environment variable with the same key, it will be overriden.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Job WithEnvironmentVariable(this Job job, EnvironmentVariable environmentVariable)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td><span class="parametername">job</span></td>
+        <td><p>The original job</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a></td>
+        <td><span class="parametername">environmentVariable</span></td>
+        <td><p>The new environment variable which should be added for the new job</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td><p>The new job with additional environment variable</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Jobs_JobExtensions_WithEnvironmentVariable_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithEnvironmentVariable*"></a>
   <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithEnvironmentVariable_BenchmarkDotNet_Jobs_Job_System_String_System_String_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithEnvironmentVariable(BenchmarkDotNet.Jobs.Job,System.String,System.String)">WithEnvironmentVariable(Job, String, String)</h4>
   <div class="markdown level1 summary"><p>Creates a new job based on the given job with additional environment variable.
@@ -1166,6 +812,74 @@ If the original job already contains an environment variable with the same key, 
       <tr>
         <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
         <td><p>The new job with additional environment variable</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithEnvironmentVariables_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithEnvironmentVariables*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithEnvironmentVariables_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Jobs_EnvironmentVariable___" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithEnvironmentVariables(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Jobs.EnvironmentVariable[])">WithEnvironmentVariables(Job, EnvironmentVariable[])</h4>
+  <div class="markdown level1 summary"><p>Creates a new job based on the given job with specified environment variables.
+It overrides the whole list of environment variables which were defined in the original job.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Job WithEnvironmentVariables(this Job job, params EnvironmentVariable[] environmentVariables)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td><span class="parametername">job</span></td>
+        <td><p>The original job</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>[]</td>
+        <td><span class="parametername">environmentVariables</span></td>
+        <td><p>The environment variables for the new job</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td><p>The new job with overriden environment variables</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.InvalidOperationException</span></td>
+        <td><p>Throws an exception if <code data-dev-comment-type="paramref" class="paramref">environmentVariables</code> contains two variables with the same key.</p>
 </td>
       </tr>
     </tbody>
@@ -1400,6 +1114,53 @@ True by default, very important for nano-benchmarks.</p>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
         <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithGcMode_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithGcMode*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithGcMode_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Jobs_GcMode_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithGcMode(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Jobs.GcMode)">WithGcMode(Job, GcMode)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Job WithGcMode(this Job job, GcMode gc)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td><span class="parametername">job</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.GcMode.html">GcMode</a></td>
+        <td><span class="parametername">gc</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -1715,54 +1476,6 @@ If specified, it must be a multiple of <a class="xref" href="BenchmarkDotNet.Job
   </table>
   
   
-  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithIsBaseline_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithIsBaseline*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithIsBaseline_BenchmarkDotNet_Jobs_Job_System_Boolean_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithIsBaseline(BenchmarkDotNet.Jobs.Job,System.Boolean)">WithIsBaseline(Job, Boolean)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Obsolete(&quot;Please use the new WithBaseline instead&quot;)]
-public static Job WithIsBaseline(this Job job, bool value)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td><span class="parametername">job</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">value</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
   <a id="BenchmarkDotNet_Jobs_JobExtensions_WithIterationCount_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithIterationCount*"></a>
   <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithIterationCount_BenchmarkDotNet_Jobs_Job_System_Int32_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithIterationCount(BenchmarkDotNet.Jobs.Job,System.Int32)">WithIterationCount(Job, Int32)</h4>
   <div class="markdown level1 summary"><p>How many target iterations should be performed.
@@ -1814,7 +1527,7 @@ If specified, <a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html#BenchmarkD
   
   
   <a id="BenchmarkDotNet_Jobs_JobExtensions_WithIterationTime_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithIterationTime*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithIterationTime_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Horology_TimeInterval_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithIterationTime(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Horology.TimeInterval)">WithIterationTime(Job, TimeInterval)</h4>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithIterationTime_BenchmarkDotNet_Jobs_Job_Perfolizer_Horology_TimeInterval_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithIterationTime(BenchmarkDotNet.Jobs.Job,Perfolizer.Horology.TimeInterval)">WithIterationTime(Job, TimeInterval)</h4>
   <div class="markdown level1 summary"><p>Desired time of execution of an iteration. Used by Pilot stage to estimate the number of invocations per iteration.
 The default value is 500 milliseconds.</p>
 </div>
@@ -1839,8 +1552,55 @@ The default value is 500 milliseconds.</p>
         <td></td>
       </tr>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Horology.TimeInterval.html">TimeInterval</a></td>
+        <td><span class="xref">Perfolizer.Horology.TimeInterval</span></td>
         <td><span class="parametername">time</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithJit_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithJit*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithJit_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Environments_Jit_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithJit(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Environments.Jit)">WithJit(Job, Jit)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Job WithJit(this Job job, Jit jit)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td><span class="parametername">job</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Environments.Jit.html">Jit</a></td>
+        <td><span class="parametername">jit</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -1911,7 +1671,7 @@ The default value is 500 milliseconds.</p>
   
   
   <a id="BenchmarkDotNet_Jobs_JobExtensions_WithMaxAbsoluteError_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithMaxAbsoluteError*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithMaxAbsoluteError_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Horology_TimeInterval_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithMaxAbsoluteError(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Horology.TimeInterval)">WithMaxAbsoluteError(Job, TimeInterval)</h4>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithMaxAbsoluteError_BenchmarkDotNet_Jobs_Job_Perfolizer_Horology_TimeInterval_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithMaxAbsoluteError(BenchmarkDotNet.Jobs.Job,Perfolizer.Horology.TimeInterval)">WithMaxAbsoluteError(Job, TimeInterval)</h4>
   <div class="markdown level1 summary"><p>Maximum acceptable error for a benchmark (by default, BenchmarkDotNet continue iterations until the actual error is less than the specified error).
 Doesn't have a default value.
 <remarks>If <a class="xref" href="BenchmarkDotNet.Jobs.AccuracyMode.html#BenchmarkDotNet_Jobs_AccuracyMode_MaxRelativeError">MaxRelativeError</a> is also provided, the smallest value is used as stop criteria.</remarks></p>
@@ -1919,7 +1679,7 @@ Doesn't have a default value.
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job WithMaxAbsoluteError(this Job job, TimeInterval value)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Job WithMaxAbsoluteError(this Job job, TimeInterval interval)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1937,8 +1697,8 @@ Doesn't have a default value.
         <td></td>
       </tr>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Horology.TimeInterval.html">TimeInterval</a></td>
-        <td><span class="parametername">value</span></td>
+        <td><span class="xref">Perfolizer.Horology.TimeInterval</span></td>
+        <td><span class="parametername">interval</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -2209,14 +1969,14 @@ The default value is 15.
   
   
   <a id="BenchmarkDotNet_Jobs_JobExtensions_WithMinIterationTime_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithMinIterationTime*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithMinIterationTime_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Horology_TimeInterval_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithMinIterationTime(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Horology.TimeInterval)">WithMinIterationTime(Job, TimeInterval)</h4>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithMinIterationTime_BenchmarkDotNet_Jobs_Job_Perfolizer_Horology_TimeInterval_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithMinIterationTime(BenchmarkDotNet.Jobs.Job,Perfolizer.Horology.TimeInterval)">WithMinIterationTime(Job, TimeInterval)</h4>
   <div class="markdown level1 summary"><p>Minimum time of a single iteration. Unlike Run.IterationTime, this characteristic specifies only the lower limit. In case of need, BenchmarkDotNet can increase this value.
 The default value is 500 milliseconds.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job WithMinIterationTime(this Job job, TimeInterval value)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Job WithMinIterationTime(this Job job, TimeInterval interval)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -2234,8 +1994,8 @@ The default value is 500 milliseconds.</p>
         <td></td>
       </tr>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Horology.TimeInterval.html">TimeInterval</a></td>
-        <td><span class="parametername">value</span></td>
+        <td><span class="xref">Perfolizer.Horology.TimeInterval</span></td>
+        <td><span class="parametername">interval</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -2355,13 +2115,13 @@ The default value is 6</p>
   
   
   <a id="BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithNuGet*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_BenchmarkDotNet_Jobs_Job_System_Collections_Generic_IReadOnlyCollection_BenchmarkDotNet_Jobs_NuGetReference__" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,System.Collections.Generic.IReadOnlyCollection{BenchmarkDotNet.Jobs.NuGetReference})">WithNuGet(Job, IReadOnlyCollection&lt;NuGetReference&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Jobs_NuGetReferenceList_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Jobs.NuGetReferenceList)">WithNuGet(Job, NuGetReferenceList)</h4>
   <div class="markdown level1 summary"><p>Runs the job with a specific NuGet dependencies which will be resolved during the Job build process</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job WithNuGet(this Job job, IReadOnlyCollection&lt;NuGetReference&gt; nuGetReferences)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Job WithNuGet(this Job job, NuGetReferenceList nuGetReferences)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -2379,7 +2139,7 @@ The default value is 6</p>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyCollection</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.NuGetReference.html">NuGetReference</a>&gt;</td>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.NuGetReferenceList.html">NuGetReferenceList</a></td>
         <td><span class="parametername">nuGetReferences</span></td>
         <td><p>A collection of NuGet dependencies</p>
 </td>
@@ -2553,7 +2313,7 @@ The default value is 6</p>
   
   
   <a id="BenchmarkDotNet_Jobs_JobExtensions_WithOutlierMode_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithOutlierMode*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithOutlierMode_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Mathematics_OutlierMode_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithOutlierMode(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Mathematics.OutlierMode)">WithOutlierMode(Job, OutlierMode)</h4>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithOutlierMode_BenchmarkDotNet_Jobs_Job_Perfolizer_Mathematics_OutlierDetection_OutlierMode_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithOutlierMode(BenchmarkDotNet.Jobs.Job,Perfolizer.Mathematics.OutlierDetection.OutlierMode)">WithOutlierMode(Job, OutlierMode)</h4>
   <div class="markdown level1 summary"><p>Specifies which outliers should be removed from the distribution</p>
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -2577,8 +2337,55 @@ The default value is 6</p>
         <td></td>
       </tr>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Mathematics.OutlierMode.html">OutlierMode</a></td>
+        <td><span class="xref">Perfolizer.Mathematics.OutlierDetection.OutlierMode</span></td>
         <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithPlatform_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithPlatform*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithPlatform_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Environments_Platform_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithPlatform(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Environments.Platform)">WithPlatform(Job, Platform)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Job WithPlatform(this Job job, Platform platform)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td><span class="parametername">job</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Environments.Platform.html">Platform</a></td>
+        <td><span class="parametername">platform</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -2700,14 +2507,13 @@ The default value is HighPerformance.
   </table>
   
   
-  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithRemoveOutliers_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithRemoveOutliers*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithRemoveOutliers_BenchmarkDotNet_Jobs_Job_System_Boolean_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithRemoveOutliers(BenchmarkDotNet.Jobs.Job,System.Boolean)">WithRemoveOutliers(Job, Boolean)</h4>
+  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithRuntime_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithRuntime*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithRuntime_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Environments_Runtime_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithRuntime(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Environments.Runtime)">WithRuntime(Job, Runtime)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Obsolete(&quot;Please use the new WithOutlierMode instead&quot;)]
-public static Job WithRemoveOutliers(this Job job, bool value)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Job WithRuntime(this Job job, Runtime runtime)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -2725,8 +2531,8 @@ public static Job WithRemoveOutliers(this Job job, bool value)</code></pre>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">value</span></td>
+        <td><a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a></td>
+        <td><span class="parametername">runtime</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -2748,14 +2554,17 @@ public static Job WithRemoveOutliers(this Job job, bool value)</code></pre>
   </table>
   
   
-  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithTargetCount_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithTargetCount*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithTargetCount_BenchmarkDotNet_Jobs_Job_System_Int32_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithTargetCount(BenchmarkDotNet.Jobs.Job,System.Int32)">WithTargetCount(Job, Int32)</h4>
-  <div class="markdown level1 summary"></div>
+  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithStrategy_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithStrategy*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithStrategy_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Engines_RunStrategy_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithStrategy(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Engines.RunStrategy)">WithStrategy(Job, RunStrategy)</h4>
+  <div class="markdown level1 summary"><p>Available values: Throughput, ColdStart and Monitoring.
+Throughput: default strategy which allows to get good precision level.
+ColdStart: should be used only for measuring cold start of the application or testing purpose.
+Monitoring: no overhead evaluating, with several target iterations. Perfect for macrobenchmarks without a steady state with high variance.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Obsolete(&quot;Please use WithIterationCount instead (rename)&quot;)]
-public static Job WithTargetCount(this Job job, int count)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Job WithStrategy(this Job job, RunStrategy strategy)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -2773,8 +2582,55 @@ public static Job WithTargetCount(this Job job, int count)</code></pre>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">count</span></td>
+        <td><a class="xref" href="BenchmarkDotNet.Engines.RunStrategy.html">RunStrategy</a></td>
+        <td><span class="parametername">strategy</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithToolchain_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithToolchain*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithToolchain_BenchmarkDotNet_Jobs_Job_BenchmarkDotNet_Toolchains_IToolchain_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithToolchain(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Toolchains.IToolchain)">WithToolchain(Job, IToolchain)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Job WithToolchain(this Job job, IToolchain toolchain)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td><span class="parametername">job</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a></td>
+        <td><span class="parametername">toolchain</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -2915,7 +2771,7 @@ The default value is 16.</p>
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

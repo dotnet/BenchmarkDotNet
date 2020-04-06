@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class DisassemblyDiagnoserConfig
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -157,12 +157,12 @@
   
   
   <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig__ctor_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig__ctor_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Int32_System_Boolean_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Int32,System.Boolean)">DisassemblyDiagnoserConfig(Boolean, Boolean, Boolean, Boolean, Int32, Boolean)</h4>
+  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig__ctor_System_Int32_Iced_Intel_Formatter_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Boolean_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.#ctor(System.Int32,Iced.Intel.Formatter,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">DisassemblyDiagnoserConfig(Int32, Formatter, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DisassemblyDiagnoserConfig(bool printAsm = true, bool printIL = false, bool printSource = false, bool printPrologAndEpilog = false, int recursiveDepth = 1, bool printDiff = false)</code></pre>
+    <pre><code class="lang-csharp hljs">public DisassemblyDiagnoserConfig(int maxDepth = 1, Formatter formatter = null, bool printSource = false, bool printInstructionAddresses = false, bool exportGithubMarkdown = true, bool exportHtml = false, bool exportCombinedDisassemblyReport = false, bool exportDiff = false)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -175,186 +175,52 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">printAsm</span></td>
-        <td><p>ASM will be printed. True by default.</p>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">maxDepth</span></td>
+        <td><p>Includes called methods to given level. 1 by default, indexed from 1. To print just the benchmark set it to 0.</p>
 </td>
       </tr>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">printIL</span></td>
-        <td><p>IL will be printed. False by default.</p>
+        <td><span class="xref">Iced.Intel.Formatter</span></td>
+        <td><span class="parametername">formatter</span></td>
+        <td><p>Assembly code formatter. If not provided, MasmFormatter with the recommended settings will be used.</p>
 </td>
       </tr>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
         <td><span class="parametername">printSource</span></td>
-        <td><p>C# source code will be printed. False by default.</p>
+        <td><p>C#|F#|VB source code will be printed. False by default.</p>
 </td>
       </tr>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">printPrologAndEpilog</span></td>
-        <td><p>ASM for prolog and epilog will be printed. False by default.</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td><span class="parametername">recursiveDepth</span></td>
-        <td><p>Includes called methods to given level. 1 by default, indexed from 1. To print just benchmark set to 0</p>
+        <td><span class="parametername">printInstructionAddresses</span></td>
+        <td><p>Print instruction addresses. False by default</p>
 </td>
       </tr>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
-        <td><span class="parametername">printDiff</span></td>
-        <td><p>Diff will be printed. False by default.</p>
+        <td><span class="parametername">exportGithubMarkdown</span></td>
+        <td><p>Exports to GitHub markdown. True by default.</p>
 </td>
       </tr>
-    </tbody>
-  </table>
-  <h3 id="fields">Fields
-  </h3>
-  
-  
-  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_All" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.All">All</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static readonly DisassemblyDiagnoserConfig All</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
       <tr>
-        <th>Type</th>
-        <th>Description</th>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">exportHtml</span></td>
+        <td><p>Exports to HTML with clickable links. False by default.</p>
+</td>
       </tr>
-    </thead>
-    <tbody>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.html">DisassemblyDiagnoserConfig</a></td>
-        <td></td>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">exportCombinedDisassemblyReport</span></td>
+        <td><p>Exports all benchmarks to a single HTML report. Makes it easy to compare different runtimes or methods (each becomes a column in HTML table).</p>
+</td>
       </tr>
-    </tbody>
-  </table>
-  
-  
-  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_Asm" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.Asm">Asm</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static readonly DisassemblyDiagnoserConfig Asm</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
       <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.html">DisassemblyDiagnoserConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_AsmAndIL" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.AsmAndIL">AsmAndIL</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static readonly DisassemblyDiagnoserConfig AsmAndIL</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.html">DisassemblyDiagnoserConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_AsmAndILAddDiff" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.AsmAndILAddDiff">AsmAndILAddDiff</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static readonly DisassemblyDiagnoserConfig AsmAndILAddDiff</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.html">DisassemblyDiagnoserConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_AsmFullRecursive" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.AsmFullRecursive">AsmFullRecursive</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static readonly DisassemblyDiagnoserConfig AsmFullRecursive</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.html">DisassemblyDiagnoserConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_IL" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.IL">IL</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static readonly DisassemblyDiagnoserConfig IL</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.html">DisassemblyDiagnoserConfig</a></td>
-        <td></td>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">exportDiff</span></td>
+        <td><p>Exports a diff. False by default.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -362,13 +228,13 @@
   </h3>
   
   
-  <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_PrintAsm_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.PrintAsm*"></a>
-  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_PrintAsm" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.PrintAsm">PrintAsm</h4>
+  <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_ExportCombinedDisassemblyReport_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.ExportCombinedDisassemblyReport*"></a>
+  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_ExportCombinedDisassemblyReport" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.ExportCombinedDisassemblyReport">ExportCombinedDisassemblyReport</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool PrintAsm { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool ExportCombinedDisassemblyReport { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -387,13 +253,13 @@
   </table>
   
   
-  <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_PrintDiff_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.PrintDiff*"></a>
-  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_PrintDiff" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.PrintDiff">PrintDiff</h4>
+  <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_ExportDiff_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.ExportDiff*"></a>
+  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_ExportDiff" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.ExportDiff">ExportDiff</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool PrintDiff { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool ExportDiff { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -412,13 +278,13 @@
   </table>
   
   
-  <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_PrintIL_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.PrintIL*"></a>
-  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_PrintIL" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.PrintIL">PrintIL</h4>
+  <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_ExportGithubMarkdown_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.ExportGithubMarkdown*"></a>
+  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_ExportGithubMarkdown" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.ExportGithubMarkdown">ExportGithubMarkdown</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool PrintIL { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool ExportGithubMarkdown { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -437,13 +303,63 @@
   </table>
   
   
-  <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_PrintPrologAndEpilog_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.PrintPrologAndEpilog*"></a>
-  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_PrintPrologAndEpilog" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.PrintPrologAndEpilog">PrintPrologAndEpilog</h4>
+  <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_ExportHtml_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.ExportHtml*"></a>
+  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_ExportHtml" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.ExportHtml">ExportHtml</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool PrintPrologAndEpilog { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool ExportHtml { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_MaxDepth_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.MaxDepth*"></a>
+  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_MaxDepth" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.MaxDepth">MaxDepth</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int MaxDepth { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_PrintInstructionAddresses_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.PrintInstructionAddresses*"></a>
+  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_PrintInstructionAddresses" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.PrintInstructionAddresses">PrintInstructionAddresses</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool PrintInstructionAddresses { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -485,31 +401,6 @@
       </tr>
     </tbody>
   </table>
-  
-  
-  <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_RecursiveDepth_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.RecursiveDepth*"></a>
-  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_RecursiveDepth" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.RecursiveDepth">RecursiveDepth</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int RecursiveDepth { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Int32</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
 </article>
           </div>
           
@@ -534,7 +425,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>

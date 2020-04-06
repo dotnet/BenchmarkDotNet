@@ -562,6 +562,7 @@ body .toc{
   border: 0;
   color: #666666;
   padding-left: 20px;
+  padding-right: 20px;
   width: 100%;
 }
 .toc-filter > input:focus {
@@ -571,6 +572,11 @@ body .toc{
   position: absolute;
   top: 10px;
   left: 5px;
+}
+.toc-filter > .clear-icon {
+  position: absolute;
+  top: 10px;
+  right: 5px;
 }
 .article {
   margin-top: 120px;

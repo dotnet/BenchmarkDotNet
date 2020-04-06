@@ -8,7 +8,7 @@
     <title>Sample: IntroEnvVars | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroEnvVars | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.46.0.0">
+    <meta name="generator" content="docfx 2.51.0.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -132,9 +132,9 @@ namespace BenchmarkDotNet.Samples
 
             public ConfigWithCustomEnvVars()
             {
-                Add(Job.Default.With(CoreRuntime.Core21).WithId(&quot;Inlining enabled&quot;));
-                Add(Job.Default.With(CoreRuntime.Core21)
-                    .With(new[] { new EnvironmentVariable(JitNoInline, &quot;1&quot;) })
+                AddJob(Job.Default.WithRuntime(CoreRuntime.Core21).WithId(&quot;Inlining enabled&quot;));
+                AddJob(Job.Default.WithRuntime(CoreRuntime.Core21)
+                    .WithEnvironmentVariables(new EnvironmentVariable(JitNoInline, &quot;1&quot;))
                     .WithId(&quot;Inlining disabled&quot;));
             }
         }
@@ -181,7 +181,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2019 .NET Foundation and contributors
+            Copyright &copy; 2013–2020 .NET Foundation and contributors
             
           </div>
         </div>
