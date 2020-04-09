@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="BenchmarkDotNet.Samples.Forms.MainPage">
+    <Grid RowSpacing="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Button
+            x:Name="Run"
+            Text="Run"
+            Padding="10,10,10,0"
+            Clicked="Button_Clicked" />
+        <ScrollView Orientation="Both" Grid.Row="1">
+            <Label
+                x:Name="Summary"
+                Grid.Row="1"
+                Padding="10"
+                FontFamily="monospace" />
+        </ScrollView>
+        <ActivityIndicator
+            x:Name="Indicator"
+            Grid.RowSpan="2"
+            Color="DarkGray"
+            HorizontalOptions="Center"
+            VerticalOptions="Center" />
+    </Grid>
+</ContentPage>
