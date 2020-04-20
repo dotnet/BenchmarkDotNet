@@ -121,7 +121,7 @@ namespace BenchmarkDotNet.Portability
             if (IsMono)
             {
                 var monoRuntimeType = Type.GetType("Mono.Runtime");
-                var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
+                var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
                 if (monoDisplayName != null)
                 {
                     string version = monoDisplayName.Invoke(null, null)?.ToString();
