@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
     internal abstract class Session : IDisposable
     {
-        private const int MaxBenchmarkNameLength = 128;
+        private const int MaxSessionNameLength = 128;
 
         protected abstract string FileExtension { get; }
 
@@ -135,12 +135,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         protected static string GetSessionName(BenchmarkCase benchmarkCase)
         {
-            string methodName = FullNameProvider.GetMethodName(benchmarkCase);
-            if (methodName.Length <= MaxBenchmarkNameLength)
-                return methodName;
+            string benchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase);
+            if (benchmarkName.Length <= MaxSessionNameLength)
+                return benchmarkName;
 
             // session name is not really used by humans, we can just give it the hashcode value
-            return methodName.GetHashCode().ToString();
+            return Hashing.HashString(benchmarkName.AsSpan()).ToString();
         }
     }
 }
