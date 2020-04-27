@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Exporters
         };
 
         [PublicAPI("used by the dotnet/performance repository")]
-        public static string GetBenchmarkName(BenchmarkCase benchmarkCase, int maxArgumentLength = int.MaxValue)
+        public static string GetBenchmarkName(BenchmarkCase benchmarkCase)
         {
             var type = benchmarkCase.Descriptor.Type;
 
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Exporters
 
             name.Append(GetTypeName(type)).Append('.');
 
-            name.Append(GetMethodName(benchmarkCase, maxArgumentLength));
+            name.Append(GetMethodName(benchmarkCase));
 
             return name.ToString();
         }
@@ -92,17 +92,17 @@ namespace BenchmarkDotNet.Exporters
             return $"{mainName}<{args}>";
         }
 
-        internal static string GetMethodName(BenchmarkCase benchmarkCase, int maxArgumentLength = int.MaxValue)
+        internal static string GetMethodName(BenchmarkCase benchmarkCase)
         {
             var name = new StringBuilder(benchmarkCase.Descriptor.WorkloadMethod.Name);
 
             if (benchmarkCase.HasParameters)
-                name.Append(GetBenchmarkParameters(benchmarkCase.Descriptor.WorkloadMethod, benchmarkCase.Parameters, maxArgumentLength));
+                name.Append(GetBenchmarkParameters(benchmarkCase.Descriptor.WorkloadMethod, benchmarkCase.Parameters));
 
             return name.ToString();
         }
 
-        private static string GetBenchmarkParameters(MethodInfo method, ParameterInstances benchmarkParameters, int maxArgumentLength)
+        private static string GetBenchmarkParameters(MethodInfo method, ParameterInstances benchmarkParameters)
         {
             var methodArguments = method.GetParameters();
             var benchmarkParams = benchmarkParameters.Items.Where(parameter => !parameter.IsArgument).ToArray();
@@ -114,7 +114,7 @@ namespace BenchmarkDotNet.Exporters
                     parametersBuilder.Append(", ");
 
                 parametersBuilder.Append(methodArguments[i].Name).Append(':').Append(' ');
-                parametersBuilder.Append(GetArgument(benchmarkParameters.GetArgument(methodArguments[i].Name).Value, methodArguments[i].ParameterType, maxArgumentLength));
+                parametersBuilder.Append(GetArgument(benchmarkParameters.GetArgument(methodArguments[i].Name).Value, methodArguments[i].ParameterType));
             }
 
             for (int i = 0; i < benchmarkParams.Length; i++)
@@ -125,24 +125,23 @@ namespace BenchmarkDotNet.Exporters
                     parametersBuilder.Append(", ");
 
                 parametersBuilder.Append(parameter.Name).Append(':').Append(' ');
-                parametersBuilder.Append(GetArgument(parameter.Value, parameter.Value?.GetType(), maxArgumentLength));
+                parametersBuilder.Append(GetArgument(parameter.Value, parameter.Value?.GetType()));
             }
 
             return parametersBuilder.Append(')').ToString();
         }
 
-        private static string GetArgument(object argumentValue, Type argumentType, int maxArgumentLength)
+        private static string GetArgument(object argumentValue, Type argumentType)
         {
-            switch (argumentValue)
-            {
+            switch (argumentValue) {
                 case null:
                     return "null";
                 case IParam iparam:
-                    return GetArgument(iparam.Value, argumentType, maxArgumentLength);
+                    return GetArgument(iparam.Value, argumentType);
                 case object[] array when array.Length == 1:
-                    return GetArgument(array[0], argumentType, maxArgumentLength);
+                    return GetArgument(array[0], argumentType);
                 case string text:
-                    return $"\"{EscapeWhitespaces(Substring(text, maxArgumentLength))}\"";
+                    return $"\"{EscapeWhitespaces(text)}\"";
                 case char character:
                     return $"'{character}'";
                 case DateTime time:
@@ -152,13 +151,13 @@ namespace BenchmarkDotNet.Exporters
             }
 
             if (argumentType != null && argumentType.IsArray)
-                return GetArray((IEnumerable)argumentValue, maxArgumentLength);
+                return GetArray((IEnumerable)argumentValue);
 
             return argumentValue.ToString();
         }
 
         // it's not generic so I can't simply use .Skip and all other LINQ goodness
-        private static string GetArray(IEnumerable collection, int maxArgumentLength)
+        private static string GetArray(IEnumerable collection)
         {
             var buffer = new StringBuilder().Append('[');
 
@@ -174,7 +173,7 @@ namespace BenchmarkDotNet.Exporters
                     break;
                 }
 
-                buffer.Append(GetArgument(item, item?.GetType(), maxArgumentLength));
+                buffer.Append(GetArgument(item, item?.GetType()));
 
                 ++index;
             }
@@ -200,14 +199,6 @@ namespace BenchmarkDotNet.Exporters
                 return $"{type.Namespace}.{GetTypeName(type)}";
 
             return GetTypeName(type);
-        }
-
-        private static string Substring(string value, int maxLength)
-        {
-            if (value.Length < maxLength)
-                return value;
-
-            return $"{value.Substring(0, maxLength - 3)}...";
         }
     }
 }
