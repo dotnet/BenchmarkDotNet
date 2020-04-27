@@ -140,7 +140,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 return benchmarkName;
 
             // session name is not really used by humans, we can just give it the hashcode value
-            return Hashing.HashString(benchmarkName.AsSpan()).ToString();
+            return $"BenchmarkDotNet.EtwProfiler.Session_{Hashing.HashString(benchmarkName.AsSpan())}";
         }
     }
 }
