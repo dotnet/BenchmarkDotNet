@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     internal class HeapSession : Session
     {
         public HeapSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
-            : base(GetBenchmarkName(details.BenchmarkCase) + "Heap", details, config, creationTime)
+            : base(GetSessionName(details.BenchmarkCase) + "Heap", details, config, creationTime)
         {
         }
 
@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     internal class UserSession : Session
     {
         public UserSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
-            : base(GetBenchmarkName(details.BenchmarkCase), details, config, creationTime)
+            : base(GetSessionName(details.BenchmarkCase), details, config, creationTime)
         {
         }
 
@@ -133,18 +133,14 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private void OnProcessExit(object sender, EventArgs e) => Stop();
 
-        // benchmark name is used as part of trace file name and we need to make sure that long string arguments don't hit "path is too long" exception
-        protected static string GetBenchmarkName(BenchmarkCase benchmarkCase)
+        protected static string GetSessionName(BenchmarkCase benchmarkCase)
         {
             string methodName = FullNameProvider.GetMethodName(benchmarkCase);
             if (methodName.Length <= MaxBenchmarkNameLength)
                 return methodName;
 
-            methodName = FullNameProvider.GetMethodName(benchmarkCase, maxArgumentLength: 24); // try to limit argument length
-            if (methodName.Length <= MaxBenchmarkNameLength)
-                return methodName;
-
-            return methodName.Substring(0, MaxBenchmarkNameLength);
+            // session name is not really used by humans, we can just give it the hashcode value
+            return methodName.GetHashCode().ToString();
         }
     }
 }
