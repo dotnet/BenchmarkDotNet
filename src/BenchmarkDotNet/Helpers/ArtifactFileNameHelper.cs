@@ -28,22 +28,14 @@ namespace BenchmarkDotNet.Helpers
             return GetLimitedFilePath(details, creationTime, fileExtension, limit);
         }
 
-        internal static string GetFilePathNoLimits(DiagnoserActionParameters details, DateTime creationTime, string fileExtension)
+        private static string GetFilePathNoLimits(DiagnoserActionParameters details, DateTime creationTime, string fileExtension)
         {
             string fileName = $@"{FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type)}.{FullNameProvider.GetMethodName(details.BenchmarkCase)}";
 
-            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
-            if (details.Config.GetJobs().Select(job => ToolchainExtensions.GetToolchain(job)).Distinct().Count() > 1)
-                fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
-
-            fileName += $"-{creationTime.ToString(BenchmarkRunnerClean.DateTimeFormat)}";
-
-            fileName = FolderNameHelper.ToFolderName(fileName);
-
-            return Path.Combine(details.Config.ArtifactsPath, $"{fileName}.{fileExtension}");
+            return GetFilePath(fileName, details, creationTime, fileExtension);
         }
 
-        internal static string GetLimitedFilePath(DiagnoserActionParameters details, DateTime creationTime, string fileExtension, int limit)
+        private static string GetLimitedFilePath(DiagnoserActionParameters details, DateTime creationTime, string fileExtension, int limit)
         {
             string shortTypeName = FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type, includeNamespace: false);
             string methodName = details.BenchmarkCase.Descriptor.WorkloadMethod.Name;
@@ -53,15 +45,7 @@ namespace BenchmarkDotNet.Helpers
 
             string fileName = $@"{shortTypeName}.{methodName}{parameters}";
 
-            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
-            if (details.Config.GetJobs().Select(job => ToolchainExtensions.GetToolchain(job)).Distinct().Count() > 1)
-                fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
-
-            fileName += $"-{creationTime.ToString(BenchmarkRunnerClean.DateTimeFormat)}";
-
-            fileName = FolderNameHelper.ToFolderName(fileName);
-
-            string finalResult = Path.Combine(details.Config.ArtifactsPath, $"{fileName}.{fileExtension}");
+            string finalResult = GetFilePath(fileName, details, creationTime, fileExtension);
 
             if (finalResult.Length > limit)
             {
@@ -70,6 +54,19 @@ namespace BenchmarkDotNet.Helpers
             }
 
             return finalResult;
+        }
+
+        private static string GetFilePath(string fileName, DiagnoserActionParameters details, DateTime creationTime, string fileExtension)
+        {
+            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
+            if (details.Config.GetJobs().Select(job => ToolchainExtensions.GetToolchain(job)).Distinct().Count() > 1)
+                fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
+
+            fileName += $"-{creationTime.ToString(BenchmarkRunnerClean.DateTimeFormat)}";
+
+            fileName = FolderNameHelper.ToFolderName(fileName);
+
+            return Path.Combine(details.Config.ArtifactsPath, $"{fileName}.{fileExtension}");
         }
     }
 }
