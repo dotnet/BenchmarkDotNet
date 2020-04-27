@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<IExporter> GetExporters()
         {
-            // Now that we can specify exporters on the cmd line (e.g. "exporters=html,stackoverflow"), 
+            // Now that we can specify exporters on the cmd line (e.g. "exporters=html,stackoverflow"),
             // we should have less enabled by default and then users can turn on the ones they want
             yield return CsvExporter.Default;
             yield return MarkdownExporter.GitHub;
@@ -71,13 +71,24 @@ namespace BenchmarkDotNet.Configs
 
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 
-        public Encoding Encoding => Encoding.ASCII;
+        public CultureInfo CultureInfo => null;
 
         public ConfigOptions Options => ConfigOptions.Default;
 
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
 
-        public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
+        public string ArtifactsPath
+        {
+            get
+            {
+                var root = Directory.GetCurrentDirectory();
+                if (root == "/")
+                {
+                    root = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                }
+                return Path.Combine(root, "BenchmarkDotNet.Artifacts");
+            }
+        }
 
         public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
 

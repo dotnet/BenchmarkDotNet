@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Columns
             int index = Array.IndexOf(logicalGroup, benchmarkCase);
             if (index == -1)
                 return "?";
-            
+
             var ranks = RankHelper.GetRanks(logicalGroup.Select(b => summary[b].ResultStatistics).ToArray());
             int rank = ranks[index];
             return numeralSystem.ToPresentation(rank);

@@ -1,8 +1,8 @@
 ﻿using System;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Environments
 {

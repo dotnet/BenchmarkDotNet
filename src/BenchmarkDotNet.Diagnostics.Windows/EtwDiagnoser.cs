@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Loggers;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
@@ -42,7 +43,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             // This is in effect the inverted sequence of actions in the Stop() method.
             Console.CancelKeyPress += OnConsoleCancelKeyPress;
             AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
-            
+
             Session = CreateSession(parameters.BenchmarkCase);
 
             EnableProvider();
@@ -56,7 +57,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             // and through the TraceEventSession class, which is thread-safe.
             var task = Task.Factory.StartNew((Action)(() => Session.Source.Process()), TaskCreationOptions.LongRunning);
 
-            // wait until the processing has started, block by then so we don't loose any 
+            // wait until the processing has started, block by then so we don't loose any
             // information (very important for jit-related things)
             WaitUntilStarted(task);
         }

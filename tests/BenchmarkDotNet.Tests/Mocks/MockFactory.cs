@@ -26,6 +26,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                 string.Empty,
                 string.Empty,
                 TimeSpan.FromMinutes(1),
+                TestCultureInfo.Instance,
                 ImmutableArray<ValidationError>.Empty);
         }
 
@@ -36,6 +37,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                 string.Empty,
                 string.Empty,
                 TimeSpan.FromMinutes(1),
+                config.CultureInfo,
                 ImmutableArray<ValidationError>.Empty);
 
         public static Summary CreateSummary(IConfig config, bool hugeSd, Metric[] metrics)
@@ -48,12 +50,13 @@ namespace BenchmarkDotNet.Tests.Mocks
                 string.Empty,
                 string.Empty,
                 TimeSpan.FromMinutes(1),
+                TestCultureInfo.Instance,
                 ImmutableArray<ValidationError>.Empty);
 
-        private static ImmutableArray<BenchmarkReport> CreateReports(IConfig config) 
+        private static ImmutableArray<BenchmarkReport> CreateReports(IConfig config)
             => CreateBenchmarks<MockBenchmarkClass>(config).Select(CreateSimpleReport).ToImmutableArray();
 
-        private static BenchmarkCase[] CreateBenchmarks<TBenchmarks>(IConfig config) 
+        private static BenchmarkCase[] CreateBenchmarks<TBenchmarks>(IConfig config)
             => BenchmarkConverter.TypeToBenchmarks(typeof(TBenchmarks), config).BenchmarksCases;
 
         private static BenchmarkReport CreateSimpleReport(BenchmarkCase benchmarkCase) => CreateReport(benchmarkCase, 1, 1);

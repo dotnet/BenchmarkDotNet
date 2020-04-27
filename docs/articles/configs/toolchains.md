@@ -57,7 +57,7 @@ class Program
 }
 ```
 
-You can achieve the same thing using `[TargetFrameworkJobAttribute]`:
+You can achieve the same thing using `[SimpleJobAttribute]`:
 
 ```cs
 using BenchmarkDotNet.Attributes;
@@ -65,10 +65,10 @@ using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples
 {
-    [TargetFrameworkJob(TargetFrameworkMoniker.Net48)]
-    [TargetFrameworkJob(TargetFrameworkMoniker.Mono)]
-    [TargetFrameworkJob(TargetFrameworkMoniker.NetCoreApp21)]
-    [TargetFrameworkJob(TargetFrameworkMoniker.NetCoreApp30)]
+    [SimpleJob(RuntimeMoniker.Net48)]
+    [SimpleJob(RuntimeMoniker.Mono)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp21)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp30)]
     public class TheClassWithBenchmarks
 ```
 
@@ -194,7 +194,7 @@ BenchmarkDotNet supports [CoreRT](https://github.com/dotnet/corert)! However, yo
 
 * CoreRT is a flavor of .NET Core. Which means that:
   *  you have to target .NET Core to be able to build CoreRT benchmarks (`<TargetFramework>netcoreapp2.1</TargetFramework>` in the .csproj file)
-  *  you have to specify the CoreRT runtime in an explicit way, either by using `[TargetFrameworkJob]` attribute or by using the fluent Job config API `Job.ShortRun.With(CoreRtRuntime.$version)`
+  *  you have to specify the CoreRT runtime in an explicit way, either by using `[SimpleJob]` attribute or by using the fluent Job config API `Job.ShortRun.With(CoreRtRuntime.$version)`
   *  to run CoreRT benchmark you run the app as a .NET Core/.NET process (`dotnet run -c Release -f netcoreapp2.1`) and BenchmarkDotNet does all the CoreRT compilation for you. If you want to check what files are generated you need to apply `[KeepBenchmarkFiles]` attribute to the class which defines benchmarks.
 
 By default BenchmarkDotNet uses the latest version of `Microsoft.DotNet.ILCompiler` to build the CoreRT benchmark according to [this instructions](https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project).
@@ -209,7 +209,7 @@ BenchmarkSwitcher
 ```
 
 ```cs
-[TargetFrameworkJob(TargetFrameworkMoniker.CoreRt21)] // compiles the benchmarks as netcoreapp2.1 and uses the latest CoreRT to build a native app
+[SimpleJob(RuntimeMoniker.CoreRt21)] // compiles the benchmarks as netcoreapp2.1 and uses the latest CoreRT to build a native app
 public class TheTypeWithBenchmarks
 {
    [Benchmark] // the benchmarks go here

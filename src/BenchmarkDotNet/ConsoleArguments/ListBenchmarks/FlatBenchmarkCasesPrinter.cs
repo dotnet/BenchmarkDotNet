@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Loggers;
 
-namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks 
+namespace BenchmarkDotNet.ConsoleArguments.ListBenchmarks
 {
     internal class FlatBenchmarkCasesPrinter : IBenchmarkCasesPrinter
     {

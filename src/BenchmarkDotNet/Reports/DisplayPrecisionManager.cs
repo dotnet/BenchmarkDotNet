@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Reports
     {
         private const int MinPrecision = 1;
         private const int MaxPrecision = 4;
-        
+
         private readonly IDictionary<string, int> precision = new Dictionary<string, int>();
         private readonly Summary summary;
 

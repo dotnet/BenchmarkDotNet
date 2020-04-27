@@ -23,14 +23,28 @@ namespace BenchmarkDotNet.Helpers
         private void Attach()
         {
             process.Exited += ProcessOnExited;
-            Console.CancelKeyPress += CancelKeyPressHandlerCallback;
+            try
+            {
+                Console.CancelKeyPress += CancelKeyPressHandlerCallback;
+            } 
+            catch (PlatformNotSupportedException)
+            {
+                // Thrown when running in Xamarin
+            }
             AppDomain.CurrentDomain.ProcessExit += ProcessExitEventHandlerHandlerCallback;
         }
 
         private void Detach()
         {
             process.Exited -= ProcessOnExited;
-            Console.CancelKeyPress -= CancelKeyPressHandlerCallback;
+            try
+            {
+                Console.CancelKeyPress -= CancelKeyPressHandlerCallback;
+            }
+            catch (PlatformNotSupportedException)
+            {
+                // Thrown when running in Xamarin
+            }
             AppDomain.CurrentDomain.ProcessExit -= ProcessExitEventHandlerHandlerCallback;
         }
 

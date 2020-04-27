@@ -1,6 +1,5 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
@@ -12,18 +11,18 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class ProcessorArchitectureTest : BenchmarkTestExecutor
     {
-        const string X86FailedCaption = "// x86FAILED";
-        const string X64FailedCaption = "// x64FAILED";
-        const string AnyCpuOkCaption = "// AnyCpuOkCaption";
-        const string HostPlatformOkCaption = "// HostPlatformOkCaption";
-        const string BenchmarkNotFound = "// There are no benchmarks found";
+        private const string X86FailedCaption = "// x86FAILED";
+        private const string X64FailedCaption = "// x64FAILED";
+        private const string AnyCpuOkCaption = "// AnyCpuOkCaption";
+        private const string HostPlatformOkCaption = "// HostPlatformOkCaption";
+        private const string BenchmarkNotFound = "// There are no benchmarks found";
 
         public ProcessorArchitectureTest(ITestOutputHelper outputHelper) : base(outputHelper)
         {
         }
 
         [Fact]
-        public void SpecifiedProccesorArchitectureMustBeRespected()
+        public void SpecifiedProcessorArchitectureMustBeRespected()
         {
 #if !CORE // dotnet cli does not support x86 compilation so far, so I disable this test
             Verify(Platform.X86, typeof(X86Benchmark), X86FailedCaption);
@@ -37,8 +36,8 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
 
             var config = ManualConfig.CreateEmpty()
-                    .With(Job.Dry.With(platform))
-                    .With(logger); // make sure we get an output in the TestRunner log
+                    .AddJob(Job.Dry.WithPlatform(platform))
+                    .AddLogger(logger); // make sure we get an output in the TestRunner log
 
             CanExecute(benchmark, config);
 

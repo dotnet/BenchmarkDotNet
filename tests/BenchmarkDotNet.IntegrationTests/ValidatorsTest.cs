@@ -36,15 +36,15 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             CanExecute<Nothing>(
                 CreateSimpleConfig()
-                        .With(new FailingValidator())
-                        .With(AllKnownExportersThatSupportExportToLog),
+                        .AddValidator(new FailingValidator())
+                        .AddExporter(AllKnownExportersThatSupportExportToLog),
                 fullValidation: false);
         }
 
         [Fact]
         public void LoggersShouldNotFailOnCriticalValidationErrors()
         {
-            var summary = CanExecute<Nothing>(CreateSimpleConfig().With(new FailingValidator()), fullValidation: false);
+            var summary = CanExecute<Nothing>(CreateSimpleConfig().AddValidator(new FailingValidator()), fullValidation: false);
 
             foreach (var exporter in AllKnownExportersThatSupportExportToLog)
             {

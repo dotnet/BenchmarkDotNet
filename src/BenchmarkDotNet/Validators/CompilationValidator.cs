@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Validators
                                   $"Benchmarked method `{benchmark.Descriptor.WorkloadMethod.Name}` is static. Benchmarks MUST be instance methods, static methods are not supported.",
                                   benchmark
                               ));
-                
+
         private static bool IsValidCSharpIdentifier(string identifier) // F# allows to use whitespaces as names #479
             => !string.IsNullOrEmpty(identifier)
                && (char.IsLetter(identifier[0]) || identifier[0] == Underscore) // An identifier must start with a letter or an underscore
@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Validators
             return from memberInfo in memberInfos
                            where memberInfo.Name.EndsWith("Keyword")
                            orderby memberInfo.Name
-                           select memberInfo.Name.Substring(startIndex: 0, length: memberInfo.Name.IndexOf("Keyword")).ToLower();
+                           select memberInfo.Name.Substring(startIndex: 0, length: memberInfo.Name.IndexOf("Keyword", StringComparison.Ordinal)).ToLower();
         }
 
         private class BenchmarkMethodEqualityComparer : IEqualityComparer<BenchmarkCase>

@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Columns
         {
             if (!benchmarkCase.Job.HasValue(characteristic) && EnvironmentResolver.Instance.CanResolve(characteristic))
                 return Presenter.ToPresentation(benchmarkCase.Job.ResolveValue(characteristic, EnvironmentResolver.Instance), characteristic);
-            
+
             return Presenter.ToPresentation(benchmarkCase.Job, characteristic);
         }
 

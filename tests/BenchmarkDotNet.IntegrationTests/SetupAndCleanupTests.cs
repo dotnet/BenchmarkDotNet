@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests
         private const string SecondIterationCleanupCalled = SecondPrefix + "IterationCleanup";
         private const string SecondBenchmarkCalled = SecondPrefix + "Benchmark";
 
-        private const string OutputDelimeter = "===========================================================";
+        private const string OutputDelimiter = "===========================================================";
 
         private readonly string[] firstExpectedLogLines = {
             "// ### First Called: GlobalSetup",
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.IntegrationTests
             "// ### First Called: IterationSetup (2)", // MainWarmup2
             "// ### First Called: Benchmark", // MainWarmup2
             "// ### First Called: IterationCleanup (2)", // MainWarmup2
-            
+
             "// ### First Called: IterationSetup (3)", // MainTarget1
             "// ### First Called: Benchmark", // MainTarget1
             "// ### First Called: IterationCleanup (3)", // MainTarget1
@@ -46,10 +46,10 @@ namespace BenchmarkDotNet.IntegrationTests
             "// ### First Called: IterationSetup (5)", // MainTarget3
             "// ### First Called: Benchmark", // MainTarget3
             "// ### First Called: IterationCleanup (5)", // MainTarget3
-            
+
             "// ### First Called: GlobalCleanup"
         };
-        
+
         private readonly string[] secondExpectedLogLines = {
             "// ### Second Called: GlobalSetup",
 
@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.IntegrationTests
             "// ### Second Called: IterationSetup (2)", // MainWarmup2
             "// ### Second Called: Benchmark", // MainWarmup2
             "// ### Second Called: IterationCleanup (2)", // MainWarmup2
-            
+
             "// ### Second Called: IterationSetup (3)", // MainTarget1
             "// ### Second Called: Benchmark", // MainTarget1
             "// ### Second Called: IterationCleanup (3)", // MainTarget1
@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.IntegrationTests
             "// ### Second Called: IterationSetup (5)", // MainTarget3
             "// ### Second Called: Benchmark", // MainTarget3
             "// ### Second Called: IterationCleanup (5)", // MainTarget3
-            
+
             "// ### Second Called: GlobalCleanup"
         };
 
@@ -79,19 +79,19 @@ namespace BenchmarkDotNet.IntegrationTests
         public void AllSetupAndCleanupMethodRunsForSpecificBenchmark()
         {
             var logger = new OutputLogger(Output);
-            var miniJob = Job.Default.With(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
+            var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
             var config = CreateSimpleConfig(logger, miniJob);
 
             CanExecute<Benchmarks>(config);
-            Output.WriteLine(OutputDelimeter);
-            Output.WriteLine(OutputDelimeter);
-            Output.WriteLine(OutputDelimeter);
+            Output.WriteLine(OutputDelimiter);
+            Output.WriteLine(OutputDelimiter);
+            Output.WriteLine(OutputDelimiter);
 
             var firstActualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(FirstPrefix)).ToArray();
             foreach (string line in firstActualLogLines)
                 Output.WriteLine(line);
             Assert.Equal(firstExpectedLogLines, firstActualLogLines);
-            
+
             var secondActualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(SecondPrefix)).ToArray();
             foreach (string line in secondActualLogLines)
                 Output.WriteLine(line);
@@ -117,7 +117,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public void FirstBenchmark() => Console.WriteLine(FirstBenchmarkCalled);
-            
+
 
             [IterationSetup(Target = nameof(SecondBenchmark))]
             public void SecondIterationSetup() => Console.WriteLine(SecondIterationSetupCalled + " (" + ++setupCounter + ")");

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Xunit;
@@ -46,7 +45,7 @@ namespace BenchmarkDotNet.Tests.Reports
             { "Min=   0.001 ", new TestData(new[] { 0.0010 }, 4, 2, 3, 4, 4) },
             { "Min=   0.0001", new TestData(new[] { 0.0001 }, 4, 2, 3, 4, 4) },
             { "Min=   0.0000", new TestData(new[] { 0.0000 }, 1, 1, 2, 3, 4) },
-            { "Empty", new TestData(new double[0], 1, 1, 2, 3, 4) },
+            { "Empty", new TestData(Array.Empty<double>(), 1, 1, 2, 3, 4) },
             { "NaN", new TestData(new[] { double.NaN }, 1, 1, 2, 3, 4) },
             { "Infinity", new TestData(new[] { double.PositiveInfinity }, 1, 1, 2, 3, 4) }
         };
@@ -60,7 +59,7 @@ namespace BenchmarkDotNet.Tests.Reports
         {
             var testData = TestDataItems[testDataName];
 
-            output.WriteLine("Values: [" + string.Join(";", testData.Values.Select(v => v.ToStr())) + "]");
+            output.WriteLine("Values: [" + string.Join(";", testData.Values.Select(v => v.ToString("0.##", TestCultureInfo.Instance))) + "]");
 
             foreach (var configuration in testData.Configurations)
             {
@@ -70,8 +69,8 @@ namespace BenchmarkDotNet.Tests.Reports
                     ? DisplayPrecisionManager.CalcPrecision(testData.Values, parentPrecision.Value)
                     : DisplayPrecisionManager.CalcPrecision(testData.Values);
 
-                string strParent = parentPrecision.HasValue ? 1234.5678.ToStr("N" + parentPrecision) : "NA";
-                var strValues = testData.Values.Select(v => v.ToStr("N" + actualPrecision)).ToList();
+                string strParent = parentPrecision.HasValue ? 1234.5678.ToString("N" + parentPrecision, TestCultureInfo.Instance) : "NA";
+                var strValues = testData.Values.Select(v => v.ToString("N" + actualPrecision, TestCultureInfo.Instance)).ToList();
                 int maxWidth = strValues.Any() ? Math.Max(strValues.Max(s => s.Length), strParent.Length) + 6 : 0;
                 int parentWidth = maxWidth - (actualPrecision - parentPrecision) ?? 0;
 
@@ -89,7 +88,7 @@ namespace BenchmarkDotNet.Tests.Reports
                 Assert.Equal(expectedPrecision, actualPrecision);
             }
         }
-        
+
         [Theory]
         [InlineData(4, 0.01)]
         [InlineData(4, 0.123456)]

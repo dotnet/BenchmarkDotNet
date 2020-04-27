@@ -43,6 +43,27 @@ namespace BenchmarkDotNet.Tests
             public void TheMethod(ref ValueTuple<int, short> _) { }
         }
 
+        [Fact]
+        public void GetCorrectCSharpTypeNameSupportsNestedTypes()
+        {
+            var nestedType = typeof(Nested);
+
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.Nested", nestedType);
+        }
+
+        [Fact]
+        public void GetCorrectCSharpTypeNameSupportsNestedTypesPassedByReference()
+        {
+            var byRefNestedType = typeof(Nested).GetMethod(nameof(Nested.TheMethod)).GetParameters().Single().ParameterType;
+
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.Nested", byRefNestedType);
+        }
+
+        public class Nested
+        {
+            public void TheMethod(ref Nested _) { }
+        }
+
         [AssertionMethod]
         private static void CheckCorrectTypeName(string expectedName, Type type)
         {
@@ -91,7 +112,7 @@ namespace BenchmarkDotNet.Tests
 
             [Benchmark] public T Create() => default;
         }
-        
+
         [FactDotNetCore21Only("the implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)")]
         public void StringCanBeUsedAsReadOnlySpanOfCharArgument() => Assert.True(typeof(ReadOnlySpan<char>).IsStackOnlyWithImplicitCast("a string"));
 

@@ -50,6 +50,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         /// <param name="targetFrameworkMoniker">TFM, example: netcoreapp2.1</param>
         [PublicAPI]
+        [SuppressMessage("ReSharper", "ParameterHidesMember")]
         public CustomDotNetCliToolchainBuilder TargetFrameworkMoniker(string targetFrameworkMoniker)
         {
             this.targetFrameworkMoniker = targetFrameworkMoniker ?? throw new ArgumentNullException(nameof(targetFrameworkMoniker));
@@ -124,6 +125,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// sets provided timeout for build
         /// </summary>
         [PublicAPI]
+        [SuppressMessage("ReSharper", "ParameterHidesMember")]
         public CustomDotNetCliToolchainBuilder Timeout(TimeSpan timeout)
         {
             this.timeout = timeout;

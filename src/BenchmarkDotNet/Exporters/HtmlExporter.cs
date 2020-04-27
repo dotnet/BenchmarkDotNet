@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Exporters
 {
     public class HtmlExporter : ExporterBase
     {
-        internal const string CssDefinition = @"
+        private const string CssDefinition = @"
 <style type=""text/css"">
 	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
 	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
@@ -19,6 +19,11 @@ namespace BenchmarkDotNet.Exporters
         public static readonly IExporter Default = new HtmlExporter();
 
         public override void ExportToLog(Summary summary, ILogger logger)
+        {
+            PrintAll(summary, new HtmlLoggerWrapper(logger));
+        }
+
+        private static void PrintAll(Summary summary, ILogger logger)
         {
             logger.WriteLine("<!DOCTYPE html>");
             logger.WriteLine("<html lang='en'>");
@@ -89,6 +94,26 @@ namespace BenchmarkDotNet.Exporters
             }
 
             logger.WriteLine();
+        }
+
+        private class HtmlLoggerWrapper : ILogger
+        {
+            private readonly ILogger internalLogger;
+
+            public HtmlLoggerWrapper(ILogger logger) => internalLogger = logger;
+
+            public string Id => nameof(HtmlLoggerWrapper);
+            public int Priority => 0;
+
+            public void Write(LogKind logKind, string text) => internalLogger.Write(logKind, Escape(text));
+            public void WriteLine() => internalLogger.WriteLine();
+            public void WriteLine(LogKind logKind, string text) => internalLogger.WriteLine(logKind, Escape(text));
+            public void Flush() => internalLogger.Flush();
+
+            private static string Escape(string text)
+            {
+                return text.Replace("\u03BC", "&mu;");
+            }
         }
     }
 }

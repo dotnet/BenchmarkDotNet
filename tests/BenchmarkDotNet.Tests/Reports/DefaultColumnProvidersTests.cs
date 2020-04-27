@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Tests.Reports
             output.WriteLine("DefaultStatisticsColumns: " + columnNames);
             Assert.Equal(expectedColumnNames, columnNames);
         }
-        
+
         [Fact]
         public void EveyMetricHasItsOwnColumn()
         {
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Tests.Reports
             var summary = CreateSummary(false, metrics);
 
             var columns = DefaultColumnProviders.Metrics.GetColumns(summary).ToArray();
-            
+
             Assert.Equal("metric1", columns[0].Id);
             Assert.Equal("metric2", columns[1].Id);
         }

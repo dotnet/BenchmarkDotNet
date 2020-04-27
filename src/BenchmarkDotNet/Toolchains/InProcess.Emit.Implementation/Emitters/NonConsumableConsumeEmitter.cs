@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 method private hidebysig
                 instance void NonGenericKeepAliveWithoutBoxing(
                     valuetype BenchmarkDotNet.Samples.CustomStructNonConsumable _
-                ) cil managed noinlining 
+                ) cil managed noinlining
              */
             var valueArg = new EmitParameterInfo(
                 0,

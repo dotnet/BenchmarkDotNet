@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.IntegrationTests.CustomPaths
         [Benchmark]
         public void Verify()
         {
-            if(!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "ShouldGetCopied.xml")))
+            if (!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "ShouldGetCopied.xml")))
             {
                 throw new InvalidOperationException("the file did not get copied");
             }

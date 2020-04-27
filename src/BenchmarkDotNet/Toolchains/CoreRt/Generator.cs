@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,7 +14,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 {
     /// <summary>
     /// generates new csproj file for self-contained .NET Core RT app
-    /// based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built 
+    /// based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built
     /// and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project
     /// </summary>
     public class Generator : CsProjGenerator
@@ -22,7 +23,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 
         internal Generator(string coreRtVersion, bool useCppCodeGenerator,
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string cliPath,
-            string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag, 
+            string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag,
             bool useTempFolderForRestore, string packagesRestorePath,
             bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData)
             : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore, packagesRestorePath), runtimeFrameworkVersion)
@@ -41,6 +42,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 
         private readonly string coreRtVersion;
         private readonly bool useCppCodeGenerator;
+        [SuppressMessage("ReSharper", "NotAccessedField.Local")]
         private readonly string targetFrameworkMoniker;
         private readonly string runtimeIdentifier;
         private readonly IReadOnlyDictionary<string, string> feeds;
@@ -71,11 +73,11 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
                 .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition)} {extraArguments}")
                 .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition)} {extraArguments}")
                 .ToString();
-            
+
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
         }
 
-        // we always want to have a new directory for NuGet packages restore 
+        // we always want to have a new directory for NuGet packages restore
         // to avoid this https://github.com/dotnet/coreclr/blob/master/Documentation/workflow/UsingDotNetCli.md#update-coreclr-using-runtime-nuget-package
         // some of the packages are going to contain source code, so they can not be in the subfolder of current solution
         // otherwise they would be compiled too (new .csproj include all .cs files from subfolders by default
@@ -201,7 +203,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 </Directives>
 ";
 
-            File.WriteAllText(Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath), "rd.xml"), content);
+            string directoryName = Path.GetDirectoryName(artifactsPaths.ProjectFilePath);
+            if (directoryName != null)
+                File.WriteAllText(Path.Combine(directoryName, "rd.xml"), content);
+            else
+                throw new InvalidOperationException($"Can't get directory of projectFilePath ('{artifactsPaths.ProjectFilePath}')");
         }
     }
 }

@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.Results
             => new BuildResult(generateResult, true, null);
 
         [PublicAPI]
-        public static BuildResult Failure(GenerateResult generateResult, string errorMessage) 
+        public static BuildResult Failure(GenerateResult generateResult, string errorMessage)
             => new BuildResult(generateResult, false, errorMessage);
 
         [PublicAPI]

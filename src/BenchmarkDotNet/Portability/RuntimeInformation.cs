@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Management;
 using System.Reflection;
-using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Environments;
@@ -32,23 +31,25 @@ namespace BenchmarkDotNet.Portability
         [PublicAPI]
         public static bool IsNetNative => FrameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase);
 
-        public static bool IsNetCore => FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(typeof(object).Assembly.Location);
+        public static bool IsNetCore
+            => ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
+                && !string.IsNullOrEmpty(typeof(object).Assembly.Location);
 
         /// <summary>
         /// "The north star for CoreRT is to be a flavor of .NET Core" -> CoreRT reports .NET Core everywhere
         /// </summary>
-        public static bool IsCoreRT 
-            => FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase) 
+        public static bool IsCoreRT
+            => ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
                && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
 
         public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
-                
+
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
 
         internal static string ScriptFileExtension => IsWindows() ? ".bat" : ".sh";
 
         internal static string GetArchitecture() => GetCurrentPlatform().ToString();
-        
+
         internal static bool IsWindows() => IsOSPlatform(OSPlatform.Windows);
 
         internal static bool IsLinux() => IsOSPlatform(OSPlatform.Linux);
@@ -84,9 +85,8 @@ namespace BenchmarkDotNet.Portability
             {
                 try
                 {
-                    using (var ndpKey = RegistryKey
-                        .OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
-                        .OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion"))
+                    using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+                    using (var ndpKey = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion"))
                     {
                         if (ndpKey == null)
                             return null;
@@ -121,7 +121,7 @@ namespace BenchmarkDotNet.Portability
             if (IsMono)
             {
                 var monoRuntimeType = Type.GetType("Mono.Runtime");
-                var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
+                var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
                 if (monoDisplayName != null)
                 {
                     string version = monoDisplayName.Invoke(null, null)?.ToString();
@@ -172,7 +172,7 @@ namespace BenchmarkDotNet.Portability
                 return CoreRuntime.GetCurrentVersion();
             if (IsCoreRT)
                 return CoreRtRuntime.GetCurrentVersion();
-            
+
             throw new NotSupportedException("Unknown .NET Runtime");
         }
 
@@ -273,19 +273,18 @@ namespace BenchmarkDotNet.Portability
             {
                 try
                 {
-                    var wmi = new ManagementObjectSearcher(@"root\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
-                    var data = wmi.Get();
-
-                    foreach (var o in data)
-                    {
-                        var av = (ManagementObject) o;
-                        if (av != null)
+                    using (var wmi = new ManagementObjectSearcher(@"root\SecurityCenter2", "SELECT * FROM AntiVirusProduct"))
+                    using (var data = wmi.Get())
+                        foreach (var o in data)
                         {
-                            string name = av["displayName"].ToString();
-                            string path = av["pathToSignedProductExe"].ToString();
-                            products.Add(new Antivirus(name, path));
+                            var av = (ManagementObject) o;
+                            if (av != null)
+                            {
+                                string name = av["displayName"].ToString();
+                                string path = av["pathToSignedProductExe"].ToString();
+                                products.Add(new Antivirus(name, path));
+                            }
                         }
-                    }
                 }
                 catch
                 {

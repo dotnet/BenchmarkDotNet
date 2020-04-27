@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
@@ -40,7 +39,7 @@ namespace BenchmarkDotNet.Configs
             var uniqueHardwareCounters = source.GetHardwareCounters().ToImmutableHashSet();
             var uniqueDiagnosers = GetDiagnosers(source.GetDiagnosers(), uniqueHardwareCounters);
             var uniqueExporters = GetExporters(source.GetExporters(), uniqueDiagnosers);
-            var unqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);
+            var uniqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);
 
             var uniqueValidators = GetValidators(source.GetValidators(), MandatoryValidators, source.Options);
 
@@ -55,21 +54,21 @@ namespace BenchmarkDotNet.Configs
                 uniqueHardwareCounters,
                 uniqueDiagnosers,
                 uniqueExporters,
-                unqueAnalyzers,
+                uniqueAnalyzers,
                 uniqueValidators,
                 uniqueFilters,
                 uniqueRules,
                 uniqueRunnableJobs,
                 source.UnionRule,
                 source.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath,
-                source.Encoding,
+                source.CultureInfo,
                 source.Orderer ?? DefaultOrderer.Instance,
                 source.SummaryStyle,
                 source.Options
             );
         }
 
-        private static ImmutableHashSet<IDiagnoser> GetDiagnosers(IEnumerable<IDiagnoser> diagnosers, ImmutableHashSet<HardwareCounter> uniqueHardwareCoutners)
+        private static ImmutableHashSet<IDiagnoser> GetDiagnosers(IEnumerable<IDiagnoser> diagnosers, ImmutableHashSet<HardwareCounter> uniqueHardwareCounters)
         {
             var builder = ImmutableHashSet.CreateBuilder(new TypeComparer<IDiagnoser>());
 
@@ -77,12 +76,12 @@ namespace BenchmarkDotNet.Configs
                 if (!builder.Contains(diagnoser))
                     builder.Add(diagnoser);
 
-            if (!uniqueHardwareCoutners.IsEmpty && !diagnosers.OfType<IHardwareCountersDiagnoser>().Any())
+            if (!uniqueHardwareCounters.IsEmpty && !diagnosers.OfType<IHardwareCountersDiagnoser>().Any())
             {
                 // if users define hardware counters via [HardwareCounters] we need to dynamically load the right diagnoser
                 var hardwareCountersDiagnoser = DiagnosersLoader.GetImplementation<IHardwareCountersDiagnoser>();
 
-                if (hardwareCountersDiagnoser != default && !builder.Contains(hardwareCountersDiagnoser))
+                if (hardwareCountersDiagnoser != default(IDiagnoser) && !builder.Contains(hardwareCountersDiagnoser))
                     builder.Add(hardwareCountersDiagnoser);
             }
 
@@ -103,10 +102,10 @@ namespace BenchmarkDotNet.Configs
                     result.Add(exporter);
 
             var hardwareCounterDiagnoser = uniqueDiagnosers.OfType<IHardwareCountersDiagnoser>().SingleOrDefault();
-            var disassemblyDiagnoser = uniqueDiagnosers.OfType<IDisassemblyDiagnoser>().SingleOrDefault();
+            var disassemblyDiagnoser = uniqueDiagnosers.OfType<DisassemblyDiagnoser>().SingleOrDefault();
 
-            // we can use InstructionPointerExporter only when we have both IHardwareCountersDiagnoser and IDisassemblyDiagnoser
-            if (hardwareCounterDiagnoser != default && disassemblyDiagnoser != default)
+            // we can use InstructionPointerExporter only when we have both IHardwareCountersDiagnoser and DisassemblyDiagnoser
+            if (hardwareCounterDiagnoser != default(IHardwareCountersDiagnoser) && disassemblyDiagnoser != default(DisassemblyDiagnoser))
                 result.Add(new InstructionPointerExporter(hardwareCounterDiagnoser, disassemblyDiagnoser));
 
             for (int i = result.Count - 1; i >=0; i--)

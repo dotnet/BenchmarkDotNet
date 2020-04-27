@@ -1,6 +1,5 @@
-﻿using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Portability.Cpu;
-using BenchmarkDotNet.Tests.Environments;
+﻿using BenchmarkDotNet.Portability.Cpu;
+using Perfolizer.Horology;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Portability.Cpu
@@ -16,7 +15,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             Assert.Null(parser.PhysicalCoreCount);
             Assert.Null(parser.LogicalCoreCount);
             Assert.Null(parser.NominalFrequency);
-            
+
             Assert.Null(parser.MaxFrequency);
             Assert.Null(parser.MinFrequency);
         }

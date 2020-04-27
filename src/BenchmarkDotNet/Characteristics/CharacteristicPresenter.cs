@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Text;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -16,15 +15,20 @@ namespace BenchmarkDotNet.Characteristics
         public static readonly CharacteristicPresenter SourceCodePresenter = new SourceCodeCharacteristicPresenter();
 
         public abstract string ToPresentation(CharacteristicObject obj, Characteristic characteristic);
-        
+
         public abstract string ToPresentation(object characteristicValue, Characteristic characteristic);
 
         private class DefaultCharacteristicPresenter : CharacteristicPresenter
         {
-            public override string ToPresentation(CharacteristicObject obj, Characteristic characteristic) 
-                => obj.HasValue(characteristic) 
-                    ? ToPresentation(characteristic[obj], characteristic) 
+            public override string ToPresentation(CharacteristicObject obj, Characteristic characteristic)
+            {
+                if (characteristic == CharacteristicObject.IdCharacteristic && obj is Job job)
+                    return job.ResolvedId;
+
+                return obj.HasValue(characteristic)
+                    ? ToPresentation(characteristic[obj], characteristic)
                     : "Default";
+            }
 
             public override string ToPresentation(object value, Characteristic characteristic)
             {
@@ -60,12 +64,12 @@ namespace BenchmarkDotNet.Characteristics
                 return buffer.ToString();
             }
 
-            private static string ToPresentation(object value) 
-                => (value as IFormattable)?.ToString(null, HostEnvironmentInfo.MainCultureInfo)
+            private static string ToPresentation(object value)
+                => (value as IFormattable)?.ToString(null, DefaultCultureInfo.Instance)
                       ?? value?.ToString()
                       ?? "";
 
-            
+
         }
 
         private class SourceCodeCharacteristicPresenter : CharacteristicPresenter
@@ -85,7 +89,7 @@ namespace BenchmarkDotNet.Characteristics
 
         private class FolderCharacteristicPresenter : CharacteristicPresenter
         {
-            public override string ToPresentation(CharacteristicObject obj, Characteristic characteristic) 
+            public override string ToPresentation(CharacteristicObject obj, Characteristic characteristic)
                 => obj.HasValue(characteristic)
                     ? ToPresentation(characteristic[obj], characteristic)
                     : "Default";

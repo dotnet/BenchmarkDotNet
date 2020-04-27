@@ -13,8 +13,14 @@ namespace BenchmarkDotNet.Environments
 
         public string MonoBclPath { get; }
 
-        private MonoRuntime(string name) : base(TargetFrameworkMoniker.Mono, "mono", name)
+        public bool IsXamarinAndroid { get; }
+
+        public bool IsXamariniOS { get; }
+
+        private MonoRuntime(string name) : base(RuntimeMoniker.Mono, "mono", name)
         {
+            IsXamarinAndroid = Type.GetType("Java.Lang.Object, Mono.Android") != null;
+            IsXamariniOS = !IsXamarinAndroid && Type.GetType("Foundation.NSObject, Xamarin.iOS") != null;
         }
 
         public MonoRuntime(string name, string customPath) : this(name) => CustomPath = customPath;
@@ -28,10 +34,10 @@ namespace BenchmarkDotNet.Environments
 
         public override bool Equals(object obj) => obj is MonoRuntime other && Equals(other);
 
-        public bool Equals(MonoRuntime other) 
+        public bool Equals(MonoRuntime other)
             => base.Equals(other) && Name == other?.Name && CustomPath == other?.CustomPath && AotArgs == other?.AotArgs && MonoBclPath == other?.MonoBclPath;
 
-        public override int GetHashCode() 
+        public override int GetHashCode()
             => base.GetHashCode() ^ Name.GetHashCode() ^ (CustomPath?.GetHashCode() ?? 0) ^ (AotArgs?.GetHashCode() ?? 0) ^ (MonoBclPath?.GetHashCode() ?? 0);
     }
 }

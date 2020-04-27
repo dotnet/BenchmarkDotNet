@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Extensions
                 logger.WriteLineError($"Failed to set up high priority. Make sure you have the right permissions. Message: {ex.Message}");
             }
         }
-        
+
         internal static string ToPresentation(this IntPtr processorAffinity, int processorCount)
             => (RuntimeInformation.Is64BitPlatform()
                     ? Convert.ToString(processorAffinity.ToInt64(), 2)
@@ -125,7 +125,7 @@ namespace BenchmarkDotNet.Extensions
             foreach (var environmentVariable in benchmarkCase.Job.Environment.EnvironmentVariables)
                 start.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;
         }
-        
+
         // the code below was copy-pasted from https://github.com/dotnet/cli/blob/0bc24bff775e22352c2309ef990281280f92dbaa/test/Microsoft.DotNet.Tools.Tests.Utilities/Extensions/ProcessExtensions.cs#L13
 
         public static void KillTree(this Process process) => process.KillTree(DefaultKillTimeout);

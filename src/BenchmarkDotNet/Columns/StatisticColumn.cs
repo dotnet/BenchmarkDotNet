@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
+using Perfolizer.Common;
+using Perfolizer.Horology;
+using Perfolizer.Mathematics.Common;
+using Perfolizer.Mathematics.Multimodality;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -14,7 +17,7 @@ namespace BenchmarkDotNet.Columns
     {
         List<double> GetAllValues(Summary summary, SummaryStyle style);
     }
-    
+
     public class StatisticColumn : IStatisticColumn
     {
         private enum Priority
@@ -24,7 +27,7 @@ namespace BenchmarkDotNet.Columns
             Percentiles,
             Additional
         }
-        
+
         public static readonly IStatisticColumn Mean = new StatisticColumn("Mean", "Arithmetic mean of all measurements",
             s => s.Mean, Priority.Main);
 
@@ -64,8 +67,8 @@ namespace BenchmarkDotNet.Columns
         /// See http://www.brendangregg.com/FrequencyTrails/modes.html
         /// </summary>
         public static readonly IColumn MValue = new StatisticColumn("MValue", "Modal value, see http://www.brendangregg.com/FrequencyTrails/modes.html",
-            MathHelper.CalculateMValue, Priority.Additional, UnitType.Dimensionless);
-        
+            s => MValueCalculator.Calculate(s.OriginalValues), Priority.Additional, UnitType.Dimensionless);
+
         public static readonly IColumn Iterations = new StatisticColumn("Iterations", "Number of target iterations",
             s => s.N, Priority.Additional, UnitType.Dimensionless);
 
@@ -141,7 +144,7 @@ namespace BenchmarkDotNet.Columns
         {
             if (statistics == null)
                 return "NA";
-            
+
             int precision = summary.DisplayPrecisionManager.GetPrecision(style, this, parentColumn);
             string format = "N" + precision;
 
@@ -149,8 +152,13 @@ namespace BenchmarkDotNet.Columns
             if (double.IsNaN(value))
                 return "NA";
             return UnitType == UnitType.Time
-                   ? value.ToTimeStr(style.TimeUnit, config.Encoding, format, 1, style.PrintUnitsInContent)
-                   : value.ToStr(format);
+                ? TimeInterval.FromNanoseconds(value)
+                    .ToString(
+                        style.TimeUnit,
+                        style.CultureInfo,
+                        format,
+                        UnitPresentation.FromVisibility(style.PrintUnitsInContent))
+                : value.ToString(format, style.CultureInfo);
         }
 
         public override string ToString() => ColumnName;

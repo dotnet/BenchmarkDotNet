@@ -13,12 +13,12 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                Add(Job.MediumRun.WithPowerPlan(new Guid("e9a42b02-d5df-448d-aa00-03f14749eb61")));
-                Add(Job.MediumRun.WithPowerPlan(PowerPlan.UltimatePerformance));
-                Add(Job.MediumRun.WithPowerPlan(PowerPlan.UserPowerPlan));
-                Add(Job.MediumRun.WithPowerPlan(PowerPlan.HighPerformance));
-                Add(Job.MediumRun.WithPowerPlan(PowerPlan.Balanced));
-                Add(Job.MediumRun.WithPowerPlan(PowerPlan.PowerSaver));
+                AddJob(Job.MediumRun.WithPowerPlan(new Guid("e9a42b02-d5df-448d-aa00-03f14749eb61")));
+                AddJob(Job.MediumRun.WithPowerPlan(PowerPlan.UltimatePerformance));
+                AddJob(Job.MediumRun.WithPowerPlan(PowerPlan.UserPowerPlan));
+                AddJob(Job.MediumRun.WithPowerPlan(PowerPlan.HighPerformance));
+                AddJob(Job.MediumRun.WithPowerPlan(PowerPlan.Balanced));
+                AddJob(Job.MediumRun.WithPowerPlan(PowerPlan.PowerSaver));
             }
         }
 

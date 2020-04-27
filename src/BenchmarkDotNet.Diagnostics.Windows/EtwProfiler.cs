@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public string ShortName => "ETW";
 
-        public IEnumerable<string> Ids => new [] { nameof(EtwProfiler) };
+        public IEnumerable<string> Ids => new[] { nameof(EtwProfiler) };
 
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
 

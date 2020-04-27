@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.OutlierDetection;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Engine
@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Tests.Engine
 
             CheckResults(5, measurements, OutlierMode.RemoveUpper);
             CheckResults(5, measurements, OutlierMode.RemoveAll);
-            
+
             CheckResults(6, measurements, OutlierMode.DontRemove);
             CheckResults(6, measurements, OutlierMode.RemoveLower);
         }
@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Tests.Engine
         [AssertionMethod]
         private static void CheckResults(int expectedResultCount, List<Measurement> measurements, OutlierMode outlierMode)
         {
-            Assert.Equal(expectedResultCount, new RunResults(null, measurements, outlierMode, default, default, default).GetMeasurements().Count());
+            Assert.Equal(expectedResultCount, new RunResults(null, measurements, outlierMode, default, default).GetMeasurements().Count());
         }
 
         private static void Add(List<Measurement> measurements, int time)

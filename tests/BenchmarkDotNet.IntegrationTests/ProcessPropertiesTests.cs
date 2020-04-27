@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class ProcessPropertiesTests : BenchmarkTestExecutor
     {
-        public ProcessPropertiesTests(ITestOutputHelper output) 
+        public ProcessPropertiesTests(ITestOutputHelper output)
             : base(output)
         {
         }
@@ -27,9 +27,9 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CustomAffinityCanBeSet()
         {
             var config = ManualConfig.CreateEmpty()
-                .With(Job.Dry.WithAffinity(CustomAffinity.Value))
-                .With(DefaultColumnProviders.Instance)
-                .With(new OutputLogger(Output));
+                .AddJob(Job.Dry.WithAffinity(CustomAffinity.Value))
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddLogger(new OutputLogger(Output));
 
             CanExecute<CustomAffinity>(config);
         }
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
     public class CustomAffinity
     {
-        public static readonly IntPtr Value = new IntPtr(2); 
+        public static readonly IntPtr Value = new IntPtr(2);
 
         [Benchmark]
         public void Ensure()

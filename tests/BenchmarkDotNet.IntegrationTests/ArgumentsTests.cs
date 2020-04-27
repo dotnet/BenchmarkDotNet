@@ -97,6 +97,21 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
+        public void ArgumentsCanBePassedByReadonlyReferenceToBenchmark(IToolchain toolchain) => CanExecute<WithInArguments>(toolchain);
+
+        public class WithInArguments
+        {
+            [Benchmark]
+            [Arguments(true, 1)]
+            [Arguments(false, 2)]
+            public void Simple(in bool boolean, in int number)
+            {
+                if (boolean && number != 1 || !boolean && number != 2)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
         public void NonCompileTimeConstantsCanBeReturnedFromSource(IToolchain toolchain) => CanExecute<WithComplexTypesReturnedFromSources>(toolchain);
 
         public class WithComplexTypesReturnedFromSources

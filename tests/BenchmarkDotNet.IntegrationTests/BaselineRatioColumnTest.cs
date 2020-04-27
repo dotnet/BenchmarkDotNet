@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void Test()
         {
             var testExporter = new TestExporter();
-            var config = CreateSimpleConfig().With(testExporter);
+            var config = CreateSimpleConfig().AddExporter(testExporter);
 
             CanExecute<BaselineRatioResultExtenderNoBaseline>(config);
 
@@ -142,7 +142,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             // Long different parameters with equal length but different values
             [Params("12345ThisIsALongParameter54321", "12345ThisIsARongParameter54321")]
-            public string LongStringParamPropery { get; set; }
+            public string LongStringParamProperty { get; set; }
 
             [Benchmark(Baseline = true)]
             public void BenchmarkSlow() => Thread.Sleep(20);

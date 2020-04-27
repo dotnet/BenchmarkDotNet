@@ -1,8 +1,8 @@
 ﻿using System;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Mathematics;
+using Perfolizer.Horology;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Engines
         internal const int ForceAutoWarmup = -1;
         internal const int DefaultMinWarmupIterationCount = 6;
         internal const int DefaultMaxWarmupIterationCount = 50;
-        
+
         public static readonly IResolver Instance = new EngineResolver();
 
         private EngineResolver()

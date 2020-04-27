@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using BenchmarkDotNet.Toolchains.CsProj;
 using JetBrains.Annotations;
 using Xunit;

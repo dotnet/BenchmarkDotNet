@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         /// <summary>
-        /// Runs Benchmarks with the most simple config (SingleRunFastConfig) 
+        /// Runs Benchmarks with the most simple config (SingleRunFastConfig)
         /// combined with any benchmark config applied to TBenchmark (via an attribute)
         /// By default will verify if every benchmark was successfully executed
         /// </summary>
@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         /// <summary>
-        /// Runs Benchmarks with the most simple config (SingleRunFastConfig) 
+        /// Runs Benchmarks with the most simple config (SingleRunFastConfig)
         /// combined with any benchmark config applied to Type (via an attribute)
         /// By default will verify if every benchmark was successfully executed
         /// </summary>
@@ -54,10 +54,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 config = CreateSimpleConfig();
 
             if (!config.GetLoggers().OfType<OutputLogger>().Any())
-                config = config.With(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default);
+                config = config.AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default);
 
             if (!config.GetColumnProviders().Any())
-                config = config.With(DefaultColumnProviders.Instance);
+                config = config.AddColumnProvider(DefaultColumnProviders.Instance);
 
             // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
             var summary = BenchmarkRunner.Run(type, BenchmarkConverter.GetFullConfig(type, config));
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.True(summary.Reports.All(r => r.ExecuteResults != null),
                     "The following benchmarks don't have any execution results: " +
                     string.Join(", ", summary.Reports.Where(r => r.ExecuteResults == null).Select(r => r.BenchmarkCase.DisplayInfo)));
-                
+
                 Assert.True(summary.Reports.All(r => r.ExecuteResults.Any(er => er.FoundExecutable && er.Data.Any())),
                     "All reports should have at least one \"ExecuteResult\" with \"FoundExecutable\" = true and at least one \"Data\" item");
 
@@ -90,9 +90,9 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var baseConfig = job == null ? (IConfig)new SingleRunFastConfig() : new SingleJobConfig(job);
             return baseConfig
-                .With(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
-                .With(DefaultColumnProviders.Instance)
-                .With(DefaultConfig.Instance.GetAnalysers().ToArray());
+                .AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray());
         }
     }
 }

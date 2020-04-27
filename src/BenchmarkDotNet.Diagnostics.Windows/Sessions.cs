@@ -7,11 +7,11 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Extensions;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
@@ -106,12 +106,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             Details = details;
             Config = config;
-            FilePath = EnsureFolderExists(GetFilePath(details, creationTime));
-
+            FilePath = ArtifactFileNameHelper.GetFilePath(details, creationTime, FileExtension).EnsureFolderExists();
             TraceEventSession = new TraceEventSession(sessionName, FilePath)
             {
                 BufferSizeMB = config.BufferSizeInMb,
-                CpuSampleIntervalMSec = config.CpuSampleIntervalInMiliseconds,
+                CpuSampleIntervalMSec = config.CpuSampleIntervalInMilliseconds,
             };
 
             Console.CancelKeyPress += OnConsoleCancelKeyPress;
@@ -134,22 +133,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private void OnProcessExit(object sender, EventArgs e) => Stop();
 
-        private string GetFilePath(DiagnoserActionParameters details, DateTime creationTime)
-        {
-            string methodName = GetBenchmarkName(details.BenchmarkCase);
-            string fileName = $@"{FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type)}.{methodName}";
-
-            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
-            if (details.Config.GetJobs().Select(job => job.GetToolchain()).Distinct().Count() > 1)
-                fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
-
-            fileName += $"-{creationTime.ToString(BenchmarkRunnerClean.DateTimeFormat)}";
-
-            fileName = FolderNameHelper.ToFolderName(fileName);
-
-            return Path.Combine(details.Config.ArtifactsPath, $"{fileName}{FileExtension}");
-        }
-
         // benchmark name is used as part of trace file name and we need to make sure that long string arguments don't hit "path is too long" exception
         protected static string GetBenchmarkName(BenchmarkCase benchmarkCase)
         {
@@ -162,16 +145,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 return methodName;
 
             return methodName.Substring(0, MaxBenchmarkNameLength);
-        }
-
-        private string EnsureFolderExists(string filePath)
-        {
-            string directoryPath = Path.GetDirectoryName(filePath);
-
-            if (!Directory.Exists(directoryPath))
-                Directory.CreateDirectory(directoryPath);
-
-            return filePath;
         }
     }
 }

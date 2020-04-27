@@ -50,26 +50,29 @@ namespace BenchmarkDotNet.Running
         public static BenchmarkRunInfo[] SourceToBenchmarks(string source, IConfig config = null)
         {
             string benchmarkContent = source;
-            var cSharpCodeProvider = new CSharpCodeProvider();
-            string directoryName = Path.GetDirectoryName(typeof(BenchmarkCase).Assembly.Location)
-                ?? throw new DirectoryNotFoundException(typeof(BenchmarkCase).Assembly.Location);
-            var compilerParameters = new CompilerParameters(
-                new[]
+            CompilerResults compilerResults;
+            using (var cSharpCodeProvider = new CSharpCodeProvider()) {
+                string directoryName = Path.GetDirectoryName(typeof(BenchmarkCase).Assembly.Location)
+                                       ?? throw new DirectoryNotFoundException(typeof(BenchmarkCase).Assembly.Location);
+                var compilerParameters = new CompilerParameters(
+                    new[]
+                    {
+                        "mscorlib.dll",
+                        "System.dll",
+                        "System.Core.dll"
+                    })
                 {
-                    "mscorlib.dll",
-                    "System.dll",
-                    "System.Core.dll"
-                })
-            {
-                CompilerOptions = "/unsafe /optimize",
-                GenerateInMemory = false,
-                OutputAssembly = Path.Combine(
-                    directoryName,
-                    $"{Path.GetFileNameWithoutExtension(Path.GetTempFileName())}.dll")
-            };
+                    CompilerOptions = "/unsafe /optimize",
+                    GenerateInMemory = false,
+                    OutputAssembly = Path.Combine(
+                        directoryName,
+                        $"{Path.GetFileNameWithoutExtension(Path.GetTempFileName())}.dll")
+                };
 
-            compilerParameters.ReferencedAssemblies.Add(typeof(BenchmarkCase).Assembly.Location);
-            var compilerResults = cSharpCodeProvider.CompileAssemblyFromSource(compilerParameters, benchmarkContent);
+                compilerParameters.ReferencedAssemblies.Add(typeof(BenchmarkCase).Assembly.Location);
+                compilerResults = cSharpCodeProvider.CompileAssemblyFromSource(compilerParameters, benchmarkContent);
+            }
+
             if (compilerResults.Errors.HasErrors)
             {
                 var logger = HostEnvironmentInfo.FallbackLogger;

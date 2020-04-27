@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Attributes
 
         public KeepBenchmarkFilesAttribute(bool value = true)
         {
-            Config = ManualConfig.CreateEmpty().KeepBenchmarkFiles(value);
+            Config = ManualConfig.CreateEmpty().WithOption(ConfigOptions.KeepBenchmarkFiles, value);
         }
     }
 }

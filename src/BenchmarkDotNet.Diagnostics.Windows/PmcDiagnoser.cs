@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         protected override PmcStats GetInitializedStats(DiagnoserActionParameters parameters)
         {
             var stats = new PmcStats(
-                parameters.Config.GetHardwareCounters().ToArray(), 
+                parameters.Config.GetHardwareCounters().ToArray(),
                 counter => HardwareCounters.FromCounter(counter, info => info.MinInterval )); // for this diagnoser we want the smallest interval to have best possible precision
 
             HardwareCounters.Enable(stats.Counters.Values);

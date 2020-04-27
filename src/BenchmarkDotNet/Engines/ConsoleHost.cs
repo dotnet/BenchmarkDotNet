@@ -29,8 +29,8 @@ namespace BenchmarkDotNet.Engines
             // read the response from Parent process, make the communication blocking
             // I did not use Mutexes because they are not supported for Linux/MacOs for .NET Core
             // this solution is stupid simple and it works
-            string acknowledgment = inReader.ReadLine(); 
-            if(acknowledgment != Engine.Signals.Acknowledgment)
+            string acknowledgment = inReader.ReadLine();
+            if (acknowledgment != Engine.Signals.Acknowledgment)
                 throw new NotSupportedException($"Unknown Acknowledgment: {acknowledgment}");
         }
 

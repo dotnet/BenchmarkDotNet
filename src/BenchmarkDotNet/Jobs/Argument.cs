@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Jobs
     {
         public MonoArgument(string value)
         {
-            if(value == "--llvm" || value == "--nollvm")
+            if (value == "--llvm" || value == "--nollvm")
                 throw new NotSupportedException("Please use job.Env.Jit to specify Jit in explicit way");
 
             TextRepresentation = value;

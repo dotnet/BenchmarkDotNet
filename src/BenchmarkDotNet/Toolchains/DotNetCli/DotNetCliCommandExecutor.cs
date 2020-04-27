@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 if (!process.WaitForExit((int)parameters.Timeout.TotalMilliseconds))
                 {
-                    parameters.Logger.WriteLineError($"// command took more that the timeout: {parameters.Timeout.TotalSeconds:0.##}s. Killing the process tree!");
+                    parameters.Logger.WriteLineError($"// command took more than the timeout: {parameters.Timeout.TotalSeconds:0.##}s. Killing the process tree!");
 
                     outputReader.CancelRead();
                     process.KillTree();
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     : DotNetCliCommandResult.Failure(stopwatch.Elapsed, outputReader.GetOutputText(), outputReader.GetErrorText());
             }
         }
-        
+
         internal static string GetDotNetSdkVersion()
         {
             using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version") })
