@@ -7,12 +7,12 @@ namespace BenchmarkDotNet.Diagnosers
     public class PmcStats
     {
         public long TotalOperations { get; set; }
-        public IReadOnlyDictionary<HardwareCounter, PreciseMachineCounter> Counters { get; }
+        public IReadOnlyDictionary<HardwareCounterInfo, PreciseMachineCounter> Counters { get; }
         private IReadOnlyDictionary<int, PreciseMachineCounter> CountersByProfileSourceId { get; }
 
         public PmcStats() { throw new InvalidOperationException("should never be used"); }
 
-        public PmcStats(IReadOnlyCollection<HardwareCounter> hardwareCounters, Func<HardwareCounter, PreciseMachineCounter> factory)
+        public PmcStats(IReadOnlyCollection<HardwareCounterInfo> hardwareCounters, Func<HardwareCounterInfo, PreciseMachineCounter> factory)
         {
             CountersByProfileSourceId = hardwareCounters
                 .Select(factory)

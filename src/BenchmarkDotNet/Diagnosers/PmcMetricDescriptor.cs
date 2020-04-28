@@ -9,8 +9,8 @@ namespace BenchmarkDotNet.Diagnosers
         {
             Id = counter.Name;
             DisplayName = $"{counter.Name}/Op";
-            Legend = $"Hardware counter '{counter.Name}' per single operation";
-            TheGreaterTheBetter = counter.Counter.TheGreaterTheBetter();
+            Legend = $"Hardware counter '{counter.Counter.Name}' per single operation";
+            TheGreaterTheBetter = counter.Counter.TheGreaterTheBetter;
         }
 
         public string Id { get; }

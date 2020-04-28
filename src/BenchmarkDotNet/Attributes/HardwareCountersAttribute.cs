@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using JetBrains.Annotations;
@@ -17,7 +18,12 @@ namespace BenchmarkDotNet.Attributes
 
         public HardwareCountersAttribute(params HardwareCounter[] counters)
         {
-            Config = ManualConfig.CreateEmpty().AddHardwareCounters(counters);
+            Config = ManualConfig.CreateEmpty().AddHardwareCounters(counters.Select(x => (HardwareCounterInfo)x).ToArray());
+        }
+
+        public HardwareCountersAttribute(params string[] counters)
+        {
+            Config = ManualConfig.CreateEmpty().AddHardwareCounters(counters.Select(x => new HardwareCounterInfo(x)).ToArray());
         }
 
         public IConfig Config { get; }

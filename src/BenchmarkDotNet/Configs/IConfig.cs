@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IAnalyser> GetAnalysers();
         IEnumerable<Job> GetJobs();
         IEnumerable<IValidator> GetValidators();
-        IEnumerable<HardwareCounter> GetHardwareCounters();
+        IEnumerable<HardwareCounterInfo> GetHardwareCounters();
         IEnumerable<IFilter> GetFilters();
         IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
 

@@ -360,9 +360,9 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void InvalidHardwareCounterNameMeansFailure()
+        public void CustomHardwareCounterNameIsFine()
         {
-            Assert.False(ConfigParser.Parse(new[] { "--counters", "WRONG_NAME" }, new OutputLogger(Output)).isSuccess);
+            Assert.True(ConfigParser.Parse(new[] { "--counters", "WRONG_NAME" }, new OutputLogger(Output)).isSuccess);
         }
 
         [Fact]

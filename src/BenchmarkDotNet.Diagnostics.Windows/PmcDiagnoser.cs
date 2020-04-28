@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public IEnumerable<string> Ids => new[] { DiagnoserId };
 
         protected override ulong EventType
-            => unchecked((ulong)(KernelTraceEventParser.Keywords.PMCProfile | KernelTraceEventParser.Keywords.Profile));
+            => unchecked((ulong)(KernelTraceEventParser.Keywords.PMCProfile)); // Only PMCProfile instead of PMCProfile + Profile to save HW counters usage
 
         protected override string SessionNamePrefix
             => throw new NotImplementedException("Not needed for Kernel sessions (can be only one at a time");

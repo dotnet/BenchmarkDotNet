@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.Exporters
         /// there might be some hardware counter events not belonging to the benchmarked code (for example CLR or BenchmarkDotNet's Engine)
         /// to calculate the % per IP we need to know the total per benchmark, not per process
         /// </summary>
-        private static Dictionary<HardwareCounter, (ulong withoutNoise, ulong total)> SumHardwareCountersStatsOfBenchmarkedCode(
+        private static Dictionary<HardwareCounterInfo, (ulong withoutNoise, ulong total)> SumHardwareCountersStatsOfBenchmarkedCode(
             DisassemblyResult disassemblyResult, PmcStats pmcStats)
         {
             IEnumerable<ulong> Range(Asm asm)
@@ -163,7 +163,7 @@ namespace BenchmarkDotNet.Exporters
             return model;
         }
 
-        private void Export(ILogger logger, BenchmarkCase benchmarkCase, Dictionary<HardwareCounter, (ulong withoutNoise, ulong total)> totals, IReadOnlyList<MethodWithCounters> model, HardwareCounter[] hardwareCounters)
+        private void Export(ILogger logger, BenchmarkCase benchmarkCase, Dictionary<HardwareCounterInfo, (ulong withoutNoise, ulong total)> totals, IReadOnlyList<MethodWithCounters> model, HardwareCounterInfo[] hardwareCounters)
         {
             int columnsCount = hardwareCounters.Length + 1;
 
@@ -185,7 +185,7 @@ namespace BenchmarkDotNet.Exporters
             logger.WriteLine("<table><thead><tr>");
 
             foreach (var hardwareCounter in hardwareCounters)
-                logger.WriteLine($"<th>{hardwareCounter.ToShortName()}</th>");
+                logger.WriteLine($"<th>{hardwareCounter.ShortName}</th>");
 
             logger.WriteLine("<th></th></tr></thead>");
 
@@ -254,14 +254,14 @@ namespace BenchmarkDotNet.Exporters
         private class CodeWithCounters
         {
             internal SourceCode Code { get; set; }
-            internal IReadOnlyDictionary<HardwareCounter, ulong> SumPerCounter { get; set; }
+            internal IReadOnlyDictionary<HardwareCounterInfo, ulong> SumPerCounter { get; set; }
         }
 
         private class MethodWithCounters
         {
             internal DisassembledMethod Method { get; set; }
             internal IReadOnlyList<IReadOnlyList<CodeWithCounters>> Instructions { get; set; }
-            internal IReadOnlyDictionary<HardwareCounter, ulong> SumPerCounter { get; set; }
+            internal IReadOnlyDictionary<HardwareCounterInfo, ulong> SumPerCounter { get; set; }
 
             internal bool HasCounters => SumPerCounter.Values.Any(value => value != default);
         }

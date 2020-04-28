@@ -153,13 +153,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return false;
             }
 
-            foreach (var counterName in options.HardwareCounters)
-                if (!Enum.TryParse(counterName, ignoreCase: true, out HardwareCounter _))
-                {
-                    logger.WriteLineError($"The provided hardware counter \"{counterName}\" is invalid. Available options are: {string.Join("+", Enum.GetNames(typeof(HardwareCounter)))}.");
-                    return false;
-                }
-
             if (!string.IsNullOrEmpty(options.StatisticalTestThreshold) && !Threshold.TryParse(options.StatisticalTestThreshold, out _))
             {
                 logger.WriteLineError("Invalid Threshold for Statistical Test. Use --help to see examples.");
@@ -190,7 +183,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.AddExporter(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
 
             config.AddHardwareCounters(options.HardwareCounters
-                .Select(counterName => (HardwareCounter)Enum.Parse(typeof(HardwareCounter), counterName, ignoreCase: true))
+                .Select(HardwareCounterInfo.Parse)
                 .ToArray());
 
             if (options.UseMemoryDiagnoser)

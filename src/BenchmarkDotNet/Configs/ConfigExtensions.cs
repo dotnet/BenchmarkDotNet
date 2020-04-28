@@ -57,8 +57,8 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static ManualConfig WithOrderer(this IConfig config, IOrderer orderer) => config.With(m => m.WithOrderer(orderer));
 
         [Obsolete("This method will soon be removed, please start using .AddHardwareCounters() instead.")]
-        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.AddHardwareCounters(counters));
-        [PublicAPI] public static ManualConfig AddHardwareCounters(this IConfig config, params HardwareCounter[] counters) => config.With(c => c.AddHardwareCounters(counters));
+        [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params HardwareCounterInfo[] counters) => config.With(c => c.AddHardwareCounters(counters));
+        [PublicAPI] public static ManualConfig AddHardwareCounters(this IConfig config, params HardwareCounterInfo[] counters) => config.With(c => c.AddHardwareCounters(counters));
 
         [Obsolete("This method will soon be removed, please start using .AddFilter() instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params IFilter[] filters) => config.AddFilter(filters);

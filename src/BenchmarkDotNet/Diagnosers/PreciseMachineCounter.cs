@@ -8,13 +8,13 @@ namespace BenchmarkDotNet.Diagnosers
     {
         [PublicAPI] public int ProfileSourceId { get; }
         [PublicAPI] public string Name { get; }
-        [PublicAPI] public HardwareCounter Counter { get; }
+        [PublicAPI] public HardwareCounterInfo Counter { get; }
         [PublicAPI] public int Interval { get; }
         [PublicAPI] public Dictionary<ulong, ulong> PerInstructionPointer { get; }
 
         public ulong Count { get; private set; }
 
-        internal PreciseMachineCounter(int profileSourceId, string name, HardwareCounter counter, int interval)
+        internal PreciseMachineCounter(int profileSourceId, string name, HardwareCounterInfo counter, int interval)
         {
             ProfileSourceId = profileSourceId;
             Name = name;

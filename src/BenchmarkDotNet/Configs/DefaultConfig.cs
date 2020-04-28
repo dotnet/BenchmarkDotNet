@@ -96,7 +96,7 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
 
-        public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
+        public IEnumerable<HardwareCounterInfo> GetHardwareCounters() => Array.Empty<HardwareCounterInfo>();
 
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
     }

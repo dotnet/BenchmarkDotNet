@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Characteristics
             private static readonly HashSet<Type> NonExportableTypes = new HashSet<Type>
             {
                 typeof(IToolchain), // there is no need to set toolchain in child process, it was causing parameterless ctor requirement for all IToolchain implementations
-                typeof(IReadOnlyCollection<HardwareCounter>), // we don't need to export this array to child process
+                typeof(IReadOnlyCollection<HardwareCounterInfo>), // we don't need to export this array to child process
                 typeof(IReadOnlyList<Argument>),
                 typeof(IReadOnlyList<EnvironmentVariable>),
                 typeof(Runtime) // there is no need to set runtime in child process, it was causing parameterless ctor requirement for all Runtime implementations

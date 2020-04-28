@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public KernelTraceEventParser.Keywords KernelKeywords { get; }
 
-        public IReadOnlyDictionary<HardwareCounter, Func<ProfileSourceInfo, int>> IntervalSelectors { get; }
+        public IReadOnlyDictionary<HardwareCounterInfo, Func<ProfileSourceInfo, int>> IntervalSelectors { get; }
 
         public IReadOnlyCollection<(Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)> Providers { get; }
 
@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             int bufferSizeInMb = 256,
             float cpuSampleIntervalInMilliseconds = 1.0f,
             KernelTraceEventParser.Keywords kernelKeywords = KernelTraceEventParser.Keywords.ImageLoad | KernelTraceEventParser.Keywords.Profile,
-            IReadOnlyDictionary<HardwareCounter, Func<ProfileSourceInfo, int>> intervalSelectors = null,
+            IReadOnlyDictionary<HardwareCounterInfo, Func<ProfileSourceInfo, int>> intervalSelectors = null,
             IReadOnlyCollection<(Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)> providers = null,
             bool createHeapSession = false)
         {
@@ -46,13 +46,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             PerformExtraBenchmarksRun = performExtraBenchmarksRun;
             BufferSizeInMb = bufferSizeInMb;
             CpuSampleIntervalInMilliseconds = cpuSampleIntervalInMilliseconds;
-            IntervalSelectors = intervalSelectors ?? new Dictionary<HardwareCounter, Func<ProfileSourceInfo, int>>
+            IntervalSelectors = intervalSelectors ?? new Dictionary<HardwareCounterInfo, Func<ProfileSourceInfo, int>>
             {
                 // following values come from xunit-performance, were selected based on a many trace files from benchmark runs
                 // to keep good balance between accuracy and trace file size
-                { HardwareCounter.InstructionRetired, _ => 1_000_000 },
-                { HardwareCounter.BranchMispredictions, _ => 1_000 },
-                { HardwareCounter.CacheMisses, _ => 1_000 }
+                { HardwareCounterInfo.InstructionRetired, _ => 1_000_000 },
+                { HardwareCounterInfo.BranchMispredictions, _ => 1_000 },
+                { HardwareCounterInfo.CacheMisses, _ => 1_000 }
             };
             Providers = providers ?? new (Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)[]
             {
