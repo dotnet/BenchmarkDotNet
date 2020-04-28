@@ -136,7 +136,7 @@ namespace BenchmarkDotNet.Environments
                 new Windows10Version(1803, "Redstone 4", "April 2018 Update", 17134),
                 new Windows10Version(1809, "Redstone 5", "October 2018 Update", 17763),
                 new Windows10Version(1903, "19H1", "May 2019 Update", 18362),
-                new Windows10Version(1909, "19H2", "November 2018 Update", 18363),
+                new Windows10Version(1909, "19H2", "November 2019 Update", 18363),
                 new Windows10Version(2004, "20H1", "?", 19041)
             };
 
