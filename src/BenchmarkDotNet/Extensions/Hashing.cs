@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Extensions
     {
         private const uint _defaultSeed = (5381 << 16) + 5381;
 
-        internal static uint HashString(ReadOnlySpan<char> str) => MurmurHash(_defaultSeed, str);
+        internal static uint HashString(string str) => MurmurHash(_defaultSeed, str.AsSpan());
 
         /// <summary>
         /// Implements the murmur hash 3 algorithm, using a mock UTF-8 encoding.

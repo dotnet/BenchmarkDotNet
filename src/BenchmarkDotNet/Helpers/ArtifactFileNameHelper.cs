@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Helpers
             string shortTypeName = FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type, includeNamespace: false);
             string methodName = details.BenchmarkCase.Descriptor.WorkloadMethod.Name;
             string parameters = details.BenchmarkCase.HasParameters
-                ? $"-hash{Hashing.HashString(FullNameProvider.GetMethodName(details.BenchmarkCase).AsSpan()).ToString()}"
+                ? $"-hash{Hashing.HashString(FullNameProvider.GetMethodName(details.BenchmarkCase)).ToString()}"
                 : string.Empty;
 
             string fileName = $@"{shortTypeName}.{methodName}{parameters}";

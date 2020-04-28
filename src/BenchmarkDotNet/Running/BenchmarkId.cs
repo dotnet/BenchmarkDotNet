@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Running
             string typeName = FullNameProvider.GetTypeName(benchmark.Descriptor.Type);
             string methodName = benchmark.Descriptor.WorkloadMethod.Name;
             string paramsHash = benchmark.HasParameters
-                ? "paramsHash_" + Hashing.HashString(FullNameProvider.GetMethodName(benchmark).AsSpan()).ToString()
+                ? "paramsHash_" + Hashing.HashString(FullNameProvider.GetMethodName(benchmark)).ToString()
                 : string.Empty;
 
             return $"{typeName}.{methodName}({paramsHash})";
