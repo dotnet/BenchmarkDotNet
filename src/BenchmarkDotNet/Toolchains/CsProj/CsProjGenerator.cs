@@ -35,13 +35,12 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
         {
-            string directoryName = Path.GetDirectoryName(buildPartition.AssemblyLocation);
+            string assemblyLocation = buildPartition.AssemblyLocation;
 
             //Assembles loaded from a stream will have an empty location (https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location).
-            if (directoryName == null || directoryName.IsEmpty())
-            {
-                directoryName = Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Bin");
-            }
+            string directoryName = assemblyLocation.IsEmpty() ?
+                Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Bin") :
+                Path.GetDirectoryName(buildPartition.AssemblyLocation);
 
             return Path.Combine(directoryName, programName);
         }
