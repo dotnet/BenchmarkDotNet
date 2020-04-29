@@ -10,18 +10,12 @@ using BenchmarkDotNet.Toolchains.CsProj;
 using JetBrains.Annotations;
 using Xunit;
 using BenchmarkDotNet.Extensions;
-using Xunit.Abstractions;
 
- namespace BenchmarkDotNet.Tests
+namespace BenchmarkDotNet.Tests
 {
     public class CsProjGeneratorTests
     {
-        private readonly ITestOutputHelper testOutputHelper;
         private FileInfo TestAssemblyFileInfo = new FileInfo(typeof(CsProjGeneratorTests).Assembly.Location);
-        public CsProjGeneratorTests(ITestOutputHelper testOutputHelper)
-        {
-            this.testOutputHelper = testOutputHelper;
-        }
 
         [Theory]
         [InlineData("net471")]
