@@ -181,7 +181,7 @@ namespace BenchmarkDotNet.Tests
         public void TestAssemblyFilePathIsUsedWhenTheAssemblyLocationIsNotEmpty()
         {
             const string programName = "testProgram";
-            var asyncVoidMethod =
+            var benchmarkMethod =
                 typeof(MockFactory.MockBenchmarkClass)
                     .GetTypeInfo()
                     .GetMethods()
