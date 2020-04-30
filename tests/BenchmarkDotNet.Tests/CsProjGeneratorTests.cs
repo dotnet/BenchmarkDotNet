@@ -166,7 +166,7 @@ namespace BenchmarkDotNet.Tests
             var streamLoadedAssembly = Assembly.Load(File.ReadAllBytes(benchmarkDotNetAssembly.Location));
             var assemblyType = streamLoadedAssembly.GetRunnableBenchmarks().Select(type => type).FirstOrDefault();
 
-            var target = new Descriptor(assemblyType, asyncVoidMethod);
+            var target = new Descriptor(assemblyType, benchmarkMethod);
             var benchmarkCase = BenchmarkCase.Create(target, Job.Default, null, config);
 
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, config.CreateImmutableConfig(), 999) };
@@ -186,7 +186,7 @@ namespace BenchmarkDotNet.Tests
                     .GetTypeInfo()
                     .GetMethods()
                     .Single(method => method.Name == nameof(MockFactory.MockBenchmarkClass.Foo));
-            var target = new Descriptor(typeof(MockFactory.MockBenchmarkClass), asyncVoidMethod);
+            var target = new Descriptor(typeof(MockFactory.MockBenchmarkClass), benchmarkMethod);
             var benchmarkCase = BenchmarkCase.Create(target, Job.Default, null, ManualConfig.CreateEmpty().CreateImmutableConfig());
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0) };
             var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.0", null, null, null);
