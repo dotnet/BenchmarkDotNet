@@ -154,7 +154,7 @@ namespace BenchmarkDotNet.Tests
         {
             const string programName = "testProgram";
             var config = ManualConfig.CreateEmpty().CreateImmutableConfig();
-            var asyncVoidMethod =
+            var benchmarkMethod =
                 typeof(MockFactory.MockBenchmarkClass)
                     .GetTypeInfo()
                     .GetMethods()
