@@ -95,7 +95,8 @@ namespace BenchmarkDotNet.Environments
             { "10.0.17134", "10 Redstone 4 [1803, April 2018 Update]" },
             { "10.0.17763", "10 Redstone 5 [1809, October 2018 Update]" },
             { "10.0.18362", "10 19H1 [1903, May 2019 Update]" },
-            { "10.0.18363", "10 19H2 [1909, November 2019 Update]" }
+            { "10.0.18363", "10 19H2 [1909, November 2019 Update]" },
+            { "10.0.19041", "10 20H1 [2004, May 2020 Update]" }
         };
 
         private class Windows10Version
@@ -137,7 +138,7 @@ namespace BenchmarkDotNet.Environments
                 new Windows10Version(1809, "Redstone 5", "October 2018 Update", 17763),
                 new Windows10Version(1903, "19H1", "May 2019 Update", 18362),
                 new Windows10Version(1909, "19H2", "November 2019 Update", 18363),
-                new Windows10Version(2004, "20H1", "?", 19041)
+                new Windows10Version(2004, "20H1", "May 2020 Update", 19041)
             };
 
             [CanBeNull]
