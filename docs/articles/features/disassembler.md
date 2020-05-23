@@ -15,7 +15,7 @@ The configuration options available from code level are:
 * `exportGithubMarkdown`: Exports to GitHub markdown. True by default.
 * `exportHtml`: Exports to HTML with clickable links. False by default.
 * `exportCombinedDisassemblyReport`: Exports all benchmarks to a single HTML report. Makes it easy to compare different runtimes or methods (each becomes a column in HTML table).
-* `exportDiff`: Exports a diff. False by default.
+* `exportDiff`: Exports a diff of the assembly code to the Github markdown format. False by default.
 
 ### Requirements
 

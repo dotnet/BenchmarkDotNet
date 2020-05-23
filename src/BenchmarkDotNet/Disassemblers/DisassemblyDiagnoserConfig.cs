@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Diagnosers
         /// <param name="exportGithubMarkdown">Exports to GitHub markdown. True by default.</param>
         /// <param name="exportHtml">Exports to HTML with clickable links. False by default.</param>
         /// <param name="exportCombinedDisassemblyReport">Exports all benchmarks to a single HTML report. Makes it easy to compare different runtimes or methods (each becomes a column in HTML table).</param>
-        /// <param name="exportDiff">Exports a diff. False by default.</param>
+        /// <param name="exportDiff">Exports a diff of the assembly code to the Github markdown format. False by default.</param>
         [PublicAPI]
         public DisassemblyDiagnoserConfig(
             int maxDepth = 1,
