@@ -9,11 +9,13 @@ Can be enabled by using `[DisassemblyDiagnoser]` or command line args: `-d` or `
 
 The configuration options available from code level are:
 
-* `printIL`: IL will be printed. False by default.
-* `printAsm`: ASM will be printed. True by default.
-* `printSource`: C# source code will be printed. False by default.
-* `printPrologAndEpilog`: ASM for prolog and epilog will be printed. False by default.
-* `recursiveDepth`: Includes called methods to given level. 1 by default, indexed from 1. To print just benchmark set to 0. This option is also available from the console arguments level `--disasmDepth`.
+* `maxDepth`: Includes called methods to given level. 1 by default, indexed from 1. To print just the benchmark set it to 0. This option is also available from the console arguments level `--disasmDepth`.
+* `printSource`: C#|F#|VB source code will be printed. False by default.
+* `printInstructionAddresses`: Print instruction addresses. False by default.
+* `exportGithubMarkdown`: Exports to GitHub markdown. True by default.
+* `exportHtml`: Exports to HTML with clickable links. False by default.
+* `exportCombinedDisassemblyReport`: Exports all benchmarks to a single HTML report. Makes it easy to compare different runtimes or methods (each becomes a column in HTML table).
+* `exportDiff`: Exports a diff. False by default.
 
 ### Requirements
 
