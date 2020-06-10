@@ -1,0 +1,43 @@
+﻿<Project Sdk="$SDKNAME$" DefaultTargets="BuildApp">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <OutputPath>bin</OutputPath>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TargetFramework>$TFM$</TargetFramework>
+    <TargetArchitecture>wasm</TargetArchitecture>
+    <TargetOS>Browser</TargetOS>
+    <RuntimePackDir>$RUNTIMEPACKDIR$</RuntimePackDir>
+    <AppDir>$(MSBuildThisFileDirectory)\bin\net5.0\browser-wasm\publish</AppDir>
+    <AssemblyName>$PROGRAMNAME$</AssemblyName>
+    <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+    $COPIEDSETTINGS$
+  </PropertyGroup>
+
+
+  <UsingTask TaskName="WasmAppBuilder" 
+      AssemblyFile="$WASMAPPBUILDERASSEMBLY$"/>
+
+  <Target Name="BuildApp" DependsOnTargets="Publish">
+    <ItemGroup>
+      <AssemblySearchPaths Include="$(AppDir)"/>
+      <AssemblySearchPaths Include="$(RuntimePackDir)\native"/>
+      <AssemblySearchPaths Include="$(RuntimePackDir)\lib\net5.0"/>
+    </ItemGroup>    
+    <WasmAppBuilder
+      AppDir="$(AppDir)/output"
+      MicrosoftNetCoreAppRuntimePackDir="$(RuntimePackDir)"
+      MainAssembly="bin/net5.0/browser-wasm/$(AssemblyName).dll"
+      MainJS="$MAINJS$"
+      AssemblySearchPaths="@(AssemblySearchPaths)"
+      FilesToIncludeInFileSystem="$(RuntimePackDir)/native/System.Private.CoreLib.dll"/>
+   <Exec Command="chmod a+x $(AppDir)/output/run-v8.sh" />
+ </Target>
+
+  <ItemGroup>
+    <Compile Include="$CODEFILENAME$" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$CSPROJPATH$" />
+  </ItemGroup>
+</Project>

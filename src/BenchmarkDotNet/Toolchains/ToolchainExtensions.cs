@@ -11,11 +11,13 @@ using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.Roslyn;
+using BenchmarkDotNet.Toolchains.MonoWasm;
 
 namespace BenchmarkDotNet.Toolchains
 {
     internal static class ToolchainExtensions
     {
+ 
         internal static IToolchain GetToolchain(this BenchmarkCase benchmarkCase) => GetToolchain(benchmarkCase.Job, benchmarkCase.Descriptor);
 
         internal static IToolchain GetToolchain(this Job job) => GetToolchain(job, null);
@@ -62,6 +64,9 @@ namespace BenchmarkDotNet.Toolchains
                     return coreRtRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
                             ? GetToolchain(coreRtRuntime.RuntimeMoniker)
                             : CoreRtToolchain.CreateBuilder().UseCoreRtNuGet().TargetFrameworkMoniker(coreRtRuntime.MsBuildMoniker).ToToolchain();
+
+                case WasmRuntime wasmRuntime:
+                    return WasmToolChain.NetCoreApp50Wasm;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtime), runtime, "Runtime not supported");

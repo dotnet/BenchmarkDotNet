@@ -49,4 +49,7 @@
     <Compile Include="..\BenchmarkDotNet.Disassembler.x64\SourceCodeProvider.cs" Link="Disassemblers\SourceCodeProvider.cs" />
     <Compile Include="..\BenchmarkDotNet.Disassembler.x64\ClrMdDisassembler.cs" Link="Disassemblers\ClrMdDisassembler.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Toolchains\MonoWasm\" />
+  </ItemGroup>
 </Project>

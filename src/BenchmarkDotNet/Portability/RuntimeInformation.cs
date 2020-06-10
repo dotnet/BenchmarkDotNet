@@ -42,6 +42,13 @@ namespace BenchmarkDotNet.Portability
             => ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
                && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
 
+        /// <summary>
+        /// "Is the target where we will run the benchmarks WASM?"
+        /// </summary>
+        public static bool IsBenchmarkTargetWasm { get; set; }
+
+        public static bool IsWasm() => IsOSPlatform(OSPlatform.Create("BROWSER")); // { return BenchmarkEnvironmentInfo.RunningWasm; }
+
         public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
 
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
@@ -144,6 +151,10 @@ namespace BenchmarkDotNet.Portability
             {
                 return FrameworkVersionHelper.GetFrameworkDescription();
             }
+            else if (IsBenchmarkTargetWasm || IsWasm())
+            {
+                return "wasm";
+            }
             else if (IsNetCore)
             {
                 string runtimeVersion = CoreRuntime.TryGetVersion(out var version) ? version.ToString() : "?";
@@ -168,10 +179,14 @@ namespace BenchmarkDotNet.Portability
                 return MonoRuntime.Default;
             if (IsFullFramework)
                 return ClrRuntime.GetCurrentVersion();
+            if (IsBenchmarkTargetWasm || IsWasm())
+                return WasmRuntime.Default;
             if (IsNetCore)
                 return CoreRuntime.GetCurrentVersion();
             if (IsCoreRT)
                 return CoreRtRuntime.GetCurrentVersion();
+
+
 
             throw new NotSupportedException("Unknown .NET Runtime");
         }

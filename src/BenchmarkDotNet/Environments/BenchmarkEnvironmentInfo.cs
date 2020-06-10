@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Environments
             IsConcurrentGC = GCSettings.LatencyMode != GCLatencyMode.Batch;
             HasAttachedDebugger = Debugger.IsAttached;
             GCAllocationQuantum = GcStats.AllocationQuantum;
-            InDocker = RuntimeInformation.IsRunningInContainer;
+            InDocker = false; //RuntimeInformation.IsRunningInContainer;
         }
 
         public static BenchmarkEnvironmentInfo GetCurrent() => new BenchmarkEnvironmentInfo();

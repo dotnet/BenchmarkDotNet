@@ -119,7 +119,16 @@ namespace BenchmarkDotNet.Toolchains
             string programName = buildPartition.ProgramName;
             string buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(buildPartition, programName);
             string binariesDirectoryPath = GetBinariesDirectoryPath(buildArtifactsDirectoryPath, buildPartition.BuildConfiguration);
-            string executablePath = Path.Combine(binariesDirectoryPath, $"{programName}{GetExecutableExtension()}");
+
+            string executablePath;
+            if (buildPartition.IsWasm)
+            {
+                executablePath = Path.Combine(binariesDirectoryPath, "run-v8.sh");
+            }
+            else
+            {
+                executablePath = Path.Combine(binariesDirectoryPath, $"{programName}{GetExecutableExtension()}");
+            }
 
             return new ArtifactsPaths(
                 rootArtifactsFolderPath: rootArtifactsFolderPath,

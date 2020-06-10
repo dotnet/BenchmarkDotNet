@@ -43,11 +43,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             string name,
             string customDotNetCliPath = null,
             string packagesPath = null,
-            TimeSpan? timeout = null)
+            TimeSpan? timeout = null
+            )
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
             RuntimeFrameworkVersion = runtimeFrameworkVersion;
             Name = name;
+
             CustomDotNetCliPath = customDotNetCliPath;
             PackagesPath = packagesPath;
             Timeout = timeout ?? DefaultBuildTimeout;
@@ -67,6 +69,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public string CustomDotNetCliPath { get; }
 
+
         /// <summary>
         /// The directory to restore packages to.
         /// </summary>
@@ -77,13 +80,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         public TimeSpan Timeout { get; }
 
-        public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
+        public virtual NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath, Timeout);
 
-        public NetCoreAppSettings WithCustomPackagesRestorePath(string packagesPath, string displayName = null)
+        public virtual NetCoreAppSettings WithCustomPackagesRestorePath(string packagesPath, string displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, CustomDotNetCliPath, packagesPath, Timeout);
 
-        public NetCoreAppSettings WithTimeout(TimeSpan? timeOut)
+        public virtual NetCoreAppSettings WithTimeout(TimeSpan? timeOut)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, Name, CustomDotNetCliPath, PackagesPath, timeOut ?? Timeout);
 
     }

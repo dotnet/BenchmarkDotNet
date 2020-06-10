@@ -15,15 +15,15 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     [PublicAPI]
     public class CsProjClassicNetToolchain : Toolchain
     {
-        [PublicAPI] public static readonly IToolchain Net461 = new CsProjClassicNetToolchain("net461");
-        [PublicAPI] public static readonly IToolchain Net462 = new CsProjClassicNetToolchain("net462");
-        [PublicAPI] public static readonly IToolchain Net47 = new CsProjClassicNetToolchain("net47");
-        [PublicAPI] public static readonly IToolchain Net471 = new CsProjClassicNetToolchain("net471");
-        [PublicAPI] public static readonly IToolchain Net472 = new CsProjClassicNetToolchain("net472");
-        [PublicAPI] public static readonly IToolchain Net48 = new CsProjClassicNetToolchain("net48");
+        [PublicAPI] public static readonly IToolchain Net461 = new CsProjClassicNetToolchain("net461", ".NET Framework 4.6.1");
+        [PublicAPI] public static readonly IToolchain Net462 = new CsProjClassicNetToolchain("net462", ".NET Framework 4.6.2");
+        [PublicAPI] public static readonly IToolchain Net47 = new CsProjClassicNetToolchain("net47", ".NET Framework 4.7");
+        [PublicAPI] public static readonly IToolchain Net471 = new CsProjClassicNetToolchain("net471", ".NET Framework 4.7.1");
+        [PublicAPI] public static readonly IToolchain Net472 = new CsProjClassicNetToolchain("net472", ".NET Framework 4.7.2");
+        [PublicAPI] public static readonly IToolchain Net48 = new CsProjClassicNetToolchain("net48", ".NET Framework 4.8");
 
-        private CsProjClassicNetToolchain(string targetFrameworkMoniker, string packagesPath = null, TimeSpan? timeout = null)
-            : base(targetFrameworkMoniker,
+        private CsProjClassicNetToolchain(string targetFrameworkMoniker, string name, string packagesPath = null, TimeSpan? timeout = null)
+            : base(name,
                 new CsProjGenerator(targetFrameworkMoniker, cliPath: null, packagesPath: packagesPath, runtimeFrameworkVersion: null),
                 new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath: null, timeout: timeout),
                 new Executor())
@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         }
 
         public static IToolchain From(string targetFrameworkMoniker, string packagesPath = null, TimeSpan? timeout = null)
-            => new CsProjClassicNetToolchain(targetFrameworkMoniker, packagesPath, timeout);
+            => new CsProjClassicNetToolchain(targetFrameworkMoniker, targetFrameworkMoniker, packagesPath, timeout);
 
         public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
         {

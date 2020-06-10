@@ -17,11 +17,13 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.MonoWasm;
 using CommandLine;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
@@ -356,6 +358,19 @@ namespace BenchmarkDotNet.ConsoleArguments
                     builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
 
                     return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
+                case RuntimeMoniker.Wasm:
+                        IToolchain toolChain = new WasmToolChain("Wasm",
+                                                                 "net5.0",
+                                                                 options.CliPath.FullName,
+                                                                 null,
+                                                                 null,
+                                                                 options.WasmRuntimePackPath,
+                                                                 options.WasmAppBuilderPath,
+                                                                 options.WasmMainJS,
+                                                                 timeOut ?? NetCoreAppSettings.DefaultBuildTimeout);
+
+                        RuntimeInformation.IsBenchmarkTargetWasm = true;
+                        return baseJob.WithRuntime(runtimeMoniker.GetRuntime()).WithToolchain(toolChain);
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
