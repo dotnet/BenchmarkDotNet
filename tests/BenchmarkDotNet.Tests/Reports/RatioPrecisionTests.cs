@@ -29,9 +29,9 @@ namespace BenchmarkDotNet.Tests.Reports
         }
 
         [Theory]
-        [InlineData(new [] { 140, 1, 50 })]
-        [InlineData(new [] { 40, 1, 20 })]
-        [InlineData(new [] { 0, 1, 20 })]
+        [InlineData(new[] { 140, 1, 50 })]
+        [InlineData(new[] { 40, 1, 20 })]
+        [InlineData(new[] { 0, 1, 20 })]
         // First value is baseline, others are benchmark measurements
         public void RatioPrecisionTestWithBaseline(int[] values)
         {

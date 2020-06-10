@@ -6,7 +6,9 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.Roslyn;
 
@@ -19,8 +21,8 @@ namespace BenchmarkDotNet.Toolchains
         internal static IToolchain GetToolchain(this Job job) => GetToolchain(job, null);
 
         private static IToolchain GetToolchain(Job job, Descriptor descriptor)
-            => job.HasValue(InfrastructureMode.ToolchainCharacteristic)
-                ? job.Infrastructure.Toolchain
+            => job.Infrastructure.TryGetToolchain(out var toolchain)
+                ? toolchain
                 : GetToolchain(
                     job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance),
                     descriptor,
@@ -39,7 +41,11 @@ namespace BenchmarkDotNet.Toolchains
                     return RoslynToolchain.Instance;
 
                 case MonoRuntime mono:
-                    if(!string.IsNullOrEmpty(mono.AotArgs))
+                    if (mono.IsXamarinAndroid)
+                        return InProcessEmitToolchain.Instance;
+                    if (mono.IsXamariniOS)
+                        return InProcessNoEmitToolchain.Instance;
+                    if (!string.IsNullOrEmpty(mono.AotArgs))
                         return MonoAotToolchain.Instance;
 
                     return RoslynToolchain.Instance;

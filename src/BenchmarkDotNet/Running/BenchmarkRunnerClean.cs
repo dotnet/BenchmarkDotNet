@@ -12,7 +12,6 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
@@ -21,6 +20,7 @@ using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
+using Perfolizer.Horology;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
 namespace BenchmarkDotNet.Running
@@ -47,11 +47,11 @@ namespace BenchmarkDotNet.Running
 
                 var supportedBenchmarks = GetSupportedBenchmarks(benchmarkRunInfos, compositeLogger, resolver);
                 if (!supportedBenchmarks.Any(benchmarks => benchmarks.BenchmarksCases.Any()))
-                    return new [] { Summary.NothingToRun(title, resultsFolderPath, logFilePath) };
+                    return new[] { Summary.NothingToRun(title, resultsFolderPath, logFilePath) };
 
                 var validationErrors = Validate(supportedBenchmarks, compositeLogger);
                 if (validationErrors.Any(validationError => validationError.IsCritical))
-                    return new [] { Summary.ValidationFailed(title, resultsFolderPath, logFilePath, validationErrors) };
+                    return new[] { Summary.ValidationFailed(title, resultsFolderPath, logFilePath, validationErrors) };
 
                 var benchmarksToRunCount = supportedBenchmarks.Sum(benchmarkInfo => benchmarkInfo.BenchmarksCases.Length);
                 compositeLogger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
@@ -196,7 +196,7 @@ namespace BenchmarkDotNet.Running
         private static void PrintSummary(ILogger logger, ImmutableConfig config, Summary summary)
         {
             var cultureInfo = config.CultureInfo ?? DefaultCultureInfo.Instance;
-            
+
             logger.WriteLineHeader("// ***** BenchmarkRunner: Finish  *****");
             logger.WriteLine();
 
@@ -256,6 +256,17 @@ namespace BenchmarkDotNet.Running
 
             var validationErrors = new List<ValidationError>();
 
+            if (benchmarks.Any(b => b.Config.Options.IsSet(ConfigOptions.JoinSummary)))
+            {
+                var joinedCases = benchmarks.SelectMany(b => b.BenchmarksCases).ToArray();
+
+                validationErrors.AddRange(
+                    ConfigCompatibilityValidator
+                        .FailOnError
+                        .Validate(new ValidationParameters(joinedCases, null))
+                    );
+            }
+
             foreach (var benchmarkRunInfo in benchmarks)
                 validationErrors.AddRange(benchmarkRunInfo.Config.GetCompositeValidator().Validate(new ValidationParameters(benchmarkRunInfo.BenchmarksCases, benchmarkRunInfo.Config)));
 
@@ -284,7 +295,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build   *****");
 
             foreach (var buildPartition in buildPartitions)
-                if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess && !buildResults[buildPartition].TryToExplainFailureReason(out var reason))
+                if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess && !buildResults[buildPartition].TryToExplainFailureReason(out string _))
                     buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, buildLogger);
 
             logger.WriteLineHeader($"// ***** Done, took {globalChronometer.GetElapsed().GetTimeSpan().ToFormattedTotalTime(DefaultCultureInfo.Instance)}   *****");
@@ -326,7 +337,7 @@ namespace BenchmarkDotNet.Running
             {
                 int currentIndex = index;
                 var executeResult = executeResults[index];
-                runs.AddRange(executeResult.Data.Select(line => Measurement.Parse(logger, line, currentIndex + 1)).Where(r => r.IterationMode != IterationMode.Unknown));
+                runs.AddRange(executeResult.Data.Where(line => !string.IsNullOrEmpty(line)).Select(line => Measurement.Parse(logger, line, currentIndex + 1)).Where(r => r.IterationMode != IterationMode.Unknown));
             }
 
             return new BenchmarkReport(success, benchmarkCase, buildResult, buildResult, executeResults, runs, gcStats, metrics);
@@ -394,6 +405,7 @@ namespace BenchmarkDotNet.Running
 
                 var measurements = executeResults
                     .SelectMany(r => r.Data)
+                    .Where(line => !string.IsNullOrEmpty(line))
                     .Select(line => Measurement.Parse(logger, line, 0))
                     .Where(r => r.IterationMode != IterationMode.Unknown)
                     .ToArray();
@@ -451,7 +463,7 @@ namespace BenchmarkDotNet.Running
                     extraRunCompositeDiagnoser,
                     ref success);
 
-                var allRuns = executeResult.Data.Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
+                var allRuns = executeResult.Data.Where(line => !string.IsNullOrEmpty(line)).Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
 
                 metrics.AddRange(
                     extraRunCompositeDiagnoser.ProcessResults(

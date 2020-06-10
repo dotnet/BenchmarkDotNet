@@ -128,4 +128,3 @@ namespace BenchmarkDotNet.Tests
         }
     }
 }
-

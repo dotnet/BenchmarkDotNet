@@ -2,7 +2,6 @@
 using System.Reflection;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
@@ -176,7 +175,7 @@ namespace BenchmarkDotNet.Engines
 
         public static GcStats Parse(string line)
         {
-            if(!line.StartsWith(ResultsLinePrefix))
+            if (!line.StartsWith(ResultsLinePrefix))
                 throw new NotSupportedException($"Line must start with {ResultsLinePrefix}");
 
             var measurementSplit = line.Remove(0, ResultsLinePrefix.Length).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);

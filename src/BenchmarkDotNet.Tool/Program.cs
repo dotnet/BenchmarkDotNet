@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Tool
     [Command(
         Name = "benchmark",
         Description = "A dotnet tool to execute benchmarks built with BenchmarkDotNet.")]
-    [HelpOption()]
+    [HelpOption]
     [VersionOptionFromMember(MemberName = nameof(GetVersion))]
     public sealed class Program
     {

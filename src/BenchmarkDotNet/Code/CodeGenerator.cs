@@ -7,8 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -48,6 +47,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$WorkloadTypeName$", provider.WorkloadTypeName)
                     .Replace("$WorkloadMethodDelegate$", provider.WorkloadMethodDelegate(passArguments))
                     .Replace("$WorkloadMethodReturnType$", provider.WorkloadMethodReturnTypeName)
+                    .Replace("$WorkloadMethodReturnTypeModifiers$", provider.WorkloadMethodReturnTypeModifiers)
                     .Replace("$OverheadMethodReturnTypeName$", provider.OverheadMethodReturnTypeName)
                     .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)
                     .Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName)
@@ -62,7 +62,6 @@ namespace BenchmarkDotNet.Code
                     .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark)).Replace("$LoadArguments$", GetLoadArguments(benchmark))
                     .Replace("$PassArguments$", passArguments)
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
-                    .Replace("$Ref$", provider.UseRefKeyword ? "ref" : null)
                     .Replace("$MeasureExtraStats$", buildInfo.Config.HasExtraStatsDiagnoser() ? "true" : "false")
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
                     .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments)).ToString();
@@ -74,6 +73,8 @@ namespace BenchmarkDotNet.Code
 
             if (buildPartition.IsCoreRT)
                 extraDefines.Add("#define CORERT");
+            else if (buildPartition.IsNetFramework)
+                extraDefines.Add("#define NETFRAMEWORK");
 
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
                 .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
@@ -149,7 +150,7 @@ namespace BenchmarkDotNet.Code
         {
             var method = descriptor.WorkloadMethod;
 
-            if (method.ReturnType == typeof(Task))
+            if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask))
             {
                 return new TaskDeclarationsProvider(descriptor);
             }
@@ -173,7 +174,11 @@ namespace BenchmarkDotNet.Code
 
             if (method.ReturnType.IsByRef)
             {
-                return new ByRefDeclarationsProvider(descriptor);
+                // System.Runtime.CompilerServices.IsReadOnlyAttribute is part of .NET Standard 2.1, we can't use it here..
+                if (method.ReturnParameter.GetCustomAttributes().Any(attribute => attribute.GetType().Name == "IsReadOnlyAttribute"))
+                    return new ByReadOnlyRefDeclarationsProvider(descriptor);
+                else
+                    return new ByRefDeclarationsProvider(descriptor);
             }
 
             return new NonVoidDeclarationsProvider(descriptor);
@@ -233,11 +238,20 @@ namespace BenchmarkDotNet.Code
         }
 
         private static string GetParameterModifier(ParameterInfo parameterInfo)
-            => parameterInfo.ParameterType.IsByRef
-                ? "ref"
-                : parameterInfo.IsOut
-                    ? "out"
-                    : string.Empty;
+        {
+            if (!parameterInfo.ParameterType.IsByRef)
+                return string.Empty;
+
+            // From https://stackoverflow.com/a/38110036/5852046 :
+            // "If you don't do the IsByRef check for out parameters, then you'll incorrectly get members decorated with the
+            // [Out] attribute from System.Runtime.InteropServices but which aren't actually C# out parameters."
+            if (parameterInfo.IsOut)
+                return "out";
+            else if (parameterInfo.IsIn)
+                return "in";
+            else
+                return "ref";
+        }
 
         /// <summary>
         /// for CoreRT we can't use reflection to load type and run a method, so we simply generate a switch for all types..
@@ -262,7 +276,7 @@ namespace BenchmarkDotNet.Code
         private static Type GetFieldType(Type argumentType, ParameterInstance argument)
         {
             // #774 we can't store Span in a field, so we store an array (which is later casted to Span when we load the arguments)
-            if(argumentType.IsStackOnlyWithImplicitCast(argument.Value))
+            if (argumentType.IsStackOnlyWithImplicitCast(argument.Value))
                 return argument.Value.GetType();
 
             return argumentType;

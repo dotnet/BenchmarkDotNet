@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using Perfolizer.Mathematics.SignificanceTesting;
+using Perfolizer.Mathematics.Thresholds;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -26,7 +28,8 @@ namespace BenchmarkDotNet.Columns
         public override string Id => nameof(StatisticalTestColumn) + "." + Kind + "." + Threshold + "." + (ShowPValues ? "WithDetails" : "WithoutDetails");
         public override string ColumnName => $"{Kind}({Threshold.ToString().Replace(" ", "")}){(ShowPValues ? "/p-values" : "")}";
 
-        internal override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, Statistics current, bool isBaseline)
+        public override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, IReadOnlyDictionary<string, Metric> baselineMetrics,
+            Statistics current, IReadOnlyDictionary<string, Metric> currentMetrics, bool isBaseline)
         {
             var x = baseline.OriginalValues.ToArray();
             var y = current.OriginalValues.ToArray();

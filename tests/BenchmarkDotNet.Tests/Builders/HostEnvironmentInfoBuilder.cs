@@ -1,8 +1,8 @@
 ﻿using System;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Portability.Cpu;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Tests.Builders
 {

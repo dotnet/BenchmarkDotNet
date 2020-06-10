@@ -215,7 +215,7 @@ namespace BenchmarkDotNet.Running
                     argumentsAttribute
                         .Values
                         .Select((value, index) =>
-                            { 
+                            {
                                 var definition = parameterDefinitions[index];
                                 var type = definition.ParameterType;
                                 return new ParameterInstance(definition, Map(value, type), summaryStyle);
@@ -306,7 +306,7 @@ namespace BenchmarkDotNet.Running
             else if (providedValue.GetType().IsEnum || type.IsEnum)
             {
                 return EnumParam.FromObject(providedValue, type);
-            }            
+            }
             return providedValue;
         }
 

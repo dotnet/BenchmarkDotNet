@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
+using Perfolizer.Horology;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests

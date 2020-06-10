@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Attributes
         {
             Config = ManualConfig.CreateEmpty().AddLogger(ConsoleLogger.Unicode);
         }
-        
+
         public IConfig Config { get; }
     }
 }

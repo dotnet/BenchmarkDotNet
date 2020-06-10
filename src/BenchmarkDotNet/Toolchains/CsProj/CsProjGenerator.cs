@@ -35,8 +35,13 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
         {
-            string directoryName = Path.GetDirectoryName(buildPartition.AssemblyLocation)
-                ?? throw new DirectoryNotFoundException(buildPartition.AssemblyLocation);
+            string assemblyLocation = buildPartition.AssemblyLocation;
+
+            //Assembles loaded from a stream will have an empty location (https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location).
+            string directoryName = assemblyLocation.IsEmpty() ?
+                Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Bin") :
+                Path.GetDirectoryName(buildPartition.AssemblyLocation);
+
             return Path.Combine(directoryName, programName);
         }
 
@@ -92,7 +97,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         // the host project or one of the .props file that it imports might contain some custom settings that needs to be copied, sth like
         // <NetCoreAppImplicitPackageVersion>2.0.0-beta-001607-00</NetCoreAppImplicitPackageVersion>
-	    // <RuntimeFrameworkVersion>2.0.0-beta-001607-00</RuntimeFrameworkVersion>
+        // <RuntimeFrameworkVersion>2.0.0-beta-001607-00</RuntimeFrameworkVersion>
         internal (string customProperties, string sdkName) GetSettingsThatNeedsToBeCopied(TextReader streamReader, FileInfo projectFile)
         {
             if (!string.IsNullOrEmpty(RuntimeFrameworkVersion)) // some power users knows what to configure, just do it and copy nothing more
@@ -140,11 +145,11 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI]
         protected virtual FileInfo GetProjectFilePath(Type benchmarkTarget, ILogger logger)
         {
-            if (!GetSolutionRootDirectory(out var solutionRootDirectory))
+            if (!GetSolutionRootDirectory(out var rootDirectory) && !GetProjectRootDirectory(out rootDirectory))
             {
                 logger.WriteLineError(
-                    $"Unable to find .sln file. Will use current directory {Directory.GetCurrentDirectory()} to search for project file. If you don't use .sln file on purpose it should not be a problem.");
-                solutionRootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
+                    $"Unable to find .sln or .csproj file. Will use current directory {Directory.GetCurrentDirectory()} to search for project file. If you don't use .sln file on purpose it should not be a problem.");
+                rootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
             }
 
             // important assumption! project's file name === output dll name
@@ -153,14 +158,14 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             // I was afraid of using .GetFiles with some smart search pattern due to the fact that the method was designed for Windows
             // and now .NET is cross platform so who knows if the pattern would be supported for other OSes
             var possibleNames = new HashSet<string> { $"{projectName}.csproj", $"{projectName}.fsproj", $"{projectName}.vbproj" };
-            var projectFile = solutionRootDirectory
+            var projectFile = rootDirectory
                 .EnumerateFiles("*.*", SearchOption.AllDirectories)
                 .FirstOrDefault(file => possibleNames.Contains(file.Name));
 
             if (projectFile == default(FileInfo))
             {
                 throw new NotSupportedException(
-                    $"Unable to find {projectName} in {solutionRootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj");
+                    $"Unable to find {projectName} in {rootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj");
             }
             return projectFile;
         }

@@ -10,3 +10,5 @@
   href: disassembler.md
 - name: EtwProfiler
   href: etwprofiler.md
+- name: EventPipeProfiler
+  href: event-pipe-profiler.md

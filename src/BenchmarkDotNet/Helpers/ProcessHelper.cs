@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Helpers
                 RedirectStandardError = true
             };
 
-            if(environmentVariables != null)
+            if (environmentVariables != null)
                 foreach (var environmentVariable in environmentVariables)
                     processStartInfo.Environment[environmentVariable.Key] = environmentVariable.Value;
 

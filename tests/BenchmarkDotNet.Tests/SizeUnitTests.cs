@@ -12,8 +12,8 @@ namespace BenchmarkDotNet.Tests
         {
             this.output = output;
         }
-        
-        
+
+
         [Fact]
         public void ConvertTest()
         {
@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Tests
         {
             Assert.Equal(expected, SizeValue.FromBytes(bytes).ToString(TestCultureInfo.Instance));
         }
-        
+
         private void CheckConvertTwoWay(long value1, SizeUnit unit1, long value2, SizeUnit unit2)
         {
             CheckConvertOneWay(value1, unit1, value2, unit2);

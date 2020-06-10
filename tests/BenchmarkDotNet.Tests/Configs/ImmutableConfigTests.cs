@@ -70,18 +70,18 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Single(final.GetDiagnosers().OfType<IHardwareCountersDiagnoser>());
         }
 
-        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers and disassembler only for Windows. This test is disabled for .NET Core because CoreRT compiler goes crazy when some dependency has reference to TraceEvent...")]
+        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because CoreRT compiler goes crazy when some dependency has reference to TraceEvent...")]
         public void WhenUserDefinesHardwareCountersAndUsesDisassemblyDiagnoserWeAddInstructionPointerExporter()
         {
             var mutable = ManualConfig.CreateEmpty();
 
             mutable.AddHardwareCounters(HardwareCounter.CacheMisses);
-            mutable.AddDiagnoser(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.All));
+            mutable.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig()));
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
             Assert.Single(final.GetDiagnosers().OfType<IHardwareCountersDiagnoser>());
-            Assert.Single(final.GetDiagnosers().OfType<IDisassemblyDiagnoser>());
+            Assert.Single(final.GetDiagnosers().OfType<DisassemblyDiagnoser>());
             Assert.Single(final.GetExporters().OfType<InstructionPointerExporter>());
         }
 
@@ -90,8 +90,8 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var mutable = ManualConfig.CreateEmpty();
 
-            mutable.AddDiagnoser(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.All));
-            mutable.AddDiagnoser(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.Asm));
+            mutable.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig()));
+            mutable.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig()));
 
             var final = ImmutableConfigBuilder.Create(mutable);
 
@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             var fromEmpty = ImmutableConfigBuilder.Create(ManualConfig.CreateEmpty());
             Assert.Contains(JitOptimizationsValidator.DontFailOnError, fromEmpty.GetValidators());
-            
+
 #if !DEBUG
             // DefaultConfig.Instance doesn't include JitOptimizationsValidator.FailOnError in the DEBUG mode
             var fromDefault = ImmutableConfigBuilder.Create(DefaultConfig.Instance);
@@ -304,7 +304,7 @@ namespace BenchmarkDotNet.Tests.Configs
             var leftAddedToTheRight = ManualConfig.Create(right);
             leftAddedToTheRight.Add(left);
 
-            return new []{ rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig() };
+            return new[]{ rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig() };
         }
 
         public class TestExporter : IExporter, IExporterDependencies

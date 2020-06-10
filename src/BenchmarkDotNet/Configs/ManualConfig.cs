@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Configs
             Options = Options.Set(value, option);
             return this;
         }
-        
+
         public ManualConfig WithOptions(ConfigOptions options)
         {
             Options |= options;
@@ -168,7 +168,7 @@ namespace BenchmarkDotNet.Configs
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will soon be removed, please start using ..AddHardwareCounters()() instead.")]
         public void Add(params HardwareCounter[] newHardwareCounters) => AddHardwareCounters(newHardwareCounters);
-        
+
         public ManualConfig AddHardwareCounters(params HardwareCounter[] newHardwareCounters)
         {
             hardwareCounters.AddRange(newHardwareCounters);
@@ -178,7 +178,7 @@ namespace BenchmarkDotNet.Configs
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will soon be removed, please start using .AddFilter() instead.")]
         public void Add(params IFilter[] newFilters) => AddFilter(newFilters);
-        
+
         public ManualConfig AddFilter(params IFilter[] newFilters)
         {
             filters.AddRange(newFilters);
@@ -188,7 +188,7 @@ namespace BenchmarkDotNet.Configs
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will soon be removed, please start using .AddLogicalGroupRules() instead.")]
         public void Add(params BenchmarkLogicalGroupRule[] rules) => AddLogicalGroupRules(rules);
-        
+
         public ManualConfig AddLogicalGroupRules(params BenchmarkLogicalGroupRule[] rules)
         {
             logicalGroupRules.AddRange(rules);

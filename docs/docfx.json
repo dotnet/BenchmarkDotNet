@@ -3,7 +3,10 @@
     {
       "src": [
         {
-          "files": "src/BenchmarkDotNet/*.csproj",
+          "files": [
+            "src/BenchmarkDotNet/*.csproj",
+            "src/BenchmarkDotNet.Annotations/*.csproj"
+          ],
           "exclude": [
             "**/obj/**",
             "**/bin/**"

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.Common;
+using Perfolizer.Mathematics.OutlierDetection;
+using Perfolizer.Mathematics.QuantileEstimators;
 
 namespace BenchmarkDotNet.Mathematics
 {
@@ -31,6 +34,8 @@ namespace BenchmarkDotNet.Mathematics
         public ConfidenceInterval ConfidenceInterval { get; }
         public PercentileValues Percentiles { get; }
 
+        private OutlierDetector outlierDetector;
+
         public Statistics(params double[] values) :
             this(values.ToList()) { }
 
@@ -45,44 +50,38 @@ namespace BenchmarkDotNet.Mathematics
             if (N == 0)
                 throw new InvalidOperationException("Sequence of values contains no elements, Statistics can't be calculated");
 
-            if (N == 1)
-                Q1 = Median = Q3 = SortedValues[0];
-            else
-            {
-                double GetMedian(IReadOnlyList<double> x) => x.Count % 2 == 0
-                    ? (x[x.Count / 2 - 1] + x[x.Count / 2]) / 2
-                    : x[x.Count / 2];
+            var quartiles = Quartiles.FromSorted(SortedValues);
+            Min = quartiles.Min;
+            Q1 = quartiles.Q1;
+            Median = quartiles.Median;
+            Q3 = quartiles.Q3;
+            Max = quartiles.Max;
+            InterquartileRange = quartiles.InterquartileRange;
 
-                Median = GetMedian(SortedValues);
-                Q1 = GetMedian(SortedValues.Take(N / 2).ToList());
-                Q3 = GetMedian(SortedValues.Skip((N + 1) / 2).ToList());
-            }
+            var moments = Moments.Create(SortedValues);
+            Mean = moments.Mean;
+            StandardDeviation = moments.StandardDeviation;
+            Variance = moments.Variance;
+            Skewness = moments.Skewness;
+            Kurtosis = moments.Kurtosis;
 
-            Min = SortedValues.First();
-            Mean = SortedValues.Average();
-            Max = SortedValues.Last();
+            var tukey = TukeyOutlierDetector.FromQuartiles(quartiles);
+            LowerFence = tukey.LowerFence;
+            UpperFence = tukey.UpperFence;
+            AllOutliers = SortedValues.Where(tukey.IsOutlier).ToArray();
+            LowerOutliers = SortedValues.Where(tukey.IsLowerOutlier).ToArray();
+            UpperOutliers = SortedValues.Where(tukey.IsUpperOutlier).ToArray();
+            outlierDetector = tukey;
 
-            InterquartileRange = Q3 - Q1;
-            LowerFence = Q1 - 1.5 * InterquartileRange;
-            UpperFence = Q3 + 1.5 * InterquartileRange;
-
-            AllOutliers = SortedValues.Where(IsOutlier).ToArray();
-            LowerOutliers = SortedValues.Where(IsLowerOutlier).ToArray();
-            UpperOutliers = SortedValues.Where(IsUpperOutlier).ToArray();
-
-            Variance = N == 1 ? 0 : SortedValues.Sum(d => Math.Pow(d - Mean, 2)) / (N - 1);
-            StandardDeviation = Math.Sqrt(Variance);
             StandardError = StandardDeviation / Math.Sqrt(N);
-            Skewness = CalcCentralMoment(3) / StandardDeviation.Pow(3);
-            Kurtosis = CalcCentralMoment(4) / StandardDeviation.Pow(4);
             ConfidenceInterval = new ConfidenceInterval(Mean, StandardError, N);
             Percentiles = new PercentileValues(SortedValues);
         }
 
         [PublicAPI] public ConfidenceInterval GetConfidenceInterval(ConfidenceLevel level, int n) => new ConfidenceInterval(Mean, StandardError, n, level);
-        [PublicAPI] public bool IsLowerOutlier(double value) => value < LowerFence;
-        [PublicAPI] public bool IsUpperOutlier(double value) => value > UpperFence;
-        [PublicAPI] public bool IsOutlier(double value) => value < LowerFence || value > UpperFence;
+        [PublicAPI] public bool IsLowerOutlier(double value) => outlierDetector.IsLowerOutlier(value);
+        [PublicAPI] public bool IsUpperOutlier(double value) => outlierDetector.IsUpperOutlier(value);
+        [PublicAPI] public bool IsOutlier(double value) => outlierDetector.IsOutlier(value);
         [PublicAPI] public double[] WithoutOutliers() => SortedValues.Where(value => !IsOutlier(value)).ToArray();
 
         [PublicAPI] public double CalcCentralMoment(int k) => SortedValues.Average(x => (x - Mean).Pow(k));
@@ -91,20 +90,14 @@ namespace BenchmarkDotNet.Mathematics
         {
             switch (outlierMode)
             {
-#pragma warning disable 618
-                case OutlierMode.None:
                 case OutlierMode.DontRemove:
                     return false;
-                case OutlierMode.OnlyUpper:
                 case OutlierMode.RemoveUpper:
                     return IsUpperOutlier(value);
-                case OutlierMode.OnlyLower:
                 case OutlierMode.RemoveLower:
                     return IsLowerOutlier(value);
-                case OutlierMode.All:
                 case OutlierMode.RemoveAll:
                     return IsOutlier(value);
-#pragma warning restore 618
                 default:
                     throw new ArgumentOutOfRangeException(nameof(outlierMode), outlierMode, null);
             }
@@ -115,20 +108,14 @@ namespace BenchmarkDotNet.Mathematics
         {
             switch (outlierMode)
             {
-#pragma warning disable 618
-                case OutlierMode.None:
                 case OutlierMode.DontRemove:
                     return Array.Empty<double>();
-                case OutlierMode.OnlyUpper:
                 case OutlierMode.RemoveUpper:
                     return UpperOutliers;
-                case OutlierMode.OnlyLower:
                 case OutlierMode.RemoveLower:
                     return LowerOutliers;
-                case OutlierMode.All:
                 case OutlierMode.RemoveAll:
                     return AllOutliers;
-#pragma warning restore 618
                 default:
                     throw new ArgumentOutOfRangeException(nameof(outlierMode), outlierMode, null);
             }

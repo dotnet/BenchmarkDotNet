@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Samples
                 CultureInfo.NumberFormat.NumberDecimalSeparator = "@";
             }
         }
-        
+
         [Benchmark]
         public void Foo() => Thread.Sleep(100);
     }

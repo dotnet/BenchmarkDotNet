@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         }
     }
 
-    [KeepBenchmarkFiles()]
+    [KeepBenchmarkFiles]
     public class CoreRtBenchmark
     {
         [Benchmark]

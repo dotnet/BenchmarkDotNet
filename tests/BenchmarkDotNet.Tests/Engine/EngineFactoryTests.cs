@@ -13,31 +13,31 @@ namespace BenchmarkDotNet.Tests.Engine
 {
     public class EngineFactoryTests
     {
-        int timesBenchmarkCalled = 0, timesOverheadCalled = 0;
-        int timesGlobalSetupCalled = 0, timesGlobalCleanupCalled = 0, timesIterationSetupCalled = 0, timesIterationCleanupCalled = 0;
+        private int timesBenchmarkCalled = 0, timesOverheadCalled = 0;
+        private int timesGlobalSetupCalled = 0, timesGlobalCleanupCalled = 0, timesIterationSetupCalled = 0, timesIterationCleanupCalled = 0;
 
-        TimeSpan IterationTime => TimeSpan.FromMilliseconds(EngineResolver.Instance.Resolve(Job.Default, RunMode.IterationTimeCharacteristic).ToMilliseconds());
+        private TimeSpan IterationTime => TimeSpan.FromMilliseconds(EngineResolver.Instance.Resolve(Job.Default, RunMode.IterationTimeCharacteristic).ToMilliseconds());
 
-        IResolver DefaultResolver => BenchmarkRunnerClean.DefaultResolver;
+        private IResolver DefaultResolver => BenchmarkRunnerClean.DefaultResolver;
 
-        void GlobalSetup() => timesGlobalSetupCalled++;
-        void IterationSetup() => timesIterationSetupCalled++;
-        void IterationCleanup() => timesIterationCleanupCalled++;
-        void GlobalCleanup() => timesGlobalCleanupCalled++;
+        private void GlobalSetup() => timesGlobalSetupCalled++;
+        private void IterationSetup() => timesIterationSetupCalled++;
+        private void IterationCleanup() => timesIterationCleanupCalled++;
+        private void GlobalCleanup() => timesGlobalCleanupCalled++;
 
-        void Throwing(long _) => throw new InvalidOperationException("must NOT be called");
+        private void Throwing(long _) => throw new InvalidOperationException("must NOT be called");
 
-        void VeryTimeConsumingSingle(long _)
+        private void VeryTimeConsumingSingle(long _)
         {
             timesBenchmarkCalled++;
             Thread.Sleep(IterationTime);
         }
 
-        void InstantNoUnroll(long invocationCount) => timesBenchmarkCalled += (int) invocationCount;
-        void InstantUnroll(long _) => timesBenchmarkCalled += 16;
+        private void InstantNoUnroll(long invocationCount) => timesBenchmarkCalled += (int) invocationCount;
+        private void InstantUnroll(long _) => timesBenchmarkCalled += 16;
 
-        void OverheadNoUnroll(long invocationCount) => timesOverheadCalled += (int) invocationCount;
-        void OverheadUnroll(long _) => timesOverheadCalled += 16;
+        private void OverheadNoUnroll(long invocationCount) => timesOverheadCalled += (int) invocationCount;
+        private void OverheadUnroll(long _) => timesOverheadCalled += 16;
 
         private static readonly Dictionary<string, Job> JobsWhichDontRequireJitting = new Dictionary<string, Job>
         {

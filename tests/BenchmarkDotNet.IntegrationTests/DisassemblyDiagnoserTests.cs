@@ -6,6 +6,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Xunit;
@@ -21,9 +22,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         private const string WindowsOnly = "Disassembler supports only Windows";
 
-        public DisassemblyDiagnoserTests(ITestOutputHelper output) : base(output)
-        {
-        }
+        public DisassemblyDiagnoserTests(ITestOutputHelper output) : base(output) { }
 
         public static IEnumerable<object[]> GetAllJits()
             => new[]
@@ -54,7 +53,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 Static();
                 Instance();
                 Recursive();
-                Virtual();
 
                 Benchmark(true);
             }
@@ -70,8 +68,6 @@ namespace BenchmarkDotNet.IntegrationTests
                     Recursive();
             }
 
-            public virtual void Virtual() { }
-
             [MethodImpl(MethodImplOptions.NoInlining)] public void Benchmark(bool justAnOverload) { } // we need to test overloads (#562)
         }
 
@@ -80,8 +76,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, Runtime runtime)
         {
-            var disassemblyDiagnoser = (IDisassemblyDiagnoser)DisassemblyDiagnoser.Create(
-                new DisassemblyDiagnoserConfig(printAsm: true, printIL: true, printSource: true, recursiveDepth: 3));
+            var disassemblyDiagnoser = new DisassemblyDiagnoser(
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
             CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.ColdStart));
 
@@ -90,7 +86,6 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Static)}()");
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Instance)}()");
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Recursive)}()");
-            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Virtual)}()");
         }
 
         public class Generic<T> where T : new()
@@ -104,14 +99,14 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleGenericTypes(Jit jit, Platform platform, Runtime runtime)
         {
-            var disassemblyDiagnoser = (IDisassemblyDiagnoser)DisassemblyDiagnoser.Create(
-                new DisassemblyDiagnoserConfig(printAsm: true, printIL: true, printSource: true, recursiveDepth: 3));
+            var disassemblyDiagnoser = new DisassemblyDiagnoser(
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
             CanExecute<Generic<int>>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.Monitoring));
 
             var result = disassemblyDiagnoser.Results.Values.Single();
 
-            Assert.Contains(result.Methods, method => method.Maps.Any(map => map.Instructions.OfType<Asm>().Any()));
+            Assert.Contains(result.Methods, method => method.Maps.Any(map => map.SourceCodes.OfType<Asm>().Any()));
         }
 
         public class WithInlineable
@@ -124,14 +119,14 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleInlinableBenchmarks(Jit jit, Platform platform, Runtime runtime)
         {
-            var disassemblyDiagnoser = (IDisassemblyDiagnoser)DisassemblyDiagnoser.Create(
-                new DisassemblyDiagnoserConfig(printAsm: true, printIL: true, printSource: true, recursiveDepth: 3));
+            var disassemblyDiagnoser = new DisassemblyDiagnoser(
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
             CanExecute<WithInlineable>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.Monitoring));
 
             var disassemblyResult = disassemblyDiagnoser.Results.Values.Single(result => result.Methods.Count(method => method.Name.Contains(nameof(WithInlineable.JustReturn))) == 1);
 
-            Assert.Contains(disassemblyResult.Methods, method => method.Maps.Any(map => map.Instructions.OfType<Asm>().All(asm => asm.TextRepresentation.Contains("ret"))));
+            Assert.Contains(disassemblyResult.Methods, method => method.Maps.Any(map => map.SourceCodes.OfType<Asm>().All(asm => asm.Instruction.ToString().Contains("ret"))));
         }
 
         private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, IDiagnoser disassemblyDiagnoser, RunStrategy runStrategy)
@@ -145,10 +140,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddDiagnoser(disassemblyDiagnoser)
                 .AddLogger(new OutputLogger(Output));
 
-        private void AssertDisassembled(IDisassemblyDiagnoser diagnoser, string methodSignature)
+        private void AssertDisassembled(DisassemblyDiagnoser diagnoser, string methodSignature)
         {
             Assert.True(diagnoser.Results.Single().Value
-                .Methods.Any(method => method.Name.EndsWith(methodSignature) && method.Maps.Any(map => map.Instructions.Any())),
+                .Methods.Any(method => method.Name.EndsWith(methodSignature) && method.Maps.Any(map => map.SourceCodes.Any())),
                 $"{methodSignature} is missing");
         }
     }
