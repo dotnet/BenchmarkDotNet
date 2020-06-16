@@ -741,7 +741,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new ArgumentException("The argument value is incorrect!");
                 if (ParamOne != 1)
                     throw new ArgumentException("The ParamOne value is incorrect!");
-                if (ParamTwo != 2)
+                if (ParamTwo != 2 && ParamTwo != 3)
                     throw new ArgumentException("The ParamTwo value is incorrect!");
             }
         }
