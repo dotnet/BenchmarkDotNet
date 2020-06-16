@@ -651,6 +651,101 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void StaticMethodsAndPropertiesCanBeUsedAsSources_EnumerableOfObjects(IToolchain toolchain)
+            => CanExecute<WithStaticSources_EnumerableOfObjects>(toolchain);
+
+        public class WithStaticSources_EnumerableOfObjects
+        {
+            public static IEnumerable<object> StaticMethod() { yield return 1; }
+
+            public static IEnumerable<object> StaticProperty
+            {
+                get
+                {
+                    yield return 2;
+                    yield return 3;
+                }
+            }
+
+            [ParamsSource(nameof(StaticMethod))]
+            public int ParamOne { get; set; }
+
+            [ParamsSource(nameof(StaticProperty))]
+            public int ParamTwo { get; set; }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(StaticMethod))]
+            public void TestMethod(int argument)
+            {
+                if (argument != 1)
+                    throw new ArgumentException("The argument value is incorrect!");
+                if (ParamOne != 1)
+                    throw new ArgumentException("The ParamOne value is incorrect!");
+                if (ParamTwo != 2 && ParamTwo != 3)
+                    throw new ArgumentException("The ParamTwo value is incorrect!");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(StaticProperty))]
+            public void TestProperty(int argument)
+            {
+                if (argument != 2 && argument != 3)
+                    throw new ArgumentException("The argument value is incorrect!");
+                if (ParamOne != 1)
+                    throw new ArgumentException("The ParamOne value is incorrect!");
+                if (ParamTwo != 2 && ParamTwo != 3)
+                    throw new ArgumentException("The ParamTwo value is incorrect!");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void StaticMethodsAndPropertiesCanBeUsedAsSources_EnumerableOfArrayOfObjects(IToolchain toolchain)
+            => CanExecute<WithStaticSources_EnumerableOfArrayOfObjects>(toolchain);
+
+        public class WithStaticSources_EnumerableOfArrayOfObjects
+        {
+            public static IEnumerable<object[]> StaticMethod() { yield return new object[] { 1 }; }
+            public static IEnumerable<object[]> StaticProperty
+            {
+                get
+                {
+                    yield return new object[] { 2 };
+                    yield return new object[] { 3 };
+                }
+            }
+
+            [ParamsSource(nameof(StaticMethod))]
+            public int ParamOne { get; set; }
+
+            [ParamsSource(nameof(StaticProperty))]
+            public int ParamTwo { get; set; }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(StaticMethod))]
+            public void TestMethod(int argument)
+            {
+                if (argument != 1)
+                    throw new ArgumentException("The argument value is incorrect!");
+                if (ParamOne != 1)
+                    throw new ArgumentException("The ParamOne value is incorrect!");
+                if (ParamTwo != 2 && ParamTwo != 3)
+                    throw new ArgumentException("The ParamTwo value is incorrect!");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(StaticProperty))]
+            public void TestProperty(int argument)
+            {
+                if (argument != 2 && argument != 3)
+                    throw new ArgumentException("The argument value is incorrect!");
+                if (ParamOne != 1)
+                    throw new ArgumentException("The ParamOne value is incorrect!");
+                if (ParamTwo != 2 && ParamTwo != 3)
+                    throw new ArgumentException("The ParamTwo value is incorrect!");
+            }
+        }
+
         private void CanExecute<T>(IToolchain toolchain)
         {
             var config = CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain));
