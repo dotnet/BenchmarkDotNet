@@ -1,7 +1,15 @@
 ﻿using System.IO;
+using System.Linq;
+using System.Reflection;
+using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Toolchains.CsProj;
 using JetBrains.Annotations;
 using Xunit;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -139,6 +147,64 @@ namespace BenchmarkDotNet.Tests
             }
 
             File.Delete(propsFilePath);
+        }
+
+        [Fact]
+        public void TheDefaultFilePathShouldBeUsedWhenAnAssemblyLocationIsEmpty()
+        {
+            const string programName = "testProgram";
+            var config = ManualConfig.CreateEmpty().CreateImmutableConfig();
+            var benchmarkMethod =
+                typeof(MockFactory.MockBenchmarkClass)
+                    .GetTypeInfo()
+                    .GetMethods()
+                    .Single(method => method.Name == nameof(MockFactory.MockBenchmarkClass.Foo));
+
+
+            //Simulate loading an assembly from a stream
+            var benchmarkDotNetAssembly = typeof(MockFactory.MockBenchmarkClass).GetTypeInfo().Assembly;
+            var streamLoadedAssembly = Assembly.Load(File.ReadAllBytes(benchmarkDotNetAssembly.Location));
+            var assemblyType = streamLoadedAssembly.GetRunnableBenchmarks().Select(type => type).FirstOrDefault();
+
+            var target = new Descriptor(assemblyType, benchmarkMethod);
+            var benchmarkCase = BenchmarkCase.Create(target, Job.Default, null, config);
+
+            var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, config.CreateImmutableConfig(), 999) };
+            var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.0", null, null, null);
+            string binariesPath = projectGenerator.ResolvePathForBinaries(new BuildPartition(benchmarks, new Resolver()), programName);
+
+            string expectedPath = Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Bin"), programName);
+            Assert.Equal(expectedPath, binariesPath);
+        }
+
+        [Fact]
+        public void TestAssemblyFilePathIsUsedWhenTheAssemblyLocationIsNotEmpty()
+        {
+            const string programName = "testProgram";
+            var benchmarkMethod =
+                typeof(MockFactory.MockBenchmarkClass)
+                    .GetTypeInfo()
+                    .GetMethods()
+                    .Single(method => method.Name == nameof(MockFactory.MockBenchmarkClass.Foo));
+            var target = new Descriptor(typeof(MockFactory.MockBenchmarkClass), benchmarkMethod);
+            var benchmarkCase = BenchmarkCase.Create(target, Job.Default, null, ManualConfig.CreateEmpty().CreateImmutableConfig());
+            var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0) };
+            var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.0", null, null, null);
+            var buildPartition = new BuildPartition(benchmarks, new Resolver());
+            string binariesPath = projectGenerator.ResolvePathForBinaries(buildPartition, programName);
+
+            string expectedPath = Path.Combine(Path.GetDirectoryName(buildPartition.AssemblyLocation), programName);
+            Assert.Equal(expectedPath, binariesPath);
+        }
+
+        private class SteamLoadedBuildPartition : CsProjGenerator
+        {
+            internal string ResolvePathForBinaries(BuildPartition buildPartition, string programName)
+            {
+                return base.GetBuildArtifactsDirectoryPath(buildPartition, programName);
+            }
+
+            public SteamLoadedBuildPartition(string targetFrameworkMoniker, string cliPath, string packagesPath, string runtimeFrameworkVersion) : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion) { }
         }
     }
 }

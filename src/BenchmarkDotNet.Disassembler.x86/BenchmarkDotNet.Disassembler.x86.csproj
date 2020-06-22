@@ -21,6 +21,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Iced" Version="1.4.0" />
-    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="1.1.57604" />
+    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="1.1.126102" />
   </ItemGroup>
 </Project>
