@@ -45,9 +45,8 @@ namespace BenchmarkDotNet.Portability
         /// <summary>
         /// "Is the target where we will run the benchmarks WASM?"
         /// </summary>
-        public static bool IsBenchmarkTargetWasm { get; set; }
 
-        public static bool IsWasm() => IsOSPlatform(OSPlatform.Create("BROWSER")); // { return BenchmarkEnvironmentInfo.RunningWasm; }
+        public static bool IsWasm => IsOSPlatform(OSPlatform.Create("BROWSER")); // { return BenchmarkEnvironmentInfo.RunningWasm; }
 
         public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
 
@@ -151,7 +150,7 @@ namespace BenchmarkDotNet.Portability
             {
                 return FrameworkVersionHelper.GetFrameworkDescription();
             }
-            else if (IsBenchmarkTargetWasm || IsWasm())
+            else if (IsWasm)
             {
                 return "wasm";
             }
@@ -179,7 +178,7 @@ namespace BenchmarkDotNet.Portability
                 return MonoRuntime.Default;
             if (IsFullFramework)
                 return ClrRuntime.GetCurrentVersion();
-            if (IsBenchmarkTargetWasm || IsWasm())
+            if (IsWasm)
                 return WasmRuntime.Default;
             if (IsNetCore)
                 return CoreRuntime.GetCurrentVersion();

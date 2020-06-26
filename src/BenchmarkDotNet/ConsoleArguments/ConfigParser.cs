@@ -369,7 +369,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                                                                  options.WasmMainJS,
                                                                  timeOut ?? NetCoreAppSettings.DefaultBuildTimeout);
 
-                        RuntimeInformation.IsBenchmarkTargetWasm = true;
                         return baseJob.WithRuntime(runtimeMoniker.GetRuntime()).WithToolchain(toolChain);
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
