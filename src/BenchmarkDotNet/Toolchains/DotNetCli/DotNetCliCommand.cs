@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// we use these settings to make sure that MSBuild does the job and simply quits without spawning any long living processes
         /// we want to avoid "file in use" and "zombie processes" issues
         /// </summary>
-        private const string MandatoryMsBuildSettings = " /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1";
+        private const string MandatoryMsBuildSettings = " /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true";
 
         [PublicAPI] public string CliPath { get; }
 
