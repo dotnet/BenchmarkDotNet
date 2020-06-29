@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Toolchains
 {
     internal static class ToolchainExtensions
     {
- 
+        // TODO: Hack to specifiy tool chain.
         internal static IToolchain GetToolchain(this BenchmarkCase benchmarkCase) => GetToolchain(benchmarkCase.Job, benchmarkCase.Descriptor);
 
         internal static IToolchain GetToolchain(this Job job) => GetToolchain(job, null);

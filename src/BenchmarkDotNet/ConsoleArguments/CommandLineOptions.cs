@@ -164,18 +164,6 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("envVars", Required = false, HelpText = "Colon separated environment variables (key:value)")]
         public IEnumerable<string> EnvironmentVariables { get; set; }
 
-        [Option("wasmJavascriptEnginePath", Required = false, Default = "v8", HelpText = "Full path to a java script engine used to run the benchmarks, if using the WASM runtime.")]
-        public string WasmJavascriptEnginePath { get; set; }
-
-        [Option("wasmAppBuilderPath", Required = false, HelpText = "Full path to the Wasm App Builder assembly.")]
-        public string WasmAppBuilderPath { get; set; }
-
-        [Option("wasmRuntimePack", Required = false, HelpText = "Path to the wasm runtime pack directory")]
-        public string WasmRuntimePackPath { get; set; }
-
-        [Option("wasmMainJS", Required = false, HelpText = "Path to the main.js file used for wasm apps.")]
-        public string WasmMainJS { get; set; }
-
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
         [Usage(ApplicationAlias = "")]

@@ -68,10 +68,8 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             ProcessStartInfo startInfo = WasmExecutor.BuildStartInfo(
                 CustomDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
-                artifactsPaths.ProgramName,
-                benchmarkId.ToArguments(),
+                $"{executableName.Escape()} {benchmarkId.ToArguments()}",
                 redirectStandardInput: true);
-
 
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
@@ -114,8 +112,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
         internal static ProcessStartInfo BuildStartInfo(string customDotNetCliPath,
                                                         string workingDirectory,
-                                                        string programName,
-                                                        string benchmarkId,
+                                                        string arguments,
                                                         IReadOnlyList<EnvironmentVariable> environmentVariables = null,
                                                         bool redirectStandardInput = false)
         {
@@ -125,7 +122,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             {
                 FileName = "v8",
                 WorkingDirectory = workingDirectory,
-                Arguments = $"--expose_wasm runtime.js  -- --enable-gc --run {programName}.dll {benchmarkId} ",
+                Arguments = "--expose_wasm runtime.js  -- --enable-gc --run AssemblyName.dll ",
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
