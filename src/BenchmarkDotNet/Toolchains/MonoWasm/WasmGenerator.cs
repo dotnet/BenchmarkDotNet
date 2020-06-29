@@ -36,7 +36,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             RuntimePackPath = runtimePackPath;
             WasmAppBuilderAssembly = wasmAppBuilderAssembly;
             MainJS = mainJS;
-
         }
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)

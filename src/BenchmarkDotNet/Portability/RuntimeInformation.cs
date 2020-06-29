@@ -185,8 +185,6 @@ namespace BenchmarkDotNet.Portability
             if (IsCoreRT)
                 return CoreRtRuntime.GetCurrentVersion();
 
-
-
             throw new NotSupportedException("Unknown .NET Runtime");
         }
 
