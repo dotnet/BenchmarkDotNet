@@ -121,11 +121,11 @@ namespace BenchmarkDotNet.Engines
                 warmupStage.RunWorkload(invokeCount, UnrollFactor, Strategy);
             }
 
-            // Host.BeforeMainRun();
+            Host.BeforeMainRun();
 
             var main = actualStage.RunWorkload(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
 
-            // Host.AfterMainRun();
+            Host.AfterMainRun();
 
             (GcStats workGcHasDone, ThreadingStats threadingStats) = includeExtraStats
                 ? GetExtraStats(new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor))

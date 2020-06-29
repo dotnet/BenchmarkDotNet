@@ -4,7 +4,8 @@ using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
-{
+{   /* This class is used by wasm because wasm cannot read from the console.
+     * This potentially breaks communication with Diagnosers. */
     public sealed class NoAcknowledgementConsoleHost : IHost
     {
         private readonly TextWriter outWriter;

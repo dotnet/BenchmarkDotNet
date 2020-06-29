@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 using BenchmarkDotNet.Characteristics;
@@ -13,13 +14,34 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     [PublicAPI]
     public class WasmToolChain : Toolchain
     {
-        [PublicAPI] public static readonly IToolchain NetCoreApp50Wasm = From( NetCoreAppSettings.NetCoreApp50Wasm.WithCustomDotNetCliPath("/Users/naricc/workspace/runtime-webassembly-ci/dotnet.sh") );
+        [PublicAPI] public static readonly IToolchain NetCoreApp50Wasm = From(NetCoreAppSettings.NetCoreApp50, new WasmSettings(null, null, null));
 
         private WasmToolChain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string runtimeJavaScriptPath)
             : base(name, generator, builder, executor)
         {
-            RuntimeJavaScripthPath = runtimeJavaScriptPath;
         }
+
+        public WasmToolChain(string name,
+                             string targetFrameworkMoniker,
+                             string cliPath,
+                             string packagesPath,
+                             string runtimePackPath,
+                             string wasmAppBuilderAssembly,
+                             string mainJS,
+                             TimeSpan timeout)
+           : base(name,
+                 new WasmGenerator(targetFrameworkMoniker,
+                                   cliPath,
+                                   packagesPath,
+                                   runtimePackPath,
+                                   wasmAppBuilderAssembly,
+                                   mainJS),
+                 new DotNetCliBuilder(targetFrameworkMoniker, cliPath, timeout),
+                 new WasmExecutor(mainJS)
+                 )
+        {
+        }
+
 
         internal string RuntimeJavaScripthPath { get; }
 
@@ -28,14 +50,23 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             return !System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         }
 
-         [PublicAPI]
-        public static IToolchain From(NetCoreAppSettings settings)
-            => new WasmToolChain(settings.Name,
-                new WasmGenerator(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.PackagesPath, settings.RuntimeFrameworkVersion),
-                new DotNetCliBuilder(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.Timeout),
-                new WasmExecutor(settings.RuntimeJavaScriptPath),
-                settings.CustomDotNetCliPath);
+        [PublicAPI]
+        public static IToolchain From(NetCoreAppSettings netCoreAppSettings,  WasmSettings wasmSettings)
+        {
 
+            return new  WasmToolChain(netCoreAppSettings.Name,
+                                      new WasmGenerator(netCoreAppSettings.TargetFrameworkMoniker,
+                                                        netCoreAppSettings.CustomDotNetCliPath,
+                                                        netCoreAppSettings.PackagesPath,
+                                                        wasmSettings.WasmRuntimePack,
+                                                        wasmSettings.WasmAppBuilder,
+                                                        wasmSettings.WasmMainJS),
+                                      new DotNetCliBuilder(netCoreAppSettings.TargetFrameworkMoniker,
+                                                           netCoreAppSettings.CustomDotNetCliPath,
+                                                           netCoreAppSettings.Timeout),
+                                      new WasmExecutor(wasmSettings.WasmMainJS),
+                netCoreAppSettings.CustomDotNetCliPath);
+        }
 
     }
 }

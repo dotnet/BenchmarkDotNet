@@ -19,15 +19,26 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     public class WasmGenerator : CsProjGenerator
 
     {
+        private string RuntimePackPath;
+        private string WasmAppBuilderAssembly;
+        private string MainJS;
+
         public WasmGenerator(string targetFrameworkMoniker,
                              string cliPath,
                              string packagesPath,
-                             string runtimeFrameworkVersion)
+                             string runtimePackPath,
+                             string wasmAppBuilderAssembly,
+                             string mainJS
+                             )
             : base(targetFrameworkMoniker,
                    cliPath,
                    packagesPath,
-                   runtimeFrameworkVersion)
+                   null)
         {
+            RuntimePackPath = runtimePackPath;
+            WasmAppBuilderAssembly = wasmAppBuilderAssembly;
+            MainJS = mainJS;
+
         }
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
@@ -37,13 +48,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             using (var file = new StreamReader(File.OpenRead(projectFile.FullName)))
             {
                 var (customProperties, sdkName) = GetSettingsThatNeedsToBeCopied(file, projectFile);
-
-                Console.WriteLine("!! WasmGenerator.GenerateProject");
-                string runtimeBin = "/Users/naricc/workspace/runtime-pristine/artifacts/bin";
-
-                string runtimePackDir = $"{runtimeBin}/lib-runtime-packs/net5.0-Browser-Release-wasm/runtimes/browser-wasm";
-                string wasmAppBuilderAssembly = $"{runtimeBin}/WasmAppBuilder/Debug/net5.0/publish/WasmAppBuilder.dll";
-                string mainJS = "/Users/naricc/workspace/runtime-pristine/src/mono/wasm/runtime-test.js";
 
                 string content = new StringBuilder(ResourceHelper.LoadTemplate("WasmCsProj.txt"))
                    .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
@@ -55,15 +59,18 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                    .Replace("$COPIEDSETTINGS$", customProperties)
                    .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
                    .Replace("$SDKNAME$", sdkName)
-                   .Replace("$RUNTIMEPACKDIR$", runtimePackDir)
-                   .Replace("$WASMAPPBUILDERASSEMBLY$", wasmAppBuilderAssembly)
-                   .Replace("$MAINJS$", mainJS)
+                   .Replace("$RUNTIMEPACKDIR$", RuntimePackPath)
+                   .Replace("$WASMAPPBUILDERASSEMBLY$", WasmAppBuilderAssembly)
+                   .Replace("$MAINJS$", MainJS)
                    .ToString();
 
                 File.WriteAllText(artifactsPaths.ProjectFilePath, content);
             }
 
         }
+
+        protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
+    => Path.Combine(buildArtifactsDirectoryPath, "bin/net5.0/browser-wasm/publish/output");
 
         private static string GetPackagesDirectoryPath(bool useTempFolderForRestore, string packagesRestorePath)
     => packagesRestorePath ?? (useTempFolderForRestore ? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()) : null);

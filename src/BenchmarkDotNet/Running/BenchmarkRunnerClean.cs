@@ -284,7 +284,7 @@ namespace BenchmarkDotNet.Running
             var buildLogger = buildPartitions.Length == 1 ? logger : NullLogger.Instance; // when we have just one partition we can print to std out
 
             var buildResults = buildPartitions
-                // .AsParallel() TODO: Hack: Remove parallelisim to maek debugging easier.
+                .AsParallel()
                 .Select(buildPartition => (buildPartition, buildResult: Build(buildPartition, rootArtifactsFolderPath, buildLogger)))
                 .ToDictionary(result => result.buildPartition, result => result.buildResult);
 
@@ -338,7 +338,7 @@ namespace BenchmarkDotNet.Running
             {
                 int currentIndex = index;
                 var executeResult = executeResults[index];
-                runs.AddRange(executeResult.Data.Where(line => !string.IsNullOrEmpty(line)).Select(line => Measurement.Parse(logger, line, currentIndex + 1)).Where(r => r.IterationMode != IterationMode.Unknown));
+                runs.AddRange(executeResult.Data.Where(line => !string.IsNullOrEmpty(line)).Select(line => removeWasmPrefix(line)).Select(line => Measurement.Parse(logger, line, currentIndex + 1)).Where(r => r.IterationMode != IterationMode.Unknown));
             }
 
             return new BenchmarkReport(success, benchmarkCase, buildResult, buildResult, executeResults, runs, gcStats, metrics);
@@ -407,6 +407,7 @@ namespace BenchmarkDotNet.Running
                 var measurements = executeResults
                     .SelectMany(r => r.Data)
                     .Where(line => !string.IsNullOrEmpty(line))
+                    .Select(line => removeWasmPrefix(line))
                     .Select(line => Measurement.Parse(logger, line, 0))
                     .Where(r => r.IterationMode != IterationMode.Unknown)
                     .ToArray();
@@ -603,6 +604,18 @@ namespace BenchmarkDotNet.Running
                     // sth is locking our auto-generated files
                     // there is very little we can do about it
                 }
+            }
+        }
+
+        private static string removeWasmPrefix(string line)
+        {
+            if (line.StartsWith("WASM: "))
+            {
+                return line.Remove(0, 6);
+            }
+            else
+            {
+                return line;
             }
         }
     }

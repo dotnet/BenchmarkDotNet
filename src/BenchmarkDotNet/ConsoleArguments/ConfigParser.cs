@@ -17,11 +17,13 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.MonoWasm;
 using CommandLine;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
@@ -326,7 +328,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.NetCoreApp50:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
-                        .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, null, options.RestorePath?.FullName, timeOut)));
+                        .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));
                 case RuntimeMoniker.Mono:
                     return baseJob.WithRuntime(new MonoRuntime("Mono", options.MonoPath?.FullName));
                 case RuntimeMoniker.CoreRt20:
@@ -357,7 +359,15 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                     return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
                 case RuntimeMoniker.Wasm:
-                    return baseJob.WithRuntime(WasmRuntime.Default);
+                        IToolchain toolChain = new WasmToolChain("Wasm",
+                                                                 "net5.0",
+                                                                 options.CliPath.FullName,
+                                                                 null,                                                                 options.WasmRuntimePackPath,
+                                                                 options.WasmAppBuilderPath,
+                                                                 options.WasmMainJS,
+                                                                 timeOut ?? NetCoreAppSettings.DefaultBuildTimeout);
+
+                        return baseJob.WithRuntime(runtimeMoniker.GetRuntime()).WithToolchain(toolChain);
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }

@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Environments
         protected BenchmarkEnvironmentInfo()
         {
             Architecture = RuntimeInformation.GetArchitecture();
-            RuntimeVersion = "wasm"; // RuntimeInformation.GetRuntimeVersion();
+            RuntimeVersion = RuntimeInformation.GetRuntimeVersion();
             Configuration = RuntimeInformation.GetConfiguration();
             HasRyuJit = RuntimeInformation.HasRyuJit();
             JitInfo = RuntimeInformation.GetJitInfo();

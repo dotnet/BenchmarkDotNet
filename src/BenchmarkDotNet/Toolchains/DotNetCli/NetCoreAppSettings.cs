@@ -17,7 +17,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp30 = new NetCoreAppSettings("netcoreapp3.0", null, ".NET Core 3.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp31 = new NetCoreAppSettings("netcoreapp3.1", null, ".NET Core 3.1");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp50 = new NetCoreAppSettings("netcoreapp5.0", null, ".NET Core 5.0");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp50Wasm = new NetCoreAppSettings("net5.0", null, ".NET Core 5.0 wasm", null, "/Users/naricc/workspace/runtime-webassembly-ci/src/mono/netcore/sample/wasm/bin/Release/publish/runtime.js");
 
         /// <summary>
         /// <param name="targetFrameworkMoniker">
@@ -43,14 +42,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             string runtimeFrameworkVersion,
             string name,
             string customDotNetCliPath = null,
-            string runtimeJavaScriptPath = null,
             string packagesPath = null,
-            TimeSpan? timeout = null)
+            TimeSpan? timeout = null
+            )
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
             RuntimeFrameworkVersion = runtimeFrameworkVersion;
             Name = name;
-            RuntimeJavaScriptPath = runtimeJavaScriptPath;
+
             CustomDotNetCliPath = customDotNetCliPath;
             PackagesPath = packagesPath;
             Timeout = timeout ?? DefaultBuildTimeout;
@@ -70,10 +69,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public string CustomDotNetCliPath { get; }
 
-        /// <summary>
-        ///  The path of the .Net runtime, compiled to JavaScript, for WASM.
-        /// </summary>
-        public string RuntimeJavaScriptPath { get; }
 
         /// <summary>
         /// The directory to restore packages to.
@@ -85,14 +80,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         public TimeSpan Timeout { get; }
 
-        public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
-            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, null, PackagesPath, Timeout);
+        public virtual NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
+            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath, Timeout);
 
-        public NetCoreAppSettings WithCustomPackagesRestorePath(string packagesPath, string displayName = null)
-            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, CustomDotNetCliPath, null, packagesPath, Timeout);
+        public virtual NetCoreAppSettings WithCustomPackagesRestorePath(string packagesPath, string displayName = null)
+            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, CustomDotNetCliPath, packagesPath, Timeout);
 
-        public NetCoreAppSettings WithTimeout(TimeSpan? timeOut)
-            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, Name, CustomDotNetCliPath, null, PackagesPath, timeOut ?? Timeout);
+        public virtual NetCoreAppSettings WithTimeout(TimeSpan? timeOut)
+            => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, Name, CustomDotNetCliPath, PackagesPath, timeOut ?? Timeout);
 
     }
 }
