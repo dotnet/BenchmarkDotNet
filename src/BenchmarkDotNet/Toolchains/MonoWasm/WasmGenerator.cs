@@ -63,7 +63,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
                 File.WriteAllText(artifactsPaths.ProjectFilePath, content);
             }
-
         }
 
         protected override string  GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, "run-v8.sh");
