@@ -80,13 +80,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         public TimeSpan Timeout { get; }
 
-        public virtual NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
+        public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath, Timeout);
 
-        public virtual NetCoreAppSettings WithCustomPackagesRestorePath(string packagesPath, string displayName = null)
+        public NetCoreAppSettings WithCustomPackagesRestorePath(string packagesPath, string displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, CustomDotNetCliPath, packagesPath, Timeout);
 
-        public virtual NetCoreAppSettings WithTimeout(TimeSpan? timeOut)
+        public NetCoreAppSettings WithTimeout(TimeSpan? timeOut)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, Name, CustomDotNetCliPath, PackagesPath, timeOut ?? Timeout);
 
     }
