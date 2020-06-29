@@ -30,8 +30,11 @@ namespace BenchmarkDotNet.Engines
             // I did not use Mutexes because they are not supported for Linux/MacOs for .NET Core
             // this solution is stupid simple and it works
             string acknowledgment = inReader.ReadLine();
-            if (acknowledgment != Engine.Signals.Acknowledgment)
-                throw new NotSupportedException($"Unknown Acknowledgment: {acknowledgment}");
+            if (acknowledgment.IndexOf(Engine.Signals.Acknowledgment, StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                throw new NotSupportedException($"Unknown Acknowledgment: '{acknowledgment}'." + Environment.NewLine +
+                    $"If for some reason you are running the benchmark process manually you just need to type '{Engine.Signals.Acknowledgment}' and hit enter.");
+            }
         }
 
         public void SendError(string message) => outWriter.WriteLine($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
