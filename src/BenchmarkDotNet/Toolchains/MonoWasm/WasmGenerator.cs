@@ -12,8 +12,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 
-
-
 namespace BenchmarkDotNet.Toolchains.MonoWasm
 {
     public class WasmGenerator : CsProjGenerator
