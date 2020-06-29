@@ -361,7 +361,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Wasm:
                         IToolchain toolChain = new WasmToolChain("Wasm",
                                                                  "net5.0",
-                                                                 options.CliPath.FullName,                                                                 options.WasmRuntimePackPath,
+                                                                 options.CliPath.FullName,
+                                                                 options.RestorePath.FullName,
+                                                                 options.WasmRuntimePackPath,
                                                                  options.WasmAppBuilderPath,
                                                                  options.WasmMainJS,
                                                                  timeOut ?? NetCoreAppSettings.DefaultBuildTimeout);
