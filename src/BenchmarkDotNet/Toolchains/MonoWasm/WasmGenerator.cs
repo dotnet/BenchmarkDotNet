@@ -25,14 +25,13 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
         public WasmGenerator(string targetFrameworkMoniker,
                              string cliPath,
-                             string packagesPath,
                              string runtimePackPath,
                              string wasmAppBuilderAssembly,
                              string mainJS
                              )
             : base(targetFrameworkMoniker,
                    cliPath,
-                   packagesPath,
+                   null,
                    null)
         {
             RuntimePackPath = runtimePackPath;
