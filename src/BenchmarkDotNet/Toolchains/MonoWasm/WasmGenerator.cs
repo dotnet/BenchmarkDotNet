@@ -69,6 +69,9 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
         }
 
+        protected override string  GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, "run-v8.sh");
+
+
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
     => Path.Combine(buildArtifactsDirectoryPath, "bin/net5.0/browser-wasm/publish/output");
 
