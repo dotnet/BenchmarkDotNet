@@ -71,7 +71,5 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
     => Path.Combine(buildArtifactsDirectoryPath, "bin/net5.0/browser-wasm/publish/output");
 
-        private static string GetPackagesDirectoryPath(bool useTempFolderForRestore, string packagesRestorePath)
-    => packagesRestorePath ?? (useTempFolderForRestore ? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()) : null);
     }
 }
