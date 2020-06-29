@@ -6,9 +6,6 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Loggers;
 
-
-
-
 namespace BenchmarkDotNet.Toolchains.MonoWasm
 {
     [PublicAPI]
