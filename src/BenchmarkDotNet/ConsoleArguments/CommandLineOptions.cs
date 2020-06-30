@@ -5,6 +5,7 @@ using System.Linq;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using CommandLine;
 using CommandLine.Text;
@@ -130,6 +131,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("strategy", Required = false, HelpText = "The RunStrategy that should be used. Throughput/ColdStart/Monitoring.")]
         public RunStrategy? RunStrategy { get; set; }
+
+        [Option("platform", Required = false, HelpText = "The Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64.")]
+        public Platform? Platform { get; set; }
 
         [Option("runOncePerIteration", Required = false, Default = false, HelpText = "Run the benchmark exactly once per iteration.")]
         public bool RunOncePerIteration { get; set; }
