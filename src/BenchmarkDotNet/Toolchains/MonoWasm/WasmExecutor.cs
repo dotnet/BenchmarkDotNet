@@ -21,11 +21,15 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     [PublicAPI]
     public class WasmExecutor : IExecutor
     {
-        public WasmExecutor(string customDotNetCliPath) => CustomDotNetCliPath = customDotNetCliPath;
+        public WasmExecutor(string customDotNetCliPath, string javaScriptEngine)
+        {
+            CustomDotNetCliPath = customDotNetCliPath;
+            JavaScriptEngine = javaScriptEngine;
+        }
 
         private string CustomDotNetCliPath { get; }
 
-        private string JavaScriptEngine = "v8";
+        private string JavaScriptEngine;
 
         public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
@@ -66,10 +70,11 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                                       IResolver resolver)
         {
             ProcessStartInfo startInfo = WasmExecutor.BuildStartInfo(
-                CustomDotNetCliPath,
-                artifactsPaths.BinariesDirectoryPath,
-                artifactsPaths.ProgramName,
-                benchmarkId.ToArguments(),
+                customDotNetCliPath: CustomDotNetCliPath,
+                workingDirectory: artifactsPaths.BinariesDirectoryPath,
+                programName: artifactsPaths.ProgramName,
+                benchmarkId: benchmarkId.ToArguments(),
+                javaScriptEngine: JavaScriptEngine,
                 redirectStandardInput: true);
 
 
@@ -116,6 +121,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                                                         string workingDirectory,
                                                         string programName,
                                                         string benchmarkId,
+                                                        string javaScriptEngine,
                                                         IReadOnlyList<EnvironmentVariable> environmentVariables = null,
                                                         bool redirectStandardInput = false)
         {
@@ -123,7 +129,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                FileName = "v8",
+                FileName = javaScriptEngine,
                 WorkingDirectory = workingDirectory,
                 Arguments = $"--expose_wasm runtime.js  -- --enable-gc --run {programName}.dll {benchmarkId} ",
                 UseShellExecute = false,

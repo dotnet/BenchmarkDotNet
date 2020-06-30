@@ -366,6 +366,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                                                                  runtimePackPath: options.WasmRuntimePackPath,
                                                                  wasmAppBuilderAssembly: options.WasmAppBuilderPath,
                                                                  mainJS: options.WasmMainJS,
+                                                                 javaScriptEngine: options.WasmJavascriptEnginePath,
                                                                  timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout);
 
                         return baseJob.WithRuntime(runtimeMoniker.GetRuntime()).WithToolchain(toolChain);

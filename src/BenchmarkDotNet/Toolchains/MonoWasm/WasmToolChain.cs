@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     [PublicAPI]
     public class WasmToolChain : Toolchain
     {
-        [PublicAPI] public static readonly IToolchain NetCoreApp50Wasm = From(NetCoreAppSettings.NetCoreApp50, new WasmSettings(null, null, null));
+        [PublicAPI] public static readonly IToolchain NetCoreApp50Wasm = From(NetCoreAppSettings.NetCoreApp50, new WasmSettings(null, null, null, null));
 
         private WasmToolChain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string runtimeJavaScriptPath)
             : base(name, generator, builder, executor)
@@ -25,6 +25,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                              string runtimePackPath,
                              string wasmAppBuilderAssembly,
                              string mainJS,
+                             string javaScriptEngine,
                              TimeSpan timeout)
            : base(name,
                  new WasmGenerator(targetFrameworkMoniker,
@@ -34,7 +35,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                                    wasmAppBuilderAssembly,
                                    mainJS),
                  new DotNetCliBuilder(targetFrameworkMoniker, cliPath, timeout),
-                 new WasmExecutor(mainJS)
+                 new WasmExecutor(mainJS, javaScriptEngine)
                  )
         {
         }
@@ -61,7 +62,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                                       new DotNetCliBuilder(netCoreAppSettings.TargetFrameworkMoniker,
                                                            netCoreAppSettings.CustomDotNetCliPath,
                                                            netCoreAppSettings.Timeout),
-                                      new WasmExecutor(wasmSettings.WasmMainJS),
+                                      new WasmExecutor(wasmSettings.WasmMainJS, wasmSettings.WasmJavaScriptEngine),
                 netCoreAppSettings.CustomDotNetCliPath);
         }
 

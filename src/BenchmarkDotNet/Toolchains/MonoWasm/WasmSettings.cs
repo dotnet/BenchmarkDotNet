@@ -9,11 +9,15 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
         public string WasmAppBuilder { get; }
 
-        public WasmSettings(string wasmMainJS, string wasmRuntimePack, string wasmAppBuilder)
+        public string WasmJavaScriptEngine { get; }
+
+
+        public WasmSettings(string wasmMainJS, string wasmRuntimePack, string wasmAppBuilder, string wasmJavaScriptEngine)
         {
             WasmMainJS = wasmMainJS;
             WasmRuntimePack = wasmRuntimePack;
             WasmAppBuilder = wasmAppBuilder;
+            WasmJavaScriptEngine = wasmJavaScriptEngine;
         }
     }
 }
