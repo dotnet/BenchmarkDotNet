@@ -21,15 +21,24 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     [PublicAPI]
     public class WasmExecutor : IExecutor
     {
-        public WasmExecutor(string customDotNetCliPath, string javaScriptEngine)
+        public WasmExecutor(string customDotNetCliPath, string javaScriptEngine, string javaScriptEngineArguments)
         {
             CustomDotNetCliPath = customDotNetCliPath;
             JavaScriptEngine = javaScriptEngine;
+            JavaScriptEngineArguments = javaScriptEngineArguments;
+            RuntimeJavaScriptName = "runtime.js";
+            ExtraRuntimeArguments = "";
         }
 
         private string CustomDotNetCliPath { get; }
 
-        private string JavaScriptEngine;
+        private string JavaScriptEngine { get; set; }
+
+        private string JavaScriptEngineArguments { get; set; }
+
+        private string RuntimeJavaScriptName { get; set; }
+
+        private string ExtraRuntimeArguments { get; set; }
 
         public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
@@ -75,6 +84,9 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 programName: artifactsPaths.ProgramName,
                 benchmarkId: benchmarkId.ToArguments(),
                 javaScriptEngine: JavaScriptEngine,
+                runtimeJavaScriptName: RuntimeJavaScriptName,
+                javaScriptEngineArguments: JavaScriptEngineArguments,
+                extraRuntimeArguments: ExtraRuntimeArguments,
                 redirectStandardInput: true);
 
 
@@ -122,6 +134,9 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                                                         string programName,
                                                         string benchmarkId,
                                                         string javaScriptEngine,
+                                                        string runtimeJavaScriptName,
+                                                        string javaScriptEngineArguments,
+                                                        string extraRuntimeArguments,
                                                         IReadOnlyList<EnvironmentVariable> environmentVariables = null,
                                                         bool redirectStandardInput = false)
         {
@@ -131,7 +146,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             {
                 FileName = javaScriptEngine,
                 WorkingDirectory = workingDirectory,
-                Arguments = $"--expose_wasm runtime.js  -- --enable-gc --run {programName}.dll {benchmarkId} ",
+                Arguments = $"{javaScriptEngineArguments} {runtimeJavaScriptName} -- {extraRuntimeArguments} --run {programName}.dll {benchmarkId} ",
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,

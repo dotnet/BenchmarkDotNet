@@ -176,6 +176,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("wasmMainJS", Required = false, HelpText = "Path to the main.js file used for wasm apps.")]
         public string WasmMainJS { get; set; }
 
+        [Option("wasmJavaScriptEngineArguments", Required = false, Default = "--expose_wasm", HelpText = "Arguments for the javascript engine used by wasm.")]
+        public string WasmJavaScriptEngineArguments { get; set; }
+
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
         [Usage(ApplicationAlias = "")]

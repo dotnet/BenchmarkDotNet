@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
-            BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
+                BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
             using (var file = new StreamReader(File.OpenRead(projectFile.FullName)))
             {

@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     [PublicAPI]
     public class WasmToolChain : Toolchain
     {
-        [PublicAPI] public static readonly IToolchain NetCoreApp50Wasm = From(NetCoreAppSettings.NetCoreApp50, new WasmSettings(null, null, null, null));
+        [PublicAPI] public static readonly IToolchain NetCoreApp50Wasm = From(NetCoreAppSettings.NetCoreApp50, new WasmSettings(null, null, null, null, null));
 
         private WasmToolChain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string runtimeJavaScriptPath)
             : base(name, generator, builder, executor)
@@ -26,6 +26,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                              string wasmAppBuilderAssembly,
                              string mainJS,
                              string javaScriptEngine,
+                             string javaScriptEngineArguments,
                              TimeSpan timeout)
            : base(name,
                  new WasmGenerator(targetFrameworkMoniker,
@@ -35,7 +36,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                                    wasmAppBuilderAssembly,
                                    mainJS),
                  new DotNetCliBuilder(targetFrameworkMoniker, cliPath, timeout),
-                 new WasmExecutor(mainJS, javaScriptEngine)
+                 new WasmExecutor(mainJS, javaScriptEngine, javaScriptEngineArguments)
                  )
         {
         }
@@ -62,7 +63,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                                       new DotNetCliBuilder(netCoreAppSettings.TargetFrameworkMoniker,
                                                            netCoreAppSettings.CustomDotNetCliPath,
                                                            netCoreAppSettings.Timeout),
-                                      new WasmExecutor(wasmSettings.WasmMainJS, wasmSettings.WasmJavaScriptEngine),
+                                      new WasmExecutor(wasmSettings.WasmMainJS, wasmSettings.WasmJavaScriptEngine, wasmSettings.WasmJavaScriptEngineArguments),
                 netCoreAppSettings.CustomDotNetCliPath);
         }
 

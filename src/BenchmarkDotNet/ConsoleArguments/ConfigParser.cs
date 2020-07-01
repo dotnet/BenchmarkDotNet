@@ -362,11 +362,12 @@ namespace BenchmarkDotNet.ConsoleArguments
                         IToolchain toolChain = new WasmToolChain(name: "Wasm",
                                                                  targetFrameworkMoniker: "net5.0",
                                                                  cliPath: options.CliPath.FullName,
-                                                                 packagesPath: options.RestorePath.FullName,
+                                                                 packagesPath: options.RestorePath?.FullName,
                                                                  runtimePackPath: options.WasmRuntimePackPath,
                                                                  wasmAppBuilderAssembly: options.WasmAppBuilderPath,
                                                                  mainJS: options.WasmMainJS,
                                                                  javaScriptEngine: options.WasmJavascriptEnginePath,
+                                                                 javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
                                                                  timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout);
 
                         return baseJob.WithRuntime(runtimeMoniker.GetRuntime()).WithToolchain(toolChain);

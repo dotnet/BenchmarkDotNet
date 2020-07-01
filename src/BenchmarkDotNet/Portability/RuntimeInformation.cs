@@ -201,6 +201,8 @@ namespace BenchmarkDotNet.Portability
                 case Architecture.X86:
                     return Platform.X86;
                 default:
+                    if (IsWasm)
+                        return Platform.Wasm;
                     throw new ArgumentOutOfRangeException();
             }
         }
