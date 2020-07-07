@@ -18,14 +18,12 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
     {
         private string RuntimePackPath;
-        private string WasmAppBuilderAssembly;
         private string MainJS;
 
         public WasmGenerator(string targetFrameworkMoniker,
                              string cliPath,
                              string packagesPath,
                              string runtimePackPath,
-                             string wasmAppBuilderAssembly,
                              string mainJS
                              )
             : base(targetFrameworkMoniker,
@@ -34,7 +32,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                    null)
         {
             RuntimePackPath = runtimePackPath;
-            WasmAppBuilderAssembly = wasmAppBuilderAssembly;
             MainJS = mainJS;
         }
 
@@ -57,7 +54,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                    .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
                    .Replace("$SDKNAME$", sdkName)
                    .Replace("$RUNTIMEPACKDIR$", RuntimePackPath)
-                   .Replace("$WASMAPPBUILDERASSEMBLY$", WasmAppBuilderAssembly)
                    .Replace("$MAINJS$", MainJS)
                    .ToString();
 

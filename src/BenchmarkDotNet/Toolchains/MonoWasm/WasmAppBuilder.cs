@@ -11,83 +11,92 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using BenchmarkDotNet.Toolchains.MonoWasm;
 
 public class WasmAppBuilder
 {
     // FIXME: Document
 
-    public string AppDir { get; set; }
-    public string MicrosoftNetCoreAppRuntimePackDir { get; set; }
-    public string MainAssembly { get; set; }
-    public string TargetPath { get; set; }
+    private readonly WasmSettings WasmSettings;
 
-    public string MainJS { get; set; }
+    private readonly List<string> FilesToIncludeInFileSystem;
 
-    public List<string> AssemblySearchPaths { get; set; }
-    public List<string> ExtraAssemblies { get; set; }
-    public List<string> FilesToIncludeInFileSystem { get; set; }
-   
-    Dictionary<string, Assembly>_assemblies;
-    private Resolver _resolver;
+    private Dictionary<string, Assembly> _assemblies;
+    private AssemblyResolver _resolver;
 
-    public bool Execute ()
+
+    public WasmAppBuilder(WasmSettings wasmSettings)
     {
-        if (!File.Exists(MainAssembly))
-            throw new ArgumentException($"File MainAssembly='{MainAssembly}' doesn't exist.");
-        if (!File.Exists(MainJS))
-            throw new ArgumentException($"File MainJS='{MainJS}' doesn't exist.");
+        WasmSettings = wasmSettings;
+
+        FilesToIncludeInFileSystem = new List<string>
+                                     {
+                                        $"{wasmSettings.WasmRuntimePack}/native/System.Private.CoreLib.dll"
+                                     };
+    }
+
+    public bool BuildApp (string programName, string projectRoot)
+    {
+        string appDir = Path.Combine(projectRoot, "bin/net5.0/browser-wasm/publish");
+
+        string outputDir = Path.Combine(appDir, "output");
+
+        List<string> assemblySearchPaths = new List<string>
+                                  {
+                                    appDir,
+                                    $"{WasmSettings.WasmRuntimePack}/native",
+                                    $"{WasmSettings.WasmRuntimePack}/lib/net5.0"
+                                  };
+
+        string mainAssemblyPath = Path.Combine(projectRoot, "bin/net5.0/browser-wasm/", $"{programName}.dll");
+
+
+        if (!File.Exists(mainAssemblyPath))
+            throw new ArgumentException($"File MainAssembly='{mainAssemblyPath}' doesn't exist.");
+        if (!File.Exists(WasmSettings.WasmMainJS))
+            throw new ArgumentException($"File MainJS='{WasmSettings.WasmMainJS}' doesn't exist.");
 
         var paths = new List<string>();
         _assemblies = new Dictionary<string, Assembly>();
 
         // Collect and load assemblies used by the app
-        foreach (string dir in AssemblySearchPaths)
+        foreach (string dir in assemblySearchPaths)
         {
             if (!Directory.Exists(dir))
                 throw new ArgumentException($"Directory '{dir}' doesn't exist or not a directory.");
             paths.Add(dir);
         }
-        _resolver = new Resolver(paths);
+        _resolver = new AssemblyResolver(paths);
         var mlc = new MetadataLoadContext(_resolver, "System.Private.CoreLib");
 
-        var mainAssembly = mlc.LoadFromAssemblyPath (MainAssembly);
+        Assembly mainAssembly = mlc.LoadFromAssemblyPath (mainAssemblyPath);
         Add(mlc, mainAssembly);
 
-        if (ExtraAssemblies != null)
-        {
-            foreach (var item in ExtraAssemblies)
-            {
-                var refAssembly = mlc.LoadFromAssemblyPath(item);
-                Add(mlc, refAssembly);
-            }
-        }
-
         // Create app
-        Directory.CreateDirectory(AppDir);
-        Directory.CreateDirectory(Path.Combine(AppDir, "managed"));
+        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(Path.Combine(outputDir, "managed"));
         foreach (var assembly in _assemblies.Values)
-            File.Copy(assembly.Location, Path.Combine(AppDir, "managed", Path.GetFileName(assembly.Location)), true);
+            File.Copy(assembly.Location, Path.Combine(outputDir, "managed", Path.GetFileName(assembly.Location)), true);
         foreach (var f in new string[] { "dotnet.wasm", "dotnet.js" })
-            File.Copy(Path.Combine(MicrosoftNetCoreAppRuntimePackDir, "native", f), Path.Combine(AppDir, f), true);
-        File.Copy(MainJS, Path.Combine(AppDir, "runtime.js"),  true);
+            File.Copy(Path.Combine(WasmSettings.WasmRuntimePack, "native", f), Path.Combine(outputDir, f), true);
+        File.Copy(WasmSettings.WasmMainJS, Path.Combine(outputDir, "runtime.js"),  true);
 
         var filesToMap = new Dictionary<string, List<string>>();
         if (FilesToIncludeInFileSystem != null)
         {
-            string supportFilesDir = Path.Combine(AppDir, "supportFiles");
+            string supportFilesDir = Path.Combine(outputDir, "supportFiles");
             Directory.CreateDirectory(supportFilesDir);
 
             foreach (var item in FilesToIncludeInFileSystem)
             {
-                if (string.IsNullOrEmpty(TargetPath))
-                {
-                    TargetPath = Path.GetFileName(item);
-                }
+                string targetPath = null;
+
+                targetPath = Path.GetFileName(item);
 
                 // We normalize paths from `\` to `/` as MSBuild items could use `\`.
-                TargetPath = TargetPath.Replace('\\', '/');
+                targetPath = targetPath.Replace('\\', '/');
 
-                string directory = Path.GetDirectoryName(TargetPath);
+                string directory = Path.GetDirectoryName(targetPath);
 
                 if (!string.IsNullOrEmpty(directory))
                 {
@@ -98,22 +107,22 @@ public class WasmAppBuilder
                     directory = "/";
                 }
 
-                File.Copy(item, Path.Combine(supportFilesDir, TargetPath), true);
+                File.Copy(item, Path.Combine(supportFilesDir, targetPath), true);
 
                 if (filesToMap.TryGetValue(directory, out List<string> files))
                 {
-                    files.Add(Path.GetFileName(TargetPath));
+                    files.Add(Path.GetFileName(targetPath));
                 }
                 else
                 {
                     files = new List<string>();
-                    files.Add(Path.GetFileName(TargetPath));
+                    files.Add(Path.GetFileName(targetPath));
                     filesToMap[directory] = files;
                 }
             }
         }
 
-        using (var sw = File.CreateText(Path.Combine(AppDir, "mono-config.js")))
+        using (var sw = File.CreateText(Path.Combine(outputDir, "mono-config.js")))
         {
             sw.WriteLine("config = {");
             sw.WriteLine("\tvfs_prefix: \"managed\",");
@@ -143,6 +152,13 @@ public class WasmAppBuilder
             sw.WriteLine ("}");
         }
 
+
+        using (var sw = File.CreateText(Path.Combine(outputDir, "run-v8.sh")))
+        {
+            sw.WriteLine("v8 --expose_wasm runtime.js -- --run " + Path.GetFileName(mainAssemblyPath) + " $*");
+        }
+
+
         return true;
     }
 
@@ -168,11 +184,11 @@ public class WasmAppBuilder
     }
 }
 
-internal class Resolver : MetadataAssemblyResolver
+internal class AssemblyResolver : MetadataAssemblyResolver
 {
     private List<string> _searchPaths;
 
-    public Resolver(List<string> searchPaths)
+    public AssemblyResolver(List<string> searchPaths)
     {
         _searchPaths = searchPaths;
     }
