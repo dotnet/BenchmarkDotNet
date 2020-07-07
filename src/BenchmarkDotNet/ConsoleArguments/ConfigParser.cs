@@ -360,7 +360,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
                 case RuntimeMoniker.Wasm:
                     WasmSettings wasmSettings = new WasmSettings(wasmMainJS: options.WasmMainJS,
-                                                                 wasmRuntimePack: options.WasmRuntimePackPath,
                                                                  wasmJavaScriptEngine: options.WasmJavascriptEnginePath,
                                                                  wasmjavaScriptEngineArguments: options.WasmJavaScriptEngineArguments
                                                                  );

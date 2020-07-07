@@ -21,7 +21,7 @@ public class WasmAppBuilder
 
     private readonly string TargetFrameworkMoniker;
 
-    private readonly List<string> FilesToIncludeInFileSystem;
+  
 
     private Dictionary<string, Assembly> _assemblies;
     private AssemblyResolver _resolver;
@@ -31,11 +31,6 @@ public class WasmAppBuilder
     {
         WasmSettings = wasmSettings;
         TargetFrameworkMoniker = targetFrameworkMoniker;
-
-        FilesToIncludeInFileSystem = new List<string>
-                                     {
-                                        $"{wasmSettings.WasmRuntimePack}/native/System.Private.CoreLib.dll"
-                                     };
     }
 
     public bool BuildApp (string programName, string projectRoot)
@@ -50,6 +45,13 @@ public class WasmAppBuilder
                                     $"{WasmSettings.WasmRuntimePack}/native",
                                     $"{WasmSettings.WasmRuntimePack}/lib/{TargetFrameworkMoniker}"*/
                                   };
+
+        /* Benchmark Dotnet will try to open this file, so we need it on the file system.*/
+        List<string> filesToIncludeInFileSystem = new List<string>
+                                                 {
+                                                       $"{appDir}/System.Private.CoreLib.dll"
+                                                 };
+
 
         string mainAssemblyPath = Path.Combine(projectRoot, "bin/net5.0/browser-wasm/", $"{programName}.dll");
 
@@ -81,16 +83,16 @@ public class WasmAppBuilder
         foreach (var assembly in _assemblies.Values)
             File.Copy(assembly.Location, Path.Combine(outputDir, "managed", Path.GetFileName(assembly.Location)), true);
         foreach (var f in new string[] { "dotnet.wasm", "dotnet.js" })
-            File.Copy(Path.Combine(WasmSettings.WasmRuntimePack, "native", f), Path.Combine(outputDir, f), true);
+            File.Copy(Path.Combine(appDir, f), Path.Combine(outputDir, f), true);
         File.Copy(WasmSettings.WasmMainJS, Path.Combine(outputDir, "runtime.js"),  true);
 
         var filesToMap = new Dictionary<string, List<string>>();
-        if (FilesToIncludeInFileSystem != null)
+        if (filesToIncludeInFileSystem != null)
         {
             string supportFilesDir = Path.Combine(outputDir, "supportFiles");
             Directory.CreateDirectory(supportFilesDir);
 
-            foreach (var item in FilesToIncludeInFileSystem)
+            foreach (var item in filesToIncludeInFileSystem)
             {
                 string targetPath = null;
 

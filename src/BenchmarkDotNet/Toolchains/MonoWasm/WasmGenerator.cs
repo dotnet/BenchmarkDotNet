@@ -17,13 +17,11 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     public class WasmGenerator : CsProjGenerator
 
     {
-        private string RuntimePackPath;
         private string MainJS;
 
         public WasmGenerator(string targetFrameworkMoniker,
                              string cliPath,
                              string packagesPath,
-                             string runtimePackPath,
                              string mainJS
                              )
             : base(targetFrameworkMoniker,
@@ -31,7 +29,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                    packagesPath,
                    null)
         {
-            RuntimePackPath = runtimePackPath;
             MainJS = mainJS;
         }
 
