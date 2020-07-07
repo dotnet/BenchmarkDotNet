@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     [PublicAPI]
     public class WasmToolChain : Toolchain
     {
-        [PublicAPI] public static readonly IToolchain NetCoreApp50Wasm = From(NetCoreAppSettings.NetCoreApp50, new WasmSettings(null, null, null, null));
+        [PublicAPI] public static readonly IToolchain NetCoreApp50Wasm = From(NetCoreAppSettings.NetCoreApp50, new WasmSettings(null, null, null));
 
         private WasmToolChain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string runtimeJavaScriptPath)
             : base(name, generator, builder, executor)
@@ -28,7 +28,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                  new WasmGenerator(targetFrameworkMoniker,
                                    cliPath,
                                    packagesPath,
-                                   wasmSettings.WasmRuntimePack,
                                    wasmSettings.WasmMainJS),
                  new WasmBuilder(targetFrameworkMoniker, wasmSettings, cliPath, timeout),
                  new WasmExecutor(wasmSettings.WasmMainJS, wasmSettings.WasmJavaScriptEngine,  wasmSettings.WasmJavaScriptEngineArguments)
@@ -52,7 +51,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                                       new WasmGenerator(netCoreAppSettings.TargetFrameworkMoniker,
                                                         netCoreAppSettings.CustomDotNetCliPath,
                                                         netCoreAppSettings.PackagesPath,
-                                                        wasmSettings.WasmRuntimePack,
                                                         wasmSettings.WasmMainJS),
                                       new DotNetCliBuilder(netCoreAppSettings.TargetFrameworkMoniker,
                                                            netCoreAppSettings.CustomDotNetCliPath,
