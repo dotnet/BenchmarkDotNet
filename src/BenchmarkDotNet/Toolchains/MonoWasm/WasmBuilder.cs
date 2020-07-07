@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         {
             List<string> extraAssemblies = new List<string> { };
 
-            WasmAppBuilder = new WasmAppBuilder(wasmSettings);
+            WasmAppBuilder = new WasmAppBuilder(wasmSettings, targetFrameworkMoniker);
         }
 
 

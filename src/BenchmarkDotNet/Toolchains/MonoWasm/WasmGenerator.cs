@@ -49,12 +49,9 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                    .Replace("$CSPROJPATH$", projectFile.FullName)
                    .Replace("$TFM$", TargetFrameworkMoniker)
                    .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
-                   .Replace("$RUNTIMESETTINGS$", GetRuntimeSettings(benchmark.Job.Environment.Gc, buildPartition.Resolver))
                    .Replace("$COPIEDSETTINGS$", customProperties)
                    .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
                    .Replace("$SDKNAME$", sdkName)
-                   .Replace("$RUNTIMEPACKDIR$", RuntimePackPath)
-                   .Replace("$MAINJS$", MainJS)
                    .ToString();
 
                 File.WriteAllText(artifactsPaths.ProjectFilePath, content);

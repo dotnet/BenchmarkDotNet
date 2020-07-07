@@ -19,15 +19,18 @@ public class WasmAppBuilder
 
     private readonly WasmSettings WasmSettings;
 
+    private readonly string TargetFrameworkMoniker;
+
     private readonly List<string> FilesToIncludeInFileSystem;
 
     private Dictionary<string, Assembly> _assemblies;
     private AssemblyResolver _resolver;
 
 
-    public WasmAppBuilder(WasmSettings wasmSettings)
+    public WasmAppBuilder(WasmSettings wasmSettings, string targetFrameworkMoniker)
     {
         WasmSettings = wasmSettings;
+        TargetFrameworkMoniker = targetFrameworkMoniker;
 
         FilesToIncludeInFileSystem = new List<string>
                                      {
@@ -37,15 +40,15 @@ public class WasmAppBuilder
 
     public bool BuildApp (string programName, string projectRoot)
     {
-        string appDir = Path.Combine(projectRoot, "bin/net5.0/browser-wasm/publish");
+        string appDir = Path.Combine(projectRoot, $"bin/{TargetFrameworkMoniker}/browser-wasm/publish");
 
         string outputDir = Path.Combine(appDir, "output");
 
         List<string> assemblySearchPaths = new List<string>
                                   {
-                                    appDir,
+                                    appDir/*,
                                     $"{WasmSettings.WasmRuntimePack}/native",
-                                    $"{WasmSettings.WasmRuntimePack}/lib/net5.0"
+                                    $"{WasmSettings.WasmRuntimePack}/lib/{TargetFrameworkMoniker}"*/
                                   };
 
         string mainAssemblyPath = Path.Combine(projectRoot, "bin/net5.0/browser-wasm/", $"{programName}.dll");
