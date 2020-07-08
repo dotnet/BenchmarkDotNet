@@ -107,7 +107,7 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         CoreRt50,
 
-        // <summary>
+        /// <summary>
         /// Net5 Runtime built as a wasm app for
         /// </summary>
         Wasm
