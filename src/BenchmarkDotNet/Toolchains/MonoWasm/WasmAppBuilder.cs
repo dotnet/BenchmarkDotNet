@@ -135,7 +135,7 @@ public class WasmAppBuilder
                 var refAssembly = mlc.LoadFromAssemblyName(aname);
                 Add(mlc, refAssembly);
             }
-            catch (System.IO.FileNotFoundException e)
+            catch (System.IO.FileNotFoundException)
             {
                 Console.Error.WriteLine($"WARNING: Could not load {aname.Name}");
             }
