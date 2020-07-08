@@ -41,17 +41,8 @@ public class WasmAppBuilder
 
         List<string> assemblySearchPaths = new List<string>
                                   {
-                                    appDir/*,
-                                    $"{WasmSettings.WasmRuntimePack}/native",
-                                    $"{WasmSettings.WasmRuntimePack}/lib/{TargetFrameworkMoniker}"*/
+                                    appDir
                                   };
-
-        /* Benchmark Dotnet will try to open this file, so we need it on the file system.*/
-        List<string> filesToIncludeInFileSystem = new List<string>
-                                                 {
-                                                       $"{appDir}/System.Private.CoreLib.dll"
-                                                 };
-
 
         string mainAssemblyPath = Path.Combine(projectRoot, "bin/net5.0/browser-wasm/", $"{programName}.dll");
 
@@ -86,46 +77,10 @@ public class WasmAppBuilder
             File.Copy(Path.Combine(appDir, f), Path.Combine(outputDir, f), true);
         File.Copy(WasmSettings.WasmMainJS, Path.Combine(outputDir, "runtime.js"),  true);
 
-        var filesToMap = new Dictionary<string, List<string>>();
-        if (filesToIncludeInFileSystem != null)
-        {
-            string supportFilesDir = Path.Combine(outputDir, "supportFiles");
-            Directory.CreateDirectory(supportFilesDir);
+        string supportFilesDir = Path.Combine(outputDir, "supportFiles");
+        Directory.CreateDirectory(supportFilesDir);
 
-            foreach (var item in filesToIncludeInFileSystem)
-            {
-                string targetPath = null;
-
-                targetPath = Path.GetFileName(item);
-
-                // We normalize paths from `\` to `/` as MSBuild items could use `\`.
-                targetPath = targetPath.Replace('\\', '/');
-
-                string directory = Path.GetDirectoryName(targetPath);
-
-                if (!string.IsNullOrEmpty(directory))
-                {
-                    Directory.CreateDirectory(Path.Combine(supportFilesDir, directory));
-                }
-                else
-                {
-                    directory = "/";
-                }
-
-                File.Copy(item, Path.Combine(supportFilesDir, targetPath), true);
-
-                if (filesToMap.TryGetValue(directory, out List<string> files))
-                {
-                    files.Add(Path.GetFileName(targetPath));
-                }
-                else
-                {
-                    files = new List<string>();
-                    files.Add(Path.GetFileName(targetPath));
-                    filesToMap[directory] = files;
-                }
-            }
-        }
+        var filesToMap = copySystemPrivateCoreLib(appDir, supportFilesDir);
 
         using (var sw = File.CreateText(Path.Combine(outputDir, "mono-config.js")))
         {
@@ -163,7 +118,6 @@ public class WasmAppBuilder
             sw.WriteLine("v8 --expose_wasm runtime.js -- --run " + Path.GetFileName(mainAssemblyPath) + " $*");
         }
 
-
         return true;
     }
 
@@ -187,7 +141,40 @@ public class WasmAppBuilder
             }
         }
     }
+
+    private Dictionary<string, List<string>> copySystemPrivateCoreLib(string appDir, string supportFilesDir)
+    {
+        Dictionary<string, List<string>> fileMap = new Dictionary<string, List<string>>();
+
+        string systemPrivateCoreLibPath = $"{appDir}/System.Private.CoreLib.dll";
+
+        string targetPath = Path.GetFileName(systemPrivateCoreLibPath);
+
+        // We normalize paths from `\` to `/` as MSBuild items could use `\`;
+
+        string directory = Path.GetDirectoryName(targetPath);
+
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(Path.Combine(supportFilesDir, directory));
+        }
+        else
+        {
+            directory = "/";
+        }
+
+        File.Copy(systemPrivateCoreLibPath, Path.Combine(supportFilesDir, targetPath), true);
+
+
+        List<string> files = new List<string>();
+        files.Add(Path.GetFileName(targetPath));
+        fileMap[directory] = files;
+
+        return fileMap;
+    }
+
 }
+
 
 internal class AssemblyResolver : MetadataAssemblyResolver
 {
