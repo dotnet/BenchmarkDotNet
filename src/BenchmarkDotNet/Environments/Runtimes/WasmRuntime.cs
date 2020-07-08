@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Environments
     {
         public static readonly WasmRuntime Default = new WasmRuntime("Wasm");
 
-        public WasmRuntime(string name) : base(RuntimeMoniker.Wasm, "wasm", name)
+        public WasmRuntime(string name) : base(RuntimeMoniker.Wasm, "net5.0", name)
         {
         }
 

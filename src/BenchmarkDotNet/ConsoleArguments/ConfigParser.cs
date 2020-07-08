@@ -359,16 +359,19 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                     return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
                 case RuntimeMoniker.Wasm:
-                        IToolchain toolChain = new WasmToolChain(name: "Wasm",
-                                                                 targetFrameworkMoniker: "net5.0",
-                                                                 cliPath: options.CliPath.FullName,
-                                                                 packagesPath: options.RestorePath?.FullName,
-                                                                 runtimePackPath: options.WasmRuntimePackPath,
-                                                                 wasmAppBuilderAssembly: options.WasmAppBuilderPath,
-                                                                 mainJS: options.WasmMainJS,
-                                                                 javaScriptEngine: options.WasmJavascriptEnginePath,
-                                                                 javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
-                                                                 timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout);
+                    var wasmRuntime = runtimeMoniker.GetRuntime();
+
+                    WasmSettings wasmSettings = new WasmSettings(wasmMainJS: options.WasmMainJS,
+                                                                 wasmJavaScriptEngine: options.WasmJavascriptEnginePath,
+                                                                 wasmjavaScriptEngineArguments: options.WasmJavaScriptEngineArguments
+                                                                 );
+
+                    IToolchain toolChain = new WasmToolChain(name: "Wasm",
+                                                             targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
+                                                             cliPath: options.CliPath.FullName,
+                                                             packagesPath: options.RestorePath?.FullName,
+                                                             wasmSettings: wasmSettings,
+                                                             timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout);
 
                         return baseJob.WithRuntime(runtimeMoniker.GetRuntime()).WithToolchain(toolChain);
                 default:
