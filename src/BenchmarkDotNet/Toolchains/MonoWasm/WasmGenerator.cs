@@ -17,11 +17,15 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     public class WasmGenerator : CsProjGenerator
 
     {
+        private string RuntimePackPath;
+        private string WasmAppBuilderAssembly;
         private string MainJS;
 
         public WasmGenerator(string targetFrameworkMoniker,
                              string cliPath,
                              string packagesPath,
+                             string runtimePackPath,
+                             string wasmAppBuilderAssembly,
                              string mainJS
                              )
             : base(targetFrameworkMoniker,
@@ -29,6 +33,8 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                    packagesPath,
                    null)
         {
+            RuntimePackPath = runtimePackPath;
+            WasmAppBuilderAssembly = wasmAppBuilderAssembly;
             MainJS = mainJS;
         }
 
@@ -46,9 +52,13 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                    .Replace("$CSPROJPATH$", projectFile.FullName)
                    .Replace("$TFM$", TargetFrameworkMoniker)
                    .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
+                   .Replace("$RUNTIMESETTINGS$", GetRuntimeSettings(benchmark.Job.Environment.Gc, buildPartition.Resolver))
                    .Replace("$COPIEDSETTINGS$", customProperties)
                    .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
                    .Replace("$SDKNAME$", sdkName)
+                   .Replace("$RUNTIMEPACKDIR$", RuntimePackPath)
+                   .Replace("$WASMAPPBUILDERASSEMBLY$", WasmAppBuilderAssembly)
+                   .Replace("$MAINJS$", MainJS)
                    .ToString();
 
                 File.WriteAllText(artifactsPaths.ProjectFilePath, content);

@@ -6,7 +6,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CsProj;
-using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.Roslyn;
 using JetBrains.Annotations;
 
@@ -47,8 +46,7 @@ namespace BenchmarkDotNet.Running
             // given job can have CoreRT toolchain set, but Runtime == default ;)
             || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is CoreRtToolchain);
 
-        public bool IsWasm => Runtime is WasmRuntime // given job can have Wasm toolchain set, but Runtime == default ;)
-            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is WasmToolChain);
+        public bool IsWasm => Runtime is WasmRuntime;
 
         public bool IsNetFramework => Runtime is ClrRuntime
             || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && (toolchain is RoslynToolchain || toolchain is CsProjClassicNetToolchain));
