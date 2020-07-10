@@ -4,7 +4,7 @@
     <OutputPath>bin</OutputPath>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <TargetFramework>$TFM$</TargetFramework>
-    <AppDir>$(MSBuildThisFileDirectory)\bin\net5.0\browser-wasm\publish</AppDir>
+    <AppDir>$(MSBuildThisFileDirectory)\bin\$TFM$\browser-wasm\publish</AppDir>
     <AssemblyName>$PROGRAMNAME$</AssemblyName>
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
     $COPIEDSETTINGS$
