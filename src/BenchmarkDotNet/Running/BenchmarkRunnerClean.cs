@@ -21,7 +21,6 @@ using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
 using Perfolizer.Horology;
-using BenchmarkDotNet.Toolchains.MonoWasm;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
 namespace BenchmarkDotNet.Running
