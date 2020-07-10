@@ -35,8 +35,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         {
         }
 
-        internal string RuntimeJavaScripthPath { get; }
-
         public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
         {
             return !System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
