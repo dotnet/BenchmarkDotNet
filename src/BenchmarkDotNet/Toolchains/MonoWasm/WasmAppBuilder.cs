@@ -1,4 +1,3 @@
-// -*- indent-tabs-mode: nil -*-
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
@@ -15,13 +14,8 @@ using BenchmarkDotNet.Toolchains.MonoWasm;
 
 public class WasmAppBuilder
 {
-    // FIXME: Document
-
     private readonly WasmSettings WasmSettings;
-
     private readonly string TargetFrameworkMoniker;
-
-  
 
     public WasmAppBuilder(WasmSettings wasmSettings, string targetFrameworkMoniker)
     {
@@ -37,7 +31,6 @@ public class WasmAppBuilder
 
         string mainAssemblyPath = Path.Combine(appDir, $"{programName}.dll");
 
-
         if (!File.Exists(mainAssemblyPath))
             throw new ArgumentException($"File MainAssembly='{mainAssemblyPath}' doesn't exist.");
         if (!File.Exists(WasmSettings.WasmMainJS))
@@ -46,14 +39,16 @@ public class WasmAppBuilder
         var paths = new List<string>();
         assemblies = Directory.GetFiles(appDir, "*.dll");
 
-
         // Create app
         Directory.CreateDirectory(outputDir);
         Directory.CreateDirectory(Path.Combine(outputDir, "managed"));
+
         foreach (var assembly in assemblies)
             File.Copy(assembly, Path.Combine(outputDir, "managed", Path.GetFileName(assembly)), true);
+
         foreach (var f in new string[] { "dotnet.wasm", "dotnet.js" })
             File.Copy(Path.Combine(appDir, f), Path.Combine(outputDir, f), true);
+
         File.Copy(WasmSettings.WasmMainJS, Path.Combine(outputDir, "runtime.js"),  true);
 
         string supportFilesDir = Path.Combine(outputDir, "supportFiles");
@@ -85,7 +80,6 @@ public class WasmAppBuilder
             sw.WriteLine ("}");
         }
 
-
         using (var sw = File.CreateText(Path.Combine(outputDir, "run-v8.sh")))
         {
             sw.WriteLine("v8 --expose_wasm runtime.js -- --run " + Path.GetFileName(mainAssemblyPath) + " $*");
@@ -93,7 +87,6 @@ public class WasmAppBuilder
 
         return true;
     }
-
 
     private (string, string) copySystemPrivateCoreLib(string appDir, string supportFilesDir)
     {
