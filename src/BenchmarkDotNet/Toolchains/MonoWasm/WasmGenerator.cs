@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-    => Path.Combine(buildArtifactsDirectoryPath, "bin/net5.0/browser-wasm/publish/output");
+    => Path.Combine(buildArtifactsDirectoryPath, $"bin/{TargetFrameworkMoniker}/browser-wasm/publish/output");
 
     }
 }
