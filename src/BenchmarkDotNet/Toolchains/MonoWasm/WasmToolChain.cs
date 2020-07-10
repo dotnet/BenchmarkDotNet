@@ -45,7 +45,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         [PublicAPI]
         public static IToolchain From(NetCoreAppSettings netCoreAppSettings,  WasmSettings wasmSettings)
         {
-
             return new  WasmToolChain(netCoreAppSettings.Name,
                                       new WasmGenerator(netCoreAppSettings.TargetFrameworkMoniker,
                                                         netCoreAppSettings.CustomDotNetCliPath,
