@@ -42,7 +42,6 @@ public class WasmAppBuilder
         // Create app
         Directory.CreateDirectory(outputDir);
         Directory.CreateDirectory(Path.Combine(outputDir, "managed"));
-
         foreach (var assembly in assemblies)
             File.Copy(assembly, Path.Combine(outputDir, "managed", Path.GetFileName(assembly)), true);
 
@@ -50,11 +49,6 @@ public class WasmAppBuilder
             File.Copy(Path.Combine(appDir, f), Path.Combine(outputDir, f), true);
 
         File.Copy(WasmSettings.WasmMainJS, Path.Combine(outputDir, "runtime.js"),  true);
-
-        string supportFilesDir = Path.Combine(outputDir, "supportFiles");
-        Directory.CreateDirectory(supportFilesDir);
-
-        (string, string) coreLibDirAndPath= copySystemPrivateCoreLib(appDir, supportFilesDir);
 
         using (var sw = File.CreateText(Path.Combine(outputDir, "mono-config.js")))
         {
@@ -69,14 +63,8 @@ public class WasmAppBuilder
                 sw.WriteLine(",");
             }
             sw.WriteLine ("\t],");
-            sw.WriteLine("\tfiles_to_map: [");
+            sw.WriteLine("\tfiles_to_map: [],");
 
-            sw.WriteLine("\t{");
-            sw.WriteLine($"\t\tdirectory: \"{coreLibDirAndPath.Item1}\",");
-            sw.WriteLine($"\t\tfiles: [\"{coreLibDirAndPath.Item2}\"]");
-            sw.WriteLine("\t},");
-
-            sw.WriteLine ("\t],");
             sw.WriteLine ("}");
         }
 
@@ -87,29 +75,4 @@ public class WasmAppBuilder
 
         return true;
     }
-
-    private (string, string) copySystemPrivateCoreLib(string appDir, string supportFilesDir)
-    {
-        string systemPrivateCoreLibPath = $"{appDir}/System.Private.CoreLib.dll";
-
-        string targetPath = Path.GetFileName(systemPrivateCoreLibPath);
-
-        // We normalize paths from `\` to `/` as MSBuild items could use `\`;
-
-        string directory = Path.GetDirectoryName(targetPath);
-
-        if (!string.IsNullOrEmpty(directory))
-        {
-            Directory.CreateDirectory(Path.Combine(supportFilesDir, directory));
-        }
-        else
-        {
-            directory = "/";
-        }
-
-        File.Copy(systemPrivateCoreLibPath, Path.Combine(supportFilesDir, targetPath), true);
-
-        return (directory, targetPath);
-    }
-
 }
