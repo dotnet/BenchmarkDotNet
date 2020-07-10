@@ -69,7 +69,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public string CustomDotNetCliPath { get; }
 
-
         /// <summary>
         /// The directory to restore packages to.
         /// </summary>

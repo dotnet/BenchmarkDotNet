@@ -21,8 +21,6 @@ public class WasmAppBuilder
 
     private readonly string TargetFrameworkMoniker;
 
-  
-
     private Dictionary<string, Assembly> _assemblies;
     private AssemblyResolver _resolver;
 

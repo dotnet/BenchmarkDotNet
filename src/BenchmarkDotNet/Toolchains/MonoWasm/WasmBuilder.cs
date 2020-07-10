@@ -29,7 +29,5 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
             return buildResult;
         }
-
-
     }
 }
