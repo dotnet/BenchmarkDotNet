@@ -15,7 +15,6 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 namespace BenchmarkDotNet.Toolchains.MonoWasm
 {
     public class WasmGenerator : CsProjGenerator
-
     {
         private string MainJS;
 

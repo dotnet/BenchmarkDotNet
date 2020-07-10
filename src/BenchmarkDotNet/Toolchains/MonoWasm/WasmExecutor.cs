@@ -16,7 +16,6 @@ using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.MonoWasm
-
 {
     [PublicAPI]
     public class WasmExecutor : IExecutor
