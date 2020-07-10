@@ -21,9 +21,7 @@ public class WasmAppBuilder
 
     private readonly string TargetFrameworkMoniker;
 
-    private Dictionary<string, Assembly> _assemblies;
-    private AssemblyResolver _resolver;
-
+  
 
     public WasmAppBuilder(WasmSettings wasmSettings, string targetFrameworkMoniker)
     {
@@ -33,14 +31,9 @@ public class WasmAppBuilder
 
     public bool BuildApp (string programName, string projectRoot)
     {
+        string[] assemblies;
         string appDir = Path.Combine(projectRoot, $"bin/{TargetFrameworkMoniker}/browser-wasm/publish");
-
         string outputDir = Path.Combine(appDir, "output");
-
-        List<string> assemblySearchPaths = new List<string>
-                                  {
-                                    appDir
-                                  };
 
         string mainAssemblyPath = Path.Combine(appDir, $"{programName}.dll");
 
@@ -51,26 +44,14 @@ public class WasmAppBuilder
             throw new ArgumentException($"File MainJS='{WasmSettings.WasmMainJS}' doesn't exist.");
 
         var paths = new List<string>();
-        _assemblies = new Dictionary<string, Assembly>();
+        assemblies = Directory.GetFiles(appDir, "*.dll");
 
-        // Collect and load assemblies used by the app
-        foreach (string dir in assemblySearchPaths)
-        {
-            if (!Directory.Exists(dir))
-                throw new ArgumentException($"Directory '{dir}' doesn't exist or not a directory.");
-            paths.Add(dir);
-        }
-        _resolver = new AssemblyResolver(paths);
-        var mlc = new MetadataLoadContext(_resolver, "System.Private.CoreLib");
-
-        Assembly mainAssembly = mlc.LoadFromAssemblyPath (mainAssemblyPath);
-        Add(mlc, mainAssembly);
 
         // Create app
         Directory.CreateDirectory(outputDir);
         Directory.CreateDirectory(Path.Combine(outputDir, "managed"));
-        foreach (var assembly in _assemblies.Values)
-            File.Copy(assembly.Location, Path.Combine(outputDir, "managed", Path.GetFileName(assembly.Location)), true);
+        foreach (var assembly in assemblies)
+            File.Copy(assembly, Path.Combine(outputDir, "managed", Path.GetFileName(assembly)), true);
         foreach (var f in new string[] { "dotnet.wasm", "dotnet.js" })
             File.Copy(Path.Combine(appDir, f), Path.Combine(outputDir, f), true);
         File.Copy(WasmSettings.WasmMainJS, Path.Combine(outputDir, "runtime.js"),  true);
@@ -78,7 +59,7 @@ public class WasmAppBuilder
         string supportFilesDir = Path.Combine(outputDir, "supportFiles");
         Directory.CreateDirectory(supportFilesDir);
 
-        var filesToMap = copySystemPrivateCoreLib(appDir, supportFilesDir);
+        (string, string) coreLibDirAndPath= copySystemPrivateCoreLib(appDir, supportFilesDir);
 
         using (var sw = File.CreateText(Path.Combine(outputDir, "mono-config.js")))
         {
@@ -87,25 +68,19 @@ public class WasmAppBuilder
             sw.WriteLine("\tdeploy_prefix: \"managed\",");
             sw.WriteLine("\tenable_debugging: 0,");
             sw.WriteLine("\tassembly_list: [");
-            foreach (var assembly in _assemblies.Values)
+            foreach (var assembly in assemblies)
             {
-                sw.Write("\t\t\"" + Path.GetFileName(assembly.Location) + "\"");
+                sw.Write("\t\t\"" + Path.GetFileName(assembly) + "\"");
                 sw.WriteLine(",");
             }
             sw.WriteLine ("\t],");
             sw.WriteLine("\tfiles_to_map: [");
-            foreach (KeyValuePair<string, List<string>> keyValuePair in filesToMap)
-            {
-                sw.WriteLine("\t{");
-                sw.WriteLine($"\t\tdirectory: \"{keyValuePair.Key}\",");
-                sw.WriteLine("\t\tfiles: [");
-                foreach (string file in keyValuePair.Value)
-                {
-                    sw.WriteLine($"\t\t\t\"{file}\",");
-                }
-                sw.WriteLine("\t\t],");
-                sw.WriteLine("\t},");
-            }
+
+            sw.WriteLine("\t{");
+            sw.WriteLine($"\t\tdirectory: \"{coreLibDirAndPath.Item1}\",");
+            sw.WriteLine($"\t\tfiles: [\"{coreLibDirAndPath.Item2}\"]");
+            sw.WriteLine("\t},");
+
             sw.WriteLine ("\t],");
             sw.WriteLine ("}");
         }
@@ -119,31 +94,9 @@ public class WasmAppBuilder
         return true;
     }
 
-    private void Add(MetadataLoadContext mlc, Assembly assembly)
+
+    private (string, string) copySystemPrivateCoreLib(string appDir, string supportFilesDir)
     {
-        if (_assemblies.ContainsKey(assembly.GetName().Name))
-            return;
-        _assemblies[assembly.GetName().Name] = assembly;
-
-
-        foreach (var aname in assembly.GetReferencedAssemblies())
-        {
-            try
-            {
-                var refAssembly = mlc.LoadFromAssemblyName(aname);
-                Add(mlc, refAssembly);
-            }
-            catch (System.IO.FileNotFoundException)
-            {
-                Console.Error.WriteLine($"WARNING: Could not load {aname.Name}");
-            }
-        }
-    }
-
-    private Dictionary<string, List<string>> copySystemPrivateCoreLib(string appDir, string supportFilesDir)
-    {
-        Dictionary<string, List<string>> fileMap = new Dictionary<string, List<string>>();
-
         string systemPrivateCoreLibPath = $"{appDir}/System.Private.CoreLib.dll";
 
         string targetPath = Path.GetFileName(systemPrivateCoreLibPath);
@@ -163,37 +116,7 @@ public class WasmAppBuilder
 
         File.Copy(systemPrivateCoreLibPath, Path.Combine(supportFilesDir, targetPath), true);
 
-
-        List<string> files = new List<string>();
-        files.Add(Path.GetFileName(targetPath));
-        fileMap[directory] = files;
-
-        return fileMap;
+        return (directory, targetPath);
     }
 
-}
-
-
-internal class AssemblyResolver : MetadataAssemblyResolver
-{
-    private List<string> _searchPaths;
-
-    public AssemblyResolver(List<string> searchPaths)
-    {
-        _searchPaths = searchPaths;
-    }
-
-    public override Assembly Resolve(MetadataLoadContext context, AssemblyName assemblyName)
-    {
-        var name = assemblyName.Name;
-        foreach (var dir in _searchPaths)
-        {
-            var path = Path.Combine(dir, name + ".dll");
-            if (File.Exists(path))
-            {
-                return context.LoadFromAssemblyPath(path);
-            }
-        }
-        return null;
-    }
 }
