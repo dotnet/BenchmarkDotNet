@@ -26,7 +26,7 @@ public class WasmAppBuilder
     public bool BuildApp (string programName, string projectRoot)
     {
         string[] assemblies;
-        string appDir = Path.Combine(projectRoot, $"bin/{TargetFrameworkMoniker}/browser-wasm/publish");
+        string appDir = Path.Combine(projectRoot, $"bin", TargetFrameworkMoniker, "browser-wasm", "publish");
         string outputDir = Path.Combine(appDir, "output");
 
         string mainAssemblyPath = Path.Combine(appDir, $"{programName}.dll");
