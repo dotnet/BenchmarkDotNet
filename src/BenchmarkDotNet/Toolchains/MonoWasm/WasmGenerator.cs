@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             }
         }
 
-        protected override string  GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, "run-v8.sh");
+        protected override string  GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, "runtime.js");
 
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)

@@ -68,11 +68,6 @@ public class WasmAppBuilder
             sw.WriteLine ("}");
         }
 
-        using (var sw = File.CreateText(Path.Combine(outputDir, "run-v8.sh")))
-        {
-            sw.WriteLine("v8 --expose_wasm runtime.js -- --run " + Path.GetFileName(mainAssemblyPath) + " $*");
-        }
-
         return true;
     }
 }
