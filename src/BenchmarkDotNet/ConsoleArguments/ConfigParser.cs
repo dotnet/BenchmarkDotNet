@@ -105,11 +105,18 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
 
             foreach (string runtime in options.Runtimes)
-                if (!Enum.TryParse<RuntimeMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out _))
+            {
+                if (!Enum.TryParse<RuntimeMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out var parsed))
                 {
                     logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(RuntimeMoniker)).Select(name => name.ToLower()))}.");
                     return false;
                 }
+                else if (parsed == RuntimeMoniker.Wasm && (options.WasmMainJs == null || options.WasmMainJs.IsNotNullButDoesNotExist()))
+                {
+                    logger.WriteLineError($"The provided {nameof(options.WasmMainJs)} \"{options.WasmMainJs}\" does NOT exist. It MUST be provided.");
+                    return false;
+                }
+            }
 
             foreach (string exporter in options.Exporters)
                 if (!AvailableExporters.ContainsKey(exporter))
@@ -134,12 +141,6 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.MonoPath.IsNotNullButDoesNotExist())
             {
                 logger.WriteLineError($"The provided {nameof(options.MonoPath)} \"{options.MonoPath}\" does NOT exist.");
-                return false;
-            }
-
-            if (options.WasmMainJs.IsNotNullButDoesNotExist())
-            {
-                logger.WriteLineError($"The provided {nameof(options.WasmMainJs)} \"{options.WasmMainJs}\" does NOT exist.");
                 return false;
             }
 

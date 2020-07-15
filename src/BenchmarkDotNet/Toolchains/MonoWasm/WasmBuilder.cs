@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             foreach (var f in new string[] { "dotnet.wasm", "dotnet.js" })
                 File.Copy(Path.Combine(appDir, f), Path.Combine(outputDir, f), true);
 
-            File.Copy(runtime.MainJS.FullName, Path.Combine(outputDir, "runtime.js"),  true);
+            File.Copy(runtime.MainJs.FullName, Path.Combine(outputDir, "runtime.js"),  true);
 
             using (var sw = File.CreateText(Path.Combine(outputDir, "mono-config.js")))
             {

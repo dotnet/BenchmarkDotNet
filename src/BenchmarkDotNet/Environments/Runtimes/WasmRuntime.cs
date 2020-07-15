@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Environments
         [EditorBrowsable(EditorBrowsableState.Never)]
         internal static readonly WasmRuntime Default = new WasmRuntime();
 
-        public FileInfo MainJS { get; }
+        public FileInfo MainJs { get; }
 
         public string JavaScriptEngine { get; }
 
@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Environments
             if (!string.IsNullOrEmpty(javaScriptEngine) && javaScriptEngine != "v8" && !File.Exists(javaScriptEngine))
                 throw new FileNotFoundException($"Provided {nameof(javaScriptEngine)} file: \"{javaScriptEngine}\" doest NOT exist");
 
-            MainJS = mainJs;
+            MainJs = mainJs;
             JavaScriptEngine = javaScriptEngine;
             JavaScriptEngineArguments = javaScriptEngineArguments;
         }
@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Environments
         // this ctor exists only for the purpose of having .Default property that returns something consumable by RuntimeInformation.GetCurrentRuntime()
         private WasmRuntime(string msBuildMoniker = "net5.0", string displayName = "WASM", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm") : base(RuntimeMoniker.Wasm, msBuildMoniker, displayName)
         {
-            MainJS = new FileInfo("fake");
+            MainJs = new FileInfo("fake");
             JavaScriptEngine = javaScriptEngine;
             JavaScriptEngineArguments = javaScriptEngineArguments;
         }
@@ -52,9 +52,9 @@ namespace BenchmarkDotNet.Environments
             => obj is WasmRuntime other && Equals(other);
 
         public bool Equals(WasmRuntime other)
-            => other != null && base.Equals(other) && other.MainJS == MainJS && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments;
+            => other != null && base.Equals(other) && other.MainJs == MainJs && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments;
 
         public override int GetHashCode()
-            => base.GetHashCode() ^ MainJS.GetHashCode() ^ (JavaScriptEngine?.GetHashCode() ?? 0) ^ (JavaScriptEngineArguments?.GetHashCode() ?? 0);
+            => base.GetHashCode() ^ MainJs.GetHashCode() ^ (JavaScriptEngine?.GetHashCode() ?? 0) ^ (JavaScriptEngineArguments?.GetHashCode() ?? 0);
     }
 }
