@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.Reports
         // ReSharper disable once UnusedParameter.Global
         public static Measurement Parse(ILogger logger, string line, int processIndex)
         {
-            if (line == null || line.StartsWith(GcStats.ResultsLinePrefix))
+            if (string.IsNullOrWhiteSpace(line) || line.StartsWith(GcStats.ResultsLinePrefix))
                 return Error();
 
             try
