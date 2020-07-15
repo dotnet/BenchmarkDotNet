@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                         netCoreAppSettings.PackagesPath),
                     new WasmBuilder(netCoreAppSettings.TargetFrameworkMoniker,
                         netCoreAppSettings.CustomDotNetCliPath,
-                        netCoreAppSettings.Timeout), 
+                        netCoreAppSettings.Timeout),
                     new Executor(),
                     netCoreAppSettings.CustomDotNetCliPath);
     }
