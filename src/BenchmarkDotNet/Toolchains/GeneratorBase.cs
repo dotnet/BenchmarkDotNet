@@ -111,6 +111,8 @@ namespace BenchmarkDotNet.Toolchains
         [PublicAPI] protected virtual void GenerateCode(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
             => File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(buildPartition));
 
+        protected virtual string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, $"{programName}{GetExecutableExtension()}");
+
         private ArtifactsPaths GetArtifactsPaths(BuildPartition buildPartition, string rootArtifactsFolderPath)
         {
             // its not ".cs" in order to avoid VS from displaying and compiling it with xprojs/csprojs that include all *.cs by default
@@ -119,7 +121,8 @@ namespace BenchmarkDotNet.Toolchains
             string programName = buildPartition.ProgramName;
             string buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(buildPartition, programName);
             string binariesDirectoryPath = GetBinariesDirectoryPath(buildArtifactsDirectoryPath, buildPartition.BuildConfiguration);
-            string executablePath = Path.Combine(binariesDirectoryPath, $"{programName}{GetExecutableExtension()}");
+
+            string executablePath = GetExecutablePath(binariesDirectoryPath, programName);
 
             return new ArtifactsPaths(
                 rootArtifactsFolderPath: rootArtifactsFolderPath,

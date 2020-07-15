@@ -17,11 +17,13 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.MonoWasm;
 using CommandLine;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
@@ -356,6 +358,21 @@ namespace BenchmarkDotNet.ConsoleArguments
                     builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
 
                     return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
+                case RuntimeMoniker.Wasm:
+                    var wasmRuntime = runtimeMoniker.GetRuntime();
+
+                    WasmSettings wasmSettings = new WasmSettings(wasmMainJS: options.WasmMainJS,
+                                                                 wasmJavaScriptEngine: options.WasmJavascriptEnginePath,
+                                                                 wasmjavaScriptEngineArguments: options.WasmJavaScriptEngineArguments);
+
+                    IToolchain toolChain = new WasmToolChain(name: "Wasm",
+                                                             targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
+                                                             cliPath: options.CliPath.FullName,
+                                                             packagesPath: options.RestorePath?.FullName,
+                                                             wasmSettings: wasmSettings,
+                                                             timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout);
+
+                        return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain);
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
