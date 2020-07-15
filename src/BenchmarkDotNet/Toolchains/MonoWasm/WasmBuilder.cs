@@ -44,8 +44,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
             if (!File.Exists(mainAssemblyPath))
                 throw new ArgumentException($"File MainAssembly='{mainAssemblyPath}' doesn't exist.");
-            if (!File.Exists(wasmSettings.WasmMainJS))
-                throw new ArgumentException($"File MainJS='{wasmSettings.WasmMainJS}' doesn't exist.");
 
             var assemblies = Directory.GetFiles(appDir, "*.dll");
 

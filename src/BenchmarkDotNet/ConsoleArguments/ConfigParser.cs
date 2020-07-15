@@ -137,6 +137,18 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return false;
             }
 
+            if (options.WasmMainJs.IsNotNullButDoesNotExist())
+            {
+                logger.WriteLineError($"The provided {nameof(options.WasmMainJs)} \"{options.WasmMainJs}\" does NOT exist.");
+                return false;
+            }
+
+            if (options.WasmJavascriptEngine.IsNotNullButDoesNotExist())
+            {
+                logger.WriteLineError($"The provided {nameof(options.WasmJavascriptEngine)} \"{options.WasmJavascriptEngine}\" does NOT exist.");
+                return false;
+            }
+
             if (options.CoreRtPath.IsNotNullButDoesNotExist())
             {
                 logger.WriteLineError($"The provided {nameof(options.CoreRtPath)} \"{options.CoreRtPath}\" does NOT exist.");
@@ -367,7 +379,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                     IToolchain toolChain = new WasmToolChain(name: "Wasm",
                                                              targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
-                                                             cliPath: options.CliPath.FullName,
+                                                             cliPath: options.CliPath?.FullName,
                                                              packagesPath: options.RestorePath?.FullName,
                                                              wasmSettings: wasmSettings,
                                                              timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout);

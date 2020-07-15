@@ -30,14 +30,21 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                                    packagesPath,
                                    wasmSettings.WasmMainJS),
                  new WasmBuilder(targetFrameworkMoniker, wasmSettings, cliPath, timeout),
-                 new WasmExecutor(wasmSettings.WasmMainJS, wasmSettings.WasmJavaScriptEngine,  wasmSettings.WasmJavaScriptEngineArguments)
-                 )
+                 new WasmExecutor(wasmSettings.WasmMainJS, wasmSettings.WasmJavaScriptEngine,  wasmSettings.WasmJavaScriptEngineArguments))
         {
         }
 
         public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
         {
-            return !System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            if (!base.IsSupported(benchmarkCase, logger, resolver))
+                return false;
+
+            if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                logger.WriteLineError($"{nameof(WasmToolChain)} is supported only on Unix, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
+                return false;
+            }
+            return true;
         }
 
         [PublicAPI]
