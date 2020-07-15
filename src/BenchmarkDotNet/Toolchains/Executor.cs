@@ -25,6 +25,7 @@ namespace BenchmarkDotNet.Toolchains
         public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
             string exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
+            string programName = executeParameters.BuildResult.ArtifactsPaths.ProgramName;
             string args = executeParameters.BenchmarkId.ToArguments();
 
             if (!File.Exists(exePath))
@@ -32,14 +33,14 @@ namespace BenchmarkDotNet.Toolchains
                 return new ExecuteResult(false, -1, default, Array.Empty<string>(), Array.Empty<string>());
             }
 
-            return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, exePath, null, args, executeParameters.Diagnoser, executeParameters.Resolver);
+            return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, exePath, null, args, executeParameters.Diagnoser, executeParameters.Resolver, programName);
         }
 
-        private ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, string exePath, string workingDirectory, string args, IDiagnoser diagnoser, IResolver resolver)
+        private ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, string exePath, string workingDirectory, string args, IDiagnoser diagnoser, IResolver resolver, string programName)
         {
             try
             {
-                using (var process = new Process { StartInfo = CreateStartInfo(benchmarkCase, exePath, args, workingDirectory, resolver) })
+                using (var process = new Process { StartInfo = CreateStartInfo(benchmarkCase, exePath, args, workingDirectory, resolver, programName) })
                 using (new ConsoleExitHandler(process, logger))
                 {
                     var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId);
@@ -82,7 +83,7 @@ namespace BenchmarkDotNet.Toolchains
             return new ExecuteResult(true, process.ExitCode, process.Id, Array.Empty<string>(), Array.Empty<string>());
         }
 
-        private ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, string exePath, string args, string workingDirectory, IResolver resolver)
+        private ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, string exePath, string args, string workingDirectory, IResolver resolver, string programName)
         {
             var start = new ProcessStartInfo
             {
@@ -112,6 +113,10 @@ namespace BenchmarkDotNet.Toolchains
                 case MonoRuntime mono:
                     start.FileName = mono.CustomPath ?? "mono";
                     start.Arguments = GetMonoArguments(benchmarkCase.Job, exePath, args, resolver);
+                    break;
+                case WasmRuntime wasm:
+                    start.FileName = wasm.JavaScriptEngine;
+                    start.Arguments = $"{wasm.JavaScriptEngineArguments} runtime.js -- --run {programName}.dll {args} ";
                     break;
                 default:
                     throw new NotSupportedException("Runtime = " + runtime);
