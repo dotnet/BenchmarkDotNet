@@ -1,0 +1,20 @@
+﻿<Project Sdk="$SDKNAME$" DefaultTargets="Publish">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <OutputPath>bin</OutputPath>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TargetFramework>$TFM$</TargetFramework>
+    <AppDir>$(MSBuildThisFileDirectory)\bin\$TFM$\browser-wasm\publish</AppDir>
+    <AssemblyName>$PROGRAMNAME$</AssemblyName>
+    <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+    $COPIEDSETTINGS$
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$CODEFILENAME$" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$CSPROJPATH$" />
+  </ItemGroup>
+</Project>
