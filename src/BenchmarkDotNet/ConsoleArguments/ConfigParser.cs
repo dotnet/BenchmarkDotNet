@@ -371,18 +371,19 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                     return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
                 case RuntimeMoniker.Wasm:
-                    var wasmRuntime = runtimeMoniker.GetRuntime();
+                    var wasmRuntime = new WasmRuntime(
+                        mainJs: options.WasmMainJs,
+                        msBuildMoniker: "net5.0",
+                        javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
+                        javaScriptEngineArguments: options.WasmJavaScriptEngineArguments);
 
-                    WasmSettings wasmSettings = new WasmSettings(wasmMainJS: options.WasmMainJs.FullName,
-                                                                 wasmJavaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
-                                                                 wasmjavaScriptEngineArguments: options.WasmJavaScriptEngineArguments);
-
-                    IToolchain toolChain = new WasmToolChain(name: "Wasm",
-                                                             targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
-                                                             cliPath: options.CliPath?.FullName,
-                                                             packagesPath: options.RestorePath?.FullName,
-                                                             wasmSettings: wasmSettings,
-                                                             timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout);
+                    var toolChain = WasmToolChain.From(new NetCoreAppSettings(
+                        targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
+                        runtimeFrameworkVersion: null,
+                        name: wasmRuntime.Name,
+                        customDotNetCliPath: options.CliPath?.FullName,
+                        packagesPath: options.RestorePath?.FullName,
+                        timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout));
 
                         return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain);
                 default:

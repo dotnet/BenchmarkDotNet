@@ -1,22 +1,48 @@
 ﻿using System;
+using System.IO;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Environments
 {
     public class WasmRuntime : Runtime, IEquatable<WasmRuntime>
     {
-        public static readonly WasmRuntime Default = new WasmRuntime("Wasm");
+        public FileInfo MainJS { get; }
 
-        public WasmRuntime(string name) : base(RuntimeMoniker.Wasm, "net5.0", name)
+        public string JavaScriptEngine { get; }
+
+        public string JavaScriptEngineArguments { get;  }
+
+        /// <summary>
+        /// creates new instance of WasmRuntime
+        /// </summary>
+        /// <param name="mainJs">MANDATORY path to the main.js file.</param>
+        /// <param name="javaScriptEngine">Full path to a java script engine used to run the benchmarks. "v8" by default</param>
+        /// <param name="javaScriptEngineArguments">Arguments for the javascript engine. "--expose_wasm" by default</param>
+        /// <param name="msBuildMoniker">moniker, default: "net5.0"</param>
+        /// <param name="displayName">default: "WASM"</param>
+        /// <remarks>path to mainJs MUST be provided</remarks>
+        public WasmRuntime(FileInfo mainJs, string msBuildMoniker = "net5.0", string displayName = "WASM", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm") : base(RuntimeMoniker.Wasm, msBuildMoniker, displayName)
         {
-        }
-        
-        public WasmRuntime(string name, string msBuildMoniker) : base(RuntimeMoniker.Wasm, msBuildMoniker, name)
-        {
+            if (mainJs == null)
+                throw new ArgumentNullException(paramName: nameof(mainJs));
+            if (mainJs.IsNotNullButDoesNotExist())
+                throw new FileNotFoundException($"Provided {nameof(mainJs)} file: \"{mainJs.FullName}\" doest NOT exist");
+            if (!string.IsNullOrEmpty(javaScriptEngine) && javaScriptEngine != "v8" && !File.Exists(javaScriptEngine))
+                throw new FileNotFoundException($"Provided {nameof(javaScriptEngine)} file: \"{javaScriptEngine}\" doest NOT exist");
+
+            MainJS = mainJs;
+            JavaScriptEngine = javaScriptEngine;
+            JavaScriptEngineArguments = javaScriptEngineArguments;
         }
 
-        public override bool Equals(object obj) => obj is WasmRuntime other && Equals(other);
+        public override bool Equals(object obj)
+            => obj is WasmRuntime other && Equals(other);
 
-        public bool Equals(WasmRuntime other) => base.Equals(other);
+        public bool Equals(WasmRuntime other)
+            => base.Equals(other) && other.MainJS == MainJS && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments;
+
+        public override int GetHashCode() 
+            => base.GetHashCode() ^ MainJS.GetHashCode() ^ (JavaScriptEngine?.GetHashCode() ?? 0) ^ (JavaScriptEngineArguments?.GetHashCode() ?? 0);
     }
 }

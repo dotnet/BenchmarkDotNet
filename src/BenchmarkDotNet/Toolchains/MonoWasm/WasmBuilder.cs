@@ -6,6 +6,7 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using System.IO;
+using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Toolchains.MonoWasm
 {
@@ -13,12 +14,10 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     {
         private readonly DotNetCliBuilder dotNetCliBuilder;
         private readonly string targetFrameworkMoniker;
-        private readonly WasmSettings wasmSettings;
 
-        public WasmBuilder(string targetFrameworkMoniker, WasmSettings wasmSettings, string customDotNetCliPath = null, TimeSpan? timeout = null)
+        public WasmBuilder(string targetFrameworkMoniker, string customDotNetCliPath = null, TimeSpan? timeout = null)
         {
             this.targetFrameworkMoniker = targetFrameworkMoniker;
-            this.wasmSettings = wasmSettings;
 
             dotNetCliBuilder = new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath, timeout);
         }
@@ -29,13 +28,13 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
             if (buildResult.IsBuildSuccess)
             {
-                BuildApp(buildPartition.ProgramName, generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
+                BuildApp(buildPartition.ProgramName, generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, (WasmRuntime)buildPartition.Runtime);
             }
 
             return buildResult;
         }
 
-        private void BuildApp(string programName, string projectRoot)
+        private void BuildApp(string programName, string projectRoot, WasmRuntime runtime)
         {
             string appDir = Path.Combine(projectRoot, $"bin", targetFrameworkMoniker, "browser-wasm", "publish");
             string outputDir = Path.Combine(appDir, "output");
@@ -56,7 +55,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             foreach (var f in new string[] { "dotnet.wasm", "dotnet.js" })
                 File.Copy(Path.Combine(appDir, f), Path.Combine(outputDir, f), true);
 
-            File.Copy(wasmSettings.WasmMainJS, Path.Combine(outputDir, "runtime.js"),  true);
+            File.Copy(runtime.MainJS.FullName, Path.Combine(outputDir, "runtime.js"),  true);
 
             using (var sw = File.CreateText(Path.Combine(outputDir, "mono-config.js")))
             {
