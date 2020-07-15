@@ -9,20 +9,25 @@ using System.IO;
 
 namespace BenchmarkDotNet.Toolchains.MonoWasm
 {
-    public class WasmBuilder : DotNetCliBuilder
+    public class WasmBuilder : IBuilder
     {
-        private WasmAppBuilder WasmAppBuilder;
+        private readonly DotNetCliBuilder dotNetCliBuilder;
+        private readonly WasmAppBuilder wasmAppBuilder;
 
         public WasmBuilder(string targetFrameworkMoniker, WasmSettings wasmSettings, string customDotNetCliPath = null, TimeSpan? timeout = null)
-            :base (targetFrameworkMoniker, customDotNetCliPath, timeout)
         {
-            WasmAppBuilder = new WasmAppBuilder(wasmSettings, targetFrameworkMoniker);
+            dotNetCliBuilder = new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath, timeout);
+            wasmAppBuilder = new WasmAppBuilder(wasmSettings, targetFrameworkMoniker);
         }
 
-        public override BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
+        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
-            BuildResult buildResult = base.Build(generateResult, buildPartition, logger);
-            WasmAppBuilder.BuildApp(buildPartition.ProgramName, generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
+            BuildResult buildResult = dotNetCliBuilder.Build(generateResult, buildPartition, logger);
+
+            if (buildResult.IsBuildSuccess)
+            {
+                wasmAppBuilder.BuildApp(buildPartition.ProgramName, generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
+            }
 
             return buildResult;
         }
