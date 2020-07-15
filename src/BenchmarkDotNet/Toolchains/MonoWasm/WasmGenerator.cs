@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
-                BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
+            BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
             using (var file = new StreamReader(File.OpenRead(projectFile.FullName)))
             {
@@ -56,9 +56,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
         protected override string  GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, "runtime.js");
 
-
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-    => Path.Combine(buildArtifactsDirectoryPath, $"bin/{TargetFrameworkMoniker}/browser-wasm/publish/output");
-
+            => Path.Combine(buildArtifactsDirectoryPath, "bin", TargetFrameworkMoniker, "browser-wasm", "publish", "output");
     }
 }

@@ -54,6 +54,5 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                                       new WasmExecutor(wasmSettings.WasmMainJS, wasmSettings.WasmJavaScriptEngine, wasmSettings.WasmJavaScriptEngineArguments),
                 netCoreAppSettings.CustomDotNetCliPath);
         }
-
     }
 }

@@ -45,7 +45,6 @@ namespace BenchmarkDotNet.Portability
         /// <summary>
         /// "Is the target where we will run the benchmarks WASM?"
         /// </summary>
-
         public static bool IsWasm => IsOSPlatform(OSPlatform.Create("BROWSER"));
 
         public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");

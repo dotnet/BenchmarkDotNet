@@ -9,7 +9,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
         public string WasmJavaScriptEngineArguments { get;  }
 
-
         public WasmSettings(string wasmMainJS, string wasmJavaScriptEngine, string wasmjavaScriptEngineArguments)
         {
             WasmMainJS = wasmMainJS;

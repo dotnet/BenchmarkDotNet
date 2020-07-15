@@ -363,8 +363,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                     WasmSettings wasmSettings = new WasmSettings(wasmMainJS: options.WasmMainJS,
                                                                  wasmJavaScriptEngine: options.WasmJavascriptEnginePath,
-                                                                 wasmjavaScriptEngineArguments: options.WasmJavaScriptEngineArguments
-                                                                 );
+                                                                 wasmjavaScriptEngineArguments: options.WasmJavaScriptEngineArguments);
 
                     IToolchain toolChain = new WasmToolChain(name: "Wasm",
                                                              targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
@@ -373,7 +372,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                                                              wasmSettings: wasmSettings,
                                                              timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout);
 
-                        return baseJob.WithRuntime(runtimeMoniker.GetRuntime()).WithToolchain(toolChain);
+                        return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain);
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }

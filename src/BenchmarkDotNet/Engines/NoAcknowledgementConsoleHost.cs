@@ -22,10 +22,7 @@ namespace BenchmarkDotNet.Engines
 
         public void WriteLine(string message) => outWriter.WriteLine(message);
 
-        public void SendSignal(HostSignal hostSignal)
-        {
-            WriteLine(Engine.Signals.ToMessage(hostSignal));
-        }
+        public void SendSignal(HostSignal hostSignal) => WriteLine(Engine.Signals.ToMessage(hostSignal));
 
         public void SendError(string message) => outWriter.WriteLine($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
 

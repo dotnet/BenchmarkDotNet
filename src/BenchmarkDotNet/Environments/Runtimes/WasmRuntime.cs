@@ -10,11 +10,13 @@ namespace BenchmarkDotNet.Environments
         public WasmRuntime(string name) : base(RuntimeMoniker.Wasm, "net5.0", name)
         {
         }
+        
+        public WasmRuntime(string name, string msBuildMoniker) : base(RuntimeMoniker.Wasm, msBuildMoniker, name)
+        {
+        }
 
         public override bool Equals(object obj) => obj is WasmRuntime other && Equals(other);
 
-        public bool Equals(WasmRuntime other) => base.Equals(other) && Name == other?.Name;
-
-        public override int GetHashCode() => base.GetHashCode() ^ Name.GetHashCode();
+        public bool Equals(WasmRuntime other) => base.Equals(other);
     }
 }

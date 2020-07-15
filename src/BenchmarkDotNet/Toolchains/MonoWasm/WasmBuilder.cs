@@ -16,11 +16,8 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         public WasmBuilder(string targetFrameworkMoniker, WasmSettings wasmSettings, string customDotNetCliPath = null, TimeSpan? timeout = null)
             :base (targetFrameworkMoniker, customDotNetCliPath, timeout)
         {
-            List<string> extraAssemblies = new List<string> { };
-
             WasmAppBuilder = new WasmAppBuilder(wasmSettings, targetFrameworkMoniker);
         }
-
 
         public override BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
