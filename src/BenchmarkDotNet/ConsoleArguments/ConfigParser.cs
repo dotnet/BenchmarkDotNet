@@ -361,8 +361,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Wasm:
                     var wasmRuntime = runtimeMoniker.GetRuntime();
 
-                    WasmSettings wasmSettings = new WasmSettings(wasmMainJS: options.WasmMainJS,
-                                                                 wasmJavaScriptEngine: options.WasmJavascriptEnginePath,
+                    WasmSettings wasmSettings = new WasmSettings(wasmMainJS: options.WasmMainJs.FullName,
+                                                                 wasmJavaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
                                                                  wasmjavaScriptEngineArguments: options.WasmJavaScriptEngineArguments);
 
                     IToolchain toolChain = new WasmToolChain(name: "Wasm",
