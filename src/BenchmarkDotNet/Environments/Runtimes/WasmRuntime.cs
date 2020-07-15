@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
@@ -7,6 +8,9 @@ namespace BenchmarkDotNet.Environments
 {
     public class WasmRuntime : Runtime, IEquatable<WasmRuntime>
     {
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        internal static readonly WasmRuntime Default = new WasmRuntime();
+
         public FileInfo MainJS { get; }
 
         public string JavaScriptEngine { get; }
@@ -36,13 +40,21 @@ namespace BenchmarkDotNet.Environments
             JavaScriptEngineArguments = javaScriptEngineArguments;
         }
 
+        // this ctor exists only for the purpose of having .Default property that returns something consumable by RuntimeInformation.GetCurrentRuntime()
+        private WasmRuntime(string msBuildMoniker = "net5.0", string displayName = "WASM", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm") : base(RuntimeMoniker.Wasm, msBuildMoniker, displayName)
+        {
+            MainJS = new FileInfo("fake");
+            JavaScriptEngine = javaScriptEngine;
+            JavaScriptEngineArguments = javaScriptEngineArguments;
+        }
+
         public override bool Equals(object obj)
             => obj is WasmRuntime other && Equals(other);
 
         public bool Equals(WasmRuntime other)
-            => base.Equals(other) && other.MainJS == MainJS && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments;
+            => other != null && base.Equals(other) && other.MainJS == MainJS && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments;
 
-        public override int GetHashCode() 
+        public override int GetHashCode()
             => base.GetHashCode() ^ MainJS.GetHashCode() ^ (JavaScriptEngine?.GetHashCode() ?? 0) ^ (JavaScriptEngineArguments?.GetHashCode() ?? 0);
     }
 }
