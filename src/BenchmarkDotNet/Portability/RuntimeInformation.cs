@@ -151,7 +151,20 @@ namespace BenchmarkDotNet.Portability
             }
             else if (IsWasm)
             {
-                return "wasm";
+                // code copied from https://github.com/dotnet/runtime/blob/2c573b59aaaf3fd17e2ecab95ad3769f195d2dbc/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/RuntimeInformation.cs#L20-L30
+                string versionString = typeof(object).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+
+                // Strip the git hash if there is one
+                if (versionString != null)
+                {
+                    int plusIndex = versionString.IndexOf('+');
+                    if (plusIndex != -1)
+                    {
+                        versionString = versionString.Substring(0, plusIndex);
+                    }
+                }
+
+                return $".NET Core (Mono) {versionString}";
             }
             else if (IsNetCore)
             {
