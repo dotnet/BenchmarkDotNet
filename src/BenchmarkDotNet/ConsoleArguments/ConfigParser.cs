@@ -387,7 +387,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                         customDotNetCliPath: options.CliPath?.FullName,
                         packagesPath: options.RestorePath?.FullName,
                         timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
-                        customRuntimePack: options.CustomRuntimePath));
+                        customRuntimePack: options.CustomRuntimePack));
 
                         return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain);
                 default:

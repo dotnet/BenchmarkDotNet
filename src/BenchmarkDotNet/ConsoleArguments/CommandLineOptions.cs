@@ -178,7 +178,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public string WasmJavaScriptEngineArguments { get; set; }
 
         [Option("customRuntimePack", Required = false, HelpText = "Specify the path to a custom runtime pack. Only used for wasm currently.")]
-        public string CustomRuntimePath { get; set; }
+        public string CustomRuntimePack { get; set; }
 
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
