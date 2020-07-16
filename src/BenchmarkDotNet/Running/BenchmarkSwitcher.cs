@@ -63,8 +63,6 @@ namespace BenchmarkDotNet.Running
             // VS generates bad assembly binding redirects for ValueTuple for Full .NET Framework
             // we need to keep the logic that uses it in a separate method and create DirtyAssemblyResolveHelper first
             // so it can ignore the version mismatch ;)
-
-            Console.WriteLine("!!! naricc modified BenchmarkDotNet");
             using (DirtyAssemblyResolveHelper.Create())
                 return RunWithDirtyAssemblyResolveHelper(args, config);
         }
