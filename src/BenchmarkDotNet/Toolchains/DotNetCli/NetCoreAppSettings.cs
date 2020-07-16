@@ -43,11 +43,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             string name,
             string customDotNetCliPath = null,
             string packagesPath = null,
-            TimeSpan? timeout = null)
+            TimeSpan? timeout = null
+            )
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
             RuntimeFrameworkVersion = runtimeFrameworkVersion;
             Name = name;
+
             CustomDotNetCliPath = customDotNetCliPath;
             PackagesPath = packagesPath;
             Timeout = timeout ?? DefaultBuildTimeout;

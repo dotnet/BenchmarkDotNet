@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Helpers
             try
             {
                 Console.CancelKeyPress += CancelKeyPressHandlerCallback;
-            } 
+            }
             catch (PlatformNotSupportedException)
             {
                 // Thrown when running in Xamarin

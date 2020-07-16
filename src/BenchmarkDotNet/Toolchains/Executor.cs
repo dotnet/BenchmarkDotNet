@@ -32,14 +32,14 @@ namespace BenchmarkDotNet.Toolchains
                 return new ExecuteResult(false, -1, default, Array.Empty<string>(), Array.Empty<string>());
             }
 
-            return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, exePath, null, args, executeParameters.Diagnoser, executeParameters.Resolver);
+            return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths, args, executeParameters.Diagnoser, executeParameters.Resolver);
         }
 
-        private ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, string exePath, string workingDirectory, string args, IDiagnoser diagnoser, IResolver resolver)
+        private ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths, string args, IDiagnoser diagnoser, IResolver resolver)
         {
             try
             {
-                using (var process = new Process { StartInfo = CreateStartInfo(benchmarkCase, exePath, args, workingDirectory, resolver) })
+                using (var process = new Process { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) })
                 using (new ConsoleExitHandler(process, logger))
                 {
                     var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId);
@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Toolchains
             return new ExecuteResult(true, process.ExitCode, process.Id, Array.Empty<string>(), Array.Empty<string>());
         }
 
-        private ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, string exePath, string args, string workingDirectory, IResolver resolver)
+        private ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, string args, IResolver resolver)
         {
             var start = new ProcessStartInfo
             {
@@ -91,10 +91,12 @@ namespace BenchmarkDotNet.Toolchains
                 RedirectStandardInput = true,
                 RedirectStandardError = true,
                 CreateNoWindow = true,
-                WorkingDirectory = workingDirectory
+                WorkingDirectory = null // by default it's null
             };
 
             start.SetEnvironmentVariables(benchmarkCase, resolver);
+
+            string exePath = artifactsPaths.ExecutablePath;
 
             var runtime = benchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
                 ? benchmarkCase.Job.Environment.Runtime
@@ -112,6 +114,11 @@ namespace BenchmarkDotNet.Toolchains
                 case MonoRuntime mono:
                     start.FileName = mono.CustomPath ?? "mono";
                     start.Arguments = GetMonoArguments(benchmarkCase.Job, exePath, args, resolver);
+                    break;
+                case WasmRuntime wasm:
+                    start.FileName = wasm.JavaScriptEngine;
+                    start.Arguments = $"{wasm.JavaScriptEngineArguments} runtime.js -- --run {artifactsPaths.ProgramName}.dll {args} ";
+                    start.WorkingDirectory = artifactsPaths.BinariesDirectoryPath;
                     break;
                 default:
                     throw new NotSupportedException("Runtime = " + runtime);

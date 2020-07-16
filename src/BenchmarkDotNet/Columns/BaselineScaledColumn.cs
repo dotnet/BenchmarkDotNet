@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Columns
         {
             double mean = isBaseline ? 1 : Statistics.DivMean(current, baseline);
 
-            var cultureInfo = summary.Style.CultureInfo;
+            var cultureInfo = summary.GetCultureInfo();
             switch (Kind)
             {
                 case ScaledKind.Mean:
