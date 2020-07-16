@@ -15,6 +15,17 @@
     <Compile Include="$CODEFILENAME$" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
   </ItemGroup>
 
+  <Target Name="UpdateRuntimePack"
+          DependsOnTargets="ResolveFrameworkReferences">
+    <ItemGroup>
+      <ResolvedRuntimePack Update="@(ResolvedRuntimePack)" PackageDirectory="$(MicrosoftNetCoreAppRuntimePackDir)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="PublishWithCustomRuntimePack"
+          AfterTargets="Build"
+          DependsOnTargets="UpdateRuntimePack;Publish" />
+
   <ItemGroup>
     <ProjectReference Include="$CSPROJPATH$" />
   </ItemGroup>
