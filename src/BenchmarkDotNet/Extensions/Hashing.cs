@@ -2,7 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-// file copied from https://github.com/dotnet/machinelearning/blob/master/src/Microsoft.ML.Core/Utilities/Hashing.cs
+// file copied from https://github.com/dotnet/machinelearning/blob/b31bdee6671bfe50460f9279609dd948f8ce081c/src/Microsoft.ML.Core/Utilities/Hashing.cs
 
 using System;
 using System.Runtime.CompilerServices;

@@ -2,7 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-// file copied from https://github.com/dotnet/runtime/blob/master/src/libraries/Common/tests/System/IO/PathFeatures.cs
+// file copied from https://github.com/dotnet/runtime/blob/bf2e135c12cbd34aeba2fa4a31d0e84184041a17/src/libraries/Common/tests/System/IO/PathFeatures.cs
 
 using System;
 using System.Reflection;
