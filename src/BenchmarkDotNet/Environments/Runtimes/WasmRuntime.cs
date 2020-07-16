@@ -24,9 +24,9 @@ namespace BenchmarkDotNet.Environments
         /// <param name="javaScriptEngine">Full path to a java script engine used to run the benchmarks. "v8" by default</param>
         /// <param name="javaScriptEngineArguments">Arguments for the javascript engine. "--expose_wasm" by default</param>
         /// <param name="msBuildMoniker">moniker, default: "net5.0"</param>
-        /// <param name="displayName">default: "WASM"</param>
+        /// <param name="displayName">default: "Wasm"</param>
         /// <remarks>path to mainJs MUST be provided</remarks>
-        public WasmRuntime(FileInfo mainJs, string msBuildMoniker = "net5.0", string displayName = "WASM", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm") : base(RuntimeMoniker.Wasm, msBuildMoniker, displayName)
+        public WasmRuntime(FileInfo mainJs, string msBuildMoniker = "net5.0", string displayName = "Wasm", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm") : base(RuntimeMoniker.Wasm, msBuildMoniker, displayName)
         {
             if (mainJs == null)
                 throw new ArgumentNullException(paramName: nameof(mainJs));
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Environments
         }
 
         // this ctor exists only for the purpose of having .Default property that returns something consumable by RuntimeInformation.GetCurrentRuntime()
-        private WasmRuntime(string msBuildMoniker = "net5.0", string displayName = "WASM", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm") : base(RuntimeMoniker.Wasm, msBuildMoniker, displayName)
+        private WasmRuntime(string msBuildMoniker = "net5.0", string displayName = "Wasm", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm") : base(RuntimeMoniker.Wasm, msBuildMoniker, displayName)
         {
             MainJs = new FileInfo("fake");
             JavaScriptEngine = javaScriptEngine;

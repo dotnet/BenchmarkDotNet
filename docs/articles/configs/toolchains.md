@@ -265,3 +265,89 @@ var config = DefaultConfig.Instance
 ```
 
 **Note**: You might get some `The method or operation is not implemented.` errors as of today if the code that you are trying to benchmark is using some features that are not implemented by CoreRT/transpiler yet...
+
+## Wasm
+
+BenchmarkDotNet supports Web Assembly on Unix! However, currently you need to build the **dotnet runtime** yourself to be able to run the benchmarks.
+
+For up-to-date docs, you should visit [dotnet/runtime repository](https://github.com/dotnet/runtime/blob/master/docs/workflow/testing/libraries/testing-wasm.md).
+
+The docs below are specific to Ubuntu 18.04 at the moment of writing this document (16/07/2020).
+
+Firs of all, you need to install.... **npm** 10+:
+
+```cmd
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+sudo apt install nodejs
+```
+
+After this, you need to install [jsvu](https://github.com/GoogleChromeLabs/jsvu):
+
+```cmd
+npm install jsvu -g
+```
+
+Add it to PATH:
+
+```cmd
+export PATH="${HOME}/.jsvu:${PATH}"
+```
+
+And use it to install V8, JavaScriptCore and SpiderMonkey:
+
+```cmd
+jsvu --os=linux64 --engines=javascriptcore,spidermonkey,v8
+```
+
+Now you need to install [Emscripten](https://emscripten.org/docs/getting_started/downloads.html#installation-instructions):
+
+```cmd
+git clone https://github.com/emscripten-core/emsdk.git
+cd emsdk
+./emsdk install latest
+./emsdk activate latest
+source ./emsdk_env.sh
+```
+
+The last thing before cloning dotnet/runtime repository is creation of `EMSDK_PATH` env var used by Mono build scripts:
+
+```cmd
+export EMSDK_PATH=$EMSDK
+```
+
+Now you need to clone dotnet/runtime repository:
+
+```cmd
+git clone https://github.com/dotnet/runtime
+cd runtime
+```
+
+Install [all Mono prerequisites](https://github.com/dotnet/runtime/blob/master/docs/workflow/testing/libraries/testing-wasm.md):
+
+```cmd
+sudo apt-get install cmake llvm-9 clang-9 autoconf automake libtool build-essential python curl git lldb-6.0 liblldb-6.0-dev libunwind8 libunwind8-dev gettext libicu-dev liblttng-ust-dev libssl-dev libnuma-dev libkrb5-dev zlib1g-dev
+```
+
+And FINALLY build Mono Runtime with Web Assembly support:
+
+```cmd
+./build.sh --arch wasm --os Browser -c release
+```
+
+Before you run the benchmarks, you need to make sure that following two file exists:
+
+```cmd
+runtime/src/mono/wasm/runtime-test.js
+runtime/build.sh
+```
+
+And that you have .NET 5 feed added to your `nuget.config` file:
+
+```xml
+<add key="dotnet5" value="https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5/nuget/v3/index.json" />
+```
+
+Now you should be able to run the Wasm benchmarks!
+
+[!include[IntroWasm](../samples/IntroWasm.md)]
+

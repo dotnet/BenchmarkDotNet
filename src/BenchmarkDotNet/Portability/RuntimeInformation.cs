@@ -42,9 +42,6 @@ namespace BenchmarkDotNet.Portability
             => ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
                && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
 
-        /// <summary>
-        /// "Is the target where we will run the benchmarks WASM?"
-        /// </summary>
         public static bool IsWasm => IsOSPlatform(OSPlatform.Create("BROWSER"));
 
         public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
@@ -151,7 +148,20 @@ namespace BenchmarkDotNet.Portability
             }
             else if (IsWasm)
             {
-                return "wasm";
+                // code copied from https://github.com/dotnet/runtime/blob/2c573b59aaaf3fd17e2ecab95ad3769f195d2dbc/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/RuntimeInformation.cs#L20-L30
+                string versionString = typeof(object).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+
+                // Strip the git hash if there is one
+                if (versionString != null)
+                {
+                    int plusIndex = versionString.IndexOf('+');
+                    if (plusIndex != -1)
+                    {
+                        versionString = versionString.Substring(0, plusIndex);
+                    }
+                }
+
+                return $".NET Core (Mono) {versionString}";
             }
             else if (IsNetCore)
             {
@@ -189,6 +199,10 @@ namespace BenchmarkDotNet.Portability
 
         public static Platform GetCurrentPlatform()
         {
+            // it's not part of .NET Standard 2.0, so we use a hack
+            // https://github.com/dotnet/runtime/blob/2c573b59aaaf3fd17e2ecab95ad3769f195d2dbc/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/Architecture.cs#L12
+            const Architecture Wasm = (Architecture)4;
+
             switch (ProcessArchitecture)
             {
                 case Architecture.Arm:
@@ -199,9 +213,9 @@ namespace BenchmarkDotNet.Portability
                     return Platform.X64;
                 case Architecture.X86:
                     return Platform.X86;
+                case Wasm:
+                    return Platform.Wasm;
                 default:
-                    if (IsWasm)
-                        return Platform.Wasm;
                     throw new ArgumentOutOfRangeException();
             }
         }
@@ -226,7 +240,7 @@ namespace BenchmarkDotNet.Portability
         {
             if (IsCoreRT || IsNetNative)
                 return "AOT";
-            if (IsMono)
+            if (IsMono || IsWasm)
                 return ""; // There is no helpful information about JIT on Mono
             if (IsNetCore || HasRyuJit()) // CoreCLR supports only RyuJIT
                 return "RyuJIT";
