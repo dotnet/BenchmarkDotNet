@@ -264,6 +264,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithUnrollFactor(options.UnrollFactor.Value);
             if (options.RunStrategy.HasValue)
                 baseJob = baseJob.WithStrategy(options.RunStrategy.Value);
+            if (options.Platform.HasValue)
+                baseJob = baseJob.WithPlatform(options.Platform.Value);
             if (options.RunOncePerIteration)
                 baseJob = baseJob.RunOncePerIteration();
 
