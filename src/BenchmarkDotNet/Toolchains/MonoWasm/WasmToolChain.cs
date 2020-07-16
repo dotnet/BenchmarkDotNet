@@ -12,6 +12,8 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     {
         private string CustomDotNetCliPath { get; }
 
+        private string CustomRuntimePack { get;  }
+
         private WasmToolChain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath)
             : base(name, generator, builder, executor)
         {
@@ -39,7 +41,8 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             => new WasmToolChain(netCoreAppSettings.Name,
                     new WasmGenerator(netCoreAppSettings.TargetFrameworkMoniker,
                         netCoreAppSettings.CustomDotNetCliPath,
-                        netCoreAppSettings.PackagesPath),
+                        netCoreAppSettings.PackagesPath,
+                        netCoreAppSettings.CustomRuntimePack),
                     new WasmBuilder(netCoreAppSettings.TargetFrameworkMoniker,
                         netCoreAppSettings.CustomDotNetCliPath,
                         netCoreAppSettings.Timeout),

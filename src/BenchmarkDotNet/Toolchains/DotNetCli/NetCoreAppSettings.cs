@@ -43,7 +43,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             string name,
             string customDotNetCliPath = null,
             string packagesPath = null,
-            TimeSpan? timeout = null
+            TimeSpan? timeout = null,
+            string customRuntimePack = null
             )
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
@@ -53,6 +54,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             CustomDotNetCliPath = customDotNetCliPath;
             PackagesPath = packagesPath;
             Timeout = timeout ?? DefaultBuildTimeout;
+            CustomRuntimePack = customRuntimePack;
         }
 
         /// <summary>
@@ -78,6 +80,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// timeout to build the benchmark
         /// </summary>
         public TimeSpan Timeout { get; }
+
+        /// <summary>
+        /// Path to a custom runtime pack.
+        /// </summary>
+        public string CustomRuntimePack { get; }
 
         public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath, Timeout);

@@ -1,4 +1,4 @@
-﻿<Project Sdk="$SDKNAME$" DefaultTargets="Publish">
+﻿<Project Sdk="$SDKNAME$" DefaultTargets="$TARGET$">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <OutputPath>bin</OutputPath>
@@ -7,6 +7,7 @@
     <AppDir>$(MSBuildThisFileDirectory)\bin\$TFM$\browser-wasm\publish</AppDir>
     <AssemblyName>$PROGRAMNAME$</AssemblyName>
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+    <MicrosoftNetCoreAppRuntimePackDir>$RUNTIMEPACK$</MicrosoftNetCoreAppRuntimePackDir>
     $COPIEDSETTINGS$
   </PropertyGroup>
 

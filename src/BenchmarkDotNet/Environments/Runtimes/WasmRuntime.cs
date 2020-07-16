@@ -15,7 +15,9 @@ namespace BenchmarkDotNet.Environments
 
         public string JavaScriptEngine { get; }
 
-        public string JavaScriptEngineArguments { get;  }
+        public string JavaScriptEngineArguments { get; }
+
+        public string CustomRuntimePack { get; }
 
         /// <summary>
         /// creates new instance of WasmRuntime
@@ -26,7 +28,7 @@ namespace BenchmarkDotNet.Environments
         /// <param name="msBuildMoniker">moniker, default: "net5.0"</param>
         /// <param name="displayName">default: "Wasm"</param>
         /// <remarks>path to mainJs MUST be provided</remarks>
-        public WasmRuntime(FileInfo mainJs, string msBuildMoniker = "net5.0", string displayName = "Wasm", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm") : base(RuntimeMoniker.Wasm, msBuildMoniker, displayName)
+        public WasmRuntime(FileInfo mainJs, string msBuildMoniker = "net5.0", string displayName = "Wasm", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm", string customRuntimePack = null) : base(RuntimeMoniker.Wasm, msBuildMoniker, displayName)
         {
             if (mainJs == null)
                 throw new ArgumentNullException(paramName: nameof(mainJs));
@@ -38,6 +40,7 @@ namespace BenchmarkDotNet.Environments
             MainJs = mainJs;
             JavaScriptEngine = javaScriptEngine;
             JavaScriptEngineArguments = javaScriptEngineArguments;
+            CustomRuntimePack = customRuntimePack;
         }
 
         // this ctor exists only for the purpose of having .Default property that returns something consumable by RuntimeInformation.GetCurrentRuntime()
