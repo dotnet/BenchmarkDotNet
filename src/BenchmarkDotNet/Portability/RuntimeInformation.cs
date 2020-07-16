@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -243,7 +243,7 @@ namespace BenchmarkDotNet.Portability
         {
             if (IsCoreRT || IsNetNative)
                 return "AOT";
-            if (IsMono)
+            if (IsMono || IsWasm)
                 return ""; // There is no helpful information about JIT on Mono
             if (IsNetCore || HasRyuJit()) // CoreCLR supports only RyuJIT
                 return "RyuJIT";
