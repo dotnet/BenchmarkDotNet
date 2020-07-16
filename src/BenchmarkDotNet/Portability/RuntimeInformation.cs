@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Portability
 {
     internal static class RuntimeInformation
     {
-        private const string DebugConfigurationName = "DEBUG";
+        internal const string DebugConfigurationName = "DEBUG";
         internal const string ReleaseConfigurationName = "RELEASE";
         internal const string Unknown = "?";
 
