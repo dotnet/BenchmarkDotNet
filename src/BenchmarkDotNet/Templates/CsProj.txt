@@ -15,6 +15,7 @@
     <DebugSymbols>true</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
     <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
+    <Deterministic>true</Deterministic>
     <!-- needed for custom build configurations (only "Release" builds are optimized by default) -->
     <Optimize Condition=" '$(Configuration)' != 'Debug' ">true</Optimize>
     $COPIEDSETTINGS$
