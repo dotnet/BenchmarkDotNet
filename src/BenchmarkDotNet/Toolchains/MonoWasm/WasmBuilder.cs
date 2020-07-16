@@ -6,25 +6,74 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using System.IO;
+using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Toolchains.MonoWasm
 {
-    public class WasmBuilder : DotNetCliBuilder
+    public class WasmBuilder : IBuilder
     {
-        private WasmAppBuilder WasmAppBuilder;
+        private readonly DotNetCliBuilder dotNetCliBuilder;
+        private readonly string targetFrameworkMoniker;
 
-        public WasmBuilder(string targetFrameworkMoniker, WasmSettings wasmSettings, string customDotNetCliPath = null, TimeSpan? timeout = null)
-            :base (targetFrameworkMoniker, customDotNetCliPath, timeout)
+        public WasmBuilder(string targetFrameworkMoniker, string customDotNetCliPath = null, TimeSpan? timeout = null)
         {
-            WasmAppBuilder = new WasmAppBuilder(wasmSettings, targetFrameworkMoniker);
+            this.targetFrameworkMoniker = targetFrameworkMoniker;
+
+            dotNetCliBuilder = new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath, timeout);
         }
 
-        public override BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
+        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
-            BuildResult buildResult = base.Build(generateResult, buildPartition, logger);
-            WasmAppBuilder.BuildApp(buildPartition.ProgramName, generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath);
+            BuildResult buildResult = dotNetCliBuilder.Build(generateResult, buildPartition, logger);
+
+            if (buildResult.IsBuildSuccess)
+            {
+                BuildApp(buildPartition.ProgramName, generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, (WasmRuntime)buildPartition.Runtime);
+            }
 
             return buildResult;
+        }
+
+        private void BuildApp(string programName, string projectRoot, WasmRuntime runtime)
+        {
+            string appDir = Path.Combine(projectRoot, $"bin", targetFrameworkMoniker, "browser-wasm", "publish");
+            string outputDir = Path.Combine(appDir, "output");
+
+            string mainAssemblyPath = Path.Combine(appDir, $"{programName}.dll");
+
+            if (!File.Exists(mainAssemblyPath))
+                throw new ArgumentException($"File MainAssembly='{mainAssemblyPath}' doesn't exist.");
+
+            var assemblies = Directory.GetFiles(appDir, "*.dll");
+
+            // Create app
+            Directory.CreateDirectory(outputDir);
+            Directory.CreateDirectory(Path.Combine(outputDir, "managed"));
+            foreach (var assembly in assemblies)
+                File.Copy(assembly, Path.Combine(outputDir, "managed", Path.GetFileName(assembly)), true);
+
+            foreach (var f in new string[] { "dotnet.wasm", "dotnet.js" })
+                File.Copy(Path.Combine(appDir, f), Path.Combine(outputDir, f), true);
+
+            File.Copy(runtime.MainJs.FullName, Path.Combine(outputDir, "runtime.js"),  true);
+
+            using (var sw = File.CreateText(Path.Combine(outputDir, "mono-config.js")))
+            {
+                sw.WriteLine("config = {");
+                sw.WriteLine("\tvfs_prefix: \"managed\",");
+                sw.WriteLine("\tdeploy_prefix: \"managed\",");
+                sw.WriteLine("\tenable_debugging: 0,");
+                sw.WriteLine("\tassembly_list: [");
+                foreach (var assembly in assemblies)
+                {
+                    sw.Write("\t\t\"" + Path.GetFileName(assembly) + "\"");
+                    sw.WriteLine(",");
+                }
+                sw.WriteLine ("\t],");
+                sw.WriteLine("\tfiles_to_map: [],");
+
+                sw.WriteLine ("}");
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             Timeout = timeout ?? NetCoreAppSettings.DefaultBuildTimeout;
         }
 
-        public virtual BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
+        public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
             => new DotNetCliCommand(
                     CustomDotNetCliPath,
                     string.Empty,
