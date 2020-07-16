@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         private CsProjClassicNetToolchain(string targetFrameworkMoniker, string name, string packagesPath = null, TimeSpan? timeout = null)
             : base(name,
-                new CsProjGenerator(targetFrameworkMoniker, cliPath: null, packagesPath: packagesPath, runtimeFrameworkVersion: null),
+                new CsProjGenerator(targetFrameworkMoniker, cliPath: null, packagesPath: packagesPath, runtimeFrameworkVersion: null, isNetCore: false),
                 new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath: null, timeout: timeout),
                 new Executor())
         {

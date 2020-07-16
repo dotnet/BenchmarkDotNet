@@ -25,6 +25,11 @@
         /// <summary>
         /// ARM64
         /// </summary>
-        Arm64
+        Arm64,
+
+        /// <summary>
+        /// Wasm
+        /// </summary>
+        Wasm
     }
 }
