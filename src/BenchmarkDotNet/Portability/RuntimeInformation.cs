@@ -42,9 +42,6 @@ namespace BenchmarkDotNet.Portability
             => ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
                && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
 
-        /// <summary>
-        /// "Is the target where we will run the benchmarks WASM?"
-        /// </summary>
         public static bool IsWasm => IsOSPlatform(OSPlatform.Create("BROWSER"));
 
         public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
