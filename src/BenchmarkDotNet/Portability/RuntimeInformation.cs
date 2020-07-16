@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -202,6 +202,10 @@ namespace BenchmarkDotNet.Portability
 
         public static Platform GetCurrentPlatform()
         {
+            // it's not part of .NET Standard 2.0, so we use a hack
+            // https://github.com/dotnet/runtime/blob/2c573b59aaaf3fd17e2ecab95ad3769f195d2dbc/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/Architecture.cs#L12
+            const Architecture Wasm = (Architecture)4;
+
             switch (ProcessArchitecture)
             {
                 case Architecture.Arm:
@@ -212,9 +216,9 @@ namespace BenchmarkDotNet.Portability
                     return Platform.X64;
                 case Architecture.X86:
                     return Platform.X86;
+                case Wasm:
+                    return Platform.Wasm;
                 default:
-                    if (IsWasm)
-                        return Platform.Wasm;
                     throw new ArgumentOutOfRangeException();
             }
         }
