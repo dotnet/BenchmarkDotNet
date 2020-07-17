@@ -10,8 +10,13 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 {
     public class WasmGenerator : CsProjGenerator
     {
-        public WasmGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath)
-            : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null) { }
+        private readonly string CustomRuntimePack;
+
+        public WasmGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack)
+            : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null)
+        {
+            CustomRuntimePack = customRuntimePack;
+        }
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
@@ -30,6 +35,8 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     .Replace("$COPIEDSETTINGS$", customProperties)
                     .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
                     .Replace("$SDKNAME$", sdkName)
+                    .Replace("$RUNTIMEPACK$", CustomRuntimePack ?? "")
+                    .Replace("$TARGET$", CustomRuntimePack != null ? "PublishWithCustomRuntimePack" : "Publish")
                     .ToString();
 
                 File.WriteAllText(artifactsPaths.ProjectFilePath, content);
