@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <Target Name="UpdateRuntimePack"
-          DependsOnTargets="ResolveFrameworkReferences">
+          DependsOnTargets="ResolveFrameworkReferences" Condition="'$(MicrosoftNetCoreAppRuntimePackDir)' != ''">
     <ItemGroup>
       <ResolvedRuntimePack Update="@(ResolvedRuntimePack)" PackageDirectory="$(MicrosoftNetCoreAppRuntimePackDir)" />
     </ItemGroup>
