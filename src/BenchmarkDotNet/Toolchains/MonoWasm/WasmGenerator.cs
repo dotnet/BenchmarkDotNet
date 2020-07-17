@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     .Replace("$COPIEDSETTINGS$", customProperties)
                     .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
                     .Replace("$SDKNAME$", sdkName)
-                    .Replace("$RUNTIMEPACK$", CustomRuntimePack != null ? CustomRuntimePack : "")
+                    .Replace("$RUNTIMEPACK$", CustomRuntimePack ?? "")
                     .Replace("$TARGET$", CustomRuntimePack != null ? "PublishWithCustomRuntimePack" : "Publish")
                     .ToString();
 

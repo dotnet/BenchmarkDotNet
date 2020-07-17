@@ -12,8 +12,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     {
         private string CustomDotNetCliPath { get; }
 
-        private string CustomRuntimePack { get;  }
-
         private WasmToolChain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath)
             : base(name, generator, builder, executor)
         {
