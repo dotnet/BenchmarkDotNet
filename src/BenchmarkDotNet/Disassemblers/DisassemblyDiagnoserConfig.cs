@@ -65,13 +65,13 @@ namespace BenchmarkDotNet.Diagnosers
             switch (Formatter)
             {
                 case MasmFormatter masmFormatter:
-                    return new MasmFormatter(masmFormatter.MasmOptions, symbolSolver);
+                    return new MasmFormatter(masmFormatter.Options, symbolSolver);
                 case NasmFormatter nasmFormatter:
-                    return new NasmFormatter(nasmFormatter.NasmOptions, symbolSolver);
+                    return new NasmFormatter(nasmFormatter.Options, symbolSolver);
                 case GasFormatter gasFormatter:
-                    return new GasFormatter(gasFormatter.GasOptions, symbolSolver);
+                    return new GasFormatter(gasFormatter.Options, symbolSolver);
                 case IntelFormatter intelFormatter:
-                    return new IntelFormatter(intelFormatter.IntelOptions, symbolSolver);
+                    return new IntelFormatter(intelFormatter.Options, symbolSolver);
                 default:
                     // we don't know how to translate it so we just return the original one
                     // it's better not to solve symbols rather than throw exception ;)

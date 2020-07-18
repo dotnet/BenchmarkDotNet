@@ -156,7 +156,7 @@ namespace BenchmarkDotNet.Diagnosers
         }
 
         private static long SumNativeCodeSize(DisassemblyResult disassembly)
-            => disassembly.Methods.Sum(method => method.Maps.Sum(map => map.SourceCodes.OfType<Asm>().Sum(asm => asm.Instruction.ByteLength)));
+            => disassembly.Methods.Sum(method => method.Maps.Sum(map => map.SourceCodes.OfType<Asm>().Sum(asm => asm.Instruction.Length)));
 
         private class NativeCodeSizeMetricDescriptor : IMetricDescriptor
         {
