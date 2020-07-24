@@ -52,7 +52,10 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             foreach (var assembly in assemblies)
                 File.Copy(assembly, Path.Combine(outputDir, "managed", Path.GetFileName(assembly)), true);
 
-            foreach (var f in new string[] { "dotnet.wasm", "dotnet.js", "dotnet.timezones.blat", "icudt.dat" })
+            string timeZoneDat = "dotnet.timezones.blat";
+            string icutDat = "icudt.dat";
+
+            foreach (var f in new string[] { "dotnet.wasm", "dotnet.js", timeZoneDat, icutDat })
                 File.Copy(Path.Combine(appDir, f), Path.Combine(outputDir, f), true);
 
             File.Copy(runtime.MainJs.FullName, Path.Combine(outputDir, "runtime.js"), true);
@@ -60,8 +63,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             using (var sw = File.CreateText(Path.Combine(outputDir, "mono-config.js")))
             {
                 sw.WriteLine("config = {");
-                // sw.WriteLine("\tvfs_prefix: \"managed\",");
-                // sw.WriteLine("\tdeploy_prefix: \"managed\",");
                 sw.WriteLine("\t\"assembly_root\": \"managed\",");
                 sw.WriteLine("\t\"enable_debugging\": 0,");
                 sw.WriteLine("\t\"assets\": [");
@@ -72,7 +73,8 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     sw.WriteLine(",");
                 }
 
-                sw.WriteLine($"\t\t{{ \"behavior\": \"icu\", \"name\": \"icudt.dat\", \"load_remote\": false}}");
+                sw.WriteLine($"\t\t{{ \"behavior\": \"icu\", \"name\": \"icudt.dat\", \"load_remote\": false}},");
+                sw.WriteLine($"\t\t{{ \"behavior\": \"vfs\", \"name\": \"{timeZoneDat}\", \"virtual_path\": \"/usr/share/zoneinfo/\" }}");
 
                 sw.WriteLine("\t],");
                 sw.WriteLine("\t\"files_to_map\": []");
