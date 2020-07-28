@@ -11,6 +11,7 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Validators;
 
@@ -81,11 +82,9 @@ namespace BenchmarkDotNet.Configs
         {
             get
             {
-                var root = Directory.GetCurrentDirectory();
-                if (root == "/")
-                {
-                    root = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                }
+                var root = RuntimeInformation.IsAndroid() ?
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) :
+                    Directory.GetCurrentDirectory();
                 return Path.Combine(root, "BenchmarkDotNet.Artifacts");
             }
         }

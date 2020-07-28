@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -24,7 +25,11 @@ namespace BenchmarkDotNet.Samples.Forms
                 var logger = new AccumulationLogger();
                 await Task.Run(() =>
                 {
-                    var summary = BenchmarkRunner.Run<IntroBasic>();
+                    var config = default(IConfig);
+#if DEBUG
+                    config = new DebugInProcessConfig();
+#endif
+                    var summary = BenchmarkRunner.Run<IntroBasic>(config);
                     MarkdownExporter.Console.ExportToLog(summary, logger);
                     ConclusionHelper.Print(logger,
                             summary.BenchmarksCases
