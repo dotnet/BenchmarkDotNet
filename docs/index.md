@@ -30,7 +30,7 @@ It's no harder than writing unit tests!
 Under the hood, it performs a lot of [magic](#automation) that guarantees [reliable and precise](#reliability) results thanks to the [perfolizer](https://github.com/AndreyAkinshin/perfolizer) statistical engine.
 BenchmarkDotNet protects you from popular benchmarking mistakes and warns you if something is wrong with your benchmark design or obtained measurements.
 The results are presented in a [user-friendly](#friendliness) form that highlights all the important facts about your experiment.
-The library is adopted by [3800+ projects](#who-use-benchmarkdotnet) including .NET Runtime and supported by the [.NET Foundation](https://dotnetfoundation.org).
+The library is adopted by [4500+ projects](#who-use-benchmarkdotnet) including .NET Runtime and supported by the [.NET Foundation](https://dotnetfoundation.org).
 
 It's [easy](#simplicity) to start writing benchmarks, check out an example
   (copy-pastable version is [here](https://benchmarkdotnet.org/articles/guides/getting-started.html)):
@@ -237,7 +237,7 @@ If you don't customize the summary view,
 ## Who use BenchmarkDotNet?
 
 Everyone!
-BenchmarkDotNet is already adopted by more than [3800+](https://github.com/dotnet/BenchmarkDotNet/network/dependents?package_id=UGFja2FnZS0xNTY3MzExMzE%3D) projects including
+BenchmarkDotNet is already adopted by more than [4500+](https://github.com/dotnet/BenchmarkDotNet/network/dependents?package_id=UGFja2FnZS0xNTY3MzExMzE%3D) projects including
   [dotnet/performance](https://github.com/dotnet/performance) (reference benchmarks for all .NET Runtimes),
   [dotnet/runtime](https://github.com/dotnet/runtime/issues?utf8=%E2%9C%93&q=BenchmarkDotNet) (.NET Core runtime and libraries),
   [Roslyn](https://github.com/dotnet/roslyn/search?q=BenchmarkDotNet&type=Issues&utf8=✓) (C# and Visual Basic compiler),
@@ -266,13 +266,15 @@ BenchmarkDotNet is already adopted by more than [3800+](https://github.com/dotne
   [SharpZipLib](https://github.com/icsharpcode/SharpZipLib/tree/master/benchmark/ICSharpCode.SharpZipLib.Benchmark),
   [LiteDB](https://github.com/mbdavid/LiteDB/tree/master/LiteDB.Benchmarks),
   [GraphQL for .NET](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.Benchmarks),
+  [.NET Docs](https://github.com/dotnet/docs/tree/master/samples/snippets/csharp/safe-efficient-code/benchmark),
+  [RestSharp](https://github.com/restsharp/RestSharp/tree/dev/benchmarks/RestSharp.Benchmarks),
   [MediatR](https://github.com/jbogard/MediatR/tree/master/test/MediatR.Benchmarks),
   [TensorFlow.NET](https://github.com/SciSharp/TensorFlow.NET/tree/master/src/TensorFlowNet.Benchmarks),
   [Apache Thrift](https://github.com/apache/thrift/tree/master/lib/netstd/Benchmarks/Thrift.Benchmarks).  
 On GitHub, you can find
-  3000+ [issues](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=created&type=Issues&utf8=✓),
-  1800+ [commits](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=committer-date&type=Commits&utf8=✓), and
-  500,000+ [files](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=indexed&type=Code&utf8=✓)
+  3500+ [issues](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=created&type=Issues&utf8=✓),
+  2100+ [commits](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=committer-date&type=Commits&utf8=✓), and
+  650,000+ [files](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=indexed&type=Code&utf8=✓)
   that involve BenchmarkDotNet.
 
 ## Learn more about benchmarking
