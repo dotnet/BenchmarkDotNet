@@ -651,10 +651,125 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private void CanExecute<T>(IToolchain toolchain)
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void StaticMethodsAndPropertiesCanBeUsedAsSources_EnumerableOfObjects(IToolchain toolchain)
+            => CanExecute<WithStaticSources_EnumerableOfObjects>(toolchain);
+
+        public class WithStaticSources_EnumerableOfObjects
         {
-            var config = CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain));
-            CanExecute<T>(config);
+            public static IEnumerable<object> StaticMethod() { yield return 1; }
+
+            public static IEnumerable<object> StaticProperty
+            {
+                get
+                {
+                    yield return 2;
+                    yield return 3;
+                }
+            }
+
+            [ParamsSource(nameof(StaticMethod))]
+            public int ParamOne { get; set; }
+
+            [ParamsSource(nameof(StaticProperty))]
+            public int ParamTwo { get; set; }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(StaticMethod))]
+            public void TestMethod(int argument)
+            {
+                if (argument != 1)
+                    throw new ArgumentException("The argument value is incorrect!");
+                if (ParamOne != 1)
+                    throw new ArgumentException("The ParamOne value is incorrect!");
+                if (ParamTwo != 2 && ParamTwo != 3)
+                    throw new ArgumentException("The ParamTwo value is incorrect!");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(StaticProperty))]
+            public void TestProperty(int argument)
+            {
+                if (argument != 2 && argument != 3)
+                    throw new ArgumentException("The argument value is incorrect!");
+                if (ParamOne != 1)
+                    throw new ArgumentException("The ParamOne value is incorrect!");
+                if (ParamTwo != 2 && ParamTwo != 3)
+                    throw new ArgumentException("The ParamTwo value is incorrect!");
+            }
         }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void StaticMethodsAndPropertiesCanBeUsedAsSources_EnumerableOfArrayOfObjects(IToolchain toolchain)
+            => CanExecute<WithStaticSources_EnumerableOfArrayOfObjects>(toolchain);
+
+        public class WithStaticSources_EnumerableOfArrayOfObjects
+        {
+            public static IEnumerable<object[]> StaticMethod() { yield return new object[] { 1 }; }
+            public static IEnumerable<object[]> StaticProperty
+            {
+                get
+                {
+                    yield return new object[] { 2 };
+                    yield return new object[] { 3 };
+                }
+            }
+
+            [ParamsSource(nameof(StaticMethod))]
+            public int ParamOne { get; set; }
+
+            [ParamsSource(nameof(StaticProperty))]
+            public int ParamTwo { get; set; }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(StaticMethod))]
+            public void TestMethod(int argument)
+            {
+                if (argument != 1)
+                    throw new ArgumentException("The argument value is incorrect!");
+                if (ParamOne != 1)
+                    throw new ArgumentException("The ParamOne value is incorrect!");
+                if (ParamTwo != 2 && ParamTwo != 3)
+                    throw new ArgumentException("The ParamTwo value is incorrect!");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(StaticProperty))]
+            public void TestProperty(int argument)
+            {
+                if (argument != 2 && argument != 3)
+                    throw new ArgumentException("The argument value is incorrect!");
+                if (ParamOne != 1)
+                    throw new ArgumentException("The ParamOne value is incorrect!");
+                if (ParamTwo != 2 && ParamTwo != 3)
+                    throw new ArgumentException("The ParamTwo value is incorrect!");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void VeryLongStringsAreSupported(IToolchain toolchain) => CanExecute<WithVeryLongString>(toolchain);
+
+        public class WithVeryLongString
+        {
+            private readonly string LongString = new string('a', 200_000);
+            private readonly string LongString2 = new string('a', 200_000 - 1) + "b";
+
+            public IEnumerable<object[]> Arguments()
+            {
+                yield return new object[] { LongString, LongString2 };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Arguments))]
+            public void Test(string first, string second)
+            {
+                if (first != LongString)
+                    throw new ArgumentException($"{nameof(first)} passed string has wrong value!");
+                if (second != LongString2)
+                    throw new ArgumentException($"{nameof(second)} passed string has wrong value!");
+            }
+        }
+
+        private void CanExecute<T>(IToolchain toolchain) => CanExecute<T>(CreateSimpleConfig(job: Job.Dry.With(toolchain)));
     }
 }

@@ -434,6 +434,22 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(value, envVar.Value);
         }
 
+        [Theory]
+        [InlineData(Platform.AnyCpu)]
+        [InlineData(Platform.X86)]
+        [InlineData(Platform.X64)]
+        [InlineData(Platform.Arm)]
+        [InlineData(Platform.Arm64)]
+        public void UserCanSpecifyProcessPlatform(Platform platform)
+        {
+            var parsedConfig = ConfigParser.Parse(new[] { "--platform", platform.ToString() }, new OutputLogger(Output)).config;
+
+            var job = parsedConfig.GetJobs().Single();
+            var parsed = job.Environment.Platform;
+
+            Assert.Equal(platform, parsed);
+        }
+
         [Fact]
         public void InvalidEnvVarAreRecognized()
         {

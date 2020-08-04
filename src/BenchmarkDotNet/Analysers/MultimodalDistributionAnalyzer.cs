@@ -23,11 +23,11 @@ namespace BenchmarkDotNet.Analysers
 
             double mValue = MValueCalculator.Calculate(statistics.OriginalValues);
             if (mValue > 4.2)
-                yield return Create("is multimodal", mValue, report, summary.Style.CultureInfo);
+                yield return Create("is multimodal", mValue, report, summary.GetCultureInfo());
             else if (mValue > 3.2)
-                yield return Create("is bimodal", mValue, report, summary.Style.CultureInfo);
+                yield return Create("is bimodal", mValue, report, summary.GetCultureInfo());
             else if (mValue > 2.8)
-                yield return Create("can have several modes", mValue, report, summary.Style.CultureInfo);
+                yield return Create("can have several modes", mValue, report, summary.GetCultureInfo());
         }
 
         [NotNull]

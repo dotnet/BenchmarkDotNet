@@ -77,7 +77,18 @@ namespace BenchmarkDotNet.Configs
 
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
 
-        public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
+        public string ArtifactsPath
+        {
+            get
+            {
+                var root = Directory.GetCurrentDirectory();
+                if (root == "/")
+                {
+                    root = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                }
+                return Path.Combine(root, "BenchmarkDotNet.Artifacts");
+            }
+        }
 
         public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
 

@@ -105,6 +105,11 @@ namespace BenchmarkDotNet.Jobs
         /// <summary>
         /// CoreRT compiled as netcoreapp5.0
         /// </summary>
-        CoreRt50
+        CoreRt50,
+
+        /// <summary>
+        /// WebAssembly
+        /// </summary>
+        Wasm
     }
 }

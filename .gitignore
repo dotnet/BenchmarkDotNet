@@ -56,3 +56,6 @@ src/BenchmarkDotNet/Disassemblers/net461/*
 # Cake
 tools/**
 .dotnet
+
+# Xamarin
+Resource.designer.cs

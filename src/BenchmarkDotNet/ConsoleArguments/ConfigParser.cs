@@ -17,11 +17,13 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.MonoWasm;
 using CommandLine;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
@@ -103,11 +105,18 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
 
             foreach (string runtime in options.Runtimes)
-                if (!Enum.TryParse<RuntimeMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out _))
+            {
+                if (!Enum.TryParse<RuntimeMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out var parsed))
                 {
                     logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(RuntimeMoniker)).Select(name => name.ToLower()))}.");
                     return false;
                 }
+                else if (parsed == RuntimeMoniker.Wasm && (options.WasmMainJs == null || options.WasmMainJs.IsNotNullButDoesNotExist()))
+                {
+                    logger.WriteLineError($"The provided {nameof(options.WasmMainJs)} \"{options.WasmMainJs}\" does NOT exist. It MUST be provided.");
+                    return false;
+                }
+            }
 
             foreach (string exporter in options.Exporters)
                 if (!AvailableExporters.ContainsKey(exporter))
@@ -132,6 +141,12 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.MonoPath.IsNotNullButDoesNotExist())
             {
                 logger.WriteLineError($"The provided {nameof(options.MonoPath)} \"{options.MonoPath}\" does NOT exist.");
+                return false;
+            }
+
+            if (options.WasmJavascriptEngine.IsNotNullButDoesNotExist())
+            {
+                logger.WriteLineError($"The provided {nameof(options.WasmJavascriptEngine)} \"{options.WasmJavascriptEngine}\" does NOT exist.");
                 return false;
             }
 
@@ -262,6 +277,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithUnrollFactor(options.UnrollFactor.Value);
             if (options.RunStrategy.HasValue)
                 baseJob = baseJob.WithStrategy(options.RunStrategy.Value);
+            if (options.Platform.HasValue)
+                baseJob = baseJob.WithPlatform(options.Platform.Value);
             if (options.RunOncePerIteration)
                 baseJob = baseJob.RunOncePerIteration();
 
@@ -356,6 +373,23 @@ namespace BenchmarkDotNet.ConsoleArguments
                     builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
 
                     return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
+                case RuntimeMoniker.Wasm:
+                    var wasmRuntime = new WasmRuntime(
+                        mainJs: options.WasmMainJs,
+                        msBuildMoniker: "net5.0",
+                        javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
+                        javaScriptEngineArguments: options.WasmJavaScriptEngineArguments);
+
+                    var toolChain = WasmToolChain.From(new NetCoreAppSettings(
+                        targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
+                        runtimeFrameworkVersion: null,
+                        name: wasmRuntime.Name,
+                        customDotNetCliPath: options.CliPath?.FullName,
+                        packagesPath: options.RestorePath?.FullName,
+                        timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
+                        customRuntimePack: options.CustomRuntimePack));
+
+                        return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain);
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }

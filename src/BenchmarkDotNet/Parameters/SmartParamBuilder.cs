@@ -14,8 +14,13 @@ namespace BenchmarkDotNet.Parameters
         [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
         internal static object[] CreateForParams(MemberInfo source, object[] values)
         {
+            // IEnumerable<object>
             if (values.IsEmpty() || values.All(SourceCodeHelper.IsCompilationTimeConstant))
                 return values;
+
+            // IEnumerable<object[]>
+            if (values.All(value => value is object[] array && array.Length == 1 && SourceCodeHelper.IsCompilationTimeConstant(array[0])))
+                return values.Select(x => ((object[])x)[0]).ToArray();
 
             return values.Select((value, index) => new SmartParameter(source, value, index)).ToArray();
         }
