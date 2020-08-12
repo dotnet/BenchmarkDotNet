@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Mathematics
     /// <summary>
     /// the goal of this struct is to avoid any heap allocations, please keep it in mind
     /// </summary>
-    internal struct MeasurementsStatistics
+    internal readonly ref struct MeasurementsStatistics
     {
         /// <summary>
         /// Standard error in nanoseconds.
