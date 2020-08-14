@@ -144,7 +144,7 @@ namespace BenchmarkDotNet.Exporters
 
             if (UseCodeBlocks)
             {
-                logger.Write(CodeBlockEnd);
+                logger.WriteLine(CodeBlockEnd);
                 logger.WriteLine();
             }
 
