@@ -58,6 +58,10 @@ namespace BenchmarkDotNet.Portability
 
         internal static bool IsMacOSX() => IsOSPlatform(OSPlatform.OSX);
 
+        internal static bool IsAndroid() => Type.GetType("Java.Lang.Object, Mono.Android") != null;
+
+        internal static bool IsiOS() => Type.GetType("Foundation.NSObject, Xamarin.iOS") != null;
+
         public static string GetOsVersion()
         {
             if (IsMacOSX())
