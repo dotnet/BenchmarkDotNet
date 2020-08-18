@@ -13,15 +13,7 @@ namespace BenchmarkDotNet.Environments
 
         public string MonoBclPath { get; }
 
-        public bool IsXamarinAndroid { get; }
-
-        public bool IsXamariniOS { get; }
-
-        private MonoRuntime(string name) : base(RuntimeMoniker.Mono, "mono", name)
-        {
-            IsXamarinAndroid = Type.GetType("Java.Lang.Object, Mono.Android") != null;
-            IsXamariniOS = !IsXamarinAndroid && Type.GetType("Foundation.NSObject, Xamarin.iOS") != null;
-        }
+        private MonoRuntime(string name) : base(RuntimeMoniker.Mono, "mono", name) { }
 
         public MonoRuntime(string name, string customPath) : this(name) => CustomPath = customPath;
 

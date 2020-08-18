@@ -43,9 +43,9 @@ namespace BenchmarkDotNet.Toolchains
                     return RoslynToolchain.Instance;
 
                 case MonoRuntime mono:
-                    if (mono.IsXamarinAndroid)
+                    if (RuntimeInformation.IsAndroid())
                         return InProcessEmitToolchain.Instance;
-                    if (mono.IsXamariniOS)
+                    if (RuntimeInformation.IsiOS())
                         return InProcessNoEmitToolchain.Instance;
                     if (!string.IsNullOrEmpty(mono.AotArgs))
                         return MonoAotToolchain.Instance;
