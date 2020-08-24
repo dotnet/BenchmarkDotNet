@@ -31,6 +31,10 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         /// compiled as net5.0, targets latest (1.0.0-alpha-*) CoreRT build from https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json
         /// </summary>
         public static readonly IToolchain Core50 = CreateBuilder().UseCoreRtNuGet().TargetFrameworkMoniker("net5.0").ToToolchain();
+        /// <summary>
+        /// compiled as net6.0, targets latest (1.0.0-alpha-*) CoreRT build from https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json
+        /// </summary>
+        public static readonly IToolchain Core60 = CreateBuilder().UseCoreRtNuGet().TargetFrameworkMoniker("net6.0").ToToolchain();
 
         internal CoreRtToolchain(string displayName,
             string coreRtVersion, string ilcPath, bool useCppCodeGenerator,
