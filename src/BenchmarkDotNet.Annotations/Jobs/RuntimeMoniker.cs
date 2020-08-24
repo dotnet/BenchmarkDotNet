@@ -86,6 +86,11 @@ namespace BenchmarkDotNet.Jobs
         Net50, // it's after NetCoreApp50 in the enum definition because the value of enumeration is used for framework version comparison using > < operators
 
         /// <summary>
+        /// .NET 6.0
+        /// </summary>
+        Net60, // it's after NetCoreApp50 and Net50 in the enum definition because the value of enumeration is used for framework version comparison using > < operators
+
+        /// <summary>
         /// CoreRT compiled as netcoreapp2.0
         /// </summary>
         CoreRt20,

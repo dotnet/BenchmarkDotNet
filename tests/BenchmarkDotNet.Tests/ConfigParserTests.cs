@@ -306,6 +306,19 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(tfm, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
         }
 
+        [Theory]
+        [InlineData("net50")]
+        [InlineData("net60")]
+        public void Net50AndNet60MonikersAreRecognizedAsNetCoreMonikers(string tfm)
+        {
+            var config = ConfigParser.Parse(new[] { "-r", tfm }, new OutputLogger(Output)).config;
+
+            Assert.Single(config.GetJobs());
+            CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
+            Assert.NotNull(toolchain);
+            Assert.Equal(tfm, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
+        }
+
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {

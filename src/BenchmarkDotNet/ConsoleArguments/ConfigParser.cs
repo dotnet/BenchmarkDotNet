@@ -344,6 +344,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.NetCoreApp50:
 #pragma warning restore CS0618 // Type or member is obsolete
                 case RuntimeMoniker.Net50:
+                case RuntimeMoniker.Net60:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
                         .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));

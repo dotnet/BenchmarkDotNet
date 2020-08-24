@@ -37,6 +37,8 @@ namespace BenchmarkDotNet.Extensions
                 case RuntimeMoniker.NetCoreApp50:
 #pragma warning restore CS0618 // Type or member is obsolete
                     return CoreRuntime.Core50;
+                case RuntimeMoniker.Net60:
+                    return CoreRuntime.Core60;
                 case RuntimeMoniker.Mono:
                     return MonoRuntime.Default;
                 case RuntimeMoniker.CoreRt20:
