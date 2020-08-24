@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Jobs
         public EnvironmentMode(string id) : base(id) => GcCharacteristic[this] = new GcMode();
 
         /// <summary>
-        /// Platform (x86 or x64)
+        /// Platform (x86, x64, ARM, ARM64, Wasm)
         /// </summary>
         public Platform Platform
         {
