@@ -96,7 +96,7 @@ namespace BenchmarkDotNet.Environments
                 yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution.ToString(cultureInfo)}, Timer={HardwareTimerKind.ToString().ToUpper()}";
 
             if (RuntimeInformation.IsNetCore && IsDotNetCliInstalled())
-                yield return $".NET Core SDK={DotNetSdkVersion.Value}";
+                yield return $".NET SDK={DotNetSdkVersion.Value}";
         }
 
         [PublicAPI]
