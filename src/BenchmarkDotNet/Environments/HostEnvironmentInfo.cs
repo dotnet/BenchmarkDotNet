@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Environments
 
         protected HostEnvironmentInfo()
         {
-            BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
+            BenchmarkDotNetVersion = BenchmarkDotNetInfo.FullVersion;
             OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
             CpuInfo = new Lazy<CpuInfo>(RuntimeInformation.GetCpuInfo);
             ChronometerFrequency = Chronometer.Frequency;
@@ -108,8 +108,6 @@ namespace BenchmarkDotNet.Environments
 
         [PublicAPI]
         public bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetSdkVersion.Value);
-
-        private static string GetBenchmarkDotNetVersion() => BenchmarkDotNetInfo.FullVersion;
 
         /// <summary>
         /// Return string representation of CPU and environment configuration including BenchmarkDotNet, OS and .NET version
