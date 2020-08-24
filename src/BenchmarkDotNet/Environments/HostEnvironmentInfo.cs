@@ -96,7 +96,13 @@ namespace BenchmarkDotNet.Environments
                 yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution.ToString(cultureInfo)}, Timer={HardwareTimerKind.ToString().ToUpper()}";
 
             if (RuntimeInformation.IsNetCore && IsDotNetCliInstalled())
-                yield return $".NET SDK={DotNetSdkVersion.Value}";
+            {
+                // this wonderfull version number contains words like "preview" and ... 5 segments so it can not be parsed by Version.Parse. Example: "5.0.100-preview.8.20362.3"
+                if (DotNetSdkVersion.Value[0] >= '5')
+                    yield return $".NET SDK={DotNetSdkVersion.Value}";
+                else
+                    yield return $".NET Core SDK={DotNetSdkVersion.Value}";
+            }
         }
 
         [PublicAPI]
