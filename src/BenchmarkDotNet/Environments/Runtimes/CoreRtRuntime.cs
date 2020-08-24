@@ -31,6 +31,10 @@ namespace BenchmarkDotNet.Environments
         /// CoreRT compiled as net5.0
         /// </summary>
         public static readonly CoreRtRuntime CoreRt50 = new CoreRtRuntime(RuntimeMoniker.CoreRt50, "net5.0", "CoreRt 5.0");
+        /// <summary>
+        /// CoreRT compiled as net6.0
+        /// </summary>
+        public static readonly CoreRtRuntime CoreRt60 = new CoreRtRuntime(RuntimeMoniker.CoreRt50, "net6.0", "CoreRt 6.0");
 
         private CoreRtRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
             : base(runtimeMoniker, msBuildMoniker, displayName)
@@ -47,7 +51,7 @@ namespace BenchmarkDotNet.Environments
             var frameworkDescription = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
             string netCoreAppVersion = new string(frameworkDescription.SkipWhile(c => !char.IsDigit(c)).ToArray());
             string[] versionNumbers = netCoreAppVersion.Split('.');
-            string msBuildMoniker = $"netcoreapp{versionNumbers[0]}.{versionNumbers[1]}";
+            string msBuildMoniker = int.Parse(versionNumbers[0]) >= 5 ? $"net{versionNumbers[0]}.{versionNumbers[1]}" : $"netcoreapp{versionNumbers[0]}.{versionNumbers[1]}";
             string displayName = $"CoreRT {versionNumbers[0]}.{versionNumbers[1]}";
 
             switch (msBuildMoniker)
@@ -57,8 +61,9 @@ namespace BenchmarkDotNet.Environments
                 case "netcoreapp2.2": return CoreRt22;
                 case "netcoreapp3.0": return CoreRt30;
                 case "netcoreapp3.1": return CoreRt31;
+                case "net5.0":
                 case "netcoreapp5.0": return CoreRt50;
-                case "net5.0": return CoreRt50;
+                case "net6.0": return CoreRt60;
                 default: // support future version of CoreRT
                     return new CoreRtRuntime(RuntimeMoniker.NotRecognized, msBuildMoniker, displayName);
             }

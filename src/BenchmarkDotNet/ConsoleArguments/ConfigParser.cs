@@ -356,6 +356,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.CoreRt30:
                 case RuntimeMoniker.CoreRt31:
                 case RuntimeMoniker.CoreRt50:
+                case RuntimeMoniker.CoreRt60:
                     var builder = CoreRtToolchain.CreateBuilder();
 
                     if (options.CliPath != null)

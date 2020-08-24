@@ -118,6 +118,8 @@ namespace BenchmarkDotNet.Toolchains
                     return CoreRtToolchain.Core31;
                 case RuntimeMoniker.CoreRt50:
                     return CoreRtToolchain.Core50;
+                case RuntimeMoniker.CoreRt60:
+                    return CoreRtToolchain.Core60;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "RuntimeMoniker not supported");
             }

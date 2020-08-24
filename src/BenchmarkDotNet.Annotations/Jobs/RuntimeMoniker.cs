@@ -121,6 +121,11 @@ namespace BenchmarkDotNet.Jobs
         CoreRt50,
 
         /// <summary>
+        /// CoreRT compiled as net6.0
+        /// </summary>
+        CoreRt60,
+
+        /// <summary>
         /// WebAssembly
         /// </summary>
         Wasm
