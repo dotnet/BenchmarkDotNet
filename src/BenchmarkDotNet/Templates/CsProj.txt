@@ -27,6 +27,11 @@
     <Compile Include="$CODEFILENAME$" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework'">
+    <!-- don't generate App.config file for Full .NET Framework, BenchmarkDotNet does it on it's own -->
+    <None Include="App.config" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="$CSPROJPATH$" />
   </ItemGroup>
