@@ -28,9 +28,9 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public static readonly CoreRtRuntime CoreRt31 = new CoreRtRuntime(RuntimeMoniker.CoreRt31, "netcoreapp3.1", "CoreRt 3.1");
         /// <summary>
-        /// CoreRT compiled as netcoreapp5.0
+        /// CoreRT compiled as net5.0
         /// </summary>
-        public static readonly CoreRtRuntime CoreRt50 = new CoreRtRuntime(RuntimeMoniker.CoreRt50, "netcoreapp5.0", "CoreRt 5.0");
+        public static readonly CoreRtRuntime CoreRt50 = new CoreRtRuntime(RuntimeMoniker.CoreRt50, "net5.0", "CoreRt 5.0");
 
         private CoreRtRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
             : base(runtimeMoniker, msBuildMoniker, displayName)
@@ -58,6 +58,7 @@ namespace BenchmarkDotNet.Environments
                 case "netcoreapp3.0": return CoreRt30;
                 case "netcoreapp3.1": return CoreRt31;
                 case "netcoreapp5.0": return CoreRt50;
+                case "net5.0": return CoreRt50;
                 default: // support future version of CoreRT
                     return new CoreRtRuntime(RuntimeMoniker.NotRecognized, msBuildMoniker, displayName);
             }
