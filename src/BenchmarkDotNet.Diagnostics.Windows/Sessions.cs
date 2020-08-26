@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
@@ -8,16 +7,35 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Extensions;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
+    internal class HeapSession : Session
+    {
+        public HeapSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
+            : base(GetSessionName(details.BenchmarkCase) + "Heap", details, config, creationTime)
+        {
+        }
+
+        protected override string FileExtension => ".userheap.etl";
+
+        internal override Session EnableProviders()
+        {
+            var osHeapExe = Path.GetFileName(Path.ChangeExtension(Details.Process.StartInfo.FileName, ".exe"));
+            TraceEventSession.EnableWindowsHeapProvider(osHeapExe);
+            return this;
+        }
+    }
+
     internal class UserSession : Session
     {
         public UserSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
-            : base(FullNameProvider.GetBenchmarkName(details.BenchmarkCase), details, config, creationTime)
+            : base(GetSessionName(details.BenchmarkCase), details, config, creationTime)
         {
         }
 
@@ -42,13 +60,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             : base(KernelTraceEventParser.KernelSessionName, details, config, creationTime)
         {
         }
-        
+
         protected override string FileExtension => ".kernel.etl";
 
         internal override Session EnableProviders()
         {
-            var keywords = Config.KernelKeywords 
-                | KernelTraceEventParser.Keywords.ImageLoad // handles stack frames from native modules, SUPER IMPORTANT! 
+            var keywords = Config.KernelKeywords
+                | KernelTraceEventParser.Keywords.ImageLoad // handles stack frames from native modules, SUPER IMPORTANT!
                 | KernelTraceEventParser.Keywords.Profile; // CPU stacks
 
             if (Details.Config.GetHardwareCounters().Any())
@@ -69,15 +87,17 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             return this;
         }
     }
-    
+
     internal abstract class Session : IDisposable
     {
+        private const int MaxSessionNameLength = 128;
+
         protected abstract string FileExtension { get; }
 
         protected TraceEventSession TraceEventSession { get; }
 
         protected DiagnoserActionParameters Details { get; }
-        
+
         protected EtwProfilerConfig Config { get; }
 
         internal string FilePath { get; }
@@ -86,12 +106,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             Details = details;
             Config = config;
-            FilePath = EnsureFolderExists(GetFilePath(details, creationTime));
-
+            FilePath = ArtifactFileNameHelper.GetTraceFilePath(details, creationTime, FileExtension).EnsureFolderExists();
             TraceEventSession = new TraceEventSession(sessionName, FilePath)
             {
                 BufferSizeMB = config.BufferSizeInMb,
-                CpuSampleIntervalMSec = config.CpuSampleIntervalInMiliseconds
+                CpuSampleIntervalMSec = config.CpuSampleIntervalInMilliseconds,
             };
 
             Console.CancelKeyPress += OnConsoleCancelKeyPress;
@@ -110,47 +129,18 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         internal abstract Session EnableProviders();
 
-        internal string MergeFiles(Session other) 
-        {
-            //  `other` is not used here because MergeInPlace expects .etl and .kernel.etl files in this folder
-            // it searches for them and merges into a single file
-            TraceEventSession.MergeInPlace(FilePath, TextWriter.Null);
-
-            return FilePath;
-        }
-
         private void OnConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e) => Stop();
 
         private void OnProcessExit(object sender, EventArgs e) => Stop();
 
-        private string GetFilePath(DiagnoserActionParameters details, DateTime creationTime)
+        protected static string GetSessionName(BenchmarkCase benchmarkCase)
         {
-            var folderPath = details.Config.ArtifactsPath;
+            string benchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase);
+            if (benchmarkName.Length <= MaxSessionNameLength)
+                return benchmarkName;
 
-            folderPath = Path.Combine(folderPath, $"{creationTime:yyyyMMdd-hhmm}-{Process.GetCurrentProcess().Id}");
-            
-            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
-            if (details.Config.GetJobs().Select(job => job.Infrastructure.Toolchain).Distinct().Count() > 1)
-                folderPath = Path.Combine(folderPath, details.BenchmarkCase.Job.Infrastructure.Toolchain.Name);
-
-            if (!string.IsNullOrWhiteSpace(details.BenchmarkCase.Descriptor.Type.Namespace))
-                folderPath = Path.Combine(folderPath, details.BenchmarkCase.Descriptor.Type.Namespace.Replace('.', Path.DirectorySeparatorChar));
-
-            folderPath = Path.Combine(folderPath, FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type, includeNamespace: false));
-
-            var fileName = FolderNameHelper.ToFolderName(FullNameProvider.GetMethodName(details.BenchmarkCase));
-
-            return Path.Combine(folderPath, $"{fileName}{FileExtension}");
-        }
-
-        private string EnsureFolderExists(string filePath)
-        {
-            string directoryPath = Path.GetDirectoryName(filePath);
-
-            if (!Directory.Exists(directoryPath))
-                Directory.CreateDirectory(directoryPath);
-
-            return filePath;
+            // session name is not really used by humans, we can just give it the hashcode value
+            return $"BenchmarkDotNet.EtwProfiler.Session_{Hashing.HashString(benchmarkName)}";
         }
     }
 }

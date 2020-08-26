@@ -5,11 +5,12 @@ using System.Linq;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Helpers;
 using CommandLine;
 using CommandLine.Text;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -29,10 +30,13 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('m', "memory", Required = false, Default = false, HelpText = "Prints memory statistics")]
         public bool UseMemoryDiagnoser { get; set; }
 
+        [Option('t', "threading", Required = false, Default = false, HelpText = "Prints threading statistics")]
+        public bool UseThreadingDiagnoser { get; set; }
+
         [Option('d', "disasm", Required = false, Default = false, HelpText = "Gets disassembly of benchmarked code")]
         public bool UseDisassemblyDiagnoser { get; set; }
-        
-        [Option('p', "profiler", Required = false, HelpText = "Profiles benchmarked code using selected profiler. Currently the only available is \"ETW\" for Windows.")]
+
+        [Option('p', "profiler", Required = false, HelpText = "Profiles benchmarked code using selected profiler. Available options: EP/ETW/CV/NativeMemory")]
         public string Profiler { get; set; }
 
         [Option('f', "filter", Required = false, HelpText = "Glob patterns")]
@@ -44,7 +48,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('a', "artifacts", Required = false, HelpText = "Valid path to accessible directory")]
         public DirectoryInfo ArtifactsDirectory { get; set; }
 
-        [Option("outliers", Required = false, Default = OutlierMode.OnlyUpper, HelpText = "None/OnlyUpper/OnlyLower/All")]
+        [Option("outliers", Required = false, Default = OutlierMode.RemoveUpper, HelpText = "DontRemove/RemoveUpper/RemoveLower/RemoveAll")]
         public OutlierMode Outliers { get; set; }
 
         [Option("affinity", Required = false, HelpText = "Affinity mask to set for the benchmark process")]
@@ -64,7 +68,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("join", Required = false, Default = false, HelpText = "Prints single table with results for all benchmarks")]
         public bool Join { get; set; }
-        
+
         [Option("keepFiles", Required = false, Default = false, HelpText = "Determines if all auto-generated files should be kept or removed after running the benchmarks.")]
         public bool KeepBenchmarkFiles { get; set; }
 
@@ -73,10 +77,10 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("counters", Required = false, HelpText = "Hardware Counters", Separator = '+')]
         public IEnumerable<string> HardwareCounters { get; set; }
-        
+
         [Option("cli", Required = false, HelpText = "Path to dotnet cli (optional).")]
         public FileInfo CliPath { get; set; }
-        
+
         [Option("packages", Required = false, HelpText = "The directory to restore packages to (optional).")]
         public DirectoryInfo RestorePath { get; set; }
 
@@ -88,45 +92,48 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("clrVersion", Required = false, HelpText = "Optional version of private CLR build used as the value of COMPLUS_Version env var.")]
         public string ClrVersion { get; set; }
-        
+
         [Option("coreRtVersion", Required = false, HelpText = "Optional version of Microsoft.DotNet.ILCompiler which should be used to run with CoreRT. Example: \"1.0.0-alpha-26414-01\"")]
         public string CoreRtVersion { get; set; }
 
         [Option("ilcPath", Required = false, HelpText = "Optional IlcPath which should be used to run with private CoreRT build.")]
         public DirectoryInfo CoreRtPath { get; set; }
-        
+
         [Option("launchCount", Required = false, HelpText = "How many times we should launch process with target benchmark. The default is 1.")]
         public int? LaunchCount { get; set; }
-            
+
         [Option("warmupCount", Required = false, HelpText = "How many warmup iterations should be performed. If you set it, the minWarmupCount and maxWarmupCount are ignored. By default calculated by the heuristic.")]
         public int? WarmupIterationCount { get; set; }
-        
+
         [Option("minWarmupCount", Required = false, HelpText = "Minimum count of warmup iterations that should be performed. The default is 6.")]
         public int? MinWarmupIterationCount { get; set; }
-        
+
         [Option("maxWarmupCount", Required = false, HelpText = "Maximum count of warmup iterations that should be performed. The default is 50.")]
         public int? MaxWarmupIterationCount { get; set; }
-        
+
         [Option("iterationTime", Required = false, HelpText = "Desired time of execution of an iteration in milliseconds. Used by Pilot stage to estimate the number of invocations per iteration. 500ms by default")]
         public int? IterationTimeInMilliseconds { get; set; }
-        
+
         [Option("iterationCount", Required = false, HelpText = "How many target iterations should be performed. By default calculated by the heuristic.")]
         public int? IterationCount { get; set; }
-        
+
         [Option("minIterationCount", Required = false, HelpText = "Minimum number of iterations to run. The default is 15.")]
         public int? MinIterationCount { get; set; }
-        
+
         [Option("maxIterationCount", Required = false, HelpText = "Maximum number of iterations to run. The default is 100.")]
         public int? MaxIterationCount { get; set; }
-        
+
         [Option("invocationCount", Required = false, HelpText = "Invocation count in a single iteration. By default calculated by the heuristic.")]
         public int? InvocationCount { get; set; }
-        
+
         [Option("unrollFactor", Required = false, HelpText = "How many times the benchmark method will be invoked per one iteration of a generated loop. 16 by default")]
         public int? UnrollFactor { get; set; }
 
         [Option("strategy", Required = false, HelpText = "The RunStrategy that should be used. Throughput/ColdStart/Monitoring.")]
         public RunStrategy? RunStrategy { get; set; }
+
+        [Option("platform", Required = false, HelpText = "The Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64.")]
+        public Platform? Platform { get; set; }
 
         [Option("runOncePerIteration", Required = false, Default = false, HelpText = "Run the benchmark exactly once per iteration.")]
         public bool RunOncePerIteration { get; set; }
@@ -136,7 +143,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("list", Required = false, Default = ListBenchmarkCaseMode.Disabled, HelpText = "Prints all of the available benchmark names. Flat/Tree")]
         public ListBenchmarkCaseMode ListBenchmarkCaseMode { get; set; }
-        
+
         [Option("disasmDepth", Required = false, Default = 1, HelpText = "Sets the recursive depth for the disassembler.")]
         public int DisassemblerRecursiveDepth { get; set; }
 
@@ -148,10 +155,31 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("stopOnFirstError", Required = false, Default = false, HelpText = "Stop on first error.")]
         public bool StopOnFirstError { get; set; }
-        
+
         [Option("statisticalTest", Required = false, HelpText = "Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s")]
         public string StatisticalTestThreshold { get; set; }
-        
+
+        [Option("disableLogFile", Required = false, HelpText = "Disables the logfile.")]
+        public bool DisableLogFile { get; set; }
+
+        [Option("maxWidth", Required = false, HelpText = "Max paramter column width, the default is 20.")]
+        public int? MaxParameterColumnWidth { get; set; }
+
+        [Option("envVars", Required = false, HelpText = "Colon separated environment variables (key:value)")]
+        public IEnumerable<string> EnvironmentVariables { get; set; }
+
+        [Option("wasmEngine", Required = false, HelpText = "Full path to a java script engine used to run the benchmarks, used by Wasm toolchain.")]
+        public FileInfo WasmJavascriptEngine { get; set; }
+
+        [Option("wasmMainJS", Required = false, HelpText = "Path to the main.js file used by Wasm toolchain. Mandatory when using \"--runtimes wasm\"")]
+        public FileInfo WasmMainJs { get; set; }
+
+        [Option("wasmArgs", Required = false, Default = "--expose_wasm", HelpText = "Arguments for the javascript engine used by Wasm toolchain.")]
+        public string WasmJavaScriptEngineArguments { get; set; }
+
+        [Option("customRuntimePack", Required = false, HelpText = "Specify the path to a custom runtime pack. Only used for wasm currently.")]
+        public string CustomRuntimePack { get; set; }
+
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
         [Usage(ApplicationAlias = "")]
@@ -169,20 +197,22 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run benchmarks for .NET Core 2.0, .NET Core 2.1 and .NET Core 2.2. .NET Core 2.0 will be baseline because it was first.", longName, new CommandLineOptions { Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1", "netcoreapp2.2" } });
                 yield return new Example("Use MemoryDiagnoser to get GC stats", shortName, new CommandLineOptions { UseMemoryDiagnoser = true });
                 yield return new Example("Use DisassemblyDiagnoser to get disassembly", shortName, new CommandLineOptions { UseDisassemblyDiagnoser = true });
-                yield return new Example("Use HardwareCountersDiagnoser to get hardware counter info", longName, new CommandLineOptions { HardwareCounters = new [] { nameof(HardwareCounter.CacheMisses), nameof(HardwareCounter.InstructionRetired) } });
-                yield return new Example("Run all benchmarks exactly once", shortName, new CommandLineOptions { BaseJob = "Dry", Filters = new[] { HandleWildcardsOnUnix("*") } });
-                yield return new Example("Run all benchmarks from System.Memory namespace", shortName, new CommandLineOptions { Filters = new[] { HandleWildcardsOnUnix("System.Memory*") } });
+                yield return new Example("Use HardwareCountersDiagnoser to get hardware counter info", longName, new CommandLineOptions { HardwareCounters = new[] { nameof(HardwareCounter.CacheMisses), nameof(HardwareCounter.InstructionRetired) } });
+                yield return new Example("Run all benchmarks exactly once", shortName, new CommandLineOptions { BaseJob = "Dry", Filters = new[] { Escape("*") } });
+                yield return new Example("Run all benchmarks from System.Memory namespace", shortName, new CommandLineOptions { Filters = new[] { Escape("System.Memory*") } });
                 yield return new Example("Run all benchmarks from ClassA and ClassB using type names", shortName, new CommandLineOptions { Filters = new[] { "ClassA", "ClassB" } });
-                yield return new Example("Run all benchmarks from ClassA and ClassB using patterns", shortName, new CommandLineOptions { Filters = new[] { HandleWildcardsOnUnix("*.ClassA.*"), HandleWildcardsOnUnix("*.ClassB.*") } });
-                yield return new Example("Run all benchmarks called `BenchmarkName` and show the results in single summary", longName, new CommandLineOptions { Join = true, Filters = new[] { HandleWildcardsOnUnix("*.BenchmarkName") } });
+                yield return new Example("Run all benchmarks from ClassA and ClassB using patterns", shortName, new CommandLineOptions { Filters = new[] { Escape("*.ClassA.*"), Escape("*.ClassB.*") } });
+                yield return new Example("Run all benchmarks called `BenchmarkName` and show the results in single summary", longName, new CommandLineOptions { Join = true, Filters = new[] { Escape("*.BenchmarkName") } });
                 yield return new Example("Run selected benchmarks once per iteration", longName, new CommandLineOptions { RunOncePerIteration = true });
                 yield return new Example("Run selected benchmarks 100 times per iteration. Perform single warmup iteration and 5 actual workload iterations", longName, new CommandLineOptions { InvocationCount = 100, WarmupIterationCount = 1, IterationCount = 5});
                 yield return new Example("Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations", longName, new CommandLineOptions { IterationTimeInMilliseconds = 250, MinIterationCount = 9, MaxIterationCount = 15});
-                yield return new Example("Run MannWhitney test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was provided as first.", longName, 
-                    new CommandLineOptions { Filters = new [] { "*"}, Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1" }, StatisticalTestThreshold = "5%" });
+                yield return new Example("Run MannWhitney test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was provided as first.", longName,
+                    new CommandLineOptions { Filters = new[] { "*"}, Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1" }, StatisticalTestThreshold = "5%" });
+                yield return new Example("Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2'", longName,
+                    new CommandLineOptions { EnvironmentVariables = new[] { "ENV_VAR_KEY_1:value_1", "ENV_VAR_KEY_2:value_2" } });
             }
         }
 
-        private static string HandleWildcardsOnUnix(string input) => !RuntimeInformation.IsWindows() && input.IndexOf('*') >= 0 ? $"'{input}'" : input; // #842
+        private static string Escape(string input) => UserInteractionHelper.EscapeCommandExample(input);
     }
 }

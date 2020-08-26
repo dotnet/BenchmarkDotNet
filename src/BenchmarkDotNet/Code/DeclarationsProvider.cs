@@ -38,6 +38,8 @@ namespace BenchmarkDotNet.Code
 
         public virtual string WorkloadMethodDelegate(string passArguments) => Descriptor.WorkloadMethod.Name;
 
+        public virtual string WorkloadMethodReturnTypeModifiers => null;
+
         public virtual string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments})";
 
         public virtual string ConsumeField => null;
@@ -47,8 +49,6 @@ namespace BenchmarkDotNet.Code
         public string OverheadMethodReturnTypeName => OverheadMethodReturnType.GetCorrectCSharpTypeName();
 
         public abstract string OverheadImplementation { get; }
-
-        public virtual bool UseRefKeyword => false;
 
         private string GetMethodName(MethodInfo method)
         {
@@ -133,14 +133,23 @@ namespace BenchmarkDotNet.Code
 
         public override string ExtraDefines => "#define RETURNS_BYREF";
 
-        public override bool UseRefKeyword => true;
+        public override string WorkloadMethodReturnTypeModifiers => "ref";
+    }
+
+    internal class ByReadOnlyRefDeclarationsProvider : ByRefDeclarationsProvider
+    {
+        public ByReadOnlyRefDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
+
+        public override string ExtraDefines => "#define RETURNS_BYREF_READONLY";
+
+        public override string WorkloadMethodReturnTypeModifiers => "ref readonly";
     }
 
     internal class TaskDeclarationsProvider : VoidDeclarationsProvider
     {
         public TaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
-        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
+        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way,
         // and will eventually throw actual exception, not aggregated one
         public override string WorkloadMethodDelegate(string passArguments)
             => $"({passArguments}) => {{ {Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";
@@ -159,7 +168,7 @@ namespace BenchmarkDotNet.Code
 
         protected override Type WorkloadMethodReturnType => Descriptor.WorkloadMethod.ReturnType.GetTypeInfo().GetGenericArguments().Single();
 
-        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way, 
+        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way,
         // and will eventually throw actual exception, not aggregated one
         public override string WorkloadMethodDelegate(string passArguments)
             => $"({passArguments}) => {{ return {Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";

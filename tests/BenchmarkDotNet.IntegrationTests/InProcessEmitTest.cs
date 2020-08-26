@@ -31,32 +31,31 @@ namespace BenchmarkDotNet.IntegrationTests
         private IConfig CreateInProcessConfig(OutputLogger logger)
         {
             return new ManualConfig()
-                .With(Job.Dry.With(new InProcessEmitToolchain(TimeSpan.Zero, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
-                .With(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
-                .With(DefaultColumnProviders.Instance);
+                .AddJob(Job.Dry.WithToolchain(new InProcessEmitToolchain(TimeSpan.Zero, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
+                .AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
+                .AddColumnProvider(DefaultColumnProviders.Instance);
         }
 
         private IConfig CreateInProcessAndRoslynConfig(OutputLogger logger)
         {
-            var config = new ManualConfig();
-
-            config.Add(DefaultConfig.Instance.GetColumnProviders().ToArray());
-            config.Add(DefaultConfig.Instance.GetAnalysers().ToArray());
-            config.Add(DefaultConfig.Instance.GetExporters().ToArray());
-            config.Add(DefaultConfig.Instance.GetFilters().ToArray());
-            config.Add(DefaultConfig.Instance.GetLoggers().ToArray());
-            config.Add(
-                Job.Dry
-                    .With(InProcessEmitToolchain.DontLogOutput)
-                    .WithInvocationCount(4)
-                    .WithUnrollFactor(4));
-            config.Add(
-                Job.Dry
-                    .With(new RoslynToolchain())
-                    .WithInvocationCount(4)
-                    .WithUnrollFactor(4));
-            config.Options |= ConfigOptions.KeepBenchmarkFiles;
-            config.Add(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default));
+            var config = new ManualConfig()
+                .AddColumnProvider(DefaultConfig.Instance.GetColumnProviders().ToArray())
+                .AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray())
+                .AddExporter(DefaultConfig.Instance.GetExporters().ToArray())
+                .AddFilter(DefaultConfig.Instance.GetFilters().ToArray())
+                .AddLogger(DefaultConfig.Instance.GetLoggers().ToArray())
+                .AddJob(
+                    Job.Dry
+                        .WithToolchain(InProcessEmitToolchain.DontLogOutput)
+                        .WithInvocationCount(4)
+                        .WithUnrollFactor(4))
+                .AddJob(
+                    Job.Dry
+                        .WithToolchain(new RoslynToolchain())
+                        .WithInvocationCount(4)
+                        .WithUnrollFactor(4))
+                .WithOptions(ConfigOptions.KeepBenchmarkFiles)
+                .AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default));
 
             return config;
         }
@@ -220,6 +219,37 @@ namespace BenchmarkDotNet.IntegrationTests
                 Interlocked.Increment(ref Counter);
                 return new ValueTask<decimal>(DecimalResult);
             }
+        }
+
+        [Fact]
+        public void InProcessEmitToolchainSupportsIterationSetupAndCleanup()
+        {
+            var logger = new OutputLogger(Output);
+            var config = CreateInProcessConfig(logger);
+
+            WithIterationSetupAndCleanup.SetupCounter = 0;
+            WithIterationSetupAndCleanup.BenchmarkCounter = 0;
+            WithIterationSetupAndCleanup.CleanupCounter = 0;
+
+            var summary = CanExecute<WithIterationSetupAndCleanup>(config);
+
+            Assert.Equal(1, WithIterationSetupAndCleanup.SetupCounter);
+            Assert.Equal(16, WithIterationSetupAndCleanup.BenchmarkCounter);
+            Assert.Equal(1, WithIterationSetupAndCleanup.CleanupCounter);
+        }
+
+        public class WithIterationSetupAndCleanup
+        {
+            public static int SetupCounter, BenchmarkCounter, CleanupCounter;
+
+            [IterationSetup]
+            public void Setup() => Interlocked.Increment(ref SetupCounter);
+
+            [Benchmark]
+            public void Benchmark() => Interlocked.Increment(ref BenchmarkCounter);
+
+            [IterationCleanup]
+            public void Cleanup() => Interlocked.Increment(ref CleanupCounter);
         }
     }
 }

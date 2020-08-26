@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -49,7 +50,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     : DotNetCliCommandResult.Failure(stopwatch.Elapsed, outputReader.GetOutputText(), outputReader.GetErrorText());
             }
         }
-        
+
         internal static string GetDotNetSdkVersion()
         {
             using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version") })
@@ -88,7 +89,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                RedirectStandardInput = redirectStandardInput
+                RedirectStandardInput = redirectStandardInput,
+                StandardErrorEncoding = Encoding.UTF8,
+                StandardOutputEncoding = Encoding.UTF8,
             };
 
             if (environmentVariables != null)

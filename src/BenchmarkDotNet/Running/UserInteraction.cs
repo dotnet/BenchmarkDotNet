@@ -2,22 +2,19 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using BenchmarkDotNet.ConsoleArguments;
-using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
 {
     internal class UserInteraction : IUserInteraction
     {
         private static bool consoleCancelKeyPressed;
-        
+
         static UserInteraction() => Console.CancelKeyPress += (_, __) => consoleCancelKeyPressed = true;
 
         public void PrintNoBenchmarksError(ILogger logger)
@@ -25,21 +22,23 @@ namespace BenchmarkDotNet.Running
             logger.WriteError("No benchmarks to choose from. Make sure you provided public non-sealed non-static types with public [Benchmark] methods.");
         }
 
-        public IReadOnlyList<Type> AskUser(IReadOnlyList<Type> allTypes, ILogger logger)
+        [NotNull]
+        public IReadOnlyList<Type> AskUser([NotNull] IReadOnlyList<Type> allTypes, ILogger logger)
         {
             var selectedTypes = new List<Type>();
             string benchmarkCaptionExample = allTypes.First().GetDisplayName();
 
-            while (selectedTypes.Count == 0  && !consoleCancelKeyPressed)
+            while (selectedTypes.Count == 0 && !consoleCancelKeyPressed)
             {
                 PrintAvailable(allTypes, logger);
-                
+
                 if (consoleCancelKeyPressed)
                     break;
 
-                logger.WriteLineHelp($"You should select the target benchmark(s). Please, print a number of a benchmark (e.g. '0') or a contained benchmark caption (e.g. '{benchmarkCaptionExample}'):");
-                logger.WriteLineHelp("If you want to select few, please separate them with space ` ` (e.g. `1 2 3`)");
-                logger.WriteLineHelp($"You can also provide the class name in console arguments by using --filter. (e.g. '--filter *{benchmarkCaptionExample}*'):");
+                string filterExample = "--filter " + UserInteractionHelper.EscapeCommandExample($"*{benchmarkCaptionExample}*");
+                logger.WriteLineHelp($"You should select the target benchmark(s). Please, print a number of a benchmark (e.g. `0`) or a contained benchmark caption (e.g. `{benchmarkCaptionExample}`).");
+                logger.WriteLineHelp("If you want to select few, please separate them with space ` ` (e.g. `1 2 3`).");
+                logger.WriteLineHelp($"You can also provide the class name in console arguments by using --filter. (e.g. `{filterExample}`).");
 
                 string userInput = Console.ReadLine() ?? "";
 
@@ -50,14 +49,14 @@ namespace BenchmarkDotNet.Running
             return selectedTypes;
         }
 
-        public void PrintWrongFilterInfo(IReadOnlyList<Type> allTypes, ILogger logger, string[] userFilters)
+        public void PrintWrongFilterInfo(IReadOnlyList<Type> allTypes, ILogger logger, [NotNull] string[] userFilters)
         {
             var correctionSuggester = new CorrectionsSuggester(allTypes);
 
             var filterToNames = userFilters
                 .Select(userFilter => (userFilter: userFilter, suggestedBenchmarkNames: correctionSuggester.SuggestFor(userFilter)))
                 .ToArray();
-            
+
             foreach ((string userFilter, var suggestedBenchmarkNames) in filterToNames)
                 if (!suggestedBenchmarkNames.IsEmpty())
                 {
@@ -101,7 +100,7 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static void PrintAvailable(IReadOnlyList<Type> allTypes, ILogger logger)
+        private static void PrintAvailable([NotNull] IReadOnlyList<Type> allTypes, ILogger logger)
         {
             logger.WriteLineHelp($"Available Benchmark{(allTypes.Count > 1 ? "s" : "")}:");
 

@@ -1,11 +1,12 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using BenchmarkDotNet.Helpers;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests
 {
-    // TODO: add decimal, typeof, CreateInstance, TimeInterval, IntPtr, IFormattable
+    // TODO: add decimal, typeof, CreateInstance, TimeValue, IntPtr, IFormattable
     public class SourceCodeHelperTests
     {
         private ITestOutputHelper output;
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData('a', "'a'")]
         [InlineData('\\', "'\\\\'")]
         [InlineData(0.123f, "0.123f")]
-        [InlineData(0.123d, "0.123d")]        
+        [InlineData(0.123d, "0.123d")]
         [InlineData(BindingFlags.Public, "(System.Reflection.BindingFlags)(16)")]
         public void ToSourceCodeSimpleTest(object original, string expected)
         {
@@ -30,6 +31,13 @@ namespace BenchmarkDotNet.Tests
             output.WriteLine("ACTUAL    : " + actual);
             output.WriteLine("EXPECTED  : " + expected);
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void SupportsGuid()
+        {
+            const string guidAsString = "e9a42b02-d5df-448d-aa00-03f14749eb61";
+            Assert.Equal($"System.Guid.Parse(\"{guidAsString}\")", SourceCodeHelper.ToSourceCode(Guid.Parse(guidAsString)));
         }
 
         [Fact]

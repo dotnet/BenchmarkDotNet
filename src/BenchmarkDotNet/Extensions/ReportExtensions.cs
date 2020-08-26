@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Extensions
         {
             if (runs.IsEmpty())
                 throw new InvalidOperationException("List of measurements contains no elements");
-            return new Statistics(runs.Select(r => r.GetAverageNanoseconds()));
+            return new Statistics(runs.Select(r => r.GetAverageTime().Nanoseconds));
         }
 
         public static Statistics GetStatistics(this IEnumerable<Measurement> runs) =>

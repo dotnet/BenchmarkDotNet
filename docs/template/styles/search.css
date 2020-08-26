@@ -1,0 +1,8 @@
+.algolia-autocomplete, #search-query{
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.navbar-right.navbar-form{
+  padding: 0;
+}

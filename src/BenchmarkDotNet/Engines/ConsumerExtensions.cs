@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Engines
                 consumer.Consume(item);
             }
         }
-        
+
         /// <summary>
         /// executes and consumes given <see cref="IQueryable"/>
         /// <remarks>By using non-generic <see cref="IQueryable"/> you pay for boxing. Use generic <see cref="IQueryable{T}"/> if you can.</remarks>
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Engines
                 consumer.Consume(item);
             }
         }
-        
+
         /// <summary>
         /// executes and consumes given <see cref="IEnumerable{T}"/>
         /// </summary>
@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Engines
                 consumer.Consume<T>(in item);
             }
         }
-        
+
         /// <summary>
         /// executes and consumes given <see cref="IQueryable{T}"/>
         /// </summary>

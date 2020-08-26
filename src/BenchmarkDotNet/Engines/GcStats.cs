@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Reflection;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
 {
-    public struct GcStats
+    public struct GcStats : IEquatable<GcStats>
     {
         internal const string ResultsLinePrefix = "GC: ";
 
         public static readonly long AllocationQuantum = CalculateAllocationQuantumSize();
 
-        private static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = GetAllocatedBytesForCurrentThread();
+        private static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = CreateGetAllocatedBytesForCurrentThreadDelegate();
+        private static readonly Func<bool, long> GetTotalAllocatedBytesDelegate = CreateGetTotalAllocatedBytesDelegate();
 
         public static readonly GcStats Empty = new GcStats(0, 0, 0, 0, 0);
 
@@ -41,8 +42,9 @@ namespace BenchmarkDotNet.Engines
         {
             get
             {
-                bool excludeAllocationQuantumSideEffects = !RuntimeInformation.IsNetCore || NetCoreAppSettings.Current.Value == NetCoreAppSettings.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
-                
+                bool excludeAllocationQuantumSideEffects = !RuntimeInformation.IsNetCore
+                    || RuntimeInformation.GetCurrentRuntime().RuntimeMoniker == RuntimeMoniker.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
+
                 return GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects) == 0
                     ? 0
                     : (long) Math.Round( // let's round it to reduce the side effects of Allocation quantum
@@ -103,7 +105,7 @@ namespace BenchmarkDotNet.Engines
         public static GcStats ReadInitial()
         {
             // this will force GC.Collect, so we want to do this before collecting collections counts
-            long allocatedBytes = GetAllocatedBytes(); 
+            long allocatedBytes = GetAllocatedBytes();
 
             return new GcStats(
                 GC.CollectionCount(0),
@@ -120,9 +122,9 @@ namespace BenchmarkDotNet.Engines
                 GC.CollectionCount(1),
                 GC.CollectionCount(2),
 
-                // this will force GC.Collect, so we want to do this after collecting collections counts 
+                // this will force GC.Collect, so we want to do this after collecting collections counts
                 // to exclude this single full forced collection from results
-                GetAllocatedBytes(), 
+                GetAllocatedBytes(),
                 0);
         }
 
@@ -135,7 +137,7 @@ namespace BenchmarkDotNet.Engines
             if (RuntimeInformation.IsMono) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
                 return 0;
 
-            // "This instance Int64 property returns the number of bytes that have been allocated by a specific 
+            // "This instance Int64 property returns the number of bytes that have been allocated by a specific
             // AppDomain. The number is accurate as of the last garbage collection." - CLR via C#
             // so we enforce GC.Collect here just to make sure we get accurate results
             GC.Collect();
@@ -143,11 +145,14 @@ namespace BenchmarkDotNet.Engines
             if (RuntimeInformation.IsFullFramework) // it can be a .NET app consuming our .NET Standard package
                 return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
 
+            if (GetTotalAllocatedBytesDelegate != null) // it's .NET Core 3.0 with the new API available
+                return GetTotalAllocatedBytesDelegate.Invoke(true); // true for the "precise" argument
+
             // https://apisof.net/catalog/System.GC.GetAllocatedBytesForCurrentThread() is not part of the .NET Standard, so we use reflection to call it..
             return GetAllocatedBytesForCurrentThreadDelegate.Invoke();
         }
 
-        private static Func<long> GetAllocatedBytesForCurrentThread()
+        private static Func<long> CreateGetAllocatedBytesForCurrentThreadDelegate()
         {
             // this method is not a part of .NET Standard so we need to use reflection
             var method = typeof(GC).GetTypeInfo().GetMethod("GetAllocatedBytesForCurrentThread", BindingFlags.Public | BindingFlags.Static);
@@ -155,13 +160,22 @@ namespace BenchmarkDotNet.Engines
             // we create delegate to avoid boxing, IMPORTANT!
             return method != null ? (Func<long>)method.CreateDelegate(typeof(Func<long>)) : null;
         }
-  
-        public string ToOutputLine() 
+
+        private static Func<bool, long> CreateGetTotalAllocatedBytesDelegate()
+        {
+            // this method is not a part of .NET Standard so we need to use reflection
+            var method = typeof(GC).GetTypeInfo().GetMethod("GetTotalAllocatedBytes", BindingFlags.Public | BindingFlags.Static);
+
+            // we create delegate to avoid boxing, IMPORTANT!
+            return method != null ? (Func<bool, long>)method.CreateDelegate(typeof(Func<bool, long>)) : null;
+        }
+
+        public string ToOutputLine()
             => $"{ResultsLinePrefix} {Gen0Collections} {Gen1Collections} {Gen2Collections} {AllocatedBytes} {TotalOperations}";
 
         public static GcStats Parse(string line)
         {
-            if(!line.StartsWith(ResultsLinePrefix))
+            if (!line.StartsWith(ResultsLinePrefix))
                 throw new NotSupportedException($"Line must start with {ResultsLinePrefix}");
 
             var measurementSplit = line.Remove(0, ResultsLinePrefix.Length).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -206,6 +220,23 @@ namespace BenchmarkDotNet.Engines
             } while (result <= 0);
 
             return result;
+        }
+
+        public bool Equals(GcStats other) => Gen0Collections == other.Gen0Collections && Gen1Collections == other.Gen1Collections && Gen2Collections == other.Gen2Collections && AllocatedBytes == other.AllocatedBytes && TotalOperations == other.TotalOperations;
+
+        public override bool Equals(object obj) => obj is GcStats other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = Gen0Collections;
+                hashCode = (hashCode * 397) ^ Gen1Collections;
+                hashCode = (hashCode * 397) ^ Gen2Collections;
+                hashCode = (hashCode * 397) ^ AllocatedBytes.GetHashCode();
+                hashCode = (hashCode * 397) ^ TotalOperations.GetHashCode();
+                return hashCode;
+            }
         }
     }
 }

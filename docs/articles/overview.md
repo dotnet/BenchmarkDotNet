@@ -9,7 +9,7 @@ name: Overview
 
 Create new console application and install the [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/) NuGet package. We support:
 
-* *Projects:* `*.csproj` (classic and modern with PackageReferences), `*.xproj`/`project.json`
+* *Projects:* classic and modern with PackageReferences
 * *Runtimes:* Full .NET Framework (4.6+), .NET Core (2.0+), Mono, CoreRT
 * *OS:* Windows, Linux, MacOS
 * *Languages:* C#, F#, VB
@@ -51,7 +51,7 @@ namespace MyBenchmarks
     {
         public static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<Md5VsSha256>();
+            var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
         }
     }
 }
@@ -173,7 +173,7 @@ public class Md5VsSha256
 
 If you have installed R, `RPlotExporter` will generate a lot of nice plots:
 
-![](../images/rplot.png)
+![](../images/v0.12.0/rplot.png)
 
 Read more:  [Exporters](configs/exporters.md)
 
@@ -298,7 +298,7 @@ Read more:  [Diagnosers](configs/diagnosers.md)
 
 ## BenchmarkRunner
 
-There are several ways to run your benchmarks: you can use existed class, run a benchmark based on code from internet or based on source code:
+There are several ways to run your benchmarks: you can use an existing class, run a benchmark based on code from internet or based on source code:
 
 ```cs
 var summary = BenchmarkRunner.Run<MyBenchmarkClass>();

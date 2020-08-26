@@ -2,13 +2,16 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
+
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.InProcess
 {
     /// <summary>Helper class that creates <see cref="BenchmarkAction"/> instances. </summary>
+    [Obsolete("Please use BenchmarkDotNet.Toolchains.InProcess.NoEmit.* classes")]
     public static partial class BenchmarkActionFactory
     {
         /// <summary>

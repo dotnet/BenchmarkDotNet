@@ -98,11 +98,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 GlobalSetupAction = CallbackFromField(instance, GlobalSetupActionFieldName),
                 GlobalCleanupAction = CallbackFromField(instance, GlobalCleanupActionFieldName),
                 IterationSetupAction = CallbackFromField(instance, IterationSetupActionFieldName),
-                IterationCleanupAction = CallbackFromField(instance, IterationSetupActionFieldName),
+                IterationCleanupAction = CallbackFromField(instance, IterationCleanupActionFieldName),
                 TargetJob = benchmarkCase.Job,
                 OperationsPerInvoke = benchmarkCase.Descriptor.OperationsPerInvoke,
-                MeasureGcStats = benchmarkCase.Config.HasMemoryDiagnoser(),
-                Encoding = benchmarkCase.Config.Encoding,
+                MeasureExtraStats = benchmarkCase.Config.HasExtraStatsDiagnoser(),
                 BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase)
             };
             return engineParameters;

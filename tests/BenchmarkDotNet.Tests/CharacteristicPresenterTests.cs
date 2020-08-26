@@ -1,13 +1,5 @@
 ﻿using System;
-using System.Linq;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Running;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests

@@ -20,10 +20,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         private readonly ITestOutputHelper output;
 
-        public MultipleRuntimesTest(ITestOutputHelper outputHelper)
-        {
-            output = outputHelper;
-        }
+        public MultipleRuntimesTest(ITestOutputHelper outputHelper) => output = outputHelper;
 
         [FactWindowsOnly("CLR is a valid job only on Windows")]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
@@ -32,10 +29,10 @@ namespace BenchmarkDotNet.IntegrationTests
             var summary = BenchmarkRunner
                 .Run<C>(
                     ManualConfig.CreateEmpty()
-                                .With(new Job(Job.Dry, EnvironmentMode.Core).With(Platform.X64))
-                                .With(new Job(Job.Dry, EnvironmentMode.Clr))
-                                .With(DefaultColumnProviders.Instance)
-                                .With(new OutputLogger(output)));
+                        .AddJob(Job.Dry.WithRuntime(CoreRuntime.Core21).WithPlatform(Platform.X64).WithId("Core"))
+                        .AddJob(Job.Dry.WithRuntime(ClrRuntime.Net461).WithId("Framework"))
+                        .AddColumnProvider(DefaultColumnProviders.Instance)
+                        .AddLogger(new OutputLogger(output)));
 
             Assert.True(summary.Reports
                 .All(report => report.ExecuteResults

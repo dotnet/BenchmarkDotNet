@@ -10,7 +10,7 @@ but not between operations. We have the following type of iterations:
     * `OverheadWarmup`, `OverheadWorkload`: BenchmarkDotNet overhead will be evaluated.
     * `ActualWarmup`: Warmup of the workload method.
     * `ActualWorkload`: Actual measurements.
-    * `Result` = `ActualWorkload` - `<AverageOverhead>`
+    * `Result` = `ActualWorkload` - `<MedianOverhead>`
 4. After all of the measurements, BenchmarkDotNet creates:
     * An instance of the `Summary` class that contains all information about benchmark runs.
     * A set of files that contains summary in human-readable and machine-readable formats.
@@ -51,7 +51,7 @@ Result ActualRun(Method method, Job job)
 
     GlobalCleanup(); 
 
-    return (result - Avg(overhead), gcStats);
+    return (result - Median(overhead), gcStats);
 }
 
 long Pilot(Method method, int unrollFactor)

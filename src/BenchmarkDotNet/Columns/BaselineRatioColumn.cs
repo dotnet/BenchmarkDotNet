@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -44,18 +44,20 @@ namespace BenchmarkDotNet.Columns
             }
         }
 
-        internal override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, Statistics current, bool isBaseline)
+        public override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, IReadOnlyDictionary<string, Metric> baselineMetrics,
+            Statistics current, IReadOnlyDictionary<string, Metric> currentMetrics, bool isBaseline)
         {
             var ratio = GetRatioStatistics(current, baseline);
             if (ratio == null)
                 return "NA";
 
+            var cultureInfo = summary.GetCultureInfo();
             switch (Metric)
             {
                 case RatioMetric.Mean:
-                    return IsNonBaselinesPrecise(summary, baseline, benchmarkCase) ? ratio.Mean.ToStr("N3") : ratio.Mean.ToStr("N2");
+                    return IsNonBaselinesPrecise(summary, baseline, benchmarkCase) ? ratio.Mean.ToString("N3", cultureInfo) : ratio.Mean.ToString("N2", cultureInfo);
                 case RatioMetric.StdDev:
-                    return ratio.StandardDeviation.ToStr("N2");
+                    return ratio.StandardDeviation.ToString("N2", cultureInfo);
                 default:
                     throw new NotSupportedException();
             }

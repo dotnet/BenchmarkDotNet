@@ -1,9 +1,11 @@
 ﻿using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Environments;
 using JetBrains.Annotations;
+using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Jobs
 {
+    [SuppressMessage("ReSharper", "UnassignedReadonlyField")]
     public sealed class Job : JobMode<Job>
     {
         [PublicAPI] public static readonly Characteristic<EnvironmentMode> EnvironmentCharacteristic = CreateCharacteristic<EnvironmentMode>(nameof(Environment));
@@ -13,10 +15,14 @@ namespace BenchmarkDotNet.Jobs
         [PublicAPI] public static readonly Characteristic<MetaMode> MetaCharacteristic = CreateCharacteristic<MetaMode>(nameof(Meta));
 
         // Env
-        public static readonly Job Clr = new Job(nameof(Clr), EnvironmentMode.Clr).Freeze();
-        public static readonly Job Core = new Job(nameof(Core), EnvironmentMode.Core).Freeze();
-        public static readonly Job Mono = new Job(nameof(Mono), EnvironmentMode.Mono).Freeze();
-        public static readonly Job CoreRT = new Job(nameof(CoreRT), EnvironmentMode.CoreRT).Freeze();
+        [Obsolete("Please use Job.Default.WithRuntime(ClrRuntime.Net$Version) instead", true)]
+        public static readonly Job Clr;
+        [Obsolete("Please use Job.Default.WithRuntime(CoreRuntime.Core$Version) instead", true)]
+        public static readonly Job Core;
+        [Obsolete("Please use Job.Default.WithRuntime(MonoRuntime.Default) instead", true)]
+        public static readonly Job Mono;
+        [Obsolete("Please use Job.Default.WithRuntime(CoreRtRuntime.CoreRt$Version) instead", true)]
+        public static readonly Job CoreRT;
 
         public static readonly Job LegacyJitX86 = new Job(nameof(LegacyJitX86), EnvironmentMode.LegacyJitX86).Freeze();
         public static readonly Job LegacyJitX64 = new Job(nameof(LegacyJitX64), EnvironmentMode.LegacyJitX64).Freeze();
@@ -25,10 +31,16 @@ namespace BenchmarkDotNet.Jobs
 
         // Run
         public static readonly Job Dry = new Job(nameof(Dry), RunMode.Dry).Freeze();
-        public static readonly Job DryClr = Dry.With(Runtime.Clr).WithId("DryClr").Freeze();
-        public static readonly Job DryCore = Dry.With(Runtime.Core).WithId("DryCore").Freeze();
-        public static readonly Job DryMono = Dry.With(Runtime.Mono).WithId("DryMono").Freeze();
-        public static readonly Job DryCoreRT = Dry.With(Runtime.CoreRT).WithId("DryCoreRT").Freeze();
+
+        [Obsolete("Please use Job.Dry.WithRuntime(ClrRuntime.Net$Version) instead", true)]
+        public static readonly Job DryClr;
+        [Obsolete("Please use Job.Dry.WithRuntime(CoreRuntime.Core$Version) instead", true)]
+        public static readonly Job DryCore;
+        [Obsolete("Please use Job.Dry.WithRuntime(MonoRuntime.Default) instead", true)]
+        public static readonly Job DryMono;
+        [Obsolete("Please use Job.Dry.WithRuntime(CoreRtRuntime.CoreRt$Version) instead", true)]
+        public static readonly Job DryCoreRT;
+
         public static readonly Job ShortRun = new Job(nameof(ShortRun), RunMode.Short).Freeze();
         public static readonly Job MediumRun = new Job(nameof(MediumRun), RunMode.Medium).Freeze();
         public static readonly Job LongRun = new Job(nameof(LongRun), RunMode.Long).Freeze();

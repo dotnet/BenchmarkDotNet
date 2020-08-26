@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
@@ -16,7 +15,7 @@ namespace BenchmarkDotNet.Configs
     /// </summary>
     public static class ImmutableConfigBuilder
     {
-        private static readonly IValidator[] MandatoryValidators = 
+        private static readonly IValidator[] MandatoryValidators =
         {
             BaselineValidator.FailOnError,
             SetupCleanupValidator.FailOnError,
@@ -28,7 +27,7 @@ namespace BenchmarkDotNet.Configs
             JitOptimizationsValidator.DontFailOnError,
             DeferredExecutionValidator.DontFailOnError
         };
-        
+
         /// <summary>
         /// removes duplicates and applies all extra logic required to make the config a final one
         /// </summary>
@@ -36,53 +35,53 @@ namespace BenchmarkDotNet.Configs
         {
             var uniqueColumnProviders = source.GetColumnProviders().Distinct().ToImmutableArray();
             var uniqueLoggers = source.GetLoggers().ToImmutableHashSet();
-            
+
             var uniqueHardwareCounters = source.GetHardwareCounters().ToImmutableHashSet();
             var uniqueDiagnosers = GetDiagnosers(source.GetDiagnosers(), uniqueHardwareCounters);
             var uniqueExporters = GetExporters(source.GetExporters(), uniqueDiagnosers);
-            var unqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);
+            var uniqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);
 
             var uniqueValidators = GetValidators(source.GetValidators(), MandatoryValidators, source.Options);
-            
+
             var uniqueFilters = source.GetFilters().ToImmutableHashSet();
             var uniqueRules = source.GetLogicalGroupRules().ToImmutableHashSet();
 
             var uniqueRunnableJobs = GetRunnableJobs(source.GetJobs()).ToImmutableHashSet();
-            
+
             return new ImmutableConfig(
                 uniqueColumnProviders,
                 uniqueLoggers,
                 uniqueHardwareCounters,
                 uniqueDiagnosers,
                 uniqueExporters,
-                unqueAnalyzers,
+                uniqueAnalyzers,
                 uniqueValidators,
                 uniqueFilters,
                 uniqueRules,
                 uniqueRunnableJobs,
                 source.UnionRule,
-                source.ArtifactsPath,
-                source.Encoding,
+                source.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath,
+                source.CultureInfo,
                 source.Orderer ?? DefaultOrderer.Instance,
                 source.SummaryStyle,
                 source.Options
             );
         }
 
-        private static ImmutableHashSet<IDiagnoser> GetDiagnosers(IEnumerable<IDiagnoser> diagnosers, ImmutableHashSet<HardwareCounter> uniqueHardwareCoutners)
+        private static ImmutableHashSet<IDiagnoser> GetDiagnosers(IEnumerable<IDiagnoser> diagnosers, ImmutableHashSet<HardwareCounter> uniqueHardwareCounters)
         {
             var builder = ImmutableHashSet.CreateBuilder(new TypeComparer<IDiagnoser>());
 
             foreach (var diagnoser in diagnosers)
                 if (!builder.Contains(diagnoser))
                     builder.Add(diagnoser);
-            
-            if (!uniqueHardwareCoutners.IsEmpty && !diagnosers.OfType<IHardwareCountersDiagnoser>().Any())
+
+            if (!uniqueHardwareCounters.IsEmpty && !diagnosers.OfType<IHardwareCountersDiagnoser>().Any())
             {
                 // if users define hardware counters via [HardwareCounters] we need to dynamically load the right diagnoser
                 var hardwareCountersDiagnoser = DiagnosersLoader.GetImplementation<IHardwareCountersDiagnoser>();
 
-                if (hardwareCountersDiagnoser != default && !builder.Contains(hardwareCountersDiagnoser))
+                if (hardwareCountersDiagnoser != default(IDiagnoser) && !builder.Contains(hardwareCountersDiagnoser))
                     builder.Add(hardwareCountersDiagnoser);
             }
 
@@ -92,7 +91,7 @@ namespace BenchmarkDotNet.Configs
         private static ImmutableArray<IExporter> GetExporters(IEnumerable<IExporter> exporters, ImmutableHashSet<IDiagnoser> uniqueDiagnosers)
         {
             var result = new List<IExporter>();
-            
+
             foreach (var exporter in exporters)
                 if (!result.Contains(exporter))
                     result.Add(exporter);
@@ -103,12 +102,12 @@ namespace BenchmarkDotNet.Configs
                     result.Add(exporter);
 
             var hardwareCounterDiagnoser = uniqueDiagnosers.OfType<IHardwareCountersDiagnoser>().SingleOrDefault();
-            var disassemblyDiagnoser = uniqueDiagnosers.OfType<IDisassemblyDiagnoser>().SingleOrDefault();
+            var disassemblyDiagnoser = uniqueDiagnosers.OfType<DisassemblyDiagnoser>().SingleOrDefault();
 
-            // we can use InstructionPointerExporter only when we have both IHardwareCountersDiagnoser and IDisassemblyDiagnoser
-            if (hardwareCounterDiagnoser != default && disassemblyDiagnoser != default)
+            // we can use InstructionPointerExporter only when we have both IHardwareCountersDiagnoser and DisassemblyDiagnoser
+            if (hardwareCounterDiagnoser != default(IHardwareCountersDiagnoser) && disassemblyDiagnoser != default(DisassemblyDiagnoser))
                 result.Add(new InstructionPointerExporter(hardwareCounterDiagnoser, disassemblyDiagnoser));
-            
+
             for (int i = result.Count - 1; i >=0; i--)
                 if (result[i] is IExporterDependencies exporterDependencies)
                     foreach (var dependency in exporterDependencies.Dependencies)
@@ -169,7 +168,7 @@ namespace BenchmarkDotNet.Configs
 
             var customDefaultJob = unique.SingleOrDefault(job => job.Meta.IsDefault);
             var defaultJob = customDefaultJob ?? Job.Default;
-            
+
             if (!result.Any())
                 result.Add(defaultJob);
 

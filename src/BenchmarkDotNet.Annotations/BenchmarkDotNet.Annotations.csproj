@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
-    <AssemblyTitle>BenchmarkDotNet.Annotations</AssemblyTitle>
-    <TargetFramework>netstandard1.0</TargetFramework>
+    <AssemblyTitle>Basic BenchmarkDotNet attributes that can be used to annotate your benchmarks</AssemblyTitle>
+    <TargetFrameworks>netstandard1.0;netstandard2.0</TargetFrameworks>
+    <NoWarn>$(NoWarn);1701;1702;1705;1591;3005;NU1702;CA1825</NoWarn>
     <AssemblyName>BenchmarkDotNet.Annotations</AssemblyName>
     <PackageId>BenchmarkDotNet.Annotations</PackageId>
-    <!-- to keep backward compat we did NOT rename the namesapce -->
-    <RootNamespace>BenchmarkDotNet.Attributes</RootNamespace>
+    <RootNamespace>BenchmarkDotNet</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\BenchmarkDotNet\Helpers\CodeAnnotations.cs" Link="CodeAnnotations.cs" />
+    <Compile Include="..\BenchmarkDotNet\Helpers\CodeAnnotations.cs" Link="Attributes\CodeAnnotations.cs" />
   </ItemGroup>
 </Project>

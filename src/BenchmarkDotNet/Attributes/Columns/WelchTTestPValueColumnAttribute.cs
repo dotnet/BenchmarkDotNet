@@ -1,7 +1,8 @@
 ﻿using System;
 using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.SignificanceTesting;
+using Perfolizer.Mathematics.Thresholds;
 
 namespace BenchmarkDotNet.Attributes
 {
@@ -13,7 +14,7 @@ namespace BenchmarkDotNet.Attributes
             : base(StatisticalTestColumn.Create(testKind, Threshold.Create(thresholdUnit, value), showPValues)) { }
 
         public StatisticalTestColumnAttribute(StatisticalTestKind testKind, bool showPValues = false) : this(testKind, ThresholdUnit.Ratio, 0.1, showPValues) { }
-        
+
         public StatisticalTestColumnAttribute(bool showPValues = false) : this(StatisticalTestKind.MannWhitney, showPValues) {}
     }
 

@@ -3,7 +3,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -16,13 +16,13 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                Add(Job.MediumRun
+                AddJob(Job.MediumRun
                     .WithLaunchCount(1)
                     .WithId("OutOfProc"));
 
-                Add(Job.MediumRun
+                AddJob(Job.MediumRun
                     .WithLaunchCount(1)
-                    .With(InProcessToolchain.Instance)
+                    .WithToolchain(InProcessEmitToolchain.Instance)
                     .WithId("InProcess"));
             }
         }

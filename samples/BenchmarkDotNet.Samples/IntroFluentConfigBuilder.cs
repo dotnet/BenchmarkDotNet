@@ -2,13 +2,13 @@
 using System.Security.Cryptography;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Samples
 {
-    [ClrJob, MonoJob, CoreJob, CoreRtJob]
     public class Algo_Md5VsSha256
     {
         private const int N = 10000;
@@ -29,18 +29,17 @@ namespace BenchmarkDotNet.Samples
         [Benchmark]
         public byte[] Sha256() => sha256.ComputeHash(data);
     }
-    
+
     public class IntroFluentConfigBuilder
     {
         public static void Run()
         {
             BenchmarkRunner
                 .Run<Algo_Md5VsSha256>(
-                    ManualConfig
-                        .Create(DefaultConfig.Instance)
-                        .With(Job.RyuJitX64)
-                        .With(Job.Core)
-                        .With(ExecutionValidator.FailOnError));
+                    DefaultConfig.Instance
+                        .AddJob(Job.Default.WithRuntime(ClrRuntime.Net461))
+                        .AddJob(Job.Default.WithRuntime(CoreRuntime.Core21))
+                        .AddValidator(ExecutionValidator.FailOnError));
         }
     }
 }

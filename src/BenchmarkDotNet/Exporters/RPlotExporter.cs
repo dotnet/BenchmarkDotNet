@@ -16,6 +16,7 @@ namespace BenchmarkDotNet.Exporters
         public static readonly IExporter Default = new RPlotExporter();
         public string Name => nameof(RPlotExporter);
 
+        private const string ImageExtension = ".png";
         private static readonly object BuildScriptLock = new object();
 
         public IEnumerable<IExporter> Dependencies
@@ -28,11 +29,9 @@ namespace BenchmarkDotNet.Exporters
         {
             const string scriptFileName = "BuildPlots.R";
             const string logFileName = "BuildPlots.log";
-            yield return scriptFileName;
+            yield return Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
 
-            string fileNamePrefix = Path.Combine(summary.ResultsDirectoryPath, summary.Title);
             string csvFullPath = CsvMeasurementsExporter.Default.GetArtifactFullName(summary);
-            
             string scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
             string logFullPath = Path.Combine(summary.ResultsDirectoryPath, logFileName);
             string script = ResourceHelper.
@@ -42,26 +41,9 @@ namespace BenchmarkDotNet.Exporters
             lock (BuildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
-            string rscriptExecutable = RuntimeInformation.IsWindows() ? "Rscript.exe" : "Rscript";
-            string rscriptPath;
-            string rHome = Environment.GetEnvironmentVariable("R_HOME");
-            if (rHome != null)
+            if (!TryFindRScript(consoleLogger, out string rscriptPath))
             {
-                rscriptPath = Path.Combine(rHome, "bin", rscriptExecutable);
-                if (!File.Exists(rscriptPath))
-                {
-                    consoleLogger.WriteLineError($"RPlotExporter requires R_HOME to point to the directory containing bin{Path.DirectorySeparatorChar}{rscriptExecutable} (currently points to {rHome})");
-                    yield break;
-                }
-            }
-            else // No R_HOME, try the path
-            {
-                rscriptPath = FindInPath(rscriptExecutable);
-                if (rscriptPath == null)
-                {
-                    consoleLogger.WriteLineError($"RPlotExporter couldn't find {rscriptExecutable} in your PATH and no R_HOME environment variable is defined");
-                    yield break;
-                }
+                yield break;
             }
 
             var start = new ProcessStartInfo
@@ -74,16 +56,23 @@ namespace BenchmarkDotNet.Exporters
                 WorkingDirectory = summary.ResultsDirectoryPath,
                 Arguments = $"\"{scriptFullPath}\" \"{csvFullPath}\""
             };
-            using (var process = Process.Start(start))
+            using (var process = new Process {StartInfo = start})
+            using (AsyncProcessOutputReader reader = new AsyncProcessOutputReader(process))
             {
-                string output = process?.StandardOutput.ReadToEnd() ?? "";
-                string error = process?.StandardError.ReadToEnd() ?? "";
-                File.WriteAllText(logFullPath, output + Environment.NewLine + error);
-                process?.WaitForExit();
+                // When large R scripts are generated then ran, ReadToEnd()
+                // causes the stdout and stderr buffers to become full,
+                // which causes R to hang. To avoid this, use
+                // AsyncProcessOutputReader to cache the log contents
+                // then write to disk rather than Process.Standard*.ReadToEnd().
+                process.Start();
+                reader.BeginRead();
+                process.WaitForExit();
+                reader.StopRead();
+                File.WriteAllLines(logFullPath, reader.GetOutputLines());
+                File.AppendAllLines(logFullPath, reader.GetErrorLines());
             }
 
-            yield return fileNamePrefix + "-boxplot.png";
-            yield return fileNamePrefix + "-barplot.png";
+            yield return Path.Combine(summary.ResultsDirectoryPath, $"*{ImageExtension}");
         }
 
         public void ExportToLog(Summary summary, ILogger logger)
@@ -91,12 +80,39 @@ namespace BenchmarkDotNet.Exporters
             throw new NotSupportedException();
         }
 
+        private static bool TryFindRScript(ILogger consoleLogger, out string rscriptPath)
+        {
+            string rscriptExecutable = RuntimeInformation.IsWindows() ? "Rscript.exe" : "Rscript";
+            rscriptPath = null;
+            string rHome = Environment.GetEnvironmentVariable("R_HOME");
+            if (rHome != null)
+            {
+                rscriptPath = Path.Combine(rHome, "bin", rscriptExecutable);
+                if (File.Exists(rscriptPath))
+                {
+                    return true;
+                }
+
+                consoleLogger.WriteLineError($"RPlotExporter requires R_HOME to point to the parent directory of the existing '{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}{rscriptExecutable} (currently points to {rHome})");
+            }
+
+            // No R_HOME, or R_HOME points to a wrong folder, try the path
+            rscriptPath = FindInPath(rscriptExecutable);
+            if (rscriptPath == null)
+            {
+                consoleLogger.WriteLineError($"RPlotExporter couldn't find {rscriptExecutable} in your PATH and no R_HOME environment variable is defined");
+                return false;
+            }
+
+            return true;
+        }
+
         private static string FindInPath(string fileName)
         {
             string path = Environment.GetEnvironmentVariable("PATH");
             if (path == null)
                 return null;
-            
+
             var dirs = path.Split(Path.PathSeparator);
             foreach (string dir in dirs)
             {

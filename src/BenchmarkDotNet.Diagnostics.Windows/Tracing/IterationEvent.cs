@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
     public sealed class IterationEvent : TraceEvent
     {
         public long TotalOperations => GetInt64At(0);
-        
+
         private event Action<IterationEvent> target;
 
         internal IterationEvent(Action<IterationEvent> target, int eventID, int task, string taskName, Guid taskGuid, int opcode, string opcodeName, Guid providerGuid, string providerName)
@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             Prefix(sb);
             XmlAttrib(sb, nameof(TotalOperations), TotalOperations);
             sb.Append("/>");
-            
+
             return sb;
         }
 

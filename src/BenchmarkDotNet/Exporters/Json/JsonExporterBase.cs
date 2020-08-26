@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -39,14 +38,13 @@ namespace BenchmarkDotNet.Exporters.Json
                 summary.HostEnvironmentInfo.HasAttachedDebugger,
                 summary.HostEnvironmentInfo.HasRyuJit,
                 summary.HostEnvironmentInfo.Configuration,
-                summary.HostEnvironmentInfo.JitModules,
                 DotNetCliVersion = summary.HostEnvironmentInfo.DotNetSdkVersion.Value,
                 summary.HostEnvironmentInfo.ChronometerFrequency,
                 HardwareTimerKind = summary.HostEnvironmentInfo.HardwareTimerKind.ToString()
             };
 
-            // If we just ask SimpleJson to serialise the entire "summary" object it throws several errors.
-            // So we are more specific in what we serialise (plus some fields/properties aren't relevant)
+            // If we just ask SimpleJson to serialize the entire "summary" object it throws several errors.
+            // So we are more specific in what we serialize (plus some fields/properties aren't relevant)
 
             var benchmarks = summary.Reports.Select(report =>
             {
@@ -65,11 +63,11 @@ namespace BenchmarkDotNet.Exporters.Json
                 };
 
                 // We show MemoryDiagnoser's results only if it is being used
-                if(report.BenchmarkCase.Config.HasMemoryDiagnoser())
+                if (report.BenchmarkCase.Config.HasMemoryDiagnoser())
                 {
                     data.Add("Memory", report.GcStats);
                 }
-                
+
                 if (ExcludeMeasurements == false)
                 {
                     // We construct Measurements manually, so that we can have the IterationMode enum as text, rather than an integer

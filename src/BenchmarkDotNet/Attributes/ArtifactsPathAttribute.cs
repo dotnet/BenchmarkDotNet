@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Attributes
 {
     [PublicAPI]
+    [AttributeUsage(AttributeTargets.Class)]
     public class ArtifactsPathAttribute : Attribute, IConfigSource
     {
         public string Value { get; }
@@ -17,4 +18,3 @@ namespace BenchmarkDotNet.Attributes
         }
     }
 }
-

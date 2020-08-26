@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Reports
             }
 
             // Ensure we have all required data for styling
-            style = style ?? SummaryStyle.Default;
+            style = style ?? summary.Style ?? SummaryStyle.Default;
             if (style.TimeUnit == null)
             {
                 style = style.WithTimeUnit(TimeUnit.GetBestTimeUnit(summary.Reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean)

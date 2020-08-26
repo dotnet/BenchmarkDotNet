@@ -15,6 +15,6 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             {
                 return reader.ReadToEnd();
             }
-        }        
+        }
     }
 }

@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Attributes
 {
     [PublicAPI]
+    [AttributeUsage(AttributeTargets.Class)]
     public class GroupBenchmarksByAttribute: Attribute, IConfigSource
     {
         public IConfig Config { get; }
@@ -14,10 +15,10 @@ namespace BenchmarkDotNet.Attributes
         {
             Config = ManualConfig.CreateEmpty();
         }
-        
+
         public GroupBenchmarksByAttribute(params BenchmarkLogicalGroupRule[] rules)
         {
-            Config = ManualConfig.CreateEmpty().With(rules);
+            Config = ManualConfig.CreateEmpty().AddLogicalGroupRules(rules);
         }
     }
 }

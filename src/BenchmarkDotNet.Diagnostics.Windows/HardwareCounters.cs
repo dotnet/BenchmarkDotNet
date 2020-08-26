@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.Tracing.Session;
 
@@ -29,7 +28,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 { HardwareCounter.BranchInstructionRetired, "BranchInstructionRetired" },
                 { HardwareCounter.BranchMispredictsRetired, "BranchMispredictsRetired" }
             };
-        
+
         public static IEnumerable<ValidationError> Validate(ValidationParameters validationParameters, bool mandatory)
         {
             if (!RuntimeInformation.IsWindows())
@@ -37,7 +36,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 yield return new ValidationError(true, "Hardware Counters and EtwProfiler are supported only on Windows");
                 yield break;
             }
-            
+
             if (!validationParameters.Config.GetHardwareCounters().Any() && mandatory)
             {
                 yield return new ValidationError(true, "No Hardware Counters defined, probably a bug");
@@ -60,10 +59,9 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             foreach (var benchmark in validationParameters.Benchmarks)
             {
-                if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic)
-                    && benchmark.Job.Infrastructure.Toolchain is InProcessToolchain)
+                if (benchmark.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is InProcessEmitToolchain)
                 {
-                    yield return new ValidationError(true, "Hardware Counters are not supported for InProcessToolchain.", benchmark);
+                    yield return new ValidationError(true, "Hardware Counters and EtwProfiler are not supported for InProcessToolchain.", benchmark);
                 }
             }
         }

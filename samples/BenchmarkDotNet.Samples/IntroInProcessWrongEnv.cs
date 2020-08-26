@@ -6,6 +6,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -22,13 +23,13 @@ namespace BenchmarkDotNet.Samples
                     ? Platform.X64
                     : Platform.X86;
 
-                Add(Job.MediumRun
+                AddJob(Job.MediumRun
                     .WithLaunchCount(1)
-                    .With(wrongPlatform)
-                    .With(InProcessToolchain.Instance)
+                    .WithPlatform(wrongPlatform)
+                    .WithToolchain(InProcessEmitToolchain.Instance)
                     .WithId("InProcess"));
 
-                Add(InProcessValidator.DontFailOnError);
+                AddValidator(InProcessValidator.DontFailOnError);
             }
         }
 

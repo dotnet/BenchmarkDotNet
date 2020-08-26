@@ -1,12 +1,12 @@
 using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Mathematics;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.Samples
 {
     // Don't remove outliers
-    [Outliers(OutlierMode.None)]
+    [Outliers(OutlierMode.DontRemove)]
     // Skip jitting, pilot, warmup; measure 10 iterations
     [SimpleJob(RunStrategy.Monitoring, targetCount: 10, invocationCount: 1)]
     public class IntroRatioSD

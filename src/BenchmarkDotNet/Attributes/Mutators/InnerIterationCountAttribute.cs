@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Attributes
     [PublicAPI]
     public class InnerIterationCountAttribute : JobMutatorConfigBaseAttribute
     {
-        public InnerIterationCountAttribute(int invocationCount) 
+        public InnerIterationCountAttribute(int invocationCount)
             : base(Job.Default
                 .WithInvocationCount(invocationCount)
                 .WithUnrollFactor(1)) // it's for xunit-performance porting purpose, where the idea of unroll factor did not exist

@@ -8,10 +8,11 @@ using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Exporters
 {
-    internal static class FullNameProvider 
+    public static class FullNameProvider
     {
         private static readonly IReadOnlyDictionary<Type, string> Aliases = new Dictionary<Type, string>
         {
@@ -44,11 +45,11 @@ namespace BenchmarkDotNet.Exporters
             { typeof(bool?), "bool?" },
             { typeof(char?), "char?" }
         };
-        
-        internal static string GetBenchmarkName(BenchmarkCase benchmarkCase)
+
+        [PublicAPI("used by the dotnet/performance repository")]
+        public static string GetBenchmarkName(BenchmarkCase benchmarkCase)
         {
             var type = benchmarkCase.Descriptor.Type;
-            var method = benchmarkCase.Descriptor.WorkloadMethod;
 
             // we can't just use type.FullName because we need sth different for generics (it reports SimpleGeneric`1[[System.Int32, mscorlib, Version=4.0.0.0)
             var name = new StringBuilder();
@@ -115,16 +116,16 @@ namespace BenchmarkDotNet.Exporters
                 parametersBuilder.Append(methodArguments[i].Name).Append(':').Append(' ');
                 parametersBuilder.Append(GetArgument(benchmarkParameters.GetArgument(methodArguments[i].Name).Value, methodArguments[i].ParameterType));
             }
-            
+
             for (int i = 0; i < benchmarkParams.Length; i++)
             {
                 var parameter = benchmarkParams[i];
-                
+
                 if (methodArguments.Length > 0 || i > 0)
                     parametersBuilder.Append(", ");
-                
+
                 parametersBuilder.Append(parameter.Name).Append(':').Append(' ');
-                parametersBuilder.Append(GetArgument(parameter.Value, parameter.Value?.GetType()));
+                parametersBuilder.Append(GetArgument(parameter.Value, parameter.Definition.ParameterType));
             }
 
             return parametersBuilder.Append(')').ToString();
@@ -193,7 +194,7 @@ namespace BenchmarkDotNet.Exporters
 
             if (type.IsNullable())
                 return $"{GetTypeArgumentName(Nullable.GetUnderlyingType(type))}?";
-            
+
             if (!string.IsNullOrEmpty(type.Namespace))
                 return $"{type.Namespace}.{GetTypeName(type)}";
 

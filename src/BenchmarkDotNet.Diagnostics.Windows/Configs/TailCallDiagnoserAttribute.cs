@@ -3,6 +3,7 @@ using System;
 
 namespace BenchmarkDotNet.Diagnostics.Windows.Configs
 {
+    [AttributeUsage(AttributeTargets.Class)]
     public class TailCallDiagnoserAttribute : Attribute, IConfigSource
     {
         public IConfig Config { get; }
@@ -11,7 +12,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Configs
         /// <param name="filterByNamespace">only the methods from declaring type's namespace. Set to false if you want to see all Jit tail events. True by default.</param>
         public TailCallDiagnoserAttribute(bool logFailuresOnly = true, bool filterByNamespace = true)
         {
-            Config = ManualConfig.CreateEmpty().With(new TailCallDiagnoser(logFailuresOnly, filterByNamespace));
+            Config = ManualConfig.CreateEmpty().AddDiagnoser(new TailCallDiagnoser(logFailuresOnly, filterByNamespace));
         }
     }
 }

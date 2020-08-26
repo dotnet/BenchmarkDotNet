@@ -18,8 +18,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void UserCanSpecifyEnvironmentVariables()
         {
-            var variables = new [] { new EnvironmentVariable(Key, Value) };
-            var jobWithCustomConfiguration = JobExtensions.With(Job.Dry, variables);
+            var variables = new[] { new EnvironmentVariable(Key, Value) };
+            var jobWithCustomConfiguration = Job.Dry.WithEnvironmentVariables(variables);
             var config = CreateSimpleConfig(job: jobWithCustomConfiguration);
 
             CanExecute<WithEnvironmentVariables>(config);
@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]
             public void Benchmark()
             {
-                if(Environment.GetEnvironmentVariable(Key) != Value)
+                if (Environment.GetEnvironmentVariable(Key) != Value)
                     throw new InvalidOperationException("The env var was not set");
             }
         }

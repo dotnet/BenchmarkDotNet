@@ -1,8 +1,8 @@
 ﻿using System;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Portability.Cpu;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Tests.Builders
 {
@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Tests.Builders
         public MockHostEnvironmentInfo(
             string architecture, string benchmarkDotNetVersion, Frequency chronometerFrequency, string configuration, string dotNetSdkVersion,
             HardwareTimerKind hardwareTimerKind, bool hasAttachedDebugger, bool hasRyuJit, bool isConcurrentGC, bool isServerGC,
-            string jitInfo, string jitModules, string osVersion, CpuInfo cpuInfo, 
+            string jitInfo, string jitModules, string osVersion, CpuInfo cpuInfo,
             string runtimeVersion, VirtualMachineHypervisor virtualMachineHypervisor)
         {
             Architecture = architecture;
@@ -78,7 +78,6 @@ namespace BenchmarkDotNet.Tests.Builders
             IsConcurrentGC = isConcurrentGC;
             IsServerGC = isServerGC;
             JitInfo = jitInfo;
-            JitModules = jitModules;
             OsVersion = new Lazy<string>(() => osVersion);
             CpuInfo = new Lazy<CpuInfo>(() => cpuInfo);
             RuntimeVersion = runtimeVersion;
