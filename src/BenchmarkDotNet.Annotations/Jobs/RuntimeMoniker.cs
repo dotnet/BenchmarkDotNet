@@ -1,3 +1,5 @@
+using System;
+
 namespace BenchmarkDotNet.Jobs
 {
     public enum RuntimeMoniker
@@ -75,7 +77,18 @@ namespace BenchmarkDotNet.Jobs
         /// <summary>
         /// .NET Core 5.0 aka ".NET 5"
         /// </summary>
+        [Obsolete("Please switch to the 'RuntimeMoniker.Net50'")]
         NetCoreApp50,
+
+        /// <summary>
+        /// .NET 5.0
+        /// </summary>
+        Net50, // it's after NetCoreApp50 in the enum definition because the value of enumeration is used for framework version comparison using > < operators
+
+        /// <summary>
+        /// .NET 6.0
+        /// </summary>
+        Net60, // it's after NetCoreApp50 and Net50 in the enum definition because the value of enumeration is used for framework version comparison using > < operators
 
         /// <summary>
         /// CoreRT compiled as netcoreapp2.0
@@ -103,9 +116,14 @@ namespace BenchmarkDotNet.Jobs
         CoreRt31,
 
         /// <summary>
-        /// CoreRT compiled as netcoreapp5.0
+        /// CoreRT compiled as net5.0
         /// </summary>
         CoreRt50,
+
+        /// <summary>
+        /// CoreRT compiled as net6.0
+        /// </summary>
+        CoreRt60,
 
         /// <summary>
         /// WebAssembly

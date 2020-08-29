@@ -32,8 +32,13 @@ namespace BenchmarkDotNet.Extensions
                     return CoreRuntime.Core30;
                 case RuntimeMoniker.NetCoreApp31:
                     return CoreRuntime.Core31;
+                case RuntimeMoniker.Net50:
+#pragma warning disable CS0618 // Type or member is obsolete
                 case RuntimeMoniker.NetCoreApp50:
+#pragma warning restore CS0618 // Type or member is obsolete
                     return CoreRuntime.Core50;
+                case RuntimeMoniker.Net60:
+                    return CoreRuntime.Core60;
                 case RuntimeMoniker.Mono:
                     return MonoRuntime.Default;
                 case RuntimeMoniker.CoreRt20:
@@ -48,6 +53,8 @@ namespace BenchmarkDotNet.Extensions
                     return CoreRtRuntime.CoreRt31;
                 case RuntimeMoniker.CoreRt50:
                     return CoreRtRuntime.CoreRt50;
+                case RuntimeMoniker.CoreRt60:
+                    return CoreRtRuntime.CoreRt60;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "Runtime Moniker not supported");
             }
