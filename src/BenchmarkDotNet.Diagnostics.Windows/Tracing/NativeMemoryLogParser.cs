@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Microsoft.Diagnostics.Tracing.Etlx;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
+using Microsoft.Diagnostics.Tracing.Stacks;
 using Address = System.UInt64;
 
 namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
@@ -23,11 +26,19 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
         private readonly ILogger logger;
 
-        public NativeMemoryLogParser(string etlFilePath, BenchmarkCase benchmarkCase, ILogger logger)
+        private readonly string moduleName;
+
+        private readonly string functionName;
+
+        public NativeMemoryLogParser(string etlFilePath, BenchmarkCase benchmarkCase, ILogger logger,
+            string programName)
         {
             this.etlFilePath = etlFilePath;
             this.benchmarkCase = benchmarkCase;
             this.logger = logger;
+
+            moduleName = programName;
+            functionName = nameof(EngineParameters.WorkloadActionUnroll);
         }
 
         //Code is inspired by https://github.com/Microsoft/perfview/blob/master/src/PerfView/PerfViewData.cs#L5719-L5944
@@ -35,6 +46,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
         {
             using (var traceLog = new TraceLog(TraceLog.CreateFromEventTraceLogFile(etlFilePath)))
             {
+                var stackSource = new MutableTraceEventStackSource(traceLog);
                 var eventSource = traceLog.Events.GetSource();
 
                 var bdnEventsParser = new EngineEventLogParser(eventSource);
@@ -77,6 +89,14 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                         return;
                     }
 
+                    var call = data.CallStackIndex();
+                    var frameIndex = stackSource.GetCallStack(call, data);
+
+                    if (!IsCallStackIn(frameIndex))
+                    {
+                        return;
+                    }
+
                     var allocs = lastHeapAllocs;
                     if (data.HeapHandle != lastHeapHandle)
                     {
@@ -91,7 +111,27 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                         nativeLeakSize += data.AllocSize;
                         totalAllocation += data.AllocSize;
                     }
+
+                    bool IsCallStackIn(StackSourceCallStackIndex index)
+                    {
+                        while (index != StackSourceCallStackIndex.Invalid)
+                        {
+                            var frame = stackSource.GetFrameIndex(index);
+                            var name = stackSource.GetFrameName(frame, false);
+
+                            if (name.StartsWith(moduleName, StringComparison.Ordinal) &&
+                                name.IndexOf(functionName, StringComparison.Ordinal) > 0)
+                            {
+                                return true;
+                            }
+
+                            index = stackSource.GetCallerIndex(index);
+                        }
+
+                        return false;
+                    }
                 };
+
                 heapParser.HeapTraceFree += delegate(HeapFreeTraceData data)
                 {
                     if (!start)
@@ -112,6 +152,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                         allocs.Remove(data.FreeAddress);
                     }
                 };
+
                 heapParser.HeapTraceReAlloc += delegate(HeapReallocTraceData data)
                 {
                     if (!start)
@@ -132,22 +173,23 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                         allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
                     }
 
-                    // This is a clone of the Free code
                     if (allocs.TryGetValue(data.OldAllocAddress, out long alloc))
                     {
+                        // Free
                         nativeLeakSize -= alloc;
 
                         allocs.Remove(data.OldAllocAddress);
-                    }
 
-                    // This is a clone of the Alloc code (sigh don't clone code)
-                    allocs[data.NewAllocAddress] = data.NewAllocSize;
+                        // Alloc
+                        allocs[data.NewAllocAddress] = data.NewAllocSize;
 
-                    checked
-                    {
-                        nativeLeakSize += data.NewAllocSize;
+                        checked
+                        {
+                            nativeLeakSize += data.NewAllocSize;
+                        }
                     }
                 };
+
                 heapParser.HeapTraceDestroy += delegate(HeapTraceData data)
                 {
                     if (!start)

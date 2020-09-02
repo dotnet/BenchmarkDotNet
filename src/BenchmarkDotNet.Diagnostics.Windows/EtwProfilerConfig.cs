@@ -62,6 +62,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                              | ClrTraceEventParser.Keywords.GC
                              | ClrTraceEventParser.Keywords.Jit
                              | ClrTraceEventParser.Keywords.JitTracing // for the inlining events
+                             | ClrTraceEventParser.Keywords.JittedMethodILToNativeMap // Fix NativeMemoryProfiler for .Net Framework
                              | ClrTraceEventParser.Keywords.Loader
                              | ClrTraceEventParser.Keywords.NGen),
                     new TraceEventProviderOptions { StacksEnabled = false }), // stacks are too expensive for our purposes

@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
         }
 
-        protected override string FileExtension => ".userheap.etl";
+        protected override string FileExtension => "userheap.etl";
 
         internal override Session EnableProviders()
         {
@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
         }
 
-        protected override string FileExtension => ".etl";
+        protected override string FileExtension => "etl";
 
         internal override Session EnableProviders()
         {
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
         }
 
-        protected override string FileExtension => ".kernel.etl";
+        protected override string FileExtension => "kernel.etl";
 
         internal override Session EnableProviders()
         {
@@ -71,6 +71,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             if (Details.Config.GetHardwareCounters().Any())
                 keywords |= KernelTraceEventParser.Keywords.PMCProfile; // Precise Machine Counters
+
+            TraceEventSession.StackCompression = true;
 
             try
             {
