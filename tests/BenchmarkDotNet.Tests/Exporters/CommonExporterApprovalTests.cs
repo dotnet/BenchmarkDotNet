@@ -9,9 +9,11 @@ using ApprovalTests.Reporters;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Mocks;
 using JetBrains.Annotations;
 using Xunit;
@@ -50,6 +52,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             var cultureInfo = CultureInfos[cultureInfoName];
             NamerFactory.AdditionalInformation = $"{GetName(cultureInfo)}";
             Thread.CurrentThread.CurrentCulture = cultureInfo;
+            RuntimeInformationWrapperProvider.RuntimeInformationWrapper = MockFactory.CreateRuntimeInformationWrapper();
 
             var logger = new AccumulationLogger();
 
@@ -79,7 +82,8 @@ namespace BenchmarkDotNet.Tests.Exporters
 
         private static IEnumerable<IExporter> GetExporters()
         {
-            //todo add CsvExporter and CsvMeasurementsExporter (need to mock RuntimeInformation)
+            yield return CsvExporter.Default;
+            yield return CsvMeasurementsExporter.Default;
             yield return AsciiDocExporter.Default;
             yield return HtmlExporter.Default;
             yield return JsonExporter.Brief;

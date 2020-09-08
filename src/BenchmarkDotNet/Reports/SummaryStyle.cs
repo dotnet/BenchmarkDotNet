@@ -52,6 +52,12 @@ namespace BenchmarkDotNet.Reports
         public SummaryStyle WithCultureInfo(CultureInfo cultureInfo)
             => new SummaryStyle(cultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth);
 
+        public SummaryStyle WithUnitsInHeader(bool printUnitsInHeader)
+            => new SummaryStyle(CultureInfo, printUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth);
+
+        public SummaryStyle WithUnitsInContent(bool printUnitsInContent)
+            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, printUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth);
+
         public bool Equals(SummaryStyle other)
         {
             if (ReferenceEquals(null, other))

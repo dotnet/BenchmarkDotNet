@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Exporters.Csv
         public override void ExportToLog(Summary summary, ILogger logger)
         {
             string realSeparator = separator.ToRealSeparator();
-            foreach (var line in summary.GetTable(style.WithCultureInfo(summary.GetCultureInfo())).FullContentWithHeader)
+            foreach (var line in summary.GetTable(style.WithCultureInfo(summary.GetCultureInfo()).WithUnitsInContent(false).WithUnitsInHeader(true)).FullContentWithHeader)
             {
                 for (int i = 0; i < line.Length;)
                 {
