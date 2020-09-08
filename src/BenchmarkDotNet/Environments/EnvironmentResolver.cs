@@ -11,14 +11,14 @@ namespace BenchmarkDotNet.Environments
     {
         public const int DefaultUnrollFactorForThroughput = 16;
 
-        public static IResolver Instance = new CompositeResolver(new EnvironmentResolver(RuntimeInformationWrapperProvider.RuntimeInformationWrapper), GcResolver.Instance);
+        public static IResolver Instance = new CompositeResolver(new EnvironmentResolver(RuntimeInfoProvider.RuntimeInfoWrapper), GcResolver.Instance);
 
-        private EnvironmentResolver(IRuntimeInformationWrapper runtimeInformationWrapper)
+        private EnvironmentResolver(IRuntimeInfoWrapper runtimeInfoWrapper)
         {
-            Register(EnvironmentMode.PlatformCharacteristic, runtimeInformationWrapper.GetCurrentPlatform);
-            Register(EnvironmentMode.RuntimeCharacteristic, runtimeInformationWrapper.GetCurrentRuntime);
-            Register(EnvironmentMode.JitCharacteristic, runtimeInformationWrapper.GetCurrentJit);
-            Register(EnvironmentMode.AffinityCharacteristic, runtimeInformationWrapper.GetCurrentAffinity);
+            Register(EnvironmentMode.PlatformCharacteristic, runtimeInfoWrapper.GetCurrentPlatform);
+            Register(EnvironmentMode.RuntimeCharacteristic, runtimeInfoWrapper.GetCurrentRuntime);
+            Register(EnvironmentMode.JitCharacteristic, runtimeInfoWrapper.GetCurrentJit);
+            Register(EnvironmentMode.AffinityCharacteristic, runtimeInfoWrapper.GetCurrentAffinity);
             Register(EnvironmentMode.EnvironmentVariablesCharacteristic, Array.Empty<EnvironmentVariable>);
             Register(EnvironmentMode.PowerPlanModeCharacteristic, () => PowerManagementApplier.Map(PowerPlan.HighPerformance));
 

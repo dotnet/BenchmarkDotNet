@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                 TestCultureInfo.Instance,
                 ImmutableArray<ValidationError>.Empty);
 
-        public static IRuntimeInformationWrapper CreateRuntimeInformationWrapper() => new MockRuntimeInformationWrapper();
+        public static IRuntimeInfoWrapper CreateRuntimeInformationWrapper() => new MockRuntimeInfoWrapper();
 
         private static ImmutableArray<BenchmarkReport> CreateReports(IConfig config)
             => CreateBenchmarks<MockBenchmarkClass>(config).Select(CreateSimpleReport).ToImmutableArray();
@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default, metrics);
         }
 
-        class MockRuntimeInformationWrapper : IRuntimeInformationWrapper
+        private class MockRuntimeInfoWrapper : IRuntimeInfoWrapper
         {
             public Runtime GetCurrentRuntime() => ClrRuntime.Net47;
 

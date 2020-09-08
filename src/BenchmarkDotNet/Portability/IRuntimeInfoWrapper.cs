@@ -3,7 +3,7 @@ using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Portability
 {
-    public interface IRuntimeInformationWrapper
+    public interface IRuntimeInfoWrapper
     {
         Runtime GetCurrentRuntime();
         Platform GetCurrentPlatform();

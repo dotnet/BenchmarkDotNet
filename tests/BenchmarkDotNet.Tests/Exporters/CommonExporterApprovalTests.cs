@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             var cultureInfo = CultureInfos[cultureInfoName];
             NamerFactory.AdditionalInformation = $"{GetName(cultureInfo)}";
             Thread.CurrentThread.CurrentCulture = cultureInfo;
-            RuntimeInformationWrapperProvider.RuntimeInformationWrapper = MockFactory.CreateRuntimeInformationWrapper();
+            RuntimeInfoProvider.RuntimeInfoWrapper = MockFactory.CreateRuntimeInformationWrapper();
 
             var logger = new AccumulationLogger();
 

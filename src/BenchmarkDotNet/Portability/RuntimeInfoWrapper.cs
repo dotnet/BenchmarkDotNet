@@ -5,7 +5,7 @@ using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Portability
 {
-    public class RuntimeInformationWrapper : IRuntimeInformationWrapper
+    public class RuntimeInfoWrapper : IRuntimeInfoWrapper
     {
         public Runtime GetCurrentRuntime()
         {
