@@ -175,7 +175,7 @@ namespace BenchmarkDotNet.Portability
                 if (CoreRuntime.TryGetVersion(out var version) && version >= new Version(5, 0))
                 {
                     // after the merge of dotnet/corefx and dotnet/coreclr into dotnet/runtime the version should always be the same
-                    Debug.Assert(coreclrAssemblyInfo.FileVersion == corefxAssemblyInfo.FileVersion); 
+                    Debug.Assert(coreclrAssemblyInfo.FileVersion == corefxAssemblyInfo.FileVersion);
 
                     return $".NET {version} ({coreclrAssemblyInfo.FileVersion})";
                 }

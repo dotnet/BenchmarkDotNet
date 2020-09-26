@@ -5,6 +5,7 @@ using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -41,208 +42,225 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             functionName = nameof(EngineParameters.WorkloadActionUnroll);
         }
 
-        //Code is inspired by https://github.com/Microsoft/perfview/blob/master/src/PerfView/PerfViewData.cs#L5719-L5944
         public IEnumerable<Metric> Parse()
         {
-            using (var traceLog = new TraceLog(TraceLog.CreateFromEventTraceLogFile(etlFilePath)))
+            var etlxFilePath = TraceLog.CreateFromEventTraceLogFile(etlFilePath);
+
+            try
             {
-                var stackSource = new MutableTraceEventStackSource(traceLog);
-                var eventSource = traceLog.Events.GetSource();
-
-                var bdnEventsParser = new EngineEventLogParser(eventSource);
-
-                var start = false;
-                var isFirstActualStartEnd = false;
-
-                long totalOperation = 0;
-                long countOfAllocatedObject = 0;
-
-                bdnEventsParser.WorkloadActualStart += data =>
+                using (var traceLog = new TraceLog(etlxFilePath))
                 {
-                    if (!isFirstActualStartEnd)
-                    {
-                        start = true;
-                    }
+                    return Parse(traceLog);
+                }
+            }
+            finally
+            {
+                etlxFilePath.DeleteFileIfExists();
+            }
+        }
 
-                    totalOperation = data.TotalOperations;
-                };
-                bdnEventsParser.WorkloadActualStop += data =>
+        //Code is inspired by https://github.com/Microsoft/perfview/blob/master/src/PerfView/PerfViewData.cs#L5719-L5944
+        private IEnumerable<Metric> Parse(TraceLog traceLog)
+        {
+            var stackSource = new MutableTraceEventStackSource(traceLog);
+            var eventSource = traceLog.Events.GetSource();
+
+            var bdnEventsParser = new EngineEventLogParser(eventSource);
+
+            var start = false;
+            var isFirstActualStartEnd = false;
+
+            long totalOperation = 0;
+            long countOfAllocatedObject = 0;
+
+            bdnEventsParser.WorkloadActualStart += data =>
+            {
+                if (!isFirstActualStartEnd)
                 {
-                    start = false;
-                    isFirstActualStartEnd = true;
-                };
+                    start = true;
+                }
 
-                var heapParser = new HeapTraceProviderTraceEventParser(eventSource);
-                // We index by heap address and then within the heap we remember the allocation stack
-                var heaps = new Dictionary<Address, Dictionary<Address, long>>();
-                Dictionary<Address, long> lastHeapAllocs = null;
+                totalOperation = data.TotalOperations;
+            };
+            bdnEventsParser.WorkloadActualStop += data =>
+            {
+                start = false;
+                isFirstActualStartEnd = true;
+            };
 
-                Address lastHeapHandle = 0;
+            var heapParser = new HeapTraceProviderTraceEventParser(eventSource);
+            // We index by heap address and then within the heap we remember the allocation stack
+            var heaps = new Dictionary<Address, Dictionary<Address, long>>();
+            Dictionary<Address, long> lastHeapAllocs = null;
 
-                long nativeLeakSize = 0;
-                long totalAllocation = 0;
+            Address lastHeapHandle = 0;
 
-                heapParser.HeapTraceAlloc += delegate(HeapAllocTraceData data)
+            long nativeLeakSize = 0;
+            long totalAllocation = 0;
+
+            heapParser.HeapTraceAlloc += delegate(HeapAllocTraceData data)
+            {
+                if (!start)
                 {
-                    if (!start)
+                    return;
+                }
+
+                var call = data.CallStackIndex();
+                var frameIndex = stackSource.GetCallStack(call, data);
+
+                if (!IsCallStackIn(frameIndex))
+                {
+                    return;
+                }
+
+                var allocs = lastHeapAllocs;
+                if (data.HeapHandle != lastHeapHandle)
+                {
+                    allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
+                }
+
+                allocs[data.AllocAddress] = data.AllocSize;
+
+                checked
+                {
+                    countOfAllocatedObject++;
+                    nativeLeakSize += data.AllocSize;
+                    totalAllocation += data.AllocSize;
+                }
+
+                bool IsCallStackIn(StackSourceCallStackIndex index)
+                {
+                    while (index != StackSourceCallStackIndex.Invalid)
                     {
-                        return;
+                        var frame = stackSource.GetFrameIndex(index);
+                        var name = stackSource.GetFrameName(frame, false);
+
+                        if (name.StartsWith(moduleName, StringComparison.Ordinal) &&
+                            name.IndexOf(functionName, StringComparison.Ordinal) > 0)
+                        {
+                            return true;
+                        }
+
+                        index = stackSource.GetCallerIndex(index);
                     }
 
-                    var call = data.CallStackIndex();
-                    var frameIndex = stackSource.GetCallStack(call, data);
+                    return false;
+                }
+            };
 
-                    if (!IsCallStackIn(frameIndex))
-                    {
-                        return;
-                    }
+            heapParser.HeapTraceFree += delegate(HeapFreeTraceData data)
+            {
+                if (!start)
+                {
+                    return;
+                }
 
-                    var allocs = lastHeapAllocs;
-                    if (data.HeapHandle != lastHeapHandle)
-                    {
-                        allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
-                    }
+                var allocs = lastHeapAllocs;
+                if (data.HeapHandle != lastHeapHandle)
+                {
+                    allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
+                }
 
-                    allocs[data.AllocAddress] = data.AllocSize;
+                if (allocs.TryGetValue(data.FreeAddress, out long alloc))
+                {
+                    nativeLeakSize -= alloc;
+
+                    allocs.Remove(data.FreeAddress);
+                }
+            };
+
+            heapParser.HeapTraceReAlloc += delegate(HeapReallocTraceData data)
+            {
+                if (!start)
+                {
+                    return;
+                }
+                // Reallocs that actually move stuff will cause a Alloc and delete event
+                // so there is nothing to do for those events. But when the address is
+                // the same we need to resize.
+                if (data.OldAllocAddress != data.NewAllocAddress)
+                {
+                    return;
+                }
+
+                var allocs = lastHeapAllocs;
+                if (data.HeapHandle != lastHeapHandle)
+                {
+                    allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
+                }
+
+                if (allocs.TryGetValue(data.OldAllocAddress, out long alloc))
+                {
+                    // Free
+                    nativeLeakSize -= alloc;
+
+                    allocs.Remove(data.OldAllocAddress);
+
+                    // Alloc
+                    allocs[data.NewAllocAddress] = data.NewAllocSize;
 
                     checked
                     {
-                        countOfAllocatedObject++;
-                        nativeLeakSize += data.AllocSize;
-                        totalAllocation += data.AllocSize;
+                        nativeLeakSize += data.NewAllocSize;
                     }
+                }
+            };
 
-                    bool IsCallStackIn(StackSourceCallStackIndex index)
-                    {
-                        while (index != StackSourceCallStackIndex.Invalid)
-                        {
-                            var frame = stackSource.GetFrameIndex(index);
-                            var name = stackSource.GetFrameName(frame, false);
-
-                            if (name.StartsWith(moduleName, StringComparison.Ordinal) &&
-                                name.IndexOf(functionName, StringComparison.Ordinal) > 0)
-                            {
-                                return true;
-                            }
-
-                            index = stackSource.GetCallerIndex(index);
-                        }
-
-                        return false;
-                    }
-                };
-
-                heapParser.HeapTraceFree += delegate(HeapFreeTraceData data)
+            heapParser.HeapTraceDestroy += delegate(HeapTraceData data)
+            {
+                if (!start)
                 {
-                    if (!start)
-                    {
-                        return;
-                    }
-
-                    var allocs = lastHeapAllocs;
-                    if (data.HeapHandle != lastHeapHandle)
-                    {
-                        allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
-                    }
-
-                    if (allocs.TryGetValue(data.FreeAddress, out long alloc))
-                    {
-                        nativeLeakSize -= alloc;
-
-                        allocs.Remove(data.FreeAddress);
-                    }
-                };
-
-                heapParser.HeapTraceReAlloc += delegate(HeapReallocTraceData data)
-                {
-                    if (!start)
-                    {
-                        return;
-                    }
-                    // Reallocs that actually move stuff will cause a Alloc and delete event
-                    // so there is nothing to do for those events. But when the address is
-                    // the same we need to resize.
-                    if (data.OldAllocAddress != data.NewAllocAddress)
-                    {
-                        return;
-                    }
-
-                    var allocs = lastHeapAllocs;
-                    if (data.HeapHandle != lastHeapHandle)
-                    {
-                        allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
-                    }
-
-                    if (allocs.TryGetValue(data.OldAllocAddress, out long alloc))
-                    {
-                        // Free
-                        nativeLeakSize -= alloc;
-
-                        allocs.Remove(data.OldAllocAddress);
-
-                        // Alloc
-                        allocs[data.NewAllocAddress] = data.NewAllocSize;
-
-                        checked
-                        {
-                            nativeLeakSize += data.NewAllocSize;
-                        }
-                    }
-                };
-
-                heapParser.HeapTraceDestroy += delegate(HeapTraceData data)
-                {
-                    if (!start)
-                    {
-                        return;
-                    }
-
-                    // Heap is dieing, kill all objects in it.
-                    var allocs = lastHeapAllocs;
-                    if (data.HeapHandle != lastHeapHandle)
-                    {
-                        allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
-                    }
-
-                    foreach (var alloc in allocs.Values)
-                    {
-                        nativeLeakSize -= alloc;
-                    }
-                };
-
-                eventSource.Process();
-
-                logger.WriteLine();
-                logger.WriteLineHeader(LogSeparator);
-                logger.WriteLineInfo($"{benchmarkCase.DisplayInfo}");
-                logger.WriteLineHeader(LogSeparator);
-
-                if (totalOperation == 0)
-                {
-                    logger.WriteLine($"Something went wrong. The trace file {etlFilePath} does not contain BenchmarkDotNet engine events.");
-                    yield break;
+                    return;
                 }
 
-                var memoryAllocatedPerOperation = totalAllocation / totalOperation;
-                var memoryLeakPerOperation = nativeLeakSize / totalOperation;
-
-                logger.WriteLine($"Native memory allocated per single operation: {SizeValue.FromBytes(memoryAllocatedPerOperation).ToString(SizeUnit.B, benchmarkCase.Config.CultureInfo)}");
-                logger.WriteLine($"Count of allocated object: {countOfAllocatedObject / totalOperation}");
-
-                if (nativeLeakSize != 0)
+                // Heap is dieing, kill all objects in it.
+                var allocs = lastHeapAllocs;
+                if (data.HeapHandle != lastHeapHandle)
                 {
-                    logger.WriteLine($"Native memory leak per single operation: {SizeValue.FromBytes(memoryLeakPerOperation).ToString(SizeUnit.B, benchmarkCase.Config.CultureInfo)}");
+                    allocs = CreateHeapCache(data.HeapHandle, heaps, ref lastHeapAllocs, ref lastHeapHandle);
                 }
 
-                var heapInfoList = heaps.Select(h => new { Address = h.Key, h.Value.Count, types = h.Value.Values });
-                foreach (var item in heapInfoList.Where(p => p.Count > 0))
+                foreach (var alloc in allocs.Values)
                 {
-                    logger.WriteLine($"Count of not deallocated object: {item.Count / totalOperation}");
+                    nativeLeakSize -= alloc;
                 }
+            };
 
-                yield return new Metric(new AllocatedNativeMemoryDescriptor(), memoryAllocatedPerOperation);
-                yield return new Metric(new NativeMemoryLeakDescriptor(), memoryLeakPerOperation);
+            eventSource.Process();
+
+            logger.WriteLine();
+            logger.WriteLineHeader(LogSeparator);
+            logger.WriteLineInfo($"{benchmarkCase.DisplayInfo}");
+            logger.WriteLineHeader(LogSeparator);
+
+            if (totalOperation == 0)
+            {
+                logger.WriteLine($"Something went wrong. The trace file {etlFilePath} does not contain BenchmarkDotNet engine events.");
+                return Enumerable.Empty<Metric>();
             }
+
+            var memoryAllocatedPerOperation = totalAllocation / totalOperation;
+            var memoryLeakPerOperation = nativeLeakSize / totalOperation;
+
+            logger.WriteLine($"Native memory allocated per single operation: {SizeValue.FromBytes(memoryAllocatedPerOperation).ToString(SizeUnit.B, benchmarkCase.Config.CultureInfo)}");
+            logger.WriteLine($"Count of allocated object: {countOfAllocatedObject / totalOperation}");
+
+            if (nativeLeakSize != 0)
+            {
+                logger.WriteLine($"Native memory leak per single operation: {SizeValue.FromBytes(memoryLeakPerOperation).ToString(SizeUnit.B, benchmarkCase.Config.CultureInfo)}");
+            }
+
+            var heapInfoList = heaps.Select(h => new { Address = h.Key, h.Value.Count, types = h.Value.Values });
+            foreach (var item in heapInfoList.Where(p => p.Count > 0))
+            {
+                logger.WriteLine($"Count of not deallocated object: {item.Count / totalOperation}");
+            }
+
+            return new[]
+            {
+                new Metric(new AllocatedNativeMemoryDescriptor(), memoryAllocatedPerOperation),
+                new Metric(new NativeMemoryLeakDescriptor(), memoryLeakPerOperation)
+            };
         }
 
         private static Dictionary<Address, long> CreateHeapCache(Address heapHandle, Dictionary<Address, Dictionary<Address, long>> heaps, ref Dictionary<Address, long> lastHeapAllocs, ref Address lastHeapHandle)
