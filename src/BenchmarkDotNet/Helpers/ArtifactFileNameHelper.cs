@@ -20,6 +20,8 @@ namespace BenchmarkDotNet.Helpers
 
             int limit = PathFeatures.AreAllLongPathsAvailable() ? CommonSenseLimit : WindowsOldPathLimit;
 
+            limit -= "userheap.etl".Length; // we should consider trace file extension as part of the name
+
             if (nameNoLimit.Length <= limit)
             {
                 return nameNoLimit;
@@ -40,7 +42,7 @@ namespace BenchmarkDotNet.Helpers
             string shortTypeName = FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type, includeNamespace: false);
             string methodName = details.BenchmarkCase.Descriptor.WorkloadMethod.Name;
             string parameters = details.BenchmarkCase.HasParameters
-                ? $"-hash{Hashing.HashString(FullNameProvider.GetMethodName(details.BenchmarkCase)).ToString()}"
+                ? $"-hash{Hashing.HashString(FullNameProvider.GetMethodName(details.BenchmarkCase))}"
                 : string.Empty;
 
             string fileName = $@"{shortTypeName}.{methodName}{parameters}";
