@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
 using Microsoft.Diagnostics.Tracing.Etlx;
 using Microsoft.Diagnostics.Tracing.Parsers;
@@ -17,11 +18,20 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
         public static IEnumerable<Metric> Parse(string etlFilePath, PreciseMachineCounter[] counters)
         {
-            using (var traceLog = new TraceLog(TraceLog.CreateFromEventTraceLogFile(etlFilePath)))
-            {
-                var traceLogEventSource = traceLog.Events.GetSource();
+            var etlxFilePath = TraceLog.CreateFromEventTraceLogFile(etlFilePath);
 
-                return new TraceLogParser().Parse(traceLogEventSource, counters);
+            try
+            {
+                using (var traceLog = new TraceLog(etlxFilePath))
+                {
+                    var traceLogEventSource = traceLog.Events.GetSource();
+
+                    return new TraceLogParser().Parse(traceLogEventSource, counters);
+                }
+            }
+            finally
+            {
+                etlxFilePath.DeleteFileIfExists();
             }
         }
 
