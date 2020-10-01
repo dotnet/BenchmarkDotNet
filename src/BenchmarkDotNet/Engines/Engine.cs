@@ -183,6 +183,13 @@ namespace BenchmarkDotNet.Engines
             // it does not matter, because we have already obtained the results!
             EnableMonitoring();
 
+            if (RuntimeInformation.IsNetCore)
+            {
+                // we put the current thread to sleep so Tiered Compiler can kick in, compile it's stuff
+                // and NOT allocate anything on the background thread when we are measuring allocations
+                System.Threading.Thread.Sleep(TimeSpan.FromMilliseconds(250));
+            }
+
             IterationSetupAction(); // we run iteration setup first, so even if it allocates, it is not included in the results
 
             var initialThreadingStats = ThreadingStats.ReadInitial(); // this method might allocate
