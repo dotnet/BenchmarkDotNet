@@ -105,6 +105,16 @@ namespace BenchmarkDotNet.IntegrationTests
         public class NoAllocationsAtAll
         {
             [Benchmark] public void EmptyMethod() { }
+
+            [Benchmark] public ulong TimeConsuming()
+            {
+                var r = 1ul;
+                for (var i = 0; i < 50_000_000; i++)
+                {
+                    r /= 1;
+                }
+                return r;
+            }
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
@@ -115,6 +125,19 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 { nameof(NoAllocationsAtAll.EmptyMethod), 0 }
             });
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void TieredJitShouldNotInterfereAllocationResults(IToolchain toolchain)
+        {
+            // see https://github.com/dotnet/BenchmarkDotNet/issues/1542 for details
+
+            AssertAllocations(toolchain, typeof(NoAllocationsAtAll), new Dictionary<string, long>
+            {
+                { nameof(NoAllocationsAtAll.TimeConsuming), 0 }
+            },
+            iterationCount: 10); // 1 iteration is not enough to repro the problem
         }
 
         public class NoBoxing
@@ -255,9 +278,9 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
-        private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarksAllocationsValidators)
+        private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarksAllocationsValidators, int iterationCount = 1)
         {
-            var config = CreateConfig(toolchain);
+            var config = CreateConfig(toolchain, iterationCount);
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
 
             var summary = BenchmarkRunner.Run(benchmarks);
@@ -285,12 +308,12 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private IConfig CreateConfig(IToolchain toolchain)
+        private IConfig CreateConfig(IToolchain toolchain, int iterationCount = 1) // single iteration is enough for most of the tests
             => ManualConfig.CreateEmpty()
                 .AddJob(Job.ShortRun
                     .WithEvaluateOverhead(false) // no need to run idle for this test
                     .WithWarmupCount(0) // don't run warmup to save some time for our CI runs
-                    .WithIterationCount(1) // single iteration is enough for us
+                    .WithIterationCount(iterationCount)
                     .WithGcForce(false)
                     .WithToolchain(toolchain))
                 .AddColumnProvider(DefaultColumnProviders.Instance)
