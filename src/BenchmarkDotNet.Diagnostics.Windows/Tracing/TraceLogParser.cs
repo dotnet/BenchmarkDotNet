@@ -144,8 +144,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
                 overheadTotalPerCounter.TryGetValue(perCounter.Key, out var overhead);
 
-                double result = (perCounter.Value / (double) workloadIterations.Length - overhead / (double) overheadIterations.Length)
-                                    / totalOperationsPerIteration.Value; // result = (avg(workload) - avg(overhead))/op
+                // result = (avg(workload) - avg(overhead))/op
+                double result = perCounter.Value / (double)workloadIterations.Length;
+
+                if (overheadIterations.Length > 0) // we skip the overhead phase for long-running benchmarks
+                {
+                    result -= (overhead / (double)overheadIterations.Length);
+                }
+
+                result /= totalOperationsPerIteration.Value;
 
                 return new Metric(new PmcMetricDescriptor(pmc), result);
             });
