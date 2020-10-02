@@ -26,9 +26,12 @@ namespace BenchmarkDotNet.Tests
                 benchmarkCase: benchmarkCase,
                 new BenchmarkId(0, benchmarkCase));
 
-            var traceFilePath = ArtifactFileNameHelper.GetTraceFilePath(parameters, new System.DateTime(2020, 10, 1), "etl");
+            foreach (string fileExtension in new[] { "etl", "kernel.etl", "userheap.etl" })
+            {
+                var traceFilePath = ArtifactFileNameHelper.GetTraceFilePath(parameters, new System.DateTime(2020, 10, 1), fileExtension);
 
-            Assert.InRange(actual: traceFilePath.Length, low: 0, high: 260);
+                Assert.InRange(actual: traceFilePath.Length, low: 0, high: 260);
+            }
         }
     }
 }

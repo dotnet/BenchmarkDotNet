@@ -21,7 +21,9 @@ namespace BenchmarkDotNet.Helpers
 
             // long paths can be enabled on Windows but it does not mean that ETW is going to work fine..
             // so we always use 260 as limit on Windows
-            int limit =  RuntimeInformation.IsWindows() ? WindowsOldPathLimit : CommonSenseLimit;
+            int limit =  RuntimeInformation.IsWindows()
+                ? WindowsOldPathLimit - "userheap.etl".Length // the session files get merged, they need to have same name (without extension)
+                : CommonSenseLimit;
 
             if (nameNoLimit.Length <= limit)
             {
