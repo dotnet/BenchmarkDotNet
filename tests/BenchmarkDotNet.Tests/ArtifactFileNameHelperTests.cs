@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Tests
 
             var traceFilePath = ArtifactFileNameHelper.GetTraceFilePath(parameters, new System.DateTime(2020, 10, 1), "etl");
 
-            Assert.True(traceFilePath.Length < 260);
+            Assert.InRange(actual: traceFilePath.Length, low: 0, high: 260);
         }
     }
 }
