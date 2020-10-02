@@ -9,6 +9,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.CoreRun;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Extensions
