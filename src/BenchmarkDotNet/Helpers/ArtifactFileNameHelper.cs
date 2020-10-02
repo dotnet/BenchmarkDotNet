@@ -4,6 +4,7 @@ using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
 
@@ -18,9 +19,9 @@ namespace BenchmarkDotNet.Helpers
         {
             string nameNoLimit = GetFilePathNoLimits(details, creationTime, fileExtension);
 
-            int limit = PathFeatures.AreAllLongPathsAvailable() ? CommonSenseLimit : WindowsOldPathLimit;
-
-            limit -= "userheap.etl".Length; // we should consider trace file extension as part of the name
+            // long paths can be enabled on Windows but it does not mean that ETW is going to work fine..
+            // so we always use 260 as limit on Windows
+            int limit =  RuntimeInformation.IsWindows() ? WindowsOldPathLimit : CommonSenseLimit;
 
             if (nameNoLimit.Length <= limit)
             {
