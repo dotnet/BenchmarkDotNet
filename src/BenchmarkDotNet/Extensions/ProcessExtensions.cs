@@ -120,7 +120,7 @@ namespace BenchmarkDotNet.Extensions
             if (benchmarkCase.Job.Environment.Runtime is MonoRuntime monoRuntime && !string.IsNullOrEmpty(monoRuntime.MonoBclPath))
                 start.EnvironmentVariables["MONO_PATH"] = monoRuntime.MonoBclPath;
 
-            if (benchmarkCase.Job.Infrastructure.Toolchain is CoreRunToolchain _)
+            if (benchmarkCase.Job.Infrastructure.Toolchain is CoreRunToolchain)
                 start.EnvironmentVariables["COMPlus_gcServer"] = benchmarkCase.Job.Environment.Gc.Server ? "1" : "0";
 
             if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
