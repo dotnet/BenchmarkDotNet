@@ -5,8 +5,6 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Builders;
@@ -55,8 +53,6 @@ namespace BenchmarkDotNet.Tests.Mocks
                 TestCultureInfo.Instance,
                 ImmutableArray<ValidationError>.Empty);
 
-        public static IRuntimeInfoWrapper CreateRuntimeInformationWrapper() => new MockRuntimeInfoWrapper();
-
         private static ImmutableArray<BenchmarkReport> CreateReports(IConfig config)
             => CreateBenchmarks<MockBenchmarkClass>(config).Select(CreateSimpleReport).ToImmutableArray();
 
@@ -91,17 +87,6 @@ namespace BenchmarkDotNet.Tests.Mocks
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, 1)
             };
             return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default, metrics);
-        }
-
-        private class MockRuntimeInfoWrapper : IRuntimeInfoWrapper
-        {
-            public Runtime GetCurrentRuntime() => ClrRuntime.Net47;
-
-            public Platform GetCurrentPlatform() => Platform.AnyCpu;
-
-            public Jit GetCurrentJit() => Jit.Default;
-
-            public IntPtr GetCurrentAffinity() => IntPtr.Zero;
         }
 
         [LongRunJob]
