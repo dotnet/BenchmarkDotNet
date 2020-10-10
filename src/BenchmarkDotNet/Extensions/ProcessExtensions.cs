@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -120,8 +120,11 @@ namespace BenchmarkDotNet.Extensions
             if (benchmarkCase.Job.Environment.Runtime is MonoRuntime monoRuntime && !string.IsNullOrEmpty(monoRuntime.MonoBclPath))
                 start.EnvironmentVariables["MONO_PATH"] = monoRuntime.MonoBclPath;
 
-            if (benchmarkCase.Job.Infrastructure.Toolchain is CoreRunToolchain)
-                start.EnvironmentVariables["COMPlus_gcServer"] = benchmarkCase.Job.Environment.Gc.Server ? "1" : "0";
+            // corerun does not understand runtimeconfig.json files;
+            // we have to set "COMPlus_GC*" environment variables as documented in
+            // https://docs.microsoft.com/en-us/dotnet/core/run-time-config/garbage-collector
+            if (benchmarkCase.Job.Infrastructure.Toolchain is CoreRunToolchain _)
+                start.SetCoreRunEnvironmentVariables(benchmarkCase);
 
             if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
                 return;
@@ -224,6 +227,18 @@ namespace BenchmarkDotNet.Extensions
 
                 return process.ExitCode;
             }
+        }
+
+        private static void SetCoreRunEnvironmentVariables(this ProcessStartInfo start, BenchmarkCase benchmarkCase)
+        {
+            start.EnvironmentVariables["COMPlus_gcServer"] = benchmarkCase.Job.Environment.Gc.Server ? "1" : "0";
+            start.EnvironmentVariables["COMPlus_gcConcurrent"] = benchmarkCase.Job.Environment.Gc.Concurrent ? "1" : "0";
+            start.EnvironmentVariables["COMPlus_GCCpuGroup"] = benchmarkCase.Job.Environment.Gc.CpuGroups ? "1" : "0";
+            start.EnvironmentVariables["COMPlus_gcAllowVeryLargeObjects"] = benchmarkCase.Job.Environment.Gc.AllowVeryLargeObjects ? "1" : "0";
+            start.EnvironmentVariables["COMPlus_GCRetainVM"] = benchmarkCase.Job.Environment.Gc.RetainVm ? "1" : "0";
+            start.EnvironmentVariables["COMPlus_GCNoAffinitize"] = benchmarkCase.Job.Environment.Gc.NoAffinitize ? "1" : "0";
+            start.EnvironmentVariables["COMPlus_GCHeapAffinitizeMask"] = benchmarkCase.Job.Environment.Gc.HeapAffinitizeMask.ToString("X");
+            start.EnvironmentVariables["COMPlus_GCHeapCount"] = benchmarkCase.Job.Environment.Gc.HeapCount.ToString("X");
         }
     }
 }
