@@ -247,6 +247,5 @@ namespace BenchmarkDotNet.Extensions
             if (gcMode.HasValue(GcMode.HeapCountCharacteristic))
                 start.EnvironmentVariables["COMPlus_GCHeapCount"] = gcMode.HeapCount.ToString("X");
         }
-        }
     }
 }
