@@ -231,8 +231,6 @@ namespace BenchmarkDotNet.Extensions
 
         private static void SetCoreRunEnvironmentVariables(this ProcessStartInfo start, BenchmarkCase benchmarkCase)
         {
-        private static void SetCoreRunEnvironmentVariables(this ProcessStartInfo start, BenchmarkCase benchmarkCase)
-        {
             var gcMode = benchmarkCase.Job.Environment.Gc;        
             if (!gcMode.HasChanges)
                 return; // do nothing for the default settings
