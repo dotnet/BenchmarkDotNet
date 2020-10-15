@@ -231,14 +231,24 @@ namespace BenchmarkDotNet.Extensions
 
         private static void SetCoreRunEnvironmentVariables(this ProcessStartInfo start, BenchmarkCase benchmarkCase)
         {
-            start.EnvironmentVariables["COMPlus_gcServer"] = benchmarkCase.Job.Environment.Gc.Server ? "1" : "0";
-            start.EnvironmentVariables["COMPlus_gcConcurrent"] = benchmarkCase.Job.Environment.Gc.Concurrent ? "1" : "0";
-            start.EnvironmentVariables["COMPlus_GCCpuGroup"] = benchmarkCase.Job.Environment.Gc.CpuGroups ? "1" : "0";
-            start.EnvironmentVariables["COMPlus_gcAllowVeryLargeObjects"] = benchmarkCase.Job.Environment.Gc.AllowVeryLargeObjects ? "1" : "0";
-            start.EnvironmentVariables["COMPlus_GCRetainVM"] = benchmarkCase.Job.Environment.Gc.RetainVm ? "1" : "0";
-            start.EnvironmentVariables["COMPlus_GCNoAffinitize"] = benchmarkCase.Job.Environment.Gc.NoAffinitize ? "1" : "0";
-            start.EnvironmentVariables["COMPlus_GCHeapAffinitizeMask"] = benchmarkCase.Job.Environment.Gc.HeapAffinitizeMask.ToString("X");
-            start.EnvironmentVariables["COMPlus_GCHeapCount"] = benchmarkCase.Job.Environment.Gc.HeapCount.ToString("X");
+        private static void SetCoreRunEnvironmentVariables(this ProcessStartInfo start, BenchmarkCase benchmarkCase)
+        {
+            var gcMode = benchmarkCase.Job.Environment.Gc;        
+            if (!gcMode.HasChanges)
+                return; // do nothing for the default settings
+            
+            start.EnvironmentVariables["COMPlus_gcServer"] = gcMode.Server ? "1" : "0";
+            start.EnvironmentVariables["COMPlus_gcConcurrent"] = gcMode.Concurrent ? "1" : "0";
+            start.EnvironmentVariables["COMPlus_GCCpuGroup"] = gcMode.CpuGroups ? "1" : "0";
+            start.EnvironmentVariables["COMPlus_gcAllowVeryLargeObjects"] = gcMode.AllowVeryLargeObjects ? "1" : "0";
+            start.EnvironmentVariables["COMPlus_GCRetainVM"] = gcMode.RetainVm ? "1" : "0";
+            start.EnvironmentVariables["COMPlus_GCNoAffinitize"] = gcMode.NoAffinitize ? "1" : "0";
+            
+            if (gcMode.HasValue(GcMode.HeapAffinitizeMaskCharacteristic))
+                start.EnvironmentVariables["COMPlus_GCHeapAffinitizeMask"] = gcMode.HeapAffinitizeMask.ToString("X");
+            if (gcMode.HasValue(GcMode.HeapCountCharacteristic))
+                start.EnvironmentVariables["COMPlus_GCHeapCount"] = gcMode.HeapCount.ToString("X");
+        }
         }
     }
 }
