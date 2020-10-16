@@ -24,6 +24,8 @@ namespace BenchmarkDotNet.Environments
         {
         }
 
+        public bool IsPlatformSpecific => MsBuildMoniker.IndexOf('-') > 0;
+
         /// <summary>
         /// use this method if you want to target .NET Core version not supported by current version of BenchmarkDotNet. Example: .NET Core 10
         /// </summary>

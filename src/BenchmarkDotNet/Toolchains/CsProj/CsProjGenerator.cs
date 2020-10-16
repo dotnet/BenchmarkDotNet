@@ -18,7 +18,7 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Toolchains.CsProj
 {
     [PublicAPI]
-    public class CsProjGenerator : DotNetCliGenerator
+    public class CsProjGenerator : DotNetCliGenerator, IEquatable<CsProjGenerator>
     {
         private const string DefaultSdkName = "Microsoft.NET.Sdk";
 
@@ -169,5 +169,19 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             }
             return projectFile;
         }
+
+        public override bool Equals(object obj) => obj is CsProjGenerator other && Equals(other);
+
+        public bool Equals(CsProjGenerator other)
+            => TargetFrameworkMoniker == other.TargetFrameworkMoniker
+                && RuntimeFrameworkVersion == other.RuntimeFrameworkVersion
+                && CliPath == other.CliPath
+                && PackagesPath == other.PackagesPath;
+
+        public override int GetHashCode()
+            => TargetFrameworkMoniker.GetHashCode()
+                ^ (RuntimeFrameworkVersion?.GetHashCode() ?? 0)
+                ^ (CliPath?.GetHashCode() ?? 0)
+                ^ (PackagesPath?.GetHashCode() ?? 0);
     }
 }

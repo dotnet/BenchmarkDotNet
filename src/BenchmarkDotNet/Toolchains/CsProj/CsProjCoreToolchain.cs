@@ -7,11 +7,12 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using JetBrains.Annotations;
+using System;
 
 namespace BenchmarkDotNet.Toolchains.CsProj
 {
     [PublicAPI]
-    public class CsProjCoreToolchain : Toolchain
+    public class CsProjCoreToolchain : Toolchain, IEquatable<CsProjCoreToolchain>
     {
         [PublicAPI] public static readonly IToolchain NetCoreApp20 = From(NetCoreAppSettings.NetCoreApp20);
         [PublicAPI] public static readonly IToolchain NetCoreApp21 = From(NetCoreAppSettings.NetCoreApp21);
@@ -70,5 +71,11 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             return true;
         }
+
+        public override bool Equals(object obj) => obj is CsProjCoreToolchain typed && Equals(typed);
+
+        public bool Equals(CsProjCoreToolchain other) => Generator.Equals(other.Generator);
+
+        public override int GetHashCode() => Generator.GetHashCode();
     }
 }
