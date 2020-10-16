@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Environments
                 case Version v when v.Major == 3 && v.Minor == 1: return Core31;
                 case Version v when v.Major == 5 && v.Minor == 0: return Core50;
                 default:
-                    return CreateForNewVersion($"netcoreapp{version.Major}.{version.Minor}", $".NET Core {version.Major}.{version.Minor}");
+                    return CreateForNewVersion($"net{version.Major}.{version.Minor}", $".NET {version.Major}.{version.Minor}");
             }
         }
 
