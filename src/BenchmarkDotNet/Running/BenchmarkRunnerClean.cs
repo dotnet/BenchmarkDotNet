@@ -173,6 +173,14 @@ namespace BenchmarkDotNet.Running
                         else if (buildResult.ErrorMessage != null)
                             logger.WriteLineError($"// Build Error: {buildResult.ErrorMessage}");
 
+                        if (!benchmark.Job.GetToolchain().IsInProcess)
+                        {
+                            logger.WriteLine();
+                            logger.WriteLineError("// BenchmarkDotNet has failed to build the auto-generated boilerplate code.");
+                            logger.WriteLineError($"// It can be found in {buildResult.ArtifactsPaths.BuildArtifactsDirectoryPath}");
+                            logger.WriteLineError("// Please follow the troubleshooting guide: https://benchmarkdotnet.org/articles/guides/troubleshooting.html");
+                        }
+
                         if (config.Options.IsSet(ConfigOptions.StopOnFirstError))
                             break;
                     }
