@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Columns
 
             var cultureInfo = summary.GetCultureInfo();
             if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Size)
-                return SizeValue.FromBytes((long)metric.Value).ToString(style.SizeUnit, cultureInfo);
+                return SizeValue.FromBytes((long)metric.Value).ToString(style.SizeUnit, cultureInfo, descriptor.NumberFormat);
             if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Time)
                 return TimeInterval.FromNanoseconds(metric.Value).ToString(style.TimeUnit, cultureInfo);
 
