@@ -55,6 +55,13 @@ namespace BenchmarkDotNet.Loggers
                 {
                     diagnoser?.Handle(signal, diagnoserActionParameters);
                     process.StandardInput.WriteLine(Engine.Signals.Acknowledgment);
+
+                    if (signal == HostSignal.AfterAll)
+                    {
+                        // we have received the last signal so we can stop reading the output
+                        // if the process won't exit after this, its hung and needs to be killed
+                        return;
+                    }
                 }
                 else if (!string.IsNullOrEmpty(line))
                 {
