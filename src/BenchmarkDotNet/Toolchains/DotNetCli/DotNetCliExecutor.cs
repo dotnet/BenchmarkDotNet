@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
             using (var process = new Process { StartInfo = startInfo })
-            using (new ConsoleExitHandler(process, logger))
+            using (var consoleExitHandler = new ConsoleExitHandler(process, logger))
             {
                 var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId);
 
@@ -87,14 +87,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 loggerWithDiagnoser.ProcessInput();
 
-                process.WaitForExit(); // should we add timeout here?
-
-                if (process.ExitCode == 0)
+                if (!process.WaitForExit(milliseconds: 250))
                 {
-                    return new ExecuteResult(true, process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
+                    logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
+
+                    consoleExitHandler.KillProcessTree();
                 }
 
-                return new ExecuteResult(true, process.ExitCode, process.Id, Array.Empty<string>(), Array.Empty<string>());
+                return new ExecuteResult(true, process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
             }
         }
     }

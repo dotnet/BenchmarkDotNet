@@ -40,13 +40,13 @@ namespace BenchmarkDotNet.Toolchains
             try
             {
                 using (var process = new Process { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) })
-                using (new ConsoleExitHandler(process, logger))
+                using (var consoleExitHandler = new ConsoleExitHandler(process, logger))
                 {
                     var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId);
 
                     diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 
-                    return Execute(process, benchmarkCase, loggerWithDiagnoser, logger);
+                    return Execute(process, benchmarkCase, loggerWithDiagnoser, logger, consoleExitHandler);
                 }
             }
             finally
@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private ExecuteResult Execute(Process process, BenchmarkCase benchmarkCase, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser, ILogger logger)
+        private ExecuteResult Execute(Process process, BenchmarkCase benchmarkCase, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser, ILogger logger, ConsoleExitHandler consoleExitHandler)
         {
             logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
@@ -69,17 +69,17 @@ namespace BenchmarkDotNet.Toolchains
 
             loggerWithDiagnoser.ProcessInput();
 
-            process.WaitForExit(); // should we add timeout here?
-
-            if (process.ExitCode == 0)
+            if (!process.WaitForExit(milliseconds: 250))
             {
-                return new ExecuteResult(true, process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
+                logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
+
+                consoleExitHandler.KillProcessTree();
             }
 
             if (loggerWithDiagnoser.LinesWithResults.Any(line => line.Contains("BadImageFormatException")))
                 logger.WriteLineError("You are probably missing <PlatformTarget>AnyCPU</PlatformTarget> in your .csproj file.");
 
-            return new ExecuteResult(true, process.ExitCode, process.Id, Array.Empty<string>(), Array.Empty<string>());
+            return new ExecuteResult(true, process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
         }
 
         private ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, string args, IResolver resolver)
