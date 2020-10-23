@@ -501,10 +501,12 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineError($"Executable {buildResult.ArtifactsPaths.ExecutablePath} not found");
             }
 
-            if (executeResult.ExitCode != 0)
+            // exit code can be different than 0 if the process has hanged at the end
+            // so we check if some results were reported, if not then it was a failure
+            if (executeResult.ExitCode != 0 && executeResult.Data.IsEmpty())
             {
                 success = false;
-                logger.WriteLineError("ExitCode != 0");
+                logger.WriteLineError("ExitCode != 0 and no results reported");
             }
 
             return executeResult;
