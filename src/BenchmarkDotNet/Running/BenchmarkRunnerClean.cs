@@ -107,6 +107,14 @@ namespace BenchmarkDotNet.Running
                 }
                 finally
                 {
+                    // some benchmarks might be using parameters that have locking finalizers
+                    // so we need to dispose them after we are done running the benchmarks
+                    // see https://github.com/dotnet/BenchmarkDotNet/issues/1383 and https://github.com/dotnet/runtime/issues/314 for more
+                    foreach (var benchmarkInfo in benchmarkRunInfos)
+                    {
+                        benchmarkInfo.Dispose();
+                    }
+
                     compositeLogger.WriteLineHeader("// * Artifacts cleanup *");
                     Cleanup(new HashSet<string>(artifactsToCleanup.Distinct()));
                     compositeLogger.Flush();
