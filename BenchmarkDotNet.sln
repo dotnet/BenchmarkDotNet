@@ -39,8 +39,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Disassemble
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.IntegrationTests.ManualRunning", "tests\BenchmarkDotNet.IntegrationTests.ManualRunning\BenchmarkDotNet.IntegrationTests.ManualRunning.csproj", "{9816D316-95C4-42E6-9E7B-A256C7E5D4BF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Tool", "src\BenchmarkDotNet.Tool\BenchmarkDotNet.Tool.csproj", "{1336CAFF-5321-495E-BAFA-AB4DC6BF791C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.IntegrationTests.Static", "tests\BenchmarkDotNet.IntegrationTests.Static\BenchmarkDotNet.IntegrationTests.Static.csproj", "{B4405781-40D3-42B8-B168-00E711FABA15}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkDotNet.Annotations", "src\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj", "{D9F5065B-6190-431B-850C-117E3D64AB33}"
