@@ -22,8 +22,11 @@ namespace BenchmarkDotNet.Reports
         public TimeUnit TimeUnit { get; }
         [NotNull]
         public CultureInfo CultureInfo { get; }
+        
+        public RatioStyle RatioStyle { get; }
 
-        public SummaryStyle([CanBeNull] CultureInfo cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true, bool printZeroValuesInContent = false, int maxParameterColumnWidth = DefaultMaxParameterColumnWidth)
+        public SummaryStyle([CanBeNull] CultureInfo cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true,
+            bool printZeroValuesInContent = false, int maxParameterColumnWidth = DefaultMaxParameterColumnWidth, RatioStyle ratioStyle = RatioStyle.Value)
         {
             if (maxParameterColumnWidth < DefaultMaxParameterColumnWidth)
                 throw new ArgumentOutOfRangeException(nameof(maxParameterColumnWidth), $"{DefaultMaxParameterColumnWidth} is the minimum.");
@@ -35,22 +38,26 @@ namespace BenchmarkDotNet.Reports
             TimeUnit = timeUnit;
             PrintZeroValuesInContent = printZeroValuesInContent;
             MaxParameterColumnWidth = maxParameterColumnWidth;
+            RatioStyle = ratioStyle;
         }
 
         public SummaryStyle WithTimeUnit(TimeUnit timeUnit)
-            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, timeUnit, PrintUnitsInContent, PrintZeroValuesInContent);
+            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, timeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, RatioStyle);
 
         public SummaryStyle WithSizeUnit(SizeUnit sizeUnit)
-            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, sizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent);
+            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, sizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, RatioStyle);
 
         public SummaryStyle WithZeroMetricValuesInContent()
-            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, printZeroValuesInContent: true);
+            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, printZeroValuesInContent: true, MaxParameterColumnWidth, RatioStyle);
 
         public SummaryStyle WithMaxParameterColumnWidth(int maxParameterColumnWidth)
-            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, maxParameterColumnWidth);
+            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, maxParameterColumnWidth, RatioStyle);
 
         public SummaryStyle WithCultureInfo(CultureInfo cultureInfo)
-            => new SummaryStyle(cultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth);
+            => new SummaryStyle(cultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, RatioStyle);
+
+        public SummaryStyle WithRatioStyle(RatioStyle ratioStyle)
+            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, ratioStyle);
 
         public bool Equals(SummaryStyle other)
         {

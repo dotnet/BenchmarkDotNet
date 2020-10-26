@@ -50,14 +50,62 @@ namespace BenchmarkDotNet.Columns
             var ratio = GetRatioStatistics(current, baseline);
             if (ratio == null)
                 return "NA";
+            var invertedRatio = GetRatioStatistics(baseline, current);
 
             var cultureInfo = summary.GetCultureInfo();
+            var ratioStyle = summary?.Style?.RatioStyle ?? RatioStyle.Value;
+
             switch (Metric)
             {
                 case RatioMetric.Mean:
-                    return IsNonBaselinesPrecise(summary, baseline, benchmarkCase) ? ratio.Mean.ToString("N3", cultureInfo) : ratio.Mean.ToString("N2", cultureInfo);
+                {
+                    bool advancedPrecision = IsNonBaselinesPrecise(summary, baseline, benchmarkCase);
+                    switch (ratioStyle)
+                    {
+                        case RatioStyle.Value:
+                            return ratio.Mean.ToString(advancedPrecision ? "N3" : "N2", cultureInfo);
+                        case RatioStyle.Percentage:
+                            return isBaseline
+                                ? "baseline"
+                                : ratio.Mean >= 1.0
+                                    ? "+" + ((ratio.Mean - 1.0) * 100).ToString(advancedPrecision ? "N1" : "N0") + "%"
+                                    : "-" + ((1.0 - ratio.Mean) * 100).ToString(advancedPrecision ? "N1" : "N0") + "%";
+                        case RatioStyle.Trend:
+                            return isBaseline
+                                ? "baseline"
+                                : ratio.Mean >= 1.0
+                                    ? ratio.Mean.ToString(advancedPrecision ? "N3" : "N2") + "x slower"
+                                    : invertedRatio == null
+                                        ? "NA"
+                                        : invertedRatio.Mean.ToString(advancedPrecision ? "N3" : "N2") + "x faster";
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(summary), ratioStyle, "RatioStyle is not supported");
+                    }
+                }
                 case RatioMetric.StdDev:
-                    return ratio.StandardDeviation.ToString("N2", cultureInfo);
+                {
+                    switch (ratioStyle)
+                    {
+                        case RatioStyle.Value:
+                            return ratio.StandardDeviation.ToString("N2", cultureInfo);
+                        case RatioStyle.Percentage:
+                            return isBaseline
+                                ? ""
+                                : Math.Abs(ratio.Mean) < 1e-9
+                                    ? "NA"
+                                    : (100 * ratio.StandardDeviation / ratio.Mean).ToString("N1", cultureInfo) + "%";
+                        case RatioStyle.Trend:
+                            return isBaseline
+                                ? ""
+                                : ratio.Mean >= 1.0
+                                    ? ratio.StandardDeviation.ToString("N2", cultureInfo) + "x"
+                                    : invertedRatio == null
+                                        ? "NA"
+                                        : invertedRatio.StandardDeviation.ToString("N2", cultureInfo) + "x";
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(summary), ratioStyle, "RatioStyle is not supported");
+                    }
+                }
                 default:
                     throw new NotSupportedException();
             }
