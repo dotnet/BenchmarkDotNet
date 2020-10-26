@@ -133,7 +133,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             var overheadIterations = CreateIterationData(overheadTimestamps);
             var workloadIterations = CreateIterationData(workloadTimestamps);
 
-            SumCountersPerIterations(profileSourceIdToInterval, workloadIterations, overheadIterations);
+            SumCountersPerIterations(profileSourceIdToInterval, workloadIterations, overheadIterations, counters);
 
             var workloadTotalPerCounter = Sum(workloadIterations);
             var overheadTotalPerCounter = Sum(overheadIterations);
@@ -172,15 +172,22 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             return iterations;
         }
 
-        private void SumCountersPerIterations(Dictionary<int, int> profileSourceIdToInterval, IterationData[] workloadIterations, IterationData[] overheadIterations)
+        private void SumCountersPerIterations(Dictionary<int, int> profileSourceIdToInterval, IterationData[] workloadIterations, IterationData[] overheadIterations,
+            PreciseMachineCounter[] counters)
         {
+            var profileSourceIdToCounter = counters.ToDictionary(counter => counter.ProfileSourceId);
+
             foreach (var sample in samples)
             {
                 var interval = profileSourceIdToInterval[sample.profileSource];
 
                 foreach (var workloadIteration in workloadIterations)
                     if (workloadIteration.TryHandle(sample.timeStamp, sample.profileSource, interval))
+                    {
+                        profileSourceIdToCounter[sample.profileSource].OnSample(sample.instructionPointer);
+
                         goto next;
+                    }
 
                 foreach (var overheadIteration in overheadIterations)
                     if (overheadIteration.TryHandle(sample.timeStamp, sample.profileSource, interval))
