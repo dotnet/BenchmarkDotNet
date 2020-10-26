@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Parameters
 {
-    public class ParameterInstance
+    public class ParameterInstance : IDisposable
     {
         public const string NullParameterTextRepresentation = "?";
 
@@ -23,6 +23,8 @@ namespace BenchmarkDotNet.Parameters
             this.value = value;
             maxParameterColumnWidth = summaryStyle?.MaxParameterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
         }
+
+        public void Dispose() => (Value as IDisposable)?.Dispose();
 
         public string Name => Definition.Name;
         public bool IsStatic => Definition.IsStatic;

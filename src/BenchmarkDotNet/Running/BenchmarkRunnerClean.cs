@@ -107,6 +107,14 @@ namespace BenchmarkDotNet.Running
                 }
                 finally
                 {
+                    // some benchmarks might be using parameters that have locking finalizers
+                    // so we need to dispose them after we are done running the benchmarks
+                    // see https://github.com/dotnet/BenchmarkDotNet/issues/1383 and https://github.com/dotnet/runtime/issues/314 for more
+                    foreach (var benchmarkInfo in benchmarkRunInfos)
+                    {
+                        benchmarkInfo.Dispose();
+                    }
+
                     compositeLogger.WriteLineHeader("// * Artifacts cleanup *");
                     Cleanup(new HashSet<string>(artifactsToCleanup.Distinct()));
                     compositeLogger.Flush();
@@ -509,10 +517,12 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineError($"Executable {buildResult.ArtifactsPaths.ExecutablePath} not found");
             }
 
-            if (executeResult.ExitCode != 0)
+            // exit code can be different than 0 if the process has hanged at the end
+            // so we check if some results were reported, if not then it was a failure
+            if (executeResult.ExitCode != 0 && executeResult.Data.IsEmpty())
             {
                 success = false;
-                logger.WriteLineError("ExitCode != 0");
+                logger.WriteLineError("ExitCode != 0 and no results reported");
             }
 
             return executeResult;

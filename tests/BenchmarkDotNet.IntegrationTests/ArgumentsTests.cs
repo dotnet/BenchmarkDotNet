@@ -770,6 +770,56 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private void CanExecute<T>(IToolchain toolchain) => CanExecute<T>(CreateSimpleConfig(job: Job.Dry.With(toolchain)));
+        [Fact]
+        public void UnusedDisposableParamsAreDisposed() => CanExecute<WithDisposableArguments>(Job.Default.GetToolchain());
+
+        public class WithDisposableArguments
+        {
+            public IEnumerable<Disposable> GetDisposables()
+            {
+                yield return new Disposable(0);
+                yield return new Disposable(1);
+            }
+
+            [ParamsSource(nameof(GetDisposables))]
+            public Disposable used;
+
+            [Benchmark]
+            public void CheckDisposed()
+            {
+                if (used.Id == 0)
+                {
+                    if (Disposable.Created != 1)
+                        throw new ArgumentException("Only one instance should be created so far!");
+                    if (Disposable.Disposed != 0)
+                        throw new ArgumentException("None should be disposed as only one was created and is still in use");
+                }
+                if (used.Id == 1)
+                {
+                    if (Disposable.Created != 2)
+                        throw new ArgumentException("Two instances should be created so far!");
+                    if (Disposable.Disposed != 1)
+                        throw new ArgumentException("The first one should be disposed as it's not used");
+                }
+            }
+
+            public class Disposable : IDisposable
+            {
+                public static int Created = 0;
+                public static int Disposed = 0;
+
+                public int Id { get; private set; }
+
+                public Disposable(int id)
+                {
+                    Id = id;
+                    ++Created;
+                }
+
+                public void Dispose() => ++Disposed;
+            }
+        }
+
+        private void CanExecute<T>(IToolchain toolchain) => CanExecute<T>(CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain)));
     }
 }

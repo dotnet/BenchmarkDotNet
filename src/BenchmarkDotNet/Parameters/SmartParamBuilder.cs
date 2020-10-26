@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
@@ -97,9 +99,8 @@ namespace BenchmarkDotNet.Parameters
                 ? $"[{argumentIndex}]" // IEnumerable<object[]>
                 : string.Empty; // IEnumerable<object>
 
-            // we just execute (cast)source.ToArray()[case][argumentIndex];
-            // we know that source is IEnumerable so we can do that!
-            return $"{cast}System.Linq.Enumerable.ToArray({source.Name}{callPostfix})[{sourceIndex}]{indexPostfix};";
+            // we do something like enumerable.ElementAt(sourceIndex)[argumentIndex];
+            return $"{cast}BenchmarkDotNet.Parameters.ParameterExtractor.GetParameter({source.Name}{callPostfix}, {sourceIndex}){indexPostfix};";
         }
     }
 
@@ -129,8 +130,38 @@ namespace BenchmarkDotNet.Parameters
 
             string callPostfix = source is PropertyInfo ? string.Empty : "()";
 
-            // we just execute (cast)source.ToArray()[index];
-            return $"{cast}System.Linq.Enumerable.ToArray({instancePrefix}.{source.Name}{callPostfix})[{index}];";
+            // we so something like enumerable.ElementAt(index);
+            return $"{cast}BenchmarkDotNet.Parameters.ParameterExtractor.GetParameter({instancePrefix}.{source.Name}{callPostfix}, {index});";
+        }
+    }
+
+    public static class ParameterExtractor
+    {
+        [EditorBrowsable(EditorBrowsableState.Never)] // hide from intellisense, it's public so we can call it form the boilerplate code
+        public static T GetParameter<T>(IEnumerable<T> parameters, int index)
+        {
+            int count = 0;
+
+            foreach (T parameter in parameters)
+            {
+                if (count == index)
+                {
+                    return parameter;
+                }
+
+                if (parameter is IDisposable disposable)
+                {
+                    // parameters might contain locking finalizers which might cause the benchmarking process to hung at the end
+                    // to avoid that, we dispose the parameters that were created, but won't be used
+                    // (for every test case we have to enumerate the underlying source enumerator and stop when we reach index of given test case)
+                    // See https://github.com/dotnet/BenchmarkDotNet/issues/1383 and https://github.com/dotnet/runtime/issues/314 for more
+                    disposable.Dispose();
+                }
+
+                count++;
+            }
+
+            throw new InvalidOperationException("We should never get here!");
         }
     }
 }

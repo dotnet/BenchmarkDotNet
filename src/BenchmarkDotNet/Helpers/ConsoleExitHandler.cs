@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Helpers
         // the user has closed the console window so we kill the entire process tree
         private void ProcessExitEventHandlerHandlerCallback(object sender, EventArgs e) => KillProcessTree();
 
-        private void KillProcessTree()
+        internal void KillProcessTree()
         {
             try
             {
