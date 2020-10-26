@@ -24,24 +24,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
-            if (!File.Exists(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath))
-            {
-                executeParameters.Logger.WriteLineError($"Did not find {executeParameters.BuildResult.ArtifactsPaths.ExecutablePath}, but the folder contained:");
-                foreach (var file in new DirectoryInfo(executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
-                    executeParameters.Logger.WriteLineError(file.Name);
-
-                return new ExecuteResult(false, -1, default, Array.Empty<string>(), Array.Empty<string>());
-            }
-
             try
             {
                 return Execute(
+                    executeParameters.BuildResult.ExecutablePath,
                     executeParameters.BenchmarkCase,
                     executeParameters.BenchmarkId,
                     executeParameters.Logger,
-                    executeParameters.BuildResult.ArtifactsPaths,
                     executeParameters.Diagnoser,
-                    Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath),
                     executeParameters.Resolver);
             }
             finally
@@ -52,18 +42,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        private ExecuteResult Execute(BenchmarkCase benchmarkCase,
-                                      BenchmarkId benchmarkId,
-                                      ILogger logger,
-                                      ArtifactsPaths artifactsPaths,
-                                      IDiagnoser diagnoser,
-                                      string executableName,
-                                      IResolver resolver)
+        private ExecuteResult Execute(string executablePath, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, IDiagnoser diagnoser, IResolver resolver)
         {
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
                 CustomDotNetCliPath,
-                artifactsPaths.BinariesDirectoryPath,
-                $"{executableName.Escape()} {benchmarkId.ToArguments()}",
+                Path.GetDirectoryName(executablePath),
+                $"{Path.GetFileName(executablePath).Escape()} {benchmarkId.ToArguments()}",
                 redirectStandardInput: true);
 
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);

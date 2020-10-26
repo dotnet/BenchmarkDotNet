@@ -12,6 +12,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
     {
         /// <summary>always returns success</summary>
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
-            => BuildResult.Success(generateResult);
+            => BuildResult.Success(generateResult, string.Empty);
     }
 }

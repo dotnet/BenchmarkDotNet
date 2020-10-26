@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 var emitResult = compilation.Emit(executable);
 
                 if (emitResult.Success)
-                    return (BuildResult.Success(generateResult), default);
+                    return (BuildResult.Success(generateResult, generateResult.ArtifactsPaths.ExecutablePath), default);
 
                 var compilationErrors = emitResult.Diagnostics
                     .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error)

@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 logger.WriteLine("Building");
                 Done = true;
-                return BuildResult.Success(generateResult);
+                return BuildResult.Success(generateResult, string.Empty);
             }
         }
 
