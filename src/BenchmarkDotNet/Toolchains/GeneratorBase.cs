@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Toolchains
         /// <summary>
         /// returns a path to the auto-generated .csproj file
         /// </summary>
-        [PublicAPI] protected virtual string GetProjectFilePath(string buildArtifactsDirectoryPath)
+        [PublicAPI] protected virtual string GetProjectFilePath(BuildPartition buildPartition, string buildArtifactsDirectoryPath)
             => string.Empty;
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.Toolchains
                 programCodePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{codeFileExtension}"),
                 appConfigPath: $"{executablePath}.config",
                 nuGetConfigPath: Path.Combine(buildArtifactsDirectoryPath, "NuGet.config"),
-                projectFilePath: GetProjectFilePath(buildArtifactsDirectoryPath),
+                projectFilePath: GetProjectFilePath(buildPartition, buildArtifactsDirectoryPath),
                 buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{RuntimeInformation.ScriptFileExtension}"),
                 executablePath: executablePath,
                 programName: programName,
