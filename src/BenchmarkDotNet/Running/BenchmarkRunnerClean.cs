@@ -143,11 +143,11 @@ namespace BenchmarkDotNet.Running
                     var info = buildResults[benchmark];
                     var buildResult = info.buildResult;
 
-                    if (!config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
-                        artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
-
                     if (buildResult.IsBuildSuccess)
                     {
+                        if (!config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
+                            artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
+
                         var report = RunCore(benchmark, info.benchmarkId, logger, resolver, buildResult);
                         if (report.AllMeasurements.Any(m => m.Operations == 0))
                             throw new InvalidOperationException("An iteration with 'Operations == 0' detected");
@@ -172,6 +172,14 @@ namespace BenchmarkDotNet.Running
                             logger.WriteLineError($"// Build Error: {reason}");
                         else if (buildResult.ErrorMessage != null)
                             logger.WriteLineError($"// Build Error: {buildResult.ErrorMessage}");
+
+                        if (!benchmark.Job.GetToolchain().IsInProcess)
+                        {
+                            logger.WriteLine();
+                            logger.WriteLineError("// BenchmarkDotNet has failed to build the auto-generated boilerplate code.");
+                            logger.WriteLineError($"// It can be found in {buildResult.ArtifactsPaths.BuildArtifactsDirectoryPath}");
+                            logger.WriteLineError("// Please follow the troubleshooting guide: https://benchmarkdotnet.org/articles/guides/troubleshooting.html");
+                        }
 
                         if (config.Options.IsSet(ConfigOptions.StopOnFirstError))
                             break;
