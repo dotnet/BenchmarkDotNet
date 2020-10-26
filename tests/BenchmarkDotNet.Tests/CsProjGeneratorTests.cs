@@ -171,7 +171,7 @@ namespace BenchmarkDotNet.Tests
 
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, config.CreateImmutableConfig(), 999) };
             var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.0", null, null, null, true);
-            string binariesPath = projectGenerator.ResolvePathForBinaries(new BuildPartition(benchmarks, new Resolver()), programName);
+            string binariesPath = projectGenerator.ResolvePathForBinaries(new BuildPartition(0, benchmarks, new Resolver()), programName);
 
             string expectedPath = Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Bin"), programName);
             Assert.Equal(expectedPath, binariesPath);
@@ -190,7 +190,7 @@ namespace BenchmarkDotNet.Tests
             var benchmarkCase = BenchmarkCase.Create(target, Job.Default, null, ManualConfig.CreateEmpty().CreateImmutableConfig());
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0) };
             var projectGenerator = new SteamLoadedBuildPartition("netcoreapp3.0", null, null, null, true);
-            var buildPartition = new BuildPartition(benchmarks, new Resolver());
+            var buildPartition = new BuildPartition(0, benchmarks, new Resolver());
             string binariesPath = projectGenerator.ResolvePathForBinaries(buildPartition, programName);
 
             string expectedPath = Path.Combine(Path.GetDirectoryName(buildPartition.AssemblyLocation), programName);

@@ -14,13 +14,16 @@ namespace BenchmarkDotNet.Running
 {
     public class BuildPartition
     {
-        public BuildPartition(BenchmarkBuildInfo[] benchmarks, IResolver resolver)
+        public BuildPartition(uint index, BenchmarkBuildInfo[] benchmarks, IResolver resolver)
         {
+            Index = index;
             Resolver = resolver;
             RepresentativeBenchmarkCase = benchmarks[0].BenchmarkCase;
             Benchmarks = benchmarks;
             ProgramName = benchmarks[0].Config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles) ? RepresentativeBenchmarkCase.Job.FolderInfo : Guid.NewGuid().ToString();
         }
+
+        public uint Index { get; }
 
         public BenchmarkBuildInfo[] Benchmarks { get; }
 

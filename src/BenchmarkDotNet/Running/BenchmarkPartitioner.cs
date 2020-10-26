@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Running
             => supportedBenchmarks
                 .SelectMany(info => info.BenchmarksCases.Select(benchmark => (benchmark, info.Config)))
                 .GroupBy(tuple => tuple.benchmark, BenchmarkRuntimePropertiesComparer.Instance)
-                .Select(group => new BuildPartition(group.Select((item, index) => new BenchmarkBuildInfo(item.benchmark, item.Config, index)).ToArray(), resolver))
+                .Select((group, groupIndex) => new BuildPartition((uint)groupIndex, group.Select((item, index) => new BenchmarkBuildInfo(item.benchmark, item.Config, index)).ToArray(), resolver))
                 .ToArray();
 
         internal class BenchmarkRuntimePropertiesComparer : IEqualityComparer<BenchmarkCase>
