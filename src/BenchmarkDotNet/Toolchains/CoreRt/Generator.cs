@@ -69,9 +69,9 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
             string extraArguments = useCppCodeGenerator ? $"-r {runtimeIdentifier} /p:NativeCodeGen=cpp" : $"-r {runtimeIdentifier}";
 
             var content = new StringBuilder(300)
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition)} {extraArguments}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition)} {extraArguments}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition)} {extraArguments}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath)} {extraArguments}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath)} {extraArguments}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath)} {extraArguments}")
                 .ToString();
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);

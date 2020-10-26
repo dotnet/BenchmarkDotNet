@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
@@ -28,12 +29,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [PublicAPI] public TimeSpan Timeout { get; }
 
+        [PublicAPI] public string ProjectFile { get; }
+
         public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger,
             BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout)
         {
             CliPath = cliPath;
             Arguments = arguments;
             GenerateResult = generateResult;
+            ProjectFile = Path.GetFileName(generateResult.ArtifactsPaths.ProjectFilePath);
             Logger = logger;
             BuildPartition = buildPartition;
             EnvironmentVariables = environmentVariables;
@@ -98,7 +102,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             var executionTime = new TimeSpan(0);
             var stdOutput = new StringBuilder();
-            foreach (var cmd in GetAddPackagesCommands(BuildPartition))
+            foreach (var cmd in GetAddPackagesCommands(BuildPartition, ProjectFile))
             {
                 var result = DotNetCliCommandExecutor.Execute(WithArguments(cmd));
                 if (!result.IsSuccess) return result;
@@ -110,52 +114,55 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public DotNetCliCommandResult Restore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, Arguments)));
+                GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, ProjectFile, Arguments)));
 
         public DotNetCliCommandResult Build()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, Arguments)));
+                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, ProjectFile, Arguments)));
 
         public DotNetCliCommandResult BuildNoRestore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, $"{Arguments} --no-restore")));
+                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, ProjectFile, $"{Arguments} --no-restore")));
 
         public DotNetCliCommandResult BuildNoRestoreNoDependencies()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, $"{Arguments} --no-restore --no-dependencies")));
+                GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, ProjectFile, $"{Arguments} --no-restore --no-dependencies")));
 
         public DotNetCliCommandResult Publish()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, Arguments)));
+                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, ProjectFile, Arguments)));
 
         public DotNetCliCommandResult PublishNoBuildAndNoRestore()
             => DotNetCliCommandExecutor.Execute(WithArguments(
-                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, $"{Arguments} --no-build --no-restore")));
+                GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, ProjectFile, $"{Arguments} --no-build --no-restore")));
 
-        internal static IEnumerable<string> GetAddPackagesCommands(BuildPartition buildPartition)
-            => GetNuGetAddPackageCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
+        internal static IEnumerable<string> GetAddPackagesCommands(BuildPartition buildPartition, string projectFile)
+            => GetNuGetAddPackageCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver, projectFile);
 
-        internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null)
+        internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string projectFile, string extraArguments = null)
             => new StringBuilder()
                 .Append("restore ")
+                .Append($"{projectFile} ")
                 .Append(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\" ")
                 .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .Append(extraArguments)
                 .Append(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .ToString();
 
-        internal static string GetBuildCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null)
+        internal static string GetBuildCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string projectFile, string extraArguments = null)
             => new StringBuilder()
                 .Append($"build -c {buildPartition.BuildConfiguration} ") // we don't need to specify TFM, our auto-generated project contains always single one
+                .Append($"{projectFile} ")
                 .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .Append(extraArguments)
                 .Append(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .Append(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $" /p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
                 .ToString();
 
-        internal static string GetPublishCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null)
+        internal static string GetPublishCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string projectFile, string extraArguments = null)
             => new StringBuilder()
                 .Append($"publish -c {buildPartition.BuildConfiguration} ") // we don't need to specify TFM, our auto-generated project contains always single one
+                .Append($"{projectFile} ")
                 .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .Append(extraArguments)
                 .Append(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
@@ -172,14 +179,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return string.Join(" ", msBuildArguments.Select(arg => arg.TextRepresentation));
         }
 
-        private static IEnumerable<string> GetNuGetAddPackageCommands(BenchmarkCase benchmarkCase, IResolver resolver)
+        private static IEnumerable<string> GetNuGetAddPackageCommands(BenchmarkCase benchmarkCase, IResolver resolver, string projectFile)
         {
             if (!benchmarkCase.Job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic))
                 return Enumerable.Empty<string>();
 
             var nuGetRefs = benchmarkCase.Job.ResolveValue(InfrastructureMode.NuGetReferencesCharacteristic, resolver);
 
-            return nuGetRefs.Select(x => $"add package {x.PackageName}{(string.IsNullOrWhiteSpace(x.PackageVersion) ? string.Empty : " -v " + x.PackageVersion)}");
+            return nuGetRefs.Select(x => $"add package {x.PackageName}{(string.IsNullOrWhiteSpace(x.PackageVersion) ? string.Empty : " -v " + x.PackageVersion)} {projectFile}");
         }
 
         private static string GetMandatoryMsBuildSettings(string buildConfiguration)
