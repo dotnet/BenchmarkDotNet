@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             BuildPartition buildPartition,
             ILogger logger)
         {
-            var assemblyResultPath = generateResult.ArtifactsPaths.ExecutablePath;
+            var assemblyResultPath = Path.Combine(generateResult.ArtifactsPaths.BinariesDirectoryPath, $"{generateResult.ArtifactsPaths.ProgramName}.dll");
             var assemblyFileName = Path.GetFileName(assemblyResultPath);
             var config = buildPartition.Benchmarks.First().Config;
 

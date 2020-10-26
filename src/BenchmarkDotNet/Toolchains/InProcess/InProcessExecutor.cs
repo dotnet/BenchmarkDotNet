@@ -125,7 +125,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         {
             if (exitCode != 0)
             {
-                return new ExecuteResult(true, exitCode, default, Array.Empty<string>(), Array.Empty<string>());
+                return new ExecuteResult(exitCode, default, Array.Empty<string>(), Array.Empty<string>());
             }
 
             var lines = runResults.GetMeasurements().Select(measurement => measurement.ToString()).ToList();
@@ -134,7 +134,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             if (!runResults.ThreadingStats.Equals(ThreadingStats.Empty))
                 lines.Add(runResults.ThreadingStats.ToOutputLine());
 
-            return new ExecuteResult(true, 0, default, lines.ToArray(), Array.Empty<string>());
+            return new ExecuteResult(0, default, lines.ToArray(), Array.Empty<string>());
         }
     }
 }

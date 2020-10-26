@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Toolchains.Mono
             if (!result.IsBuildSuccess)
                 return result;
 
-            var exePath = generateResult.ArtifactsPaths.ExecutablePath;
+            var exePath = result.ExecutablePath;
             var monoRuntime = (MonoRuntime)buildPartition.Runtime;
             var environmentVariables = string.IsNullOrEmpty(monoRuntime.MonoBclPath)
                 ? null

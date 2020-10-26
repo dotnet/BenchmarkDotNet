@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Reports
 
         public bool HasCriticalValidationErrors => ValidationErrors.Any(validationError => validationError.IsCritical);
 
-        public int GetNumberOfExecutedBenchmarks() => Reports.Count(report => report.ExecuteResults.Any(result => result.FoundExecutable));
+        public int GetNumberOfExecutedBenchmarks() => Reports.Count(report => report.ExecuteResults.Count > 0);
 
         internal static Summary NothingToRun(string title, string resultsDirectoryPath, string logFilePath)
             => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, DefaultCultureInfo.Instance, ImmutableArray<ValidationError>.Empty);

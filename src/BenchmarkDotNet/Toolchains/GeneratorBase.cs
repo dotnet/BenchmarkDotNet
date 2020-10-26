@@ -111,8 +111,6 @@ namespace BenchmarkDotNet.Toolchains
         [PublicAPI] protected virtual void GenerateCode(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
             => File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(buildPartition));
 
-        protected virtual string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, $"{programName}{GetExecutableExtension()}");
-
         private ArtifactsPaths GetArtifactsPaths(BuildPartition buildPartition, string rootArtifactsFolderPath)
         {
             // its not ".cs" in order to avoid VS from displaying and compiling it with xprojs/csprojs that include all *.cs by default
@@ -122,18 +120,15 @@ namespace BenchmarkDotNet.Toolchains
             string buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(buildPartition, programName);
             string binariesDirectoryPath = GetBinariesDirectoryPath(buildArtifactsDirectoryPath, buildPartition.BuildConfiguration);
 
-            string executablePath = GetExecutablePath(binariesDirectoryPath, programName);
-
             return new ArtifactsPaths(
                 rootArtifactsFolderPath: rootArtifactsFolderPath,
                 buildArtifactsDirectoryPath: buildArtifactsDirectoryPath,
                 binariesDirectoryPath: binariesDirectoryPath,
                 programCodePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{codeFileExtension}"),
-                appConfigPath: $"{executablePath}.config",
+                appConfigPath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}.config"),
                 nuGetConfigPath: Path.Combine(buildArtifactsDirectoryPath, "NuGet.config"),
                 projectFilePath: GetProjectFilePath(buildPartition, buildArtifactsDirectoryPath),
                 buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{RuntimeInformation.ScriptFileExtension}"),
-                executablePath: executablePath,
                 programName: programName,
                 packagesDirectoryName: GetPackagesDirectoryPath(buildArtifactsDirectoryPath));
         }

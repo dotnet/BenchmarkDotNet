@@ -31,8 +31,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 
         private string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath) => buildArtifactsDirectoryPath;
 
-        private string GetExecutableExtension() => ".dll";
-
         private string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition) => Path.GetDirectoryName(buildPartition.AssemblyLocation);
 
         private ArtifactsPaths GetArtifactsPaths(BuildPartition buildPartition, string rootArtifactsFolderPath)
@@ -41,7 +39,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             string buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(buildPartition);
             string binariesDirectoryPath =
                 GetBinariesDirectoryPath(buildArtifactsDirectoryPath);
-            string executablePath = Path.Combine(binariesDirectoryPath, $"{programName}{GetExecutableExtension()}");
 
             return new ArtifactsPaths(
                 rootArtifactsFolderPath: rootArtifactsFolderPath,
@@ -52,7 +49,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
                 nuGetConfigPath: null,
                 projectFilePath: null,
                 buildScriptFilePath: null,
-                executablePath: executablePath,
                 programName: programName,
                 packagesDirectoryName: null);
         }

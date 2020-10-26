@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Tests.Reports
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, int measurementValue)
         {
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()), string.Empty);
-            var executeResult = new ExecuteResult(true, 0, default, Array.Empty<string>(), Array.Empty<string>());
+            var executeResult = new ExecuteResult(0, default, Array.Empty<string>(), Array.Empty<string>());
             var measurements = new List<Measurement>
                 {
                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, measurementValue),

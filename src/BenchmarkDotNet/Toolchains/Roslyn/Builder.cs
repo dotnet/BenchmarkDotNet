@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
@@ -64,18 +65,20 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         private static (BuildResult result, AssemblyMetadata[] missingReference) Build(GenerateResult generateResult, SyntaxTree syntaxTree,
             CSharpCompilationOptions compilationOptions, IEnumerable<PortableExecutableReference> references)
         {
+            var exePath = Path.Combine(generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, $"{generateResult.ArtifactsPaths.ProgramName}{RuntimeInformation.ExecutableExtension}");
+
             var compilation = CSharpCompilation
-                .Create(assemblyName: Path.GetFileName(generateResult.ArtifactsPaths.ExecutablePath))
+                .Create(assemblyName: generateResult.ArtifactsPaths.ProgramName)
                 .AddSyntaxTrees(syntaxTree)
                 .WithOptions(compilationOptions)
                 .AddReferences(references);
 
-            using (var executable = File.Create(generateResult.ArtifactsPaths.ExecutablePath))
+            using (var executable = File.Create(exePath))
             {
                 var emitResult = compilation.Emit(executable);
 
                 if (emitResult.Success)
-                    return (BuildResult.Success(generateResult, generateResult.ArtifactsPaths.ExecutablePath), default);
+                    return (BuildResult.Success(generateResult, exePath), default);
 
                 var compilationErrors = emitResult.Diagnostics
                     .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error)

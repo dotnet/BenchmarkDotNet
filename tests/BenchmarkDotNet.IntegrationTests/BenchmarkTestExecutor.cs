@@ -76,8 +76,8 @@ namespace BenchmarkDotNet.IntegrationTests
                     "The following benchmarks don't have any execution results: " +
                     string.Join(", ", summary.Reports.Where(r => r.ExecuteResults == null).Select(r => r.BenchmarkCase.DisplayInfo)));
 
-                Assert.True(summary.Reports.All(r => r.ExecuteResults.Any(er => er.FoundExecutable && er.Data.Any())),
-                    "All reports should have at least one \"ExecuteResult\" with \"FoundExecutable\" = true and at least one \"Data\" item");
+                Assert.True(summary.Reports.All(r => r.ExecuteResults.Any(er => er.Data.Any())),
+                    "All reports should have at least one \"ExecuteResult\" with at least one \"Data\" item");
 
                 Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()),
                     "All reports should have at least one \"Measurement\" in the \"AllMeasurements\" collection");

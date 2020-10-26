@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 if (process.ExitCode == 0)
                 {
-                    return new ExecuteResult(true, process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
+                    return new ExecuteResult(process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
                 }
 
                 if (!string.IsNullOrEmpty(standardError))
@@ -84,7 +84,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     logger.WriteError(standardError);
                 }
 
-                return new ExecuteResult(true, process.ExitCode, process.Id, Array.Empty<string>(), Array.Empty<string>());
+                return new ExecuteResult(process.ExitCode, process.Id, Array.Empty<string>(), Array.Empty<string>());
             }
         }
     }

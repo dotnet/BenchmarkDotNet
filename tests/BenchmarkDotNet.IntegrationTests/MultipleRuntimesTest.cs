@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.True(summary.Reports
                 .All(report => report.ExecuteResults
-                .All(executeResult => executeResult.FoundExecutable)));
+                .All(executeResult => executeResult.Data.Any())));
 
             Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()));
 

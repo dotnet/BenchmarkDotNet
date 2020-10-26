@@ -22,7 +22,6 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 artifactsPaths.ProgramCodePath,
                 artifactsPaths.AppConfigPath,
                 artifactsPaths.BuildScriptFilePath,
-                artifactsPaths.ExecutablePath
             };
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)

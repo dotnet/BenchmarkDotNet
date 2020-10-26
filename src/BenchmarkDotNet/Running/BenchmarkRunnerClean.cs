@@ -144,7 +144,10 @@ namespace BenchmarkDotNet.Running
                     var buildResult = info.buildResult;
 
                     if (!config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
+                    {
                         artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
+                        artifactsToCleanup.Add(buildResult.ExecutablePath);
+                    }
 
                     if (buildResult.IsBuildSuccess)
                     {
@@ -494,12 +497,6 @@ namespace BenchmarkDotNet.Running
                     logger,
                     resolver,
                     diagnoser));
-
-            if (!executeResult.FoundExecutable)
-            {
-                success = false;
-                logger.WriteLineError($"Executable {buildResult.ArtifactsPaths.ExecutablePath} not found");
-            }
 
             if (executeResult.ExitCode != 0)
             {

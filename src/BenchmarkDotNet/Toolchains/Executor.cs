@@ -24,34 +24,27 @@ namespace BenchmarkDotNet.Toolchains
     {
         public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
-            string exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
+            string exePath = executeParameters.BuildResult.ExecutablePath;
             string args = executeParameters.BenchmarkId.ToArguments();
 
-            if (!File.Exists(exePath))
-            {
-                return new ExecuteResult(false, -1, default, Array.Empty<string>(), Array.Empty<string>());
-            }
+            var benchmarkCase = executeParameters.BenchmarkCase;
+            var diagnoser = executeParameters.Diagnoser;
 
-            return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths, args, executeParameters.Diagnoser, executeParameters.Resolver);
-        }
-
-        private ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths, string args, IDiagnoser diagnoser, IResolver resolver)
-        {
             try
             {
-                using (var process = new Process { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) })
-                using (new ConsoleExitHandler(process, logger))
+                using (var process = new Process { StartInfo = CreateStartInfo(benchmarkCase, executeParameters.BuildResult.ArtifactsPaths, exePath, args, executeParameters.Resolver) })
+                using (new ConsoleExitHandler(process, executeParameters.Logger))
                 {
-                    var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId);
+                    var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(executeParameters.Logger, process, diagnoser, benchmarkCase, executeParameters.BenchmarkId);
 
-                    diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
+                    diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, executeParameters.BenchmarkId));
 
-                    return Execute(process, benchmarkCase, loggerWithDiagnoser, logger);
+                    return Execute(process, benchmarkCase, loggerWithDiagnoser, executeParameters.Logger);
                 }
             }
             finally
             {
-                diagnoser?.Handle(HostSignal.AfterProcessExit, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId));
+                diagnoser?.Handle(HostSignal.AfterProcessExit, new DiagnoserActionParameters(null, benchmarkCase, executeParameters.BenchmarkId));
             }
         }
 
@@ -73,16 +66,16 @@ namespace BenchmarkDotNet.Toolchains
 
             if (process.ExitCode == 0)
             {
-                return new ExecuteResult(true, process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
+                return new ExecuteResult(process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
             }
 
             if (loggerWithDiagnoser.LinesWithResults.Any(line => line.Contains("BadImageFormatException")))
                 logger.WriteLineError("You are probably missing <PlatformTarget>AnyCPU</PlatformTarget> in your .csproj file.");
 
-            return new ExecuteResult(true, process.ExitCode, process.Id, Array.Empty<string>(), Array.Empty<string>());
+            return new ExecuteResult(process.ExitCode, process.Id, Array.Empty<string>(), Array.Empty<string>());
         }
 
-        private ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, string args, IResolver resolver)
+        private ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, string exePath, string args, IResolver resolver)
         {
             var start = new ProcessStartInfo
             {
@@ -95,8 +88,6 @@ namespace BenchmarkDotNet.Toolchains
             };
 
             start.SetEnvironmentVariables(benchmarkCase, resolver);
-
-            string exePath = artifactsPaths.ExecutablePath;
 
             var runtime = benchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
                 ? benchmarkCase.Job.Environment.Runtime
