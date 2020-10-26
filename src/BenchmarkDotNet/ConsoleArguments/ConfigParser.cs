@@ -106,12 +106,12 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             foreach (string runtime in options.Runtimes)
             {
-                if (!Enum.TryParse<RuntimeMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out var parsed))
+                if (!TryParse(runtime, out RuntimeMoniker runtimeMoniker))
                 {
                     logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(RuntimeMoniker)).Select(name => name.ToLower()))}.");
                     return false;
                 }
-                else if (parsed == RuntimeMoniker.Wasm && (options.WasmMainJs == null || options.WasmMainJs.IsNotNullButDoesNotExist()))
+                else if (runtimeMoniker == RuntimeMoniker.Wasm && (options.WasmMainJs == null || options.WasmMainJs.IsNotNullButDoesNotExist()))
                 {
                     logger.WriteLineError($"The provided {nameof(options.WasmMainJs)} \"{options.WasmMainJs}\" does NOT exist. It MUST be provided.");
                     return false;
@@ -319,7 +319,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             TimeSpan? timeOut = options.TimeOutInSeconds.HasValue ? TimeSpan.FromSeconds(options.TimeOutInSeconds.Value) : default(TimeSpan?);
 
-            if (!Enum.TryParse(runtimeId.Replace(".", string.Empty), ignoreCase: true, out RuntimeMoniker runtimeMoniker))
+            if (!TryParse(runtimeId, out RuntimeMoniker runtimeMoniker))
             {
                 throw new InvalidOperationException("Impossible, already validated by the Validate method");
             }
@@ -480,6 +480,15 @@ namespace BenchmarkDotNet.ConsoleArguments
             var lastCommonDirectorySeparatorIndex = coreRunPath.FullName.LastIndexOf(Path.DirectorySeparatorChar, commonLongestPrefixIndex - 1);
 
             return coreRunPath.FullName.Substring(lastCommonDirectorySeparatorIndex);
+        }
+
+        private static bool TryParse(string runtime, out RuntimeMoniker runtimeMoniker)
+        {
+            int index = runtime.IndexOf('-');
+
+            return index < 0
+                ? Enum.TryParse<RuntimeMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker)
+                : Enum.TryParse<RuntimeMoniker>(runtime.Substring(0, index).Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker);
         }
     }
 }

@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Toolchains
                 case CoreRuntime coreRuntime:
                     if (descriptor != null && descriptor.Type.Assembly.IsLinqPad())
                         return InProcessEmitToolchain.Instance;
-                    if (coreRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized)
+                    if (coreRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized && !coreRuntime.IsPlatformSpecific)
                         return GetToolchain(coreRuntime.RuntimeMoniker);
 
                     return CsProjCoreToolchain.From(new NetCoreAppSettings(coreRuntime.MsBuildMoniker, null, coreRuntime.Name));
