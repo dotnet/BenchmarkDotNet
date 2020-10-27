@@ -4,6 +4,7 @@ using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
 
@@ -18,7 +19,11 @@ namespace BenchmarkDotNet.Helpers
         {
             string nameNoLimit = GetFilePathNoLimits(details, creationTime, fileExtension);
 
-            int limit = PathFeatures.AreAllLongPathsAvailable() ? CommonSenseLimit : WindowsOldPathLimit;
+            // long paths can be enabled on Windows but it does not mean that ETW is going to work fine..
+            // so we always use 260 as limit on Windows
+            int limit =  RuntimeInformation.IsWindows()
+                ? WindowsOldPathLimit - "userheap.etl".Length // the session files get merged, they need to have same name (without extension)
+                : CommonSenseLimit;
 
             if (nameNoLimit.Length <= limit)
             {
@@ -40,7 +45,7 @@ namespace BenchmarkDotNet.Helpers
             string shortTypeName = FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type, includeNamespace: false);
             string methodName = details.BenchmarkCase.Descriptor.WorkloadMethod.Name;
             string parameters = details.BenchmarkCase.HasParameters
-                ? $"-hash{Hashing.HashString(FullNameProvider.GetMethodName(details.BenchmarkCase)).ToString()}"
+                ? $"-hash{Hashing.HashString(FullNameProvider.GetMethodName(details.BenchmarkCase))}"
                 : string.Empty;
 
             string fileName = $@"{shortTypeName}.{methodName}{parameters}";

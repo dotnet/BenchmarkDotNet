@@ -92,6 +92,8 @@
   href: IntroRankColumn.md
 - name: IntroRatioSD
   href: IntroRatioSD.md
+- name: IntroRatioStyle
+  href: IntroRatioStyle.md
 - name: IntroSetupCleanupGlobal
   href: IntroSetupCleanupGlobal.md
 - name: IntroSetupCleanupIteration

@@ -319,6 +319,19 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(tfm, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
         }
 
+        [Theory]
+        [InlineData("net5.0-windows")]
+        [InlineData("net5.0-ios")]
+        public void PlatformSpecificMonikersAreSupported(string msBuildMoniker)
+        {
+            var config = ConfigParser.Parse(new[] { "-r", msBuildMoniker }, new OutputLogger(Output)).config;
+
+            Assert.Single(config.GetJobs());
+            CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
+            Assert.NotNull(toolchain);
+            Assert.Equal(msBuildMoniker, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
+        }
+
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {

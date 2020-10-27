@@ -151,13 +151,7 @@ ManualConfig.CreateEmpty() // A configuration for our benchmarks
 
 If you prefer command-line experience, you can configure your benchmarks via
   the [console arguments](https://benchmarkdotnet.org/articles/guides/console-args.html)
-  in any console application or use
-  [.NET Core command-line tool](https://benchmarkdotnet.org/articles/guides/global-dotnet-tool.html)
-  to run benchmarks from any dll:
-
-```sh
-dotnet benchmark MyAssembly.dll --runtimes net472 netcoreapp2.1 Mono
-```
+  in any console application (other types of applications are not supported).
 
 ### Automation
 

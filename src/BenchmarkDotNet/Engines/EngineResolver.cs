@@ -10,6 +10,7 @@ namespace BenchmarkDotNet.Engines
     {
         internal const int DefaultMinWorkloadIterationCount = 15;
         internal const int DefaultMaxWorkloadIterationCount = 100;
+        internal const int DefaultIterationTime = 500;
 
         internal const int ForceAutoWarmup = -1;
         internal const int DefaultMinWarmupIterationCount = 6;
@@ -20,7 +21,7 @@ namespace BenchmarkDotNet.Engines
         private EngineResolver()
         {
             Register(RunMode.RunStrategyCharacteristic, () => RunStrategy.Throughput);
-            Register(RunMode.IterationTimeCharacteristic, () => TimeInterval.Millisecond * 500);
+            Register(RunMode.IterationTimeCharacteristic, () => TimeInterval.Millisecond * DefaultIterationTime);
 
             Register(RunMode.MinIterationCountCharacteristic, () => DefaultMinWorkloadIterationCount);
             Register(RunMode.MaxIterationCountCharacteristic, () => DefaultMaxWorkloadIterationCount);

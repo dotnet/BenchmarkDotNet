@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Disassemblers;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -46,9 +49,12 @@ namespace BenchmarkDotNet.Exporters
 
         private string Export(Summary summary, BenchmarkCase benchmarkCase, DisassemblyResult disassemblyResult, PmcStats pmcStats)
         {
-            string filePath = $"{Path.Combine(summary.ResultsDirectoryPath, benchmarkCase.Descriptor.WorkloadMethod.Name)}-{benchmarkCase.Job.Environment.Jit}-{benchmarkCase.Job.Environment.Platform}-instructionPointer.html";
-            if (File.Exists(filePath))
-                File.Delete(filePath);
+            string filePath = Path.Combine(summary.ResultsDirectoryPath,
+                                            $"{FolderNameHelper.ToFolderName(benchmarkCase.Descriptor.Type)}." +
+                                            $"{benchmarkCase.Descriptor.WorkloadMethod.Name}." +
+                                            $"{GetShortRuntimeInfo(summary[benchmarkCase].GetRuntimeInfo())}.counters.html");
+
+            filePath.DeleteFileIfExists();
 
             var totals = SumHardwareCountersStatsOfBenchmarkedCode(disassemblyResult, pmcStats);
             var perMethod = SumHardwareCountersPerMethod(disassemblyResult, pmcStats);
@@ -249,6 +255,38 @@ namespace BenchmarkDotNet.Exporters
             }
 
             logger.WriteLine("</tbody></table></body></html>");
+        }
+
+        // fullInfo is sth like ".NET Core 2.1.21 (CoreCLR 4.6.29130.01, CoreFX 4.6.29130.02), X64 RyuJIT"
+        private static string GetShortRuntimeInfo(string fullInfo)
+        {
+            var builder = new StringBuilder();
+
+            for (int i = 0; i < fullInfo.IndexOf('(') - 1; i++)
+            {
+                if (fullInfo[i] != ' ')
+                {
+                    builder.Append(fullInfo[i]);
+                }
+                else
+                {
+                    builder.Append('_');
+                }
+            }
+
+            for (int i = fullInfo.LastIndexOf(',') + 1; i < fullInfo.Length; i++)
+            {
+                if (fullInfo[i] != ' ')
+                {
+                    builder.Append(fullInfo[i]);
+                }
+                else
+                {
+                    builder.Append('_');
+                }
+            }
+
+            return builder.ToString();
         }
 
         private class CodeWithCounters
