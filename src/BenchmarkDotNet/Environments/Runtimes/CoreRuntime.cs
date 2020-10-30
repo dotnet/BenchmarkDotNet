@@ -76,6 +76,13 @@ namespace BenchmarkDotNet.Environments
             // we can't just use System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription
             // because it can be null and it reports versions like 4.6.* for .NET Core 2.*
 
+            // for .NET 5+ we can use Environment.Version
+            if (Environment.Version.Major >= 5)
+            {
+                version = Environment.Version;
+                return true;
+            }
+
             string runtimeDirectory = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
             if (TryGetVersionFromRuntimeDirectory(runtimeDirectory, out version))
             {
@@ -89,6 +96,9 @@ namespace BenchmarkDotNet.Environments
                 return true;
             }
 
+            // it's OK to use this method only after checking the previous ones
+            // because we might have a benchmark app build for .NET Core X but executed using CoreRun Y
+            // example: -f netcoreapp3.1 --corerun $omittedForBrevity\Microsoft.NETCore.App\6.0.0\CoreRun.exe - built as 3.1, run as 6.0 (#1576)
             string frameworkName = Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
             if (TryGetVersionFromFrameworkName(frameworkName, out version))
             {
