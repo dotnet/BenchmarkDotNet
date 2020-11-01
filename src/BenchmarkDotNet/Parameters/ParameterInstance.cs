@@ -1,25 +1,30 @@
 ﻿using System;
+using System.Globalization;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Parameters
 {
-    public class ParameterInstance
+    public class ParameterInstance : IDisposable
     {
         public const string NullParameterTextRepresentation = "?";
-        private const int MaxDisplayTextInnerLength = 15 + 5; // 5 is for postfix " [15]"
 
         [PublicAPI] public ParameterDefinition Definition { get; }
-        
-        private readonly object value;
 
-        public ParameterInstance(ParameterDefinition definition, object value)
+        private readonly object value;
+        private readonly int maxParameterColumnWidth;
+
+        public ParameterInstance(ParameterDefinition definition, object value, SummaryStyle summaryStyle)
         {
             Definition = definition;
             this.value = value;
+            maxParameterColumnWidth = summaryStyle?.MaxParameterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
         }
+
+        public void Dispose() => (Value as IDisposable)?.Dispose();
 
         public string Name => Definition.Name;
         public bool IsStatic => Definition.IsStatic;
@@ -27,31 +32,43 @@ namespace BenchmarkDotNet.Parameters
 
         public object Value => value is IParam parameter ? parameter.Value : value;
 
-        public string ToSourceCode() 
-            => value is IParam parameter 
+        public string ToSourceCode()
+            => value is IParam parameter
                 ? parameter.ToSourceCode()
                 : SourceCodeHelper.ToSourceCode(value);
 
-        public string ToDisplayText()
+        public string ToDisplayText(CultureInfo cultureInfo)
         {
-            switch (value) {
+            switch (value)
+            {
                 case null:
                     return NullParameterTextRepresentation;
                 case IParam parameter:
-                    return Trim(parameter.DisplayText);
+                    return Trim(parameter.DisplayText, maxParameterColumnWidth);
+                case IFormattable formattable:
+                    return Trim(formattable.ToString(null, cultureInfo), maxParameterColumnWidth);
                 // no trimming for types!
                 case Type type:
                     return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).GetDisplayName()}?" : type.GetDisplayName();
+                default:
+                    return Trim(value.ToString(), maxParameterColumnWidth);
             }
-
-            return Trim(value.ToString());
         }
+
+        public string ToDisplayText() => ToDisplayText(CultureInfo.CurrentCulture);
 
         public override string ToString() => ToDisplayText();
 
-        private static string Trim(string value) 
-            => value.Length <= MaxDisplayTextInnerLength
-                ? value
-                : value.Substring(0, 5) + "(...)" + value.Substring(value.Length - 5, 5) + $" [{value.Length}]";
+        private static string Trim(string value, int maxDisplayTextInnerLength)
+        {
+            if (value.Length <= maxDisplayTextInnerLength)
+                return value;
+
+            var postfix = $" [{value.Length}]";
+            const string dots = "(...)";
+            int take = (maxDisplayTextInnerLength - postfix.Length - dots.Length) / 2;
+
+            return value.Substring(0, take) + dots + value.Substring(value.Length - take, take) + postfix;
+        }
     }
 }

@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public int ParamProperty { get; private set; }
 
             private HashSet<int> collectedParams = new HashSet<int>();
-            
+
             [Benchmark]
             public void Benchmark()
             {
@@ -162,13 +162,13 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]
             public void Benchmark()
             {
-                if(Field != null) { throw new Exception("Field should be initialized in ctor with 1 and then set to null by Engine"); }
+                if (Field != null) { throw new Exception("Field should be initialized in ctor with 1 and then set to null by Engine"); }
             }
         }
 
         [Fact]
         public void InvalidFileNamesInParamsAreSupported() => CanExecute<InvalidFileNamesInParams>();
-        
+
         public class InvalidFileNamesInParams
         {
             [Params("/\\@#$%")]
@@ -196,15 +196,15 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new InvalidOperationException("Wrong character escaping!");
             }
         }
-        
+
         [Fact]
         public void ArrayCanBeUsedAsParameter() => CanExecute<WithArray>();
-        
+
         public class WithArray
         {
             [Params(new[] { 0, 1, 2 })]
             public int[] Array;
-            
+
             [Benchmark]
             public void AcceptingArray()
             {
@@ -212,7 +212,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new InvalidOperationException("Incorrect array length");
 
                 for (int i = 0; i < 3; i++)
-                    if(Array[i] != i)
+                    if (Array[i] != i)
                         throw new InvalidOperationException($"Incorrect array element at index {i}, was {Array[i]} instead of {i}");
             }
         }

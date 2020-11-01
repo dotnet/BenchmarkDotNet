@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.Common;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.Mathematics
 {
     /// <summary>
     /// the goal of this struct is to avoid any heap allocations, please keep it in mind
     /// </summary>
-    internal struct MeasurementsStatistics
+    internal readonly ref struct MeasurementsStatistics
     {
         /// <summary>
         /// Standard error in nanoseconds.
@@ -136,23 +138,17 @@ namespace BenchmarkDotNet.Mathematics
         {
             switch (outlierMode)
             {
-#pragma warning disable 618
-                case OutlierMode.None:
                 case OutlierMode.DontRemove:
                     return false;
-                case OutlierMode.OnlyUpper:
                 case OutlierMode.RemoveUpper:
                     return value > upperFence;
-                case OutlierMode.OnlyLower:
                 case OutlierMode.RemoveLower:
                     return value < lowerFence;
-                case OutlierMode.All:
                 case OutlierMode.RemoveAll:
                     return value < lowerFence || value > upperFence;
-#pragma warning restore 618
                 default:
                     throw new ArgumentOutOfRangeException(nameof(outlierMode), outlierMode, null);
-            }            
+            }
         }
     }
 }

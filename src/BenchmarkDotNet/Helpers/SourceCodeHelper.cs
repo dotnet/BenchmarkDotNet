@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Horology;
+using Perfolizer.Horology;
 using SimpleJson.Reflection;
 
 namespace BenchmarkDotNet.Helpers
@@ -39,10 +40,10 @@ namespace BenchmarkDotNet.Helpers
                 return "typeof(" + type.GetCorrectCSharpTypeName() + ")";
             if (!ReflectionUtils.GetTypeInfo(value.GetType()).IsValueType)
                 return "System.Activator.CreateInstance<" + value.GetType().GetCorrectCSharpTypeName() + ">()";
-            
+
             switch (value) {
                 case TimeInterval interval:
-                    return "new BenchmarkDotNet.Horology.TimeInterval(" + ToSourceCode(interval.Nanoseconds) + ")";
+                    return "new Perfolizer.Horology.TimeInterval(" + ToSourceCode(interval.Nanoseconds) + ")";
                 case IntPtr ptr:
                     return $"new System.IntPtr({ptr})";
                 case IFormattable formattable:
@@ -52,7 +53,7 @@ namespace BenchmarkDotNet.Helpers
             return value.ToString();
         }
 
-        public static bool IsCompilationTimeConstant(object value) 
+        public static bool IsCompilationTimeConstant(object value)
             => value == null || IsCompilationTimeConstant(value.GetType());
 
         public static bool IsCompilationTimeConstant(Type type)
@@ -95,6 +96,7 @@ namespace BenchmarkDotNet.Helpers
             return false;
         }
 
+        [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
         private static string ToSourceCode(double value)
         {
             if (double.IsNaN(value))
@@ -109,10 +111,11 @@ namespace BenchmarkDotNet.Helpers
                 return "System.Double.MaxValue";
             if (value == double.MinValue)
                 return "System.Double.MinValue";
-            
+
             return value.ToString("G", CultureInfo.InvariantCulture) + "d";
         }
 
+        [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
         private static string ToSourceCode(float value)
         {
             if (float.IsNaN(value))
@@ -127,7 +130,7 @@ namespace BenchmarkDotNet.Helpers
                 return "System.Single.MaxValue";
             if (value == float.MinValue)
                 return "System.Single.MinValue";
-            
+
             return value.ToString("G", CultureInfo.InvariantCulture) + "f";
         }
 

@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Samples
                 var jobs = jits
                     .Select(jit => new Job(Job.Dry) { Environment = { Jit = jit, Platform = Platform.X64 } })
                     .ToArray();
-                Config = ManualConfig.CreateEmpty().With(jobs);
+                Config = ManualConfig.CreateEmpty().AddJob(jobs);
             }
         }
 

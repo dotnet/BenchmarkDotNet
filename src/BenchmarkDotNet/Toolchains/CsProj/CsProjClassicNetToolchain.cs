@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -19,38 +15,23 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     [PublicAPI]
     public class CsProjClassicNetToolchain : Toolchain
     {
-        [PublicAPI] public static readonly IToolchain Net461 = new CsProjClassicNetToolchain("net461");
-        [PublicAPI] public static readonly IToolchain Net462 = new CsProjClassicNetToolchain("net462");
-        [PublicAPI] public static readonly IToolchain Net47 = new CsProjClassicNetToolchain("net47");
-        [PublicAPI] public static readonly IToolchain Net471 = new CsProjClassicNetToolchain("net471");
-        [PublicAPI] public static readonly IToolchain Net472 = new CsProjClassicNetToolchain("net472");
-        [PublicAPI] public static readonly IToolchain Net48 = new CsProjClassicNetToolchain("net48");
+        [PublicAPI] public static readonly IToolchain Net461 = new CsProjClassicNetToolchain("net461", ".NET Framework 4.6.1");
+        [PublicAPI] public static readonly IToolchain Net462 = new CsProjClassicNetToolchain("net462", ".NET Framework 4.6.2");
+        [PublicAPI] public static readonly IToolchain Net47 = new CsProjClassicNetToolchain("net47", ".NET Framework 4.7");
+        [PublicAPI] public static readonly IToolchain Net471 = new CsProjClassicNetToolchain("net471", ".NET Framework 4.7.1");
+        [PublicAPI] public static readonly IToolchain Net472 = new CsProjClassicNetToolchain("net472", ".NET Framework 4.7.2");
+        [PublicAPI] public static readonly IToolchain Net48 = new CsProjClassicNetToolchain("net48", ".NET Framework 4.8");
 
-        private static readonly IToolchain Default = Net461; // the lowest version we support (.NET Standard 2.0)
-
-        private static readonly Dictionary<string, IToolchain> Toolchains = new Dictionary<string, IToolchain>
-        {
-            { "4.6.1", Net461 },
-            { "4.6.2", Net462 },
-            { "4.7", Net47 },
-            { "4.7.1", Net471 },
-            { "4.7.2", Net472 },
-            { "4.8", Net48 }
-        };
-
-        [PublicAPI]
-        public static readonly Lazy<IToolchain> Current = new Lazy<IToolchain>(GetCurrentVersion);
-
-        private CsProjClassicNetToolchain(string targetFrameworkMoniker, string packagesPath = null, TimeSpan? timeout = null)
-            : base(targetFrameworkMoniker,
-                new CsProjGenerator(targetFrameworkMoniker, cliPath: null, packagesPath: packagesPath, runtimeFrameworkVersion: null),
+        private CsProjClassicNetToolchain(string targetFrameworkMoniker, string name, string packagesPath = null, TimeSpan? timeout = null)
+            : base(name,
+                new CsProjGenerator(targetFrameworkMoniker, cliPath: null, packagesPath: packagesPath, runtimeFrameworkVersion: null, isNetCore: false),
                 new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath: null, timeout: timeout),
                 new Executor())
         {
         }
 
         public static IToolchain From(string targetFrameworkMoniker, string packagesPath = null, TimeSpan? timeout = null)
-            => new CsProjClassicNetToolchain(targetFrameworkMoniker, packagesPath, timeout);
+            => new CsProjClassicNetToolchain(targetFrameworkMoniker, targetFrameworkMoniker, packagesPath, timeout);
 
         public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
         {
@@ -67,19 +48,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 return false;
 
             return true;
-        }
-
-        private static IToolchain GetCurrentVersion()
-        {
-            if (!RuntimeInformation.IsWindows())
-                return Net461; // we return .NET 4.6.1 which during validation will tell the user about lack of support
-            
-            // this logic is put to a separate method to avoid any assembly loading issues on non Windows systems
-            string version = FrameworkVersionHelper.GetLatestNetDeveloperPackVersion();
-            if (version == null) // .NET Developer Pack is not installed 
-                return Default;
-            
-            return Toolchains.TryGetValue(version, out var toolchain) ? toolchain : Default;
         }
     }
 }

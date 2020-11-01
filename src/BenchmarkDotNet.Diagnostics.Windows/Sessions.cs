@@ -7,22 +7,22 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Extensions;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
     internal class HeapSession : Session
     {
         public HeapSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
-            : base(FullNameProvider.GetBenchmarkName(details.BenchmarkCase) + "Heap", details, config, creationTime)
+            : base(GetSessionName(details.BenchmarkCase) + "Heap", details, config, creationTime)
         {
         }
 
-        protected override string FileExtension => ".userheap.etl";
+        protected override string FileExtension => "userheap.etl";
 
         internal override Session EnableProviders()
         {
@@ -35,11 +35,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     internal class UserSession : Session
     {
         public UserSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
-            : base(FullNameProvider.GetBenchmarkName(details.BenchmarkCase), details, config, creationTime)
+            : base(GetSessionName(details.BenchmarkCase), details, config, creationTime)
         {
         }
 
-        protected override string FileExtension => ".etl";
+        protected override string FileExtension => "etl";
 
         internal override Session EnableProviders()
         {
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
         }
 
-        protected override string FileExtension => ".kernel.etl";
+        protected override string FileExtension => "kernel.etl";
 
         internal override Session EnableProviders()
         {
@@ -71,6 +71,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             if (Details.Config.GetHardwareCounters().Any())
                 keywords |= KernelTraceEventParser.Keywords.PMCProfile; // Precise Machine Counters
+
+            TraceEventSession.StackCompression = true;
 
             try
             {
@@ -90,6 +92,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
     internal abstract class Session : IDisposable
     {
+        private const int MaxSessionNameLength = 128;
+
         protected abstract string FileExtension { get; }
 
         protected TraceEventSession TraceEventSession { get; }
@@ -104,12 +108,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             Details = details;
             Config = config;
-            FilePath = EnsureFolderExists(GetFilePath(details, creationTime));
-
+            FilePath = ArtifactFileNameHelper.GetTraceFilePath(details, creationTime, FileExtension).EnsureFolderExists();
             TraceEventSession = new TraceEventSession(sessionName, FilePath)
             {
                 BufferSizeMB = config.BufferSizeInMb,
-                CpuSampleIntervalMSec = config.CpuSampleIntervalInMiliseconds,
+                CpuSampleIntervalMSec = config.CpuSampleIntervalInMilliseconds,
             };
 
             Console.CancelKeyPress += OnConsoleCancelKeyPress;
@@ -132,29 +135,14 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private void OnProcessExit(object sender, EventArgs e) => Stop();
 
-        private string GetFilePath(DiagnoserActionParameters details, DateTime creationTime)
+        protected static string GetSessionName(BenchmarkCase benchmarkCase)
         {
-            string fileName = $@"{FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type)}.{FullNameProvider.GetMethodName(details.BenchmarkCase)}";
+            string benchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase);
+            if (benchmarkName.Length <= MaxSessionNameLength)
+                return benchmarkName;
 
-            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
-            if (details.Config.GetJobs().Select(job => job.GetToolchain()).Distinct().Count() > 1)
-                fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.Job.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
-
-            fileName += $"-{creationTime.ToString(BenchmarkRunnerClean.DateTimeFormat)}";
-
-            fileName = FolderNameHelper.ToFolderName(fileName);
-
-            return Path.Combine(details.Config.ArtifactsPath, $"{fileName}{FileExtension}");
-        }
-
-        private string EnsureFolderExists(string filePath)
-        {
-            string directoryPath = Path.GetDirectoryName(filePath);
-
-            if (!Directory.Exists(directoryPath))
-                Directory.CreateDirectory(directoryPath);
-
-            return filePath;
+            // session name is not really used by humans, we can just give it the hashcode value
+            return $"BenchmarkDotNet.EtwProfiler.Session_{Hashing.HashString(benchmarkName)}";
         }
     }
 }

@@ -29,9 +29,9 @@ namespace BenchmarkDotNet.Tests.Reports
         }
 
         [Theory]
-        [InlineData(new [] { 140, 1, 50 })]
-        [InlineData(new [] { 40, 1, 20 })]
-        [InlineData(new [] { 0, 1, 20 })]
+        [InlineData(new[] { 140, 1, 50 })]
+        [InlineData(new[] { 40, 1, 20 })]
+        [InlineData(new[] { 0, 1, 20 })]
         // First value is baseline, others are benchmark measurements
         public void RatioPrecisionTestWithBaseline(int[] values)
         {
@@ -71,6 +71,7 @@ namespace BenchmarkDotNet.Tests.Reports
                 string.Empty,
                 string.Empty,
                 TimeSpan.FromMinutes(1),
+                TestCultureInfo.Instance,
                 ImmutableArray<ValidationError>.Empty);
             MarkdownExporter.Default.ExportToLog(summary, logger);
             output.WriteLine(logger.GetLog());

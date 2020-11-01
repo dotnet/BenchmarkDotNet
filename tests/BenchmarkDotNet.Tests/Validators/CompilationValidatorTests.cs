@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Tests.Validators
         public void BenchmarkedMethodNameMustNotContainWhitespaces()
         {
             Delegate method = BuildDummyMethod<int>("Has Some Whitespaces");
-            
+
             var config = new ManualConfig().CreateImmutableConfig();
             var parameters = new ValidationParameters(
                 new[]
@@ -69,10 +69,10 @@ namespace BenchmarkDotNet.Tests.Validators
         public void Benchmark_Class_Methods_Must_Be_Non_Static(Type type, bool hasErrors)
         {
             var validationErrors = CompilationValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(type));
-            
+
             Assert.Equal(hasErrors, validationErrors.Any());
         }
-        
+
         [Theory]
         [InlineData(typeof(PublicClass), false)]
         [InlineData(typeof(PublicClass.PublicNestedClass), false)]
@@ -88,15 +88,15 @@ namespace BenchmarkDotNet.Tests.Validators
         {
             // Arrange
             var constructed = typeof(BenchmarkClass<>).MakeGenericType(type);
-            
+
             // Act
             var validationErrors = CompilationValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(constructed))
                                                                .ToList();
-            
+
             // Assert
             Assert.Equal(hasErrors, validationErrors.Any());
         }
-      
+
         private static Delegate BuildDummyMethod<T>(string name)
         {
             var dynamicMethod = new DynamicMethod(
@@ -110,7 +110,7 @@ namespace BenchmarkDotNet.Tests.Validators
 
             return dynamicMethod.CreateDelegate(typeof(Func<T, T>));
         }
-        
+
         private class PrivateNestedClass { }
         private protected class PrivateProtectedNestedClass { }
         private class PrivateClass { }
@@ -120,13 +120,13 @@ namespace BenchmarkDotNet.Tests.Validators
             protected internal class ProtectedInternalNestedClass { }
         }
     }
-    
+
     public class BenchmarkClassWithStaticMethod
     {
         [Benchmark]
         public static void StaticMethod() { }
     }
-    
+
     public class BenchmarkClass<T> where T : new()
     {
         [Benchmark]

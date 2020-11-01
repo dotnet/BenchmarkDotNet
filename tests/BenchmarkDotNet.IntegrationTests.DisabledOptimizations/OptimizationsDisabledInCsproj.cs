@@ -4,14 +4,14 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.IntegrationTests.DisabledOptimizations
-{               
+{
     internal class JitOptimizationsValidatorConfig : ManualConfig
     {
         public JitOptimizationsValidatorConfig()
         {
-            Add(Job.Dry);
-            Add(Loggers.ConsoleLogger.Default);
-            Add(JitOptimizationsValidator.DontFailOnError);
+            AddJob(Job.Dry);
+            AddLogger(Loggers.ConsoleLogger.Default);
+            AddValidator(JitOptimizationsValidator.DontFailOnError);
         }
     }
 

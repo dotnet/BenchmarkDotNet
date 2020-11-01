@@ -4,16 +4,16 @@ using BenchmarkDotNet.Engines;
 
 namespace BenchmarkDotNet.Samples
 {
-    [SimpleJob(RunStrategy.Monitoring, launchCount: 0, 
+    [SimpleJob(RunStrategy.Monitoring, launchCount: 0,
         warmupCount: 0, targetCount: 1)]
     public class IntroSetupCleanupTarget
     {
         [GlobalSetup(Target = nameof(BenchmarkA))]
-        public void GlobalSetupA() 
+        public void GlobalSetupA()
             => Console.WriteLine("// " + "GlobalSetup A");
 
         [Benchmark]
-        public void BenchmarkA() 
+        public void BenchmarkA()
             => Console.WriteLine("// " + "Benchmark A");
 
         [GlobalSetup(Targets = new[] { nameof(BenchmarkB), nameof(BenchmarkC) })]
@@ -21,15 +21,15 @@ namespace BenchmarkDotNet.Samples
             => Console.WriteLine("// " + "GlobalSetup B");
 
         [Benchmark]
-        public void BenchmarkB() 
+        public void BenchmarkB()
             => Console.WriteLine("// " + "Benchmark B");
 
         [Benchmark]
-        public void BenchmarkC() 
+        public void BenchmarkC()
             => Console.WriteLine("// " + "Benchmark C");
 
         [Benchmark]
-        public void BenchmarkD() 
+        public void BenchmarkD()
             => Console.WriteLine("// " + "Benchmark D");
     }
 }

@@ -14,9 +14,9 @@ namespace BenchmarkDotNet.Diagnosers
     public class MemoryDiagnoser : IDiagnoser
     {
         private const string DiagnoserId = nameof(MemoryDiagnoser);
-        
+
         public static readonly MemoryDiagnoser Default = new MemoryDiagnoser();
-        
+
         private MemoryDiagnoser() { } // we want to have only a single instance of MemoryDiagnoser
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
         public void DisplayResults(ILogger logger) { }
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Array.Empty<ValidationError>();
-        
+
         // the following methods are left empty on purpose
         // the action takes places in other process, and the values are gathered by Engine
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Diagnosers
         private class AllocatedMemoryMetricDescriptor : IMetricDescriptor
         {
             internal static readonly IMetricDescriptor Instance = new AllocatedMemoryMetricDescriptor();
-            
+
             public string Id => "Allocated Memory";
             public string DisplayName => "Allocated";
             public string Legend => "Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)";

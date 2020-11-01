@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -151,8 +150,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     IterationCleanupAction = iterationCleanupAction.InvokeSingle,
                     TargetJob = job,
                     OperationsPerInvoke = target.OperationsPerInvoke,
-                    MeasureGcStats = benchmarkCase.Config.HasMemoryDiagnoser(),
-                    Encoding = benchmarkCase.Config.Encoding,
+                    MeasureExtraStats = benchmarkCase.Config.HasExtraStatsDiagnoser(),
                     BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase)
                 };
 

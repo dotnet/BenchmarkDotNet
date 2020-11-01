@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -25,18 +25,19 @@ namespace BenchmarkDotNet.Columns
         public bool IsAvailable(Summary summary) => summary.Reports.Any(report => report.Metrics.ContainsKey(descriptor.Id));
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => GetValue(summary, benchmarkCase, SummaryStyle.Default);
-        
-        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) 
+
+        public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style)
         {
-            if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase].Metrics.TryGetValue(descriptor.Id, out Metric metric) || metric.Value == 0.0)
+            if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase].Metrics.TryGetValue(descriptor.Id, out Metric metric) || (metric.Value == 0.0 && !style.PrintZeroValuesInContent))
                 return "-";
 
+            var cultureInfo = summary.GetCultureInfo();
             if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Size)
-                return ((long)metric.Value).ToSizeStr(style.SizeUnit, 1, style.PrintUnitsInContent);
+                return SizeValue.FromBytes((long)metric.Value).ToString(style.SizeUnit, cultureInfo, descriptor.NumberFormat);
             if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Time)
-                return metric.Value.ToTimeStr(style.TimeUnit, 1, style.PrintUnitsInContent);
+                return TimeInterval.FromNanoseconds(metric.Value).ToString(style.TimeUnit, cultureInfo);
 
-            return metric.Value.ToStr(descriptor.NumberFormat);
+            return metric.Value.ToString(descriptor.NumberFormat, cultureInfo);
         }
 
         public override string ToString() => descriptor.DisplayName;

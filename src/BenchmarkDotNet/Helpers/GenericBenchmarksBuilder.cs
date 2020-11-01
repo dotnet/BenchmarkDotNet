@@ -20,16 +20,16 @@ namespace BenchmarkDotNet.Helpers
             var typeArguments = type.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>()
                                                               .Select(x => x.GenericTypeArguments)
                                                               .ToArray();
-            
+
             if (typeArguments.Any())
                 return BuildGenericTypes(type, typeArguments);
-            
+
             return new (bool isSuccess, Type result)[] { (true,  type) };
         }
-        
+
         private static IEnumerable<(bool isSuccess, Type result)> BuildGenericTypes(Type type, IEnumerable<Type[]> typeArguments)
             => typeArguments.Select(genericArg => (type.TryMakeGenericType(genericArg, out var builtType), builtType));
-        
+
         private static bool TryMakeGenericType(this Type type, Type[] typeArguments, out Type result)
         {
             try

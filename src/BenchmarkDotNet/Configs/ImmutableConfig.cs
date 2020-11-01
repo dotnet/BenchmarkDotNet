@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
-using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -38,14 +38,14 @@ namespace BenchmarkDotNet.Configs
             ImmutableHashSet<HardwareCounter> uniqueHardwareCounters,
             ImmutableHashSet<IDiagnoser> uniqueDiagnosers,
             ImmutableArray<IExporter> uniqueExporters,
-            ImmutableHashSet<IAnalyser> unqueAnalyzers, 
+            ImmutableHashSet<IAnalyser> uniqueAnalyzers,
             ImmutableHashSet<IValidator> uniqueValidators,
             ImmutableHashSet<IFilter> uniqueFilters,
             ImmutableHashSet<BenchmarkLogicalGroupRule> uniqueRules,
-            ImmutableHashSet<Job> uniqueRunnableJobs, 
-            ConfigUnionRule unionRule, 
-            string artifactsPath, 
-            Encoding encoding,
+            ImmutableHashSet<Job> uniqueRunnableJobs,
+            ConfigUnionRule unionRule,
+            string artifactsPath,
+            CultureInfo cultureInfo,
             IOrderer orderer,
             SummaryStyle summaryStyle,
             ConfigOptions options)
@@ -55,14 +55,14 @@ namespace BenchmarkDotNet.Configs
             hardwareCounters = uniqueHardwareCounters;
             diagnosers = uniqueDiagnosers;
             exporters = uniqueExporters;
-            analysers = unqueAnalyzers;
+            analysers = uniqueAnalyzers;
             validators = uniqueValidators;
             filters = uniqueFilters;
             rules = uniqueRules;
             jobs = uniqueRunnableJobs;
             UnionRule = unionRule;
             ArtifactsPath = artifactsPath;
-            Encoding = encoding;
+            CultureInfo = cultureInfo;
             Orderer = orderer;
             SummaryStyle = summaryStyle;
             Options = options;
@@ -70,9 +70,9 @@ namespace BenchmarkDotNet.Configs
 
         public ConfigUnionRule UnionRule { get; }
         public string ArtifactsPath { get; }
-        public Encoding Encoding { get; }
+        public CultureInfo CultureInfo { get; }
         public ConfigOptions Options { get; }
-        [NotNull] public IOrderer Orderer { get; } 
+        [NotNull] public IOrderer Orderer { get; }
         public SummaryStyle SummaryStyle { get; }
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => rules;
-        
+
         public ILogger GetCompositeLogger() => new CompositeLogger(loggers);
         public IExporter GetCompositeExporter() => new CompositeExporter(exporters);
         public IValidator GetCompositeValidator() => new CompositeValidator(validators);
@@ -93,6 +93,10 @@ namespace BenchmarkDotNet.Configs
         public IDiagnoser GetCompositeDiagnoser() => new CompositeDiagnoser(diagnosers);
 
         public bool HasMemoryDiagnoser() => diagnosers.Contains(MemoryDiagnoser.Default);
+
+        public bool HasThreadingDiagnoser() => diagnosers.Contains(ThreadingDiagnoser.Default);
+
+        public bool HasExtraStatsDiagnoser() => HasMemoryDiagnoser() || HasThreadingDiagnoser();
 
         public IDiagnoser GetCompositeDiagnoser(BenchmarkCase benchmarkCase, RunMode runMode)
         {

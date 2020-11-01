@@ -5,6 +5,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.Common;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -56,7 +57,7 @@ namespace BenchmarkDotNet.Columns
                     yield return BaselineRatioColumn.RatioMean;
                     var stdDevColumn = BaselineRatioColumn.RatioStdDev;
                     var stdDevColumnValues = summary.BenchmarksCases.Select(b => stdDevColumn.GetValue(summary, b));
-    
+
                     // Hide RatioSD column if values is small
                     // TODO: rewrite and check raw values
                     bool hide = stdDevColumnValues.All(value => value == "0.00" || value == "0.01");
@@ -79,7 +80,7 @@ namespace BenchmarkDotNet.Columns
                 .Distinct()
                 .Select(name => new ParamColumn(name));
         }
-        
+
         private class MetricsColumnProvider : IColumnProvider
         {
             public IEnumerable<IColumn> GetColumns(Summary summary) => summary

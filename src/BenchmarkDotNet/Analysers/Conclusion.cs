@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 
@@ -12,7 +11,7 @@ namespace BenchmarkDotNet.Analysers
         public string AnalyserId { get; }
 
         public ConclusionKind Kind { get; }
-        
+
         public bool Mergeable { get; }
 
         [NotNull]
@@ -21,10 +20,10 @@ namespace BenchmarkDotNet.Analysers
         [CanBeNull]
         public BenchmarkReport Report { get; }
 
-        private Conclusion([NotNull] string analyserId, 
-                           ConclusionKind kind, 
-                           [NotNull] string message, 
-                           [CanBeNull] BenchmarkReport report, 
+        private Conclusion([NotNull] string analyserId,
+                           ConclusionKind kind,
+                           [NotNull] string message,
+                           [CanBeNull] BenchmarkReport report,
                            bool mergeable)
         {
             AnalyserId = analyserId;
@@ -34,13 +33,13 @@ namespace BenchmarkDotNet.Analysers
             Mergeable = mergeable;
         }
 
-        public static Conclusion CreateHint(string analyserId, string message, [CanBeNull] BenchmarkReport report = null, bool mergeable = true) 
+        public static Conclusion CreateHint(string analyserId, string message, [CanBeNull] BenchmarkReport report = null, bool mergeable = true)
             => new Conclusion(analyserId, ConclusionKind.Hint, message, report, mergeable);
 
-        public static Conclusion CreateWarning(string analyserId, string message, [CanBeNull] BenchmarkReport report = null, bool mergeable = true) 
+        public static Conclusion CreateWarning(string analyserId, string message, [CanBeNull] BenchmarkReport report = null, bool mergeable = true)
             => new Conclusion(analyserId, ConclusionKind.Warning, message, report, mergeable);
 
-        public static Conclusion CreateError(string analyserId, string message, [CanBeNull] BenchmarkReport report = null, bool mergeable = true) 
+        public static Conclusion CreateError(string analyserId, string message, [CanBeNull] BenchmarkReport report = null, bool mergeable = true)
             => new Conclusion(analyserId, ConclusionKind.Error, message, report, mergeable);
 
         public bool Equals(Conclusion other)

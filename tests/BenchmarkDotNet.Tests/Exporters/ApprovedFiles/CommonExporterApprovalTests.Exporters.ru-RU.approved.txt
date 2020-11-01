@@ -14,8 +14,8 @@ WarmupCount=15
 [options="header"]
 |===
 |  Method|      Mean|  Error|    StdDev|       P67
-|     Foo|  1.000 ns|     NA|  0.000 ns|  1.000 ns
-|     Bar|  1.000 ns|     NA|  0.000 ns|  1.000 ns
+|     Foo|  1,000 ns|     NA|  0,000 ns|  1,000 ns
+|     Bar|  1,000 ns|     NA|  0,000 ns|  1,000 ns
 |===
 ############################################
 HtmlExporter
@@ -48,8 +48,8 @@ WarmupCount=15
 <table>
 <thead><tr><th>Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>P67</th>
 </tr>
-</thead><tbody><tr><td>Foo</td><td>1.000 ns</td><td>NA</td><td>0.000 ns</td><td>1.000 ns</td>
-</tr><tr><td>Bar</td><td>1.000 ns</td><td>NA</td><td>0.000 ns</td><td>1.000 ns</td>
+</thead><tbody><tr><td>Foo</td><td>1,000 ns</td><td>NA</td><td>0,000 ns</td><td>1,000 ns</td>
+</tr><tr><td>Bar</td><td>1,000 ns</td><td>NA</td><td>0,000 ns</td><td>1,000 ns</td>
 </tr></tbody></table>
 </body>
 </html>
@@ -380,8 +380,8 @@ WarmupCount=15
 
  Method |     Mean | Error |   StdDev |      P67 |
 ------- |---------:|------:|---------:|---------:|
-    Foo | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
-    Bar | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
+    Foo | 1,000 ns |    NA | 0,000 ns | 1,000 ns |
+    Bar | 1,000 ns |    NA | 0,000 ns | 1,000 ns |
 ############################################
 MarkdownExporter-atlassian
 ############################################
@@ -398,8 +398,8 @@ WarmupCount=15
 
 {noformat}
 ||Method ||    Mean ||Error ||  StdDev ||     P67 ||
-|    Foo | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
-|    Bar | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
+|    Foo | 1,000 ns |    NA | 0,000 ns | 1,000 ns |
+|    Bar | 1,000 ns |    NA | 0,000 ns | 1,000 ns |
 ############################################
 MarkdownExporter-console
 ############################################
@@ -415,8 +415,8 @@ WarmupCount=15
 
 | Method |     Mean | Error |   StdDev |      P67 |
 |------- |---------:|------:|---------:|---------:|
-|    Foo | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
-|    Bar | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
+|    Foo | 1,000 ns |    NA | 0,000 ns | 1,000 ns |
+|    Bar | 1,000 ns |    NA | 0,000 ns | 1,000 ns |
 ############################################
 MarkdownExporter-github
 ############################################
@@ -434,8 +434,8 @@ WarmupCount=15
 ```
 | Method |     Mean | Error |   StdDev |      P67 |
 |------- |---------:|------:|---------:|---------:|
-|    Foo | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
-|    Bar | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
+|    Foo | 1,000 ns |    NA | 0,000 ns | 1,000 ns |
+|    Bar | 1,000 ns |    NA | 0,000 ns | 1,000 ns |
 ############################################
 MarkdownExporter-stackoverflow
 ############################################
@@ -451,36 +451,36 @@ MarkdownExporter-stackoverflow
 
      Method |     Mean | Error |   StdDev |      P67 |
     ------- |---------:|------:|---------:|---------:|
-        Foo | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
-        Bar | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
+        Foo | 1,000 ns |    NA | 0,000 ns | 1,000 ns |
+        Bar | 1,000 ns |    NA | 0,000 ns | 1,000 ns |
 ############################################
 PlainExporter
 ############################################
 *** MockBenchmarkClass.Foo: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15) ***
 * Raw *
-WorkloadResult 1: 1 op, 1 ns, 1.0000 ns/op
+WorkloadResult   1: 1 op, 1.00 ns, 1.0000 ns/op
 
 * Statistics for WorkloadResult
-Mean = 1.0000 ns, StdErr = 0.0000 ns (0.00%); N = 1, StdDev = 0.0000 ns
-Min = 1.0000 ns, Q1 = 1.0000 ns, Median = 1.0000 ns, Q3 = 1.0000 ns, Max = 1.0000 ns
-IQR = 0.0000 ns, LowerFence = 1.0000 ns, UpperFence = 1.0000 ns
-ConfidenceInterval = [NaN ns; NaN ns] (CI 99.9%), Margin = NaN ns (NaN% of Mean)
-Skewness = NaN, Kurtosis = NaN, MValue = 2
+Mean = 1,000 ns; StdErr = 0,000 ns (0,00%); N = 1; StdDev = 0,000 ns
+Min = 1,000 ns; Q1 = 1,000 ns; Median = 1,000 ns; Q3 = 1,000 ns; Max = 1,000 ns
+IQR = 0,000 ns; LowerFence = 1,000 ns; UpperFence = 1,000 ns
+ConfidenceInterval = [не число ns; не число ns] (CI 99.9%); Margin = не число ns (не число% of Mean)
+Skewness = не число; Kurtosis = не число; MValue = 2
 -------------------- Histogram --------------------
-[0.500 ns ; 1.500 ns) | @
+[0,500 ns ; 1,500 ns) | @
 ---------------------------------------------------
 *** MockBenchmarkClass.Bar: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15) ***
 * Raw *
-WorkloadResult 1: 1 op, 1 ns, 1.0000 ns/op
+WorkloadResult   1: 1 op, 1.00 ns, 1.0000 ns/op
 
 * Statistics for WorkloadResult
-Mean = 1.0000 ns, StdErr = 0.0000 ns (0.00%); N = 1, StdDev = 0.0000 ns
-Min = 1.0000 ns, Q1 = 1.0000 ns, Median = 1.0000 ns, Q3 = 1.0000 ns, Max = 1.0000 ns
-IQR = 0.0000 ns, LowerFence = 1.0000 ns, UpperFence = 1.0000 ns
-ConfidenceInterval = [NaN ns; NaN ns] (CI 99.9%), Margin = NaN ns (NaN% of Mean)
-Skewness = NaN, Kurtosis = NaN, MValue = 2
+Mean = 1,000 ns; StdErr = 0,000 ns (0,00%); N = 1; StdDev = 0,000 ns
+Min = 1,000 ns; Q1 = 1,000 ns; Median = 1,000 ns; Q3 = 1,000 ns; Max = 1,000 ns
+IQR = 0,000 ns; LowerFence = 1,000 ns; UpperFence = 1,000 ns
+ConfidenceInterval = [не число ns; не число ns] (CI 99.9%); Margin = не число ns (не число% of Mean)
+Skewness = не число; Kurtosis = не число; MValue = 2
 -------------------- Histogram --------------------
-[0.500 ns ; 1.500 ns) | @
+[0,500 ns ; 1,500 ns) | @
 ---------------------------------------------------
 ############################################
 XmlExporter-brief

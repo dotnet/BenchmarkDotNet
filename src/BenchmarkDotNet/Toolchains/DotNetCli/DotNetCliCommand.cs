@@ -5,22 +5,17 @@ using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Toolchains.DotNetCli 
+namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     public class DotNetCliCommand
     {
-        /// <summary>
-        /// we use these settings to make sure that MSBuild does the job and simply quits without spawning any long living processes
-        /// we want to avoid "file in use" and "zombie processes" issues
-        /// </summary>
-        private const string MandatoryMsBuildSettings = " /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1";
-        
         [PublicAPI] public string CliPath { get; }
-            
+
         [PublicAPI] public string Arguments { get; }
 
         [PublicAPI] public GenerateResult GenerateResult { get; }
@@ -30,10 +25,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI] public BuildPartition BuildPartition { get; }
 
         [PublicAPI] public IReadOnlyList<EnvironmentVariable> EnvironmentVariables { get; }
-        
+
         [PublicAPI] public TimeSpan Timeout { get; }
 
-        public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger, 
+        public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger,
             BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout)
         {
             CliPath = cliPath;
@@ -44,7 +39,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             EnvironmentVariables = environmentVariables;
             Timeout = timeout;
         }
-            
+
         public DotNetCliCommand WithArguments(string arguments)
             => new DotNetCliCommand(CliPath, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout);
 
@@ -140,30 +135,30 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         internal static IEnumerable<string> GetAddPackagesCommands(BuildPartition buildPartition)
             => GetNuGetAddPackageCommands(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver);
 
-        internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null) 
+        internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null)
             => new StringBuilder()
                 .Append("restore ")
                 .Append(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\" ")
                 .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .Append(extraArguments)
-                .Append(MandatoryMsBuildSettings)
+                .Append(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .ToString();
-        
-        internal static string GetBuildCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null) 
+
+        internal static string GetBuildCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null)
             => new StringBuilder()
                 .Append($"build -c {buildPartition.BuildConfiguration} ") // we don't need to specify TFM, our auto-generated project contains always single one
                 .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .Append(extraArguments)
-                .Append(MandatoryMsBuildSettings)
+                .Append(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .Append(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $" /p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
                 .ToString();
-        
-        internal static string GetPublishCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null) 
+
+        internal static string GetPublishCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null)
             => new StringBuilder()
                 .Append($"publish -c {buildPartition.BuildConfiguration} ") // we don't need to specify TFM, our auto-generated project contains always single one
                 .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .Append(extraArguments)
-                .Append(MandatoryMsBuildSettings)
+                .Append(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .Append(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $" /p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
                 .ToString();
 
@@ -185,6 +180,21 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var nuGetRefs = benchmarkCase.Job.ResolveValue(InfrastructureMode.NuGetReferencesCharacteristic, resolver);
 
             return nuGetRefs.Select(x => $"add package {x.PackageName}{(string.IsNullOrWhiteSpace(x.PackageVersion) ? string.Empty : " -v " + x.PackageVersion)}");
+        }
+
+        private static string GetMandatoryMsBuildSettings(string buildConfiguration)
+        {
+            // we use these settings to make sure that MSBuild does the job and simply quits without spawning any long living processes
+            // we want to avoid "file in use" and "zombie processes" issues
+            const string NoMsBuildZombieProcesses = " /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true";
+            const string EnforceOptimizations = "/p:Optimize=true";
+
+            if (string.Equals(buildConfiguration, RuntimeInformation.DebugConfigurationName, StringComparison.OrdinalIgnoreCase))
+            {
+                return NoMsBuildZombieProcesses;
+            }
+
+            return $"{NoMsBuildZombieProcesses} {EnforceOptimizations}";
         }
     }
 }

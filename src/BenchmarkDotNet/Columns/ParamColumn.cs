@@ -17,7 +17,8 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase) =>
-            benchmarkCase.Parameters.Items.FirstOrDefault(item => item.Name == ColumnName)?.ToDisplayText() ?? ParameterInstance.NullParameterTextRepresentation;
+            benchmarkCase.Parameters.Items.FirstOrDefault(item => item.Name == ColumnName)?.ToDisplayText(summary.GetCultureInfo()) ??
+            ParameterInstance.NullParameterTextRepresentation;
 
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;

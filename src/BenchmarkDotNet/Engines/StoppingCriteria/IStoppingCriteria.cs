@@ -19,14 +19,14 @@ namespace BenchmarkDotNet.Engines
         /// </summary>
         [NotNull]
         string Title { get; }
-        
+
         /// <summary>
         /// The maximum possible count of iterations.
         /// Engine needs this value for setting the maximum capacity of the returned list of measurements.
         /// The correct capacity helps to avoid infrastructure allocations during benchmarking.
         /// </summary>
         int MaxIterationCount { get; }
-        
+
         /// <summary>
         /// An array of user-friendly warnings which notify about incorrect parameters.
         /// </summary>

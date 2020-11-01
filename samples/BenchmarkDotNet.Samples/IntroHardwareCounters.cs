@@ -5,7 +5,7 @@ using BenchmarkDotNet.Diagnosers;
 namespace BenchmarkDotNet.Samples
 {
     [HardwareCounters(
-        HardwareCounter.BranchMispredictions, 
+        HardwareCounter.BranchMispredictions,
         HardwareCounter.BranchInstructions)]
     public class IntroHardwareCounters
     {

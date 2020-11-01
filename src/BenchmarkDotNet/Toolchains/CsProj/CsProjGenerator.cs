@@ -18,25 +18,30 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Toolchains.CsProj
 {
     [PublicAPI]
-    public class CsProjGenerator : DotNetCliGenerator
+    public class CsProjGenerator : DotNetCliGenerator, IEquatable<CsProjGenerator>
     {
         private const string DefaultSdkName = "Microsoft.NET.Sdk";
 
         private static readonly ImmutableArray<string> SettingsWeWantToCopy =
-            new[] { "NetCoreAppImplicitPackageVersion", "RuntimeFrameworkVersion", "PackageTargetFallback", "LangVersion", "UseWpf", "UseWindowsForms", "CopyLocalLockFileAssemblies", "PreserveCompilationContext" }.ToImmutableArray();
+            new[] { "NetCoreAppImplicitPackageVersion", "RuntimeFrameworkVersion", "PackageTargetFallback", "LangVersion", "UseWpf", "UseWindowsForms", "CopyLocalLockFileAssemblies", "PreserveCompilationContext", "UserSecretsId" }.ToImmutableArray();
 
         public string RuntimeFrameworkVersion { get; }
 
-        public CsProjGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string runtimeFrameworkVersion)
-            : base(targetFrameworkMoniker, cliPath, packagesPath)
+        public CsProjGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string runtimeFrameworkVersion, bool isNetCore = true)
+            : base(targetFrameworkMoniker, cliPath, packagesPath, isNetCore)
         {
             RuntimeFrameworkVersion = runtimeFrameworkVersion;
         }
 
         protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
         {
-            string directoryName = Path.GetDirectoryName(buildPartition.AssemblyLocation)
-                ?? throw new DirectoryNotFoundException(buildPartition.AssemblyLocation);
+            string assemblyLocation = buildPartition.AssemblyLocation;
+
+            //Assembles loaded from a stream will have an empty location (https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location).
+            string directoryName = assemblyLocation.IsEmpty() ?
+                Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Bin") :
+                Path.GetDirectoryName(buildPartition.AssemblyLocation);
+
             return Path.Combine(directoryName, programName);
         }
 
@@ -92,7 +97,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         // the host project or one of the .props file that it imports might contain some custom settings that needs to be copied, sth like
         // <NetCoreAppImplicitPackageVersion>2.0.0-beta-001607-00</NetCoreAppImplicitPackageVersion>
-	    // <RuntimeFrameworkVersion>2.0.0-beta-001607-00</RuntimeFrameworkVersion>
+        // <RuntimeFrameworkVersion>2.0.0-beta-001607-00</RuntimeFrameworkVersion>
         internal (string customProperties, string sdkName) GetSettingsThatNeedsToBeCopied(TextReader streamReader, FileInfo projectFile)
         {
             if (!string.IsNullOrEmpty(RuntimeFrameworkVersion)) // some power users knows what to configure, just do it and copy nothing more
@@ -126,7 +131,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 // custom SDKs are not added for non-netcoreapp apps (like net471), so when the TFM != netcoreapp we dont parse "<Import Sdk="
                 // we don't allow for that mostly to prevent from edge cases like the following
                 // <Import Sdk="Microsoft.NET.Sdk.WindowsDesktop" Project="Sdk.props" Condition="'$(TargetFramework)'=='netcoreapp3.0'"/>
-                if (trimmedLine.StartsWith("<Project Sdk=\"") 
+                if (trimmedLine.StartsWith("<Project Sdk=\"")
                     || (TargetFrameworkMoniker.StartsWith("netcoreapp", StringComparison.InvariantCultureIgnoreCase) &&  trimmedLine.StartsWith("<Import Sdk=\"")))
                     sdkName = trimmedLine.Split('"')[1]; // its sth like Sdk="name"
             }
@@ -140,11 +145,11 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI]
         protected virtual FileInfo GetProjectFilePath(Type benchmarkTarget, ILogger logger)
         {
-            if (!GetSolutionRootDirectory(out var solutionRootDirectory))
+            if (!GetSolutionRootDirectory(out var rootDirectory) && !GetProjectRootDirectory(out rootDirectory))
             {
                 logger.WriteLineError(
-                    $"Unable to find .sln file. Will use current directory {Directory.GetCurrentDirectory()} to search for project file. If you don't use .sln file on purpose it should not be a problem.");
-                solutionRootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
+                    $"Unable to find .sln or .csproj file. Will use current directory {Directory.GetCurrentDirectory()} to search for project file. If you don't use .sln file on purpose it should not be a problem.");
+                rootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
             }
 
             // important assumption! project's file name === output dll name
@@ -153,16 +158,30 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             // I was afraid of using .GetFiles with some smart search pattern due to the fact that the method was designed for Windows
             // and now .NET is cross platform so who knows if the pattern would be supported for other OSes
             var possibleNames = new HashSet<string> { $"{projectName}.csproj", $"{projectName}.fsproj", $"{projectName}.vbproj" };
-            var projectFile = solutionRootDirectory
+            var projectFile = rootDirectory
                 .EnumerateFiles("*.*", SearchOption.AllDirectories)
                 .FirstOrDefault(file => possibleNames.Contains(file.Name));
 
             if (projectFile == default(FileInfo))
             {
                 throw new NotSupportedException(
-                    $"Unable to find {projectName} in {solutionRootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj");
+                    $"Unable to find {projectName} in {rootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj");
             }
             return projectFile;
         }
+
+        public override bool Equals(object obj) => obj is CsProjGenerator other && Equals(other);
+
+        public bool Equals(CsProjGenerator other)
+            => TargetFrameworkMoniker == other.TargetFrameworkMoniker
+                && RuntimeFrameworkVersion == other.RuntimeFrameworkVersion
+                && CliPath == other.CliPath
+                && PackagesPath == other.PackagesPath;
+
+        public override int GetHashCode()
+            => TargetFrameworkMoniker.GetHashCode()
+                ^ (RuntimeFrameworkVersion?.GetHashCode() ?? 0)
+                ^ (CliPath?.GetHashCode() ?? 0)
+                ^ (PackagesPath?.GetHashCode() ?? 0);
     }
 }

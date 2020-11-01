@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Reports
                     logger.WriteStatistic(text);
                 }
             }
-            
+
             if (startOfGroup && startOfGroupHighlightStrategy == MarkdownExporter.MarkdownHighlightStrategy.Marker)
                 logger.Write(highlightRow ? LogKind.Header : LogKind.Statistic, " ^"); //
 

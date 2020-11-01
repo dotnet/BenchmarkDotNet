@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -19,18 +21,18 @@ namespace BenchmarkDotNet.Reports
         [PublicAPI] public string LogFilePath { get; }
         [PublicAPI] public HostEnvironmentInfo HostEnvironmentInfo { get; }
         [PublicAPI] public TimeSpan TotalTime { get; }
-        [PublicAPI] public SummaryStyle Style { get; }
+        [PublicAPI, CanBeNull] public SummaryStyle Style { get; }
         [PublicAPI] public IOrderer Orderer { get; }
         [PublicAPI] public SummaryTable Table { get; }
         [PublicAPI] public string AllRuntimes { get; }
         [PublicAPI] public ImmutableArray<ValidationError> ValidationErrors { get; }
-        
+
         [PublicAPI] public ImmutableArray<BenchmarkCase> BenchmarksCases { get; }
         [PublicAPI] public ImmutableArray<BenchmarkReport> Reports { get; }
 
         private ImmutableDictionary<BenchmarkCase, BenchmarkReport> ReportMap {get; }
         private BaseliningStrategy BaseliningStrategy {get; }
-        
+
         internal DisplayPrecisionManager DisplayPrecisionManager { get; }
 
         public Summary(
@@ -40,6 +42,7 @@ namespace BenchmarkDotNet.Reports
             string resultsDirectoryPath,
             string logFilePath,
             TimeSpan totalTime,
+            CultureInfo cultureInfo,
             ImmutableArray<ValidationError> validationErrors)
         {
             Title = title;
@@ -50,13 +53,13 @@ namespace BenchmarkDotNet.Reports
             ValidationErrors = validationErrors;
 
             ReportMap = reports.ToImmutableDictionary(report => report.BenchmarkCase, report => report);
-            
+
             DisplayPrecisionManager = new DisplayPrecisionManager(this);
             Orderer = GetConfiguredOrdererOrDefaultOne(reports.Select(report => report.BenchmarkCase.Config));
             BenchmarksCases = Orderer.GetSummaryOrder(reports.Select(report => report.BenchmarkCase).ToImmutableArray(), this).ToImmutableArray(); // we sort it first
             Reports = BenchmarksCases.Select(b => ReportMap[b]).ToImmutableArray(); // we use sorted collection to re-create reports list
-            BaseliningStrategy = BaseliningStrategy.Create(BenchmarksCases); 
-            Style = GetConfiguredSummaryStyleOrNull(BenchmarksCases);
+            BaseliningStrategy = BaseliningStrategy.Create(BenchmarksCases);
+            Style = GetConfiguredSummaryStyleOrNull(BenchmarksCases)?.WithCultureInfo(cultureInfo);
             Table = GetTable(Style);
             AllRuntimes = BuildAllRuntimes(HostEnvironmentInfo, Reports);
         }
@@ -65,7 +68,7 @@ namespace BenchmarkDotNet.Reports
 
         /// <summary>
         /// Returns a report for the given benchmark or null if there is no a corresponded report.
-        /// </summary>        
+        /// </summary>
         public BenchmarkReport this[BenchmarkCase benchmarkCase] => ReportMap.GetValueOrDefault(benchmarkCase);
 
         public bool HasCriticalValidationErrors => ValidationErrors.Any(validationError => validationError.IsCritical);
@@ -73,19 +76,20 @@ namespace BenchmarkDotNet.Reports
         public int GetNumberOfExecutedBenchmarks() => Reports.Count(report => report.ExecuteResults.Any(result => result.FoundExecutable));
 
         internal static Summary NothingToRun(string title, string resultsDirectoryPath, string logFilePath)
-            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, ImmutableArray<ValidationError>.Empty);
+            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, DefaultCultureInfo.Instance, ImmutableArray<ValidationError>.Empty);
 
         internal static Summary ValidationFailed(string title, string resultsDirectoryPath, string logFilePath, ImmutableArray<ValidationError> validationErrors)
-            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, validationErrors);
+            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, DefaultCultureInfo.Instance, validationErrors);
 
-        internal static Summary Join(List<Summary> summaries, ClockSpan clockSpan) 
+        internal static Summary Join(List<Summary> summaries, ClockSpan clockSpan)
             => new Summary(
-                $"BenchmarkRun-joined-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}",
+                $"BenchmarkRun-joined-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}",
                 summaries.SelectMany(summary => summary.Reports).ToImmutableArray(),
-                HostEnvironmentInfo.GetCurrent(), 
+                HostEnvironmentInfo.GetCurrent(),
                 summaries.First().ResultsDirectoryPath,
                 summaries.First().LogFilePath,
                 clockSpan.GetTimeSpan(),
+                summaries.First().GetCultureInfo(),
                 summaries.SelectMany(summary => summary.ValidationErrors).ToImmutableArray());
 
         internal static string BuildAllRuntimes(HostEnvironmentInfo hostEnvironmentInfo, IEnumerable<BenchmarkReport> reports)
@@ -122,17 +126,17 @@ namespace BenchmarkDotNet.Reports
         public string GetLogicalGroupKey(BenchmarkCase benchmarkCase)
             => Orderer.GetLogicalGroupKey(BenchmarksCases, benchmarkCase);
 
-        public bool IsBaseline(BenchmarkCase benchmarkCase) 
+        public bool IsBaseline(BenchmarkCase benchmarkCase)
             => BaseliningStrategy.IsBaseline(benchmarkCase);
 
         [CanBeNull]
-        public BenchmarkCase GetBaseline(string logicalGroupKey) 
+        public BenchmarkCase GetBaseline(string logicalGroupKey)
             => BenchmarksCases
                 .Where(b => GetLogicalGroupKey(b) == logicalGroupKey)
                 .FirstOrDefault(IsBaseline);
 
         [NotNull]
-        public IEnumerable<BenchmarkCase> GetNonBaselines(string logicalGroupKey) 
+        public IEnumerable<BenchmarkCase> GetNonBaselines(string logicalGroupKey)
             => BenchmarksCases
                 .Where(b => GetLogicalGroupKey(b) == logicalGroupKey)
                 .Where(b => !IsBaseline(b));

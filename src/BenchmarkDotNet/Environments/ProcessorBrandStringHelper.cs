@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Portability.Cpu;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -29,7 +28,7 @@ namespace BenchmarkDotNet.Environments
 
             // Remove parts which don't provide any useful information for user
             var processorName = cpuInfo.ProcessorName.Replace("@", "").Replace("(R)", "").Replace("(TM)", "");
-            
+
             // If we have found physical core(s), we can safely assume we can drop extra info from brand
             if (cpuInfo.PhysicalCoreCount.HasValue && cpuInfo.PhysicalCoreCount.Value > 0)
                 processorName = Regex.Replace(processorName, @"(\w+?-Core Processor)", "").Trim();
@@ -41,7 +40,7 @@ namespace BenchmarkDotNet.Environments
                 string maxFrequency = processorName.Contains("Hz") ? $"(Max: {frequencyString})" : frequencyString;
                 processorName = $"{processorName} {maxFrequency}";
             }
-            
+
             // Remove double spaces
             processorName = Regex.Replace(processorName.Trim(), @"\s+", " ");
 
@@ -61,7 +60,7 @@ namespace BenchmarkDotNet.Environments
         {
             if (frequency == null)
                 return null;
-            return $"{frequency.Value.ToGHz().ToStr("N2")}GHz";
+            return $"{frequency.Value.ToGHz().ToString("N2", DefaultCultureInfo.Instance)}GHz";
         }
 
         /// <summary>
@@ -127,7 +126,7 @@ namespace BenchmarkDotNet.Environments
         {
             if (KnownMicroarchitectures.Value.ContainsKey(modelNumber))
                 return KnownMicroarchitectures.Value[modelNumber];
-            
+
             if (modelNumber.Length >= 3 && modelNumber.Substring(0, 3).All(char.IsDigit) &&
                 (modelNumber.Length == 3 || !char.IsDigit(modelNumber[3])))
                 return "Nehalem";

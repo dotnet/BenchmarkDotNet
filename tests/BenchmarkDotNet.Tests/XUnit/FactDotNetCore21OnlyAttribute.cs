@@ -6,9 +6,9 @@ namespace BenchmarkDotNet.Tests.XUnit
     {
         public FactDotNetCore21OnlyAttribute(string skipReason)
         {
-#if !NETCOREAPP2_1            
+#if !NETCOREAPP2_1
             Skip = skipReason;
-#endif    
+#endif
         }
     }
 }

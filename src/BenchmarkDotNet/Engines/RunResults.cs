@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.Engines
 {
     public struct RunResults
     {
         private readonly OutlierMode outlierMode;
-        private readonly Encoding encoding;
-        
+
         [CanBeNull, PublicAPI]
         public IReadOnlyList<Measurement> Overhead { get; }
 
@@ -22,17 +21,19 @@ namespace BenchmarkDotNet.Engines
 
         public GcStats GCStats { get; }
 
+        public ThreadingStats ThreadingStats { get; }
+
         public RunResults([CanBeNull] IReadOnlyList<Measurement> overhead,
                           [NotNull] IReadOnlyList<Measurement> workload,
                           OutlierMode outlierMode,
                           GcStats gcStats,
-                          Encoding encoding)
+                          ThreadingStats threadingStats)
         {
             this.outlierMode = outlierMode;
-            this.encoding = encoding;
             Overhead = overhead;
             Workload = workload;
             GCStats = gcStats;
+            ThreadingStats = threadingStats;
         }
 
         public IEnumerable<Measurement> GetMeasurements()
@@ -51,20 +52,23 @@ namespace BenchmarkDotNet.Engines
                 yield return new Measurement(
                     measurement.LaunchIndex,
                     IterationMode.Workload,
-                    IterationStage.Result, 
+                    IterationStage.Result,
                     ++resultIndex,
                     measurement.Operations,
-                    value,
-                    encoding);
+                    value);
             }
         }
 
         public void Print(TextWriter outWriter)
         {
             foreach (var measurement in GetMeasurements())
-                outWriter.WriteLine(measurement.ToOutputLine());
+                outWriter.WriteLine(measurement.ToString());
 
-            outWriter.WriteLine(GCStats.ToOutputLine());
+            if (!GCStats.Equals(GcStats.Empty))
+                outWriter.WriteLine(GCStats.ToOutputLine());
+            if (!ThreadingStats.Equals(ThreadingStats.Empty))
+                outWriter.WriteLine(ThreadingStats.ToOutputLine());
+
             outWriter.WriteLine();
         }
 

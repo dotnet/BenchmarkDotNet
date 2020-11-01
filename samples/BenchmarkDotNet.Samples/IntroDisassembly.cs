@@ -1,19 +1,33 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Environments;
+using System.Linq;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DryCoreJob, DryMonoJob, DryClrJob(Platform.X86)]
     [DisassemblyDiagnoser]
     public class IntroDisassembly
     {
+        private int[] field = Enumerable.Range(0, 100).ToArray();
+
         [Benchmark]
-        public double Sum()
+        public int SumLocal()
         {
-            double res = 0;
-            for (int i = 0; i < 64; i++)
-                res += i;
-            return res;
+            var local = field; // we use local variable that points to the field
+
+            int sum = 0;
+            for (int i = 0; i < local.Length; i++)
+                sum += local[i];
+
+            return sum;
+        }
+
+        [Benchmark]
+        public int SumField()
+        {
+            int sum = 0;
+            for (int i = 0; i < field.Length; i++)
+                sum += field[i];
+
+            return sum;
         }
     }
 }

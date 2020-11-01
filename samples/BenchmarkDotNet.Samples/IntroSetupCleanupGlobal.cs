@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Samples
         {
             data = new int[N]; // executed once per each N value
         }
-        
+
         [Benchmark]
         public int Logic()
         {
@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Samples
                 res += data[i];
             return res;
         }
-        
+
         [GlobalCleanup]
         public void GlobalCleanup()
         {

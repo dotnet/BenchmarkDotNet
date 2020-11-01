@@ -34,9 +34,9 @@ namespace BenchmarkDotNet.Extensions
         private static Dictionary<string, string> BuildInvalidPathCharactersMappings()
         {
             var invalidFileNameChars = Path.GetInvalidFileNameChars().ToList();
-            
+
             // '\\' is a valid file name char on Unix
-            // which can be a problem when we are working with MSBuild 
+            // which can be a problem when we are working with MSBuild
             if (!invalidFileNameChars.Contains('\\'))
                 invalidFileNameChars.Add('\\');
 
@@ -83,6 +83,14 @@ namespace BenchmarkDotNet.Extensions
                 }
             }
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Returns file base name
+        /// </summary>
+        internal static string GetBaseName(this string path, string directory)
+        {
+            return path.Replace(directory, string.Empty).Trim('/', '\\');
         }
     }
 }

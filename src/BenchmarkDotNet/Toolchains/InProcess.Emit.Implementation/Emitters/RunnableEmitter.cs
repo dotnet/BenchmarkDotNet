@@ -476,14 +476,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         private ConstructorBuilder DefineCtor()
         {
-            // .method public hidebysig specialname rtspecialname 
+            // .method public hidebysig specialname rtspecialname
             //    instance void.ctor() cil managed
             return runnableBuilder.DefinePublicInstanceCtor();
         }
 
         private MethodBuilder DefineTrickTheJitMethod()
         {
-            // .method public hidebysig 
+            // .method public hidebysig
             //    instance void __TrickTheJIT__() cil managed noinlining nooptimization
             var result = runnableBuilder
                 .DefinePublicNonVirtualVoidInstanceMethod(TrickTheJitCoreMethodName)
@@ -541,7 +541,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         {
             var overheadInvokeMethod = TypeBuilderExtensions.GetDelegateInvokeMethod(overheadDelegateType);
 
-            //.method private hidebysig 
+            //.method private hidebysig
             //    instance int32 __Overhead(int64 arg0) cil managed
             var methodBuilder = runnableBuilder.DefineNonVirtualInstanceMethod(
                 methodName,
@@ -572,7 +572,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             var workloadInvokeMethod = TypeBuilderExtensions.GetDelegateInvokeMethod(workloadDelegateType);
 
-            //.method private hidebysig 
+            //.method private hidebysig
             //   instance int32 __Workload(int64 arg0) cil managed
             var args = workloadInvokeMethod.GetParameters();
             var methodBuilder = runnableBuilder.DefineNonVirtualInstanceMethod(
@@ -655,7 +655,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             }
 
             // .method private hidebysig
-            //    instance void OverheadActionUnroll(int64 invokeCount) cil managed 
+            //    instance void OverheadActionUnroll(int64 invokeCount) cil managed
             var toArg = new EmitParameterInfo(0, InvokeCountParamName, typeof(long));
             var actionMethodBuilder = runnableBuilder.DefineNonVirtualInstanceMethod(
                 methodName,
@@ -808,7 +808,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         private MethodBuilder EmitForDisassemblyDiagnoser(string methodName)
         {
-            // .method public hidebysig 
+            // .method public hidebysig
             //    instance int32 __ForDisassemblyDiagnoser__() cil managed noinlining nooptimization
             var workloadMethod = Descriptor.WorkloadMethod;
             var workloadReturnParameter = EmitParameterInfo.CreateReturnParameter(consumableInfo.WorkloadMethodReturnType);
@@ -1013,7 +1013,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             var resultTuple = new ValueTuple<Job, EngineParameters, IEngineFactory>();
 
             /*
-                .method public hidebysig static 
+                .method public hidebysig static
                     void Run (
                         class [BenchmarkDotNet]BenchmarkDotNet.Running.BenchmarkCase benchmarkCase,
                         class [BenchmarkDotNet]BenchmarkDotNet.Engines.IHost host

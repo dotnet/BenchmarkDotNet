@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -19,12 +21,16 @@ namespace BenchmarkDotNet.Columns
                 return "?";
 
             var baselineStat = summary[baseline].ResultStatistics;
+            var baselineMetrics = summary[baseline].Metrics;
             var currentStat = summary[benchmarkCase].ResultStatistics;
+            var currentMetrics = summary[benchmarkCase].Metrics;
 
-            return GetValue(summary, benchmarkCase, baselineStat, currentStat, isBaseline);
+            return GetValue(summary, benchmarkCase, baselineStat, baselineMetrics, currentStat, currentMetrics, isBaseline);
         }
 
-        internal abstract string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, Statistics current, bool isBaseline);
+        [PublicAPI]
+        public abstract string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, IReadOnlyDictionary<string, Metric> baselineMetrics,
+            Statistics current, IReadOnlyDictionary<string, Metric> currentMetrics, bool isBaseline);
 
         public bool IsAvailable(Summary summary) => summary.HasBaselines();
         public bool AlwaysShow => true;

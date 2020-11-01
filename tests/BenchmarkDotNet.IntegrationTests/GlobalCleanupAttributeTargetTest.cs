@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.Contains(BaselineBenchmarkCalled + Environment.NewLine, log);
             Assert.True(
-                log.IndexOf(BaselineBenchmarkCalled + Environment.NewLine) < 
+                log.IndexOf(BaselineBenchmarkCalled + Environment.NewLine) <
                 log.IndexOf(BaselineGlobalCleanupCalled + Environment.NewLine));
 
             Assert.Contains(FirstGlobalCleanupCalled + Environment.NewLine, log);
