@@ -1554,10 +1554,28 @@ namespace SimpleJson
             foreach (KeyValuePair<string, ReflectionUtils.GetDelegate> getter in getters)
             {
                 if (getter.Value != null)
-                    obj.Add(MapClrMemberNameToJsonFieldName(getter.Key), getter.Value(input));
+                    obj.Add(MapClrMemberNameToJsonFieldName(getter.Key), ReplaceUnsupportedNumericValues(getter.Value(input)));
             }
             output = obj;
             return true;
+        }
+
+        private object ReplaceUnsupportedNumericValues(object value)
+        {
+            if (!(value is double))
+            {
+                return value;
+            }
+
+            switch (value)
+            {
+                case double.NaN:
+                case double.NegativeInfinity:
+                case double.PositiveInfinity:
+                    return 0.0;
+                default:
+                    return value;
+            }
         }
     }
 
