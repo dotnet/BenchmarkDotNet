@@ -515,6 +515,7 @@ namespace SimpleJson
         private const int TOKEN_FALSE = 10;
         private const int TOKEN_NULL = 11;
         private const int BUILDER_CAPACITY = 2000;
+        internal const string JSON_EMPTY_STRING = "\"\"";
 
         private static readonly char[] EscapeTable;
         private static readonly char[] EscapeCharacters = new char[] { '"', '\\', '\b', '\f', '\n', '\r', '\t' };
@@ -1169,20 +1170,36 @@ namespace SimpleJson
 
         static bool SerializeNumber(object number, StringBuilder builder)
         {
-            if (number is long)
-                builder.Append(((long)number).ToString(CultureInfo.InvariantCulture));
-            else if (number is ulong)
-                builder.Append(((ulong)number).ToString(CultureInfo.InvariantCulture));
-            else if (number is int)
-                builder.Append(((int)number).ToString(CultureInfo.InvariantCulture));
-            else if (number is uint)
-                builder.Append(((uint)number).ToString(CultureInfo.InvariantCulture));
-            else if (number is decimal)
-                builder.Append(((decimal)number).ToString(CultureInfo.InvariantCulture));
-            else if (number is float)
-                builder.Append(((float)number).ToString(CultureInfo.InvariantCulture));
-            else
-                builder.Append(Convert.ToDouble(number, CultureInfo.InvariantCulture).ToString("r", CultureInfo.InvariantCulture));
+            object value = ReplaceUnsupportedNumericValues(number);
+            if (!value.Equals(JSON_EMPTY_STRING))
+            {
+                switch (value)
+                {
+                    case long num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    case ulong num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    case int num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    case uint num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    case decimal num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    case float num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    default:
+                        value = Convert.ToDouble(value, CultureInfo.InvariantCulture).ToString("r", CultureInfo.InvariantCulture);
+                        break;
+                }
+            }
+           
+            builder.Append(value);
             return true;
         }
 
@@ -1204,6 +1221,22 @@ namespace SimpleJson
             if (value is double) return true;
             if (value is decimal) return true;
             return false;
+        }
+
+        internal static object ReplaceUnsupportedNumericValues(object value)
+        {
+            switch (value)
+            {
+                case float.NaN:
+                case float.NegativeInfinity:
+                case float.PositiveInfinity:
+                case double.NaN:
+                case double.NegativeInfinity:
+                case double.PositiveInfinity:
+                    return JSON_EMPTY_STRING;
+                default:
+                    return value;
+            }
         }
 
         private static int indentationLevel;

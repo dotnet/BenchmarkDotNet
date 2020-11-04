@@ -112,16 +112,16 @@ JsonExporter-brief
             "StandardError":0,
             "Variance":0,
             "StandardDeviation":0,
-            "Skewness":NaN,
-            "Kurtosis":NaN,
+            "Skewness":"",
+            "Kurtosis":"",
             "ConfidenceInterval":{
                "N":1,
                "Mean":1,
                "StandardError":0,
                "Level":12,
-               "Margin":NaN,
-               "Lower":NaN,
-               "Upper":NaN
+               "Margin":"",
+               "Lower":"",
+               "Upper":""
             },
             "Percentiles":{
                "P0":1,
@@ -169,16 +169,16 @@ JsonExporter-brief
             "StandardError":0,
             "Variance":0,
             "StandardDeviation":0,
-            "Skewness":NaN,
-            "Kurtosis":NaN,
+            "Skewness":"",
+            "Kurtosis":"",
             "ConfidenceInterval":{
                "N":1,
                "Mean":1,
                "StandardError":0,
                "Level":12,
-               "Margin":NaN,
-               "Lower":NaN,
-               "Upper":NaN
+               "Margin":"",
+               "Lower":"",
+               "Upper":""
             },
             "Percentiles":{
                "P0":1,
@@ -198,7 +198,7 @@ JsonExporter-brief
 ############################################
 JsonExporter-brief-compressed
 ############################################
-{"Title":"MockSummary","HostEnvironmentInfo":{"BenchmarkDotNetCaption":"BenchmarkDotNet","BenchmarkDotNetVersion":"0.10.x-mock","OsVersion":"Microsoft Windows NT 10.0.x.mock","ProcessorName":"MockIntel Core i7-6700HQ CPU 2.60GHz","PhysicalProcessorCount":1,"PhysicalCoreCount":4,"LogicalCoreCount":8,"RuntimeVersion":"Clr 4.0.x.mock","Architecture":"64mock","HasAttachedDebugger":false,"HasRyuJit":true,"Configuration":"CONFIGURATION","DotNetCliVersion":null,"ChronometerFrequency":{"Hertz":2531248},"HardwareTimerKind":"Tsc"},"Benchmarks":[{"DisplayInfo":"MockBenchmarkClass.Foo: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Foo","MethodTitle":"Foo","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Foo","Statistics":{"OriginalValues":[1],"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":NaN,"Kurtosis":NaN,"ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":NaN,"Lower":NaN,"Upper":NaN},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}}},{"DisplayInfo":"MockBenchmarkClass.Bar: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Bar","MethodTitle":"Bar","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Bar","Statistics":{"OriginalValues":[1],"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":NaN,"Kurtosis":NaN,"ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":NaN,"Lower":NaN,"Upper":NaN},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}}}]}
+{"Title":"MockSummary","HostEnvironmentInfo":{"BenchmarkDotNetCaption":"BenchmarkDotNet","BenchmarkDotNetVersion":"0.10.x-mock","OsVersion":"Microsoft Windows NT 10.0.x.mock","ProcessorName":"MockIntel Core i7-6700HQ CPU 2.60GHz","PhysicalProcessorCount":1,"PhysicalCoreCount":4,"LogicalCoreCount":8,"RuntimeVersion":"Clr 4.0.x.mock","Architecture":"64mock","HasAttachedDebugger":false,"HasRyuJit":true,"Configuration":"CONFIGURATION","DotNetCliVersion":null,"ChronometerFrequency":{"Hertz":2531248},"HardwareTimerKind":"Tsc"},"Benchmarks":[{"DisplayInfo":"MockBenchmarkClass.Foo: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Foo","MethodTitle":"Foo","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Foo","Statistics":{"OriginalValues":[1],"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":"","Kurtosis":"","ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":"","Lower":"","Upper":""},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}}},{"DisplayInfo":"MockBenchmarkClass.Bar: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Bar","MethodTitle":"Bar","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Bar","Statistics":{"OriginalValues":[1],"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":"","Kurtosis":"","ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":"","Lower":"","Upper":""},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}}}]}
 ############################################
 JsonExporter-full
 ############################################
@@ -258,16 +258,16 @@ JsonExporter-full
             "StandardError":0,
             "Variance":0,
             "StandardDeviation":0,
-            "Skewness":NaN,
-            "Kurtosis":NaN,
+            "Skewness":"",
+            "Kurtosis":"",
             "ConfidenceInterval":{
                "N":1,
                "Mean":1,
                "StandardError":0,
                "Level":12,
-               "Margin":NaN,
-               "Lower":NaN,
-               "Upper":NaN
+               "Margin":"",
+               "Lower":"",
+               "Upper":""
             },
             "Percentiles":{
                "P0":1,
@@ -325,16 +325,16 @@ JsonExporter-full
             "StandardError":0,
             "Variance":0,
             "StandardDeviation":0,
-            "Skewness":NaN,
-            "Kurtosis":NaN,
+            "Skewness":"",
+            "Kurtosis":"",
             "ConfidenceInterval":{
                "N":1,
                "Mean":1,
                "StandardError":0,
                "Level":12,
-               "Margin":NaN,
-               "Lower":NaN,
-               "Upper":NaN
+               "Margin":"",
+               "Lower":"",
+               "Upper":""
             },
             "Percentiles":{
                "P0":1,
@@ -364,7 +364,7 @@ JsonExporter-full
 ############################################
 JsonExporter-full-compressed
 ############################################
-{"Title":"MockSummary","HostEnvironmentInfo":{"BenchmarkDotNetCaption":"BenchmarkDotNet","BenchmarkDotNetVersion":"0.10.x-mock","OsVersion":"Microsoft Windows NT 10.0.x.mock","ProcessorName":"MockIntel Core i7-6700HQ CPU 2.60GHz","PhysicalProcessorCount":1,"PhysicalCoreCount":4,"LogicalCoreCount":8,"RuntimeVersion":"Clr 4.0.x.mock","Architecture":"64mock","HasAttachedDebugger":false,"HasRyuJit":true,"Configuration":"CONFIGURATION","DotNetCliVersion":null,"ChronometerFrequency":{"Hertz":2531248},"HardwareTimerKind":"Tsc"},"Benchmarks":[{"DisplayInfo":"MockBenchmarkClass.Foo: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Foo","MethodTitle":"Foo","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Foo","Statistics":{"OriginalValues":[1],"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":NaN,"Kurtosis":NaN,"ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":NaN,"Lower":NaN,"Upper":NaN},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Measurements":[{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":1,"Operations":1,"Nanoseconds":1}]},{"DisplayInfo":"MockBenchmarkClass.Bar: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Bar","MethodTitle":"Bar","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Bar","Statistics":{"OriginalValues":[1],"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":NaN,"Kurtosis":NaN,"ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":NaN,"Lower":NaN,"Upper":NaN},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Measurements":[{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":1,"Operations":1,"Nanoseconds":1}]}]}
+{"Title":"MockSummary","HostEnvironmentInfo":{"BenchmarkDotNetCaption":"BenchmarkDotNet","BenchmarkDotNetVersion":"0.10.x-mock","OsVersion":"Microsoft Windows NT 10.0.x.mock","ProcessorName":"MockIntel Core i7-6700HQ CPU 2.60GHz","PhysicalProcessorCount":1,"PhysicalCoreCount":4,"LogicalCoreCount":8,"RuntimeVersion":"Clr 4.0.x.mock","Architecture":"64mock","HasAttachedDebugger":false,"HasRyuJit":true,"Configuration":"CONFIGURATION","DotNetCliVersion":null,"ChronometerFrequency":{"Hertz":2531248},"HardwareTimerKind":"Tsc"},"Benchmarks":[{"DisplayInfo":"MockBenchmarkClass.Foo: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Foo","MethodTitle":"Foo","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Foo","Statistics":{"OriginalValues":[1],"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":"","Kurtosis":"","ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":"","Lower":"","Upper":""},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Measurements":[{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":1,"Operations":1,"Nanoseconds":1}]},{"DisplayInfo":"MockBenchmarkClass.Bar: LongRun(IterationCount=100, LaunchCount=3, WarmupCount=15)","Namespace":"BenchmarkDotNet.Tests.Mocks","Type":"MockBenchmarkClass","Method":"Bar","MethodTitle":"Bar","Parameters":"","FullName":"BenchmarkDotNet.Tests.Mocks.MockFactory+MockBenchmarkClass.Bar","Statistics":{"OriginalValues":[1],"N":1,"Min":1,"LowerFence":1,"Q1":1,"Median":1,"Mean":1,"Q3":1,"UpperFence":1,"Max":1,"InterquartileRange":0,"LowerOutliers":[],"UpperOutliers":[],"AllOutliers":[],"StandardError":0,"Variance":0,"StandardDeviation":0,"Skewness":"","Kurtosis":"","ConfidenceInterval":{"N":1,"Mean":1,"StandardError":0,"Level":12,"Margin":"","Lower":"","Upper":""},"Percentiles":{"P0":1,"P25":1,"P50":1,"P67":1,"P80":1,"P85":1,"P90":1,"P95":1,"P100":1}},"Measurements":[{"IterationMode":"Workload","IterationStage":"Result","LaunchIndex":1,"IterationIndex":1,"Operations":1,"Nanoseconds":1}]}]}
 ############################################
 MarkdownExporter-default
 ############################################
