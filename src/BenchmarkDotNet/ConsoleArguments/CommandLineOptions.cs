@@ -168,6 +168,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("envVars", Required = false, HelpText = "Colon separated environment variables (key:value)")]
         public IEnumerable<string> EnvironmentVariables { get; set; }
 
+        [Option("memoryRandomization", Required = false, HelpText = "Enables Memory Randomization that causes Engine to allocate random-size memory between iterations and invoke GlobalSetup afterwards.")]
+        public bool MemoryRandomization { get; set; }
+
         [Option("wasmEngine", Required = false, HelpText = "Full path to a java script engine used to run the benchmarks, used by Wasm toolchain.")]
         public FileInfo WasmJavascriptEngine { get; set; }
 

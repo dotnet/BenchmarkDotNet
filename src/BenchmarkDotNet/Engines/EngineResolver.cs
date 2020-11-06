@@ -33,6 +33,7 @@ namespace BenchmarkDotNet.Engines
             Register(AccuracyMode.MinIterationTimeCharacteristic, () => TimeInterval.Millisecond * 500);
             Register(AccuracyMode.MinInvokeCountCharacteristic, () => 4);
             Register(AccuracyMode.EvaluateOverheadCharacteristic, () => true);
+            Register(RunMode.MemoryRandomizationCharacteristic, () => false);
             Register(AccuracyMode.OutlierModeCharacteristic, job =>
             {
                 var strategy = job.ResolveValue(RunMode.RunStrategyCharacteristic, this);

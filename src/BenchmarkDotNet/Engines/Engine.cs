@@ -38,11 +38,13 @@ namespace BenchmarkDotNet.Engines
         private RunStrategy Strategy { get; }
         private bool EvaluateOverhead { get; }
         private int InvocationCount { get; }
+        private bool MemoryRandomization { get; }
 
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineActualStage actualStage;
         private readonly bool includeExtraStats;
+        private readonly Random random;
 
         internal Engine(
             IHost host,
@@ -75,10 +77,13 @@ namespace BenchmarkDotNet.Engines
             Strategy = targetJob.ResolveValue(RunMode.RunStrategyCharacteristic, Resolver);
             EvaluateOverhead = targetJob.ResolveValue(AccuracyMode.EvaluateOverheadCharacteristic, Resolver);
             InvocationCount = targetJob.ResolveValue(RunMode.InvocationCountCharacteristic, Resolver);
+            MemoryRandomization = targetJob.ResolveValue(RunMode.MemoryRandomizationCharacteristic, Resolver);
 
             warmupStage = new EngineWarmupStage(this);
             pilotStage = new EnginePilotStage(this);
             actualStage = new EngineActualStage(this);
+
+            random = new Random(12345);
         }
 
         public void Dispose()
@@ -166,6 +171,12 @@ namespace BenchmarkDotNet.Engines
 
             if (!isOverhead)
                 IterationCleanupAction();
+
+            if (!isOverhead && MemoryRandomization)
+            {
+                GC.KeepAlive(new byte[random.Next(32)]);
+                GlobalSetupAction?.Invoke();
+            }
 
             GcCollect();
 
