@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Engines
         [PublicAPI] public string BenchmarkName { get; }
 
         private IClock Clock { get; }
-        private bool ForceAllocations { get; }
+        private bool ForceGcCleanups { get; }
         private int UnrollFactor { get; }
         private RunStrategy Strategy { get; }
         private bool EvaluateOverhead { get; }
@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Engines
             Resolver = resolver;
 
             Clock = targetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
-            ForceAllocations = targetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
+            ForceGcCleanups = targetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
             UnrollFactor = targetJob.ResolveValue(RunMode.UnrollFactorCharacteristic, Resolver);
             Strategy = targetJob.ResolveValue(RunMode.RunStrategyCharacteristic, Resolver);
             EvaluateOverhead = targetJob.ResolveValue(AccuracyMode.EvaluateOverheadCharacteristic, Resolver);
@@ -214,7 +214,7 @@ namespace BenchmarkDotNet.Engines
 
         private void GcCollect()
         {
-            if (!ForceAllocations)
+            if (!ForceGcCleanups)
                 return;
 
             ForceGcCollect();
