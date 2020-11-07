@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
@@ -83,7 +84,7 @@ namespace BenchmarkDotNet.Engines
             pilotStage = new EnginePilotStage(this);
             actualStage = new EngineActualStage(this);
 
-            random = new Random(12345);
+            random = new Random(12345); // we are using constant seed to try to get repeatable results
         }
 
         public void Dispose()
@@ -173,10 +174,7 @@ namespace BenchmarkDotNet.Engines
                 IterationCleanupAction();
 
             if (!isOverhead && MemoryRandomization)
-            {
-                GC.KeepAlive(new byte[random.Next(32)]);
-                GlobalSetupAction?.Invoke();
-            }
+                RandomizeMemory();
 
             GcCollect();
 
@@ -210,6 +208,31 @@ namespace BenchmarkDotNet.Engines
             ThreadingStats threadingStats = (finalThreadingStats - initialThreadingStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
 
             return (gcStats, threadingStats);
+        }
+
+        private void RandomizeMemory()
+        {
+            // invoke global cleanup before we invoke global setup again
+            GlobalCleanupAction?.Invoke();
+
+            // allocate random size small array
+            var gen0object = new byte[random.Next(32)];
+            Debug.Assert(GC.GetGeneration(gen0object) == 0);
+            GC.Collect(0); // get it promoted to Gen 1
+            GC.Collect(1); // get it promoted to Gen 2
+
+            // allocate random-size LOH object
+            var lohObject = new byte[85 * 1024 + random.Next(32)];
+            Debug.Assert(GC.GetGeneration(lohObject) == 2);
+
+            GlobalSetupAction?.Invoke();
+
+            // keep it alive to make it possible to promote it to Gen 1 and Gen 2
+            GC.KeepAlive(gen0object);
+            // just keep it alive for the [GlobalSetup] period
+            GC.KeepAlive(lohObject);
+
+            // we don't enforce GC.Collects here as engine does it later anyway
         }
 
         private void GcCollect()
