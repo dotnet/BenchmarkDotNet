@@ -184,7 +184,7 @@ namespace BenchmarkDotNet.Jobs
 
         /// <summary>
         /// specifies whether Engine should allocate some random-sized memory between iterations
-        /// it makes [GlobalSetup] methods to be executed between every iteration
+        /// <remarks>it makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration</remarks>
         /// </summary>
         public bool MemoryRandomization
         {

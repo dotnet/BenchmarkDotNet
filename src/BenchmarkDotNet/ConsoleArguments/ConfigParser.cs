@@ -282,7 +282,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.RunOncePerIteration)
                 baseJob = baseJob.RunOncePerIteration();
             if (options.MemoryRandomization)
-                baseJob = baseJob.EnforceMemoryRandomization();
+                baseJob = baseJob.WithMemoryRandomization();
 
             if (options.EnvironmentVariables.Any())
             {
