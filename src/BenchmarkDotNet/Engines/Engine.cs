@@ -164,8 +164,7 @@ namespace BenchmarkDotNet.Engines
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStart(data.IterationMode, data.IterationStage, totalOperations);
 
-            if (randomizeMemory)
-                RandomizeStackMemory();
+            Span<byte> stackMemory = randomizeMemory ? stackalloc byte[random.Next(32)] : Span<byte>.Empty;
 
             // Measure
             var clock = Clock.Start();
@@ -186,6 +185,8 @@ namespace BenchmarkDotNet.Engines
             // Results
             var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, clockSpan.GetNanoseconds());
             WriteLine(measurement.ToString());
+
+            Consume(stackMemory);
 
             return measurement;
         }
@@ -213,12 +214,6 @@ namespace BenchmarkDotNet.Engines
             ThreadingStats threadingStats = (finalThreadingStats - initialThreadingStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
 
             return (gcStats, threadingStats);
-        }
-
-        private unsafe void RandomizeStackMemory()
-        {
-            Span<byte> stackMemory = stackalloc byte[random.Next(32)];
-            Consume(stackMemory);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
