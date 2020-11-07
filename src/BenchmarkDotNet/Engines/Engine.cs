@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -152,6 +153,7 @@ namespace BenchmarkDotNet.Engines
             int unrollFactor = data.UnrollFactor;
             long totalOperations = invokeCount * OperationsPerInvoke;
             bool isOverhead = data.IterationMode == IterationMode.Overhead;
+            bool randomizeMemory = !isOverhead && MemoryRandomization;
             var action = isOverhead ? OverheadAction : WorkloadAction;
 
             if (!isOverhead)
@@ -161,6 +163,9 @@ namespace BenchmarkDotNet.Engines
 
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStart(data.IterationMode, data.IterationStage, totalOperations);
+
+            if (randomizeMemory)
+                RandomizeStackMemory();
 
             // Measure
             var clock = Clock.Start();
@@ -173,8 +178,8 @@ namespace BenchmarkDotNet.Engines
             if (!isOverhead)
                 IterationCleanupAction();
 
-            if (!isOverhead && MemoryRandomization)
-                RandomizeMemory();
+            if (randomizeMemory)
+                RandomizeManagedHeapMemory();
 
             GcCollect();
 
@@ -210,7 +215,16 @@ namespace BenchmarkDotNet.Engines
             return (gcStats, threadingStats);
         }
 
-        private void RandomizeMemory()
+        private unsafe void RandomizeStackMemory()
+        {
+            Span<byte> stackMemory = stackalloc byte[random.Next(32)];
+            Consume(stackMemory);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void Consume(in Span<byte> _) { }
+
+        private void RandomizeManagedHeapMemory()
         {
             // invoke global cleanup before we invoke global setup again
             GlobalCleanupAction?.Invoke();
