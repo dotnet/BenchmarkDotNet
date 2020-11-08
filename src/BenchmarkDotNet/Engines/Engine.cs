@@ -221,24 +221,16 @@ namespace BenchmarkDotNet.Engines
 
         private void RandomizeManagedHeapMemory()
         {
-            // invoke global cleanup before we invoke global setup again
+            // invoke global cleanup before global setup
             GlobalCleanupAction?.Invoke();
 
-            // allocate random size small array
             var gen0object = new byte[random.Next(32)];
-            Debug.Assert(GC.GetGeneration(gen0object) == 0);
-            GC.Collect(0); // get it promoted to Gen 1
-            GC.Collect(1); // get it promoted to Gen 2
-
-            // allocate random-size LOH object
             var lohObject = new byte[85 * 1024 + random.Next(32)];
-            Debug.Assert(GC.GetGeneration(lohObject) == 2);
 
             GlobalSetupAction?.Invoke();
 
-            // keep it alive to make it possible to promote it to Gen 1 and Gen 2
+            // keep objects alive for global setup period
             GC.KeepAlive(gen0object);
-            // just keep it alive for the [GlobalSetup] period
             GC.KeepAlive(lohObject);
 
             // we don't enforce GC.Collects here as engine does it later anyway
