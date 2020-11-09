@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Validators
                             TreatsWarningsAsErrors,
                             $"Assembly {group.Key.GetName().Name} which defines benchmarks references non-optimized {referencedAssemblyName.Name}" +
                             $"{Environment.NewLine}\tIf you own this dependency, please, build it in RELEASE." +
-                            $"{Environment.NewLine}\tIf you don't, you can disable this policy by using 'config.With(ConfigOptions.DisableOptimizationsValidator)'.");
+                            $"{Environment.NewLine}\tIf you don't, you can disable this policy by using 'config.WithOptions(ConfigOptions.DisableOptimizationsValidator)'.");
                     }
                 }
 
