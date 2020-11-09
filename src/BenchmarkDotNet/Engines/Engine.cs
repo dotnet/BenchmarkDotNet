@@ -227,9 +227,10 @@ namespace BenchmarkDotNet.Engines
             var gen0object = new byte[random.Next(32)];
             var lohObject = new byte[85 * 1024 + random.Next(32)];
 
+            // we expect the key allocations to happen in global setup (not ctor)
+            // so we call it while keeping the random-size objects alive
             GlobalSetupAction?.Invoke();
 
-            // keep objects alive for global setup period
             GC.KeepAlive(gen0object);
             GC.KeepAlive(lohObject);
 
