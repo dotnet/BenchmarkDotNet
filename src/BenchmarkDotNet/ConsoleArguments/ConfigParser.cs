@@ -379,25 +379,35 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                     return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
                 case RuntimeMoniker.Wasm:
-                    var wasmRuntime = new WasmRuntime(
-                        mainJs: options.WasmMainJs,
-                        msBuildMoniker: "net5.0",
-                        javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
-                        javaScriptEngineArguments: options.WasmJavaScriptEngineArguments);
+                    return MakeWasmJob(baseJob, options, timeOut, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0");
+                case RuntimeMoniker.WasmNet50:
+                    return MakeWasmJob(baseJob, options, timeOut, "net5.0");
+                case RuntimeMoniker.WasmNet60:
+                    return MakeWasmJob(baseJob, options, timeOut, "net6.0");
 
-                    var toolChain = WasmToolChain.From(new NetCoreAppSettings(
-                        targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
-                        runtimeFrameworkVersion: null,
-                        name: wasmRuntime.Name,
-                        customDotNetCliPath: options.CliPath?.FullName,
-                        packagesPath: options.RestorePath?.FullName,
-                        timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
-                        customRuntimePack: options.CustomRuntimePack));
-
-                        return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain);
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
+        }
+
+        private static Job MakeWasmJob(Job baseJob, CommandLineOptions options, TimeSpan? timeOut, string msBuildMoniker)
+        {
+            var wasmRuntime = new WasmRuntime(
+                mainJs: options.WasmMainJs,
+                msBuildMoniker: msBuildMoniker,
+                javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
+                javaScriptEngineArguments: options.WasmJavaScriptEngineArguments);
+
+            var toolChain = WasmToolChain.From(new NetCoreAppSettings(
+                targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
+                runtimeFrameworkVersion: null,
+                name: wasmRuntime.Name,
+                customDotNetCliPath: options.CliPath?.FullName,
+                packagesPath: options.RestorePath?.FullName,
+                timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
+                customRuntimePack: options.CustomRuntimePack));
+
+            return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain);
         }
 
         private static IEnumerable<IFilter> GetFilters(CommandLineOptions options)
