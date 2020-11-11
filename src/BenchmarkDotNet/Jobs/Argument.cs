@@ -33,6 +33,20 @@ namespace BenchmarkDotNet.Jobs
     [PublicAPI]
     public class MsBuildArgument : Argument
     {
-        public MsBuildArgument(string value) => TextRepresentation = value;
+
+        public MsBuildArgument(string value) => TextRepresentation = EscapeBuildArguments(value);
+
+        /// <summary>
+        /// Escapes the \ with \\ when \ is part of the build argument.
+        /// <see href="https://github.com/dotnet/BenchmarkDotNet/issues/1536">Fixes issue 1536</see>
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public string EscapeBuildArguments(string args)
+        {
+            if (args.Contains("\\"))
+                args = args.Replace("\\", "\\\\");
+            return args;
+        }
     }
 }
