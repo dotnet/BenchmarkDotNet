@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Extensions;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Configs
@@ -66,6 +67,19 @@ namespace BenchmarkDotNet.Tests.Configs
                 .WithEnvironmentVariable("a", "b")
                 .WithoutEnvironmentVariables();
             Assert.Empty(job.Environment.EnvironmentVariables);
+        }
+
+        [Fact]
+        public void TestShouldEscapeMSBuildArguments()
+        {
+            string escapedString = new MsBuildArgument(@"/p:a=b\\").TextRepresentation.Escape();
+            Assert.Equal("\"/p:a=b\\\\\\\\\"", escapedString);
+
+            escapedString = new MsBuildArgument(@"/p:\a=b\").TextRepresentation.Escape();
+            Assert.Equal("\"/p:\\\\a=b\\\\\"", escapedString);
+
+            escapedString = new MsBuildArgument(@"/p:\a=\nb\").TextRepresentation.Escape();
+            Assert.Equal("\"/p:\\\\a=\\\\nb\\\\\"", escapedString);
         }
     }
 }
