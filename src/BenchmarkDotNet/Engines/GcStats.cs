@@ -15,15 +15,16 @@ namespace BenchmarkDotNet.Engines
         private static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = CreateGetAllocatedBytesForCurrentThreadDelegate();
         private static readonly Func<bool, long> GetTotalAllocatedBytesDelegate = CreateGetTotalAllocatedBytesDelegate();
 
-        public static readonly GcStats Empty = new GcStats(0, 0, 0, 0, 0);
+        public static readonly GcStats Empty = new GcStats(0, 0, 0, 0, 0, 0);
 
-        private GcStats(int gen0Collections, int gen1Collections, int gen2Collections, long allocatedBytes, long totalOperations)
+        private GcStats(int gen0Collections, int gen1Collections, int gen2Collections, long allocatedBytes, long totalOperations, long survivedBytes)
         {
             Gen0Collections = gen0Collections;
             Gen1Collections = gen1Collections;
             Gen2Collections = gen2Collections;
             AllocatedBytes = allocatedBytes;
             TotalOperations = totalOperations;
+            SurvivedBytes = survivedBytes;
         }
 
         // did not use array here just to avoid heap allocation
@@ -37,6 +38,7 @@ namespace BenchmarkDotNet.Engines
         private long AllocatedBytes { get; }
 
         public long TotalOperations { get; }
+        public long SurvivedBytes { get; }
 
         public long BytesAllocatedPerOperation
         {
@@ -60,7 +62,8 @@ namespace BenchmarkDotNet.Engines
                 left.Gen1Collections + right.Gen1Collections,
                 left.Gen2Collections + right.Gen2Collections,
                 left.AllocatedBytes + right.AllocatedBytes,
-                left.TotalOperations + right.TotalOperations);
+                left.TotalOperations + right.TotalOperations,
+                left.SurvivedBytes + right.SurvivedBytes);
         }
 
         public static GcStats operator -(GcStats left, GcStats right)
@@ -70,11 +73,15 @@ namespace BenchmarkDotNet.Engines
                 Math.Max(0, left.Gen1Collections - right.Gen1Collections),
                 Math.Max(0, left.Gen2Collections - right.Gen2Collections),
                 Math.Max(0, left.AllocatedBytes - right.AllocatedBytes),
-                Math.Max(0, left.TotalOperations - right.TotalOperations));
+                Math.Max(0, left.TotalOperations - right.TotalOperations),
+                Math.Max(0, left.SurvivedBytes - right.SurvivedBytes));
         }
 
         public GcStats WithTotalOperations(long totalOperationsCount)
-            => this + new GcStats(0, 0, 0, 0, totalOperationsCount);
+            => this + new GcStats(0, 0, 0, 0, totalOperationsCount, 0);
+
+        public GcStats WithSurvivedBytes(bool getBytes)
+            => this + new GcStats(0, 0, 0, 0, 0, GetTotalBytes(getBytes));
 
         public int GetCollectionsCount(int generation)
         {
@@ -112,6 +119,7 @@ namespace BenchmarkDotNet.Engines
                 GC.CollectionCount(1),
                 GC.CollectionCount(2),
                 allocatedBytes,
+                0,
                 0);
         }
 
@@ -125,12 +133,31 @@ namespace BenchmarkDotNet.Engines
                 // this will force GC.Collect, so we want to do this after collecting collections counts
                 // to exclude this single full forced collection from results
                 GetAllocatedBytes(),
+                0,
                 0);
         }
 
         [PublicAPI]
         public static GcStats FromForced(int forcedFullGarbageCollections)
-            => new GcStats(forcedFullGarbageCollections, forcedFullGarbageCollections, forcedFullGarbageCollections, 0, 0);
+            => new GcStats(forcedFullGarbageCollections, forcedFullGarbageCollections, forcedFullGarbageCollections, 0, 0, 0);
+
+        private static long GetTotalBytes(bool actual)
+        {
+            if (!actual)
+                return 0;
+
+            if (RuntimeInformation.IsFullFramework) // it can be a .NET app consuming our .NET Standard package
+            {
+                AppDomain.MonitoringIsEnabled = true;
+
+                // Enforce GC.Collect here just to make sure we get accurate results
+                GC.Collect();
+                return AppDomain.CurrentDomain.MonitoringSurvivedMemorySize;
+            }
+
+            GC.Collect();
+            return GC.GetTotalMemory(true);
+        }
 
         private static long GetAllocatedBytes()
         {
@@ -171,7 +198,7 @@ namespace BenchmarkDotNet.Engines
         }
 
         public string ToOutputLine()
-            => $"{ResultsLinePrefix} {Gen0Collections} {Gen1Collections} {Gen2Collections} {AllocatedBytes} {TotalOperations}";
+            => $"{ResultsLinePrefix} {Gen0Collections} {Gen1Collections} {Gen2Collections} {AllocatedBytes} {TotalOperations} {SurvivedBytes}";
 
         public static GcStats Parse(string line)
         {
@@ -183,12 +210,13 @@ namespace BenchmarkDotNet.Engines
                 || !int.TryParse(measurementSplit[1], out int gen1)
                 || !int.TryParse(measurementSplit[2], out int gen2)
                 || !long.TryParse(measurementSplit[3], out long allocatedBytes)
-                || !long.TryParse(measurementSplit[4], out long totalOperationsCount))
+                || !long.TryParse(measurementSplit[4], out long totalOperationsCount)
+                || !long.TryParse(measurementSplit[5], out long survivedBytes))
             {
                 throw new NotSupportedException("Invalid string");
             }
 
-            return new GcStats(gen0, gen1, gen2, allocatedBytes, totalOperationsCount);
+            return new GcStats(gen0, gen1, gen2, allocatedBytes, totalOperationsCount, survivedBytes);
         }
 
         public override string ToString() => ToOutputLine();
@@ -222,7 +250,13 @@ namespace BenchmarkDotNet.Engines
             return result;
         }
 
-        public bool Equals(GcStats other) => Gen0Collections == other.Gen0Collections && Gen1Collections == other.Gen1Collections && Gen2Collections == other.Gen2Collections && AllocatedBytes == other.AllocatedBytes && TotalOperations == other.TotalOperations;
+        public bool Equals(GcStats other) =>
+            Gen0Collections == other.Gen0Collections
+            && Gen1Collections == other.Gen1Collections
+            && Gen2Collections == other.Gen2Collections
+            && AllocatedBytes == other.AllocatedBytes
+            && TotalOperations == other.TotalOperations
+            && SurvivedBytes == other.SurvivedBytes;
 
         public override bool Equals(object obj) => obj is GcStats other && Equals(other);
 

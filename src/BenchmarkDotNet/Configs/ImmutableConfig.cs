@@ -92,7 +92,9 @@ namespace BenchmarkDotNet.Configs
         public IAnalyser GetCompositeAnalyser() => new CompositeAnalyser(analysers);
         public IDiagnoser GetCompositeDiagnoser() => new CompositeDiagnoser(diagnosers);
 
-        public bool HasMemoryDiagnoser() => diagnosers.Contains(MemoryDiagnoser.Default);
+        public bool HasMemoryDiagnoser() => diagnosers.Any(diagnoser => diagnoser is MemoryDiagnoser);
+
+        public bool HasSurvivedMemoryDiagnoser() => diagnosers.Contains(MemoryDiagnoser.WithSurvived);
 
         public bool HasThreadingDiagnoser() => diagnosers.Contains(ThreadingDiagnoser.Default);
 

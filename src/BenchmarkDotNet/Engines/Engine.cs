@@ -42,14 +42,14 @@ namespace BenchmarkDotNet.Engines
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineActualStage actualStage;
-        private readonly bool includeExtraStats;
+        private readonly bool includeExtraStats, includeSurvivedMemory;
 
         internal Engine(
             IHost host,
             IResolver resolver,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeExtraStats, string benchmarkName)
+            bool includeExtraStats, bool includeSurvivedMemory, string benchmarkName)
         {
 
             Host = host;
@@ -66,6 +66,7 @@ namespace BenchmarkDotNet.Engines
             OperationsPerInvoke = operationsPerInvoke;
             this.includeExtraStats = includeExtraStats;
             BenchmarkName = benchmarkName;
+            this.includeSurvivedMemory = includeSurvivedMemory;
 
             Resolver = resolver;
 
@@ -135,8 +136,8 @@ namespace BenchmarkDotNet.Engines
                 EngineEventSource.Log.BenchmarkStop(BenchmarkName);
 
             var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
-
-            return new RunResults(idle, main, outlierMode, workGcHasDone, threadingStats);
+            
+            return new RunResults(idle, main, outlierMode, workGcHasDone.WithSurvivedBytes(includeSurvivedMemory), threadingStats);
         }
 
         public Measurement RunIteration(IterationData data)

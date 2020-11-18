@@ -15,9 +15,15 @@ namespace BenchmarkDotNet.Diagnosers
     {
         private const string DiagnoserId = nameof(MemoryDiagnoser);
 
-        public static readonly MemoryDiagnoser Default = new MemoryDiagnoser();
+        public static readonly MemoryDiagnoser Default = new MemoryDiagnoser(false);
+        public static readonly MemoryDiagnoser WithSurvived = new MemoryDiagnoser(true);
 
-        private MemoryDiagnoser() { } // we want to have only a single instance of MemoryDiagnoser
+        private MemoryDiagnoser(bool includeSurvived)
+        {
+            IncludeSurvived = includeSurvived;
+        }
+
+        public bool IncludeSurvived { get; }
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
 
@@ -37,6 +43,10 @@ namespace BenchmarkDotNet.Diagnosers
             yield return new Metric(GarbageCollectionsMetricDescriptor.Gen1, diagnoserResults.GcStats.Gen1Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
             yield return new Metric(GarbageCollectionsMetricDescriptor.Gen2, diagnoserResults.GcStats.Gen2Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
             yield return new Metric(AllocatedMemoryMetricDescriptor.Instance, diagnoserResults.GcStats.BytesAllocatedPerOperation);
+            if (IncludeSurvived)
+            {
+                yield return new Metric(SurvivedMemoryMetricDescriptor.Instance, diagnoserResults.GcStats.SurvivedBytes);
+            }
         }
 
         private class AllocatedMemoryMetricDescriptor : IMetricDescriptor
@@ -46,6 +56,19 @@ namespace BenchmarkDotNet.Diagnosers
             public string Id => "Allocated Memory";
             public string DisplayName => "Allocated";
             public string Legend => "Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)";
+            public string NumberFormat => "N0";
+            public UnitType UnitType => UnitType.Size;
+            public string Unit => SizeUnit.B.Name;
+            public bool TheGreaterTheBetter => false;
+        }
+
+        private class SurvivedMemoryMetricDescriptor : IMetricDescriptor
+        {
+            internal static readonly IMetricDescriptor Instance = new SurvivedMemoryMetricDescriptor();
+
+            public string Id => "Survived Memory";
+            public string DisplayName => "Survived";
+            public string Legend => "Total application memory consumed after all operations, including Cleanups (managed only, inclusive, 1KB = 1024B)";
             public string NumberFormat => "N0";
             public UnitType UnitType => UnitType.Size;
             public string Unit => SizeUnit.B.Name;

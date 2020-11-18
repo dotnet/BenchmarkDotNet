@@ -119,6 +119,7 @@ namespace BenchmarkDotNet.Engines
                 engineParameters.IterationCleanupAction,
                 engineParameters.OperationsPerInvoke,
                 engineParameters.MeasureExtraStats,
+                engineParameters.MeasureSurvivedMemory,
                 engineParameters.BenchmarkName);
     }
 }
