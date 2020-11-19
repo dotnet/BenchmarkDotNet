@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
         private readonly string moduleName;
 
-        private readonly string functionName;
+        private readonly string[] functionNames;
 
         public NativeMemoryLogParser(string etlFilePath, BenchmarkCase benchmarkCase, ILogger logger,
             string programName)
@@ -39,7 +39,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             this.logger = logger;
 
             moduleName = programName;
-            functionName = nameof(EngineParameters.WorkloadActionUnroll);
+            functionNames = new[]
+            {
+                nameof(EngineParameters.WorkloadActionUnroll),
+                nameof(EngineParameters.WorkloadActionNoUnroll)
+            };
         }
 
         public IEnumerable<Metric> Parse()
@@ -136,7 +140,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                         var name = stackSource.GetFrameName(frame, false);
 
                         if (name.StartsWith(moduleName, StringComparison.Ordinal) &&
-                            name.IndexOf(functionName, StringComparison.Ordinal) > 0)
+                            functionNames.Any(functionName => name.IndexOf(functionName, StringComparison.Ordinal) > 0))
                         {
                             return true;
                         }
