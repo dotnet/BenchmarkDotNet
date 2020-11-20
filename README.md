@@ -137,15 +137,15 @@ If you don't like attributes, you can call most of the APIs via the fluent style
 
 ```cs
 ManualConfig.CreateEmpty() // A configuration for our benchmarks
-    .With(Job.Default // Adding first job
-            .With(ClrRuntime.Net472) // .NET Framework 4.7.2
-            .With(Platform.X64) // Run as x64 application
-            .With(Jit.LegacyJit) // Use LegacyJIT instead of the default RyuJIT
-            .WithGcServer(true) // Use Server GC
-    ).With(Job.Default // Adding second job
-            .AsBaseline() // It will be marked as baseline
-            .WithEnvironmentVariable("Key", "Value") // Setting an environment variable
-            .WithWarmupCount(0) // Disable warm-up stage
+    .AddJob(Job.Default // Adding first job
+        .WithRuntime(ClrRuntime.Net472) // .NET Framework 4.7.2
+        .WithPlatform(Platform.X64) // Run as x64 application
+        .WithJit(Jit.LegacyJit) // Use LegacyJIT instead of the default RyuJIT
+        .WithGcServer(true) // Use Server GC
+    ).AddJob(Job.Default // Adding second job
+        .AsBaseline() // It will be marked as baseline
+        .WithEnvironmentVariable("Key", "Value") // Setting an environment variable
+        .WithWarmupCount(0) // Disable warm-up stage
     );
 ```
 
