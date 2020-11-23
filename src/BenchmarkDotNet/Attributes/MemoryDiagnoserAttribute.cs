@@ -9,7 +9,9 @@ namespace BenchmarkDotNet.Attributes
     {
         public IConfig Config { get; }
 
-        public MemoryDiagnoserAttribute(bool includeSurvived = false)
+        public MemoryDiagnoserAttribute() : this(false) { }
+
+        public MemoryDiagnoserAttribute(bool includeSurvived)
         {
             Config = ManualConfig.CreateEmpty().AddDiagnoser(includeSurvived ? MemoryDiagnoser.WithSurvived : MemoryDiagnoser.Default);
         }

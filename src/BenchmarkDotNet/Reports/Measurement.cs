@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Reports
         private const string OpSymbol = "op";
         private const string SBSymbol = "B";
 
-        private static Measurement Error() => new Measurement(-1, IterationMode.Unknown, IterationStage.Unknown, 0, 0, 0, 0);
+        private static Measurement Error() => new Measurement(-1, IterationMode.Unknown, IterationStage.Unknown, 0, 0, 0);
 
         private static readonly int IterationInfoNameMaxWidth
             = Enum.GetNames(typeof(IterationMode)).Max(text => text.Length) + Enum.GetNames(typeof(IterationStage)).Max(text => text.Length);
@@ -48,6 +48,18 @@ namespace BenchmarkDotNet.Reports
         /// Gets the total number of survived bytes from all operations.
         /// </summary>
         public long SurvivedBytes { get; }
+
+        /// <summary>
+        /// Creates an instance of <see cref="Measurement"/> struct.
+        /// </summary>
+        /// <param name="launchIndex"></param>
+        /// <param name="iterationMode"></param>
+        /// <param name="iterationStage"></param>
+        /// <param name="iterationIndex"></param>
+        /// <param name="operations">The number of operations performed.</param>
+        /// <param name="nanoseconds">The total number of nanoseconds it took to perform all operations.</param>
+        public Measurement(int launchIndex, IterationMode iterationMode, IterationStage iterationStage, int iterationIndex, long operations, double nanoseconds)
+            : this(launchIndex, iterationMode, iterationStage, iterationIndex, operations, nanoseconds, 0) { }
 
         /// <summary>
         /// Creates an instance of <see cref="Measurement"/> struct.

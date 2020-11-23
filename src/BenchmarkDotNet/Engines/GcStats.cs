@@ -248,6 +248,7 @@ namespace BenchmarkDotNet.Engines
                 hashCode = (hashCode * 397) ^ Gen2Collections;
                 hashCode = (hashCode * 397) ^ AllocatedBytes.GetHashCode();
                 hashCode = (hashCode * 397) ^ TotalOperations.GetHashCode();
+                hashCode = (hashCode * 397) ^ SurvivedBytes.GetHashCode();
                 return hashCode;
             }
         }

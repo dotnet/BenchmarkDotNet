@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             public string Id => "Survived Memory";
             public string DisplayName => "Survived";
-            public string Legend => "Total application memory consumed after all operations, including Cleanups (managed only, inclusive, 1KB = 1024B)";
+            public string Legend => "Total memory survived after all operations (managed only, inclusive, 1KB = 1024B)";
             public string NumberFormat => "N0";
             public UnitType UnitType => UnitType.Size;
             public string Unit => SizeUnit.B.Name;
