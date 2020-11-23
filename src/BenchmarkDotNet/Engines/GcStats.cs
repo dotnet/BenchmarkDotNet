@@ -77,11 +77,8 @@ namespace BenchmarkDotNet.Engines
                 Math.Max(0, left.SurvivedBytes - right.SurvivedBytes));
         }
 
-        public GcStats WithTotalOperations(long totalOperationsCount)
-            => this + new GcStats(0, 0, 0, 0, totalOperationsCount, 0);
-
-        public GcStats WithSurvivedBytes(bool getBytes)
-            => this + new GcStats(0, 0, 0, 0, 0, GetTotalBytes(getBytes));
+        public GcStats WithTotalOperationsAndSurvivedBytes(long totalOperationsCount)
+            => this + new GcStats(0, 0, 0, 0, totalOperationsCount, _totalMeasured);
 
         public int GetCollectionsCount(int generation)
         {
@@ -140,24 +137,6 @@ namespace BenchmarkDotNet.Engines
         [PublicAPI]
         public static GcStats FromForced(int forcedFullGarbageCollections)
             => new GcStats(forcedFullGarbageCollections, forcedFullGarbageCollections, forcedFullGarbageCollections, 0, 0, 0);
-
-        private static long GetTotalBytes(bool actual)
-        {
-            if (!actual)
-                return 0;
-
-            if (RuntimeInformation.IsFullFramework) // it can be a .NET app consuming our .NET Standard package
-            {
-                AppDomain.MonitoringIsEnabled = true;
-
-                // Enforce GC.Collect here just to make sure we get accurate results
-                GC.Collect();
-                return AppDomain.CurrentDomain.MonitoringSurvivedMemorySize;
-            }
-
-            GC.Collect();
-            return GC.GetTotalMemory(true);
-        }
 
         private static long GetAllocatedBytes()
         {
@@ -271,6 +250,36 @@ namespace BenchmarkDotNet.Engines
                 hashCode = (hashCode * 397) ^ TotalOperations.GetHashCode();
                 return hashCode;
             }
+        }
+
+        private static long _totalMeasured = 0;
+        private static long _currentMeasured;
+
+        public static void StartMeasuringSurvived(bool measure)
+        {
+            _currentMeasured = GetTotalBytes(measure);
+        }
+
+        public static long StopMeasuringSurvived(bool measure)
+        {
+            long measured = GetTotalBytes(measure) - _currentMeasured;
+            _currentMeasured = 0;
+            _totalMeasured += measured;
+            return measured;
+        }
+
+        private static long GetTotalBytes(bool actual)
+        {
+            if (!actual || RuntimeInformation.IsMono) // Monitoring is not available in Mono.
+                return 0;
+
+            AppDomain.MonitoringIsEnabled = true;
+
+            // Enforce GC.Collect here to make sure we get accurate results.
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+            return AppDomain.CurrentDomain.MonitoringSurvivedMemorySize;
         }
     }
 }

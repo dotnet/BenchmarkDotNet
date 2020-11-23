@@ -19,8 +19,9 @@ namespace BenchmarkDotNet.Reports
 
         private const string NsSymbol = "ns";
         private const string OpSymbol = "op";
+        private const string SBSymbol = "B";
 
-        private static Measurement Error() => new Measurement(-1, IterationMode.Unknown, IterationStage.Unknown, 0, 0, 0);
+        private static Measurement Error() => new Measurement(-1, IterationMode.Unknown, IterationStage.Unknown, 0, 0, 0, 0);
 
         private static readonly int IterationInfoNameMaxWidth
             = Enum.GetNames(typeof(IterationMode)).Max(text => text.Length) + Enum.GetNames(typeof(IterationStage)).Max(text => text.Length);
@@ -44,6 +45,11 @@ namespace BenchmarkDotNet.Reports
         public double Nanoseconds { get; }
 
         /// <summary>
+        /// Gets the total number of survived bytes from all operations.
+        /// </summary>
+        public long SurvivedBytes { get; }
+
+        /// <summary>
         /// Creates an instance of <see cref="Measurement"/> struct.
         /// </summary>
         /// <param name="launchIndex"></param>
@@ -52,7 +58,8 @@ namespace BenchmarkDotNet.Reports
         /// <param name="iterationIndex"></param>
         /// <param name="operations">The number of operations performed.</param>
         /// <param name="nanoseconds">The total number of nanoseconds it took to perform all operations.</param>
-        public Measurement(int launchIndex, IterationMode iterationMode, IterationStage iterationStage, int iterationIndex, long operations, double nanoseconds)
+        /// <param name="survivedBytes">The total number of survived bytes from all operations.</param>
+        public Measurement(int launchIndex, IterationMode iterationMode, IterationStage iterationStage, int iterationIndex, long operations, double nanoseconds, long survivedBytes)
         {
             Operations = operations;
             Nanoseconds = nanoseconds;
@@ -60,6 +67,7 @@ namespace BenchmarkDotNet.Reports
             IterationMode = iterationMode;
             IterationStage = iterationStage;
             IterationIndex = iterationIndex;
+            SurvivedBytes = survivedBytes;
         }
 
         private static IterationMode ParseIterationMode(string name) => Enum.TryParse(name, out IterationMode mode) ? mode : IterationMode.Unknown;
@@ -97,6 +105,15 @@ namespace BenchmarkDotNet.Reports
 
             builder.Append(GetAverageTime().ToString(MainCultureInfo).ToAscii());
             builder.Append("/op");
+
+            if (SurvivedBytes != 0)
+            {
+                builder.Append(", ");
+                builder.Append(SurvivedBytes.ToString(MainCultureInfo));
+                builder.Append(' ');
+                builder.Append(SBSymbol);
+                builder.Append(" Survived");
+            }
 
             return builder.ToString();
         }
@@ -146,6 +163,7 @@ namespace BenchmarkDotNet.Reports
                 var measurementsInfoSplit = measurementsInfo.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 long op = 1L;
                 double ns = double.PositiveInfinity;
+                long survived = 0;
                 foreach (string item in measurementsInfoSplit)
                 {
                     var measurementSplit = item.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -159,9 +177,12 @@ namespace BenchmarkDotNet.Reports
                         case OpSymbol:
                             op = long.Parse(value, MainCultureInfo);
                             break;
+                        case SBSymbol:
+                            survived = long.Parse(value, MainCultureInfo);
+                            break;
                     }
                 }
-                return new Measurement(processIndex, iterationMode, iterationStage, iterationIndex, op, ns);
+                return new Measurement(processIndex, iterationMode, iterationStage, iterationIndex, op, ns, survived);
             }
             catch (Exception)
             {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -80,6 +81,12 @@ namespace BenchmarkDotNet.Engines
             warmupStage = new EngineWarmupStage(this);
             pilotStage = new EnginePilotStage(this);
             actualStage = new EngineActualStage(this);
+
+            if (includeSurvivedMemory)
+            {
+                // Run the clock once to set static memory (necessary for CORE runtimes).
+                MeasureAction(_ => { }, 0);
+            }
         }
 
         public void Dispose()
@@ -136,8 +143,8 @@ namespace BenchmarkDotNet.Engines
                 EngineEventSource.Log.BenchmarkStop(BenchmarkName);
 
             var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
-            
-            return new RunResults(idle, main, outlierMode, workGcHasDone.WithSurvivedBytes(includeSurvivedMemory), threadingStats);
+
+            return new RunResults(idle, main, outlierMode, workGcHasDone, threadingStats);
         }
 
         public Measurement RunIteration(IterationData data)
@@ -158,9 +165,9 @@ namespace BenchmarkDotNet.Engines
                 EngineEventSource.Log.IterationStart(data.IterationMode, data.IterationStage, totalOperations);
 
             // Measure
-            var clock = Clock.Start();
-            action(invokeCount / unrollFactor);
-            var clockSpan = clock.GetElapsed();
+            GcStats.StartMeasuringSurvived(includeSurvivedMemory);
+            double nanoseconds = MeasureAction(action, invokeCount / unrollFactor);
+            long survivedBytes = GcStats.StopMeasuringSurvived(includeSurvivedMemory);
 
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStop(data.IterationMode, data.IterationStage, totalOperations);
@@ -171,10 +178,19 @@ namespace BenchmarkDotNet.Engines
             GcCollect();
 
             // Results
-            var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, clockSpan.GetNanoseconds());
+            var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, nanoseconds, survivedBytes);
             WriteLine(measurement.ToString());
 
             return measurement;
+        }
+
+        // This is necessary for the CORE runtime to clean up the memory from the clock.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private double MeasureAction(Action<long> action, long arg)
+        {
+            var clock = Clock.Start();
+            action(arg);
+            return clock.GetElapsed().GetNanoseconds();
         }
 
         private (GcStats, ThreadingStats) GetExtraStats(IterationData data)
@@ -196,7 +212,7 @@ namespace BenchmarkDotNet.Engines
 
             IterationCleanupAction(); // we run iteration cleanup after collecting GC stats
 
-            GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
+            GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperationsAndSurvivedBytes(data.InvokeCount * OperationsPerInvoke);
             ThreadingStats threadingStats = (finalThreadingStats - initialThreadingStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
 
             return (gcStats, threadingStats);
