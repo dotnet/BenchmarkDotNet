@@ -269,6 +269,11 @@ namespace BenchmarkDotNet.Engines
             return measured;
         }
 
+        public static void ClearTotalMeasuredSurvived()
+        {
+            _totalMeasured = 0;
+        }
+
         private static long GetTotalBytes(bool actual)
         {
             if (!actual || RuntimeInformation.IsMono) // Monitoring is not available in Mono.

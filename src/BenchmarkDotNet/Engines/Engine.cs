@@ -82,10 +82,16 @@ namespace BenchmarkDotNet.Engines
             pilotStage = new EnginePilotStage(this);
             actualStage = new EngineActualStage(this);
 
+            // Necessary for CORE runtimes.
             if (includeSurvivedMemory)
             {
-                // Run the clock once to set static memory (necessary for CORE runtimes).
+                // Measure survived once to allow jit to make its allocations.
+                GcStats.StartMeasuringSurvived(includeSurvivedMemory);
+                // Run the clock once to set static memory.
                 MeasureAction(_ => { }, 0);
+                GcStats.StopMeasuringSurvived(includeSurvivedMemory);
+                // Clear total measured to not pollute actual measurement.
+                GcStats.ClearTotalMeasuredSurvived();
             }
         }
 
