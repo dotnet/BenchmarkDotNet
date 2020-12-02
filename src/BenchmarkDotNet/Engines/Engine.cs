@@ -45,6 +45,9 @@ namespace BenchmarkDotNet.Engines
         private readonly EngineActualStage actualStage;
         private readonly bool includeExtraStats, includeSurvivedMemory;
 
+        private long _totalMeasuredSurvivedBytes;
+        private Func<long> GetTotalBytes { get; }
+
         internal Engine(
             IHost host,
             IResolver resolver,
@@ -52,7 +55,6 @@ namespace BenchmarkDotNet.Engines
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
             bool includeExtraStats, bool includeSurvivedMemory, string benchmarkName)
         {
-
             Host = host;
             OverheadAction = overheadAction;
             Dummy1Action = dummy1Action;
@@ -82,16 +84,46 @@ namespace BenchmarkDotNet.Engines
             pilotStage = new EnginePilotStage(this);
             actualStage = new EngineActualStage(this);
 
+            GetTotalBytes = GetTotalBytesFunc();
             // Necessary for CORE runtimes.
             if (includeSurvivedMemory)
             {
-                // Measure survived once to allow jit to make its allocations.
-                GcStats.StartMeasuringSurvived(includeSurvivedMemory);
-                // Run the clock once to set static memory.
+                // Measure bytes to allow GC monitor to make its allocations.
+                GetTotalBytes();
+                // Run the clock once to allow it to make its allocations.
                 MeasureAction(_ => { }, 0);
-                GcStats.StopMeasuringSurvived(includeSurvivedMemory);
-                // Clear total measured to not pollute actual measurement.
-                GcStats.ClearTotalMeasuredSurvived();
+                GetTotalBytes();
+            }
+        }
+
+        private Func<long> GetTotalBytesFunc()
+        {
+            // Only enable monitoring if memory diagnoser with survived memory is applied.
+            // Don't try to measure in Mono, Monitoring is not available, and GC.GetTotalMemory is very inaccurate.
+            if (!includeSurvivedMemory || RuntimeInformation.IsMono)
+            {
+                return () => 0;
+            }
+            try
+            {
+                // Docs say this should be available in .NET Core 2.1, but it throws an exception.
+                // Just try this on all non-Mono runtimes, fallback to GC.GetTotalMemory.
+                AppDomain.MonitoringIsEnabled = true;
+                return () =>
+                {
+                    // Enforce GC.Collect here to make sure we get accurate results.
+                    ForceGcCollect();
+                    return AppDomain.CurrentDomain.MonitoringSurvivedMemorySize;
+                };
+            }
+            catch
+            {
+                return () =>
+                {
+                    // Enforce GC.Collect here to make sure we get accurate results.
+                    ForceGcCollect();
+                    return GC.GetTotalMemory(true);
+                };
             }
         }
 
@@ -171,9 +203,11 @@ namespace BenchmarkDotNet.Engines
                 EngineEventSource.Log.IterationStart(data.IterationMode, data.IterationStage, totalOperations);
 
             // Measure
-            GcStats.StartMeasuringSurvived(includeSurvivedMemory);
+            long beforeBytes = GetTotalBytes();
             double nanoseconds = MeasureAction(action, invokeCount / unrollFactor);
-            long survivedBytes = GcStats.StopMeasuringSurvived(includeSurvivedMemory);
+            long afterBytes = GetTotalBytes();
+            long survivedBytes = afterBytes - beforeBytes;
+            _totalMeasuredSurvivedBytes += survivedBytes;
 
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStop(data.IterationMode, data.IterationStage, totalOperations);
@@ -218,7 +252,7 @@ namespace BenchmarkDotNet.Engines
 
             IterationCleanupAction(); // we run iteration cleanup after collecting GC stats
 
-            GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperationsAndSurvivedBytes(data.InvokeCount * OperationsPerInvoke);
+            GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperationsAndSurvivedBytes(data.InvokeCount * OperationsPerInvoke, _totalMeasuredSurvivedBytes);
             ThreadingStats threadingStats = (finalThreadingStats - initialThreadingStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
 
             return (gcStats, threadingStats);

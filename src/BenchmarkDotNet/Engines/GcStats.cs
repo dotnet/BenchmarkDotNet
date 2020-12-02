@@ -77,8 +77,8 @@ namespace BenchmarkDotNet.Engines
                 Math.Max(0, left.SurvivedBytes - right.SurvivedBytes));
         }
 
-        public GcStats WithTotalOperationsAndSurvivedBytes(long totalOperationsCount)
-            => this + new GcStats(0, 0, 0, 0, totalOperationsCount, _totalMeasured);
+        public GcStats WithTotalOperationsAndSurvivedBytes(long totalOperationsCount, long survivedBytes)
+            => this + new GcStats(0, 0, 0, 0, totalOperationsCount, survivedBytes);
 
         public int GetCollectionsCount(int generation)
         {
@@ -251,41 +251,6 @@ namespace BenchmarkDotNet.Engines
                 hashCode = (hashCode * 397) ^ SurvivedBytes.GetHashCode();
                 return hashCode;
             }
-        }
-
-        private static long _totalMeasured = 0;
-        private static long _currentMeasured;
-
-        public static void StartMeasuringSurvived(bool measure)
-        {
-            _currentMeasured = GetTotalBytes(measure);
-        }
-
-        public static long StopMeasuringSurvived(bool measure)
-        {
-            long measured = GetTotalBytes(measure) - _currentMeasured;
-            _currentMeasured = 0;
-            _totalMeasured += measured;
-            return measured;
-        }
-
-        public static void ClearTotalMeasuredSurvived()
-        {
-            _totalMeasured = 0;
-        }
-
-        private static long GetTotalBytes(bool actual)
-        {
-            if (!actual || RuntimeInformation.IsMono) // Monitoring is not available in Mono.
-                return 0;
-
-            AppDomain.MonitoringIsEnabled = true;
-
-            // Enforce GC.Collect here to make sure we get accurate results.
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
-            return AppDomain.CurrentDomain.MonitoringSurvivedMemorySize;
         }
     }
 }
