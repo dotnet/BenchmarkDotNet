@@ -38,10 +38,17 @@ namespace BenchmarkDotNet.IntegrationTests
                 {
                     new object[] { Job.Default.GetToolchain() },
                     new object[] { InProcessEmitToolchain.Instance },
-#if NETCOREAPP2_1
+#if NETCOREAPP2_1 || NETCOREAPP3_1
                     // we don't want to test CoreRT twice (for .NET 4.6 and Core 2.1) when running the integration tests (these tests take a lot of time)
                     // we test against specific version to keep this test stable
-                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-27408-02").ToToolchain() }
+                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(
+                        microsoftDotNetILCompilerVersion: "1.0.0-alpha-27408-02", 
+                        nuGetFeedUrl: "https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json").ToToolchain() }
+#elif NET5_0 || NET6_0
+                    // for .NET 5.0+ we use the newer version of CoreRT (it does not work with older tfms like netcoreapp2.1)
+                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(
+                        microsoftDotNetILCompilerVersion: "6.0.0-alpha.1.20602.1", 
+                        nuGetFeedUrl: "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json").ToToolchain() }
 #endif
                 };
 
