@@ -22,13 +22,6 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         private bool isCoreRtConfigured;
 
         /// <summary>
-        /// uses an OLD version and NuGet feed of CoreRT that was used prior to .NET 5
-        /// </summary>
-        /// <remarks>it's not guaranteed to work (the feed will be removed one day), you better test against .NET 5.0+ version</remarks>
-        [PublicAPI]
-        public CoreRtToolchainBuilder UseOldCoreRtNuGet() => UseCoreRtNuGet("1.0.0-alpha-*", "https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json");
-
-        /// <summary>
         /// creates a CoreRT toolchain targeting NuGet build of CoreRT
         /// Based on https://github.com/dotnet/runtimelab/blob/d0a37893a67c125f9b0cd8671846ff7d867df241/samples/HelloWorld/README.md#add-corert-to-your-project
         /// </summary>

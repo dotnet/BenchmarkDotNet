@@ -368,8 +368,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                         builder.UseCoreRtLocal(options.CoreRtPath.FullName);
                     else if (!string.IsNullOrEmpty(options.CoreRtVersion))
                         builder.UseCoreRtNuGet(options.CoreRtVersion);
-                    else if (runtimeMoniker <= RuntimeMoniker.CoreRt31)
-                        builder.UseOldCoreRtNuGet();
                     else
                         builder.UseCoreRtNuGet();
 
