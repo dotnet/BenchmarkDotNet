@@ -26,6 +26,7 @@
                 Host = host,
                 WorkloadActionUnroll = instance.WorkloadActionUnroll,
                 WorkloadActionNoUnroll = instance.WorkloadActionNoUnroll,
+                WorkloadActionSingleInvoke = instance.WorkloadActionSingleInvoke,
                 Dummy1Action = instance.Dummy1,
                 Dummy2Action = instance.Dummy2,
                 Dummy3Action = instance.Dummy3,
@@ -149,6 +150,12 @@
                 consumer.Consume(workloadDelegate($PassArguments$)$ConsumeField$);
             }
         }
+
+        private void WorkloadActionSingleInvoke()
+        {
+            $LoadArguments$
+            consumer.Consume(workloadDelegate($PassArguments$)$ConsumeField$);
+        }
         
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         public $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
@@ -206,6 +213,12 @@
                 result = workloadDelegate($PassArguments$);
             }
             NonGenericKeepAliveWithoutBoxing(result);
+        }
+
+        private void WorkloadActionSingleInvoke()
+        {
+            $LoadArguments$
+            NonGenericKeepAliveWithoutBoxing(workloadDelegate($PassArguments$));
         }
 
         // we must not simply use DeadCodeEliminationHelper.KeepAliveWithoutBoxing<T> because it's generic method
@@ -273,6 +286,14 @@
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
         }
 
+        private void WorkloadActionSingleInvoke()
+        {
+            $LoadArguments$
+            ref $WorkloadMethodReturnType$ alias = ref workloadDefaultValueHolder;
+            alias = workloadDelegate($PassArguments$);
+            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
+        }
+
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         public ref $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
         {
@@ -332,6 +353,14 @@
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(alias);
         }
 
+        private void WorkloadActionSingleInvoke()
+        {
+            $LoadArguments$
+            ref $WorkloadMethodReturnType$ alias = ref workloadDefaultValueHolder;
+            alias = workloadDelegate($PassArguments$);
+            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(alias);
+        }
+
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         public ref readonly $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
         {
@@ -379,6 +408,12 @@
             {
                 workloadDelegate($PassArguments$);
             }
+        }
+
+        private void WorkloadActionSingleInvoke()
+        {
+            $LoadArguments$
+            workloadDelegate($PassArguments$);
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]

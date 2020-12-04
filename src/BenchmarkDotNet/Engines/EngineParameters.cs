@@ -14,6 +14,7 @@ namespace BenchmarkDotNet.Engines
         public IHost Host { get; set; }
         public Action<long> WorkloadActionNoUnroll { get; set; }
         public Action<long> WorkloadActionUnroll { get; set; }
+        public Action WorkloadActionSingleInvoke { get; set; }
         public Action Dummy1Action { get; set; }
         public Action Dummy2Action { get; set; }
         public Action Dummy3Action { get; set; }
