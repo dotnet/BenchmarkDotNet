@@ -55,8 +55,7 @@ namespace BenchmarkDotNet.Engines
                     IterationStage.Result,
                     ++resultIndex,
                     measurement.Operations,
-                    value,
-                    measurement.SurvivedBytes);
+                    value);
             }
         }
 
