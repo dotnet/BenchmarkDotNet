@@ -134,6 +134,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                             workloadAction.InvokeSingle();
                     },
                     WorkloadActionUnroll = workloadAction.InvokeMultiple,
+                    WorkloadActionSingleInvoke = workloadAction.InvokeSingle,
                     Dummy1Action = dummy1.InvokeSingle,
                     Dummy2Action = dummy2.InvokeSingle,
                     Dummy3Action = dummy3.InvokeSingle,
