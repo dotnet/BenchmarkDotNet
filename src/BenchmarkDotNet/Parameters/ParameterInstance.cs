@@ -15,13 +15,13 @@ namespace BenchmarkDotNet.Parameters
         [PublicAPI] public ParameterDefinition Definition { get; }
 
         private readonly object value;
-        private readonly int maxParameterColumnWidth;
+        private readonly int defaultMaxParameterColumnWidth;
 
         public ParameterInstance(ParameterDefinition definition, object value, SummaryStyle summaryStyle)
         {
             Definition = definition;
             this.value = value;
-            maxParameterColumnWidth = summaryStyle?.MaxParameterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
+            defaultMaxParameterColumnWidth = summaryStyle?.MaxParameterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
         }
 
         public void Dispose() => (Value as IDisposable)?.Dispose();
@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Parameters
                 ? parameter.ToSourceCode()
                 : SourceCodeHelper.ToSourceCode(value);
 
-        public string ToDisplayText(CultureInfo cultureInfo)
+        public string ToDisplayText(CultureInfo cultureInfo, int maxParameterColumnWidth)
         {
             switch (value)
             {
@@ -54,6 +54,10 @@ namespace BenchmarkDotNet.Parameters
                     return Trim(value.ToString(), maxParameterColumnWidth);
             }
         }
+
+        public string ToDisplayText(SummaryStyle summary) => ToDisplayText(summary.CultureInfo, summary.MaxParameterColumnWidth);
+
+        public string ToDisplayText(CultureInfo cultureInfo) => ToDisplayText(cultureInfo, defaultMaxParameterColumnWidth);
 
         public string ToDisplayText() => ToDisplayText(CultureInfo.CurrentCulture);
 
