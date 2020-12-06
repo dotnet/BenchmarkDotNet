@@ -112,7 +112,7 @@ namespace BenchmarkDotNet.Engines
                 engineParameters.Dummy3Action,
                 idle,
                 main,
-                engineParameters.WorkloadActionSingleInvoke,
+                () => engineParameters.WorkloadActionNoUnroll(1),
                 job,
                 engineParameters.GlobalSetupAction,
                 engineParameters.GlobalCleanupAction,

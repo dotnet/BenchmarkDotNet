@@ -35,7 +35,6 @@
         public const string OverheadActionNoUnrollMethodName = "OverheadActionNoUnroll";
         public const string WorkloadActionUnrollMethodName = "WorkloadActionUnroll";
         public const string WorkloadActionNoUnrollMethodName = "WorkloadActionNoUnroll";
-        public const string WorkloadActionSingleInvokeMethodName = "WorkloadActionSingleInvoke";
         public const string ForDisassemblyDiagnoserMethodName = "__ForDisassemblyDiagnoser__";
         public const string InvokeCountParamName = "invokeCount";
 

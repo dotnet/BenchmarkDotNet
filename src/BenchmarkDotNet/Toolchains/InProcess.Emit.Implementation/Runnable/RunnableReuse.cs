@@ -90,7 +90,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 Host = host,
                 WorkloadActionUnroll = LoopCallbackFromMethod(instance, WorkloadActionUnrollMethodName),
                 WorkloadActionNoUnroll = LoopCallbackFromMethod(instance, WorkloadActionNoUnrollMethodName),
-                WorkloadActionSingleInvoke = CallbackFromMethod(instance, WorkloadActionSingleInvokeMethodName),
                 Dummy1Action = CallbackFromMethod(instance, Dummy1MethodName),
                 Dummy2Action = CallbackFromMethod(instance, Dummy2MethodName),
                 Dummy3Action = CallbackFromMethod(instance, Dummy3MethodName),
