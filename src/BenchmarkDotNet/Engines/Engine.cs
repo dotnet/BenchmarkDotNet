@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Engines
 
         [PublicAPI] public IHost Host { get; }
         [PublicAPI] public Action<long> WorkloadAction { get; }
-        [PublicAPI] public Action WorkloadActionSingleInvoke { get; }
+        [PublicAPI] public Action<long> WorkloadActionNoUnroll { get; }
         [PublicAPI] public Action Dummy1Action { get; }
         [PublicAPI] public Action Dummy2Action { get; }
         [PublicAPI] public Action Dummy3Action { get; }
@@ -54,13 +54,13 @@ namespace BenchmarkDotNet.Engines
         internal Engine(
             IHost host,
             IResolver resolver,
-            Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Action workloadActionSingleInvoke, Job targetJob,
+            Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Action<long> workloadActionNoUnroll, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
             bool includeExtraStats, bool includeSurvivedMemory, string benchmarkName)
         {
             Host = host;
             OverheadAction = overheadAction;
-            WorkloadActionSingleInvoke = workloadActionSingleInvoke;
+            WorkloadActionNoUnroll = workloadActionNoUnroll;
             Dummy1Action = dummy1Action;
             Dummy2Action = dummy2Action;
             Dummy3Action = dummy3Action;
@@ -96,7 +96,7 @@ namespace BenchmarkDotNet.Engines
                 // Measure bytes to allow GC monitor to make its allocations.
                 GetTotalBytes();
                 // Run the clock once to allow it to make its allocations.
-                MeasureAction(() => { });
+                MeasureAction(_ => { }, 0);
                 GetTotalBytes();
             }
         }
@@ -197,21 +197,9 @@ namespace BenchmarkDotNet.Engines
             bool isOverhead = data.IterationMode == IterationMode.Overhead;
             var action = isOverhead ? OverheadAction : WorkloadAction;
 
-            double nanoseconds = 0;
             if (!isOverhead)
             {
                 IterationSetupAction();
-
-                if (includeSurvivedMemory && !survivedBytesMeasured)
-                {
-                    // Measure survived bytes for only the first invocation.
-                    survivedBytesMeasured = true;
-                    ++totalOperations;
-                    long beforeBytes = GetTotalBytes();
-                    nanoseconds = MeasureAction(WorkloadActionSingleInvoke);
-                    long afterBytes = GetTotalBytes();
-                    survivedBytes = afterBytes - beforeBytes;
-                }
             }
 
             GcCollect();
@@ -219,10 +207,36 @@ namespace BenchmarkDotNet.Engines
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStart(data.IterationMode, data.IterationStage, totalOperations);
 
-            // Measure
-            var clock = Clock.Start();
-            action(invokeCount / unrollFactor);
-            nanoseconds += clock.GetElapsed().GetNanoseconds();
+            bool needsSurvivedMeasurement = includeSurvivedMemory && !isOverhead && !survivedBytesMeasured;
+            double nanoseconds;
+            if (needsSurvivedMeasurement)
+            {
+                // Measure survived bytes for only the first invocation.
+                survivedBytesMeasured = true;
+                if (totalOperations == 1)
+                {
+                    // Measure normal invocation for both survived memory and time.
+                    long beforeBytes = GetTotalBytes();
+                    nanoseconds = MeasureAction(action, invokeCount / unrollFactor);
+                    long afterBytes = GetTotalBytes();
+                    survivedBytes = afterBytes - beforeBytes;
+                }
+                else
+                {
+                    // Measure a single invocation for survived memory, plus normal invocations for time.
+                    ++totalOperations;
+                    long beforeBytes = GetTotalBytes();
+                    nanoseconds = MeasureAction(WorkloadActionNoUnroll, 1);
+                    long afterBytes = GetTotalBytes();
+                    survivedBytes = afterBytes - beforeBytes;
+                    nanoseconds += MeasureAction(action, invokeCount / unrollFactor);
+                }
+            }
+            else
+            {
+                // Measure time normally.
+                nanoseconds = MeasureAction(action, invokeCount / unrollFactor);
+            }
 
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStop(data.IterationMode, data.IterationStage, totalOperations);
@@ -241,10 +255,10 @@ namespace BenchmarkDotNet.Engines
 
         // This is necessary for the CORE runtime to clean up the memory from the clock.
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private double MeasureAction(Action action)
+        private double MeasureAction(Action<long> action, long arg)
         {
             var clock = Clock.Start();
-            action();
+            action(arg);
             return clock.GetElapsed().GetNanoseconds();
         }
 
