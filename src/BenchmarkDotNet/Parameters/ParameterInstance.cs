@@ -55,11 +55,14 @@ namespace BenchmarkDotNet.Parameters
             }
         }
 
-        public string ToDisplayText(SummaryStyle summary) => ToDisplayText(summary.CultureInfo, summary.MaxParameterColumnWidth);
-
-        private string ToDisplayText(CultureInfo cultureInfo) => ToDisplayText(cultureInfo, maxParameterColumnWidthFromConfig);
+        public string ToDisplayText(SummaryStyle summary)
+        {
+            return summary != null ? ToDisplayText(summary.CultureInfo, summary.MaxParameterColumnWidth) : ToDisplayText();
+        }
 
         public string ToDisplayText() => ToDisplayText(CultureInfo.CurrentCulture);
+
+        private string ToDisplayText(CultureInfo cultureInfo) => ToDisplayText(cultureInfo, maxParameterColumnWidthFromConfig);
 
         public override string ToString() => ToDisplayText();
 
