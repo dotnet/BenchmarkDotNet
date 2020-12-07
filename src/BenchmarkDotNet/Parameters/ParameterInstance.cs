@@ -15,13 +15,13 @@ namespace BenchmarkDotNet.Parameters
         [PublicAPI] public ParameterDefinition Definition { get; }
 
         private readonly object value;
-        private readonly int defaultMaxParameterColumnWidth;
+        private readonly int maxParameterColumnWidthFromConfig;
 
         public ParameterInstance(ParameterDefinition definition, object value, SummaryStyle summaryStyle)
         {
             Definition = definition;
             this.value = value;
-            defaultMaxParameterColumnWidth = summaryStyle?.MaxParameterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
+            maxParameterColumnWidthFromConfig = summaryStyle?.MaxParameterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
         }
 
         public void Dispose() => (Value as IDisposable)?.Dispose();
