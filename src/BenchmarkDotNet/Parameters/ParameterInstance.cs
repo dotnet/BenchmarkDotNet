@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Parameters
                 ? parameter.ToSourceCode()
                 : SourceCodeHelper.ToSourceCode(value);
 
-        public string ToDisplayText(CultureInfo cultureInfo, int maxParameterColumnWidth)
+        private string ToDisplayText(CultureInfo cultureInfo, int maxParameterColumnWidth)
         {
             switch (value)
             {
