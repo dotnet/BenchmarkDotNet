@@ -60,10 +60,7 @@ namespace BenchmarkDotNet.Parameters
             return summary != null ? ToDisplayText(summary.CultureInfo, summary.MaxParameterColumnWidth) : ToDisplayText();
         }
 
-        public string ToDisplayText() => ToDisplayText(CultureInfo.CurrentCulture);
-
-        private string ToDisplayText(CultureInfo cultureInfo) => ToDisplayText(cultureInfo, maxParameterColumnWidthFromConfig);
-
+        public string ToDisplayText() => ToDisplayText(cultureInfo, maxParameterColumnWidthFromConfig);
         public override string ToString() => ToDisplayText();
 
         private static string Trim(string value, int maxDisplayTextInnerLength)
