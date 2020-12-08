@@ -68,16 +68,16 @@ namespace BenchmarkDotNet.Columns
                             return isBaseline
                                 ? "baseline"
                                 : ratio.Mean >= 1.0
-                                    ? "+" + ((ratio.Mean - 1.0) * 100).ToString(advancedPrecision ? "N1" : "N0") + "%"
-                                    : "-" + ((1.0 - ratio.Mean) * 100).ToString(advancedPrecision ? "N1" : "N0") + "%";
+                                    ? "+" + ((ratio.Mean - 1.0) * 100).ToString(advancedPrecision ? "N1" : "N0", cultureInfo) + "%"
+                                    : "-" + ((1.0 - ratio.Mean) * 100).ToString(advancedPrecision ? "N1" : "N0", cultureInfo) + "%";
                         case RatioStyle.Trend:
                             return isBaseline
                                 ? "baseline"
                                 : ratio.Mean >= 1.0
-                                    ? ratio.Mean.ToString(advancedPrecision ? "N3" : "N2") + "x slower"
+                                    ? ratio.Mean.ToString(advancedPrecision ? "N3" : "N2", cultureInfo) + "x slower"
                                     : invertedRatio == null
                                         ? "NA"
-                                        : invertedRatio.Mean.ToString(advancedPrecision ? "N3" : "N2") + "x faster";
+                                        : invertedRatio.Mean.ToString(advancedPrecision ? "N3" : "N2", cultureInfo) + "x faster";
                         default:
                             throw new ArgumentOutOfRangeException(nameof(summary), ratioStyle, "RatioStyle is not supported");
                     }
