@@ -17,6 +17,6 @@ namespace BenchmarkDotNet.Attributes
         /// <summary>
         /// Defines order of column in the same category.
         /// </summary>
-        public int Priority { get; set; }
+        public int Priority { get; set; } = 0;
     }
 }
