@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Parameters
         public object[] Values { get; }
         public bool IsArgument { get; }
         public Type ParameterType { get; }
-        int PriorityInCategory { get; }
+        public int PriorityInCategory { get; }
 
         public ParameterDefinition(string name, bool isStatic, object[] values, bool isArgument, Type parameterType, int priorityInCategory)
         {

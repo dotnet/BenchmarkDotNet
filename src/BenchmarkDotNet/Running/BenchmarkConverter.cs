@@ -190,8 +190,8 @@ namespace BenchmarkDotNet.Running
 
             var paramsAllValuesDefinitions = GetDefinitions<ParamsAllValuesAttribute>((_, parameterType) => GetAllValidValues(parameterType));
 
-            var definitions = paramsDefinitions.Concat(paramsSourceDefinitions).Concat(paramsAllValuesDefinitions).ToArray();
-
+            var definitions = paramsDefinitions.Concat(paramsSourceDefinitions).Concat(paramsAllValuesDefinitions)
+                .OrderBy(parameter => parameter.PriorityInCategory).ToArray();
             return new ParameterDefinitions(definitions);
         }
 
