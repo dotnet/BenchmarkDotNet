@@ -130,6 +130,12 @@ namespace BenchmarkDotNet.Engines
             }
         }
 
+        private static void ResetSurvived()
+        {
+            survivedBytes = 0;
+            survivedBytesMeasured = false;
+        }
+
         public void Dispose()
         {
             try
@@ -284,6 +290,7 @@ namespace BenchmarkDotNet.Engines
             GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperationsAndSurvivedBytes(data.InvokeCount * OperationsPerInvoke, survivedBytes);
             ThreadingStats threadingStats = (finalThreadingStats - initialThreadingStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
 
+            ResetSurvived();
             return (gcStats, threadingStats);
         }
 
