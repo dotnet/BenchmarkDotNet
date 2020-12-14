@@ -400,7 +400,9 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             // Core has survived memory measurement problems.
             // See https://github.com/dotnet/runtime/issues/45446
-            if (toolchain is CsProjCoreToolchain || toolchain is CoreRtToolchain) // CoreRt actually does measure accurately in a normal benchmark run, but doesn't with the specific version used in these tests.
+            if (toolchain is CsProjCoreToolchain
+                || (toolchain.IsInProcess && RuntimeInformation.IsNetCore)
+                || toolchain is CoreRtToolchain) // CoreRt actually does measure accurately in a normal benchmark run, but doesn't with the specific version used in these tests.
                 return;
 
             var config = CreateConfig(toolchain, MemoryDiagnoser.WithSurvived);
@@ -410,11 +412,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
             foreach (var benchmarkSurvivedValidator in benchmarkSurvivedValidators)
             {
-                // CoreRT is missing some of the CoreCLR threading/task related perf improvements, so sizeof(Task<int>) calculated for CoreCLR < sizeof(Task<int>) on CoreRT
-                // see https://github.com/dotnet/corert/issues/5705 for more
-                if (benchmarkSurvivedValidator.Key == nameof(AccurateSurvived.AllocateTaskSurvive) && toolchain is CoreRtToolchain)
-                    continue;
-
                 var survivedBenchmarks = benchmarks.BenchmarksCases.Where(benchmark => benchmark.Descriptor.WorkloadMethodDisplayInfo == benchmarkSurvivedValidator.Key).ToArray();
 
                 foreach (var benchmark in survivedBenchmarks)
