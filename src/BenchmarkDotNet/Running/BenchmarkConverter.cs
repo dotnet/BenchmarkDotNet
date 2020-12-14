@@ -196,8 +196,11 @@ namespace BenchmarkDotNet.Running
 
         private static IEnumerable<ParameterInstances> GetArgumentsDefinitions(MethodInfo benchmark, Type target, SummaryStyle summaryStyle)
         {
+            var argumentsAttributes = benchmark.GetCustomAttributes<PriorityAttribute>();
+            int priority = argumentsAttributes.Select(attribute => attribute.Priority).Sum();
+
             var parameterDefinitions = benchmark.GetParameters()
-                .Select(parameter => new ParameterDefinition(parameter.Name, false, Array.Empty<object>(), true, parameter.ParameterType, 0))
+                .Select(parameter => new ParameterDefinition(parameter.Name, false, Array.Empty<object>(), true, parameter.ParameterType, priority))
                 .ToArray();
 
             if (parameterDefinitions.IsEmpty())
