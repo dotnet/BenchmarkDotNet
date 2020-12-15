@@ -1252,7 +1252,7 @@ namespace SimpleJson
         private static void HandleIndent(int change)
         {
             indentationLevel += change;
-            indentationText = Environment.NewLine + new string(' ', indentationLevel * spacesPerIndent);
+            indentationText = Environment.NewLine + new string(WhiteSpaceCharacter, indentationLevel * spacesPerIndent);
         }
 
         private static IJsonSerializerStrategy _currentJsonSerializerStrategy;
