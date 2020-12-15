@@ -126,8 +126,18 @@ namespace BenchmarkDotNet.Jobs
         CoreRt60,
 
         /// <summary>
-        /// WebAssembly
+        /// WebAssembly with default .Net version
         /// </summary>
-        Wasm
+        Wasm,
+
+        /// <summary>
+        /// WebAssembly with .net5.0
+        /// </summary>
+        WasmNet50,
+
+        /// <summary>
+        /// WebAssembly with .net6.0
+        /// </summary>
+        WasmNet60
     }
 }
