@@ -75,6 +75,8 @@ namespace BenchmarkDotNet.Reports
 
         public int GetNumberOfExecutedBenchmarks() => Reports.Count(report => report.ExecuteResults.Any(result => result.FoundExecutable));
 
+        public bool IsMultipleRuntime => BenchmarksCases.Count() > 1 ? BenchmarksCases.Where(benchmark => benchmark.Job.Environment.Runtime != null).Any(benchmark => !benchmark.Job.Environment.Runtime.Equals(BenchmarksCases[0].Job.Environment.Runtime)) : false;
+
         internal static Summary NothingToRun(string title, string resultsDirectoryPath, string logFilePath)
             => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, DefaultCultureInfo.Instance, ImmutableArray<ValidationError>.Empty);
 
