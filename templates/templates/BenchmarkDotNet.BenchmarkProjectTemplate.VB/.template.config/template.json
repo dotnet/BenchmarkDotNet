@@ -32,32 +32,32 @@
     "frameworks": {
       "type": "parameter",
       "datatype": "string",
-      "description": "The target framework(s) for the project (e.g. netstandard2.0;net472).",
-      "defaultValue": "netstandard2.0",
+      "description": "The target framework(s) for the project (e.g. netstandard2.0;net472). Default \"net5.0\"",
+      "defaultValue": "net5.0",
       "replaces": "$(Frameworks)"
     },
     "config": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Adds a benchmark config class.",
+      "description": "Adds a benchmark config class. Default \"false\"",
       "defaultValue": "false"
     },
     "skipRestore": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "If specified, skips the automatic restore of the project on create.",
+      "description": "If specified, skips the automatic restore of the project on create. Default \"false\"",
       "defaultValue": "false"
     },
     "consoleApp": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "If specified, the project is set up as console app.",
+      "description": "If specified, the project is set up as console app. Default \"false\"",
       "defaultValue": "false"
     },
     "version": {
       "type": "parameter",
       "datatype": "string",
-      "description": "Version of BenchmarkDotNet that will be referenced.",
+      "description": "Version of BenchmarkDotNet that will be referenced.  Default \"0.12.0\"",
       "defaultValue": "0.12.0",
       "replaces": "$(BenchmarkDotNetVersion)"
     }

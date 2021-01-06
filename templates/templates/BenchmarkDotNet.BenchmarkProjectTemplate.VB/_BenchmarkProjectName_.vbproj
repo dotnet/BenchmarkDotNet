@@ -1,9 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup Condition="'$(consoleApp)' == 'true'">
-    <TargetFramework>netcoreapp3.0</TargetFramework>
-    <OutputType>Exe</OutputType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(consoleApp)' == 'false'">
+  <PropertyGroup>
     <TargetFrameworks>$(Frameworks)</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
