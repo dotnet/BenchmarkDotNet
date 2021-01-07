@@ -80,25 +80,25 @@
     "config": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Adds a benchmark config class. Default \"false\"",
+      "description": "Adds a benchmark config class.",
       "defaultValue": "false"
     },
     "skipRestore": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "If specified, skips the automatic restore of the project on create. Default \"false\"",
+      "description": "If specified, skips the automatic restore of the project on create.",
       "defaultValue": "false"
     },
     "consoleApp": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "If specified, the project is set up as console app. Default \"false\"",
+      "description": "If specified, the project is set up as console app.",
       "defaultValue": "false"
     },
     "version": {
       "type": "parameter",
       "datatype": "string",
-      "description": "Version of BenchmarkDotNet that will be referenced. Default \"0.12.0\"",
+      "description": "Version of BenchmarkDotNet that will be referenced.",
       "defaultValue": "0.12.0",
       "replaces": "$(BenchmarkDotNetVersion)"
     }
