@@ -32,8 +32,49 @@
     "frameworks": {
       "type": "parameter",
       "datatype": "string",
-      "description": "The target framework(s) for the project (e.g. netstandard2.0;net472).",
-      "defaultValue": "netstandard2.0",
+      "description": "The target framework(s) for the project (e.g. netstandard2.0;net472). Default \"net5.0\" if \"--console-app\" is true, \"netstandard2.0\" if \"--console-app\" is true",
+      "defaultValue": ""
+    },
+    "frameworksDefaults": {
+      "type": "generated",
+      "generator": "switch",
+      "description": "generate a default framework value based on consoleApp",
+      "parameters": {
+        "evaluator": "C++",
+        "datatype": "string",
+        "cases": [
+          {
+            "condition": "(frameworks == '' && consoleApp == true)",
+            "value": "net5.0"
+          },
+          {
+            "condition": "(frameworks == '' && consoleApp == false)",
+            "value": "netstandard2.0"
+          },
+          {
+            "condition": "(frameworks != '')",
+            "value": ""
+          }
+        ]
+      },
+      "replaces": "$(Frameworks)"
+    },
+    "frameworksValue": {
+      "type": "generated",
+      "generator": "join",
+      "description": "join frameworks and frameworksDefaults",
+      "parameters": {
+        "symbols": [
+          {
+            "type": "ref",
+            "value": "frameworks"
+          },
+          {
+            "type": "ref",
+            "value": "frameworksDefaults"
+          }
+        ]
+      },
       "replaces": "$(Frameworks)"
     },
     "config": {
