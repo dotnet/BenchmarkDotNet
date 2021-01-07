@@ -98,7 +98,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 startInfo.StandardErrorEncoding = Encoding.UTF8;
             }
 
-
             if (environmentVariables != null)
                 foreach (var environmentVariable in environmentVariables)
                     startInfo.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;
