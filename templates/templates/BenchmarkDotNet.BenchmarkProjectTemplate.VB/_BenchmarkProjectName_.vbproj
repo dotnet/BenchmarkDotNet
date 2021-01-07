@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(consoleApp)' == 'true'">
+    <TargetFramework>$(Frameworks)</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(consoleApp)' == 'false'">
     <TargetFrameworks>$(Frameworks)</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>

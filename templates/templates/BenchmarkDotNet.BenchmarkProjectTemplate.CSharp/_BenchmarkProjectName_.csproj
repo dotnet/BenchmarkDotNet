@@ -1,7 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>$(Frameworks)</TargetFrameworks>
+  <PropertyGroup Condition="'$(consoleApp)' == 'true'">
+    <TargetFramework>$(Frameworks)</TargetFramework>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(consoleApp)' == 'false'">
+    <TargetFrameworks>$(Frameworks)</TargetFrameworks>
+ </PropertyGroup>
   <PropertyGroup>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>portable</DebugType>
