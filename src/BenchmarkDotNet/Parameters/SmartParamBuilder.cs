@@ -24,6 +24,9 @@ namespace BenchmarkDotNet.Parameters
             if (values.All(value => value is object[] array && array.Length == 1 && SourceCodeHelper.IsCompilationTimeConstant(array[0])))
                 return values.Select(x => ((object[])x)[0]).ToArray();
 
+            if (values.All(value => value is NamedParameter))
+                return values.Cast<NamedParameter>().Select((namedParameter, index) => new NamedSmartParameter(source, namedParameter, index)).ToArray();
+
             return values.Select((value, index) => new SmartParameter(source, value, index)).ToArray();
         }
 
@@ -65,7 +68,11 @@ namespace BenchmarkDotNet.Parameters
             if (SourceCodeHelper.IsCompilationTimeConstant(value))
                 return new ParameterInstance(parameterDefinitions[argumentIndex], value, summaryStyle);
 
-            return new ParameterInstance(parameterDefinitions[argumentIndex], new SmartArgument(parameterDefinitions, value, source, sourceIndex, argumentIndex), summaryStyle);
+            SmartArgument argument = value is NamedParameter namedParameter
+                ? new NamedSmartArgument(parameterDefinitions, namedParameter, source, sourceIndex, argumentIndex)
+                : new SmartArgument(parameterDefinitions, value, source, sourceIndex, argumentIndex);
+
+            return new ParameterInstance(parameterDefinitions[argumentIndex], argument, summaryStyle);
         }
     }
 
@@ -89,7 +96,7 @@ namespace BenchmarkDotNet.Parameters
 
         public virtual string DisplayText => Value is Array array ? ArrayParam.GetDisplayString(array) : Value.ToString();
 
-        public string ToSourceCode()
+        public virtual string ToSourceCode()
         {
             string cast = $"({parameterDefinitions[argumentIndex].ParameterType.GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
 
@@ -108,13 +115,21 @@ namespace BenchmarkDotNet.Parameters
     {
         private readonly string name;
 
-        public NamedSmartArgument(ParameterDefinition[] parameterDefinitions, object value, MemberInfo source, int sourceIndex, int argumentIndex, string name)
-            : base(parameterDefinitions, value, source, sourceIndex, argumentIndex)
+        public NamedSmartArgument(ParameterDefinition[] parameterDefinitions, NamedParameter namedParameter, MemberInfo source, int sourceIndex, int argumentIndex)
+            : base(parameterDefinitions, namedParameter.Value, source, sourceIndex, argumentIndex)
         {
-            this.name = name;
+            name = namedParameter.Name;
         }
 
         public override string DisplayText => name ?? base.DisplayText;
+
+        public override string ToSourceCode()
+        {
+            string sourceCode = base.ToSourceCode();
+
+            // Insert ".Value" just before the semicolon to extract the underlying value of the NamedParameter object
+            return sourceCode.Insert(sourceCode.Length - 1, ".Value");
+        }
     }
 
     internal class SmartParameter : IParam
@@ -135,7 +150,7 @@ namespace BenchmarkDotNet.Parameters
 
         public virtual string DisplayText => Value is Array array ? ArrayParam.GetDisplayString(array) : Value.ToString();
 
-        public string ToSourceCode()
+        public virtual string ToSourceCode()
         {
             string cast = $"({Value.GetType().GetCorrectCSharpTypeName()})";
 
@@ -152,13 +167,21 @@ namespace BenchmarkDotNet.Parameters
     {
         private readonly string name;
 
-        public NamedSmartParameter(MemberInfo source, object value, int index, string name)
-            : base(source, value, index)
+        public NamedSmartParameter(MemberInfo source, NamedParameter namedParameter, int index)
+            : base(source, namedParameter.Value, index)
         {
-            this.name = name;
+            name = namedParameter.Name;
         }
 
         public override string DisplayText => name ?? base.DisplayText;
+
+        public override string ToSourceCode()
+        {
+            string sourceCode = base.ToSourceCode();
+
+            // Insert ".Value" just before the semicolon to extract the underlying value of the NamedParameter object
+            return sourceCode.Insert(sourceCode.Length - 1, ".Value");
+        }
     }
 
     public static class ParameterExtractor
