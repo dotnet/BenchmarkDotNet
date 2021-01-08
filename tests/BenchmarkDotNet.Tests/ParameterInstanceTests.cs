@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Reports;
 using System;
 using System.Collections.Generic;
+using BenchmarkDotNet.Extensions;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests
@@ -77,6 +78,45 @@ namespace BenchmarkDotNet.Tests
         [InlineData(10)]
         public void MaxParameterColumnWidthCanNotBeSetToValueLessThanDefault(int newWidth)
             => Assert.Throws<ArgumentOutOfRangeException>(() => SummaryStyle.Default.WithMaxParameterColumnWidth(newWidth));
+
+        public static IEnumerable<object[]> NamedParametersSource => new[]
+        {
+            new object[] {new NamedParameter(1, "One")},
+            new object[] {new NamedParameter(2, "Two")},
+            new object[] {new NamedParameter(3, null)},
+        };
+
+        [Theory]
+        [MemberData(nameof(NamedParametersSource))]
+        public void NamedSmartParametersDisplayGivenNameOrDefaultName(object value)
+        {
+            Assert.IsType<NamedParameter>(value);
+
+            var namedParameter = (NamedParameter) value;
+            var smartParameter = new NamedSmartParameter(null, namedParameter, 0);
+
+            var parameter = new ParameterInstance(definition, smartParameter, null);
+
+            string displayTextIfGivenNameIsNull = new SmartParameter(null, namedParameter.Value, 0).DisplayText;
+
+            Assert.Equal(namedParameter.Name ?? displayTextIfGivenNameIsNull, parameter.ToDisplayText());
+        }
+
+        [Theory]
+        [MemberData(nameof(NamedParametersSource))]
+        public void NamedSmartArgumentsDisplayGivenNameOrDefaultName(object value)
+        {
+            Assert.IsType<NamedParameter>(value);
+
+            var namedParameter = (NamedParameter) value;
+            var smartParameter = new NamedSmartArgument(null, namedParameter, null, 0, 0);
+
+            var parameter = new ParameterInstance(definition, smartParameter, null);
+
+            string displayTextIfGivenNameIsNull = new SmartArgument(null, namedParameter.Value, null, 0, 0).DisplayText;
+
+            Assert.Equal(namedParameter.Name ?? displayTextIfGivenNameIsNull, parameter.ToDisplayText());
+        }
     }
 
     public class ATypeWithAVeryVeryVeryVeryVeryVeryLongNameeeeeeeee { }

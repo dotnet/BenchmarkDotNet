@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
@@ -817,6 +818,47 @@ namespace BenchmarkDotNet.IntegrationTests
                 }
 
                 public void Dispose() => ++Disposed;
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void ValuesOfNamedArgumentsArePassedToBenchmarks(IToolchain toolchain) => CanExecute<WithNamedArguments>(toolchain);
+
+        public class WithNamedArguments
+        {
+            [Benchmark]
+            [ArgumentsSource(nameof(ArgumentsProvider))]
+            public void Simple(int number)
+            {
+                if (number != 1 && number != 2)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+
+            public IEnumerable<NamedParameter> ArgumentsProvider()
+            {
+                yield return 1.WithName("One");
+                yield return 2.WithDefaultName();
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void ValuesOfNamedParametersArePassedToBenchmarks(IToolchain toolchain) => CanExecute<WithNamedParameters>(toolchain);
+
+        public class WithNamedParameters
+        {
+            [Benchmark]
+            public void Simple()
+            {
+                if (Number != 1 && Number != 2)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+
+            [ParamsSource(nameof(ParametersProvider))] public int Number { get; set; }
+
+            public IEnumerable<NamedParameter> ParametersProvider()
+            {
+                yield return 1.WithName("One");
+                yield return 2.WithDefaultName();
             }
         }
 
