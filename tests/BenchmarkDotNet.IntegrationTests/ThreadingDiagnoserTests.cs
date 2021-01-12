@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             new object[] { Job.Default.GetToolchain() },
             // new object[] { CoreRtToolchain.Core50 },
-            new object[] { InProcessEmitToolchain.Instance },
+            // new object[] { InProcessEmitToolchain.Instance },
         };
 
         [Theory, MemberData(nameof(GetToolchains))]
