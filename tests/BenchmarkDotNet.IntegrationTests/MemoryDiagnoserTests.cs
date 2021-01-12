@@ -200,6 +200,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             if (toolchain is CoreRtToolchain) // the fix has not yet been backported to CoreRT
                 return;
+            if (toolchain.IsInProcess) // #1542 Tiered JIT compilations caught in the background
+                return;
 
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
             long arraySizeOverhead = IntPtr.Size; // array length
