@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Tests.Running
 
         [SimpleJob(runtimeMoniker: RuntimeMoniker.Net461)]
         [SimpleJob(runtimeMoniker: RuntimeMoniker.Mono)]
-        [SimpleJob(runtimeMoniker: RuntimeMoniker.NetCoreApp21)]
+        [SimpleJob(runtimeMoniker: RuntimeMoniker.Net50)]
         public class AllRuntimes
         {
             [Benchmark] public void M1() { }
