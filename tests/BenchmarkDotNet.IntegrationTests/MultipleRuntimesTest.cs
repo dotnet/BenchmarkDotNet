@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Any());
 
             Assert.Contains(".NET Framework", summary.AllRuntimes);
-            Assert.Contains(".NET Core", summary.AllRuntimes);
+            Assert.Contains(".NET 5.0", summary.AllRuntimes);
         }
     }
 
