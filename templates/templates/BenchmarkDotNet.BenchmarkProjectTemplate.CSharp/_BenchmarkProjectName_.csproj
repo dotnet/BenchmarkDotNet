@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Condition="'$(consoleApp)' == 'true'">
-    <TargetFramework>$(Frameworks)</TargetFramework>
+    <TargetFramework>$(Framework)</TargetFramework>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(consoleApp)' == 'false'">
-    <TargetFrameworks>$(Frameworks)</TargetFrameworks>
+    <TargetFramework>$(Framework)</TargetFramework>
  </PropertyGroup>
   <PropertyGroup>
     <PlatformTarget>AnyCPU</PlatformTarget>
