@@ -121,9 +121,9 @@ Task("FastTests")
     .Does(() =>
     {
 		string[] targetVersions = IsRunningOnWindows() ?
-                new []{"net461", "netcoreapp2.1"}
+                new []{"net461", "net5.0"}
                 :
-                new []{"netcoreapp2.1"};
+                new []{"net5.0"};
 
         foreach(var version in targetVersions)
         {
@@ -144,7 +144,7 @@ Task("SlowTestsNetCore2")
 	.WithCriteria(!skipTests)
 	.Does(() =>
 	{
-		DotNetCoreTest(integrationTestsProjectPath, GetTestSettingsParameters("netcoreapp2.1"));
+		DotNetCoreTest(integrationTestsProjectPath, GetTestSettingsParameters("net5.0"));
 	});          
 
 Task("Pack")
