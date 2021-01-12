@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Reports
         public TimeUnit TimeUnit { get; }
         [NotNull]
         public CultureInfo CultureInfo { get; }
-        
+
         public RatioStyle RatioStyle { get; }
 
         public SummaryStyle([CanBeNull] CultureInfo cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true,

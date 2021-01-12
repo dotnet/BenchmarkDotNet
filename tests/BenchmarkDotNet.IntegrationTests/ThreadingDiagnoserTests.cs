@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 first.Join();
             }
 
-            void FirstThread()
+            private void FirstThread()
             {
                 Monitor.Enter(guard);
                 lockTaken.Set();
@@ -110,7 +110,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 Monitor.Exit(guard);
             }
 
-            void SecondThread()
+            private void SecondThread()
             {
                 lockTaken.WaitOne();
 
