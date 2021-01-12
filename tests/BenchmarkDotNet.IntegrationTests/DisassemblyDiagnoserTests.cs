@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public static IEnumerable<object[]> GetAllJits()
             => new[]
             {
-#if CLASSIC
+#if NETFRAMEWORK
                 new object[] { Jit.LegacyJit, Platform.X86, ClrRuntime.Net461 }, // 32bit LegacyJit for desktop .NET
                 new object[] { Jit.LegacyJit, Platform.X64, ClrRuntime.Net461 }, // 64bit LegacyJit for desktop .NET
 
