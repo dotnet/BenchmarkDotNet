@@ -606,8 +606,8 @@ namespace SimpleJson
         public static string SerializeObject(object json, IJsonSerializerStrategy jsonSerializerStrategy)
         {
             StringBuilder builder = new StringBuilder(BUILDER_CAPACITY);
-            ResetIndentationLevel();
             bool success = SerializeValue(jsonSerializerStrategy, json, builder);
+            ResetIndentationText();
             return (success ? builder.ToString() : null);
         }
 
@@ -1239,20 +1239,20 @@ namespace SimpleJson
             }
         }
 
-        private static int indentationLevel;
+        private const char WhiteSpaceCharacter = ' ';
+        private static int indentationLevel = 0;
         private static string indentationText;
         private static readonly int spacesPerIndent = 3;
 
-        private static void ResetIndentationLevel()
+        private static void ResetIndentationText()
         {
-            indentationLevel = 0;
-            indentationText = Environment.NewLine + new string(' ', indentationLevel * spacesPerIndent);
+            indentationText = Environment.NewLine;
         }
 
         private static void HandleIndent(int change)
         {
             indentationLevel += change;
-            indentationText = Environment.NewLine + new string(' ', indentationLevel * spacesPerIndent);
+            indentationText = Environment.NewLine + new string(WhiteSpaceCharacter, indentationLevel * spacesPerIndent);
         }
 
         private static IJsonSerializerStrategy _currentJsonSerializerStrategy;
