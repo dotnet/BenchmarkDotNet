@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void SpecifiedProcessorArchitectureMustBeRespected()
         {
-#if !CORE // dotnet cli does not support x86 compilation so far, so I disable this test
+#if NETFRAMEWORK // dotnet cli does not support x86 compilation so far, so I disable this test
             Verify(Platform.X86, typeof(X86Benchmark), X86FailedCaption);
 #endif
             Verify(Platform.X64, typeof(X64Benchmark), X64FailedCaption);

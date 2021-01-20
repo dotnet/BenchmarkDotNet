@@ -20,7 +20,8 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 foreach (var measurement in report.AllMeasurements)
                 {
-                    Assert.True(measurement.Nanoseconds > TaskDelayMethods.NanosecondsDelay);
+                    Assert.True(measurement.Nanoseconds * 1.03 > TaskDelayMethods.NanosecondsDelay,
+                        $"{report.BenchmarkCase.Descriptor.GetFilterName()} has not been awaited, took {measurement.Nanoseconds}ns, while it should take more than {TaskDelayMethods.NanosecondsDelay}ns");
                 }
             }
         }

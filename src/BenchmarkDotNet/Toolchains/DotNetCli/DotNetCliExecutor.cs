@@ -64,7 +64,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 CustomDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
                 $"{executableName.Escape()} {benchmarkId.ToArguments()}",
-                redirectStandardInput: true);
+                redirectStandardInput: true,
+                redirectStandardError: false); // #1629
 
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
