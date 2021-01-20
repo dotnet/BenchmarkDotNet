@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
-#if CLASSIC
+#if NETFRAMEWORK
 using BenchmarkDotNet.Environments;
 #endif
 
@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.IntegrationTests
             CanExecute<AvoidForcingGarbageCollection>(config);
         }
 
-#if CLASSIC // not supported by project.json so far
+#if NETFRAMEWORK // not supported by project.json so far
         [Fact]
         public void CanAllowToCreateVeryLargeObjectsFor64Bit()
         {

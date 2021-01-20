@@ -1,4 +1,4 @@
-﻿#if CLASSIC
+﻿#if NETFRAMEWORK
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;

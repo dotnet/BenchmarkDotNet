@@ -231,17 +231,17 @@ namespace BenchmarkDotNet.Extensions
 
         private static void SetCoreRunEnvironmentVariables(this ProcessStartInfo start, BenchmarkCase benchmarkCase)
         {
-            var gcMode = benchmarkCase.Job.Environment.Gc;        
+            var gcMode = benchmarkCase.Job.Environment.Gc;
             if (!gcMode.HasChanges)
                 return; // do nothing for the default settings
-            
+
             start.EnvironmentVariables["COMPlus_gcServer"] = gcMode.Server ? "1" : "0";
             start.EnvironmentVariables["COMPlus_gcConcurrent"] = gcMode.Concurrent ? "1" : "0";
             start.EnvironmentVariables["COMPlus_GCCpuGroup"] = gcMode.CpuGroups ? "1" : "0";
             start.EnvironmentVariables["COMPlus_gcAllowVeryLargeObjects"] = gcMode.AllowVeryLargeObjects ? "1" : "0";
             start.EnvironmentVariables["COMPlus_GCRetainVM"] = gcMode.RetainVm ? "1" : "0";
             start.EnvironmentVariables["COMPlus_GCNoAffinitize"] = gcMode.NoAffinitize ? "1" : "0";
-            
+
             if (gcMode.HasValue(GcMode.HeapAffinitizeMaskCharacteristic))
                 start.EnvironmentVariables["COMPlus_GCHeapAffinitizeMask"] = gcMode.HeapAffinitizeMask.ToString("X");
             if (gcMode.HasValue(GcMode.HeapCountCharacteristic))

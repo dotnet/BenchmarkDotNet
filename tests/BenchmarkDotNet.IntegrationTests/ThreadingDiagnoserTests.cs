@@ -1,17 +1,15 @@
-#if NETCOREAPP3_0
+#if !NETFRAMEWORK
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using System;
 using System.Collections.Generic;
@@ -31,8 +29,8 @@ namespace BenchmarkDotNet.IntegrationTests
         public static IEnumerable<object[]> GetToolchains() => new[]
         {
             new object[] { Job.Default.GetToolchain() },
-            new object[] { CoreRtToolchain.LatestBuild },
-            new object[] { InProcessEmitToolchain.Instance },
+            // new object[] { CoreRtToolchain.Core50 }, Disabled until #1606 gets merged with CoreRT toolchain update
+            // new object[] { InProcessEmitToolchain.Instance },
         };
 
         [Theory, MemberData(nameof(GetToolchains))]
@@ -103,7 +101,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 first.Join();
             }
 
-            void FirstThread()
+            private void FirstThread()
             {
                 Monitor.Enter(guard);
                 lockTaken.Set();
@@ -112,7 +110,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 Monitor.Exit(guard);
             }
 
-            void SecondThread()
+            private void SecondThread()
             {
                 lockTaken.WaitOne();
 
@@ -135,9 +133,9 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithIterationCount(1) // single iteration is enough for us
                     .WithGcForce(false)
                     .WithToolchain(toolchain))
-                .With(DefaultColumnProviders.Instance)
-                .With(ThreadingDiagnoser.Default)
-                .With(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddDiagnoser(ThreadingDiagnoser.Default)
+                .AddLogger(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
 
         private void AssertStats(Summary summary, Dictionary<string, (string metricName, double expectedValue)> assertions)
         {
