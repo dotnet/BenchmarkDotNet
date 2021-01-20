@@ -281,6 +281,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithPlatform(options.Platform.Value);
             if (options.RunOncePerIteration)
                 baseJob = baseJob.RunOncePerIteration();
+            if (options.MemoryRandomization)
+                baseJob = baseJob.WithMemoryRandomization();
 
             if (options.EnvironmentVariables.Any())
             {
