@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public static IEnumerable<object[]> GetToolchains() => new[]
         {
             new object[] { Job.Default.GetToolchain() },
-            // new object[] { CoreRtToolchain.Core50 }, Disabled until #1606 gets merged with CoreRT toolchain update
+            new object[] { CoreRtToolchain.Core50 },
             // new object[] { InProcessEmitToolchain.Instance },
         };
 
