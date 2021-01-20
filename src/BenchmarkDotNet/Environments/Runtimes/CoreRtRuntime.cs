@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Environments
                 case Version v when v.Major == 3 && v.Minor == 0: return CoreRt30;
                 case Version v when v.Major == 3 && v.Minor == 1: return CoreRt31;
                 case Version v when v.Major == 5 && v.Minor == 0: return CoreRt50;
-                case Version v when v.Major == 6 && v.Minor == 0: return CoreRt50;
+                case Version v when v.Major == 6 && v.Minor == 0: return CoreRt60;
                 default:
                     return new CoreRtRuntime(RuntimeMoniker.NotRecognized, $"net{version.Major}.{version.Minor}", $"CoreRT {version.Major}.{version.Minor}");
             }
