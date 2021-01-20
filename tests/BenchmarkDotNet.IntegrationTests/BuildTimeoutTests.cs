@@ -26,9 +26,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var config = ManualConfig.CreateEmpty()
                 .AddJob(Job.Dry
-                    .WithRuntime(CoreRtRuntime.CoreRt21)
+                    .WithRuntime(CoreRtRuntime.CoreRt50)
                     .WithToolchain(CoreRtToolchain.CreateBuilder()
-                        .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-27408-02") // we test against specific version to keep this test stable
+                        .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "6.0.0-alpha.1.20602.1") // we test against specific version to keep this test stable
                         .Timeout(timeout)
                         .ToToolchain()));
 

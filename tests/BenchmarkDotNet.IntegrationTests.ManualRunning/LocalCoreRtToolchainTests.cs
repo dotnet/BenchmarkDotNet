@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         {
             var config = ManualConfig.CreateEmpty()
                 .AddJob(Job.Dry
-                    .WithRuntime(CoreRtRuntime.CoreRt21)
+                    .WithRuntime(CoreRtRuntime.CoreRt50)
                     .WithToolchain(
                         CoreRtToolchain.CreateBuilder()
                             .UseCoreRtLocal(IlcPath)
@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         {
             var config = ManualConfig.CreateEmpty()
                 .AddJob(Job.Dry
-                    .WithRuntime(CoreRtRuntime.CoreRt21)
+                    .WithRuntime(CoreRtRuntime.CoreRt50)
                     .WithToolchain(
                         CoreRtToolchain.CreateBuilder()
                             .UseCoreRtLocal(IlcPath)
