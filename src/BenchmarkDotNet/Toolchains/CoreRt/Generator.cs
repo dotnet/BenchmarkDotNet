@@ -149,7 +149,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   <ItemGroup>
     <RdXmlFile Include=""rd.xml"" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' "">
     <LinkerArg Include=""-lanl"" />
   </ItemGroup>
 </Project>";
@@ -186,7 +186,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   <ItemGroup>
     <RdXmlFile Include=""rd.xml"" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' "">
     <LinkerArg Include=""-lanl"" />
   </ItemGroup>
 </Project>";
