@@ -19,4 +19,4 @@ jobs:
           sudo apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-6.0 main"
           sudo apt-get update
       - bash: |
-          sudo apt-get install cmake clang-6.0 libicu55 uuid-dev libcurl4-openssl-dev zlib1g-dev libkrb5-dev
+          sudo apt-get install cmake clang-6.0 libicu60 uuid-dev libcurl4-openssl-dev zlib1g-dev libkrb5-dev
