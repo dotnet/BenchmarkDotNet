@@ -38,10 +38,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 {
                     new object[] { Job.Default.GetToolchain() },
                     new object[] { InProcessEmitToolchain.Instance },
-#if NETCOREAPP2_1 // Disabled until #1606 gets merged with CoreRT toolchain update
-                    // we don't want to test CoreRT twice (for .NET 4.6 and Core 2.1) when running the integration tests (these tests take a lot of time)
+#if !NETFRAMEWORK
+                    // we don't want to test CoreRT twice (for .NET 4.6 and 5.0) when running the integration tests (these tests take a lot of time)
                     // we test against specific version to keep this test stable
-                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-27408-02").ToToolchain() }
+                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "6.0.0-alpha.1.20602.1").ToToolchain() }
 #endif
                 };
 

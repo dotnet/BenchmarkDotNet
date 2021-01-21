@@ -10,62 +10,60 @@ namespace BenchmarkDotNet.Environments
         /// <summary>
         /// CoreRT compiled as netcoreapp2.0
         /// </summary>
-        public static readonly CoreRtRuntime CoreRt20 = new CoreRtRuntime(RuntimeMoniker.CoreRt20, "netcoreapp2.0", "CoreRt 2.0");
+        public static readonly CoreRtRuntime CoreRt20 = new CoreRtRuntime(RuntimeMoniker.CoreRt20, "netcoreapp2.0", "CoreRT 2.0");
         /// <summary>
         /// CoreRT compiled as netcoreapp2.1
         /// </summary>
-        public static readonly CoreRtRuntime CoreRt21 = new CoreRtRuntime(RuntimeMoniker.CoreRt21, "netcoreapp2.1", "CoreRt 2.1");
+        public static readonly CoreRtRuntime CoreRt21 = new CoreRtRuntime(RuntimeMoniker.CoreRt21, "netcoreapp2.1", "CoreRT 2.1");
         /// <summary>
         /// CoreRT compiled as netcoreapp2.2
         /// </summary>
-        public static readonly CoreRtRuntime CoreRt22 = new CoreRtRuntime(RuntimeMoniker.CoreRt22, "netcoreapp2.2", "CoreRt 2.2");
+        public static readonly CoreRtRuntime CoreRt22 = new CoreRtRuntime(RuntimeMoniker.CoreRt22, "netcoreapp2.2", "CoreRT 2.2");
         /// <summary>
         /// CoreRT compiled as netcoreapp3.0
         /// </summary>
-        public static readonly CoreRtRuntime CoreRt30 = new CoreRtRuntime(RuntimeMoniker.CoreRt30, "netcoreapp3.0", "CoreRt 3.0");
+        public static readonly CoreRtRuntime CoreRt30 = new CoreRtRuntime(RuntimeMoniker.CoreRt30, "netcoreapp3.0", "CoreRT 3.0");
         /// <summary>
         /// CoreRT compiled as netcoreapp3.1
         /// </summary>
-        public static readonly CoreRtRuntime CoreRt31 = new CoreRtRuntime(RuntimeMoniker.CoreRt31, "netcoreapp3.1", "CoreRt 3.1");
+        public static readonly CoreRtRuntime CoreRt31 = new CoreRtRuntime(RuntimeMoniker.CoreRt31, "netcoreapp3.1", "CoreRT 3.1");
         /// <summary>
         /// CoreRT compiled as net5.0
         /// </summary>
-        public static readonly CoreRtRuntime CoreRt50 = new CoreRtRuntime(RuntimeMoniker.CoreRt50, "net5.0", "CoreRt 5.0");
+        public static readonly CoreRtRuntime CoreRt50 = new CoreRtRuntime(RuntimeMoniker.CoreRt50, "net5.0", "CoreRT 5.0");
         /// <summary>
         /// CoreRT compiled as net6.0
         /// </summary>
-        public static readonly CoreRtRuntime CoreRt60 = new CoreRtRuntime(RuntimeMoniker.CoreRt50, "net6.0", "CoreRt 6.0");
+        public static readonly CoreRtRuntime CoreRt60 = new CoreRtRuntime(RuntimeMoniker.CoreRt50, "net6.0", "CoreRT 6.0");
 
         private CoreRtRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
             : base(runtimeMoniker, msBuildMoniker, displayName)
         {
         }
 
-        internal static CoreRtRuntime GetCurrentVersion()
+        public static CoreRtRuntime GetCurrentVersion()
         {
             if (!RuntimeInformation.IsNetCore && !RuntimeInformation.IsCoreRT)
             {
                 throw new NotSupportedException("It's impossible to reliably detect the version of CoreRT if the process is not a .NET Core or CoreRT process!");
             }
 
-            var frameworkDescription = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
-            string netCoreAppVersion = new string(frameworkDescription.SkipWhile(c => !char.IsDigit(c)).ToArray());
-            string[] versionNumbers = netCoreAppVersion.Split('.');
-            string msBuildMoniker = int.Parse(versionNumbers[0]) >= 5 ? $"net{versionNumbers[0]}.{versionNumbers[1]}" : $"netcoreapp{versionNumbers[0]}.{versionNumbers[1]}";
-            string displayName = $"CoreRT {versionNumbers[0]}.{versionNumbers[1]}";
-
-            switch (msBuildMoniker)
+            if (!CoreRuntime.TryGetVersion(out var version))
             {
-                case "netcoreapp2.0": return CoreRt20;
-                case "netcoreapp2.1": return CoreRt21;
-                case "netcoreapp2.2": return CoreRt22;
-                case "netcoreapp3.0": return CoreRt30;
-                case "netcoreapp3.1": return CoreRt31;
-                case "net5.0":
-                case "netcoreapp5.0": return CoreRt50;
-                case "net6.0": return CoreRt60;
-                default: // support future version of CoreRT
-                    return new CoreRtRuntime(RuntimeMoniker.NotRecognized, msBuildMoniker, displayName);
+                throw new NotSupportedException("Failed to recognize CoreRT version");
+            }
+
+            switch (version)
+            {
+                case Version v when v.Major == 2 && v.Minor == 0: return CoreRt20;
+                case Version v when v.Major == 2 && v.Minor == 1: return CoreRt21;
+                case Version v when v.Major == 2 && v.Minor == 2: return CoreRt22;
+                case Version v when v.Major == 3 && v.Minor == 0: return CoreRt30;
+                case Version v when v.Major == 3 && v.Minor == 1: return CoreRt31;
+                case Version v when v.Major == 5 && v.Minor == 0: return CoreRt50;
+                case Version v when v.Major == 6 && v.Minor == 0: return CoreRt60;
+                default:
+                    return new CoreRtRuntime(RuntimeMoniker.NotRecognized, $"net{version.Major}.{version.Minor}", $"CoreRT {version.Major}.{version.Minor}");
             }
         }
     }
