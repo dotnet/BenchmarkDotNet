@@ -42,6 +42,7 @@ namespace BenchmarkDotNet.Tests.Environments
         [InlineData("10.0.18362", 693, "Windows 10.0.18362.693 (1903/May2019Update/19H1)")]
         [InlineData("10.0.18363", 657, "Windows 10.0.18363.657 (1909/November2019Update/19H2)")]
         [InlineData("10.0.19041", 1, "Windows 10.0.19041.1 (2004/May2020Update/20H1)")]
+        [InlineData("10.0.19042", 746, "Windows 10.0.19042.746 (20H2/October2020Update)")]
         public void WindowsWithUbrIsPrettified(string originalVersion, int ubr, string prettifiedName)
             => Check(OsBrandStringHelper.Prettify("Windows", originalVersion, ubr), prettifiedName);
 
@@ -49,6 +50,7 @@ namespace BenchmarkDotNet.Tests.Environments
         [InlineData("macOS 10.12.6 (16G29)", "Darwin 16.7.0", "macOS Sierra 10.12.6 (16G29) [Darwin 16.7.0]")]
         [InlineData("macOS 10.13.4 (17E199)", "Darwin 17.5.0", "macOS High Sierra 10.13.4 (17E199) [Darwin 17.5.0]")]
         [InlineData("macOS 10.15.4 (19E266)", "Darwin 19.4.0", "macOS Catalina 10.15.4 (19E266) [Darwin 19.4.0]")]
+        [InlineData("macOS 11.1 (20C69)", "Darwin 20.2.0", "macOS Big Sur 11.1 (20C69) [Darwin 20.2.0]")]
         public void MacOSXIsPrettified(string systemVersion, string kernelVersion, string prettifiedName)
             => Check(OsBrandStringHelper.PrettifyMacOSX(systemVersion, kernelVersion), prettifiedName);
     }

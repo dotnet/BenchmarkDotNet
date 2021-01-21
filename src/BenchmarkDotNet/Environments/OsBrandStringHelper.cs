@@ -96,12 +96,13 @@ namespace BenchmarkDotNet.Environments
             { "10.0.17763", "10 Redstone 5 [1809, October 2018 Update]" },
             { "10.0.18362", "10 19H1 [1903, May 2019 Update]" },
             { "10.0.18363", "10 19H2 [1909, November 2019 Update]" },
-            { "10.0.19041", "10 20H1 [2004, May 2020 Update]" }
+            { "10.0.19041", "10 20H1 [2004, May 2020 Update]" },
+            { "10.0.19042", "10 20H2 [20H2, October 2020 Update]" }
         };
 
         private class Windows10Version
         {
-            private int Version { get; }
+            private string Version { get; }
             [NotNull] private string CodeName { get; }
             [NotNull] private string MarketingName { get; }
             private int BuildNumber { get; }
@@ -109,7 +110,7 @@ namespace BenchmarkDotNet.Environments
             [NotNull] private string ShortifiedCodeName => CodeName.Replace(" ", "");
             [NotNull] private string ShortifiedMarketingName => MarketingName.Replace(" ", "");
 
-            private Windows10Version(int version, [NotNull] string codeName, [NotNull] string marketingName, int buildNumber)
+            private Windows10Version(string version, [NotNull] string codeName, [NotNull] string marketingName, int buildNumber)
             {
                 Version = version;
                 CodeName = codeName;
@@ -124,21 +125,24 @@ namespace BenchmarkDotNet.Environments
             // When people past in on GitHub, it can be a reason of an ugly horizontal scrollbar.
             // To avoid this, we are trying to minimize this line and use the minimum possible number of characters.
             public string ToPrettifiedString([CanBeNull] int? ubr)
-                => $"{ToFullVersion(ubr)} ({Version}/{ShortifiedMarketingName}/{ShortifiedCodeName})";
+                => Version == ShortifiedCodeName
+                    ? $"{ToFullVersion(ubr)} ({Version}/{ShortifiedMarketingName})"
+                    : $"{ToFullVersion(ubr)} ({Version}/{ShortifiedMarketingName}/{ShortifiedCodeName})";
 
             // See https://en.wikipedia.org/wiki/Windows_10_version_history
             private static readonly List<Windows10Version> WellKnownVersions = new List<Windows10Version>
             {
-                new Windows10Version(1507, "Threshold 1", "RTM", 10240),
-                new Windows10Version(1511, "Threshold 2", "November Update", 10586),
-                new Windows10Version(1607, "Redstone 1", "Anniversary Update", 14393),
-                new Windows10Version(1703, "Redstone 2", "Creators Update", 15063),
-                new Windows10Version(1709, "Redstone 3", "Fall Creators Update", 16299),
-                new Windows10Version(1803, "Redstone 4", "April 2018 Update", 17134),
-                new Windows10Version(1809, "Redstone 5", "October 2018 Update", 17763),
-                new Windows10Version(1903, "19H1", "May 2019 Update", 18362),
-                new Windows10Version(1909, "19H2", "November 2019 Update", 18363),
-                new Windows10Version(2004, "20H1", "May 2020 Update", 19041)
+                new Windows10Version("1507", "Threshold 1", "RTM", 10240),
+                new Windows10Version("1511", "Threshold 2", "November Update", 10586),
+                new Windows10Version("1607", "Redstone 1", "Anniversary Update", 14393),
+                new Windows10Version("1703", "Redstone 2", "Creators Update", 15063),
+                new Windows10Version("1709", "Redstone 3", "Fall Creators Update", 16299),
+                new Windows10Version("1803", "Redstone 4", "April 2018 Update", 17134),
+                new Windows10Version("1809", "Redstone 5", "October 2018 Update", 17763),
+                new Windows10Version("1903", "19H1", "May 2019 Update", 18362),
+                new Windows10Version("1909", "19H2", "November 2019 Update", 18363),
+                new Windows10Version("2004", "20H1", "May 2020 Update", 19041),
+                new Windows10Version("20H2", "20H2", "October 2020 Update", 19042),
             };
 
             [CanBeNull]
@@ -202,7 +206,8 @@ namespace BenchmarkDotNet.Environments
                 new MacOSXVersion(16, "Sierra"),
                 new MacOSXVersion(17, "High Sierra"),
                 new MacOSXVersion(18, "Mojave"),
-                new MacOSXVersion(19, "Catalina")
+                new MacOSXVersion(19, "Catalina"),
+                new MacOSXVersion(20, "Big Sur")
             };
 
             [CanBeNull]
