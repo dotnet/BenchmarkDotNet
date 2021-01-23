@@ -3,7 +3,7 @@ using System;
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class ParamsSourceAttribute : Attribute
+    public class ParamsSourceAttribute : PriorityAttribute
     {
         public string Name { get; }
 

@@ -215,7 +215,19 @@ namespace BenchmarkDotNet.Configs
             Options |= config.Options;
         }
 
+        /// <summary>
+        /// Creates a completely EMPTY config with no predefined settings.
+        /// </summary>
+        /// <remarks>You should most probably use the <see cref="CreateMinimumViable"></see> method instead.</remarks>
         public static ManualConfig CreateEmpty() => new ManualConfig();
+
+        /// <summary>
+        /// Creates a minimum viable config with predefined columns provider and console logger.
+        /// </summary>
+        public static ManualConfig CreateMinimumViable()
+            => CreateEmpty()
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddLogger(ConsoleLogger.Default);
 
         public static ManualConfig Create(IConfig config)
         {

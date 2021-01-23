@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                     {
                         checked
                         {
-                            totalSizeInBytes += (uint)asm.Instruction.ByteLength;
+                            totalSizeInBytes += (uint)asm.Instruction.Length;
                         }
 
                         logger.WriteLine($"       {element.TextRepresentation}");

@@ -515,6 +515,7 @@ namespace SimpleJson
         private const int TOKEN_FALSE = 10;
         private const int TOKEN_NULL = 11;
         private const int BUILDER_CAPACITY = 2000;
+        internal const string JSON_EMPTY_STRING = "\"\"";
 
         private static readonly char[] EscapeTable;
         private static readonly char[] EscapeCharacters = new char[] { '"', '\\', '\b', '\f', '\n', '\r', '\t' };
@@ -605,8 +606,8 @@ namespace SimpleJson
         public static string SerializeObject(object json, IJsonSerializerStrategy jsonSerializerStrategy)
         {
             StringBuilder builder = new StringBuilder(BUILDER_CAPACITY);
-            ResetIndentationLevel();
             bool success = SerializeValue(jsonSerializerStrategy, json, builder);
+            ResetIndentationText();
             return (success ? builder.ToString() : null);
         }
 
@@ -1169,20 +1170,36 @@ namespace SimpleJson
 
         static bool SerializeNumber(object number, StringBuilder builder)
         {
-            if (number is long)
-                builder.Append(((long)number).ToString(CultureInfo.InvariantCulture));
-            else if (number is ulong)
-                builder.Append(((ulong)number).ToString(CultureInfo.InvariantCulture));
-            else if (number is int)
-                builder.Append(((int)number).ToString(CultureInfo.InvariantCulture));
-            else if (number is uint)
-                builder.Append(((uint)number).ToString(CultureInfo.InvariantCulture));
-            else if (number is decimal)
-                builder.Append(((decimal)number).ToString(CultureInfo.InvariantCulture));
-            else if (number is float)
-                builder.Append(((float)number).ToString(CultureInfo.InvariantCulture));
-            else
-                builder.Append(Convert.ToDouble(number, CultureInfo.InvariantCulture).ToString("r", CultureInfo.InvariantCulture));
+            object value = ReplaceUnsupportedNumericValues(number);
+            if (!value.Equals(JSON_EMPTY_STRING))
+            {
+                switch (value)
+                {
+                    case long num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    case ulong num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    case int num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    case uint num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    case decimal num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    case float num:
+                        value = num.ToString(CultureInfo.InvariantCulture);
+                        break;
+                    default:
+                        value = Convert.ToDouble(value, CultureInfo.InvariantCulture).ToString("r", CultureInfo.InvariantCulture);
+                        break;
+                }
+            }
+           
+            builder.Append(value);
             return true;
         }
 
@@ -1206,20 +1223,36 @@ namespace SimpleJson
             return false;
         }
 
-        private static int indentationLevel;
+        internal static object ReplaceUnsupportedNumericValues(object value)
+        {
+            switch (value)
+            {
+                case float.NaN:
+                case float.NegativeInfinity:
+                case float.PositiveInfinity:
+                case double.NaN:
+                case double.NegativeInfinity:
+                case double.PositiveInfinity:
+                    return JSON_EMPTY_STRING;
+                default:
+                    return value;
+            }
+        }
+
+        private const char WhiteSpaceCharacter = ' ';
+        private static int indentationLevel = 0;
         private static string indentationText;
         private static readonly int spacesPerIndent = 3;
 
-        private static void ResetIndentationLevel()
+        private static void ResetIndentationText()
         {
-            indentationLevel = 0;
-            indentationText = Environment.NewLine + new string(' ', indentationLevel * spacesPerIndent);
+            indentationText = Environment.NewLine;
         }
 
         private static void HandleIndent(int change)
         {
             indentationLevel += change;
-            indentationText = Environment.NewLine + new string(' ', indentationLevel * spacesPerIndent);
+            indentationText = Environment.NewLine + new string(WhiteSpaceCharacter, indentationLevel * spacesPerIndent);
         }
 
         private static IJsonSerializerStrategy _currentJsonSerializerStrategy;

@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Parameters
 {
-    public class ParameterInstances
+    public class ParameterInstances : IDisposable
     {
         public IReadOnlyList<ParameterInstance> Items { get; }
         public int Count => Items.Count;
@@ -16,6 +17,14 @@ namespace BenchmarkDotNet.Parameters
         public ParameterInstances(IReadOnlyList<ParameterInstance> items)
         {
             Items = items;
+        }
+
+        public void Dispose()
+        {
+            foreach (var parameterInstance in Items)
+            {
+                parameterInstance.Dispose();
+            }
         }
 
         public string FolderInfo => string.Join("_", Items.Select(p => $"{p.Name}-{p.ToDisplayText()}")).AsValidFileName();

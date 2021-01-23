@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Condition="'$(consoleApp)' == 'true'">
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>$(Framework)</TargetFramework>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(consoleApp)' == 'false'">
-    <TargetFrameworks>$(Frameworks)</TargetFrameworks>
+    <TargetFramework>$(Framework)</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -13,6 +13,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
     <Configuration>Release</Configuration>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <Tailcalls>true</Tailcalls>

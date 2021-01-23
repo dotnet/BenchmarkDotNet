@@ -132,9 +132,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
+    <Deterministic>true</Deterministic>
     <RootAllApplicationAssemblies>{rootAllApplicationAssemblies}</RootAllApplicationAssemblies>
     <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
+    <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
   </PropertyGroup>
   {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
   <ItemGroup>
@@ -146,6 +148,9 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   </ItemGroup>
   <ItemGroup>
     <RdXmlFile Include=""rd.xml"" />
+  </ItemGroup>
+  <ItemGroup Condition="" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' "">
+    <LinkerArg Include=""-lanl"" />
   </ItemGroup>
 </Project>";
 
@@ -164,6 +169,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
+    <Deterministic>true</Deterministic>
     <RootAllApplicationAssemblies>{rootAllApplicationAssemblies}</RootAllApplicationAssemblies>
     <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
@@ -179,6 +185,9 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   </ItemGroup>
   <ItemGroup>
     <RdXmlFile Include=""rd.xml"" />
+  </ItemGroup>
+  <ItemGroup Condition="" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' "">
+    <LinkerArg Include=""-lanl"" />
   </ItemGroup>
 </Project>";
 

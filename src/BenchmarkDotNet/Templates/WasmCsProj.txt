@@ -1,0 +1,32 @@
+﻿<Project Sdk="$SDKNAME$" DefaultTargets="$TARGET$">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <OutputPath>bin</OutputPath>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TargetFramework>$TFM$</TargetFramework>
+    <AppDir>$(MSBuildThisFileDirectory)\bin\$TFM$\browser-wasm\publish</AppDir>
+    <AssemblyName>$PROGRAMNAME$</AssemblyName>
+    <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+    <MicrosoftNetCoreAppRuntimePackDir>$RUNTIMEPACK$</MicrosoftNetCoreAppRuntimePackDir>
+    $COPIEDSETTINGS$
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$CODEFILENAME$" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+  </ItemGroup>
+
+  <Target Name="UpdateRuntimePack"
+          DependsOnTargets="ResolveFrameworkReferences" Condition="'$(MicrosoftNetCoreAppRuntimePackDir)' != ''">
+    <ItemGroup>
+      <ResolvedRuntimePack Update="@(ResolvedRuntimePack)" PackageDirectory="$(MicrosoftNetCoreAppRuntimePackDir)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="PublishWithCustomRuntimePack"
+          AfterTargets="Build"
+          DependsOnTargets="UpdateRuntimePack;Publish" />
+
+  <ItemGroup>
+    <ProjectReference Include="$CSPROJPATH$" />
+  </ItemGroup>
+</Project>

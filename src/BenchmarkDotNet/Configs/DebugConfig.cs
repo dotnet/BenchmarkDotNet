@@ -10,6 +10,7 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Validators;
@@ -65,7 +66,18 @@ namespace BenchmarkDotNet.Configs
         public IOrderer Orderer => DefaultOrderer.Instance;
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
-        public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
+
+        public string ArtifactsPath
+        {
+            get
+            {
+                var root = RuntimeInformation.IsAndroid () ?
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) :
+                    Directory.GetCurrentDirectory();
+                return Path.Combine(root, "BenchmarkDotNet.Artifacts");
+            }
+        }
+
         public CultureInfo CultureInfo => null;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
 

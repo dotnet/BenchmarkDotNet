@@ -36,6 +36,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             list.Add("/target:exe");
             list.Add("/optimize");
             list.Add("/unsafe");
+            list.Add("/deterministic");
             list.Add("/platform:" + buildPartition.Platform.ToConfig());
             list.Add("/appconfig:" + artifactsPaths.AppConfigPath.Escape());
             var references = GetAllReferences(buildPartition.RepresentativeBenchmarkCase).Select(assembly => assembly.Location.Escape());

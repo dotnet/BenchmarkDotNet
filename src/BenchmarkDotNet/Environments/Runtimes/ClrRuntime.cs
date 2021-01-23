@@ -7,12 +7,12 @@ namespace BenchmarkDotNet.Environments
 {
     public class ClrRuntime : Runtime, IEquatable<ClrRuntime>
     {
-        public static readonly ClrRuntime Net461 = new ClrRuntime(RuntimeMoniker.Net461, "net461", ".NET 4.6.1");
-        public static readonly ClrRuntime Net462 = new ClrRuntime(RuntimeMoniker.Net462, "net462", ".NET 4.6.2");
-        public static readonly ClrRuntime Net47 = new ClrRuntime(RuntimeMoniker.Net47, "net47", ".NET 4.7");
-        public static readonly ClrRuntime Net471 = new ClrRuntime(RuntimeMoniker.Net471, "net471", ".NET 4.7.1");
-        public static readonly ClrRuntime Net472 = new ClrRuntime(RuntimeMoniker.Net472, "net472", ".NET 4.7.2");
-        public static readonly ClrRuntime Net48 = new ClrRuntime(RuntimeMoniker.Net48, "net48", ".NET 4.8");
+        public static readonly ClrRuntime Net461 = new ClrRuntime(RuntimeMoniker.Net461, "net461", ".NET Framework 4.6.1");
+        public static readonly ClrRuntime Net462 = new ClrRuntime(RuntimeMoniker.Net462, "net462", ".NET Framework 4.6.2");
+        public static readonly ClrRuntime Net47 = new ClrRuntime(RuntimeMoniker.Net47, "net47", ".NET Framework 4.7");
+        public static readonly ClrRuntime Net471 = new ClrRuntime(RuntimeMoniker.Net471, "net471", ".NET Framework 4.7.1");
+        public static readonly ClrRuntime Net472 = new ClrRuntime(RuntimeMoniker.Net472, "net472", ".NET Framework 4.7.2");
+        public static readonly ClrRuntime Net48 = new ClrRuntime(RuntimeMoniker.Net48, "net48", ".NET Framework 4.8");
 
         public string Version { get; }
 
@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Environments
         {
             if (!RuntimeInformation.IsWindows())
             {
-                throw new NotSupportedException("Full .NET Framework supports Windows OS only.");
+                throw new NotSupportedException(".NET Framework supports Windows OS only.");
             }
 
             // this logic is put to a separate method to avoid any assembly loading issues on non Windows systems
@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Environments
                 case "4.7.2": return Net472;
                 case "4.8":   return Net48;
                 default: // unlikely to happen but theoretically possible
-                    return new ClrRuntime(RuntimeMoniker.NotRecognized, $"net{version.Replace(".", null)}", $".NET {version}");
+                    return new ClrRuntime(RuntimeMoniker.NotRecognized, $"net{version.Replace(".", null)}", $".NET Framework {version}");
             }
         }
     }

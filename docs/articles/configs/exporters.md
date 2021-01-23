@@ -99,16 +99,17 @@ The CSV exporter and other compatible exporters may consume an instance of `ISum
 Example of CSV exporter configured to always use microseconds, kilobytes, and to render units only in column headers:
 
 ```cs
-var config = ManualConfig.Create(DefaultConfig.Instance);
-config.Add(new CsvExporter(
+var exporter = new CsvExporter(
     CsvSeparator.CurrentCulture,
-    new BenchmarkDotNet.Reports.SummaryStyle
-    {
-        PrintUnitsInHeader = true,
-        PrintUnitsInContent = false,
-        TimeUnit = BenchmarkDotNet.Horology.TimeUnit.Microsecond,
-        SizeUnit = BenchmarkDotNet.Columns.SizeUnit.KB
-    }));
+    new SummaryStyle(
+        cultureInfo: System.Globalization.CultureInfo.CurrentCulture,
+        printUnitsInHeader: true,
+        printUnitsInContent: false,
+        timeUnit: Perfolizer.Horology.TimeUnit.Microsecond,
+        sizeUnit: SizeUnit.KB
+    ));
+
+var config = ManualConfig.CreateMinimumViable().AddExporter(exporter);
 ```
 
 Excerpt from the resulting CSV file:

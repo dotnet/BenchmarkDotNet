@@ -76,9 +76,9 @@ namespace BenchmarkDotNet.Columns
         {
             public IEnumerable<IColumn> GetColumns(Summary summary) => summary
                 .BenchmarksCases
-                .SelectMany(b => b.Parameters.Items.Select(item => item.Name))
+                .SelectMany(b => b.Parameters.Items.Select(item => item.Definition))
                 .Distinct()
-                .Select(name => new ParamColumn(name));
+                .Select(definition => new ParamColumn(definition.Name, definition.PriorityInCategory));
         }
 
         private class MetricsColumnProvider : IColumnProvider

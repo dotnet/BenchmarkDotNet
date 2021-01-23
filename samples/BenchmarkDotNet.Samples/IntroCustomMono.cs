@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Samples
         public static void Run()
         {
             BenchmarkRunner.Run<IntroCustomMonoFluentConfig>(ManualConfig
-                .CreateEmpty()
+                .CreateMinimumViable()
                 .AddJob(Job.ShortRun.WithRuntime(new MonoRuntime(
                     "Mono x64", @"C:\Program Files\Mono\bin\mono.exe")))
                 .AddJob(Job.ShortRun.WithRuntime(new MonoRuntime(

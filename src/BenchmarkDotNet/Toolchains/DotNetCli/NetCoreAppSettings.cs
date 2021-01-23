@@ -16,7 +16,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp22 = new NetCoreAppSettings("netcoreapp2.2", null, ".NET Core 2.2");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp30 = new NetCoreAppSettings("netcoreapp3.0", null, ".NET Core 3.0");
         [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp31 = new NetCoreAppSettings("netcoreapp3.1", null, ".NET Core 3.1");
-        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp50 = new NetCoreAppSettings("netcoreapp5.0", null, ".NET Core 5.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp50 = new NetCoreAppSettings("net5.0", null, ".NET 5.0");
+        [PublicAPI] public static readonly NetCoreAppSettings NetCoreApp60 = new NetCoreAppSettings("net6.0", null, ".NET 6.0");
 
         /// <summary>
         /// <param name="targetFrameworkMoniker">
@@ -43,14 +44,18 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             string name,
             string customDotNetCliPath = null,
             string packagesPath = null,
-            TimeSpan? timeout = null)
+            TimeSpan? timeout = null,
+            string customRuntimePack = null
+            )
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
             RuntimeFrameworkVersion = runtimeFrameworkVersion;
             Name = name;
+
             CustomDotNetCliPath = customDotNetCliPath;
             PackagesPath = packagesPath;
             Timeout = timeout ?? DefaultBuildTimeout;
+            CustomRuntimePack = customRuntimePack;
         }
 
         /// <summary>
@@ -76,6 +81,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// timeout to build the benchmark
         /// </summary>
         public TimeSpan Timeout { get; }
+
+        /// <summary>
+        /// Path to a custom runtime pack.
+        /// </summary>
+        public string CustomRuntimePack { get; }
 
         public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath, Timeout);

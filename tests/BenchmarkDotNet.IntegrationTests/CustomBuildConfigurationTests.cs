@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Reflection;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -19,7 +22,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var config = CreateSimpleConfig(job: jobWithCustomConfiguration);
 
-            CanExecute<CustomBuildConfiguration>(config);
+            var report = CanExecute<CustomBuildConfiguration>(config);
+
+#if !DEBUG
+            Assert.NotEqual(RuntimeInformation.DebugConfigurationName, report.HostEnvironmentInfo.Configuration);
+            Assert.DoesNotContain(report.AllRuntimes, RuntimeInformation.DebugConfigurationName);
+#endif
         }
 
         public class CustomBuildConfiguration
@@ -27,6 +35,19 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]
             public void Benchmark()
             {
+                if (Assembly.GetEntryAssembly().IsJitOptimizationDisabled().IsTrue())
+                {
+                    throw new InvalidOperationException("Auto-generated project has not enabled optimizations!");
+                }
+                if (typeof(CustomBuildConfiguration).Assembly.IsJitOptimizationDisabled().IsTrue())
+                {
+                    throw new InvalidOperationException("Project that defines benchmarks has not enabled optimizations!");
+                }
+                if (RuntimeInformation.GetConfiguration() == RuntimeInformation.DebugConfigurationName)
+                {
+                    throw new InvalidOperationException($"Configuration rezognized as {RuntimeInformation.DebugConfigurationName}!");
+                }
+
 #if !CUSTOM
                 throw new InvalidOperationException("Should never happen");
 #endif

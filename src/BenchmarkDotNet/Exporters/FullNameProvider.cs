@@ -125,7 +125,7 @@ namespace BenchmarkDotNet.Exporters
                     parametersBuilder.Append(", ");
 
                 parametersBuilder.Append(parameter.Name).Append(':').Append(' ');
-                parametersBuilder.Append(GetArgument(parameter.Value, parameter.Value?.GetType()));
+                parametersBuilder.Append(GetArgument(parameter.Value, parameter.Definition.ParameterType));
             }
 
             return parametersBuilder.Append(')').ToString();

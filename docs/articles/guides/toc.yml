@@ -16,7 +16,5 @@
   href: console-args.md
 - name: Troubleshooting
   href: troubleshooting.md
-- name: Command-line tool
-  href: tool.md
 - name: BenchmarkDotNet templates
   href: dotnet-new-templates.md

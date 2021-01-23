@@ -3,7 +3,7 @@
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class ParamsAttribute : Attribute
+    public class ParamsAttribute : PriorityAttribute
     {
         public object[] Values { get; }
 

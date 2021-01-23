@@ -17,6 +17,6 @@ namespace BenchmarkDotNet.Samples
             => pos == 0 ? depth : FactorialWithTailing(pos - 1, depth * pos);
 
         private static long FactorialWithTailing(int depth)
-            => FactorialWithTailing(1, depth);
+            => FactorialWithTailing(depth - 1, depth);
     }
 }

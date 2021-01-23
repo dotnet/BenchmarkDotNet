@@ -6,7 +6,7 @@ using BenchmarkDotNet.Parameters;
 
 namespace BenchmarkDotNet.Running
 {
-    public class BenchmarkCase : IComparable<BenchmarkCase>
+    public class BenchmarkCase : IComparable<BenchmarkCase>, IDisposable
     {
         public Descriptor Descriptor { get; }
         public Job Job { get; }
@@ -25,6 +25,8 @@ namespace BenchmarkDotNet.Running
             Parameters = parameters;
             Config = config;
         }
+
+        public void Dispose() => Parameters.Dispose();
 
         public int CompareTo(BenchmarkCase other) => string.Compare(FolderInfo, other.FolderInfo, StringComparison.Ordinal);
 

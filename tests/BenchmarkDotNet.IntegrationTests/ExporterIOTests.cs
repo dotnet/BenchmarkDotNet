@@ -134,7 +134,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private class MockExporter : ExporterBase
         {
-            public int ExportCount = 0;
+            public int ExportCount;
 
             public override void ExportToLog(Summary summary, ILogger logger)
             {

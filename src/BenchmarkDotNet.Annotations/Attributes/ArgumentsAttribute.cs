@@ -4,7 +4,7 @@ using System;
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class ArgumentsAttribute : Attribute
+    public class ArgumentsAttribute : PriorityAttribute
     {
         public object[] Values { get; }
 

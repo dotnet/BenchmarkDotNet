@@ -18,15 +18,18 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [PublicAPI] public string PackagesPath { get; }
 
+        protected bool IsNetCore { get; }
+
         [PublicAPI]
-        protected DotNetCliGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath)
+        protected DotNetCliGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, bool isNetCore)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
             CliPath = cliPath;
             PackagesPath = packagesPath;
+            IsNetCore = isNetCore;
         }
 
-        protected override string GetExecutableExtension() => TargetFrameworkMoniker.Contains("core") ? ".dll" : ".exe";
+        protected override string GetExecutableExtension() => IsNetCore ? ".dll" : ".exe";
 
         /// <summary>
         /// we need our folder to be on the same level as the project that we want to reference

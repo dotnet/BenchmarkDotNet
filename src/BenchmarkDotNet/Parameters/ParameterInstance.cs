@@ -8,21 +8,23 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Parameters
 {
-    public class ParameterInstance
+    public class ParameterInstance : IDisposable
     {
         public const string NullParameterTextRepresentation = "?";
 
         [PublicAPI] public ParameterDefinition Definition { get; }
 
         private readonly object value;
-        private readonly int maxParameterColumnWidth;
+        private readonly int maxParameterColumnWidthFromConfig;
 
         public ParameterInstance(ParameterDefinition definition, object value, SummaryStyle summaryStyle)
         {
             Definition = definition;
             this.value = value;
-            maxParameterColumnWidth = summaryStyle?.MaxParameterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
+            maxParameterColumnWidthFromConfig = summaryStyle?.MaxParameterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
         }
+
+        public void Dispose() => (Value as IDisposable)?.Dispose();
 
         public string Name => Definition.Name;
         public bool IsStatic => Definition.IsStatic;
@@ -35,7 +37,7 @@ namespace BenchmarkDotNet.Parameters
                 ? parameter.ToSourceCode()
                 : SourceCodeHelper.ToSourceCode(value);
 
-        public string ToDisplayText(CultureInfo cultureInfo)
+        private string ToDisplayText(CultureInfo cultureInfo, int maxParameterColumnWidth)
         {
             switch (value)
             {
@@ -53,7 +55,12 @@ namespace BenchmarkDotNet.Parameters
             }
         }
 
-        public string ToDisplayText() => ToDisplayText(CultureInfo.CurrentCulture);
+        public string ToDisplayText(SummaryStyle summary)
+        {
+            return summary != null ? ToDisplayText(summary.CultureInfo, summary.MaxParameterColumnWidth) : ToDisplayText();
+        }
+
+        public string ToDisplayText() => ToDisplayText(CultureInfo.CurrentCulture, maxParameterColumnWidthFromConfig);
 
         public override string ToString() => ToDisplayText();
 

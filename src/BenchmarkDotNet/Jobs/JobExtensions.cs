@@ -210,11 +210,16 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public static Job WithPowerPlan(this Job job, Guid powerPlanGuid) => job.WithCore(j => j.Environment.PowerPlanMode = powerPlanGuid);
 
-
         /// <summary>
         /// ensures that BenchmarkDotNet does not enforce any power plan
         /// </summary>
         public static Job DontEnforcePowerPlan(this Job job) => job.WithCore(j => j.Environment.PowerPlanMode = Guid.Empty);
+
+        /// <summary>
+        /// specifies whether Engine should allocate some random-sized memory between iterations
+        /// <remarks>it makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration</remarks>
+        /// </summary>
+        public static Job WithMemoryRandomization(this Job job, bool enable = true) => job.WithCore(j => j.Run.MemoryRandomization = enable);
 
         // Infrastructure
         [EditorBrowsable(EditorBrowsableState.Never)]

@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (!etwProfiler.BenchmarkToEtlFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))
                 return Enumerable.Empty<Metric>();
 
-            return new NativeMemoryLogParser(traceFilePath, results.BenchmarkCase, logger).Parse();
+            return new NativeMemoryLogParser(traceFilePath, results.BenchmarkCase, logger, results.BuildResult.ArtifactsPaths.ProgramName).Parse();
         }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => etwProfiler.Validate(validationParameters);
@@ -67,7 +67,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             var kernelKeywords = KernelTraceEventParser.Keywords.VirtualAlloc | KernelTraceEventParser.Keywords.VAMap;
 
             return new EtwProfilerConfig(
-                providers: Enumerable.Empty<(Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)>().ToList(),
                 performExtraBenchmarksRun: true,
                 kernelKeywords: kernelKeywords,
                 createHeapSession: true);

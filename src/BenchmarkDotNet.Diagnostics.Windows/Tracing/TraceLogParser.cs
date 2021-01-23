@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
 using Microsoft.Diagnostics.Tracing.Etlx;
 using Microsoft.Diagnostics.Tracing.Parsers;
@@ -17,11 +18,20 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
         public static IEnumerable<Metric> Parse(string etlFilePath, PreciseMachineCounter[] counters)
         {
-            using (var traceLog = new TraceLog(TraceLog.CreateFromEventTraceLogFile(etlFilePath)))
-            {
-                var traceLogEventSource = traceLog.Events.GetSource();
+            var etlxFilePath = TraceLog.CreateFromEventTraceLogFile(etlFilePath);
 
-                return new TraceLogParser().Parse(traceLogEventSource, counters);
+            try
+            {
+                using (var traceLog = new TraceLog(etlxFilePath))
+                {
+                    var traceLogEventSource = traceLog.Events.GetSource();
+
+                    return new TraceLogParser().Parse(traceLogEventSource, counters);
+                }
+            }
+            finally
+            {
+                etlxFilePath.DeleteFileIfExists();
             }
         }
 
@@ -123,7 +133,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             var overheadIterations = CreateIterationData(overheadTimestamps);
             var workloadIterations = CreateIterationData(workloadTimestamps);
 
-            SumCountersPerIterations(profileSourceIdToInterval, workloadIterations, overheadIterations);
+            SumCountersPerIterations(profileSourceIdToInterval, workloadIterations, overheadIterations, counters);
 
             var workloadTotalPerCounter = Sum(workloadIterations);
             var overheadTotalPerCounter = Sum(overheadIterations);
@@ -134,8 +144,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
                 overheadTotalPerCounter.TryGetValue(perCounter.Key, out var overhead);
 
-                double result = (perCounter.Value / (double) workloadIterations.Length - overhead / (double) overheadIterations.Length)
-                                    / totalOperationsPerIteration.Value; // result = (avg(workload) - avg(overhead))/op
+                // result = (avg(workload) - avg(overhead))/op
+                double result = perCounter.Value / (double)workloadIterations.Length;
+
+                if (overheadIterations.Length > 0) // we skip the overhead phase for long-running benchmarks
+                {
+                    result -= (overhead / (double)overheadIterations.Length);
+                }
+
+                result /= totalOperationsPerIteration.Value;
 
                 return new Metric(new PmcMetricDescriptor(pmc), result);
             });
@@ -155,15 +172,22 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             return iterations;
         }
 
-        private void SumCountersPerIterations(Dictionary<int, int> profileSourceIdToInterval, IterationData[] workloadIterations, IterationData[] overheadIterations)
+        private void SumCountersPerIterations(Dictionary<int, int> profileSourceIdToInterval, IterationData[] workloadIterations, IterationData[] overheadIterations,
+            PreciseMachineCounter[] counters)
         {
+            var profileSourceIdToCounter = counters.ToDictionary(counter => counter.ProfileSourceId);
+
             foreach (var sample in samples)
             {
                 var interval = profileSourceIdToInterval[sample.profileSource];
 
                 foreach (var workloadIteration in workloadIterations)
                     if (workloadIteration.TryHandle(sample.timeStamp, sample.profileSource, interval))
+                    {
+                        profileSourceIdToCounter[sample.profileSource].OnSample(sample.instructionPointer);
+
                         goto next;
+                    }
 
                 foreach (var overheadIteration in overheadIterations)
                     if (overheadIteration.TryHandle(sample.timeStamp, sample.profileSource, interval))

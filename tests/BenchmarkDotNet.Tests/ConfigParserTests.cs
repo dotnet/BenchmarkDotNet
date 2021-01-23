@@ -306,6 +306,32 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(tfm, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
         }
 
+        [Theory]
+        [InlineData("net50")]
+        [InlineData("net60")]
+        public void Net50AndNet60MonikersAreRecognizedAsNetCoreMonikers(string tfm)
+        {
+            var config = ConfigParser.Parse(new[] { "-r", tfm }, new OutputLogger(Output)).config;
+
+            Assert.Single(config.GetJobs());
+            CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
+            Assert.NotNull(toolchain);
+            Assert.Equal(tfm, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
+        }
+
+        [Theory]
+        [InlineData("net5.0-windows")]
+        [InlineData("net5.0-ios")]
+        public void PlatformSpecificMonikersAreSupported(string msBuildMoniker)
+        {
+            var config = ConfigParser.Parse(new[] { "-r", msBuildMoniker }, new OutputLogger(Output)).config;
+
+            Assert.Single(config.GetJobs());
+            CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
+            Assert.NotNull(toolchain);
+            Assert.Equal(msBuildMoniker, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
+        }
+
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
@@ -432,6 +458,22 @@ namespace BenchmarkDotNet.Tests
 
             Assert.Equal(key, envVar.Key);
             Assert.Equal(value, envVar.Value);
+        }
+
+        [Theory]
+        [InlineData(Platform.AnyCpu)]
+        [InlineData(Platform.X86)]
+        [InlineData(Platform.X64)]
+        [InlineData(Platform.Arm)]
+        [InlineData(Platform.Arm64)]
+        public void UserCanSpecifyProcessPlatform(Platform platform)
+        {
+            var parsedConfig = ConfigParser.Parse(new[] { "--platform", platform.ToString() }, new OutputLogger(Output)).config;
+
+            var job = parsedConfig.GetJobs().Single();
+            var parsed = job.Environment.Platform;
+
+            Assert.Equal(platform, parsed);
         }
 
         [Fact]

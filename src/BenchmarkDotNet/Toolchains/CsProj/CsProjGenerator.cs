@@ -18,7 +18,7 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Toolchains.CsProj
 {
     [PublicAPI]
-    public class CsProjGenerator : DotNetCliGenerator
+    public class CsProjGenerator : DotNetCliGenerator, IEquatable<CsProjGenerator>
     {
         private const string DefaultSdkName = "Microsoft.NET.Sdk";
 
@@ -27,16 +27,21 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         public string RuntimeFrameworkVersion { get; }
 
-        public CsProjGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string runtimeFrameworkVersion)
-            : base(targetFrameworkMoniker, cliPath, packagesPath)
+        public CsProjGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string runtimeFrameworkVersion, bool isNetCore = true)
+            : base(targetFrameworkMoniker, cliPath, packagesPath, isNetCore)
         {
             RuntimeFrameworkVersion = runtimeFrameworkVersion;
         }
 
         protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
         {
-            string directoryName = Path.GetDirectoryName(buildPartition.AssemblyLocation)
-                ?? throw new DirectoryNotFoundException(buildPartition.AssemblyLocation);
+            string assemblyLocation = buildPartition.AssemblyLocation;
+
+            //Assembles loaded from a stream will have an empty location (https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location).
+            string directoryName = assemblyLocation.IsEmpty() ?
+                Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Bin") :
+                Path.GetDirectoryName(buildPartition.AssemblyLocation);
+
             return Path.Combine(directoryName, programName);
         }
 
@@ -164,5 +169,19 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             }
             return projectFile;
         }
+
+        public override bool Equals(object obj) => obj is CsProjGenerator other && Equals(other);
+
+        public bool Equals(CsProjGenerator other)
+            => TargetFrameworkMoniker == other.TargetFrameworkMoniker
+                && RuntimeFrameworkVersion == other.RuntimeFrameworkVersion
+                && CliPath == other.CliPath
+                && PackagesPath == other.PackagesPath;
+
+        public override int GetHashCode()
+            => TargetFrameworkMoniker.GetHashCode()
+                ^ (RuntimeFrameworkVersion?.GetHashCode() ?? 0)
+                ^ (CliPath?.GetHashCode() ?? 0)
+                ^ (PackagesPath?.GetHashCode() ?? 0);
     }
 }

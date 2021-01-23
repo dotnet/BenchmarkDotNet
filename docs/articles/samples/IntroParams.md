@@ -17,12 +17,12 @@ As a result, you will get results for each combination of params values.
 ### Output
 
 ```markdown
-   Method  |      Median |    StdDev |   A |  B
----------- |------------ |---------- |---- |---
- Benchmark | 115.3325 ms | 0.0242 ms | 100 | 10
- Benchmark | 125.3282 ms | 0.0245 ms | 100 | 20
- Benchmark | 215.3024 ms | 0.0375 ms | 200 | 10
- Benchmark | 225.2710 ms | 0.0434 ms | 200 | 20
+|    Method |   A |  B |     Mean |   Error |  StdDev |
+|---------- |---- |--- |---------:|--------:|--------:|
+| Benchmark | 100 | 10 | 115.3 ms | 0.13 ms | 0.12 ms |
+| Benchmark | 100 | 20 | 125.4 ms | 0.14 ms | 0.12 ms |
+| Benchmark | 200 | 10 | 215.5 ms | 0.19 ms | 0.18 ms |
+| Benchmark | 200 | 20 | 225.4 ms | 0.17 ms | 0.16 ms |
 ```
 
 ### Links

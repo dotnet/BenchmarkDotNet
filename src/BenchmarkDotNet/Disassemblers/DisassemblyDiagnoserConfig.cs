@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Diagnosers
         /// <param name="exportGithubMarkdown">Exports to GitHub markdown. True by default.</param>
         /// <param name="exportHtml">Exports to HTML with clickable links. False by default.</param>
         /// <param name="exportCombinedDisassemblyReport">Exports all benchmarks to a single HTML report. Makes it easy to compare different runtimes or methods (each becomes a column in HTML table).</param>
-        /// <param name="exportDiff">Exports a diff. False by default.</param>
+        /// <param name="exportDiff">Exports a diff of the assembly code to the Github markdown format. False by default.</param>
         [PublicAPI]
         public DisassemblyDiagnoserConfig(
             int maxDepth = 1,
@@ -65,13 +65,13 @@ namespace BenchmarkDotNet.Diagnosers
             switch (Formatter)
             {
                 case MasmFormatter masmFormatter:
-                    return new MasmFormatter(masmFormatter.MasmOptions, symbolSolver);
+                    return new MasmFormatter(masmFormatter.Options, symbolSolver);
                 case NasmFormatter nasmFormatter:
-                    return new NasmFormatter(nasmFormatter.NasmOptions, symbolSolver);
+                    return new NasmFormatter(nasmFormatter.Options, symbolSolver);
                 case GasFormatter gasFormatter:
-                    return new GasFormatter(gasFormatter.GasOptions, symbolSolver);
+                    return new GasFormatter(gasFormatter.Options, symbolSolver);
                 case IntelFormatter intelFormatter:
-                    return new IntelFormatter(intelFormatter.IntelOptions, symbolSolver);
+                    return new IntelFormatter(intelFormatter.Options, symbolSolver);
                 default:
                     // we don't know how to translate it so we just return the original one
                     // it's better not to solve symbols rather than throw exception ;)

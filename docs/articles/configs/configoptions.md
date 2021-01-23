@@ -13,7 +13,7 @@ Available config options are:
 * `ConfigOptions.JoinSummary` - All benchmarks results should be joined into a single summary (by default we have a summary per type).
 * `ConfigOptions.StopOnFirstError` - Benchmarking should be stopped after the first error (by default it's not).
 * `ConfigOptions.DisableOptimizationsValidator` - Mandatory optimizations validator should be entirely turned off.
-* `ConfigOptions.DontOverwriteResults` - The exported result files should not be overwritten (be default they are overwritten).
+* `ConfigOptions.DontOverwriteResults` - The exported result files should not be overwritten (by default they are overwritten).
 * `ConfigOptions.DisableLogFile` - Disables the log file written on disk.
 
 All of these options could be combined and are available as CLI (Comand Line Interface) option (except `DisableOptimizationsValidator`), see [Console Arguments](xref:docs.console-args) for further information how to use the CLI.

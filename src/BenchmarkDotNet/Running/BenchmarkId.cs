@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Running
         public BenchmarkId(int value, BenchmarkCase benchmarkCase)
         {
             Value = value;
-            FullBenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase);
+            FullBenchmarkName = GetBenchmarkName(benchmarkCase);
             JobId = benchmarkCase.Job.Id;
         }
 
@@ -32,5 +32,23 @@ namespace BenchmarkDotNet.Running
         public string ToArguments() => $"--benchmarkName {FullBenchmarkName.Escape()} --job {JobId.Escape()} --benchmarkId {Value}";
 
         public override string ToString() => Value.ToString();
+
+        private static string GetBenchmarkName(BenchmarkCase benchmark)
+        {
+            var fullName = FullNameProvider.GetBenchmarkName(benchmark);
+
+            // FullBenchmarkName is passed to Process.Start as an argument and each OS limits the max argument length, so we have to limit it too
+            // Windows limit is 32767 chars, Unix is 128*1024 but we use 1024 as a common sense limit
+            if (fullName.Length < 1024)
+                return fullName;
+
+            string typeName = FullNameProvider.GetTypeName(benchmark.Descriptor.Type);
+            string methodName = benchmark.Descriptor.WorkloadMethod.Name;
+            string paramsHash = benchmark.HasParameters
+                ? "paramsHash_" + Hashing.HashString(FullNameProvider.GetMethodName(benchmark)).ToString()
+                : string.Empty;
+
+            return $"{typeName}.{methodName}({paramsHash})";
+        }
     }
 }

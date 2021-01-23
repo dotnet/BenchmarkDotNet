@@ -19,12 +19,12 @@ The source must be within benchmarked type!
 ### Output
 
 ```markdown
-   Method  |      Median |    StdDev |   A |  B
----------- |------------ |---------- |---- |---
- Benchmark | 115.3325 ms | 0.0242 ms | 100 | 10
- Benchmark | 125.3282 ms | 0.0245 ms | 100 | 20
- Benchmark | 215.3024 ms | 0.0375 ms | 200 | 10
- Benchmark | 225.2710 ms | 0.0434 ms | 200 | 20
+|    Method |  B |   A |     Mean |   Error |  StdDev |
+|---------- |--- |---- |---------:|--------:|--------:|
+| Benchmark | 10 | 100 | 115.5 ms | 0.17 ms | 0.16 ms |
+| Benchmark | 10 | 200 | 215.6 ms | 0.15 ms | 0.14 ms |
+| Benchmark | 20 | 100 | 125.5 ms | 0.19 ms | 0.18 ms |
+| Benchmark | 20 | 200 | 225.5 ms | 0.23 ms | 0.22 ms |
 ```
 
 ### Remarks

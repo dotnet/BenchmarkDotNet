@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
 
-        public IReadOnlyDictionary<BenchmarkCase, PmcStats> Results => ImmutableDictionary<BenchmarkCase, PmcStats>.Empty;
+        public IReadOnlyDictionary<BenchmarkCase, PmcStats> Results => BuildPmcStats();
 
         internal IReadOnlyDictionary<BenchmarkCase, string> BenchmarkToEtlFile => benchmarkToEtlFile;
 
@@ -149,5 +149,24 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         /// This increases the likelihood that all relevant events are processed by the collection thread by the time we are done with the benchmark.
         /// </summary>
         private static void WaitForDelayedEvents() => Thread.Sleep(TimeSpan.FromMilliseconds(500));
+
+        private IReadOnlyDictionary<BenchmarkCase, PmcStats> BuildPmcStats()
+        {
+            var builder = ImmutableDictionary.CreateBuilder<BenchmarkCase, PmcStats>();
+
+            foreach (var benchmarkToCounter in benchmarkToCounters)
+            {
+                var uniqueCounters = benchmarkToCounter.Value.Select(x => x.Counter).Distinct().ToImmutableArray();
+
+                var pmcStats = new PmcStats(
+                    uniqueCounters,
+                    counter => benchmarkToCounter.Value.Single(pmc => pmc.Counter == counter)
+                );
+
+                builder.Add(benchmarkToCounter.Key, pmcStats);
+            }
+
+            return builder.ToImmutable();
+        }
     }
 }
