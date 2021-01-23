@@ -149,9 +149,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   <ItemGroup>
     <RdXmlFile Include=""rd.xml"" />
   </ItemGroup>
-  <ItemGroup Condition="" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' "">
-    <LinkerArg Include=""-lanl"" />
-  </ItemGroup>
 </Project>";
 
         private string GenerateProjectForLocalBuild(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
@@ -185,9 +182,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   </ItemGroup>
   <ItemGroup>
     <RdXmlFile Include=""rd.xml"" />
-  </ItemGroup>
-  <ItemGroup Condition="" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' "">
-    <LinkerArg Include=""-lanl"" />
   </ItemGroup>
 </Project>";
 
