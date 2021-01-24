@@ -416,7 +416,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             foreach (var benchmarkSurvivedValidator in benchmarkSurvivedValidators)
             {
-                var survivedBenchmarks = benchmarks.BenchmarksCases.Where(benchmark => benchmark.Descriptor.WorkloadMethodDisplayInfo == benchmarkSurvivedValidator.Key).ToArray();
+                var survivedBenchmarks = benchmarks.BenchmarksCases.Where(benchmark => benchmark.Descriptor.WorkloadMethodDisplayInfo == benchmarkSurvivedValidator.Key);
 
                 foreach (var benchmark in survivedBenchmarks)
                 {

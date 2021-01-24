@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Engines
         // These must be static since more than one Engine is used.
         private static long survivedBytes;
         private static bool survivedBytesMeasured;
-        private Func<long> GetTotalBytes { get; }
+        private static Func<long> GetTotalBytes { get; set; }
 
         internal Engine(
             IHost host,
@@ -93,9 +93,11 @@ namespace BenchmarkDotNet.Engines
             actualStage = new EngineActualStage(this);
 
             random = new Random(12345); // we are using constant seed to try to get repeatable results
-            if (includeSurvivedMemory && !survivedBytesMeasured)
+
+            if (includeSurvivedMemory && GetTotalBytes is null)
             {
-                GetTotalBytes = GetTotalBytesFunc();
+                // CreateGetTotalBytesFunc enables monitoring, so we only call it if we need to measure survived memory.
+                GetTotalBytes = CreateGetTotalBytesFunc();
 
                 // Necessary for CORE runtimes.
                 // Measure bytes to allow GC monitor to make its allocations.
@@ -106,9 +108,8 @@ namespace BenchmarkDotNet.Engines
             }
         }
 
-        private Func<long> GetTotalBytesFunc()
+        private static Func<long> CreateGetTotalBytesFunc()
         {
-            // Only enable monitoring if memory diagnoser with survived memory is applied.
             // Don't try to measure in Mono, Monitoring is not available, and GC.GetTotalMemory is very inaccurate.
             if (RuntimeInformation.IsMono)
                 return () => 0;
