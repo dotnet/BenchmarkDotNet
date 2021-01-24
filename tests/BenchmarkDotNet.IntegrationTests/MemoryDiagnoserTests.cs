@@ -82,15 +82,17 @@ namespace BenchmarkDotNet.IntegrationTests
             public byte[] bytes64;
             public Task<int> task;
 
-            [GlobalSetup(Targets = new string[] { nameof(EightBytesArrayNoAllocate), nameof(SixtyFourBytesArrayNoAllocate) })]
+            [GlobalSetup(Targets = new string[] { nameof(EightBytesArrayNoAllocate), nameof(SixtyFourBytesArrayNoAllocate), nameof(TaskNoAllocate) })]
             public void SetupNoAllocate()
             {
                 bytes8 = new byte[8];
                 bytes64 = new byte[64];
+                task = Task.FromResult(default(int));
             }
 
             [Benchmark] public byte[] EightBytesArrayNoAllocate() => bytes8;
             [Benchmark] public byte[] SixtyFourBytesArrayNoAllocate() => bytes64;
+            [Benchmark] public Task<int> TaskNoAllocate() => task;
 
 
             [Benchmark] public void EightBytesArraySurvive() => bytes8 = new byte[8];
@@ -118,6 +120,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 { nameof(AccurateSurvived.EightBytesArrayNoAllocate), 0 },
                 { nameof(AccurateSurvived.SixtyFourBytesArrayNoAllocate), 0 },
+                { nameof(AccurateSurvived.TaskNoAllocate), 0 },
 
                 { nameof(AccurateSurvived.EightBytesArraySurvive), 8 + objectAllocationOverhead + arraySizeOverhead },
                 { nameof(AccurateSurvived.SixtyFourBytesArraySurvive), 64 + objectAllocationOverhead + arraySizeOverhead },
