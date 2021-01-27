@@ -9,7 +9,6 @@ using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 
@@ -26,25 +25,32 @@ namespace BenchmarkDotNet.Running
             var bindingFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
             var benchmarkMethods = type.GetMethods(bindingFlags).Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
 
+            return MethodsToBenchmarksWithFullConfig(type, benchmarkMethods, config);
+        }
+
+        public static BenchmarkRunInfo MethodsToBenchmarks(Type containingType, MethodInfo[] benchmarkMethods, IConfig config = null)
+            => MethodsToBenchmarksWithFullConfig(containingType, benchmarkMethods, config);
+
+        private static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type type, MethodInfo[] benchmarkMethods, IConfig config)
+        {
             var allPublicMethods = type.GetMethods(); // benchmarkMethods can be filtered, without Setups, look #564
+            var configPerType = GetFullTypeConfig(type, config);
 
             var globalSetupMethods = GetAttributedMethods<GlobalSetupAttribute>(allPublicMethods, "GlobalSetup");
             var globalCleanupMethods = GetAttributedMethods<GlobalCleanupAttribute>(allPublicMethods, "GlobalCleanup");
             var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(allPublicMethods, "IterationSetup");
             var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(allPublicMethods, "IterationCleanup");
 
-            var parameterDefinitions = GetParameterDefinitions(type);
-            var parameterInstancesList = parameterDefinitions.Expand(immutableConfig.SummaryStyle);
-
             var targets = GetTargets(benchmarkMethods, type, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
 
-            var configPerType = GetFullTypeConfig(type, config);
+            var parameterDefinitions = GetParameterDefinitions(type);
+            var parameterInstancesList = parameterDefinitions.Expand(configPerType.SummaryStyle);
 
             var benchmarks = new List<BenchmarkCase>();
 
             foreach (var target in targets)
             {
-                var argumentsDefinitions = GetArgumentsDefinitions(target.WorkloadMethod, target.Type, immutableConfig.SummaryStyle).ToArray();
+                var argumentsDefinitions = GetArgumentsDefinitions(target.WorkloadMethod, target.Type, configPerType.SummaryStyle).ToArray();
 
                 var parameterInstances =
                     (from parameterInstance in parameterInstancesList
