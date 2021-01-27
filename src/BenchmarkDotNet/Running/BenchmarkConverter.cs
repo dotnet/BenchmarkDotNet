@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Running
 
                 var configPerMethod = GetFullMethodConfig(target.WorkloadMethod, configPerType);
 
-                var benchmarksForTarget = 
+                var benchmarksForTarget =
                     from job in configPerMethod.GetJobs()
                     from parameterInstance in parameterInstances
                     select BenchmarkCase.Create(target, job, parameterInstance, configPerMethod);
@@ -72,10 +72,10 @@ namespace BenchmarkDotNet.Running
 
             var typeAttributes = type.GetCustomAttributes(true).OfType<IConfigSource>();
             var assemblyAttributes = type.Assembly.GetCustomAttributes().OfType<IConfigSource>();
-            
+
             foreach (var configFromAttribute in typeAttributes.Concat(assemblyAttributes))
                 config = ManualConfig.Union(config, configFromAttribute.Config);
-            
+
             return ImmutableConfigBuilder.Create(config);
         }
 
@@ -245,7 +245,7 @@ namespace BenchmarkDotNet.Running
             return attributes.SelectMany(attr => attr.Categories).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
         }
 
-        private static ImmutableArray<BenchmarkCase> GetFilteredBenchmarks(IEnumerable<BenchmarkCase> benchmarks, IEnumerable<IFilter> filters) 
+        private static ImmutableArray<BenchmarkCase> GetFilteredBenchmarks(IEnumerable<BenchmarkCase> benchmarks, IEnumerable<IFilter> filters)
             => benchmarks.Where(benchmark => filters.All(filter => filter.Predicate(benchmark))).ToImmutableArray();
 
         private static void AssertMethodHasCorrectSignature(string methodType, MethodInfo methodInfo)
