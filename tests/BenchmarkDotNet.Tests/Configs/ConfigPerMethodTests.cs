@@ -61,14 +61,14 @@ namespace BenchmarkDotNet.Tests.Configs
         public class WithBenchmarkAllowedForWindows
         {
             [Benchmark]
-            [OperatingSystemsFilter(allowed: true, PlatformID.Win32NT)]
+            [OperatingSystemsFilter(allowed: true, OS.Windows)]
             public void Method() { }
         }
 
         public class WithBenchmarkNotAllowedForWindows
         {
             [Benchmark]
-            [OperatingSystemsFilter(allowed: false, PlatformID.Win32NT)]
+            [OperatingSystemsFilter(allowed: false, OS.Windows)]
             public void Method() { }
         }
 
