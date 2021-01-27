@@ -8,6 +8,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
     /// <summary>
     /// Implementation of <see cref="IGenerator"/> for in-process benchmarks.
     /// </summary>
+    [Obsolete("Please use BenchmarkDotNet.Toolchains.InProcess.NoEmit.* classes")]
     public class InProcessGenerator : IGenerator
     {
         /// <summary>returns a success</summary>

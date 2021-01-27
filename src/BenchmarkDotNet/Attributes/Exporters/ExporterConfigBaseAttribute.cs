@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Attributes
 
         protected ExporterConfigBaseAttribute(params IExporter[] exporters)
         {
-            Config = ManualConfig.CreateEmpty().With(exporters);
+            Config = ManualConfig.CreateEmpty().AddExporter(exporters);
         }
 
         public IConfig Config { get; }

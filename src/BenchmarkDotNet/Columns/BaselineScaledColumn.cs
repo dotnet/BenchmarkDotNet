@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Columns
 {
-    [Obsolete("Use BaselineRatioColumn"), PublicAPI]    
+    [Obsolete("Use BaselineRatioColumn"), PublicAPI]
     public class BaselineScaledColumn : BaselineCustomColumn
     {
         public enum ScaledKind
@@ -34,21 +34,23 @@ namespace BenchmarkDotNet.Columns
                 switch (Kind)
                 {
                     case ScaledKind.Mean:
-                        return "Scaled";                    
+                        return "Scaled";
                     default:
                         throw new NotSupportedException();
                 }
             }
         }
 
-        internal override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, Statistics current, bool isBaseline)
+        public override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, IReadOnlyDictionary<string, Metric> baselineMetrics,
+            Statistics current, IReadOnlyDictionary<string, Metric> currentMetrics, bool isBaseline)
         {
             double mean = isBaseline ? 1 : Statistics.DivMean(current, baseline);
 
+            var cultureInfo = summary.GetCultureInfo();
             switch (Kind)
             {
                 case ScaledKind.Mean:
-                    return IsNonBaselinesPrecise(summary, baseline, benchmarkCase) ? mean.ToStr("N3") : mean.ToStr("N2");
+                    return IsNonBaselinesPrecise(summary, baseline, benchmarkCase) ? mean.ToString("N3", cultureInfo) : mean.ToString("N2", cultureInfo);
                 default:
                     throw new NotSupportedException();
             }

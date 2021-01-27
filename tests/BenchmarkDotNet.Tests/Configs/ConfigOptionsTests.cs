@@ -18,6 +18,9 @@ namespace BenchmarkDotNet.Tests.Configs
         public void DefaultConfigDoesNotStopOnFirstError() => Assert.False(DefaultConfig.Instance.Options.HasFlag(ConfigOptions.StopOnFirstError));
 
         [Fact]
+        public void DefaultConfigDoesNotDisableLogFile() => Assert.False(DefaultConfig.Instance.Options.HasFlag(ConfigOptions.DisableLogFile));
+
+        [Fact]
         public void DefaultConfigDoesDisableOptimizationsValidator() => Assert.False(DefaultConfig.Instance.Options.HasFlag(ConfigOptions.DisableOptimizationsValidator));
 
         [Fact]
@@ -61,6 +64,24 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.False(flag.HasFlag(ConfigOptions.StopOnFirstError));
             Assert.False(flag.IsSet(ConfigOptions.JoinSummary));
             Assert.False(flag.HasFlag(ConfigOptions.JoinSummary));
+        }
+
+        [Fact]
+        public void ConfigFlagCanBeEnabledOrDisabledUsedManualConfigMethods()
+        {
+            var config = ManualConfig.Create(DefaultConfig.Instance);
+
+            config.WithOption(ConfigOptions.StopOnFirstError, true);
+            Assert.True(config.Options.IsSet(ConfigOptions.StopOnFirstError));
+            Assert.True(config.Options.HasFlag(ConfigOptions.StopOnFirstError));
+
+            config.WithOption(ConfigOptions.StopOnFirstError, false);
+            Assert.False(config.Options.IsSet(ConfigOptions.StopOnFirstError));
+            Assert.False(config.Options.HasFlag(ConfigOptions.StopOnFirstError));
+
+            config.WithOptions(ConfigOptions.StopOnFirstError);
+            Assert.True(config.Options.IsSet(ConfigOptions.StopOnFirstError));
+            Assert.True(config.Options.HasFlag(ConfigOptions.StopOnFirstError));
         }
     }
 }

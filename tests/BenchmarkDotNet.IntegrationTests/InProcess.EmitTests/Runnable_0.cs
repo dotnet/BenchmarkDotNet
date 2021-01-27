@@ -1,6 +1,4 @@
-﻿
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Engines;
+﻿using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 

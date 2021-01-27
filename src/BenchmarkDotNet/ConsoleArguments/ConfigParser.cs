@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -14,24 +13,29 @@ using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.MonoWasm;
 using CommandLine;
+using Perfolizer.Horology;
+using Perfolizer.Mathematics.OutlierDetection;
+using Perfolizer.Mathematics.SignificanceTesting;
+using Perfolizer.Mathematics.Thresholds;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
     public static class ConfigParser
     {
         private const int MinimumDisplayWidth = 80;
+        private const char EnvVarKeyValueSeparator = ':';
 
         private static readonly IReadOnlyDictionary<string, Job> AvailableJobs = new Dictionary<string, Job>(StringComparer.InvariantCultureIgnoreCase)
         {
@@ -42,22 +46,6 @@ namespace BenchmarkDotNet.ConsoleArguments
             { "long", Job.LongRun },
             { "verylong", Job.VeryLongRun }
         };
-
-        private static readonly ImmutableHashSet<string> AvailableRuntimes = ImmutableHashSet.Create(StringComparer.InvariantCultureIgnoreCase,
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "netcoreapp2.0",
-            "netcoreapp2.1",
-            "netcoreapp2.2",
-            "netcoreapp3.0",
-            "clr",
-            "core",
-            "mono",
-            "corert"
-        );
 
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
         [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
@@ -117,11 +105,18 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
 
             foreach (string runtime in options.Runtimes)
-                if (!AvailableRuntimes.Contains(runtime))
+            {
+                if (!TryParse(runtime, out RuntimeMoniker runtimeMoniker))
                 {
-                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", AvailableRuntimes.OrderBy(name => name))}.");
+                    logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(RuntimeMoniker)).Select(name => name.ToLower()))}.");
                     return false;
                 }
+                else if (runtimeMoniker == RuntimeMoniker.Wasm && (options.WasmMainJs == null || options.WasmMainJs.IsNotNullButDoesNotExist()))
+                {
+                    logger.WriteLineError($"The provided {nameof(options.WasmMainJs)} \"{options.WasmMainJs}\" does NOT exist. It MUST be provided.");
+                    return false;
+                }
+            }
 
             foreach (string exporter in options.Exporters)
                 if (!AvailableExporters.ContainsKey(exporter))
@@ -142,13 +137,19 @@ namespace BenchmarkDotNet.ConsoleArguments
                     logger.WriteLineError($"The provided path to CoreRun: \"{coreRunPath}\" does NOT exist. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.");
                     return false;
                 }
-            
+
             if (options.MonoPath.IsNotNullButDoesNotExist())
             {
                 logger.WriteLineError($"The provided {nameof(options.MonoPath)} \"{options.MonoPath}\" does NOT exist.");
                 return false;
             }
-            
+
+            if (options.WasmJavascriptEngine.IsNotNullButDoesNotExist())
+            {
+                logger.WriteLineError($"The provided {nameof(options.WasmJavascriptEngine)} \"{options.WasmJavascriptEngine}\" does NOT exist.");
+                return false;
+            }
+
             if (options.CoreRtPath.IsNotNullButDoesNotExist())
             {
                 logger.WriteLineError($"The provided {nameof(options.CoreRtPath)} \"{options.CoreRtPath}\" does NOT exist.");
@@ -166,7 +167,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 logger.WriteLineError("You can't use more than 3 HardwareCounters at the same time.");
                 return false;
             }
-            
+
             foreach (var counterName in options.HardwareCounters)
                 if (!Enum.TryParse(counterName, ignoreCase: true, out HardwareCounter _))
                 {
@@ -177,6 +178,12 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (!string.IsNullOrEmpty(options.StatisticalTestThreshold) && !Threshold.TryParse(options.StatisticalTestThreshold, out _))
             {
                 logger.WriteLineError("Invalid Threshold for Statistical Test. Use --help to see examples.");
+                return false;
+            }
+
+            if (options.EnvironmentVariables.Any(envVar => envVar.IndexOf(EnvVarKeyValueSeparator) <= 0))
+            {
+                logger.WriteLineError($"Environment variable value must be separated from the key using '{EnvVarKeyValueSeparator}'. Use --help to see examples.");
                 return false;
             }
 
@@ -191,52 +198,58 @@ namespace BenchmarkDotNet.ConsoleArguments
             var expanded = Expand(baseJob.UnfreezeCopy(), options).ToArray(); // UnfreezeCopy ensures that each of the expanded jobs will have it's own ID
             if (expanded.Length > 1)
                 expanded[0] = expanded[0].AsBaseline(); // if the user provides multiple jobs, then the first one should be a baseline
-            config.Add(expanded); 
+            config.AddJob(expanded);
             if (config.GetJobs().IsEmpty() && baseJob != Job.Default)
-                config.Add(baseJob);
+                config.AddJob(baseJob);
 
-            config.Add(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
-            
-            config.Add(options.HardwareCounters
+            config.AddExporter(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
+
+            config.AddHardwareCounters(options.HardwareCounters
                 .Select(counterName => (HardwareCounter)Enum.Parse(typeof(HardwareCounter), counterName, ignoreCase: true))
                 .ToArray());
 
             if (options.UseMemoryDiagnoser)
-                config.Add(MemoryDiagnoser.Default);
+                config.AddDiagnoser(MemoryDiagnoser.Default);
+            if (options.UseThreadingDiagnoser)
+                config.AddDiagnoser(ThreadingDiagnoser.Default);
             if (options.UseDisassemblyDiagnoser)
-                config.Add(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(recursiveDepth: options.DisassemblerRecursiveDepth, printPrologAndEpilog: true, printDiff: options.DisassemblerDiff)));
+                config.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(maxDepth: options.DisassemblerRecursiveDepth, exportDiff: options.DisassemblerDiff)));
             if (!string.IsNullOrEmpty(options.Profiler))
-                config.Add(DiagnosersLoader.GetImplementation<IProfiler>(profiler => profiler.ShortName.EqualsWithIgnoreCase(options.Profiler)));
+                config.AddDiagnoser(DiagnosersLoader.GetImplementation<IProfiler>(profiler => profiler.ShortName.EqualsWithIgnoreCase(options.Profiler)));
 
             if (options.DisplayAllStatistics)
-                config.Add(StatisticColumn.AllStatistics);
+                config.AddColumn(StatisticColumn.AllStatistics);
             if (!string.IsNullOrEmpty(options.StatisticalTestThreshold) && Threshold.TryParse(options.StatisticalTestThreshold, out var threshold))
-                config.Add(new StatisticalTestColumn(StatisticalTestKind.MannWhitney, threshold));
+                config.AddColumn(new StatisticalTestColumn(StatisticalTestKind.MannWhitney, threshold));
 
             if (options.ArtifactsDirectory != null)
                 config.ArtifactsPath = options.ArtifactsDirectory.FullName;
 
             var filters = GetFilters(options).ToArray();
             if (filters.Length > 1)
-                config.Add(new UnionFilter(filters));
+                config.AddFilter(new UnionFilter(filters));
             else
-                config.Add(filters);
+                config.AddFilter(filters);
 
-            config.Options = config.Options.Set(options.Join, ConfigOptions.JoinSummary);
-            config.Options = config.Options.Set(options.KeepBenchmarkFiles, ConfigOptions.KeepBenchmarkFiles);
-            config.Options = config.Options.Set(options.DontOverwriteResults, ConfigOptions.DontOverwriteResults);
-            config.Options = config.Options.Set(options.StopOnFirstError, ConfigOptions.StopOnFirstError);
+            config.WithOption(ConfigOptions.JoinSummary, options.Join);
+            config.WithOption(ConfigOptions.KeepBenchmarkFiles, options.KeepBenchmarkFiles);
+            config.WithOption(ConfigOptions.DontOverwriteResults, options.DontOverwriteResults);
+            config.WithOption(ConfigOptions.StopOnFirstError, options.StopOnFirstError);
+            config.WithOption(ConfigOptions.DisableLogFile, options.DisableLogFile);
+
+            if (options.MaxParameterColumnWidth.HasValue)
+                config.WithSummaryStyle(SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParameterColumnWidth.Value));
 
             return config;
         }
 
         private static Job GetBaseJob(CommandLineOptions options, IConfig globalConfig)
         {
-            var baseJob = 
+            var baseJob =
                 globalConfig?.GetJobs().SingleOrDefault(job => job.Meta.IsDefault) // global config might define single custom Default job
                 ?? AvailableJobs[options.BaseJob.ToLowerInvariant()];
 
-            if (baseJob != Job.Dry && options.Outliers != OutlierMode.OnlyUpper)
+            if (baseJob != Job.Dry && options.Outliers != OutlierMode.RemoveUpper)
                 baseJob = baseJob.WithOutlierMode(options.Outliers);
 
             if (options.Affinity.HasValue)
@@ -263,9 +276,22 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.UnrollFactor.HasValue)
                 baseJob = baseJob.WithUnrollFactor(options.UnrollFactor.Value);
             if (options.RunStrategy.HasValue)
-                baseJob = baseJob.With(options.RunStrategy.Value);
+                baseJob = baseJob.WithStrategy(options.RunStrategy.Value);
+            if (options.Platform.HasValue)
+                baseJob = baseJob.WithPlatform(options.Platform.Value);
             if (options.RunOncePerIteration)
                 baseJob = baseJob.RunOncePerIteration();
+            if (options.MemoryRandomization)
+                baseJob = baseJob.WithMemoryRandomization();
+
+            if (options.EnvironmentVariables.Any())
+            {
+                baseJob = baseJob.WithEnvironmentVariables(options.EnvironmentVariables.Select(text =>
+                {
+                    var separated = text.Split(new[] { EnvVarKeyValueSeparator }, 2);
+                    return new EnvironmentVariable(separated[0], separated[1]);
+                }).ToArray());
+            }
 
             if (AvailableJobs.Values.Contains(baseJob)) // no custom settings
                 return baseJob;
@@ -278,9 +304,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         private static IEnumerable<Job> Expand(Job baseJob, CommandLineOptions options)
         {
             if (options.RunInProcess)
-                yield return baseJob.With(InProcessEmitToolchain.Instance);
+                yield return baseJob.WithToolchain(InProcessEmitToolchain.Instance);
             else if (!string.IsNullOrEmpty(options.ClrVersion))
-                yield return baseJob.With(new ClrRuntime(options.ClrVersion)); // local builds of .NET Runtime
+                yield return baseJob.WithRuntime(ClrRuntime.CreateForLocalFullNetFrameworkBuild(options.ClrVersion)); // local builds of .NET Runtime
             else if (options.CoreRunPaths.Any())
                 foreach (var coreRunPath in options.CoreRunPaths)
                     yield return CreateCoreRunJob(baseJob, options, coreRunPath); // local CoreFX and CoreCLR builds
@@ -288,39 +314,51 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return CreateCoreJobWithCli(baseJob, options);
             else
                 foreach (string runtime in options.Runtimes) // known runtimes
-                    yield return CreateJobForGivenRuntime(baseJob, runtime.ToLowerInvariant(), options);
+                    yield return CreateJobForGivenRuntime(baseJob, runtime, options);
         }
 
-        private static Job CreateJobForGivenRuntime(Job baseJob, string runtime, CommandLineOptions options)
+        private static Job CreateJobForGivenRuntime(Job baseJob, string runtimeId, CommandLineOptions options)
         {
             TimeSpan? timeOut = options.TimeOutInSeconds.HasValue ? TimeSpan.FromSeconds(options.TimeOutInSeconds.Value) : default(TimeSpan?);
 
-            switch (runtime)
+            if (!TryParse(runtimeId, out RuntimeMoniker runtimeMoniker))
             {
-                case "clr":
-                    return baseJob.With(Runtime.Clr);
-                case "core":
-                    return baseJob.With(Runtime.Core).With(
-                        CsProjCoreToolchain.From(
-                            NetCoreAppSettings.GetCurrentVersion()
-                                .WithCustomDotNetCliPath(options.CliPath?.FullName)
-                                .WithCustomPackagesRestorePath(options.RestorePath?.FullName)
-                                .WithTimeout(timeOut)));
-                case "net461":
-                case "net462":
-                case "net47":
-                case "net471":
-                case "net472":
-                    return baseJob.With(Runtime.Clr).With(CsProjClassicNetToolchain.From(runtime, options.RestorePath?.FullName, timeOut));
-                case "netcoreapp2.0":
-                case "netcoreapp2.1":
-                case "netcoreapp2.2":
-                case "netcoreapp3.0":
-                    return baseJob.With(Runtime.Core).With(
-                        CsProjCoreToolchain.From(new NetCoreAppSettings(runtime, null, runtime, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));
-                case "mono":
-                    return baseJob.With(new MonoRuntime("Mono", options.MonoPath?.FullName));
-                case "corert":
+                throw new InvalidOperationException("Impossible, already validated by the Validate method");
+            }
+
+            switch (runtimeMoniker)
+            {
+                case RuntimeMoniker.Net461:
+                case RuntimeMoniker.Net462:
+                case RuntimeMoniker.Net47:
+                case RuntimeMoniker.Net471:
+                case RuntimeMoniker.Net472:
+                case RuntimeMoniker.Net48:
+                    return baseJob
+                        .WithRuntime(runtimeMoniker.GetRuntime())
+                        .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName, timeOut));
+                case RuntimeMoniker.NetCoreApp20:
+                case RuntimeMoniker.NetCoreApp21:
+                case RuntimeMoniker.NetCoreApp22:
+                case RuntimeMoniker.NetCoreApp30:
+                case RuntimeMoniker.NetCoreApp31:
+#pragma warning disable CS0618 // Type or member is obsolete
+                case RuntimeMoniker.NetCoreApp50:
+#pragma warning restore CS0618 // Type or member is obsolete
+                case RuntimeMoniker.Net50:
+                case RuntimeMoniker.Net60:
+                    return baseJob
+                        .WithRuntime(runtimeMoniker.GetRuntime())
+                        .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));
+                case RuntimeMoniker.Mono:
+                    return baseJob.WithRuntime(new MonoRuntime("Mono", options.MonoPath?.FullName));
+                case RuntimeMoniker.CoreRt20:
+                case RuntimeMoniker.CoreRt21:
+                case RuntimeMoniker.CoreRt22:
+                case RuntimeMoniker.CoreRt30:
+                case RuntimeMoniker.CoreRt31:
+                case RuntimeMoniker.CoreRt50:
+                case RuntimeMoniker.CoreRt60:
                     var builder = CoreRtToolchain.CreateBuilder();
 
                     if (options.CliPath != null)
@@ -337,11 +375,41 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                     if (timeOut.HasValue)
                         builder.Timeout(timeOut.Value);
-                    
-                    return baseJob.With(Runtime.CoreRT).With(builder.ToToolchain());
+
+                    var runtime = runtimeMoniker.GetRuntime();
+                    builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
+
+                    return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
+                case RuntimeMoniker.Wasm:
+                    return MakeWasmJob(baseJob, options, timeOut, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0");
+                case RuntimeMoniker.WasmNet50:
+                    return MakeWasmJob(baseJob, options, timeOut, "net5.0");
+                case RuntimeMoniker.WasmNet60:
+                    return MakeWasmJob(baseJob, options, timeOut, "net6.0");
+
                 default:
-                    throw new NotSupportedException($"Runtime {runtime} is not supported");
+                    throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
+        }
+
+        private static Job MakeWasmJob(Job baseJob, CommandLineOptions options, TimeSpan? timeOut, string msBuildMoniker)
+        {
+            var wasmRuntime = new WasmRuntime(
+                mainJs: options.WasmMainJs,
+                msBuildMoniker: msBuildMoniker,
+                javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
+                javaScriptEngineArguments: options.WasmJavaScriptEngineArguments);
+
+            var toolChain = WasmToolChain.From(new NetCoreAppSettings(
+                targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
+                runtimeFrameworkVersion: null,
+                name: wasmRuntime.Name,
+                customDotNetCliPath: options.CliPath?.FullName,
+                packagesPath: options.RestorePath?.FullName,
+                timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
+                customRuntimePack: options.CustomRuntimePack));
+
+            return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain);
         }
 
         private static IEnumerable<IFilter> GetFilters(CommandLineOptions options)
@@ -370,24 +438,22 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static Job CreateCoreRunJob(Job baseJob, CommandLineOptions options, FileInfo coreRunPath)
             => baseJob
-                .With(Runtime.Core)
-                .With(new CoreRunToolchain(
+                .WithToolchain(new CoreRunToolchain(
                     coreRunPath,
                     createCopy: true,
-                    targetFrameworkMoniker: options.Runtimes.SingleOrDefault() ?? NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker,
+                    targetFrameworkMoniker: options.Runtimes.SingleOrDefault() ?? RuntimeInformation.GetCurrentRuntime().MsBuildMoniker,
                     customDotNetCliPath: options.CliPath,
                     restorePath: options.RestorePath,
                     displayName: GetCoreRunToolchainDisplayName(options.CoreRunPaths, coreRunPath)));
 
         private static Job CreateCoreJobWithCli(Job baseJob, CommandLineOptions options)
             => baseJob
-                .With(Runtime.Core)
-                .With(CsProjCoreToolchain.From(
+                .WithToolchain(CsProjCoreToolchain.From(
                     new NetCoreAppSettings(
-                        targetFrameworkMoniker: NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker, 
+                        targetFrameworkMoniker: RuntimeInformation.GetCurrentRuntime().MsBuildMoniker,
                         customDotNetCliPath: options.CliPath?.FullName,
                         runtimeFrameworkVersion: null,
-                        name: NetCoreAppSettings.GetCurrentVersion().TargetFrameworkMoniker,
+                        name: RuntimeInformation.GetCurrentRuntime().Name,
                         packagesPath: options.RestorePath?.FullName)));
 
         /// <summary>
@@ -424,8 +490,17 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return coreRunPath.FullName;
 
             var lastCommonDirectorySeparatorIndex = coreRunPath.FullName.LastIndexOf(Path.DirectorySeparatorChar, commonLongestPrefixIndex - 1);
-            
+
             return coreRunPath.FullName.Substring(lastCommonDirectorySeparatorIndex);
+        }
+
+        private static bool TryParse(string runtime, out RuntimeMoniker runtimeMoniker)
+        {
+            int index = runtime.IndexOf('-');
+
+            return index < 0
+                ? Enum.TryParse<RuntimeMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker)
+                : Enum.TryParse<RuntimeMoniker>(runtime.Substring(0, index).Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker);
         }
     }
 }

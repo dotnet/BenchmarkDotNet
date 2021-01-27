@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.OutlierDetection;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Engine
@@ -21,11 +21,11 @@ namespace BenchmarkDotNet.Tests.Engine
             Add(measurements, 104);
             Add(measurements, 500); // It's an outlier
 
-            CheckResults(5, measurements, OutlierMode.OnlyUpper);
-            CheckResults(5, measurements, OutlierMode.All);
-            
-            CheckResults(6, measurements, OutlierMode.None);
-            CheckResults(6, measurements, OutlierMode.OnlyLower);
+            CheckResults(5, measurements, OutlierMode.RemoveUpper);
+            CheckResults(5, measurements, OutlierMode.RemoveAll);
+
+            CheckResults(6, measurements, OutlierMode.DontRemove);
+            CheckResults(6, measurements, OutlierMode.RemoveLower);
         }
 
         [AssertionMethod]

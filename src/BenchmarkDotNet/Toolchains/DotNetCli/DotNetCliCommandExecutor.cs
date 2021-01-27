@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -49,7 +50,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     : DotNetCliCommandResult.Failure(stopwatch.Elapsed, outputReader.GetOutputText(), outputReader.GetErrorText());
             }
         }
-        
+
         internal static string GetDotNetSdkVersion()
         {
             using (var process = new Process { StartInfo = BuildStartInfo(customDotNetCliPath: null, workingDirectory: string.Empty, arguments: "--version") })
@@ -75,7 +76,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         internal static ProcessStartInfo BuildStartInfo(string customDotNetCliPath, string workingDirectory, string arguments,
-            IReadOnlyList<EnvironmentVariable> environmentVariables = null, bool redirectStandardInput = false)
+            IReadOnlyList<EnvironmentVariable> environmentVariables = null, bool redirectStandardInput = false, bool redirectStandardError = true)
         {
             const string dotnetMultiLevelLookupEnvVarName = "DOTNET_MULTILEVEL_LOOKUP";
 
@@ -87,9 +88,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                RedirectStandardInput = redirectStandardInput
+                RedirectStandardError = redirectStandardError,
+                RedirectStandardInput = redirectStandardInput,
+                StandardOutputEncoding = Encoding.UTF8,
             };
+
+            if (redirectStandardError) // StandardErrorEncoding is only supported when standard error is redirected
+            {
+                startInfo.StandardErrorEncoding = Encoding.UTF8;
+            }
 
             if (environmentVariables != null)
                 foreach (var environmentVariable in environmentVariables)

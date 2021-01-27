@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Characteristics
         public static readonly object EmptyValue = new object();
 
         public static Characteristic<T> Create<TOwner, T>(string memberName)
-            where TOwner : CharacteristicObject 
+            where TOwner : CharacteristicObject
             => new Characteristic<T>(
                 memberName,
                 typeof(TOwner),
@@ -16,15 +16,15 @@ namespace BenchmarkDotNet.Characteristics
                 false);
 
         public static Characteristic<T> Create<TOwner, T>(string memberName, T fallbackValue)
-            where TOwner : CharacteristicObject 
+            where TOwner : CharacteristicObject
             => new Characteristic<T>(
-                memberName, 
+                memberName,
                 typeof(TOwner),
                 null, fallbackValue,
                 false);
 
         public static Characteristic<T> Create<TOwner, T>(string memberName, Func<CharacteristicObject, T, T> resolver, T fallbackValue, bool ignoreOnApply)
-            where TOwner : CharacteristicObject 
+            where TOwner : CharacteristicObject
             => new Characteristic<T>(
                 memberName,
                 typeof(TOwner),
@@ -32,15 +32,15 @@ namespace BenchmarkDotNet.Characteristics
                 ignoreOnApply);
 
         public static Characteristic<T> CreateHidden<TOwner, T>(string memberName)
-            where TOwner : CharacteristicObject 
+            where TOwner : CharacteristicObject
             => new Characteristic<T>(
                 memberName,
                 typeof(TOwner),
                 null, default,
                 false, true);
-        
+
         public static Characteristic<T> CreateIgnoreOnApply<TOwner, T>(string memberName)
-            where TOwner : CharacteristicObject 
+            where TOwner : CharacteristicObject
             => new Characteristic<T>(
                 memberName,
                 typeof(TOwner),
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Characteristics
 
         // TODO: better naming. As it is for now this property used for Id only and has meaning "if set, will not transfer to others nor be cleared".
         public bool IgnoreOnApply { get; }
-        
+
         public bool DontShowInSummary { get; }
 
         public Type CharacteristicType { get; }

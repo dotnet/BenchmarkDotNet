@@ -9,7 +9,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Mathematics;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CustomEnginesAreSupported()
         {
             var config = ManualConfig.CreateEmpty()
-                .With(new Job(Job.Dry) { Infrastructure = { EngineFactory = new CustomFactory() } });
+                .AddJob(new Job(Job.Dry) { Infrastructure = { EngineFactory = new CustomFactory() } });
 
             var summary = CanExecute<SimpleBenchmark>(config, fullValidation: false);
 
@@ -62,8 +62,8 @@ namespace BenchmarkDotNet.IntegrationTests
                     GlobalCleanupAction = engineParameters.GlobalCleanupAction,
                     GlobalSetupAction = engineParameters.GlobalSetupAction
                 };
-                
-                engine.GlobalSetupAction?.Invoke(); // engine factory is now supposed to create an engine which is ready to run (hence the method name change) 
+
+                engine.GlobalSetupAction?.Invoke(); // engine factory is now supposed to create an engine which is ready to run (hence the method name change)
 
                 return engine;
             }
@@ -78,13 +78,13 @@ namespace BenchmarkDotNet.IntegrationTests
                 return new RunResults(
                     new List<Measurement> { new Measurement(1, IterationMode.Overhead, IterationStage.Actual, 1, 1, 1) },
                     new List<Measurement> { new Measurement(1, IterationMode.Workload, IterationStage.Actual, 1, 1, 1) },
-                    OutlierMode.None,
+                    OutlierMode.DontRemove,
                     default,
                     default);
             }
 
             public void Dispose() => GlobalCleanupAction?.Invoke();
-            
+
             public IHost Host { get; }
             public void WriteLine() { }
             public void WriteLine(string line) { }

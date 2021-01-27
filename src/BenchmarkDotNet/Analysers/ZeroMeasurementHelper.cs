@@ -1,4 +1,4 @@
-using BenchmarkDotNet.Mathematics.StatisticalTesting;
+using Perfolizer.Mathematics.SignificanceTesting;
 
 namespace BenchmarkDotNet.Analysers
 {

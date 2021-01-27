@@ -108,8 +108,10 @@ namespace BenchmarkDotNet.Toolchains
         /// generates the C# source code with all required boilerplate.
         /// <remarks>You most probably do NOT need to override this method!!</remarks>
         /// </summary>
-        [PublicAPI] protected virtual void GenerateCode(BuildPartition buildPartition, ArtifactsPaths artifactsPaths) 
+        [PublicAPI] protected virtual void GenerateCode(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
             => File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(buildPartition));
+
+        protected virtual string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, $"{programName}{GetExecutableExtension()}");
 
         private ArtifactsPaths GetArtifactsPaths(BuildPartition buildPartition, string rootArtifactsFolderPath)
         {
@@ -119,7 +121,8 @@ namespace BenchmarkDotNet.Toolchains
             string programName = buildPartition.ProgramName;
             string buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(buildPartition, programName);
             string binariesDirectoryPath = GetBinariesDirectoryPath(buildArtifactsDirectoryPath, buildPartition.BuildConfiguration);
-            string executablePath = Path.Combine(binariesDirectoryPath, $"{programName}{GetExecutableExtension()}");
+
+            string executablePath = GetExecutablePath(binariesDirectoryPath, programName);
 
             return new ArtifactsPaths(
                 rootArtifactsFolderPath: rootArtifactsFolderPath,

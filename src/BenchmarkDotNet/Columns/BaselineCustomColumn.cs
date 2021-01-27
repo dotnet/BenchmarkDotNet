@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -14,23 +16,21 @@ namespace BenchmarkDotNet.Columns
             string logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
             var baseline = summary.GetBaseline(logicalGroupKey);
             bool isBaseline = summary.IsBaseline(benchmarkCase);
-            bool invalidResults = baseline == null ||
-                                 summary[baseline] == null ||
-                                 summary[baseline].ResultStatistics == null ||
-                                 !summary[baseline].ResultStatistics.CanBeInverted() ||
-                                 summary[benchmarkCase] == null ||
-                                 summary[benchmarkCase].ResultStatistics == null;
 
-            if (invalidResults)
+            if (ResultsAreInvalid(summary, benchmarkCase, baseline))
                 return "?";
 
             var baselineStat = summary[baseline].ResultStatistics;
+            var baselineMetrics = summary[baseline].Metrics;
             var currentStat = summary[benchmarkCase].ResultStatistics;
+            var currentMetrics = summary[benchmarkCase].Metrics;
 
-            return GetValue(summary, benchmarkCase, baselineStat, currentStat, isBaseline);
+            return GetValue(summary, benchmarkCase, baselineStat, baselineMetrics, currentStat, currentMetrics, isBaseline);
         }
 
-        internal abstract string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, Statistics current, bool isBaseline);
+        [PublicAPI]
+        public abstract string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, IReadOnlyDictionary<string, Metric> baselineMetrics,
+            Statistics current, IReadOnlyDictionary<string, Metric> currentMetrics, bool isBaseline);
 
         public bool IsAvailable(Summary summary) => summary.HasBaselines();
         public bool AlwaysShow => true;
@@ -42,5 +42,15 @@ namespace BenchmarkDotNet.Columns
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);
         public override string ToString() => ColumnName;
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
+
+        internal static bool ResultsAreInvalid(Summary summary, BenchmarkCase benchmarkCase, BenchmarkCase baseline)
+        {
+            return baseline == null ||
+                   summary[baseline] == null ||
+                   summary[baseline].ResultStatistics == null ||
+                   !summary[baseline].ResultStatistics.CanBeInverted() ||
+                   summary[benchmarkCase] == null ||
+                   summary[benchmarkCase].ResultStatistics == null;
+        }
     }
 }

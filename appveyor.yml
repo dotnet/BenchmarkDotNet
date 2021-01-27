@@ -3,7 +3,7 @@
 #---------------------------------#
 
 # version format
-version: 0.11.4.{build}
+version: 0.12.1.{build}
 
 # branches to build
 branches:
@@ -21,7 +21,7 @@ skip_tags: true
 #    environment configuration    #
 #---------------------------------#
 
-os: Visual Studio 2017
+os: Visual Studio 2019
 
 # scripts that are called at very beginning, before repo cloning
 init:

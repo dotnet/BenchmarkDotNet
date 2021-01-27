@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             {
                 return "Unknown processor";
             }
-            
+
             var parts = new List<string>
             {
                 ProcessorBrandStringHelper.Prettify(cpuInfo, includeMaxFrequency: true)
@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Portability.Cpu
                 parts.Add("1 physical core");
             if (cpuInfo.PhysicalCoreCount > 1)
                 parts.Add($"{cpuInfo.PhysicalCoreCount} physical cores");
-            
+
             string result = string.Join("", parts);
             // The line with ProcessorBrandString is one of the longest lines in the summary.
             // When people past in on GitHub, it can be a reason of an ugly horizontal scrollbar.

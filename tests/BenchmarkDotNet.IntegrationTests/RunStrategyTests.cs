@@ -21,11 +21,11 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var logger = new OutputLogger(Output);
             var config = ManualConfig.CreateEmpty()
-                .With(DefaultColumnProviders.Instance)
-                .With(logger)
-                .With(new Job(Job.Dry) { Run = { RunStrategy = RunStrategy.ColdStart } })
-                .With(new Job(Job.Dry) { Run = { RunStrategy = RunStrategy.Monitoring } })
-                .With(new Job(Job.Dry) { Run = { RunStrategy = RunStrategy.Throughput } });
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddLogger(logger)
+                .AddJob(new Job(Job.Dry) { Run = { RunStrategy = RunStrategy.ColdStart } })
+                .AddJob(new Job(Job.Dry) { Run = { RunStrategy = RunStrategy.Monitoring } })
+                .AddJob(new Job(Job.Dry) { Run = { RunStrategy = RunStrategy.Throughput } });
 
             var results = CanExecute<ModeBenchmarks>(config);
 

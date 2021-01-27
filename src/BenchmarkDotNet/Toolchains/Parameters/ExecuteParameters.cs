@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;

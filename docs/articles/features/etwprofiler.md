@@ -21,7 +21,7 @@ What we have today comes with following limitations:
 
 * EtwProfiler works only on Windows (one day we might implement similar thing for Unix using EventPipe)
 * Requires to run as Admin (to create ETW Kernel Session)
-* No `InProcessToolchain` support 
+* No `InProcessToolchain` support
 * To get the best possible managed code symbols you should configure your project in following way:
 
 ```xml
@@ -38,6 +38,8 @@ It can be enabled in few ways, some of them:
 * Use the new attribute (apply it on a class that contains Benchmarks):
 
 ```cs
+using BenchmarkDotNet.Diagnostics.Windows.Configs;
+
 [EtwProfiler]
 public class TheClassThatContainsBenchmarks { /* benchmarks go here */ }
 ```
@@ -47,12 +49,12 @@ public class TheClassThatContainsBenchmarks { /* benchmarks go here */ }
 ```cs
 class Program
 {
-    static void Main(string[] args) 
+    static void Main(string[] args)
         => BenchmarkSwitcher
             .FromAssembly(typeof(Program).Assembly)
             .Run(args,
                 DefaultConfig.Instance
-                    .With(new EtwProfiler())); // HERE
+                    .AddDiagnoser(new EtwProfiler())); // HERE
 }
 ```
 
@@ -65,7 +67,7 @@ To configure the new diagnoser you need to create an instance of `EtwProfilerCon
 
 * `performExtraBenchmarksRun` - if set to true, benchmarks will be executed one more time with the profiler attached. If set to false, there will be no extra run but the results will contain overhead. True by default.
 * `bufferSizeInMb` - ETW session buffer size, in MB. 256 by default.
-* `intervalSelectors` - interval per harwdare counter, if not provided then default values will be used.
+* `intervalSelectors` - interval per hardware counter, if not provided then default values will be used.
 * `kernelKeywords` - kernel session keywords, ImageLoad (for native stack frames) and Profile (for CPU Stacks) are the defaults.
 * `providers` - providers that should be enabled, if not provided then default values will be used.
 

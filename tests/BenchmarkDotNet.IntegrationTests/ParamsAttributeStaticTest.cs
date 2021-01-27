@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public class ParamsTestStaticProperty
         {
             /// <summary>
-            /// Deliberately made the Property "static" to ensure that Params also work okay in this scenario 
+            /// Deliberately made the Property "static" to ensure that Params also work okay in this scenario
             /// </summary>
             [Params(1, 2)]
             public static int StaticParamProperty { get; set; }
@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
     }
-    
+
     public class ParamsTestStaticPrivatePropertyError : BenchmarkTestExecutor
     {
         public ParamsTestStaticPrivatePropertyError(ITestOutputHelper output) : base(output) { }

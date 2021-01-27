@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "identity": "BenchmarkDotNet.BenchmarkProjectTemplate.VB",
+  "name": "Benchmark Project",
+  "shortName": "benchmark",
+  "groupIdentity": "BenchmarkDotNet",
+  "classifications": [
+    "Benchmark",
+    "Library"
+  ],
+  "precedence": "3000",
+  "tags": {
+    "language": "VB",
+    "type": "project"
+  },
+  "description": "A project template for creating benchmarks.",
+  "author": ".NET Foundation and contributors",
+  "generatorVersions": "[1.0.0.0-*)",
+
+  "sourceName": "_BenchmarkProjectName_",
+  "preferNameDirectory": true,
+  "defaultName": "BenchmarkSuite",
+  "symbols": {
+    "benchmarkName": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "The name of the benchmark class.",
+      "defaultValue": "Benchmarks",
+      "FileRename": "_BenchmarkName_",
+      "replaces": "$(BenchmarkName)"
+    },
+    "framework": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "The target framework for the project (e.g. netstandard2.0). Default \"net5.0\" if \"--console-app\" is true, \"netstandard2.0\" if \"--console-app\" is false",
+      "defaultValue": ""
+    },
+    "frameworkDefault": {
+      "type": "generated",
+      "generator": "switch",
+      "description": "generate a default framework value based on consoleApp",
+      "parameters": {
+        "evaluator": "C++",
+        "datatype": "string",
+        "cases": [
+          {
+            "condition": "(framework == '' && consoleApp == true)",
+            "value": "net5.0"
+          },
+          {
+            "condition": "(framework == '' && consoleApp == false)",
+            "value": "netstandard2.0"
+          },
+          {
+            "condition": "(framework != '')",
+            "value": ""
+          }
+        ]
+      }
+    },
+    "frameworkValue": {
+      "type": "generated",
+      "generator": "join",
+      "description": "join framework and frameworkDefault",
+      "parameters": {
+        "symbols": [
+          {
+            "type": "ref",
+            "value": "framework"
+          },
+          {
+            "type": "ref",
+            "value": "frameworkDefault"
+          }
+        ]
+      },
+      "replaces": "$(Framework)"
+    },
+    "config": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Adds a benchmark config class.",
+      "defaultValue": "false"
+    },
+    "skipRestore": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "If specified, skips the automatic restore of the project on create.",
+      "defaultValue": "false"
+    },
+    "consoleApp": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "If specified, the project is set up as console app.",
+      "defaultValue": "false"
+    },
+    "version": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "Version of BenchmarkDotNet that will be referenced.",
+      "defaultValue": "0.12.1",
+      "replaces": "$(BenchmarkDotNetVersion)"
+    }
+  },
+  "sources": [
+    {
+      "source": "./",
+      "target": "./",
+      "exclude": [
+        ".template.config/**"
+      ],
+      "modifiers": [
+        {
+          "condition": "(!config)",
+          "exclude": [
+            "BenchmarkConfig.vb"
+          ]
+        },
+        {
+          "condition": "(!consoleApp)",
+          "exclude": [
+            "Program.vb"
+          ]
+        }
+      ]
+    }
+  ],
+  "primaryOutputs": [
+    {
+      "path": "_BenchmarkProjectName_.vbproj"
+    }
+  ],
+  "postActions": [
+    {
+      "condition": "(!skipRestore)",
+      "description": "Restore NuGet packages required by this project.",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet restore'"
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
+}

@@ -14,9 +14,9 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                Add(Job.Dry);
-                Add(new TagColumn("Kind", name => name.Substring(0, 3)));
-                Add(new TagColumn("Number", name => name.Substring(3)));
+                AddJob(Job.Dry);
+                AddColumn(new TagColumn("Kind", name => name.Substring(0, 3)));
+                AddColumn(new TagColumn("Number", name => name.Substring(3)));
             }
         }
 

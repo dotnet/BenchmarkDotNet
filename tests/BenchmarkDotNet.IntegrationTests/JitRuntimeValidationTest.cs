@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public PlatformConfig(Runtime runtime, Jit jit, Platform platform)
             {
-                Add(new Job(Job.Dry, new EnvironmentMode()
+                AddJob(new Job(Job.Dry, new EnvironmentMode()
                 {
                     Runtime = runtime,
                     Jit = jit,
@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         private const string OkCaption = "// OkCaption";
-        private const string LegacyJitNotAvailableForMono = "// ERROR:  LegacyJIT is requested but it is not available for Mono";
+        // private const string LegacyJitNotAvailableForMono = "// ERROR:  LegacyJIT is requested but it is not available for Mono";
         private const string RyuJitNotAvailable = "// ERROR:  RyuJIT is requested but it is not available in current environment";
         private const string ToolchainSupportsOnlyRyuJit = "Currently dotnet cli toolchain supports only RyuJit";
 
@@ -46,9 +46,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData(Jit.RyuJit, Platform.X64, OkCaption)]
         public void CheckClrOnWindows(Jit jit, Platform platform, string expectedText)
         {
-            Verify(Runtime.Clr, jit, platform, expectedText);
+            Verify(ClrRuntime.Net461, jit, platform, expectedText);
         }
-        
+
 //        [TheoryWindowsOnly("CLR is a valid job only on Windows")]
 //        [InlineData(Jit.LegacyJit, Platform.X86, LegacyJitNotAvailableForMono)]
 //        [InlineData(Jit.LegacyJit, Platform.X64, LegacyJitNotAvailableForMono)]
@@ -65,13 +65,13 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData(Jit.RyuJit, Platform.X64, OkCaption)]
         public void CheckCore(Jit jit, Platform platform, string expectedText)
         {
-            Verify(Runtime.Core, jit, platform, expectedText);
+            Verify(CoreRuntime.Core50, jit, platform, expectedText);
         }
 
         private void Verify(Runtime runtime, Jit jit, Platform platform, string expectedText)
         {
             var logger = new OutputLogger(Output);
-            var config = new PlatformConfig(runtime, jit, platform).With(logger).With(DefaultColumnProviders.Instance);
+            var config = new PlatformConfig(runtime, jit, platform).AddLogger(logger).AddColumnProvider(DefaultColumnProviders.Instance);
 
             BenchmarkRunner.Run(new[] { BenchmarkConverter.TypeToBenchmarks(typeof(TestBenchmark), config) });
 

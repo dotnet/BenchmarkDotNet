@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using JetBrains.Annotations;
 using Microsoft.Win32;
 
 namespace BenchmarkDotNet.Helpers
@@ -12,35 +11,57 @@ namespace BenchmarkDotNet.Helpers
         // should be ordered by release number
         private static readonly (int minReleaseNumber, string version)[] FrameworkVersions =
         {
+            (528040, "4.8"),
             (461808, "4.7.2"),
             (461308, "4.7.1"),
             (460798, "4.7"),
             (394802, "4.6.2"),
             (394254, "4.6.1")
         };
-        
+
+        internal static string GetFrameworkDescription()
+        {
+            var fullName = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription; // sth like .NET Framework 4.7.3324.0
+            var servicingVersion = new string(fullName.SkipWhile(c => !char.IsDigit(c)).ToArray());
+            var releaseVersion = MapToReleaseVersion(servicingVersion);
+
+            return $".NET Framework {releaseVersion} ({servicingVersion})";
+        }
+
+        internal static string GetFrameworkReleaseVersion()
+        {
+            var fullName = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription; // sth like .NET Framework 4.7.3324.0
+            var servicingVersion = new string(fullName.SkipWhile(c => !char.IsDigit(c)).ToArray());
+            return MapToReleaseVersion(servicingVersion);
+        }
+
+        internal static string MapToReleaseVersion(string servicingVersion)
+        {
+            // the following code assumes that .NET 4.6.1 is the oldest supported version
+            if (string.Compare(servicingVersion, "4.6.2") < 0)
+                return "4.6.1";
+            if (string.Compare(servicingVersion, "4.7") < 0)
+                return "4.6.2";
+            if (string.Compare(servicingVersion, "4.7.1") < 0)
+                return "4.7";
+            if (string.Compare(servicingVersion, "4.7.2") < 0)
+                return "4.7.1";
+            if (string.Compare(servicingVersion, "4.8") < 0)
+                return "4.7.2";
+
+            return "4.8"; // most probably the last major release of Full .NET Framework
+        }
+
+
         private static int? GetReleaseNumberFromWindowsRegistry()
         {
-            using (var ndpKey = RegistryKey
-                .OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
-                .OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\"))
+            using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+            using (var ndpKey = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\"))
             {
                 if (ndpKey == null)
                     return null;
                 return Convert.ToInt32(ndpKey.GetValue("Release"));
             }
-        }
-        
-        [NotNull]
-        internal static string GetCurrentNetFrameworkVersion()
-        {
-            var releaseNumber = GetReleaseNumberFromWindowsRegistry();
-            if (!releaseNumber.HasValue)
-                return "?";
-
-            return FrameworkVersions
-                       .FirstOrDefault(v => releaseNumber >= v.minReleaseNumber)
-                       .version ?? "?";
         }
 
         internal static string GetLatestNetDeveloperPackVersion()
@@ -52,7 +73,7 @@ namespace BenchmarkDotNet.Helpers
                        .FirstOrDefault(v => releaseNumber >= v.minReleaseNumber && IsDeveloperPackInstalled(v.version))
                        .version;
         }
-        
+
         // Reference Assemblies exists when Developer Pack is installed
         private static bool IsDeveloperPackInstalled(string version) => Directory.Exists(Path.Combine(
             ProgramFilesX86DirectoryPath, @"Reference Assemblies\Microsoft\Framework\.NETFramework", 'v' + version));

@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples
@@ -10,12 +11,12 @@ namespace BenchmarkDotNet.Samples
         private class ConfigWithCustomEnvVars : ManualConfig
         {
             private const string JitNoInline = "COMPlus_JitNoInline";
-            
+
             public ConfigWithCustomEnvVars()
             {
-                Add(Job.Core.WithId("Inlining enabled"));
-                Add(Job.Core
-                    .With(new[] { new EnvironmentVariable(JitNoInline, "1") })
+                AddJob(Job.Default.WithRuntime(CoreRuntime.Core21).WithId("Inlining enabled"));
+                AddJob(Job.Default.WithRuntime(CoreRuntime.Core21)
+                    .WithEnvironmentVariables(new EnvironmentVariable(JitNoInline, "1"))
                     .WithId("Inlining disabled"));
             }
         }

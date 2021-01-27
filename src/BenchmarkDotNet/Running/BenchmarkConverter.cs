@@ -11,6 +11,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Running
 {
@@ -33,7 +34,7 @@ namespace BenchmarkDotNet.Running
             var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(allPublicMethods, "IterationCleanup");
 
             var parameterDefinitions = GetParameterDefinitions(type);
-            var parameterInstancesList = parameterDefinitions.Expand();
+            var parameterInstancesList = parameterDefinitions.Expand(immutableConfig.SummaryStyle);
 
             var targets = GetTargets(benchmarkMethods, type, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
 
@@ -43,7 +44,7 @@ namespace BenchmarkDotNet.Running
 
             foreach (var target in targets)
             {
-                var argumentsDefinitions = GetArgumentsDefinitions(target.WorkloadMethod, target.Type).ToArray();
+                var argumentsDefinitions = GetArgumentsDefinitions(target.WorkloadMethod, target.Type, immutableConfig.SummaryStyle).ToArray();
 
                 var parameterInstances =
                     (from parameterInstance in parameterInstancesList
@@ -158,7 +159,7 @@ namespace BenchmarkDotNet.Running
 
         private static ParameterDefinitions GetParameterDefinitions(Type type)
         {
-            IEnumerable<ParameterDefinition> GetDefinitions<TAttribute>(Func<TAttribute, Type, object[]> getValidValues) where TAttribute : Attribute
+            IEnumerable<ParameterDefinition> GetDefinitions<TAttribute>(Func<TAttribute, Type, object[]> getValidValues) where TAttribute : PriorityAttribute
             {
                 const BindingFlags reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
@@ -168,7 +169,9 @@ namespace BenchmarkDotNet.Running
                         member.Name,
                         member.IsStatic,
                         getValidValues(member.Attribute, member.ParameterType),
-                        false));
+                        false,
+                        member.ParameterType,
+                        member.Attribute.Priority));
             }
 
             var paramsDefinitions = GetDefinitions<ParamsAttribute>((attribute, parameterType) => GetValidValues(attribute.Values, parameterType));
@@ -182,14 +185,16 @@ namespace BenchmarkDotNet.Running
             var paramsAllValuesDefinitions = GetDefinitions<ParamsAllValuesAttribute>((_, parameterType) => GetAllValidValues(parameterType));
 
             var definitions = paramsDefinitions.Concat(paramsSourceDefinitions).Concat(paramsAllValuesDefinitions).ToArray();
-
             return new ParameterDefinitions(definitions);
         }
 
-        private static IEnumerable<ParameterInstances> GetArgumentsDefinitions(MethodInfo benchmark, Type target)
+        private static IEnumerable<ParameterInstances> GetArgumentsDefinitions(MethodInfo benchmark, Type target, SummaryStyle summaryStyle)
         {
+            var argumentsAttributes = benchmark.GetCustomAttributes<PriorityAttribute>();
+            int priority = argumentsAttributes.Select(attribute => attribute.Priority).Sum();
+
             var parameterDefinitions = benchmark.GetParameters()
-                .Select(parameter => new ParameterDefinition(parameter.Name, false, Array.Empty<object>(), true))
+                .Select(parameter => new ParameterDefinition(parameter.Name, false, Array.Empty<object>(), true, parameter.ParameterType, priority))
                 .ToArray();
 
             if (parameterDefinitions.IsEmpty())
@@ -204,7 +209,15 @@ namespace BenchmarkDotNet.Running
                     throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of defined arguments provided with [Arguments]! {argumentsAttribute.Values.Length} instead of {parameterDefinitions.Length}.");
 
                 yield return new ParameterInstances(
-                    argumentsAttribute.Values.Select((value, index) => new ParameterInstance(parameterDefinitions[index], Map(value))).ToArray());
+                    argumentsAttribute
+                        .Values
+                        .Select((value, index) =>
+                            {
+                                var definition = parameterDefinitions[index];
+                                var type = definition.ParameterType;
+                                return new ParameterInstance(definition, Map(value, type), summaryStyle);
+                            })
+                        .ToArray());
             }
 
             if (!benchmark.HasAttribute<ArgumentsSourceAttribute>())
@@ -214,7 +227,7 @@ namespace BenchmarkDotNet.Running
 
             var valuesInfo = GetValidValuesForParamsSource(target, argumentsSourceAttribute.Name);
             for (int sourceIndex = 0; sourceIndex < valuesInfo.values.Length; sourceIndex++)
-                yield return SmartParamBuilder.CreateForArguments(benchmark, parameterDefinitions, valuesInfo, sourceIndex);
+                yield return SmartParamBuilder.CreateForArguments(benchmark, parameterDefinitions, valuesInfo, sourceIndex, summaryStyle);
         }
 
         private static string[] GetCategories(MethodInfo method)
@@ -238,20 +251,20 @@ namespace BenchmarkDotNet.Running
         private static void AssertMethodHasCorrectSignature(string methodType, MethodInfo methodInfo)
         {
             if (methodInfo.GetParameters().Any() && !methodInfo.HasAttribute<ArgumentsAttribute>() && !methodInfo.HasAttribute<ArgumentsSourceAttribute>())
-                throw new InvalidOperationException($"{methodType} method {methodInfo.Name} has incorrect signature.\nMethod shouldn't have any arguments.");
+                throw new InvalidBenchmarkDeclarationException($"{methodType} method {methodInfo.Name} has incorrect signature.\nMethod shouldn't have any arguments.");
         }
 
         private static void AssertMethodIsAccessible(string methodType, MethodInfo methodInfo)
         {
             if (!methodInfo.IsPublic)
-                throw new InvalidOperationException($"{methodType} method {methodInfo.Name} has incorrect access modifiers.\nMethod must be public.");
+                throw new InvalidBenchmarkDeclarationException($"{methodType} method {methodInfo.Name} has incorrect access modifiers.\nMethod must be public.");
 
             var declaringType = methodInfo.DeclaringType;
 
             while (declaringType != null)
             {
                 if (!declaringType.GetTypeInfo().IsPublic && !declaringType.GetTypeInfo().IsNestedPublic)
-                    throw new InvalidOperationException($"{declaringType.FullName} containing {methodType} method {methodInfo.Name} has incorrect access modifiers.\nDeclaring type must be public.");
+                    throw new InvalidBenchmarkDeclarationException($"{declaringType.FullName} containing {methodType} method {methodInfo.Name} has incorrect access modifiers.\nDeclaring type must be public.");
 
                 declaringType = declaringType.DeclaringType;
             }
@@ -260,7 +273,7 @@ namespace BenchmarkDotNet.Running
         private static void AssertMethodIsNotGeneric(string methodType, MethodInfo methodInfo)
         {
             if (methodInfo.IsGenericMethod)
-                throw new InvalidOperationException($"{methodType} method {methodInfo.Name} is generic.\nGeneric {methodType} methods are not supported.");
+                throw new InvalidBenchmarkDeclarationException($"{methodType} method {methodInfo.Name} is generic.\nGeneric {methodType} methods are not supported.");
         }
 
         private static object[] GetValidValues(object[] values, Type parameterType)
@@ -270,15 +283,28 @@ namespace BenchmarkDotNet.Running
                 return new object[] { null };
             }
 
-            return values?.Select(Map).ToArray();
+            return values?.Select(value => Map(value, parameterType)).ToArray();
         }
 
-        private static object Map(object providedValue)
+        private static object Map(object providedValue, Type type)
         {
             if (providedValue == null)
                 return null;
 
-            return providedValue.GetType().IsArray ? ArrayParam<IParam>.FromObject(providedValue) : providedValue;
+            if (providedValue.GetType().IsArray)
+            {
+                return ArrayParam<IParam>.FromObject(providedValue);
+            }
+            // Usually providedValue contains all needed type information,
+            // but in case of F# enum types in attributes are erased.
+            // We can to restore them from types of arguments and fields.
+            // See also:
+            // https://github.com/dotnet/fsharp/issues/995
+            else if (providedValue.GetType().IsEnum || type.IsEnum)
+            {
+                return EnumParam.FromObject(providedValue, type);
+            }
+            return providedValue;
         }
 
         private static (MemberInfo source, object[] values) GetValidValuesForParamsSource(Type parentType, string sourceName)
@@ -299,13 +325,13 @@ namespace BenchmarkDotNet.Running
                     paramsSourceProperty,
                     parentType));
 
-            throw new InvalidOperationException($"{parentType.Name} has no public, accessible method/property called {sourceName}, unable to read values for [ParamsSource]");
+            throw new InvalidBenchmarkDeclarationException($"{parentType.Name} has no public, accessible method/property called {sourceName}, unable to read values for [ParamsSource]");
         }
 
         private static object[] ToArray(object sourceValue, MemberInfo memberInfo, Type type)
         {
             if (!(sourceValue is IEnumerable collection))
-                throw new InvalidOperationException($"{memberInfo.Name} of type {type.Name} does not implement IEnumerable, unable to read values for [ParamsSource]");
+                throw new InvalidBenchmarkDeclarationException($"{memberInfo.Name} of type {type.Name} does not implement IEnumerable, unable to read values for [ParamsSource]");
 
             return collection.Cast<object>().ToArray();
         }

@@ -8,13 +8,14 @@ namespace BenchmarkDotNet.Columns
     {
         private readonly Func<string, string> getTag;
 
-        public string Id => nameof(TagColumn);
+        public string Id { get; }
         public string ColumnName { get; }
 
         public TagColumn(string columnName, Func<string, string> getTag)
         {
             this.getTag = getTag;
             ColumnName = columnName;
+            Id = nameof(TagColumn) + "." + ColumnName;
         }
 
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;

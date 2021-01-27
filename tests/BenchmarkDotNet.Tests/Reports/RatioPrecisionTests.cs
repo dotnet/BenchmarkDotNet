@@ -29,9 +29,9 @@ namespace BenchmarkDotNet.Tests.Reports
         }
 
         [Theory]
-        [InlineData(new [] { 140, 1, 50 })]
-        [InlineData(new [] { 40, 1, 20 })]
-        [InlineData(new [] { 0, 1, 20 })]
+        [InlineData(new[] { 140, 1, 50 })]
+        [InlineData(new[] { 40, 1, 20 })]
+        [InlineData(new[] { 0, 1, 20 })]
         // First value is baseline, others are benchmark measurements
         public void RatioPrecisionTestWithBaseline(int[] values)
         {
@@ -67,9 +67,11 @@ namespace BenchmarkDotNet.Tests.Reports
             var summary = new Summary(
                 "MockSummary",
                 benchmarkReports.ToImmutableArray(),
-                new HostEnvironmentInfoBuilder().Build(), 
-                "",
+                new HostEnvironmentInfoBuilder().Build(),
+                string.Empty,
+                string.Empty,
                 TimeSpan.FromMinutes(1),
+                TestCultureInfo.Instance,
                 ImmutableArray<ValidationError>.Empty);
             MarkdownExporter.Default.ExportToLog(summary, logger);
             output.WriteLine(logger.GetLog());
@@ -79,7 +81,7 @@ namespace BenchmarkDotNet.Tests.Reports
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, int measurementValue)
         {
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
-            var executeResult = new ExecuteResult(true, 0, Array.Empty<string>(), Array.Empty<string>());
+            var executeResult = new ExecuteResult(true, 0, default, Array.Empty<string>(), Array.Empty<string>());
             var measurements = new List<Measurement>
                 {
                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, measurementValue),

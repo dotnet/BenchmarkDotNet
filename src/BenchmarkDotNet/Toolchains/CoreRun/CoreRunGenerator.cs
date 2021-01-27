@@ -14,13 +14,12 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         }
 
         private FileInfo SourceCoreRun { get; }
-        
+
         private FileInfo CopyCoreRun { get; }
 
         private bool NeedsCopy => SourceCoreRun != CopyCoreRun;
 
-        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath)
-            => base.PackagesPath;
+        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) => PackagesPath;
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, "publish");
@@ -29,21 +28,21 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         {
             if (NeedsCopy)
                 CopyFilesRecursively(SourceCoreRun.Directory, CopyCoreRun.Directory);
-            
+
             base.CopyAllRequiredFiles(artifactsPaths);
         }
 
-        protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths) 
-            => NeedsCopy 
-                ? base.GetArtifactsToCleanup(artifactsPaths).Concat(new [] { CopyCoreRun.Directory.FullName }).ToArray() 
+        protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
+            => NeedsCopy
+                ? base.GetArtifactsToCleanup(artifactsPaths).Concat(new[] { CopyCoreRun.Directory.FullName }).ToArray()
                 : base.GetArtifactsToCleanup(artifactsPaths);
 
         // source: https://stackoverflow.com/a/58779/5852046
-        private static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target) 
+        private static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
         {
             if (!target.Exists)
                 target.Create();
-            
+
             foreach (DirectoryInfo dir in source.GetDirectories())
                 CopyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
 

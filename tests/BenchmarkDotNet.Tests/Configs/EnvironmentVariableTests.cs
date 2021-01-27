@@ -11,8 +11,8 @@ namespace BenchmarkDotNet.Tests.Configs
         public void AddVariableArray()
         {
             var job = new Job()
-                .With(new[] { new EnvironmentVariable("a", "b") })
-                .With(new[] { new EnvironmentVariable("c", "d") });
+                .WithEnvironmentVariables(new EnvironmentVariable("a", "b"))
+                .WithEnvironmentVariables(new EnvironmentVariable("c", "d"));
             Assert.Equal(1, job.Environment.EnvironmentVariables.Count);
         }
 
@@ -21,11 +21,9 @@ namespace BenchmarkDotNet.Tests.Configs
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                new Job().With(new[]
-                {
+                new Job().WithEnvironmentVariables(
                     new EnvironmentVariable("a", "b"),
-                    new EnvironmentVariable("a", "c")
-                });
+                    new EnvironmentVariable("a", "c"));
             });
         }
 
@@ -33,27 +31,19 @@ namespace BenchmarkDotNet.Tests.Configs
         public void AddOneVariable()
         {
             var job = new Job()
-                .With(new[]
-                {
-                    new EnvironmentVariable("a", "b"),
-                    new EnvironmentVariable("c", "d")
-                })
-                .With(new EnvironmentVariable("e", "f"));
+                .WithEnvironmentVariables(new EnvironmentVariable("a", "b"), new EnvironmentVariable("c", "d"))
+                .WithEnvironmentVariable(new EnvironmentVariable("e", "f"));
             Assert.Equal(3, job.Environment.EnvironmentVariables.Count);
             Assert.Equal(new EnvironmentVariable("a", "b"), job.Environment.EnvironmentVariables[0]);
             Assert.Equal(new EnvironmentVariable("c", "d"), job.Environment.EnvironmentVariables[1]);
             Assert.Equal(new EnvironmentVariable("e", "f"), job.Environment.EnvironmentVariables[2]);
         }
-        
+
         [Fact]
         public void OverrideOneVariable()
         {
             var job = new Job()
-                .With(new[]
-                {
-                    new EnvironmentVariable("a", "b"),
-                    new EnvironmentVariable("c", "d")
-                })
+                .WithEnvironmentVariables(new EnvironmentVariable("a", "b"), new EnvironmentVariable("c", "d"))
                 .WithEnvironmentVariable("c", "e");
             Assert.Equal(2, job.Environment.EnvironmentVariables.Count);
             Assert.Equal(new EnvironmentVariable("a", "b"), job.Environment.EnvironmentVariables[0]);

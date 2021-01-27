@@ -8,10 +8,10 @@ BenchmarkDotNet uses [DocFX](https://dotnet.github.io/docfx/) as a documentation
     [cross references](https://dotnet.github.io/docfx/tutorial/links_and_cross_references.html#different-syntax-of-cross-reference) by
     [UID](https://dotnet.github.io/docfx/tutorial/links_and_cross_references.html#define-uid).
   For example,
-    `[OutlierMode](xref:BenchmarkDotNet.Mathematics.OutlierMode)` and
-    `@BenchmarkDotNet.Mathematics.OutlierMode`
+    `[SimpleJobAttribute](xref:BenchmarkDotNet.Attributes.SimpleJobAttribute)` and
+    `@BenchmarkDotNet.Attributes.SimpleJobAttribute`
     will be transformed to
-    [OutlierMode](xref:BenchmarkDotNet.Mathematics.OutlierMode).
+    [SimpleJobAttribute](xref:BenchmarkDotNet.Attributes.SimpleJobAttribute).
     
 ## Notes
 

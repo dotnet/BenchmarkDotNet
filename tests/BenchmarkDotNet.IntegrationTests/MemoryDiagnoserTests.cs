@@ -37,12 +37,11 @@ namespace BenchmarkDotNet.IntegrationTests
                 : new[]
                 {
                     new object[] { Job.Default.GetToolchain() },
-                    // new object[] { InProcessToolchain.Instance }, // this test takes a LOT of time and since we have new InProcessEmitToolchain we can disable it 
                     new object[] { InProcessEmitToolchain.Instance },
-#if NETCOREAPP2_1 
-                    // we don't want to test CoreRT twice (for .NET 4.6 and Core 2.1) when running the integration tests (these tests take a lot of time)
+#if !NETFRAMEWORK
+                    // we don't want to test CoreRT twice (for .NET 4.6 and 5.0) when running the integration tests (these tests take a lot of time)
                     // we test against specific version to keep this test stable
-                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-27408-02").ToToolchain() }
+                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "6.0.0-alpha.1.20602.1").ToToolchain() }
 #endif
                 };
 
@@ -64,7 +63,7 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertAllocations(toolchain, typeof(AccurateAllocations), new Dictionary<string, long>
             {
                 { nameof(AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
-                { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + + objectAllocationOverhead + arraySizeOverhead },
+                { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead },
 
                 { nameof(AccurateAllocations.AllocateTask), CalculateRequiredSpace<Task<int>>() },
             });
@@ -93,7 +92,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory(Skip = "#1542 Tiered JIT Thread allocates memory in the background"), MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserDoesNotIncludeAllocationsFromSetupAndCleanup(IToolchain toolchain)
         {
@@ -195,7 +194,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryNetCore21PlusOnly("Only .NET Core 2.0+ API is bug free for this case"), MemberData(nameof(GetToolchains))]
+        [Theory(Skip = "#1542 Tiered JIT Thread allocates memory in the background"), MemberData(nameof(GetToolchains))]
+        //[TheoryNetCoreOnly("Only .NET Core 2.0+ API is bug free for this case"), MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocationQuantumIsNotAnIssueForNetCore21Plus(IToolchain toolchain)
         {
@@ -208,6 +208,51 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertAllocations(toolchain, typeof(TimeConsuming), new Dictionary<string, long>
             {
                 { nameof(TimeConsuming.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead }
+            });
+        }
+
+        public class MultiThreadedAllocation
+        {
+            public const int Size = 1_000_000;
+            public const int ThreadsCount = 10;
+
+            private Thread[] threads;
+
+            [IterationSetup]
+            public void SetupIteration()
+            {
+                threads = Enumerable.Range(0, ThreadsCount)
+                    .Select(_ => new Thread(() => GC.KeepAlive(new byte[Size])))
+                    .ToArray();
+            }
+
+            [Benchmark]
+            public void Allocate()
+            {
+                foreach (var thread in threads)
+                {
+                    thread.Start();
+                    thread.Join();
+                }
+            }
+        }
+
+        [TheoryNetCore30(".NET Core 3.0 preview6+ exposes a GC.GetTotalAllocatedBytes method which makes it possible to work"), MemberData(nameof(GetToolchains))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void MemoryDiagnoserIsAccurateForMultiThreadedBenchmarks(IToolchain toolchain)
+        {
+            if (toolchain is CoreRtToolchain) // the API has not been yet ported to CoreRT
+                return;
+
+            long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
+            long arraySizeOverhead = IntPtr.Size; // array length
+            long memoryAllocatedPerArray = (MultiThreadedAllocation.Size + objectAllocationOverhead + arraySizeOverhead);
+            long threadStartAndJoinOverhead = 112; // this is more or less a magic number taken from memory profiler
+            long allocatedMemoryPerThread = memoryAllocatedPerArray + threadStartAndJoinOverhead;
+
+            AssertAllocations(toolchain, typeof(MultiThreadedAllocation), new Dictionary<string, long>
+            {
+                { nameof(MultiThreadedAllocation.Allocate), allocatedMemoryPerThread * MultiThreadedAllocation.ThreadsCount }
             });
         }
 
@@ -243,15 +288,15 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private IConfig CreateConfig(IToolchain toolchain)
             => ManualConfig.CreateEmpty()
-                .With(Job.ShortRun
+                .AddJob(Job.ShortRun
                     .WithEvaluateOverhead(false) // no need to run idle for this test
                     .WithWarmupCount(0) // don't run warmup to save some time for our CI runs
                     .WithIterationCount(1) // single iteration is enough for us
                     .WithGcForce(false)
-                    .With(toolchain))
-                .With(DefaultColumnProviders.Instance)
-                .With(MemoryDiagnoser.Default)
-                .With(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
+                    .WithToolchain(toolchain))
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddDiagnoser(MemoryDiagnoser.Default)
+                .AddLogger(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
 
         // note: don't copy, never use in production systems (it should work but I am not 100% sure)
         private int CalculateRequiredSpace<T>()

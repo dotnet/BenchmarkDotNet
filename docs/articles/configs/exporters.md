@@ -20,9 +20,10 @@ By default, files with results will be located in
 
 ## Plots
 
-You can install [R](https://www.r-project.org/) to automatically get nice plots of your benchmark results.
+[You can install R](https://www.r-project.org/) to automatically get nice plots of your benchmark results.
 First, make sure `Rscript.exe` or `Rscript` is in your path,
-  or define an R_HOME environment variable pointing to the R installation directory (containing the `bin` directory).
+  or define an R_HOME environment variable pointing to the R installation directory.  
+_eg: If `Rscript` is located in `/path/to/R/R-1.2.3/bin/Rscript`, then `R_HOME` must point to `/path/to/R/R-1.2.3/`, it **should not** point to `/path/to/R/R-1.2.3/bin`_  
 Use `RPlotExporter.Default` and `CsvMeasurementsExporter.Default` in your config,
   and the `BuildPlots.R` script in your bin directory will take care of the rest.
 
@@ -98,16 +99,17 @@ The CSV exporter and other compatible exporters may consume an instance of `ISum
 Example of CSV exporter configured to always use microseconds, kilobytes, and to render units only in column headers:
 
 ```cs
-var config = ManualConfig.Create(DefaultConfig.Instance);
-config.Add(new CsvExporter(
+var exporter = new CsvExporter(
     CsvSeparator.CurrentCulture,
-    new BenchmarkDotNet.Reports.SummaryStyle
-    {
-        PrintUnitsInHeader = true,
-        PrintUnitsInContent = false,
-        TimeUnit = BenchmarkDotNet.Horology.TimeUnit.Microsecond,
-        SizeUnit = BenchmarkDotNet.Columns.SizeUnit.KB
-    }));
+    new SummaryStyle(
+        cultureInfo: System.Globalization.CultureInfo.CurrentCulture,
+        printUnitsInHeader: true,
+        printUnitsInContent: false,
+        timeUnit: Perfolizer.Horology.TimeUnit.Microsecond,
+        sizeUnit: SizeUnit.KB
+    ));
+
+var config = ManualConfig.CreateMinimumViable().AddExporter(exporter);
 ```
 
 Excerpt from the resulting CSV file:

@@ -3,7 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Horology;
+using Perfolizer.Horology;
 using SimpleJson.Reflection;
 
 namespace BenchmarkDotNet.Helpers
@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Helpers
                 return value.GetType().Name; // TODO
             if (value is TimeInterval interval)
                 return interval.Nanoseconds + "ns";
-            
+
             return value.ToString();
         }
 
@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Helpers
         // example: typeof(List<int>).FullName => "System.Collections.Generic.List`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
         public static string ToFolderName(Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = false)
             => Escape(new StringBuilder(type.GetCorrectCSharpTypeName(includeNamespace, includeGenericArgumentsNamespace)));
-        
+
         private static string Escape(StringBuilder builder)
         {
             foreach (char invalidPathChar in Path.GetInvalidFileNameChars())

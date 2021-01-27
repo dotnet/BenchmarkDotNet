@@ -1,10 +1,11 @@
-﻿#if CLASSIC
+﻿#if NETFRAMEWORK
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnostics.Windows;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Loggers;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,8 +29,8 @@ namespace BenchmarkDotNet.IntegrationTests
         public static IEnumerable<object[]> GetJits()
             => new[]
             {
-                new object[] { Jit.LegacyJit, Platform.X64, Runtime.Clr }, // 64bit LegacyJit for desktop .NET
-                new object[] { Jit.RyuJit, Platform.X64, Runtime.Clr }, // RyuJit for desktop .NET
+                new object[] { Jit.LegacyJit, Platform.X64, ClrRuntime.Net461 }, // 64bit LegacyJit for desktop .NET
+                new object[] { Jit.RyuJit, Platform.X64, ClrRuntime.Net461 }, // RyuJit for desktop .NET
             };
 
         public class TailCallBenchmarks
@@ -81,11 +82,11 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, TailCallDiagnoser diagnoser) => ManualConfig.CreateEmpty()
-            .With(Job.Dry.With(jit).With(platform).With(runtime))
-            .With(DefaultConfig.Instance.GetLoggers().ToArray())
-            .With(DefaultColumnProviders.Instance)
-            .With(diagnoser)
-            .With(new OutputLogger(Output));
+            .AddJob(Job.Dry.WithJit(jit).WithPlatform(platform).WithRuntime(runtime))
+            .AddLogger(DefaultConfig.Instance.GetLoggers().ToArray())
+            .AddColumnProvider(DefaultColumnProviders.Instance)
+            .AddDiagnoser(diagnoser)
+            .AddLogger(new OutputLogger(Output));
     }
 }
 #endif

@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             foreach (var exporter in exporters)
             {
                 PrintTitle(logger, exporter);
-                exporter.ExportToLog(MockFactory.CreateSummary(config), logger);
+                exporter.ExportToLog(MockFactory.CreateSummary(config.WithCultureInfo(cultureInfo)), logger);
             }
 
             Approvals.Verify(logger.GetLog());
@@ -99,9 +99,9 @@ namespace BenchmarkDotNet.Tests.Exporters
         }
 
         private static readonly IConfig config = ManualConfig.Create(DefaultConfig.Instance)
-            .With(StatisticColumn.Mean)
-            .With(StatisticColumn.StdDev)
-            .With(StatisticColumn.P67);
+            .AddColumn(StatisticColumn.Mean)
+            .AddColumn(StatisticColumn.StdDev)
+            .AddColumn(StatisticColumn.P67);
 
         public void Dispose()
         {

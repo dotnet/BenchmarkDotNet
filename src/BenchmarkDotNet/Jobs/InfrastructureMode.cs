@@ -2,9 +2,9 @@
 using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<IToolchain> ToolchainCharacteristic = CreateCharacteristic<IToolchain>(nameof(Toolchain));
         public static readonly Characteristic<IClock> ClockCharacteristic = CreateCharacteristic<IClock>(nameof(Clock));
         public static readonly Characteristic<IEngineFactory> EngineFactoryCharacteristic = CreateCharacteristic<IEngineFactory>(nameof(EngineFactory));
-        public static readonly Characteristic<string> BuildConfigurationCharacteristic = CreateCharacteristic<string>(nameof(BuildConfiguration));        
+        public static readonly Characteristic<string> BuildConfigurationCharacteristic = CreateCharacteristic<string>(nameof(BuildConfiguration));
         public static readonly Characteristic<IReadOnlyList<Argument>> ArgumentsCharacteristic = CreateCharacteristic<IReadOnlyList<Argument>>(nameof(Arguments));
         public static readonly Characteristic<IReadOnlyCollection<NuGetReference>> NuGetReferencesCharacteristic = CreateCharacteristic<IReadOnlyCollection<NuGetReference>>(nameof(NuGetReferences));
 
@@ -68,6 +68,12 @@ namespace BenchmarkDotNet.Jobs
         {
             get => NuGetReferencesCharacteristic[this];
             set => NuGetReferencesCharacteristic[this] = value;
+        }
+
+        public bool TryGetToolchain(out IToolchain toolchain)
+        {
+            toolchain = HasValue(ToolchainCharacteristic) ? Toolchain : default;
+            return toolchain != default;
         }
     }
 }

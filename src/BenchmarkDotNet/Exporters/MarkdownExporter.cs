@@ -107,7 +107,7 @@ namespace BenchmarkDotNet.Exporters
 
             PrintTable(summary.Table, logger);
 
-            // TODO: move this logic to an analyser
+            // TODO: move this logic to an analyzer
             var benchmarksWithTroubles = summary.Reports.Where(r => !r.GetResultRuns().Any()).Select(r => r.BenchmarkCase).ToList();
             if (benchmarksWithTroubles.Count > 0)
             {
@@ -179,7 +179,7 @@ namespace BenchmarkDotNet.Exporters
                         BoldMarkupFormat, false);
                 }
 
-                // Each time we hit the start of a new group, alternative the colour (in the console) or display bold in Markdown
+                // Each time we hit the start of a new group, alternative the color (in the console) or display bold in Markdown
                 if (table.FullContentStartOfHighlightGroup[rowCounter])
                 {
                     highlightRow = !highlightRow;

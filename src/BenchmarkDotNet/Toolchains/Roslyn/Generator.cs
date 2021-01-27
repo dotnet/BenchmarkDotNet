@@ -12,12 +12,12 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
     [PublicAPI]
     public class Generator : GeneratorBase
     {
-        protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName) 
+        protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
             => Path.GetDirectoryName(buildPartition.AssemblyLocation);
 
         [PublicAPI]
         protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
-            => new[] 
+            => new[]
             {
                 artifactsPaths.ProgramCodePath,
                 artifactsPaths.AppConfigPath,
@@ -36,6 +36,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             list.Add("/target:exe");
             list.Add("/optimize");
             list.Add("/unsafe");
+            list.Add("/deterministic");
             list.Add("/platform:" + buildPartition.Platform.ToConfig());
             list.Add("/appconfig:" + artifactsPaths.AppConfigPath.Escape());
             var references = GetAllReferences(buildPartition.RepresentativeBenchmarkCase).Select(assembly => assembly.Location.Escape());
@@ -47,7 +48,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 prefix + string.Join(" ", list));
         }
 
-        internal static IEnumerable<Assembly> GetAllReferences(BenchmarkCase benchmarkCase) 
+        internal static IEnumerable<Assembly> GetAllReferences(BenchmarkCase benchmarkCase)
             => benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly
                 .GetReferencedAssemblies()
                 .Select(Assembly.Load)

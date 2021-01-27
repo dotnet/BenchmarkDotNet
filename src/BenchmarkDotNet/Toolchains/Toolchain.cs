@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Toolchains
                 return false;
             }
 
-            if (runtime is MonoRuntime mono)
+            if (runtime is MonoRuntime mono && !benchmarkCase.GetToolchain().IsInProcess)
             {
                 if (string.IsNullOrEmpty(mono.CustomPath) && !HostEnvironmentInfo.GetCurrent().IsMonoInstalled.Value)
                 {
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Toolchains
                 logger.WriteLineError($"BenchmarkDotNet requires dotnet cli to be installed or path to local dotnet cli provided in explicit way using `--cli` argument, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
                 return true;
             }
-            
+
             if (!string.IsNullOrEmpty(customDotNetCliPath) && !File.Exists(customDotNetCliPath))
             {
                 logger.WriteLineError($"Provided custom dotnet cli path does not exist, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
