@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Filters;
@@ -102,6 +103,28 @@ namespace BenchmarkDotNet.Tests.Configs
             [Benchmark]
             [OperatingSystemsArchitectureFilter(allowed: false, Architecture.X64)]
             public void Method() { }
+        }
+
+        [Fact]
+        public void CanEnableOrDisableMemoryRandomizationPerMethod()
+        {
+            var benchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(WithMemoryRandomization)).BenchmarksCases;
+
+            Assert.Equal(2, benchmarks.Length);
+            var disabled = benchmarks.Single(benchmark => benchmark.Descriptor.WorkloadMethod.Name == nameof(WithMemoryRandomization.DisabledByDefault));
+            Assert.False(disabled.Job.Run.MemoryRandomization);
+            var enabled = benchmarks.Single(benchmark => benchmark.Descriptor.WorkloadMethod.Name == nameof(WithMemoryRandomization.EnabledWithAttributeOnMethod));
+            Assert.True(enabled.Job.Run.MemoryRandomization);
+        }
+
+        public class WithMemoryRandomization
+        {
+            [Benchmark]
+            public void DisabledByDefault() { }
+
+            [Benchmark]
+            [MemoryRandomization(true)]
+            public void EnabledWithAttributeOnMethod() { }
         }
     }
 }
