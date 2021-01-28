@@ -148,7 +148,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   </ItemGroup>
   <ItemGroup>
     <RdXmlFile Include=""rd.xml"" />
-    <IlcArg Include=""--verbose"" />
   </ItemGroup>
 </Project>";
 
@@ -183,7 +182,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   </ItemGroup>
   <ItemGroup>
     <RdXmlFile Include=""rd.xml"" />
-    <IlcArg Include=""--verbose"" />
   </ItemGroup>
 </Project>";
 
