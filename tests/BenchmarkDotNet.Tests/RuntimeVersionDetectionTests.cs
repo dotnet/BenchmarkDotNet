@@ -16,8 +16,8 @@ namespace BenchmarkDotNet.Tests
         [InlineData(".NETCoreApp,Version=v2.2", RuntimeMoniker.NetCoreApp22, "netcoreapp2.2")]
         [InlineData(".NETCoreApp,Version=v3.0", RuntimeMoniker.NetCoreApp30, "netcoreapp3.0")]
         [InlineData(".NETCoreApp,Version=v3.1", RuntimeMoniker.NetCoreApp31, "netcoreapp3.1")]
-        [InlineData(".NETCoreApp,Version=v5.0", RuntimeMoniker.NetCoreApp50, "netcoreapp5.0")]
-        [InlineData(".NETCoreApp,Version=v123.0", RuntimeMoniker.NotRecognized, "netcoreapp123.0")]
+        [InlineData(".NETCoreApp,Version=v5.0", RuntimeMoniker.Net50, "net5.0")]
+        [InlineData(".NETCoreApp,Version=v123.0", RuntimeMoniker.NotRecognized, "net123.0")]
         public void TryGetVersionFromFrameworkNameHandlesValidInput(string frameworkName, RuntimeMoniker expectedTfm, string expectedMsBuildMoniker)
         {
             Assert.True(CoreRuntime.TryGetVersionFromFrameworkName(frameworkName, out Version version));
@@ -43,8 +43,8 @@ namespace BenchmarkDotNet.Tests
         [InlineData(RuntimeMoniker.NetCoreApp22, "netcoreapp2.2", "Microsoft .NET Framework", "4.6.27817.03 @BuiltBy: dlab14-DDVSOWINAGE101 @Branch: release/2.2 @SrcCode: https://github.com/dotnet/coreclr/tree/ce1d090d33b400a25620c0145046471495067cc7")]
         [InlineData(RuntimeMoniker.NetCoreApp30, "netcoreapp3.0", "Microsoft .NET Core", "3.0.0-preview8-28379-12")]
         [InlineData(RuntimeMoniker.NetCoreApp31, "netcoreapp3.1", "Microsoft .NET Core", "3.1.0-something")]
-        [InlineData(RuntimeMoniker.NetCoreApp50, "netcoreapp5.0", "Microsoft .NET Core", "5.0.0-alpha1.19415.3")]
-        [InlineData(RuntimeMoniker.NotRecognized, "netcoreapp123.0", "Microsoft .NET Core", "123.0.0-future")]
+        [InlineData(RuntimeMoniker.Net50, "net5.0", "Microsoft .NET Core", "5.0.0-alpha1.19415.3")]
+        [InlineData(RuntimeMoniker.NotRecognized, "net123.0", "Microsoft .NET Core", "123.0.0-future")]
         public void TryGetVersionFromProductInfoHandlesValidInput(RuntimeMoniker expectedTfm, string expectedMsBuildMoniker, string productName, string productVersion)
         {
             Assert.True(CoreRuntime.TryGetVersionFromProductInfo(productVersion, productName, out Version version));
@@ -73,8 +73,8 @@ namespace BenchmarkDotNet.Tests
             yield return new object[] { Path.Combine(directoryPrefix, "2.1.12") + Path.DirectorySeparatorChar, RuntimeMoniker.NetCoreApp21, "netcoreapp2.1" };
             yield return new object[] { Path.Combine(directoryPrefix, "2.2.6") + Path.DirectorySeparatorChar, RuntimeMoniker.NetCoreApp22, "netcoreapp2.2" };
             yield return new object[] { Path.Combine(directoryPrefix, "3.0.0-preview8-28379-12") + Path.DirectorySeparatorChar, RuntimeMoniker.NetCoreApp30, "netcoreapp3.0" };
-            yield return new object[] { Path.Combine(directoryPrefix, "5.0.0-alpha1.19422.13") + Path.DirectorySeparatorChar, RuntimeMoniker.NetCoreApp50, "netcoreapp5.0" };
-            yield return new object[] { Path.Combine(directoryPrefix, "123.0.0") + Path.DirectorySeparatorChar, RuntimeMoniker.NotRecognized, "netcoreapp123.0" };
+            yield return new object[] { Path.Combine(directoryPrefix, "5.0.0-alpha1.19422.13") + Path.DirectorySeparatorChar, RuntimeMoniker.Net50, "net5.0" };
+            yield return new object[] { Path.Combine(directoryPrefix, "123.0.0") + Path.DirectorySeparatorChar, RuntimeMoniker.NotRecognized, "net123.0" };
         }
 
         [Theory]
@@ -128,4 +128,3 @@ namespace BenchmarkDotNet.Tests
         }
     }
 }
-

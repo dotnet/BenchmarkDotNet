@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class ValuesReturnedByBenchmark
         {
-#if !NETCOREAPP
+#if NETFRAMEWORK
             [Benchmark]
             public System.Windows.Point? TypeFromCustomFrameworkAssembly() => new System.Windows.Point();
 
@@ -48,9 +48,24 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]
             public Jit ReturnEnum() => Jit.RyuJit;
 
-            private int field = 123;
+            private int intergerField = 123;
             [Benchmark]
-            public ref int ReturnByRef() => ref field;
+            public ref int ReturnByRef() => ref intergerField;
+
+            [Benchmark]
+            public ref readonly int ReturnByReadonlyRef() => ref intergerField;
+
+            public readonly struct ReadOnlyStruct { }
+            private ReadOnlyStruct readOnlyStructField;
+
+            [Benchmark]
+            public ReadOnlyStruct ReturnReadOnlyStruct() => new ReadOnlyStruct();
+
+            [Benchmark]
+            public ref ReadOnlyStruct ReturnReadOnlyStructByRef() => ref readOnlyStructField;
+
+            [Benchmark]
+            public ref readonly ReadOnlyStruct ReturnReadOnlyStructByReadonlyRef() => ref readOnlyStructField;
 
             [Benchmark]
             public Span<byte> ReturnStackOnlyType() => new Span<byte>(Array.Empty<byte>());

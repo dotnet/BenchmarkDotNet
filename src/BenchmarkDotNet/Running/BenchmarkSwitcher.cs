@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -30,11 +31,15 @@ namespace BenchmarkDotNet.Running
 
         [PublicAPI] public BenchmarkSwitcher With(Type type) { types.Add(type); return this; }
 
-        [PublicAPI] public BenchmarkSwitcher With(Type[] types) { this.types.AddRange(types); return this; }
+        [PublicAPI]
+        [SuppressMessage("ReSharper", "ParameterHidesMember")]
+        public BenchmarkSwitcher With(Type[] types) { this.types.AddRange(types); return this; }
 
         [PublicAPI] public BenchmarkSwitcher With(Assembly assembly) { assemblies.Add(assembly); return this; }
 
-        [PublicAPI] public BenchmarkSwitcher With(Assembly[] assemblies) { this.assemblies.AddRange(assemblies); return this; }
+        [PublicAPI]
+        [SuppressMessage("ReSharper", "ParameterHidesMember")]
+        public BenchmarkSwitcher With(Assembly[] assemblies) { this.assemblies.AddRange(assemblies); return this; }
 
         [PublicAPI] public static BenchmarkSwitcher FromTypes(Type[] types) => new BenchmarkSwitcher(types);
 
@@ -59,16 +64,22 @@ namespace BenchmarkDotNet.Running
             // we need to keep the logic that uses it in a separate method and create DirtyAssemblyResolveHelper first
             // so it can ignore the version mismatch ;)
             using (DirtyAssemblyResolveHelper.Create())
-                return RunWithDirtyAssemblyResolveHelper(args ?? Array.Empty<string>(), config ?? DefaultConfig.Instance, true);
+                return RunWithDirtyAssemblyResolveHelper(args, config, true);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[] args, IConfig config, bool askUserForInput)
         {
-            var logger = config.GetNonNullCompositeLogger();
-            var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args, logger, config);
+            var notNullArgs = args ?? Array.Empty<string>();
+            var notNullConfig = config ?? DefaultConfig.Instance;
+
+            var logger = notNullConfig.GetNonNullCompositeLogger();
+            var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(notNullArgs, logger, notNullConfig);
             if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
                 return Array.Empty<Summary>();
+
+            if (args == null && Environment.GetCommandLineArgs().Length > 1) // The first element is the executable file name
+                logger.WriteLineHint("You haven't passed command line arguments to BenchmarkSwitcher.Run method. Running with default configuration.");
 
             if (options.PrintInformation)
             {
@@ -76,7 +87,7 @@ namespace BenchmarkDotNet.Running
                 return Array.Empty<Summary>();
             }
 
-            var effectiveConfig = ManualConfig.Union(config, parsedConfig);
+            var effectiveConfig = ManualConfig.Union(notNullConfig, parsedConfig);
 
             var (allTypesValid, allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(types, assemblies, logger);
             if (!allTypesValid) // there were some invalid and TypeFilter printed errors
@@ -90,7 +101,7 @@ namespace BenchmarkDotNet.Running
 
             if (options.ListBenchmarkCaseMode != ListBenchmarkCaseMode.Disabled)
             {
-                BenchmarkCasesPrinter.PrintList(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
+                PrintList(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
                 return Array.Empty<Summary>();
             }
 
@@ -107,6 +118,18 @@ namespace BenchmarkDotNet.Running
             }
 
             return BenchmarkRunnerClean.Run(filteredBenchmarks);
+        }
+
+        private static void PrintList(ILogger nonNullLogger, IConfig effectiveConfig, IReadOnlyList<Type> allAvailableTypesWithRunnableBenchmarks, CommandLineOptions options)
+        {
+            var printer = new BenchmarkCasesPrinter(options.ListBenchmarkCaseMode);
+
+            var testNames = TypeFilter.Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
+                .SelectMany(p => p.BenchmarksCases)
+                .Select(p => p.Descriptor.GetFilterName())
+                .Distinct();
+
+            printer.Print(testNames, nonNullLogger);
         }
     }
 }

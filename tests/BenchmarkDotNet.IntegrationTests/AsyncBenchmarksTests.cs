@@ -20,7 +20,8 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 foreach (var measurement in report.AllMeasurements)
                 {
-                    Assert.True(measurement.Nanoseconds > TaskDelayMethods.NanosecondsDelay);
+                    Assert.True(measurement.Nanoseconds * 1.03 > TaskDelayMethods.NanosecondsDelay,
+                        $"{report.BenchmarkCase.Descriptor.GetFilterName()} has not been awaited, took {measurement.Nanoseconds}ns, while it should take more than {TaskDelayMethods.NanosecondsDelay}ns");
                 }
             }
         }
@@ -35,13 +36,16 @@ namespace BenchmarkDotNet.IntegrationTests
             public Task ReturningTask() => Task.Delay(MillisecondsDelay);
 
             [Benchmark]
+            public ValueTask ReturningValueTask() => new ValueTask(Task.Delay(MillisecondsDelay));
+
+            [Benchmark]
             public async Task Awaiting() => await Task.Delay(MillisecondsDelay);
 
             [Benchmark]
             public Task<int> ReturningGenericTask() => ReturningTask().ContinueWith(_ => default(int));
 
             [Benchmark]
-            public ValueTask<int> ReturningValueTask() => new ValueTask<int>(ReturningGenericTask());
+            public ValueTask<int> ReturningGenericValueTask() => new ValueTask<int>(ReturningGenericTask());
         }
     }
 }

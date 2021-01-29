@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.QuantileEstimators;
 
 namespace BenchmarkDotNet.Mathematics
 {
@@ -30,22 +29,14 @@ namespace BenchmarkDotNet.Mathematics
             if (percentile < 0 || percentile > 100)
             {
                 throw new ArgumentOutOfRangeException(
-                     nameof(percentile), percentile,
-                     "The percentile arg should be in range of 0 - 100.");
+                    nameof(percentile), percentile,
+                    "The percentile arg should be in range of 0 - 100.");
             }
 
             if (sortedValues.Count == 0)
                 return 0;
 
-            // DONTTOUCH: the following code was taken from http://stackoverflow.com/a/8137526 and it is proven
-            // to work in the same way the excel's counterpart does.
-            // So it's better to leave it as it is unless you do not want to reimplement it from scratch:)
-            double realIndex = percentile / 100.0 * (sortedValues.Count - 1);
-            int index = (int)realIndex;
-            double frac = realIndex - index;
-            if (index + 1 < sortedValues.Count)
-                return sortedValues[index] * (1 - frac) + sortedValues[index + 1] * frac;
-            return sortedValues[index];
+            return SimpleQuantileEstimator.Instance.GetQuantileFromSorted(sortedValues, percentile / 100.0);
         }
 
         [PublicAPI] public double Percentile(int percentile) => Percentile(SortedValues, percentile);

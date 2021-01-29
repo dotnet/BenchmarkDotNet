@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Validators
             return from memberInfo in memberInfos
                            where memberInfo.Name.EndsWith("Keyword")
                            orderby memberInfo.Name
-                           select memberInfo.Name.Substring(startIndex: 0, length: memberInfo.Name.IndexOf("Keyword")).ToLower();
+                           select memberInfo.Name.Substring(startIndex: 0, length: memberInfo.Name.IndexOf("Keyword", StringComparison.Ordinal)).ToLower();
         }
 
         private class BenchmarkMethodEqualityComparer : IEqualityComparer<BenchmarkCase>

@@ -38,10 +38,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 {
                     new object[] { Job.Default.GetToolchain() },
                     new object[] { InProcessEmitToolchain.Instance },
-#if NETCOREAPP2_1
-                    // we don't want to test CoreRT twice (for .NET 4.6 and Core 2.1) when running the integration tests (these tests take a lot of time)
+#if !NETFRAMEWORK
+                    // we don't want to test CoreRT twice (for .NET 4.6 and 5.0) when running the integration tests (these tests take a lot of time)
                     // we test against specific version to keep this test stable
-                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-27408-02").ToToolchain() }
+                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "6.0.0-preview.1.21074.3").ToToolchain() }
 #endif
                 };
 
@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertAllocations(toolchain, typeof(AccurateAllocations), new Dictionary<string, long>
             {
                 { nameof(AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
-                { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + + objectAllocationOverhead + arraySizeOverhead },
+                { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead },
 
                 { nameof(AccurateAllocations.AllocateTask), CalculateRequiredSpace<Task<int>>() },
             });
@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory(Skip = "#1542 Tiered JIT Thread allocates memory in the background"), MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserDoesNotIncludeAllocationsFromSetupAndCleanup(IToolchain toolchain)
         {
@@ -194,7 +194,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryNetCoreOnly("Only .NET Core 2.0+ API is bug free for this case"), MemberData(nameof(GetToolchains))]
+        [Theory(Skip = "#1542 Tiered JIT Thread allocates memory in the background"), MemberData(nameof(GetToolchains))]
+        //[TheoryNetCoreOnly("Only .NET Core 2.0+ API is bug free for this case"), MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocationQuantumIsNotAnIssueForNetCore21Plus(IToolchain toolchain)
         {

@@ -5,11 +5,12 @@ using System.Linq;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Mathematics;
 using CommandLine;
 using CommandLine.Text;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -35,7 +36,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('d', "disasm", Required = false, Default = false, HelpText = "Gets disassembly of benchmarked code")]
         public bool UseDisassemblyDiagnoser { get; set; }
 
-        [Option('p', "profiler", Required = false, HelpText = "Profiles benchmarked code using selected profiler. Currently the only available is \"ETW\" for Windows.")]
+        [Option('p', "profiler", Required = false, HelpText = "Profiles benchmarked code using selected profiler. Available options: EP/ETW/CV/NativeMemory")]
         public string Profiler { get; set; }
 
         [Option('f', "filter", Required = false, HelpText = "Glob patterns")]
@@ -131,6 +132,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("strategy", Required = false, HelpText = "The RunStrategy that should be used. Throughput/ColdStart/Monitoring.")]
         public RunStrategy? RunStrategy { get; set; }
 
+        [Option("platform", Required = false, HelpText = "The Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64.")]
+        public Platform? Platform { get; set; }
+
         [Option("runOncePerIteration", Required = false, Default = false, HelpText = "Run the benchmark exactly once per iteration.")]
         public bool RunOncePerIteration { get; set; }
 
@@ -164,6 +168,21 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("envVars", Required = false, HelpText = "Colon separated environment variables (key:value)")]
         public IEnumerable<string> EnvironmentVariables { get; set; }
 
+        [Option("memoryRandomization", Required = false, HelpText = "Specifies whether Engine should allocate some random-sized memory between iterations. It makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration.")]
+        public bool MemoryRandomization { get; set; }
+
+        [Option("wasmEngine", Required = false, HelpText = "Full path to a java script engine used to run the benchmarks, used by Wasm toolchain.")]
+        public FileInfo WasmJavascriptEngine { get; set; }
+
+        [Option("wasmMainJS", Required = false, HelpText = "Path to the main.js file used by Wasm toolchain. Mandatory when using \"--runtimes wasm\"")]
+        public FileInfo WasmMainJs { get; set; }
+
+        [Option("wasmArgs", Required = false, Default = "--expose_wasm", HelpText = "Arguments for the javascript engine used by Wasm toolchain.")]
+        public string WasmJavaScriptEngineArguments { get; set; }
+
+        [Option("customRuntimePack", Required = false, HelpText = "Specify the path to a custom runtime pack. Only used for wasm currently.")]
+        public string CustomRuntimePack { get; set; }
+
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
         [Usage(ApplicationAlias = "")]
@@ -181,7 +200,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run benchmarks for .NET Core 2.0, .NET Core 2.1 and .NET Core 2.2. .NET Core 2.0 will be baseline because it was first.", longName, new CommandLineOptions { Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1", "netcoreapp2.2" } });
                 yield return new Example("Use MemoryDiagnoser to get GC stats", shortName, new CommandLineOptions { UseMemoryDiagnoser = true });
                 yield return new Example("Use DisassemblyDiagnoser to get disassembly", shortName, new CommandLineOptions { UseDisassemblyDiagnoser = true });
-                yield return new Example("Use HardwareCountersDiagnoser to get hardware counter info", longName, new CommandLineOptions { HardwareCounters = new [] { nameof(HardwareCounter.CacheMisses), nameof(HardwareCounter.InstructionRetired) } });
+                yield return new Example("Use HardwareCountersDiagnoser to get hardware counter info", longName, new CommandLineOptions { HardwareCounters = new[] { nameof(HardwareCounter.CacheMisses), nameof(HardwareCounter.InstructionRetired) } });
                 yield return new Example("Run all benchmarks exactly once", shortName, new CommandLineOptions { BaseJob = "Dry", Filters = new[] { Escape("*") } });
                 yield return new Example("Run all benchmarks from System.Memory namespace", shortName, new CommandLineOptions { Filters = new[] { Escape("System.Memory*") } });
                 yield return new Example("Run all benchmarks from ClassA and ClassB using type names", shortName, new CommandLineOptions { Filters = new[] { "ClassA", "ClassB" } });
@@ -191,8 +210,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run selected benchmarks 100 times per iteration. Perform single warmup iteration and 5 actual workload iterations", longName, new CommandLineOptions { InvocationCount = 100, WarmupIterationCount = 1, IterationCount = 5});
                 yield return new Example("Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations", longName, new CommandLineOptions { IterationTimeInMilliseconds = 250, MinIterationCount = 9, MaxIterationCount = 15});
                 yield return new Example("Run MannWhitney test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was provided as first.", longName,
-                    new CommandLineOptions { Filters = new [] { "*"}, Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1" }, StatisticalTestThreshold = "5%" });
-                yield return new Example("Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2'", longName, 
+                    new CommandLineOptions { Filters = new[] { "*"}, Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1" }, StatisticalTestThreshold = "5%" });
+                yield return new Example("Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2'", longName,
                     new CommandLineOptions { EnvironmentVariables = new[] { "ENV_VAR_KEY_1:value_1", "ENV_VAR_KEY_2:value_2" } });
             }
         }

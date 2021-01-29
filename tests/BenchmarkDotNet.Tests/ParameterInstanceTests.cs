@@ -1,5 +1,4 @@
-﻿using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Parameters;
+﻿using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 using System;
 using System.Collections.Generic;
@@ -9,7 +8,7 @@ namespace BenchmarkDotNet.Tests
 {
     public class ParameterInstanceTests
     {
-        private static readonly ParameterDefinition definition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>(), isArgument: false, parameterType: null);
+        private static readonly ParameterDefinition definition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>(), isArgument: false, parameterType: null, 0);
 
         [Theory]
         [InlineData(5)]

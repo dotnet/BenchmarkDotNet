@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         private const string OkCaption = "// OkCaption";
-        private const string LegacyJitNotAvailableForMono = "// ERROR:  LegacyJIT is requested but it is not available for Mono";
+        // private const string LegacyJitNotAvailableForMono = "// ERROR:  LegacyJIT is requested but it is not available for Mono";
         private const string RyuJitNotAvailable = "// ERROR:  RyuJIT is requested but it is not available in current environment";
         private const string ToolchainSupportsOnlyRyuJit = "Currently dotnet cli toolchain supports only RyuJit";
 
@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData(Jit.RyuJit, Platform.X64, OkCaption)]
         public void CheckCore(Jit jit, Platform platform, string expectedText)
         {
-            Verify(CoreRuntime.Core21, jit, platform, expectedText);
+            Verify(CoreRuntime.Core50, jit, platform, expectedText);
         }
 
         private void Verify(Runtime runtime, Jit jit, Platform platform, string expectedText)

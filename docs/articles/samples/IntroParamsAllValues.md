@@ -28,10 +28,6 @@ If you want to use all possible values of an `enum` or another type with a small
  Benchmark | Three |     ? | 301.4 ms |    NA |
  Benchmark | Three | False | 311.5 ms |    NA |
  Benchmark | Three |  True | 320.8 ms |    NA |
-
-// * Legends *
-  E     : Value of the 'E' parameter
-  B     : Value of the 'B' parameter
 ```
 
 ### Links

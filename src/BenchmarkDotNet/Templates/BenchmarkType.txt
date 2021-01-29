@@ -53,7 +53,7 @@
 
         public delegate $OverheadMethodReturnTypeName$ OverheadDelegate($ArgumentsDefinition$);
 
-        public delegate $Ref$ $WorkloadMethodReturnType$ WorkloadDelegate($ArgumentsDefinition$);
+        public delegate $WorkloadMethodReturnTypeModifiers$ $WorkloadMethodReturnType$ WorkloadDelegate($ArgumentsDefinition$);
 
         public Runnable_$ID$()
         {
@@ -274,6 +274,65 @@
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         public ref $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
+        {
+            if (NotEleven == 11)
+            {
+                $LoadArguments$
+                return ref $WorkloadMethodCall$;
+            }
+            
+            return ref workloadDefaultValueHolder;
+        }
+#elif RETURNS_BYREF_READONLY_$ID$
+
+        private void OverheadActionUnroll(System.Int64 invokeCount)
+        {
+            $LoadArguments$
+            $OverheadMethodReturnTypeName$ value = default($OverheadMethodReturnTypeName$);
+            for (System.Int64 i = 0; i < invokeCount; i++)
+            {
+                value = overheadDelegate($PassArguments$);@Unroll@
+            }
+            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
+        }
+
+        private void OverheadActionNoUnroll(System.Int64 invokeCount)
+        {
+            $LoadArguments$
+            $OverheadMethodReturnTypeName$ value = default($OverheadMethodReturnTypeName$);
+            for (System.Int64 i = 0; i < invokeCount; i++)
+            {
+                value = overheadDelegate($PassArguments$);
+            }
+            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
+        }
+
+        private $WorkloadMethodReturnType$ workloadDefaultValueHolder = default($WorkloadMethodReturnType$);
+
+        private void WorkloadActionUnroll(System.Int64 invokeCount)
+        {
+            $LoadArguments$
+            ref $WorkloadMethodReturnType$ alias = ref workloadDefaultValueHolder;
+            for (System.Int64 i = 0; i < invokeCount; i++)
+            {
+                alias = workloadDelegate($PassArguments$);@Unroll@
+            }
+            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(alias);
+        }
+        
+        private void WorkloadActionNoUnroll(System.Int64 invokeCount)
+        {
+            $LoadArguments$
+            ref $WorkloadMethodReturnType$ alias = ref workloadDefaultValueHolder;
+            for (System.Int64 i = 0; i < invokeCount; i++)
+            {
+                alias = workloadDelegate($PassArguments$);
+            }
+            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(alias);
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public ref readonly $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
         {
             if (NotEleven == 11)
             {

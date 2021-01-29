@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Exporters
         {
             const string scriptFileName = "BuildPlots.R";
             const string logFileName = "BuildPlots.log";
-            yield return scriptFileName;
+            yield return Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
 
             string csvFullPath = CsvMeasurementsExporter.Default.GetArtifactFullName(summary);
             string scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Exporters
             lock (BuildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
-            if(!TryFindRScript(consoleLogger, out string rscriptPath))
+            if (!TryFindRScript(consoleLogger, out string rscriptPath))
             {
                 yield break;
             }
@@ -56,15 +56,23 @@ namespace BenchmarkDotNet.Exporters
                 WorkingDirectory = summary.ResultsDirectoryPath,
                 Arguments = $"\"{scriptFullPath}\" \"{csvFullPath}\""
             };
-            using (var process = Process.Start(start))
+            using (var process = new Process {StartInfo = start})
+            using (AsyncProcessOutputReader reader = new AsyncProcessOutputReader(process))
             {
-                string output = process?.StandardOutput.ReadToEnd() ?? "";
-                string error = process?.StandardError.ReadToEnd() ?? "";
-                File.WriteAllText(logFullPath, output + Environment.NewLine + error);
-                process?.WaitForExit();
+                // When large R scripts are generated then ran, ReadToEnd()
+                // causes the stdout and stderr buffers to become full,
+                // which causes R to hang. To avoid this, use
+                // AsyncProcessOutputReader to cache the log contents
+                // then write to disk rather than Process.Standard*.ReadToEnd().
+                process.Start();
+                reader.BeginRead();
+                process.WaitForExit();
+                reader.StopRead();
+                File.WriteAllLines(logFullPath, reader.GetOutputLines());
+                File.AppendAllLines(logFullPath, reader.GetErrorLines());
             }
 
-            yield return $"*{ImageExtension}";
+            yield return Path.Combine(summary.ResultsDirectoryPath, $"*{ImageExtension}");
         }
 
         public void ExportToLog(Summary summary, ILogger logger)

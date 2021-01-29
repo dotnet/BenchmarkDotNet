@@ -17,6 +17,8 @@ using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
 
+#pragma warning disable CS0618
+
 namespace BenchmarkDotNet.IntegrationTests
 {
     public class InProcessTest : BenchmarkTestExecutor

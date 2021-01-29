@@ -33,6 +33,9 @@ The current Diagnosers are:
 - Native Memory Profiler (`NativeMemoryProfiler`)
   It uses `EtwProfiler` to profile the code using ETW and adds the extra columns `Allocated native memory` and `Native memory leak`.
   Please see Wojciech Nagórski's [blog post](https://wojciechnagorski.com/2019/08/analyzing-native-memory-allocation-with-benchmarkdotnet/) for all the details.
+- Event Pipe Profiler (`EventPipeProfiler`).
+  It is a cross-platform profiler that allows profile .NET code on every platform - Windows, Linux, macOS.
+  Please see Wojciech Nagórski's [blog post](https://wojciechnagorski.com/2020/04/cross-platform-profiling-.net-code-with-benchmarkdotnet/) for all the details.
 - Threading Diagnoser (`ThreadingDiagnoser`) - .NET Core 3.0+ diagnoser that reports some Threading statistics.
 
 ## Usage

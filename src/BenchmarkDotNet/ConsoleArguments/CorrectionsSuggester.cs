@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 possibleBenchmarkNames.AddRange(names);
             }
 
-            allBenchmarkNames.AddRange(benchmarkNames.OrderBy(name => name));
+            allBenchmarkNames.AddRange(benchmarkNames);
         }
 
         public string[] SuggestFor([NotNull] string userInput)

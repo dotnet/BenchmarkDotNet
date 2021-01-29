@@ -1,9 +1,11 @@
 ﻿using BenchmarkDotNet.Characteristics;
 using JetBrains.Annotations;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Jobs
 {
+    [SuppressMessage("ReSharper", "UnassignedReadonlyField")]
     public sealed class Job : JobMode<Job>
     {
         [PublicAPI] public static readonly Characteristic<EnvironmentMode> EnvironmentCharacteristic = CreateCharacteristic<EnvironmentMode>(nameof(Environment));

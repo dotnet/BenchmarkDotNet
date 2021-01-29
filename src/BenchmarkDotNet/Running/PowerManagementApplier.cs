@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Running
     {
         private static readonly Guid UserPowerPlan = new Guid("67b4a053-3646-4532-affd-0535c9ea82a7");
 
-        private static readonly Dictionary<PowerPlan, Guid> powerPlansDict = new Dictionary<PowerPlan, Guid>()
+        private static readonly Dictionary<PowerPlan, Guid> PowerPlansDict = new Dictionary<PowerPlan, Guid>()
         {
             { PowerPlan.UserPowerPlan, UserPowerPlan },
             { PowerPlan.HighPerformance, new Guid("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c") },
@@ -22,14 +22,14 @@ namespace BenchmarkDotNet.Running
 
         private readonly ILogger logger;
         private Guid? userCurrentPowerPlan;
-        private bool powerPlanChanged = false;
-        private bool isInitialized = false;
+        private bool powerPlanChanged;
+        private bool isInitialized;
 
         internal PowerManagementApplier(ILogger logger) => this.logger = logger;
 
         public void Dispose() => ApplyUserPowerPlan();
 
-        internal static Guid Map(PowerPlan value) => powerPlansDict[value];
+        internal static Guid Map(PowerPlan value) => PowerPlansDict[value];
 
         internal void ApplyPerformancePlan(Guid id)
         {

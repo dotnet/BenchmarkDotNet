@@ -18,4 +18,3 @@ namespace BenchmarkDotNet.Attributes
         }
     }
 }
-

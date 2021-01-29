@@ -6,11 +6,11 @@ using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Reports
 {

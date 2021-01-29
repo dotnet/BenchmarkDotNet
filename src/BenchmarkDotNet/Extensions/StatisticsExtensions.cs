@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Globalization;
 using System.Text;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Mathematics.Histograms;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
+using Perfolizer.Mathematics.Histograms;
+using Perfolizer.Mathematics.Multimodality;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -17,7 +18,7 @@ namespace BenchmarkDotNet.Extensions
             var timeUnit = TimeUnit.GetBestTimeUnit(s.Mean);
             return x => TimeInterval.FromNanoseconds(x).ToString(timeUnit, cultureInfo, format);
         }
-        
+
         [PublicAPI]
         public static string ToString(this Statistics s, CultureInfo cultureInfo, Func<double, string> formatter, bool calcHistogram = false)
         {
@@ -25,12 +26,12 @@ namespace BenchmarkDotNet.Extensions
                 return NullSummaryMessage;
 
             string listSeparator = cultureInfo.GetActualListSeparator();
-            
+
             var builder = new StringBuilder();
             string errorPercent = (s.StandardError / s.Mean * 100).ToString("0.00", cultureInfo);
             var ci = s.ConfidenceInterval;
             string ciMarginPercent = (ci.Margin / s.Mean * 100).ToString("0.00", cultureInfo);
-            double mValue = MathHelper.CalculateMValue(s);
+            double mValue = MValueCalculator.Calculate(s.OriginalValues);
 
             builder.Append("Mean = ");
             builder.Append(formatter(s.Mean));
@@ -47,7 +48,7 @@ namespace BenchmarkDotNet.Extensions
             builder.Append(" StdDev = ");
             builder.Append(formatter(s.StandardDeviation));
             builder.AppendLine();
-            
+
             builder.Append("Min = ");
             builder.Append(formatter(s.Min));
             builder.Append(listSeparator);
@@ -63,7 +64,7 @@ namespace BenchmarkDotNet.Extensions
             builder.Append(" Max = ");
             builder.Append(formatter(s.Max));
             builder.AppendLine();
-            
+
             builder.Append("IQR = ");
             builder.Append(formatter(s.InterquartileRange));
             builder.Append(listSeparator);
@@ -73,7 +74,7 @@ namespace BenchmarkDotNet.Extensions
             builder.Append(" UpperFence = ");
             builder.Append(formatter(s.UpperFence));
             builder.AppendLine();
-            
+
             builder.Append("ConfidenceInterval = ");
             builder.Append(s.ConfidenceInterval.ToString(formatter));
             builder.Append(listSeparator);
@@ -83,7 +84,7 @@ namespace BenchmarkDotNet.Extensions
             builder.Append(ciMarginPercent);
             builder.Append("% of Mean)");
             builder.AppendLine();
-            
+
             builder.Append("Skewness = ");
             builder.Append(s.Skewness.ToString("0.##", cultureInfo));
             builder.Append(listSeparator);
@@ -93,10 +94,10 @@ namespace BenchmarkDotNet.Extensions
             builder.Append(" MValue = ");
             builder.Append(mValue.ToString("0.##", cultureInfo));
             builder.AppendLine();
-            
+
             if (calcHistogram)
             {
-                var histogram = HistogramBuilder.Adaptive.Build(s);
+                var histogram = HistogramBuilder.Adaptive.Build(s.OriginalValues);
                 builder.AppendLine("-------------------- Histogram --------------------");
                 builder.AppendLine(histogram.ToString(formatter));
                 builder.AppendLine("---------------------------------------------------");

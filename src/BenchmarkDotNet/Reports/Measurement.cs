@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Reports
             builder.Append(NsSymbol);
             builder.Append(", ");
 
-            builder.Append(GetAverageTime().ToString(MainCultureInfo));
+            builder.Append(GetAverageTime().ToString(MainCultureInfo).ToAscii());
             builder.Append("/op");
 
             return builder.ToString();
@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.Reports
         // ReSharper disable once UnusedParameter.Global
         public static Measurement Parse(ILogger logger, string line, int processIndex)
         {
-            if (line == null || line.StartsWith(GcStats.ResultsLinePrefix))
+            if (string.IsNullOrWhiteSpace(line) || line.StartsWith(GcStats.ResultsLinePrefix))
                 return Error();
 
             try

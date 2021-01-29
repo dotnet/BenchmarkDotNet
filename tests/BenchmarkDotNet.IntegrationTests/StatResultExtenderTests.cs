@@ -3,9 +3,9 @@ using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
+using Perfolizer.Horology;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -54,10 +54,10 @@ namespace BenchmarkDotNet.IntegrationTests
             private readonly Random random = new Random(42);
 
             [Benchmark]
-            public void Sleep50() => Thread.Sleep(50 + random.Next(50));
+            public void Sleep5() => Thread.Sleep(5 + random.Next(5));
 
             [Benchmark]
-            public void Sleep100() => Thread.Sleep(100 + random.Next(50));
+            public void Sleep10() => Thread.Sleep(10 + random.Next(5));
         }
     }
 }

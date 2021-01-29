@@ -11,5 +11,5 @@ jobs:
 - template: build/azure-pipelines.job.template.yml
   parameters:
     name: Windows
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-2019'
     scriptFileName: .\build.ps1

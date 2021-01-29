@@ -7,37 +7,46 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Engine
 {
     public class EngineFactoryTests
     {
-        int timesBenchmarkCalled = 0, timesOverheadCalled = 0;
-        int timesGlobalSetupCalled = 0, timesGlobalCleanupCalled = 0, timesIterationSetupCalled = 0, timesIterationCleanupCalled = 0;
+        private int timesBenchmarkCalled = 0, timesOverheadCalled = 0;
+        private int timesGlobalSetupCalled = 0, timesGlobalCleanupCalled = 0, timesIterationSetupCalled = 0, timesIterationCleanupCalled = 0;
 
-        TimeSpan IterationTime => TimeSpan.FromMilliseconds(EngineResolver.Instance.Resolve(Job.Default, RunMode.IterationTimeCharacteristic).ToMilliseconds());
+        private TimeSpan IterationTime => TimeSpan.FromMilliseconds(EngineResolver.Instance.Resolve(Job.Default, RunMode.IterationTimeCharacteristic).ToMilliseconds());
 
-        IResolver DefaultResolver => BenchmarkRunnerClean.DefaultResolver;
+        private IResolver DefaultResolver => BenchmarkRunnerClean.DefaultResolver;
 
-        void GlobalSetup() => timesGlobalSetupCalled++;
-        void IterationSetup() => timesIterationSetupCalled++;
-        void IterationCleanup() => timesIterationCleanupCalled++;
-        void GlobalCleanup() => timesGlobalCleanupCalled++;
+        private void GlobalSetup() => timesGlobalSetupCalled++;
+        private void IterationSetup() => timesIterationSetupCalled++;
+        private void IterationCleanup() => timesIterationCleanupCalled++;
+        private void GlobalCleanup() => timesGlobalCleanupCalled++;
 
-        void Throwing(long _) => throw new InvalidOperationException("must NOT be called");
+        private void Throwing(long _) => throw new InvalidOperationException("must NOT be called");
 
-        void VeryTimeConsumingSingle(long _)
+        private void VeryTimeConsumingSingle(long _)
         {
             timesBenchmarkCalled++;
             Thread.Sleep(IterationTime);
         }
 
-        void InstantNoUnroll(long invocationCount) => timesBenchmarkCalled += (int) invocationCount;
-        void InstantUnroll(long _) => timesBenchmarkCalled += 16;
+        private void TimeConsumingOnlyForTheFirstCall(long _)
+        {
+            if (timesBenchmarkCalled++ == 0)
+            {
+                Thread.Sleep(IterationTime);
+            }
+        }
 
-        void OverheadNoUnroll(long invocationCount) => timesOverheadCalled += (int) invocationCount;
-        void OverheadUnroll(long _) => timesOverheadCalled += 16;
+        private void InstantNoUnroll(long invocationCount) => timesBenchmarkCalled += (int) invocationCount;
+        private void InstantUnroll(long _) => timesBenchmarkCalled += 16;
+
+        private void OverheadNoUnroll(long invocationCount) => timesOverheadCalled += (int) invocationCount;
+        private void OverheadUnroll(long _) => timesOverheadCalled += 16;
 
         private static readonly Dictionary<string, Job> JobsWhichDontRequireJitting = new Dictionary<string, Job>
         {
@@ -78,10 +87,10 @@ namespace BenchmarkDotNet.Tests.Engine
             var engine = new EngineFactory().CreateReadyToRun(engineParameters);
 
             Assert.Equal(1, timesGlobalSetupCalled);
-            Assert.Equal(1, timesIterationSetupCalled); // 1x for Target
-            Assert.Equal(1, timesBenchmarkCalled);
-            Assert.Equal(1, timesOverheadCalled);
-            Assert.Equal(1, timesIterationCleanupCalled); // 1x for Target
+            Assert.Equal(2, timesIterationSetupCalled); // 2x for Target
+            Assert.Equal(2, timesBenchmarkCalled);
+            Assert.Equal(2, timesOverheadCalled);
+            Assert.Equal(2, timesIterationCleanupCalled); // 2x for Target
             Assert.Equal(0, timesGlobalCleanupCalled); // cleanup is called as part of dispose
 
             Assert.Equal(1, engine.TargetJob.Run.InvocationCount); // call the benchmark once per iteration
@@ -89,6 +98,39 @@ namespace BenchmarkDotNet.Tests.Engine
 
             Assert.True(engine.TargetJob.Run.HasValue(AccuracyMode.EvaluateOverheadCharacteristic)); // is set to false in explicit way
             Assert.False(engine.TargetJob.Accuracy.EvaluateOverhead); // don't evaluate overhead in that case
+
+            engine.Dispose(); // cleanup is called as part of dispose
+
+            Assert.Equal(1, timesGlobalCleanupCalled);
+        }
+
+        [Theory]
+        [InlineData(120)] // 120 ms as in the bug report
+        [InlineData(250)] // 250 ms as configured in dotnet/performance repo
+        [InlineData(EngineResolver.DefaultIterationTime)] // 500 ms - the default BDN setting
+        public void BenchmarksThatRunLongerThanIterationTimeOnlyDuringFirstInvocationAreNotInvokedOncePerIteration(int iterationTime)
+        {
+            var engineParameters = CreateEngineParameters(
+                mainNoUnroll: TimeConsumingOnlyForTheFirstCall,
+                mainUnroll: InstantUnroll,
+                job: Job.Default.WithIterationTime(TimeInterval.FromMilliseconds(iterationTime)));
+
+            var engine = new EngineFactory().CreateReadyToRun(engineParameters);
+
+            Assert.Equal(1, timesGlobalSetupCalled);
+            // the factory should call the benchmark:
+            // 1st time with unroll factor to JIT the code
+            // one more to check that the Jitting has not dominated the reported time
+            // and one more time to JIT the 16 unroll factor case as it turned out that Jitting has dominated the time
+            Assert.Equal(1 + 1 + 1, timesIterationSetupCalled);
+            Assert.Equal(1 + 1 + 16, timesBenchmarkCalled);
+            Assert.Equal(1 + 1 + 16, timesOverheadCalled);
+            Assert.Equal(1 + 1 + 1, timesIterationCleanupCalled); // 2x for Target
+            Assert.Equal(0, timesGlobalCleanupCalled); // cleanup is called as part of dispose
+
+            Assert.False(engine.TargetJob.Run.HasValue(RunMode.InvocationCountCharacteristic)); // we need pilot stage
+
+            Assert.False(engine.TargetJob.Run.HasValue(AccuracyMode.EvaluateOverheadCharacteristic));
 
             engine.Dispose(); // cleanup is called as part of dispose
 

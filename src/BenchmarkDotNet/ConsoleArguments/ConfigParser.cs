@@ -13,19 +13,22 @@ using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using BenchmarkDotNet.Toolchains.MonoWasm;
 using CommandLine;
+using Perfolizer.Horology;
+using Perfolizer.Mathematics.OutlierDetection;
+using Perfolizer.Mathematics.SignificanceTesting;
+using Perfolizer.Mathematics.Thresholds;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -102,11 +105,18 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
 
             foreach (string runtime in options.Runtimes)
-                if (!Enum.TryParse<RuntimeMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out _))
+            {
+                if (!TryParse(runtime, out RuntimeMoniker runtimeMoniker))
                 {
                     logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(RuntimeMoniker)).Select(name => name.ToLower()))}.");
                     return false;
                 }
+                else if (runtimeMoniker == RuntimeMoniker.Wasm && (options.WasmMainJs == null || options.WasmMainJs.IsNotNullButDoesNotExist()))
+                {
+                    logger.WriteLineError($"The provided {nameof(options.WasmMainJs)} \"{options.WasmMainJs}\" does NOT exist. It MUST be provided.");
+                    return false;
+                }
+            }
 
             foreach (string exporter in options.Exporters)
                 if (!AvailableExporters.ContainsKey(exporter))
@@ -131,6 +141,12 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.MonoPath.IsNotNullButDoesNotExist())
             {
                 logger.WriteLineError($"The provided {nameof(options.MonoPath)} \"{options.MonoPath}\" does NOT exist.");
+                return false;
+            }
+
+            if (options.WasmJavascriptEngine.IsNotNullButDoesNotExist())
+            {
+                logger.WriteLineError($"The provided {nameof(options.WasmJavascriptEngine)} \"{options.WasmJavascriptEngine}\" does NOT exist.");
                 return false;
             }
 
@@ -197,7 +213,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.UseThreadingDiagnoser)
                 config.AddDiagnoser(ThreadingDiagnoser.Default);
             if (options.UseDisassemblyDiagnoser)
-                config.AddDiagnoser(DisassemblyDiagnoser.Create(new DisassemblyDiagnoserConfig(recursiveDepth: options.DisassemblerRecursiveDepth, printPrologAndEpilog: true, printDiff: options.DisassemblerDiff)));
+                config.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(maxDepth: options.DisassemblerRecursiveDepth, exportDiff: options.DisassemblerDiff)));
             if (!string.IsNullOrEmpty(options.Profiler))
                 config.AddDiagnoser(DiagnosersLoader.GetImplementation<IProfiler>(profiler => profiler.ShortName.EqualsWithIgnoreCase(options.Profiler)));
 
@@ -261,14 +277,18 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithUnrollFactor(options.UnrollFactor.Value);
             if (options.RunStrategy.HasValue)
                 baseJob = baseJob.WithStrategy(options.RunStrategy.Value);
+            if (options.Platform.HasValue)
+                baseJob = baseJob.WithPlatform(options.Platform.Value);
             if (options.RunOncePerIteration)
                 baseJob = baseJob.RunOncePerIteration();
+            if (options.MemoryRandomization)
+                baseJob = baseJob.WithMemoryRandomization();
 
             if (options.EnvironmentVariables.Any())
             {
                 baseJob = baseJob.WithEnvironmentVariables(options.EnvironmentVariables.Select(text =>
                 {
-                    var separated = text.Split(new [] { EnvVarKeyValueSeparator }, 2);
+                    var separated = text.Split(new[] { EnvVarKeyValueSeparator }, 2);
                     return new EnvironmentVariable(separated[0], separated[1]);
                 }).ToArray());
             }
@@ -301,7 +321,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             TimeSpan? timeOut = options.TimeOutInSeconds.HasValue ? TimeSpan.FromSeconds(options.TimeOutInSeconds.Value) : default(TimeSpan?);
 
-            if (!Enum.TryParse(runtimeId.Replace(".", string.Empty), ignoreCase: true, out RuntimeMoniker runtimeMoniker))
+            if (!TryParse(runtimeId, out RuntimeMoniker runtimeMoniker))
             {
                 throw new InvalidOperationException("Impossible, already validated by the Validate method");
             }
@@ -322,7 +342,11 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.NetCoreApp22:
                 case RuntimeMoniker.NetCoreApp30:
                 case RuntimeMoniker.NetCoreApp31:
+#pragma warning disable CS0618 // Type or member is obsolete
                 case RuntimeMoniker.NetCoreApp50:
+#pragma warning restore CS0618 // Type or member is obsolete
+                case RuntimeMoniker.Net50:
+                case RuntimeMoniker.Net60:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
                         .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));
@@ -334,6 +358,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.CoreRt30:
                 case RuntimeMoniker.CoreRt31:
                 case RuntimeMoniker.CoreRt50:
+                case RuntimeMoniker.CoreRt60:
                     var builder = CoreRtToolchain.CreateBuilder();
 
                     if (options.CliPath != null)
@@ -355,9 +380,36 @@ namespace BenchmarkDotNet.ConsoleArguments
                     builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
 
                     return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
+                case RuntimeMoniker.Wasm:
+                    return MakeWasmJob(baseJob, options, timeOut, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0");
+                case RuntimeMoniker.WasmNet50:
+                    return MakeWasmJob(baseJob, options, timeOut, "net5.0");
+                case RuntimeMoniker.WasmNet60:
+                    return MakeWasmJob(baseJob, options, timeOut, "net6.0");
+
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
+        }
+
+        private static Job MakeWasmJob(Job baseJob, CommandLineOptions options, TimeSpan? timeOut, string msBuildMoniker)
+        {
+            var wasmRuntime = new WasmRuntime(
+                mainJs: options.WasmMainJs,
+                msBuildMoniker: msBuildMoniker,
+                javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
+                javaScriptEngineArguments: options.WasmJavaScriptEngineArguments);
+
+            var toolChain = WasmToolChain.From(new NetCoreAppSettings(
+                targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
+                runtimeFrameworkVersion: null,
+                name: wasmRuntime.Name,
+                customDotNetCliPath: options.CliPath?.FullName,
+                packagesPath: options.RestorePath?.FullName,
+                timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
+                customRuntimePack: options.CustomRuntimePack));
+
+            return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain);
         }
 
         private static IEnumerable<IFilter> GetFilters(CommandLineOptions options)
@@ -440,6 +492,15 @@ namespace BenchmarkDotNet.ConsoleArguments
             var lastCommonDirectorySeparatorIndex = coreRunPath.FullName.LastIndexOf(Path.DirectorySeparatorChar, commonLongestPrefixIndex - 1);
 
             return coreRunPath.FullName.Substring(lastCommonDirectorySeparatorIndex);
+        }
+
+        private static bool TryParse(string runtime, out RuntimeMoniker runtimeMoniker)
+        {
+            int index = runtime.IndexOf('-');
+
+            return index < 0
+                ? Enum.TryParse<RuntimeMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker)
+                : Enum.TryParse<RuntimeMoniker>(runtime.Substring(0, index).Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker);
         }
     }
 }

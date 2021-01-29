@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
@@ -103,10 +102,10 @@ namespace BenchmarkDotNet.Configs
                     result.Add(exporter);
 
             var hardwareCounterDiagnoser = uniqueDiagnosers.OfType<IHardwareCountersDiagnoser>().SingleOrDefault();
-            var disassemblyDiagnoser = uniqueDiagnosers.OfType<IDisassemblyDiagnoser>().SingleOrDefault();
+            var disassemblyDiagnoser = uniqueDiagnosers.OfType<DisassemblyDiagnoser>().SingleOrDefault();
 
-            // we can use InstructionPointerExporter only when we have both IHardwareCountersDiagnoser and IDisassemblyDiagnoser
-            if (hardwareCounterDiagnoser != default(IHardwareCountersDiagnoser) && disassemblyDiagnoser != default(IDisassemblyDiagnoser))
+            // we can use InstructionPointerExporter only when we have both IHardwareCountersDiagnoser and DisassemblyDiagnoser
+            if (hardwareCounterDiagnoser != default(IHardwareCountersDiagnoser) && disassemblyDiagnoser != default(DisassemblyDiagnoser))
                 result.Add(new InstructionPointerExporter(hardwareCounterDiagnoser, disassemblyDiagnoser));
 
             for (int i = result.Count - 1; i >=0; i--)

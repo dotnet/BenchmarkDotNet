@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Running;
@@ -9,21 +10,26 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public abstract class DotNetCliGenerator : GeneratorBase
     {
+        private static readonly string[] ProjectExtensions = { ".csproj", ".fsproj", ".vbroj" };
+
         [PublicAPI] public string TargetFrameworkMoniker { get; }
 
         [PublicAPI] public string CliPath { get; }
 
         [PublicAPI] public string PackagesPath { get; }
 
+        protected bool IsNetCore { get; }
+
         [PublicAPI]
-        protected DotNetCliGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath)
+        protected DotNetCliGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, bool isNetCore)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
             CliPath = cliPath;
             PackagesPath = packagesPath;
+            IsNetCore = isNetCore;
         }
 
-        protected override string GetExecutableExtension() => TargetFrameworkMoniker.Contains("core") ? ".dll" : ".exe";
+        protected override string GetExecutableExtension() => IsNetCore ? ".dll" : ".exe";
 
         /// <summary>
         /// we need our folder to be on the same level as the project that we want to reference
@@ -47,10 +53,20 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         internal static bool GetSolutionRootDirectory(out DirectoryInfo directoryInfo)
         {
+            return GetRootDirectory(IsRootSolutionFolder, out directoryInfo);
+        }
+
+        internal static bool GetProjectRootDirectory(out DirectoryInfo directoryInfo)
+        {
+            return GetRootDirectory(IsRootProjectFolder, out directoryInfo);
+        }
+
+        internal static bool GetRootDirectory(Func<DirectoryInfo, bool> condition, out DirectoryInfo directoryInfo)
+        {
             directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
             while (directoryInfo != null)
             {
-                if (IsRootSolutionFolder(directoryInfo))
+                if (condition(directoryInfo))
                 {
                     return true;
                 }
@@ -88,5 +104,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             => directoryInfo
                 .GetFileSystemInfos()
                 .Any(fileInfo => fileInfo.Extension == ".sln" || fileInfo.Name == "global.json");
+
+        private static bool IsRootProjectFolder(DirectoryInfo directoryInfo)
+            => directoryInfo
+                .GetFileSystemInfos()
+                .Any(fileInfo => ProjectExtensions.Contains(fileInfo.Extension));
     }
 }

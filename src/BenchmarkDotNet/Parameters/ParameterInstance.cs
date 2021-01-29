@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -7,21 +8,23 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Parameters
 {
-    public class ParameterInstance
+    public class ParameterInstance : IDisposable
     {
         public const string NullParameterTextRepresentation = "?";
 
         [PublicAPI] public ParameterDefinition Definition { get; }
 
         private readonly object value;
-        private readonly int maxParameterColumnWidth;
+        private readonly int maxParameterColumnWidthFromConfig;
 
         public ParameterInstance(ParameterDefinition definition, object value, SummaryStyle summaryStyle)
         {
             Definition = definition;
             this.value = value;
-            maxParameterColumnWidth = summaryStyle?.MaxParameterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
+            maxParameterColumnWidthFromConfig = summaryStyle?.MaxParameterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
         }
+
+        public void Dispose() => (Value as IDisposable)?.Dispose();
 
         public string Name => Definition.Name;
         public bool IsStatic => Definition.IsStatic;
@@ -34,20 +37,30 @@ namespace BenchmarkDotNet.Parameters
                 ? parameter.ToSourceCode()
                 : SourceCodeHelper.ToSourceCode(value);
 
-        public string ToDisplayText()
+        private string ToDisplayText(CultureInfo cultureInfo, int maxParameterColumnWidth)
         {
-            switch (value) {
+            switch (value)
+            {
                 case null:
                     return NullParameterTextRepresentation;
                 case IParam parameter:
                     return Trim(parameter.DisplayText, maxParameterColumnWidth);
+                case IFormattable formattable:
+                    return Trim(formattable.ToString(null, cultureInfo), maxParameterColumnWidth);
                 // no trimming for types!
                 case Type type:
                     return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).GetDisplayName()}?" : type.GetDisplayName();
+                default:
+                    return Trim(value.ToString(), maxParameterColumnWidth);
             }
-
-            return Trim(value.ToString(), maxParameterColumnWidth);
         }
+
+        public string ToDisplayText(SummaryStyle summary)
+        {
+            return summary != null ? ToDisplayText(summary.CultureInfo, summary.MaxParameterColumnWidth) : ToDisplayText();
+        }
+
+        public string ToDisplayText() => ToDisplayText(CultureInfo.CurrentCulture, maxParameterColumnWidthFromConfig);
 
         public override string ToString() => ToDisplayText();
 

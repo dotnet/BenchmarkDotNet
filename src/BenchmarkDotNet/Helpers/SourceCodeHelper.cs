@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Horology;
+using Perfolizer.Horology;
 using SimpleJson.Reflection;
 
 namespace BenchmarkDotNet.Helpers
@@ -42,7 +43,7 @@ namespace BenchmarkDotNet.Helpers
 
             switch (value) {
                 case TimeInterval interval:
-                    return "new BenchmarkDotNet.Horology.TimeInterval(" + ToSourceCode(interval.Nanoseconds) + ")";
+                    return "new Perfolizer.Horology.TimeInterval(" + ToSourceCode(interval.Nanoseconds) + ")";
                 case IntPtr ptr:
                     return $"new System.IntPtr({ptr})";
                 case IFormattable formattable:
@@ -95,6 +96,7 @@ namespace BenchmarkDotNet.Helpers
             return false;
         }
 
+        [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
         private static string ToSourceCode(double value)
         {
             if (double.IsNaN(value))
@@ -113,6 +115,7 @@ namespace BenchmarkDotNet.Helpers
             return value.ToString("G", CultureInfo.InvariantCulture) + "d";
         }
 
+        [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
         private static string ToSourceCode(float value)
         {
             if (float.IsNaN(value))

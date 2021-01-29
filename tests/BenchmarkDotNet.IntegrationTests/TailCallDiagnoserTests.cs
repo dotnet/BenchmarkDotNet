@@ -1,10 +1,11 @@
-﻿#if CLASSIC
+﻿#if NETFRAMEWORK
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnostics.Windows;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Loggers;
 using System.Collections.Generic;
 using System.Linq;

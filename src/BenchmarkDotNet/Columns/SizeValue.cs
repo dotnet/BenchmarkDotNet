@@ -1,6 +1,7 @@
 using System.Globalization;
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
+using Perfolizer.Common;
 
 namespace BenchmarkDotNet.Columns
 {

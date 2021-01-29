@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Mathematics;
+using Perfolizer.Horology;
 using Xunit;
 using Xunit.Abstractions;
 

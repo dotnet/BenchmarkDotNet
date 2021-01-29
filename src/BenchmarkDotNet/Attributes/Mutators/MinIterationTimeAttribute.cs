@@ -1,6 +1,6 @@
-﻿using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Jobs;
+﻿using BenchmarkDotNet.Jobs;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Attributes
 {

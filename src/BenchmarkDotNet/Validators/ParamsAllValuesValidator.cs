@@ -7,7 +7,7 @@ using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Validators
 {
-    class ParamsAllValuesValidator : IValidator
+    public class ParamsAllValuesValidator : IValidator
     {
         public static readonly ParamsAllValuesValidator FailOnError = new ParamsAllValuesValidator();
 
@@ -15,13 +15,13 @@ namespace BenchmarkDotNet.Validators
 
         private ParamsAllValuesValidator() { }
 
-        private const BindingFlags reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        private const BindingFlags ReflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
         public IEnumerable<ValidationError> Validate(ValidationParameters input) =>
             input.Benchmarks
                 .Select(benchmark => benchmark.Descriptor.Type)
                 .Distinct()
-                .SelectMany(type => type.GetTypeMembersWithGivenAttribute<ParamsAllValuesAttribute>(reflectionFlags))
+                .SelectMany(type => type.GetTypeMembersWithGivenAttribute<ParamsAllValuesAttribute>(ReflectionFlags))
                 .Distinct()
                 .Select(member => GetErrorOrDefault(member.ParameterType))
                 .Where(error => error != null);

@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Configs
         [Obsolete("This method will soon be removed, please start using .AddColumn() instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params IColumn[] columns) => config.AddColumn(columns);
         [PublicAPI] public static ManualConfig AddColumn(this IConfig config, params IColumn[] columns) => config.With(m => m.AddColumn(columns));
-        
+
         [Obsolete("This method will soon be removed, please start using .AddColumnProvider() instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params IColumnProvider[] columnProviders) => config.AddColumnProvider(columnProviders);
         [PublicAPI] public static ManualConfig AddColumnProvider(this IConfig config, params IColumnProvider[] columnProviders) => config.With(m => m.AddColumnProvider(columnProviders));
@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static ManualConfig WithArtifactsPath(this IConfig config, string artifactsPath) => config.With(m => m.WithArtifactsPath(artifactsPath));
         [PublicAPI] public static ManualConfig WithUnionRule(this IConfig config, ConfigUnionRule unionRule) => config.With(m => m.WithUnionRule(unionRule));
         [PublicAPI] public static ManualConfig WithCultureInfo(this IConfig config, CultureInfo cultureInfo) => config.With(m => m.CultureInfo = cultureInfo);
-        
+
         /// <summary>
         /// determines if all auto-generated files should be kept or removed after running the benchmarks
         /// </summary>
@@ -96,17 +96,17 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         [Obsolete("This method will soon be removed, please start using .WithOptions() instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, ConfigOptions options) => config.WithOptions(options);
-        
+
         /// <summary>
         /// sets given option to provided value
         /// </summary>
         [PublicAPI] public static ManualConfig WithOption(this IConfig config, ConfigOptions option, bool value) => config.With(m => m.WithOption(option, value));
-        
+
         /// <summary>
         /// sets given options for the config
         /// </summary>
         [PublicAPI] public static ManualConfig WithOptions(this IConfig config, ConfigOptions options) => config.With(m => m.WithOptions(options));
-        
+
         [Obsolete("This method will soon be removed, please start using .AddLogicalGroupRules() instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.AddLogicalGroupRules(rules);
         [PublicAPI] public static ManualConfig AddLogicalGroupRules(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.With(c => c.AddLogicalGroupRules(rules));

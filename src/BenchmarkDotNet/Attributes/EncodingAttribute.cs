@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
-    [Obsolete]
+    [Obsolete("Don't use it")]
     public class EncodingAttribute : Attribute, IConfigSource
     {
         public IConfig Config { get; }

@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.Multimodality;
 
 namespace BenchmarkDotNet.Analysers
 {
@@ -22,13 +21,13 @@ namespace BenchmarkDotNet.Analysers
             if (statistics == null || statistics.N < EngineResolver.DefaultMinWorkloadIterationCount)
                 yield break;
 
-            double mValue = MathHelper.CalculateMValue(statistics);
+            double mValue = MValueCalculator.Calculate(statistics.OriginalValues);
             if (mValue > 4.2)
-                yield return Create("is multimodal", mValue, report, summary.Style.CultureInfo);
+                yield return Create("is multimodal", mValue, report, summary.GetCultureInfo());
             else if (mValue > 3.2)
-                yield return Create("is bimodal", mValue, report, summary.Style.CultureInfo);
+                yield return Create("is bimodal", mValue, report, summary.GetCultureInfo());
             else if (mValue > 2.8)
-                yield return Create("can have several modes", mValue, report, summary.Style.CultureInfo);
+                yield return Create("can have several modes", mValue, report, summary.GetCultureInfo());
         }
 
         [NotNull]

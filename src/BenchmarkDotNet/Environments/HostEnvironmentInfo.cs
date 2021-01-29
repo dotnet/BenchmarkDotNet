@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Portability.Cpu;
@@ -11,6 +10,7 @@ using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Environments
 
         protected HostEnvironmentInfo()
         {
-            BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
+            BenchmarkDotNetVersion = BenchmarkDotNetInfo.FullVersion;
             OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
             CpuInfo = new Lazy<CpuInfo>(RuntimeInformation.GetCpuInfo);
             ChronometerFrequency = Chronometer.Frequency;
@@ -97,13 +97,17 @@ namespace BenchmarkDotNet.Environments
                 yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution.ToString(cultureInfo)}, Timer={HardwareTimerKind.ToString().ToUpper()}";
 
             if (RuntimeInformation.IsNetCore && IsDotNetCliInstalled())
-                yield return $".NET Core SDK={DotNetSdkVersion.Value}";
+            {
+                // this wonderfull version number contains words like "preview" and ... 5 segments so it can not be parsed by Version.Parse. Example: "5.0.100-preview.8.20362.3"
+                if (int.TryParse(new string(DotNetSdkVersion.Value.TrimStart().TakeWhile(char.IsDigit).ToArray()), out int major) && major >= 5)
+                    yield return $".NET SDK={DotNetSdkVersion.Value}";
+                else
+                    yield return $".NET Core SDK={DotNetSdkVersion.Value}";
+            }
         }
 
         [PublicAPI]
         public bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetSdkVersion.Value);
-
-        private static string GetBenchmarkDotNetVersion() => BenchmarkDotNetInfo.FullVersion;
 
         /// <summary>
         /// Return string representation of CPU and environment configuration including BenchmarkDotNet, OS and .NET version

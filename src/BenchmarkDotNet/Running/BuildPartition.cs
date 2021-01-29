@@ -5,6 +5,9 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.CoreRt;
+using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.MonoWasm;
+using BenchmarkDotNet.Toolchains.Roslyn;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
@@ -41,7 +44,14 @@ namespace BenchmarkDotNet.Running
         public Jit Jit => RepresentativeBenchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, Resolver);
 
         public bool IsCoreRT => Runtime is CoreRtRuntime
-            || RepresentativeBenchmarkCase.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic) && RepresentativeBenchmarkCase.Job.Infrastructure.Toolchain is CoreRtToolchain; // given job can have CoreRT toolchain set, but Runtime == default ;)
+            // given job can have CoreRT toolchain set, but Runtime == default ;)
+            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is CoreRtToolchain);
+
+        public bool IsWasm => Runtime is WasmRuntime // given job can have Wasm toolchain set, but Runtime == default ;)
+            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is WasmToolChain);
+
+        public bool IsNetFramework => Runtime is ClrRuntime
+            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && (toolchain is RoslynToolchain || toolchain is CsProjClassicNetToolchain));
 
         public Runtime Runtime => RepresentativeBenchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
                 ? RepresentativeBenchmarkCase.Job.Environment.Runtime

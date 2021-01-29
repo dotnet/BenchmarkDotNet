@@ -3,8 +3,8 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Running;
+using Perfolizer.Mathematics.OutlierDetection;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Running
@@ -173,7 +173,7 @@ namespace BenchmarkDotNet.Tests.Running
         }
 
         [MaxIterationCount(int.MaxValue)] // mutator attribute is before job attribute
-        [SimpleJob(runtimeMoniker: RuntimeMoniker.NetCoreApp21)]
+        [SimpleJob(runtimeMoniker: RuntimeMoniker.Net50)]
         public class WithMutatorAfterJobAttribute
         {
             [Benchmark] public void Method() { }

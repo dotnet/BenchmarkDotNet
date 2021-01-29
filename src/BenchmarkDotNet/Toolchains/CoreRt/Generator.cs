@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -41,6 +42,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 
         private readonly string coreRtVersion;
         private readonly bool useCppCodeGenerator;
+        [SuppressMessage("ReSharper", "NotAccessedField.Local")]
         private readonly string targetFrameworkMoniker;
         private readonly string runtimeIdentifier;
         private readonly IReadOnlyDictionary<string, string> feeds;
@@ -130,9 +132,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
-    <RootAllApplicationAssemblies>{rootAllApplicationAssemblies}</RootAllApplicationAssemblies>
+    <Deterministic>true</Deterministic>
+    {GetTrimmingSettings()}
     <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
+    <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
   </PropertyGroup>
   {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
   <ItemGroup>
@@ -162,7 +166,8 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
-    <RootAllApplicationAssemblies>{rootAllApplicationAssemblies}</RootAllApplicationAssemblies>
+    <Deterministic>true</Deterministic>
+    {GetTrimmingSettings()}
     <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
   </PropertyGroup>
@@ -179,6 +184,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <RdXmlFile Include=""rd.xml"" />
   </ItemGroup>
 </Project>";
+
+        private string GetTrimmingSettings()
+            => rootAllApplicationAssemblies
+                ? "<PublishTrimmed>false</PublishTrimmed>"
+                : "<TrimMode>link</TrimMode>";
 
         /// <summary>
         /// mandatory to make it possible to call GC.GetAllocatedBytesForCurrentThread() using reflection (not part of .NET Standard)
@@ -201,7 +211,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 </Directives>
 ";
 
-            File.WriteAllText(Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath), "rd.xml"), content);
+            string directoryName = Path.GetDirectoryName(artifactsPaths.ProjectFilePath);
+            if (directoryName != null)
+                File.WriteAllText(Path.Combine(directoryName, "rd.xml"), content);
+            else
+                throw new InvalidOperationException($"Can't get directory of projectFilePath ('{artifactsPaths.ProjectFilePath}')");
         }
     }
 }

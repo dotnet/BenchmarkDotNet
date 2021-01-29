@@ -2,8 +2,8 @@
 using System.Linq;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Reports;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Analysers
 {
@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Analysers
                 yield break;
             var minActualIterationTime = TimeInterval.FromNanoseconds(target.Min(m => m.Nanoseconds));
             if (minActualIterationTime < MinSufficientIterationTime)
-                yield return CreateWarning($"The minimum observed iteration time is {minActualIterationTime} which is very small. It's recommended to increase it.", report);
+                yield return CreateWarning($"The minimum observed iteration time is {minActualIterationTime} which is very small. It's recommended to increase it to at least {MinSufficientIterationTime} using more operations.", report);
         }
     }
 }
