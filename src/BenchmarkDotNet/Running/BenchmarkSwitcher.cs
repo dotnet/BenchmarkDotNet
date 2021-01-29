@@ -59,11 +59,11 @@ namespace BenchmarkDotNet.Running
             // we need to keep the logic that uses it in a separate method and create DirtyAssemblyResolveHelper first
             // so it can ignore the version mismatch ;)
             using (DirtyAssemblyResolveHelper.Create())
-                return RunWithDirtyAssemblyResolveHelper(args ?? Array.Empty<string>(), config ?? DefaultConfig.Instance);
+                return RunWithDirtyAssemblyResolveHelper(args ?? Array.Empty<string>(), config ?? DefaultConfig.Instance, true);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[] args, IConfig config)
+        internal IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[] args, IConfig config, bool askUserForInput)
         {
             var logger = config.GetNonNullCompositeLogger();
             var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args, logger, config);
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Running
                 return Array.Empty<Summary>();
             }
 
-            var benchmarksToFilter = options.UserProvidedFilters
+            var benchmarksToFilter = options.UserProvidedFilters || !askUserForInput
                 ? allAvailableTypesWithRunnableBenchmarks
                 : userInteraction.AskUser(allAvailableTypesWithRunnableBenchmarks, logger);
 

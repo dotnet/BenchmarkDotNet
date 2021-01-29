@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.ConsoleArguments;
-using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -24,21 +20,14 @@ namespace BenchmarkDotNet.Running
         public static Summary Run<T>(IConfig config = null, string[] args = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
-                return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(typeof(T), config, args ?? Array.Empty<string>()));
+                return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(typeof(T), config, args));
         }
 
         [PublicAPI]
         public static Summary Run(Type type, IConfig config = null, string[] args = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
-                return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(type, config, args ?? Array.Empty<string>()));
-        }
-
-        [PublicAPI]
-        public static Summary Run(Assembly assembly, IConfig config = null, string[] args = null)
-        {
-            using (DirtyAssemblyResolveHelper.Create())
-                return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(assembly, config, args ?? Array.Empty<string>()));
+                return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(type, config, args));
         }
 
         [PublicAPI]
@@ -49,10 +38,10 @@ namespace BenchmarkDotNet.Running
         }
 
         [PublicAPI]
-        public static Summary[] Run(Assembly assembly, IConfig config = null)
+        public static Summary[] Run(Assembly assembly, IConfig config = null, string[] args = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
-                return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(assembly, config));
+                return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(assembly, config, args));
         }
 
         [PublicAPI]
@@ -85,19 +74,20 @@ namespace BenchmarkDotNet.Running
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Type type, IConfig config, string[] args)
-            => RunWithDirtyAssemblyResolveHelper(new[] { type }, Array.Empty<Assembly>(), config, args);
+            => (args == null
+                ? BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.TypeToBenchmarks(type, config) })
+                : new BenchmarkSwitcher(new[] { type }).RunWithDirtyAssemblyResolveHelper(args ?? Array.Empty<string>(), config ?? DefaultConfig.Instance, false))
+                .Single();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Summary RunWithDirtyAssemblyResolveHelper(Assembly assembly, IConfig config, string[] args)
-             => RunWithDirtyAssemblyResolveHelper(Array.Empty<Type>(), new[] { assembly }, config, args);
+        private static Summary[] RunWithDirtyAssemblyResolveHelper(Assembly assembly, IConfig config, string[] args)
+            => args == null
+                ? BenchmarkRunnerClean.Run(assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray())
+                : new BenchmarkSwitcher(assembly).RunWithDirtyAssemblyResolveHelper(args, config, false).ToArray();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Type type, MethodInfo[] methods, IConfig config = null)
             => BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.MethodsToBenchmarks(type, methods, config) }).Single();
-        
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Summary[] RunWithDirtyAssemblyResolveHelper(Assembly assembly, IConfig config = null)
-            => BenchmarkRunnerClean.Run(assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray());
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary[] RunWithDirtyAssemblyResolveHelper(BenchmarkRunInfo[] benchmarkRunInfos)
@@ -140,50 +130,5 @@ namespace BenchmarkDotNet.Running
                 return new[] { Summary.NothingToRun(e.Message, string.Empty, string.Empty) };
             }
         }
-
-        private static Summary RunWithDirtyAssemblyResolveHelper(Type[] type, IEnumerable<Assembly> assemblies, IConfig config, string[] args)
-        {
-            var logger = config.GetNonNullCompositeLogger();
-            var (isParsingSuccess, parsedConfig, options) = ConfigParser.Parse(args, logger, config);
-            if (!isParsingSuccess) // invalid console args, the ConfigParser printed the error
-                return null;
-
-            if (options.PrintInformation)
-            {
-                logger.WriteLine(HostEnvironmentInfo.GetInformation());
-                return null;
-            }
-
-            var effectiveConfig = ManualConfig.Union(config, parsedConfig);
-            var (allTypesValid, allAvailableTypesWithRunnableBenchmarks) = TypeFilter.GetTypesWithRunnableBenchmarks(type, assemblies, logger);
-            
-            if (!allTypesValid) // there were some invalid and TypeFilter printed errors
-                return null;
-
-            if (allAvailableTypesWithRunnableBenchmarks.IsEmpty())
-            {
-                var userInteraction = new UserInteraction();
-                userInteraction.PrintNoBenchmarksError(logger);
-                return null;
-            }
-
-            if (options.ListBenchmarkCaseMode != ListBenchmarkCaseMode.Disabled)
-            {
-                BenchmarkCasesPrinter.PrintList(logger, effectiveConfig, allAvailableTypesWithRunnableBenchmarks, options);
-                return null;
-            }
-                      
-            var BenchmarkRunInfos = options.UserProvidedFilters
-                            ? TypeFilter.Filter(effectiveConfig, allAvailableTypesWithRunnableBenchmarks)
-                            : new BenchmarkRunInfo[] { BenchmarkConverter.TypeToBenchmarks(type.Single(), config) };
-                     
-
-            Summary benchmark = BenchmarkRunnerClean.Run(BenchmarkRunInfos).Single();
-                      
-            var benchmarks = BenchmarkRunnerClean.Run(BenchmarkRunInfos);
-          
-            return benchmarks.Single();
-        }
-
     }
 }
