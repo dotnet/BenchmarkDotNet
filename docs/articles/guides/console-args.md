@@ -27,7 +27,7 @@ Examples:
 2. Run all benchmarks: `-f *`
 3. Run all benchmarks from ClassA and ClassB `-f *ClassA* *ClassB*`
 
-**Note**: If you would like to **join** all the results into a **single summary**, you need to us `--join`.
+**Note**: If you would like to **join** all the results into a **single summary**, you need to put `--join`. For example: `-f *ClassA* *ClassB* --join`
 
 ## List of benchmarks
 
@@ -101,6 +101,7 @@ You can also filter the benchmarks by categories:
 ## Diagnosers
 
 * `-m`, `--memory` - enables MemoryDiagnoser and prints memory statistics
+* `-t`, `--threading` - enables `ThreadingDiagnoser` and prints threading statistics
 * `-d`, `--disasm`- enables DisassemblyDiagnoser and exports diassembly of benchmarked code. When you enable this option, you can use:
   - `--disasmDepth` - Sets the recursive depth for the disassembler.
   - `--disasmDiff` - Generates diff reports for the disassembler.
@@ -183,7 +184,7 @@ dotnet run -c Release -- --warmupCount 2
 
 To perform a Mann–Whitney U Test and display the results in a dedicated column you need to provide the Threshold:
 
-* `--statisticalTest`- Threshold for Statistical Test. Examples: 5%, 10ms, 100ns, 1s
+* `--statisticalTest`- Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s
 
 Example: run Mann–Whitney U test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was first.
 
@@ -193,22 +194,34 @@ dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --sta
 
 ## More
 
-* `-j`, `--job` (Default: Default) Dry/Short/Medium/Long or Default
-* `-e`, `--exporters` GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML
-* `-i`, `--inProcess` (Default: false) Run benchmarks in Process
-* `-a`, `--artifacts` Valid path to accessible directory
-* `--outliers` (Default: RemoveUpper) DontRemove/RemoveUpper/RemoveLower/RemoveAll
-* `--affinity` Affinity mask to set for the benchmark process
-* `--allStats` (Default: false) Displays all statistics (min, max & more)
-* `--attribute` Run all methods with given attribute (applied to class or method)
-* `--monoPath` custom Path for Mono
-* `--cliPath` custom Path for dotnet cli
+* `-j`, `--job` (Default: Default) Dry/Short/Medium/Long or Default.
+* `-e`, `--exporters` GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML.
+* `-i`, `--inProcess` (default: false) run benchmarks in the same process, without spawning child process per benchmark.
+* `-a`, `--artifacts` valid path to an accessible directory where output artifacts will be stored.
+* `--outliers` (default: RemoveUpper) DontRemove/RemoveUpper/RemoveLower/RemoveAll.
+* `--affinity` affinity mask to set for the benchmark process.
+* `--allStats` (default: false) Displays all statistics (min, max & more).
+* `--allCategories` categories to run. If few are provided, only the benchmarks which belong to all of them are going to be executed.
+* `--attribute` run all methods with given attribute (applied to class or method).
+* `--monoPath` optional path to Mono which should be used for running benchmarks.
+* `--cli` path to dotnet cli (optional).
+* `--packages` the directory to restore packages to (optional).
+* `--coreRun` path(s) to CoreRun (optional).
 * `--coreRt` path to ILCompiler for CoreRT
 * `--info` prints environment configuration including BenchmarkDotNet, OS, CPU and .NET version
-* `--stopOnFirstError` Stop on first error.
-* `--help` Display this help screen.
-* `--version` Display version information.
-* `--keepFiles` Determines if all auto-generated files should be kept or removed after running the benchmarks.
-* `--noOverwrite` Determines if the exported result files should not be overwritten.
-* `--disableLogFile` Disables the logfile.
-* `--maxWidth` Max paramter column width, the default is 20.
+* `--stopOnFirstError` stop on first error.
+* `--help` display this help screen.
+* `--version` display version information.
+* `--keepFiles` (default: false) determines if all auto-generated files should be kept or removed after running the benchmarks.
+* `--noOverwrite` (default: false) determines if the exported result files should not be overwritten.
+* `--disableLogFile` disables the logfile.
+* `--maxWidth` max parameter column width, the default is 20.
+* `--envVars` colon separated environment variables (key:value).
+* `--strategy` the RunStrategy that should be used. Throughput/ColdStart/Monitoring.
+* `--platform` the Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64.
+* `--runOncePerIteration` run the benchmark exactly once per iteration.
+* `--buildTimeout` build timeout in seconds.
+* `--wasmEngine` full path to a java script engine used to run the benchmarks, used by Wasm toolchain.
+* `--wasmMainJS` path to the main.js file used by Wasm toolchain. Mandatory when using \"--runtimes wasm\"
+* `--expose_wasm` arguments for the JavaScript engine used by Wasm toolchain.
+* `--customRuntimePack` specify the path to a custom runtime pack. Only used for wasm currently.
