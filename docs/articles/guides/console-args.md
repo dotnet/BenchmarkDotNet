@@ -101,7 +101,7 @@ You can also filter the benchmarks by categories:
 ## Diagnosers
 
 * `-m`, `--memory` - enables MemoryDiagnoser and prints memory statistics
-* `-t`, `--threading` - enables MemoryDiagnoser and Prints threading statistics
+* `-t`, `--threading` - enables `ThreadingDiagnoser` and prints threading statistics
 * `-d`, `--disasm`- enables DisassemblyDiagnoser and exports diassembly of benchmarked code. When you enable this option, you can use:
   - `--disasmDepth` - Sets the recursive depth for the disassembler.
   - `--disasmDiff` - Generates diff reports for the disassembler.
@@ -196,8 +196,8 @@ dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --sta
 
 * `-j`, `--job` (Default: Default) Dry/Short/Medium/Long or Default.
 * `-e`, `--exporters` GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML.
-* `-i`, `--inProcess` (default: false) run benchmarks in Process.
-* `-a`, `--artifacts` valid path to accessible directory.
+* `-i`, `--inProcess` (default: false) run benchmarks in the same process, without spawning child process per benchmark.
+* `-a`, `--artifacts` valid path to an accessible directory where output artifacts will be stored.
 * `--outliers` (default: RemoveUpper) DontRemove/RemoveUpper/RemoveLower/RemoveAll.
 * `--affinity` affinity mask to set for the benchmark process.
 * `--allStats` (default: false) Displays all statistics (min, max & more).
@@ -212,8 +212,8 @@ dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --sta
 * `--stopOnFirstError` stop on first error.
 * `--help` display this help screen.
 * `--version` display version information.
-* `--keepFiles` determines if all auto-generated files should be kept or removed after running the benchmarks.
-* `--noOverwrite` determines if the exported result files should not be overwritten.
+* `--keepFiles` (default: false) determines if all auto-generated files should be kept or removed after running the benchmarks.
+* `--noOverwrite` (default: false) determines if the exported result files should not be overwritten.
 * `--disableLogFile` disables the logfile.
 * `--maxWidth` max parameter column width, the default is 20.
 * `--envVars` colon separated environment variables (key:value).
