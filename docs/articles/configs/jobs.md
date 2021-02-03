@@ -101,12 +101,12 @@ public class MyBenchmarks
             // The same, using the .With() factory methods:
             Add(
                 Job.Dry
-                .With(Platform.X64)
-                .With(Jit.RyuJit)
-                .With(Runtime.Core)
+                .WithPlatform(Platform.X64)
+                .WithJit(Jit.RyuJit)
+                .WithRuntime(Runtime.Core)
                 .WithLaunchCount(5)
                 .WithIterationTime(TimeInterval.Millisecond * 200)
-                .WithMaxStdErrRelative(0.01)
+                .WithMaxRelativeError(0.01)
                 .WithId("MySuperJob"));
         }
     }
