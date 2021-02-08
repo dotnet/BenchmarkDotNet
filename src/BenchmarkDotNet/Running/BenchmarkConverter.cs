@@ -23,78 +23,78 @@ namespace BenchmarkDotNet.Running
 
             // We should check all methods including private to notify users about private methods with the [Benchmark] attribute
             var bindingFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            var benchmarkMethods = type.GetMethods(bindingFlags).Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
 
-            var fullConfig = GetFullConfig(type, config);
-            var allMethods = type.GetMethods(bindingFlags);
-            return MethodsToBenchmarksWithFullConfig(type, allMethods, fullConfig);
+            return MethodsToBenchmarksWithFullConfig(type, benchmarkMethods, config);
         }
 
         public static BenchmarkRunInfo MethodsToBenchmarks(Type containingType, MethodInfo[] benchmarkMethods, IConfig config = null)
+            => MethodsToBenchmarksWithFullConfig(containingType, benchmarkMethods, config);
+
+        private static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type type, MethodInfo[] benchmarkMethods, IConfig config)
         {
-            var fullConfig = GetFullConfig(containingType, config);
+            var allPublicMethods = type.GetMethods(); // benchmarkMethods can be filtered, without Setups, look #564
+            var configPerType = GetFullTypeConfig(type, config);
 
-            return MethodsToBenchmarksWithFullConfig(containingType, benchmarkMethods, fullConfig);
-        }
+            var globalSetupMethods = GetAttributedMethods<GlobalSetupAttribute>(allPublicMethods, "GlobalSetup");
+            var globalCleanupMethods = GetAttributedMethods<GlobalCleanupAttribute>(allPublicMethods, "GlobalCleanup");
+            var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(allPublicMethods, "IterationSetup");
+            var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(allPublicMethods, "IterationCleanup");
 
-        private static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type containingType, MethodInfo[] benchmarkMethods, ImmutableConfig immutableConfig)
-        {
-            if (immutableConfig == null)
-                throw new ArgumentNullException(nameof(immutableConfig));
+            var targets = GetTargets(benchmarkMethods, type, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
 
-            var helperMethods = containingType.GetMethods(); // benchmarkMethods can be filtered, without Setups, look #564
-
-            var globalSetupMethods = GetAttributedMethods<GlobalSetupAttribute>(helperMethods, "GlobalSetup");
-            var globalCleanupMethods = GetAttributedMethods<GlobalCleanupAttribute>(helperMethods, "GlobalCleanup");
-            var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(helperMethods, "IterationSetup");
-            var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(helperMethods, "IterationCleanup");
-
-            var targetMethods = benchmarkMethods.Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
-
-            var parameterDefinitions = GetParameterDefinitions(containingType);
-            var parameterInstancesList = parameterDefinitions.Expand(immutableConfig.SummaryStyle);
-
-            var jobs = immutableConfig.GetJobs();
-
-            var targets = GetTargets(targetMethods, containingType, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
+            var parameterDefinitions = GetParameterDefinitions(type);
+            var parameterInstancesList = parameterDefinitions.Expand(configPerType.SummaryStyle);
 
             var benchmarks = new List<BenchmarkCase>();
+
             foreach (var target in targets)
             {
-                var argumentsDefinitions = GetArgumentsDefinitions(target.WorkloadMethod, target.Type, immutableConfig.SummaryStyle).ToArray();
+                var argumentsDefinitions = GetArgumentsDefinitions(target.WorkloadMethod, target.Type, configPerType.SummaryStyle).ToArray();
 
                 var parameterInstances =
                     (from parameterInstance in parameterInstancesList
                      from argumentDefinition in argumentsDefinitions
                      select new ParameterInstances(parameterInstance.Items.Concat(argumentDefinition.Items).ToArray())).ToArray();
 
-                benchmarks.AddRange(
-                    from job in jobs
+                var configPerMethod = GetFullMethodConfig(target.WorkloadMethod, configPerType);
+
+                var benchmarksForTarget =
+                    from job in configPerMethod.GetJobs()
                     from parameterInstance in parameterInstances
-                    select BenchmarkCase.Create(target, job, parameterInstance, immutableConfig)
-                );
+                    select BenchmarkCase.Create(target, job, parameterInstance, configPerMethod);
+
+                benchmarks.AddRange(GetFilteredBenchmarks(benchmarksForTarget, configPerMethod.GetFilters()));
             }
 
-            var filters = immutableConfig.GetFilters().ToArray();
-            var filteredBenchmarks = GetFilteredBenchmarks(benchmarks, filters);
-            var orderedBenchmarks = immutableConfig.Orderer.GetExecutionOrder(filteredBenchmarks).ToArray();
+            var orderedBenchmarks = configPerType.Orderer.GetExecutionOrder(benchmarks.ToImmutableArray()).ToArray();
 
-            return new BenchmarkRunInfo(orderedBenchmarks, containingType, immutableConfig);
+            return new BenchmarkRunInfo(orderedBenchmarks, type, configPerType);
         }
 
-        public static ImmutableConfig GetFullConfig(Type type, IConfig config)
+        private static ImmutableConfig GetFullTypeConfig(Type type, IConfig config)
         {
             config = config ?? DefaultConfig.Instance;
-            if (type != null)
-            {
-                var typeAttributes = type.GetTypeInfo().GetCustomAttributes(true).OfType<IConfigSource>();
-                var assemblyAttributes = type.GetTypeInfo().Assembly.GetCustomAttributes().OfType<IConfigSource>();
-                var allAttributes = typeAttributes.Concat(assemblyAttributes);
-                var configs = allAttributes.Select(attribute => attribute.Config)
-                    .OrderBy(c => c.GetJobs().Count(job => job.Meta.IsMutator)); // configs with mutators must be the ones applied at the end
 
-                foreach (var configFromAttribute in configs)
-                    config = ManualConfig.Union(config, configFromAttribute);
-            }
+            var typeAttributes = type.GetCustomAttributes(true).OfType<IConfigSource>();
+            var assemblyAttributes = type.Assembly.GetCustomAttributes().OfType<IConfigSource>();
+
+            foreach (var configFromAttribute in typeAttributes.Concat(assemblyAttributes))
+                config = ManualConfig.Union(config, configFromAttribute.Config);
+
+            return ImmutableConfigBuilder.Create(config);
+        }
+
+        private static ImmutableConfig GetFullMethodConfig(MethodInfo method, ImmutableConfig typeConfig)
+        {
+            var methodAttributes = method.GetCustomAttributes(true).OfType<IConfigSource>();
+
+            if (!methodAttributes.Any()) // the most common case
+                return typeConfig;
+
+            var config = ManualConfig.Create(typeConfig);
+            foreach (var configFromAttribute in methodAttributes)
+                config = ManualConfig.Union(config, configFromAttribute.Config);
 
             return ImmutableConfigBuilder.Create(config);
         }
@@ -251,7 +251,7 @@ namespace BenchmarkDotNet.Running
             return attributes.SelectMany(attr => attr.Categories).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
         }
 
-        private static ImmutableArray<BenchmarkCase> GetFilteredBenchmarks(IList<BenchmarkCase> benchmarks, IList<IFilter> filters)
+        private static ImmutableArray<BenchmarkCase> GetFilteredBenchmarks(IEnumerable<BenchmarkCase> benchmarks, IEnumerable<IFilter> filters)
             => benchmarks.Where(benchmark => filters.All(filter => filter.Predicate(benchmark))).ToImmutableArray();
 
         private static void AssertMethodHasCorrectSignature(string methodType, MethodInfo methodInfo)

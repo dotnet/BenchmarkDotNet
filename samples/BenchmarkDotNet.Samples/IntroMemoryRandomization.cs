@@ -1,9 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -23,6 +19,12 @@ namespace BenchmarkDotNet.Samples
         }
 
         [Benchmark]
-        public void Array() => System.Array.Copy(_array, _destination, Size);
+        [MemoryRandomization(false)]
+        public void Array_RandomizationDisabled() => Array.Copy(_array, _destination, Size);
+
+        [Benchmark]
+        [MemoryRandomization(true)]
+        [MaxIterationCount(40)] // the benchmark becomes multimodal and need a lower limit of max iterations than the default
+        public void Array_RandomizationEnabled() => Array.Copy(_array, _destination, Size);
     }
 }
