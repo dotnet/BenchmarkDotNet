@@ -196,6 +196,16 @@ namespace BenchmarkDotNet.Tests.Exporters
             /* JobBaseline */
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
+            [SimpleJob(id: "Job1"), SimpleJob(id: "Job2")]
+            [BenchmarkDotNet.Attributes.BenchmarkName(Name = "MyRenamedTestCase")]
+            public class JobBaseline_RenameJob_MethodsJobs
+            {
+                [Benchmark] public void Base() { }
+                [Benchmark] public void Foo() { }
+                [Benchmark] public void Bar() { }
+            }
+
+            [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1", baseline: true), SimpleJob(id: "Job2")]
             public class JobBaseline_MethodsJobs
             {
