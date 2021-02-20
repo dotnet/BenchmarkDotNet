@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger,
             BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout)
         {
-            CliPath = cliPath;
+            CliPath = cliPath ?? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value;
             Arguments = arguments;
             GenerateResult = generateResult;
             Logger = logger;
