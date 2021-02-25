@@ -27,12 +27,6 @@ public class Config : ManualConfig
 {
     public Config()
     {
-        Options.Set(true, ConfigOptions.JoinSummary);
-        Options.Set(true, ConfigOptions.DisableLogFile);
-
-        // or
-        Options.Set(true, ConfigOptions.JoinSummary | ConfigOptions.DisableLogFile);
-
         // or using the With() factory method:
         this.With(ConfigOptions.JoinSummary)
             .With(ConfigOptions.DisableLogFile);
