@@ -353,3 +353,38 @@ Now you should be able to run the Wasm benchmarks!
 
 [!include[IntroWasm](../samples/IntroWasm.md)]
 
+## MonoAotLLVM
+
+BenchmarkDotNet supports doing Mono AOT runs with both the Mono-Mini compiler and the Mono-LLVM compiler (which uses llvm on the back end).
+
+Using this tool chain requires the following flags:
+
+```
+--runtimes monoaotllvm
+--aotcompilerpath <path to mono aot compiler>
+--customruntimepack <path to runtime pack>
+```
+
+and optionally (defaults to mini)
+
+```
+--aotcompilermode <mini|llvm>  
+```
+
+As of this writing, the mono aot compiler is not available as a seperate download or nuget package. Therefore, it is required to build the compiler in the [dotnet/runtime repository].
+
+The compiler binary (mono-sgen) is built as part of the `mono` subset, so it can be built (along with the runtime pack) like so (in the root of [dotnet/runtime]).
+
+`./build.sh -subset mono+libs -c Release`
+
+The compiler binary should be generated here (modify for your platform):
+
+```
+<runtime root>/artifacts/obj/mono/OSX.x64.Release/mono/mini/mono-sgen
+```
+
+And the runtime pack should be generated here:
+
+```
+<runtimeroot>artifacts/bin/microsoft.netcore.app.runtime.osx-x64/Release/
+```

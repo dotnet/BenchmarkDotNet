@@ -1,5 +1,7 @@
 using System;
+using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using JetBrains.Annotations;
+
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
@@ -45,7 +47,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             string customDotNetCliPath = null,
             string packagesPath = null,
             TimeSpan? timeout = null,
-            string customRuntimePack = null
+            string customRuntimePack = null,
+            string aotCompilerPath = null,
+            MonoAotCompilerMode? aotCompilerMode = null
             )
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
@@ -56,6 +60,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             PackagesPath = packagesPath;
             Timeout = timeout ?? DefaultBuildTimeout;
             CustomRuntimePack = customRuntimePack;
+            AOTCompilerPath = aotCompilerPath;
+            AOTCompilerMode = aotCompilerMode;
         }
 
         /// <summary>
@@ -86,6 +92,17 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// Path to a custom runtime pack.
         /// </summary>
         public string CustomRuntimePack { get; }
+
+        /// <summary>
+        /// Path to the Mono AOT Compiler
+        /// </summary>
+        public string AOTCompilerPath { get; }
+
+        /// <summary>
+        /// Mono AOT Compiler mode, either 'mini' or 'llvm'
+        /// </summary>
+        public MonoAotCompilerMode? AOTCompilerMode { get; }
+
 
         public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath, Timeout);

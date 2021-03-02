@@ -120,6 +120,11 @@ namespace BenchmarkDotNet.Toolchains
                     start.Arguments = $"{wasm.JavaScriptEngineArguments} runtime.js -- --run {artifactsPaths.ProgramName}.dll {args} ";
                     start.WorkingDirectory = artifactsPaths.BinariesDirectoryPath;
                     break;
+                case MonoAotLLVMRuntime _:
+                    start.FileName = exePath;
+                    start.Arguments = args;
+                    start.WorkingDirectory = artifactsPaths.BinariesDirectoryPath;
+                    break;
                 default:
                     throw new NotSupportedException("Runtime = " + runtime);
             }

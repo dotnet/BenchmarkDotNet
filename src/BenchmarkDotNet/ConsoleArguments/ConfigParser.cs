@@ -24,6 +24,7 @@ using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.MonoWasm;
+using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using CommandLine;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
@@ -115,6 +116,10 @@ namespace BenchmarkDotNet.ConsoleArguments
                 {
                     logger.WriteLineError($"The provided {nameof(options.WasmMainJs)} \"{options.WasmMainJs}\" does NOT exist. It MUST be provided.");
                     return false;
+                }
+                else if (runtimeMoniker == RuntimeMoniker.MonoAOTLLVM && (options.AOTCompilerPath == null || options.AOTCompilerPath.IsNotNullButDoesNotExist()))
+                {
+                     logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{ options.AOTCompilerPath }\" does NOT exist. It MUST be provided.");
                 }
             }
 
@@ -386,7 +391,22 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return MakeWasmJob(baseJob, options, timeOut, "net5.0");
                 case RuntimeMoniker.WasmNet60:
                     return MakeWasmJob(baseJob, options, timeOut, "net6.0");
+                case RuntimeMoniker.MonoAOTLLVM:
+                    var monoAotLLVMRuntime = new MonoAotLLVMRuntime(aotCompilerPath: options.AOTCompilerPath);
 
+                    var toolChain = MonoAotLLVMToolChain.From(
+                    new NetCoreAppSettings(
+                        targetFrameworkMoniker: monoAotLLVMRuntime.MsBuildMoniker,
+                        runtimeFrameworkVersion: null,
+                        name: monoAotLLVMRuntime.Name,
+                        customDotNetCliPath: options.CliPath?.FullName,
+                        packagesPath: options.RestorePath?.FullName,
+                        timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
+                        customRuntimePack: options.CustomRuntimePack,
+                        aotCompilerPath: options.AOTCompilerPath.ToString(),
+                        aotCompilerMode: options.AOTCompilerMode));
+
+                    return baseJob.WithRuntime(monoAotLLVMRuntime).WithToolchain(toolChain);
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
