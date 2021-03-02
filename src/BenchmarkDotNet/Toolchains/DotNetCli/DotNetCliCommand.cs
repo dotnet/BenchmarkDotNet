@@ -179,7 +179,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             var nuGetRefs = benchmarkCase.Job.ResolveValue(InfrastructureMode.NuGetReferencesCharacteristic, resolver);
 
-            return nuGetRefs.Select(x => $"add package {x.PackageName}{(string.IsNullOrWhiteSpace(x.PackageVersion) ? string.Empty : " -v " + x.PackageVersion)}");
+            return nuGetRefs.Select(BuildAddPackageCommand);
         }
 
         private static string GetMandatoryMsBuildSettings(string buildConfiguration)
@@ -195,6 +195,28 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
 
             return $"{NoMsBuildZombieProcesses} {EnforceOptimizations}";
+        }
+
+        private static string BuildAddPackageCommand(NuGetReference reference)
+        {
+            var commandBuilder = new StringBuilder();
+            commandBuilder.Append("add package ");
+            commandBuilder.Append(reference.PackageName);
+            if (!string.IsNullOrWhiteSpace(reference.PackageVersion))
+            {
+                commandBuilder.Append(" -v ");
+                commandBuilder.Append(reference.PackageVersion);
+            }
+            if (reference.PackageSource != null)
+            {
+                commandBuilder.Append(" -s ");
+                commandBuilder.Append(reference.PackageSource);
+            }
+            if (reference.Prerelease)
+            {
+                commandBuilder.Append(" --prerelease");
+            }
+            return commandBuilder.ToString();
         }
     }
 }
