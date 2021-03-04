@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Extensions;
@@ -16,6 +17,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public static class DotNetCliCommandExecutor
     {
+        internal static readonly Lazy<string> DefaultDotNetCliPath = new Lazy<string>(GetDefaultDotNetCliPath);
+
         [PublicAPI]
         public static DotNetCliCommandResult Execute(DotNetCliCommand parameters)
         {
@@ -82,7 +85,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             var startInfo = new ProcessStartInfo
             {
-                FileName = customDotNetCliPath ?? "dotnet",
+                FileName = customDotNetCliPath ?? DefaultDotNetCliPath.Value,
                 WorkingDirectory = workingDirectory,
                 Arguments = arguments,
                 UseShellExecute = false,
@@ -107,5 +110,26 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             return startInfo;
         }
+
+        private static string GetDefaultDotNetCliPath()
+        {
+            if (!Portability.RuntimeInformation.IsLinux())
+                return "dotnet";
+
+            using (var parentProcess = Process.GetProcessById(getppid()))
+            {
+                string parentPath = parentProcess.MainModule?.FileName ?? string.Empty;
+                // sth like /snap/dotnet-sdk/112/dotnet and we should use the exact path instead of just "dotnet"
+                if (parentPath.StartsWith("/snap/", StringComparison.Ordinal))
+                {
+                    return parentPath;
+                }
+
+                return "dotnet";
+            }
+        }
+
+        [DllImport("libc")]
+        private static extern int getppid();
     }
 }
