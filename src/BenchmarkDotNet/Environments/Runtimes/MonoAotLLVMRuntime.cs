@@ -15,6 +15,7 @@ namespace BenchmarkDotNet.Environments
 
         /// <summary>
         /// creates new instance of MonoAotLLVMRuntime
+        /// </summary>
         public MonoAotLLVMRuntime(FileInfo aotCompilerPath, string msBuildMoniker = "net6.0", string displayName = "MonoAOTLLVM") : base(RuntimeMoniker.MonoAOTLLVM, msBuildMoniker, displayName)
         {
             if (aotCompilerPath == null)
@@ -26,7 +27,7 @@ namespace BenchmarkDotNet.Environments
         }
 
         // this ctor exists only for the purpose of having .Default property that returns something consumable by RuntimeInformation.GetCurrentRuntime()
-        private MonoAotLLVMRuntime(string msBuildMoniker = "net6.0", string displayName = "MonoAOTLLVM") : base(RuntimeMoniker.Wasm, msBuildMoniker, displayName)
+        private MonoAotLLVMRuntime(string msBuildMoniker = "net6.0", string displayName = "MonoAOTLLVM") : base(RuntimeMoniker.MonoAOTLLVM, msBuildMoniker, displayName)
         {
             AOTCompilerPath = new FileInfo("fake");
         }

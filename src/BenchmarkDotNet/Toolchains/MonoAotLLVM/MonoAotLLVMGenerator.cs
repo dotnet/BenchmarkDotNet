@@ -1,15 +1,11 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using Microsoft.DotNet.PlatformAbstractions;
 
 namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
 {
@@ -19,12 +15,12 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
         private readonly string AotCompilerPath;
         private readonly MonoAotCompilerMode AotCompilerMode;
 
-        public MonoAotLLVMGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, string aotCompilerPath, MonoAotCompilerMode? aotCompilerMode)
+        public MonoAotLLVMGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, string aotCompilerPath, MonoAotCompilerMode aotCompilerMode)
             : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null)
         {
             CustomRuntimePack = customRuntimePack;
             AotCompilerPath = aotCompilerPath;
-            AotCompilerMode = aotCompilerMode ?? MonoAotCompilerMode.mini;
+            AotCompilerMode = aotCompilerMode;
         }
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
@@ -57,7 +53,10 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
             }
         }
 
-        protected override string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, programName);
+        protected override string GetExecutablePath(string binariesDirectoryPath, string programName)
+            => Portability.RuntimeInformation.IsWindows()
+                ? Path.Combine(binariesDirectoryPath, $"{programName}.exe")
+                : Path.Combine(binariesDirectoryPath, programName);
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", TargetFrameworkMoniker, CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier(), "publish");

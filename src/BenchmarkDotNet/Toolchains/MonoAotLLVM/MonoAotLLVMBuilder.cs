@@ -1,9 +1,7 @@
 using System;
 using System.IO;
-using System.Linq;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -23,7 +21,19 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
         {
             BuildResult buildResult = dotnetCliBuilder.Build(generateResult, buildPartition, logger);
 
-            RenameSharedLibaries(generateResult, logger);
+            if (buildResult.IsBuildSuccess
+                || File.Exists(generateResult.ArtifactsPaths.ExecutablePath)) // the build has failed, but produced an exe
+            {
+                RenameSharedLibaries(generateResult, logger);
+            }
+
+            if (!buildResult.IsBuildSuccess && File.Exists(generateResult.ArtifactsPaths.ExecutablePath))
+            {
+                logger.WriteLineError($"The buid has failed with following error: {buildResult.ErrorMessage}");
+                logger.WriteLine("But it has produced the executable file, so we are going to try to use it.");
+
+                return BuildResult.Success(generateResult); // we lie on purpose
+            }
 
             return buildResult;
         }
@@ -51,7 +61,7 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
                 string newFileName = Path.ChangeExtension(fileName, sharedObjectExtension);
 
                 logger.WriteLine($"RenameSharedLibraries: Moving ${fileName} to {newFileName}");
-                System.IO.File.Move(fileName, newFileName);
+                File.Move(fileName, newFileName);
             }
         }
     }

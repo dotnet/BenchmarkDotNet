@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Portability
 
                 if (methodInfo != null)
                 {
-                    return (bool)methodInfo.Invoke(null, null);
+                    return !(bool)methodInfo.Invoke(null, null);
                 }
             }
 
@@ -272,7 +272,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetJitInfo()
         {
-            if (IsCoreRT || IsNetNative)
+            if (IsCoreRT || IsNetNative || IsAot)
                 return "AOT";
             if (IsMono || IsWasm)
                 return ""; // There is no helpful information about JIT on Mono

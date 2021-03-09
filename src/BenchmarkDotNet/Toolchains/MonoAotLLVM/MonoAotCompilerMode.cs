@@ -1,9 +1,8 @@
-﻿using System;
-namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
+﻿namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
 {
     public enum MonoAotCompilerMode
     {
-        mini,
+        mini = 0, // default
         llvm
     }
 }
