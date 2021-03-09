@@ -44,6 +44,24 @@ namespace BenchmarkDotNet.Portability
 
         public static bool IsWasm => IsOSPlatform(OSPlatform.Create("BROWSER"));
 
+        public static bool IsAot { get; } = IsAotMethod(); // This allocates, so we only want to call it once statically.
+
+        private static bool IsAotMethod()
+        {
+            Type runtimeFeature = Type.GetType("System.Runtime.CompilerServices.RuntimeFeature");
+            if (runtimeFeature != null)
+            {
+                MethodInfo methodInfo = runtimeFeature.GetProperty("IsDynamicCodeCompiled", BindingFlags.Public | BindingFlags.Static)?.GetMethod;
+
+                if (methodInfo != null)
+                {
+                    return !(bool)methodInfo.Invoke(null, null);
+                }
+            }
+
+            return false;
+        }
+
         public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
 
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
@@ -197,6 +215,8 @@ namespace BenchmarkDotNet.Portability
         internal static Runtime GetCurrentRuntime()
         {
             //do not change the order of conditions because it may cause incorrect determination of runtime
+            if (IsAot && IsMono)
+                return MonoAotLLVMRuntime.Default;
             if (IsMono)
                 return MonoRuntime.Default;
             if (IsFullFramework)
@@ -252,7 +272,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetJitInfo()
         {
-            if (IsCoreRT || IsNetNative)
+            if (IsCoreRT || IsNetNative || IsAot)
                 return "AOT";
             if (IsMono || IsWasm)
                 return ""; // There is no helpful information about JIT on Mono

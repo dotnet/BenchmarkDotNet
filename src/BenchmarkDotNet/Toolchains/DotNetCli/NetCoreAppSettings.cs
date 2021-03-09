@@ -1,5 +1,7 @@
 using System;
+using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using JetBrains.Annotations;
+
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
@@ -36,6 +38,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </param>
         /// <param name="packagesPath">the directory to restore packages to</param>
         /// <param name="timeout">timeout to build the benchmark</param>
+        /// <param name="customRuntimePack">path to a custom runtime pack</param>
+        /// <param name="aotCompilerPath">path to Mono AOT compiler</param>
+        /// <param name="aotCompilerMode">Mono AOT compiler moder</param>
         /// </summary>
         [PublicAPI]
         public NetCoreAppSettings(
@@ -45,7 +50,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             string customDotNetCliPath = null,
             string packagesPath = null,
             TimeSpan? timeout = null,
-            string customRuntimePack = null
+            string customRuntimePack = null,
+            string aotCompilerPath = null,
+            MonoAotCompilerMode aotCompilerMode = MonoAotCompilerMode.mini
             )
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
@@ -56,6 +63,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             PackagesPath = packagesPath;
             Timeout = timeout ?? DefaultBuildTimeout;
             CustomRuntimePack = customRuntimePack;
+            AOTCompilerPath = aotCompilerPath;
+            AOTCompilerMode = aotCompilerMode;
         }
 
         /// <summary>
@@ -87,6 +96,16 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         public string CustomRuntimePack { get; }
 
+        /// <summary>
+        /// Path to the Mono AOT Compiler
+        /// </summary>
+        public string AOTCompilerPath { get; }
+
+        /// <summary>
+        /// Mono AOT Compiler mode, either 'mini' or 'llvm'
+        /// </summary>
+        public MonoAotCompilerMode AOTCompilerMode { get; }
+
         public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath, Timeout);
 
@@ -95,6 +114,5 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         public NetCoreAppSettings WithTimeout(TimeSpan? timeOut)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, Name, CustomDotNetCliPath, PackagesPath, timeOut ?? Timeout);
-
     }
 }

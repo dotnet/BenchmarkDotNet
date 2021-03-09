@@ -7,6 +7,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using CommandLine;
 using CommandLine.Text;
 using JetBrains.Annotations;
@@ -180,8 +181,14 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("wasmArgs", Required = false, Default = "--expose_wasm", HelpText = "Arguments for the javascript engine used by Wasm toolchain.")]
         public string WasmJavaScriptEngineArguments { get; set; }
 
-        [Option("customRuntimePack", Required = false, HelpText = "Specify the path to a custom runtime pack. Only used for wasm currently.")]
+        [Option("customRuntimePack", Required = false, HelpText = "Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.")]
         public string CustomRuntimePack { get; set; }
+
+        [Option("AOTCompilerPath", Required = false, HelpText = "Path to Mono AOT compiler, used for MonoAotLLVM.")]
+        public FileInfo AOTCompilerPath { get; set; }
+
+        [Option("AOTCompilerMode", Required = false, Default = MonoAotCompilerMode.mini, HelpText = "Mono AOT compiler mode, either 'mini' or 'llvm'")]
+        public MonoAotCompilerMode AOTCompilerMode { get; set; }
 
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
