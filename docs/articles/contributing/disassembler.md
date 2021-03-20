@@ -36,15 +36,13 @@ namespace Sample
         {
             var result = Benchmark(); // execute the benchmark do method gets jitted
 
-            Console.WriteLine($"{Process.GetCurrentProcess().Id} " + // process Id
+            Console.WriteLine(
+            $"{Process.GetCurrentProcess().Id} " +   // process Id
                 $"\"{typeof(Program).FullName}\" " + // full type name
-                $"{nameof(Benchmark)} " + // benchmarked method name
-                $"{bool.TrueString} " + // printAsm
-                $"{bool.FalseString} " + // printIL
-                $"{bool.FalseString} " + // print Source
-                $"{bool.FalseString} " + // print prolog and epilog
-                "2 " + // recursive depth
-                $"{Path.GetTempFileName()}.xml"); // result xml file path
+                $"{nameof(Benchmark)} " +            // benchmarked method name
+                $"{bool.FalseString} " +             // print Source
+                "2 " +                               // recursive depth
+                $"{Path.GetTempFileName()}.xml");    // result xml file path
 
             while(true)
             {
@@ -78,7 +76,7 @@ namespace Sample
 
 Once you configure your app, you should run it. It will give you an output similar to this:
 
-`13672 ConsoleApp1.RandomSort ArraySort True True True True 7 C:\Users\adsitnik\AppData\Local\Temp\tmpDCB9.tmp.xml`
+`13672 ConsoleApp1.RandomSort ArraySort True 7 C:\Users\adsitnik\AppData\Local\Temp\tmpDCB9.tmp.xml`
 
 Now you go to BenchmarkDotNet solution, select desired Disassembler project in the Solution Explorer and Set it as Startup project. After this you go to the project's properties and in the Debug tab copy-paste the arguments for the disassembler. Now when you start debugging, your IDE will spawn new process of the disassembler with the right arguments to attach to the desired exe. You should be able to debug it like any other app.
 
