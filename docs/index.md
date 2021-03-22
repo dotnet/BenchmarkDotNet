@@ -228,7 +228,7 @@ Of course, you can request any additional statistics and visualizations manually
 If you don't customize the summary view,
   the default presentation will be as much user-friendly as possible. :)
 
-## Who use BenchmarkDotNet?
+## Who uses BenchmarkDotNet?
 
 Everyone!
 BenchmarkDotNet is already adopted by more than [4500+](https://github.com/dotnet/BenchmarkDotNet/network/dependents?package_id=UGFja2FnZS0xNTY3MzExMzE%3D) projects including
