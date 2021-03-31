@@ -60,6 +60,7 @@ namespace BenchmarkDotNet.Running
 
                 var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
                 var buildResults = BuildInParallel(compositeLogger, rootArtifactsFolderPath, buildPartitions, ref globalChronometer);
+                var allBuildsHaveFailed = buildResults.Values.All(buildResult => !buildResult.IsBuildSuccess);
 
                 try
                 {
@@ -85,7 +86,7 @@ namespace BenchmarkDotNet.Running
 
                         results.Add(summary);
 
-                        if (benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.StopOnFirstError) && summary.Reports.Any(report => !report.Success))
+                        if ((benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.StopOnFirstError) && summary.Reports.Any(report => !report.Success)) || allBuildsHaveFailed)
                             break;
                     }
 
@@ -132,6 +133,7 @@ namespace BenchmarkDotNet.Running
                                    ref StartedClock runChronometer)
         {
             var benchmarks = benchmarkRunInfo.BenchmarksCases;
+            var allBuildsHaveFailed = benchmarks.All(benchmark => !buildResults[benchmark].buildResult.IsBuildSuccess);
             var config = benchmarkRunInfo.Config;
             var cultureInfo = config.CultureInfo ?? DefaultCultureInfo.Instance;
             var reports = new List<BenchmarkReport>();
@@ -189,7 +191,7 @@ namespace BenchmarkDotNet.Running
                             logger.WriteLineError("// Please follow the troubleshooting guide: https://benchmarkdotnet.org/articles/guides/troubleshooting.html");
                         }
 
-                        if (config.Options.IsSet(ConfigOptions.StopOnFirstError))
+                        if (config.Options.IsSet(ConfigOptions.StopOnFirstError) || allBuildsHaveFailed)
                             break;
                     }
 
