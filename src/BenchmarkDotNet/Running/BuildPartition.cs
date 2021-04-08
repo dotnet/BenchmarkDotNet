@@ -66,7 +66,6 @@ namespace BenchmarkDotNet.Running
         private static string GetResolvedAssemblyLocation(Assembly assembly) =>
             // in case of SingleFile, location.Length returns 0, so we use GetName() and
             // manually construct the path.
-            assembly.Location.Length == 0 ?
-                Path.Combine(AppContext.BaseDirectory, assembly.GetName().Name) : assembly.Location;
+            assembly.Location.Length == 0 ? Path.Combine(AppContext.BaseDirectory, assembly.GetName().Name) : assembly.Location;
     }
 }
