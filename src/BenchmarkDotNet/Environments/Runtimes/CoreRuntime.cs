@@ -208,9 +208,7 @@ namespace BenchmarkDotNet.Environments
             if (!(platformNameProperty.GetValue(attributeInstance) is string platformName))
                 return fallback;
 
-            // it's something like "Windows7.0";
-            var justName = new string(platformName.TakeWhile(char.IsLetter).ToArray());
-            return new CoreRuntime(fallback.RuntimeMoniker, $"{fallback.MsBuildMoniker}-{justName}", fallback.Name);
+            return new CoreRuntime(fallback.RuntimeMoniker, $"{fallback.MsBuildMoniker}-{platformName}", fallback.Name);
         }
     }
 }
