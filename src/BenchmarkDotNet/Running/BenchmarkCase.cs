@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Running
 {
@@ -24,6 +26,13 @@ namespace BenchmarkDotNet.Running
             Job = job;
             Parameters = parameters;
             Config = config;
+        }
+
+        public Runtime GetRuntime()
+        {
+            return Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
+                              ? Job.Environment.Runtime
+                              : RuntimeInformation.GetCurrentRuntime();
         }
 
         public void Dispose() => Parameters.Dispose();
