@@ -6,7 +6,6 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Running;
 
-
 namespace BenchmarkDotNet.Loggers
 {
     internal class SynchronousProcessOutputLoggerWithDiagnoser

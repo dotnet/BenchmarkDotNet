@@ -28,12 +28,9 @@ namespace BenchmarkDotNet.Running
             Config = config;
         }
 
-        public Runtime GetRuntime()
-        {
-            return Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
-                              ? Job.Environment.Runtime
-                              : RuntimeInformation.GetCurrentRuntime();
-        }
+        public Runtime GetRuntime() => Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
+                ? Job.Environment.Runtime
+                : RuntimeInformation.GetCurrentRuntime();
 
         public void Dispose() => Parameters.Dispose();
 

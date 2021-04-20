@@ -99,7 +99,6 @@ namespace BenchmarkDotNet.Toolchains
             string exePath = artifactsPaths.ExecutablePath;
 
             var runtime = benchmarkCase.GetRuntime();
-
             // TODO: use resolver
 
             switch (runtime)
