@@ -98,9 +98,7 @@ namespace BenchmarkDotNet.Toolchains
 
             string exePath = artifactsPaths.ExecutablePath;
 
-            var runtime = benchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
-                ? benchmarkCase.Job.Environment.Runtime
-                : RuntimeInformation.GetCurrentRuntime();
+            var runtime = benchmarkCase.GetRuntime();
             // TODO: use resolver
 
             switch (runtime)
@@ -117,6 +115,7 @@ namespace BenchmarkDotNet.Toolchains
                     break;
                 case WasmRuntime wasm:
                     start.FileName = wasm.JavaScriptEngine;
+                    start.RedirectStandardInput = false;
                     start.Arguments = $"{wasm.JavaScriptEngineArguments} runtime.js -- --run {artifactsPaths.ProgramName}.dll {args} ";
                     start.WorkingDirectory = artifactsPaths.BinariesDirectoryPath;
                     break;
