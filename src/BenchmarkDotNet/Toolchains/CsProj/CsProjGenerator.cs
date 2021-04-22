@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
         {
-            string assemblyLocation = buildPartition.AssemblyLocation;
+            string assemblyLocation = buildPartition.RepresentativeBenchmarkCase.Descriptor.Type.Assembly.Location;
 
             //Assembles loaded from a stream will have an empty location (https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location).
             string directoryName = assemblyLocation.IsEmpty() ?

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
@@ -34,7 +36,7 @@ namespace BenchmarkDotNet.Running
 
         public IResolver Resolver { get; }
 
-        public string AssemblyLocation => RepresentativeBenchmarkCase.Descriptor.Type.Assembly.Location;
+        public string AssemblyLocation => GetResolvedAssemblyLocation(RepresentativeBenchmarkCase.Descriptor.Type.Assembly);
 
         public string BuildConfiguration => RepresentativeBenchmarkCase.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, Resolver);
 
@@ -60,5 +62,10 @@ namespace BenchmarkDotNet.Running
         public bool IsCustomBuildConfiguration => BuildConfiguration != InfrastructureMode.ReleaseConfigurationName;
 
         public override string ToString() => RepresentativeBenchmarkCase.Job.DisplayInfo;
+
+        private static string GetResolvedAssemblyLocation(Assembly assembly) =>
+            // in case of SingleFile, location.Length returns 0, so we use GetName() and
+            // manually construct the path.
+            assembly.Location.Length == 0 ? Path.Combine(AppContext.BaseDirectory, assembly.GetName().Name) : assembly.Location;
     }
 }
