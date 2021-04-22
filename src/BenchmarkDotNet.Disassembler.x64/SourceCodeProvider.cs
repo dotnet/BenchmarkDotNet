@@ -3,6 +3,7 @@ using Microsoft.Diagnostics.Runtime.Utilities;
 using Microsoft.Diagnostics.Runtime.Utilities.Pdb;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace BenchmarkDotNet.Disassemblers
@@ -24,8 +25,9 @@ namespace BenchmarkDotNet.Disassemblers
                     continue;
 
                 var text = sourceLine + Environment.NewLine
-                    + GetSmartPrefix(sourceLine, sourceLocation.ColStart - 1)
-                    + new string('^', sourceLocation.ColEnd - sourceLocation.ColStart);
+                    + GetSmartPointer(sourceLine,
+                        start: line == sourceLocation.LineNumber ? sourceLocation.ColStart - 1 : default(int?),
+                        end: line == sourceLocation.LineNumberEnd ? sourceLocation.ColEnd - 1 : default(int?));
 
                 yield return new Sharp
                 {
@@ -54,17 +56,32 @@ namespace BenchmarkDotNet.Disassemblers
                 : null; // "nop" can have no corresponding c# code ;)
         }
 
-        private static string GetSmartPrefix(string sourceLine, int length)
+        private static string GetSmartPointer(string sourceLine, int? start, int? end)
         {
-            if (length <= 0)
-                return string.Empty;
+            Debug.Assert(start is null || start < sourceLine.Length);
+            Debug.Assert(end is null || end <= sourceLine.Length);
 
-            var prefix = new char[length];
-            for (int i = 0; i < length; i++)
+            var prefix = new char[end ?? sourceLine.Length];
+            var index = 0;
+
+            // write offset using whitespaces
+            while (index < (start ?? prefix.Length))
             {
-                char sourceChar = i < sourceLine.Length ? sourceLine[i] : ' ';
-                prefix[i] = sourceChar == '\t' ? sourceChar : ' ';
+                prefix[index] =
+                    sourceLine.Length > index &&
+                    sourceLine[index] == '\t'
+                    ? '\t'
+                    : ' ';
+                index++;
             }
+
+            // write smart pointer
+            while (index < prefix.Length)
+            {
+                prefix[index] = '^';
+                index++;
+            }
+
             return new string(prefix);
         }
     }
