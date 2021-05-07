@@ -243,11 +243,9 @@ namespace BenchmarkDotNet.Configs
             {
                 case ConfigUnionRule.AlwaysUseLocal:
                     manualConfig.Add(localConfig);
-                    manualConfig.AddFilter(globalConfig.GetFilters().ToArray()); // the filters should be merged anyway
                     break;
                 case ConfigUnionRule.AlwaysUseGlobal:
                     manualConfig.Add(globalConfig);
-                    manualConfig.AddFilter(localConfig.GetFilters().ToArray()); // the filters should be merged anyway
                     break;
                 case ConfigUnionRule.Union:
                     manualConfig.Add(globalConfig);
@@ -256,6 +254,7 @@ namespace BenchmarkDotNet.Configs
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+            manualConfig.AddFilter(localConfig.GetFilters().ToArray()); // the filters should be merged anyway
             return manualConfig;
         }
     }
