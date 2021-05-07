@@ -90,16 +90,18 @@ namespace BenchmarkDotNet.Configs
 
         private static ImmutableArray<IExporter> GetExporters(IEnumerable<IExporter> exporters, ImmutableHashSet<IDiagnoser> uniqueDiagnosers)
         {
-            var result = new List<IExporter>();
+
+            var mergeDictionary = new Dictionary<System.Type, IExporter>();
 
             foreach (var exporter in exporters)
-                if (!result.Contains(exporter))
-                    result.Add(exporter);
+                mergeDictionary[exporter.GetType()] = exporter;
 
             foreach (var diagnoser in uniqueDiagnosers)
-            foreach (var exporter in diagnoser.Exporters)
-                if (!result.Contains(exporter))
-                    result.Add(exporter);
+                foreach (var exporter in diagnoser.Exporters)
+                    mergeDictionary[exporter.GetType()] = exporter;
+
+            var result = mergeDictionary.Values.ToList();
+
 
             var hardwareCounterDiagnoser = uniqueDiagnosers.OfType<IHardwareCountersDiagnoser>().SingleOrDefault();
             var disassemblyDiagnoser = uniqueDiagnosers.OfType<DisassemblyDiagnoser>().SingleOrDefault();
@@ -111,6 +113,27 @@ namespace BenchmarkDotNet.Configs
             for (int i = result.Count - 1; i >=0; i--)
                 if (result[i] is IExporterDependencies exporterDependencies)
                     foreach (var dependency in exporterDependencies.Dependencies)
+                        /*
+                         * I don't know how to correct
+                         * the problem is:
+                         * you have banchmark like this:
+                         *
+                         *  // Global Current Culture separetor is Semicolon;
+                         *  [CsvMeasurementsExporter(CsvSeparator.Comma)] // force use Comma
+                         *  [RPlotExporter]
+                         *  public class MYBanch
+                         *  {
+                         *
+                         *  }
+                         *
+                         *  RPlotExporter is depend from CsvMeasurementsExporter.Default
+                         *
+                         *  If I check for the type of the exporter RPlotExporter will fail
+                         *  because it will find an unexpected delimiter,
+                         *  if I stay the check as it is
+                         *  RPlotExporter it will work but the generated CSV
+                         *  will not have the required delimiter.
+                        */
                         if (!result.Contains(dependency))
                             result.Insert(i, dependency); // All the exporter dependencies should be added before the exporter
 
