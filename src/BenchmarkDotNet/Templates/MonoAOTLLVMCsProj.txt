@@ -8,6 +8,7 @@
     <EnableTargetingPackDownload>false</EnableTargetingPackDownload>
     <PublishTrimmed>false</PublishTrimmed>
     <AssemblyName>$PROGRAMNAME$</AssemblyName>
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
   </PropertyGroup>
 
   <ItemGroup>
