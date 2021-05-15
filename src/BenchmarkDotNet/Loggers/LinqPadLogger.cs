@@ -82,7 +82,8 @@ namespace BenchmarkDotNet.Loggers
                 { LogKind.Statistic, "#00FFFF" },
                 { LogKind.Info, "#808000" },
                 { LogKind.Error, "#FF0000" },
-                { LogKind.Hint, "#008080" }
+                { LogKind.Hint, "#008080" },
+                { LogKind.Warning, "#FFFF00" },
             };
 
         private static IReadOnlyDictionary<LogKind, string> CreateLightScheme() =>
@@ -95,7 +96,8 @@ namespace BenchmarkDotNet.Loggers
                 { LogKind.Statistic, "#008080" },
                 { LogKind.Info, "#808000" },
                 { LogKind.Error, "#FF0000" },
-                { LogKind.Hint, "#008080" }
+                { LogKind.Hint, "#008080" },
+                { LogKind.Warning, "#FFFF00" },
             };
     }
 }
