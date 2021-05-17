@@ -331,5 +331,47 @@ namespace BenchmarkDotNet.Tests.Configs
             public string Name => nameof(TestExporterDependency);
             public void ExportToLog(Summary summary, ILogger logger) { }
         }
+
+        [Fact]
+        public void GenerateWarningWhenExporterDependencyAlreadyExistInConfig()
+        {
+            System.Globalization.CultureInfo currentCulture = default;
+            System.Globalization.CultureInfo currentUICulture = default;
+            {
+                var ct = System.Threading.Thread.CurrentThread;
+                currentCulture = ct.CurrentCulture;
+                currentUICulture = ct.CurrentUICulture;
+                ct.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+                ct.CurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;
+            }
+            try
+            {
+                var countWarning = 0;
+                var logger = new Loggers.DelegateLogger((kind, text) =>
+                {
+                    if (kind == LogKind.Warning)
+                    {
+                        countWarning++;
+                    }
+                });
+
+                var mutable = ManualConfig.CreateEmpty();
+                mutable.AddLogger(logger);
+                mutable.AddExporter(new BenchmarkDotNet.Exporters.Csv.CsvMeasurementsExporter(BenchmarkDotNet.Exporters.Csv.CsvSeparator.Comma));
+                mutable.AddExporter(RPlotExporter.Default);
+
+                var final = ImmutableConfigBuilder.Create(mutable);
+
+                Assert.Equal(1, countWarning);
+            }
+            finally
+            {
+                var ct = System.Threading.Thread.CurrentThread;
+                ct.CurrentCulture = currentCulture;
+                ct.CurrentUICulture = currentUICulture;
+
+            }
+
+        }
     }
 }
