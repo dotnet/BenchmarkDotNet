@@ -1,7 +1,7 @@
 :: this script should be executed from the root dir
 
 git clean -xfd
-dotnet restore
+dotnet restore BenchmarkDotNet.sln
 dotnet build .\src\BenchmarkDotNet\BenchmarkDotNet.csproj -c Release
 dotnet build .\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj  -c Release
 dotnet build .\src\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj  -c Release
