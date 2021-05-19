@@ -10,7 +10,7 @@ SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 TOOLS_DIR=$SCRIPT_DIR/tools
 NUGET_EXE=$TOOLS_DIR/nuget.exe
 NUGET_URL=https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
-CAKE_VERSION=0.37.0
+CAKE_VERSION=1.1.0
 CAKE_EXE=$TOOLS_DIR/Cake.$CAKE_VERSION/Cake.exe
 
 # Define default arguments.
