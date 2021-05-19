@@ -7,9 +7,7 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class AsyncBenchmarksTests : BenchmarkTestExecutor
     {
-        public AsyncBenchmarksTests(ITestOutputHelper output) : base(output)
-        {
-        }
+        public AsyncBenchmarksTests(ITestOutputHelper output) : base(output) { }
 
         [Fact]
         public void TaskReturningMethodsAreAwaited()
@@ -17,12 +15,12 @@ namespace BenchmarkDotNet.IntegrationTests
             var summary = CanExecute<TaskDelayMethods>();
 
             foreach (var report in summary.Reports)
+            foreach (var measurement in report.AllMeasurements)
             {
-                foreach (var measurement in report.AllMeasurements)
-                {
-                    Assert.True(measurement.Nanoseconds * 1.03 > TaskDelayMethods.NanosecondsDelay,
-                        $"{report.BenchmarkCase.Descriptor.GetFilterName()} has not been awaited, took {measurement.Nanoseconds}ns, while it should take more than {TaskDelayMethods.NanosecondsDelay}ns");
-                }
+                double actual = measurement.Nanoseconds;
+                const double minExpected = TaskDelayMethods.NanosecondsDelay - TaskDelayMethods.MaxTaskDelayResolutionInNanoseconds;
+                string name = report.BenchmarkCase.Descriptor.GetFilterName();
+                Assert.True(actual > minExpected, $"{name} has not been awaited, took {actual}ns, while it should take more than {minExpected}ns");
             }
         }
 
@@ -31,6 +29,9 @@ namespace BenchmarkDotNet.IntegrationTests
             private const int MillisecondsDelay = 100;
 
             internal const double NanosecondsDelay = MillisecondsDelay * 1e+6;
+
+            // The default frequency of the Windows System Timer is 64Hz, so the Task.Delay error is up to 15.625ms.
+            internal const int MaxTaskDelayResolutionInNanoseconds = 1_000_000_000 / 64;
 
             [Benchmark]
             public Task ReturningTask() => Task.Delay(MillisecondsDelay);
