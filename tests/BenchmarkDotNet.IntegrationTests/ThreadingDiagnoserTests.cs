@@ -10,11 +10,11 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
-using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using BenchmarkDotNet.Portability;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -26,15 +26,23 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public ThreadingDiagnoserTests(ITestOutputHelper outputHelper) => output = outputHelper;
 
-        public static IEnumerable<object[]> GetToolchains() => new[]
+        public static IEnumerable<object[]> GetToolchains()
         {
-            new object[] { Job.Default.GetToolchain() },
-            new object[] { CoreRtToolchain.Core50 },
-            // new object[] { InProcessEmitToolchain.Instance },
-        };
+            yield return new object[] { Job.Default.GetToolchain() };
+
+            // Currently, CoreRtToolchain.Core50 produces the following error on Unix without installed clang:
+            //   Standard error:
+            //   ~/.nuget/packages/microsoft.dotnet.ilcompiler/6.0.0-preview.5.21269.1/build/Microsoft.NETCore.Native.Unix.props(99,5):
+            //   error : Platform linker ('clang') not found. Try installing clang or the appropriate package for your platform to resolve the problem.
+            if (RuntimeInformation.IsWindows())
+                yield return new object[] { CoreRtToolchain.Core50 };
+
+            // TODO: Support InProcessEmitToolchain.Instance
+            // yield return new object[] { InProcessEmitToolchain.Instance };
+        }
 
         [Theory, MemberData(nameof(GetToolchains))]
-        public void CompletedWorkItemCounIsAccurate(IToolchain toolchain)
+        public void CompletedWorkItemCountIsAccurate(IToolchain toolchain)
         {
             var config = CreateConfig(toolchain);
 
@@ -135,7 +143,9 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithToolchain(toolchain))
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(ThreadingDiagnoser.Default)
-                .AddLogger(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
+                .AddLogger(toolchain.IsInProcess
+                    ? ConsoleLogger.Default
+                    : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
 
         private void AssertStats(Summary summary, Dictionary<string, (string metricName, double expectedValue)> assertions)
         {
