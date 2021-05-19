@@ -31,8 +31,8 @@
     <LangVersion>7.3</LangVersion>
     
     <Major>0</Major>
-    <Minor>12</Minor>
-    <Revision>1</Revision>
+    <Minor>13</Minor>
+    <Revision>0</Revision>
 
     <BuildNumber Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' ">$(APPVEYOR_BUILD_NUMBER)</BuildNumber>
     <BuildNumber Condition=" '$(BuildNumber)' == '' ">0</BuildNumber>
