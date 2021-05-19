@@ -8,7 +8,7 @@
     <title>How to use console arguments | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="How to use console arguments | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -127,7 +127,7 @@
 <li>Run all benchmarks: <code>-f *</code></li>
 <li>Run all benchmarks from ClassA and ClassB <code>-f *ClassA* *ClassB*</code></li>
 </ol>
-<p><strong>Note</strong>: If you would like to <strong>join</strong> all the results into a <strong>single summary</strong>, you need to us <code>--join</code>.</p>
+<p><strong>Note</strong>: If you would like to <strong>join</strong> all the results into a <strong>single summary</strong>, you need to put <code>--join</code>. For example: <code>-f *ClassA* *ClassB* --join</code></p>
 <h2 id="list-of-benchmarks">List of benchmarks</h2>
 <p>The <code>--list</code> allows you to print all of the available benchmark names. Available options are:</p>
 <ul>
@@ -198,6 +198,7 @@ BenchmarkDotNet.Samples.IntroSetupCleanupTarget.BenchmarkD
 <h2 id="diagnosers">Diagnosers</h2>
 <ul>
 <li><code>-m</code>, <code>--memory</code> - enables MemoryDiagnoser and prints memory statistics</li>
+<li><code>-t</code>, <code>--threading</code> - enables <code>ThreadingDiagnoser</code> and prints threading statistics</li>
 <li><code>-d</code>, <code>--disasm</code>- enables DisassemblyDiagnoser and exports diassembly of benchmarked code. When you enable this option, you can use:
 <ul>
 <li><code>--disasmDepth</code> - Sets the recursive depth for the disassembler.</li>
@@ -261,31 +262,44 @@ static IConfig GetGlobalConfig()
 <h2 id="statistical-test">Statistical Test</h2>
 <p>To perform a Mann–Whitney U Test and display the results in a dedicated column you need to provide the Threshold:</p>
 <ul>
-<li><code>--statisticalTest</code>- Threshold for Statistical Test. Examples: 5%, 10ms, 100ns, 1s</li>
+<li><code>--statisticalTest</code>- Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s</li>
 </ul>
 <p>Example: run Mann–Whitney U test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was first.</p>
 <pre><code class="lang-log">dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --statisticalTest 5%
 </code></pre>
 <h2 id="more">More</h2>
 <ul>
-<li><code>-j</code>, <code>--job</code> (Default: Default) Dry/Short/Medium/Long or Default</li>
-<li><code>-e</code>, <code>--exporters</code> GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML</li>
-<li><code>-i</code>, <code>--inProcess</code> (Default: false) Run benchmarks in Process</li>
-<li><code>-a</code>, <code>--artifacts</code> Valid path to accessible directory</li>
-<li><code>--outliers</code> (Default: RemoveUpper) DontRemove/RemoveUpper/RemoveLower/RemoveAll</li>
-<li><code>--affinity</code> Affinity mask to set for the benchmark process</li>
-<li><code>--allStats</code> (Default: false) Displays all statistics (min, max &amp; more)</li>
-<li><code>--attribute</code> Run all methods with given attribute (applied to class or method)</li>
-<li><code>--monoPath</code> custom Path for Mono</li>
-<li><code>--cliPath</code> custom Path for dotnet cli</li>
+<li><code>-j</code>, <code>--job</code> (Default: Default) Dry/Short/Medium/Long or Default.</li>
+<li><code>-e</code>, <code>--exporters</code> GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML.</li>
+<li><code>-i</code>, <code>--inProcess</code> (default: false) run benchmarks in the same process, without spawning child process per benchmark.</li>
+<li><code>-a</code>, <code>--artifacts</code> valid path to an accessible directory where output artifacts will be stored.</li>
+<li><code>--outliers</code> (default: RemoveUpper) DontRemove/RemoveUpper/RemoveLower/RemoveAll.</li>
+<li><code>--affinity</code> affinity mask to set for the benchmark process.</li>
+<li><code>--allStats</code> (default: false) Displays all statistics (min, max &amp; more).</li>
+<li><code>--allCategories</code> categories to run. If few are provided, only the benchmarks which belong to all of them are going to be executed.</li>
+<li><code>--attribute</code> run all methods with given attribute (applied to class or method).</li>
+<li><code>--monoPath</code> optional path to Mono which should be used for running benchmarks.</li>
+<li><code>--cli</code> path to dotnet cli (optional).</li>
+<li><code>--packages</code> the directory to restore packages to (optional).</li>
+<li><code>--coreRun</code> path(s) to CoreRun (optional).</li>
 <li><code>--coreRt</code> path to ILCompiler for CoreRT</li>
 <li><code>--info</code> prints environment configuration including BenchmarkDotNet, OS, CPU and .NET version</li>
-<li><code>--stopOnFirstError</code> Stop on first error.</li>
-<li><code>--help</code> Display this help screen.</li>
-<li><code>--version</code> Display version information.</li>
-<li><code>--keepFiles</code> Determines if all auto-generated files should be kept or removed after running the benchmarks.</li>
-<li><code>--noOverwrite</code> Determines if the exported result files should not be overwritten.</li>
-<li><code>--disableLogFile</code> Disables the logfile.</li>
+<li><code>--stopOnFirstError</code> stop on first error.</li>
+<li><code>--help</code> display this help screen.</li>
+<li><code>--version</code> display version information.</li>
+<li><code>--keepFiles</code> (default: false) determines if all auto-generated files should be kept or removed after running the benchmarks.</li>
+<li><code>--noOverwrite</code> (default: false) determines if the exported result files should not be overwritten.</li>
+<li><code>--disableLogFile</code> disables the logfile.</li>
+<li><code>--maxWidth</code> max parameter column width, the default is 20.</li>
+<li><code>--envVars</code> colon separated environment variables (key:value).</li>
+<li><code>--strategy</code> the RunStrategy that should be used. Throughput/ColdStart/Monitoring.</li>
+<li><code>--platform</code> the Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64.</li>
+<li><code>--runOncePerIteration</code> run the benchmark exactly once per iteration.</li>
+<li><code>--buildTimeout</code> build timeout in seconds.</li>
+<li><code>--wasmEngine</code> full path to a java script engine used to run the benchmarks, used by Wasm toolchain.</li>
+<li><code>--wasmMainJS</code> path to the main.js file used by Wasm toolchain. Mandatory when using &quot;--runtimes wasm&quot;</li>
+<li><code>--expose_wasm</code> arguments for the JavaScript engine used by Wasm toolchain.</li>
+<li><code>--customRuntimePack</code> specify the path to a custom runtime pack. Only used for wasm currently.</li>
 </ul>
 </article>
           </div>
@@ -300,7 +314,8 @@ static IConfig GetGlobalConfig()
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -314,7 +329,7 @@ static IConfig GetGlobalConfig()
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

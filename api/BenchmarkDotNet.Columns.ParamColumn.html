@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ParamColumn
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -158,12 +158,12 @@
   
   
   <a id="BenchmarkDotNet_Columns_ParamColumn__ctor_" data-uid="BenchmarkDotNet.Columns.ParamColumn.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Columns_ParamColumn__ctor_System_String_" data-uid="BenchmarkDotNet.Columns.ParamColumn.#ctor(System.String)">ParamColumn(String)</h4>
+  <h4 id="BenchmarkDotNet_Columns_ParamColumn__ctor_System_String_System_Int32_" data-uid="BenchmarkDotNet.Columns.ParamColumn.#ctor(System.String,System.Int32)">ParamColumn(String, Int32)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ParamColumn(string columnName)</code></pre>
+    <pre><code class="lang-csharp hljs">public ParamColumn(string columnName, int priorityInCategory = 0)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -178,6 +178,11 @@
       <tr>
         <td><span class="xref">System.String</span></td>
         <td><span class="parametername">columnName</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">priorityInCategory</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -619,7 +624,8 @@
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -633,7 +639,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

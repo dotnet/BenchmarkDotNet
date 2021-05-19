@@ -8,7 +8,7 @@
     <title>Exporters | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Exporters | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -557,16 +557,17 @@ type MyPerformanceTests() =
 </tbody>
 </table>
 <p>Example of CSV exporter configured to always use microseconds, kilobytes, and to render units only in column headers:</p>
-<pre><code class="lang-cs">var config = ManualConfig.Create(DefaultConfig.Instance);
-config.Add(new CsvExporter(
+<pre><code class="lang-cs">var exporter = new CsvExporter(
     CsvSeparator.CurrentCulture,
-    new BenchmarkDotNet.Reports.SummaryStyle
-    {
-        PrintUnitsInHeader = true,
-        PrintUnitsInContent = false,
-        TimeUnit = BenchmarkDotNet.Horology.TimeUnit.Microsecond,
-        SizeUnit = BenchmarkDotNet.Columns.SizeUnit.KB
-    }));
+    new SummaryStyle(
+        cultureInfo: System.Globalization.CultureInfo.CurrentCulture,
+        printUnitsInHeader: true,
+        printUnitsInContent: false,
+        timeUnit: Perfolizer.Horology.TimeUnit.Microsecond,
+        sizeUnit: SizeUnit.KB
+    ));
+
+var config = ManualConfig.CreateMinimumViable().AddExporter(exporter);
 </code></pre>
 <p>Excerpt from the resulting CSV file:</p>
 <pre><code>Method,...,Mean [us],Error [us],StdDev [us],Min [us],Max [us],Allocated [KB]
@@ -585,7 +586,8 @@ Benchmark,...,&quot;37,647.6&quot;,&quot;32,717.9&quot;,&quot;21,640.9&quot;,&qu
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -599,7 +601,7 @@ Benchmark,...,&quot;37,647.6&quot;,&quot;32,717.9&quot;,&quot;21,640.9&quot;,&qu
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

@@ -8,7 +8,7 @@
     <title>Parameterization | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Parameterization | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -137,12 +137,12 @@ namespace BenchmarkDotNet.Samples
     }
 }
 </code></pre><h3 id="output">Output</h3>
-<pre><code class="lang-markdown">   Method  |      Median |    StdDev |   A |  B
----------- |------------ |---------- |---- |---
- Benchmark | 115.3325 ms | 0.0242 ms | 100 | 10
- Benchmark | 125.3282 ms | 0.0245 ms | 100 | 20
- Benchmark | 215.3024 ms | 0.0375 ms | 200 | 10
- Benchmark | 225.2710 ms | 0.0434 ms | 200 | 20
+<pre><code class="lang-markdown">|    Method |   A |  B |     Mean |   Error |  StdDev |
+|---------- |---- |--- |---------:|--------:|--------:|
+| Benchmark | 100 | 10 | 115.3 ms | 0.13 ms | 0.12 ms |
+| Benchmark | 100 | 20 | 125.4 ms | 0.14 ms | 0.12 ms |
+| Benchmark | 200 | 10 | 215.5 ms | 0.19 ms | 0.18 ms |
+| Benchmark | 200 | 20 | 225.4 ms | 0.17 ms | 0.16 ms |
 </code></pre>
 <h3 id="links">Links</h3>
 <ul>
@@ -186,12 +186,12 @@ namespace BenchmarkDotNet.Samples
     }
 }
 </code></pre><h3 id="output">Output</h3>
-<pre><code class="lang-markdown">   Method  |      Median |    StdDev |   A |  B
----------- |------------ |---------- |---- |---
- Benchmark | 115.3325 ms | 0.0242 ms | 100 | 10
- Benchmark | 125.3282 ms | 0.0245 ms | 100 | 20
- Benchmark | 215.3024 ms | 0.0375 ms | 200 | 10
- Benchmark | 225.2710 ms | 0.0434 ms | 200 | 20
+<pre><code class="lang-markdown">|    Method |  B |   A |     Mean |   Error |  StdDev |
+|---------- |--- |---- |---------:|--------:|--------:|
+| Benchmark | 10 | 100 | 115.5 ms | 0.17 ms | 0.16 ms |
+| Benchmark | 10 | 200 | 215.6 ms | 0.15 ms | 0.14 ms |
+| Benchmark | 20 | 100 | 125.5 ms | 0.19 ms | 0.18 ms |
+| Benchmark | 20 | 200 | 225.5 ms | 0.23 ms | 0.22 ms |
 </code></pre>
 <h3 id="remarks">Remarks</h3>
 <p><strong>A remark about IParam.</strong></p>
@@ -253,15 +253,43 @@ namespace BenchmarkDotNet.Samples
  Benchmark | Three |     ? | 301.4 ms |    NA |
  Benchmark | Three | False | 311.5 ms |    NA |
  Benchmark | Three |  True | 320.8 ms |    NA |
-
-// * Legends *
-  E     : Value of the 'E' parameter
-  B     : Value of the 'B' parameter
 </code></pre>
 <h3 id="links">Links</h3>
 <ul>
 <li><a class="xref" href="parameterization.html">Parameterization</a></li>
 <li>The permanent link to this sample: <a class="xref" href="../samples/IntroParamsAllValues.html">Sample: IntroParamsAllValues</a></li>
+</ul>
+<hr>
+<h2 id="sample-introparamspriority">Sample: IntroParamsPriority</h2>
+<p>In order to sort columns of parameters in the results table you can use the Property <code>Priority</code> inside the params attribute. The priority range is <code>[Int32.MinValue;Int32.MaxValue]</code>, lower priorites will appear earlier in the column order. The default priority is set to <code>0</code>.</p>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroParamsPriority.cs">using System.Threading;
+using BenchmarkDotNet.Attributes;
+
+namespace BenchmarkDotNet.Samples
+{
+    public class IntroParamsPriority
+    {
+        [Params(100)]
+        public int A { get; set; }
+
+        [Params(10, Priority = -100)]
+        public int B { get; set; }
+
+        [Benchmark]
+        public void Benchmark() =&gt; Thread.Sleep(A + B + 5);
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<pre><code class="lang-markdown">|    Method |  B |   A |     Mean |   Error |  StdDev |
+|---------- |--- |---- |---------:|--------:|--------:|
+| Benchmark | 10 | 100 | 115.4 ms | 0.12 ms | 0.11 ms |
+</code></pre>
+<h3 id="links">Links</h3>
+<ul>
+<li>Priority BaseClass <a class="xref" href="../../api/BenchmarkDotNet.Attributes.PriorityAttribute.html"><code>PriorityAttribute.cs</code></a></li>
+<li><a class="xref" href="parameterization.html">Parameterization</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroParamsPriority.html">Sample: IntroParamsPriority</a></li>
 </ul>
 <hr>
 <h2 id="sample-introarguments">Sample: IntroArguments</h2>
@@ -472,6 +500,51 @@ namespace BenchmarkDotNet.Samples
 <li>The permanent link to this sample: <a class="xref" href="../samples/IntroArrayParam.html">Sample: IntroArrayParam</a></li>
 </ul>
 <hr>
+<h2 id="sample-introargumentspriority">Sample: IntroArgumentsPriority</h2>
+<p>Like Params also Argument columns can be sorted in the table result through their <code>Priority</code>. The priority should be defined only once for multiple Arguments and will keep their inner order as they are defined in the method.</p>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroArgumentsPriority.cs">using System.Collections.Generic;
+using System.Threading;
+using BenchmarkDotNet.Attributes;
+
+namespace BenchmarkDotNet.Samples
+{
+    public class IntroArgumentsPriority
+    {
+        [Params(100, Priority = 0)] // Argument priority can be combined with Params priority
+        public int A { get; set; }
+
+        [Arguments(5, Priority = -10)] // Define priority just once for multiple argument attributes
+        [Arguments(10)]
+        [Arguments(20)]
+        [Benchmark]
+        public void Benchmark(int b) =&gt; Thread.Sleep(A + b);
+
+        [Benchmark]
+        [ArgumentsSource(nameof(Numbers), Priority = 10)]
+        public void ManyArguments(int c, int d) =&gt; Thread.Sleep(A + c + d);
+
+        public IEnumerable&lt;object[]&gt; Numbers()
+        {
+            yield return new object[] { 1, 2 };
+        }
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<pre><code class="lang-markdown">|        Method |  b |   A | c | d |     Mean |   Error |  StdDev |
+|-------------- |--- |---- |-- |-- |---------:|--------:|--------:|
+| ManyArguments |  ? | 100 | 1 | 2 | 103.4 ms | 0.09 ms | 0.08 ms |
+|     Benchmark |  5 | 100 | ? | ? | 105.5 ms | 0.21 ms | 0.19 ms |
+|     Benchmark | 10 | 100 | ? | ? | 110.5 ms | 0.14 ms | 0.14 ms |
+|     Benchmark | 20 | 100 | ? | ? | 120.4 ms | 0.16 ms | 0.15 ms |
+</code></pre>
+<h3 id="links">Links</h3>
+<ul>
+<li>Priority BaseClass <a class="xref" href="../../api/BenchmarkDotNet.Attributes.PriorityAttribute.html"><code>PriorityAttribute.cs</code></a></li>
+<li><a class="xref" href="parameterization.html">Parameterization</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroArgumentsPriority.html">Sample: IntroArgumentsPriority</a></li>
+</ul>
+<hr>
 </article>
           </div>
           
@@ -485,7 +558,8 @@ namespace BenchmarkDotNet.Samples
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -499,7 +573,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

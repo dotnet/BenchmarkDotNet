@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Generator
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -131,6 +131,7 @@ and <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c7195
   <div classs="implements">
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Toolchains.IGenerator.html">IGenerator</a></div>
+    <div><span class="xref">System.IEquatable</span>&lt;<a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html">CsProjGenerator</a>&gt;</div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -147,6 +148,15 @@ and <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c7195
       <a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetProjectFilePath_System_Type_BenchmarkDotNet_Loggers_ILogger_">CsProjGenerator.GetProjectFilePath(Type, ILogger)</a>
     </div>
     <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_Equals_System_Object_">CsProjGenerator.Equals(Object)</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_Equals_BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_">CsProjGenerator.Equals(CsProjGenerator)</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetHashCode">CsProjGenerator.GetHashCode()</a>
+    </div>
+    <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator_TargetFrameworkMoniker">DotNetCliGenerator.TargetFrameworkMoniker</a>
     </div>
     <div>
@@ -154,6 +164,9 @@ and <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c7195
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator_PackagesPath">DotNetCliGenerator.PackagesPath</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator_IsNetCore">DotNetCliGenerator.IsNetCore</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator_CopyAllRequiredFiles_BenchmarkDotNet_Toolchains_ArtifactsPaths_">DotNetCliGenerator.CopyAllRequiredFiles(ArtifactsPaths)</a>
@@ -171,13 +184,10 @@ and <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c7195
       <a class="xref" href="BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GenerateCode_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Toolchains_ArtifactsPaths_">GeneratorBase.GenerateCode(BuildPartition, ArtifactsPaths)</a>
     </div>
     <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GetExecutablePath_System_String_System_String_">GeneratorBase.GetExecutablePath(String, String)</a>
     </div>
     <div>
       <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
     </div>
     <div>
       <span class="xref">System.Object.GetType()</span>
@@ -196,7 +206,7 @@ and <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c7195
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Toolchains_CoreRt_Generator_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class Generator : CsProjGenerator, IGenerator</code></pre>
+    <pre><code class="lang-csharp hljs">public class Generator : CsProjGenerator, IGenerator, IEquatable&lt;CsProjGenerator&gt;</code></pre>
   </div>
   <h3 id="methods">Methods
   </h3>
@@ -475,6 +485,9 @@ and <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c7195
   <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.IGenerator.html">IGenerator</a>
   </div>
+  <div>
+      <span class="xref">System.IEquatable&lt;T&gt;</span>
+  </div>
 </article>
           </div>
           
@@ -485,7 +498,8 @@ and <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c7195
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -499,7 +513,7 @@ and <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c7195
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

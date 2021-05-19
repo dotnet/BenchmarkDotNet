@@ -8,7 +8,7 @@
     <title>Sample: IntroParamsSource | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroParamsSource | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -146,12 +146,12 @@ namespace BenchmarkDotNet.Samples
     }
 }
 </code></pre><h3 id="output">Output</h3>
-<pre><code class="lang-markdown">   Method  |      Median |    StdDev |   A |  B
----------- |------------ |---------- |---- |---
- Benchmark | 115.3325 ms | 0.0242 ms | 100 | 10
- Benchmark | 125.3282 ms | 0.0245 ms | 100 | 20
- Benchmark | 215.3024 ms | 0.0375 ms | 200 | 10
- Benchmark | 225.2710 ms | 0.0434 ms | 200 | 20
+<pre><code class="lang-markdown">|    Method |  B |   A |     Mean |   Error |  StdDev |
+|---------- |--- |---- |---------:|--------:|--------:|
+| Benchmark | 10 | 100 | 115.5 ms | 0.17 ms | 0.16 ms |
+| Benchmark | 10 | 200 | 215.6 ms | 0.15 ms | 0.14 ms |
+| Benchmark | 20 | 100 | 125.5 ms | 0.19 ms | 0.18 ms |
+| Benchmark | 20 | 200 | 225.5 ms | 0.23 ms | 0.22 ms |
 </code></pre>
 <h3 id="remarks">Remarks</h3>
 <p><strong>A remark about IParam.</strong></p>
@@ -176,7 +176,8 @@ Just use complex types as you wish and override <code>ToString</code> method to 
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -190,7 +191,7 @@ Just use complex types as you wish and override <code>ToString</code> method to 
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

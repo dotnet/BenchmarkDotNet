@@ -8,7 +8,7 @@
     <title>Config Options | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Config Options | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -119,7 +119,7 @@ Available config options are:</p>
 <li><code>ConfigOptions.JoinSummary</code> - All benchmarks results should be joined into a single summary (by default we have a summary per type).</li>
 <li><code>ConfigOptions.StopOnFirstError</code> - Benchmarking should be stopped after the first error (by default it's not).</li>
 <li><code>ConfigOptions.DisableOptimizationsValidator</code> - Mandatory optimizations validator should be entirely turned off.</li>
-<li><code>ConfigOptions.DontOverwriteResults</code> - The exported result files should not be overwritten (be default they are overwritten).</li>
+<li><code>ConfigOptions.DontOverwriteResults</code> - The exported result files should not be overwritten (by default they are overwritten).</li>
 <li><code>ConfigOptions.DisableLogFile</code> - Disables the log file written on disk.</li>
 </ul>
 <p>All of these options could be combined and are available as CLI (Comand Line Interface) option (except <code>DisableOptimizationsValidator</code>), see <a class="xref" href="../guides/console-args.html">Console Arguments</a> for further information how to use the CLI.</p>
@@ -129,15 +129,12 @@ Available config options are:</p>
 {
     public Config()
     {
-        Options.Set(true, ConfigOptions.JoinSummary);
-        Options.Set(true, ConfigOptions.DisableLogFile);
-
-        // or
-        Options.Set(true, ConfigOptions.JoinSummary | ConfigOptions.DisableLogFile);
-
-        // or using the With() factory method:
-        this.With(ConfigOptions.JoinSummary)
-            .With(ConfigOptions.DisableLogFile);
+        // Using the WithOptions() factory method:
+        this.WithOptions(ConfigOptions.JoinSummary)
+            .WithOptions(ConfigOptions.DisableLogFile);
+        
+        // Or (The ConfigOptions Enum is defined as a BitField)
+        this.WithOptions(ConfigOptions.JoinSummary | ConfigOptions.DisableLogFile);
 
     }
 }
@@ -149,10 +146,10 @@ Available config options are:</p>
             .Run&lt;Benchmarks&gt;(
                 ManualConfig
                     .Create(DefaultConfig.Instance)
-                    .With(ConfigOptions.JoinSummary)
-                    .With(ConfigOptions.DisableLogFile)
+                    .WithOptions(ConfigOptions.JoinSummary)
+                    .WithOptions(ConfigOptions.DisableLogFile)
                     // or
-                    .With(ConfigOptions.JoinSummary | ConfigOptions.DisableLogFile));
+                    .WithOptions(ConfigOptions.JoinSummary | ConfigOptions.DisableLogFile));
     }
 </code></pre>
 </article>
@@ -168,7 +165,8 @@ Available config options are:</p>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -182,7 +180,7 @@ Available config options are:</p>
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

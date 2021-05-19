@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ParamsAllValuesAttribute
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -121,10 +121,14 @@
     <h5>Inheritance</h5>
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">System.Attribute</span></div>
-    <div class="level2"><span class="xref">ParamsAllValuesAttribute</span></div>
+    <div class="level2"><a class="xref" href="BenchmarkDotNet.Attributes.PriorityAttribute.html">PriorityAttribute</a></div>
+    <div class="level3"><span class="xref">ParamsAllValuesAttribute</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Attributes.PriorityAttribute.html#BenchmarkDotNet_Attributes_PriorityAttribute_Priority">PriorityAttribute.Priority</a>
+    </div>
     <div>
       <span class="xref">System.Attribute.Equals(System.Object)</span>
     </div>
@@ -253,11 +257,11 @@
     </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Attributes.html">BenchmarkDotNet.Attributes</a></h6>
-  <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
+  <h6><strong>Assembly</strong>: BenchmarkDotNet.Annotations.dll</h6>
   <h5 id="BenchmarkDotNet_Attributes_ParamsAllValuesAttribute_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-public class ParamsAllValuesAttribute : Attribute</code></pre>
+    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+public class ParamsAllValuesAttribute : PriorityAttribute</code></pre>
   </div>
 </article>
           </div>
@@ -269,7 +273,8 @@ public class ParamsAllValuesAttribute : Attribute</code></pre>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -283,7 +288,7 @@ public class ParamsAllValuesAttribute : Attribute</code></pre>
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ParameterDefinition
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -157,12 +157,12 @@
   
   
   <a id="BenchmarkDotNet_Parameters_ParameterDefinition__ctor_" data-uid="BenchmarkDotNet.Parameters.ParameterDefinition.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Parameters_ParameterDefinition__ctor_System_String_System_Boolean_System_Object___System_Boolean_System_Type_" data-uid="BenchmarkDotNet.Parameters.ParameterDefinition.#ctor(System.String,System.Boolean,System.Object[],System.Boolean,System.Type)">ParameterDefinition(String, Boolean, Object[], Boolean, Type)</h4>
+  <h4 id="BenchmarkDotNet_Parameters_ParameterDefinition__ctor_System_String_System_Boolean_System_Object___System_Boolean_System_Type_System_Int32_" data-uid="BenchmarkDotNet.Parameters.ParameterDefinition.#ctor(System.String,System.Boolean,System.Object[],System.Boolean,System.Type,System.Int32)">ParameterDefinition(String, Boolean, Object[], Boolean, Type, Int32)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ParameterDefinition(string name, bool isStatic, object[] values, bool isArgument, Type parameterType)</code></pre>
+    <pre><code class="lang-csharp hljs">public ParameterDefinition(string name, bool isStatic, object[] values, bool isArgument, Type parameterType, int priorityInCategory)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -197,6 +197,11 @@
       <tr>
         <td><span class="xref">System.Type</span></td>
         <td><span class="parametername">parameterType</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">priorityInCategory</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -305,6 +310,31 @@
   </table>
   
   
+  <a id="BenchmarkDotNet_Parameters_ParameterDefinition_PriorityInCategory_" data-uid="BenchmarkDotNet.Parameters.ParameterDefinition.PriorityInCategory*"></a>
+  <h4 id="BenchmarkDotNet_Parameters_ParameterDefinition_PriorityInCategory" data-uid="BenchmarkDotNet.Parameters.ParameterDefinition.PriorityInCategory">PriorityInCategory</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int PriorityInCategory { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Parameters_ParameterDefinition_Values_" data-uid="BenchmarkDotNet.Parameters.ParameterDefinition.Values*"></a>
   <h4 id="BenchmarkDotNet_Parameters_ParameterDefinition_Values" data-uid="BenchmarkDotNet.Parameters.ParameterDefinition.Values">Values</h4>
   <div class="markdown level1 summary"></div>
@@ -338,7 +368,8 @@
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -352,7 +383,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

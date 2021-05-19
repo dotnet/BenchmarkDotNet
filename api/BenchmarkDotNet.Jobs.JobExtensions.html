@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class JobExtensions
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -1869,6 +1869,55 @@ The default value is 50</p>
   </table>
   
   
+  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithMemoryRandomization_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithMemoryRandomization*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithMemoryRandomization_BenchmarkDotNet_Jobs_Job_System_Boolean_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithMemoryRandomization(BenchmarkDotNet.Jobs.Job,System.Boolean)">WithMemoryRandomization(Job, Boolean)</h4>
+  <div class="markdown level1 summary"><p>specifies whether Engine should allocate some random-sized memory between iterations
+<remarks>it makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration</remarks></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Job WithMemoryRandomization(this Job job, bool enable = true)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td><span class="parametername">job</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">enable</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Jobs_JobExtensions_WithMinInvokeCount_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithMinInvokeCount*"></a>
   <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithMinInvokeCount_BenchmarkDotNet_Jobs_Job_System_Int32_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithMinInvokeCount(BenchmarkDotNet.Jobs.Job,System.Int32)">WithMinInvokeCount(Job, Int32)</h4>
   <div class="markdown level1 summary"><p>Minimum count of benchmark invocations per iteration
@@ -2164,62 +2213,13 @@ The default value is 6</p>
   
   
   <a id="BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithNuGet*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_BenchmarkDotNet_Jobs_Job_System_String_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,System.String)">WithNuGet(Job, String)</h4>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_BenchmarkDotNet_Jobs_Job_System_String_System_String_System_Uri_System_Boolean_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,System.String,System.String,System.Uri,System.Boolean)">WithNuGet(Job, String, String, Uri, Boolean)</h4>
   <div class="markdown level1 summary"><p>Runs the job with a specific NuGet dependency which will be resolved during the Job build process</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job WithNuGet(this Job job, string packageName)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td><span class="parametername">job</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.String</span></td>
-        <td><span class="parametername">packageName</span></td>
-        <td><p>The NuGet package name, the latest version will be resolved</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithNuGet*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_BenchmarkDotNet_Jobs_Job_System_String_System_String_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,System.String,System.String)">WithNuGet(Job, String, String)</h4>
-  <div class="markdown level1 summary"><p>Runs the job with a specific NuGet dependency which will be resolved during the Job build process</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job WithNuGet(this Job job, string packageName, string packageVersion)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Job WithNuGet(this Job job, string packageName, string packageVersion = null, Uri source = null, bool prerelease = false)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -2245,7 +2245,19 @@ The default value is 6</p>
       <tr>
         <td><span class="xref">System.String</span></td>
         <td><span class="parametername">packageVersion</span></td>
-        <td><p>The NuGet package version</p>
+        <td><p>(optional)The NuGet package version</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Uri</span></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>(optional)Indicate the URI of the NuGet package source to use during the restore operation.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">prerelease</span></td>
+        <td><p>(optional)Allows prerelease packages to be installed.</p>
 </td>
       </tr>
     </tbody>
@@ -2757,7 +2769,8 @@ The default value is 16.</p>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -2771,7 +2784,7 @@ The default value is 16.</p>
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class CommandLineOptions
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -234,6 +234,58 @@ public IEnumerable&lt;string&gt; AnyCategories { get; set; }</code></pre>
   </table>
   
   
+  <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_AOTCompilerMode_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerMode*"></a>
+  <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_AOTCompilerMode" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerMode">AOTCompilerMode</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Option(&quot;AOTCompilerMode&quot;, Required = false, Default = MonoAotCompilerMode.mini, HelpText = &quot;Mono AOT compiler mode, either 'mini' or 'llvm'&quot;)]
+public MonoAotCompilerMode AOTCompilerMode { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode.html">MonoAotCompilerMode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_AOTCompilerPath_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerPath*"></a>
+  <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_AOTCompilerPath" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerPath">AOTCompilerPath</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Option(&quot;AOTCompilerPath&quot;, Required = false, HelpText = &quot;Path to Mono AOT compiler, used for MonoAotLLVM.&quot;)]
+public FileInfo AOTCompilerPath { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_ArtifactsDirectory_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.ArtifactsDirectory*"></a>
   <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_ArtifactsDirectory" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.ArtifactsDirectory">ArtifactsDirectory</h4>
   <div class="markdown level1 summary"></div>
@@ -436,6 +488,32 @@ public IReadOnlyList&lt;FileInfo&gt; CoreRunPaths { get; set; }</code></pre>
     <tbody>
       <tr>
         <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<span class="xref">System.IO.FileInfo</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_CustomRuntimePack_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.CustomRuntimePack*"></a>
+  <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_CustomRuntimePack" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.CustomRuntimePack">CustomRuntimePack</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Option(&quot;customRuntimePack&quot;, Required = false, HelpText = &quot;Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.&quot;)]
+public string CustomRuntimePack { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -962,6 +1040,32 @@ public int? MaxWarmupIterationCount { get; set; }</code></pre>
   </table>
   
   
+  <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_MemoryRandomization_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.MemoryRandomization*"></a>
+  <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_MemoryRandomization" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.MemoryRandomization">MemoryRandomization</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Option(&quot;memoryRandomization&quot;, Required = false, HelpText = &quot;Specifies whether Engine should allocate some random-sized memory between iterations. It makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration.&quot;)]
+public bool MemoryRandomization { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_MinIterationCount_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.MinIterationCount*"></a>
   <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_MinIterationCount" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.MinIterationCount">MinIterationCount</h4>
   <div class="markdown level1 summary"></div>
@@ -1060,6 +1164,32 @@ public OutlierMode Outliers { get; set; }</code></pre>
     <tbody>
       <tr>
         <td><span class="xref">Perfolizer.Mathematics.OutlierDetection.OutlierMode</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_Platform_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.Platform*"></a>
+  <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_Platform" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.Platform">Platform</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Option(&quot;platform&quot;, Required = false, HelpText = &quot;The Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64.&quot;)]
+public Platform? Platform { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Nullable</span>&lt;<a class="xref" href="BenchmarkDotNet.Environments.Platform.html">Platform</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -1454,6 +1584,84 @@ public int? WarmupIterationCount { get; set; }</code></pre>
       </tr>
     </tbody>
   </table>
+  
+  
+  <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_WasmJavascriptEngine_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavascriptEngine*"></a>
+  <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_WasmJavascriptEngine" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavascriptEngine">WasmJavascriptEngine</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Option(&quot;wasmEngine&quot;, Required = false, HelpText = &quot;Full path to a java script engine used to run the benchmarks, used by Wasm toolchain.&quot;)]
+public FileInfo WasmJavascriptEngine { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_WasmJavaScriptEngineArguments_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavaScriptEngineArguments*"></a>
+  <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_WasmJavaScriptEngineArguments" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavaScriptEngineArguments">WasmJavaScriptEngineArguments</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Option(&quot;wasmArgs&quot;, Required = false, Default = &quot;--expose_wasm&quot;, HelpText = &quot;Arguments for the javascript engine used by Wasm toolchain.&quot;)]
+public string WasmJavaScriptEngineArguments { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_WasmMainJs_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmMainJs*"></a>
+  <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_WasmMainJs" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmMainJs">WasmMainJs</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Option(&quot;wasmMainJS&quot;, Required = false, HelpText = &quot;Path to the main.js file used by Wasm toolchain. Mandatory when using \&quot;--runtimes wasm\&quot;&quot;)]
+public FileInfo WasmMainJs { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
 </article>
           </div>
           
@@ -1464,7 +1672,8 @@ public int? WarmupIterationCount { get; set; }</code></pre>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -1478,7 +1687,7 @@ public int? WarmupIterationCount { get; set; }</code></pre>
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

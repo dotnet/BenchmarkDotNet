@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class BenchmarkRunner
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -241,12 +241,12 @@
   
   
   <a id="BenchmarkDotNet_Running_BenchmarkRunner_Run_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run*"></a>
-  <h4 id="BenchmarkDotNet_Running_BenchmarkRunner_Run_System_Reflection_Assembly_BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Reflection.Assembly,BenchmarkDotNet.Configs.IConfig)">Run(Assembly, IConfig)</h4>
+  <h4 id="BenchmarkDotNet_Running_BenchmarkRunner_Run_System_Reflection_Assembly_BenchmarkDotNet_Configs_IConfig_System_String___" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Reflection.Assembly,BenchmarkDotNet.Configs.IConfig,System.String[])">Run(Assembly, IConfig, String[])</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Summary[] Run(Assembly assembly, IConfig config = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Summary[] Run(Assembly assembly, IConfig config = null, string[] args = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -266,6 +266,11 @@
       <tr>
         <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
         <td><span class="parametername">config</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span>[]</td>
+        <td><span class="parametername">args</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -288,12 +293,12 @@
   
   
   <a id="BenchmarkDotNet_Running_BenchmarkRunner_Run_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run*"></a>
-  <h4 id="BenchmarkDotNet_Running_BenchmarkRunner_Run_System_Type_BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Type,BenchmarkDotNet.Configs.IConfig)">Run(Type, IConfig)</h4>
+  <h4 id="BenchmarkDotNet_Running_BenchmarkRunner_Run_System_Type_BenchmarkDotNet_Configs_IConfig_System_String___" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Type,BenchmarkDotNet.Configs.IConfig,System.String[])">Run(Type, IConfig, String[])</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Summary Run(Type type, IConfig config = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Summary Run(Type type, IConfig config = null, string[] args = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -313,6 +318,11 @@
       <tr>
         <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
         <td><span class="parametername">config</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span>[]</td>
+        <td><span class="parametername">args</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -387,12 +397,12 @@
   
   
   <a id="BenchmarkDotNet_Running_BenchmarkRunner_Run_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run*"></a>
-  <h4 id="BenchmarkDotNet_Running_BenchmarkRunner_Run__1_BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run``1(BenchmarkDotNet.Configs.IConfig)">Run&lt;T&gt;(IConfig)</h4>
+  <h4 id="BenchmarkDotNet_Running_BenchmarkRunner_Run__1_BenchmarkDotNet_Configs_IConfig_System_String___" data-uid="BenchmarkDotNet.Running.BenchmarkRunner.Run``1(BenchmarkDotNet.Configs.IConfig,System.String[])">Run&lt;T&gt;(IConfig, String[])</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Summary Run&lt;T&gt;(IConfig config = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Summary Run&lt;T&gt;(IConfig config = null, string[] args = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -407,6 +417,11 @@
       <tr>
         <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
         <td><span class="parametername">config</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span>[]</td>
+        <td><span class="parametername">args</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -545,7 +560,8 @@
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -559,7 +575,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

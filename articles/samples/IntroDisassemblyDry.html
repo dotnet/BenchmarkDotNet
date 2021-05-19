@@ -8,7 +8,7 @@
     <title>Sample: IntroDisassemblyDry | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroDisassemblyDry | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -116,27 +116,14 @@
 In that case you can use <strong>Job.Dry</strong> which runs the benchmark only <strong>once</strong>.</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroDisassemblyDry.cs">using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples
 {
-    [Config(typeof(JustDisassembly))]
+    [DisassemblyDiagnoser(maxDepth: 3)]
+    [DryJob]
     public class IntroDisassemblyDry
     {
-        public class JustDisassembly : ManualConfig
-        {
-            public JustDisassembly()
-            {
-                AddJob(Job.Dry.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core20));
-                AddJob(Job.Dry.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core21));
-
-                AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(maxDepth: 3)));
-            }
-        }
-
         [Benchmark]
         public void Foo()
         {
@@ -164,7 +151,8 @@ namespace BenchmarkDotNet.Samples
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -178,7 +166,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

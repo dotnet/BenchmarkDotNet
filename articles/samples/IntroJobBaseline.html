@@ -8,7 +8,7 @@
     <title>Sample: IntroJobBaseline | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroJobBaseline | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -121,7 +121,7 @@ namespace BenchmarkDotNet.Samples
 {
     [SimpleJob(runtimeMoniker: RuntimeMoniker.Net461, baseline: true)]
     [SimpleJob(runtimeMoniker: RuntimeMoniker.Mono)]
-    [SimpleJob(runtimeMoniker: RuntimeMoniker.NetCoreApp21)]
+    [SimpleJob(runtimeMoniker: RuntimeMoniker.Net50)]
     public class IntroJobBaseline
     {
         [Benchmark]
@@ -164,7 +164,8 @@ Frequency=2531249 Hz, Resolution=395.0619 ns, Timer=TSC
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -178,7 +179,7 @@ Frequency=2531249 Hz, Resolution=395.0619 ns, Timer=TSC
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

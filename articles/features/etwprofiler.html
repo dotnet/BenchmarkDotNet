@@ -8,7 +8,7 @@
     <title>EtwProfiler | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="EtwProfiler | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -148,7 +148,7 @@ public class TheClassThatContainsBenchmarks { /* benchmarks go here */ }
             .FromAssembly(typeof(Program).Assembly)
             .Run(args,
                 DefaultConfig.Instance
-                    .With(new EtwProfiler())); // HERE
+                    .AddDiagnoser(new EtwProfiler())); // HERE
 }
 </code></pre>
 <ul>
@@ -193,7 +193,8 @@ public class TheClassThatContainsBenchmarks { /* benchmarks go here */ }
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -207,7 +208,7 @@ public class TheClassThatContainsBenchmarks { /* benchmarks go here */ }
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

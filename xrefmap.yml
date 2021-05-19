@@ -2542,6 +2542,25 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Attributes.MemoryDiagnoserAttribute.Config
   nameWithType: MemoryDiagnoserAttribute.Config
+- uid: BenchmarkDotNet.Attributes.MemoryRandomizationAttribute
+  name: MemoryRandomizationAttribute
+  href: api/BenchmarkDotNet.Attributes.MemoryRandomizationAttribute.html
+  commentId: T:BenchmarkDotNet.Attributes.MemoryRandomizationAttribute
+  fullName: BenchmarkDotNet.Attributes.MemoryRandomizationAttribute
+  nameWithType: MemoryRandomizationAttribute
+- uid: BenchmarkDotNet.Attributes.MemoryRandomizationAttribute.#ctor(System.Boolean,Perfolizer.Mathematics.OutlierDetection.OutlierMode)
+  name: MemoryRandomizationAttribute(Boolean, OutlierMode)
+  href: api/BenchmarkDotNet.Attributes.MemoryRandomizationAttribute.html#BenchmarkDotNet_Attributes_MemoryRandomizationAttribute__ctor_System_Boolean_Perfolizer_Mathematics_OutlierDetection_OutlierMode_
+  commentId: M:BenchmarkDotNet.Attributes.MemoryRandomizationAttribute.#ctor(System.Boolean,Perfolizer.Mathematics.OutlierDetection.OutlierMode)
+  fullName: BenchmarkDotNet.Attributes.MemoryRandomizationAttribute.MemoryRandomizationAttribute(System.Boolean, Perfolizer.Mathematics.OutlierDetection.OutlierMode)
+  nameWithType: MemoryRandomizationAttribute.MemoryRandomizationAttribute(Boolean, OutlierMode)
+- uid: BenchmarkDotNet.Attributes.MemoryRandomizationAttribute.#ctor*
+  name: MemoryRandomizationAttribute
+  href: api/BenchmarkDotNet.Attributes.MemoryRandomizationAttribute.html#BenchmarkDotNet_Attributes_MemoryRandomizationAttribute__ctor_
+  commentId: Overload:BenchmarkDotNet.Attributes.MemoryRandomizationAttribute.#ctor
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Attributes.MemoryRandomizationAttribute.MemoryRandomizationAttribute
+  nameWithType: MemoryRandomizationAttribute.MemoryRandomizationAttribute
 - uid: BenchmarkDotNet.Attributes.MinColumnAttribute
   name: MinColumnAttribute
   href: api/BenchmarkDotNet.Attributes.MinColumnAttribute.html
@@ -2700,6 +2719,62 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Attributes.NamespaceColumnAttribute.NamespaceColumnAttribute
   nameWithType: NamespaceColumnAttribute.NamespaceColumnAttribute
+- uid: BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute
+  name: OperatingSystemsArchitectureFilterAttribute
+  href: api/BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.html
+  commentId: T:BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute
+  fullName: BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute
+  nameWithType: OperatingSystemsArchitectureFilterAttribute
+- uid: BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.#ctor
+  name: OperatingSystemsArchitectureFilterAttribute()
+  href: api/BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.html#BenchmarkDotNet_Attributes_OperatingSystemsArchitectureFilterAttribute__ctor
+  commentId: M:BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.#ctor
+  fullName: BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.OperatingSystemsArchitectureFilterAttribute()
+  nameWithType: OperatingSystemsArchitectureFilterAttribute.OperatingSystemsArchitectureFilterAttribute()
+- uid: BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.#ctor(System.Boolean,System.Runtime.InteropServices.Architecture[])
+  name: OperatingSystemsArchitectureFilterAttribute(Boolean, Architecture[])
+  href: api/BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.html#BenchmarkDotNet_Attributes_OperatingSystemsArchitectureFilterAttribute__ctor_System_Boolean_System_Runtime_InteropServices_Architecture___
+  commentId: M:BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.#ctor(System.Boolean,System.Runtime.InteropServices.Architecture[])
+  name.vb: OperatingSystemsArchitectureFilterAttribute(Boolean, Architecture())
+  fullName: BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.OperatingSystemsArchitectureFilterAttribute(System.Boolean, System.Runtime.InteropServices.Architecture[])
+  fullName.vb: BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.OperatingSystemsArchitectureFilterAttribute(System.Boolean, System.Runtime.InteropServices.Architecture())
+  nameWithType: OperatingSystemsArchitectureFilterAttribute.OperatingSystemsArchitectureFilterAttribute(Boolean, Architecture[])
+  nameWithType.vb: OperatingSystemsArchitectureFilterAttribute.OperatingSystemsArchitectureFilterAttribute(Boolean, Architecture())
+- uid: BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.#ctor*
+  name: OperatingSystemsArchitectureFilterAttribute
+  href: api/BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.html#BenchmarkDotNet_Attributes_OperatingSystemsArchitectureFilterAttribute__ctor_
+  commentId: Overload:BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.#ctor
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.OperatingSystemsArchitectureFilterAttribute
+  nameWithType: OperatingSystemsArchitectureFilterAttribute.OperatingSystemsArchitectureFilterAttribute
+- uid: BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute
+  name: OperatingSystemsFilterAttribute
+  href: api/BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.html
+  commentId: T:BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute
+  fullName: BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute
+  nameWithType: OperatingSystemsFilterAttribute
+- uid: BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.#ctor
+  name: OperatingSystemsFilterAttribute()
+  href: api/BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.html#BenchmarkDotNet_Attributes_OperatingSystemsFilterAttribute__ctor
+  commentId: M:BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.#ctor
+  fullName: BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.OperatingSystemsFilterAttribute()
+  nameWithType: OperatingSystemsFilterAttribute.OperatingSystemsFilterAttribute()
+- uid: BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.#ctor(System.Boolean,BenchmarkDotNet.Attributes.OS[])
+  name: OperatingSystemsFilterAttribute(Boolean, OS[])
+  href: api/BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.html#BenchmarkDotNet_Attributes_OperatingSystemsFilterAttribute__ctor_System_Boolean_BenchmarkDotNet_Attributes_OS___
+  commentId: M:BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.#ctor(System.Boolean,BenchmarkDotNet.Attributes.OS[])
+  name.vb: OperatingSystemsFilterAttribute(Boolean, OS())
+  fullName: BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.OperatingSystemsFilterAttribute(System.Boolean, BenchmarkDotNet.Attributes.OS[])
+  fullName.vb: BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.OperatingSystemsFilterAttribute(System.Boolean, BenchmarkDotNet.Attributes.OS())
+  nameWithType: OperatingSystemsFilterAttribute.OperatingSystemsFilterAttribute(Boolean, OS[])
+  nameWithType.vb: OperatingSystemsFilterAttribute.OperatingSystemsFilterAttribute(Boolean, OS())
+- uid: BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.#ctor*
+  name: OperatingSystemsFilterAttribute
+  href: api/BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.html#BenchmarkDotNet_Attributes_OperatingSystemsFilterAttribute__ctor_
+  commentId: Overload:BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.#ctor
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.OperatingSystemsFilterAttribute
+  nameWithType: OperatingSystemsFilterAttribute.OperatingSystemsFilterAttribute
 - uid: BenchmarkDotNet.Attributes.OrdererAttribute
   name: OrdererAttribute
   href: api/BenchmarkDotNet.Attributes.OrdererAttribute.html
@@ -2732,6 +2807,36 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Attributes.OrdererAttribute.Config
   nameWithType: OrdererAttribute.Config
+- uid: BenchmarkDotNet.Attributes.OS
+  name: OS
+  href: api/BenchmarkDotNet.Attributes.OS.html
+  commentId: T:BenchmarkDotNet.Attributes.OS
+  fullName: BenchmarkDotNet.Attributes.OS
+  nameWithType: OS
+- uid: BenchmarkDotNet.Attributes.OS.Browser
+  name: Browser
+  href: api/BenchmarkDotNet.Attributes.OS.html#BenchmarkDotNet_Attributes_OS_Browser
+  commentId: F:BenchmarkDotNet.Attributes.OS.Browser
+  fullName: BenchmarkDotNet.Attributes.OS.Browser
+  nameWithType: OS.Browser
+- uid: BenchmarkDotNet.Attributes.OS.Linux
+  name: Linux
+  href: api/BenchmarkDotNet.Attributes.OS.html#BenchmarkDotNet_Attributes_OS_Linux
+  commentId: F:BenchmarkDotNet.Attributes.OS.Linux
+  fullName: BenchmarkDotNet.Attributes.OS.Linux
+  nameWithType: OS.Linux
+- uid: BenchmarkDotNet.Attributes.OS.macOS
+  name: macOS
+  href: api/BenchmarkDotNet.Attributes.OS.html#BenchmarkDotNet_Attributes_OS_macOS
+  commentId: F:BenchmarkDotNet.Attributes.OS.macOS
+  fullName: BenchmarkDotNet.Attributes.OS.macOS
+  nameWithType: OS.macOS
+- uid: BenchmarkDotNet.Attributes.OS.Windows
+  name: Windows
+  href: api/BenchmarkDotNet.Attributes.OS.html#BenchmarkDotNet_Attributes_OS_Windows
+  commentId: F:BenchmarkDotNet.Attributes.OS.Windows
+  fullName: BenchmarkDotNet.Attributes.OS.Windows
+  nameWithType: OS.Windows
 - uid: BenchmarkDotNet.Attributes.OutliersAttribute
   name: OutliersAttribute
   href: api/BenchmarkDotNet.Attributes.OutliersAttribute.html
@@ -2849,6 +2954,25 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Attributes.PlainExporterAttribute.PlainExporterAttribute
   nameWithType: PlainExporterAttribute.PlainExporterAttribute
+- uid: BenchmarkDotNet.Attributes.PriorityAttribute
+  name: PriorityAttribute
+  href: api/BenchmarkDotNet.Attributes.PriorityAttribute.html
+  commentId: T:BenchmarkDotNet.Attributes.PriorityAttribute
+  fullName: BenchmarkDotNet.Attributes.PriorityAttribute
+  nameWithType: PriorityAttribute
+- uid: BenchmarkDotNet.Attributes.PriorityAttribute.Priority
+  name: Priority
+  href: api/BenchmarkDotNet.Attributes.PriorityAttribute.html#BenchmarkDotNet_Attributes_PriorityAttribute_Priority
+  commentId: P:BenchmarkDotNet.Attributes.PriorityAttribute.Priority
+  fullName: BenchmarkDotNet.Attributes.PriorityAttribute.Priority
+  nameWithType: PriorityAttribute.Priority
+- uid: BenchmarkDotNet.Attributes.PriorityAttribute.Priority*
+  name: Priority
+  href: api/BenchmarkDotNet.Attributes.PriorityAttribute.html#BenchmarkDotNet_Attributes_PriorityAttribute_Priority_
+  commentId: Overload:BenchmarkDotNet.Attributes.PriorityAttribute.Priority
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Attributes.PriorityAttribute.Priority
+  nameWithType: PriorityAttribute.Priority
 - uid: BenchmarkDotNet.Attributes.ProcessCountAttribute
   name: ProcessCountAttribute
   href: api/BenchmarkDotNet.Attributes.ProcessCountAttribute.html
@@ -6477,12 +6601,12 @@ references:
   commentId: T:BenchmarkDotNet.Columns.ParamColumn
   fullName: BenchmarkDotNet.Columns.ParamColumn
   nameWithType: ParamColumn
-- uid: BenchmarkDotNet.Columns.ParamColumn.#ctor(System.String)
-  name: ParamColumn(String)
-  href: api/BenchmarkDotNet.Columns.ParamColumn.html#BenchmarkDotNet_Columns_ParamColumn__ctor_System_String_
-  commentId: M:BenchmarkDotNet.Columns.ParamColumn.#ctor(System.String)
-  fullName: BenchmarkDotNet.Columns.ParamColumn.ParamColumn(System.String)
-  nameWithType: ParamColumn.ParamColumn(String)
+- uid: BenchmarkDotNet.Columns.ParamColumn.#ctor(System.String,System.Int32)
+  name: ParamColumn(String, Int32)
+  href: api/BenchmarkDotNet.Columns.ParamColumn.html#BenchmarkDotNet_Columns_ParamColumn__ctor_System_String_System_Int32_
+  commentId: M:BenchmarkDotNet.Columns.ParamColumn.#ctor(System.String,System.Int32)
+  fullName: BenchmarkDotNet.Columns.ParamColumn.ParamColumn(System.String, System.Int32)
+  nameWithType: ParamColumn.ParamColumn(String, Int32)
 - uid: BenchmarkDotNet.Columns.ParamColumn.#ctor*
   name: ParamColumn
   href: api/BenchmarkDotNet.Columns.ParamColumn.html#BenchmarkDotNet_Columns_ParamColumn__ctor_
@@ -6851,6 +6975,30 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Columns.RankColumn.UnitType
   nameWithType: RankColumn.UnitType
+- uid: BenchmarkDotNet.Columns.RatioStyle
+  name: RatioStyle
+  href: api/BenchmarkDotNet.Columns.RatioStyle.html
+  commentId: T:BenchmarkDotNet.Columns.RatioStyle
+  fullName: BenchmarkDotNet.Columns.RatioStyle
+  nameWithType: RatioStyle
+- uid: BenchmarkDotNet.Columns.RatioStyle.Percentage
+  name: Percentage
+  href: api/BenchmarkDotNet.Columns.RatioStyle.html#BenchmarkDotNet_Columns_RatioStyle_Percentage
+  commentId: F:BenchmarkDotNet.Columns.RatioStyle.Percentage
+  fullName: BenchmarkDotNet.Columns.RatioStyle.Percentage
+  nameWithType: RatioStyle.Percentage
+- uid: BenchmarkDotNet.Columns.RatioStyle.Trend
+  name: Trend
+  href: api/BenchmarkDotNet.Columns.RatioStyle.html#BenchmarkDotNet_Columns_RatioStyle_Trend
+  commentId: F:BenchmarkDotNet.Columns.RatioStyle.Trend
+  fullName: BenchmarkDotNet.Columns.RatioStyle.Trend
+  nameWithType: RatioStyle.Trend
+- uid: BenchmarkDotNet.Columns.RatioStyle.Value
+  name: Value
+  href: api/BenchmarkDotNet.Columns.RatioStyle.html#BenchmarkDotNet_Columns_RatioStyle_Value
+  commentId: F:BenchmarkDotNet.Columns.RatioStyle.Value
+  fullName: BenchmarkDotNet.Columns.RatioStyle.Value
+  nameWithType: RatioStyle.Value
 - uid: BenchmarkDotNet.Columns.SimpleColumnProvider
   name: SimpleColumnProvider
   href: api/BenchmarkDotNet.Columns.SimpleColumnProvider.html
@@ -9886,6 +10034,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Configs.ManualConfig.CreateEmpty
   nameWithType: ManualConfig.CreateEmpty
+- uid: BenchmarkDotNet.Configs.ManualConfig.CreateMinimumViable
+  name: CreateMinimumViable()
+  href: api/BenchmarkDotNet.Configs.ManualConfig.html#BenchmarkDotNet_Configs_ManualConfig_CreateMinimumViable
+  commentId: M:BenchmarkDotNet.Configs.ManualConfig.CreateMinimumViable
+  fullName: BenchmarkDotNet.Configs.ManualConfig.CreateMinimumViable()
+  nameWithType: ManualConfig.CreateMinimumViable()
+- uid: BenchmarkDotNet.Configs.ManualConfig.CreateMinimumViable*
+  name: CreateMinimumViable
+  href: api/BenchmarkDotNet.Configs.ManualConfig.html#BenchmarkDotNet_Configs_ManualConfig_CreateMinimumViable_
+  commentId: Overload:BenchmarkDotNet.Configs.ManualConfig.CreateMinimumViable
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Configs.ManualConfig.CreateMinimumViable
+  nameWithType: ManualConfig.CreateMinimumViable
 - uid: BenchmarkDotNet.Configs.ManualConfig.CultureInfo
   name: CultureInfo
   href: api/BenchmarkDotNet.Configs.ManualConfig.html#BenchmarkDotNet_Configs_ManualConfig_CultureInfo
@@ -10223,6 +10384,32 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AnyCategories
   nameWithType: CommandLineOptions.AnyCategories
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerMode
+  name: AOTCompilerMode
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_AOTCompilerMode
+  commentId: P:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerMode
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerMode
+  nameWithType: CommandLineOptions.AOTCompilerMode
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerMode*
+  name: AOTCompilerMode
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_AOTCompilerMode_
+  commentId: Overload:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerMode
+  isSpec: "True"
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerMode
+  nameWithType: CommandLineOptions.AOTCompilerMode
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerPath
+  name: AOTCompilerPath
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_AOTCompilerPath
+  commentId: P:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerPath
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerPath
+  nameWithType: CommandLineOptions.AOTCompilerPath
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerPath*
+  name: AOTCompilerPath
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_AOTCompilerPath_
+  commentId: Overload:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerPath
+  isSpec: "True"
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.AOTCompilerPath
+  nameWithType: CommandLineOptions.AOTCompilerPath
 - uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.ArtifactsDirectory
   name: ArtifactsDirectory
   href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_ArtifactsDirectory
@@ -10327,6 +10514,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.CoreRunPaths
   nameWithType: CommandLineOptions.CoreRunPaths
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.CustomRuntimePack
+  name: CustomRuntimePack
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_CustomRuntimePack
+  commentId: P:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.CustomRuntimePack
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.CustomRuntimePack
+  nameWithType: CommandLineOptions.CustomRuntimePack
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.CustomRuntimePack*
+  name: CustomRuntimePack
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_CustomRuntimePack_
+  commentId: Overload:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.CustomRuntimePack
+  isSpec: "True"
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.CustomRuntimePack
+  nameWithType: CommandLineOptions.CustomRuntimePack
 - uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.DisableLogFile
   name: DisableLogFile
   href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_DisableLogFile
@@ -10587,6 +10787,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.MaxWarmupIterationCount
   nameWithType: CommandLineOptions.MaxWarmupIterationCount
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.MemoryRandomization
+  name: MemoryRandomization
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_MemoryRandomization
+  commentId: P:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.MemoryRandomization
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.MemoryRandomization
+  nameWithType: CommandLineOptions.MemoryRandomization
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.MemoryRandomization*
+  name: MemoryRandomization
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_MemoryRandomization_
+  commentId: Overload:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.MemoryRandomization
+  isSpec: "True"
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.MemoryRandomization
+  nameWithType: CommandLineOptions.MemoryRandomization
 - uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.MinIterationCount
   name: MinIterationCount
   href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_MinIterationCount
@@ -10639,6 +10852,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.Outliers
   nameWithType: CommandLineOptions.Outliers
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.Platform
+  name: Platform
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_Platform
+  commentId: P:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.Platform
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.Platform
+  nameWithType: CommandLineOptions.Platform
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.Platform*
+  name: Platform
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_Platform_
+  commentId: Overload:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.Platform
+  isSpec: "True"
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.Platform
+  nameWithType: CommandLineOptions.Platform
 - uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.PrintInformation
   name: PrintInformation
   href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_PrintInformation
@@ -10834,6 +11060,45 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WarmupIterationCount
   nameWithType: CommandLineOptions.WarmupIterationCount
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavascriptEngine
+  name: WasmJavascriptEngine
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_WasmJavascriptEngine
+  commentId: P:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavascriptEngine
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavascriptEngine
+  nameWithType: CommandLineOptions.WasmJavascriptEngine
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavascriptEngine*
+  name: WasmJavascriptEngine
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_WasmJavascriptEngine_
+  commentId: Overload:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavascriptEngine
+  isSpec: "True"
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavascriptEngine
+  nameWithType: CommandLineOptions.WasmJavascriptEngine
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavaScriptEngineArguments
+  name: WasmJavaScriptEngineArguments
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_WasmJavaScriptEngineArguments
+  commentId: P:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavaScriptEngineArguments
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavaScriptEngineArguments
+  nameWithType: CommandLineOptions.WasmJavaScriptEngineArguments
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavaScriptEngineArguments*
+  name: WasmJavaScriptEngineArguments
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_WasmJavaScriptEngineArguments_
+  commentId: Overload:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavaScriptEngineArguments
+  isSpec: "True"
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmJavaScriptEngineArguments
+  nameWithType: CommandLineOptions.WasmJavaScriptEngineArguments
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmMainJs
+  name: WasmMainJs
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_WasmMainJs
+  commentId: P:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmMainJs
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmMainJs
+  nameWithType: CommandLineOptions.WasmMainJs
+- uid: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmMainJs*
+  name: WasmMainJs
+  href: api/BenchmarkDotNet.ConsoleArguments.CommandLineOptions.html#BenchmarkDotNet_ConsoleArguments_CommandLineOptions_WasmMainJs_
+  commentId: Overload:BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmMainJs
+  isSpec: "True"
+  fullName: BenchmarkDotNet.ConsoleArguments.CommandLineOptions.WasmMainJs
+  nameWithType: CommandLineOptions.WasmMainJs
 - uid: BenchmarkDotNet.ConsoleArguments.ConfigParser
   name: ConfigParser
   href: api/BenchmarkDotNet.ConsoleArguments.ConfigParser.html
@@ -11143,12 +11408,12 @@ references:
   commentId: T:BenchmarkDotNet.Diagnosers.DiagnoserResults
   fullName: BenchmarkDotNet.Diagnosers.DiagnoserResults
   nameWithType: DiagnoserResults
-- uid: BenchmarkDotNet.Diagnosers.DiagnoserResults.#ctor(BenchmarkDotNet.Running.BenchmarkCase,System.Int64,BenchmarkDotNet.Engines.GcStats,BenchmarkDotNet.Engines.ThreadingStats)
-  name: DiagnoserResults(BenchmarkCase, Int64, GcStats, ThreadingStats)
-  href: api/BenchmarkDotNet.Diagnosers.DiagnoserResults.html#BenchmarkDotNet_Diagnosers_DiagnoserResults__ctor_BenchmarkDotNet_Running_BenchmarkCase_System_Int64_BenchmarkDotNet_Engines_GcStats_BenchmarkDotNet_Engines_ThreadingStats_
-  commentId: M:BenchmarkDotNet.Diagnosers.DiagnoserResults.#ctor(BenchmarkDotNet.Running.BenchmarkCase,System.Int64,BenchmarkDotNet.Engines.GcStats,BenchmarkDotNet.Engines.ThreadingStats)
-  fullName: BenchmarkDotNet.Diagnosers.DiagnoserResults.DiagnoserResults(BenchmarkDotNet.Running.BenchmarkCase, System.Int64, BenchmarkDotNet.Engines.GcStats, BenchmarkDotNet.Engines.ThreadingStats)
-  nameWithType: DiagnoserResults.DiagnoserResults(BenchmarkCase, Int64, GcStats, ThreadingStats)
+- uid: BenchmarkDotNet.Diagnosers.DiagnoserResults.#ctor(BenchmarkDotNet.Running.BenchmarkCase,System.Int64,BenchmarkDotNet.Engines.GcStats,BenchmarkDotNet.Engines.ThreadingStats,BenchmarkDotNet.Toolchains.Results.BuildResult)
+  name: DiagnoserResults(BenchmarkCase, Int64, GcStats, ThreadingStats, BuildResult)
+  href: api/BenchmarkDotNet.Diagnosers.DiagnoserResults.html#BenchmarkDotNet_Diagnosers_DiagnoserResults__ctor_BenchmarkDotNet_Running_BenchmarkCase_System_Int64_BenchmarkDotNet_Engines_GcStats_BenchmarkDotNet_Engines_ThreadingStats_BenchmarkDotNet_Toolchains_Results_BuildResult_
+  commentId: M:BenchmarkDotNet.Diagnosers.DiagnoserResults.#ctor(BenchmarkDotNet.Running.BenchmarkCase,System.Int64,BenchmarkDotNet.Engines.GcStats,BenchmarkDotNet.Engines.ThreadingStats,BenchmarkDotNet.Toolchains.Results.BuildResult)
+  fullName: BenchmarkDotNet.Diagnosers.DiagnoserResults.DiagnoserResults(BenchmarkDotNet.Running.BenchmarkCase, System.Int64, BenchmarkDotNet.Engines.GcStats, BenchmarkDotNet.Engines.ThreadingStats, BenchmarkDotNet.Toolchains.Results.BuildResult)
+  nameWithType: DiagnoserResults.DiagnoserResults(BenchmarkCase, Int64, GcStats, ThreadingStats, BuildResult)
 - uid: BenchmarkDotNet.Diagnosers.DiagnoserResults.#ctor*
   name: DiagnoserResults
   href: api/BenchmarkDotNet.Diagnosers.DiagnoserResults.html#BenchmarkDotNet_Diagnosers_DiagnoserResults__ctor_
@@ -11169,6 +11434,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Diagnosers.DiagnoserResults.BenchmarkCase
   nameWithType: DiagnoserResults.BenchmarkCase
+- uid: BenchmarkDotNet.Diagnosers.DiagnoserResults.BuildResult
+  name: BuildResult
+  href: api/BenchmarkDotNet.Diagnosers.DiagnoserResults.html#BenchmarkDotNet_Diagnosers_DiagnoserResults_BuildResult
+  commentId: P:BenchmarkDotNet.Diagnosers.DiagnoserResults.BuildResult
+  fullName: BenchmarkDotNet.Diagnosers.DiagnoserResults.BuildResult
+  nameWithType: DiagnoserResults.BuildResult
+- uid: BenchmarkDotNet.Diagnosers.DiagnoserResults.BuildResult*
+  name: BuildResult
+  href: api/BenchmarkDotNet.Diagnosers.DiagnoserResults.html#BenchmarkDotNet_Diagnosers_DiagnoserResults_BuildResult_
+  commentId: Overload:BenchmarkDotNet.Diagnosers.DiagnoserResults.BuildResult
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Diagnosers.DiagnoserResults.BuildResult
+  nameWithType: DiagnoserResults.BuildResult
 - uid: BenchmarkDotNet.Diagnosers.DiagnoserResults.GcStats
   name: GcStats
   href: api/BenchmarkDotNet.Diagnosers.DiagnoserResults.html#BenchmarkDotNet_Diagnosers_DiagnoserResults_GcStats
@@ -15042,6 +15320,96 @@ references:
   commentId: F:BenchmarkDotNet.Engines.IterationStage.Warmup
   fullName: BenchmarkDotNet.Engines.IterationStage.Warmup
   nameWithType: IterationStage.Warmup
+- uid: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost
+  name: NoAcknowledgementConsoleHost
+  href: api/BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.html
+  commentId: T:BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost
+  fullName: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost
+  nameWithType: NoAcknowledgementConsoleHost
+- uid: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.#ctor(System.IO.TextWriter)
+  name: NoAcknowledgementConsoleHost(TextWriter)
+  href: api/BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.html#BenchmarkDotNet_Engines_NoAcknowledgementConsoleHost__ctor_System_IO_TextWriter_
+  commentId: M:BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.#ctor(System.IO.TextWriter)
+  fullName: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.NoAcknowledgementConsoleHost(System.IO.TextWriter)
+  nameWithType: NoAcknowledgementConsoleHost.NoAcknowledgementConsoleHost(TextWriter)
+- uid: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.#ctor*
+  name: NoAcknowledgementConsoleHost
+  href: api/BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.html#BenchmarkDotNet_Engines_NoAcknowledgementConsoleHost__ctor_
+  commentId: Overload:BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.#ctor
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.NoAcknowledgementConsoleHost
+  nameWithType: NoAcknowledgementConsoleHost.NoAcknowledgementConsoleHost
+- uid: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.ReportResults(BenchmarkDotNet.Engines.RunResults)
+  name: ReportResults(RunResults)
+  href: api/BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.html#BenchmarkDotNet_Engines_NoAcknowledgementConsoleHost_ReportResults_BenchmarkDotNet_Engines_RunResults_
+  commentId: M:BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.ReportResults(BenchmarkDotNet.Engines.RunResults)
+  fullName: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.ReportResults(BenchmarkDotNet.Engines.RunResults)
+  nameWithType: NoAcknowledgementConsoleHost.ReportResults(RunResults)
+- uid: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.ReportResults*
+  name: ReportResults
+  href: api/BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.html#BenchmarkDotNet_Engines_NoAcknowledgementConsoleHost_ReportResults_
+  commentId: Overload:BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.ReportResults
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.ReportResults
+  nameWithType: NoAcknowledgementConsoleHost.ReportResults
+- uid: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.SendError(System.String)
+  name: SendError(String)
+  href: api/BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.html#BenchmarkDotNet_Engines_NoAcknowledgementConsoleHost_SendError_System_String_
+  commentId: M:BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.SendError(System.String)
+  fullName: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.SendError(System.String)
+  nameWithType: NoAcknowledgementConsoleHost.SendError(String)
+- uid: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.SendError*
+  name: SendError
+  href: api/BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.html#BenchmarkDotNet_Engines_NoAcknowledgementConsoleHost_SendError_
+  commentId: Overload:BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.SendError
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.SendError
+  nameWithType: NoAcknowledgementConsoleHost.SendError
+- uid: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.SendSignal(BenchmarkDotNet.Engines.HostSignal)
+  name: SendSignal(HostSignal)
+  href: api/BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.html#BenchmarkDotNet_Engines_NoAcknowledgementConsoleHost_SendSignal_BenchmarkDotNet_Engines_HostSignal_
+  commentId: M:BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.SendSignal(BenchmarkDotNet.Engines.HostSignal)
+  fullName: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.SendSignal(BenchmarkDotNet.Engines.HostSignal)
+  nameWithType: NoAcknowledgementConsoleHost.SendSignal(HostSignal)
+- uid: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.SendSignal*
+  name: SendSignal
+  href: api/BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.html#BenchmarkDotNet_Engines_NoAcknowledgementConsoleHost_SendSignal_
+  commentId: Overload:BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.SendSignal
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.SendSignal
+  nameWithType: NoAcknowledgementConsoleHost.SendSignal
+- uid: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.Write(System.String)
+  name: Write(String)
+  href: api/BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.html#BenchmarkDotNet_Engines_NoAcknowledgementConsoleHost_Write_System_String_
+  commentId: M:BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.Write(System.String)
+  fullName: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.Write(System.String)
+  nameWithType: NoAcknowledgementConsoleHost.Write(String)
+- uid: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.Write*
+  name: Write
+  href: api/BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.html#BenchmarkDotNet_Engines_NoAcknowledgementConsoleHost_Write_
+  commentId: Overload:BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.Write
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.Write
+  nameWithType: NoAcknowledgementConsoleHost.Write
+- uid: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.WriteLine
+  name: WriteLine()
+  href: api/BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.html#BenchmarkDotNet_Engines_NoAcknowledgementConsoleHost_WriteLine
+  commentId: M:BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.WriteLine
+  fullName: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.WriteLine()
+  nameWithType: NoAcknowledgementConsoleHost.WriteLine()
+- uid: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.WriteLine(System.String)
+  name: WriteLine(String)
+  href: api/BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.html#BenchmarkDotNet_Engines_NoAcknowledgementConsoleHost_WriteLine_System_String_
+  commentId: M:BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.WriteLine(System.String)
+  fullName: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.WriteLine(System.String)
+  nameWithType: NoAcknowledgementConsoleHost.WriteLine(String)
+- uid: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.WriteLine*
+  name: WriteLine
+  href: api/BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.html#BenchmarkDotNet_Engines_NoAcknowledgementConsoleHost_WriteLine_
+  commentId: Overload:BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.WriteLine
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Engines.NoAcknowledgementConsoleHost.WriteLine
+  nameWithType: NoAcknowledgementConsoleHost.WriteLine
 - uid: BenchmarkDotNet.Engines.RunResults
   name: RunResults
   href: api/BenchmarkDotNet.Engines.RunResults.html
@@ -15930,6 +16298,25 @@ references:
   commentId: F:BenchmarkDotNet.Environments.CoreRtRuntime.CoreRt50
   fullName: BenchmarkDotNet.Environments.CoreRtRuntime.CoreRt50
   nameWithType: CoreRtRuntime.CoreRt50
+- uid: BenchmarkDotNet.Environments.CoreRtRuntime.CoreRt60
+  name: CoreRt60
+  href: api/BenchmarkDotNet.Environments.CoreRtRuntime.html#BenchmarkDotNet_Environments_CoreRtRuntime_CoreRt60
+  commentId: F:BenchmarkDotNet.Environments.CoreRtRuntime.CoreRt60
+  fullName: BenchmarkDotNet.Environments.CoreRtRuntime.CoreRt60
+  nameWithType: CoreRtRuntime.CoreRt60
+- uid: BenchmarkDotNet.Environments.CoreRtRuntime.GetCurrentVersion
+  name: GetCurrentVersion()
+  href: api/BenchmarkDotNet.Environments.CoreRtRuntime.html#BenchmarkDotNet_Environments_CoreRtRuntime_GetCurrentVersion
+  commentId: M:BenchmarkDotNet.Environments.CoreRtRuntime.GetCurrentVersion
+  fullName: BenchmarkDotNet.Environments.CoreRtRuntime.GetCurrentVersion()
+  nameWithType: CoreRtRuntime.GetCurrentVersion()
+- uid: BenchmarkDotNet.Environments.CoreRtRuntime.GetCurrentVersion*
+  name: GetCurrentVersion
+  href: api/BenchmarkDotNet.Environments.CoreRtRuntime.html#BenchmarkDotNet_Environments_CoreRtRuntime_GetCurrentVersion_
+  commentId: Overload:BenchmarkDotNet.Environments.CoreRtRuntime.GetCurrentVersion
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Environments.CoreRtRuntime.GetCurrentVersion
+  nameWithType: CoreRtRuntime.GetCurrentVersion
 - uid: BenchmarkDotNet.Environments.CoreRuntime
   name: CoreRuntime
   href: api/BenchmarkDotNet.Environments.CoreRuntime.html
@@ -15972,6 +16359,12 @@ references:
   commentId: F:BenchmarkDotNet.Environments.CoreRuntime.Core50
   fullName: BenchmarkDotNet.Environments.CoreRuntime.Core50
   nameWithType: CoreRuntime.Core50
+- uid: BenchmarkDotNet.Environments.CoreRuntime.Core60
+  name: Core60
+  href: api/BenchmarkDotNet.Environments.CoreRuntime.html#BenchmarkDotNet_Environments_CoreRuntime_Core60
+  commentId: F:BenchmarkDotNet.Environments.CoreRuntime.Core60
+  fullName: BenchmarkDotNet.Environments.CoreRuntime.Core60
+  nameWithType: CoreRuntime.Core60
 - uid: BenchmarkDotNet.Environments.CoreRuntime.CreateForNewVersion(System.String,System.String)
   name: CreateForNewVersion(String, String)
   href: api/BenchmarkDotNet.Environments.CoreRuntime.html#BenchmarkDotNet_Environments_CoreRuntime_CreateForNewVersion_System_String_System_String_
@@ -15985,6 +16378,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Environments.CoreRuntime.CreateForNewVersion
   nameWithType: CoreRuntime.CreateForNewVersion
+- uid: BenchmarkDotNet.Environments.CoreRuntime.IsPlatformSpecific
+  name: IsPlatformSpecific
+  href: api/BenchmarkDotNet.Environments.CoreRuntime.html#BenchmarkDotNet_Environments_CoreRuntime_IsPlatformSpecific
+  commentId: P:BenchmarkDotNet.Environments.CoreRuntime.IsPlatformSpecific
+  fullName: BenchmarkDotNet.Environments.CoreRuntime.IsPlatformSpecific
+  nameWithType: CoreRuntime.IsPlatformSpecific
+- uid: BenchmarkDotNet.Environments.CoreRuntime.IsPlatformSpecific*
+  name: IsPlatformSpecific
+  href: api/BenchmarkDotNet.Environments.CoreRuntime.html#BenchmarkDotNet_Environments_CoreRuntime_IsPlatformSpecific_
+  commentId: Overload:BenchmarkDotNet.Environments.CoreRuntime.IsPlatformSpecific
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Environments.CoreRuntime.IsPlatformSpecific
+  nameWithType: CoreRuntime.IsPlatformSpecific
 - uid: BenchmarkDotNet.Environments.EnvironmentResolver
   name: EnvironmentResolver
   href: api/BenchmarkDotNet.Environments.EnvironmentResolver.html
@@ -16277,6 +16683,70 @@ references:
   commentId: F:BenchmarkDotNet.Environments.Jit.RyuJit
   fullName: BenchmarkDotNet.Environments.Jit.RyuJit
   nameWithType: Jit.RyuJit
+- uid: BenchmarkDotNet.Environments.MonoAotLLVMRuntime
+  name: MonoAotLLVMRuntime
+  href: api/BenchmarkDotNet.Environments.MonoAotLLVMRuntime.html
+  commentId: T:BenchmarkDotNet.Environments.MonoAotLLVMRuntime
+  fullName: BenchmarkDotNet.Environments.MonoAotLLVMRuntime
+  nameWithType: MonoAotLLVMRuntime
+- uid: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.#ctor(System.IO.FileInfo,System.String,System.String)
+  name: MonoAotLLVMRuntime(FileInfo, String, String)
+  href: api/BenchmarkDotNet.Environments.MonoAotLLVMRuntime.html#BenchmarkDotNet_Environments_MonoAotLLVMRuntime__ctor_System_IO_FileInfo_System_String_System_String_
+  commentId: M:BenchmarkDotNet.Environments.MonoAotLLVMRuntime.#ctor(System.IO.FileInfo,System.String,System.String)
+  fullName: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.MonoAotLLVMRuntime(System.IO.FileInfo, System.String, System.String)
+  nameWithType: MonoAotLLVMRuntime.MonoAotLLVMRuntime(FileInfo, String, String)
+- uid: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.#ctor*
+  name: MonoAotLLVMRuntime
+  href: api/BenchmarkDotNet.Environments.MonoAotLLVMRuntime.html#BenchmarkDotNet_Environments_MonoAotLLVMRuntime__ctor_
+  commentId: Overload:BenchmarkDotNet.Environments.MonoAotLLVMRuntime.#ctor
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.MonoAotLLVMRuntime
+  nameWithType: MonoAotLLVMRuntime.MonoAotLLVMRuntime
+- uid: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.AOTCompilerPath
+  name: AOTCompilerPath
+  href: api/BenchmarkDotNet.Environments.MonoAotLLVMRuntime.html#BenchmarkDotNet_Environments_MonoAotLLVMRuntime_AOTCompilerPath
+  commentId: P:BenchmarkDotNet.Environments.MonoAotLLVMRuntime.AOTCompilerPath
+  fullName: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.AOTCompilerPath
+  nameWithType: MonoAotLLVMRuntime.AOTCompilerPath
+- uid: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.AOTCompilerPath*
+  name: AOTCompilerPath
+  href: api/BenchmarkDotNet.Environments.MonoAotLLVMRuntime.html#BenchmarkDotNet_Environments_MonoAotLLVMRuntime_AOTCompilerPath_
+  commentId: Overload:BenchmarkDotNet.Environments.MonoAotLLVMRuntime.AOTCompilerPath
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.AOTCompilerPath
+  nameWithType: MonoAotLLVMRuntime.AOTCompilerPath
+- uid: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.Equals(BenchmarkDotNet.Environments.MonoAotLLVMRuntime)
+  name: Equals(MonoAotLLVMRuntime)
+  href: api/BenchmarkDotNet.Environments.MonoAotLLVMRuntime.html#BenchmarkDotNet_Environments_MonoAotLLVMRuntime_Equals_BenchmarkDotNet_Environments_MonoAotLLVMRuntime_
+  commentId: M:BenchmarkDotNet.Environments.MonoAotLLVMRuntime.Equals(BenchmarkDotNet.Environments.MonoAotLLVMRuntime)
+  fullName: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.Equals(BenchmarkDotNet.Environments.MonoAotLLVMRuntime)
+  nameWithType: MonoAotLLVMRuntime.Equals(MonoAotLLVMRuntime)
+- uid: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.Equals(System.Object)
+  name: Equals(Object)
+  href: api/BenchmarkDotNet.Environments.MonoAotLLVMRuntime.html#BenchmarkDotNet_Environments_MonoAotLLVMRuntime_Equals_System_Object_
+  commentId: M:BenchmarkDotNet.Environments.MonoAotLLVMRuntime.Equals(System.Object)
+  fullName: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.Equals(System.Object)
+  nameWithType: MonoAotLLVMRuntime.Equals(Object)
+- uid: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.Equals*
+  name: Equals
+  href: api/BenchmarkDotNet.Environments.MonoAotLLVMRuntime.html#BenchmarkDotNet_Environments_MonoAotLLVMRuntime_Equals_
+  commentId: Overload:BenchmarkDotNet.Environments.MonoAotLLVMRuntime.Equals
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.Equals
+  nameWithType: MonoAotLLVMRuntime.Equals
+- uid: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.GetHashCode
+  name: GetHashCode()
+  href: api/BenchmarkDotNet.Environments.MonoAotLLVMRuntime.html#BenchmarkDotNet_Environments_MonoAotLLVMRuntime_GetHashCode
+  commentId: M:BenchmarkDotNet.Environments.MonoAotLLVMRuntime.GetHashCode
+  fullName: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.GetHashCode()
+  nameWithType: MonoAotLLVMRuntime.GetHashCode()
+- uid: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.GetHashCode*
+  name: GetHashCode
+  href: api/BenchmarkDotNet.Environments.MonoAotLLVMRuntime.html#BenchmarkDotNet_Environments_MonoAotLLVMRuntime_GetHashCode_
+  commentId: Overload:BenchmarkDotNet.Environments.MonoAotLLVMRuntime.GetHashCode
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Environments.MonoAotLLVMRuntime.GetHashCode
+  nameWithType: MonoAotLLVMRuntime.GetHashCode
 - uid: BenchmarkDotNet.Environments.MonoRuntime
   name: MonoRuntime
   href: api/BenchmarkDotNet.Environments.MonoRuntime.html
@@ -16438,6 +16908,12 @@ references:
   commentId: F:BenchmarkDotNet.Environments.Platform.Arm64
   fullName: BenchmarkDotNet.Environments.Platform.Arm64
   nameWithType: Platform.Arm64
+- uid: BenchmarkDotNet.Environments.Platform.Wasm
+  name: Wasm
+  href: api/BenchmarkDotNet.Environments.Platform.html#BenchmarkDotNet_Environments_Platform_Wasm
+  commentId: F:BenchmarkDotNet.Environments.Platform.Wasm
+  fullName: BenchmarkDotNet.Environments.Platform.Wasm
+  nameWithType: Platform.Wasm
 - uid: BenchmarkDotNet.Environments.Platform.X64
   name: X64
   href: api/BenchmarkDotNet.Environments.Platform.html#BenchmarkDotNet_Environments_Platform_X64
@@ -16608,6 +17084,96 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Environments.Runtime.ToString
   nameWithType: Runtime.ToString
+- uid: BenchmarkDotNet.Environments.WasmRuntime
+  name: WasmRuntime
+  href: api/BenchmarkDotNet.Environments.WasmRuntime.html
+  commentId: T:BenchmarkDotNet.Environments.WasmRuntime
+  fullName: BenchmarkDotNet.Environments.WasmRuntime
+  nameWithType: WasmRuntime
+- uid: BenchmarkDotNet.Environments.WasmRuntime.#ctor(System.IO.FileInfo,System.String,System.String,System.String,System.String)
+  name: WasmRuntime(FileInfo, String, String, String, String)
+  href: api/BenchmarkDotNet.Environments.WasmRuntime.html#BenchmarkDotNet_Environments_WasmRuntime__ctor_System_IO_FileInfo_System_String_System_String_System_String_System_String_
+  commentId: M:BenchmarkDotNet.Environments.WasmRuntime.#ctor(System.IO.FileInfo,System.String,System.String,System.String,System.String)
+  fullName: BenchmarkDotNet.Environments.WasmRuntime.WasmRuntime(System.IO.FileInfo, System.String, System.String, System.String, System.String)
+  nameWithType: WasmRuntime.WasmRuntime(FileInfo, String, String, String, String)
+- uid: BenchmarkDotNet.Environments.WasmRuntime.#ctor*
+  name: WasmRuntime
+  href: api/BenchmarkDotNet.Environments.WasmRuntime.html#BenchmarkDotNet_Environments_WasmRuntime__ctor_
+  commentId: Overload:BenchmarkDotNet.Environments.WasmRuntime.#ctor
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Environments.WasmRuntime.WasmRuntime
+  nameWithType: WasmRuntime.WasmRuntime
+- uid: BenchmarkDotNet.Environments.WasmRuntime.Equals(BenchmarkDotNet.Environments.WasmRuntime)
+  name: Equals(WasmRuntime)
+  href: api/BenchmarkDotNet.Environments.WasmRuntime.html#BenchmarkDotNet_Environments_WasmRuntime_Equals_BenchmarkDotNet_Environments_WasmRuntime_
+  commentId: M:BenchmarkDotNet.Environments.WasmRuntime.Equals(BenchmarkDotNet.Environments.WasmRuntime)
+  fullName: BenchmarkDotNet.Environments.WasmRuntime.Equals(BenchmarkDotNet.Environments.WasmRuntime)
+  nameWithType: WasmRuntime.Equals(WasmRuntime)
+- uid: BenchmarkDotNet.Environments.WasmRuntime.Equals(System.Object)
+  name: Equals(Object)
+  href: api/BenchmarkDotNet.Environments.WasmRuntime.html#BenchmarkDotNet_Environments_WasmRuntime_Equals_System_Object_
+  commentId: M:BenchmarkDotNet.Environments.WasmRuntime.Equals(System.Object)
+  fullName: BenchmarkDotNet.Environments.WasmRuntime.Equals(System.Object)
+  nameWithType: WasmRuntime.Equals(Object)
+- uid: BenchmarkDotNet.Environments.WasmRuntime.Equals*
+  name: Equals
+  href: api/BenchmarkDotNet.Environments.WasmRuntime.html#BenchmarkDotNet_Environments_WasmRuntime_Equals_
+  commentId: Overload:BenchmarkDotNet.Environments.WasmRuntime.Equals
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Environments.WasmRuntime.Equals
+  nameWithType: WasmRuntime.Equals
+- uid: BenchmarkDotNet.Environments.WasmRuntime.GetHashCode
+  name: GetHashCode()
+  href: api/BenchmarkDotNet.Environments.WasmRuntime.html#BenchmarkDotNet_Environments_WasmRuntime_GetHashCode
+  commentId: M:BenchmarkDotNet.Environments.WasmRuntime.GetHashCode
+  fullName: BenchmarkDotNet.Environments.WasmRuntime.GetHashCode()
+  nameWithType: WasmRuntime.GetHashCode()
+- uid: BenchmarkDotNet.Environments.WasmRuntime.GetHashCode*
+  name: GetHashCode
+  href: api/BenchmarkDotNet.Environments.WasmRuntime.html#BenchmarkDotNet_Environments_WasmRuntime_GetHashCode_
+  commentId: Overload:BenchmarkDotNet.Environments.WasmRuntime.GetHashCode
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Environments.WasmRuntime.GetHashCode
+  nameWithType: WasmRuntime.GetHashCode
+- uid: BenchmarkDotNet.Environments.WasmRuntime.JavaScriptEngine
+  name: JavaScriptEngine
+  href: api/BenchmarkDotNet.Environments.WasmRuntime.html#BenchmarkDotNet_Environments_WasmRuntime_JavaScriptEngine
+  commentId: P:BenchmarkDotNet.Environments.WasmRuntime.JavaScriptEngine
+  fullName: BenchmarkDotNet.Environments.WasmRuntime.JavaScriptEngine
+  nameWithType: WasmRuntime.JavaScriptEngine
+- uid: BenchmarkDotNet.Environments.WasmRuntime.JavaScriptEngine*
+  name: JavaScriptEngine
+  href: api/BenchmarkDotNet.Environments.WasmRuntime.html#BenchmarkDotNet_Environments_WasmRuntime_JavaScriptEngine_
+  commentId: Overload:BenchmarkDotNet.Environments.WasmRuntime.JavaScriptEngine
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Environments.WasmRuntime.JavaScriptEngine
+  nameWithType: WasmRuntime.JavaScriptEngine
+- uid: BenchmarkDotNet.Environments.WasmRuntime.JavaScriptEngineArguments
+  name: JavaScriptEngineArguments
+  href: api/BenchmarkDotNet.Environments.WasmRuntime.html#BenchmarkDotNet_Environments_WasmRuntime_JavaScriptEngineArguments
+  commentId: P:BenchmarkDotNet.Environments.WasmRuntime.JavaScriptEngineArguments
+  fullName: BenchmarkDotNet.Environments.WasmRuntime.JavaScriptEngineArguments
+  nameWithType: WasmRuntime.JavaScriptEngineArguments
+- uid: BenchmarkDotNet.Environments.WasmRuntime.JavaScriptEngineArguments*
+  name: JavaScriptEngineArguments
+  href: api/BenchmarkDotNet.Environments.WasmRuntime.html#BenchmarkDotNet_Environments_WasmRuntime_JavaScriptEngineArguments_
+  commentId: Overload:BenchmarkDotNet.Environments.WasmRuntime.JavaScriptEngineArguments
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Environments.WasmRuntime.JavaScriptEngineArguments
+  nameWithType: WasmRuntime.JavaScriptEngineArguments
+- uid: BenchmarkDotNet.Environments.WasmRuntime.MainJs
+  name: MainJs
+  href: api/BenchmarkDotNet.Environments.WasmRuntime.html#BenchmarkDotNet_Environments_WasmRuntime_MainJs
+  commentId: P:BenchmarkDotNet.Environments.WasmRuntime.MainJs
+  fullName: BenchmarkDotNet.Environments.WasmRuntime.MainJs
+  nameWithType: WasmRuntime.MainJs
+- uid: BenchmarkDotNet.Environments.WasmRuntime.MainJs*
+  name: MainJs
+  href: api/BenchmarkDotNet.Environments.WasmRuntime.html#BenchmarkDotNet_Environments_WasmRuntime_MainJs_
+  commentId: Overload:BenchmarkDotNet.Environments.WasmRuntime.MainJs
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Environments.WasmRuntime.MainJs
+  nameWithType: WasmRuntime.MainJs
 - uid: BenchmarkDotNet.Exporters
   name: BenchmarkDotNet.Exporters
   href: api/BenchmarkDotNet.Exporters.html
@@ -20017,6 +20583,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Jobs.JobExtensions.WithMaxWarmupCount
   nameWithType: JobExtensions.WithMaxWarmupCount
+- uid: BenchmarkDotNet.Jobs.JobExtensions.WithMemoryRandomization(BenchmarkDotNet.Jobs.Job,System.Boolean)
+  name: WithMemoryRandomization(Job, Boolean)
+  href: api/BenchmarkDotNet.Jobs.JobExtensions.html#BenchmarkDotNet_Jobs_JobExtensions_WithMemoryRandomization_BenchmarkDotNet_Jobs_Job_System_Boolean_
+  commentId: M:BenchmarkDotNet.Jobs.JobExtensions.WithMemoryRandomization(BenchmarkDotNet.Jobs.Job,System.Boolean)
+  fullName: BenchmarkDotNet.Jobs.JobExtensions.WithMemoryRandomization(BenchmarkDotNet.Jobs.Job, System.Boolean)
+  nameWithType: JobExtensions.WithMemoryRandomization(Job, Boolean)
+- uid: BenchmarkDotNet.Jobs.JobExtensions.WithMemoryRandomization*
+  name: WithMemoryRandomization
+  href: api/BenchmarkDotNet.Jobs.JobExtensions.html#BenchmarkDotNet_Jobs_JobExtensions_WithMemoryRandomization_
+  commentId: Overload:BenchmarkDotNet.Jobs.JobExtensions.WithMemoryRandomization
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Jobs.JobExtensions.WithMemoryRandomization
+  nameWithType: JobExtensions.WithMemoryRandomization
 - uid: BenchmarkDotNet.Jobs.JobExtensions.WithMinInvokeCount(BenchmarkDotNet.Jobs.Job,System.Int32)
   name: WithMinInvokeCount(Job, Int32)
   href: api/BenchmarkDotNet.Jobs.JobExtensions.html#BenchmarkDotNet_Jobs_JobExtensions_WithMinInvokeCount_BenchmarkDotNet_Jobs_Job_System_Int32_
@@ -20088,18 +20667,12 @@ references:
   commentId: M:BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,BenchmarkDotNet.Jobs.NuGetReferenceList)
   fullName: BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job, BenchmarkDotNet.Jobs.NuGetReferenceList)
   nameWithType: JobExtensions.WithNuGet(Job, NuGetReferenceList)
-- uid: BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,System.String)
-  name: WithNuGet(Job, String)
-  href: api/BenchmarkDotNet.Jobs.JobExtensions.html#BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_BenchmarkDotNet_Jobs_Job_System_String_
-  commentId: M:BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,System.String)
-  fullName: BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job, System.String)
-  nameWithType: JobExtensions.WithNuGet(Job, String)
-- uid: BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,System.String,System.String)
-  name: WithNuGet(Job, String, String)
-  href: api/BenchmarkDotNet.Jobs.JobExtensions.html#BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_BenchmarkDotNet_Jobs_Job_System_String_System_String_
-  commentId: M:BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,System.String,System.String)
-  fullName: BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job, System.String, System.String)
-  nameWithType: JobExtensions.WithNuGet(Job, String, String)
+- uid: BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,System.String,System.String,System.Uri,System.Boolean)
+  name: WithNuGet(Job, String, String, Uri, Boolean)
+  href: api/BenchmarkDotNet.Jobs.JobExtensions.html#BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_BenchmarkDotNet_Jobs_Job_System_String_System_String_System_Uri_System_Boolean_
+  commentId: M:BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,System.String,System.String,System.Uri,System.Boolean)
+  fullName: BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job, System.String, System.String, System.Uri, System.Boolean)
+  nameWithType: JobExtensions.WithNuGet(Job, String, String, Uri, Boolean)
 - uid: BenchmarkDotNet.Jobs.JobExtensions.WithNuGet*
   name: WithNuGet
   href: api/BenchmarkDotNet.Jobs.JobExtensions.html#BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_
@@ -20415,12 +20988,12 @@ references:
   commentId: T:BenchmarkDotNet.Jobs.NuGetReference
   fullName: BenchmarkDotNet.Jobs.NuGetReference
   nameWithType: NuGetReference
-- uid: BenchmarkDotNet.Jobs.NuGetReference.#ctor(System.String,System.String)
-  name: NuGetReference(String, String)
-  href: api/BenchmarkDotNet.Jobs.NuGetReference.html#BenchmarkDotNet_Jobs_NuGetReference__ctor_System_String_System_String_
-  commentId: M:BenchmarkDotNet.Jobs.NuGetReference.#ctor(System.String,System.String)
-  fullName: BenchmarkDotNet.Jobs.NuGetReference.NuGetReference(System.String, System.String)
-  nameWithType: NuGetReference.NuGetReference(String, String)
+- uid: BenchmarkDotNet.Jobs.NuGetReference.#ctor(System.String,System.String,System.Uri,System.Boolean)
+  name: NuGetReference(String, String, Uri, Boolean)
+  href: api/BenchmarkDotNet.Jobs.NuGetReference.html#BenchmarkDotNet_Jobs_NuGetReference__ctor_System_String_System_String_System_Uri_System_Boolean_
+  commentId: M:BenchmarkDotNet.Jobs.NuGetReference.#ctor(System.String,System.String,System.Uri,System.Boolean)
+  fullName: BenchmarkDotNet.Jobs.NuGetReference.NuGetReference(System.String, System.String, System.Uri, System.Boolean)
+  nameWithType: NuGetReference.NuGetReference(String, String, Uri, Boolean)
 - uid: BenchmarkDotNet.Jobs.NuGetReference.#ctor*
   name: NuGetReference
   href: api/BenchmarkDotNet.Jobs.NuGetReference.html#BenchmarkDotNet_Jobs_NuGetReference__ctor_
@@ -20473,6 +21046,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Jobs.NuGetReference.PackageName
   nameWithType: NuGetReference.PackageName
+- uid: BenchmarkDotNet.Jobs.NuGetReference.PackageSource
+  name: PackageSource
+  href: api/BenchmarkDotNet.Jobs.NuGetReference.html#BenchmarkDotNet_Jobs_NuGetReference_PackageSource
+  commentId: P:BenchmarkDotNet.Jobs.NuGetReference.PackageSource
+  fullName: BenchmarkDotNet.Jobs.NuGetReference.PackageSource
+  nameWithType: NuGetReference.PackageSource
+- uid: BenchmarkDotNet.Jobs.NuGetReference.PackageSource*
+  name: PackageSource
+  href: api/BenchmarkDotNet.Jobs.NuGetReference.html#BenchmarkDotNet_Jobs_NuGetReference_PackageSource_
+  commentId: Overload:BenchmarkDotNet.Jobs.NuGetReference.PackageSource
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Jobs.NuGetReference.PackageSource
+  nameWithType: NuGetReference.PackageSource
 - uid: BenchmarkDotNet.Jobs.NuGetReference.PackageVersion
   name: PackageVersion
   href: api/BenchmarkDotNet.Jobs.NuGetReference.html#BenchmarkDotNet_Jobs_NuGetReference_PackageVersion
@@ -20486,6 +21072,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Jobs.NuGetReference.PackageVersion
   nameWithType: NuGetReference.PackageVersion
+- uid: BenchmarkDotNet.Jobs.NuGetReference.Prerelease
+  name: Prerelease
+  href: api/BenchmarkDotNet.Jobs.NuGetReference.html#BenchmarkDotNet_Jobs_NuGetReference_Prerelease
+  commentId: P:BenchmarkDotNet.Jobs.NuGetReference.Prerelease
+  fullName: BenchmarkDotNet.Jobs.NuGetReference.Prerelease
+  nameWithType: NuGetReference.Prerelease
+- uid: BenchmarkDotNet.Jobs.NuGetReference.Prerelease*
+  name: Prerelease
+  href: api/BenchmarkDotNet.Jobs.NuGetReference.html#BenchmarkDotNet_Jobs_NuGetReference_Prerelease_
+  commentId: Overload:BenchmarkDotNet.Jobs.NuGetReference.Prerelease
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Jobs.NuGetReference.Prerelease
+  nameWithType: NuGetReference.Prerelease
 - uid: BenchmarkDotNet.Jobs.NuGetReference.ToString
   name: ToString()
   href: api/BenchmarkDotNet.Jobs.NuGetReference.html#BenchmarkDotNet_Jobs_NuGetReference_ToString
@@ -20760,6 +21359,25 @@ references:
   commentId: F:BenchmarkDotNet.Jobs.RunMode.Medium
   fullName: BenchmarkDotNet.Jobs.RunMode.Medium
   nameWithType: RunMode.Medium
+- uid: BenchmarkDotNet.Jobs.RunMode.MemoryRandomization
+  name: MemoryRandomization
+  href: api/BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_MemoryRandomization
+  commentId: P:BenchmarkDotNet.Jobs.RunMode.MemoryRandomization
+  fullName: BenchmarkDotNet.Jobs.RunMode.MemoryRandomization
+  nameWithType: RunMode.MemoryRandomization
+- uid: BenchmarkDotNet.Jobs.RunMode.MemoryRandomization*
+  name: MemoryRandomization
+  href: api/BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_MemoryRandomization_
+  commentId: Overload:BenchmarkDotNet.Jobs.RunMode.MemoryRandomization
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Jobs.RunMode.MemoryRandomization
+  nameWithType: RunMode.MemoryRandomization
+- uid: BenchmarkDotNet.Jobs.RunMode.MemoryRandomizationCharacteristic
+  name: MemoryRandomizationCharacteristic
+  href: api/BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_MemoryRandomizationCharacteristic
+  commentId: F:BenchmarkDotNet.Jobs.RunMode.MemoryRandomizationCharacteristic
+  fullName: BenchmarkDotNet.Jobs.RunMode.MemoryRandomizationCharacteristic
+  nameWithType: RunMode.MemoryRandomizationCharacteristic
 - uid: BenchmarkDotNet.Jobs.RunMode.MinIterationCount
   name: MinIterationCount
   href: api/BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_MinIterationCount
@@ -20909,6 +21527,12 @@ references:
   commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.CoreRt50
   fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.CoreRt50
   nameWithType: RuntimeMoniker.CoreRt50
+- uid: BenchmarkDotNet.Jobs.RuntimeMoniker.CoreRt60
+  name: CoreRt60
+  href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_CoreRt60
+  commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.CoreRt60
+  fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.CoreRt60
+  nameWithType: RuntimeMoniker.CoreRt60
 - uid: BenchmarkDotNet.Jobs.RuntimeMoniker.HostProcess
   name: HostProcess
   href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_HostProcess
@@ -20921,6 +21545,12 @@ references:
   commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.Mono
   fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.Mono
   nameWithType: RuntimeMoniker.Mono
+- uid: BenchmarkDotNet.Jobs.RuntimeMoniker.MonoAOTLLVM
+  name: MonoAOTLLVM
+  href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVM
+  commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.MonoAOTLLVM
+  fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.MonoAOTLLVM
+  nameWithType: RuntimeMoniker.MonoAOTLLVM
 - uid: BenchmarkDotNet.Jobs.RuntimeMoniker.Net461
   name: Net461
   href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_Net461
@@ -20957,6 +21587,18 @@ references:
   commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.Net48
   fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.Net48
   nameWithType: RuntimeMoniker.Net48
+- uid: BenchmarkDotNet.Jobs.RuntimeMoniker.Net50
+  name: Net50
+  href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_Net50
+  commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.Net50
+  fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.Net50
+  nameWithType: RuntimeMoniker.Net50
+- uid: BenchmarkDotNet.Jobs.RuntimeMoniker.Net60
+  name: Net60
+  href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_Net60
+  commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.Net60
+  fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.Net60
+  nameWithType: RuntimeMoniker.Net60
 - uid: BenchmarkDotNet.Jobs.RuntimeMoniker.NetCoreApp20
   name: NetCoreApp20
   href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_NetCoreApp20
@@ -20999,6 +21641,24 @@ references:
   commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.NotRecognized
   fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.NotRecognized
   nameWithType: RuntimeMoniker.NotRecognized
+- uid: BenchmarkDotNet.Jobs.RuntimeMoniker.Wasm
+  name: Wasm
+  href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_Wasm
+  commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.Wasm
+  fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.Wasm
+  nameWithType: RuntimeMoniker.Wasm
+- uid: BenchmarkDotNet.Jobs.RuntimeMoniker.WasmNet50
+  name: WasmNet50
+  href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet50
+  commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.WasmNet50
+  fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.WasmNet50
+  nameWithType: RuntimeMoniker.WasmNet50
+- uid: BenchmarkDotNet.Jobs.RuntimeMoniker.WasmNet60
+  name: WasmNet60
+  href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet60
+  commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.WasmNet60
+  fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.WasmNet60
+  nameWithType: RuntimeMoniker.WasmNet60
 - uid: BenchmarkDotNet.Loggers
   name: BenchmarkDotNet.Loggers
   href: api/BenchmarkDotNet.Loggers.html
@@ -23168,15 +23828,15 @@ references:
   commentId: T:BenchmarkDotNet.Parameters.ParameterDefinition
   fullName: BenchmarkDotNet.Parameters.ParameterDefinition
   nameWithType: ParameterDefinition
-- uid: BenchmarkDotNet.Parameters.ParameterDefinition.#ctor(System.String,System.Boolean,System.Object[],System.Boolean,System.Type)
-  name: ParameterDefinition(String, Boolean, Object[], Boolean, Type)
-  href: api/BenchmarkDotNet.Parameters.ParameterDefinition.html#BenchmarkDotNet_Parameters_ParameterDefinition__ctor_System_String_System_Boolean_System_Object___System_Boolean_System_Type_
-  commentId: M:BenchmarkDotNet.Parameters.ParameterDefinition.#ctor(System.String,System.Boolean,System.Object[],System.Boolean,System.Type)
-  name.vb: ParameterDefinition(String, Boolean, Object(), Boolean, Type)
-  fullName: BenchmarkDotNet.Parameters.ParameterDefinition.ParameterDefinition(System.String, System.Boolean, System.Object[], System.Boolean, System.Type)
-  fullName.vb: BenchmarkDotNet.Parameters.ParameterDefinition.ParameterDefinition(System.String, System.Boolean, System.Object(), System.Boolean, System.Type)
-  nameWithType: ParameterDefinition.ParameterDefinition(String, Boolean, Object[], Boolean, Type)
-  nameWithType.vb: ParameterDefinition.ParameterDefinition(String, Boolean, Object(), Boolean, Type)
+- uid: BenchmarkDotNet.Parameters.ParameterDefinition.#ctor(System.String,System.Boolean,System.Object[],System.Boolean,System.Type,System.Int32)
+  name: ParameterDefinition(String, Boolean, Object[], Boolean, Type, Int32)
+  href: api/BenchmarkDotNet.Parameters.ParameterDefinition.html#BenchmarkDotNet_Parameters_ParameterDefinition__ctor_System_String_System_Boolean_System_Object___System_Boolean_System_Type_System_Int32_
+  commentId: M:BenchmarkDotNet.Parameters.ParameterDefinition.#ctor(System.String,System.Boolean,System.Object[],System.Boolean,System.Type,System.Int32)
+  name.vb: ParameterDefinition(String, Boolean, Object(), Boolean, Type, Int32)
+  fullName: BenchmarkDotNet.Parameters.ParameterDefinition.ParameterDefinition(System.String, System.Boolean, System.Object[], System.Boolean, System.Type, System.Int32)
+  fullName.vb: BenchmarkDotNet.Parameters.ParameterDefinition.ParameterDefinition(System.String, System.Boolean, System.Object(), System.Boolean, System.Type, System.Int32)
+  nameWithType: ParameterDefinition.ParameterDefinition(String, Boolean, Object[], Boolean, Type, Int32)
+  nameWithType.vb: ParameterDefinition.ParameterDefinition(String, Boolean, Object(), Boolean, Type, Int32)
 - uid: BenchmarkDotNet.Parameters.ParameterDefinition.#ctor*
   name: ParameterDefinition
   href: api/BenchmarkDotNet.Parameters.ParameterDefinition.html#BenchmarkDotNet_Parameters_ParameterDefinition__ctor_
@@ -23236,6 +23896,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Parameters.ParameterDefinition.ParameterType
   nameWithType: ParameterDefinition.ParameterType
+- uid: BenchmarkDotNet.Parameters.ParameterDefinition.PriorityInCategory
+  name: PriorityInCategory
+  href: api/BenchmarkDotNet.Parameters.ParameterDefinition.html#BenchmarkDotNet_Parameters_ParameterDefinition_PriorityInCategory
+  commentId: P:BenchmarkDotNet.Parameters.ParameterDefinition.PriorityInCategory
+  fullName: BenchmarkDotNet.Parameters.ParameterDefinition.PriorityInCategory
+  nameWithType: ParameterDefinition.PriorityInCategory
+- uid: BenchmarkDotNet.Parameters.ParameterDefinition.PriorityInCategory*
+  name: PriorityInCategory
+  href: api/BenchmarkDotNet.Parameters.ParameterDefinition.html#BenchmarkDotNet_Parameters_ParameterDefinition_PriorityInCategory_
+  commentId: Overload:BenchmarkDotNet.Parameters.ParameterDefinition.PriorityInCategory
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Parameters.ParameterDefinition.PriorityInCategory
+  nameWithType: ParameterDefinition.PriorityInCategory
 - uid: BenchmarkDotNet.Parameters.ParameterDefinition.Values
   name: Values
   href: api/BenchmarkDotNet.Parameters.ParameterDefinition.html#BenchmarkDotNet_Parameters_ParameterDefinition_Values
@@ -23310,6 +23983,12 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Parameters.ParameterDefinitions.ToString
   nameWithType: ParameterDefinitions.ToString
+- uid: BenchmarkDotNet.Parameters.ParameterExtractor
+  name: ParameterExtractor
+  href: api/BenchmarkDotNet.Parameters.ParameterExtractor.html
+  commentId: T:BenchmarkDotNet.Parameters.ParameterExtractor
+  fullName: BenchmarkDotNet.Parameters.ParameterExtractor
+  nameWithType: ParameterExtractor
 - uid: BenchmarkDotNet.Parameters.ParameterInstance
   name: ParameterInstance
   href: api/BenchmarkDotNet.Parameters.ParameterInstance.html
@@ -23342,6 +24021,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Parameters.ParameterInstance.Definition
   nameWithType: ParameterInstance.Definition
+- uid: BenchmarkDotNet.Parameters.ParameterInstance.Dispose
+  name: Dispose()
+  href: api/BenchmarkDotNet.Parameters.ParameterInstance.html#BenchmarkDotNet_Parameters_ParameterInstance_Dispose
+  commentId: M:BenchmarkDotNet.Parameters.ParameterInstance.Dispose
+  fullName: BenchmarkDotNet.Parameters.ParameterInstance.Dispose()
+  nameWithType: ParameterInstance.Dispose()
+- uid: BenchmarkDotNet.Parameters.ParameterInstance.Dispose*
+  name: Dispose
+  href: api/BenchmarkDotNet.Parameters.ParameterInstance.html#BenchmarkDotNet_Parameters_ParameterInstance_Dispose_
+  commentId: Overload:BenchmarkDotNet.Parameters.ParameterInstance.Dispose
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Parameters.ParameterInstance.Dispose
+  nameWithType: ParameterInstance.Dispose
 - uid: BenchmarkDotNet.Parameters.ParameterInstance.IsArgument
   name: IsArgument
   href: api/BenchmarkDotNet.Parameters.ParameterInstance.html#BenchmarkDotNet_Parameters_ParameterInstance_IsArgument
@@ -23393,12 +24085,12 @@ references:
   commentId: M:BenchmarkDotNet.Parameters.ParameterInstance.ToDisplayText
   fullName: BenchmarkDotNet.Parameters.ParameterInstance.ToDisplayText()
   nameWithType: ParameterInstance.ToDisplayText()
-- uid: BenchmarkDotNet.Parameters.ParameterInstance.ToDisplayText(System.Globalization.CultureInfo)
-  name: ToDisplayText(CultureInfo)
-  href: api/BenchmarkDotNet.Parameters.ParameterInstance.html#BenchmarkDotNet_Parameters_ParameterInstance_ToDisplayText_System_Globalization_CultureInfo_
-  commentId: M:BenchmarkDotNet.Parameters.ParameterInstance.ToDisplayText(System.Globalization.CultureInfo)
-  fullName: BenchmarkDotNet.Parameters.ParameterInstance.ToDisplayText(System.Globalization.CultureInfo)
-  nameWithType: ParameterInstance.ToDisplayText(CultureInfo)
+- uid: BenchmarkDotNet.Parameters.ParameterInstance.ToDisplayText(BenchmarkDotNet.Reports.SummaryStyle)
+  name: ToDisplayText(SummaryStyle)
+  href: api/BenchmarkDotNet.Parameters.ParameterInstance.html#BenchmarkDotNet_Parameters_ParameterInstance_ToDisplayText_BenchmarkDotNet_Reports_SummaryStyle_
+  commentId: M:BenchmarkDotNet.Parameters.ParameterInstance.ToDisplayText(BenchmarkDotNet.Reports.SummaryStyle)
+  fullName: BenchmarkDotNet.Parameters.ParameterInstance.ToDisplayText(BenchmarkDotNet.Reports.SummaryStyle)
+  nameWithType: ParameterInstance.ToDisplayText(SummaryStyle)
 - uid: BenchmarkDotNet.Parameters.ParameterInstance.ToDisplayText*
   name: ToDisplayText
   href: api/BenchmarkDotNet.Parameters.ParameterInstance.html#BenchmarkDotNet_Parameters_ParameterInstance_ToDisplayText_
@@ -23493,6 +24185,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Parameters.ParameterInstances.DisplayInfo
   nameWithType: ParameterInstances.DisplayInfo
+- uid: BenchmarkDotNet.Parameters.ParameterInstances.Dispose
+  name: Dispose()
+  href: api/BenchmarkDotNet.Parameters.ParameterInstances.html#BenchmarkDotNet_Parameters_ParameterInstances_Dispose
+  commentId: M:BenchmarkDotNet.Parameters.ParameterInstances.Dispose
+  fullName: BenchmarkDotNet.Parameters.ParameterInstances.Dispose()
+  nameWithType: ParameterInstances.Dispose()
+- uid: BenchmarkDotNet.Parameters.ParameterInstances.Dispose*
+  name: Dispose
+  href: api/BenchmarkDotNet.Parameters.ParameterInstances.html#BenchmarkDotNet_Parameters_ParameterInstances_Dispose_
+  commentId: Overload:BenchmarkDotNet.Parameters.ParameterInstances.Dispose
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Parameters.ParameterInstances.Dispose
+  nameWithType: ParameterInstances.Dispose
 - uid: BenchmarkDotNet.Parameters.ParameterInstances.FolderInfo
   name: FolderInfo
   href: api/BenchmarkDotNet.Parameters.ParameterInstances.html#BenchmarkDotNet_Parameters_ParameterInstances_FolderInfo
@@ -24948,12 +25653,12 @@ references:
   commentId: T:BenchmarkDotNet.Reports.SummaryStyle
   fullName: BenchmarkDotNet.Reports.SummaryStyle
   nameWithType: SummaryStyle
-- uid: BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32)
-  name: SummaryStyle(CultureInfo, Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Int32)
-  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle__ctor_System_Globalization_CultureInfo_System_Boolean_BenchmarkDotNet_Columns_SizeUnit_Perfolizer_Horology_TimeUnit_System_Boolean_System_Boolean_System_Int32_
-  commentId: M:BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32)
-  fullName: BenchmarkDotNet.Reports.SummaryStyle.SummaryStyle(System.Globalization.CultureInfo, System.Boolean, BenchmarkDotNet.Columns.SizeUnit, Perfolizer.Horology.TimeUnit, System.Boolean, System.Boolean, System.Int32)
-  nameWithType: SummaryStyle.SummaryStyle(CultureInfo, Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Int32)
+- uid: BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle)
+  name: SummaryStyle(CultureInfo, Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Int32, RatioStyle)
+  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle__ctor_System_Globalization_CultureInfo_System_Boolean_BenchmarkDotNet_Columns_SizeUnit_Perfolizer_Horology_TimeUnit_System_Boolean_System_Boolean_System_Int32_BenchmarkDotNet_Columns_RatioStyle_
+  commentId: M:BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle)
+  fullName: BenchmarkDotNet.Reports.SummaryStyle.SummaryStyle(System.Globalization.CultureInfo, System.Boolean, BenchmarkDotNet.Columns.SizeUnit, Perfolizer.Horology.TimeUnit, System.Boolean, System.Boolean, System.Int32, BenchmarkDotNet.Columns.RatioStyle)
+  nameWithType: SummaryStyle.SummaryStyle(CultureInfo, Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Int32, RatioStyle)
 - uid: BenchmarkDotNet.Reports.SummaryStyle.#ctor*
   name: SummaryStyle
   href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle__ctor_
@@ -25090,6 +25795,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Reports.SummaryStyle.PrintZeroValuesInContent
   nameWithType: SummaryStyle.PrintZeroValuesInContent
+- uid: BenchmarkDotNet.Reports.SummaryStyle.RatioStyle
+  name: RatioStyle
+  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle_RatioStyle
+  commentId: P:BenchmarkDotNet.Reports.SummaryStyle.RatioStyle
+  fullName: BenchmarkDotNet.Reports.SummaryStyle.RatioStyle
+  nameWithType: SummaryStyle.RatioStyle
+- uid: BenchmarkDotNet.Reports.SummaryStyle.RatioStyle*
+  name: RatioStyle
+  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle_RatioStyle_
+  commentId: Overload:BenchmarkDotNet.Reports.SummaryStyle.RatioStyle
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Reports.SummaryStyle.RatioStyle
+  nameWithType: SummaryStyle.RatioStyle
 - uid: BenchmarkDotNet.Reports.SummaryStyle.SizeUnit
   name: SizeUnit
   href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle_SizeUnit
@@ -25142,6 +25860,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Reports.SummaryStyle.WithMaxParameterColumnWidth
   nameWithType: SummaryStyle.WithMaxParameterColumnWidth
+- uid: BenchmarkDotNet.Reports.SummaryStyle.WithRatioStyle(BenchmarkDotNet.Columns.RatioStyle)
+  name: WithRatioStyle(RatioStyle)
+  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle_WithRatioStyle_BenchmarkDotNet_Columns_RatioStyle_
+  commentId: M:BenchmarkDotNet.Reports.SummaryStyle.WithRatioStyle(BenchmarkDotNet.Columns.RatioStyle)
+  fullName: BenchmarkDotNet.Reports.SummaryStyle.WithRatioStyle(BenchmarkDotNet.Columns.RatioStyle)
+  nameWithType: SummaryStyle.WithRatioStyle(RatioStyle)
+- uid: BenchmarkDotNet.Reports.SummaryStyle.WithRatioStyle*
+  name: WithRatioStyle
+  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle_WithRatioStyle_
+  commentId: Overload:BenchmarkDotNet.Reports.SummaryStyle.WithRatioStyle
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Reports.SummaryStyle.WithRatioStyle
+  nameWithType: SummaryStyle.WithRatioStyle
 - uid: BenchmarkDotNet.Reports.SummaryStyle.WithSizeUnit(BenchmarkDotNet.Columns.SizeUnit)
   name: WithSizeUnit(SizeUnit)
   href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle_WithSizeUnit_BenchmarkDotNet_Columns_SizeUnit_
@@ -25663,6 +26394,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Running.BenchmarkCase.DisplayInfo
   nameWithType: BenchmarkCase.DisplayInfo
+- uid: BenchmarkDotNet.Running.BenchmarkCase.Dispose
+  name: Dispose()
+  href: api/BenchmarkDotNet.Running.BenchmarkCase.html#BenchmarkDotNet_Running_BenchmarkCase_Dispose
+  commentId: M:BenchmarkDotNet.Running.BenchmarkCase.Dispose
+  fullName: BenchmarkDotNet.Running.BenchmarkCase.Dispose()
+  nameWithType: BenchmarkCase.Dispose()
+- uid: BenchmarkDotNet.Running.BenchmarkCase.Dispose*
+  name: Dispose
+  href: api/BenchmarkDotNet.Running.BenchmarkCase.html#BenchmarkDotNet_Running_BenchmarkCase_Dispose_
+  commentId: Overload:BenchmarkDotNet.Running.BenchmarkCase.Dispose
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Running.BenchmarkCase.Dispose
+  nameWithType: BenchmarkCase.Dispose
 - uid: BenchmarkDotNet.Running.BenchmarkCase.FolderInfo
   name: FolderInfo
   href: api/BenchmarkDotNet.Running.BenchmarkCase.html#BenchmarkDotNet_Running_BenchmarkCase_FolderInfo
@@ -25676,6 +26420,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Running.BenchmarkCase.FolderInfo
   nameWithType: BenchmarkCase.FolderInfo
+- uid: BenchmarkDotNet.Running.BenchmarkCase.GetRuntime
+  name: GetRuntime()
+  href: api/BenchmarkDotNet.Running.BenchmarkCase.html#BenchmarkDotNet_Running_BenchmarkCase_GetRuntime
+  commentId: M:BenchmarkDotNet.Running.BenchmarkCase.GetRuntime
+  fullName: BenchmarkDotNet.Running.BenchmarkCase.GetRuntime()
+  nameWithType: BenchmarkCase.GetRuntime()
+- uid: BenchmarkDotNet.Running.BenchmarkCase.GetRuntime*
+  name: GetRuntime
+  href: api/BenchmarkDotNet.Running.BenchmarkCase.html#BenchmarkDotNet_Running_BenchmarkCase_GetRuntime_
+  commentId: Overload:BenchmarkDotNet.Running.BenchmarkCase.GetRuntime
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Running.BenchmarkCase.GetRuntime
+  nameWithType: BenchmarkCase.GetRuntime
 - uid: BenchmarkDotNet.Running.BenchmarkCase.HasArguments
   name: HasArguments
   href: api/BenchmarkDotNet.Running.BenchmarkCase.html#BenchmarkDotNet_Running_BenchmarkCase_HasArguments
@@ -25747,19 +26504,6 @@ references:
   commentId: T:BenchmarkDotNet.Running.BenchmarkConverter
   fullName: BenchmarkDotNet.Running.BenchmarkConverter
   nameWithType: BenchmarkConverter
-- uid: BenchmarkDotNet.Running.BenchmarkConverter.GetFullConfig(System.Type,BenchmarkDotNet.Configs.IConfig)
-  name: GetFullConfig(Type, IConfig)
-  href: api/BenchmarkDotNet.Running.BenchmarkConverter.html#BenchmarkDotNet_Running_BenchmarkConverter_GetFullConfig_System_Type_BenchmarkDotNet_Configs_IConfig_
-  commentId: M:BenchmarkDotNet.Running.BenchmarkConverter.GetFullConfig(System.Type,BenchmarkDotNet.Configs.IConfig)
-  fullName: BenchmarkDotNet.Running.BenchmarkConverter.GetFullConfig(System.Type, BenchmarkDotNet.Configs.IConfig)
-  nameWithType: BenchmarkConverter.GetFullConfig(Type, IConfig)
-- uid: BenchmarkDotNet.Running.BenchmarkConverter.GetFullConfig*
-  name: GetFullConfig
-  href: api/BenchmarkDotNet.Running.BenchmarkConverter.html#BenchmarkDotNet_Running_BenchmarkConverter_GetFullConfig_
-  commentId: Overload:BenchmarkDotNet.Running.BenchmarkConverter.GetFullConfig
-  isSpec: "True"
-  fullName: BenchmarkDotNet.Running.BenchmarkConverter.GetFullConfig
-  nameWithType: BenchmarkConverter.GetFullConfig
 - uid: BenchmarkDotNet.Running.BenchmarkConverter.MethodsToBenchmarks(System.Type,System.Reflection.MethodInfo[],BenchmarkDotNet.Configs.IConfig)
   name: MethodsToBenchmarks(Type, MethodInfo[], IConfig)
   href: api/BenchmarkDotNet.Running.BenchmarkConverter.html#BenchmarkDotNet_Running_BenchmarkConverter_MethodsToBenchmarks_System_Type_System_Reflection_MethodInfo___BenchmarkDotNet_Configs_IConfig_
@@ -25975,6 +26719,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Running.BenchmarkRunInfo.Config
   nameWithType: BenchmarkRunInfo.Config
+- uid: BenchmarkDotNet.Running.BenchmarkRunInfo.Dispose
+  name: Dispose()
+  href: api/BenchmarkDotNet.Running.BenchmarkRunInfo.html#BenchmarkDotNet_Running_BenchmarkRunInfo_Dispose
+  commentId: M:BenchmarkDotNet.Running.BenchmarkRunInfo.Dispose
+  fullName: BenchmarkDotNet.Running.BenchmarkRunInfo.Dispose()
+  nameWithType: BenchmarkRunInfo.Dispose()
+- uid: BenchmarkDotNet.Running.BenchmarkRunInfo.Dispose*
+  name: Dispose
+  href: api/BenchmarkDotNet.Running.BenchmarkRunInfo.html#BenchmarkDotNet_Running_BenchmarkRunInfo_Dispose_
+  commentId: Overload:BenchmarkDotNet.Running.BenchmarkRunInfo.Dispose
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Running.BenchmarkRunInfo.Dispose
+  nameWithType: BenchmarkRunInfo.Dispose
 - uid: BenchmarkDotNet.Running.BenchmarkRunInfo.Type
   name: Type
   href: api/BenchmarkDotNet.Running.BenchmarkRunInfo.html#BenchmarkDotNet_Running_BenchmarkRunInfo_Type
@@ -26009,18 +26766,24 @@ references:
   fullName.vb: BenchmarkDotNet.Running.BenchmarkRunner.Run(BenchmarkDotNet.Running.BenchmarkRunInfo())
   nameWithType: BenchmarkRunner.Run(BenchmarkRunInfo[])
   nameWithType.vb: BenchmarkRunner.Run(BenchmarkRunInfo())
-- uid: BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Reflection.Assembly,BenchmarkDotNet.Configs.IConfig)
-  name: Run(Assembly, IConfig)
-  href: api/BenchmarkDotNet.Running.BenchmarkRunner.html#BenchmarkDotNet_Running_BenchmarkRunner_Run_System_Reflection_Assembly_BenchmarkDotNet_Configs_IConfig_
-  commentId: M:BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Reflection.Assembly,BenchmarkDotNet.Configs.IConfig)
-  fullName: BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Reflection.Assembly, BenchmarkDotNet.Configs.IConfig)
-  nameWithType: BenchmarkRunner.Run(Assembly, IConfig)
-- uid: BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Type,BenchmarkDotNet.Configs.IConfig)
-  name: Run(Type, IConfig)
-  href: api/BenchmarkDotNet.Running.BenchmarkRunner.html#BenchmarkDotNet_Running_BenchmarkRunner_Run_System_Type_BenchmarkDotNet_Configs_IConfig_
-  commentId: M:BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Type,BenchmarkDotNet.Configs.IConfig)
-  fullName: BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Type, BenchmarkDotNet.Configs.IConfig)
-  nameWithType: BenchmarkRunner.Run(Type, IConfig)
+- uid: BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Reflection.Assembly,BenchmarkDotNet.Configs.IConfig,System.String[])
+  name: Run(Assembly, IConfig, String[])
+  href: api/BenchmarkDotNet.Running.BenchmarkRunner.html#BenchmarkDotNet_Running_BenchmarkRunner_Run_System_Reflection_Assembly_BenchmarkDotNet_Configs_IConfig_System_String___
+  commentId: M:BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Reflection.Assembly,BenchmarkDotNet.Configs.IConfig,System.String[])
+  name.vb: Run(Assembly, IConfig, String())
+  fullName: BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Reflection.Assembly, BenchmarkDotNet.Configs.IConfig, System.String[])
+  fullName.vb: BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Reflection.Assembly, BenchmarkDotNet.Configs.IConfig, System.String())
+  nameWithType: BenchmarkRunner.Run(Assembly, IConfig, String[])
+  nameWithType.vb: BenchmarkRunner.Run(Assembly, IConfig, String())
+- uid: BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Type,BenchmarkDotNet.Configs.IConfig,System.String[])
+  name: Run(Type, IConfig, String[])
+  href: api/BenchmarkDotNet.Running.BenchmarkRunner.html#BenchmarkDotNet_Running_BenchmarkRunner_Run_System_Type_BenchmarkDotNet_Configs_IConfig_System_String___
+  commentId: M:BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Type,BenchmarkDotNet.Configs.IConfig,System.String[])
+  name.vb: Run(Type, IConfig, String())
+  fullName: BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Type, BenchmarkDotNet.Configs.IConfig, System.String[])
+  fullName.vb: BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Type, BenchmarkDotNet.Configs.IConfig, System.String())
+  nameWithType: BenchmarkRunner.Run(Type, IConfig, String[])
+  nameWithType.vb: BenchmarkRunner.Run(Type, IConfig, String())
 - uid: BenchmarkDotNet.Running.BenchmarkRunner.Run(System.Type,System.Reflection.MethodInfo[],BenchmarkDotNet.Configs.IConfig)
   name: Run(Type, MethodInfo[], IConfig)
   href: api/BenchmarkDotNet.Running.BenchmarkRunner.html#BenchmarkDotNet_Running_BenchmarkRunner_Run_System_Type_System_Reflection_MethodInfo___BenchmarkDotNet_Configs_IConfig_
@@ -26037,15 +26800,15 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Running.BenchmarkRunner.Run
   nameWithType: BenchmarkRunner.Run
-- uid: BenchmarkDotNet.Running.BenchmarkRunner.Run``1(BenchmarkDotNet.Configs.IConfig)
-  name: Run<T>(IConfig)
-  href: api/BenchmarkDotNet.Running.BenchmarkRunner.html#BenchmarkDotNet_Running_BenchmarkRunner_Run__1_BenchmarkDotNet_Configs_IConfig_
-  commentId: M:BenchmarkDotNet.Running.BenchmarkRunner.Run``1(BenchmarkDotNet.Configs.IConfig)
-  name.vb: Run(Of T)(IConfig)
-  fullName: BenchmarkDotNet.Running.BenchmarkRunner.Run<T>(BenchmarkDotNet.Configs.IConfig)
-  fullName.vb: BenchmarkDotNet.Running.BenchmarkRunner.Run(Of T)(BenchmarkDotNet.Configs.IConfig)
-  nameWithType: BenchmarkRunner.Run<T>(IConfig)
-  nameWithType.vb: BenchmarkRunner.Run(Of T)(IConfig)
+- uid: BenchmarkDotNet.Running.BenchmarkRunner.Run``1(BenchmarkDotNet.Configs.IConfig,System.String[])
+  name: Run<T>(IConfig, String[])
+  href: api/BenchmarkDotNet.Running.BenchmarkRunner.html#BenchmarkDotNet_Running_BenchmarkRunner_Run__1_BenchmarkDotNet_Configs_IConfig_System_String___
+  commentId: M:BenchmarkDotNet.Running.BenchmarkRunner.Run``1(BenchmarkDotNet.Configs.IConfig,System.String[])
+  name.vb: Run(Of T)(IConfig, String())
+  fullName: BenchmarkDotNet.Running.BenchmarkRunner.Run<T>(BenchmarkDotNet.Configs.IConfig, System.String[])
+  fullName.vb: BenchmarkDotNet.Running.BenchmarkRunner.Run(Of T)(BenchmarkDotNet.Configs.IConfig, System.String())
+  nameWithType: BenchmarkRunner.Run<T>(IConfig, String[])
+  nameWithType.vb: BenchmarkRunner.Run(Of T)(IConfig, String())
 - uid: BenchmarkDotNet.Running.BenchmarkRunner.RunSource(System.String,BenchmarkDotNet.Configs.IConfig)
   name: RunSource(String, IConfig)
   href: api/BenchmarkDotNet.Running.BenchmarkRunner.html#BenchmarkDotNet_Running_BenchmarkRunner_RunSource_System_String_BenchmarkDotNet_Configs_IConfig_
@@ -26333,6 +27096,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Running.BuildPartition.IsNetFramework
   nameWithType: BuildPartition.IsNetFramework
+- uid: BenchmarkDotNet.Running.BuildPartition.IsWasm
+  name: IsWasm
+  href: api/BenchmarkDotNet.Running.BuildPartition.html#BenchmarkDotNet_Running_BuildPartition_IsWasm
+  commentId: P:BenchmarkDotNet.Running.BuildPartition.IsWasm
+  fullName: BenchmarkDotNet.Running.BuildPartition.IsWasm
+  nameWithType: BuildPartition.IsWasm
+- uid: BenchmarkDotNet.Running.BuildPartition.IsWasm*
+  name: IsWasm
+  href: api/BenchmarkDotNet.Running.BuildPartition.html#BenchmarkDotNet_Running_BuildPartition_IsWasm_
+  commentId: Overload:BenchmarkDotNet.Running.BuildPartition.IsWasm
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Running.BuildPartition.IsWasm
+  nameWithType: BuildPartition.IsWasm
 - uid: BenchmarkDotNet.Running.BuildPartition.Jit
   name: Jit
   href: api/BenchmarkDotNet.Running.BuildPartition.html#BenchmarkDotNet_Running_BuildPartition_Jit
@@ -26689,6 +27465,9 @@ references:
 - uid: BenchmarkDotNet.Samples.IntroArguments
   name: 'Sample: IntroArguments'
   href: articles/samples/IntroArguments.html
+- uid: BenchmarkDotNet.Samples.IntroArgumentsPriority
+  name: 'Sample: IntroArgumentsPriority'
+  href: articles/samples/IntroArgumentsPriority.html
 - uid: BenchmarkDotNet.Samples.IntroArgumentsSource
   name: 'Sample: IntroArgumentsSource'
   href: articles/samples/IntroArgumentsSource.html
@@ -26812,6 +27591,9 @@ references:
 - uid: BenchmarkDotNet.Samples.IntroParamsAllValues
   name: 'Sample: IntroParamsAllValues'
   href: articles/samples/IntroParamsAllValues.html
+- uid: BenchmarkDotNet.Samples.IntroParamsPriority
+  name: 'Sample: IntroParamsPriority'
+  href: articles/samples/IntroParamsPriority.html
 - uid: BenchmarkDotNet.Samples.IntroParamsSource
   name: 'Sample: IntroParamsSource'
   href: articles/samples/IntroParamsSource.html
@@ -26827,6 +27609,9 @@ references:
 - uid: BenchmarkDotNet.Samples.IntroRatioSD
   name: 'Sample: IntroRatioSD'
   href: articles/samples/IntroRatioSD.html
+- uid: BenchmarkDotNet.Samples.IntroRatioStyle
+  name: 'Sample: IntroRatioStyle'
+  href: articles/samples/IntroRatioStyle.html
 - uid: BenchmarkDotNet.Samples.IntroSetupCleanupGlobal
   name: 'Sample: IntroSetupCleanupGlobal'
   href: articles/samples/IntroSetupCleanupGlobal.html
@@ -26860,6 +27645,12 @@ references:
 - uid: BenchmarkDotNet.Samples.IntroUnicode
   name: 'Sample: IntroUnicode'
   href: articles/samples/IntroUnicode.html
+- uid: BenchmarkDotNet.Samples.IntroWasm
+  name: 'Sample: IntroWasm'
+  href: articles/samples/IntroWasm.html
+- uid: BenchmarkDotNet.Samples.Xamarin
+  name: 'Sample: IntroXamarin'
+  href: articles/samples/IntroXamarin.html
 - uid: BenchmarkDotNet.Toolchains
   name: BenchmarkDotNet.Toolchains
   href: api/BenchmarkDotNet.Toolchains.html
@@ -27082,6 +27873,12 @@ references:
   commentId: F:BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchain.Core50
   fullName: BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchain.Core50
   nameWithType: CoreRtToolchain.Core50
+- uid: BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchain.Core60
+  name: Core60
+  href: api/BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchain.html#BenchmarkDotNet_Toolchains_CoreRt_CoreRtToolchain_Core60
+  commentId: F:BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchain.Core60
+  fullName: BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchain.Core60
+  nameWithType: CoreRtToolchain.Core60
 - uid: BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchain.CreateBuilder
   name: CreateBuilder()
   href: api/BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchain.html#BenchmarkDotNet_Toolchains_CoreRt_CoreRtToolchain_CreateBuilder
@@ -27688,6 +28485,25 @@ references:
   commentId: T:BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain
   fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain
   nameWithType: CsProjCoreToolchain
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Equals(BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain)
+  name: Equals(CsProjCoreToolchain)
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.html#BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_Equals_BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_
+  commentId: M:BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Equals(BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain)
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Equals(BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain)
+  nameWithType: CsProjCoreToolchain.Equals(CsProjCoreToolchain)
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Equals(System.Object)
+  name: Equals(Object)
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.html#BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_Equals_System_Object_
+  commentId: M:BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Equals(System.Object)
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Equals(System.Object)
+  nameWithType: CsProjCoreToolchain.Equals(Object)
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Equals*
+  name: Equals
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.html#BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_Equals_
+  commentId: Overload:BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Equals
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Equals
+  nameWithType: CsProjCoreToolchain.Equals
 - uid: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.From(BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings)
   name: From(NetCoreAppSettings)
   href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.html#BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_From_BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_
@@ -27701,6 +28517,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.From
   nameWithType: CsProjCoreToolchain.From
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.GetHashCode
+  name: GetHashCode()
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.html#BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_GetHashCode
+  commentId: M:BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.GetHashCode
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.GetHashCode()
+  nameWithType: CsProjCoreToolchain.GetHashCode()
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.GetHashCode*
+  name: GetHashCode
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.html#BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_GetHashCode_
+  commentId: Overload:BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.GetHashCode
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.GetHashCode
+  nameWithType: CsProjCoreToolchain.GetHashCode
 - uid: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.IsSupported(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Characteristics.IResolver)
   name: IsSupported(BenchmarkCase, ILogger, IResolver)
   href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.html#BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_IsSupported_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Characteristics_IResolver_
@@ -27750,18 +28579,24 @@ references:
   commentId: F:BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.NetCoreApp50
   fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.NetCoreApp50
   nameWithType: CsProjCoreToolchain.NetCoreApp50
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.NetCoreApp60
+  name: NetCoreApp60
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.html#BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_NetCoreApp60
+  commentId: F:BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.NetCoreApp60
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.NetCoreApp60
+  nameWithType: CsProjCoreToolchain.NetCoreApp60
 - uid: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator
   name: CsProjGenerator
   href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html
   commentId: T:BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator
   fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator
   nameWithType: CsProjGenerator
-- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.#ctor(System.String,System.String,System.String,System.String)
-  name: CsProjGenerator(String, String, String, String)
-  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator__ctor_System_String_System_String_System_String_System_String_
-  commentId: M:BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.#ctor(System.String,System.String,System.String,System.String)
-  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.CsProjGenerator(System.String, System.String, System.String, System.String)
-  nameWithType: CsProjGenerator.CsProjGenerator(String, String, String, String)
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.#ctor(System.String,System.String,System.String,System.String,System.Boolean)
+  name: CsProjGenerator(String, String, String, String, Boolean)
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator__ctor_System_String_System_String_System_String_System_String_System_Boolean_
+  commentId: M:BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.#ctor(System.String,System.String,System.String,System.String,System.Boolean)
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.CsProjGenerator(System.String, System.String, System.String, System.String, System.Boolean)
+  nameWithType: CsProjGenerator.CsProjGenerator(String, String, String, String, Boolean)
 - uid: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.#ctor*
   name: CsProjGenerator
   href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator__ctor_
@@ -27769,6 +28604,25 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.CsProjGenerator
   nameWithType: CsProjGenerator.CsProjGenerator
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.Equals(BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator)
+  name: Equals(CsProjGenerator)
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_Equals_BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_
+  commentId: M:BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.Equals(BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator)
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.Equals(BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator)
+  nameWithType: CsProjGenerator.Equals(CsProjGenerator)
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.Equals(System.Object)
+  name: Equals(Object)
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_Equals_System_Object_
+  commentId: M:BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.Equals(System.Object)
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.Equals(System.Object)
+  nameWithType: CsProjGenerator.Equals(Object)
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.Equals*
+  name: Equals
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_Equals_
+  commentId: Overload:BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.Equals
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.Equals
+  nameWithType: CsProjGenerator.Equals
 - uid: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GenerateProject(BenchmarkDotNet.Running.BuildPartition,BenchmarkDotNet.Toolchains.ArtifactsPaths,BenchmarkDotNet.Loggers.ILogger)
   name: GenerateProject(BuildPartition, ArtifactsPaths, ILogger)
   href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GenerateProject_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Toolchains_ArtifactsPaths_BenchmarkDotNet_Loggers_ILogger_
@@ -27808,6 +28662,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetBuildArtifactsDirectoryPath
   nameWithType: CsProjGenerator.GetBuildArtifactsDirectoryPath
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetHashCode
+  name: GetHashCode()
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetHashCode
+  commentId: M:BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetHashCode
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetHashCode()
+  nameWithType: CsProjGenerator.GetHashCode()
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetHashCode*
+  name: GetHashCode
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetHashCode_
+  commentId: Overload:BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetHashCode
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetHashCode
+  nameWithType: CsProjGenerator.GetHashCode
 - uid: BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.GetProjectFilePath(System.String)
   name: GetProjectFilePath(String)
   href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GetProjectFilePath_System_String_
@@ -27922,19 +28789,6 @@ references:
   commentId: F:BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.Feeds
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.Feeds
   nameWithType: CustomDotNetCliToolchainBuilder.Feeds
-- uid: BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier
-  name: GetPortableRuntimeIdentifier()
-  href: api/BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_GetPortableRuntimeIdentifier
-  commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier()
-  nameWithType: CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier()
-- uid: BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier*
-  name: GetPortableRuntimeIdentifier
-  href: api/BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_GetPortableRuntimeIdentifier_
-  commentId: Overload:BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier
-  isSpec: "True"
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier
-  nameWithType: CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.GetTargetFrameworkMoniker
   name: GetTargetFrameworkMoniker()
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_GetTargetFrameworkMoniker
@@ -28527,12 +29381,12 @@ references:
   commentId: T:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator
   nameWithType: DotNetCliGenerator
-- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.#ctor(System.String,System.String,System.String)
-  name: DotNetCliGenerator(String, String, String)
-  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator__ctor_System_String_System_String_System_String_
-  commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.#ctor(System.String,System.String,System.String)
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.DotNetCliGenerator(System.String, System.String, System.String)
-  nameWithType: DotNetCliGenerator.DotNetCliGenerator(String, String, String)
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.#ctor(System.String,System.String,System.String,System.Boolean)
+  name: DotNetCliGenerator(String, String, String, Boolean)
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator__ctor_System_String_System_String_System_String_System_Boolean_
+  commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.#ctor(System.String,System.String,System.String,System.Boolean)
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.DotNetCliGenerator(System.String, System.String, System.String, System.Boolean)
+  nameWithType: DotNetCliGenerator.DotNetCliGenerator(String, String, String, Boolean)
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.#ctor*
   name: DotNetCliGenerator
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator__ctor_
@@ -28631,6 +29485,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.GetPackagesDirectoryPath
   nameWithType: DotNetCliGenerator.GetPackagesDirectoryPath
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.IsNetCore
+  name: IsNetCore
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator_IsNetCore
+  commentId: P:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.IsNetCore
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.IsNetCore
+  nameWithType: DotNetCliGenerator.IsNetCore
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.IsNetCore*
+  name: IsNetCore
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator_IsNetCore_
+  commentId: Overload:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.IsNetCore
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.IsNetCore
+  nameWithType: DotNetCliGenerator.IsNetCore
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.PackagesPath
   name: PackagesPath
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator_PackagesPath
@@ -28698,15 +29565,15 @@ references:
   commentId: T:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings
   nameWithType: NetCoreAppSettings
-- uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor(System.String,System.String,System.String,System.String,System.String,System.Nullable{System.TimeSpan})
-  name: NetCoreAppSettings(String, String, String, String, String, Nullable<TimeSpan>)
-  href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings__ctor_System_String_System_String_System_String_System_String_System_String_System_Nullable_System_TimeSpan__
-  commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor(System.String,System.String,System.String,System.String,System.String,System.Nullable{System.TimeSpan})
-  name.vb: NetCoreAppSettings(String, String, String, String, String, Nullable(Of TimeSpan))
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreAppSettings(System.String, System.String, System.String, System.String, System.String, System.Nullable<System.TimeSpan>)
-  fullName.vb: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreAppSettings(System.String, System.String, System.String, System.String, System.String, System.Nullable(Of System.TimeSpan))
-  nameWithType: NetCoreAppSettings.NetCoreAppSettings(String, String, String, String, String, Nullable<TimeSpan>)
-  nameWithType.vb: NetCoreAppSettings.NetCoreAppSettings(String, String, String, String, String, Nullable(Of TimeSpan))
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor(System.String,System.String,System.String,System.String,System.String,System.Nullable{System.TimeSpan},System.String,System.String,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
+  name: NetCoreAppSettings(String, String, String, String, String, Nullable<TimeSpan>, String, String, MonoAotCompilerMode)
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings__ctor_System_String_System_String_System_String_System_String_System_String_System_Nullable_System_TimeSpan__System_String_System_String_BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotCompilerMode_
+  commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor(System.String,System.String,System.String,System.String,System.String,System.Nullable{System.TimeSpan},System.String,System.String,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
+  name.vb: NetCoreAppSettings(String, String, String, String, String, Nullable(Of TimeSpan), String, String, MonoAotCompilerMode)
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreAppSettings(System.String, System.String, System.String, System.String, System.String, System.Nullable<System.TimeSpan>, System.String, System.String, BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
+  fullName.vb: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreAppSettings(System.String, System.String, System.String, System.String, System.String, System.Nullable(Of System.TimeSpan), System.String, System.String, BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
+  nameWithType: NetCoreAppSettings.NetCoreAppSettings(String, String, String, String, String, Nullable<TimeSpan>, String, String, MonoAotCompilerMode)
+  nameWithType.vb: NetCoreAppSettings.NetCoreAppSettings(String, String, String, String, String, Nullable(Of TimeSpan), String, String, MonoAotCompilerMode)
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor*
   name: NetCoreAppSettings
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings__ctor_
@@ -28714,6 +29581,32 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreAppSettings
   nameWithType: NetCoreAppSettings.NetCoreAppSettings
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerMode
+  name: AOTCompilerMode
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_AOTCompilerMode
+  commentId: P:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerMode
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerMode
+  nameWithType: NetCoreAppSettings.AOTCompilerMode
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerMode*
+  name: AOTCompilerMode
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_AOTCompilerMode_
+  commentId: Overload:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerMode
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerMode
+  nameWithType: NetCoreAppSettings.AOTCompilerMode
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerPath
+  name: AOTCompilerPath
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_AOTCompilerPath
+  commentId: P:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerPath
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerPath
+  nameWithType: NetCoreAppSettings.AOTCompilerPath
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerPath*
+  name: AOTCompilerPath
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_AOTCompilerPath_
+  commentId: Overload:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerPath
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerPath
+  nameWithType: NetCoreAppSettings.AOTCompilerPath
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.CustomDotNetCliPath
   name: CustomDotNetCliPath
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_CustomDotNetCliPath
@@ -28727,6 +29620,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.CustomDotNetCliPath
   nameWithType: NetCoreAppSettings.CustomDotNetCliPath
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.CustomRuntimePack
+  name: CustomRuntimePack
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_CustomRuntimePack
+  commentId: P:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.CustomRuntimePack
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.CustomRuntimePack
+  nameWithType: NetCoreAppSettings.CustomRuntimePack
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.CustomRuntimePack*
+  name: CustomRuntimePack
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_CustomRuntimePack_
+  commentId: Overload:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.CustomRuntimePack
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.CustomRuntimePack
+  nameWithType: NetCoreAppSettings.CustomRuntimePack
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.DefaultBuildTimeout
   name: DefaultBuildTimeout
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_DefaultBuildTimeout
@@ -28782,6 +29688,12 @@ references:
   commentId: F:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreApp50
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreApp50
   nameWithType: NetCoreAppSettings.NetCoreApp50
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreApp60
+  name: NetCoreApp60
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_NetCoreApp60
+  commentId: F:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreApp60
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreApp60
+  nameWithType: NetCoreAppSettings.NetCoreApp60
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.PackagesPath
   name: PackagesPath
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_PackagesPath
@@ -29037,6 +29949,19 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Toolchains.GeneratorBase.GetExecutableExtension
   nameWithType: GeneratorBase.GetExecutableExtension
+- uid: BenchmarkDotNet.Toolchains.GeneratorBase.GetExecutablePath(System.String,System.String)
+  name: GetExecutablePath(String, String)
+  href: api/BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GetExecutablePath_System_String_System_String_
+  commentId: M:BenchmarkDotNet.Toolchains.GeneratorBase.GetExecutablePath(System.String,System.String)
+  fullName: BenchmarkDotNet.Toolchains.GeneratorBase.GetExecutablePath(System.String, System.String)
+  nameWithType: GeneratorBase.GetExecutablePath(String, String)
+- uid: BenchmarkDotNet.Toolchains.GeneratorBase.GetExecutablePath*
+  name: GetExecutablePath
+  href: api/BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GetExecutablePath_
+  commentId: Overload:BenchmarkDotNet.Toolchains.GeneratorBase.GetExecutablePath
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.GeneratorBase.GetExecutablePath
+  nameWithType: GeneratorBase.GetExecutablePath
 - uid: BenchmarkDotNet.Toolchains.GeneratorBase.GetPackagesDirectoryPath(System.String)
   name: GetPackagesDirectoryPath(String)
   href: api/BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GetPackagesDirectoryPath_System_String_
@@ -30894,6 +31819,299 @@ references:
   isSpec: "True"
   fullName: BenchmarkDotNet.Toolchains.Mono.MonoAotToolchain.IsSupported
   nameWithType: MonoAotToolchain.IsSupported
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM
+  name: BenchmarkDotNet.Toolchains.MonoAotLLVM
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.html
+  commentId: N:BenchmarkDotNet.Toolchains.MonoAotLLVM
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM
+  nameWithType: BenchmarkDotNet.Toolchains.MonoAotLLVM
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode
+  name: MonoAotCompilerMode
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode.html
+  commentId: T:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode
+  nameWithType: MonoAotCompilerMode
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode.llvm
+  name: llvm
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotCompilerMode_llvm
+  commentId: F:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode.llvm
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode.llvm
+  nameWithType: MonoAotCompilerMode.llvm
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode.mini
+  name: mini
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotCompilerMode_mini
+  commentId: F:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode.mini
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode.mini
+  nameWithType: MonoAotCompilerMode.mini
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder
+  name: MonoAotLLVMBuilder
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.html
+  commentId: T:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder
+  nameWithType: MonoAotLLVMBuilder
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.#ctor(System.String,System.String,System.Nullable{System.TimeSpan})
+  name: MonoAotLLVMBuilder(String, String, Nullable<TimeSpan>)
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMBuilder__ctor_System_String_System_String_System_Nullable_System_TimeSpan__
+  commentId: M:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.#ctor(System.String,System.String,System.Nullable{System.TimeSpan})
+  name.vb: MonoAotLLVMBuilder(String, String, Nullable(Of TimeSpan))
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.MonoAotLLVMBuilder(System.String, System.String, System.Nullable<System.TimeSpan>)
+  fullName.vb: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.MonoAotLLVMBuilder(System.String, System.String, System.Nullable(Of System.TimeSpan))
+  nameWithType: MonoAotLLVMBuilder.MonoAotLLVMBuilder(String, String, Nullable<TimeSpan>)
+  nameWithType.vb: MonoAotLLVMBuilder.MonoAotLLVMBuilder(String, String, Nullable(Of TimeSpan))
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.#ctor*
+  name: MonoAotLLVMBuilder
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMBuilder__ctor_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.#ctor
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.MonoAotLLVMBuilder
+  nameWithType: MonoAotLLVMBuilder.MonoAotLLVMBuilder
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.Build(BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Running.BuildPartition,BenchmarkDotNet.Loggers.ILogger)
+  name: Build(GenerateResult, BuildPartition, ILogger)
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMBuilder_Build_BenchmarkDotNet_Toolchains_Results_GenerateResult_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Loggers_ILogger_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.Build(BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Running.BuildPartition,BenchmarkDotNet.Loggers.ILogger)
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.Build(BenchmarkDotNet.Toolchains.Results.GenerateResult, BenchmarkDotNet.Running.BuildPartition, BenchmarkDotNet.Loggers.ILogger)
+  nameWithType: MonoAotLLVMBuilder.Build(GenerateResult, BuildPartition, ILogger)
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.Build*
+  name: Build
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMBuilder_Build_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.Build
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.Build
+  nameWithType: MonoAotLLVMBuilder.Build
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.RenameSharedLibaries(BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Loggers.ILogger)
+  name: RenameSharedLibaries(GenerateResult, ILogger)
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMBuilder_RenameSharedLibaries_BenchmarkDotNet_Toolchains_Results_GenerateResult_BenchmarkDotNet_Loggers_ILogger_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.RenameSharedLibaries(BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Loggers.ILogger)
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.RenameSharedLibaries(BenchmarkDotNet.Toolchains.Results.GenerateResult, BenchmarkDotNet.Loggers.ILogger)
+  nameWithType: MonoAotLLVMBuilder.RenameSharedLibaries(GenerateResult, ILogger)
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.RenameSharedLibaries*
+  name: RenameSharedLibaries
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMBuilder_RenameSharedLibaries_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.RenameSharedLibaries
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMBuilder.RenameSharedLibaries
+  nameWithType: MonoAotLLVMBuilder.RenameSharedLibaries
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator
+  name: MonoAotLLVMGenerator
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.html
+  commentId: T:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator
+  nameWithType: MonoAotLLVMGenerator
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.#ctor(System.String,System.String,System.String,System.String,System.String,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
+  name: MonoAotLLVMGenerator(String, String, String, String, String, MonoAotCompilerMode)
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMGenerator__ctor_System_String_System_String_System_String_System_String_System_String_BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotCompilerMode_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.#ctor(System.String,System.String,System.String,System.String,System.String,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.MonoAotLLVMGenerator(System.String, System.String, System.String, System.String, System.String, BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
+  nameWithType: MonoAotLLVMGenerator.MonoAotLLVMGenerator(String, String, String, String, String, MonoAotCompilerMode)
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.#ctor*
+  name: MonoAotLLVMGenerator
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMGenerator__ctor_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.#ctor
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.MonoAotLLVMGenerator
+  nameWithType: MonoAotLLVMGenerator.MonoAotLLVMGenerator
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GenerateProject(BenchmarkDotNet.Running.BuildPartition,BenchmarkDotNet.Toolchains.ArtifactsPaths,BenchmarkDotNet.Loggers.ILogger)
+  name: GenerateProject(BuildPartition, ArtifactsPaths, ILogger)
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMGenerator_GenerateProject_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Toolchains_ArtifactsPaths_BenchmarkDotNet_Loggers_ILogger_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GenerateProject(BenchmarkDotNet.Running.BuildPartition,BenchmarkDotNet.Toolchains.ArtifactsPaths,BenchmarkDotNet.Loggers.ILogger)
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GenerateProject(BenchmarkDotNet.Running.BuildPartition, BenchmarkDotNet.Toolchains.ArtifactsPaths, BenchmarkDotNet.Loggers.ILogger)
+  nameWithType: MonoAotLLVMGenerator.GenerateProject(BuildPartition, ArtifactsPaths, ILogger)
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GenerateProject*
+  name: GenerateProject
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMGenerator_GenerateProject_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GenerateProject
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GenerateProject
+  nameWithType: MonoAotLLVMGenerator.GenerateProject
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GetBinariesDirectoryPath(System.String,System.String)
+  name: GetBinariesDirectoryPath(String, String)
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMGenerator_GetBinariesDirectoryPath_System_String_System_String_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GetBinariesDirectoryPath(System.String,System.String)
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GetBinariesDirectoryPath(System.String, System.String)
+  nameWithType: MonoAotLLVMGenerator.GetBinariesDirectoryPath(String, String)
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GetBinariesDirectoryPath*
+  name: GetBinariesDirectoryPath
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMGenerator_GetBinariesDirectoryPath_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GetBinariesDirectoryPath
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GetBinariesDirectoryPath
+  nameWithType: MonoAotLLVMGenerator.GetBinariesDirectoryPath
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GetExecutablePath(System.String,System.String)
+  name: GetExecutablePath(String, String)
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMGenerator_GetExecutablePath_System_String_System_String_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GetExecutablePath(System.String,System.String)
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GetExecutablePath(System.String, System.String)
+  nameWithType: MonoAotLLVMGenerator.GetExecutablePath(String, String)
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GetExecutablePath*
+  name: GetExecutablePath
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMGenerator_GetExecutablePath_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GetExecutablePath
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMGenerator.GetExecutablePath
+  nameWithType: MonoAotLLVMGenerator.GetExecutablePath
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain
+  name: MonoAotLLVMToolChain
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.html
+  commentId: T:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain
+  nameWithType: MonoAotLLVMToolChain
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.#ctor(System.String,BenchmarkDotNet.Toolchains.IGenerator,BenchmarkDotNet.Toolchains.IBuilder,BenchmarkDotNet.Toolchains.IExecutor)
+  name: MonoAotLLVMToolChain(String, IGenerator, IBuilder, IExecutor)
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMToolChain__ctor_System_String_BenchmarkDotNet_Toolchains_IGenerator_BenchmarkDotNet_Toolchains_IBuilder_BenchmarkDotNet_Toolchains_IExecutor_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.#ctor(System.String,BenchmarkDotNet.Toolchains.IGenerator,BenchmarkDotNet.Toolchains.IBuilder,BenchmarkDotNet.Toolchains.IExecutor)
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.MonoAotLLVMToolChain(System.String, BenchmarkDotNet.Toolchains.IGenerator, BenchmarkDotNet.Toolchains.IBuilder, BenchmarkDotNet.Toolchains.IExecutor)
+  nameWithType: MonoAotLLVMToolChain.MonoAotLLVMToolChain(String, IGenerator, IBuilder, IExecutor)
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.#ctor*
+  name: MonoAotLLVMToolChain
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMToolChain__ctor_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.#ctor
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.MonoAotLLVMToolChain
+  nameWithType: MonoAotLLVMToolChain.MonoAotLLVMToolChain
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.From(BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings)
+  name: From(NetCoreAppSettings)
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMToolChain_From_BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.From(BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings)
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.From(BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings)
+  nameWithType: MonoAotLLVMToolChain.From(NetCoreAppSettings)
+- uid: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.From*
+  name: From
+  href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.html#BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotLLVMToolChain_From_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.From
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.From
+  nameWithType: MonoAotLLVMToolChain.From
+- uid: BenchmarkDotNet.Toolchains.MonoWasm
+  name: BenchmarkDotNet.Toolchains.MonoWasm
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.html
+  commentId: N:BenchmarkDotNet.Toolchains.MonoWasm
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm
+  nameWithType: BenchmarkDotNet.Toolchains.MonoWasm
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder
+  name: WasmBuilder
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.html
+  commentId: T:BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder
+  nameWithType: WasmBuilder
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.#ctor(System.String,System.String,System.Nullable{System.TimeSpan})
+  name: WasmBuilder(String, String, Nullable<TimeSpan>)
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmBuilder__ctor_System_String_System_String_System_Nullable_System_TimeSpan__
+  commentId: M:BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.#ctor(System.String,System.String,System.Nullable{System.TimeSpan})
+  name.vb: WasmBuilder(String, String, Nullable(Of TimeSpan))
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.WasmBuilder(System.String, System.String, System.Nullable<System.TimeSpan>)
+  fullName.vb: BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.WasmBuilder(System.String, System.String, System.Nullable(Of System.TimeSpan))
+  nameWithType: WasmBuilder.WasmBuilder(String, String, Nullable<TimeSpan>)
+  nameWithType.vb: WasmBuilder.WasmBuilder(String, String, Nullable(Of TimeSpan))
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.#ctor*
+  name: WasmBuilder
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmBuilder__ctor_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.#ctor
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.WasmBuilder
+  nameWithType: WasmBuilder.WasmBuilder
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.Build(BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Running.BuildPartition,BenchmarkDotNet.Loggers.ILogger)
+  name: Build(GenerateResult, BuildPartition, ILogger)
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmBuilder_Build_BenchmarkDotNet_Toolchains_Results_GenerateResult_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Loggers_ILogger_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.Build(BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Running.BuildPartition,BenchmarkDotNet.Loggers.ILogger)
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.Build(BenchmarkDotNet.Toolchains.Results.GenerateResult, BenchmarkDotNet.Running.BuildPartition, BenchmarkDotNet.Loggers.ILogger)
+  nameWithType: WasmBuilder.Build(GenerateResult, BuildPartition, ILogger)
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.Build*
+  name: Build
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmBuilder_Build_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.Build
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmBuilder.Build
+  nameWithType: WasmBuilder.Build
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator
+  name: WasmGenerator
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.html
+  commentId: T:BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator
+  nameWithType: WasmGenerator
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.#ctor(System.String,System.String,System.String,System.String)
+  name: WasmGenerator(String, String, String, String)
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator__ctor_System_String_System_String_System_String_System_String_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.#ctor(System.String,System.String,System.String,System.String)
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.WasmGenerator(System.String, System.String, System.String, System.String)
+  nameWithType: WasmGenerator.WasmGenerator(String, String, String, String)
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.#ctor*
+  name: WasmGenerator
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator__ctor_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.#ctor
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.WasmGenerator
+  nameWithType: WasmGenerator.WasmGenerator
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GenerateProject(BenchmarkDotNet.Running.BuildPartition,BenchmarkDotNet.Toolchains.ArtifactsPaths,BenchmarkDotNet.Loggers.ILogger)
+  name: GenerateProject(BuildPartition, ArtifactsPaths, ILogger)
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator_GenerateProject_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Toolchains_ArtifactsPaths_BenchmarkDotNet_Loggers_ILogger_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GenerateProject(BenchmarkDotNet.Running.BuildPartition,BenchmarkDotNet.Toolchains.ArtifactsPaths,BenchmarkDotNet.Loggers.ILogger)
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GenerateProject(BenchmarkDotNet.Running.BuildPartition, BenchmarkDotNet.Toolchains.ArtifactsPaths, BenchmarkDotNet.Loggers.ILogger)
+  nameWithType: WasmGenerator.GenerateProject(BuildPartition, ArtifactsPaths, ILogger)
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GenerateProject*
+  name: GenerateProject
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator_GenerateProject_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GenerateProject
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GenerateProject
+  nameWithType: WasmGenerator.GenerateProject
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GetBinariesDirectoryPath(System.String,System.String)
+  name: GetBinariesDirectoryPath(String, String)
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator_GetBinariesDirectoryPath_System_String_System_String_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GetBinariesDirectoryPath(System.String,System.String)
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GetBinariesDirectoryPath(System.String, System.String)
+  nameWithType: WasmGenerator.GetBinariesDirectoryPath(String, String)
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GetBinariesDirectoryPath*
+  name: GetBinariesDirectoryPath
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator_GetBinariesDirectoryPath_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GetBinariesDirectoryPath
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GetBinariesDirectoryPath
+  nameWithType: WasmGenerator.GetBinariesDirectoryPath
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GetExecutablePath(System.String,System.String)
+  name: GetExecutablePath(String, String)
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator_GetExecutablePath_System_String_System_String_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GetExecutablePath(System.String,System.String)
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GetExecutablePath(System.String, System.String)
+  nameWithType: WasmGenerator.GetExecutablePath(String, String)
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GetExecutablePath*
+  name: GetExecutablePath
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator_GetExecutablePath_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GetExecutablePath
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GetExecutablePath
+  nameWithType: WasmGenerator.GetExecutablePath
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain
+  name: WasmToolChain
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.html
+  commentId: T:BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain
+  nameWithType: WasmToolChain
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.From(BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings)
+  name: From(NetCoreAppSettings)
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmToolChain_From_BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.From(BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings)
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.From(BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings)
+  nameWithType: WasmToolChain.From(NetCoreAppSettings)
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.From*
+  name: From
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmToolChain_From_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.From
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.From
+  nameWithType: WasmToolChain.From
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.IsSupported(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Characteristics.IResolver)
+  name: IsSupported(BenchmarkCase, ILogger, IResolver)
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmToolChain_IsSupported_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Characteristics_IResolver_
+  commentId: M:BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.IsSupported(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Characteristics.IResolver)
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.IsSupported(BenchmarkDotNet.Running.BenchmarkCase, BenchmarkDotNet.Loggers.ILogger, BenchmarkDotNet.Characteristics.IResolver)
+  nameWithType: WasmToolChain.IsSupported(BenchmarkCase, ILogger, IResolver)
+- uid: BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.IsSupported*
+  name: IsSupported
+  href: api/BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.html#BenchmarkDotNet_Toolchains_MonoWasm_WasmToolChain_IsSupported_
+  commentId: Overload:BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.IsSupported
+  isSpec: "True"
+  fullName: BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.IsSupported
+  nameWithType: WasmToolChain.IsSupported
 - uid: BenchmarkDotNet.Toolchains.Parameters
   name: BenchmarkDotNet.Toolchains.Parameters
   href: api/BenchmarkDotNet.Toolchains.Parameters.html
@@ -32493,9 +33711,12 @@ references:
 - uid: changelog.v0.12.1
   name: BenchmarkDotNet v0.12.1
   href: changelog/v0.12.1.html
-- uid: changelog.v0.12.2
-  name: BenchmarkDotNet v0.12.2
-  href: changelog/v0.12.2.html
+- uid: changelog.v0.13.0
+  name: BenchmarkDotNet v0.13.0
+  href: changelog/v0.13.0.html
+- uid: changelog.v0.13.1
+  name: BenchmarkDotNet v0.13.1
+  href: changelog/v0.13.1.html
 - uid: changelog.v0.7.0
   name: BenchmarkDotNet v0.7.0
   href: changelog/v0.7.0.html
@@ -32640,9 +33861,6 @@ references:
 - uid: docs.statistics
   name: Statistics
   href: articles/features/statistics.html
-- uid: docs.tool
-  name: Command-line tool
-  href: articles/guides/tool.html
 - uid: docs.toolchains
   name: Toolchains
   href: articles/configs/toolchains.html

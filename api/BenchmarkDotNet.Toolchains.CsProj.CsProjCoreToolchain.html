@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class CsProjCoreToolchain
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -126,6 +126,7 @@
   <div classs="implements">
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a></div>
+    <div><span class="xref">System.IEquatable</span>&lt;<a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.html">CsProjCoreToolchain</a>&gt;</div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -148,13 +149,7 @@
       <a class="xref" href="BenchmarkDotNet.Toolchains.Toolchain.html#BenchmarkDotNet_Toolchains_Toolchain_ToString">Toolchain.ToString()</a>
     </div>
     <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
       <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
     </div>
     <div>
       <span class="xref">System.Object.GetType()</span>
@@ -170,7 +165,7 @@
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class CsProjCoreToolchain : Toolchain, IToolchain</code></pre>
+    <pre><code class="lang-csharp hljs">public class CsProjCoreToolchain : Toolchain, IToolchain, IEquatable&lt;CsProjCoreToolchain&gt;</code></pre>
   </div>
   <h3 id="fields">Fields
   </h3>
@@ -318,8 +313,118 @@
       </tr>
     </tbody>
   </table>
+  
+  
+  <h4 id="BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_NetCoreApp60" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.NetCoreApp60">NetCoreApp60</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly IToolchain NetCoreApp60</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="methods">Methods
   </h3>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_Equals_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Equals*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_Equals_BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Equals(BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain)">Equals(CsProjCoreToolchain)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Equals(CsProjCoreToolchain other)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.html">CsProjCoreToolchain</a></td>
+        <td><span class="parametername">other</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_Equals_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Equals*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_Equals_System_Object_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Equals(System.Object)">Equals(Object)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool Equals(object obj)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.Object.Equals(System.Object)</span></div>
   
   
   <a id="BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_From_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.From*"></a>
@@ -362,6 +467,33 @@
       </tr>
     </tbody>
   </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_GetHashCode_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.GetHashCode*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_GetHashCode" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.GetHashCode">GetHashCode()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override int GetHashCode()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.Object.GetHashCode()</span></div>
   
   
   <a id="BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_IsSupported_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.IsSupported*"></a>
@@ -420,6 +552,9 @@
   <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a>
   </div>
+  <div>
+      <span class="xref">System.IEquatable&lt;T&gt;</span>
+  </div>
 </article>
           </div>
           
@@ -430,7 +565,8 @@
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -444,7 +580,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

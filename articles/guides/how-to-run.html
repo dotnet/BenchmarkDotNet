@@ -8,7 +8,7 @@
     <title>How to run your benchmarks | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="How to run your benchmarks | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -111,33 +111,32 @@
             <article class="content wrap" id="_content" data-uid="docs.how-to-run">
 <h1 id="how-to-run-your-benchmarks">How to run your benchmarks</h1>
 
-<p>There are several ways to run your benchmarks:</p>
+<p>There are several ways to run your benchmarks. What is important is that <strong>BenchmarkDotNet works only with Console Apps</strong>. It does not support any other kind of application like ASP.NET, Azure WebJobs, etc.</p>
 <h2 id="types">Types</h2>
+<p>If you have just a few types with benchmarks, you can use <code>BenchmarkRunner</code>:</p>
 <pre><code class="lang-cs">var summary = BenchmarkRunner.Run&lt;MyBenchmarkClass&gt;();
 var summary = BenchmarkRunner.Run(typeof(MyBenchmarkClass));
 </code></pre>
-<h2 id="global-dotnet-tool">Global dotnet tool</h2>
-<p>You can also run a benchmark using <code>BenchmarkDotNet.Tool</code>.</p>
-<pre><code class="lang-log">dotnet tool install -g BenchmarkDotNet.Tool
+<p>The disadvantage of <code>BenchmarkRunner</code> is that it always runs all benchmarks in a given type (or assembly) and to change the type you need to modify the source code. But it's great for a quick start.</p>
+<h2 id="benchmarkswitcher">BenchmarkSwitcher</h2>
+<p>If you have more types and you want to choose which benchmark to run (either by using console line arguments or console input) you should use <code>BenchmarkSwitcher</code>:</p>
+<pre><code class="lang-cs">static void Main(string[] args) =&gt; BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
 </code></pre>
-<pre><code class="lang-log">dotnet benchmark MyAssemblyWithBenchmarks.dll --filter *
+<p>Also you can use the config command style to specify some config from command line (more @docs.console-args):</p>
+<pre><code class="lang-log">dotnet run -c Release -- --job short --runtimes net461 netcoreapp21--filter *BenchmarkClass1*
 </code></pre>
+<p>The most important thing about <code>BenchmarkSwitcher</code> is that you need to pass the <code>args</code> from <code>Main</code> to the <code>Run</code> method. If you don't, it won't parse the arguments.</p>
 <h2 id="url">Url</h2>
 <p>You can also run a benchmark directly from the internet:</p>
 <pre><code class="lang-cs">string url = &quot;&lt;E.g. direct link to raw content of a gist&gt;&quot;;
 var summary = BenchmarkRunner.RunUrl(url);
 </code></pre>
+<p><strong>Note:</strong> it works only for Full .NET Framework. It's not recommended to use this approach.</p>
 <h2 id="source">Source</h2>
 <pre><code class="lang-cs">string benchmarkSource = &quot;public class MyBenchmarkClass { ...&quot;;
 var summary = BenchmarkRunner.RunSource(benchmarkSource);
 </code></pre>
-<h2 id="benchmarkswitcher">BenchmarkSwitcher</h2>
-<p>Or you can create a set of benchmarks and choose one from command line:</p>
-<pre><code class="lang-cs">static void Main(string[] args) =&gt; BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
-</code></pre>
-<p>Also you can use the config command style to specify some config from command line (more @docs.console-args):</p>
-<pre><code class="lang-log">dotnet run -c Release -- --job short --runtimes clr core --filter *BenchmarkClass1*
-</code></pre>
+<p><strong>Note:</strong> it works only for Full .NET Framework. It's not recommended to use this approach.</p>
 </article>
           </div>
           
@@ -151,7 +150,8 @@ var summary = BenchmarkRunner.RunSource(benchmarkSource);
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -165,7 +165,7 @@ var summary = BenchmarkRunner.RunSource(benchmarkSource);
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

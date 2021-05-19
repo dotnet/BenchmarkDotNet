@@ -42,7 +42,11 @@ h6 mark {
 .inheritance .level2:before,
 .inheritance .level3:before,
 .inheritance .level4:before,
-.inheritance .level5:before {
+.inheritance .level5:before,
+.inheritance .level6:before,
+.inheritance .level7:before,
+.inheritance .level8:before,
+.inheritance .level9:before {
     content: '↳';
     margin-right: 5px;
 }
@@ -69,6 +73,30 @@ h6 mark {
 
 .inheritance .level5 {
     margin-left: 5em;
+}
+
+.inheritance .level6 {
+    margin-left: 6em;
+}
+
+.inheritance .level7 {
+    margin-left: 7em;
+}
+
+.inheritance .level8 {
+    margin-left: 8em;
+}
+
+.inheritance .level9 {
+    margin-left: 9em;
+}
+
+.level0.summary {
+  margin: 2em 0 2em 0;
+}
+
+.level1.summary {
+  margin: 1em 0 1em 0;
 }
 
 span.parametername,
@@ -194,7 +222,9 @@ article h1, article h2, article h3, article h4{
 }
 
 article h4{
-  border-bottom: 1px solid #ccc;
+  border: 0;
+  font-weight: bold;
+  margin-top: 2em;
 }
 
 article span.small.pull-right{
@@ -843,6 +873,33 @@ footer {
   }
 }
 
+/* Code snippet */
+code {
+  color: #717374;
+  background-color: #f1f2f3;
+}
+
+a code {
+  color: #337ab7;
+  background-color: #f1f2f3;
+}
+
+a code:hover {
+  text-decoration: underline;
+}
+
+.hljs-keyword {
+  color: rgb(86,156,214);
+}
+
+.hljs-string {
+  color: rgb(214, 157, 133);
+}
+
+pre {
+  border: 0;
+}
+
 /* For code snippet line highlight */
 pre > code .line-highlight {
   background-color: #ffffcc;
@@ -960,3 +1017,16 @@ div.embeddedvideo iframe {
 
 .mainContainer[dir='rtl'] main ul[role="tablist"] {
   margin: 0; }
+
+/* Color theme */
+
+/* These are not important, tune down **/
+.decalaration, .fieldValue, .parameters, .returns {
+  color: #a2a2a2;
+}
+
+/* Major sections, increase visibility **/
+#fields, #properties, #methods, #events {
+    font-weight: bold;
+    margin-top: 2em;
+}

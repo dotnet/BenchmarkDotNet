@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class DiagnoserResults
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -157,12 +157,12 @@
   
   
   <a id="BenchmarkDotNet_Diagnosers_DiagnoserResults__ctor_" data-uid="BenchmarkDotNet.Diagnosers.DiagnoserResults.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Diagnosers_DiagnoserResults__ctor_BenchmarkDotNet_Running_BenchmarkCase_System_Int64_BenchmarkDotNet_Engines_GcStats_BenchmarkDotNet_Engines_ThreadingStats_" data-uid="BenchmarkDotNet.Diagnosers.DiagnoserResults.#ctor(BenchmarkDotNet.Running.BenchmarkCase,System.Int64,BenchmarkDotNet.Engines.GcStats,BenchmarkDotNet.Engines.ThreadingStats)">DiagnoserResults(BenchmarkCase, Int64, GcStats, ThreadingStats)</h4>
+  <h4 id="BenchmarkDotNet_Diagnosers_DiagnoserResults__ctor_BenchmarkDotNet_Running_BenchmarkCase_System_Int64_BenchmarkDotNet_Engines_GcStats_BenchmarkDotNet_Engines_ThreadingStats_BenchmarkDotNet_Toolchains_Results_BuildResult_" data-uid="BenchmarkDotNet.Diagnosers.DiagnoserResults.#ctor(BenchmarkDotNet.Running.BenchmarkCase,System.Int64,BenchmarkDotNet.Engines.GcStats,BenchmarkDotNet.Engines.ThreadingStats,BenchmarkDotNet.Toolchains.Results.BuildResult)">DiagnoserResults(BenchmarkCase, Int64, GcStats, ThreadingStats, BuildResult)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DiagnoserResults(BenchmarkCase benchmarkCase, long totalOperations, GcStats gcStats, ThreadingStats threadingStats)</code></pre>
+    <pre><code class="lang-csharp hljs">public DiagnoserResults(BenchmarkCase benchmarkCase, long totalOperations, GcStats gcStats, ThreadingStats threadingStats, BuildResult buildResult)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -194,6 +194,11 @@
         <td><span class="parametername">threadingStats</span></td>
         <td></td>
       </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.Results.BuildResult.html">BuildResult</a></td>
+        <td><span class="parametername">buildResult</span></td>
+        <td></td>
+      </tr>
     </tbody>
   </table>
   <h3 id="properties">Properties
@@ -219,6 +224,31 @@
     <tbody>
       <tr>
         <td><a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Diagnosers_DiagnoserResults_BuildResult_" data-uid="BenchmarkDotNet.Diagnosers.DiagnoserResults.BuildResult*"></a>
+  <h4 id="BenchmarkDotNet_Diagnosers_DiagnoserResults_BuildResult" data-uid="BenchmarkDotNet.Diagnosers.DiagnoserResults.BuildResult">BuildResult</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BuildResult BuildResult { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.Results.BuildResult.html">BuildResult</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -308,7 +338,8 @@
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -322,7 +353,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

@@ -8,7 +8,7 @@
     <title>Configs | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Configs | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -123,13 +123,17 @@ public class MyClassWithBenchmarks
     {
         public Config()
         {
-            Add(new Job1(), new Job2());
-            Add(new Column1(), new Column2());
-            Add(new Exporter1(), new Exporter2());
-            Add(new Logger1(), new Logger2());
-            Add(new Diagnoser1(), new Diagnoser2());
-            Add(new Analyser1(), new Analyser2());
-            Add(new Filter1(), new Filter2());
+            AddJob(new Job1(), new Job2());
+            AddColumn(new Column1(), new Column2());
+            AddColumnProvider(new ColumnProvider1(), new ColumnProvider2());
+            AddExporter(new Exporter1(), new Exporter2());
+            AddLogger(new Logger1(), new Logger2());
+            AddDiagnoser(new Diagnoser1(), new Diagnoser2());
+            AddAnalyser(new Analyser1(), new Analyser2());
+            AddValidator(new Validator2(),new Validator2());
+            AddHardwareCounters(HardwareCounter enum1, HardwareCounter enum2);
+            AddFilter(new Filter1(), new Filter2());
+            AddLogicalGroupRules(BenchmarkLogicalGroupRule enum1, BenchmarkLogicalGroupRule enum2);
         }
     }
     
@@ -300,7 +304,8 @@ namespace BenchmarkDotNet.Samples
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -314,7 +319,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class SummaryStyle
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -155,12 +155,12 @@
   
   
   <a id="BenchmarkDotNet_Reports_SummaryStyle__ctor_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Reports_SummaryStyle__ctor_System_Globalization_CultureInfo_System_Boolean_BenchmarkDotNet_Columns_SizeUnit_Perfolizer_Horology_TimeUnit_System_Boolean_System_Boolean_System_Int32_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32)">SummaryStyle(CultureInfo, Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Int32)</h4>
+  <h4 id="BenchmarkDotNet_Reports_SummaryStyle__ctor_System_Globalization_CultureInfo_System_Boolean_BenchmarkDotNet_Columns_SizeUnit_Perfolizer_Horology_TimeUnit_System_Boolean_System_Boolean_System_Int32_BenchmarkDotNet_Columns_RatioStyle_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle)">SummaryStyle(CultureInfo, Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Int32, RatioStyle)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public SummaryStyle(CultureInfo cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true, bool printZeroValuesInContent = false, int maxParameterColumnWidth = 20)</code></pre>
+    <pre><code class="lang-csharp hljs">public SummaryStyle(CultureInfo cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true, bool printZeroValuesInContent = false, int maxParameterColumnWidth = 20, RatioStyle ratioStyle = RatioStyle.Value)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -205,6 +205,11 @@
       <tr>
         <td><span class="xref">System.Int32</span></td>
         <td><span class="parametername">maxParameterColumnWidth</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Columns.RatioStyle.html">RatioStyle</a></td>
+        <td><span class="parametername">ratioStyle</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -358,6 +363,31 @@
     <tbody>
       <tr>
         <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Reports_SummaryStyle_RatioStyle_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.RatioStyle*"></a>
+  <h4 id="BenchmarkDotNet_Reports_SummaryStyle_RatioStyle" data-uid="BenchmarkDotNet.Reports.SummaryStyle.RatioStyle">RatioStyle</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RatioStyle RatioStyle { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Columns.RatioStyle.html">RatioStyle</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -613,6 +643,48 @@
   </table>
   
   
+  <a id="BenchmarkDotNet_Reports_SummaryStyle_WithRatioStyle_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.WithRatioStyle*"></a>
+  <h4 id="BenchmarkDotNet_Reports_SummaryStyle_WithRatioStyle_BenchmarkDotNet_Columns_RatioStyle_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.WithRatioStyle(BenchmarkDotNet.Columns.RatioStyle)">WithRatioStyle(RatioStyle)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SummaryStyle WithRatioStyle(RatioStyle ratioStyle)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Columns.RatioStyle.html">RatioStyle</a></td>
+        <td><span class="parametername">ratioStyle</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Reports_SummaryStyle_WithSizeUnit_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.WithSizeUnit*"></a>
   <h4 id="BenchmarkDotNet_Reports_SummaryStyle_WithSizeUnit_BenchmarkDotNet_Columns_SizeUnit_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.WithSizeUnit(BenchmarkDotNet.Columns.SizeUnit)">WithSizeUnit(SizeUnit)</h4>
   <div class="markdown level1 summary"></div>
@@ -830,7 +902,8 @@
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -844,7 +917,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

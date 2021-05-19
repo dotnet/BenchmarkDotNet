@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class CoreRtToolchainBuilder
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -178,9 +178,6 @@
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_Timeout_System_TimeSpan_">CustomDotNetCliToolchainBuilder.Timeout(TimeSpan)</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_GetPortableRuntimeIdentifier">CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier()</a>
     </div>
     <div>
       <span class="xref">System.Object.Equals(System.Object)</span>
@@ -493,12 +490,12 @@ Based on <a href="https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06
   <a id="BenchmarkDotNet_Toolchains_CoreRt_CoreRtToolchainBuilder_UseCoreRtNuGet_" data-uid="BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchainBuilder.UseCoreRtNuGet*"></a>
   <h4 id="BenchmarkDotNet_Toolchains_CoreRt_CoreRtToolchainBuilder_UseCoreRtNuGet_System_String_System_String_" data-uid="BenchmarkDotNet.Toolchains.CoreRt.CoreRtToolchainBuilder.UseCoreRtNuGet(System.String,System.String)">UseCoreRtNuGet(String, String)</h4>
   <div class="markdown level1 summary"><p>creates a CoreRT toolchain targeting NuGet build of CoreRT
-Based on <a href="https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld/README.md#add-corert-to-your-project">https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld/README.md#add-corert-to-your-project</a></p>
+Based on <a href="https://github.com/dotnet/runtimelab/blob/d0a37893a67c125f9b0cd8671846ff7d867df241/samples/HelloWorld/README.md#add-corert-to-your-project">https://github.com/dotnet/runtimelab/blob/d0a37893a67c125f9b0cd8671846ff7d867df241/samples/HelloWorld/README.md#add-corert-to-your-project</a></p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public CoreRtToolchainBuilder UseCoreRtNuGet(string microsoftDotNetILCompilerVersion = &quot;1.0.0-alpha-*&quot;, string nuGetFeedUrl = &quot;https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json&quot;)</code></pre>
+    <pre><code class="lang-csharp hljs">public CoreRtToolchainBuilder UseCoreRtNuGet(string microsoftDotNetILCompilerVersion = &quot;6.0.0-*&quot;, string nuGetFeedUrl = &quot;https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json&quot;)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -513,13 +510,13 @@ Based on <a href="https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06
       <tr>
         <td><span class="xref">System.String</span></td>
         <td><span class="parametername">microsoftDotNetILCompilerVersion</span></td>
-        <td><p>the version of Microsoft.DotNet.ILCompiler which should be used. The default is: &quot;1.0.0-alpha-*&quot;</p>
+        <td><p>the version of Microsoft.DotNet.ILCompiler which should be used. The default is: &quot;6.0.0-*&quot;</p>
 </td>
       </tr>
       <tr>
         <td><span class="xref">System.String</span></td>
         <td><span class="parametername">nuGetFeedUrl</span></td>
-        <td><p>url to NuGet CoreRT feed, The default is: &quot;https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json&quot;</p>
+        <td><p>url to NuGet CoreRT feed, The default is: &quot;https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json&quot;</p>
 </td>
       </tr>
     </tbody>
@@ -577,7 +574,8 @@ Based on <a href="https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -591,7 +589,7 @@ Based on <a href="https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

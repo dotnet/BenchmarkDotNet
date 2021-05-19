@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class DotNetCliGenerator
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -152,6 +152,9 @@
       <a class="xref" href="BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GenerateCode_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Toolchains_ArtifactsPaths_">GeneratorBase.GenerateCode(BuildPartition, ArtifactsPaths)</a>
     </div>
     <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GetExecutablePath_System_String_System_String_">GeneratorBase.GetExecutablePath(String, String)</a>
+    </div>
+    <div>
       <span class="xref">System.Object.Equals(System.Object)</span>
     </div>
     <div>
@@ -184,12 +187,12 @@
   
   
   <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator__ctor_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator__ctor_System_String_System_String_System_String_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.#ctor(System.String,System.String,System.String)">DotNetCliGenerator(String, String, String)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator__ctor_System_String_System_String_System_String_System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.#ctor(System.String,System.String,System.String,System.Boolean)">DotNetCliGenerator(String, String, String, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected DotNetCliGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath)</code></pre>
+    <pre><code class="lang-csharp hljs">protected DotNetCliGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, bool isNetCore)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -214,6 +217,11 @@
       <tr>
         <td><span class="xref">System.String</span></td>
         <td><span class="parametername">packagesPath</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">isNetCore</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -241,6 +249,31 @@
     <tbody>
       <tr>
         <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator_IsNetCore_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.IsNetCore*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliGenerator_IsNetCore" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.IsNetCore">IsNetCore</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool IsNetCore { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -541,7 +574,8 @@ and also by NuGet internal implementation like looking for global.json file in p
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -555,7 +589,7 @@ and also by NuGet internal implementation like looking for global.json file in p
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

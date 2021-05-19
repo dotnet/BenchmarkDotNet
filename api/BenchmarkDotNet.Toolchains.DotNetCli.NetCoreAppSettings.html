@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class NetCoreAppSettings
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -158,7 +158,7 @@
   
   
   <a id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings__ctor_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings__ctor_System_String_System_String_System_String_System_String_System_String_System_Nullable_System_TimeSpan__" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor(System.String,System.String,System.String,System.String,System.String,System.Nullable{System.TimeSpan})">NetCoreAppSettings(String, String, String, String, String, Nullable&lt;TimeSpan&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings__ctor_System_String_System_String_System_String_System_String_System_String_System_Nullable_System_TimeSpan__System_String_System_String_BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotCompilerMode_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor(System.String,System.String,System.String,System.String,System.String,System.Nullable{System.TimeSpan},System.String,System.String,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)">NetCoreAppSettings(String, String, String, String, String, Nullable&lt;TimeSpan&gt;, String, String, MonoAotCompilerMode)</h4>
   <div class="markdown level1 summary"><param name="targetFrameworkMoniker">
 sample values: netcoreapp2.0, netcoreapp2.1
 
@@ -175,11 +175,14 @@ simply ignored if null
 
 <param name="packagesPath">the directory to restore packages to
 <param name="timeout">timeout to build the benchmark
+<param name="customRuntimePack">path to a custom runtime pack
+<param name="aotCompilerPath">path to Mono AOT compiler
+<param name="aotCompilerMode">Mono AOT compiler moder
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public NetCoreAppSettings(string targetFrameworkMoniker, string runtimeFrameworkVersion, string name, string customDotNetCliPath = null, string packagesPath = null, TimeSpan? timeout = default(TimeSpan? ))</code></pre>
+    <pre><code class="lang-csharp hljs">public NetCoreAppSettings(string targetFrameworkMoniker, string runtimeFrameworkVersion, string name, string customDotNetCliPath = null, string packagesPath = null, TimeSpan? timeout = default(TimeSpan? ), string customRuntimePack = null, string aotCompilerPath = null, MonoAotCompilerMode aotCompilerMode = MonoAotCompilerMode.mini)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -219,6 +222,21 @@ simply ignored if null
       <tr>
         <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.TimeSpan</span>&gt;</td>
         <td><span class="parametername">timeout</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">customRuntimePack</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">aotCompilerPath</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode.html">MonoAotCompilerMode</a></td>
+        <td><span class="parametername">aotCompilerMode</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -393,8 +411,84 @@ simply ignored if null
       </tr>
     </tbody>
   </table>
+  
+  
+  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_NetCoreApp60" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreApp60">NetCoreApp60</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly NetCoreAppSettings NetCoreApp60</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html">NetCoreAppSettings</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="properties">Properties
   </h3>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_AOTCompilerMode_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerMode*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_AOTCompilerMode" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerMode">AOTCompilerMode</h4>
+  <div class="markdown level1 summary"><p>Mono AOT Compiler mode, either 'mini' or 'llvm'</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MonoAotCompilerMode AOTCompilerMode { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode.html">MonoAotCompilerMode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_AOTCompilerPath_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerPath*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_AOTCompilerPath" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.AOTCompilerPath">AOTCompilerPath</h4>
+  <div class="markdown level1 summary"><p>Path to the Mono AOT Compiler</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string AOTCompilerPath { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_CustomDotNetCliPath_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.CustomDotNetCliPath*"></a>
@@ -404,6 +498,32 @@ simply ignored if null
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public string CustomDotNetCliPath { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_CustomRuntimePack_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.CustomRuntimePack*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_CustomRuntimePack" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.CustomRuntimePack">CustomRuntimePack</h4>
+  <div class="markdown level1 summary"><p>Path to a custom runtime pack.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string CustomRuntimePack { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -697,7 +817,8 @@ simply ignored if null
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -711,7 +832,7 @@ simply ignored if null
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

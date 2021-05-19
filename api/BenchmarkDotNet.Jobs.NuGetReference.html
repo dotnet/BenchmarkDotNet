@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class NuGetReference
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -152,12 +152,12 @@
   
   
   <a id="BenchmarkDotNet_Jobs_NuGetReference__ctor_" data-uid="BenchmarkDotNet.Jobs.NuGetReference.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_NuGetReference__ctor_System_String_System_String_" data-uid="BenchmarkDotNet.Jobs.NuGetReference.#ctor(System.String,System.String)">NuGetReference(String, String)</h4>
+  <h4 id="BenchmarkDotNet_Jobs_NuGetReference__ctor_System_String_System_String_System_Uri_System_Boolean_" data-uid="BenchmarkDotNet.Jobs.NuGetReference.#ctor(System.String,System.String,System.Uri,System.Boolean)">NuGetReference(String, String, Uri, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public NuGetReference(string packageName, string packageVersion)</code></pre>
+    <pre><code class="lang-csharp hljs">public NuGetReference(string packageName, string packageVersion, Uri source = null, bool prerelease = false)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -177,6 +177,16 @@
       <tr>
         <td><span class="xref">System.String</span></td>
         <td><span class="parametername">packageVersion</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Uri</span></td>
+        <td><span class="parametername">source</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">prerelease</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -210,6 +220,31 @@
   </table>
   
   
+  <a id="BenchmarkDotNet_Jobs_NuGetReference_PackageSource_" data-uid="BenchmarkDotNet.Jobs.NuGetReference.PackageSource*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_NuGetReference_PackageSource" data-uid="BenchmarkDotNet.Jobs.NuGetReference.PackageSource">PackageSource</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Uri PackageSource { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Uri</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Jobs_NuGetReference_PackageVersion_" data-uid="BenchmarkDotNet.Jobs.NuGetReference.PackageVersion*"></a>
   <h4 id="BenchmarkDotNet_Jobs_NuGetReference_PackageVersion" data-uid="BenchmarkDotNet.Jobs.NuGetReference.PackageVersion">PackageVersion</h4>
   <div class="markdown level1 summary"></div>
@@ -229,6 +264,31 @@
     <tbody>
       <tr>
         <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Jobs_NuGetReference_Prerelease_" data-uid="BenchmarkDotNet.Jobs.NuGetReference.Prerelease*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_NuGetReference_Prerelease" data-uid="BenchmarkDotNet.Jobs.NuGetReference.Prerelease">Prerelease</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Prerelease { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -390,7 +450,8 @@
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -404,7 +465,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

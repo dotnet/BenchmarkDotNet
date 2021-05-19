@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Namespace BenchmarkDotNet.Attributes
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -312,6 +312,10 @@ The default value is 50</p>
       <section></section>
       <h4><a class="xref" href="BenchmarkDotNet.Attributes.MemoryDiagnoserAttribute.html">MemoryDiagnoserAttribute</a></h4>
       <section></section>
+      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MemoryRandomizationAttribute.html">MemoryRandomizationAttribute</a></h4>
+      <section><p>specifies whether Engine should allocate some random-sized memory between iterations
+<remarks>it makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration</remarks></p>
+</section>
       <h4><a class="xref" href="BenchmarkDotNet.Attributes.MinColumnAttribute.html">MinColumnAttribute</a></h4>
       <section></section>
       <h4><a class="xref" href="BenchmarkDotNet.Attributes.MinInvokeCountAttribute.html">MinInvokeCountAttribute</a></h4>
@@ -340,6 +344,10 @@ See <a href="http://www.brendangregg.com/FrequencyTrails/modes.html">http://www.
       <h4><a class="xref" href="BenchmarkDotNet.Attributes.NamespaceColumnAttribute.html">NamespaceColumnAttribute</a></h4>
       <section><p>Add a column with the target method namespace.</p>
 </section>
+      <h4><a class="xref" href="BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.html">OperatingSystemsArchitectureFilterAttribute</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.html">OperatingSystemsFilterAttribute</a></h4>
+      <section></section>
       <h4><a class="xref" href="BenchmarkDotNet.Attributes.OrdererAttribute.html">OrdererAttribute</a></h4>
       <section></section>
       <h4><a class="xref" href="BenchmarkDotNet.Attributes.OutliersAttribute.html">OutliersAttribute</a></h4>
@@ -352,6 +360,8 @@ See <a href="http://www.brendangregg.com/FrequencyTrails/modes.html">http://www.
       <h4><a class="xref" href="BenchmarkDotNet.Attributes.ParamsSourceAttribute.html">ParamsSourceAttribute</a></h4>
       <section></section>
       <h4><a class="xref" href="BenchmarkDotNet.Attributes.PlainExporterAttribute.html">PlainExporterAttribute</a></h4>
+      <section></section>
+      <h4><a class="xref" href="BenchmarkDotNet.Attributes.PriorityAttribute.html">PriorityAttribute</a></h4>
       <section></section>
       <h4><a class="xref" href="BenchmarkDotNet.Attributes.ProcessCountAttribute.html">ProcessCountAttribute</a></h4>
       <section><p>How many times we should launch process with target benchmark.</p>
@@ -415,6 +425,10 @@ See <a href="http://www.brendangregg.com/FrequencyTrails/modes.html">http://www.
       <section></section>
       <h4><a class="xref" href="BenchmarkDotNet.Attributes.XmlExporterAttribute.FullCompressed.html">XmlExporterAttribute.FullCompressed</a></h4>
       <section></section>
+    <h3 id="enums">Enums
+  </h3>
+      <h4><a class="xref" href="BenchmarkDotNet.Attributes.OS.html">OS</a></h4>
+      <section></section>
 </article>
           </div>
           
@@ -425,7 +439,8 @@ See <a href="http://www.brendangregg.com/FrequencyTrails/modes.html">http://www.
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -439,7 +454,7 @@ See <a href="http://www.brendangregg.com/FrequencyTrails/modes.html">http://www.
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

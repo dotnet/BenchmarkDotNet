@@ -8,7 +8,7 @@
     <title>BenchmarkDotNet v0.12.0 | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="BenchmarkDotNet v0.12.0 | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -600,9 +600,9 @@ That's how it looks:</p>
 <p><img src="https://user-images.githubusercontent.com/2259237/67472874-701dc700-f65a-11e9-85f1-d4f3160f78cf.gif" alt=""></p>
 <h2 id="milestone-details">Milestone details</h2>
 <p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.12.0">v0.12.0</a> scope,
-34 issues were resolved and 56 pull requests where merged.
-This release includes 110 commits by 25 contributors.</p>
-<h2 id="resolved-issues-34">Resolved issues (34)</h2>
+44 issues were resolved and 56 pull requests were merged.
+This release includes 110 commits by 24 contributors.</p>
+<h2 id="resolved-issues-44">Resolved issues (44)</h2>
 <ul>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/198">#198</a> [Feature request] No logger for benchmark run? (assignee: <a href="https://github.com/CodeTherapist">@CodeTherapist</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/311">#311</a> How to debug benchmarks that fail with exception on file system access operations (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
@@ -628,16 +628,26 @@ This release includes 110 commits by 25 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1154">#1154</a> Add a ConcurrencyDiagnoser? (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1156">#1156</a> Crash when BenchmarkDotNet.Diagnostics.Windows.Session.GetFilePath throws NRE (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1158">#1158</a> 🔍 Improving search on docs with Algolia's DocSearch</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1162">#1162</a> Incorrect value of BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.Default</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1168">#1168</a> Consider using default value instead of hardcoded '-' in MetricColumn.GetValue()</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1179">#1179</a> Add System.Buffers.ArrayPoolEventSource to the list of default .NET Providers of EtwProfiler (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1181">#1181</a> Log shows a wrong name for plot images</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1182">#1182</a> Benchingmarking .NET 4.8 Causes Errors</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1183">#1183</a> Plots of benchmarks without params have a double dash (--) in the name</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1186">#1186</a> Add support for --runtimes net48 (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1187">#1187</a> When user uses --packages $path, the $path should be sent to dotnet build command as well (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1194">#1194</a> RunAll with ToolChains (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1195">#1195</a> LatestCoreRtVersionIsSupported fails on Mac Os</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1202">#1202</a> BenchmarkDotNet Not Recognizing CPU</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1220">#1220</a> [Docs] RScript / R_HOME setup</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1235">#1235</a> NativeMemoryProfiler exception (assignee: <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1236">#1236</a> Rework new API for target runtimes (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1241">#1241</a> Can BenchmarkDotNet be enabled for LINQPad 6? (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1269">#1269</a> Unable to show full param string in the report (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1280">#1280</a> Improvement in memory statistics (assignee: <a href="https://github.com/WojciechNagorski">@WojciechNagorski</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1285">#1285</a> Issue with .Net Core version 3.0</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1289">#1289</a> How to config to not save .log files?</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1291">#1291</a> MemoryDiagnoser reports weird results for .NET Core 3.0</li>
 </ul>
 <h2 id="merged-pull-requests-56">Merged pull requests (56)</h2>
 <ul>
@@ -651,7 +661,7 @@ This release includes 110 commits by 25 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1145">#1145</a> Added workaround to fix incorrect CPU info when using wmic (by <a href="https://github.com/YohDeadfall">@YohDeadfall</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1148">#1148</a> Improve search experience in the documentation (by <a href="https://github.com/s-pace">@s-pace</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1155">#1155</a> Use new .NET Core 3.0 API to get the total number of allocated bytes for all threads (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1161">#1161</a> Warn the user when benchmark baseline value is too close to zero and the columns derived from BaselineCustomColumn cannot be computed (by <a href="https://github.com/encrypt0r">@encrypt0r</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1161">#1161</a> Warn the user when benchmark baseline value is too close to zero and the columns derived from BaselineCustomColumn cannot be computed (by <a href="https://github.com/mhmd-azeez">@mhmd-azeez</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1163">#1163</a> Make netcoreapp2.1 default (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1169">#1169</a> Fix: broken link in readme.md (by <a href="https://github.com/Ant-hem">@Ant-hem</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1173">#1173</a> Updated index.md and fixed Relative performance url (by <a href="https://github.com/sergey-litvinov">@sergey-litvinov</a>)</li>
@@ -725,9 +735,9 @@ This release includes 110 commits by 25 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6e6559499652c312369fd223d0cf4747f65512d6">6e6559</a> extend Summary with LogFilePath, fixes #1135 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6d71308f4c1d96bcf8a526bfcc61bb23307b4041">6d7130</a> make FullNameProvider public so it can be reused by the dotnet/performance re... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6f91ea59474bf6cce2d7ff8de422854cb4a61b06">6f91ea</a> Drop netcoreapp2.0 TFM in sample and test projects (see #1141) (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/bfe676ea394d147bca91c445afc21514efec3ca2">bfe676</a> Warn the user when benchmark baseline value is too close to zero and the colu... (by <a href="https://github.com/encrypt0r">@encrypt0r</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/bfe676ea394d147bca91c445afc21514efec3ca2">bfe676</a> Warn the user when benchmark baseline value is too close to zero and the colu... (by <a href="https://github.com/mhmd-azeez">@mhmd-azeez</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4282b158ef6aed6b64e2744f590572b830d4c569">4282b1</a> Update year in LICENSE.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/29d01b05a9c86da415c1b69010eed93a6880a040">29d01b</a> Improve search experience in the documentation (#1148) (by <a href="https://github.com/s-pace">@s-pace</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/29d01b05a9c86da415c1b69010eed93a6880a040">29d01b</a> Improve search experience in the documentation (#1148) (by Sylvain Pace)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ddf1b8cbb7e942011fab5ccebf8bca4a576c2363">ddf1b8</a> Fixed: broken link in readme.md (by <a href="https://github.com/Ant-hem">@Ant-hem</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fc35f7aebdc7590f91dfa83e951d1ad325e9a659">fc35f7</a> simplify the reported Full .NET Framework version, fixes 1111 (#1114) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0a4550f6ab0b821f31f59806b682dace8296ba54">0a4550</a> Updated index.md and fixed Relative performance (#1173) (by <a href="https://github.com/sergey-litvinov">@sergey-litvinov</a>)</li>
@@ -811,7 +821,7 @@ This release includes 110 commits by 25 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d582b516d798fb8632d5507367272e51280229fe">d582b5</a> Revert previous commit because of the CI Error (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7bdf6e093fdac47d40a7daaf66ce93d940b9b8c9">7bdf6e</a> Set library version: 0.12.0 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 </ul>
-<h2 id="contributors-25">Contributors (25)</h2>
+<h2 id="contributors-24">Contributors (24)</h2>
 <ul>
 <li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li>Adrian Stanciu (<a href="https://github.com/stanciuadrian">@stanciuadrian</a>)</li>
@@ -830,9 +840,8 @@ This release includes 110 commits by 25 contributors.</p>
 <li>Marek Moraczyński (<a href="https://github.com/MarekM25">@MarekM25</a>)</li>
 <li>Michael Seifert (<a href="https://github.com/MSeifert04">@MSeifert04</a>)</li>
 <li>Michal Strehovský (<a href="https://github.com/MichalStrehovsky">@MichalStrehovsky</a>)</li>
-<li>Muhammad Azeez (<a href="https://github.com/encrypt0r">@encrypt0r</a>)</li>
+<li>Muhammad Azeez (<a href="https://github.com/mhmd-azeez">@mhmd-azeez</a>)</li>
 <li>Sergey Litvinov (<a href="https://github.com/sergey-litvinov">@sergey-litvinov</a>)</li>
-<li>Sylvain Pace (<a href="https://github.com/s-pace">@s-pace</a>)</li>
 <li>Szymon Kulec (<a href="https://github.com/Scooletz">@Scooletz</a>)</li>
 <li>TeBeCo (<a href="https://github.com/tebeco">@tebeco</a>)</li>
 <li>Vlad Kovalev (<a href="https://github.com/sleemer">@sleemer</a>)</li>
@@ -865,7 +874,8 @@ This release includes 110 commits by 25 contributors.</p>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -879,7 +889,7 @@ This release includes 110 commits by 25 contributors.</p>
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

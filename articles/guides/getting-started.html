@@ -8,7 +8,7 @@
     <title>Getting started | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Getting started | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -112,13 +112,15 @@
 <h1 id="getting-started">Getting started</h1>
 
 <p>To get started with BenchmarkDotNet, please follow these steps.</p>
-<h2 id="step-1-installation">Step 1. Installation</h2>
+<h2 id="step-1-create-a-project">Step 1. Create a project</h2>
+<p>Create a new console application.</p>
+<h2 id="step-2-installation">Step 2. Installation</h2>
 <p>Install BenchmarkDotNet via the NuGet package: <a href="https://www.nuget.org/packages/BenchmarkDotNet/">BenchmarkDotNet</a></p>
 <pre><code>PM&gt; Install-Package BenchmarkDotNet
 </code></pre>
 <p>Read more about BenchmarkDotNet NuGet packages: <a class="xref" href="nuget.html">Installing NuGet packages</a></p>
-<h2 id="step-2-design-a-benchmark">Step 2. Design a benchmark</h2>
-<p>Create a new console application, write a class with methods that you want to measure and mark them with the <code>Benchmark</code> attribute. In the following example, we
+<h2 id="step-3-design-a-benchmark">Step 3. Design a benchmark</h2>
+<p>Write a class with methods that you want to measure and mark them with the <code>Benchmark</code> attribute. In the following example, we
 compare <a href="https://en.wikipedia.org/wiki/MD5">MD5</a> and <a href="https://en.wikipedia.org/wiki/SHA-2">SHA256</a> cryptographic hash functions:</p>
 <pre><code class="lang-cs">using System;
 using System.Security.Cryptography;
@@ -158,39 +160,22 @@ namespace MyBenchmarks
 }
 </code></pre>
 <p>The <code>BenchmarkRunner.Run&lt;Md5VsSha256&gt;()</code> call runs your benchmarks and print results to console output.</p>
-<h2 id="step-3-view-results">Step 3. View results</h2>
+<h2 id="step-4-view-results">Step 4. View results</h2>
 <p>View the results. Here is an example of output from the above benchmark:</p>
-<pre><code class="lang-ini">BenchmarkDotNet=v0.10.1, OS=Microsoft Windows NT 6.2.9200.0
-Processor=Intel(R) Core(TM) i7-4702MQ CPU 2.20GHz, ProcessorCount=8
-Frequency=2143476 Hz, Resolution=466.5319 ns, Timer=TSC
-  [Host]     : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
-  DefaultJob : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
+<pre><code>BenchmarkDotNet=v0.11.3, OS=Windows 10.0.17134.472 (1803/April2018Update/Redstone4)
+Intel Core i7-2630QM CPU 2.00GHz (Sandy Bridge), 1 CPU, 8 logical and 4 physical cores
+Frequency=1948699 Hz, Resolution=513.1629 ns, Timer=TSC
+.NET Core SDK=2.1.502
+  [Host]     : .NET Core 2.1.6 (CoreCLR 4.6.27019.06, CoreFX 4.6.27019.05), 64bit RyuJIT
+  DefaultJob : .NET Core 2.1.6 (CoreCLR 4.6.27019.06, CoreFX 4.6.27019.05), 64bit RyuJIT
+
+
+| Method |      Mean |     Error |    StdDev |
+|------- |----------:|----------:|----------:|
+| Sha256 | 100.90 us | 0.5070 us | 0.4494 us |
+|    Md5 |  37.66 us | 0.1290 us | 0.1207 us |
 </code></pre>
-<table>
-<thead>
-<tr>
-<th>Method</th>
-<th>Mean</th>
-<th>StdDev</th>
-<th>Allocated</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Sha256</td>
-<td>130.5169 us</td>
-<td>1.8489 us</td>
-<td>188 B</td>
-</tr>
-<tr>
-<td>Md5</td>
-<td>25.8010 us</td>
-<td>0.1757 us</td>
-<td>113 B</td>
-</tr>
-</tbody>
-</table>
-<h2 id="step-4-analyze-results">Step 4. Analyze results</h2>
+<h2 id="step-5-analyze-results">Step 5. Analyze results</h2>
 <p>Analyze it. In your bin directory, you can find a lot of useful files with detailed information. For example:</p>
 <ul>
 <li>Csv reports with raw data: <code>Md5VsSha256-report.csv</code>, <code>Md5VsSha256-runs.csv</code></li>
@@ -219,7 +204,8 @@ If you didn't find answer for your question on this page, <a href="https://gitte
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -233,7 +219,7 @@ If you didn't find answer for your question on this page, <a href="https://gitte
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

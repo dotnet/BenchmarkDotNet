@@ -8,7 +8,7 @@
     <title>Toolchains | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Toolchains | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -238,7 +238,7 @@ Jit=RyuJit
 <p>This feature is now also exposed with the <code>--cli</code> console argument.</p>
 <p>Example: <code>dotnet run -c Release -- --cli &quot;C:\Projects\machinelearning\Tools\dotnetcli\dotnet.exe&quot;</code></p>
 <h2 id="corerun">CoreRun</h2>
-<p>To use CoreRun for running the benchmarks you need to use <code>--coreRun</code>command line argument. You can combine it with <code>--cli</code> described above. This is most probably the easiest and most reliable way of running benchmarks against local CoreFX/CoreCLR builds.</p>
+<p>To use CoreRun for running the benchmarks you need to use <code>--coreRun </code>command line argument. You can combine it with <code>--cli</code> described above. This is most probably the easiest and most reliable way of running benchmarks against local CoreFX/CoreCLR builds.</p>
 <p>Example: <code>dotnet run -c Release -- --coreRun &quot;C:\Projects\corefx\bin\testhost\netcoreapp-Windows_NT-Release-x64\shared\Microsoft.NETCore.App\9.9.9\CoreRun.exe&quot;</code></p>
 <hr>
 <h2 id="sample-introinprocess">Sample: IntroInProcess</h2>
@@ -372,38 +372,40 @@ namespace BenchmarkDotNet.Samples
 </ul>
 <hr>
 <h2 id="corert">CoreRT</h2>
-<p>BenchmarkDotNet supports <a href="https://github.com/dotnet/corert">CoreRT</a>! However, you might want to know how it works to get a better understanding of the results that you get.</p>
+<p>BenchmarkDotNet supports <a href="https://github.com/dotnet/runtimelab/tree/feature/NativeAOT">CoreRT</a>! However, you might want to know how it works to get a better understanding of the results that you get.</p>
 <ul>
 <li>CoreRT is a flavor of .NET Core. Which means that:
 <ul>
-<li>you have to target .NET Core to be able to build CoreRT benchmarks (<code>&lt;TargetFramework&gt;netcoreapp2.1&lt;/TargetFramework&gt;</code> in the .csproj file)</li>
-<li>you have to specify the CoreRT runtime in an explicit way, either by using <code>[SimpleJob]</code> attribute or by using the fluent Job config API <code>Job.ShortRun.With(CoreRtRuntime.$version)</code></li>
-<li>to run CoreRT benchmark you run the app as a .NET Core/.NET process (<code>dotnet run -c Release -f netcoreapp2.1</code>) and BenchmarkDotNet does all the CoreRT compilation for you. If you want to check what files are generated you need to apply <code>[KeepBenchmarkFiles]</code> attribute to the class which defines benchmarks.</li>
+<li>you have to target .NET Core to be able to build CoreRT benchmarks (example: <code>&lt;TargetFramework&gt;net5.0&lt;/TargetFramework&gt;</code> in the .csproj file)</li>
+<li>you have to specify the CoreRT runtime in an explicit way, either by using <code>[SimpleJob]</code> attribute or by using the fluent Job config API <code>Job.ShortRun.With(CoreRtRuntime.$version)</code> or console line arguments <code>--runtimes corert50</code></li>
+<li>to run CoreRT benchmark you run the app as a .NET Core/.NET process (example: <code>dotnet run -c Release -f net5.01</code>) and BenchmarkDotNet does all the CoreRT compilation for you. If you want to check what files are generated you need to apply <code>[KeepBenchmarkFiles]</code> attribute to the class which defines benchmarks.</li>
 </ul>
 </li>
 </ul>
-<p>By default BenchmarkDotNet uses the latest version of <code>Microsoft.DotNet.ILCompiler</code> to build the CoreRT benchmark according to <a href="https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project">this instructions</a>.</p>
+<p>By default BenchmarkDotNet uses the latest version of <code>Microsoft.DotNet.ILCompiler</code> to build the CoreRT benchmark according to <a href="https://github.com/dotnet/runtimelab/blob/d0a37893a67c125f9b0cd8671846ff7d867df241/samples/HelloWorld/README.md#add-corert-to-your-project">this instructions</a>.</p>
 <pre><code class="lang-cs">var config = DefaultConfig.Instance
-    .With(Job.Default.With(CoreRtRuntime.CoreRt21)); // compiles the benchmarks as netcoreapp2.1 and uses the latest CoreRT to build a native app
+    .With(Job.Default.With(CoreRtRuntime.CoreRt50)); // compiles the benchmarks as net5.0 and uses the latest CoreRT to build a native app
 
 BenchmarkSwitcher
     .FromAssembly(typeof(Program).Assembly)
     .Run(args, config);
 </code></pre>
-<pre><code class="lang-cs">[SimpleJob(RuntimeMoniker.CoreRt21)] // compiles the benchmarks as netcoreapp2.1 and uses the latest CoreRT to build a native app
+<pre><code class="lang-cs">[SimpleJob(RuntimeMoniker.CoreRt50)] // compiles the benchmarks as net5.0 and uses the latest CoreRT to build a native app
 public class TheTypeWithBenchmarks
 {
    [Benchmark] // the benchmarks go here
 }
 </code></pre>
 <p><strong>Note</strong>: BenchmarkDotNet is going to run <code>dotnet restore</code> on the auto-generated project. The first time it does so, it's going to take a <strong>LOT</strong> of time to download all the dependencies (few minutes). Just give it some time and don't press <code>Ctrl+C</code> too fast ;)</p>
-<p>If you want to benchmark some particular version of CoreRT you have to specify it in an explicit way:</p>
+<p>If you want to benchmark some particular version of CoreRT (or from a different NuGet feed) you have to specify it in an explicit way:</p>
 <pre><code class="lang-cs">var config = DefaultConfig.Instance
     .With(Job.ShortRun
         .With(CoreRtToolchain.CreateBuilder()
-            .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: &quot;1.0.0-alpha-26412-02&quot;) // the version goes here
+            .UseCoreRtNuGet(
+                microsoftDotNetILCompilerVersion: &quot;6.0.0-*&quot;, // the version goes here
+                nuGetFeedUrl: &quot;https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json&quot;) // this address might change over time
             .DisplayName(&quot;CoreRT NuGet&quot;)
-            .TargetFrameworkMoniker(&quot;netcoreapp2.1&quot;)
+            .TargetFrameworkMoniker(&quot;net5.0&quot;)
             .ToToolchain()));
 </code></pre>
 <h3 id="compiling-source-to-native-code-using-the-ilcompiler-you-built">Compiling source to native code using the ILCompiler you built</h3>
@@ -433,6 +435,136 @@ public class TheTypeWithBenchmarks
                 .ToToolchain()));
 </code></pre>
 <p><strong>Note</strong>: You might get some <code>The method or operation is not implemented.</code> errors as of today if the code that you are trying to benchmark is using some features that are not implemented by CoreRT/transpiler yet...</p>
+<h2 id="wasm">Wasm</h2>
+<p>BenchmarkDotNet supports Web Assembly on Unix! However, currently you need to build the <strong>dotnet runtime</strong> yourself to be able to run the benchmarks.</p>
+<p>For up-to-date docs, you should visit <a href="https://github.com/dotnet/runtime/blob/master/docs/workflow/testing/libraries/testing-wasm.md">dotnet/runtime repository</a>.</p>
+<p>The docs below are specific to Ubuntu 18.04 at the moment of writing this document (16/07/2020).</p>
+<p>Firs of all, you need to install.... <strong>npm</strong> 10+:</p>
+<pre><code class="lang-cmd">curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+sudo apt install nodejs
+</code></pre>
+<p>After this, you need to install <a href="https://github.com/GoogleChromeLabs/jsvu">jsvu</a>:</p>
+<pre><code class="lang-cmd">npm install jsvu -g
+</code></pre>
+<p>Add it to PATH:</p>
+<pre><code class="lang-cmd">export PATH=&quot;${HOME}/.jsvu:${PATH}&quot;
+</code></pre>
+<p>And use it to install V8, JavaScriptCore and SpiderMonkey:</p>
+<pre><code class="lang-cmd">jsvu --os=linux64 --engines=javascriptcore,spidermonkey,v8
+</code></pre>
+<p>Now you need to install <a href="https://emscripten.org/docs/getting_started/downloads.html#installation-instructions">Emscripten</a>:</p>
+<pre><code class="lang-cmd">git clone https://github.com/emscripten-core/emsdk.git
+cd emsdk
+./emsdk install latest
+./emsdk activate latest
+source ./emsdk_env.sh
+</code></pre>
+<p>The last thing before cloning dotnet/runtime repository is creation of <code>EMSDK_PATH</code> env var used by Mono build scripts:</p>
+<pre><code class="lang-cmd">export EMSDK_PATH=$EMSDK
+</code></pre>
+<p>Now you need to clone dotnet/runtime repository:</p>
+<pre><code class="lang-cmd">git clone https://github.com/dotnet/runtime
+cd runtime
+</code></pre>
+<p>Install <a href="https://github.com/dotnet/runtime/blob/master/docs/workflow/testing/libraries/testing-wasm.md">all Mono prerequisites</a>:</p>
+<pre><code class="lang-cmd">sudo apt-get install cmake llvm-9 clang-9 autoconf automake libtool build-essential python curl git lldb-6.0 liblldb-6.0-dev libunwind8 libunwind8-dev gettext libicu-dev liblttng-ust-dev libssl-dev libnuma-dev libkrb5-dev zlib1g-dev
+</code></pre>
+<p>And FINALLY build Mono Runtime with Web Assembly support:</p>
+<pre><code class="lang-cmd">./build.sh --arch wasm --os Browser -c release
+</code></pre>
+<p>Before you run the benchmarks, you need to make sure that following two file exists:</p>
+<pre><code class="lang-cmd">runtime/src/mono/wasm/runtime-test.js
+runtime/build.sh
+</code></pre>
+<p>And that you have .NET 5 feed added to your <code>nuget.config</code> file:</p>
+<pre><code class="lang-xml">&lt;add key=&quot;dotnet5&quot; value=&quot;https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5/nuget/v3/index.json&quot; /&gt;
+</code></pre>
+<p>Now you should be able to run the Wasm benchmarks!</p>
+<h2 id="sample-introwasm">Sample: IntroWasm</h2>
+<p>WasmToolchain uses a local Mono Runtime build to run the benchmarks compiled as WebAssembly using V8 JavaScript Engine.</p>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroInProcess.cs">using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Running;
+using System.IO;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Toolchains.MonoWasm;
+
+namespace BenchmarkDotNet.Samples
+{
+    // *** Command Line Arguments ***
+    public class IntroWasmCmdConfig
+    {
+        // the args must contain:
+        // an information that we want to run benchmark as Wasm:
+        // --runtimes Wasm
+        // path to dotnet cli
+        // --cli /home/adam/projects/runtime/dotnet.sh
+        // path to main js:
+        // --wasmMainJs /home/adam/projects/runtime/src/mono/wasm/runtime-test.js
+        public static void Run(string[] args) =&gt; BenchmarkSwitcher.FromAssembly(typeof(IntroWasmCmdConfig).Assembly).Run(args);
+
+        [Benchmark]
+        public void Foo()
+        {
+            // Benchmark body
+        }
+    }
+
+    // *** Fluent Config ***
+    public class IntroWasmFluentConfig
+    {
+        public static void Run()
+        {
+            // the Wasm Toolchain requires two mandatory arguments:
+            const string mainJsPath = @&quot;/home/adam/projects/runtime/src/mono/wasm/runtime-test.js&quot;;
+            const string cliPath = @&quot;/home/adam/projects/runtime/dotnet.sh&quot;;
+
+            WasmRuntime runtime = new WasmRuntime(mainJs: new FileInfo(mainJsPath), msBuildMoniker: &quot;net5.0&quot;);
+            NetCoreAppSettings netCoreAppSettings = new NetCoreAppSettings(
+                targetFrameworkMoniker: &quot;net5.0&quot;, runtimeFrameworkVersion: null, name: &quot;Wasm&quot;,
+                customDotNetCliPath: cliPath);
+            IToolchain toolChain = WasmToolChain.From(netCoreAppSettings);
+
+            BenchmarkRunner.Run&lt;IntroCustomMonoFluentConfig&gt;(DefaultConfig.Instance
+                .AddJob(Job.ShortRun.WithRuntime(runtime).WithToolchain(toolChain)));
+        }
+
+        [Benchmark]
+        public void Foo()
+        {
+            // Benchmark body
+        }
+    }
+}
+</code></pre><h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="toolchains.html">Toolchains</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroWasm.html">Sample: IntroWasm</a></li>
+</ul>
+<hr>
+<h2 id="monoaotllvm">MonoAotLLVM</h2>
+<p>BenchmarkDotNet supports doing Mono AOT runs with both the Mono-Mini compiler and the Mono-LLVM compiler (which uses llvm on the back end).</p>
+<p>Using this tool chain requires the following flags:</p>
+<pre><code>--runtimes monoaotllvm
+--aotcompilerpath &lt;path to mono aot compiler&gt;
+--customruntimepack &lt;path to runtime pack&gt;
+</code></pre>
+<p>and optionally (defaults to mini)</p>
+<pre><code>--aotcompilermode &lt;mini|llvm&gt;  
+</code></pre>
+<p>As of this writing, the mono aot compiler is not available as a seperate download or nuget package. Therefore, it is required to build the compiler in the [dotnet/runtime repository].</p>
+<p>The compiler binary (mono-sgen) is built as part of the <code>mono</code> subset, so it can be built (along with the runtime pack) like so (in the root of [dotnet/runtime]).</p>
+<p><code>./build.sh -subset mono+libs -c Release</code></p>
+<p>The compiler binary should be generated here (modify for your platform):</p>
+<pre><code>&lt;runtime root&gt;/artifacts/obj/mono/OSX.x64.Release/mono/mini/mono-sgen
+</code></pre>
+<p>And the runtime pack should be generated here:</p>
+<pre><code>&lt;runtimeroot&gt;artifacts/bin/microsoft.netcore.app.runtime.osx-x64/Release/
+</code></pre>
 </article>
           </div>
           
@@ -446,7 +578,8 @@ public class TheTypeWithBenchmarks
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -460,7 +593,7 @@ public class TheTypeWithBenchmarks
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

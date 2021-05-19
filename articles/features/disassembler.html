@@ -8,7 +8,7 @@
     <title>Disassembler | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Disassembler | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -114,11 +114,13 @@
 <p>Can be enabled by using <code>[DisassemblyDiagnoser]</code> or command line args: <code>-d</code> or <code>--disasm</code>.</p>
 <p>The configuration options available from code level are:</p>
 <ul>
-<li><code>printIL</code>: IL will be printed. False by default.</li>
-<li><code>printAsm</code>: ASM will be printed. True by default.</li>
-<li><code>printSource</code>: C# source code will be printed. False by default.</li>
-<li><code>printPrologAndEpilog</code>: ASM for prolog and epilog will be printed. False by default.</li>
-<li><code>recursiveDepth</code>: Includes called methods to given level. 1 by default, indexed from 1. To print just benchmark set to 0. This option is also available from the console arguments level <code>--disasmDepth</code>.</li>
+<li><code>maxDepth</code>: Includes called methods to given level. 1 by default, indexed from 1. To print just the benchmark set it to 0. This option is also available from the console arguments level <code>--disasmDepth</code>.</li>
+<li><code>printSource</code>: C#|F#|VB source code will be printed. False by default.</li>
+<li><code>printInstructionAddresses</code>: Print instruction addresses. False by default.</li>
+<li><code>exportGithubMarkdown</code>: Exports to GitHub markdown. True by default.</li>
+<li><code>exportHtml</code>: Exports to HTML with clickable links. False by default.</li>
+<li><code>exportCombinedDisassemblyReport</code>: Exports all benchmarks to a single HTML report. Makes it easy to compare different runtimes or methods (each becomes a column in HTML table).</li>
+<li><code>exportDiff</code>: Exports a diff of the assembly code to the Github markdown format. False by default.</li>
 </ul>
 <h3 id="requirements">Requirements</h3>
 <p>Disassembly Diagnoser requires following settings in your <code>.csproj</code> file:</p>
@@ -349,11 +351,8 @@ namespace BenchmarkDotNet.Samples
 
                 AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(ClrRuntime.Net461));
 
-                // RyuJit for .NET Core 2.0
-                AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core20));
-
-                // RyuJit for .NET Core 2.1
-                AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core21));
+                // RyuJit for .NET Core 5.0
+                AddJob(Job.ShortRun.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core50));
 
                 AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(maxDepth: 3, exportDiff: true)));
             }
@@ -396,27 +395,14 @@ The file was too big to embed it in this doc page.</p>
 In that case you can use <strong>Job.Dry</strong> which runs the benchmark only <strong>once</strong>.</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroDisassemblyDry.cs">using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples
 {
-    [Config(typeof(JustDisassembly))]
+    [DisassemblyDiagnoser(maxDepth: 3)]
+    [DryJob]
     public class IntroDisassemblyDry
     {
-        public class JustDisassembly : ManualConfig
-        {
-            public JustDisassembly()
-            {
-                AddJob(Job.Dry.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core20));
-                AddJob(Job.Dry.WithJit(Jit.RyuJit).WithPlatform(Platform.X64).WithRuntime(CoreRuntime.Core21));
-
-                AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(maxDepth: 3)));
-            }
-        }
-
         [Benchmark]
         public void Foo()
         {
@@ -444,7 +430,8 @@ namespace BenchmarkDotNet.Samples
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -458,7 +445,7 @@ namespace BenchmarkDotNet.Samples
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

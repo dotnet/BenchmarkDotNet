@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Enum RuntimeMoniker
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -160,7 +160,12 @@
       </tr>
       <tr>
         <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_CoreRt50">CoreRt50</td>
-        <td><p>CoreRT compiled as netcoreapp5.0</p>
+        <td><p>CoreRT compiled as net5.0</p>
+</td>
+      </tr>
+      <tr>
+        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_CoreRt60">CoreRt60</td>
+        <td><p>CoreRT compiled as net6.0</p>
 </td>
       </tr>
       <tr>
@@ -171,6 +176,11 @@
       <tr>
         <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono">Mono</td>
         <td><p>Mono</p>
+</td>
+      </tr>
+      <tr>
+        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVM">MonoAOTLLVM</td>
+        <td><p>Mono with the Ahead of Time LLVM Compiler backend</p>
 </td>
       </tr>
       <tr>
@@ -201,6 +211,16 @@
       <tr>
         <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net48">Net48</td>
         <td><p>.NET 4.8</p>
+</td>
+      </tr>
+      <tr>
+        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net50">Net50</td>
+        <td><p>.NET 5.0</p>
+</td>
+      </tr>
+      <tr>
+        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net60">Net60</td>
+        <td><p>.NET 6.0</p>
 </td>
       </tr>
       <tr>
@@ -238,6 +258,21 @@
         <td><p>not recognized, possibly a new version of .NET Core</p>
 </td>
       </tr>
+      <tr>
+        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Wasm">Wasm</td>
+        <td><p>WebAssembly with default .Net version</p>
+</td>
+      </tr>
+      <tr>
+        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet50">WasmNet50</td>
+        <td><p>WebAssembly with .net5.0</p>
+</td>
+      </tr>
+      <tr>
+        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet60">WasmNet60</td>
+        <td><p>WebAssembly with .net6.0</p>
+</td>
+      </tr>
     </tbody>
   </thead></thead></table>
 </article>
@@ -250,7 +285,8 @@
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -264,7 +300,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

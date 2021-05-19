@@ -8,7 +8,7 @@
     <title>Sample: IntroTailcall | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroTailcall | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -141,7 +141,7 @@ namespace BenchmarkDotNet.Samples
             =&gt; pos == 0 ? depth : FactorialWithTailing(pos - 1, depth * pos);
 
         private static long FactorialWithTailing(int depth)
-            =&gt; FactorialWithTailing(1, depth);
+            =&gt; FactorialWithTailing(depth - 1, depth);
     }
 }
 </code></pre><h3 id="output">Output</h3>
@@ -184,7 +184,8 @@ Tail call type: RecursiveLoop
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -198,7 +199,7 @@ Tail call type: RecursiveLoop
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

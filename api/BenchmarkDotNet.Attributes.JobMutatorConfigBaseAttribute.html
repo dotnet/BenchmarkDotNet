@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class JobMutatorConfigBaseAttribute
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -134,6 +134,7 @@
       <div class="level3"><a class="xref" href="BenchmarkDotNet.Attributes.MaxIterationCountAttribute.html">MaxIterationCountAttribute</a></div>
       <div class="level3"><a class="xref" href="BenchmarkDotNet.Attributes.MaxRelativeErrorAttribute.html">MaxRelativeErrorAttribute</a></div>
       <div class="level3"><a class="xref" href="BenchmarkDotNet.Attributes.MaxWarmupCountAttribute.html">MaxWarmupCountAttribute</a></div>
+      <div class="level3"><a class="xref" href="BenchmarkDotNet.Attributes.MemoryRandomizationAttribute.html">MemoryRandomizationAttribute</a></div>
       <div class="level3"><a class="xref" href="BenchmarkDotNet.Attributes.MinInvokeCountAttribute.html">MinInvokeCountAttribute</a></div>
       <div class="level3"><a class="xref" href="BenchmarkDotNet.Attributes.MinIterationCountAttribute.html">MinIterationCountAttribute</a></div>
       <div class="level3"><a class="xref" href="BenchmarkDotNet.Attributes.MinIterationTimeAttribute.html">MinIterationTimeAttribute</a></div>
@@ -280,7 +281,7 @@
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Attributes_JobMutatorConfigBaseAttribute_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    <pre><code class="lang-csharp hljs">[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
 public class JobMutatorConfigBaseAttribute : Attribute, IConfigSource</code></pre>
   </div>
   <h3 id="constructors">Constructors
@@ -363,7 +364,8 @@ public class JobMutatorConfigBaseAttribute : Attribute, IConfigSource</code></pr
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -377,7 +379,7 @@ public class JobMutatorConfigBaseAttribute : Attribute, IConfigSource</code></pr
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

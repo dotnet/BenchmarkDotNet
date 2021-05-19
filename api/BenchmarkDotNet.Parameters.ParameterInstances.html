@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ParameterInstances
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -122,6 +122,10 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><span class="xref">ParameterInstances</span></div>
   </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><span class="xref">System.IDisposable</span></div>
+  </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -150,7 +154,7 @@
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Parameters_ParameterInstances_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ParameterInstances</code></pre>
+    <pre><code class="lang-csharp hljs">public class ParameterInstances : IDisposable</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -421,6 +425,16 @@
   </h3>
   
   
+  <a id="BenchmarkDotNet_Parameters_ParameterInstances_Dispose_" data-uid="BenchmarkDotNet.Parameters.ParameterInstances.Dispose*"></a>
+  <h4 id="BenchmarkDotNet_Parameters_ParameterInstances_Dispose" data-uid="BenchmarkDotNet.Parameters.ParameterInstances.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+  
+  
   <a id="BenchmarkDotNet_Parameters_ParameterInstances_GetArgument_" data-uid="BenchmarkDotNet.Parameters.ParameterInstances.GetArgument*"></a>
   <h4 id="BenchmarkDotNet_Parameters_ParameterInstances_GetArgument_System_String_" data-uid="BenchmarkDotNet.Parameters.ParameterInstances.GetArgument(System.String)">GetArgument(String)</h4>
   <div class="markdown level1 summary"></div>
@@ -461,6 +475,10 @@
       </tr>
     </tbody>
   </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <span class="xref">System.IDisposable</span>
+  </div>
 </article>
           </div>
           
@@ -471,7 +489,8 @@
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -485,7 +504,7 @@
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>

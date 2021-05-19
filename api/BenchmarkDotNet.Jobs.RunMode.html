@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class RunMode
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.51.0.0">
+    <meta name="generator" content="docfx 2.57.2.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -471,6 +471,30 @@
   </table>
   
   
+  <h4 id="BenchmarkDotNet_Jobs_RunMode_MemoryRandomizationCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.MemoryRandomizationCharacteristic">MemoryRandomizationCharacteristic</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;bool&gt; MemoryRandomizationCharacteristic</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<span class="xref">System.Boolean</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <h4 id="BenchmarkDotNet_Jobs_RunMode_MinIterationCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.MinIterationCountCharacteristic">MinIterationCountCharacteristic</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
@@ -805,6 +829,33 @@ The default value is 50</p>
   </table>
   
   
+  <a id="BenchmarkDotNet_Jobs_RunMode_MemoryRandomization_" data-uid="BenchmarkDotNet.Jobs.RunMode.MemoryRandomization*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_RunMode_MemoryRandomization" data-uid="BenchmarkDotNet.Jobs.RunMode.MemoryRandomization">MemoryRandomization</h4>
+  <div class="markdown level1 summary"><p>specifies whether Engine should allocate some random-sized memory between iterations
+<remarks>it makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration</remarks></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool MemoryRandomization { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Jobs_RunMode_MinIterationCount_" data-uid="BenchmarkDotNet.Jobs.RunMode.MinIterationCount*"></a>
   <h4 id="BenchmarkDotNet_Jobs_RunMode_MinIterationCount" data-uid="BenchmarkDotNet.Jobs.RunMode.MinIterationCount">MinIterationCount</h4>
   <div class="markdown level1 summary"><p>Minimum count of target iterations that should be performed
@@ -956,7 +1007,8 @@ Monitoring: no overhead evaluating, with several target iterations. Perfect for 
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+                <h5>In This Article</h5>
+                <div></div>
               </nav>
             </div>
           </div>
@@ -970,7 +1022,7 @@ Monitoring: no overhead evaluating, with several target iterations. Perfect for 
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            Copyright &copy; 2013–2020 .NET Foundation and contributors
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
             
           </div>
         </div>
