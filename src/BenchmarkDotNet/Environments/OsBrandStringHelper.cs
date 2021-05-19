@@ -97,7 +97,8 @@ namespace BenchmarkDotNet.Environments
             { "10.0.18362", "10 19H1 [1903, May 2019 Update]" },
             { "10.0.18363", "10 19H2 [1909, November 2019 Update]" },
             { "10.0.19041", "10 20H1 [2004, May 2020 Update]" },
-            { "10.0.19042", "10 20H2 [20H2, October 2020 Update]" }
+            { "10.0.19042", "10 20H2 [20H2, October 2020 Update]" },
+            { "10.0.19043", "10 21H1 [21H1, May 2021 Update]" }
         };
 
         private class Windows10Version
@@ -143,6 +144,7 @@ namespace BenchmarkDotNet.Environments
                 new Windows10Version("1909", "19H2", "November 2019 Update", 18363),
                 new Windows10Version("2004", "20H1", "May 2020 Update", 19041),
                 new Windows10Version("20H2", "20H2", "October 2020 Update", 19042),
+                new Windows10Version("21H1", "21H1", "May 2021 Update", 19043),
             };
 
             [CanBeNull]
