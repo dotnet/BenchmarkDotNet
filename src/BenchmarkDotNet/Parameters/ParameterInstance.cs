@@ -71,9 +71,33 @@ namespace BenchmarkDotNet.Parameters
 
             var postfix = $" [{value.Length}]";
             const string dots = "(...)";
-            int take = (maxDisplayTextInnerLength - postfix.Length - dots.Length) / 2;
 
-            return value.Substring(0, take) + dots + value.Substring(value.Length - take, take) + postfix;
+            var takeFromStart = (maxDisplayTextInnerLength - postfix.Length - dots.Length) / 2;
+            var takeFromEnd = takeFromStart;
+
+            if (IsFirstCharInSurrogatePair(value[takeFromStart-1]))
+            {
+                takeFromStart = Math.Max(0, takeFromStart - 1);
+            }
+
+            if (IsSecondCharInSurrogatePair(value[value.Length - takeFromEnd]))
+            {
+                takeFromEnd = Math.Max(0, takeFromEnd - 1);
+            }
+
+            var result = value.Substring(0, takeFromStart) + dots + value.Substring(value.Length - takeFromEnd, takeFromEnd) + postfix;
+
+            return result;
+        }
+
+        private static bool IsFirstCharInSurrogatePair(char c)
+        {
+            return BitConverter.IsLittleEndian ? char.IsHighSurrogate(c) : char.IsLowSurrogate(c);
+        }
+
+        private static bool IsSecondCharInSurrogatePair(char c)
+        {
+            return BitConverter.IsLittleEndian ? char.IsLowSurrogate(c) : char.IsHighSurrogate(c);
         }
     }
 }
