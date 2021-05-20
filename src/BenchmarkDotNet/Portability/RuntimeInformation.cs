@@ -233,9 +233,10 @@ namespace BenchmarkDotNet.Portability
 
         public static Platform GetCurrentPlatform()
         {
-            // it's not part of .NET Standard 2.0, so we use a hack
-            // https://github.com/dotnet/runtime/blob/2c573b59aaaf3fd17e2ecab95ad3769f195d2dbc/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/Architecture.cs#L12
+            // these are not part of .NET Standard 2.0, so we use a hack
+            // https://github.com/dotnet/runtime/blob/d81ad044fa6830f5f31f6b6e8224ebf66a3c298c/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/Architecture.cs#L12-L13
             const Architecture Wasm = (Architecture)4;
+            const Architecture S390x = (Architecture)5;
 
             switch (ProcessArchitecture)
             {
@@ -249,6 +250,8 @@ namespace BenchmarkDotNet.Portability
                     return Platform.X86;
                 case Wasm:
                     return Platform.Wasm;
+                case S390x:
+                    return Platform.S390x;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

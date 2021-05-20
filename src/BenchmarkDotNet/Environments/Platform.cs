@@ -30,6 +30,11 @@
         /// <summary>
         /// Wasm
         /// </summary>
-        Wasm
+        Wasm,
+
+        /// <summary>
+        /// S390x
+        /// </summary>
+        S390x
     }
 }
