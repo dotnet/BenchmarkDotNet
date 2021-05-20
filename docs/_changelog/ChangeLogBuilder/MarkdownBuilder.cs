@@ -94,7 +94,7 @@ namespace ChangeLogBuilder
             builder.AppendLine();
             builder.AppendLine($"In the [{milestone}]({milestoneHtmlUlr}) scope, ");
             builder.Append(issues.Count + " issues were resolved and ");
-            builder.AppendLine(pullRequests.Count + " pull requests where merged.");
+            builder.AppendLine(pullRequests.Count + " pull requests were merged.");
             builder.AppendLine($"This release includes {commits.Count} commits by {contributors.Count} contributors.");
             builder.AppendLine();
 
