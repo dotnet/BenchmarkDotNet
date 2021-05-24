@@ -93,14 +93,41 @@ namespace BenchmarkDotNet.Configs
             IEnumerable<Loggers.ILogger> loggers = null)
         {
 
+            void PrintWarning(string message)
+            {
+                if (loggers?.Any() == true)
+                {
+                    foreach (var logger in loggers)
+                    {
+                        logger.WriteLine(Loggers.LogKind.Warning,
+                             message);
+                    }
+                }
+            }
+
             var mergeDictionary = new Dictionary<System.Type, IExporter>();
 
             foreach (var exporter in exporters)
-                mergeDictionary[exporter.GetType()] = exporter;
+            {
+                var exporterType = exporter.GetType();
+                if (mergeDictionary.ContainsKey(exporterType))
+                {
+                    PrintWarning($"The exporter {exporterType} is already present in configuration. There may be unexpected results.");
+                }
+                mergeDictionary[exporterType] = exporter;
+            }
+
 
             foreach (var diagnoser in uniqueDiagnosers)
                 foreach (var exporter in diagnoser.Exporters)
-                    mergeDictionary[exporter.GetType()] = exporter;
+                {
+                    var exporterType = exporter.GetType();
+                    if (mergeDictionary.ContainsKey(exporterType))
+                    {
+                        PrintWarning($"The exporter {exporterType} of {diagnoser.GetType().Name} is already present in configuration. There may be unexpected results.");
+                    }
+                    mergeDictionary[exporterType] = exporter;
+                };
 
             var result = mergeDictionary.Values.ToList();
 
@@ -138,19 +165,7 @@ namespace BenchmarkDotNet.Configs
                             result.Insert(i, dependency); // All the exporter dependencies should be added before the exporter
                         else
                         {
-                            if (loggers?.Any() == true)
-                            {
-                                var warning = $"The {dependency.Name} is already present in the configuration. There may be unexpected results of {result[i].GetType().Name}.";
-                                foreach (var logger in loggers)
-                                {
-                                    logger.WriteLine(Loggers.LogKind.Warning,
-                                         warning);
-                                }
-                            }
-                            else
-                            {
-                                // If there are no loggers should I throw an exception?
-                            }
+                            PrintWarning($"The {dependency.Name} is already present in the configuration. There may be unexpected results of {result[i].GetType().Name}.");
                         }
 
             result.Sort((left, right) => (left is IExporterDependencies).CompareTo(right is IExporterDependencies)); // the case when they were defined by user in wrong order ;)
