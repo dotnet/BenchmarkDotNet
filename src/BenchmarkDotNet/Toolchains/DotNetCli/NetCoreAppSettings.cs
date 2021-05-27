@@ -51,8 +51,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             string packagesPath = null,
             TimeSpan? timeout = null,
             string customRuntimePack = null,
+
             string aotCompilerPath = null,
-            MonoAotCompilerMode aotCompilerMode = MonoAotCompilerMode.mini
+            MonoAotCompilerMode aotCompilerMode = MonoAotCompilerMode.mini,
+            bool aot = false
             )
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
@@ -65,6 +67,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             CustomRuntimePack = customRuntimePack;
             AOTCompilerPath = aotCompilerPath;
             AOTCompilerMode = aotCompilerMode;
+            Aot = aot;
         }
 
         /// <summary>
@@ -105,6 +108,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// Mono AOT Compiler mode, either 'mini' or 'llvm'
         /// </summary>
         public MonoAotCompilerMode AOTCompilerMode { get; }
+
+        /// Use AOT compilation for Wasm
+        /// </summary>
+        public bool Aot { get;  }
 
         public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath, Timeout);

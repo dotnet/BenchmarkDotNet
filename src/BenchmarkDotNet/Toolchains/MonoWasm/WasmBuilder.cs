@@ -26,7 +26,9 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         {
             BuildResult buildResult = dotNetCliBuilder.Build(generateResult, buildPartition, logger);
 
-            if (buildResult.IsBuildSuccess)
+            WasmRuntime runtime = (WasmRuntime)buildPartition.Runtime;
+
+            if (buildResult.IsBuildSuccess && !runtime.Aot)
             {
                 BuildApp(buildPartition.ProgramName, generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, (WasmRuntime)buildPartition.Runtime);
             }

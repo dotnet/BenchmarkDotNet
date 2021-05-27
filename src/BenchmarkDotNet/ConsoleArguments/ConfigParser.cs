@@ -112,7 +112,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(RuntimeMoniker)).Select(name => name.ToLower()))}.");
                     return false;
                 }
-                else if (runtimeMoniker == RuntimeMoniker.Wasm && (options.WasmMainJs == null || options.WasmMainJs.IsNotNullButDoesNotExist()))
+                else if (runtimeMoniker == RuntimeMoniker.Wasm && (!options.WasmAot) && (options.WasmMainJs == null || options.WasmMainJs.IsNotNullButDoesNotExist()))
                 {
                     logger.WriteLineError($"The provided {nameof(options.WasmMainJs)} \"{options.WasmMainJs}\" does NOT exist. It MUST be provided.");
                     return false;
@@ -120,6 +120,13 @@ namespace BenchmarkDotNet.ConsoleArguments
                 else if (runtimeMoniker == RuntimeMoniker.MonoAOTLLVM && (options.AOTCompilerPath == null || options.AOTCompilerPath.IsNotNullButDoesNotExist()))
                 {
                      logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{ options.AOTCompilerPath }\" does NOT exist. It MUST be provided.");
+                }
+                else if (runtimeMoniker == RuntimeMoniker.Wasm && options.WasmAot && (options.RuntimeSrcDir == null || options.RuntimeSrcDir.IsNotNullButDoesNotExist()))
+                {
+                    logger.WriteLine("options.RuntimeSrcDir");
+                    logger.WriteLineError($"The provided {nameof(options.RuntimeSrcDir)} \"{options.RuntimeSrcDir}\" does NOT exist. It MUST be provided.");
+                    return false;
+
                 }
             }
 
@@ -418,7 +425,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 mainJs: options.WasmMainJs,
                 msBuildMoniker: msBuildMoniker,
                 javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
-                javaScriptEngineArguments: options.WasmJavaScriptEngineArguments);
+                javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
+                aot: options.WasmAot,
+                runtimeSrcDir: options.RuntimeSrcDir);
 
             var toolChain = WasmToolChain.From(new NetCoreAppSettings(
                 targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
@@ -427,7 +436,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 customDotNetCliPath: options.CliPath?.FullName,
                 packagesPath: options.RestorePath?.FullName,
                 timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
-                customRuntimePack: options.CustomRuntimePack));
+                customRuntimePack: options.CustomRuntimePack,
+                aot: options.WasmAot));
 
             return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain);
         }
