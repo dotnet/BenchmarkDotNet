@@ -8,6 +8,7 @@
     <AssemblyName>$PROGRAMNAME$</AssemblyName>
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
     <MicrosoftNetCoreAppRuntimePackDir>$RUNTIMEPACK$</MicrosoftNetCoreAppRuntimePackDir>
+    <UsingBrowserRuntimeWorkload>false</UsingBrowserRuntimeWorkload>
     $COPIEDSETTINGS$
   </PropertyGroup>
 
