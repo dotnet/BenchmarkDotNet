@@ -13,8 +13,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     public class WasmGenerator : CsProjGenerator
     {
         private readonly string CustomRuntimePack;
-        //TODO: Set this properly
-        private readonly bool Aot = true;
+        private readonly bool Aot;
 
         public WasmGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, bool aot)
             : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null)
