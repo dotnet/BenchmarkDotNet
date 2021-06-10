@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Environments
         /// <remarks>path to mainJs MUST be provided</remarks>
         public WasmRuntime(FileInfo mainJs, string msBuildMoniker = "net5.0", string displayName = "Wasm", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm", bool aot = false, DirectoryInfo runtimeSrcDir = null) : base(RuntimeMoniker.Wasm, msBuildMoniker, displayName)
         {
-            if (aot == false && mainJs == null)
+            if (!aot && mainJs == null)
                 throw new ArgumentNullException(paramName: nameof(mainJs));
             if (aot == false && mainJs.IsNotNullButDoesNotExist())
                 throw new FileNotFoundException($"Provided {nameof(mainJs)} file: \"{mainJs.FullName}\" doest NOT exist");
