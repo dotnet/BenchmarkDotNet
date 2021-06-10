@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Environments
         {
             if (!aot && mainJs == null)
                 throw new ArgumentNullException(paramName: nameof(mainJs));
-            if (aot == false && mainJs.IsNotNullButDoesNotExist())
+            if (!aot && mainJs.IsNotNullButDoesNotExist())
                 throw new FileNotFoundException($"Provided {nameof(mainJs)} file: \"{mainJs.FullName}\" doest NOT exist");
             if (!string.IsNullOrEmpty(javaScriptEngine) && javaScriptEngine != "v8" && !File.Exists(javaScriptEngine))
                 throw new FileNotFoundException($"Provided {nameof(javaScriptEngine)} file: \"{javaScriptEngine}\" doest NOT exist");
@@ -58,9 +58,9 @@ namespace BenchmarkDotNet.Environments
             => obj is WasmRuntime other && Equals(other);
 
         public bool Equals(WasmRuntime other)
-            => other != null && base.Equals(other) && other.MainJs == MainJs && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments;
+            => other != null && base.Equals(other) && other.MainJs == MainJs && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments && other.Aot == Aot && other.RuntimeSrcDir == RuntimeSrcDir;
 
         public override int GetHashCode()
-            => base.GetHashCode() ^ MainJs.GetHashCode() ^ (JavaScriptEngine?.GetHashCode() ?? 0) ^ (JavaScriptEngineArguments?.GetHashCode() ?? 0);
+            => base.GetHashCode() ^ MainJs.GetHashCode() ^ (JavaScriptEngine?.GetHashCode() ?? 0) ^ (JavaScriptEngineArguments?.GetHashCode() ?? 0 ^ Aot.GetHashCode() ^ (RuntimeSrcDir?.GetHashCode() ?? 0));
     }
 }
