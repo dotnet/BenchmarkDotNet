@@ -58,9 +58,8 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     .Replace("$RUNTIMESRCDIR$", runtime.RuntimeSrcDir.ToString())
                     .Replace("$COPIEDSETTINGS$", customProperties)
                     .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
-                    .Replace("$RUNTIMECONFIG$", "Debug")
+                    .Replace("$RUNTIMECONFIG$", buildPartition.BuildConfiguration)
                     .Replace("$SDKNAME$", sdkName)
-                    .Replace("$TRIM$", runtime.Aot ? "true" : "false")
                     .ToString();
 
                 File.WriteAllText(artifactsPaths.ProjectFilePath, content);
