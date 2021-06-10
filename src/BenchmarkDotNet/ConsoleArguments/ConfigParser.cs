@@ -123,10 +123,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 }
                 else if (runtimeMoniker == RuntimeMoniker.Wasm && options.AOTCompilerMode == MonoAotCompilerMode.wasm && (options.RuntimeSrcDir == null || options.RuntimeSrcDir.IsNotNullButDoesNotExist()))
                 {
-                    logger.WriteLine("options.RuntimeSrcDir");
                     logger.WriteLineError($"The provided {nameof(options.RuntimeSrcDir)} \"{options.RuntimeSrcDir}\" does NOT exist. It MUST be provided.");
                     return false;
-
                 }
             }
 
