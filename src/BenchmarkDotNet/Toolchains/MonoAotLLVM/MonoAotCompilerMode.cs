@@ -3,6 +3,7 @@
     public enum MonoAotCompilerMode
     {
         mini = 0, // default
-        llvm
+        llvm,
+        wasm
     }
 }
