@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
             if (buildResult.IsBuildSuccess && !runtime.Aot)
             {
-                BuildApp(buildPartition.ProgramName, generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, (WasmRuntime)buildPartition.Runtime);
+                BuildApp(buildPartition.ProgramName, generateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, runtime);
             }
 
             return buildResult;
