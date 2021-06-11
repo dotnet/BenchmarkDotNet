@@ -190,6 +190,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("AOTCompilerMode", Required = false, Default = MonoAotCompilerMode.mini, HelpText = "Mono AOT compiler mode, either 'mini' or 'llvm'")]
         public MonoAotCompilerMode AOTCompilerMode { get; set; }
 
+        [Option("runtimeSrcDir", Required = false, HelpText = "Path to a local copy of dotnet/runtime. . Used by the WASM toolchain when AOTCompilerMode is 'wasm'.")]
+        public DirectoryInfo RuntimeSrcDir { get; set; }
+
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
         [Usage(ApplicationAlias = "")]

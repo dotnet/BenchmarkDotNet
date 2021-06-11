@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Toolchains.MonoWasm;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -17,6 +18,10 @@ namespace BenchmarkDotNet.Environments
 
         public string JavaScriptEngineArguments { get;  }
 
+        public bool Aot { get;  }
+
+        public DirectoryInfo RuntimeSrcDir { get;  }
+
         /// <summary>
         /// creates new instance of WasmRuntime
         /// </summary>
@@ -26,11 +31,11 @@ namespace BenchmarkDotNet.Environments
         /// <param name="msBuildMoniker">moniker, default: "net5.0"</param>
         /// <param name="displayName">default: "Wasm"</param>
         /// <remarks>path to mainJs MUST be provided</remarks>
-        public WasmRuntime(FileInfo mainJs, string msBuildMoniker = "net5.0", string displayName = "Wasm", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm") : base(RuntimeMoniker.Wasm, msBuildMoniker, displayName)
+        public WasmRuntime(FileInfo mainJs, string msBuildMoniker = "net5.0", string displayName = "Wasm", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm", bool aot = false, DirectoryInfo runtimeSrcDir = null) : base(RuntimeMoniker.Wasm, msBuildMoniker, displayName)
         {
-            if (mainJs == null)
+            if (!aot && mainJs == null)
                 throw new ArgumentNullException(paramName: nameof(mainJs));
-            if (mainJs.IsNotNullButDoesNotExist())
+            if (!aot && mainJs.IsNotNullButDoesNotExist())
                 throw new FileNotFoundException($"Provided {nameof(mainJs)} file: \"{mainJs.FullName}\" doest NOT exist");
             if (!string.IsNullOrEmpty(javaScriptEngine) && javaScriptEngine != "v8" && !File.Exists(javaScriptEngine))
                 throw new FileNotFoundException($"Provided {nameof(javaScriptEngine)} file: \"{javaScriptEngine}\" doest NOT exist");
@@ -38,6 +43,8 @@ namespace BenchmarkDotNet.Environments
             MainJs = mainJs;
             JavaScriptEngine = javaScriptEngine;
             JavaScriptEngineArguments = javaScriptEngineArguments;
+            Aot = aot;
+            RuntimeSrcDir = runtimeSrcDir;
         }
 
         // this ctor exists only for the purpose of having .Default property that returns something consumable by RuntimeInformation.GetCurrentRuntime()
@@ -52,9 +59,9 @@ namespace BenchmarkDotNet.Environments
             => obj is WasmRuntime other && Equals(other);
 
         public bool Equals(WasmRuntime other)
-            => other != null && base.Equals(other) && other.MainJs == MainJs && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments;
+            => other != null && base.Equals(other) && other.MainJs == MainJs && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments && other.Aot == Aot && other.RuntimeSrcDir == RuntimeSrcDir;
 
         public override int GetHashCode()
-            => base.GetHashCode() ^ MainJs.GetHashCode() ^ (JavaScriptEngine?.GetHashCode() ?? 0) ^ (JavaScriptEngineArguments?.GetHashCode() ?? 0);
+            => base.GetHashCode() ^ MainJs.GetHashCode() ^ (JavaScriptEngine?.GetHashCode() ?? 0) ^ (JavaScriptEngineArguments?.GetHashCode() ?? 0 ^ Aot.GetHashCode() ^ (RuntimeSrcDir?.GetHashCode() ?? 0));
     }
 }
