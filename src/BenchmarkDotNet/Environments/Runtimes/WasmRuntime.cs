@@ -22,8 +22,6 @@ namespace BenchmarkDotNet.Environments
 
         public DirectoryInfo RuntimeSrcDir { get;  }
 
-        public MonoRuntimeConfiguration RuntimeConfiguration { get;  }
-
         /// <summary>
         /// creates new instance of WasmRuntime
         /// </summary>
