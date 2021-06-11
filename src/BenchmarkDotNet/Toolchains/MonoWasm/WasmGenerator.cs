@@ -7,7 +7,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 
-
 namespace BenchmarkDotNet.Toolchains.MonoWasm
 {
     public class WasmGenerator : CsProjGenerator
@@ -22,12 +21,9 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             CustomRuntimePack = customRuntimePack;
         }
 
-
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
-            WasmRuntime runtime = (WasmRuntime)buildPartition.Runtime;
-
-            if (runtime.Aot)
+            if (((WasmRuntime)buildPartition.Runtime).Aot)
             {
                 GenerateProjectAot(buildPartition, artifactsPaths, logger);
             }
@@ -35,7 +31,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             {
                 GenerateProjectInterpreter(buildPartition, artifactsPaths, logger);
             }
-
         }
 
         protected  void GenerateProjectAot(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
@@ -65,15 +60,10 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             }
         }
 
-
         protected void GenerateProjectInterpreter(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
-
             BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
-
-            WasmRuntime runtime = (WasmRuntime)buildPartition.Runtime;
-
             using (var file = new StreamReader(File.OpenRead(projectFile.FullName)))
             {
                 var (customProperties, sdkName) = GetSettingsThatNeedsToBeCopied(file, projectFile);
