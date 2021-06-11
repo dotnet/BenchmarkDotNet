@@ -90,8 +90,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     .Replace("$SDKNAME$", sdkName)
                     .Replace("$RUNTIMEPACK$", CustomRuntimePack ?? "")
                     .Replace("$TARGET$", CustomRuntimePack != null ? "PublishWithCustomRuntimePack" : "Publish")
-                    .Replace("$AOT$", runtime.Aot ? "true" : "false")
-                    .Replace("$TRIM$", runtime.Aot ? "true" : "false")
                     .ToString();
 
                 File.WriteAllText(artifactsPaths.ProjectFilePath, content);
