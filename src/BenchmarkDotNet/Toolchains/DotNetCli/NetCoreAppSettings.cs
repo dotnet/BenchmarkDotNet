@@ -52,8 +52,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             TimeSpan? timeout = null,
             string customRuntimePack = null,
             string aotCompilerPath = null,
-            MonoAotCompilerMode aotCompilerMode = MonoAotCompilerMode.mini,
-            bool aot = false
+            MonoAotCompilerMode aotCompilerMode = MonoAotCompilerMode.mini
             )
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
@@ -66,7 +65,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             CustomRuntimePack = customRuntimePack;
             AOTCompilerPath = aotCompilerPath;
             AOTCompilerMode = aotCompilerMode;
-            Aot = aot;
         }
 
         /// <summary>

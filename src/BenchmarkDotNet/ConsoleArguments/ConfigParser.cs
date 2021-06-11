@@ -437,7 +437,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 packagesPath: options.RestorePath?.FullName,
                 timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
                 customRuntimePack: options.CustomRuntimePack,
-                aot: wasmAot));
+                aotCompilerMode: options.AOTCompilerMode));
 
             return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain);
         }
