@@ -3,7 +3,7 @@
     <OutputType>Exe</OutputType>
     <OutputPath>bin</OutputPath>
     <RuntimeSrcDir>$RUNTIMESRCDIR$</RuntimeSrcDir>
-    <RuntimeConfig>Release/RuntimeConfig>
+    <RuntimeConfig>Release</RuntimeConfig>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <TargetFramework>$TFM$</TargetFramework>
     <AppDir>$(MSBuildThisFileDirectory)\bin\$TFM$\browser-wasm\publish</AppDir>
