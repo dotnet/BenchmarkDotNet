@@ -51,7 +51,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             string packagesPath = null,
             TimeSpan? timeout = null,
             string customRuntimePack = null,
-
             string aotCompilerPath = null,
             MonoAotCompilerMode aotCompilerMode = MonoAotCompilerMode.mini,
             bool aot = false

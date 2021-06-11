@@ -21,7 +21,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             CustomRuntimePack = customRuntimePack;
         }
 
-
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
             if (((WasmRuntime)buildPartition.Runtime).Aot)
@@ -63,7 +62,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
         protected void GenerateProjectInterpreter(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
-
             BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
             using (var file = new StreamReader(File.OpenRead(projectFile.FullName)))
