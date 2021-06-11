@@ -106,10 +106,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         public MonoAotCompilerMode AOTCompilerMode { get; }
 
-        /// Use AOT compilation for Wasm
-        /// </summary>
-        public bool Aot { get;  }
-
         public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath, Timeout);
 
