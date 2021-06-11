@@ -8,6 +8,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Toolchains.MonoAotLLVM;
+using BenchmarkDotNet.Toolchains.MonoWasm;
 using CommandLine;
 using CommandLine.Text;
 using JetBrains.Annotations;
@@ -192,6 +193,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("runtimeSrcDir", Required = false, HelpText = "Path to a local copy of dotnet/runtime. . Used by the WASM toolchain when AOTCompilerMode is 'wasm'.")]
         public DirectoryInfo RuntimeSrcDir { get; set; }
+
+        [Option("runtimeConfiguration", Required = false, Default = MonoRuntimeConfiguration.Release, HelpText = "The configuration of the runtime to use. Only used for wasm in aot mode.")]
+        public MonoRuntimeConfiguration runtimeConfiguration { get; set; }
 
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 

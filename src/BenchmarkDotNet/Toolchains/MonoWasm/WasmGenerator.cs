@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     .Replace("$RUNTIMESRCDIR$", runtime.RuntimeSrcDir.ToString())
                     .Replace("$COPIEDSETTINGS$", customProperties)
                     .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
-                    .Replace("$RUNTIMECONFIG$", buildPartition.BuildConfiguration)
+                    .Replace("$RUNTIMECONFIG$", runtime.RuntimeConfiguration.ToString())
                     .Replace("$SDKNAME$", sdkName)
                     .ToString();
 

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Toolchains.MonoWasm;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -20,6 +21,8 @@ namespace BenchmarkDotNet.Environments
         public bool Aot { get;  }
 
         public DirectoryInfo RuntimeSrcDir { get;  }
+
+        public MonoRuntimeConfiguration RuntimeConfiguration { get;  }
 
         /// <summary>
         /// creates new instance of WasmRuntime
