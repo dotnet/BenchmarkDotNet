@@ -13,6 +13,7 @@
     <RunAOTCompilation>true</RunAOTCompilation>
     <WasmMainJSPath>$(RuntimeSrcDir)\src\mono\wasm\runtime-test.js</WasmMainJSPath>
     <WasmGenerateRunV8Script>true</WasmGenerateRunV8Script>
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
     $COPIEDSETTINGS$
   </PropertyGroup>
 

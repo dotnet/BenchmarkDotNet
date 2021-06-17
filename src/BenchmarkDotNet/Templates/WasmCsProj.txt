@@ -9,6 +9,7 @@
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
     <MicrosoftNetCoreAppRuntimePackDir>$RUNTIMEPACK$</MicrosoftNetCoreAppRuntimePackDir>
     <UsingBrowserRuntimeWorkload>false</UsingBrowserRuntimeWorkload>
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
     $COPIEDSETTINGS$
   </PropertyGroup>
 
