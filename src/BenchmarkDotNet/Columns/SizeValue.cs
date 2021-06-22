@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Columns
         [Pure, NotNull]
         public string ToString(
             [CanBeNull] CultureInfo cultureInfo,
-            [CanBeNull] string format = "0.##",
+            [CanBeNull] string format = "0.00",
             [CanBeNull] UnitPresentation unitPresentation = null)
         {
             return ToString(null, cultureInfo, format, unitPresentation);
@@ -41,12 +41,12 @@ namespace BenchmarkDotNet.Columns
         public string ToString(
             [CanBeNull] SizeUnit sizeUnit,
             [CanBeNull] CultureInfo cultureInfo,
-            [CanBeNull] string format = "0.##",
+            [CanBeNull] string format = "0.00",
             [CanBeNull] UnitPresentation unitPresentation = null)
         {
             sizeUnit = sizeUnit ?? SizeUnit.GetBestSizeUnit(Bytes);
             cultureInfo = cultureInfo ?? DefaultCultureInfo.Instance;
-            format = format ?? "0.##";
+            format = format ?? "0.00";
             unitPresentation = unitPresentation ?? UnitPresentation.Default;
             double unitValue = SizeUnit.Convert(Bytes, SizeUnit.B, sizeUnit);
             if (unitPresentation.IsVisible)

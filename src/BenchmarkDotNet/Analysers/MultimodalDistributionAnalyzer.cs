@@ -32,6 +32,6 @@ namespace BenchmarkDotNet.Analysers
 
         [NotNull]
         private Conclusion Create([NotNull] string kind, double mValue, [CanBeNull] BenchmarkReport report, CultureInfo cultureInfo)
-            => CreateWarning($"It seems that the distribution {kind} (mValue = {mValue.ToString("0.##", cultureInfo)})", report);
+            => CreateWarning($"It seems that the distribution {kind} (mValue = {mValue.ToString("0.00", cultureInfo)})", report);
     }
 }

@@ -99,9 +99,9 @@ namespace BenchmarkDotNet.Exporters.Csv
             columns.Add(new MeasurementColumn("Measurement_IterationMode", (summary, report, m) => m.IterationMode.ToString()));
             columns.Add(new MeasurementColumn("Measurement_IterationStage", (summary, report, m) => m.IterationStage.ToString()));
             columns.Add(new MeasurementColumn("Measurement_IterationIndex", (summary, report, m) => m.IterationIndex.ToString()));
-            columns.Add(new MeasurementColumn("Measurement_Nanoseconds", (summary, report, m) => m.Nanoseconds.ToString("0.##", summary.GetCultureInfo())));
+            columns.Add(new MeasurementColumn("Measurement_Nanoseconds", (summary, report, m) => m.Nanoseconds.ToString("0.00", summary.GetCultureInfo())));
             columns.Add(new MeasurementColumn("Measurement_Operations", (summary, report, m) => m.Operations.ToString()));
-            columns.Add(new MeasurementColumn("Measurement_Value", (summary, report, m) => (m.Nanoseconds / m.Operations).ToString("0.##", summary.GetCultureInfo())));
+            columns.Add(new MeasurementColumn("Measurement_Value", (summary, report, m) => (m.Nanoseconds / m.Operations).ToString("0.00", summary.GetCultureInfo())));
 
             return columns.ToArray();
         }

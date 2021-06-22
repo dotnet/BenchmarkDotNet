@@ -86,13 +86,13 @@ namespace BenchmarkDotNet.Extensions
             builder.AppendLine();
 
             builder.Append("Skewness = ");
-            builder.Append(s.Skewness.ToString("0.##", cultureInfo));
+            builder.Append(s.Skewness.ToString("0.00", cultureInfo));
             builder.Append(listSeparator);
             builder.Append(" Kurtosis = ");
-            builder.Append(s.Kurtosis.ToString("0.##", cultureInfo));
+            builder.Append(s.Kurtosis.ToString("0.00", cultureInfo));
             builder.Append(listSeparator);
             builder.Append(" MValue = ");
-            builder.Append(mValue.ToString("0.##", cultureInfo));
+            builder.Append(mValue.ToString("0.00", cultureInfo));
             builder.AppendLine();
 
             if (calcHistogram)
