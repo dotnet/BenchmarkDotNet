@@ -10,6 +10,7 @@
     <MicrosoftNetCoreAppRuntimePackDir>$RUNTIMEPACK$</MicrosoftNetCoreAppRuntimePackDir>
     <UsingBrowserRuntimeWorkload>false</UsingBrowserRuntimeWorkload>
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+    <WasmNativeWorkload>false</WasmNativeWorkload>
     $COPIEDSETTINGS$
   </PropertyGroup>
 
