@@ -91,6 +91,7 @@ namespace BenchmarkDotNet.Toolchains
                 RedirectStandardInput = true,
                 RedirectStandardError = false, // #1629
                 CreateNoWindow = true,
+                StandardOutputEncoding = Encoding.UTF8, // #1713
                 WorkingDirectory = null // by default it's null
             };
 
