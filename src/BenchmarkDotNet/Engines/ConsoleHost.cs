@@ -8,9 +8,9 @@ namespace BenchmarkDotNet.Engines
     public sealed class ConsoleHost : IHost
     {
         private readonly TextWriter outWriter;
-        private readonly TextReader inReader;
+        private readonly StreamReader inReader;
 
-        public ConsoleHost([NotNull]TextWriter outWriter, [NotNull]TextReader inReader)
+        public ConsoleHost([NotNull]TextWriter outWriter, [NotNull]StreamReader inReader)
         {
             this.outWriter = outWriter ?? throw new ArgumentNullException(nameof(outWriter));
             this.inReader = inReader ?? throw new ArgumentNullException(nameof(inReader));
