@@ -26,13 +26,13 @@ namespace BenchmarkDotNet.Portability
 
         public static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null; // it allocates a lot of memory, we need to check it once in order to keep Engine non-allocating!
 
-        public static bool IsFullFramework => FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
+        public static bool IsFullFramework { get; } = FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
 
         [PublicAPI]
         public static bool IsNetNative => FrameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase);
 
-        public static bool IsNetCore
-            => ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
+        public static bool IsNetCore { get; }
+            = ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
                 && !string.IsNullOrEmpty(typeof(object).Assembly.Location);
 
         /// <summary>
