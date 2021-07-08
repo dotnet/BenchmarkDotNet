@@ -150,6 +150,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     TargetJob = job,
                     OperationsPerInvoke = target.OperationsPerInvoke,
                     MeasureExtraStats = benchmarkCase.Config.HasExtraStatsDiagnoser(),
+                    MeasureSurvivedMemory = benchmarkCase.Config.HasSurvivedMemoryDiagnoser(),
                     BenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase)
                 };
 

@@ -35,6 +35,14 @@ namespace BenchmarkDotNet.Engines
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
+        public void Clear()
+        {
+            Volatile.Write(ref stringHolder, null);
+            Volatile.Write(ref objectHolder, null);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
         public void Consume(byte byteValue) => byteHolder = byteValue;
 
         [CLSCompliant(false)]

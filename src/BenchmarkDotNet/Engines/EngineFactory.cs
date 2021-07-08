@@ -120,6 +120,7 @@ namespace BenchmarkDotNet.Engines
                 engineParameters.Dummy3Action,
                 idle,
                 main,
+                engineParameters.WorkloadActionNoUnroll,
                 job,
                 engineParameters.GlobalSetupAction,
                 engineParameters.GlobalCleanupAction,
@@ -127,6 +128,7 @@ namespace BenchmarkDotNet.Engines
                 engineParameters.IterationCleanupAction,
                 engineParameters.OperationsPerInvoke,
                 engineParameters.MeasureExtraStats,
+                engineParameters.MeasureSurvivedMemory,
                 engineParameters.BenchmarkName);
     }
 }

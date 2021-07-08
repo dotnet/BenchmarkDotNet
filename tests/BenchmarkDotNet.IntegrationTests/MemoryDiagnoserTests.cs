@@ -9,6 +9,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
@@ -19,6 +20,7 @@ using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
+using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Xunit;
 using Xunit.Abstractions;
@@ -69,6 +71,67 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
+        public class AccurateSurvived
+        {
+            [Benchmark] public byte[] EightBytesArray() => new byte[8];
+            [Benchmark] public byte[] SixtyFourBytesArray() => new byte[64];
+            [Benchmark] public Task<int> AllocateTask() => Task.FromResult(default(int));
+
+
+            public byte[] bytes8;
+            public byte[] bytes64;
+            public Task<int> task;
+
+            [GlobalSetup(Targets = new string[] { nameof(EightBytesArrayNoAllocate), nameof(SixtyFourBytesArrayNoAllocate), nameof(TaskNoAllocate) })]
+            public void SetupNoAllocate()
+            {
+                bytes8 = new byte[8];
+                bytes64 = new byte[64];
+                task = Task.FromResult(default(int));
+            }
+
+            [Benchmark] public byte[] EightBytesArrayNoAllocate() => bytes8;
+            [Benchmark] public byte[] SixtyFourBytesArrayNoAllocate() => bytes64;
+            [Benchmark] public Task<int> TaskNoAllocate() => task;
+
+
+            [Benchmark] public void EightBytesArraySurvive() => bytes8 = new byte[8];
+            [Benchmark] public void SixtyFourBytesArraySurvive() => bytes64 = new byte[64];
+            [Benchmark] public void AllocateTaskSurvive() => task = Task.FromResult(default(int));
+
+
+            [Benchmark] public void EightBytesArrayAllocateNoSurvive() => DeadCodeEliminationHelper.KeepAliveWithoutBoxing(new byte[8]);
+            [Benchmark] public void SixtyFourBytesArrayAllocateNoSurvive() => DeadCodeEliminationHelper.KeepAliveWithoutBoxing(new byte[64]);
+            [Benchmark] public void TaskAllocateNoSurvive() => DeadCodeEliminationHelper.KeepAliveWithoutBoxing(Task.FromResult(default(int)));
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void MemoryDiagnoserSurvivedIsAccurate(IToolchain toolchain)
+        {
+            long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
+            long arraySizeOverhead = IntPtr.Size; // array length
+
+            AssertSurvived(toolchain, typeof(AccurateSurvived), new Dictionary<string, long>
+            {
+                { nameof(AccurateSurvived.EightBytesArray), 0 },
+                { nameof(AccurateSurvived.SixtyFourBytesArray), 0 },
+                { nameof(AccurateSurvived.AllocateTask), 0 },
+
+                { nameof(AccurateSurvived.EightBytesArrayNoAllocate), 0 },
+                { nameof(AccurateSurvived.SixtyFourBytesArrayNoAllocate), 0 },
+                { nameof(AccurateSurvived.TaskNoAllocate), 0 },
+
+                { nameof(AccurateSurvived.EightBytesArraySurvive), 8 + objectAllocationOverhead + arraySizeOverhead },
+                { nameof(AccurateSurvived.SixtyFourBytesArraySurvive), 64 + objectAllocationOverhead + arraySizeOverhead },
+                { nameof(AccurateSurvived.AllocateTaskSurvive), CalculateRequiredSpace<Task<int>>() },
+
+                { nameof(AccurateSurvived.EightBytesArrayAllocateNoSurvive), 0 },
+                { nameof(AccurateSurvived.SixtyFourBytesArrayAllocateNoSurvive), 0 },
+                { nameof(AccurateSurvived.TaskAllocateNoSurvive), 0 },
+            });
+        }
+
         public class AllocatingGlobalSetupAndCleanup
         {
             private List<int> list;
@@ -102,6 +165,16 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
+        [Theory, MemberData(nameof(GetToolchains))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void MemoryDiagnoserDoesNotIncludeSurvivedFromSetupAndCleanup(IToolchain toolchain)
+        {
+            AssertSurvived(toolchain, typeof(AllocatingGlobalSetupAndCleanup), new Dictionary<string, long>
+            {
+                { nameof(AllocatingGlobalSetupAndCleanup.AllocateNothing), 0 }
+            });
+        }
+
         public class NoAllocationsAtAll
         {
             [Benchmark] public void EmptyMethod() { }
@@ -112,6 +185,16 @@ namespace BenchmarkDotNet.IntegrationTests
         public void EngineShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
             AssertAllocations(toolchain, typeof(NoAllocationsAtAll), new Dictionary<string, long>
+            {
+                { nameof(NoAllocationsAtAll.EmptyMethod), 0 }
+            });
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void EngineShouldNotInterfereSurvivedResults(IToolchain toolchain)
+        {
+            AssertSurvived(toolchain, typeof(NoAllocationsAtAll), new Dictionary<string, long>
             {
                 { nameof(NoAllocationsAtAll.EmptyMethod), 0 }
             });
@@ -132,9 +215,28 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
+        [Theory, MemberData(nameof(GetToolchains))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void EngineShouldNotIntroduceBoxingSurvived(IToolchain toolchain)
+        {
+            AssertSurvived(toolchain, typeof(NoBoxing), new Dictionary<string, long>
+            {
+                { nameof(NoBoxing.ReturnsValueType), 0 }
+            });
+        }
+
         public class NonAllocatingAsynchronousBenchmarks
         {
             private readonly Task<int> completedTaskOfT = Task.FromResult(default(int)); // we store it in the field, because Task<T> is reference type so creating it allocates heap memory
+
+            [GlobalSetup]
+            public void Setup()
+            {
+                // Run once to set static memory.
+                DeadCodeEliminationHelper.KeepAliveWithoutBoxing(CompletedTask());
+                DeadCodeEliminationHelper.KeepAliveWithoutBoxing(CompletedTaskOfT());
+                DeadCodeEliminationHelper.KeepAliveWithoutBoxing(CompletedValueTaskOfT());
+            }
 
             [Benchmark] public Task CompletedTask() => Task.CompletedTask;
 
@@ -148,6 +250,18 @@ namespace BenchmarkDotNet.IntegrationTests
         public void AwaitingTasksShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
             AssertAllocations(toolchain, typeof(NonAllocatingAsynchronousBenchmarks), new Dictionary<string, long>
+            {
+                { nameof(NonAllocatingAsynchronousBenchmarks.CompletedTask), 0 },
+                { nameof(NonAllocatingAsynchronousBenchmarks.CompletedTaskOfT), 0 },
+                { nameof(NonAllocatingAsynchronousBenchmarks.CompletedValueTaskOfT), 0 }
+            });
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void AwaitingTasksShouldNotInterfereSurvivedResults(IToolchain toolchain)
+        {
+            AssertSurvived(toolchain, typeof(NonAllocatingAsynchronousBenchmarks), new Dictionary<string, long>
             {
                 { nameof(NonAllocatingAsynchronousBenchmarks.CompletedTask), 0 },
                 { nameof(NonAllocatingAsynchronousBenchmarks.CompletedTaskOfT), 0 },
@@ -258,7 +372,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarksAllocationsValidators)
         {
-            var config = CreateConfig(toolchain);
+            var config = CreateConfig(toolchain, MemoryDiagnoser.Default);
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
 
             var summary = BenchmarkRunner.Run(benchmarks);
@@ -286,7 +400,34 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private IConfig CreateConfig(IToolchain toolchain)
+        private void AssertSurvived(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarkSurvivedValidators)
+        {
+            // Core has survived memory measurement problems.
+            // See https://github.com/dotnet/runtime/issues/45446
+            if (toolchain is CsProjCoreToolchain
+                || (toolchain.IsInProcess && RuntimeInformation.IsNetCore)
+                || toolchain is CoreRtToolchain) // CoreRt actually does measure accurately in a normal benchmark run, but doesn't with the specific version used in these tests.
+                return;
+
+            var config = CreateConfig(toolchain, MemoryDiagnoser.WithSurvived);
+            var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
+
+            var summary = BenchmarkRunner.Run(benchmarks);
+
+            foreach (var benchmarkSurvivedValidator in benchmarkSurvivedValidators)
+            {
+                var survivedBenchmarks = benchmarks.BenchmarksCases.Where(benchmark => benchmark.Descriptor.WorkloadMethodDisplayInfo == benchmarkSurvivedValidator.Key);
+
+                foreach (var benchmark in survivedBenchmarks)
+                {
+                    var benchmarkReport = summary.Reports.Single(report => report.BenchmarkCase == benchmark);
+
+                    Assert.Equal(benchmarkSurvivedValidator.Value, benchmarkReport.GcStats.SurvivedBytes);
+                }
+            }
+        }
+
+        private IConfig CreateConfig(IToolchain toolchain, MemoryDiagnoser memoryDiagnoser)
             => ManualConfig.CreateEmpty()
                 .AddJob(Job.ShortRun
                     .WithEvaluateOverhead(false) // no need to run idle for this test
@@ -295,7 +436,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithGcForce(false)
                     .WithToolchain(toolchain))
                 .AddColumnProvider(DefaultColumnProviders.Instance)
-                .AddDiagnoser(MemoryDiagnoser.Default)
+                .AddDiagnoser(memoryDiagnoser)
                 .AddLogger(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
 
         // note: don't copy, never use in production systems (it should work but I am not 100% sure)

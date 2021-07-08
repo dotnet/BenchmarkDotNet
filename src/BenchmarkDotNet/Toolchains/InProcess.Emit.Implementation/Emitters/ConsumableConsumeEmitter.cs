@@ -122,5 +122,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 }
             }
         }
+
+        protected override void EmitActionAfterLoopOverride(ILGenerator ilBuilder)
+        {
+            var clearMethod = typeof(Consumer).GetMethod(nameof(Consumer.Clear));
+            ilBuilder.Emit(OpCodes.Ldarg_0);
+            ilBuilder.Emit(OpCodes.Ldfld, consumerField);
+            ilBuilder.Emit(OpCodes.Callvirt, clearMethod);
+        }
     }
 }

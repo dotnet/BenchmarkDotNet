@@ -20,6 +20,7 @@ namespace BenchmarkDotNet.Engines
 
         [PublicAPI] public IHost Host { get; }
         [PublicAPI] public Action<long> WorkloadAction { get; }
+        [PublicAPI] public Action<long> WorkloadActionNoUnroll { get; }
         [PublicAPI] public Action Dummy1Action { get; }
         [PublicAPI] public Action Dummy2Action { get; }
         [PublicAPI] public Action Dummy3Action { get; }
@@ -45,19 +46,24 @@ namespace BenchmarkDotNet.Engines
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineActualStage actualStage;
-        private readonly bool includeExtraStats;
         private readonly Random random;
+        private readonly bool includeExtraStats, includeSurvivedMemory;
+
+        // These must be static since more than one Engine is used.
+        private static long survivedBytes;
+        private static bool survivedBytesMeasured;
+        private static Func<long> GetTotalBytes { get; set; }
 
         internal Engine(
             IHost host,
             IResolver resolver,
-            Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
+            Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Action<long> workloadActionNoUnroll, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeExtraStats, string benchmarkName)
+            bool includeExtraStats, bool includeSurvivedMemory, string benchmarkName)
         {
-
             Host = host;
             OverheadAction = overheadAction;
+            WorkloadActionNoUnroll = workloadActionNoUnroll;
             Dummy1Action = dummy1Action;
             Dummy2Action = dummy2Action;
             Dummy3Action = dummy3Action;
@@ -70,6 +76,7 @@ namespace BenchmarkDotNet.Engines
             OperationsPerInvoke = operationsPerInvoke;
             this.includeExtraStats = includeExtraStats;
             BenchmarkName = benchmarkName;
+            this.includeSurvivedMemory = includeSurvivedMemory;
 
             Resolver = resolver;
 
@@ -86,6 +93,53 @@ namespace BenchmarkDotNet.Engines
             actualStage = new EngineActualStage(this);
 
             random = new Random(12345); // we are using constant seed to try to get repeatable results
+
+            if (includeSurvivedMemory && GetTotalBytes is null)
+            {
+                // CreateGetTotalBytesFunc enables monitoring, so we only call it if we need to measure survived memory.
+                GetTotalBytes = CreateGetTotalBytesFunc();
+
+                // Necessary for CORE runtimes.
+                // Measure bytes to allow GC monitor to make its allocations.
+                GetTotalBytes();
+                // Run the clock once to allow it to make its allocations.
+                MeasureAction(_ => { }, 0);
+                GetTotalBytes();
+            }
+        }
+
+        private static Func<long> CreateGetTotalBytesFunc()
+        {
+            // Don't try to measure in Mono, Monitoring is not available, and GC.GetTotalMemory is very inaccurate.
+            if (RuntimeInformation.IsMono)
+                return () => 0;
+            try
+            {
+                // Docs say this should be available in .NET Core 2.1, but it throws an exception.
+                // Just try this on all non-Mono runtimes, fallback to GC.GetTotalMemory.
+                AppDomain.MonitoringIsEnabled = true;
+                return () =>
+                {
+                    // Enforce GC.Collect here to make sure we get accurate results.
+                    ForceGcCollect();
+                    return AppDomain.CurrentDomain.MonitoringSurvivedMemorySize;
+                };
+            }
+            catch
+            {
+                return () =>
+                {
+                    // Enforce GC.Collect here to make sure we get accurate results.
+                    ForceGcCollect();
+                    return GC.GetTotalMemory(true);
+                };
+            }
+        }
+
+        private static void ResetSurvived()
+        {
+            survivedBytes = 0;
+            survivedBytesMeasured = false;
         }
 
         public void Dispose()
@@ -157,7 +211,9 @@ namespace BenchmarkDotNet.Engines
             var action = isOverhead ? OverheadAction : WorkloadAction;
 
             if (!isOverhead)
+            {
                 IterationSetupAction();
+            }
 
             GcCollect();
 
@@ -166,10 +222,36 @@ namespace BenchmarkDotNet.Engines
 
             Span<byte> stackMemory = randomizeMemory ? stackalloc byte[random.Next(32)] : Span<byte>.Empty;
 
-            // Measure
-            var clock = Clock.Start();
-            action(invokeCount / unrollFactor);
-            var clockSpan = clock.GetElapsed();
+            bool needsSurvivedMeasurement = includeSurvivedMemory && !isOverhead && !survivedBytesMeasured;
+            double nanoseconds;
+            if (needsSurvivedMeasurement)
+            {
+                // Measure survived bytes for only the first invocation.
+                survivedBytesMeasured = true;
+                if (totalOperations == 1)
+                {
+                    // Measure normal invocation for both survived memory and time.
+                    long beforeBytes = GetTotalBytes();
+                    nanoseconds = MeasureAction(action, invokeCount / unrollFactor);
+                    long afterBytes = GetTotalBytes();
+                    survivedBytes = afterBytes - beforeBytes;
+                }
+                else
+                {
+                    // Measure a single invocation for survived memory, plus normal invocations for time.
+                    ++totalOperations;
+                    long beforeBytes = GetTotalBytes();
+                    nanoseconds = MeasureAction(WorkloadActionNoUnroll, 1);
+                    long afterBytes = GetTotalBytes();
+                    survivedBytes = afterBytes - beforeBytes;
+                    nanoseconds += MeasureAction(action, invokeCount / unrollFactor);
+                }
+            }
+            else
+            {
+                // Measure time normally.
+                nanoseconds = MeasureAction(action, invokeCount / unrollFactor);
+            }
 
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStop(data.IterationMode, data.IterationStage, totalOperations);
@@ -183,12 +265,21 @@ namespace BenchmarkDotNet.Engines
             GcCollect();
 
             // Results
-            var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, clockSpan.GetNanoseconds());
+            var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, nanoseconds);
             WriteLine(measurement.ToString());
 
             Consume(stackMemory);
 
             return measurement;
+        }
+
+        // This is necessary for the CORE runtime to clean up the memory from the clock.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private double MeasureAction(Action<long> action, long arg)
+        {
+            var clock = Clock.Start();
+            action(arg);
+            return clock.GetElapsed().GetNanoseconds();
         }
 
         private (GcStats, ThreadingStats) GetExtraStats(IterationData data)
@@ -210,9 +301,10 @@ namespace BenchmarkDotNet.Engines
 
             IterationCleanupAction(); // we run iteration cleanup after collecting GC stats
 
-            GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
+            GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperationsAndSurvivedBytes(data.InvokeCount * OperationsPerInvoke, survivedBytes);
             ThreadingStats threadingStats = (finalThreadingStats - initialThreadingStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
 
+            ResetSurvived();
             return (gcStats, threadingStats);
         }
 

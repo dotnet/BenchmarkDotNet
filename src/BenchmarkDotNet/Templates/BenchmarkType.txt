@@ -38,6 +38,7 @@
                 TargetJob = job,
                 OperationsPerInvoke = $OperationsPerInvoke$,
                 MeasureExtraStats = $MeasureExtraStats$,
+                MeasureSurvivedMemory = $MeasureSurvivedMemory$,
                 BenchmarkName = benchmarkName
             };
 
@@ -120,6 +121,7 @@
             {
                 consumer.Consume(overheadDelegate($PassArguments$));@Unroll@
             }
+            consumer.Clear(); // Necessary for survived memory diagnoser.
         }
 
         private void OverheadActionNoUnroll(System.Int64 invokeCount)
@@ -129,6 +131,7 @@
             {
                 consumer.Consume(overheadDelegate($PassArguments$));
             }
+            consumer.Clear(); // Necessary for survived memory diagnoser.
         }
 
         private void WorkloadActionUnroll(System.Int64 invokeCount)
@@ -138,6 +141,7 @@
             {
                 consumer.Consume(workloadDelegate($PassArguments$)$ConsumeField$);@Unroll@
             }
+            consumer.Clear(); // Necessary for survived memory diagnoser.
         }
 
         private void WorkloadActionNoUnroll(System.Int64 invokeCount)
@@ -147,6 +151,7 @@
             {
                 consumer.Consume(workloadDelegate($PassArguments$)$ConsumeField$);
             }
+            consumer.Clear(); // Necessary for survived memory diagnoser.
         }
         
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]

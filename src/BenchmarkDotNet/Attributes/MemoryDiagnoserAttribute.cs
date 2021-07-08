@@ -9,9 +9,14 @@ namespace BenchmarkDotNet.Attributes
     {
         public IConfig Config { get; }
 
-        public MemoryDiagnoserAttribute()
+        public MemoryDiagnoserAttribute() : this(false) { }
+
+        /// <summary>
+        /// If <paramref name="includeSurvived"/> is true, monitoring will be enabled and survived memory will be measured on the first benchmark run.
+        /// </summary>
+        public MemoryDiagnoserAttribute(bool includeSurvived)
         {
-            Config = ManualConfig.CreateEmpty().AddDiagnoser(MemoryDiagnoser.Default);
+            Config = ManualConfig.CreateEmpty().AddDiagnoser(includeSurvived ? MemoryDiagnoser.WithSurvived : MemoryDiagnoser.Default);
         }
     }
 }
