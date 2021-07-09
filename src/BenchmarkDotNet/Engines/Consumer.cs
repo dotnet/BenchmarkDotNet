@@ -32,6 +32,7 @@ namespace BenchmarkDotNet.Engines
         private ulong ulongHolder;
         private string stringHolder;
         private object objectHolder;
+        private IntPtr ptrHolder;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
@@ -97,6 +98,12 @@ namespace BenchmarkDotNet.Engines
         [PublicAPI]
         public void Consume<T>(T objectValue) where T : class // class constraint prevents from boxing structs
             => Volatile.Write(ref objectHolder, objectValue);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public unsafe void Consume<T>(T* ptrValue) where T: unmanaged => Volatile.Write(ref ptrHolder, (IntPtr)ptrValue);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public unsafe void Consume(void* ptrValue) => Volatile.Write(ref ptrHolder, (IntPtr)ptrValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Consume<T>(in T value)
