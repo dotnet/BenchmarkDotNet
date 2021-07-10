@@ -42,6 +42,7 @@ namespace BenchmarkDotNet.Configs
                 yield return LinqPadLogger.Instance;
             else
                 yield return ConsoleLogger.Default;
+            yield return LoggerAnalyzer.Instance;
         }
 
         public IEnumerable<IAnalyser> GetAnalysers()
@@ -53,6 +54,7 @@ namespace BenchmarkDotNet.Configs
             yield return RuntimeErrorAnalyser.Default;
             yield return ZeroMeasurementAnalyser.Default;
             yield return BaselineCustomAnalyzer.Default;
+            yield return LoggerAnalyzer.Instance;
         }
 
         public IEnumerable<IValidator> GetValidators()
