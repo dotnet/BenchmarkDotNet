@@ -15,6 +15,7 @@
     <WasmGenerateRunV8Script>true</WasmGenerateRunV8Script>
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
     <WasmNativeWorkload>false</WasmNativeWorkload>
+    <UsingBrowserRuntimeWorkload>false</UsingBrowserRuntimeWorkload>
     $COPIEDSETTINGS$
   </PropertyGroup>
 
