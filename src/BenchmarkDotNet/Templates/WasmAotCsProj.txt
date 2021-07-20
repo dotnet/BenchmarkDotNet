@@ -21,12 +21,6 @@
   <Import Project="$(RuntimeSrcDir)/src/mono/wasm/build/WasmApp.LocalBuild.props" />
   <Import Project="$(RuntimeSrcDir)/src/mono/wasm/build/WasmApp.LocalBuild.targets" />
 
-
-  <ItemGroup>
-        <WasmAssembliesToBundle Include="$(AppDir)/*.dll" />
-  </ItemGroup>
-
-
   <ItemGroup>
     <Compile Include="$CODEFILENAME$" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
   </ItemGroup>
@@ -34,4 +28,13 @@
   <ItemGroup>
     <ProjectReference Include="$CSPROJPATH$" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <WasmBuildAppDependsOn>PrepareForWasmBuild;$(WasmBuildAppDependsOn)</WasmBuildAppDependsOn>
+  </PropertyGroup>
+  <Target Name="PrepareForWasmBuild">
+    <ItemGroup>
+      <WasmAssembliesToBundle Include="$(TargetDir)publish\*.dll" />
+    </ItemGroup>
+  </Target>
 </Project>
