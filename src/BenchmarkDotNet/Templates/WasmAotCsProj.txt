@@ -10,6 +10,7 @@
     <AssemblyName>$PROGRAMNAME$</AssemblyName>
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
     <PublishTrimmed>true</PublishTrimmed>
+    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
     <RunAOTCompilation>true</RunAOTCompilation>
     <WasmMainJSPath>$(RuntimeSrcDir)\src\mono\wasm\runtime-test.js</WasmMainJSPath>
     <WasmGenerateRunV8Script>true</WasmGenerateRunV8Script>
@@ -24,6 +25,7 @@
 
   <ItemGroup>
     <Compile Include="$CODEFILENAME$" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+    <TrimmerRootDescriptor Include="WasmLinkerDescription.xml" />
   </ItemGroup>
 
   <ItemGroup>
