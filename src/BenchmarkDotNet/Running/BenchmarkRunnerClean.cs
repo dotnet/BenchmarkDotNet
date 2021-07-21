@@ -402,7 +402,14 @@ namespace BenchmarkDotNet.Running
 
                 if (executeResult.ProcessId.HasValue)
                 {
-                    logger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} has exited with code {executeResult.ExitCode}");
+                    if (executeResult.ExitCode is int exitCode)
+                    {
+                        logger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} has exited with code {exitCode}.");
+                    }
+                    else
+                    {
+                        logger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} failed to exit.");
+                    }
                 }
 
                 executeResults.Add(executeResult);
