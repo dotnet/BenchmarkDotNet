@@ -95,8 +95,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     logger.WriteLineInfo($"// The benchmarking process did not quit within {ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
 
                     consoleExitHandler.KillProcessTree();
-                    // Give KillProcessTree a few moments to actually kill the benchmarking process.
-                    Thread.Sleep(millisecondsTimeout: 500);
                 }
 
                 return new ExecuteResult(true, process.HasExited ? (int?)process.ExitCode : null, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
