@@ -27,10 +27,8 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 return false;
 
             if (RuntimeInformation.IsWindows())
-            {
-                logger.WriteLineError($"{nameof(WasmToolChain)} is supported only on Unix, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
-                return false;
-            }
+                logger.WriteLineInfo($"{nameof(WasmToolChain)} is supported only on Unix, benchmark '{benchmarkCase.DisplayInfo}' might not work correctly");
+
             return true;
         }
 
