@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public DotNetCliExecutor(string customDotNetCliPath) => CustomDotNetCliPath = customDotNetCliPath;
 
         private string CustomDotNetCliPath { get; }
-        private readonly TimeSpan ProcessExitTimeout = TimeSpan.FromSeconds(2);
+        private static readonly TimeSpan ProcessExitTimeout = TimeSpan.FromSeconds(2);
 
         public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
