@@ -34,9 +34,9 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <WasmBuildAppDependsOn>PrepareForWasmBuild;$(WasmBuildAppDependsOn)</WasmBuildAppDependsOn>
+    <WasmBuildAppAfterThisTarget>PrepareForWasmBuild</WasmBuildAppAfterThisTarget>
   </PropertyGroup>
-  <Target Name="PrepareForWasmBuild">
+  <Target Name="PrepareForWasmBuild" AfterTargets="Publish">
     <ItemGroup>
       <WasmAssembliesToBundle Include="$(TargetDir)publish\*.dll" />
     </ItemGroup>
