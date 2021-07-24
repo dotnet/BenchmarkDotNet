@@ -13,7 +13,6 @@ namespace BenchmarkDotNet.Tests
             this.output = output;
         }
 
-
         [Fact]
         public void ConvertTest()
         {
@@ -31,10 +30,13 @@ namespace BenchmarkDotNet.Tests
         [InlineData("100 B", 100)]
         [InlineData("1000 B", 1000)]
         [InlineData("1023 B", 1023)]
-        [InlineData("1 KB", 1024)]
-        [InlineData("1 KB", 1025)]
-        [InlineData("1.07 KB", 1100)]
-        [InlineData("1.5 KB", 1024 + 512)]
+        [InlineData("1024 B", 1024)]
+        [InlineData("1025 B", 1025)]
+        [InlineData("1100 B", 1100)]
+        [InlineData("1536 B", 1024 + 512)]
+        [InlineData("9216 B", 9 * 1024)]
+        [InlineData("9 KB", 9 * 1024 + 1)]
+        [InlineData("9.5 KB", 9 * 1024 + 512)]
         [InlineData("10 KB", 10 * 1024)]
         [InlineData("1023 KB", 1023 * 1024)]
         [InlineData("1 MB", 1024 * 1024)]

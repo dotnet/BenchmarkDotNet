@@ -36,6 +36,14 @@ namespace BenchmarkDotNet.Columns
                 return B;
             // Use the largest unit to display the smallest recorded measurement without loss of precision.
             long minValue = values.Min();
+            long maxValue = values.Max();
+
+            const long maxSmallBytes = 9 * 1024;
+
+            if (minValue <= maxSmallBytes && maxValue <= maxSmallBytes) {
+              return B; // its useful to show small amount of bytes like bytes and not rounded to kilobytes if all bytes are small
+            }
+
             foreach (var sizeUnit in All)
             {
                 if (minValue < sizeUnit.ByteAmount * BytesInKiloByte)
