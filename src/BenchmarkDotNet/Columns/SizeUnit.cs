@@ -40,8 +40,9 @@ namespace BenchmarkDotNet.Columns
 
             const long maxSmallBytes = 9 * 1024;
 
-            if (minValue <= maxSmallBytes && maxValue <= maxSmallBytes) {
-              return B; // its useful to show small amount of bytes like bytes and not rounded to kilobytes if all bytes are small
+            if (minValue <= maxSmallBytes && maxValue <= maxSmallBytes)
+            {
+              return B; // its useful to show small amount of bytes as bytes and not rounded to kilobytes if all bytes are small
             }
 
             foreach (var sizeUnit in All)
