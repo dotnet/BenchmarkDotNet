@@ -116,6 +116,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public System.UIntPtr UIntPtr() => System.UIntPtr.Zero;
+
+            [Benchmark]
+            public nint NativeSizeInteger() => 0;
+
+            [Benchmark]
+            public uint UnsignedNativeSizeInteger() => 0;
         }
     }
 }
