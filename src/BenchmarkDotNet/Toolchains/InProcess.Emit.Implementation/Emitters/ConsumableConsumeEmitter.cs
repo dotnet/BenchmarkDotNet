@@ -27,9 +27,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                             // we are interested in "Consume<T>(T objectValue) where T : class"
                             return m.Name == nameof(Consumer.Consume) && m.IsGenericMethodDefinition
                                 && !firstParameterType.IsByRef // Consume<T>(in T value)
-                                && !firstParameterType.IsPointer; // Consume<T>(T* ptrValue) where T: unmanaged
+                                && firstParameterType.IsPointer == consumableType.IsPointer; // Consume<T>(T* ptrValue) where T: unmanaged
                         });
-                    consumeMethod = consumeMethod?.MakeGenericMethod(consumableType);
+
+                    consumeMethod = consumableType.IsPointer
+                        ? consumeMethod?.MakeGenericMethod(consumableType.GetElementType()) // consumableType is T*, we need T for Consume<T>(T* ptrValue)
+                        : consumeMethod?.MakeGenericMethod(consumableType);
                 }
                 else
                 {
