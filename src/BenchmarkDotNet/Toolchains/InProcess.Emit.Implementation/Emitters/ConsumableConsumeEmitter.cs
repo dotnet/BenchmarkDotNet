@@ -22,12 +22,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                         .GetMethods()
                         .Single(m =>
                         {
-                            Type firstParameterType = m.GetParameterTypes().FirstOrDefault();
+                            Type argType = m.GetParameterTypes().FirstOrDefault();
 
-                            // we are interested in "Consume<T>(T objectValue) where T : class"
                             return m.Name == nameof(Consumer.Consume) && m.IsGenericMethodDefinition
-                                && !firstParameterType.IsByRef // Consume<T>(in T value)
-                                && firstParameterType.IsPointer == consumableType.IsPointer; // Consume<T>(T* ptrValue) where T: unmanaged
+                                && !argType.IsByRef // we are not interested in "Consume<T>(in T value)"
+                                && argType.IsPointer == consumableType.IsPointer; // use "Consume<T>(T objectValue) where T : class" or "Consume<T>(T* ptrValue) where T: unmanaged"
                         });
 
                     consumeMethod = consumableType.IsPointer
