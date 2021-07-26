@@ -93,6 +93,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public NoNamespace TypeWithoutNamespace() => new NoNamespace();
+
+            [Benchmark]
+            public unsafe void* PointerToAnything() => IntPtr.Zero.ToPointer();
         }
     }
 }
