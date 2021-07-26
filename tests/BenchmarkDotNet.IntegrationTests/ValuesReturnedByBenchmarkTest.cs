@@ -96,6 +96,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public unsafe void* PointerToAnything() => IntPtr.Zero.ToPointer();
+
+            [Benchmark]
+            public unsafe int* PointerToUnmanagedType() => (int*)IntPtr.Zero.ToPointer();
         }
     }
 }
