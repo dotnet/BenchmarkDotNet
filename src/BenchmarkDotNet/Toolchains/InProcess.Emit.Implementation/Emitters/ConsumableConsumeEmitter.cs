@@ -30,8 +30,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                         });
 
                     consumeMethod = consumableType.IsPointer
-                        ? consumeMethod?.MakeGenericMethod(consumableType.GetElementType()) // consumableType is T*, we need T for Consume<T>(T* ptrValue)
-                        : consumeMethod?.MakeGenericMethod(consumableType);
+                        ? consumeMethod.MakeGenericMethod(consumableType.GetElementType()) // consumableType is T*, we need T for Consume<T>(T* ptrValue)
+                        : consumeMethod.MakeGenericMethod(consumableType);
                 }
                 else
                 {
