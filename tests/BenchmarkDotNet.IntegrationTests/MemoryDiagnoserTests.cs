@@ -293,6 +293,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithWarmupCount(0) // don't run warmup to save some time for our CI runs
                     .WithIterationCount(1) // single iteration is enough for us
                     .WithGcForce(false)
+                    .WithEnvironmentVariable("COMPlus_TieredCompilation", "0") // Tiered JIT can allocate some memory on a background thread, let's disable it to make our tests less flaky (#1542)
                     .WithToolchain(toolchain))
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(MemoryDiagnoser.Default)

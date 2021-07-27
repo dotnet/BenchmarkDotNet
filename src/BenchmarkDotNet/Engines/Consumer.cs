@@ -33,6 +33,7 @@ namespace BenchmarkDotNet.Engines
         private string stringHolder;
         private object objectHolder;
         private IntPtr ptrHolder;
+        private UIntPtr uptrHolder;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
@@ -80,6 +81,14 @@ namespace BenchmarkDotNet.Engines
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
         public void Consume(long longValue) => Volatile.Write(ref longHolder, longValue);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
+        public void Consume(IntPtr intPtrValue) => Volatile.Write(ref ptrHolder, intPtrValue);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI]
+        public void Consume(UIntPtr uintPtrValue) => Volatile.Write(ref uptrHolder, uintPtrValue);
 
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
