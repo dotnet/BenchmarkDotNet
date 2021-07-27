@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -11,8 +16,14 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public ValuesReturnedByBenchmarkTest(ITestOutputHelper output) : base(output) { }
 
-        [Fact]
-        public void AnyValueCanBeReturned() => CanExecute<ValuesReturnedByBenchmark>();
+        public static IEnumerable<object[]> GetToolchains() => new[]
+        {
+            new object[] { Job.Default.GetToolchain() },
+            new object[] { InProcessEmitToolchain.Instance },
+        };
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void AnyValueCanBeReturned(IToolchain toolchain) => CanExecute<ValuesReturnedByBenchmark>(ManualConfig.CreateEmpty().AddJob(Job.Dry.WithToolchain(toolchain)));
 
         public class ValuesReturnedByBenchmark
         {
@@ -93,6 +104,24 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public NoNamespace TypeWithoutNamespace() => new NoNamespace();
+
+            [Benchmark]
+            public unsafe void* PointerToAnything() => System.IntPtr.Zero.ToPointer();
+
+            [Benchmark]
+            public unsafe int* PointerToUnmanagedType() => (int*)System.IntPtr.Zero.ToPointer();
+
+            [Benchmark]
+            public System.IntPtr IntPtr() => System.IntPtr.Zero;
+
+            [Benchmark]
+            public System.UIntPtr UIntPtr() => System.UIntPtr.Zero;
+
+            [Benchmark]
+            public nint NativeSizeInteger() => 0;
+
+            [Benchmark]
+            public nuint UnsignedNativeSizeInteger() => 0;
         }
     }
 }
