@@ -2,12 +2,14 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <OutputPath>bin</OutputPath>
+    <RuntimeSrcDir>$RUNTIMESRCDIR$</RuntimeSrcDir>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <TargetFramework>$TFM$</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AppDir>$(MSBuildThisFileDirectory)\bin\$TFM$\browser-wasm\publish</AppDir>
     <AssemblyName>$PROGRAMNAME$</AssemblyName>
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+    <WasmMainJSPath>$(RuntimeSrcDir)\src\mono\wasm\runtime-test.js</WasmMainJSPath>
     <MicrosoftNetCoreAppRuntimePackDir>$RUNTIMEPACK$</MicrosoftNetCoreAppRuntimePackDir>
     <UsingBrowserRuntimeWorkload>false</UsingBrowserRuntimeWorkload>
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
