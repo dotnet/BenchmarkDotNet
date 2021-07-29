@@ -76,6 +76,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     .Replace("$CSPROJPATH$", projectFile.FullName)
                     .Replace("$TFM$", TargetFrameworkMoniker)
                     .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
+                    .Replace("$RUNTIMESRCDIR$", runtime.RuntimeSrcDir.ToString())
                     .Replace("$COPIEDSETTINGS$", customProperties)
                     .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
                     .Replace("$SDKNAME$", sdkName)
