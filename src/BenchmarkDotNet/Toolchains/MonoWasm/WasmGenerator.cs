@@ -85,7 +85,8 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     .Replace("$SDKNAME$", sdkName)
                     .Replace("$RUNTIMEPACK$", CustomRuntimePack ?? "")
                     .Replace("$TARGET$", CustomRuntimePack != null ? "PublishWithCustomRuntimePack" : "Publish")
-                    .ToString();
+                    .Replace("$MAINJS$", runtime.MainJs.ToString())
+                .ToString();
 
                 File.WriteAllText(artifactsPaths.ProjectFilePath, content);
             }
