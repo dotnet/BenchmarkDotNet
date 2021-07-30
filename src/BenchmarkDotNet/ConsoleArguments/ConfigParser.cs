@@ -112,7 +112,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(RuntimeMoniker)).Select(name => name.ToLower()))}.");
                     return false;
                 }
-                else if (runtimeMoniker == RuntimeMoniker.Wasm && !(options.AOTCompilerMode == MonoAotCompilerMode.wasm) && (options.WasmMainJs == null || options.WasmMainJs.IsNotNullButDoesNotExist()))
+                else if (runtimeMoniker == RuntimeMoniker.Wasm && (options.WasmMainJs == null || options.WasmMainJs.IsNotNullButDoesNotExist()))
                 {
                     logger.WriteLineError($"The provided {nameof(options.WasmMainJs)} \"{options.WasmMainJs}\" does NOT exist. It MUST be provided.");
                     return false;
