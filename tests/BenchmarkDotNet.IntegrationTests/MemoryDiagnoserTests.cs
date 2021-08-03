@@ -276,7 +276,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 {
                     var benchmarkReport = summary.Reports.Single(report => report.BenchmarkCase == benchmark);
 
-                    Assert.Equal(benchmarkAllocationsValidator.Value, benchmarkReport.GcStats.BytesAllocatedPerOperation);
+                    Assert.Equal(benchmarkAllocationsValidator.Value, benchmarkReport.GcStats.GetBytesAllocatedPerOperation(benchmark));
 
                     if (benchmarkAllocationsValidator.Value == 0)
                     {
