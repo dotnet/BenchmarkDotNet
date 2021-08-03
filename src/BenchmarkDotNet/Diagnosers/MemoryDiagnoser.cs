@@ -15,9 +15,11 @@ namespace BenchmarkDotNet.Diagnosers
     {
         private const string DiagnoserId = nameof(MemoryDiagnoser);
 
-        public static readonly MemoryDiagnoser Default = new MemoryDiagnoser();
+        public static readonly MemoryDiagnoser Default = new MemoryDiagnoser(new MemoryDiagnoserConfig(displayGenColumns: true));
 
-        private MemoryDiagnoser() { } // we want to have only a single instance of MemoryDiagnoser
+        public MemoryDiagnoser(MemoryDiagnoserConfig config) => Config = config;
+
+        public MemoryDiagnoserConfig Config { get; }
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
 
@@ -33,11 +35,11 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults diagnoserResults)
         {
-            if (diagnoserResults.GcStats.Gen0Collections > 0)
+            if (diagnoserResults.GcStats.Gen0Collections > 0 && Config.DisplayGenColumns)
                 yield return new Metric(GarbageCollectionsMetricDescriptor.Gen0, diagnoserResults.GcStats.Gen0Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
-            if (diagnoserResults.GcStats.Gen1Collections > 0)
+            if (diagnoserResults.GcStats.Gen1Collections > 0 && Config.DisplayGenColumns)
                 yield return new Metric(GarbageCollectionsMetricDescriptor.Gen1, diagnoserResults.GcStats.Gen1Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
-            if (diagnoserResults.GcStats.Gen2Collections > 0)
+            if (diagnoserResults.GcStats.Gen2Collections > 0 && Config.DisplayGenColumns)
                 yield return new Metric(GarbageCollectionsMetricDescriptor.Gen2, diagnoserResults.GcStats.Gen2Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
 
             yield return new Metric(AllocatedMemoryMetricDescriptor.Instance, diagnoserResults.GcStats.BytesAllocatedPerOperation);
