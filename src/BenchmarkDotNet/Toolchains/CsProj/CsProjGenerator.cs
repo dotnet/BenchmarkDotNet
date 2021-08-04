@@ -83,9 +83,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI]
         protected virtual string GetRuntimeSettings(GcMode gcMode, IResolver resolver)
         {
-            if (!gcMode.HasChanges)
-                return string.Empty;
-
             return new StringBuilder(80)
                 .AppendLine("<PropertyGroup>")
                     .AppendLine($"<ServerGarbageCollection>{gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()}</ServerGarbageCollection>")
