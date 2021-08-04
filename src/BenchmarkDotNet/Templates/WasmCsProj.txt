@@ -9,7 +9,7 @@
     <AppDir>$(MSBuildThisFileDirectory)\bin\$TFM$\browser-wasm\publish</AppDir>
     <AssemblyName>$PROGRAMNAME$</AssemblyName>
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
-    <WasmMainJSPath>$(RuntimeSrcDir)\src\mono\wasm\runtime-test.js</WasmMainJSPath>
+    <WasmMainJSPath>$MAINJS$</WasmMainJSPath>
     <MicrosoftNetCoreAppRuntimePackDir>$RUNTIMEPACK$</MicrosoftNetCoreAppRuntimePackDir>
     <UsingBrowserRuntimeWorkload>false</UsingBrowserRuntimeWorkload>
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>

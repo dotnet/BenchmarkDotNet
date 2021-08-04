@@ -66,6 +66,9 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         {
             BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
+
+            WasmRuntime runtime = (WasmRuntime)buildPartition.Runtime;
+
             using (var file = new StreamReader(File.OpenRead(projectFile.FullName)))
             {
                 var (customProperties, sdkName) = GetSettingsThatNeedsToBeCopied(file, projectFile);
@@ -76,12 +79,14 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     .Replace("$CSPROJPATH$", projectFile.FullName)
                     .Replace("$TFM$", TargetFrameworkMoniker)
                     .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
+                    .Replace("$RUNTIMESRCDIR$", runtime.RuntimeSrcDir.ToString())
                     .Replace("$COPIEDSETTINGS$", customProperties)
                     .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
                     .Replace("$SDKNAME$", sdkName)
                     .Replace("$RUNTIMEPACK$", CustomRuntimePack ?? "")
                     .Replace("$TARGET$", CustomRuntimePack != null ? "PublishWithCustomRuntimePack" : "Publish")
-                    .ToString();
+                    .Replace("$MAINJS$", runtime.MainJs.ToString())
+                .ToString();
 
                 File.WriteAllText(artifactsPaths.ProjectFilePath, content);
             }
