@@ -48,10 +48,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class AccurateAllocations
         {
-            [Benchmark] public byte[] EightBytesArray() => new byte[8];
-            [Benchmark] public byte[] SixtyFourBytesArray() => new byte[64];
-
-            [Benchmark] public Task<int> AllocateTask() => Task.FromResult(default(int));
+            [Benchmark] public byte[] SmallObjectHeap() => new byte[8];
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
@@ -63,10 +60,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             AssertAllocations(toolchain, typeof(AccurateAllocations), new Dictionary<string, long>
             {
-                { nameof(AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
-                { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead },
-
-                { nameof(AccurateAllocations.AllocateTask), CalculateRequiredSpace<Task<int>>() },
+                { nameof(AccurateAllocations.SmallObjectHeap), 8 + objectAllocationOverhead + arraySizeOverhead },
             });
         }
 
@@ -265,11 +259,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
             foreach (var benchmarkAllocationsValidator in benchmarksAllocationsValidators)
             {
-                // CoreRT is missing some of the CoreCLR threading/task related perf improvements, so sizeof(Task<int>) calculated for CoreCLR < sizeof(Task<int>) on CoreRT
-                // see https://github.com/dotnet/corert/issues/5705 for more
-                if (benchmarkAllocationsValidator.Key == nameof(AccurateAllocations.AllocateTask) && toolchain is CoreRtToolchain)
-                    continue;
-
                 var allocatingBenchmarks = benchmarks.BenchmarksCases.Where(benchmark => benchmark.DisplayInfo.Contains(benchmarkAllocationsValidator.Key));
 
                 foreach (var benchmark in allocatingBenchmarks)
@@ -297,36 +286,5 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(MemoryDiagnoser.Default)
                 .AddLogger(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
-
-        // note: don't copy, never use in production systems (it should work but I am not 100% sure)
-        private int CalculateRequiredSpace<T>()
-        {
-            int total = SizeOfAllFields<T>();
-
-            if (!typeof(T).GetTypeInfo().IsValueType)
-                total += IntPtr.Size * 2; // pointer to method table + object header word
-
-            if (total % IntPtr.Size != 0) // aligning..
-                total += IntPtr.Size - (total % IntPtr.Size);
-
-            return total;
-        }
-
-        // note: don't copy, never use in production systems (it should work but I am not 100% sure)
-        private int SizeOfAllFields<T>()
-        {
-            int GetSize(Type type)
-            {
-                var sizeOf = typeof(Unsafe).GetTypeInfo().GetMethod(nameof(Unsafe.SizeOf));
-
-                return (int)sizeOf.MakeGenericMethod(type).Invoke(null, null);
-            }
-
-            return typeof(T)
-                .GetAllFields()
-                .Where(field => !field.IsStatic && !field.IsLiteral)
-                .Distinct()
-                .Sum(field => GetSize(field.FieldType));
-        }
     }
 }
