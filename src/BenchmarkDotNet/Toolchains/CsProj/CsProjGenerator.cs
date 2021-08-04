@@ -83,16 +83,15 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI]
         protected virtual string GetRuntimeSettings(GcMode gcMode, IResolver resolver)
         {
-            if (!gcMode.HasChanges)
-                return string.Empty;
-
-            return new StringBuilder(80)
+            var builder = new StringBuilder(80)
                 .AppendLine("<PropertyGroup>")
-                    .AppendLine($"<ServerGarbageCollection>{gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()}</ServerGarbageCollection>")
-                    .AppendLine($"<ConcurrentGarbageCollection>{gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase()}</ConcurrentGarbageCollection>")
-                    .AppendLine($"<RetainVMGarbageCollection>{gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver).ToLowerCase()}</RetainVMGarbageCollection>")
-                .AppendLine("</PropertyGroup>")
-                .ToString();
+                .AppendLine($"<ServerGarbageCollection>{gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()}</ServerGarbageCollection>")
+                .AppendLine($"<ConcurrentGarbageCollection>{gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase()}</ConcurrentGarbageCollection>");
+
+            if (gcMode.HasValue(GcMode.RetainVmCharacteristic))
+                builder.AppendLine($"<RetainVMGarbageCollection>{gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver).ToLowerCase()}</RetainVMGarbageCollection>");
+
+            return builder.AppendLine("</PropertyGroup>").ToString();
         }
 
         // the host project or one of the .props file that it imports might contain some custom settings that needs to be copied, sth like

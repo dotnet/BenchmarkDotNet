@@ -124,7 +124,7 @@ namespace BenchmarkDotNet.Extensions
             // we have to set "COMPlus_GC*" environment variables as documented in
             // https://docs.microsoft.com/en-us/dotnet/core/run-time-config/garbage-collector
             if (benchmarkCase.Job.Infrastructure.Toolchain is CoreRunToolchain _)
-                start.SetCoreRunEnvironmentVariables(benchmarkCase);
+                start.SetCoreRunEnvironmentVariables(benchmarkCase, resolver);
 
             if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
                 return;
@@ -229,19 +229,21 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        private static void SetCoreRunEnvironmentVariables(this ProcessStartInfo start, BenchmarkCase benchmarkCase)
+        private static void SetCoreRunEnvironmentVariables(this ProcessStartInfo start, BenchmarkCase benchmarkCase, IResolver resolver)
         {
             var gcMode = benchmarkCase.Job.Environment.Gc;
-            if (!gcMode.HasChanges)
-                return; // do nothing for the default settings
 
-            start.EnvironmentVariables["COMPlus_gcServer"] = gcMode.Server ? "1" : "0";
-            start.EnvironmentVariables["COMPlus_gcConcurrent"] = gcMode.Concurrent ? "1" : "0";
-            start.EnvironmentVariables["COMPlus_GCCpuGroup"] = gcMode.CpuGroups ? "1" : "0";
-            start.EnvironmentVariables["COMPlus_gcAllowVeryLargeObjects"] = gcMode.AllowVeryLargeObjects ? "1" : "0";
-            start.EnvironmentVariables["COMPlus_GCRetainVM"] = gcMode.RetainVm ? "1" : "0";
-            start.EnvironmentVariables["COMPlus_GCNoAffinitize"] = gcMode.NoAffinitize ? "1" : "0";
+            start.EnvironmentVariables["COMPlus_gcServer"] = gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver) ? "1" : "0";
+            start.EnvironmentVariables["COMPlus_gcConcurrent"] = gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver) ? "1" : "0";
 
+            if (gcMode.HasValue(GcMode.CpuGroupsCharacteristic))
+                start.EnvironmentVariables["COMPlus_GCCpuGroup"] = gcMode.ResolveValue(GcMode.CpuGroupsCharacteristic, resolver) ? "1" : "0";
+            if (gcMode.HasValue(GcMode.AllowVeryLargeObjectsCharacteristic))
+                start.EnvironmentVariables["COMPlus_gcAllowVeryLargeObjects"] = gcMode.ResolveValue(GcMode.AllowVeryLargeObjectsCharacteristic, resolver) ? "1" : "0";
+            if (gcMode.HasValue(GcMode.RetainVmCharacteristic))
+                start.EnvironmentVariables["COMPlus_GCRetainVM"] = gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver) ? "1" : "0";
+            if (gcMode.HasValue(GcMode.NoAffinitizeCharacteristic))
+                start.EnvironmentVariables["COMPlus_GCNoAffinitize"] = gcMode.ResolveValue(GcMode.NoAffinitizeCharacteristic, resolver) ? "1" : "0";
             if (gcMode.HasValue(GcMode.HeapAffinitizeMaskCharacteristic))
                 start.EnvironmentVariables["COMPlus_GCHeapAffinitizeMask"] = gcMode.HeapAffinitizeMask.ToString("X");
             if (gcMode.HasValue(GcMode.HeapCountCharacteristic))

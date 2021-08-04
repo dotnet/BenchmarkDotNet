@@ -18,10 +18,14 @@ namespace BenchmarkDotNet.IntegrationTests
         private IConfig CreateConfig(GcMode gc) => ManualConfig.CreateEmpty().AddJob(new Job(Job.Dry, gc));
 
         [Fact]
-        public void CanHostGcMode()
+        public void HostProcessSettingsAreCopiedByDefault()
         {
             var config = CreateConfig(GcMode.Default);
-            CanExecute<WorkstationGcOnly>(config);
+
+            if (GCSettings.IsServerGC)
+                CanExecute<ServerModeEnabled>(config);
+            else
+                CanExecute<WorkstationGcOnly>(config);
         }
 
         [Fact]
