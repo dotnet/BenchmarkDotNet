@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Columns
         public string Legend => descriptor.Legend;
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Metric;
-        public int PriorityInCategory => 0;
+        public int PriorityInCategory => descriptor.PriorityInCategory;
         public bool IsNumeric => true;
         public UnitType UnitType => descriptor.UnitType;
 

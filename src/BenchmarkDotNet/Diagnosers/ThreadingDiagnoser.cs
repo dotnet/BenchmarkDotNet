@@ -61,6 +61,7 @@ namespace BenchmarkDotNet.Diagnosers
             public UnitType UnitType => UnitType.Dimensionless;
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
+            public int PriorityInCategory => 0;
         }
 
         private class LockContentionCountMetricDescriptor : IMetricDescriptor
@@ -74,6 +75,7 @@ namespace BenchmarkDotNet.Diagnosers
             public UnitType UnitType => UnitType.Dimensionless;
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
+            public int PriorityInCategory => 0;
         }
     }
 }
