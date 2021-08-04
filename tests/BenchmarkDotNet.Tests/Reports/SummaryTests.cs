@@ -92,6 +92,7 @@ namespace BenchmarkDotNet.Tests.Reports
             public UnitType UnitType { get; }
             public string Unit { get; } = nameof(Unit);
             public bool TheGreaterTheBetter { get; }
+            public int PriorityInCategory => 0;
         }
     }
 }
