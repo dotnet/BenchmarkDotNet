@@ -425,7 +425,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             bool wasmAot = options.AOTCompilerMode == MonoAotCompilerMode.wasm;
 
             var wasmRuntime = new WasmRuntime(
-                mainJs: options.WasmMainJs ?? new FileInfo(options.RuntimeSrcDir.ToString() + @"\src\mono\wasm\runtime-test.js"),
+                mainJs: options.WasmMainJs ?? new FileInfo(Path.Combine(options.RuntimeSrcDir.FullName, "src", "mono", "wasm", "runtime-test.js")),
                 msBuildMoniker: msBuildMoniker,
                 javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
                 javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
