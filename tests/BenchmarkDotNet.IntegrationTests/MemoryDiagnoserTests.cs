@@ -193,9 +193,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocationQuantumIsNotAnIssueForNetCore21Plus(IToolchain toolchain)
         {
-            if (toolchain is CoreRtToolchain) // the fix has not yet been backported to CoreRT
-                return;
-
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
             long arraySizeOverhead = IntPtr.Size; // array length
 
@@ -235,13 +232,10 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserIsAccurateForMultiThreadedBenchmarks(IToolchain toolchain)
         {
-            if (toolchain is CoreRtToolchain) // the API has not been yet ported to CoreRT
-                return;
-
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
             long arraySizeOverhead = IntPtr.Size; // array length
             long memoryAllocatedPerArray = (MultiThreadedAllocation.Size + objectAllocationOverhead + arraySizeOverhead);
-            long threadStartAndJoinOverhead = 112; // this is more or less a magic number taken from memory profiler
+            long threadStartAndJoinOverhead = toolchain is CoreRtToolchain ? 560 : 112; // this is more or less a magic number taken from memory profiler
             long allocatedMemoryPerThread = memoryAllocatedPerArray + threadStartAndJoinOverhead;
 
             AssertAllocations(toolchain, typeof(MultiThreadedAllocation), new Dictionary<string, long>
