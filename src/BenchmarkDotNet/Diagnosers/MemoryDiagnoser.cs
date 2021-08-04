@@ -56,6 +56,7 @@ namespace BenchmarkDotNet.Diagnosers
             public UnitType UnitType => UnitType.Size;
             public string Unit => SizeUnit.B.Name;
             public bool TheGreaterTheBetter => false;
+            public int PriorityInCategory => GC.MaxGeneration + 1;
         }
 
         private class GarbageCollectionsMetricDescriptor : IMetricDescriptor
@@ -69,6 +70,7 @@ namespace BenchmarkDotNet.Diagnosers
                 Id = $"Gen{generationId}Collects";
                 DisplayName = $"Gen {generationId}";
                 Legend = $"GC Generation {generationId} collects per 1000 operations";
+                PriorityInCategory = generationId;
             }
 
             public string Id { get; }
@@ -78,6 +80,7 @@ namespace BenchmarkDotNet.Diagnosers
             public UnitType UnitType => UnitType.Dimensionless;
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
+            public int PriorityInCategory { get; }
         }
     }
 }

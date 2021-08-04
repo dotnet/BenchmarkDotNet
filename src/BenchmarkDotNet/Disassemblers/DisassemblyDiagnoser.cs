@@ -169,6 +169,7 @@ namespace BenchmarkDotNet.Diagnosers
             public UnitType UnitType => UnitType.Size;
             public string Unit => SizeUnit.B.Name;
             public bool TheGreaterTheBetter => false;
+            public int PriorityInCategory => 0;
         }
     }
 }
