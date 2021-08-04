@@ -98,7 +98,8 @@ namespace BenchmarkDotNet.Environments
             { "10.0.18363", "10 19H2 [1909, November 2019 Update]" },
             { "10.0.19041", "10 20H1 [2004, May 2020 Update]" },
             { "10.0.19042", "10 20H2 [20H2, October 2020 Update]" },
-            { "10.0.19043", "10 21H1 [21H1, May 2021 Update]" }
+            { "10.0.19043", "10 21H1 [21H1, May 2021 Update]" },
+            { "10.0.19044", "10 21H2 [21H2]" }
         };
 
         private class Windows10Version
@@ -122,13 +123,15 @@ namespace BenchmarkDotNet.Environments
             private string ToFullVersion([CanBeNull] int? ubr = null)
                 => ubr == null ? $"10.0.{BuildNumber}" : $"10.0.{BuildNumber}.{ubr}";
 
+            private static string Collapse(params string[] values) => string.Join("/", values.Where(v => !string.IsNullOrEmpty(v)));
+
             // The line with OsBrandString is one of the longest lines in the summary.
             // When people past in on GitHub, it can be a reason of an ugly horizontal scrollbar.
             // To avoid this, we are trying to minimize this line and use the minimum possible number of characters.
             public string ToPrettifiedString([CanBeNull] int? ubr)
                 => Version == ShortifiedCodeName
-                    ? $"{ToFullVersion(ubr)} ({Version}/{ShortifiedMarketingName})"
-                    : $"{ToFullVersion(ubr)} ({Version}/{ShortifiedMarketingName}/{ShortifiedCodeName})";
+                    ? $"{ToFullVersion(ubr)} ({Collapse(Version, ShortifiedMarketingName)})"
+                    : $"{ToFullVersion(ubr)} ({Collapse(Version, ShortifiedMarketingName, ShortifiedCodeName)})";
 
             // See https://en.wikipedia.org/wiki/Windows_10_version_history
             private static readonly List<Windows10Version> WellKnownVersions = new List<Windows10Version>
@@ -145,6 +148,7 @@ namespace BenchmarkDotNet.Environments
                 new Windows10Version("2004", "20H1", "May 2020 Update", 19041),
                 new Windows10Version("20H2", "20H2", "October 2020 Update", 19042),
                 new Windows10Version("21H1", "21H1", "May 2021 Update", 19043),
+                new Windows10Version("21H2", "21H2", "", 19044), // The markingName is not announced yet
             };
 
             [CanBeNull]
@@ -209,7 +213,8 @@ namespace BenchmarkDotNet.Environments
                 new MacOSXVersion(17, "High Sierra"),
                 new MacOSXVersion(18, "Mojave"),
                 new MacOSXVersion(19, "Catalina"),
-                new MacOSXVersion(20, "Big Sur")
+                new MacOSXVersion(20, "Big Sur"),
+                new MacOSXVersion(21, "Monterey")
             };
 
             [CanBeNull]
