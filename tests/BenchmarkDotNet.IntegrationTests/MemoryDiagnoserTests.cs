@@ -9,6 +9,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
@@ -228,44 +229,56 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryNetCoreOnly(".NET Core 3.0 preview6+ exposes a GC.GetTotalAllocatedBytes method which makes it possible to work"), MemberData(nameof(GetToolchains))]
+        [Theory, MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserIsAccurateForMultiThreadedBenchmarks(IToolchain toolchain)
         {
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
             long arraySizeOverhead = IntPtr.Size; // array length
             long memoryAllocatedPerArray = (MultiThreadedAllocation.Size + objectAllocationOverhead + arraySizeOverhead);
-            long threadStartAndJoinOverhead = toolchain is CoreRtToolchain ? 560 : 112; // this is more or less a magic number taken from memory profiler
-            long allocatedMemoryPerThread = memoryAllocatedPerArray + threadStartAndJoinOverhead;
+            long maxThreadStartAndJoinOverhead = RuntimeInformation.IsFullFramework ? 2500 : 600; // these are more or less a magic numbers taken from memory profiler and test runs
 
-            AssertAllocations(toolchain, typeof(MultiThreadedAllocation), new Dictionary<string, long>
+            AssertAllocations(toolchain, typeof(MultiThreadedAllocation), new Dictionary<string, (long low, long high)>
             {
-                { nameof(MultiThreadedAllocation.Allocate), allocatedMemoryPerThread * MultiThreadedAllocation.ThreadsCount }
+                { nameof(MultiThreadedAllocation.Allocate), (
+                    low: memoryAllocatedPerArray * MultiThreadedAllocation.ThreadsCount,
+                    high: (memoryAllocatedPerArray + maxThreadStartAndJoinOverhead) * MultiThreadedAllocation.ThreadsCount) }
             });
         }
 
         private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarksAllocationsValidators)
+        {
+            AssertAllocations(toolchain, benchmarkType, benchmarksAllocationsValidators, (benchmark, gcStats, expectedBytes) =>
+            {
+                Assert.Equal(expectedBytes, gcStats.GetBytesAllocatedPerOperation(benchmark));
+
+                if (expectedBytes == 0)
+                {
+                    Assert.Equal(0, gcStats.GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects: true));
+                }
+            });
+        }
+
+        private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, (long low, long high)> benchmarksAllocationsValidators)
+        {
+            AssertAllocations(toolchain, benchmarkType, benchmarksAllocationsValidators, (benchmark, gcStats, expectedBytes) =>
+            {
+                Assert.InRange(gcStats.GetBytesAllocatedPerOperation(benchmark), expectedBytes.low, expectedBytes.high);
+            });
+        }
+
+        private void AssertAllocations<T>(IToolchain toolchain, Type benchmarkType, Dictionary<string, T> benchmarksAllocationsValidators, Action<BenchmarkCase, GcStats, T> assert)
         {
             var config = CreateConfig(toolchain);
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
 
             var summary = BenchmarkRunner.Run(benchmarks);
 
-            foreach (var benchmarkAllocationsValidator in benchmarksAllocationsValidators)
+            foreach (var report in summary.Reports)
             {
-                var allocatingBenchmarks = benchmarks.BenchmarksCases.Where(benchmark => benchmark.DisplayInfo.Contains(benchmarkAllocationsValidator.Key));
+                var benchmark = report.BenchmarkCase;
 
-                foreach (var benchmark in allocatingBenchmarks)
-                {
-                    var benchmarkReport = summary.Reports.Single(report => report.BenchmarkCase == benchmark);
-
-                    Assert.Equal(benchmarkAllocationsValidator.Value, benchmarkReport.GcStats.GetBytesAllocatedPerOperation(benchmark));
-
-                    if (benchmarkAllocationsValidator.Value == 0)
-                    {
-                        Assert.Equal(0, benchmarkReport.GcStats.GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects: true));
-                    }
-                }
+                assert(benchmark, report.GcStats, benchmarksAllocationsValidators[benchmark.Descriptor.WorkloadMethod.Name]);
             }
         }
 
