@@ -128,7 +128,7 @@ For example, if you want to [parameterize](https://benchmarkdotnet.org/articles/
   and run benchmarks for each case.
 If you want to compare benchmarks with each other,
   mark one of the benchmark as the [baseline](https://benchmarkdotnet.org/articles/features/baselines.html)
-  via `[Benchmark(baseline: true)]`: BenchmarkDotNet will compare it with all of the other benchmarks.
+  via `[Benchmark(Baseline = true)]`: BenchmarkDotNet will compare it with all of the other benchmarks.
 If you want to compare performance in different environments, use [jobs](https://benchmarkdotnet.org/articles/configs/jobs.html).
 For example, you can run all the benchmarks on .NET Core 3.0 and Mono via
   `[SimpleJob(RuntimeMoniker.NetCoreApp30)]` and `[SimpleJob(RuntimeMoniker.Mono)]`.
