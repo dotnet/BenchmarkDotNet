@@ -96,14 +96,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
         {
-            if (Aot)
-            {
                 return Path.Combine(buildArtifactsDirectoryPath, "bin", TargetFrameworkMoniker, "browser-wasm", "AppBundle");
-            }
-            else
-            {
-                return Path.Combine(buildArtifactsDirectoryPath, "bin", TargetFrameworkMoniker, "browser-wasm", "publish", "output");
-            }
         }
     }
 }
