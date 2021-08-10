@@ -11,7 +11,6 @@
     <AssemblyName>$PROGRAMNAME$</AssemblyName>
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
     <PublishTrimmed>false</PublishTrimmed>
-    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
     <RunAOTCompilation>false</RunAOTCompilation>
     <WasmMainJSPath>$(RuntimeSrcDir)\src\mono\wasm\runtime-test.js</WasmMainJSPath>
     <WasmGenerateRunV8Script>true</WasmGenerateRunV8Script>
