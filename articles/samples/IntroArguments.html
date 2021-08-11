@@ -111,14 +111,14 @@
             <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Samples.IntroArguments">
 <h2 id="sample-introarguments">Sample: IntroArguments</h2>
 
-<p>As an alternative to using <a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAttribute.html"><code>[Params]</code></a>,
+<p>As an alternative to using <a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a>,
 you can specify arguments for your benchmarks.
 There are several ways to do it (described below).</p>
-<p>The <a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsAttribute.html"><code>[Arguments]</code></a> allows you to provide a set of values.
+<p>The <a href="xref:BenchmarkDotNet.Attributes.ArgumentsAttribute"><code>[Arguments]</code></a> allows you to provide a set of values.
 Every value must be a compile-time constant (it's C# language limitation for attributes in general).
 You can also combine
-<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsAttribute.html"><code>[Arguments]</code></a> with
-<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAttribute.html"><code>[Params]</code></a>.
+<a href="xref:BenchmarkDotNet.Attributes.ArgumentsAttribute"><code>[Arguments]</code></a> with
+<a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a>.
 As a result, you will get results for each combination of params values.</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroArguments.cs">using System.Threading;

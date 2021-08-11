@@ -114,7 +114,7 @@
 <hr>
 <h2 id="sample-introparams">Sample: IntroParams</h2>
 <p>You can mark one or several fields or properties in your class by
-the <a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAttribute.html"><code>[Params]</code></a> attribute.
+the <a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a> attribute.
 In this attribute, you can specify set of values.
 Every value must be a compile-time constant.
 As a result, you will get results for each combination of params values.</p>
@@ -152,9 +152,9 @@ namespace BenchmarkDotNet.Samples
 <hr>
 <h2 id="sample-introparamssource">Sample: IntroParamsSource</h2>
 <p>In case you want to use a lot of values, you should use
-<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsSourceAttribute.html"><code>[ParamsSource]</code></a>
+<a href="xref:BenchmarkDotNet.Attributes.ParamsSourceAttribute"><code>[ParamsSource]</code></a>
 You can mark one or several fields or properties in your class by the
-<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAttribute.html"><code>[Params]</code></a> attribute.
+<a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a> attribute.
 In this attribute, you have to specify the name of public method/property which is going to provide the values
 (something that implements <code>IEnumerable</code>).
 The source must be within benchmarked type!</p>
@@ -204,7 +204,7 @@ Just use complex types as you wish and override <code>ToString</code> method to 
 </ul>
 <hr>
 <h2 id="sample-introparamsallvalues">Sample: IntroParamsAllValues</h2>
-<p>If you want to use all possible values of an <code>enum</code> or another type with a small number of values, you can use the <a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAllValuesAttribute.html"><code>[ParamsAllValues]</code></a> attribute, instead of listing all the values by hand. The types supported by the attribute are:</p>
+<p>If you want to use all possible values of an <code>enum</code> or another type with a small number of values, you can use the <a href="xref:BenchmarkDotNet.Attributes.ParamsAllValuesAttribute"><code>[ParamsAllValues]</code></a> attribute, instead of listing all the values by hand. The types supported by the attribute are:</p>
 <ul>
 <li><code>bool</code></li>
 <li>any <code>enum</code> that is not marked with <code>[Flags]</code></li>
@@ -287,20 +287,20 @@ namespace BenchmarkDotNet.Samples
 </code></pre>
 <h3 id="links">Links</h3>
 <ul>
-<li>Priority BaseClass <a class="xref" href="../../api/BenchmarkDotNet.Attributes.PriorityAttribute.html"><code>PriorityAttribute.cs</code></a></li>
+<li>Priority BaseClass <a href="xref:BenchmarkDotNet.Attributes.PriorityAttribute"><code>PriorityAttribute.cs</code></a></li>
 <li><a class="xref" href="parameterization.html">Parameterization</a></li>
 <li>The permanent link to this sample: <a class="xref" href="../samples/IntroParamsPriority.html">Sample: IntroParamsPriority</a></li>
 </ul>
 <hr>
 <h2 id="sample-introarguments">Sample: IntroArguments</h2>
-<p>As an alternative to using <a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAttribute.html"><code>[Params]</code></a>,
+<p>As an alternative to using <a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a>,
 you can specify arguments for your benchmarks.
 There are several ways to do it (described below).</p>
-<p>The <a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsAttribute.html"><code>[Arguments]</code></a> allows you to provide a set of values.
+<p>The <a href="xref:BenchmarkDotNet.Attributes.ArgumentsAttribute"><code>[Arguments]</code></a> allows you to provide a set of values.
 Every value must be a compile-time constant (it's C# language limitation for attributes in general).
 You can also combine
-<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsAttribute.html"><code>[Arguments]</code></a> with
-<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ParamsAttribute.html"><code>[Params]</code></a>.
+<a href="xref:BenchmarkDotNet.Attributes.ArgumentsAttribute"><code>[Arguments]</code></a> with
+<a href="xref:BenchmarkDotNet.Attributes.ParamsAttribute"><code>[Params]</code></a>.
 As a result, you will get results for each combination of params values.</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroArguments.cs">using System.Threading;
@@ -347,9 +347,9 @@ namespace BenchmarkDotNet.Samples
 <hr>
 <h2 id="sample-introargumentssource">Sample: IntroArgumentsSource</h2>
 <p>In case you want to use a lot of values, you should use
-<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html"><code>[ArgumentsSource]</code></a>.</p>
+<a href="xref:BenchmarkDotNet.Attributes.ArgumentsSourceAttribute"><code>[ArgumentsSource]</code></a>.</p>
 <p>You can mark one or several fields or properties in your class by the
-<a class="xref" href="../../api/BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html"><code>[ArgumentsSource]</code></a> attribute.
+<a href="xref:BenchmarkDotNet.Attributes.ArgumentsSourceAttribute"><code>[ArgumentsSource]</code></a> attribute.
 In this attribute, you have to specify the name of public method/property which is going to provide the values
 (something that implements <code>IEnumerable</code>).
 The source must be within benchmarked type!</p>
@@ -540,7 +540,7 @@ namespace BenchmarkDotNet.Samples
 </code></pre>
 <h3 id="links">Links</h3>
 <ul>
-<li>Priority BaseClass <a class="xref" href="../../api/BenchmarkDotNet.Attributes.PriorityAttribute.html"><code>PriorityAttribute.cs</code></a></li>
+<li>Priority BaseClass <a href="xref:BenchmarkDotNet.Attributes.PriorityAttribute"><code>PriorityAttribute.cs</code></a></li>
 <li><a class="xref" href="parameterization.html">Parameterization</a></li>
 <li>The permanent link to this sample: <a class="xref" href="../samples/IntroArgumentsPriority.html">Sample: IntroArgumentsPriority</a></li>
 </ul>
