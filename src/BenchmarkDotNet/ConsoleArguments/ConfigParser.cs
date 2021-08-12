@@ -112,19 +112,11 @@ namespace BenchmarkDotNet.ConsoleArguments
                     logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(RuntimeMoniker)).Select(name => name.ToLower()))}.");
                     return false;
                 }
-                else if (runtimeMoniker == RuntimeMoniker.Wasm && options.WasmMainJs == null && options.RuntimeSrcDir == null) {
-                    logger.WriteLine("Either runtimeSrcDir or WasmMainJS must be specified.");
-                }
-                else if (runtimeMoniker == RuntimeMoniker.Wasm && options.WasmMainJs.IsNotNullButDoesNotExist())
-                {
-                    logger.WriteLineError($"The provided {nameof(options.WasmMainJs)} \"{options.WasmMainJs}\" does NOT exist.");
-                    return false;
-                }
                 else if (runtimeMoniker == RuntimeMoniker.MonoAOTLLVM && (options.AOTCompilerPath == null || options.AOTCompilerPath.IsNotNullButDoesNotExist()))
                 {
                      logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{ options.AOTCompilerPath }\" does NOT exist. It MUST be provided.");
                 }
-                else if (runtimeMoniker == RuntimeMoniker.Wasm && options.AOTCompilerMode == MonoAotCompilerMode.wasm && (options.RuntimeSrcDir == null || options.RuntimeSrcDir.IsNotNullButDoesNotExist()))
+                else if (runtimeMoniker == RuntimeMoniker.Wasm && (options.RuntimeSrcDir == null || options.RuntimeSrcDir.IsNotNullButDoesNotExist()))
                 {
                     logger.WriteLineError($"The provided {nameof(options.RuntimeSrcDir)} \"{options.RuntimeSrcDir}\" does NOT exist. It MUST be provided for wasm-aot.");
                     return false;
@@ -425,7 +417,6 @@ namespace BenchmarkDotNet.ConsoleArguments
             bool wasmAot = options.AOTCompilerMode == MonoAotCompilerMode.wasm;
 
             var wasmRuntime = new WasmRuntime(
-                mainJs: options.WasmMainJs ?? new FileInfo(Path.Combine(options.RuntimeSrcDir.FullName, "src", "mono", "wasm", "runtime-test.js")),
                 msBuildMoniker: msBuildMoniker,
                 javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
                 javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,

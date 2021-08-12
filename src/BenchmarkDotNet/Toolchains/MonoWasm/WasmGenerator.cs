@@ -85,7 +85,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     .Replace("$SDKNAME$", sdkName)
                     .Replace("$RUNTIMEPACK$", CustomRuntimePack ?? "")
                     .Replace("$TARGET$", CustomRuntimePack != null ? "PublishWithCustomRuntimePack" : "Publish")
-                    .Replace("$MAINJS$", runtime.MainJs.ToString())
                 .ToString();
 
                 File.WriteAllText(artifactsPaths.ProjectFilePath, content);
@@ -96,14 +95,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
         {
-            if (Aot)
-            {
                 return Path.Combine(buildArtifactsDirectoryPath, "bin", TargetFrameworkMoniker, "browser-wasm", "AppBundle");
-            }
-            else
-            {
-                return Path.Combine(buildArtifactsDirectoryPath, "bin", TargetFrameworkMoniker, "browser-wasm", "publish", "output");
-            }
         }
     }
 }
