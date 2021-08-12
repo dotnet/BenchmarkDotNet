@@ -35,10 +35,9 @@ namespace BenchmarkDotNet.Samples
         public static void Run()
         {
             // the Wasm Toolchain requires two mandatory arguments:
-            const string mainJsPath = @"/home/adam/projects/runtime/src/mono/wasm/runtime-test.js";
             const string cliPath = @"/home/adam/projects/runtime/dotnet.sh";
 
-            WasmRuntime runtime = new WasmRuntime(mainJs: new FileInfo(mainJsPath), msBuildMoniker: "net5.0");
+            WasmRuntime runtime = new WasmRuntime(msBuildMoniker: "net5.0");
             NetCoreAppSettings netCoreAppSettings = new NetCoreAppSettings(
                 targetFrameworkMoniker: "net5.0", runtimeFrameworkVersion: null, name: "Wasm",
                 customDotNetCliPath: cliPath);
