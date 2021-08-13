@@ -120,7 +120,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             {
                 string parentPath = parentProcess.MainModule?.FileName ?? string.Empty;
                 // sth like /snap/dotnet-sdk/112/dotnet and we should use the exact path instead of just "dotnet"
-                if (parentPath.StartsWith("/snap/", StringComparison.Ordinal))
+                if (parentPath.StartsWith("/snap/", StringComparison.Ordinal) &&
+                    parentPath.EndsWith("/dotnet", StringComparison.Ordinal))
                 {
                     return parentPath;
                 }
