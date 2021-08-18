@@ -9,6 +9,7 @@
     <PublishTrimmed>false</PublishTrimmed>
     <AssemblyName>$PROGRAMNAME$</AssemblyName>
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
