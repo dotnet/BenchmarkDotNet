@@ -44,11 +44,11 @@ namespace BenchmarkDotNet.Engines
             var singleActionEngine = CreateSingleActionEngine(engineParameters);
             var singleInvocationTime = Jit(singleActionEngine, ++jitIndex, invokeCount: 1, unrollFactor: 1);
 
-            if (singleInvocationTime > engineParameters.IterationTime && singleInvocationTime < TimeInterval.FromSeconds(1.0))
+            if (singleInvocationTime > engineParameters.IterationTime && singleInvocationTime < TimeInterval.FromSeconds(10.0))
             {
-                // if the Jitting took more than IterationTime but still less than 1s (a magic number based on observations of the reported bug)
+                // if the Jitting took more than IterationTime but still less than 10s (a magic number based on observations of the reported bugs)
                 // we call it one more time to see if Jitting itself has not dominated the first invocation
-                // if it did, it shoud NOT be a single invocation engine (see #837, #1337 and #1338)
+                // if it did, it should NOT be a single invocation engine (see #837, #1337, #1338, and #1780)
                 singleInvocationTime = Jit(singleActionEngine, ++jitIndex, invokeCount: 1, unrollFactor: 1);
             }
 
