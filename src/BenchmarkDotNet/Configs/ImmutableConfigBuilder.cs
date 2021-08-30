@@ -129,7 +129,7 @@ namespace BenchmarkDotNet.Configs
 
             foreach (var diagnoser in uniqueDiagnosers)
             foreach (var analyser in diagnoser.Analysers)
-                if (builder.Contains(analyser))
+                if (!builder.Contains(analyser))
                     builder.Add(analyser);
 
             return builder.ToImmutable();
