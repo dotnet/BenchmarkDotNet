@@ -255,6 +255,9 @@ namespace BenchmarkDotNet.Running
             // TODO: make exporter
             ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).Distinct().ToList());
 
+            logger.WriteLineHeader("// * Config Issues *");
+            ConclusionHelper.Print(logger, config.ConfigAnalyse);
+
             // TODO: move to conclusions
             var columnWithLegends = summary.Table.Columns.Select(c => c.OriginalColumn).Where(c => !string.IsNullOrEmpty(c.Legend)).ToList();
             var effectiveTimeUnit = summary.Table.EffectiveSummaryStyle.TimeUnit;
