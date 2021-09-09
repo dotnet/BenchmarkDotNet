@@ -71,7 +71,8 @@ namespace BenchmarkDotNet.Reports
                    && PrintZeroValuesInContent == other.PrintZeroValuesInContent
                    && Equals(SizeUnit, other.SizeUnit)
                    && Equals(TimeUnit, other.TimeUnit)
-                   && MaxParameterColumnWidth == other.MaxParameterColumnWidth;
+                   && MaxParameterColumnWidth == other.MaxParameterColumnWidth
+                   && RatioStyle == other.RatioStyle;
         }
 
         public override bool Equals(object obj) => obj is SummaryStyle summary && Equals(summary);
@@ -86,6 +87,7 @@ namespace BenchmarkDotNet.Reports
                 hashCode = (hashCode * 397) ^ (SizeUnit != null ? SizeUnit.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (TimeUnit != null ? TimeUnit.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ MaxParameterColumnWidth;
+                hashCode = (hashCode * 397) ^ RatioStyle.GetHashCode();
                 return hashCode;
             }
         }
