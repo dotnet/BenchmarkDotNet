@@ -120,11 +120,11 @@ namespace BenchmarkDotNet.Parameters
 
         public object Value { get; }
 
-        public string DisplayText => Value is Array array ? ArrayParam.GetDisplayString(array) : Value.ToString();
+        public string DisplayText => Value is Array array ? ArrayParam.GetDisplayString(array) : Value?.ToString() ?? ParameterInstance.NullParameterTextRepresentation;
 
         public string ToSourceCode()
         {
-            string cast = $"({Value.GetType().GetCorrectCSharpTypeName()})";
+            string cast = Value == null ? string.Empty : $"({Value.GetType().GetCorrectCSharpTypeName()})";
 
             string instancePrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "instance";
 
