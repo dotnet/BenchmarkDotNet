@@ -38,7 +38,7 @@
   </PropertyGroup>
   <Target Name="PrepareForWasmBuild" AfterTargets="Publish">
     <ItemGroup>
-      <WasmAssembliesToBundle Include="$(TargetDir)publish\*.dll" />
+      <WasmAssembliesToBundle Include="$(TargetDir)publish\*.dll" Exclude="**/KernelTraceControl.dll" />
     </ItemGroup>
   </Target>
 </Project>
