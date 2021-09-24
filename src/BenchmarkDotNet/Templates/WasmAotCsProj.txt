@@ -18,6 +18,7 @@
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
     <WasmNativeWorkload>false</WasmNativeWorkload>
     <UsingBrowserRuntimeWorkload>false</UsingBrowserRuntimeWorkload>
+    <EnableDefaultWasmAssembliesToBundle>false</EnableDefaultWasmAssembliesToBundle>
     $COPIEDSETTINGS$
   </PropertyGroup>
 
@@ -38,7 +39,7 @@
   </PropertyGroup>
   <Target Name="PrepareForWasmBuild" AfterTargets="Publish">
     <ItemGroup>
-      <WasmAssembliesToBundle Include="$(TargetDir)publish\*.dll" />
+      <WasmAssembliesToBundle Include="$(TargetDir)publish\*.dll" Exclude="$(TargetDir)publish\KernelTraceControl.dll" />
     </ItemGroup>
   </Target>
 </Project>
