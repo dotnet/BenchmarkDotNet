@@ -38,7 +38,6 @@
     <WasmBuildAppAfterThisTarget>PrepareForWasmBuild</WasmBuildAppAfterThisTarget>
   </PropertyGroup>
   <Target Name="PrepareForWasmBuild" AfterTargets="Publish">
-    <Message Text="!!!debug!!! TargetDir: $(TargetDir)" />
     <ItemGroup>
       <WasmAssembliesToBundle Include="$(TargetDir)publish\*.dll" Exclude="$(TargetDir)publish\KernelTraceControl.dll" />
     </ItemGroup>
