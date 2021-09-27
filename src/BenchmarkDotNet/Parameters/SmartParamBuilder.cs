@@ -93,11 +93,24 @@ namespace BenchmarkDotNet.Parameters
         {
             string cast = $"({parameterDefinitions[argumentIndex].ParameterType.GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
 
-            string callPostfix = source is PropertyInfo ? string.Empty : "()";
+            string callPostfix = string.Empty;
+            string indexPostfix = string.Empty;
+            Type returnType = default;
 
-            string indexPostfix = parameterDefinitions.Length > 1
-                ? $"[{argumentIndex}]" // IEnumerable<object[]>
-                : string.Empty; // IEnumerable<object>
+            if (source is PropertyInfo propertyInfo)
+            {
+                returnType = propertyInfo.PropertyType;
+            }
+            else if (source is MethodInfo method)
+            {
+                returnType = method.ReturnType;
+                callPostfix = "()";
+            }
+
+            if (typeof(IEnumerable<object[]>).IsAssignableFrom(returnType))
+            {
+                indexPostfix = $"[{argumentIndex}]";
+            }
 
             // we do something like enumerable.ElementAt(sourceIndex)[argumentIndex];
             return $"{cast}BenchmarkDotNet.Parameters.ParameterExtractor.GetParameter({source.Name}{callPostfix}, {sourceIndex}){indexPostfix};";
