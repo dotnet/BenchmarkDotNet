@@ -88,7 +88,12 @@ namespace BenchmarkDotNet.Jobs
         /// <summary>
         /// .NET 6.0
         /// </summary>
-        Net60, // it's after NetCoreApp50 and Net50 in the enum definition because the value of enumeration is used for framework version comparison using > < operators
+        Net60,
+
+        /// <summary>
+        /// .NET 7.0
+        /// </summary>
+        Net70,
 
         /// <summary>
         /// CoreRT compiled as netcoreapp2.0
@@ -126,6 +131,11 @@ namespace BenchmarkDotNet.Jobs
         CoreRt60,
 
         /// <summary>
+        /// CoreRT compiled as net7.0
+        /// </summary>
+        CoreRt70,
+
+        /// <summary>
         /// WebAssembly with default .Net version
         /// </summary>
         Wasm,
@@ -139,6 +149,11 @@ namespace BenchmarkDotNet.Jobs
         /// WebAssembly with .net6.0
         /// </summary>
         WasmNet60,
+
+        /// <summary>
+        /// WebAssembly with .net7.0
+        /// </summary>
+        WasmNet70,
 
         /// <summary>
         /// Mono with the Ahead of Time LLVM Compiler backend

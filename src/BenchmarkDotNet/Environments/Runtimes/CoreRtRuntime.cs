@@ -34,7 +34,11 @@ namespace BenchmarkDotNet.Environments
         /// <summary>
         /// CoreRT compiled as net6.0
         /// </summary>
-        public static readonly CoreRtRuntime CoreRt60 = new CoreRtRuntime(RuntimeMoniker.CoreRt50, "net6.0", "CoreRT 6.0");
+        public static readonly CoreRtRuntime CoreRt60 = new CoreRtRuntime(RuntimeMoniker.CoreRt60, "net6.0", "CoreRT 6.0");
+        /// <summary>
+        /// CoreRT compiled as net7.0
+        /// </summary>
+        public static readonly CoreRtRuntime CoreRt70 = new CoreRtRuntime(RuntimeMoniker.CoreRt70, "net7.0", "CoreRT 7.0");
 
         private CoreRtRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
             : base(runtimeMoniker, msBuildMoniker, displayName)
@@ -62,6 +66,7 @@ namespace BenchmarkDotNet.Environments
                 case Version v when v.Major == 3 && v.Minor == 1: return CoreRt31;
                 case Version v when v.Major == 5 && v.Minor == 0: return CoreRt50;
                 case Version v when v.Major == 6 && v.Minor == 0: return CoreRt60;
+                case Version v when v.Major == 7 && v.Minor == 0: return CoreRt70;
                 default:
                     return new CoreRtRuntime(RuntimeMoniker.NotRecognized, $"net{version.Major}.{version.Minor}", $"CoreRT {version.Major}.{version.Minor}");
             }

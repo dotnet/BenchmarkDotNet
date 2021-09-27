@@ -352,6 +352,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 #pragma warning restore CS0618 // Type or member is obsolete
                 case RuntimeMoniker.Net50:
                 case RuntimeMoniker.Net60:
+                case RuntimeMoniker.Net70:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
                         .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));
@@ -364,6 +365,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.CoreRt31:
                 case RuntimeMoniker.CoreRt50:
                 case RuntimeMoniker.CoreRt60:
+                case RuntimeMoniker.CoreRt70:
                     var builder = CoreRtToolchain.CreateBuilder();
 
                     if (options.CliPath != null)
@@ -391,6 +393,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return MakeWasmJob(baseJob, options, timeOut, "net5.0");
                 case RuntimeMoniker.WasmNet60:
                     return MakeWasmJob(baseJob, options, timeOut, "net6.0");
+                case RuntimeMoniker.WasmNet70:
+                    return MakeWasmJob(baseJob, options, timeOut, "net7.0");
                 case RuntimeMoniker.MonoAOTLLVM:
                     var monoAotLLVMRuntime = new MonoAotLLVMRuntime(aotCompilerPath: options.AOTCompilerPath);
 
