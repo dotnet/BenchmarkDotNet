@@ -309,7 +309,8 @@ namespace BenchmarkDotNet.Tests
         [Theory]
         [InlineData("net50")]
         [InlineData("net60")]
-        public void Net50AndNet60MonikersAreRecognizedAsNetCoreMonikers(string tfm)
+        [InlineData("net70")]
+        public void NetMonikersAreRecognizedAsNetCoreMonikers(string tfm)
         {
             var config = ConfigParser.Parse(new[] { "-r", tfm }, new OutputLogger(Output)).config;
 
