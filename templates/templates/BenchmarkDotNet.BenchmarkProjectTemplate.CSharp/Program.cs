@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
 namespace _BenchmarkProjectName_
@@ -6,7 +8,8 @@ namespace _BenchmarkProjectName_
     {
         public static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<$(BenchmarkName)>();
+            IEnumerable<Summary> summaries =
+                BenchmarkSwitcher.FromTypes(new []{ typeof($(BenchmarkName)) }).Run(args);
         }
     }
 }
