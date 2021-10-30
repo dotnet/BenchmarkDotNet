@@ -11,12 +11,12 @@ jobs:
 - template: build/azure-pipelines.job.template.yml
   parameters:
     name: Ubuntu
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-20.04'
     scriptFileName: ./build.sh
     initialization:
       - bash: |
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo apt-add-repository "deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-3.9 main"
+          sudo apt-add-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-9 main"
           sudo apt-get update
       - bash: |
-          sudo apt-get install cmake clang-3.9 libicu55 uuid-dev libcurl4-openssl-dev zlib1g-dev libkrb5-dev
+          sudo apt-get install cmake clang-9 libicu66 uuid-dev libcurl4-openssl-dev zlib1g-dev libkrb5-dev
