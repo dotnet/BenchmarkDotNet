@@ -396,24 +396,33 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.WasmNet70:
                     return MakeWasmJob(baseJob, options, timeOut, "net7.0");
                 case RuntimeMoniker.MonoAOTLLVM:
-                    var monoAotLLVMRuntime = new MonoAotLLVMRuntime(aotCompilerPath: options.AOTCompilerPath);
-
-                    var toolChain = MonoAotLLVMToolChain.From(
-                    new NetCoreAppSettings(
-                        targetFrameworkMoniker: monoAotLLVMRuntime.MsBuildMoniker,
-                        runtimeFrameworkVersion: null,
-                        name: monoAotLLVMRuntime.Name,
-                        customDotNetCliPath: options.CliPath?.FullName,
-                        packagesPath: options.RestorePath?.FullName,
-                        timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
-                        customRuntimePack: options.CustomRuntimePack,
-                        aotCompilerPath: options.AOTCompilerPath.ToString(),
-                        aotCompilerMode: options.AOTCompilerMode));
-
-                    return baseJob.WithRuntime(monoAotLLVMRuntime).WithToolchain(toolChain);
+                    return MakeMonoAOTLLVMJob(baseJob, options, timeOut, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0");
+                case RuntimeMoniker.MonoAOTLLVMNet60:
+                    return MakeMonoAOTLLVMJob(baseJob, options, timeOut, "net6.0");
+                case RuntimeMoniker.MonoAOTLLVMNet70:
+                    return MakeMonoAOTLLVMJob(baseJob, options, timeOut, "net7.0");
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
+        }
+
+        private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, TimeSpan? timeOut, string msBuildMoniker)
+        {
+            var monoAotLLVMRuntime = new MonoAotLLVMRuntime(aotCompilerPath: options.AOTCompilerPath, msBuildMoniker: msBuildMoniker);
+
+            var toolChain = MonoAotLLVMToolChain.From(
+            new NetCoreAppSettings(
+                targetFrameworkMoniker: monoAotLLVMRuntime.MsBuildMoniker,
+                runtimeFrameworkVersion: null,
+                name: monoAotLLVMRuntime.Name,
+                customDotNetCliPath: options.CliPath?.FullName,
+                packagesPath: options.RestorePath?.FullName,
+                timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
+                customRuntimePack: options.CustomRuntimePack,
+                aotCompilerPath: options.AOTCompilerPath.ToString(),
+                aotCompilerMode: options.AOTCompilerMode));
+
+            return baseJob.WithRuntime(monoAotLLVMRuntime).WithToolchain(toolChain);
         }
 
         private static Job MakeWasmJob(Job baseJob, CommandLineOptions options, TimeSpan? timeOut, string msBuildMoniker)
