@@ -287,6 +287,14 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Equal(final.Orderer, DefaultOrderer.Instance);
         }
 
+        [Fact]
+        public void WhenSummaryStyleIsNullDefaultValueShouldBeUsed()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+            var final = ImmutableConfigBuilder.Create(mutable);
+            Assert.Equal(final.SummaryStyle, SummaryStyle.Default);
+        }
+
         private static ManualConfig CreateConfigFromJobs(params Job[] jobs)
         {
             var config = ManualConfig.CreateEmpty();

@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Reports
         [PublicAPI] public string LogFilePath { get; }
         [PublicAPI] public HostEnvironmentInfo HostEnvironmentInfo { get; }
         [PublicAPI] public TimeSpan TotalTime { get; }
-        [PublicAPI, CanBeNull] public SummaryStyle Style { get; }
+        [PublicAPI] public SummaryStyle Style { get; }
         [PublicAPI] public IOrderer Orderer { get; }
         [PublicAPI] public SummaryTable Table { get; }
         [PublicAPI] public string AllRuntimes { get; }
@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Reports
             BenchmarksCases = Orderer.GetSummaryOrder(reports.Select(report => report.BenchmarkCase).ToImmutableArray(), this).ToImmutableArray(); // we sort it first
             Reports = BenchmarksCases.Select(b => ReportMap[b]).ToImmutableArray(); // we use sorted collection to re-create reports list
             BaseliningStrategy = BaseliningStrategy.Create(BenchmarksCases);
-            Style = GetConfiguredSummaryStyleOrNull(BenchmarksCases)?.WithCultureInfo(cultureInfo);
+            Style = GetConfiguredSummaryStyleOrDefaultOne(BenchmarksCases).WithCultureInfo(cultureInfo);
             Table = GetTable(Style);
             AllRuntimes = BuildAllRuntimes(HostEnvironmentInfo, Reports);
         }
@@ -151,7 +151,13 @@ namespace BenchmarkDotNet.Reports
                    .SingleOrDefault()
                ?? DefaultOrderer.Instance;
 
-        private static SummaryStyle GetConfiguredSummaryStyleOrNull(ImmutableArray<BenchmarkCase> benchmarkCases)
-            => benchmarkCases.Select(benchmark => benchmark.Config.SummaryStyle).Distinct().SingleOrDefault();
+        private static SummaryStyle GetConfiguredSummaryStyleOrDefaultOne(ImmutableArray<BenchmarkCase> benchmarkCases)
+            => benchmarkCases
+                   .Where(benchmark => benchmark.Config.SummaryStyle != SummaryStyle.Default
+                          && benchmark.Config.SummaryStyle != null) // Paranoid
+                   .Select(benchmark => benchmark.Config.SummaryStyle)
+                   .Distinct()
+                   .SingleOrDefault()
+               ?? SummaryStyle.Default;
     }
 }
