@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Attributes
             bool printSource = false,
             bool printInstructionAddresses = false,
             bool exportGithubMarkdown = true,
-            bool exportHtml = false,
+            bool exportHtml = true,
             bool exportCombinedDisassemblyReport = false,
             bool exportDiff = false)
         {
