@@ -5,6 +5,7 @@ AsciiDocExporter
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+It is running with administrative rights:False
   [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
   LongRun : extra output line
 
@@ -38,6 +39,7 @@ HtmlExporter
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+It is running with administrative rights:False
   [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
   LongRun : extra output line
 </code></pre>
@@ -372,6 +374,7 @@ MarkdownExporter-default
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+It is running with administrative rights:False
   [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
   LongRun : extra output line
 
@@ -390,6 +393,7 @@ MarkdownExporter-atlassian
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+It is running with administrative rights:False
   [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
   LongRun : extra output line
 
@@ -407,6 +411,7 @@ MarkdownExporter-console
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+It is running with administrative rights:False
   [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
   LongRun : extra output line
 
@@ -425,6 +430,7 @@ MarkdownExporter-github
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+It is running with administrative rights:False
   [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
   LongRun : extra output line
 
@@ -443,6 +449,7 @@ MarkdownExporter-stackoverflow
     BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
     MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
     Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+    It is running with administrative rights:False
       [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
       LongRun : extra output line
 
