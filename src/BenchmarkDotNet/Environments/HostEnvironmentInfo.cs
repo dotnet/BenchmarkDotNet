@@ -104,6 +104,8 @@ namespace BenchmarkDotNet.Environments
                 else
                     yield return $".NET Core SDK={DotNetSdkVersion.Value}";
             }
+
+            yield return $"It is running with administrative rights:{IsRunningAsAdmin()}";
         }
 
         [PublicAPI]
@@ -124,6 +126,26 @@ namespace BenchmarkDotNet.Environments
 
             sb.AppendLine(Summary.BuildAllRuntimes(hostEnvironmentInfo, Array.Empty<BenchmarkReport>()));
             return sb.ToString();
+        }
+
+        [System.Runtime.InteropServices.DllImport("libc")]
+        private static extern uint getuid(); // Only used on Linux but causes no issues on Windows
+
+        /// <summary>
+        /// Determines whether the current Benchmark is running with administrative rights.
+        /// </summary>
+        /// <returns><see cref="bool">True</see> is Benchmark  running with administrative rights</returns>
+        [PublicAPI]
+        public static bool IsRunningAsAdmin()
+        {
+            // Ref https://stackoverflow.com/a/58567692/9798562
+            if (RuntimeInformation.IsWindows())
+            {
+                using var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
+                var principal = new System.Security.Principal.WindowsPrincipal(identity);
+                return principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+            }
+            else return getuid() == 0;
         }
     }
 }
