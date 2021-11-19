@@ -336,13 +336,6 @@ And FINALLY build Mono Runtime with Web Assembly support:
 ./build.sh --arch wasm --os Browser -c release
 ```
 
-Before you run the benchmarks, you need to make sure that following two file exists:
-
-```cmd
-runtime/src/mono/wasm/runtime-test.js
-runtime/build.sh
-```
-
 And that you have .NET 5 feed added to your `nuget.config` file:
 
 ```xml

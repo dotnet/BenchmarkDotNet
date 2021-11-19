@@ -117,7 +117,7 @@ namespace BenchmarkDotNet.Toolchains
                 case WasmRuntime wasm:
                     start.FileName = wasm.JavaScriptEngine;
                     start.RedirectStandardInput = false;
-                    start.Arguments = $"{wasm.JavaScriptEngineArguments} runtime.js -- --run {artifactsPaths.ProgramName}.dll {args} ";
+                    start.Arguments = $"{wasm.JavaScriptEngineArguments} main.js -- --run {artifactsPaths.ProgramName}.dll {args} ";
                     start.WorkingDirectory = artifactsPaths.BinariesDirectoryPath;
                     break;
                 case MonoAotLLVMRuntime _:

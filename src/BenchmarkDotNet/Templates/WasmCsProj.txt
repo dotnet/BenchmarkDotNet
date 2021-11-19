@@ -12,7 +12,7 @@
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
     <PublishTrimmed>false</PublishTrimmed>
     <RunAOTCompilation>false</RunAOTCompilation>
-    <WasmMainJSPath>$(RuntimeSrcDir)\src\mono\wasm\runtime-test.js</WasmMainJSPath>
+    <WasmMainJSPath>$(RuntimeSrcDir)\src\mono\wasm\test-main.js</WasmMainJSPath>
     <WasmGenerateRunV8Script>true</WasmGenerateRunV8Script>
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
     <WasmNativeWorkload>false</WasmNativeWorkload>
