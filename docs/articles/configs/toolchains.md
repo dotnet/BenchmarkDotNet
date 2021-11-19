@@ -339,7 +339,7 @@ And FINALLY build Mono Runtime with Web Assembly support:
 Before you run the benchmarks, you need to make sure that following two file exists:
 
 ```cmd
-runtime/src/mono/wasm/runtime-test.js
+runtime/src/mono/wasm/test-main.js
 runtime/build.sh
 ```
 

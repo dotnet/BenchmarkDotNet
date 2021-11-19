@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Samples
         // path to dotnet cli
         // --cli /home/adam/projects/runtime/dotnet.sh
         // path to main js:
-        // --wasmMainJs /home/adam/projects/runtime/src/mono/wasm/runtime-test.js
+        // --wasmMainJs /home/adam/projects/runtime/src/mono/wasm/test-main.js
         public static void Run(string[] args) => BenchmarkSwitcher.FromAssembly(typeof(IntroWasmCmdConfig).Assembly).Run(args);
 
         [Benchmark]
