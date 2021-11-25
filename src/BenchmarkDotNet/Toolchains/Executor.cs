@@ -11,7 +11,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
@@ -69,7 +68,7 @@ namespace BenchmarkDotNet.Toolchains
 
             loggerWithDiagnoser.ProcessInput();
 
-            if (!process.WaitForExit(milliseconds: 250))
+            if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
             {
                 logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
 

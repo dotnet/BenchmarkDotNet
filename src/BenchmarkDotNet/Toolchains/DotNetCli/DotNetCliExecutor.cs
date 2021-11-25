@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
@@ -22,7 +21,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public DotNetCliExecutor(string customDotNetCliPath) => CustomDotNetCliPath = customDotNetCliPath;
 
         private string CustomDotNetCliPath { get; }
-        private static readonly TimeSpan ProcessExitTimeout = TimeSpan.FromSeconds(2);
 
         public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
@@ -90,14 +88,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 loggerWithDiagnoser.ProcessInput();
 
-                if (!process.WaitForExit(milliseconds: (int)ProcessExitTimeout.TotalMilliseconds))
+                if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                 {
-                    logger.WriteLineInfo($"// The benchmarking process did not quit within {ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
+                    logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
 
                     consoleExitHandler.KillProcessTree();
                 }
 
-                return new ExecuteResult(true, process.HasExited ? (int?)process.ExitCode : null, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
+                return new ExecuteResult(true, process.HasExited ? process.ExitCode : null, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
             }
         }
     }
