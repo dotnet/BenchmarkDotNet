@@ -7,7 +7,8 @@ name: Exporters
 
 An *exporter* allows you to export results of your benchmark in different formats.
 By default, files with results will be located in 
-`.\BenchmarkDotNet.Artifacts\results` directory. Default exporters are: csv, html and markdown.
+`.\BenchmarkDotNet.Artifacts\results` directory, but this can be changed via the `ArtifactsPath` property in the `IConfig`. 
+Default exporters are: csv, html and markdown.
 
 ---
 
