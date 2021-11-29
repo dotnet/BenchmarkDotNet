@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Extensions
             switch (column.UnitType)
             {
                 case UnitType.CodeSize:
-                    return $"{column.ColumnName} [{style.SizeUnit.Name}]";
+                    return $"{column.ColumnName} [{style.CodeSizeUnit.Name}]";
                 case UnitType.Size:
                     return $"{column.ColumnName} [{style.SizeUnit.Name}]";
                 case UnitType.Time:
