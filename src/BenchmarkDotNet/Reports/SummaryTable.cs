@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Reports
 
             if (style.SizeUnit == null)
             {
-                style = style.WithSizeUnit(SizeUnit.B);
+                style = style.WithSizeUnit(SizeUnit.GetBestSizeUnit(summary.Reports.Select(r => r.GcStats.GetBytesAllocatedPerOperation(r.BenchmarkCase)).ToArray()));
             }
 
             var columns = summary.GetColumns();
