@@ -21,6 +21,8 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class DisassemblyDiagnoser : IDiagnoser
     {
+        internal static string DescriptorId { get; } = NativeCodeSizeMetricDescriptor.Instance.Id;
+        
         private static readonly Lazy<string> ptrace_scope = new Lazy<string>(() => ProcessHelper.RunAndReadOutput("cat", "/proc/sys/kernel/yama/ptrace_scope").Trim());
 
         private readonly WindowsDisassembler windowsDisassembler;
@@ -165,8 +167,8 @@ namespace BenchmarkDotNet.Diagnosers
             public string Id => "Native Code Size";
             public string DisplayName => "Code Size";
             public string Legend => "Native code size of the disassembled method(s)";
-            public string NumberFormat => "N0";
-            public UnitType UnitType => UnitType.CodeSize;
+            public string NumberFormat => "0.##";
+            public UnitType UnitType => UnitType.Size;
             public string Unit => SizeUnit.B.Name;
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory => 0;
