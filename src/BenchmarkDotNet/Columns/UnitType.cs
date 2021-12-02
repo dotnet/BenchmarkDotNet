@@ -1,9 +1,14 @@
-﻿namespace BenchmarkDotNet.Columns
+﻿using System;
+
+namespace BenchmarkDotNet.Columns
 {
     public enum UnitType
     {
         Dimensionless,
         Time,
-        Size
+        Allocation,
+        [Obsolete("Use " + nameof(Allocation))]
+        Size = Allocation,
+        CodeSize
     }
 }
