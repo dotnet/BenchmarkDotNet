@@ -22,6 +22,7 @@ namespace BenchmarkDotNet.Diagnosers
     public class DisassemblyDiagnoser : IDiagnoser
     {
         private static readonly Lazy<string> ptrace_scope = new Lazy<string>(() => ProcessHelper.RunAndReadOutput("cat", "/proc/sys/kernel/yama/ptrace_scope").Trim());
+        private static readonly NativeCodeSizeMetricDescriptor Descriptor = new NativeCodeSizeMetricDescriptor();
 
         private readonly WindowsDisassembler windowsDisassembler;
         private readonly LinuxDisassembler linuxDisassembler;
@@ -52,7 +53,7 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<Metric> ProcessResults(DiagnoserResults diagnoserResults)
         {
             if (results.TryGetValue(diagnoserResults.BenchmarkCase, out var disassemblyResult))
-                yield return new Metric(NativeCodeSizeMetricDescriptor.Instance, SumNativeCodeSize(disassemblyResult));
+                yield return new Metric(Descriptor, SumNativeCodeSize(disassemblyResult));
         }
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase)
@@ -157,19 +158,5 @@ namespace BenchmarkDotNet.Diagnosers
 
         private static long SumNativeCodeSize(DisassemblyResult disassembly)
             => disassembly.Methods.Sum(method => method.Maps.Sum(map => map.SourceCodes.OfType<Asm>().Sum(asm => asm.Instruction.Length)));
-
-        private class NativeCodeSizeMetricDescriptor : IMetricDescriptor
-        {
-            internal static readonly IMetricDescriptor Instance = new NativeCodeSizeMetricDescriptor();
-
-            public string Id => "Native Code Size";
-            public string DisplayName => "Code Size";
-            public string Legend => "Native code size of the disassembled method(s)";
-            public string NumberFormat => "0.##";
-            public UnitType UnitType => UnitType.Size;
-            public string Unit => SizeUnit.B.Name;
-            public bool TheGreaterTheBetter => false;
-            public int PriorityInCategory => 0;
-        }
     }
 }
