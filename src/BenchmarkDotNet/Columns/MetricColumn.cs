@@ -32,10 +32,8 @@ namespace BenchmarkDotNet.Columns
                 return "-";
 
             var cultureInfo = summary.GetCultureInfo();
-            if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Allocation)
-                return SizeValue.FromBytes((long)metric.Value).ToString(style.AllocationUnit, cultureInfo, descriptor.NumberFormat);
-            if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.CodeSize)
-                return SizeValue.FromBytes((long)metric.Value).ToString(style.CodeSizeUnit, cultureInfo, descriptor.NumberFormat);
+            if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Size)
+                return SizeValue.FromBytes((long)metric.Value).ToString(style.SizeUnit, cultureInfo, descriptor.NumberFormat);
             if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Time)
                 return TimeInterval.FromNanoseconds(metric.Value).ToString(style.TimeUnit, cultureInfo);
 

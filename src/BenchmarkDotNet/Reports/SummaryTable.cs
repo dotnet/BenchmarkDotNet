@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
@@ -49,14 +48,9 @@ namespace BenchmarkDotNet.Reports
                     .ToArray()));
             }
 
-            if (style.AllocationUnit == null)
+            if (style.SizeUnit == null)
             {
-                style = style.WithAllocationUnit(SizeUnit.GetBestSizeUnit(summary.Reports.Select(r => r.GcStats.GetBytesAllocatedPerOperation(r.BenchmarkCase)).ToArray()));
-            }
-
-            if (style.CodeSizeUnit == null)
-            {
-                style = style.WithCodeSizeUnit(SizeUnit.GetBestSizeUnit(summary.Reports.SelectMany(r => r.Metrics.Values).Where(m => m.Descriptor is NativeCodeSizeMetricDescriptor).Select(m => (long)m.Value).ToArray()));
+                style = style.WithSizeUnit(SizeUnit.GetBestSizeUnit(summary.Reports.Select(r => r.GcStats.GetBytesAllocatedPerOperation(r.BenchmarkCase)).ToArray()));
             }
 
             var columns = summary.GetColumns();

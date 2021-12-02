@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Diagnosers
         public string DisplayName => $"Allocated native memory";
         public string Legend => $"Allocated native memory per single operation";
         public string NumberFormat => "N0";
-        public UnitType UnitType => UnitType.Allocation;
+        public UnitType UnitType => UnitType.Size;
         public string Unit => SizeUnit.B.Name;
         public bool TheGreaterTheBetter => false;
         public int PriorityInCategory => 0;
@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Diagnosers
         public string DisplayName => $"Native memory leak";
         public string Legend => $"Native memory leak size in byte.";
         public string NumberFormat => "N0";
-        public UnitType UnitType => UnitType.Allocation;
+        public UnitType UnitType => UnitType.Size;
         public string Unit => SizeUnit.B.Name;
         public bool TheGreaterTheBetter => false;
         public int PriorityInCategory => 0;
