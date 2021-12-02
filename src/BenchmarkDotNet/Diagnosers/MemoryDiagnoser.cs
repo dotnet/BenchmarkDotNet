@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Diagnosers
             public string Id => "Allocated Memory";
             public string DisplayName => "Allocated";
             public string Legend => "Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)";
-            public string NumberFormat => "N0";
+            public string NumberFormat => "0.##";
             public UnitType UnitType => UnitType.Size;
             public string Unit => SizeUnit.B.Name;
             public bool TheGreaterTheBetter => false;

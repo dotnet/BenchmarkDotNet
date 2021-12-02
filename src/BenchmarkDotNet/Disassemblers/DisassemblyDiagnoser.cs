@@ -165,7 +165,7 @@ namespace BenchmarkDotNet.Diagnosers
             public string Id => "Native Code Size";
             public string DisplayName => "Code Size";
             public string Legend => "Native code size of the disassembled method(s)";
-            public string NumberFormat => "N0";
+            public string NumberFormat => "0.##";
             public UnitType UnitType => UnitType.Size;
             public string Unit => SizeUnit.B.Name;
             public bool TheGreaterTheBetter => false;
