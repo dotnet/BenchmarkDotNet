@@ -21,8 +21,6 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class DisassemblyDiagnoser : IDiagnoser
     {
-        internal static string DescriptorId { get; } = NativeCodeSizeMetricDescriptor.Instance.Id;
-        
         private static readonly Lazy<string> ptrace_scope = new Lazy<string>(() => ProcessHelper.RunAndReadOutput("cat", "/proc/sys/kernel/yama/ptrace_scope").Trim());
 
         private readonly WindowsDisassembler windowsDisassembler;

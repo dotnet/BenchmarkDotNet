@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
@@ -33,8 +32,6 @@ namespace BenchmarkDotNet.Columns
                 return "-";
 
             var cultureInfo = summary.GetCultureInfo();
-            if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Size && descriptor.Id == DisassemblyDiagnoser.DescriptorId)
-                return SizeValue.FromBytes((long)metric.Value).ToString(style.CodeSizeUnit, cultureInfo, descriptor.NumberFormat);
             if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Size)
                 return SizeValue.FromBytes((long)metric.Value).ToString(style.SizeUnit, cultureInfo, descriptor.NumberFormat);
             if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Time)

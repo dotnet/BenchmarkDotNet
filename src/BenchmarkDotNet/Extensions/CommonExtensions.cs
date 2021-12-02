@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Extensions
@@ -20,8 +19,6 @@ namespace BenchmarkDotNet.Extensions
 
             switch (column.UnitType)
             {
-                case UnitType.Size when column.Id == DisassemblyDiagnoser.DescriptorId:
-                    return $"{column.ColumnName} [{style.CodeSizeUnit.Name}]";
                 case UnitType.Size:
                     return $"{column.ColumnName} [{style.SizeUnit.Name}]";
                 case UnitType.Time:

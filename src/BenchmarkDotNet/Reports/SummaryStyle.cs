@@ -19,7 +19,6 @@ namespace BenchmarkDotNet.Reports
         public bool PrintZeroValuesInContent { get; }
         public int MaxParameterColumnWidth { get; }
         public SizeUnit SizeUnit { get; }
-        public SizeUnit CodeSizeUnit { get; }
         public TimeUnit TimeUnit { get; }
         [NotNull]
         public CultureInfo CultureInfo { get; }
@@ -27,7 +26,7 @@ namespace BenchmarkDotNet.Reports
         public RatioStyle RatioStyle { get; }
 
         public SummaryStyle([CanBeNull] CultureInfo cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true,
-            bool printZeroValuesInContent = false, int maxParameterColumnWidth = DefaultMaxParameterColumnWidth, RatioStyle ratioStyle = RatioStyle.Value, SizeUnit codeSizeUnit = null)
+            bool printZeroValuesInContent = false, int maxParameterColumnWidth = DefaultMaxParameterColumnWidth, RatioStyle ratioStyle = RatioStyle.Value)
         {
             if (maxParameterColumnWidth < DefaultMaxParameterColumnWidth)
                 throw new ArgumentOutOfRangeException(nameof(maxParameterColumnWidth), $"{DefaultMaxParameterColumnWidth} is the minimum.");
@@ -40,29 +39,25 @@ namespace BenchmarkDotNet.Reports
             PrintZeroValuesInContent = printZeroValuesInContent;
             MaxParameterColumnWidth = maxParameterColumnWidth;
             RatioStyle = ratioStyle;
-            CodeSizeUnit = codeSizeUnit;
         }
 
         public SummaryStyle WithTimeUnit(TimeUnit timeUnit)
-            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, timeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, RatioStyle, CodeSizeUnit);
+            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, timeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, RatioStyle);
 
         public SummaryStyle WithSizeUnit(SizeUnit sizeUnit)
-            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, sizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, RatioStyle, CodeSizeUnit);
-
-        public SummaryStyle WithCodeSizeUnit(SizeUnit codeSizeUnit)
-            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, RatioStyle, codeSizeUnit);
+            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, sizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, RatioStyle);
 
         public SummaryStyle WithZeroMetricValuesInContent()
-            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, printZeroValuesInContent: true, MaxParameterColumnWidth, RatioStyle, CodeSizeUnit);
+            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, printZeroValuesInContent: true, MaxParameterColumnWidth, RatioStyle);
 
         public SummaryStyle WithMaxParameterColumnWidth(int maxParameterColumnWidth)
-            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, maxParameterColumnWidth, RatioStyle, CodeSizeUnit);
+            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, maxParameterColumnWidth, RatioStyle);
 
         public SummaryStyle WithCultureInfo(CultureInfo cultureInfo)
-            => new SummaryStyle(cultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, RatioStyle, CodeSizeUnit);
+            => new SummaryStyle(cultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, RatioStyle);
 
         public SummaryStyle WithRatioStyle(RatioStyle ratioStyle)
-            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, ratioStyle, CodeSizeUnit);
+            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, ratioStyle);
 
         public bool Equals(SummaryStyle other)
         {
@@ -75,7 +70,6 @@ namespace BenchmarkDotNet.Reports
                    && PrintUnitsInContent == other.PrintUnitsInContent
                    && PrintZeroValuesInContent == other.PrintZeroValuesInContent
                    && Equals(SizeUnit, other.SizeUnit)
-                   && Equals(CodeSizeUnit, other.CodeSizeUnit)
                    && Equals(TimeUnit, other.TimeUnit)
                    && MaxParameterColumnWidth == other.MaxParameterColumnWidth
                    && RatioStyle == other.RatioStyle;
@@ -91,7 +85,6 @@ namespace BenchmarkDotNet.Reports
                 hashCode = (hashCode * 397) ^ PrintUnitsInContent.GetHashCode();
                 hashCode = (hashCode * 397) ^ PrintZeroValuesInContent.GetHashCode();
                 hashCode = (hashCode * 397) ^ (SizeUnit != null ? SizeUnit.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (CodeSizeUnit != null ? CodeSizeUnit.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (TimeUnit != null ? TimeUnit.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ MaxParameterColumnWidth;
                 hashCode = (hashCode * 397) ^ RatioStyle.GetHashCode();

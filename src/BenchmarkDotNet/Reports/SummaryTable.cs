@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
@@ -52,12 +51,6 @@ namespace BenchmarkDotNet.Reports
             if (style.SizeUnit == null)
             {
                 style = style.WithSizeUnit(SizeUnit.GetBestSizeUnit(summary.Reports.Select(r => r.GcStats.GetBytesAllocatedPerOperation(r.BenchmarkCase)).ToArray()));
-            }
-
-            if (style.CodeSizeUnit == null)
-            {
-                var methodsSizes = summary.Reports.SelectMany(r => r.Metrics).Where(m => m.Key == DisassemblyDiagnoser.DescriptorId).Select(x => (long)x.Value.Value).ToArray();
-                style = style.WithCodeSizeUnit(SizeUnit.GetBestSizeUnit(methodsSizes));
             }
 
             var columns = summary.GetColumns();
