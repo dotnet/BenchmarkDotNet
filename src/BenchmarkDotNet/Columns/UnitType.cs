@@ -4,6 +4,7 @@
     {
         Dimensionless,
         Time,
-        Size
+        Size,
+        CodeSize
     }
 }
