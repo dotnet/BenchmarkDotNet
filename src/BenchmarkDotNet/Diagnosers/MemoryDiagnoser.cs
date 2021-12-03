@@ -42,21 +42,7 @@ namespace BenchmarkDotNet.Diagnosers
             if (diagnoserResults.GcStats.Gen2Collections > 0 && Config.DisplayGenColumns)
                 yield return new Metric(GarbageCollectionsMetricDescriptor.Gen2, diagnoserResults.GcStats.Gen2Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
 
-            yield return new Metric(AllocatedMemoryMetricDescriptor.Instance, diagnoserResults.GcStats.GetBytesAllocatedPerOperation(diagnoserResults.BenchmarkCase));
-        }
-
-        private class AllocatedMemoryMetricDescriptor : IMetricDescriptor
-        {
-            internal static readonly IMetricDescriptor Instance = new AllocatedMemoryMetricDescriptor();
-
-            public string Id => "Allocated Memory";
-            public string DisplayName => "Allocated";
-            public string Legend => "Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)";
-            public string NumberFormat => "0.##";
-            public UnitType UnitType => UnitType.Size;
-            public string Unit => SizeUnit.B.Name;
-            public bool TheGreaterTheBetter => false;
-            public int PriorityInCategory => GC.MaxGeneration + 1;
+            yield return new Metric(new AllocatedMemoryMetricDescriptor(), diagnoserResults.GcStats.GetBytesAllocatedPerOperation(diagnoserResults.BenchmarkCase));
         }
 
         private class GarbageCollectionsMetricDescriptor : IMetricDescriptor
