@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Columns
         {
             string logicalGroupKey = summary.GetLogicalGroupKey(benchmarkCase);
             var nonBaselines = summary.GetNonBaselines(logicalGroupKey);
-            return nonBaselines.Any(c => GetAllocationRatio(summary[c].Metrics, baselineMetric) < 0.01);
+            return nonBaselines.Any(c => GetAllocationRatio(summary[c].Metrics, baselineMetric) is > 0 and < 0.01);
         }
 
         private static double? GetAllocationRatio(
