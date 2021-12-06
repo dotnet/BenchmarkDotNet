@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Reports
                    && PrintUnitsInContent == other.PrintUnitsInContent
                    && PrintZeroValuesInContent == other.PrintZeroValuesInContent
                    && Equals(SizeUnit, other.SizeUnit)
-                   && Equals(SizeUnit, other.CodeSizeUnit)
+                   && Equals(CodeSizeUnit, other.CodeSizeUnit)
                    && Equals(TimeUnit, other.TimeUnit)
                    && MaxParameterColumnWidth == other.MaxParameterColumnWidth
                    && RatioStyle == other.RatioStyle;
