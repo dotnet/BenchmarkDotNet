@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Columns
                     if (!hide)
                         yield return BaselineRatioColumn.RatioStdDev;
 
-                    if (HasDisassemblyDiagnoser(summary))
+                    if (HasMemoryDiagnoser(summary))
                     {
                         yield return new BaselineAllocationRatioColumn();
                     }
@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Columns
                 return summary.Reports != null && summary.Reports.Any(r => r.ResultStatistics != null && check(r.ResultStatistics));
             }
 
-            private static bool HasDisassemblyDiagnoser(Summary summary)
+            private static bool HasMemoryDiagnoser(Summary summary)
             {
                 return summary.BenchmarksCases.Any(c => c.Config.HasMemoryDiagnoser());
             }
