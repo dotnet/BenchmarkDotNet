@@ -6,6 +6,8 @@ namespace BenchmarkDotNet.Diagnosers
 {
     internal class AllocatedMemoryMetricDescriptor : IMetricDescriptor
     {
+        internal static readonly IMetricDescriptor Instance = new AllocatedMemoryMetricDescriptor();
+
         public string Id => "Allocated Memory";
         public string DisplayName => "Allocated";
         public string Legend => "Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)";
