@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Columns
         }
 
         public override ColumnCategory Category => ColumnCategory.Metric; //it should be displayed after Allocated column
-        public override int PriorityInCategory => AllocatedMemoryMetricDescriptor.Instance.PriorityInCategory + 1; //after AllocatedMemoryMetricDescriptor
+        public override int PriorityInCategory => AllocatedMemoryMetricDescriptor.Instance.PriorityInCategory + 1;
         public override bool IsNumeric => true;
         public override UnitType UnitType => UnitType.Dimensionless;
         public override string Legend => "Allocated memory ratio distribution ([Current]/[Baseline])";
