@@ -63,12 +63,22 @@ namespace BenchmarkDotNet.Columns
                     bool hide = stdDevColumnValues.All(value => value == "0.00" || value == "0.01");
                     if (!hide)
                         yield return BaselineRatioColumn.RatioStdDev;
+
+                    if (HasMemoryDiagnoser(summary))
+                    {
+                        yield return new BaselineAllocationRatioColumn();
+                    }
                 }
             }
 
             private static bool NeedToShow(Summary summary, Func<Statistics, bool> check)
             {
                 return summary.Reports != null && summary.Reports.Any(r => r.ResultStatistics != null && check(r.ResultStatistics));
+            }
+
+            private static bool HasMemoryDiagnoser(Summary summary)
+            {
+                return summary.BenchmarksCases.Any(c => c.Config.HasMemoryDiagnoser());
             }
         }
 
