@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Running
 
         public override string ToString() => DisplayInfo;
 
-        private BenchmarkCase(Descriptor descriptor, Job job, ParameterInstances parameters, ImmutableConfig config)
+        internal BenchmarkCase(Descriptor descriptor, Job job, ParameterInstances parameters, ImmutableConfig config)
         {
             Descriptor = descriptor;
             Job = job;

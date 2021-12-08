@@ -16,6 +16,7 @@ namespace BenchmarkDotNet.Order
     {
         public static readonly IOrderer Instance = new DefaultOrderer();
 
+        private readonly IComparer<string[]> categoryComparer = CategoryComparer.Instance;
         private readonly IComparer<ParameterInstances> paramsComparer = ParameterComparer.Instance;
         private readonly IComparer<Job> jobComparer = JobComparer.Instance;
         private readonly IComparer<BenchmarkCase> benchmarkComparer;
@@ -31,7 +32,7 @@ namespace BenchmarkDotNet.Order
             SummaryOrderPolicy = summaryOrderPolicy;
             MethodOrderPolicy = methodOrderPolicy;
             IComparer<Descriptor> targetComparer = new DescriptorComparer(methodOrderPolicy);
-            benchmarkComparer = new BenchmarkComparer(paramsComparer, jobComparer, targetComparer);
+            benchmarkComparer = new BenchmarkComparer(categoryComparer, paramsComparer, jobComparer, targetComparer);
             logicalGroupComparer = new LogicalGroupComparer(benchmarkComparer);
         }
 
@@ -103,14 +104,14 @@ namespace BenchmarkDotNet.Order
             }
 
             var keys = new List<string>();
+            if (rules.Contains(BenchmarkLogicalGroupRule.ByCategory))
+                keys.Add(string.Join(",", benchmarkCase.Descriptor.Categories));
             if (rules.Contains(BenchmarkLogicalGroupRule.ByMethod))
                 keys.Add(benchmarkCase.Descriptor.DisplayInfo);
             if (rules.Contains(BenchmarkLogicalGroupRule.ByJob))
                 keys.Add(benchmarkCase.Job.DisplayInfo);
             if (rules.Contains(BenchmarkLogicalGroupRule.ByParams))
                 keys.Add(benchmarkCase.Parameters.ValueInfo);
-            if (rules.Contains(BenchmarkLogicalGroupRule.ByCategory))
-                keys.Add(string.Join(",", benchmarkCase.Descriptor.Categories));
 
             string logicalGroupKey = string.Join("-", keys.Where(key => key != string.Empty));
             return logicalGroupKey == string.Empty ? "*" : logicalGroupKey;
@@ -127,12 +128,18 @@ namespace BenchmarkDotNet.Order
 
         private class BenchmarkComparer : IComparer<BenchmarkCase>
         {
+            private readonly IComparer<string[]> categoryComparer;
             private readonly IComparer<ParameterInstances> paramsComparer;
             private readonly IComparer<Job> jobComparer;
             private readonly IComparer<Descriptor> targetComparer;
 
-            public BenchmarkComparer(IComparer<ParameterInstances> paramsComparer, IComparer<Job> jobComparer, IComparer<Descriptor> targetComparer)
+            public BenchmarkComparer(
+                IComparer<string[]> categoryComparer,
+                IComparer<ParameterInstances> paramsComparer,
+                IComparer<Job> jobComparer,
+                IComparer<Descriptor> targetComparer)
             {
+                this.categoryComparer = categoryComparer;
                 this.targetComparer = targetComparer;
                 this.jobComparer = jobComparer;
                 this.paramsComparer = paramsComparer;
@@ -145,6 +152,7 @@ namespace BenchmarkDotNet.Order
                 if (x == null) return -1;
                 return new[]
                 {
+                    categoryComparer?.Compare(x.Descriptor.Categories, y.Descriptor.Categories) ?? 0,
                     paramsComparer?.Compare(x.Parameters, y.Parameters) ?? 0,
                     jobComparer?.Compare(x.Job, y.Job) ?? 0,
                     targetComparer?.Compare(x.Descriptor, y.Descriptor) ?? 0,
