@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Configs
             var uniqueValidators = GetValidators(source.GetValidators(), MandatoryValidators, source.Options);
 
             var uniqueFilters = source.GetFilters().ToImmutableHashSet();
-            var uniqueRules = source.GetLogicalGroupRules().ToImmutableHashSet();
+            var uniqueRules = source.GetLogicalGroupRules().ToImmutableArray();
 
             var uniqueRunnableJobs = GetRunnableJobs(source.GetJobs()).ToImmutableHashSet();
 
