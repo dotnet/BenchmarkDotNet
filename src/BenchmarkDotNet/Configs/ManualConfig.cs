@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Configs
         private readonly List<Job> jobs = new List<Job>();
         private readonly HashSet<HardwareCounter> hardwareCounters = new HashSet<HardwareCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
-        private readonly HashSet<BenchmarkLogicalGroupRule> logicalGroupRules = new HashSet<BenchmarkLogicalGroupRule>();
+        private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = new List<BenchmarkLogicalGroupRule>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
@@ -191,7 +191,12 @@ namespace BenchmarkDotNet.Configs
 
         public ManualConfig AddLogicalGroupRules(params BenchmarkLogicalGroupRule[] rules)
         {
-            logicalGroupRules.AddRange(rules);
+            foreach (var rule in rules)
+            {
+                if (logicalGroupRules.Contains(rule))
+                    logicalGroupRules.Remove(rule);
+                logicalGroupRules.Add(rule);
+            }
             return this;
         }
 

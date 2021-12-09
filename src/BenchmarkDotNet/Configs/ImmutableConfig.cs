@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Configs
         private readonly ImmutableHashSet<Job> jobs;
         private readonly ImmutableHashSet<HardwareCounter> hardwareCounters;
         private readonly ImmutableHashSet<IFilter> filters;
-        private readonly ImmutableHashSet<BenchmarkLogicalGroupRule> rules;
+        private readonly ImmutableArray<BenchmarkLogicalGroupRule> rules;
 
         internal ImmutableConfig(
             ImmutableArray<IColumnProvider> uniqueColumnProviders,
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Configs
             ImmutableHashSet<IAnalyser> uniqueAnalyzers,
             ImmutableHashSet<IValidator> uniqueValidators,
             ImmutableHashSet<IFilter> uniqueFilters,
-            ImmutableHashSet<BenchmarkLogicalGroupRule> uniqueRules,
+            ImmutableArray<BenchmarkLogicalGroupRule> uniqueRules,
             ImmutableHashSet<Job> uniqueRunnableJobs,
             ConfigUnionRule unionRule,
             string artifactsPath,
