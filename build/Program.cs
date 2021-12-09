@@ -1,6 +1,8 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Xsl;
 using Cake.Common;
 using Cake.Common.Build;
 using Cake.Common.Build.AppVeyor;
@@ -41,6 +43,7 @@ public class BuildContext : FrostingContext
     public DirectoryPath DocfxDirectory { get; }
     public FilePath DocfxExeFile { get; }
     public FilePath DocfxJsonFile { get; }
+    public DirectoryPath TestOutputDirectory { get; }
 
     public DirectoryPath ChangeLogDirectory { get; }
     public DirectoryPath ChangeLogGenDirectory { get; }
@@ -72,6 +75,7 @@ public class BuildContext : FrostingContext
         DocfxDirectory = ToolsDirectory.Combine("docfx");
         DocfxExeFile = DocfxDirectory.CombineWithFilePath("docfx.exe");
         DocfxJsonFile = DocsDirectory.CombineWithFilePath("docfx.json");
+        TestOutputDirectory = RootDirectory.Combine("TestResults");
 
         ChangeLogDirectory = RootDirectory.Combine("docs").Combine("changelog");
         ChangeLogGenDirectory = RootDirectory.Combine("docs").Combine("_changelog");
@@ -93,7 +97,7 @@ public class BuildContext : FrostingContext
         MsBuildSettings.WithProperty("UseSharedCompilation", "false");
     }
 
-    public DotNetCoreTestSettings GetTestSettingsParameters(string tfm)
+    private DotNetCoreTestSettings GetTestSettingsParameters(FilePath logFile, string tfm)
     {
         return new DotNetCoreTestSettings
         {
@@ -101,13 +105,21 @@ public class BuildContext : FrostingContext
             Framework = tfm,
             NoBuild = true,
             NoRestore = true,
-            Loggers = new[] { "trx" }
+            Loggers = new[] { "trx", $"trx;LogFileName={logFile.FullPath}" }
         };
+    }
+
+    public void RunTests(FilePath projectFile, string alias, string tfm)
+    {
+        var xUnitXmlFile = TestOutputDirectory.CombineWithFilePath(alias + "-" + tfm + ".trx");
+        this.Information($"Run tests for {projectFile} ({tfm}), result file: '{xUnitXmlFile}'");
+        var settings = GetTestSettingsParameters(xUnitXmlFile, tfm);
+        this.DotNetTest(projectFile.FullPath, settings);
     }
 
     public void DocfxChangelogDownload(string version, string versionPrevious, string lastCommit = "")
     {
-        this.Verbose("DocfxChangelogDownload: " + version);
+        this.Information("DocfxChangelogDownload: " + version);
         // Required environment variables: GITHIB_PRODUCT, GITHUB_TOKEN
         var changeLogBuilderDirectory = ChangeLogGenDirectory.Combine("ChangeLogBuilder");
         var changeLogBuilderProjectFile = changeLogBuilderDirectory.CombineWithFilePath("ChangeLogBuilder.csproj");
@@ -121,12 +133,12 @@ public class BuildContext : FrostingContext
         var src = changeLogBuilderDirectory.CombineWithFilePath(version + ".md");
         var dest = ChangeLogGenDirectory.Combine("details").CombineWithFilePath(version + ".md");
         this.CopyFile(src, dest);
-        this.Verbose($"Changelog for {version}: {dest}");
+        this.Information($"Changelog for {version}: {dest}");
     }
 
     public void DocfxChangelogGenerate(string version)
     {
-        this.Verbose("DocfxChangelogGenerate: " + version);
+        this.Information("DocfxChangelogGenerate: " + version);
         var header = ChangeLogGenDirectory.Combine("header").CombineWithFilePath(version + ".md");
         var footer = ChangeLogGenDirectory.Combine("footer").CombineWithFilePath(version + ".md");
         var details = ChangeLogGenDirectory.Combine("details").CombineWithFilePath(version + ".md");
@@ -281,15 +293,12 @@ public class FastTestsTask : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
-        var targetVersions = context.IsRunningOnWindows()
+        var targetFrameworks = context.IsRunningOnWindows()
             ? new[] { "net461", "net5.0" }
             : new[] { "net5.0" };
 
-        foreach (var version in targetVersions)
-        {
-            var dotNetTestSettings = context.GetTestSettingsParameters(version);
-            context.DotNetTest(context.UnitTestsProjectFile.FullPath, dotNetTestSettings);
-        }
+        foreach (var targetFramework in targetFrameworks) 
+            context.RunTests(context.UnitTestsProjectFile, "UnitTests", targetFramework);
     }
 }
 
@@ -304,7 +313,7 @@ public class SlowTestsNet461Task : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
-        context.DotNetTest(context.IntegrationTestsProjectFile.FullPath, context.GetTestSettingsParameters("net461"));
+        context.RunTests(context.IntegrationTestsProjectFile, "IntegrationTests", "net461");
     }
 }
 
@@ -319,7 +328,7 @@ public class SlowTestsNet5Task : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
-        context.DotNetTest(context.IntegrationTestsProjectFile.FullPath, context.GetTestSettingsParameters("net5.0"));
+        context.RunTests(context.IntegrationTestsProjectFile, "IntegrationTests", "net5.0");
     }
 }
 
@@ -355,41 +364,9 @@ public class PackTask : FrostingTask<BuildContext>
     }
 }
 
-[TaskName("CiPack")]
-[IsDependentOn(typeof(PackTask))]
-public class CiPackTask : FrostingTask<BuildContext>
-{
-    public override bool ShouldRun(BuildContext context)
-    {
-        return context.IsCiBuild && context.IsOnAppVeyorAndNotPr && context.IsRunningOnWindows();
-    }
-}
-
-[TaskName("Ci")]
-[IsDependentOn(typeof(AllTestsTask))]
-[IsDependentOn(typeof(CiPackTask))]
-public class CiTask : FrostingTask<BuildContext>
-{
-    public override bool ShouldRun(BuildContext context)
-    {
-        return context.IsCiBuild;
-    }
-}
-
-[TaskName("Local")]
-[IsDependentOn(typeof(AllTestsTask))]
-[IsDependentOn(typeof(PackTask))]
-public class LocalTask : FrostingTask<BuildContext>
-{
-    public override bool ShouldRun(BuildContext context)
-    {
-        return context.IsLocalBuild;
-    }
-}
-
 [TaskName("Default")]
-[IsDependentOn(typeof(LocalTask))]
-[IsDependentOn(typeof(CiTask))]
+[IsDependentOn(typeof(AllTestsTask))]
+[IsDependentOn(typeof(PackTask))]
 public class DefaultTask : FrostingTask
 {
 }
