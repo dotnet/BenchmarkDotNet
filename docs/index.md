@@ -296,6 +296,7 @@ You will avoid common pitfalls, control the accuracy of your measurements, and i
 | Azure Pipelines | Ubuntu  | [![Azure Pipelines Ubuntu](https://dev.azure.com/dotnet/BenchmarkDotNet/_apis/build/status/BenchmarkDotNet%20-%20Ubuntu)](https://dev.azure.com/dotnet/BenchmarkDotNet/_build/latest?definitionId=56) |
 | Azure Pipelines | macOS | [![Azure Pipelines macOS](https://dev.azure.com/dotnet/BenchmarkDotNet/_apis/build/status/BenchmarkDotNet%20-%20macOS)](https://dev.azure.com/dotnet/BenchmarkDotNet/_build/latest?definitionId=57) |
 | AppVeyor | Windows | [![AppVeyor/Windows](https://img.shields.io/appveyor/ci/dotnetfoundation/benchmarkdotnet/master.svg)](https://ci.appveyor.com/project/dotnetfoundation/benchmarkdotnet/branch/master) |
+| GitHub Actions | * | [![build](https://github.com/dotnet/BenchmarkDotNet/actions/workflows/build.yaml/badge.svg)](https://github.com/dotnet/BenchmarkDotNet/actions/workflows/build.yaml) |
 
 ## Contributions are welcome!
 
