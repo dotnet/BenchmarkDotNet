@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Samples
         {
             public CustomConfig()
             {
-                AddJob(Job.ShortRun.WithRuntime(CoreRuntime.Core30));
+                AddJob(Job.ShortRun.WithRuntime(CoreRuntime.Core50));
 
                 var providers = new[]
                 {

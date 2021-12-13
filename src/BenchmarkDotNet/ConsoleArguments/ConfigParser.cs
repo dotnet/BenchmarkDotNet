@@ -24,6 +24,7 @@ using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.MonoWasm;
+using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using CommandLine;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
@@ -111,9 +112,13 @@ namespace BenchmarkDotNet.ConsoleArguments
                     logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(RuntimeMoniker)).Select(name => name.ToLower()))}.");
                     return false;
                 }
-                else if (runtimeMoniker == RuntimeMoniker.Wasm && (options.WasmMainJs == null || options.WasmMainJs.IsNotNullButDoesNotExist()))
+                else if (runtimeMoniker == RuntimeMoniker.MonoAOTLLVM && (options.AOTCompilerPath == null || options.AOTCompilerPath.IsNotNullButDoesNotExist()))
                 {
-                    logger.WriteLineError($"The provided {nameof(options.WasmMainJs)} \"{options.WasmMainJs}\" does NOT exist. It MUST be provided.");
+                     logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{ options.AOTCompilerPath }\" does NOT exist. It MUST be provided.");
+                }
+                else if (runtimeMoniker == RuntimeMoniker.Wasm && (options.RuntimeSrcDir == null || options.RuntimeSrcDir.IsNotNullButDoesNotExist()))
+                {
+                    logger.WriteLineError($"The provided {nameof(options.RuntimeSrcDir)} \"{options.RuntimeSrcDir}\" does NOT exist. It MUST be provided for wasm-aot.");
                     return false;
                 }
             }
@@ -281,6 +286,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithPlatform(options.Platform.Value);
             if (options.RunOncePerIteration)
                 baseJob = baseJob.RunOncePerIteration();
+            if (options.MemoryRandomization)
+                baseJob = baseJob.WithMemoryRandomization();
 
             if (options.EnvironmentVariables.Any())
             {
@@ -345,6 +352,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 #pragma warning restore CS0618 // Type or member is obsolete
                 case RuntimeMoniker.Net50:
                 case RuntimeMoniker.Net60:
+                case RuntimeMoniker.Net70:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
                         .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));
@@ -357,6 +365,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.CoreRt31:
                 case RuntimeMoniker.CoreRt50:
                 case RuntimeMoniker.CoreRt60:
+                case RuntimeMoniker.CoreRt70:
                     var builder = CoreRtToolchain.CreateBuilder();
 
                     if (options.CliPath != null)
@@ -384,19 +393,48 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return MakeWasmJob(baseJob, options, timeOut, "net5.0");
                 case RuntimeMoniker.WasmNet60:
                     return MakeWasmJob(baseJob, options, timeOut, "net6.0");
-
+                case RuntimeMoniker.WasmNet70:
+                    return MakeWasmJob(baseJob, options, timeOut, "net7.0");
+                case RuntimeMoniker.MonoAOTLLVM:
+                    return MakeMonoAOTLLVMJob(baseJob, options, timeOut, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0");
+                case RuntimeMoniker.MonoAOTLLVMNet60:
+                    return MakeMonoAOTLLVMJob(baseJob, options, timeOut, "net6.0");
+                case RuntimeMoniker.MonoAOTLLVMNet70:
+                    return MakeMonoAOTLLVMJob(baseJob, options, timeOut, "net7.0");
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
         }
 
+        private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, TimeSpan? timeOut, string msBuildMoniker)
+        {
+            var monoAotLLVMRuntime = new MonoAotLLVMRuntime(aotCompilerPath: options.AOTCompilerPath, msBuildMoniker: msBuildMoniker);
+
+            var toolChain = MonoAotLLVMToolChain.From(
+            new NetCoreAppSettings(
+                targetFrameworkMoniker: monoAotLLVMRuntime.MsBuildMoniker,
+                runtimeFrameworkVersion: null,
+                name: monoAotLLVMRuntime.Name,
+                customDotNetCliPath: options.CliPath?.FullName,
+                packagesPath: options.RestorePath?.FullName,
+                timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
+                customRuntimePack: options.CustomRuntimePack,
+                aotCompilerPath: options.AOTCompilerPath.ToString(),
+                aotCompilerMode: options.AOTCompilerMode));
+
+            return baseJob.WithRuntime(monoAotLLVMRuntime).WithToolchain(toolChain);
+        }
+
         private static Job MakeWasmJob(Job baseJob, CommandLineOptions options, TimeSpan? timeOut, string msBuildMoniker)
         {
+            bool wasmAot = options.AOTCompilerMode == MonoAotCompilerMode.wasm;
+
             var wasmRuntime = new WasmRuntime(
-                mainJs: options.WasmMainJs,
                 msBuildMoniker: msBuildMoniker,
                 javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
-                javaScriptEngineArguments: options.WasmJavaScriptEngineArguments);
+                javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
+                aot: wasmAot,
+                runtimeSrcDir: options.RuntimeSrcDir);
 
             var toolChain = WasmToolChain.From(new NetCoreAppSettings(
                 targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
@@ -405,7 +443,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 customDotNetCliPath: options.CliPath?.FullName,
                 packagesPath: options.RestorePath?.FullName,
                 timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
-                customRuntimePack: options.CustomRuntimePack));
+                customRuntimePack: options.CustomRuntimePack,
+                aotCompilerMode: options.AOTCompilerMode));
 
             return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain);
         }

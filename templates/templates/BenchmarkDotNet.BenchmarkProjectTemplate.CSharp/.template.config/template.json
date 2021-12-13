@@ -29,13 +29,13 @@
       "FileRename": "_BenchmarkName_",
       "replaces": "$(BenchmarkName)"
     },
-    "frameworks": {
+    "framework": {
       "type": "parameter",
       "datatype": "string",
-      "description": "The target framework(s) for the project (e.g. netstandard2.0;net472). Default \"net5.0\" if \"--console-app\" is true, \"netstandard2.0\" if \"--console-app\" is true",
+      "description": "The target framework for the project (e.g. netstandard2.0). Default \"net5.0\" if \"--console-app\" is true, \"netstandard2.0\" if \"--console-app\" is false",
       "defaultValue": ""
     },
-    "frameworksDefaults": {
+    "frameworkDefault": {
       "type": "generated",
       "generator": "switch",
       "description": "generate a default framework value based on consoleApp",
@@ -44,38 +44,37 @@
         "datatype": "string",
         "cases": [
           {
-            "condition": "(frameworks == '' && consoleApp == true)",
+            "condition": "(framework == '' && consoleApp == true)",
             "value": "net5.0"
           },
           {
-            "condition": "(frameworks == '' && consoleApp == false)",
+            "condition": "(framework == '' && consoleApp == false)",
             "value": "netstandard2.0"
           },
           {
-            "condition": "(frameworks != '')",
+            "condition": "(framework != '')",
             "value": ""
           }
         ]
-      },
-      "replaces": "$(Frameworks)"
+      }
     },
-    "frameworksValue": {
+    "frameworkValue": {
       "type": "generated",
       "generator": "join",
-      "description": "join frameworks and frameworksDefaults",
+      "description": "join framework and frameworkDefault",
       "parameters": {
         "symbols": [
           {
             "type": "ref",
-            "value": "frameworks"
+            "value": "framework"
           },
           {
             "type": "ref",
-            "value": "frameworksDefaults"
+            "value": "frameworkDefault"
           }
         ]
       },
-      "replaces": "$(Frameworks)"
+      "replaces": "$(Framework)"
     },
     "config": {
       "type": "parameter",
@@ -99,7 +98,7 @@
       "type": "parameter",
       "datatype": "string",
       "description": "Version of BenchmarkDotNet that will be referenced.",
-      "defaultValue": "0.12.0",
+      "defaultValue": "0.12.1",
       "replaces": "$(BenchmarkDotNetVersion)"
     }
   },

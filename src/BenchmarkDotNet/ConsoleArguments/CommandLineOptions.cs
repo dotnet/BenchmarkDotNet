@@ -7,6 +7,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using CommandLine;
 using CommandLine.Text;
 using JetBrains.Annotations;
@@ -168,17 +169,26 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("envVars", Required = false, HelpText = "Colon separated environment variables (key:value)")]
         public IEnumerable<string> EnvironmentVariables { get; set; }
 
+        [Option("memoryRandomization", Required = false, HelpText = "Specifies whether Engine should allocate some random-sized memory between iterations. It makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration.")]
+        public bool MemoryRandomization { get; set; }
+
         [Option("wasmEngine", Required = false, HelpText = "Full path to a java script engine used to run the benchmarks, used by Wasm toolchain.")]
         public FileInfo WasmJavascriptEngine { get; set; }
-
-        [Option("wasmMainJS", Required = false, HelpText = "Path to the main.js file used by Wasm toolchain. Mandatory when using \"--runtimes wasm\"")]
-        public FileInfo WasmMainJs { get; set; }
 
         [Option("wasmArgs", Required = false, Default = "--expose_wasm", HelpText = "Arguments for the javascript engine used by Wasm toolchain.")]
         public string WasmJavaScriptEngineArguments { get; set; }
 
-        [Option("customRuntimePack", Required = false, HelpText = "Specify the path to a custom runtime pack. Only used for wasm currently.")]
+        [Option("customRuntimePack", Required = false, HelpText = "Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.")]
         public string CustomRuntimePack { get; set; }
+
+        [Option("AOTCompilerPath", Required = false, HelpText = "Path to Mono AOT compiler, used for MonoAotLLVM.")]
+        public FileInfo AOTCompilerPath { get; set; }
+
+        [Option("AOTCompilerMode", Required = false, Default = MonoAotCompilerMode.mini, HelpText = "Mono AOT compiler mode, either 'mini' or 'llvm'")]
+        public MonoAotCompilerMode AOTCompilerMode { get; set; }
+
+        [Option("runtimeSrcDir", Required = false, HelpText = "Path to a local copy of dotnet/runtime. . Used by the WASM toolchain when AOTCompilerMode is 'wasm'.")]
+        public DirectoryInfo RuntimeSrcDir { get; set; }
 
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 

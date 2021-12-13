@@ -6,6 +6,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Configs
@@ -44,7 +45,7 @@ namespace BenchmarkDotNet.Configs
             var uniqueValidators = GetValidators(source.GetValidators(), MandatoryValidators, source.Options);
 
             var uniqueFilters = source.GetFilters().ToImmutableHashSet();
-            var uniqueRules = source.GetLogicalGroupRules().ToImmutableHashSet();
+            var uniqueRules = source.GetLogicalGroupRules().ToImmutableArray();
 
             var uniqueRunnableJobs = GetRunnableJobs(source.GetJobs()).ToImmutableHashSet();
 
@@ -63,7 +64,7 @@ namespace BenchmarkDotNet.Configs
                 source.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath,
                 source.CultureInfo,
                 source.Orderer ?? DefaultOrderer.Instance,
-                source.SummaryStyle,
+                source.SummaryStyle ?? SummaryStyle.Default,
                 source.Options
             );
         }
@@ -129,7 +130,7 @@ namespace BenchmarkDotNet.Configs
 
             foreach (var diagnoser in uniqueDiagnosers)
             foreach (var analyser in diagnoser.Analysers)
-                if (builder.Contains(analyser))
+                if (!builder.Contains(analyser))
                     builder.Add(analyser);
 
             return builder.ToImmutable();

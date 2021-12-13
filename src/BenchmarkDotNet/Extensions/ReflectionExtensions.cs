@@ -45,6 +45,8 @@ namespace BenchmarkDotNet.Extensions
 
             if (type == typeof(void))
                 return "void";
+            if (type == typeof(void*))
+                return "void*";
             string prefix = "";
             if (!string.IsNullOrEmpty(type.Namespace) && includeNamespace)
                 prefix += type.Namespace + ".";

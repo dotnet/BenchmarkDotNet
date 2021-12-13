@@ -190,18 +190,18 @@ Example: `dotnet run -c Release -- --coreRun "C:\Projects\corefx\bin\testhost\ne
 
 ## CoreRT
 
-BenchmarkDotNet supports [CoreRT](https://github.com/dotnet/corert)! However, you might want to know how it works to get a better understanding of the results that you get.
+BenchmarkDotNet supports [CoreRT](https://github.com/dotnet/runtimelab/tree/feature/NativeAOT)! However, you might want to know how it works to get a better understanding of the results that you get.
 
 * CoreRT is a flavor of .NET Core. Which means that:
-  *  you have to target .NET Core to be able to build CoreRT benchmarks (`<TargetFramework>netcoreapp2.1</TargetFramework>` in the .csproj file)
-  *  you have to specify the CoreRT runtime in an explicit way, either by using `[SimpleJob]` attribute or by using the fluent Job config API `Job.ShortRun.With(CoreRtRuntime.$version)`
-  *  to run CoreRT benchmark you run the app as a .NET Core/.NET process (`dotnet run -c Release -f netcoreapp2.1`) and BenchmarkDotNet does all the CoreRT compilation for you. If you want to check what files are generated you need to apply `[KeepBenchmarkFiles]` attribute to the class which defines benchmarks.
+  *  you have to target .NET Core to be able to build CoreRT benchmarks (example: `<TargetFramework>net5.0</TargetFramework>` in the .csproj file)
+  *  you have to specify the CoreRT runtime in an explicit way, either by using `[SimpleJob]` attribute or by using the fluent Job config API `Job.ShortRun.With(CoreRtRuntime.$version)` or console line arguments `--runtimes corert50`
+  *  to run CoreRT benchmark you run the app as a .NET Core/.NET process (example: `dotnet run -c Release -f net5.01`) and BenchmarkDotNet does all the CoreRT compilation for you. If you want to check what files are generated you need to apply `[KeepBenchmarkFiles]` attribute to the class which defines benchmarks.
 
-By default BenchmarkDotNet uses the latest version of `Microsoft.DotNet.ILCompiler` to build the CoreRT benchmark according to [this instructions](https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project).
+By default BenchmarkDotNet uses the latest version of `Microsoft.DotNet.ILCompiler` to build the CoreRT benchmark according to [this instructions](https://github.com/dotnet/runtimelab/blob/d0a37893a67c125f9b0cd8671846ff7d867df241/samples/HelloWorld/README.md#add-corert-to-your-project).
 
 ```cs
 var config = DefaultConfig.Instance
-    .With(Job.Default.With(CoreRtRuntime.CoreRt21)); // compiles the benchmarks as netcoreapp2.1 and uses the latest CoreRT to build a native app
+    .With(Job.Default.With(CoreRtRuntime.CoreRt50)); // compiles the benchmarks as net5.0 and uses the latest CoreRT to build a native app
 
 BenchmarkSwitcher
     .FromAssembly(typeof(Program).Assembly)
@@ -209,7 +209,7 @@ BenchmarkSwitcher
 ```
 
 ```cs
-[SimpleJob(RuntimeMoniker.CoreRt21)] // compiles the benchmarks as netcoreapp2.1 and uses the latest CoreRT to build a native app
+[SimpleJob(RuntimeMoniker.CoreRt50)] // compiles the benchmarks as net5.0 and uses the latest CoreRT to build a native app
 public class TheTypeWithBenchmarks
 {
    [Benchmark] // the benchmarks go here
@@ -218,15 +218,17 @@ public class TheTypeWithBenchmarks
 
 **Note**: BenchmarkDotNet is going to run `dotnet restore` on the auto-generated project. The first time it does so, it's going to take a **LOT** of time to download all the dependencies (few minutes). Just give it some time and don't press `Ctrl+C` too fast ;)
 
-If you want to benchmark some particular version of CoreRT you have to specify it in an explicit way:
+If you want to benchmark some particular version of CoreRT (or from a different NuGet feed) you have to specify it in an explicit way:
 
 ```cs
 var config = DefaultConfig.Instance
     .With(Job.ShortRun
         .With(CoreRtToolchain.CreateBuilder()
-            .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-26412-02") // the version goes here
+            .UseCoreRtNuGet(
+                microsoftDotNetILCompilerVersion: "6.0.0-*", // the version goes here
+                nuGetFeedUrl: "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json") // this address might change over time
             .DisplayName("CoreRT NuGet")
-            .TargetFrameworkMoniker("netcoreapp2.1")
+            .TargetFrameworkMoniker("net5.0")
             .ToToolchain()));
 ```
 
@@ -334,13 +336,6 @@ And FINALLY build Mono Runtime with Web Assembly support:
 ./build.sh --arch wasm --os Browser -c release
 ```
 
-Before you run the benchmarks, you need to make sure that following two file exists:
-
-```cmd
-runtime/src/mono/wasm/runtime-test.js
-runtime/build.sh
-```
-
 And that you have .NET 5 feed added to your `nuget.config` file:
 
 ```xml
@@ -351,3 +346,38 @@ Now you should be able to run the Wasm benchmarks!
 
 [!include[IntroWasm](../samples/IntroWasm.md)]
 
+## MonoAotLLVM
+
+BenchmarkDotNet supports doing Mono AOT runs with both the Mono-Mini compiler and the Mono-LLVM compiler (which uses llvm on the back end).
+
+Using this tool chain requires the following flags:
+
+```
+--runtimes monoaotllvm
+--aotcompilerpath <path to mono aot compiler>
+--customruntimepack <path to runtime pack>
+```
+
+and optionally (defaults to mini)
+
+```
+--aotcompilermode <mini|llvm>  
+```
+
+As of this writing, the mono aot compiler is not available as a seperate download or nuget package. Therefore, it is required to build the compiler in the [dotnet/runtime repository].
+
+The compiler binary (mono-sgen) is built as part of the `mono` subset, so it can be built (along with the runtime pack) like so (in the root of [dotnet/runtime]).
+
+`./build.sh -subset mono+libs -c Release`
+
+The compiler binary should be generated here (modify for your platform):
+
+```
+<runtime root>/artifacts/obj/mono/OSX.x64.Release/mono/mini/mono-sgen
+```
+
+And the runtime pack should be generated here:
+
+```
+<runtimeroot>artifacts/bin/microsoft.netcore.app.runtime.osx-x64/Release/
+```

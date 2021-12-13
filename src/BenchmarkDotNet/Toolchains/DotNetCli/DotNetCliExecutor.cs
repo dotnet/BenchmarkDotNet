@@ -64,7 +64,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 CustomDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
                 $"{executableName.Escape()} {benchmarkId.ToArguments()}",
-                redirectStandardInput: true);
+                redirectStandardInput: true,
+                redirectStandardError: false); // #1629
 
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
@@ -87,14 +88,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 loggerWithDiagnoser.ProcessInput();
 
-                if (!process.WaitForExit(milliseconds: 250))
+                if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                 {
-                    logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
+                    logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
 
                     consoleExitHandler.KillProcessTree();
                 }
 
-                return new ExecuteResult(true, process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
+                return new ExecuteResult(true, process.HasExited ? process.ExitCode : null, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
             }
         }
     }

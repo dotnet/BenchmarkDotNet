@@ -44,6 +44,24 @@ namespace BenchmarkDotNet.Portability
 
         public static bool IsWasm => IsOSPlatform(OSPlatform.Create("BROWSER"));
 
+        public static bool IsAot { get; } = IsAotMethod(); // This allocates, so we only want to call it once statically.
+
+        private static bool IsAotMethod()
+        {
+            Type runtimeFeature = Type.GetType("System.Runtime.CompilerServices.RuntimeFeature");
+            if (runtimeFeature != null)
+            {
+                MethodInfo methodInfo = runtimeFeature.GetProperty("IsDynamicCodeCompiled", BindingFlags.Public | BindingFlags.Static)?.GetMethod;
+
+                if (methodInfo != null)
+                {
+                    return !(bool)methodInfo.Invoke(null, null);
+                }
+            }
+
+            return false;
+        }
+
         public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
 
         internal static string ExecutableExtension => IsWindows() ? ".exe" : string.Empty;
@@ -197,6 +215,8 @@ namespace BenchmarkDotNet.Portability
         internal static Runtime GetCurrentRuntime()
         {
             //do not change the order of conditions because it may cause incorrect determination of runtime
+            if (IsAot && IsMono)
+                return MonoAotLLVMRuntime.Default;
             if (IsMono)
                 return MonoRuntime.Default;
             if (IsFullFramework)
@@ -213,9 +233,10 @@ namespace BenchmarkDotNet.Portability
 
         public static Platform GetCurrentPlatform()
         {
-            // it's not part of .NET Standard 2.0, so we use a hack
-            // https://github.com/dotnet/runtime/blob/2c573b59aaaf3fd17e2ecab95ad3769f195d2dbc/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/Architecture.cs#L12
+            // these are not part of .NET Standard 2.0, so we use a hack
+            // https://github.com/dotnet/runtime/blob/d81ad044fa6830f5f31f6b6e8224ebf66a3c298c/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/Architecture.cs#L12-L13
             const Architecture Wasm = (Architecture)4;
+            const Architecture S390x = (Architecture)5;
 
             switch (ProcessArchitecture)
             {
@@ -229,6 +250,8 @@ namespace BenchmarkDotNet.Portability
                     return Platform.X86;
                 case Wasm:
                     return Platform.Wasm;
+                case S390x:
+                    return Platform.S390x;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -252,7 +275,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetJitInfo()
         {
-            if (IsCoreRT || IsNetNative)
+            if (IsCoreRT || IsNetNative || IsAot)
                 return "AOT";
             if (IsMono || IsWasm)
                 return ""; // There is no helpful information about JIT on Mono

@@ -11,7 +11,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
@@ -69,7 +68,7 @@ namespace BenchmarkDotNet.Toolchains
 
             loggerWithDiagnoser.ProcessInput();
 
-            if (!process.WaitForExit(milliseconds: 250))
+            if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
             {
                 logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
 
@@ -89,8 +88,9 @@ namespace BenchmarkDotNet.Toolchains
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardInput = true,
-                RedirectStandardError = true,
+                RedirectStandardError = false, // #1629
                 CreateNoWindow = true,
+                StandardOutputEncoding = Encoding.UTF8, // #1713
                 WorkingDirectory = null // by default it's null
             };
 
@@ -98,9 +98,7 @@ namespace BenchmarkDotNet.Toolchains
 
             string exePath = artifactsPaths.ExecutablePath;
 
-            var runtime = benchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
-                ? benchmarkCase.Job.Environment.Runtime
-                : RuntimeInformation.GetCurrentRuntime();
+            var runtime = benchmarkCase.GetRuntime();
             // TODO: use resolver
 
             switch (runtime)
@@ -117,7 +115,13 @@ namespace BenchmarkDotNet.Toolchains
                     break;
                 case WasmRuntime wasm:
                     start.FileName = wasm.JavaScriptEngine;
-                    start.Arguments = $"{wasm.JavaScriptEngineArguments} runtime.js -- --run {artifactsPaths.ProgramName}.dll {args} ";
+                    start.RedirectStandardInput = false;
+                    start.Arguments = $"{wasm.JavaScriptEngineArguments} main.js -- --run {artifactsPaths.ProgramName}.dll {args} ";
+                    start.WorkingDirectory = artifactsPaths.BinariesDirectoryPath;
+                    break;
+                case MonoAotLLVMRuntime _:
+                    start.FileName = exePath;
+                    start.Arguments = args;
                     start.WorkingDirectory = artifactsPaths.BinariesDirectoryPath;
                     break;
                 default:

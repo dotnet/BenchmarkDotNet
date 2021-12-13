@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.ConsoleArguments
@@ -11,27 +12,23 @@ namespace BenchmarkDotNet.ConsoleArguments
     {
         // note This is a heuristic value, we suppose that user can make three or fewer typos.
         private static int PossibleTyposCount => 3;
-        private readonly HashSet<string> possibleBenchmarkNames = new HashSet<string>();
-        private readonly HashSet<string> allBenchmarkNames = new HashSet<string>();
+        private readonly HashSet<string> possibleBenchmarkNameFilters = new HashSet<string>();
+        private readonly HashSet<string> actualFullBenchmarkNames = new HashSet<string>();
 
         public CorrectionsSuggester(IReadOnlyList<Type> types)
         {
-            var benchmarkNames = new HashSet<string>();
-            foreach (var type in types)
+            foreach (var benchmarkRunInfo in TypeFilter.Filter(DefaultConfig.Instance, types))
             {
-                var namesCollection = type.GetMethods()
-                    .Where(methodInfo => methodInfo.HasAttribute<BenchmarkAttribute>())
-                    .Select(methodInfo => $@"{(type.IsGenericType
-                        ? type.GetDisplayName()
-                        : type.FullName)}.{methodInfo.Name}")
-                    .ToArray();
-                benchmarkNames.AddRange(namesCollection);
+                foreach (var benchmarkCase in benchmarkRunInfo.BenchmarksCases)
+                {
+                    string fullBenchmarkName = benchmarkCase.Descriptor.GetFilterName();
 
-                var names = namesCollection.Select(name => name.Split('.', '+')).SelectMany(GetAllPartialNames);
-                possibleBenchmarkNames.AddRange(names);
+                    actualFullBenchmarkNames.Add(fullBenchmarkName);
+
+                    var names = GetAllPartialNames(fullBenchmarkName.Split('.'));
+                    possibleBenchmarkNameFilters.AddRange(names);
+                }
             }
-
-            allBenchmarkNames.AddRange(benchmarkNames);
         }
 
         public string[] SuggestFor([NotNull] string userInput)
@@ -40,7 +37,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 throw new ArgumentNullException(nameof(userInput));
 
             var calculator = new LevenshteinDistanceCalculator();
-            return possibleBenchmarkNames
+            return possibleBenchmarkNameFilters
                 .Select(name => (name: name, distance: calculator.Calculate(userInput, name)))
                 .Where(tuple => tuple.distance <= PossibleTyposCount)
                 .OrderBy(tuple => tuple.distance)
@@ -49,13 +46,35 @@ namespace BenchmarkDotNet.ConsoleArguments
                 .ToArray();
         }
 
-        public string[] GetAllBenchmarkNames() => allBenchmarkNames.ToArray();
+        public string[] GetAllBenchmarkNames() => actualFullBenchmarkNames.ToArray();
 
+        // A.B.C should get translated into
+        // A*
+        // A.B*
+        // *B*
+        // *C
         private static IEnumerable<string> GetAllPartialNames(string[] nameParts)
         {
             for (int partLength = 1; partLength <= nameParts.Length; partLength++)
-            for (int i = 0; i < nameParts.Length - partLength + 1; i++)
-                yield return string.Join(".", nameParts.Skip(i).Take(partLength));
+            {
+                for (int i = 0; i < nameParts.Length - partLength + 1; i++)
+                {
+                    string permutation = string.Join(".", nameParts.Skip(i).Take(partLength));
+
+                    if (i == 0 && partLength == nameParts.Length)
+                    {
+                        yield return permutation; // we don't want to offer *fullname*
+                    }
+                    else if (i == 0)
+                    {
+                        yield return $"{permutation}*";
+                    }
+                    else
+                    {
+                        yield return $"*{permutation}*";
+                    }
+                }
+            }
         }
     }
 }

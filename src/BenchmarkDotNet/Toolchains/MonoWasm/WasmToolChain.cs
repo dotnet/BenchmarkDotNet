@@ -27,10 +27,8 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 return false;
 
             if (RuntimeInformation.IsWindows())
-            {
-                logger.WriteLineError($"{nameof(WasmToolChain)} is supported only on Unix, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
-                return false;
-            }
+                logger.WriteLineInfo($"{nameof(WasmToolChain)} is supported only on Unix, benchmark '{benchmarkCase.DisplayInfo}' might not work correctly");
+
             return true;
         }
 
@@ -40,7 +38,8 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     new WasmGenerator(netCoreAppSettings.TargetFrameworkMoniker,
                         netCoreAppSettings.CustomDotNetCliPath,
                         netCoreAppSettings.PackagesPath,
-                        netCoreAppSettings.CustomRuntimePack),
+                        netCoreAppSettings.CustomRuntimePack,
+                        netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm),
                     new WasmBuilder(netCoreAppSettings.TargetFrameworkMoniker,
                         netCoreAppSettings.CustomDotNetCliPath,
                         netCoreAppSettings.Timeout),

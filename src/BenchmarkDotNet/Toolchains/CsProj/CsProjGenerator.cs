@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         private const string DefaultSdkName = "Microsoft.NET.Sdk";
 
         private static readonly ImmutableArray<string> SettingsWeWantToCopy =
-            new[] { "NetCoreAppImplicitPackageVersion", "RuntimeFrameworkVersion", "PackageTargetFallback", "LangVersion", "UseWpf", "UseWindowsForms", "CopyLocalLockFileAssemblies", "PreserveCompilationContext", "UserSecretsId" }.ToImmutableArray();
+            new[] { "NetCoreAppImplicitPackageVersion", "RuntimeFrameworkVersion", "PackageTargetFallback", "LangVersion", "UseWpf", "UseWindowsForms", "CopyLocalLockFileAssemblies", "PreserveCompilationContext", "UserSecretsId", "EnablePreviewFeatures" }.ToImmutableArray();
 
         public string RuntimeFrameworkVersion { get; }
 
@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
         {
-            string assemblyLocation = buildPartition.AssemblyLocation;
+            string assemblyLocation = buildPartition.RepresentativeBenchmarkCase.Descriptor.Type.Assembly.Location;
 
             //Assembles loaded from a stream will have an empty location (https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location).
             string directoryName = assemblyLocation.IsEmpty() ?
@@ -83,16 +83,15 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI]
         protected virtual string GetRuntimeSettings(GcMode gcMode, IResolver resolver)
         {
-            if (!gcMode.HasChanges)
-                return string.Empty;
-
-            return new StringBuilder(80)
+            var builder = new StringBuilder(80)
                 .AppendLine("<PropertyGroup>")
-                    .AppendLine($"<ServerGarbageCollection>{gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()}</ServerGarbageCollection>")
-                    .AppendLine($"<ConcurrentGarbageCollection>{gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase()}</ConcurrentGarbageCollection>")
-                    .AppendLine($"<RetainVMGarbageCollection>{gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver).ToLowerCase()}</RetainVMGarbageCollection>")
-                .AppendLine("</PropertyGroup>")
-                .ToString();
+                .AppendLine($"<ServerGarbageCollection>{gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()}</ServerGarbageCollection>")
+                .AppendLine($"<ConcurrentGarbageCollection>{gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase()}</ConcurrentGarbageCollection>");
+
+            if (gcMode.HasValue(GcMode.RetainVmCharacteristic))
+                builder.AppendLine($"<RetainVMGarbageCollection>{gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver).ToLowerCase()}</RetainVMGarbageCollection>");
+
+            return builder.AppendLine("</PropertyGroup>").ToString();
         }
 
         // the host project or one of the .props file that it imports might contain some custom settings that needs to be copied, sth like

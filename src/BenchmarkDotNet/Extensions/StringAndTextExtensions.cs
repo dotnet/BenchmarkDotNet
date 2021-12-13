@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -14,7 +15,17 @@ namespace BenchmarkDotNet.Extensions
 
         internal static string ToLowerCase(this bool value) => value ? "true" : "false"; // to avoid .ToString().ToLower() allocation
 
-        internal static string Escape(this string path) => "\"" + path + "\"";
+        // source: https://stackoverflow.com/a/12364234/5852046
+        internal static string Escape(this string cliArg)
+        {
+            if (string.IsNullOrEmpty(cliArg))
+                return cliArg;
+
+            string value = Regex.Replace(cliArg, @"(\\*)" + "\"", @"$1\$0");
+            value = Regex.Replace(value, @"^(.*\s.*?)(\\*)$", "\"$1$2$2\"", RegexOptions.Singleline);
+
+            return value;
+        }
 
         /// <summary>
         /// replaces all invalid file name chars with their number representation

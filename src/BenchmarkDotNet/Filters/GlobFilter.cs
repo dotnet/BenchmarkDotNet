@@ -1,7 +1,5 @@
 using System.Linq;
 using System.Text.RegularExpressions;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Filters
@@ -20,9 +18,8 @@ namespace BenchmarkDotNet.Filters
         {
             var benchmark = benchmarkCase.Descriptor.WorkloadMethod;
             string fullBenchmarkName = benchmarkCase.Descriptor.GetFilterName();
-            string typeName = benchmark.DeclaringType.GetDisplayName();
 
-            return patterns.Any(pattern => typeName.EqualsWithIgnoreCase(pattern.userValue) || pattern.regex.IsMatch(fullBenchmarkName));
+            return patterns.Any(pattern => pattern.regex.IsMatch(fullBenchmarkName));
         }
 
         // https://stackoverflow.com/a/6907849/5852046 not perfect but should work for all we need

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Running
 {
@@ -18,13 +20,17 @@ namespace BenchmarkDotNet.Running
 
         public override string ToString() => DisplayInfo;
 
-        private BenchmarkCase(Descriptor descriptor, Job job, ParameterInstances parameters, ImmutableConfig config)
+        internal BenchmarkCase(Descriptor descriptor, Job job, ParameterInstances parameters, ImmutableConfig config)
         {
             Descriptor = descriptor;
             Job = job;
             Parameters = parameters;
             Config = config;
         }
+
+        public Runtime GetRuntime() => Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
+                ? Job.Environment.Runtime
+                : RuntimeInformation.GetCurrentRuntime();
 
         public void Dispose() => Parameters.Dispose();
 

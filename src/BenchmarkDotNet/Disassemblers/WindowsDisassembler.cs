@@ -31,12 +31,15 @@ namespace BenchmarkDotNet.Disassemblers
         {
             string resultsPath = Path.GetTempFileName();
 
-            string errors = ProcessHelper.RunAndReadOutput(
-                GetDisassemblerPath(parameters.Process, parameters.BenchmarkCase.Job.Environment.Platform),
-                BuildArguments(parameters, resultsPath));
+            string disassemblerPath = GetDisassemblerPath(parameters.Process, parameters.BenchmarkCase.Job.Environment.Platform);
+            string arguments = BuildArguments(parameters, resultsPath);
+            string errors = ProcessHelper.RunAndReadOutput(disassemblerPath, arguments);
 
             if (!string.IsNullOrEmpty(errors))
+            {
                 parameters.Config.GetCompositeLogger().WriteError(errors);
+                return new DisassemblyResult { Errors = new[] { errors } };
+            }
 
             try
             {
@@ -47,6 +50,10 @@ namespace BenchmarkDotNet.Disassemblers
 
                     return (DisassemblyResult)serializer.Deserialize(reader);
                 }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Can't read disassembly diagnostic file (DisassemblerPath = '{disassemblerPath}', Arguments = '{arguments}')", e);
             }
             finally
             {
@@ -80,9 +87,9 @@ namespace BenchmarkDotNet.Disassemblers
 
             var dir = new FileInfo(assemblyWithDisassemblersInResources.Location).Directory ?? throw new DirectoryNotFoundException();
             string disassemblerPath = Path.Combine(
-                    dir.FullName,
-                    FolderNameHelper.ToFolderName(BenchmarkDotNetInfo.FullVersion), // possible update
-                    exeName); // separate process per architecture!!
+                dir.FullName,
+                FolderNameHelper.ToFolderName(BenchmarkDotNetInfo.FullVersion), // possible update
+                exeName); // separate process per architecture!!
 
             Path.GetDirectoryName(disassemblerPath).CreateIfNotExists();
 

@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData(Jit.RyuJit, Platform.X64, OkCaption)]
         public void CheckCore(Jit jit, Platform platform, string expectedText)
         {
-            Verify(CoreRuntime.Core21, jit, platform, expectedText);
+            Verify(CoreRuntime.Core50, jit, platform, expectedText);
         }
 
         private void Verify(Runtime runtime, Jit jit, Platform platform, string expectedText)

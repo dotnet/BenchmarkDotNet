@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Loggers
@@ -18,7 +19,7 @@ namespace BenchmarkDotNet.Loggers
         {
             if (!process.StartInfo.RedirectStandardOutput)
                 throw new NotSupportedException("set RedirectStandardOutput to true first");
-            if (!process.StartInfo.RedirectStandardInput)
+            if (!(process.StartInfo.RedirectStandardInput || benchmarkCase.GetRuntime() is WasmRuntime))
                 throw new NotSupportedException("set RedirectStandardInput to true first");
 
             this.logger = logger;
@@ -54,7 +55,11 @@ namespace BenchmarkDotNet.Loggers
                 else if (Engine.Signals.TryGetSignal(line, out var signal))
                 {
                     diagnoser?.Handle(signal, diagnoserActionParameters);
-                    process.StandardInput.WriteLine(Engine.Signals.Acknowledgment);
+
+                    if (process.StartInfo.RedirectStandardInput)
+                    {
+                        process.StandardInput.WriteLine(Engine.Signals.Acknowledgment);
+                    }
 
                     if (signal == HostSignal.AfterAll)
                     {

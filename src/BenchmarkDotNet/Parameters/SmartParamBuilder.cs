@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Parameters
             {
                 // the user provided object[] for a benchmark accepting a single argument
                 if (parameterDefinitions.Length == 1 && array.Length == 1
-                    && array[0].GetType() == benchmark.GetParameters().FirstOrDefault()?.ParameterType) // the benchmark that accepts an object[] as argument
+                    && array[0]?.GetType() == benchmark.GetParameters().FirstOrDefault()?.ParameterType) // the benchmark that accepts an object[] as argument
                 {
                     return new ParameterInstances(
                         new[] { Create(parameterDefinitions, array[0], valuesInfo.source, sourceIndex, argumentIndex: 0, summaryStyle) });
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Parameters
 
         public object Value { get; }
 
-        public virtual string DisplayText => Value is Array array ? ArrayParam.GetDisplayString(array) : Value.ToString();
+        public virtual string DisplayText => Value is Array array ? ArrayParam.GetDisplayString(array) : Value?.ToString() ?? ParameterInstance.NullParameterTextRepresentation;
 
         public virtual string ToSourceCode()
         {
@@ -148,11 +148,11 @@ namespace BenchmarkDotNet.Parameters
 
         public object Value { get; }
 
-        public virtual string DisplayText => Value is Array array ? ArrayParam.GetDisplayString(array) : Value.ToString();
+        public virtual string DisplayText => Value is Array array ? ArrayParam.GetDisplayString(array) : Value?.ToString() ?? ParameterInstance.NullParameterTextRepresentation;
 
         public virtual string ToSourceCode()
         {
-            string cast = $"({Value.GetType().GetCorrectCSharpTypeName()})";
+            string cast = Value == null ? string.Empty : $"({Value.GetType().GetCorrectCSharpTypeName()})";
 
             string instancePrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "instance";
 

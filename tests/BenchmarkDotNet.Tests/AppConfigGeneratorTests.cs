@@ -5,9 +5,11 @@ using System.IO;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using Xunit;
 using BenchmarkDotNet.Tests.XUnit;
+using System.Runtime;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -20,10 +22,10 @@ namespace BenchmarkDotNet.Tests
         {
             using (var destination = new Utf8StringWriter())
             {
-                const string expectedMinimal =
+                string expectedMinimal =
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                     "<configuration>" +
-                    "<runtime/>" +
+                    $"<runtime>{GcSettings}</runtime>" +
                     "</configuration>";
 
                 AppConfigGenerator.Generate(Job.Default, TextReader.Null, destination, Resolver);
@@ -38,10 +40,10 @@ namespace BenchmarkDotNet.Tests
             using (var source = new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"))
             using (var destination = new Utf8StringWriter())
             {
-                const string expectedMinimal =
+                string expectedMinimal =
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                     "<configuration>" +
-                    "<runtime/>" +
+                    $"<runtime>{GcSettings}</runtime>" +
                     "</configuration>";
 
                 AppConfigGenerator.Generate(Job.Default, source, destination, Resolver);
@@ -53,50 +55,69 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void RewritesCustomSettings()
         {
-            const string customSettings =
+            string customSettingsWithoutRuntimeNode =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<!--" +
                 "commentsAreSupported" +
                 "-->" +
                 "<configuration>" +
                 "<someConfig>withItsValue</someConfig>" +
-                "<runtime/>" +
                 "</configuration>";
 
-            using (var source = new StringReader(customSettings))
+            string customSettingsWithRuntimeNode =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<!--" +
+                "commentsAreSupported" +
+                "-->" +
+                "<configuration>" +
+                "<someConfig>withItsValue</someConfig>" +
+                $"<runtime>{GcSettings}</runtime>" +
+                "</configuration>";
+
+            using (var source = new StringReader(customSettingsWithoutRuntimeNode))
             using (var destination = new Utf8StringWriter())
             {
                 AppConfigGenerator.Generate(Job.Default, source, destination, Resolver);
 
-                AssertAreEqualIgnoringWhitespacesAndCase(customSettings, destination.ToString());
+                AssertAreEqualIgnoringWhitespacesAndCase(customSettingsWithRuntimeNode, destination.ToString());
             }
         }
 
         [Fact]
         public void RewritesCustomRuntimeSettings()
         {
-            const string customSettings =
+            string customSettingsBefore =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<!--" +
                 "commentsAreSupported" +
                 "-->" +
                 "<configuration>" +
                 "<someConfig>withItsValue</someConfig>" +
-                "<runtime><AppContextSwitchOverrides value=\"Switch.System.IO.UseLegacyPathHandling=false\"/></runtime>" +
+                $"<runtime><AppContextSwitchOverrides value=\"Switch.System.IO.UseLegacyPathHandling=false\"/></runtime>" +
                 "</configuration>";
 
-            using (var source = new StringReader(customSettings))
+            string customSettingsAfter =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<!--" +
+                "commentsAreSupported" +
+                "-->" +
+                "<configuration>" +
+                "<someConfig>withItsValue</someConfig>" +
+                $"<runtime><AppContextSwitchOverrides value=\"Switch.System.IO.UseLegacyPathHandling=false\"/>{GcSettings}</runtime>" +
+                "</configuration>";
+
+            using (var source = new StringReader(customSettingsBefore))
             using (var destination = new Utf8StringWriter())
             {
                 AppConfigGenerator.Generate(Job.Default, source, destination, Resolver);
 
-                AssertAreEqualIgnoringWhitespacesAndCase(customSettings, destination.ToString());
+                AssertAreEqualIgnoringWhitespacesAndCase(customSettingsAfter, destination.ToString());
             }
         }
 
         [Theory]
-        [InlineData(Jit.LegacyJit, "<runtime><useLegacyJit enabled=\"1\" /></runtime>")]
-        [InlineData(Jit.RyuJit, "<runtime><useLegacyJit enabled=\"0\" /></runtime>")]
+        [InlineData(Jit.LegacyJit, "<useLegacyJit enabled=\"1\" />")]
+        [InlineData(Jit.RyuJit, "<useLegacyJit enabled=\"0\" />")]
         public void GeneratesRightJitSettings(Jit jit, string expectedRuntimeNode)
         {
             const string customSettings =
@@ -109,7 +130,7 @@ namespace BenchmarkDotNet.Tests
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<configuration>" +
                 "<someConfig>withItsValue</someConfig>" +
-                expectedRuntimeNode +
+                $"<runtime>{expectedRuntimeNode}{GcSettings}</runtime>" +
                 "</configuration>" + Environment.NewLine;
 
             using (var source = new StringReader(customSettings))
@@ -133,7 +154,7 @@ namespace BenchmarkDotNet.Tests
             string withoutStartup =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<configuration>" +
-                "<runtime/>" +
+                $"<runtime>{GcSettings}</runtime>" +
                 "</configuration>" + Environment.NewLine;
 
             using (var source = new StringReader(input))
@@ -158,7 +179,7 @@ namespace BenchmarkDotNet.Tests
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<configuration>" +
                 "<startup><supportedRuntime version=\"v4.0\" sku=\".NETFramework,Version=v4.6.1\" /></startup>" +
-                "<runtime/>" +
+                $"<runtime>{GcSettings}</runtime>" +
                 "</configuration>" + Environment.NewLine;
 
             using (var source = new StringReader(input))
@@ -186,7 +207,7 @@ namespace BenchmarkDotNet.Tests
                 "</runtime>" +
                 "</configuration>";
 
-            const string settingsWithBindingsAndJit =
+            string settingsWithBindingsAndJit =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<configuration>" +
                 "<runtime>" +
@@ -197,6 +218,7 @@ namespace BenchmarkDotNet.Tests
                 "</dependentAssembly>" +
                 "</assemblyBinding>" +
                 "<useLegacyJit enabled =\"0\" />" +
+                GcSettings +
                 "</runtime>" +
                 "</configuration>";
 
@@ -234,6 +256,8 @@ namespace BenchmarkDotNet.Tests
                 }
             return buffer.ToString();
         }
+
+        private static readonly string GcSettings = $"<gcConcurrentenabled=\"{(GCSettings.LatencyMode != GCLatencyMode.Batch).ToLowerCase()}\"/><gcServerenabled=\"{GCSettings.IsServerGC.ToLowerCase()}\"/>";
     }
 
     internal class Utf8StringWriter : StringWriter

@@ -9,7 +9,7 @@ The config options let you customize some behavior of BenchmarkDotNet - mainly r
 Available config options are:
 
 * `ConfigOptions.Default` - No configuration option is set - this is the default.
-* `ConfigOptions.KeepBenchmarkFiles` - All auto-generated files should be kept after running the benchmarks (be default they are removed).
+* `ConfigOptions.KeepBenchmarkFiles` - All auto-generated files should be kept after running the benchmarks (by default they are removed).
 * `ConfigOptions.JoinSummary` - All benchmarks results should be joined into a single summary (by default we have a summary per type).
 * `ConfigOptions.StopOnFirstError` - Benchmarking should be stopped after the first error (by default it's not).
 * `ConfigOptions.DisableOptimizationsValidator` - Mandatory optimizations validator should be entirely turned off.
@@ -27,15 +27,12 @@ public class Config : ManualConfig
 {
     public Config()
     {
-        Options.Set(true, ConfigOptions.JoinSummary);
-        Options.Set(true, ConfigOptions.DisableLogFile);
-
-        // or
-        Options.Set(true, ConfigOptions.JoinSummary | ConfigOptions.DisableLogFile);
-
-        // or using the With() factory method:
-        this.With(ConfigOptions.JoinSummary)
-            .With(ConfigOptions.DisableLogFile);
+        // Using the WithOptions() factory method:
+        this.WithOptions(ConfigOptions.JoinSummary)
+            .WithOptions(ConfigOptions.DisableLogFile);
+        
+        // Or (The ConfigOptions Enum is defined as a BitField)
+        this.WithOptions(ConfigOptions.JoinSummary | ConfigOptions.DisableLogFile);
 
     }
 }
@@ -50,9 +47,9 @@ public class Config : ManualConfig
             .Run<Benchmarks>(
                 ManualConfig
                     .Create(DefaultConfig.Instance)
-                    .With(ConfigOptions.JoinSummary)
-                    .With(ConfigOptions.DisableLogFile)
+                    .WithOptions(ConfigOptions.JoinSummary)
+                    .WithOptions(ConfigOptions.DisableLogFile)
                     // or
-                    .With(ConfigOptions.JoinSummary | ConfigOptions.DisableLogFile));
+                    .WithOptions(ConfigOptions.JoinSummary | ConfigOptions.DisableLogFile));
     }
 ```

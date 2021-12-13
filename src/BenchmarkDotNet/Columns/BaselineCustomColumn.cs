@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsAvailable(Summary summary) => summary.HasBaselines();
         public bool AlwaysShow => true;
-        public ColumnCategory Category => ColumnCategory.Baseline;
+        public virtual ColumnCategory Category => ColumnCategory.Baseline;
         public abstract int PriorityInCategory { get; }
         public abstract bool IsNumeric { get; }
         public abstract UnitType UnitType { get; }

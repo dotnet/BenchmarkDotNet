@@ -39,6 +39,8 @@ namespace BenchmarkDotNet.Extensions
                     return CoreRuntime.Core50;
                 case RuntimeMoniker.Net60:
                     return CoreRuntime.Core60;
+                case RuntimeMoniker.Net70:
+                    return CoreRuntime.Core70;
                 case RuntimeMoniker.Mono:
                     return MonoRuntime.Default;
                 case RuntimeMoniker.CoreRt20:
@@ -55,6 +57,8 @@ namespace BenchmarkDotNet.Extensions
                     return CoreRtRuntime.CoreRt50;
                 case RuntimeMoniker.CoreRt60:
                     return CoreRtRuntime.CoreRt60;
+                case RuntimeMoniker.CoreRt70:
+                    return CoreRtRuntime.CoreRt70;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "Runtime Moniker not supported");
             }

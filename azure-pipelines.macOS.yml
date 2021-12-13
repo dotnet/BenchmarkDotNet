@@ -11,5 +11,5 @@ jobs:
 - template: build/azure-pipelines.job.template.yml
   parameters:
     name: macOS
-    vmImage: 'macOS-10.14'
+    vmImage: 'macOS-10.15'
     scriptFileName: ./build.sh

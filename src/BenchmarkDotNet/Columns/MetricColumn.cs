@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Columns
         public string Legend => descriptor.Legend;
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Metric;
-        public int PriorityInCategory => 0;
+        public int PriorityInCategory => descriptor.PriorityInCategory;
         public bool IsNumeric => true;
         public UnitType UnitType => descriptor.UnitType;
 
@@ -32,6 +32,9 @@ namespace BenchmarkDotNet.Columns
                 return "-";
 
             var cultureInfo = summary.GetCultureInfo();
+
+            if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.CodeSize)
+                return SizeValue.FromBytes((long)metric.Value).ToString(style.CodeSizeUnit, cultureInfo, descriptor.NumberFormat);
             if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Size)
                 return SizeValue.FromBytes((long)metric.Value).ToString(style.SizeUnit, cultureInfo, descriptor.NumberFormat);
             if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Time)

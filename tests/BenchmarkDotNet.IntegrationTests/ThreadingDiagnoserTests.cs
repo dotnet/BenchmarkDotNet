@@ -1,22 +1,20 @@
-#if NETCOREAPP3_0
+#if !NETFRAMEWORK
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRt;
-using BenchmarkDotNet.Toolchains.DotNetCli;
-using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using BenchmarkDotNet.Portability;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -28,15 +26,23 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public ThreadingDiagnoserTests(ITestOutputHelper outputHelper) => output = outputHelper;
 
-        public static IEnumerable<object[]> GetToolchains() => new[]
+        public static IEnumerable<object[]> GetToolchains()
         {
-            new object[] { Job.Default.GetToolchain() },
-            new object[] { CoreRtToolchain.LatestBuild },
-            new object[] { InProcessEmitToolchain.Instance },
-        };
+            yield return new object[] { Job.Default.GetToolchain() };
+
+            // Currently, CoreRtToolchain.Core50 produces the following error on Unix without installed clang:
+            //   Standard error:
+            //   ~/.nuget/packages/microsoft.dotnet.ilcompiler/6.0.0-preview.5.21269.1/build/Microsoft.NETCore.Native.Unix.props(99,5):
+            //   error : Platform linker ('clang') not found. Try installing clang or the appropriate package for your platform to resolve the problem.
+            if (RuntimeInformation.IsWindows())
+                yield return new object[] { CoreRtToolchain.Core50 };
+
+            // TODO: Support InProcessEmitToolchain.Instance
+            // yield return new object[] { InProcessEmitToolchain.Instance };
+        }
 
         [Theory, MemberData(nameof(GetToolchains))]
-        public void CompletedWorkItemCounIsAccurate(IToolchain toolchain)
+        public void CompletedWorkItemCountIsAccurate(IToolchain toolchain)
         {
             var config = CreateConfig(toolchain);
 
@@ -103,7 +109,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 first.Join();
             }
 
-            void FirstThread()
+            private void FirstThread()
             {
                 Monitor.Enter(guard);
                 lockTaken.Set();
@@ -112,7 +118,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 Monitor.Exit(guard);
             }
 
-            void SecondThread()
+            private void SecondThread()
             {
                 lockTaken.WaitOne();
 
@@ -135,9 +141,11 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithIterationCount(1) // single iteration is enough for us
                     .WithGcForce(false)
                     .WithToolchain(toolchain))
-                .With(DefaultColumnProviders.Instance)
-                .With(ThreadingDiagnoser.Default)
-                .With(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddDiagnoser(ThreadingDiagnoser.Default)
+                .AddLogger(toolchain.IsInProcess
+                    ? ConsoleLogger.Default
+                    : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
 
         private void AssertStats(Summary summary, Dictionary<string, (string metricName, double expectedValue)> assertions)
         {
@@ -147,8 +155,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 var metric = selectedReport.Metrics.Single(m => m.Key == assertion.Value.metricName);
 
-                // precision is set to 3 because CoreCLR might schedule some work item on it's own and hence affect the results..
-                Assert.Equal(assertion.Value.expectedValue, metric.Value.Value, precision: 3);
+                // precision is set to 2 because CoreCLR might schedule some work item on it's own and hence affect the results..
+                // precision = 3 is not enough (e.g., sometimes the actual value may be equal 1.0009765625 while the expected value is 1.0)
+                Assert.Equal(assertion.Value.expectedValue, metric.Value.Value, precision: 2);
             }
         }
     }

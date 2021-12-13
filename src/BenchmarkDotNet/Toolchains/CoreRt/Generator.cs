@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
                 : base.GetBuildArtifactsDirectoryPath(buildPartition, programName);
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, runtimeIdentifier, "native");
+            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, runtimeIdentifier, "publish");
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
@@ -133,9 +133,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <DebugSymbols>true</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
     <Deterministic>true</Deterministic>
-    <RootAllApplicationAssemblies>{rootAllApplicationAssemblies}</RootAllApplicationAssemblies>
+    {GetTrimmingSettings()}
     <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
+    <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
   </PropertyGroup>
   {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
   <ItemGroup>
@@ -166,9 +168,10 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <DebugSymbols>true</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
     <Deterministic>true</Deterministic>
-    <RootAllApplicationAssemblies>{rootAllApplicationAssemblies}</RootAllApplicationAssemblies>
+    {GetTrimmingSettings()}
     <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
   </PropertyGroup>
   <Import Project=""$(MSBuildSDKsPath)\Microsoft.NET.Sdk\Sdk\Sdk.targets"" />
   <Import Project=""$(IlcPath)\build\Microsoft.NETCore.Native.targets"" />
@@ -183,6 +186,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <RdXmlFile Include=""rd.xml"" />
   </ItemGroup>
 </Project>";
+
+        private string GetTrimmingSettings()
+            => rootAllApplicationAssemblies
+                ? "<PublishTrimmed>false</PublishTrimmed>"
+                : "<TrimMode>link</TrimMode>";
 
         /// <summary>
         /// mandatory to make it possible to call GC.GetAllocatedBytesForCurrentThread() using reflection (not part of .NET Standard)

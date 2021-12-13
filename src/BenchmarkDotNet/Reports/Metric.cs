@@ -32,6 +32,8 @@ namespace BenchmarkDotNet.Reports
         [PublicAPI] string Unit { get; }
 
         [PublicAPI] bool TheGreaterTheBetter { get; }
+
+        [PublicAPI] int PriorityInCategory { get; }
     }
 
     public class MetricDescriptorEqualityComparer : EqualityComparer<IMetricDescriptor>

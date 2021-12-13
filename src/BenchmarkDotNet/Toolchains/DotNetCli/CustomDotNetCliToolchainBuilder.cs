@@ -133,7 +133,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return this;
         }
 
-        protected static string GetPortableRuntimeIdentifier()
+        internal static string GetPortableRuntimeIdentifier()
         {
             // Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.GetRuntimeIdentifier()
             // returns win10-x64, we want the simpler form win-x64

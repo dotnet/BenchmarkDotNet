@@ -210,11 +210,16 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public static Job WithPowerPlan(this Job job, Guid powerPlanGuid) => job.WithCore(j => j.Environment.PowerPlanMode = powerPlanGuid);
 
-
         /// <summary>
         /// ensures that BenchmarkDotNet does not enforce any power plan
         /// </summary>
         public static Job DontEnforcePowerPlan(this Job job) => job.WithCore(j => j.Environment.PowerPlanMode = Guid.Empty);
+
+        /// <summary>
+        /// specifies whether Engine should allocate some random-sized memory between iterations
+        /// <remarks>it makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration</remarks>
+        /// </summary>
+        public static Job WithMemoryRandomization(this Job job, bool enable = true) => job.WithCore(j => j.Run.MemoryRandomization = enable);
 
         // Infrastructure
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -324,17 +329,16 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         /// <param name="job"></param>
         /// <param name="packageName">The NuGet package name</param>
-        /// <param name="packageVersion">The NuGet package version</param>
+        /// <param name="packageVersion">(optional)The NuGet package version</param>
+        /// <param name="source">(optional)Indicate the URI of the NuGet package source to use during the restore operation.</param>
+        /// <param name="prerelease">(optional)Allows prerelease packages to be installed.</param>
         /// <returns></returns>
-        public static Job WithNuGet(this Job job, string packageName, string packageVersion) => job.WithCore(j => j.Infrastructure.NuGetReferences = new NuGetReferenceList(j.Infrastructure.NuGetReferences ?? Array.Empty<NuGetReference>()) { new NuGetReference(packageName, packageVersion) });
-
-        /// <summary>
-        /// Runs the job with a specific NuGet dependency which will be resolved during the Job build process
-        /// </summary>
-        /// <param name="job"></param>
-        /// <param name="packageName">The NuGet package name, the latest version will be resolved</param>
-        /// <returns></returns>
-        public static Job WithNuGet(this Job job, string packageName) => job.WithNuGet(packageName, string.Empty);
+        public static Job WithNuGet(this Job job, string packageName, string packageVersion = null, Uri source = null, bool prerelease = false) =>
+            job.WithCore(j => j.Infrastructure.NuGetReferences =
+                new NuGetReferenceList(j.Infrastructure.NuGetReferences ?? Array.Empty<NuGetReference>())
+                    {
+                        new NuGetReference(packageName, packageVersion, source, prerelease)
+                    });
 
         /// <summary>
         /// Runs the job with a specific NuGet dependencies which will be resolved during the Job build process
@@ -342,7 +346,8 @@ namespace BenchmarkDotNet.Jobs
         /// <param name="job"></param>
         /// <param name="nuGetReferences">A collection of NuGet dependencies</param>
         /// <returns></returns>
-        public static Job WithNuGet(this Job job, NuGetReferenceList nuGetReferences) => job.WithCore(j => j.Infrastructure.NuGetReferences = nuGetReferences);
+        public static Job WithNuGet(this Job job, NuGetReferenceList nuGetReferences) =>
+            job.WithCore(j => j.Infrastructure.NuGetReferences = nuGetReferences);
 
         // Accuracy
         /// <summary>
