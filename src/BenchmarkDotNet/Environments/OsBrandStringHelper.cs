@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -10,7 +11,8 @@ namespace BenchmarkDotNet.Environments
     public class OsBrandStringHelper
     {
         // See https://en.wikipedia.org/wiki/Ver_(command)
-        // See https://docs.microsoft.com/en-us/windows/release-information/
+        // See https://docs.microsoft.com/en-us/windows/release-health/release-information
+        // See https://docs.microsoft.com/en-us/windows/release-health/windows11-release-information
         private static readonly Dictionary<string, string> WindowsBrandVersions = new Dictionary<string, string>
         {
             { "1.04", "1.0" },
@@ -99,22 +101,24 @@ namespace BenchmarkDotNet.Environments
             { "10.0.19041", "10 20H1 [2004, May 2020 Update]" },
             { "10.0.19042", "10 20H2 [20H2, October 2020 Update]" },
             { "10.0.19043", "10 21H1 [21H1, May 2021 Update]" },
-            { "10.0.19044", "10 21H2 [21H2]" }
+            { "10.0.19044", "10 21H2 [21H2, November 2021 Update]" },
+            { "10.0.22000", "11 21H2 [21H2]" },
         };
 
-        private class Windows10Version
+        private class Windows1XVersion
         {
-            private string Version { get; }
-            [NotNull] private string CodeName { get; }
-            [NotNull] private string MarketingName { get; }
+            [CanBeNull] private string CodeVersion { get; }
+            [CanBeNull] private string CodeName { get; }
+            [CanBeNull] private string MarketingName { get; }
             private int BuildNumber { get; }
 
-            [NotNull] private string ShortifiedCodeName => CodeName.Replace(" ", "");
-            [NotNull] private string ShortifiedMarketingName => MarketingName.Replace(" ", "");
+            [NotNull] private string MarketingNumber => BuildNumber >= 22000 ? "11" : "10";
+            [CanBeNull] private string ShortifiedCodeName => CodeName?.Replace(" ", "");
+            [CanBeNull] private string ShortifiedMarketingName => MarketingName?.Replace(" ", "");
 
-            private Windows10Version(string version, [NotNull] string codeName, [NotNull] string marketingName, int buildNumber)
+            private Windows1XVersion([CanBeNull] string codeVersion, [CanBeNull] string codeName, [CanBeNull] string marketingName, int buildNumber)
             {
-                Version = version;
+                CodeVersion = codeVersion;
                 CodeName = codeName;
                 MarketingName = marketingName;
                 BuildNumber = buildNumber;
@@ -129,31 +133,46 @@ namespace BenchmarkDotNet.Environments
             // When people past in on GitHub, it can be a reason of an ugly horizontal scrollbar.
             // To avoid this, we are trying to minimize this line and use the minimum possible number of characters.
             public string ToPrettifiedString([CanBeNull] int? ubr)
-                => Version == ShortifiedCodeName
-                    ? $"{ToFullVersion(ubr)} ({Collapse(Version, ShortifiedMarketingName)})"
-                    : $"{ToFullVersion(ubr)} ({Collapse(Version, ShortifiedMarketingName, ShortifiedCodeName)})";
+                => CodeVersion == ShortifiedCodeName
+                    ? $"{MarketingNumber} ({Collapse(ToFullVersion(ubr), CodeVersion, ShortifiedMarketingName)})"
+                    : $"{MarketingNumber} ({Collapse(ToFullVersion(ubr), CodeVersion, ShortifiedMarketingName, ShortifiedCodeName)})";
 
             // See https://en.wikipedia.org/wiki/Windows_10_version_history
-            private static readonly List<Windows10Version> WellKnownVersions = new List<Windows10Version>
+            // See https://en.wikipedia.org/wiki/Windows_11_version_history
+            private static readonly List<Windows1XVersion> WellKnownVersions = new()
             {
-                new Windows10Version("1507", "Threshold 1", "RTM", 10240),
-                new Windows10Version("1511", "Threshold 2", "November Update", 10586),
-                new Windows10Version("1607", "Redstone 1", "Anniversary Update", 14393),
-                new Windows10Version("1703", "Redstone 2", "Creators Update", 15063),
-                new Windows10Version("1709", "Redstone 3", "Fall Creators Update", 16299),
-                new Windows10Version("1803", "Redstone 4", "April 2018 Update", 17134),
-                new Windows10Version("1809", "Redstone 5", "October 2018 Update", 17763),
-                new Windows10Version("1903", "19H1", "May 2019 Update", 18362),
-                new Windows10Version("1909", "19H2", "November 2019 Update", 18363),
-                new Windows10Version("2004", "20H1", "May 2020 Update", 19041),
-                new Windows10Version("20H2", "20H2", "October 2020 Update", 19042),
-                new Windows10Version("21H1", "21H1", "May 2021 Update", 19043),
-                new Windows10Version("21H2", "21H2", "", 19044), // The markingName is not announced yet
+                // Windows 10
+                new Windows1XVersion("1507", "Threshold 1", "RTM", 10240),
+                new Windows1XVersion("1511", "Threshold 2", "November Update", 10586),
+                new Windows1XVersion("1607", "Redstone 1", "Anniversary Update", 14393),
+                new Windows1XVersion("1703", "Redstone 2", "Creators Update", 15063),
+                new Windows1XVersion("1709", "Redstone 3", "Fall Creators Update", 16299),
+                new Windows1XVersion("1803", "Redstone 4", "April 2018 Update", 17134),
+                new Windows1XVersion("1809", "Redstone 5", "October 2018 Update", 17763),
+                new Windows1XVersion("1903", "19H1", "May 2019 Update", 18362),
+                new Windows1XVersion("1909", "19H2", "November 2019 Update", 18363),
+                new Windows1XVersion("2004", "20H1", "May 2020 Update", 19041),
+                new Windows1XVersion("20H2", "20H2", "October 2020 Update", 19042),
+                new Windows1XVersion("21H1", "21H1", "May 2021 Update", 19043),
+                new Windows1XVersion("21H2", "21H2", "November 2021 Update", 19044),
+                new Windows1XVersion("21H2", "21H2", "November 2021 Update", 19044),
+                // Windows 11
+                new Windows1XVersion("21H2", "21H2", null, 22000),
             };
 
             [CanBeNull]
-            public static Windows10Version Resolve([NotNull] string osVersion)
-                => WellKnownVersions.FirstOrDefault(v => osVersion == $"10.0.{v.BuildNumber}");
+            public static Windows1XVersion Resolve([NotNull] string osVersionString)
+            {
+                var windows1XVersion = WellKnownVersions.FirstOrDefault(v => osVersionString == $"10.0.{v.BuildNumber}");
+                if (windows1XVersion != null)
+                    return windows1XVersion;
+                if (Version.TryParse(osVersionString, out var osVersion))
+                {
+                    if (osVersion.Major == 10 && osVersion.Minor == 0)
+                        return new Windows1XVersion(null, null, null, osVersion.Build);
+                }
+                return null;
+            }
         }
 
         /// <summary>
@@ -174,9 +193,9 @@ namespace BenchmarkDotNet.Environments
         [NotNull]
         private static string PrettifyWindows([NotNull] string osVersion, [CanBeNull] int? windowsUbr)
         {
-            var windows10Version = Windows10Version.Resolve(osVersion);
-            if (windows10Version != null)
-                return "Windows " + windows10Version.ToPrettifiedString(windowsUbr);
+            var windows1XVersion = Windows1XVersion.Resolve(osVersion);
+            if (windows1XVersion != null)
+                return "Windows " + windows1XVersion.ToPrettifiedString(windowsUbr);
 
             string brandVersion = WindowsBrandVersions.GetValueOrDefault(osVersion);
             string completeOsVersion = windowsUbr != null && osVersion.Count(c => c == '.') == 2
