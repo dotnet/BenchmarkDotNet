@@ -1,8 +1,6 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml;
-using System.Xml.Xsl;
 using Cake.Common;
 using Cake.Common.Build;
 using Cake.Common.Build.AppVeyor;
@@ -179,11 +177,12 @@ public class BuildContext : FrostingContext
 
     public void RunDocfx(FilePath docfxJson, string args = "")
     {
+        this.Information($"Running docfx for '{docfxJson}' with args '{args}'");
         if (!this.IsRunningOnWindows())
             this.StartProcess("mono",
                 new ProcessSettings { Arguments = DocfxExeFile.FullPath + " " + docfxJson + " " + args });
         else
-            this.StartProcess(DocfxExeFile.FullPath, new ProcessSettings { Arguments = args });
+            this.StartProcess(DocfxExeFile.FullPath, new ProcessSettings { Arguments = docfxJson + " " + args });
     }
 }
 
@@ -429,7 +428,7 @@ public class DocfxChangelogGenerateTask : FrostingTask<BuildContext>
     }
 }
 
-[TaskName("DocFX_Changelog_Build")]
+[TaskName("DocFX_Build")]
 [IsDependentOn(typeof(DocfxInstallTask))]
 [IsDependentOn(typeof(DocfxChangelogGenerateTask))]
 public class DocfxChangelogBuildTask : FrostingTask<BuildContext>
@@ -440,7 +439,7 @@ public class DocfxChangelogBuildTask : FrostingTask<BuildContext>
     }
 }
 
-[TaskName("DocFX_Changelog_Serve")]
+[TaskName("DocFX_Serve")]
 [IsDependentOn(typeof(DocfxInstallTask))]
 [IsDependentOn(typeof(DocfxChangelogGenerateTask))]
 public class DocfxChangelogServeTask : FrostingTask<BuildContext>
