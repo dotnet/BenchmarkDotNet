@@ -55,15 +55,15 @@ Use the `DocFX_Serve` Cake target to build and run the documentation.
 Windows (PowerShell):
 
 ```
-.\build.ps1 -Target DocFX_Build
-.\build.ps1 -Target DocFX_Serve
+.\build.ps1 --target DocFX_Build
+.\build.ps1 --target DocFX_Serve
 ```
 
 Windows (Batch):
 
 ```
-.\build.bat -Target DocFX_Build
-.\build.bat -Target DocFX_Serve
+.\build.bat --target DocFX_Build
+.\build.bat --target DocFX_Serve
 ```
 
 Linux/macOS (Bash):
