@@ -50,8 +50,8 @@ namespace BenchmarkDotNet.Configs
             IOrderer orderer,
             SummaryStyle summaryStyle,
             ConfigOptions options,
-            TimeSpan buildTimeout)
-            IReadOnlyList<Conclusion> configAnalyse)
+            TimeSpan buildTimeout,
+            IReadOnlyList<Conclusion> configAnalysisConclusion)
         {
             columnProviders = uniqueColumnProviders;
             loggers = uniqueLoggers;
@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Configs
             SummaryStyle = summaryStyle;
             Options = options;
             BuildTimeout = buildTimeout;
-            ConfigAnalyse = configAnalyse;
+            ConfigAnalysisConclusion = configAnalysisConclusion;
         }
 
         public ConfigUnionRule UnionRule { get; }
@@ -111,6 +111,6 @@ namespace BenchmarkDotNet.Configs
             return diagnosersForGivenMode.Any() ? new CompositeDiagnoser(diagnosersForGivenMode) : null;
         }
 
-        public IReadOnlyList<Conclusion> ConfigAnalyse { get; private set; }
+        public IReadOnlyList<Conclusion> ConfigAnalysisConclusion { get; private set; }
     }
 }

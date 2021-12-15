@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
         [PublicAPI] public TimeSpan BuildTimeout { get; set; } = DefaultConfig.Instance.BuildTimeout;
 
-        public IReadOnlyList<Conclusion> ConfigAnalyse => emptyConclusion;
+        public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
 
         public ManualConfig WithOption(ConfigOptions option, bool value)
         {

@@ -85,6 +85,6 @@ namespace BenchmarkDotNet.Configs
 
         public ConfigOptions Options => ConfigOptions.KeepBenchmarkFiles | ConfigOptions.DisableOptimizationsValidator;
 
-        public IReadOnlyList<Conclusion> ConfigAnalyse => emptyConclusion;
+        public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
     }
 }

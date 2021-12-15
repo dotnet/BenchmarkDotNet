@@ -255,10 +255,10 @@ namespace BenchmarkDotNet.Running
             // TODO: make exporter
             ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).Distinct().ToList());
 
-            if (config.ConfigAnalyse.Any())
+            if (config.ConfigAnalysisConclusion.Any())
             {
                 logger.WriteLineHeader("// * Config Issues *");
-                ConclusionHelper.Print(logger, config.ConfigAnalyse);
+                ConclusionHelper.Print(logger, config.ConfigAnalysisConclusion);
             }
 
             // TODO: move to conclusions

@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Configs
             }
         }
 
-        public IReadOnlyList<Conclusion> ConfigAnalyse => emptyConclusion;
+        public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
 
         public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
 

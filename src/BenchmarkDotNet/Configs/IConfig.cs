@@ -55,6 +55,6 @@ namespace BenchmarkDotNet.Configs
         /// <summary>
         /// Collect any errors or warnings when composing the configuration
         /// </summary>
-        IReadOnlyList<Conclusion> ConfigAnalyse { get; }
+        IReadOnlyList<Conclusion> ConfigAnalysisConclusion { get; }
     }
 }
