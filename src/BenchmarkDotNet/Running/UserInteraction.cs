@@ -40,7 +40,11 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineHelp("If you want to select few, please separate them with space ` ` (e.g. `1 2 3`).");
                 logger.WriteLineHelp($"You can also provide the class name in console arguments by using --filter. (e.g. `{filterExample}`).");
 
-                string userInput = Console.ReadLine() ?? "";
+                string userInput = Console.ReadLine();
+                if (userInput == null)
+                {
+                    break;
+                }
 
                 selectedTypes.AddRange(GetMatching(allTypes, userInput.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)));
                 logger.WriteLine();
