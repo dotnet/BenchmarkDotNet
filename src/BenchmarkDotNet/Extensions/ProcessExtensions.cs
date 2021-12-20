@@ -126,6 +126,9 @@ namespace BenchmarkDotNet.Extensions
             if (benchmarkCase.Job.Infrastructure.Toolchain is CoreRunToolchain _)
                 start.SetCoreRunEnvironmentVariables(benchmarkCase, resolver);
 
+            // disable ReSharper's Dynamic Program Analysis (see https://github.com/dotnet/BenchmarkDotNet/issues/1871 for details)
+            start.EnvironmentVariables["JETBRAINS_DPA_AGENT_ENABLE"] = "0";
+
             if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
                 return;
 
