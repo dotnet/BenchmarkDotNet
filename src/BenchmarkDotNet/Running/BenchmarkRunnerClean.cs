@@ -148,7 +148,8 @@ namespace BenchmarkDotNet.Running
             {
                 foreach (var benchmark in benchmarks)
                 {
-                    powerManagementApplier.ApplyPerformancePlan(benchmark.Job.Environment.PowerPlanMode);
+                    powerManagementApplier.ApplyPerformancePlan(benchmark.Job.Environment.PowerPlanMode
+                        ?? benchmark.Job.ResolveValue(EnvironmentMode.PowerPlanModeCharacteristic, EnvironmentResolver.Instance).GetValueOrDefault());
 
                     var info = buildResults[benchmark];
                     var buildResult = info.buildResult;
