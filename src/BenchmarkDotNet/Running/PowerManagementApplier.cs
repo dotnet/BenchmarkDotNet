@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Running
             if (!RuntimeInformation.IsWindows() || id == Guid.Empty)
                 return;
 
-            if (!powerPlanChanged && id != UserPowerPlan)
+            if (id != UserPowerPlan)
                 ApplyPlanByGuid(id);
             else
                 ApplyUserPowerPlan();
