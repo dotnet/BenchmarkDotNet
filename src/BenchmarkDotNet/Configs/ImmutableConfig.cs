@@ -31,6 +31,7 @@ namespace BenchmarkDotNet.Configs
         private readonly ImmutableHashSet<HardwareCounter> hardwareCounters;
         private readonly ImmutableHashSet<IFilter> filters;
         private readonly ImmutableArray<BenchmarkLogicalGroupRule> rules;
+        private readonly ImmutableArray<IColumnHidingRule> columnHidingRules;
 
         internal ImmutableConfig(
             ImmutableArray<IColumnProvider> uniqueColumnProviders,
@@ -42,6 +43,7 @@ namespace BenchmarkDotNet.Configs
             ImmutableHashSet<IValidator> uniqueValidators,
             ImmutableHashSet<IFilter> uniqueFilters,
             ImmutableArray<BenchmarkLogicalGroupRule> uniqueRules,
+            ImmutableArray<IColumnHidingRule> uniqueColumnHidingRules,
             ImmutableHashSet<Job> uniqueRunnableJobs,
             ConfigUnionRule unionRule,
             string artifactsPath,
@@ -59,6 +61,7 @@ namespace BenchmarkDotNet.Configs
             validators = uniqueValidators;
             filters = uniqueFilters;
             rules = uniqueRules;
+            columnHidingRules = uniqueColumnHidingRules;
             jobs = uniqueRunnableJobs;
             UnionRule = unionRule;
             ArtifactsPath = artifactsPath;
@@ -85,6 +88,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => rules;
+        public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => columnHidingRules;
 
         public ILogger GetCompositeLogger() => new CompositeLogger(loggers);
         public IExporter GetCompositeExporter() => new CompositeExporter(exporters);

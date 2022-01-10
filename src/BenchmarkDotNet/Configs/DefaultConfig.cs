@@ -98,5 +98,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
 
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
+
+        public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
     }
 }

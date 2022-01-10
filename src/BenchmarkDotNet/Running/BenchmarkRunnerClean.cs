@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
@@ -209,7 +210,8 @@ namespace BenchmarkDotNet.Running
                 logFilePath,
                 clockSpan.GetTimeSpan(),
                 cultureInfo,
-                Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
+                Validate(new[] {benchmarkRunInfo }, NullLogger.Instance), // validate them once again, but don't print the output
+                benchmarkRunInfo.Config.GetColumnHidingRules().ToImmutableArray());
         }
 
         private static void PrintSummary(ILogger logger, ImmutableConfig config, Summary summary)
