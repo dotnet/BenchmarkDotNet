@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Jobs
@@ -36,12 +35,7 @@ namespace BenchmarkDotNet.Jobs
         }
 
         [PublicAPI]
-        public EnvironmentMode(string id) : base(id)
-        {
-            GcCharacteristic[this] = new GcMode();
-            //TODO: refactor to EnvironmentResolver
-            PowerPlanMode = PowerManagementApplier.Map(PowerPlan.HighPerformance);
-        }
+        public EnvironmentMode(string id) : base(id) => GcCharacteristic[this] = new GcMode();
 
         /// <summary>
         /// Platform (x86 or x64)
