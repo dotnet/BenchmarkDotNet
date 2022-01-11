@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Columns
 
                     if (HasMemoryDiagnoser(summary))
                     {
-                        yield return new BaselineAllocationRatioColumn();
+                        yield return BaselineAllocationRatioColumn.RatioMean;
                     }
                 }
             }
