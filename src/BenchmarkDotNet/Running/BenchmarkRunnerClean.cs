@@ -241,8 +241,11 @@ namespace BenchmarkDotNet.Running
             ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).Distinct().ToList());
 
             // TODO: move to conclusions
-            var columnWithLegends = summary.Table.Columns.Select(c => c.OriginalColumn).Where(c => !string.IsNullOrEmpty(c.Legend)).ToList();
-            var effectiveTimeUnit = summary.Table.EffectiveSummaryStyle.TimeUnit;
+            var columnWithLegends = summary.Table.Columns.Where(c => c.NeedToShow).Select(c => c.OriginalColumn).Where(c => !string.IsNullOrEmpty(c.Legend)).ToList();
+
+            bool needToShowTimeLegend = summary.Table.Columns.Where(c => c.NeedToShow).Select(c => c.OriginalColumn).Any(c => c.UnitType == UnitType.Time);
+            var effectiveTimeUnit = needToShowTimeLegend ? summary.Table.EffectiveSummaryStyle.TimeUnit : null;
+
             if (columnWithLegends.Any() || effectiveTimeUnit != null)
             {
                 logger.WriteLine();
