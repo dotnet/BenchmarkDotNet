@@ -139,6 +139,12 @@ namespace BenchmarkDotNet.Exporters
                 return;
             }
 
+            if (table.Columns.All(c => !c.NeedToShow))
+            {
+                logger.WriteLine("There are no columns to show ");
+                return;
+            }
+
             table.PrintCommonColumns(logger);
             logger.WriteLine();
 
