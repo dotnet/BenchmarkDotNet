@@ -57,7 +57,8 @@
         UseLLVM="$USELLVM$"
         LLVMPath="$(MicrosoftNetCoreAppRuntimePackDir)\runtimes\$(RuntimeIdentifier)\native"
 	    OutputDir="$(PublishDir)"
-        UseAotDataFile="false">
+        UseAotDataFile="false"
+        IntermediateOutputPath="$(IntermediateOutputPath)">
         <Output TaskParameter="CompiledAssemblies" ItemName="BundleAssemblies" />
     </MonoAOTCompiler>
 
