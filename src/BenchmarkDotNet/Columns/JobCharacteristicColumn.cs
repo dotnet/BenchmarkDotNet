@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Columns
             // The 'Id' characteristic is a special case:
             // here we just print 'Job'
             if (characteristic.Id == "Id")
-                ColumnName = "Job";
+                ColumnName = Column.Job;
         }
 
         public string Id { get; }

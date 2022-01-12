@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Columns
     public class BaselineAllocationRatioColumn : BaselineCustomColumn
     {
         public override string Id => nameof(BaselineAllocationRatioColumn);
-        public override string ColumnName => "Alloc Ratio";
+        public override string ColumnName => Column.AllocRatio;
 
         public override string GetValue(Summary summary, BenchmarkCase benchmarkCase, Statistics baseline, IReadOnlyDictionary<string, Metric> baselineMetrics,
             Statistics current, IReadOnlyDictionary<string, Metric> currentMetrics, bool isBaseline)
