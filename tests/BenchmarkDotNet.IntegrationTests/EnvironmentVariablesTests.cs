@@ -34,5 +34,39 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new InvalidOperationException("The env var was not set");
             }
         }
+
+        [Fact]
+        public void ResharperDynamicProgramAnalysisIsDisabledByDefault()
+            => CanExecute<TestingDpaDisabled>(CreateSimpleConfig(job: Job.Dry));
+
+        public class TestingDpaDisabled
+        {
+            [Benchmark]
+            public void Benchmark()
+            {
+                if (Environment.GetEnvironmentVariable("JETBRAINS_DPA_AGENT_ENABLE") != "0")
+                    throw new InvalidOperationException("The JETBRAINS_DPA_AGENT_ENABLE env var was not set to zero");
+            }
+        }
+
+        [Fact]
+        public void ResharperDynamicProgramAnalysisCanBeEnabled()
+        {
+            var jobWithSettingEnabled = Job.Dry.WithEnvironmentVariable("JETBRAINS_DPA_AGENT_ENABLE", "1");
+            var config = CreateSimpleConfig(job: jobWithSettingEnabled);
+
+            CanExecute<TestingDpaEnabled>(config);
+        }
+
+        public class TestingDpaEnabled
+        {
+            [Benchmark]
+            public void Benchmark()
+            {
+                if (Environment.GetEnvironmentVariable("JETBRAINS_DPA_AGENT_ENABLE") != "1")
+                    throw new InvalidOperationException("The JETBRAINS_DPA_AGENT_ENABLE env var was not set to one");
+            }
+        }
+
     }
 }
