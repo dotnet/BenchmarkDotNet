@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Running
             using (DirtyAssemblyResolveHelper.Create())
                 return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(type, config, args));
         }
-        
+
         [PublicAPI]
         public static Summary[] Run(Type[] types, IConfig config = null, string[] args = null)
         {
@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Running
             => args == null
                 ? BenchmarkRunnerClean.Run(assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray())
                 : new BenchmarkSwitcher(assembly).RunWithDirtyAssemblyResolveHelper(args, config, false).ToArray();
-        
+
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary[] RunWithDirtyAssemblyResolveHelper(Type[] types, IConfig config, string[] args)
             => args == null
