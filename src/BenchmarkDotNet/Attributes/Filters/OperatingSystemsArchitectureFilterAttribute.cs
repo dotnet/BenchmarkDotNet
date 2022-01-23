@@ -12,6 +12,7 @@ namespace BenchmarkDotNet.Attributes
         public OperatingSystemsArchitectureFilterAttribute() { }
 
         /// <param name="allowed">if set to true, the architectures are enabled, if set to false, disabled</param>
+        /// <param name="architectures">the architecture(s) for which the filter should be applied</param>
         public OperatingSystemsArchitectureFilterAttribute(bool allowed, params Architecture[] architectures)
             : base(new SimpleFilter(_ =>
             {

@@ -26,6 +26,7 @@ namespace BenchmarkDotNet.Attributes
         public OperatingSystemsFilterAttribute() { }
 
         /// <param name="allowed">if set to true, the OSes beloning to platforms are enabled, if set to false, disabled</param>
+        /// <param name="platforms">the platform(s) for which the filter should be applied</param>
         public OperatingSystemsFilterAttribute(bool allowed, params OS[] platforms)
             : base(new SimpleFilter(_ =>
             {
