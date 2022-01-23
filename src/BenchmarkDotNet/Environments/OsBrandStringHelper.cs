@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Environments
 
             // See https://en.wikipedia.org/wiki/Windows_10_version_history
             // See https://en.wikipedia.org/wiki/Windows_11_version_history
-            private static readonly List<Windows1XVersion> WellKnownVersions = new()
+            private static readonly List<Windows1XVersion> WellKnownVersions = new ()
             {
                 // Windows 10
                 new Windows1XVersion("1507", "Threshold 1", "RTM", 10240),
