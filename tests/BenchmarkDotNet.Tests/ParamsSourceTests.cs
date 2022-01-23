@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Tests
         {
             BenchmarkConverter.TypeToBenchmarks(typeof(ParamsSourceWithNull));
         }
-        
+
         public class ParamsSourceWithNull
         {
             public static IEnumerable<object> Values()
@@ -30,6 +30,6 @@ namespace BenchmarkDotNet.Tests
 
             [Benchmark]
             public object FooBar() => O;
-        }   
+        }
     }
 }

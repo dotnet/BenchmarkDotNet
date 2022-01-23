@@ -1,9 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.MonoWasm;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -23,12 +21,12 @@ namespace BenchmarkDotNet.Environments
         /// <summary>
         /// creates new instance of WasmRuntime
         /// </summary>
-        /// <param name="mainJs">MANDATORY path to the main.js file.</param>
         /// <param name="javaScriptEngine">Full path to a java script engine used to run the benchmarks. "v8" by default</param>
         /// <param name="javaScriptEngineArguments">Arguments for the javascript engine. "--expose_wasm" by default</param>
         /// <param name="msBuildMoniker">moniker, default: "net5.0"</param>
         /// <param name="displayName">default: "Wasm"</param>
-        /// <remarks>path to mainJs MUST be provided</remarks>
+        /// <param name="aot">Specifies whether AOT or Interpreter (default) project should be generated.</param>
+        /// <param name="runtimeSrcDir">The path to runtime source directory.</param>
         public WasmRuntime(string msBuildMoniker = "net5.0", string displayName = "Wasm", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm", bool aot = false, DirectoryInfo runtimeSrcDir = null) : base(RuntimeMoniker.Wasm, msBuildMoniker, displayName)
         {
             if (!string.IsNullOrEmpty(javaScriptEngine) && javaScriptEngine != "v8" && !File.Exists(javaScriptEngine))
