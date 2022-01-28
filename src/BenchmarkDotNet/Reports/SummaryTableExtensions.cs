@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Reports
         }
 
         public static void PrintLine(this SummaryTable table, string[] line, ILogger logger, string leftDel, string rightDel,
-                                     bool highlightRow, bool startOfGroup, MarkdownExporter.MarkdownHighlightStrategy startOfGroupHighlightStrategy, string boldMarkupFormat, bool escapeHtml)
+                                     bool highlightRow, bool startOfGroup, MarkdownExporter.MarkdownHighlightStrategy startOfGroupHighlightStrategy, string boldMarkupFormat, bool escapeHtml, bool escapePipe)
         {
             for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
             {
@@ -56,6 +56,9 @@ namespace BenchmarkDotNet.Reports
                 {
                     continue;
                 }
+
+                if (escapePipe)
+                    line[columnIndex] = line[columnIndex].Replace("|", "\\|");
 
                 string text = startOfGroup && startOfGroupHighlightStrategy == MarkdownExporter.MarkdownHighlightStrategy.Bold
                     ? BuildBoldText(table, line, leftDel, rightDel, columnIndex, boldMarkupFormat)

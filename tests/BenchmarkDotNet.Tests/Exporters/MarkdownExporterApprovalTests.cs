@@ -178,6 +178,16 @@ namespace BenchmarkDotNet.Tests.Exporters
             }
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
+            public class MethodBaseline_MethodsParamsEscaped
+            {
+                [Params("Should|Escape", "ShouldNotEscape"), UsedImplicitly] public string Param;
+
+                [Benchmark(Baseline = true)] public void Base() { }
+                [Benchmark] public void Foo() { }
+                [Benchmark] public void Bar() { }
+            }
+
+            [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1"), SimpleJob(id: "Job2")]
             public class MethodBaseline_MethodsJobs
             {
