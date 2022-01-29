@@ -102,25 +102,32 @@ namespace BenchmarkDotNet.Reports
             [PublicAPI] public int Index { get; }
             public string Header { get; }
             public string[] Content { get; }
-            public bool IsHidden { get; }
             public bool NeedToShow { get; }
             public int Width { get; }
             public bool IsDefault { get; }
             public TextJustification Justify { get; }
             public IColumn OriginalColumn { get; }
 
+            internal bool IsCommonColumn { get; }
+            internal bool WasHidden { get; }
+
             public SummaryTableColumn(SummaryTable table, int index, IColumn column, bool hide = false)
             {
                 Index = index;
                 Header = table.FullHeader[index];
                 Content = table.FullContent.Select(line => line[index]).ToArray();
-                IsHidden = hide;
-                NeedToShow = !hide && (column.AlwaysShow || Content.Distinct().Count() > 1);
                 Width = Math.Max(Header.Length, Content.Any() ? Content.Max(line => line.Length) : 0) + 1;
                 IsDefault = table.IsDefault[index];
                 OriginalColumn = column;
 
                 Justify = column.IsNumeric ? TextJustification.Right : TextJustification.Left;
+
+                bool needToShow = column.AlwaysShow || Content.Distinct().Count() > 1;
+                NeedToShow = !hide && needToShow;
+                WasHidden = hide && needToShow;
+
+                bool isCommonColumn = !NeedToShow && !IsDefault;
+                IsCommonColumn = (!hide && isCommonColumn) || (hide && Content.Distinct().Count() == 1);
             }
 
             public override string ToString() => Header;
