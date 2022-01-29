@@ -57,12 +57,9 @@ namespace BenchmarkDotNet.Reports
                     continue;
                 }
 
-                if (escapePipe)
-                    line[columnIndex] = line[columnIndex].Replace("|", "\\|");
-
                 string text = startOfGroup && startOfGroupHighlightStrategy == MarkdownExporter.MarkdownHighlightStrategy.Bold
-                    ? BuildBoldText(table, line, leftDel, rightDel, columnIndex, boldMarkupFormat)
-                    : BuildStandardText(table, line, leftDel, rightDel, columnIndex);
+                    ? BuildBoldText(table, line, leftDel, rightDel, columnIndex, boldMarkupFormat, escapePipe)
+                    : BuildStandardText(table, line, leftDel, rightDel, columnIndex, escapePipe);
                 if (escapeHtml)
                     text = text.HtmlEncode();
 
@@ -82,25 +79,25 @@ namespace BenchmarkDotNet.Reports
             logger.WriteLine();
         }
 
-        private static string BuildStandardText(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex)
+        private static string BuildStandardText(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex, bool escapePipe = false)
         {
             var buffer = GetClearBuffer();
 
             buffer.Append(leftDel);
             PadLeft(table, line, leftDel, rightDel, columnIndex, buffer);
-            buffer.Append(line[columnIndex]);
+            buffer.Append(escapePipe ? line[columnIndex].Replace("|", "\\|") : line[columnIndex]);
             buffer.Append(rightDel);
 
             return buffer.ToString();
         }
 
-        private static string BuildBoldText(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex, string boldMarkupFormat)
+        private static string BuildBoldText(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex, string boldMarkupFormat, bool escapePipe = false)
         {
             var buffer = GetClearBuffer();
 
             buffer.Append(leftDel);
             PadLeft(table, line, leftDel, rightDel, columnIndex, buffer);
-            buffer.AppendFormat(boldMarkupFormat, line[columnIndex]);
+            buffer.AppendFormat(boldMarkupFormat, escapePipe ? line[columnIndex].Replace("|", "\\|") : line[columnIndex]);
             buffer.Append(rightDel);
 
             return buffer.ToString();

@@ -173,7 +173,7 @@ namespace BenchmarkDotNet.Exporters
             var separatorLine = Enumerable.Range(0, table.ColumnCount).Select(_ => "").ToArray();
             foreach (var line in table.FullContent)
             {
-               if (rowCounter > 0 && table.FullContentStartOfLogicalGroup[rowCounter] && table.SeparateLogicalGroups)
+                if (rowCounter > 0 && table.FullContentStartOfLogicalGroup[rowCounter] && table.SeparateLogicalGroups)
                 {
                     // Print logical separator
                     if (ColumnsStartWithSeparator)

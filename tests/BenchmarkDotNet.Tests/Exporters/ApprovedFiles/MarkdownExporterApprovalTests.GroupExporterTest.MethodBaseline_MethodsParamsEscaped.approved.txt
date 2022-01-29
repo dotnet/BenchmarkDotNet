@@ -13,8 +13,8 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
     Foo | ShouldNotEscape | 202.0 ns | 6.09 ns | 1.58 ns |  1.98 |    0.02 |    2 | [Param=ShouldNotEscape]-DefaultJob |       No |
     Bar | ShouldNotEscape | 302.0 ns | 6.09 ns | 1.58 ns |  2.96 |    0.03 |    3 | [Param=ShouldNotEscape]-DefaultJob |       No |
         |                 |          |         |         |       |         |      |                                    |          |
-   Base |  Should\|Escape | 402.0 ns | 6.09 ns | 1.58 ns |  1.00 |    0.00 |    1 |  [Param=Should\|Escape]-DefaultJob |      Yes | ^
-    Foo |  Should\|Escape | 502.0 ns | 6.09 ns | 1.58 ns |  1.25 |    0.00 |    2 |  [Param=Should\|Escape]-DefaultJob |       No |
-    Bar |  Should\|Escape | 602.0 ns | 6.09 ns | 1.58 ns |  1.50 |    0.00 |    3 |  [Param=Should\|Escape]-DefaultJob |       No |
+   Base |   Should\|Escape | 402.0 ns | 6.09 ns | 1.58 ns |  1.00 |    0.00 |    1 |   [Param=Should\|Escape]-DefaultJob |      Yes | ^
+    Foo |   Should\|Escape | 502.0 ns | 6.09 ns | 1.58 ns |  1.25 |    0.00 |    2 |   [Param=Should\|Escape]-DefaultJob |       No |
+    Bar |   Should\|Escape | 602.0 ns | 6.09 ns | 1.58 ns |  1.50 |    0.00 |    3 |   [Param=Should\|Escape]-DefaultJob |       No |
 
 Errors: 0
