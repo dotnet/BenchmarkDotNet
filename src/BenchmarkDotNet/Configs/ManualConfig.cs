@@ -203,6 +203,20 @@ namespace BenchmarkDotNet.Configs
         }
 
         [PublicAPI]
+        public ManualConfig HideColumns(params string[] columnNames)
+        {
+            columnHidingRules.AddRange(columnNames.Select(c => new ColumnHidingByNameRule(c)));
+            return this;
+        }
+
+        [PublicAPI]
+        public ManualConfig HideColumns(params IColumn[] columns)
+        {
+            columnHidingRules.AddRange(columns.Select(c => new ColumnHidingByIdRule(c)));
+            return this;
+        }
+
+        [PublicAPI]
         public ManualConfig HideColumns(params IColumnHidingRule[] rules)
         {
             columnHidingRules.AddRange(rules);

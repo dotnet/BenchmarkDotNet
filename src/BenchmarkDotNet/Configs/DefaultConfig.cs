@@ -53,6 +53,7 @@ namespace BenchmarkDotNet.Configs
             yield return RuntimeErrorAnalyser.Default;
             yield return ZeroMeasurementAnalyser.Default;
             yield return BaselineCustomAnalyzer.Default;
+            yield return HideColumnsAnalyser.Default;
         }
 
         public IEnumerable<IValidator> GetValidators()
