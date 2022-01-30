@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Extensions;
@@ -21,10 +22,31 @@ namespace BenchmarkDotNet.Exporters
                 logger.WriteLineHint("You haven't configured any columns, your results will be empty");
 
             foreach (var exporter in exporters)
-                exporter.ExportToLog(summary, logger);
+            {
+                try
+                {
+                    exporter.ExportToLog(summary, logger);
+                }
+                catch (Exception e)
+                {
+                    logger.WriteLineError(e.ToString());
+                }
+            }
         }
 
         public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger)
-            => exporters.SelectMany(exporter => exporter.ExportToFiles(summary, consoleLogger));
+            => exporters.SelectMany(exporter =>
+            {
+                var files = new List<string>();
+                try
+                {
+                    files.AddRange(exporter.ExportToFiles(summary, consoleLogger));
+                }
+                catch (Exception e)
+                {
+                    consoleLogger.WriteLineError(e.ToString());
+                }
+                return files;
+            });
     }
 }
