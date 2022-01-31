@@ -452,10 +452,16 @@ namespace BenchmarkDotNet.Running
                 if (useDiagnoser)
                 {
                     if (benchmarkCase.Config.HasMemoryDiagnoser())
-                        gcStats = GcStats.Parse(executeResult.Data.Last(line => !string.IsNullOrEmpty(line) && line.StartsWith(GcStats.ResultsLinePrefix)));
+                    {
+                        string resultsLine = executeResult.Data.LastOrDefault(line => !string.IsNullOrEmpty(line) && line.StartsWith(GcStats.ResultsLinePrefix));
+                        gcStats = resultsLine is not null ? GcStats.Parse(resultsLine) : default;
+                    }
 
                     if (benchmarkCase.Config.HasThreadingDiagnoser())
-                        threadingStats = ThreadingStats.Parse(executeResult.Data.Last(line => !string.IsNullOrEmpty(line) && line.StartsWith(ThreadingStats.ResultsLinePrefix)));
+                    {
+                        string resultsLine = executeResult.Data.LastOrDefault(line => !string.IsNullOrEmpty(line) && line.StartsWith(ThreadingStats.ResultsLinePrefix));
+                        threadingStats = resultsLine is not null ? ThreadingStats.Parse(resultsLine) : default;
+                    }
 
                     metrics.AddRange(
                         noOverheadCompositeDiagnoser.ProcessResults(
