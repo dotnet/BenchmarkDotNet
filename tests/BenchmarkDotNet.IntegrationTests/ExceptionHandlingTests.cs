@@ -147,5 +147,35 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public void Throw3() => throw new Exception(BenchmarkExceptionMessage);
             [Benchmark] public void Throw4() => throw new Exception(BenchmarkExceptionMessage);
         }
+
+        [Fact]
+        public void DiagnosersCantCrashRunnerWhenTheyHaveNothingToParse()
+        {
+            var config = ManualConfig.CreateEmpty()
+                .AddJob(Job.Dry.WithIterationCount(10))
+                .AddDiagnoser(MemoryDiagnoser.Default); // crucial to repro the bug;
+
+            var summary = CanExecute<ThrowButNotImmediately>(config, fullValidation: false);
+
+            var benchmarkReport = summary.Reports.Single();
+            Assert.Equal(default, benchmarkReport.GcStats);
+        }
+
+        public class ThrowButNotImmediately
+        {
+            private int iterationCount;
+
+            [IterationSetup]
+            public void Setup() => ++iterationCount;
+
+            [Benchmark]
+            public void Throwing()
+            {
+                if (iterationCount >= 5)
+                {
+                    throw new Exception();
+                }
+            }
+        }
     }
 }
