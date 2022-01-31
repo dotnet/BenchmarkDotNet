@@ -475,7 +475,7 @@ namespace BenchmarkDotNet.Running
 
             // Do a "Diagnostic" run, but DISCARD the results, so that the overhead of Diagnostics doesn't skew the overall results
             var extraRunCompositeDiagnoser = benchmarkCase.Config.GetCompositeDiagnoser(benchmarkCase, Diagnosers.RunMode.ExtraRun);
-            if (extraRunCompositeDiagnoser != null)
+            if (extraRunCompositeDiagnoser != null && success)
             {
                 logger.WriteLineInfo("// Run, Diagnostic");
 
@@ -499,7 +499,7 @@ namespace BenchmarkDotNet.Running
             }
 
             var separateLogicCompositeDiagnoser = benchmarkCase.Config.GetCompositeDiagnoser(benchmarkCase, Diagnosers.RunMode.SeparateLogic);
-            if (separateLogicCompositeDiagnoser != null)
+            if (separateLogicCompositeDiagnoser != null && success)
             {
                 logger.WriteLineInfo("// Run, Diagnostic [SeparateLogic]");
 
