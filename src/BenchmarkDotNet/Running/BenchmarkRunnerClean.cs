@@ -436,7 +436,7 @@ namespace BenchmarkDotNet.Running
                     .Where(r => r.IterationMode != IterationMode.Unknown)
                     .ToArray();
 
-                if (!measurements.Any())
+                if (!measurements.Any(measurement => measurement.IsWorkload()))
                 {
                     // Something went wrong during the benchmark, don't bother doing more runs
                     logger.WriteLineError("No more Benchmark runs will be launched as NO measurements were obtained from the previous run!");
