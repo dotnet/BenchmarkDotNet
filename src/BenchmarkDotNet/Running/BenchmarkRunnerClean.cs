@@ -444,6 +444,11 @@ namespace BenchmarkDotNet.Running
                     break;
                 }
 
+                if (!success && benchmarkCase.Config.Options.IsSet(ConfigOptions.StopOnFirstError))
+                {
+                    break;
+                }
+
                 if (useDiagnoser)
                 {
                     if (benchmarkCase.Config.HasMemoryDiagnoser())
@@ -464,11 +469,6 @@ namespace BenchmarkDotNet.Running
                     double workloadApprox = new Statistics(measurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).Select(m => m.Nanoseconds)).Median;
                     double percent = overheadApprox / workloadApprox * 100;
                     launchCount = (int)Math.Round(Math.Max(2, 2 + (percent - 1) / 3)); // an empirical formula
-                }
-
-                if (!success && benchmarkCase.Config.Options.IsSet(ConfigOptions.StopOnFirstError))
-                {
-                    break;
                 }
             }
             logger.WriteLine();
