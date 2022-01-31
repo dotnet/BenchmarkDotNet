@@ -436,7 +436,7 @@ namespace BenchmarkDotNet.Running
                     .Where(r => r.IterationMode != IterationMode.Unknown)
                     .ToArray();
 
-                if (!measurements.Any())
+                if (!measurements.Any(measurement => measurement.IsWorkload()))
                 {
                     // Something went wrong during the benchmark, don't bother doing more runs
                     logger.WriteLineError("No more Benchmark runs will be launched as NO measurements were obtained from the previous run!");
@@ -444,13 +444,24 @@ namespace BenchmarkDotNet.Running
                     break;
                 }
 
+                if (!success && benchmarkCase.Config.Options.IsSet(ConfigOptions.StopOnFirstError))
+                {
+                    break;
+                }
+
                 if (useDiagnoser)
                 {
                     if (benchmarkCase.Config.HasMemoryDiagnoser())
-                        gcStats = GcStats.Parse(executeResult.Data.Last(line => !string.IsNullOrEmpty(line) && line.StartsWith(GcStats.ResultsLinePrefix)));
+                    {
+                        string resultsLine = executeResult.Data.LastOrDefault(line => !string.IsNullOrEmpty(line) && line.StartsWith(GcStats.ResultsLinePrefix));
+                        gcStats = resultsLine is not null ? GcStats.Parse(resultsLine) : default;
+                    }
 
                     if (benchmarkCase.Config.HasThreadingDiagnoser())
-                        threadingStats = ThreadingStats.Parse(executeResult.Data.Last(line => !string.IsNullOrEmpty(line) && line.StartsWith(ThreadingStats.ResultsLinePrefix)));
+                    {
+                        string resultsLine = executeResult.Data.LastOrDefault(line => !string.IsNullOrEmpty(line) && line.StartsWith(ThreadingStats.ResultsLinePrefix));
+                        threadingStats = resultsLine is not null ? ThreadingStats.Parse(resultsLine) : default;
+                    }
 
                     metrics.AddRange(
                         noOverheadCompositeDiagnoser.ProcessResults(
@@ -465,17 +476,12 @@ namespace BenchmarkDotNet.Running
                     double percent = overheadApprox / workloadApprox * 100;
                     launchCount = (int)Math.Round(Math.Max(2, 2 + (percent - 1) / 3)); // an empirical formula
                 }
-
-                if (!success && benchmarkCase.Config.Options.IsSet(ConfigOptions.StopOnFirstError))
-                {
-                    break;
-                }
             }
             logger.WriteLine();
 
             // Do a "Diagnostic" run, but DISCARD the results, so that the overhead of Diagnostics doesn't skew the overall results
             var extraRunCompositeDiagnoser = benchmarkCase.Config.GetCompositeDiagnoser(benchmarkCase, Diagnosers.RunMode.ExtraRun);
-            if (extraRunCompositeDiagnoser != null)
+            if (extraRunCompositeDiagnoser != null && success)
             {
                 logger.WriteLineInfo("// Run, Diagnostic");
 
@@ -499,7 +505,7 @@ namespace BenchmarkDotNet.Running
             }
 
             var separateLogicCompositeDiagnoser = benchmarkCase.Config.GetCompositeDiagnoser(benchmarkCase, Diagnosers.RunMode.SeparateLogic);
-            if (separateLogicCompositeDiagnoser != null)
+            if (separateLogicCompositeDiagnoser != null && success)
             {
                 logger.WriteLineInfo("// Run, Diagnostic [SeparateLogic]");
 
