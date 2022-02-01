@@ -19,7 +19,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         protected string runtimeFrameworkVersion;
 
         protected bool useNuGetClearTag, useTempFolderForRestore;
-        protected TimeSpan? timeout;
         private string targetFrameworkMoniker;
 
         public abstract IToolchain ToToolchain();
@@ -117,18 +116,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public CustomDotNetCliToolchainBuilder UseTempFolderForRestore(bool value)
         {
             useTempFolderForRestore = value;
-
-            return this;
-        }
-
-        /// <summary>
-        /// sets provided timeout for build
-        /// </summary>
-        [PublicAPI]
-        [SuppressMessage("ReSharper", "ParameterHidesMember")]
-        public CustomDotNetCliToolchainBuilder Timeout(TimeSpan timeout)
-        {
-            this.timeout = timeout;
 
             return this;
         }

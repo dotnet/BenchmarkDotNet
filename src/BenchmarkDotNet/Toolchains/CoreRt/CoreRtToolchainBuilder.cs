@@ -144,7 +144,6 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
                 feeds: Feeds,
                 useNuGetClearTag: useNuGetClearTag,
                 useTempFolderForRestore: useTempFolderForRestore,
-                timeout: timeout ?? TimeSpan.FromMinutes(5),  // downloading all CoreRT dependencies can take a LOT of time
                 rootAllApplicationAssemblies: rootAllApplicationAssemblies,
                 ilcGenerateCompleteTypeMetadata: ilcGenerateCompleteTypeMetadata,
                 ilcGenerateStackTraceData: ilcGenerateStackTraceData

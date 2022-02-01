@@ -78,6 +78,8 @@ namespace BenchmarkDotNet.Configs
 
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
 
+        public TimeSpan BuildTimeout => TimeSpan.FromSeconds(120);
+
         public string ArtifactsPath
         {
             get
