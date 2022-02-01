@@ -65,7 +65,8 @@ namespace BenchmarkDotNet.Configs
                 source.CultureInfo,
                 source.Orderer ?? DefaultOrderer.Instance,
                 source.SummaryStyle ?? SummaryStyle.Default,
-                source.Options
+                source.Options,
+                source.BuildTimeout
             );
         }
 

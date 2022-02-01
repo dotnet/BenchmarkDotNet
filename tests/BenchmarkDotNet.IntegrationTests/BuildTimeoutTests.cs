@@ -25,11 +25,11 @@ namespace BenchmarkDotNet.IntegrationTests
             var timeout = TimeSpan.FromSeconds(1);
 
             var config = ManualConfig.CreateEmpty()
+                .WithBuildTimeout(timeout)
                 .AddJob(Job.Dry
                     .WithRuntime(CoreRtRuntime.CoreRt50)
                     .WithToolchain(CoreRtToolchain.CreateBuilder()
                         .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "6.0.0-preview.1.21074.3") // we test against specific version to keep this test stable
-                        .Timeout(timeout)
                         .ToToolchain()));
 
             var summary = CanExecute<CoreRtBenchmark>(config, fullValidation: false);

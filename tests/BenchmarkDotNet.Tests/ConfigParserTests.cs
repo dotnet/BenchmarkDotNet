@@ -276,7 +276,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(timeoutInSeconds, ((DotNetCliBuilder)toolchain.Builder).Timeout.TotalSeconds);
+            Assert.Equal(timeoutInSeconds, config.BuildTimeout.TotalSeconds);
         }
 
         [Fact]
@@ -287,7 +287,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(NetCoreAppSettings.DefaultBuildTimeout, ((DotNetCliBuilder)toolchain.Builder).Timeout);
+            Assert.Equal(DefaultConfig.Instance.BuildTimeout, config.BuildTimeout);
         }
 
         [Theory]

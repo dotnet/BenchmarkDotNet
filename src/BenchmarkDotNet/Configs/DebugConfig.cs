@@ -66,6 +66,7 @@ namespace BenchmarkDotNet.Configs
         public IOrderer Orderer => DefaultOrderer.Instance;
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
+        public TimeSpan BuildTimeout => DefaultConfig.Instance.BuildTimeout;
 
         public string ArtifactsPath
         {

@@ -245,6 +245,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.MaxParameterColumnWidth.HasValue)
                 config.WithSummaryStyle(SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParameterColumnWidth.Value));
 
+            if (options.TimeOutInSeconds.HasValue)
+                config.WithBuildTimeout(TimeSpan.FromSeconds(options.TimeOutInSeconds.Value));
+
             return config;
         }
 
@@ -324,8 +327,6 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static Job CreateJobForGivenRuntime(Job baseJob, string runtimeId, CommandLineOptions options)
         {
-            TimeSpan? timeOut = options.TimeOutInSeconds.HasValue ? TimeSpan.FromSeconds(options.TimeOutInSeconds.Value) : default(TimeSpan?);
-
             if (!TryParse(runtimeId, out RuntimeMoniker runtimeMoniker))
             {
                 throw new InvalidOperationException("Impossible, already validated by the Validate method");
@@ -341,7 +342,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net48:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
-                        .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName, timeOut));
+                        .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName));
                 case RuntimeMoniker.NetCoreApp20:
                 case RuntimeMoniker.NetCoreApp21:
                 case RuntimeMoniker.NetCoreApp22:
@@ -355,7 +356,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net70:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
-                        .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));
+                        .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
                 case RuntimeMoniker.Mono:
                     return baseJob.WithRuntime(new MonoRuntime("Mono", options.MonoPath?.FullName));
                 case RuntimeMoniker.CoreRt20:
@@ -380,33 +381,30 @@ namespace BenchmarkDotNet.ConsoleArguments
                     else
                         builder.UseCoreRtNuGet();
 
-                    if (timeOut.HasValue)
-                        builder.Timeout(timeOut.Value);
-
                     var runtime = runtimeMoniker.GetRuntime();
                     builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
 
                     return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
                 case RuntimeMoniker.Wasm:
-                    return MakeWasmJob(baseJob, options, timeOut, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0");
+                    return MakeWasmJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0");
                 case RuntimeMoniker.WasmNet50:
-                    return MakeWasmJob(baseJob, options, timeOut, "net5.0");
+                    return MakeWasmJob(baseJob, options, "net5.0");
                 case RuntimeMoniker.WasmNet60:
-                    return MakeWasmJob(baseJob, options, timeOut, "net6.0");
+                    return MakeWasmJob(baseJob, options, "net6.0");
                 case RuntimeMoniker.WasmNet70:
-                    return MakeWasmJob(baseJob, options, timeOut, "net7.0");
+                    return MakeWasmJob(baseJob, options, "net7.0");
                 case RuntimeMoniker.MonoAOTLLVM:
-                    return MakeMonoAOTLLVMJob(baseJob, options, timeOut, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0");
                 case RuntimeMoniker.MonoAOTLLVMNet60:
-                    return MakeMonoAOTLLVMJob(baseJob, options, timeOut, "net6.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net6.0");
                 case RuntimeMoniker.MonoAOTLLVMNet70:
-                    return MakeMonoAOTLLVMJob(baseJob, options, timeOut, "net7.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net7.0");
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
         }
 
-        private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, TimeSpan? timeOut, string msBuildMoniker)
+        private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker)
         {
             var monoAotLLVMRuntime = new MonoAotLLVMRuntime(aotCompilerPath: options.AOTCompilerPath, msBuildMoniker: msBuildMoniker);
 
@@ -417,7 +415,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 name: monoAotLLVMRuntime.Name,
                 customDotNetCliPath: options.CliPath?.FullName,
                 packagesPath: options.RestorePath?.FullName,
-                timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
                 customRuntimePack: options.CustomRuntimePack,
                 aotCompilerPath: options.AOTCompilerPath.ToString(),
                 aotCompilerMode: options.AOTCompilerMode));
@@ -425,7 +422,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             return baseJob.WithRuntime(monoAotLLVMRuntime).WithToolchain(toolChain);
         }
 
-        private static Job MakeWasmJob(Job baseJob, CommandLineOptions options, TimeSpan? timeOut, string msBuildMoniker)
+        private static Job MakeWasmJob(Job baseJob, CommandLineOptions options, string msBuildMoniker)
         {
             bool wasmAot = options.AOTCompilerMode == MonoAotCompilerMode.wasm;
 
@@ -442,7 +439,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 name: wasmRuntime.Name,
                 customDotNetCliPath: options.CliPath?.FullName,
                 packagesPath: options.RestorePath?.FullName,
-                timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
                 customRuntimePack: options.CustomRuntimePack,
                 aotCompilerMode: options.AOTCompilerMode));
 

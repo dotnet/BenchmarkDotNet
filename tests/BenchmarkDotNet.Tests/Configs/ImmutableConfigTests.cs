@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
@@ -293,6 +294,42 @@ namespace BenchmarkDotNet.Tests.Configs
             var mutable = ManualConfig.CreateEmpty();
             var final = ImmutableConfigBuilder.Create(mutable);
             Assert.Equal(final.SummaryStyle, SummaryStyle.Default);
+        }
+
+        [Fact]
+        public void WhenTimeoutIsNotSpecifiedTheDefaultValueIsUsed()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+            var final = ImmutableConfigBuilder.Create(mutable);
+            Assert.Equal(DefaultConfig.Instance.BuildTimeout, final.BuildTimeout);
+        }
+
+        [Fact]
+        public void CustomTimeoutHasPrecedenceOverDefaultTimeout()
+        {
+            TimeSpan customTimeout = TimeSpan.FromSeconds(1);
+            var mutable = ManualConfig.CreateEmpty().WithBuildTimeout(customTimeout);
+
+            var final = ImmutableConfigBuilder.Create(mutable);
+
+            Assert.Equal(customTimeout, final.BuildTimeout);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void WhenTwoCustomTimeoutsAreProvidedTheLongerOneIsUsed(bool direction)
+        {
+            var oneSecond = ManualConfig.CreateEmpty().WithBuildTimeout(TimeSpan.FromSeconds(1));
+            var twoSeconds = ManualConfig.CreateEmpty().WithBuildTimeout(TimeSpan.FromSeconds(2));
+
+            if (direction)
+                oneSecond.Add(twoSeconds);
+            else
+                twoSeconds.Add(oneSecond);
+
+            var final = ImmutableConfigBuilder.Create(direction ? oneSecond : twoSeconds);
+            Assert.Equal(TimeSpan.FromSeconds(2), final.BuildTimeout);
         }
 
         private static ManualConfig CreateConfigFromJobs(params Job[] jobs)

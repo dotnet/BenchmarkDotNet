@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
@@ -48,7 +49,8 @@ namespace BenchmarkDotNet.Configs
             CultureInfo cultureInfo,
             IOrderer orderer,
             SummaryStyle summaryStyle,
-            ConfigOptions options)
+            ConfigOptions options,
+            TimeSpan buildTimeout)
         {
             columnProviders = uniqueColumnProviders;
             loggers = uniqueLoggers;
@@ -66,6 +68,7 @@ namespace BenchmarkDotNet.Configs
             Orderer = orderer;
             SummaryStyle = summaryStyle;
             Options = options;
+            BuildTimeout = buildTimeout;
         }
 
         public ConfigUnionRule UnionRule { get; }
@@ -74,6 +77,7 @@ namespace BenchmarkDotNet.Configs
         public ConfigOptions Options { get; }
         [NotNull] public IOrderer Orderer { get; }
         public SummaryStyle SummaryStyle { get; }
+        public TimeSpan BuildTimeout { get; }
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;

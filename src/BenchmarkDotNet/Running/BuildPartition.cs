@@ -56,10 +56,14 @@ namespace BenchmarkDotNet.Running
             || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && (toolchain is RoslynToolchain || toolchain is CsProjClassicNetToolchain));
 
         public Runtime Runtime => RepresentativeBenchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
-                ? RepresentativeBenchmarkCase.Job.Environment.Runtime
-                : RuntimeInformation.GetCurrentRuntime();
+            ? RepresentativeBenchmarkCase.Job.Environment.Runtime
+            : RuntimeInformation.GetCurrentRuntime();
 
         public bool IsCustomBuildConfiguration => BuildConfiguration != InfrastructureMode.ReleaseConfigurationName;
+
+        public TimeSpan Timeout => IsCoreRT && RepresentativeBenchmarkCase.Config.BuildTimeout == DefaultConfig.Instance.BuildTimeout
+            ? TimeSpan.FromMinutes(5) // downloading all CoreRT dependencies can take a LOT of time
+            : RepresentativeBenchmarkCase.Config.BuildTimeout;
 
         public override string ToString() => RepresentativeBenchmarkCase.Job.DisplayInfo;
 
