@@ -23,7 +23,11 @@ namespace BenchmarkDotNet.Running
 
             // We should check all methods including private to notify users about private methods with the [Benchmark] attribute
             var bindingFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-            var benchmarkMethods = type.GetMethods(bindingFlags).Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
+            var benchmarkMethods = type
+                .GetMethods(bindingFlags)
+                .Where(method => method.HasAttribute<BenchmarkAttribute>())
+                .OrderBy(method => method.ResolveAttribute<BenchmarkAttribute>().SourceCodeLineNumber)
+                .ToArray();
 
             return MethodsToBenchmarksWithFullConfig(type, benchmarkMethods, config);
         }
