@@ -164,7 +164,7 @@ namespace BenchmarkDotNet.Running
 
             return new[] { BenchmarkConverter.TypeToBenchmarks(type, config) };
         }
-        
+
         private static BenchmarkRunInfo[] MethodsToBenchmarks(Type containingType, MethodInfo[] methods, IConfig config)
         {
             if (containingType is null)
@@ -187,7 +187,6 @@ namespace BenchmarkDotNet.Running
 
             return new[] { BenchmarkConverter.MethodsToBenchmarks(containingType, methods, config) };
         }
-
 
         private static BenchmarkRunInfo[] AssemblyToBenchmarks(Assembly assembly, IConfig config)
         {
