@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
                 var content = new StringBuilder(ResourceHelper.LoadTemplate("CsProj.txt"))
                     .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
-                    .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
+                    .Replace("$COMPILEINCLUDES$", GetCompileIncludes(artifactsPaths))
                     .Replace("$CSPROJPATH$", projectFile.FullName)
                     .Replace("$TFM$", TargetFrameworkMoniker)
                     .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
@@ -75,6 +75,21 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
                 File.WriteAllText(artifactsPaths.ProjectFilePath, content);
             }
+        }
+
+        protected string GetCompileIncludes(ArtifactsPaths artifactsPaths)
+        {
+            StringBuilder builder = new StringBuilder(300);
+            builder.AppendLine(FormatNewInclude(artifactsPaths.ProgramCodePath));
+            foreach (string derivedTypesFilePath in artifactsPaths.DerivedTypesSourcePaths)
+            {
+                builder.AppendLine(FormatNewInclude(derivedTypesFilePath));
+            }
+
+            return builder.ToString();
+
+            static string FormatNewInclude(string filePath)
+                => $@"    <Compile Include=""{Path.GetFileName(filePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />";
         }
 
         /// <summary>

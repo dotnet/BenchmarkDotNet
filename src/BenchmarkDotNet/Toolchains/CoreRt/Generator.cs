@@ -141,7 +141,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   </PropertyGroup>
   {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
   <ItemGroup>
-    <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
+{GetCompileIncludes(artifactsPaths)}
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{coreRtVersion}"" />
@@ -177,7 +177,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   <Import Project=""$(IlcPath)\build\Microsoft.NETCore.Native.targets"" />
   {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
   <ItemGroup>
-    <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
+{GetCompileIncludes(artifactsPaths)}
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />

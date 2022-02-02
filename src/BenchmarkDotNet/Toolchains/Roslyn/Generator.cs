@@ -17,13 +17,13 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
         [PublicAPI]
         protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
-            => new[]
+            => artifactsPaths.DerivedTypesSourcePaths.Concat(new[]
             {
                 artifactsPaths.ProgramCodePath,
                 artifactsPaths.AppConfigPath,
                 artifactsPaths.BuildScriptFilePath,
                 artifactsPaths.ExecutablePath
-            };
+            }).ToArray();
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
@@ -42,6 +42,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             var references = GetAllReferences(buildPartition.RepresentativeBenchmarkCase).Select(assembly => assembly.Location.Escape());
             list.Add("/reference:" + string.Join(",", references));
             list.Add(Path.GetFileName(artifactsPaths.ProgramCodePath));
+            list.AddRange(artifactsPaths.DerivedTypesSourcePaths.Select(path => Path.GetFileName(path)));
 
             File.WriteAllText(
                 artifactsPaths.BuildScriptFilePath,

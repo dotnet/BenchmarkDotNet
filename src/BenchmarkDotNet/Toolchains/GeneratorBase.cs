@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Loggers;
@@ -109,7 +111,15 @@ namespace BenchmarkDotNet.Toolchains
         /// <remarks>You most probably do NOT need to override this method!!</remarks>
         /// </summary>
         [PublicAPI] protected virtual void GenerateCode(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
-            => File.WriteAllText(artifactsPaths.ProgramCodePath, CodeGenerator.Generate(buildPartition));
+        {
+            (string program, string[] derivedTypes) = CodeGenerator.Generate(buildPartition);
+
+            File.WriteAllText(artifactsPaths.ProgramCodePath, program);
+            for (int i = 0; i < derivedTypes.Length; i++)
+            {
+                File.WriteAllText(artifactsPaths.DerivedTypesSourcePaths[i], derivedTypes[i]);
+            }
+        }
 
         protected virtual string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, $"{programName}{GetExecutableExtension()}");
 
@@ -123,12 +133,16 @@ namespace BenchmarkDotNet.Toolchains
             string binariesDirectoryPath = GetBinariesDirectoryPath(buildArtifactsDirectoryPath, buildPartition.BuildConfiguration);
 
             string executablePath = GetExecutablePath(binariesDirectoryPath, programName);
+            string[] sourceFilePaths = Enumerable.Range(0, buildPartition.SourceFilesCount)
+                .Select(i => Path.Combine(buildArtifactsDirectoryPath, $"{programName}_types_{i}{codeFileExtension}"))
+                .ToArray();
 
             return new ArtifactsPaths(
                 rootArtifactsFolderPath: rootArtifactsFolderPath,
                 buildArtifactsDirectoryPath: buildArtifactsDirectoryPath,
                 binariesDirectoryPath: binariesDirectoryPath,
                 programCodePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{codeFileExtension}"),
+                derivedTypesSourcePaths: sourceFilePaths,
                 appConfigPath: $"{executablePath}.config",
                 nuGetConfigPath: Path.Combine(buildArtifactsDirectoryPath, "NuGet.config"),
                 projectFilePath: GetProjectFilePath(buildArtifactsDirectoryPath),

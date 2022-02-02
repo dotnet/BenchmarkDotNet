@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Code
 {
     internal static class CodeGenerator
     {
-        internal static string Generate(BuildPartition buildPartition)
+        internal static (string program, string[] derivedTypes) Generate(BuildPartition buildPartition)
         {
             (bool useShadowCopy, string shadowCopyFolderPath) = GetShadowCopySettings();
 
@@ -80,14 +80,24 @@ namespace BenchmarkDotNet.Code
 
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
                 .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
-                .Replace("$ExtraDefines$", string.Join(Environment.NewLine, extraDefines))
                 .Replace("$AdditionalLogic$", string.Join(Environment.NewLine, additionalLogic))
-                .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))
                 .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmarkCase.Descriptor))
                 .Replace("$CoreRtSwitch$", GetCoreRtSwitch(buildPartition))
                 .ToString();
 
-            return benchmarkProgramContent;
+            string[] derivedTypes = new string[buildPartition.SourceFilesCount];
+            for (int i = 0; i < derivedTypes.Length; i++)
+            {
+                var defines = extraDefines.Skip(i * BuildPartition.BenchmarksPerSingleSourceFile).Take(BuildPartition.BenchmarksPerSingleSourceFile);
+                var types = benchmarksCode.Skip(i * BuildPartition.BenchmarksPerSingleSourceFile).Take(BuildPartition.BenchmarksPerSingleSourceFile);
+
+                derivedTypes[i] = new SmartStringBuilder(ResourceHelper.LoadTemplate("DerivedTypes.txt"))
+                    .Replace("$ExtraDefines$", string.Join(Environment.NewLine, defines))
+                    .Replace("$DerivedTypes$", string.Join(Environment.NewLine, types))
+                    .ToString();
+            }
+
+            return (benchmarkProgramContent, derivedTypes);
         }
 
         private static void AddNonEmptyUnique(HashSet<string> items, string value)

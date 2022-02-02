@@ -26,7 +26,7 @@
   <Import Project="$(RuntimeSrcDir)/src/mono/wasm/build/WasmApp.LocalBuild.targets" />
 
   <ItemGroup>
-    <Compile Include="$CODEFILENAME$" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+$COMPILEINCLUDES$
     <TrimmerRootDescriptor Include="WasmLinkerDescription.xml" />
   </ItemGroup>
 

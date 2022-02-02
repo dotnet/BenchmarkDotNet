@@ -16,6 +16,8 @@ namespace BenchmarkDotNet.Running
 {
     public class BuildPartition
     {
+        internal const int BenchmarksPerSingleSourceFile = 100;
+
         public BuildPartition(BenchmarkBuildInfo[] benchmarks, IResolver resolver)
         {
             Resolver = resolver;
@@ -64,6 +66,8 @@ namespace BenchmarkDotNet.Running
         public TimeSpan Timeout => IsCoreRT && RepresentativeBenchmarkCase.Config.BuildTimeout == DefaultConfig.Instance.BuildTimeout
             ? TimeSpan.FromMinutes(5) // downloading all CoreRT dependencies can take a LOT of time
             : RepresentativeBenchmarkCase.Config.BuildTimeout;
+
+        public int SourceFilesCount => Benchmarks.Length / BenchmarksPerSingleSourceFile + (Benchmarks.Length % BenchmarksPerSingleSourceFile > 0 ? 1 : 0);
 
         public override string ToString() => RepresentativeBenchmarkCase.Job.DisplayInfo;
 

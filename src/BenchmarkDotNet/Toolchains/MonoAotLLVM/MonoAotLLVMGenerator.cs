@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
 
                 string content = new StringBuilder(ResourceHelper.LoadTemplate("MonoAOTLLVMCsProj.txt"))
                     .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
-                    .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
+                    .Replace("$COMPILEINCLUDES$", GetCompileIncludes(artifactsPaths))
                     .Replace("$CSPROJPATH$", projectFile.FullName)
                     .Replace("$TFM$", TargetFrameworkMoniker)
                     .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)

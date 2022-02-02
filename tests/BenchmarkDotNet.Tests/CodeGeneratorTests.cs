@@ -41,14 +41,17 @@ namespace BenchmarkDotNet.Tests
             var target = new Descriptor(typeof(CodeGeneratorTests), fineMethod);
             var benchmark = BenchmarkCase.Create(target, Job.Default, new ParameterInstances(Array.Empty<ParameterInstance>()), ManualConfig.CreateEmpty().CreateImmutableConfig());
 
-            var generatedSourceFile = CodeGenerator.Generate(new BuildPartition(new[] { new BenchmarkBuildInfo(benchmark, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0) }, BenchmarkRunnerClean.DefaultResolver));
+            (string program, string[] derivedTypes) = CodeGenerator.Generate(new BuildPartition(new[] { new BenchmarkBuildInfo(benchmark, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0) }, BenchmarkRunnerClean.DefaultResolver));
 
-            using (StringReader stringReader = new StringReader(generatedSourceFile))
+            foreach (string generatedSourceFile in derivedTypes.Concat(new string[1] { program }))
             {
-                string line;
-                while ((line = stringReader.ReadLine()) != null && !line.StartsWith("namespace"))
+                using (StringReader stringReader = new StringReader(generatedSourceFile))
                 {
-                    Assert.False(line.Trim().StartsWith("using"), line);
+                    string line;
+                    while ((line = stringReader.ReadLine()) != null && !line.StartsWith("namespace"))
+                    {
+                        Assert.False(line.Trim().StartsWith("using"), line);
+                    }
                 }
             }
         }

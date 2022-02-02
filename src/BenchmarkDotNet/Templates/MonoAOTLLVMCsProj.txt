@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="$CODEFILENAME$" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+$COMPILEINCLUDES$
   </ItemGroup>
 
   <ItemGroup>

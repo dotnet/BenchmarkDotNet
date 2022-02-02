@@ -13,6 +13,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             baseArtifacts.BuildArtifactsDirectoryPath,
             baseArtifacts.BinariesDirectoryPath,
             baseArtifacts.ProgramCodePath,
+            baseArtifacts.DerivedTypesSourcePaths,
             baseArtifacts.AppConfigPath,
             baseArtifacts.NuGetConfigPath,
             baseArtifacts.ProjectFilePath,

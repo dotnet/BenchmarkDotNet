@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
                 string content = new StringBuilder(ResourceHelper.LoadTemplate("WasmAotCsProj.txt"))
                     .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
-                    .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
+                    .Replace("$COMPILEINCLUDES$", GetCompileIncludes(artifactsPaths))
                     .Replace("$CSPROJPATH$", projectFile.FullName)
                     .Replace("$TFM$", TargetFrameworkMoniker)
                     .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
                 string content = new StringBuilder(ResourceHelper.LoadTemplate("WasmCsProj.txt"))
                     .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
-                    .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
+                    .Replace("$COMPILEINCLUDES$", GetCompileIncludes(artifactsPaths))
                     .Replace("$CSPROJPATH$", projectFile.FullName)
                     .Replace("$TFM$", TargetFrameworkMoniker)
                     .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
