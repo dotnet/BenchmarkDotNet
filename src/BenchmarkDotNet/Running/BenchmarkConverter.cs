@@ -115,7 +115,6 @@ namespace BenchmarkDotNet.Running
             Tuple<MethodInfo, TargetedAttribute>[] iterationCleanupMethods)
         {
             return targetMethods
-                .Where(m => m.HasAttribute<BenchmarkAttribute>())
                 .Select(methodInfo => CreateDescriptor(type,
                                                    GetTargetedMatchingMethod(methodInfo, globalSetupMethods),
                                                    methodInfo,
