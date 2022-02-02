@@ -182,8 +182,8 @@ namespace BenchmarkDotNet.Running
             var publicBenchmarkMethodsOfType = containingType.GetMethods().Where(m => m.HasAttribute<BenchmarkAttribute>()).ToArray();
             var wrongMethods = methods.Except(publicBenchmarkMethodsOfType).ToArray();
             if (!wrongMethods.IsEmpty())
-                ConsoleLogger.Default.WriteLineError(string.Join(", ", wrongMethods.Select(m => m.Name)) + 
-                                                    $" skipped. Methods should be with [Benchmark] attribute of {containingType} type.");
+                throw new InvalidBenchmarkDeclarationException(string.Join(", ", wrongMethods.Select(m => m.Name)) + 
+                                                               $" are wrong. Methods should be with [Benchmark] attribute of {containingType} type.");
 
             return new[] { BenchmarkConverter.MethodsToBenchmarks(containingType, methods, config) };
         }
@@ -210,8 +210,8 @@ namespace BenchmarkDotNet.Running
             var nonBenchmarkTypes = types.Where(t => !t.ContainsRunnableBenchmarks()).ToArray();
 
             if (!nonBenchmarkTypes.IsEmpty())
-                ConsoleLogger.Default.WriteLineError(string.Join(",", nonBenchmarkTypes.Select(type => type.Name))
-                                                     + " should be public non-sealed non-static types with public [Benchmark] methods.");
+                throw new InvalidBenchmarkDeclarationException(string.Join(",", nonBenchmarkTypes.Select(type => type.Name))
+                                                               + " should be public non-sealed non-static types with public [Benchmark] methods.");
 
             return types.Select(t => BenchmarkConverter.TypeToBenchmarks(t, config)).ToArray();
         }
