@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
@@ -9,7 +10,7 @@ using Xunit;
 
 namespace BenchmarkDotNet.Tests.Running
 {
-    public class BenchmarkConverterTests
+    public partial class BenchmarkConverterTests
     {
         /// <summary>
         /// https://github.com/dotnet/BenchmarkDotNet/issues/495
@@ -197,6 +198,44 @@ namespace BenchmarkDotNet.Tests.Running
         public class WithFewMutators
         {
             [Benchmark] public void Method() { }
+        }
+
+        [Fact]
+        public void MethodDeclarationOrderIsPreserved()
+        {
+            foreach (Type type in new[] { typeof(BAC), typeof(BAC_Partial), typeof(BAC_Partial_DifferentFiles) })
+            {
+                var info = BenchmarkConverter.TypeToBenchmarks(type);
+
+                Assert.Equal(nameof(BAC.B), info.BenchmarksCases[0].Descriptor.WorkloadMethod.Name);
+                Assert.Equal(nameof(BAC.A), info.BenchmarksCases[1].Descriptor.WorkloadMethod.Name);
+                Assert.Equal(nameof(BAC.C), info.BenchmarksCases[2].Descriptor.WorkloadMethod.Name);
+            }
+        }
+
+        public class BAC
+        {
+            // BAC is not sorted in either desceding or ascending way
+            [Benchmark] public void B() { }
+            [Benchmark] public void A() { }
+            [Benchmark] public void C() { }
+        }
+
+        public partial class BAC_Partial
+        {
+            [Benchmark] public void B() { }
+            [Benchmark] public void A() { }
+        }
+
+        public partial class BAC_Partial
+        {
+            [Benchmark] public void C() { }
+        }
+
+        public partial class BAC_Partial_DifferentFiles
+        {
+            [Benchmark] public void A() { }
+            [Benchmark] public void C() { }
         }
     }
 }
