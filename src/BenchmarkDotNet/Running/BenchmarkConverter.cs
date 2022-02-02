@@ -25,8 +25,11 @@ namespace BenchmarkDotNet.Running
             var bindingFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
             var benchmarkMethods = type
                 .GetMethods(bindingFlags)
-                .Where(method => method.HasAttribute<BenchmarkAttribute>())
-                .OrderBy(method => method.ResolveAttribute<BenchmarkAttribute>().SourceCodeLineNumber)
+                .Select(method => (method, attribute: method.ResolveAttribute<BenchmarkAttribute>()))
+                .Where(pair => pair.attribute is not null)
+                .OrderBy(pair => pair.attribute.SourceCodeFile)
+                .ThenBy(pair => pair.attribute.SourceCodeLineNumber)
+                .Select(pair => pair.method)
                 .ToArray();
 
             return MethodsToBenchmarksWithFullConfig(type, benchmarkMethods, config);
