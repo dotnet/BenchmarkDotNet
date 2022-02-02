@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -69,6 +70,7 @@ namespace BenchmarkDotNet.Running
         /// Supported only on Full .NET Framework. Not recommended.
         /// </summary>
         [PublicAPI]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static Summary RunUrl(string url, IConfig config = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
@@ -79,6 +81,7 @@ namespace BenchmarkDotNet.Running
         /// Supported only on Full .NET Framework. Not recommended.
         /// </summary>
         [PublicAPI]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static Summary RunSource(string source, IConfig config = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
