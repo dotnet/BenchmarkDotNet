@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
@@ -91,24 +92,24 @@ namespace BenchmarkDotNet.Running
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Type type, IConfig config, string[] args)
             => (args == null
-                ? BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.TypeToBenchmarks(type, config) })
+                ? BenchmarkRunnerClean.Run(TypeToBenchmarks(type, config))
                 : new BenchmarkSwitcher(new[] { type }).RunWithDirtyAssemblyResolveHelper(args, config, false))
                 .Single();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Type type, MethodInfo[] methods, IConfig config = null)
-            => BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.MethodsToBenchmarks(type, methods, config) }).Single();
+            => BenchmarkRunnerClean.Run(MethodsToBenchmarks(type, methods, config)).Single();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary[] RunWithDirtyAssemblyResolveHelper(Assembly assembly, IConfig config, string[] args)
             => args == null
-                ? BenchmarkRunnerClean.Run(assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray())
+                ? BenchmarkRunnerClean.Run(AssemblyToBenchmarks(assembly, config))
                 : new BenchmarkSwitcher(assembly).RunWithDirtyAssemblyResolveHelper(args, config, false).ToArray();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary[] RunWithDirtyAssemblyResolveHelper(Type[] types, IConfig config, string[] args)
             => args == null
-                ? BenchmarkRunnerClean.Run(types.Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray())
+                ? BenchmarkRunnerClean.Run(TypesToBenchmarks(types, config))
                 : new BenchmarkSwitcher(types).RunWithDirtyAssemblyResolveHelper(args, config, false).ToArray();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -151,6 +152,68 @@ namespace BenchmarkDotNet.Running
                 ConsoleLogger.Default.WriteLineError(e.Message);
                 return new[] { Summary.NothingToRun(e.Message, string.Empty, string.Empty) };
             }
+        }
+
+        private static BenchmarkRunInfo[] TypeToBenchmarks(Type type, IConfig config)
+        {
+            if (type is null)
+                throw new InvalidBenchmarkDeclarationException("Type not provided.");
+
+            if (!type.ContainsRunnableBenchmarks())
+                throw new InvalidBenchmarkDeclarationException($"{type.Name} must be public non-sealed non-static type and contain public [Benchmark] methods.");
+
+            return new[] { BenchmarkConverter.TypeToBenchmarks(type, config) };
+        }
+        
+        private static BenchmarkRunInfo[] MethodsToBenchmarks(Type containingType, MethodInfo[] methods, IConfig config)
+        {
+            if (containingType is null)
+                throw new InvalidBenchmarkDeclarationException("Type not provided.");
+
+            if (!containingType.ContainsRunnableBenchmarks())
+                throw new InvalidBenchmarkDeclarationException($"{containingType.Name} must be public non-sealed non-static type and contain public [Benchmark] methods.");
+
+            if (methods.IsNullOrEmpty())
+                throw new InvalidBenchmarkDeclarationException($"No methods provided for {containingType.Name} type.");
+
+            if (methods.Any(m => m is null))
+                throw new InvalidBenchmarkDeclarationException($"Null not allowed for benchmark methods.");
+
+            var publicBenchmarkMethodsOfType = containingType.GetMethods().Where(m => m.HasAttribute<BenchmarkAttribute>()).ToArray();
+            var wrongMethods = methods.Except(publicBenchmarkMethodsOfType).ToArray();
+            if (!wrongMethods.IsEmpty())
+                ConsoleLogger.Default.WriteLineError(string.Join(", ", wrongMethods.Select(m => m.Name)) + 
+                                                    $" skipped. Methods should be with [Benchmark] attribute of {containingType} type.");
+
+            return new[] { BenchmarkConverter.MethodsToBenchmarks(containingType, methods, config) };
+        }
+
+
+        private static BenchmarkRunInfo[] AssemblyToBenchmarks(Assembly assembly, IConfig config)
+        {
+            if (assembly is null)
+                throw new InvalidBenchmarkDeclarationException("Assembly not provided.");
+
+            var benchmarkTypes = assembly.GetRunnableBenchmarks();
+
+            if (benchmarkTypes.IsEmpty())
+                throw new InvalidBenchmarkDeclarationException("No benchmarks to choose from. Make sure you provided public non-sealed non-static types with public [Benchmark] methods.");
+
+            return benchmarkTypes.Select(t => BenchmarkConverter.TypeToBenchmarks(t, config)).ToArray();
+        }
+
+        private static BenchmarkRunInfo[] TypesToBenchmarks(Type[] types, IConfig config)
+        {
+            if (types.IsNullOrEmpty())
+                throw new InvalidBenchmarkDeclarationException("No types provided.");
+
+            var nonBenchmarkTypes = types.Where(t => !t.ContainsRunnableBenchmarks()).ToArray();
+
+            if (!nonBenchmarkTypes.IsEmpty())
+                ConsoleLogger.Default.WriteLineError(string.Join(",", nonBenchmarkTypes.Select(type => type.Name))
+                                                     + " should be public non-sealed non-static types with public [Benchmark] methods.");
+
+            return types.Select(t => BenchmarkConverter.TypeToBenchmarks(t, config)).ToArray();
         }
     }
 }
