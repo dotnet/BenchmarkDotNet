@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Running
                     {
                         var runChronometer = Chronometer.Start();
 
-                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup, 
+                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup,
                             resultsFolderPath, logFilePath, totalBenchmarkCount, in globalChronometer, ref runChronometer, ref benchmarksToRunCount);
 
                         if (!benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.JoinSummary))
@@ -658,8 +658,10 @@ namespace BenchmarkDotNet.Running
         {
             int executedBenchmarkCount = totalBenchmarkCount - benchmarksToRunCount;
             double avgSecondsPerBenchmark = globalChronometer.GetElapsed().GetTimeSpan().TotalSeconds / executedBenchmarkCount;
-            DateTime estimatedEnd = DateTime.Now.AddSeconds(avgSecondsPerBenchmark * benchmarksToRunCount);
-            string message = $"// ** Remained {benchmarksToRunCount} ({(double)benchmarksToRunCount / totalBenchmarkCount:P1}) benchmark(s) to run. Estimated finish {estimatedEnd} **";
+            TimeSpan fromNow = TimeSpan.FromSeconds(avgSecondsPerBenchmark * benchmarksToRunCount);
+            DateTime estimatedEnd = DateTime.Now.Add(fromNow);
+            string message = $"// ** Remained {benchmarksToRunCount} ({(double)benchmarksToRunCount / totalBenchmarkCount:P1}) benchmark(s) to run." +
+                $" Estimated finish {estimatedEnd:yyyy-MM-dd H:mm} ({fromNow:%h}h {fromNow:%m}m from now) **";
             logger.WriteLineHeader(message);
         }
     }
