@@ -661,7 +661,7 @@ namespace BenchmarkDotNet.Running
             TimeSpan fromNow = TimeSpan.FromSeconds(avgSecondsPerBenchmark * benchmarksToRunCount);
             DateTime estimatedEnd = DateTime.Now.Add(fromNow);
             string message = $"// ** Remained {benchmarksToRunCount} ({(double)benchmarksToRunCount / totalBenchmarkCount:P1}) benchmark(s) to run." +
-                $" Estimated finish {estimatedEnd:yyyy-MM-dd H:mm} ({fromNow:%h}h {fromNow:%m}m from now) **";
+                $" Estimated finish {estimatedEnd:yyyy-MM-dd H:mm} ({(int)fromNow.TotalHours}h {fromNow.Minutes}m from now) **";
             logger.WriteLineHeader(message);
         }
     }
