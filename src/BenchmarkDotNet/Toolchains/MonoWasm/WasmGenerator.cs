@@ -13,12 +13,14 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
     {
         private readonly string CustomRuntimePack;
         private readonly bool Aot;
+        private readonly string MainJS;
 
         public WasmGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, bool aot)
             : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion: null)
         {
             Aot = aot;
             CustomRuntimePack = customRuntimePack;
+            MainJS = (targetFrameworkMoniker == "net5.0" || targetFrameworkMoniker == "net6.0") ? "main.js" : "test-main.js";
         }
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
@@ -56,6 +58,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     .Replace("$COPIEDSETTINGS$", customProperties)
                     .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
                     .Replace("$SDKNAME$", sdkName)
+                    .Replace("$MAINJS$", MainJS)
                     .ToString();
 
                 File.WriteAllText(artifactsPaths.ProjectFilePath, content);
@@ -84,6 +87,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
                     .Replace("$SDKNAME$", sdkName)
                     .Replace("$RUNTIMEPACK$", CustomRuntimePack ?? "")
+                    .Replace("$MAINJS$", MainJS)
                     .Replace("$TARGET$", CustomRuntimePack != null ? "PublishWithCustomRuntimePack" : "Publish")
                 .ToString();
 
@@ -91,7 +95,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             }
         }
 
-        protected override string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, "main.js");
+        protected override string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, MainJS);
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
         {
