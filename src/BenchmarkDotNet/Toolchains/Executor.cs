@@ -117,7 +117,7 @@ namespace BenchmarkDotNet.Toolchains
                     start.FileName = wasm.JavaScriptEngine;
                     start.RedirectStandardInput = false;
 
-                    string main_js = (runtime.RuntimeMoniker == RuntimeMoniker.WasmNet60 || runtime.RuntimeMoniker == RuntimeMoniker.WasmNet50)? "main.js" : "test-main.js";
+                    string main_js = runtime.RuntimeMoniker < RuntimeMoniker.WasmNet70 ? "main.js" : "test-main.js";
 
                     start.Arguments = $"{wasm.JavaScriptEngineArguments} {main_js} -- --run {artifactsPaths.ProgramName}.dll {args} ";
                     start.WorkingDirectory = artifactsPaths.BinariesDirectoryPath;
