@@ -11,10 +11,12 @@
     <OutputType>Exe</OutputType>
     <OutputPath>bin\$CONFIGURATIONNAME$</OutputPath>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <DebugType>pdbonly</DebugType>
-    <DebugSymbols>true</DebugSymbols>
+    <!-- nice to have for EtwProfiler, but not mandatory. On x86 and ARM disabled due to bug in Roslyn. -->
+    <DebugType Condition=" '$(PlatformTarget)' != 'x86' And '$(PlatformTarget)' != 'ARM' ">pdbonly</DebugType>
+    <DebugSymbols Condition=" '$(PlatformTarget)' != 'x86' And '$(PlatformTarget)' != 'ARM' ">true</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
     <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
+    <RunAnalyzers>false</RunAnalyzers>
     <Deterministic>true</Deterministic>
     <!-- needed for custom build configurations (only "Release" builds are optimized by default) -->
     <Optimize Condition=" '$(Configuration)' != 'Debug' ">true</Optimize>
