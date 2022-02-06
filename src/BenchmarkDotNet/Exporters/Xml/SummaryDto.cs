@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
@@ -72,7 +71,14 @@ namespace BenchmarkDotNet.Exporters.Xml
         public string MethodTitle => report.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo;
         public string Parameters => report.BenchmarkCase.Parameters.PrintInfo;
         public Statistics Statistics => report.ResultStatistics;
-        public GcStats Memory => report.GcStats;
+        public GcStats Memory => new GcStats()
+        {
+            Gen0Collections = report.GcStats.Gen0Collections,
+            Gen1Collections = report.GcStats.Gen1Collections,
+            Gen2Collections = report.GcStats.Gen2Collections,
+            TotalOperations = report.GcStats.TotalOperations,
+            BytesAllocatedPerOperation = report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase)
+        };
         [PublicAPI] public IEnumerable<Measurement> Measurements { get; }
 
         private readonly BenchmarkReport report;
@@ -82,5 +88,14 @@ namespace BenchmarkDotNet.Exporters.Xml
             this.report = report;
             Measurements = excludeMeasurements ? null : report.AllMeasurements;
         }
+    }
+
+    internal struct GcStats
+    {
+        public int Gen0Collections { get; set; }
+        public int Gen1Collections { get; set; }
+        public int Gen2Collections { get; set; }
+        public long TotalOperations { get; set; }
+        public long BytesAllocatedPerOperation { get; set; }
     }
 }
