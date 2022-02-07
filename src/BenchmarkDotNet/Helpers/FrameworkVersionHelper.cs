@@ -15,8 +15,7 @@ namespace BenchmarkDotNet.Helpers
             (461808, "4.7.2"),
             (461308, "4.7.1"),
             (460798, "4.7"),
-            (394802, "4.6.2"),
-            (394254, "4.6.1")
+            (394802, "4.6.2")
         };
 
         internal static string GetFrameworkDescription()
@@ -38,8 +37,6 @@ namespace BenchmarkDotNet.Helpers
         internal static string MapToReleaseVersion(string servicingVersion)
         {
             // the following code assumes that .NET 4.6.2 is the oldest supported version
-            if (string.Compare(servicingVersion, "4.6.2") < 0)
-                return "4.6.1";
             if (string.Compare(servicingVersion, "4.7") < 0)
                 return "4.6.2";
             if (string.Compare(servicingVersion, "4.7.1") < 0)

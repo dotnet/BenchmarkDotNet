@@ -6,8 +6,6 @@ namespace BenchmarkDotNet.Tests
     public class FrameworkVersionHelperTests
     {
         [Theory]
-        [InlineData("4.6.1", "4.6.1")]
-        [InlineData("4.6.1.123", "4.6.1")]
         [InlineData("4.6.2", "4.6.2")]
         [InlineData("4.6.2.123", "4.6.2")]
         [InlineData("4.7", "4.7")]
