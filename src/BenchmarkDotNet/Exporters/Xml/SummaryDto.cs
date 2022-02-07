@@ -90,6 +90,12 @@ namespace BenchmarkDotNet.Exporters.Xml
         }
     }
 
+    /// <summary>
+    /// This type is used to ensure that the allocated bytes are persisted in the XML
+    /// report when serialized, as the original <see cref="Engines.GcStats"/> type does
+    /// not contain a property for the value so the report would otherwise lack it.
+    /// See https://github.com/dotnet/BenchmarkDotNet/pull/1919 for more details.
+    /// </summary>
     internal struct GcStats
     {
         public int Gen0Collections { get; set; }
