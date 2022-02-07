@@ -69,18 +69,15 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.True(summary.Reports.Any(), "The \"Summary\" should contain at least one \"BenchmarkReport\" in the \"Reports\" collection");
 
                 Assert.True(summary.Reports.All(r => r.BuildResult.IsBuildSuccess),
-                    "The following benchmarks are failed to build: " +
+                    "The following benchmarks have failed to build: " +
                     string.Join(", ", summary.Reports.Where(r => !r.BuildResult.IsBuildSuccess).Select(r => r.BenchmarkCase.DisplayInfo)));
 
                 Assert.True(summary.Reports.All(r => r.ExecuteResults != null),
                     "The following benchmarks don't have any execution results: " +
                     string.Join(", ", summary.Reports.Where(r => r.ExecuteResults == null).Select(r => r.BenchmarkCase.DisplayInfo)));
 
-                Assert.True(summary.Reports.All(r => r.ExecuteResults.Any(er => er.FoundExecutable && er.Data.Any())),
-                    "All reports should have at least one \"ExecuteResult\" with \"FoundExecutable\" = true and at least one \"Data\" item");
-
-                Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()),
-                    "All reports should have at least one \"Measurement\" in the \"AllMeasurements\" collection");
+                Assert.True(summary.Reports.All(r => r.ExecuteResults.All(er => er.IsSuccess)),
+                    "All reports should have succeeded to execute");
             }
 
             return summary;

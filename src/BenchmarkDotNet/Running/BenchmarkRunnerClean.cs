@@ -186,7 +186,7 @@ namespace BenchmarkDotNet.Running
                     }
                     else
                     {
-                        reports.Add(new BenchmarkReport(false, benchmark, buildResult, buildResult, default, default, default, default));
+                        reports.Add(new BenchmarkReport(false, benchmark, buildResult, buildResult, default, default));
 
                         if (buildResult.GenerateException != null)
                             logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException.Message}");
@@ -374,27 +374,15 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// **************************");
             logger.WriteLineHeader("// Benchmark: " + benchmarkCase.DisplayInfo);
 
-            var (success, executeResults, gcStats, metrics) = Execute(logger, benchmarkCase, benchmarkId, toolchain, buildResult, resolver);
+            var (success, executeResults, metrics) = Execute(logger, benchmarkCase, benchmarkId, toolchain, buildResult, resolver);
 
-            var runs = new List<Measurement>();
-
-            for (int index = 0; index < executeResults.Count; index++)
-            {
-                int currentIndex = index;
-                var executeResult = executeResults[index];
-                runs.AddRange(executeResult.Data.Where(line => !string.IsNullOrEmpty(line)).Select(line => Measurement.Parse(logger, line, currentIndex + 1)).Where(r => r.IterationMode != IterationMode.Unknown));
-            }
-
-            return new BenchmarkReport(success, benchmarkCase, buildResult, buildResult, executeResults, runs, gcStats, metrics);
+            return new BenchmarkReport(success, benchmarkCase, buildResult, buildResult, executeResults, metrics);
         }
 
-        private static (bool success, List<ExecuteResult> executeResults, GcStats gcStats, List<Metric> metrics) Execute(ILogger logger, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IToolchain toolchain,
-            BuildResult buildResult, IResolver resolver)
+        private static (bool success, List<ExecuteResult> executeResults, List<Metric> metrics) Execute(
+            ILogger logger, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IToolchain toolchain, BuildResult buildResult, IResolver resolver)
         {
-            var success = true;
             var executeResults = new List<ExecuteResult>();
-            var gcStats = default(GcStats);
-            var threadingStats = default(ThreadingStats);
             var metrics = new List<Metric>();
 
             logger.WriteLineInfo("// *** Execute ***");
@@ -425,73 +413,20 @@ namespace BenchmarkDotNet.Running
                     buildResult,
                     resolver,
                     useDiagnoser ? noOverheadCompositeDiagnoser : null,
-                    ref success);
-
-                if (executeResult.ProcessId.HasValue)
-                {
-                    if (executeResult.ExitCode is int exitCode)
-                    {
-                        logger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} has exited with code {exitCode}.");
-                    }
-                    else
-                    {
-                        logger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} failed to exit.");
-                    }
-                }
+                    launchIndex);
 
                 executeResults.Add(executeResult);
 
-                var errors = executeResults.SelectMany(r => r.Data)
-                    .Union(executeResults.SelectMany(r => r.ExtraOutput))
-                    .Where(line => line.StartsWith(ValidationErrorReporter.ConsoleErrorPrefix))
-                    .Select(line => line.Substring(ValidationErrorReporter.ConsoleErrorPrefix.Length).Trim())
-                    .ToArray();
-
-                if (errors.Any())
+                if (!executeResult.IsSuccess)
                 {
-                    success = false;
-                    foreach (string error in errors)
-                        logger.WriteLineError(error);
-                    break;
+                    return (false, executeResults, metrics);
                 }
 
-                var measurements = executeResults
-                    .SelectMany(r => r.Data)
-                    .Where(line => !string.IsNullOrEmpty(line))
-                    .Select(line => Measurement.Parse(logger, line, 0))
-                    .Where(r => r.IterationMode != IterationMode.Unknown)
-                    .ToArray();
-
-                if (!measurements.Any(measurement => measurement.IsWorkload()))
-                {
-                    // Something went wrong during the benchmark, don't bother doing more runs
-                    logger.WriteLineError("No more Benchmark runs will be launched as NO measurements were obtained from the previous run!");
-                    success = false;
-                    break;
-                }
-
-                if (!success && benchmarkCase.Config.Options.IsSet(ConfigOptions.StopOnFirstError))
-                {
-                    break;
-                }
+                var measurements = executeResult.Measurements;
 
                 if (useDiagnoser)
                 {
-                    if (benchmarkCase.Config.HasMemoryDiagnoser())
-                    {
-                        string resultsLine = executeResult.Data.LastOrDefault(line => !string.IsNullOrEmpty(line) && line.StartsWith(GcStats.ResultsLinePrefix));
-                        gcStats = resultsLine is not null ? GcStats.Parse(resultsLine) : default;
-                    }
-
-                    if (benchmarkCase.Config.HasThreadingDiagnoser())
-                    {
-                        string resultsLine = executeResult.Data.LastOrDefault(line => !string.IsNullOrEmpty(line) && line.StartsWith(ThreadingStats.ResultsLinePrefix));
-                        threadingStats = resultsLine is not null ? ThreadingStats.Parse(resultsLine) : default;
-                    }
-
-                    metrics.AddRange(
-                        noOverheadCompositeDiagnoser.ProcessResults(
-                            new DiagnoserResults(benchmarkCase, measurements.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations), gcStats, threadingStats, buildResult)));
+                    metrics.AddRange(noOverheadCompositeDiagnoser.ProcessResults(new DiagnoserResults(benchmarkCase, executeResult, buildResult)));
                 }
 
                 if (autoLaunchCount && launchIndex == 2 && analyzeRunToRunVariance)
@@ -507,7 +442,7 @@ namespace BenchmarkDotNet.Running
 
             // Do a "Diagnostic" run, but DISCARD the results, so that the overhead of Diagnostics doesn't skew the overall results
             var extraRunCompositeDiagnoser = benchmarkCase.Config.GetCompositeDiagnoser(benchmarkCase, Diagnosers.RunMode.ExtraRun);
-            if (extraRunCompositeDiagnoser != null && success)
+            if (extraRunCompositeDiagnoser != null)
             {
                 logger.WriteLineInfo("// Run, Diagnostic");
 
@@ -519,30 +454,29 @@ namespace BenchmarkDotNet.Running
                     buildResult,
                     resolver,
                     extraRunCompositeDiagnoser,
-                    ref success);
+                    launchCount + 1);
 
-                var allRuns = executeResult.Data.Where(line => !string.IsNullOrEmpty(line)).Select(line => Measurement.Parse(logger, line, 0)).Where(r => r.IterationMode != IterationMode.Unknown).ToList();
-
-                metrics.AddRange(
-                    extraRunCompositeDiagnoser.ProcessResults(
-                        new DiagnoserResults(benchmarkCase, allRuns.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations), gcStats, threadingStats, buildResult)));
+                if (executeResult.IsSuccess)
+                {
+                    metrics.AddRange(extraRunCompositeDiagnoser.ProcessResults(new DiagnoserResults(benchmarkCase, executeResult, buildResult)));
+                }
 
                 logger.WriteLine();
             }
 
             var separateLogicCompositeDiagnoser = benchmarkCase.Config.GetCompositeDiagnoser(benchmarkCase, Diagnosers.RunMode.SeparateLogic);
-            if (separateLogicCompositeDiagnoser != null && success)
+            if (separateLogicCompositeDiagnoser != null)
             {
                 logger.WriteLineInfo("// Run, Diagnostic [SeparateLogic]");
 
                 separateLogicCompositeDiagnoser.Handle(HostSignal.SeparateLogic, new DiagnoserActionParameters(null, benchmarkCase, benchmarkId));
             }
 
-            return (success, executeResults, gcStats, metrics);
+            return (true, executeResults, metrics);
         }
 
-        private static ExecuteResult RunExecute(ILogger logger, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IToolchain toolchain, BuildResult buildResult,
-            IResolver resolver, IDiagnoser diagnoser, ref bool success)
+        private static ExecuteResult RunExecute(ILogger logger, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IToolchain toolchain,
+            BuildResult buildResult, IResolver resolver, IDiagnoser diagnoser, int launchIndex)
         {
             var executeResult = toolchain.Executor.Execute(
                 new ExecuteParameters(
@@ -551,20 +485,24 @@ namespace BenchmarkDotNet.Running
                     benchmarkId,
                     logger,
                     resolver,
+                    launchIndex,
                     diagnoser));
 
-            if (!executeResult.FoundExecutable)
+            if (!executeResult.IsSuccess)
             {
-                success = false;
-                logger.WriteLineError($"Executable {buildResult.ArtifactsPaths.ExecutablePath} not found");
+                executeResult.LogIssues(logger, buildResult);
             }
 
-            // exit code can be different than 0 if the process has hanged at the end
-            // so we check if some results were reported, if not then it was a failure
-            if (executeResult.ExitCode != 0 && executeResult.Data.IsEmpty())
+            if (executeResult.ProcessId.HasValue)
             {
-                success = false;
-                logger.WriteLineError("ExitCode != 0 and no results reported");
+                if (executeResult.ExitCode is int exitCode)
+                {
+                    logger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} has exited with code {exitCode}.");
+                }
+                else
+                {
+                    logger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} failed to exit.");
+                }
             }
 
             return executeResult;

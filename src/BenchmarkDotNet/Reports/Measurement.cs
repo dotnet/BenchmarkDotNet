@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -111,12 +112,11 @@ namespace BenchmarkDotNet.Reports
         /// Will extract the number of <see cref="Operations"/> performed and the
         /// total number of <see cref="Nanoseconds"/> it took to perform them.
         /// </summary>
-        /// <param name="logger">The logger to write any diagnostic messages to.</param>
         /// <param name="line">The line to parse.</param>
-        /// <param name="processIndex"></param>
+        /// <param name="processIndex">Process launch index, indexed from one.</param>
         /// <returns>An instance of <see cref="Measurement"/> if parsed successfully. <c>Null</c> in case of any trouble.</returns>
         // ReSharper disable once UnusedParameter.Global
-        public static Measurement Parse(ILogger logger, string line, int processIndex)
+        public static Measurement Parse(string line, int processIndex)
         {
             if (string.IsNullOrWhiteSpace(line) || line.StartsWith(GcStats.ResultsLinePrefix))
                 return Error();
@@ -166,8 +166,8 @@ namespace BenchmarkDotNet.Reports
             catch (Exception)
             {
 #if DEBUG // some benchmarks need to write to console and when we display this error it's confusing
-                logger.WriteLineError("Parse error in the following line:");
-                logger.WriteLineError(line);
+                Debug.WriteLine("Parse error in the following line:");
+                Debug.WriteLine(line);
 #endif
                 return Error();
             }

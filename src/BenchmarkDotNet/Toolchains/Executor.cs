@@ -28,13 +28,15 @@ namespace BenchmarkDotNet.Toolchains
 
             if (!File.Exists(exePath))
             {
-                return new ExecuteResult(false, -1, default, Array.Empty<string>(), Array.Empty<string>());
+                return ExecuteResult.CreateFailed();
             }
 
-            return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths, args, executeParameters.Diagnoser, executeParameters.Resolver);
+            return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
+                args, executeParameters.Diagnoser, executeParameters.Resolver, executeParameters.LaunchIndex);
         }
 
-        private ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths, string args, IDiagnoser diagnoser, IResolver resolver)
+        private ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
+            string args, IDiagnoser diagnoser, IResolver resolver, int launchIndex)
         {
             try
             {
@@ -45,7 +47,7 @@ namespace BenchmarkDotNet.Toolchains
 
                     diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 
-                    return Execute(process, benchmarkCase, loggerWithDiagnoser, logger, consoleExitHandler);
+                    return Execute(process, benchmarkCase, loggerWithDiagnoser, logger, consoleExitHandler, launchIndex);
                 }
             }
             finally
@@ -54,7 +56,8 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private ExecuteResult Execute(Process process, BenchmarkCase benchmarkCase, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser, ILogger logger, ConsoleExitHandler consoleExitHandler)
+        private ExecuteResult Execute(Process process, BenchmarkCase benchmarkCase, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser,
+            ILogger logger, ConsoleExitHandler consoleExitHandler, int launchIndex)
         {
             logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
@@ -78,7 +81,7 @@ namespace BenchmarkDotNet.Toolchains
             if (loggerWithDiagnoser.LinesWithResults.Any(line => line.Contains("BadImageFormatException")))
                 logger.WriteLineError("You are probably missing <PlatformTarget>AnyCPU</PlatformTarget> in your .csproj file.");
 
-            return new ExecuteResult(true, process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
+            return new ExecuteResult(true, process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput, launchIndex);
         }
 
         private ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, string args, IResolver resolver)

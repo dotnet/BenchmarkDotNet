@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 foreach (var file in new DirectoryInfo(executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
                     executeParameters.Logger.WriteLineError(file.Name);
 
-                return new ExecuteResult(false, -1, default, Array.Empty<string>(), Array.Empty<string>());
+                return ExecuteResult.CreateFailed();
             }
 
             try
@@ -42,7 +42,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     executeParameters.BuildResult.ArtifactsPaths,
                     executeParameters.Diagnoser,
                     Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath),
-                    executeParameters.Resolver);
+                    executeParameters.Resolver,
+                    executeParameters.LaunchIndex);
             }
             finally
             {
@@ -58,7 +59,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                                       ArtifactsPaths artifactsPaths,
                                       IDiagnoser diagnoser,
                                       string executableName,
-                                      IResolver resolver)
+                                      IResolver resolver,
+                                      int launchIndex)
         {
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
                 CustomDotNetCliPath,
@@ -95,7 +97,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     consoleExitHandler.KillProcessTree();
                 }
 
-                return new ExecuteResult(true, process.HasExited ? process.ExitCode : null, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
+                return new ExecuteResult(true,
+                    process.HasExited ? process.ExitCode : null,
+                    process.Id,
+                    loggerWithDiagnoser.LinesWithResults,
+                    loggerWithDiagnoser.LinesWithExtraOutput,
+                    launchIndex);
             }
         }
     }
