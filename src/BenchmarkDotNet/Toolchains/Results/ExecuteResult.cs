@@ -22,7 +22,9 @@ namespace BenchmarkDotNet.Toolchains.Results
         private readonly List<string> errors;
         private readonly List<Measurement> measurements;
 
-        public bool IsSuccess => Measurements.Any(m => m.IsWorkload());
+        // benchmark can fail after few Workload Actual iterations
+        // that is why we search for Workload Results as they are produced at the end
+        public bool IsSuccess => Measurements.Any(m => m.Is(IterationMode.Workload, IterationStage.Result));
 
         public ExecuteResult(bool foundExecutable, int? exitCode, int? processId, IReadOnlyList<string> data, IReadOnlyList<string> linesWithExtraOutput, int launchIndex)
         {
@@ -75,7 +77,7 @@ namespace BenchmarkDotNet.Toolchains.Results
                 logger.WriteLineError(error);
             }
 
-            if (!Measurements.Any(m => m.IsWorkload()))
+            if (!Measurements.Any(m => m.Is(IterationMode.Workload, IterationStage.Result)))
             {
                 logger.WriteLineError("No Workload Results were obtained from the run.");
             }
