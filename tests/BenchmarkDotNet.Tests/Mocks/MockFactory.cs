@@ -64,17 +64,16 @@ namespace BenchmarkDotNet.Tests.Mocks
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, int n, double nanoseconds)
         {
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
-            var executeResult = new ExecuteResult(true, 0, default, Array.Empty<string>(), new[] { $"// Runtime=extra output line" });
             var measurements = Enumerable.Range(0, n)
-                .Select(index => new Measurement(1, IterationMode.Workload, IterationStage.Result, index + 1, 1, nanoseconds + index))
+                .Select(index => new Measurement(1, IterationMode.Workload, IterationStage.Result, index + 1, 1, nanoseconds + index).ToString())
                 .ToList();
-            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default, Array.Empty<Metric>());
+            var executeResult = new ExecuteResult(true, 0, default, measurements, new[] { $"// Runtime=extra output line" }, 1);
+            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, Array.Empty<Metric>());
         }
 
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, bool hugeSd, Metric[] metrics)
         {
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
-            var executeResult = new ExecuteResult(true, 0, default, Array.Empty<string>(), Array.Empty<string>());
             bool isFoo = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Foo";
             bool isBar = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Bar";
             var measurements = new List<Measurement>
@@ -86,7 +85,8 @@ namespace BenchmarkDotNet.Tests.Mocks
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, hugeSd && isBar ? 3 : 1),
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, 1)
             };
-            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default, metrics);
+            var executeResult = new ExecuteResult(measurements, default, default);
+            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, metrics);
         }
 
         [LongRunJob]

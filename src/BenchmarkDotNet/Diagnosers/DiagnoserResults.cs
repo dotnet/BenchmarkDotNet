@@ -1,18 +1,19 @@
 ﻿using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
+using System.Linq;
 
 namespace BenchmarkDotNet.Diagnosers
 {
     public class DiagnoserResults
     {
-        public DiagnoserResults(BenchmarkCase benchmarkCase, long totalOperations, GcStats gcStats,
-            ThreadingStats threadingStats, BuildResult buildResult)
+        public DiagnoserResults(BenchmarkCase benchmarkCase, ExecuteResult executeResult, BuildResult buildResult)
         {
             BenchmarkCase = benchmarkCase;
-            TotalOperations = totalOperations;
-            GcStats = gcStats;
-            ThreadingStats = threadingStats;
+            TotalOperations = executeResult.Measurements.Where(measurement => measurement.IsWorkload()).Sum(m => m.Operations);
+            GcStats = executeResult.GcStats;
+            ThreadingStats = executeResult.ThreadingStats;
             BuildResult = buildResult;
         }
 

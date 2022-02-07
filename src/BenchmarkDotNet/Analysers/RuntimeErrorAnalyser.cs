@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Analysers
 {
@@ -16,12 +15,7 @@ namespace BenchmarkDotNet.Analysers
 
         protected override IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary)
         {
-            var errors = report.ExecuteResults.SelectMany(r => r.Data)
-                .Union(report.ExecuteResults.SelectMany(r => r.ExtraOutput))
-                .Where(line => line.Contains(ValidationErrorReporter.ConsoleErrorPrefix))
-                .Select(line => line.Substring(ValidationErrorReporter.ConsoleErrorPrefix.Length).Trim());
-
-            foreach (string error in errors)
+            foreach (string error in report.ExecuteResults.SelectMany(r => r.Errors))
                 yield return CreateError(error, report);
         }
     }
