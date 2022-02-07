@@ -56,11 +56,11 @@ namespace BenchmarkDotNet.Running
                 int totalBenchmarkCount = supportedBenchmarks.Sum(benchmarkInfo => benchmarkInfo.BenchmarksCases.Length);
                 int benchmarksToRunCount = totalBenchmarkCount;
                 compositeLogger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
-                compositeLogger.WriteLineHeader($"// ***** Found {benchmarksToRunCount} benchmark(s) in total *****");
+                compositeLogger.WriteLineHeader($"// ***** Found {totalBenchmarkCount} benchmark(s) in total *****");
                 var globalChronometer = Chronometer.Start();
 
                 var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
-                var buildResults = BuildInParallel(compositeLogger, rootArtifactsFolderPath, buildPartitions, ref globalChronometer);
+                var buildResults = BuildInParallel(compositeLogger, rootArtifactsFolderPath, buildPartitions, in globalChronometer);
                 var allBuildsHaveFailed = buildResults.Values.All(buildResult => !buildResult.IsBuildSuccess);
 
                 try
@@ -71,17 +71,18 @@ namespace BenchmarkDotNet.Running
                         .SelectMany(buildResult => buildResult.Key.Benchmarks.Select(buildInfo => (buildInfo.BenchmarkCase, buildInfo.Id, buildResult.Value)))
                         .ToDictionary(info => info.BenchmarkCase, info => (info.Id, info.Value));
 
+                    // used to estimate finish time, in contrary to globalChronometer it does not include build time
+                    var runsChronometer = Chronometer.Start();
+
                     foreach (var benchmarkRunInfo in supportedBenchmarks) // we run them in the old order now using the new build artifacts
                     {
-                        var runChronometer = Chronometer.Start();
-
                         var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup,
-                            resultsFolderPath, logFilePath, totalBenchmarkCount, in globalChronometer, ref runChronometer, ref benchmarksToRunCount);
+                            resultsFolderPath, logFilePath, totalBenchmarkCount, in runsChronometer, ref benchmarksToRunCount);
 
                         if (!benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.JoinSummary))
                             PrintSummary(compositeLogger, benchmarkRunInfo.Config, summary);
 
-                        LogTotalTime(compositeLogger, runChronometer.GetElapsed().GetTimeSpan(), summary.GetNumberOfExecutedBenchmarks(), message: "Run time");
+                        LogTotalTime(compositeLogger, summary.TotalTime, summary.GetNumberOfExecutedBenchmarks(), message: "Run time");
                         compositeLogger.WriteLine();
 
                         results.Add(summary);
@@ -131,10 +132,11 @@ namespace BenchmarkDotNet.Running
                                    string resultsFolderPath,
                                    string logFilePath,
                                    int totalBenchmarkCount,
-                                   in StartedClock globalChronometer,
-                                   ref StartedClock runChronometer,
+                                   in StartedClock runsChronometer,
                                    ref int benchmarksToRunCount)
         {
+            var runStart = runsChronometer.GetElapsed();
+
             var benchmarks = benchmarkRunInfo.BenchmarksCases;
             var allBuildsHaveFailed = benchmarks.All(benchmark => !buildResults[benchmark].buildResult.IsBuildSuccess);
             var config = benchmarkRunInfo.Config;
@@ -211,18 +213,18 @@ namespace BenchmarkDotNet.Running
 
                     benchmarksToRunCount -= stop ? benchmarks.Length - i : 1;
 
-                    LogProgress(logger, in globalChronometer, totalBenchmarkCount, benchmarksToRunCount);
+                    LogProgress(logger, in runsChronometer, totalBenchmarkCount, benchmarksToRunCount);
                 }
             }
 
-            var clockSpan = runChronometer.GetElapsed();
+            var runEnd = runsChronometer.GetElapsed();
 
             return new Summary(title,
                 reports.ToImmutableArray(),
                 HostEnvironmentInfo.GetCurrent(),
                 resultsFolderPath,
                 logFilePath,
-                clockSpan.GetTimeSpan(),
+                runEnd.GetTimeSpan() - runStart.GetTimeSpan(),
                 cultureInfo,
                 Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
         }
@@ -310,7 +312,7 @@ namespace BenchmarkDotNet.Running
             return validationErrors.ToImmutableArray();
         }
 
-        private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, ref StartedClock globalChronometer)
+        private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer)
         {
             logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Parallel: Start   *****");
 
@@ -654,10 +656,10 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static void LogProgress(ILogger logger, in StartedClock globalChronometer, int totalBenchmarkCount, int benchmarksToRunCount)
+        private static void LogProgress(ILogger logger, in StartedClock runsChronometer, int totalBenchmarkCount, int benchmarksToRunCount)
         {
             int executedBenchmarkCount = totalBenchmarkCount - benchmarksToRunCount;
-            double avgSecondsPerBenchmark = globalChronometer.GetElapsed().GetTimeSpan().TotalSeconds / executedBenchmarkCount;
+            double avgSecondsPerBenchmark = runsChronometer.GetElapsed().GetTimeSpan().TotalSeconds / executedBenchmarkCount;
             TimeSpan fromNow = TimeSpan.FromSeconds(avgSecondsPerBenchmark * benchmarksToRunCount);
             DateTime estimatedEnd = DateTime.Now.Add(fromNow);
             string message = $"// ** Remained {benchmarksToRunCount} ({(double)benchmarksToRunCount / totalBenchmarkCount:P1}) benchmark(s) to run." +
