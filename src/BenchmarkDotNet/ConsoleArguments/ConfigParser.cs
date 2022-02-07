@@ -23,8 +23,8 @@ using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
-using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.MonoAotLLVM;
+using BenchmarkDotNet.Toolchains.MonoWasm;
 using CommandLine;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
@@ -114,7 +114,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 }
                 else if (runtimeMoniker == RuntimeMoniker.MonoAOTLLVM && (options.AOTCompilerPath == null || options.AOTCompilerPath.IsNotNullButDoesNotExist()))
                 {
-                     logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{ options.AOTCompilerPath }\" does NOT exist. It MUST be provided.");
+                    logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{ options.AOTCompilerPath }\" does NOT exist. It MUST be provided.");
                 }
                 else if (runtimeMoniker == RuntimeMoniker.Wasm && (options.RuntimeSrcDir == null || options.RuntimeSrcDir.IsNotNullButDoesNotExist()))
                 {
@@ -261,7 +261,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithOutlierMode(options.Outliers);
 
             if (options.Affinity.HasValue)
-                baseJob = baseJob.WithAffinity((IntPtr) options.Affinity.Value);
+                baseJob = baseJob.WithAffinity((IntPtr)options.Affinity.Value);
 
             if (options.LaunchCount.HasValue)
                 baseJob = baseJob.WithLaunchCount(options.LaunchCount.Value);
@@ -334,7 +334,6 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             switch (runtimeMoniker)
             {
-                case RuntimeMoniker.Net461:
                 case RuntimeMoniker.Net462:
                 case RuntimeMoniker.Net47:
                 case RuntimeMoniker.Net471:

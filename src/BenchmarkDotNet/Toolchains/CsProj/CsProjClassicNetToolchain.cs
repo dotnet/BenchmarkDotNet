@@ -14,7 +14,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
     [PublicAPI]
     public class CsProjClassicNetToolchain : Toolchain
     {
-        [PublicAPI] public static readonly IToolchain Net461 = new CsProjClassicNetToolchain("net461", ".NET Framework 4.6.1");
         [PublicAPI] public static readonly IToolchain Net462 = new CsProjClassicNetToolchain("net462", ".NET Framework 4.6.2");
         [PublicAPI] public static readonly IToolchain Net47 = new CsProjClassicNetToolchain("net47", ".NET Framework 4.7");
         [PublicAPI] public static readonly IToolchain Net471 = new CsProjClassicNetToolchain("net471", ".NET Framework 4.7.1");

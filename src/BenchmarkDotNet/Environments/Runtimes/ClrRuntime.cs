@@ -7,7 +7,6 @@ namespace BenchmarkDotNet.Environments
 {
     public class ClrRuntime : Runtime, IEquatable<ClrRuntime>
     {
-        public static readonly ClrRuntime Net461 = new ClrRuntime(RuntimeMoniker.Net461, "net461", ".NET Framework 4.6.1");
         public static readonly ClrRuntime Net462 = new ClrRuntime(RuntimeMoniker.Net462, "net462", ".NET Framework 4.6.2");
         public static readonly ClrRuntime Net47 = new ClrRuntime(RuntimeMoniker.Net47, "net47", ".NET Framework 4.7");
         public static readonly ClrRuntime Net471 = new ClrRuntime(RuntimeMoniker.Net471, "net471", ".NET Framework 4.7.1");
@@ -56,12 +55,11 @@ namespace BenchmarkDotNet.Environments
 
             switch (version)
             {
-                case "4.6.1": return Net461;
                 case "4.6.2": return Net462;
-                case "4.7":   return Net47;
+                case "4.7": return Net47;
                 case "4.7.1": return Net471;
                 case "4.7.2": return Net472;
-                case "4.8":   return Net48;
+                case "4.8": return Net48;
                 default: // unlikely to happen but theoretically possible
                     return new ClrRuntime(RuntimeMoniker.NotRecognized, $"net{version.Replace(".", null)}", $".NET Framework {version}");
             }

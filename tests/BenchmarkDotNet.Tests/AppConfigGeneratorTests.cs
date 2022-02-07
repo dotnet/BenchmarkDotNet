@@ -1,15 +1,15 @@
-﻿using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains;
-using System;
+﻿using System;
 using System.IO;
+using System.Runtime;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using Xunit;
 using BenchmarkDotNet.Tests.XUnit;
-using System.Runtime;
+using BenchmarkDotNet.Toolchains;
+using Xunit;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -160,7 +160,7 @@ namespace BenchmarkDotNet.Tests
             using (var source = new StringReader(input))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(new Job { Environment = { Runtime = ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "4.0")} }.Freeze(), source, destination, Resolver);
+                AppConfigGenerator.Generate(new Job { Environment = { Runtime = ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "4.0") } }.Freeze(), source, destination, Resolver);
 
                 AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
             }
@@ -185,7 +185,7 @@ namespace BenchmarkDotNet.Tests
             using (var source = new StringReader(input))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(new Job { Environment = { Runtime = ClrRuntime.Net461 } }.Freeze(), source, destination, Resolver);
+                AppConfigGenerator.Generate(new Job { Environment = { Runtime = ClrRuntime.Net462 } }.Freeze(), source, destination, Resolver);
 
                 AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
             }

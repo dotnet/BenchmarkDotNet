@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Helpers
 
         internal static string MapToReleaseVersion(string servicingVersion)
         {
-            // the following code assumes that .NET 4.6.1 is the oldest supported version
+            // the following code assumes that .NET 4.6.2 is the oldest supported version
             if (string.Compare(servicingVersion, "4.6.2") < 0)
                 return "4.6.1";
             if (string.Compare(servicingVersion, "4.7") < 0)

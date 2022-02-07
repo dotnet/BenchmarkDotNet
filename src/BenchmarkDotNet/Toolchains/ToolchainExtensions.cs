@@ -77,8 +77,6 @@ namespace BenchmarkDotNet.Toolchains
         {
             switch (runtimeMoniker)
             {
-                case RuntimeMoniker.Net461:
-                    return CsProjClassicNetToolchain.Net461;
                 case RuntimeMoniker.Net462:
                     return CsProjClassicNetToolchain.Net462;
                 case RuntimeMoniker.Net47:

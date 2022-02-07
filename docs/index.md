@@ -108,7 +108,7 @@ The measured data can be exported to different formats (md, html, csv, xml, json
 
 ![](images/v0.12.0/rplot.png)
 
-*Supported runtimes:* .NET 5+, .NET Framework 4.6.1+, .NET Core 2.0+, Mono, CoreRT  
+*Supported runtimes:* .NET 5+, .NET Framework 4.6.2+, .NET Core 2.0+, Mono, CoreRT  
 *Supported languages:* C#, F#, Visual Basic  
 *Supported OS:* Windows, Linux, macOS  
 *Supported architectures:* x86, x64, ARM, ARM64 and Wasm

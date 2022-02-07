@@ -28,7 +28,7 @@ static void Main(string[] args) => BenchmarkSwitcher.FromAssembly(typeof(Program
 Also you can use the config command style to specify some config from command line (more @docs.console-args):
 
 ```log
-dotnet run -c Release -- --job short --runtimes net461 netcoreapp21--filter *BenchmarkClass1*
+dotnet run -c Release -- --job short --runtimes net462 netcoreapp21--filter *BenchmarkClass1*
 ```
 
 The most important thing about `BenchmarkSwitcher` is that you need to pass the `args` from `Main` to the `Run` method. If you don't, it won't parse the arguments.

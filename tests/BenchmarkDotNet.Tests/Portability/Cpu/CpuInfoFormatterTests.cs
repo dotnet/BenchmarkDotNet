@@ -1,9 +1,9 @@
-﻿using System.Runtime.CompilerServices;
-using System.Text;
-using ApprovalTests;
+﻿using ApprovalTests;
 using ApprovalTests.Namers;
 using ApprovalTests.Reporters;
 using BenchmarkDotNet.Portability.Cpu;
+using System.Runtime.CompilerServices;
+using System.Text;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Portability.Cpu

@@ -1,6 +1,6 @@
-﻿using BenchmarkDotNet.Environments;
+﻿using System;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using System;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -10,8 +10,6 @@ namespace BenchmarkDotNet.Extensions
         {
             switch (runtimeMoniker)
             {
-                case RuntimeMoniker.Net461:
-                    return ClrRuntime.Net461;
                 case RuntimeMoniker.Net462:
                     return ClrRuntime.Net462;
                 case RuntimeMoniker.Net47:

@@ -8,9 +8,10 @@ using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.XUnit;
@@ -19,12 +20,11 @@ using BenchmarkDotNet.Toolchains.CoreRt;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using Xunit;
-using Xunit.Abstractions;
-using BenchmarkDotNet.Portability;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.SignificanceTesting;
 using Perfolizer.Mathematics.Thresholds;
+using Xunit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -206,7 +206,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CoreRtPathParsedCorrectly()
         {
-            var fakeCoreRtPath =  new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory;
+            var fakeCoreRtPath = new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory;
             var config = ConfigParser.Parse(new[] { "-r", "corert30", "--ilcPath", fakeCoreRtPath.FullName }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
@@ -237,7 +237,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(ConfigOptions.KeepBenchmarkFiles, "--keepFiles")]
         [InlineData(ConfigOptions.DontOverwriteResults, "--noOverwrite")]
         [InlineData(ConfigOptions.StopOnFirstError, "--stopOnFirstError")]
-        [InlineData(ConfigOptions.DisableLogFile, "--disableLogFile" )]
+        [InlineData(ConfigOptions.DisableLogFile, "--disableLogFile")]
         [InlineData(
             ConfigOptions.JoinSummary |
             ConfigOptions.KeepBenchmarkFiles |
@@ -291,7 +291,6 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Theory]
-        [InlineData("net461")]
         [InlineData("net462")]
         [InlineData("net47")]
         [InlineData("net471")]
@@ -336,10 +335,10 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
-            var config = ConfigParser.Parse(new[] { "--runtimes", "net461", "MONO", "netcoreapp3.0", "CoreRT30"}, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "--runtimes", "net462", "MONO", "netcoreapp3.0", "CoreRT30" }, new OutputLogger(Output)).config;
 
             Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net461"));
+            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net462"));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp30));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRtRuntime coreRtRuntime && coreRtRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRtRuntime.RuntimeMoniker == RuntimeMoniker.CoreRt30));
@@ -370,16 +369,16 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void SpecifyingInvalidStatisticalTestsThresholdMeansFailure()
         {
-            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "not a number" }, new OutputLogger(Output)).isSuccess);
-            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "1unknownUnit" }, new OutputLogger(Output)).isSuccess);
-            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "1 unknownUnit" }, new OutputLogger(Output)).isSuccess);
-            Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "%1" }, new OutputLogger(Output)).isSuccess); // reverse order - a typo
+            Assert.False(ConfigParser.Parse(new[] { "--statisticalTest", "not a number" }, new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(new[] { "--statisticalTest", "1unknownUnit" }, new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(new[] { "--statisticalTest", "1 unknownUnit" }, new OutputLogger(Output)).isSuccess);
+            Assert.False(ConfigParser.Parse(new[] { "--statisticalTest", "%1" }, new OutputLogger(Output)).isSuccess); // reverse order - a typo
         }
 
         [Fact]
         public void CanParseHardwareCounters()
         {
-            var config = ConfigParser.Parse(new[] { "--counters", $"{nameof(HardwareCounter.CacheMisses)}+{nameof(HardwareCounter.InstructionRetired)}"}, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "--counters", $"{nameof(HardwareCounter.CacheMisses)}+{nameof(HardwareCounter.InstructionRetired)}" }, new OutputLogger(Output)).config;
 
             Assert.Equal(2, config.GetHardwareCounters().Count());
             Assert.Single(config.GetHardwareCounters().Where(counter => counter == HardwareCounter.CacheMisses));
@@ -403,7 +402,7 @@ namespace BenchmarkDotNet.Tests
         {
             const int depth = 123;
 
-            var config = ConfigParser.Parse(new[] { "--disasm", "--disasmDepth", depth.ToString()}, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "--disasm", "--disasmDepth", depth.ToString() }, new OutputLogger(Output)).config;
 
             var diagnoser = config.GetDiagnosers().OfType<DisassemblyDiagnoser>().Single();
 
@@ -426,7 +425,7 @@ namespace BenchmarkDotNet.Tests
                     .WithWarmupCount(1)
                     .AsDefault());
 
-            var parsedConfig = ConfigParser.Parse(new[] { "--warmupCount", "2"}, new OutputLogger(Output), globalConfig).config;
+            var parsedConfig = ConfigParser.Parse(new[] { "--warmupCount", "2" }, new OutputLogger(Output), globalConfig).config;
 
             Assert.Equal(2, parsedConfig.GetJobs().Single().Run.WarmupCount);
             Assert.False(parsedConfig.GetJobs().Single().Meta.IsDefault); // after the merge the job is not "default" anymore

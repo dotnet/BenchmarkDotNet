@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using ApprovalTests;
+﻿using ApprovalTests;
 using ApprovalTests.Namers;
 using ApprovalTests.Reporters;
 using BenchmarkDotNet.Columns;
@@ -14,6 +9,11 @@ using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using JetBrains.Annotations;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Exporters

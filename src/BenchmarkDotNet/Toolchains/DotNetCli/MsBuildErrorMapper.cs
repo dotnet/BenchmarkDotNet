@@ -57,8 +57,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             switch (capture.Value)
             {
-                case ".NETFramework,Version=v4.6.1":
-                    return "net461";
                 case ".NETFramework,Version=v4.6.2":
                     return "net462";
                 case ".NETFramework,Version=v4.7":

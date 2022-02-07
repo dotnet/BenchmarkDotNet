@@ -20,11 +20,6 @@ namespace BenchmarkDotNet.Jobs
         Mono,
 
         /// <summary>
-        /// .NET 4.6.1
-        /// </summary>
-        Net461,
-
-        /// <summary>
         /// .NET 4.6.2
         /// </summary>
         Net462,

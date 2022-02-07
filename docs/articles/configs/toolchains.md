@@ -40,7 +40,7 @@ dotnet run -c Release -f netcoreapp2.1 --runtimes netcoreapp2.1 net48         # 
 What is going to happen if you provide multiple Full .NET Framework monikers? Let's say:
 
 ```cmd
-dotnet run -c Release -f net461 net472 net48
+dotnet run -c Release -f net462 net472 net48
 ```
 
 Full .NET Framework always runs every .NET executable using the latest .NET Framework available on a given machine. If you try to run the benchmarks for a few .NET TFMs, they are all going to be executed using the latest .NET Framework from your machine. The only difference is that they are all going to have different features enabled depending on target version they were compiled for. You can read more about this [here](https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/version-compatibility) and [here](https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/application-compatibility). This is **.NET Framework behavior which can not be controlled by BenchmarkDotNet or any other tool**.

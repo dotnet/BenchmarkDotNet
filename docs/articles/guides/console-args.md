@@ -114,7 +114,7 @@ The `--runtimes` or just `-r` allows you to run the benchmarks for selected Runt
 * Core - if you run it as .NET Core app, BDN will use the same target framework moniker, if you run it as .NET app it's going to use netcoreapp2.1
 * Mono - it's going to use the Mono from `$Path`, you can override  it with `--monoPath`
 * CoreRT - it's going to use latest CoreRT. Can be customized with additional options: `--ilcPath`, `--coreRtVersion` 
-* net46, net461, net462, net47, net471, net472 - to build and run benchmarks against specific .NET framework version 
+* net462, net47, net471, net472 - to build and run benchmarks against specific .NET framework version 
 * netcoreapp2.0, netcoreapp2.1, netcoreapp2.2, netcoreapp3.0 - to build and run benchmarks against specific .NET Core version
 
 Example: run the benchmarks for .NET 4.7.2 and .NET Core 2.1:
