@@ -16,14 +16,15 @@ namespace BenchmarkDotNet.Running
 {
     public static partial class BenchmarkConverter
     {
+        private const BindingFlags AllMethodsFlags =  BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
         public static BenchmarkRunInfo TypeToBenchmarks(Type type, IConfig config = null)
         {
             if (type.IsGenericTypeDefinition)
                 throw new ArgumentException($"{type.Name} is generic type definition, use BenchmarkSwitcher for it"); // for "open generic types" should be used BenchmarkSwitcher
 
             // We should check all methods including private to notify users about private methods with the [Benchmark] attribute
-            var bindingFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-            var benchmarkMethods = GetOrderedBenchmarkMethods(type.GetMethods(bindingFlags));
+            var benchmarkMethods = GetOrderedBenchmarkMethods(type.GetMethods(AllMethodsFlags));
 
             return MethodsToBenchmarksWithFullConfig(type, benchmarkMethods, config);
         }
@@ -42,13 +43,13 @@ namespace BenchmarkDotNet.Running
 
         private static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type type, MethodInfo[] benchmarkMethods, IConfig config)
         {
-            var allPublicMethods = type.GetMethods(); // benchmarkMethods can be filtered, without Setups, look #564
+            var allMethods = type.GetMethods(AllMethodsFlags); // benchmarkMethods can be filtered, without Setups, look #564
             var configPerType = GetFullTypeConfig(type, config);
 
-            var globalSetupMethods = GetAttributedMethods<GlobalSetupAttribute>(allPublicMethods, "GlobalSetup");
-            var globalCleanupMethods = GetAttributedMethods<GlobalCleanupAttribute>(allPublicMethods, "GlobalCleanup");
-            var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(allPublicMethods, "IterationSetup");
-            var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(allPublicMethods, "IterationCleanup");
+            var globalSetupMethods = GetAttributedMethods<GlobalSetupAttribute>(allMethods, "GlobalSetup");
+            var globalCleanupMethods = GetAttributedMethods<GlobalCleanupAttribute>(allMethods, "GlobalCleanup");
+            var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(allMethods, "IterationSetup");
+            var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(allMethods, "IterationCleanup");
 
             var targets = GetTargets(benchmarkMethods, type, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
 
@@ -135,8 +136,8 @@ namespace BenchmarkDotNet.Running
             return methods.SelectMany(m => m.GetCustomAttributes<T>()
                 .Select(attr =>
                 {
-                    AssertMethodHasCorrectSignature(methodName, m);
                     AssertMethodIsAccessible(methodName, m);
+                    AssertMethodHasCorrectSignature(methodName, m);
                     AssertMethodIsNotGeneric(methodName, m);
 
                     return new Tuple<MethodInfo, TargetedAttribute>(m, attr);

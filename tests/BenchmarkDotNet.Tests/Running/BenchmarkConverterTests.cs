@@ -237,5 +237,46 @@ namespace BenchmarkDotNet.Tests.Running
             [Benchmark] public void A() { }
             [Benchmark] public void C() { }
         }
+
+        [Fact]
+        public void ThrowsWhenSetupAndCleanupMethodsAreNonPublic()
+        {
+            var types = new[]
+            {
+                typeof(PrivateGlobalSetup),
+                typeof(PrivateGlobalCleanup),
+                typeof(PrivateIterationSetup),
+                typeof(PrivateIterationCleanup)
+            };
+
+            foreach (var type in types)
+            {
+                Assert.Throws<InvalidBenchmarkDeclarationException>(() => BenchmarkConverter.TypeToBenchmarks(type));
+            }
+        }
+
+        public class PrivateGlobalSetup
+        {
+            [GlobalSetup] private void X() { }
+            [Benchmark] public void A() { }
+        }
+
+        public class PrivateGlobalCleanup
+        {
+            [GlobalCleanup] private void X() { }
+            [Benchmark] public void A() { }
+        }
+
+        public class PrivateIterationSetup
+        {
+            [IterationSetup] private void X() { }
+            [Benchmark] public void A() { }
+        }
+
+        public class PrivateIterationCleanup
+        {
+            [IterationCleanup] private void X() { }
+            [Benchmark] public void A() { }
+        }
     }
 }
