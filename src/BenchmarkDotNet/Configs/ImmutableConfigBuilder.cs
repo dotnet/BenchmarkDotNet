@@ -36,10 +36,11 @@ namespace BenchmarkDotNet.Configs
         {
             var uniqueColumnProviders = source.GetColumnProviders().Distinct().ToImmutableArray();
             var uniqueLoggers = source.GetLoggers().ToImmutableHashSet();
+            var configAnalyse = new List<Conclusion>();
 
             var uniqueHardwareCounters = source.GetHardwareCounters().ToImmutableHashSet();
             var uniqueDiagnosers = GetDiagnosers(source.GetDiagnosers(), uniqueHardwareCounters);
-            var uniqueExporters = GetExporters(source.GetExporters(), uniqueDiagnosers);
+            var uniqueExporters = GetExporters(source.GetExporters(), uniqueDiagnosers, configAnalyse);
             var uniqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);
 
             var uniqueValidators = GetValidators(source.GetValidators(), MandatoryValidators, source.Options);
@@ -66,7 +67,8 @@ namespace BenchmarkDotNet.Configs
                 source.Orderer ?? DefaultOrderer.Instance,
                 source.SummaryStyle ?? SummaryStyle.Default,
                 source.Options,
-                source.BuildTimeout
+                source.BuildTimeout,
+                configAnalyse.AsReadOnly()
             );
         }
 
@@ -90,18 +92,43 @@ namespace BenchmarkDotNet.Configs
             return builder.ToImmutable();
         }
 
-        private static ImmutableArray<IExporter> GetExporters(IEnumerable<IExporter> exporters, ImmutableHashSet<IDiagnoser> uniqueDiagnosers)
+        private static ImmutableArray<IExporter> GetExporters(IEnumerable<IExporter> exporters,
+            ImmutableHashSet<IDiagnoser> uniqueDiagnosers,
+            IList<Conclusion> configAnalyse)
         {
-            var result = new List<IExporter>();
+
+            void AddWarning(string message)
+            {
+                var conclusion = Conclusion.CreateWarning("Configuration", message);
+                configAnalyse.Add(conclusion);
+            }
+
+            var mergeDictionary = new Dictionary<System.Type, IExporter>();
 
             foreach (var exporter in exporters)
-                if (!result.Contains(exporter))
-                    result.Add(exporter);
+            {
+                var exporterType = exporter.GetType();
+                if (mergeDictionary.ContainsKey(exporterType))
+                {
+                    AddWarning($"The exporter {exporterType} is already present in configuration. There may be unexpected results.");
+                }
+                mergeDictionary[exporterType] = exporter;
+            }
+
 
             foreach (var diagnoser in uniqueDiagnosers)
-            foreach (var exporter in diagnoser.Exporters)
-                if (!result.Contains(exporter))
-                    result.Add(exporter);
+                foreach (var exporter in diagnoser.Exporters)
+                {
+                    var exporterType = exporter.GetType();
+                    if (mergeDictionary.ContainsKey(exporterType))
+                    {
+                        AddWarning($"The exporter {exporterType} of {diagnoser.GetType().Name} is already present in configuration. There may be unexpected results.");
+                    }
+                    mergeDictionary[exporterType] = exporter;
+                };
+
+            var result = mergeDictionary.Values.ToList();
+
 
             var hardwareCounterDiagnoser = uniqueDiagnosers.OfType<IHardwareCountersDiagnoser>().SingleOrDefault();
             var disassemblyDiagnoser = uniqueDiagnosers.OfType<DisassemblyDiagnoser>().SingleOrDefault();
@@ -113,8 +140,31 @@ namespace BenchmarkDotNet.Configs
             for (int i = result.Count - 1; i >=0; i--)
                 if (result[i] is IExporterDependencies exporterDependencies)
                     foreach (var dependency in exporterDependencies.Dependencies)
-                        if (!result.Contains(dependency))
+                        /*
+                         *  When exporter that depends on an other already present in the configuration print warning.
+                         *
+                         *  Example:
+                         *
+                         *  // Global Current Culture separator is Semicolon;
+                         *  [CsvMeasurementsExporter(CsvSeparator.Comma)] // force use Comma
+                         *  [RPlotExporter]
+                         *  public class MyBanch
+                         *  {
+                         *
+                         *  }
+                         *
+                         *  RPlotExporter is depend from CsvMeasurementsExporter.Default
+                         *
+                         *  On active logger will by print:
+                         *  "The CsvMeasurementsExporter is already present in the configuration. There may be unexpected results of RPlotExporter.
+                         *
+                         */
+                        if (!result.Any(exporter=> exporter.GetType() == dependency.GetType()))
                             result.Insert(i, dependency); // All the exporter dependencies should be added before the exporter
+                        else
+                        {
+                            AddWarning($"The {dependency.Name} is already present in the configuration. There may be unexpected results of {result[i].GetType().Name}.");
+                        }
 
             result.Sort((left, right) => (left is IExporterDependencies).CompareTo(right is IExporterDependencies)); // the case when they were defined by user in wrong order ;)
 

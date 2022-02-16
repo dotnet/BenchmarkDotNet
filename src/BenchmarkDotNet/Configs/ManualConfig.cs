@@ -29,7 +29,8 @@ namespace BenchmarkDotNet.Configs
         private readonly List<Job> jobs = new List<Job>();
         private readonly HashSet<HardwareCounter> hardwareCounters = new HashSet<HardwareCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
-        private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = new List<BenchmarkLogicalGroupRule>();
+        private readonly HashSet<BenchmarkLogicalGroupRule> logicalGroupRules = new HashSet<BenchmarkLogicalGroupRule>();
+        private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
@@ -49,6 +50,8 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public IOrderer Orderer { get; set; }
         [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
         [PublicAPI] public TimeSpan BuildTimeout { get; set; } = DefaultConfig.Instance.BuildTimeout;
+
+        public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
 
         public ManualConfig WithOption(ConfigOptions option, bool value)
         {
