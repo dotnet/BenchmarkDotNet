@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Configs
         private readonly List<Job> jobs = new List<Job>();
         private readonly HashSet<HardwareCounter> hardwareCounters = new HashSet<HardwareCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
-        private readonly HashSet<BenchmarkLogicalGroupRule> logicalGroupRules = new HashSet<BenchmarkLogicalGroupRule>();
+        private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = new List<BenchmarkLogicalGroupRule>();
         private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
