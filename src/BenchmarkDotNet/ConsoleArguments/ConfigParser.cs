@@ -97,7 +97,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 settings.MaximumDisplayWidth = Math.Max(MinimumDisplayWidth, GetMaximumDisplayWidth());
             });
 
-        private static bool MonikerIsWasm (RuntimeMoniker moniker)
+        private static bool MonikerIsWasm(RuntimeMoniker moniker)
+
         {
             switch (moniker)
             {
@@ -130,7 +131,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 {
                      logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{ options.AOTCompilerPath }\" does NOT exist. It MUST be provided.");
                 }
-                else if (MonikerIsWasm (runtimeMoniker) && (options.RuntimeSrcDir == null || options.RuntimeSrcDir.IsNotNullButDoesNotExist()))
+                else if (MonikerIsWasm(runtimeMoniker) && (options.RuntimeSrcDir == null || options.RuntimeSrcDir.IsNotNullButDoesNotExist()))
+
                 {
                     logger.WriteLineError($"The provided {nameof(options.RuntimeSrcDir)} \"{options.RuntimeSrcDir}\" does NOT exist. It MUST be provided for wasm-aot.");
                     return false;
