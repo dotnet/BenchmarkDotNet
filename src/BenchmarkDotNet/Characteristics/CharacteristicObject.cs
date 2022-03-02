@@ -159,9 +159,19 @@ namespace BenchmarkDotNet.Characteristics
             return resolver.Resolve(this, characteristic);
         }
 
+        public T ResolveValue<T>(Characteristic<T> characteristic, IResolver resolver, T defaultValue)
+        {
+            return resolver.Resolve(this, characteristic, defaultValue);
+        }
+
         public object ResolveValue(Characteristic characteristic, IResolver resolver)
         {
             return resolver.Resolve(this, characteristic);
+        }
+
+        public object ResolveValue(Characteristic characteristic, IResolver resolver, object defaultValue)
+        {
+            return resolver.Resolve(this, characteristic, defaultValue);
         }
 
         public T ResolveValue<T>(Characteristic<T> characteristic, T defaultValue)

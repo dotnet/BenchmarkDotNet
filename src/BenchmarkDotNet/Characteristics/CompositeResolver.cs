@@ -16,6 +16,9 @@ namespace BenchmarkDotNet.Characteristics
 
         public object Resolve(CharacteristicObject obj, Characteristic characteristic)
         {
+            if (obj.HasValue(characteristic))
+                return characteristic[obj];
+
             var resolver = resolvers.FirstOrDefault(r => r.CanResolve(characteristic));
             if (resolver != null)
                 return resolver.Resolve(obj, characteristic);
@@ -24,10 +27,35 @@ namespace BenchmarkDotNet.Characteristics
 
         public T Resolve<T>(CharacteristicObject obj, Characteristic<T> characteristic)
         {
+            if (obj.HasValue(characteristic))
+                return characteristic[obj];
+
             var resolver = resolvers.FirstOrDefault(r => r.CanResolve(characteristic));
             if (resolver != null)
                 return resolver.Resolve(obj, characteristic);
             throw new InvalidOperationException($"There is no default resolver for {characteristic.FullId}");
+        }
+
+        public object Resolve(CharacteristicObject obj, Characteristic characteristic, object defaultValue)
+        {
+            if (obj.HasValue(characteristic))
+                return characteristic[obj];
+
+            var resolver = resolvers.FirstOrDefault(r => r.CanResolve(characteristic));
+            if (resolver != null)
+                return resolver.Resolve(obj, characteristic, defaultValue);
+            return defaultValue;
+        }
+
+        public T Resolve<T>(CharacteristicObject obj, Characteristic<T> characteristic, T defaultValue)
+        {
+            if (obj.HasValue(characteristic))
+                return characteristic[obj];
+
+            var resolver = resolvers.FirstOrDefault(r => r.CanResolve(characteristic));
+            if (resolver != null)
+                return resolver.Resolve(obj, characteristic, defaultValue);
+            return defaultValue;
         }
     }
 }
