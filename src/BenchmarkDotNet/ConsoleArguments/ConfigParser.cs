@@ -97,6 +97,21 @@ namespace BenchmarkDotNet.ConsoleArguments
                 settings.MaximumDisplayWidth = Math.Max(MinimumDisplayWidth, GetMaximumDisplayWidth());
             });
 
+        private static bool MonikerIsWasm(RuntimeMoniker moniker)
+
+        {
+            switch (moniker)
+            {
+                case RuntimeMoniker.Wasm:
+                case RuntimeMoniker.WasmNet50:
+                case RuntimeMoniker.WasmNet60:
+                case RuntimeMoniker.WasmNet70:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         private static bool Validate(CommandLineOptions options, ILogger logger)
         {
             if (!AvailableJobs.ContainsKey(options.BaseJob))
@@ -116,7 +131,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 {
                      logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{ options.AOTCompilerPath }\" does NOT exist. It MUST be provided.");
                 }
-                else if (runtimeMoniker == RuntimeMoniker.Wasm && (options.RuntimeSrcDir == null || options.RuntimeSrcDir.IsNotNullButDoesNotExist()))
+                else if (MonikerIsWasm(runtimeMoniker) && (options.RuntimeSrcDir == null || options.RuntimeSrcDir.IsNotNullButDoesNotExist()))
+
                 {
                     logger.WriteLineError($"The provided {nameof(options.RuntimeSrcDir)} \"{options.RuntimeSrcDir}\" does NOT exist. It MUST be provided for wasm-aot.");
                     return false;
@@ -386,13 +402,13 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                     return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
                 case RuntimeMoniker.Wasm:
-                    return MakeWasmJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0");
+                    return MakeWasmJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0", runtimeMoniker);
                 case RuntimeMoniker.WasmNet50:
-                    return MakeWasmJob(baseJob, options, "net5.0");
+                    return MakeWasmJob(baseJob, options, "net5.0", runtimeMoniker);
                 case RuntimeMoniker.WasmNet60:
-                    return MakeWasmJob(baseJob, options, "net6.0");
+                    return MakeWasmJob(baseJob, options, "net6.0", runtimeMoniker);
                 case RuntimeMoniker.WasmNet70:
-                    return MakeWasmJob(baseJob, options, "net7.0");
+                    return MakeWasmJob(baseJob, options, "net7.0", runtimeMoniker);
                 case RuntimeMoniker.MonoAOTLLVM:
                     return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0");
                 case RuntimeMoniker.MonoAOTLLVMNet60:
@@ -422,7 +438,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             return baseJob.WithRuntime(monoAotLLVMRuntime).WithToolchain(toolChain);
         }
 
-        private static Job MakeWasmJob(Job baseJob, CommandLineOptions options, string msBuildMoniker)
+        private static Job MakeWasmJob(Job baseJob, CommandLineOptions options, string msBuildMoniker, RuntimeMoniker moniker)
         {
             bool wasmAot = options.AOTCompilerMode == MonoAotCompilerMode.wasm;
 
@@ -431,7 +447,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
                 javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
                 aot: wasmAot,
-                runtimeSrcDir: options.RuntimeSrcDir);
+                runtimeSrcDir: options.RuntimeSrcDir,
+                moniker: moniker);
 
             var toolChain = WasmToolChain.From(new NetCoreAppSettings(
                 targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,

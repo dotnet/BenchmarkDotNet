@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Environments
         /// <param name="displayName">default: "Wasm"</param>
         /// <param name="aot">Specifies whether AOT or Interpreter (default) project should be generated.</param>
         /// <param name="runtimeSrcDir">The path to runtime source directory.</param>
-        public WasmRuntime(string msBuildMoniker = "net5.0", string displayName = "Wasm", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm", bool aot = false, DirectoryInfo runtimeSrcDir = null) : base(RuntimeMoniker.Wasm, msBuildMoniker, displayName)
+        public WasmRuntime(string msBuildMoniker = "net5.0", string displayName = "Wasm", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm", bool aot = false, DirectoryInfo runtimeSrcDir = null, RuntimeMoniker moniker = RuntimeMoniker.Wasm) : base(moniker, msBuildMoniker, displayName)
         {
             if (!string.IsNullOrEmpty(javaScriptEngine) && javaScriptEngine != "v8" && !File.Exists(javaScriptEngine))
                 throw new FileNotFoundException($"Provided {nameof(javaScriptEngine)} file: \"{javaScriptEngine}\" doest NOT exist");
