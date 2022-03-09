@@ -22,8 +22,6 @@ steps:
 - name: build
   image: mcr.microsoft.com/dotnet/runtime:6.0-bullseye-slim-arm32v7
   commands:
-  - apt-get clean
-  - apt-get install -y gnupg2 gnupg gnupg1
   - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
   - echo 'deb http://httpredir.debian.org/debian buster-backports main contrib non-free' | sudo tee -a /etc/apt/sources.list.d/debian-backports.list
   - apt-get update
