@@ -20,7 +20,7 @@ platform:
 
 steps:
 - name: build
-  image: microsoft/dotnet:2.1-runtime-deps-stretch-slim-arm32v7
+  image: microsoft/dotnet:6.0-bullseye-slim-arm32v7
   commands:
   - apt-get update
   - apt-get --yes install sudo
@@ -40,5 +40,5 @@ steps:
   - apt-get update 
     && apt-get install -y binutils curl mono-devel ca-certificates-mono fsharp mono-vbnc nuget gettext libcurl4-openssl-dev libicu-dev libssl-dev libunwind8 clang-3.9 referenceassemblies-pcl 
     && rm -rf /var/lib/apt/lists/* /tmp/*
-  - chmod +x build.arm.sh
-  - bash ./build.arm.sh
+  - chmod +x build.sh
+  - bash /build.sh
