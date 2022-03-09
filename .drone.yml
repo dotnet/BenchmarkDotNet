@@ -20,7 +20,7 @@ platform:
 
 steps:
 - name: build
-  image: mcr.microsoft.com/dotnet/runtime:5.0-bullseye-slim-arm32v7
+  image: mcr.microsoft.com/dotnet/sdk:5.0.403-buster-slim-arm32v7
   commands:
   - chmod +x build.sh
   - bash ./build.sh
