@@ -25,6 +25,7 @@ steps:
   - apt-get clean
   - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
   - echo 'deb http://httpredir.debian.org/debian buster-backports main contrib non-free' | sudo tee -a /etc/apt/sources.list.d/debian-backports.list
+  - apt-get install -y gnupg2 gnupg gnupg1
   - apt-get update
   - apt-get --yes install sudo
   - sudo apt install libseccomp2 -t buster-backports
