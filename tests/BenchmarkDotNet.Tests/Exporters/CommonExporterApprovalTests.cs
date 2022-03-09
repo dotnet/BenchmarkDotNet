@@ -57,10 +57,10 @@ namespace BenchmarkDotNet.Tests.Exporters
             foreach (var exporter in exporters)
             {
                 PrintTitle(logger, exporter);
-                exporter.ExportToLog(MockFactory.CreateSummary(config), logger);
+                exporter.ExportToLog(MockFactory.CreateSummary(config.WithCultureInfo(cultureInfo)), logger);
             }
 
-            Approvals.Verify(logger.GetLog());
+            Approvals.Verify(logger.GetLog(), x => x.Replace("\r", string.Empty));
         }
 
         private static void PrintTitle(AccumulationLogger logger, IExporter exporter)
@@ -99,9 +99,10 @@ namespace BenchmarkDotNet.Tests.Exporters
         }
 
         private static readonly IConfig config = ManualConfig.Create(DefaultConfig.Instance)
-            .With(StatisticColumn.Mean)
-            .With(StatisticColumn.StdDev)
-            .With(StatisticColumn.P67);
+            .AddColumn(StatisticColumn.Mean)
+            .AddColumn(StatisticColumn.StdDev)
+            .AddColumn(StatisticColumn.P67)
+            .AddDiagnoser(Diagnosers.MemoryDiagnoser.Default);
 
         public void Dispose()
         {

@@ -54,7 +54,7 @@ class Program
             .FromAssembly(typeof(Program).Assembly)
             .Run(args,
                 DefaultConfig.Instance
-                    .With(new EtwProfiler())); // HERE
+                    .AddDiagnoser(new EtwProfiler())); // HERE
 }
 ```
 

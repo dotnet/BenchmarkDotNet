@@ -1,11 +1,11 @@
 ﻿using System;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Mocks
@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Tests.Mocks
         {
             double nanoseconds = measure(data).Nanoseconds;
             var measurement = new Measurement(1, data.IterationMode, data.IterationStage, data.Index, data.InvokeCount * OperationsPerInvoke, nanoseconds);
-            WriteLine(measurement.ToOutputLine());
+            WriteLine(measurement.ToString());
             return measurement;
         }
 

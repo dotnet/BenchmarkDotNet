@@ -1,15 +1,16 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Running;
+using Perfolizer.Mathematics.OutlierDetection;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Running
 {
-    public class BenchmarkConverterTests
+    public partial class BenchmarkConverterTests
     {
         /// <summary>
         /// https://github.com/dotnet/BenchmarkDotNet/issues/495
@@ -105,7 +106,7 @@ namespace BenchmarkDotNet.Tests.Running
             const int InvocationCount = 100;
 
             var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(Derived),
-                DefaultConfig.Instance.With(Job.Default
+                DefaultConfig.Instance.AddJob(Job.Default
                     .WithInvocationCount(InvocationCount)))
                 .BenchmarksCases.Single();
 
@@ -119,7 +120,7 @@ namespace BenchmarkDotNet.Tests.Running
             const int UnrollFactor = 13;
 
             var benchmark = BenchmarkConverter.TypeToBenchmarks(typeof(Derived),
-                    DefaultConfig.Instance.With(Job.Default
+                    DefaultConfig.Instance.AddJob(Job.Default
                         .WithUnrollFactor(UnrollFactor)))
                 .BenchmarksCases.Single();
 
@@ -133,8 +134,8 @@ namespace BenchmarkDotNet.Tests.Running
             var info = BenchmarkConverter.TypeToBenchmarks(
                     typeof(WithMutator),
                     DefaultConfig.Instance
-                        .With(Job.Default.With(ClrRuntime.Net461))
-                        .With(Job.Default.With(CoreRuntime.Core21)));
+                        .AddJob(Job.Default.WithRuntime(ClrRuntime.Net461))
+                        .AddJob(Job.Default.WithRuntime(CoreRuntime.Core21)));
 
             Assert.Equal(2, info.BenchmarksCases.Length);
             Assert.All(info.BenchmarksCases, benchmark => Assert.Equal(int.MaxValue, benchmark.Job.Run.MaxIterationCount));
@@ -173,7 +174,7 @@ namespace BenchmarkDotNet.Tests.Running
         }
 
         [MaxIterationCount(int.MaxValue)] // mutator attribute is before job attribute
-        [TargetFrameworkJob(TargetFrameworkMoniker.NetCoreApp21)]
+        [SimpleJob(runtimeMoniker: RuntimeMoniker.Net50)]
         public class WithMutatorAfterJobAttribute
         {
             [Benchmark] public void Method() { }
@@ -197,6 +198,85 @@ namespace BenchmarkDotNet.Tests.Running
         public class WithFewMutators
         {
             [Benchmark] public void Method() { }
+        }
+
+        [Fact]
+        public void MethodDeclarationOrderIsPreserved()
+        {
+            foreach (Type type in new[] { typeof(BAC), typeof(BAC_Partial), typeof(BAC_Partial_DifferentFiles) })
+            {
+                var info = BenchmarkConverter.TypeToBenchmarks(type);
+
+                Assert.Equal(nameof(BAC.B), info.BenchmarksCases[0].Descriptor.WorkloadMethod.Name);
+                Assert.Equal(nameof(BAC.A), info.BenchmarksCases[1].Descriptor.WorkloadMethod.Name);
+                Assert.Equal(nameof(BAC.C), info.BenchmarksCases[2].Descriptor.WorkloadMethod.Name);
+            }
+        }
+
+        public class BAC
+        {
+            // BAC is not sorted in either desceding or ascending way
+            [Benchmark] public void B() { }
+            [Benchmark] public void A() { }
+            [Benchmark] public void C() { }
+        }
+
+        public partial class BAC_Partial
+        {
+            [Benchmark] public void B() { }
+            [Benchmark] public void A() { }
+        }
+
+        public partial class BAC_Partial
+        {
+            [Benchmark] public void C() { }
+        }
+
+        public partial class BAC_Partial_DifferentFiles
+        {
+            [Benchmark] public void A() { }
+            [Benchmark] public void C() { }
+        }
+
+        [Fact]
+        public void ThrowsWhenSetupAndCleanupMethodsAreNonPublic()
+        {
+            var types = new[]
+            {
+                typeof(PrivateGlobalSetup),
+                typeof(PrivateGlobalCleanup),
+                typeof(PrivateIterationSetup),
+                typeof(PrivateIterationCleanup)
+            };
+
+            foreach (var type in types)
+            {
+                Assert.Throws<InvalidBenchmarkDeclarationException>(() => BenchmarkConverter.TypeToBenchmarks(type));
+            }
+        }
+
+        public class PrivateGlobalSetup
+        {
+            [GlobalSetup] private void X() { }
+            [Benchmark] public void A() { }
+        }
+
+        public class PrivateGlobalCleanup
+        {
+            [GlobalCleanup] private void X() { }
+            [Benchmark] public void A() { }
+        }
+
+        public class PrivateIterationSetup
+        {
+            [IterationSetup] private void X() { }
+            [Benchmark] public void A() { }
+        }
+
+        public class PrivateIterationCleanup
+        {
+            [IterationCleanup] private void X() { }
+            [Benchmark] public void A() { }
         }
     }
 }

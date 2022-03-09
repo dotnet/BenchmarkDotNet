@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -7,21 +8,23 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Parameters
 {
-    public class ParameterInstance
+    public class ParameterInstance : IDisposable
     {
         public const string NullParameterTextRepresentation = "?";
 
         [PublicAPI] public ParameterDefinition Definition { get; }
 
         private readonly object value;
-        private readonly int maxParamterColumnWidth;
+        private readonly int maxParameterColumnWidthFromConfig;
 
         public ParameterInstance(ParameterDefinition definition, object value, SummaryStyle summaryStyle)
         {
             Definition = definition;
             this.value = value;
-            maxParamterColumnWidth = summaryStyle?.MaxParamterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
+            maxParameterColumnWidthFromConfig = summaryStyle?.MaxParameterColumnWidth ?? SummaryStyle.DefaultMaxParameterColumnWidth;
         }
+
+        public void Dispose() => (Value as IDisposable)?.Dispose();
 
         public string Name => Definition.Name;
         public bool IsStatic => Definition.IsStatic;
@@ -34,20 +37,30 @@ namespace BenchmarkDotNet.Parameters
                 ? parameter.ToSourceCode()
                 : SourceCodeHelper.ToSourceCode(value);
 
-        public string ToDisplayText()
+        private string ToDisplayText(CultureInfo cultureInfo, int maxParameterColumnWidth)
         {
-            switch (value) {
+            switch (value)
+            {
                 case null:
                     return NullParameterTextRepresentation;
                 case IParam parameter:
-                    return Trim(parameter.DisplayText, maxParamterColumnWidth);
+                    return Trim(parameter.DisplayText, maxParameterColumnWidth);
+                case IFormattable formattable:
+                    return Trim(formattable.ToString(null, cultureInfo), maxParameterColumnWidth);
                 // no trimming for types!
                 case Type type:
                     return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).GetDisplayName()}?" : type.GetDisplayName();
+                default:
+                    return Trim(value.ToString(), maxParameterColumnWidth);
             }
-
-            return Trim(value.ToString(), maxParamterColumnWidth);
         }
+
+        public string ToDisplayText(SummaryStyle summary)
+        {
+            return summary != null ? ToDisplayText(summary.CultureInfo, summary.MaxParameterColumnWidth) : ToDisplayText();
+        }
+
+        public string ToDisplayText() => ToDisplayText(CultureInfo.CurrentCulture, maxParameterColumnWidthFromConfig);
 
         public override string ToString() => ToDisplayText();
 
@@ -58,9 +71,33 @@ namespace BenchmarkDotNet.Parameters
 
             var postfix = $" [{value.Length}]";
             const string dots = "(...)";
-            int take = (maxDisplayTextInnerLength - postfix.Length - dots.Length) / 2;
 
-            return value.Substring(0, take) + dots + value.Substring(value.Length - take, take) + postfix;
+            var takeFromStart = (maxDisplayTextInnerLength - postfix.Length - dots.Length) / 2;
+            var takeFromEnd = takeFromStart;
+
+            if (IsFirstCharInSurrogatePair(value[takeFromStart-1]))
+            {
+                takeFromStart = Math.Max(0, takeFromStart - 1);
+            }
+
+            if (IsSecondCharInSurrogatePair(value[value.Length - takeFromEnd]))
+            {
+                takeFromEnd = Math.Max(0, takeFromEnd - 1);
+            }
+
+            var result = value.Substring(0, takeFromStart) + dots + value.Substring(value.Length - takeFromEnd, takeFromEnd) + postfix;
+
+            return result;
+        }
+
+        private static bool IsFirstCharInSurrogatePair(char c)
+        {
+            return BitConverter.IsLittleEndian ? char.IsHighSurrogate(c) : char.IsLowSurrogate(c);
+        }
+
+        private static bool IsSecondCharInSurrogatePair(char c)
+        {
+            return BitConverter.IsLittleEndian ? char.IsLowSurrogate(c) : char.IsHighSurrogate(c);
         }
     }
 }

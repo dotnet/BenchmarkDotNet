@@ -8,10 +8,10 @@ BenchmarkDotNet uses [DocFX](https://dotnet.github.io/docfx/) as a documentation
     [cross references](https://dotnet.github.io/docfx/tutorial/links_and_cross_references.html#different-syntax-of-cross-reference) by
     [UID](https://dotnet.github.io/docfx/tutorial/links_and_cross_references.html#define-uid).
   For example,
-    `[OutlierMode](xref:BenchmarkDotNet.Mathematics.OutlierMode)` and
-    `@BenchmarkDotNet.Mathematics.OutlierMode`
+    `[SimpleJobAttribute](xref:BenchmarkDotNet.Attributes.SimpleJobAttribute)` and
+    `@BenchmarkDotNet.Attributes.SimpleJobAttribute`
     will be transformed to
-    [OutlierMode](xref:BenchmarkDotNet.Mathematics.OutlierMode).
+    [SimpleJobAttribute](xref:BenchmarkDotNet.Attributes.SimpleJobAttribute).
     
 ## Notes
 
@@ -55,15 +55,15 @@ Use the `DocFX_Serve` Cake target to build and run the documentation.
 Windows (PowerShell):
 
 ```
-.\build.ps1 -Target DocFX_Build
-.\build.ps1 -Target DocFX_Serve
+.\build.ps1 --target DocFX_Build
+.\build.ps1 --target DocFX_Serve
 ```
 
 Windows (Batch):
 
 ```
-.\build.bat -Target DocFX_Build
-.\build.bat -Target DocFX_Serve
+.\build.bat --target DocFX_Build
+.\build.bat --target DocFX_Serve
 ```
 
 Linux/macOS (Bash):

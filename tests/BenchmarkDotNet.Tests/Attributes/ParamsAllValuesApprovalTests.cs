@@ -7,7 +7,6 @@ using System.Threading;
 using ApprovalTests;
 using ApprovalTests.Namers;
 using ApprovalTests.Reporters;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
@@ -15,8 +14,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using Xunit;
-using System.Collections.Generic;
-using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Tests.Attributes
 {

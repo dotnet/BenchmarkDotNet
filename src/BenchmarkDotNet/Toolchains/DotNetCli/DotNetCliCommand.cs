@@ -5,6 +5,7 @@ using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
@@ -13,12 +14,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     public class DotNetCliCommand
     {
-        /// <summary>
-        /// we use these settings to make sure that MSBuild does the job and simply quits without spawning any long living processes
-        /// we want to avoid "file in use" and "zombie processes" issues
-        /// </summary>
-        private const string MandatoryMsBuildSettings = " /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1";
-
         [PublicAPI] public string CliPath { get; }
 
         [PublicAPI] public string Arguments { get; }
@@ -36,7 +31,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger,
             BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout)
         {
-            CliPath = cliPath;
+            CliPath = cliPath ?? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value;
             Arguments = arguments;
             GenerateResult = generateResult;
             Logger = logger;
@@ -146,7 +141,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .Append(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\" ")
                 .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .Append(extraArguments)
-                .Append(MandatoryMsBuildSettings)
+                .Append(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .ToString();
 
         internal static string GetBuildCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null)
@@ -154,7 +149,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .Append($"build -c {buildPartition.BuildConfiguration} ") // we don't need to specify TFM, our auto-generated project contains always single one
                 .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .Append(extraArguments)
-                .Append(MandatoryMsBuildSettings)
+                .Append(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .Append(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $" /p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
                 .ToString();
 
@@ -163,7 +158,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .Append($"publish -c {buildPartition.BuildConfiguration} ") // we don't need to specify TFM, our auto-generated project contains always single one
                 .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .Append(extraArguments)
-                .Append(MandatoryMsBuildSettings)
+                .Append(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .Append(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $" /p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
                 .ToString();
 
@@ -184,7 +179,44 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             var nuGetRefs = benchmarkCase.Job.ResolveValue(InfrastructureMode.NuGetReferencesCharacteristic, resolver);
 
-            return nuGetRefs.Select(x => $"add package {x.PackageName}{(string.IsNullOrWhiteSpace(x.PackageVersion) ? string.Empty : " -v " + x.PackageVersion)}");
+            return nuGetRefs.Select(BuildAddPackageCommand);
+        }
+
+        private static string GetMandatoryMsBuildSettings(string buildConfiguration)
+        {
+            // we use these settings to make sure that MSBuild does the job and simply quits without spawning any long living processes
+            // we want to avoid "file in use" and "zombie processes" issues
+            const string NoMsBuildZombieProcesses = " /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true";
+            const string EnforceOptimizations = "/p:Optimize=true";
+
+            if (string.Equals(buildConfiguration, RuntimeInformation.DebugConfigurationName, StringComparison.OrdinalIgnoreCase))
+            {
+                return NoMsBuildZombieProcesses;
+            }
+
+            return $"{NoMsBuildZombieProcesses} {EnforceOptimizations}";
+        }
+
+        private static string BuildAddPackageCommand(NuGetReference reference)
+        {
+            var commandBuilder = new StringBuilder();
+            commandBuilder.Append("add package ");
+            commandBuilder.Append(reference.PackageName);
+            if (!string.IsNullOrWhiteSpace(reference.PackageVersion))
+            {
+                commandBuilder.Append(" -v ");
+                commandBuilder.Append(reference.PackageVersion);
+            }
+            if (reference.PackageSource != null)
+            {
+                commandBuilder.Append(" -s ");
+                commandBuilder.Append(reference.PackageSource);
+            }
+            if (reference.Prerelease)
+            {
+                commandBuilder.Append(" --prerelease");
+            }
+            return commandBuilder.ToString();
         }
     }
 }

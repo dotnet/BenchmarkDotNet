@@ -38,10 +38,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 {
                     new object[] { Job.Default.GetToolchain() },
                     new object[] { InProcessEmitToolchain.Instance },
-#if NETCOREAPP2_1
-                    // we don't want to test CoreRT twice (for .NET 4.6 and Core 2.1) when running the integration tests (these tests take a lot of time)
+#if !NETFRAMEWORK
+                    // we don't want to test CoreRT twice (for .NET 4.6 and 5.0) when running the integration tests (these tests take a lot of time)
                     // we test against specific version to keep this test stable
-                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-27408-02").ToToolchain() }
+                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "6.0.0-preview.1.21074.3").ToToolchain() }
 #endif
                 };
 
@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertAllocations(toolchain, typeof(AccurateAllocations), new Dictionary<string, long>
             {
                 { nameof(AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
-                { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + + objectAllocationOverhead + arraySizeOverhead },
+                { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead },
 
                 { nameof(AccurateAllocations.AllocateTask), CalculateRequiredSpace<Task<int>>() },
             });
@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory(Skip = "#1542 Tiered JIT Thread allocates memory in the background"), MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserDoesNotIncludeAllocationsFromSetupAndCleanup(IToolchain toolchain)
         {
@@ -194,7 +194,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryNetCoreOnly("Only .NET Core 2.0+ API is bug free for this case"), MemberData(nameof(GetToolchains))]
+        [Theory(Skip = "#1542 Tiered JIT Thread allocates memory in the background"), MemberData(nameof(GetToolchains))]
+        //[TheoryNetCoreOnly("Only .NET Core 2.0+ API is bug free for this case"), MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocationQuantumIsNotAnIssueForNetCore21Plus(IToolchain toolchain)
         {
@@ -275,7 +276,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 {
                     var benchmarkReport = summary.Reports.Single(report => report.BenchmarkCase == benchmark);
 
-                    Assert.Equal(benchmarkAllocationsValidator.Value, benchmarkReport.GcStats.BytesAllocatedPerOperation);
+                    Assert.Equal(benchmarkAllocationsValidator.Value, benchmarkReport.GcStats.GetBytesAllocatedPerOperation(benchmark));
 
                     if (benchmarkAllocationsValidator.Value == 0)
                     {
@@ -287,15 +288,16 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private IConfig CreateConfig(IToolchain toolchain)
             => ManualConfig.CreateEmpty()
-                .With(Job.ShortRun
+                .AddJob(Job.ShortRun
                     .WithEvaluateOverhead(false) // no need to run idle for this test
                     .WithWarmupCount(0) // don't run warmup to save some time for our CI runs
                     .WithIterationCount(1) // single iteration is enough for us
                     .WithGcForce(false)
-                    .With(toolchain))
-                .With(DefaultColumnProviders.Instance)
-                .With(MemoryDiagnoser.Default)
-                .With(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
+                    .WithEnvironmentVariable("COMPlus_TieredCompilation", "0") // Tiered JIT can allocate some memory on a background thread, let's disable it to make our tests less flaky (#1542)
+                    .WithToolchain(toolchain))
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddDiagnoser(MemoryDiagnoser.Default)
+                .AddLogger(toolchain.IsInProcess ? ConsoleLogger.Default : new OutputLogger(output)); // we can't use OutputLogger for the InProcess toolchains because it allocates memory on the same thread
 
         // note: don't copy, never use in production systems (it should work but I am not 100% sure)
         private int CalculateRequiredSpace<T>()

@@ -4,7 +4,7 @@ using BenchmarkDotNet.Filters;
 
 namespace BenchmarkDotNet.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Assembly)]
     public abstract class FilterConfigBaseAttribute : Attribute, IConfigSource
     {
         // CLS-Compliant Code requires a constructor without an array in the argument list
@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Attributes
 
         protected FilterConfigBaseAttribute(params IFilter[] filters)
         {
-            Config = ManualConfig.CreateEmpty().With(filters);
+            Config = ManualConfig.CreateEmpty().AddFilter(filters);
         }
 
         public IConfig Config { get; }

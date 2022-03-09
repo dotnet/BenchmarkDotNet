@@ -32,10 +32,12 @@
   href: IntroDisassemblyDry.md
 - name: IntroDisassemblyRyuJit
   href: IntroDisassemblyRyuJit.md
-- name: IntroEncoding
-  href: IntroEncoding.md
 - name: IntroEnvVars
   href: IntroEnvVars.md
+- name: IntroEventPipeProfiler
+  href: IntroEventPipeProfiler.md
+- name: IntroEventPipeProfilerAdvanced
+  href: IntroEventPipeProfilerAdvanced.md
 - name: IntroExport
   href: IntroExport.md
 - name: IntroExportJson
@@ -90,6 +92,8 @@
   href: IntroRankColumn.md
 - name: IntroRatioSD
   href: IntroRatioSD.md
+- name: IntroRatioStyle
+  href: IntroRatioStyle.md
 - name: IntroSetupCleanupGlobal
   href: IntroSetupCleanupGlobal.md
 - name: IntroSetupCleanupIteration
@@ -108,3 +112,9 @@
   href: IntroTagColumn.md
 - name: IntroTailcall
   href: IntroTailcall.md
+- name: IntroWasm
+  href: IntroWasm.md
+- name: IntroUnicode
+  href: IntroUnicode.md
+- name: IntroXamarin
+  href: IntroXamarin.md

@@ -4,9 +4,11 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
 {
-    [EventSource(Name = "BenchmarkDotNet.EngineEventSource")]
+    [EventSource(Name = EngineEventSource.SourceName)]
     public class EngineEventSource : EventSource
     {
+        public const string SourceName = "BenchmarkDotNet.EngineEventSource";
+
         [PublicAPI] public const int BenchmarkStartEventId = 1;
         [PublicAPI] public const int BenchmarkStopEventId = 2;
         [PublicAPI] public const int OverheadJittingStartEventId = 3;

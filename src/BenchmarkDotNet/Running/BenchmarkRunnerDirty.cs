@@ -17,17 +17,24 @@ namespace BenchmarkDotNet.Running
     public static class BenchmarkRunner
     {
         [PublicAPI]
-        public static Summary Run<T>(IConfig config = null)
+        public static Summary Run<T>(IConfig config = null, string[] args = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
-                return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(typeof(T), config));
+                return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(typeof(T), config, args));
         }
 
         [PublicAPI]
-        public static Summary Run(Type type, IConfig config = null)
+        public static Summary Run(Type type, IConfig config = null, string[] args = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
-                return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(type, config));
+                return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(type, config, args));
+        }
+
+        [PublicAPI]
+        public static Summary[] Run(Type[] types, IConfig config = null, string[] args = null)
+        {
+            using (DirtyAssemblyResolveHelper.Create())
+                return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(types, config, args));
         }
 
         [PublicAPI]
@@ -38,10 +45,10 @@ namespace BenchmarkDotNet.Running
         }
 
         [PublicAPI]
-        public static Summary[] Run(Assembly assembly, IConfig config = null)
+        public static Summary[] Run(Assembly assembly, IConfig config = null, string[] args = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
-                return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(assembly, config));
+                return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(assembly, config, args));
         }
 
         [PublicAPI]
@@ -73,16 +80,27 @@ namespace BenchmarkDotNet.Running
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Summary RunWithDirtyAssemblyResolveHelper(Type type, IConfig config)
-            => BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.TypeToBenchmarks(type, config) }).Single();
+        private static Summary RunWithDirtyAssemblyResolveHelper(Type type, IConfig config, string[] args)
+            => (args == null
+                ? BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.TypeToBenchmarks(type, config) })
+                : new BenchmarkSwitcher(new[] { type }).RunWithDirtyAssemblyResolveHelper(args, config, false))
+                .Single();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunWithDirtyAssemblyResolveHelper(Type type, MethodInfo[] methods, IConfig config = null)
             => BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.MethodsToBenchmarks(type, methods, config) }).Single();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Summary[] RunWithDirtyAssemblyResolveHelper(Assembly assembly, IConfig config = null)
-            => BenchmarkRunnerClean.Run(assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray());
+        private static Summary[] RunWithDirtyAssemblyResolveHelper(Assembly assembly, IConfig config, string[] args)
+            => args == null
+                ? BenchmarkRunnerClean.Run(assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray())
+                : new BenchmarkSwitcher(assembly).RunWithDirtyAssemblyResolveHelper(args, config, false).ToArray();
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static Summary[] RunWithDirtyAssemblyResolveHelper(Type[] types, IConfig config, string[] args)
+            => args == null
+                ? BenchmarkRunnerClean.Run(types.Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray())
+                : new BenchmarkSwitcher(types).RunWithDirtyAssemblyResolveHelper(args, config, false).ToArray();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary[] RunWithDirtyAssemblyResolveHelper(BenchmarkRunInfo[] benchmarkRunInfos)

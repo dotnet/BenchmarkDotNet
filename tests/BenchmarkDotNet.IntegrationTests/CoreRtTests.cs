@@ -5,7 +5,6 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.XUnit;
-using BenchmarkDotNet.Toolchains.CoreRt;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -21,11 +20,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 return;
 
             var config = ManualConfig.CreateEmpty()
-                .With(Job.Dry
-                    .With(CoreRtRuntime.GetCurrentVersion())
-                    .With(CoreRtToolchain.CreateBuilder()
-                        .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-*") // we test against latest version to make sure we support latest version and avoid issues like #1055
-                        .ToToolchain()));
+                .AddJob(Job.Dry
+                    .WithRuntime(CoreRtRuntime.GetCurrentVersion())); // we test against latest version for current TFM to make sure we avoid issues like #1055
 
             CanExecute<CoreRtBenchmark>(config);
         }

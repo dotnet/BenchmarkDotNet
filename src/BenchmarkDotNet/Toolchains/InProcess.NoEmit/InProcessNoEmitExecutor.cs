@@ -3,9 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -73,10 +71,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
             if (!runThread.Join((int)timeout.TotalMilliseconds))
                 throw new InvalidOperationException(
-                    $"Benchmark {executeParameters.BenchmarkCase.DisplayInfo} takes to long to run. " +
+                    $"Benchmark {executeParameters.BenchmarkCase.DisplayInfo} takes too long to run. " +
                     "Prefer to use out-of-process toolchains for long-running benchmarks.");
 
-            return GetExecutionResult(host.RunResults, exitCode, executeParameters.Logger, executeParameters.BenchmarkCase.Config.Encoding);
+            return ExecuteResult.FromRunResults(host.RunResults, exitCode);
         }
 
         private int ExecuteCore(IHost host, ExecuteParameters parameters)
@@ -117,20 +115,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             }
 
             return exitCode;
-        }
-
-        private ExecuteResult GetExecutionResult(RunResults runResults, int exitCode, ILogger logger, Encoding encoding)
-        {
-            if (exitCode != 0)
-            {
-                return new ExecuteResult(true, exitCode, default, Array.Empty<string>(), Array.Empty<string>());
-            }
-
-            var lines = runResults.GetMeasurements().Select(measurement => measurement.ToOutputLine()).ToList();
-            lines.Add(runResults.GCStats.ToOutputLine());
-            lines.Add(runResults.GCStats.ToOutputLine());
-
-            return new ExecuteResult(true, 0, default, lines.ToArray(), Array.Empty<string>());
         }
     }
 }

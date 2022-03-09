@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Attributes
 
         protected ColumnConfigBaseAttribute(params IColumn[] columns)
         {
-            Config = ManualConfig.CreateEmpty().With(columns);
+            Config = ManualConfig.CreateEmpty().AddColumn(columns);
         }
 
         public IConfig Config { get; }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Xunit;
@@ -60,7 +59,7 @@ namespace BenchmarkDotNet.Tests.Reports
         {
             var testData = TestDataItems[testDataName];
 
-            output.WriteLine("Values: [" + string.Join(";", testData.Values.Select(v => v.ToStr())) + "]");
+            output.WriteLine("Values: [" + string.Join(";", testData.Values.Select(v => v.ToString("0.##", TestCultureInfo.Instance))) + "]");
 
             foreach (var configuration in testData.Configurations)
             {
@@ -70,8 +69,8 @@ namespace BenchmarkDotNet.Tests.Reports
                     ? DisplayPrecisionManager.CalcPrecision(testData.Values, parentPrecision.Value)
                     : DisplayPrecisionManager.CalcPrecision(testData.Values);
 
-                string strParent = parentPrecision.HasValue ? 1234.5678.ToStr("N" + parentPrecision) : "NA";
-                var strValues = testData.Values.Select(v => v.ToStr("N" + actualPrecision)).ToList();
+                string strParent = parentPrecision.HasValue ? 1234.5678.ToString("N" + parentPrecision, TestCultureInfo.Instance) : "NA";
+                var strValues = testData.Values.Select(v => v.ToString("N" + actualPrecision, TestCultureInfo.Instance)).ToList();
                 int maxWidth = strValues.Any() ? Math.Max(strValues.Max(s => s.Length), strParent.Length) + 6 : 0;
                 int parentWidth = maxWidth - (actualPrecision - parentPrecision) ?? 0;
 

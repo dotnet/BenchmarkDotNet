@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -11,6 +11,7 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Validators;
 
@@ -19,6 +20,7 @@ namespace BenchmarkDotNet.Configs
     public class DefaultConfig : IConfig
     {
         public static readonly IConfig Instance = new DefaultConfig();
+        private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
 
         private DefaultConfig()
         {
@@ -71,13 +73,26 @@ namespace BenchmarkDotNet.Configs
 
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 
-        public Encoding Encoding => Encoding.ASCII;
+        public CultureInfo CultureInfo => null;
 
         public ConfigOptions Options => ConfigOptions.Default;
 
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
 
-        public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
+        public TimeSpan BuildTimeout => TimeSpan.FromSeconds(120);
+
+        public string ArtifactsPath
+        {
+            get
+            {
+                var root = RuntimeInformation.IsAndroid() ?
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) :
+                    Directory.GetCurrentDirectory();
+                return Path.Combine(root, "BenchmarkDotNet.Artifacts");
+            }
+        }
+
+        public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
 
         public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
 

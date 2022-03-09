@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Running;
 using Xunit;
@@ -101,7 +99,7 @@ namespace BenchmarkDotNet.Tests
             => AssertBenchmarkName<WithNullableTypeAsArgument>("BenchmarkDotNet.Tests.WithNullableTypeAsArgument.GetConverter(typeToConvert: typeof(BenchmarkDotNet.Tests.SomeValueType?), expectedConverter: typeof(System.ComponentModel.NullableConverter))");
 
         [Fact]
-        public void VoidTypeAsArgumentIsTransaltedToSystemDotVoid()
+        public void VoidTypeAsArgumentIsTranslatedToSystemDotVoid()
             => AssertBenchmarkName<WithVoidTypeAsArgument>("BenchmarkDotNet.Tests.WithVoidTypeAsArgument.GetConverter(typeToConvert: typeof(System.Void), expectedConverter: typeof(System.ComponentModel.TypeConverter))");
     }
 

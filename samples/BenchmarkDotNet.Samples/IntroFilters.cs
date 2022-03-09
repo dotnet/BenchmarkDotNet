@@ -16,13 +16,13 @@ namespace BenchmarkDotNet.Samples
             public Config()
             {
                 // benchmark with names which contains "A" OR "1"
-                Add(new DisjunctionFilter(
+                AddFilter(new DisjunctionFilter(
                     new NameFilter(name => name.Contains("A")),
                     new NameFilter(name => name.Contains("1"))
                 ));
 
                 // benchmark with names with length < 3
-                Add(new NameFilter(name => name.Length < 3));
+                AddFilter(new NameFilter(name => name.Length < 3));
             }
         }
 

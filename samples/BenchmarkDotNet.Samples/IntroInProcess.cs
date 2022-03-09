@@ -16,13 +16,13 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                Add(Job.MediumRun
+                AddJob(Job.MediumRun
                     .WithLaunchCount(1)
                     .WithId("OutOfProc"));
 
-                Add(Job.MediumRun
+                AddJob(Job.MediumRun
                     .WithLaunchCount(1)
-                    .With(InProcessEmitToolchain.Instance)
+                    .WithToolchain(InProcessEmitToolchain.Instance)
                     .WithId("InProcess"));
             }
         }

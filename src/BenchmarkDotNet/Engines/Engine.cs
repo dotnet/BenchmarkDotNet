@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
-using System.Text;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -29,27 +31,28 @@ namespace BenchmarkDotNet.Engines
         [PublicAPI] public Action IterationSetupAction { get; }
         [PublicAPI] public Action IterationCleanupAction { get; }
         [PublicAPI] public IResolver Resolver { get; }
-        [PublicAPI] public Encoding Encoding { get; }
+        [PublicAPI] public CultureInfo CultureInfo { get; }
         [PublicAPI] public string BenchmarkName { get; }
 
         private IClock Clock { get; }
-        private bool ForceAllocations { get; }
+        private bool ForceGcCleanups { get; }
         private int UnrollFactor { get; }
         private RunStrategy Strategy { get; }
         private bool EvaluateOverhead { get; }
-        private int InvocationCount { get; }
+        private bool MemoryRandomization { get; }
 
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineActualStage actualStage;
         private readonly bool includeExtraStats;
+        private readonly Random random;
 
         internal Engine(
             IHost host,
             IResolver resolver,
             Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
             Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeExtraStats, Encoding encoding, string benchmarkName)
+            bool includeExtraStats, string benchmarkName)
         {
 
             Host = host;
@@ -68,18 +71,19 @@ namespace BenchmarkDotNet.Engines
             BenchmarkName = benchmarkName;
 
             Resolver = resolver;
-            Encoding = encoding;
 
             Clock = targetJob.ResolveValue(InfrastructureMode.ClockCharacteristic, Resolver);
-            ForceAllocations = targetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
+            ForceGcCleanups = targetJob.ResolveValue(GcMode.ForceCharacteristic, Resolver);
             UnrollFactor = targetJob.ResolveValue(RunMode.UnrollFactorCharacteristic, Resolver);
             Strategy = targetJob.ResolveValue(RunMode.RunStrategyCharacteristic, Resolver);
             EvaluateOverhead = targetJob.ResolveValue(AccuracyMode.EvaluateOverheadCharacteristic, Resolver);
-            InvocationCount = targetJob.ResolveValue(RunMode.InvocationCountCharacteristic, Resolver);
+            MemoryRandomization = targetJob.ResolveValue(RunMode.MemoryRandomizationCharacteristic, Resolver);
 
             warmupStage = new EngineWarmupStage(this);
             pilotStage = new EnginePilotStage(this);
             actualStage = new EngineActualStage(this);
+
+            random = new Random(12345); // we are using constant seed to try to get repeatable results
         }
 
         public void Dispose()
@@ -100,7 +104,7 @@ namespace BenchmarkDotNet.Engines
 
         public RunResults Run()
         {
-            long invokeCount = InvocationCount;
+            long invokeCount = TargetJob.ResolveValue(RunMode.InvocationCountCharacteristic, Resolver, 1);
             IReadOnlyList<Measurement> idle = null;
 
             if (EngineEventSource.Log.IsEnabled())
@@ -137,7 +141,7 @@ namespace BenchmarkDotNet.Engines
 
             var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
 
-            return new RunResults(idle, main, outlierMode, workGcHasDone, threadingStats, Encoding);
+            return new RunResults(idle, main, outlierMode, workGcHasDone, threadingStats);
         }
 
         public Measurement RunIteration(IterationData data)
@@ -147,15 +151,18 @@ namespace BenchmarkDotNet.Engines
             int unrollFactor = data.UnrollFactor;
             long totalOperations = invokeCount * OperationsPerInvoke;
             bool isOverhead = data.IterationMode == IterationMode.Overhead;
+            bool randomizeMemory = !isOverhead && MemoryRandomization;
             var action = isOverhead ? OverheadAction : WorkloadAction;
 
-            if(!isOverhead)
+            if (!isOverhead)
                 IterationSetupAction();
 
             GcCollect();
 
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStart(data.IterationMode, data.IterationStage, totalOperations);
+
+            Span<byte> stackMemory = randomizeMemory ? stackalloc byte[random.Next(32)] : Span<byte>.Empty;
 
             // Measure
             var clock = Clock.Start();
@@ -165,14 +172,19 @@ namespace BenchmarkDotNet.Engines
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStop(data.IterationMode, data.IterationStage, totalOperations);
 
-            if(!isOverhead)
+            if (!isOverhead)
                 IterationCleanupAction();
+
+            if (randomizeMemory)
+                RandomizeManagedHeapMemory();
 
             GcCollect();
 
             // Results
-            var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, clockSpan.GetNanoseconds(), Encoding);
-            WriteLine(measurement.ToOutputLine());
+            var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, clockSpan.GetNanoseconds());
+            WriteLine(measurement.ToString());
+
+            Consume(stackMemory);
 
             return measurement;
         }
@@ -202,9 +214,30 @@ namespace BenchmarkDotNet.Engines
             return (gcStats, threadingStats);
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void Consume(in Span<byte> _) { }
+
+        private void RandomizeManagedHeapMemory()
+        {
+            // invoke global cleanup before global setup
+            GlobalCleanupAction?.Invoke();
+
+            var gen0object = new byte[random.Next(32)];
+            var lohObject = new byte[85 * 1024 + random.Next(32)];
+
+            // we expect the key allocations to happen in global setup (not ctor)
+            // so we call it while keeping the random-size objects alive
+            GlobalSetupAction?.Invoke();
+
+            GC.KeepAlive(gen0object);
+            GC.KeepAlive(lohObject);
+
+            // we don't enforce GC.Collects here as engine does it later anyway
+        }
+
         private void GcCollect()
         {
-            if (!ForceAllocations)
+            if (!ForceGcCleanups)
                 return;
 
             ForceGcCollect();

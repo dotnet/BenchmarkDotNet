@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Text;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
@@ -22,9 +21,14 @@ namespace BenchmarkDotNet.Characteristics
         private class DefaultCharacteristicPresenter : CharacteristicPresenter
         {
             public override string ToPresentation(CharacteristicObject obj, Characteristic characteristic)
-                => obj.HasValue(characteristic)
+            {
+                if (characteristic == CharacteristicObject.IdCharacteristic && obj is Job job)
+                    return job.ResolvedId;
+
+                return obj.HasValue(characteristic)
                     ? ToPresentation(characteristic[obj], characteristic)
                     : "Default";
+            }
 
             public override string ToPresentation(object value, Characteristic characteristic)
             {
@@ -61,7 +65,7 @@ namespace BenchmarkDotNet.Characteristics
             }
 
             private static string ToPresentation(object value)
-                => (value as IFormattable)?.ToString(null, HostEnvironmentInfo.MainCultureInfo)
+                => (value as IFormattable)?.ToString(null, DefaultCultureInfo.Instance)
                       ?? value?.ToString()
                       ?? "";
 

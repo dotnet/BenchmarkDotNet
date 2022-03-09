@@ -18,12 +18,10 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         /// <param name="customDotNetCliPath">path to dotnet cli, if not provided the one from PATH will be used</param>
         /// <param name="displayName">display name, CoreRun is the default value</param>
         /// <param name="restorePath">the directory to restore packages to</param>
-        /// <param name="timeout">the timeout for building the benchmarks</param>
         public CoreRunToolchain(FileInfo coreRun, bool createCopy = true,
             string targetFrameworkMoniker = "netcoreapp2.1",
             FileInfo customDotNetCliPath = null, DirectoryInfo restorePath = null,
-            string displayName = "CoreRun",
-            TimeSpan? timeout = null)
+            string displayName = "CoreRun")
         {
             if (coreRun == null) throw new ArgumentNullException(nameof(coreRun));
             if (!coreRun.Exists) throw new FileNotFoundException("Provided CoreRun path does not exist. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.");
@@ -35,7 +33,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 
             Name = displayName;
             Generator = new CoreRunGenerator(SourceCoreRun, CopyCoreRun, targetFrameworkMoniker, customDotNetCliPath?.FullName, restorePath?.FullName);
-            Builder = new CoreRunPublisher(CopyCoreRun, customDotNetCliPath, timeout);
+            Builder = new CoreRunPublisher(CopyCoreRun, customDotNetCliPath);
             Executor = new DotNetCliExecutor(customDotNetCliPath: CopyCoreRun.FullName); // instead of executing "dotnet $pathToDll" we do "CoreRun $pathToDll"
         }
 

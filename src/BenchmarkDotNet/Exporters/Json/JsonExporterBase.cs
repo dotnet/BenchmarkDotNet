@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -64,9 +63,16 @@ namespace BenchmarkDotNet.Exporters.Json
                 };
 
                 // We show MemoryDiagnoser's results only if it is being used
-                if(report.BenchmarkCase.Config.HasMemoryDiagnoser())
+                if (report.BenchmarkCase.Config.HasMemoryDiagnoser())
                 {
-                    data.Add("Memory", report.GcStats);
+                    data.Add("Memory", new
+                    {
+                        report.GcStats.Gen0Collections,
+                        report.GcStats.Gen1Collections,
+                        report.GcStats.Gen2Collections,
+                        report.GcStats.TotalOperations,
+                        BytesAllocatedPerOperation = report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase)
+                    });
                 }
 
                 if (ExcludeMeasurements == false)

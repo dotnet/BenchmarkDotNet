@@ -29,10 +29,10 @@ namespace BenchmarkDotNet.IntegrationTests
             var summary = BenchmarkRunner
                 .Run<C>(
                     ManualConfig.CreateEmpty()
-                                .With(Job.Dry.With(CoreRuntime.Core21).With(Platform.X64).WithId("Core"))
-                                .With(Job.Dry.With(ClrRuntime.Net461).WithId("Framework"))
-                                .With(DefaultColumnProviders.Instance)
-                                .With(new OutputLogger(output)));
+                        .AddJob(Job.Dry.WithRuntime(CoreRuntime.Core50).WithPlatform(Platform.X64).WithId("Core"))
+                        .AddJob(Job.Dry.WithRuntime(ClrRuntime.Net461).WithId("Framework"))
+                        .AddColumnProvider(DefaultColumnProviders.Instance)
+                        .AddLogger(new OutputLogger(output)));
 
             Assert.True(summary.Reports
                 .All(report => report.ExecuteResults
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Any());
 
             Assert.Contains(".NET Framework", summary.AllRuntimes);
-            Assert.Contains(".NET Core", summary.AllRuntimes);
+            Assert.Contains(".NET 5.0", summary.AllRuntimes);
         }
     }
 

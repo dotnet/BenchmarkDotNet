@@ -7,11 +7,12 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using JetBrains.Annotations;
+using System;
 
 namespace BenchmarkDotNet.Toolchains.CsProj
 {
     [PublicAPI]
-    public class CsProjCoreToolchain : Toolchain
+    public class CsProjCoreToolchain : Toolchain, IEquatable<CsProjCoreToolchain>
     {
         [PublicAPI] public static readonly IToolchain NetCoreApp20 = From(NetCoreAppSettings.NetCoreApp20);
         [PublicAPI] public static readonly IToolchain NetCoreApp21 = From(NetCoreAppSettings.NetCoreApp21);
@@ -19,6 +20,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI] public static readonly IToolchain NetCoreApp30 = From(NetCoreAppSettings.NetCoreApp30);
         [PublicAPI] public static readonly IToolchain NetCoreApp31 = From(NetCoreAppSettings.NetCoreApp31);
         [PublicAPI] public static readonly IToolchain NetCoreApp50 = From(NetCoreAppSettings.NetCoreApp50);
+        [PublicAPI] public static readonly IToolchain NetCoreApp60 = From(NetCoreAppSettings.NetCoreApp60);
+        [PublicAPI] public static readonly IToolchain NetCoreApp70 = From(NetCoreAppSettings.NetCoreApp70);
 
         private CsProjCoreToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath)
             : base(name, generator, builder, executor)
@@ -32,7 +35,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         public static IToolchain From(NetCoreAppSettings settings)
             => new CsProjCoreToolchain(settings.Name,
                 new CsProjGenerator(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.PackagesPath, settings.RuntimeFrameworkVersion),
-                new DotNetCliBuilder(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.Timeout),
+                new DotNetCliBuilder(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath),
                 new DotNetCliExecutor(settings.CustomDotNetCliPath),
                 settings.CustomDotNetCliPath);
 
@@ -69,5 +72,11 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             return true;
         }
+
+        public override bool Equals(object obj) => obj is CsProjCoreToolchain typed && Equals(typed);
+
+        public bool Equals(CsProjCoreToolchain other) => Generator.Equals(other.Generator);
+
+        public override int GetHashCode() => Generator.GetHashCode();
     }
 }

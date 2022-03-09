@@ -5,6 +5,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -48,7 +49,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void AllSetupAndCleanupMethodRunsTest()
         {
             var logger = new OutputLogger(Output);
-            var miniJob = Job.Default.With(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
+            var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
             var config = CreateSimpleConfig(logger, miniJob);
 
             CanExecute<AllSetupAndCleanupAttributeBenchmarks>(config);
@@ -84,7 +85,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void AllSetupAndCleanupMethodRunsAsyncTest()
         {
             var logger = new OutputLogger(Output);
-            var miniJob = Job.Default.With(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
+            var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
             var config = CreateSimpleConfig(logger, miniJob);
 
             CanExecute<AllSetupAndCleanupAttributeBenchmarksAsync>(config);
@@ -120,7 +121,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void AllSetupAndCleanupMethodRunsAsyncTaskSetupTest()
         {
             var logger = new OutputLogger(Output);
-            var miniJob = Job.Default.With(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
+            var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
             var config = CreateSimpleConfig(logger, miniJob);
 
             CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncTaskSetup>(config);
@@ -156,7 +157,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void AllSetupAndCleanupMethodRunsAsyncGenericTaskSetupTest()
         {
             var logger = new OutputLogger(Output);
-            var miniJob = Job.Default.With(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
+            var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
             var config = CreateSimpleConfig(logger, miniJob);
 
             CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncGenericTaskSetup>(config);
@@ -202,7 +203,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void AllSetupAndCleanupMethodRunsAsyncValueTaskSetupTest()
         {
             var logger = new OutputLogger(Output);
-            var miniJob = Job.Default.With(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
+            var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
             var config = CreateSimpleConfig(logger, miniJob);
 
             CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncValueTaskSetup>(config);
@@ -234,11 +235,11 @@ namespace BenchmarkDotNet.IntegrationTests
             public void Benchmark() => Console.WriteLine(BenchmarkCalled);
         }
 
-        [Fact]
+        [FactNotGitHubActionsWindows]
         public void AllSetupAndCleanupMethodRunsAsyncGenericValueTaskSetupTest()
         {
             var logger = new OutputLogger(Output);
-            var miniJob = Job.Default.With(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
+            var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
             var config = CreateSimpleConfig(logger, miniJob);
 
             CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncGenericValueTaskSetup>(config);

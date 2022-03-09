@@ -1,25 +1,8 @@
+#!/usr/bin/env pwsh
 $DotNetInstallerUri = 'https://dot.net/v1/dotnet-install.ps1';
 $DotNetUnixInstallerUri = 'https://dot.net/v1/dotnet-install.sh'
-$DotNetChannel = 'LTS'
 $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent
-
-[string] $CakeVersion = ''
-[string] $DotNetVersion= ''
-foreach($line in Get-Content "$PSScriptRoot\build.config")
-{
-  if ($line -like 'CAKE_VERSION=*') {
-      $CakeVersion = $line.SubString(13)
-  }
-  elseif ($line -like 'DOTNET_VERSION=*') {
-      $DotNetVersion =$line.SubString(15)
-  }
-}
-
-
-if ([string]::IsNullOrEmpty($CakeVersion) -or [string]::IsNullOrEmpty($DotNetVersion)) {
-    'Failed to parse Cake / .NET Core SDK Version'
-    exit 1
-}
+$BuildPath = Join-Path $PSScriptRoot "build"
 
 # Make sure tools folder exists
 $ToolPath = Join-Path $PSScriptRoot "tools"
@@ -49,6 +32,11 @@ if ($PSVersionTable.PSEdition -ne 'Core') {
 # INSTALL .NET CORE CLI
 ###########################################################################
 
+$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+$env:DOTNET_CLI_TELEMETRY_OPTOUT=1
+$env:DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX=2
+
+
 Function Remove-PathVariable([string]$VariableToRemove)
 {
     $SplitChar = ';'
@@ -71,75 +59,33 @@ Function Remove-PathVariable([string]$VariableToRemove)
     }
 }
 
-# Get .NET Core CLI path if installed.
-$FoundDotNetCliVersion = $null;
-if (Get-Command dotnet -ErrorAction SilentlyContinue) {
-    $FoundDotNetCliVersion = dotnet --version;
+$InstallPath = Join-Path $PSScriptRoot ".dotnet"
+$GlobalJsonPath = Join-Path $BuildPath "global.json"
+if (!(Test-Path $InstallPath)) {
+    New-Item -Path $InstallPath -ItemType Directory -Force | Out-Null;
 }
 
-if($FoundDotNetCliVersion -ne $DotNetVersion) {
-    $InstallPath = Join-Path $PSScriptRoot ".dotnet"
-    if (!(Test-Path $InstallPath)) {
-        New-Item -Path $InstallPath -ItemType Directory -Force | Out-Null;
-    }
+if ($IsMacOS -or $IsLinux) {
+    $ScriptPath = Join-Path $InstallPath 'dotnet-install.sh'
+    (New-Object System.Net.WebClient).DownloadFile($DotNetUnixInstallerUri, $ScriptPath);
+    & bash $ScriptPath --jsonfile "$GlobalJsonPath" --install-dir "$InstallPath" --no-path
 
-    if ($IsMacOS -or $IsLinux) {
-        (New-Object System.Net.WebClient).DownloadFile($DotNetUnixInstallerUri, "$InstallPath\dotnet-install.sh");
-        & bash $InstallPath\dotnet-install.sh --version "$DotNetVersion" --install-dir "$InstallPath" --channel "$DotNetChannel" --no-path
-    }
-    else {
-        (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, "$InstallPath\dotnet-install.ps1");
-        & $InstallPath\dotnet-install.ps1 -Channel $DotNetChannel -Version $DotNetVersion -InstallDir $InstallPath;
-    }
+    Remove-PathVariable "$InstallPath"
+    $env:PATH = "$($InstallPath):$env:PATH"
+}
+else {
+    $ScriptPath = Join-Path $InstallPath 'dotnet-install.ps1'
+    (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, $ScriptPath);
+    & $ScriptPath -JSonFile $GlobalJsonPath -InstallDir $InstallPath;
 
     Remove-PathVariable "$InstallPath"
     $env:PATH = "$InstallPath;$env:PATH"
 }
-
-$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
-$env:DOTNET_CLI_TELEMETRY_OPTOUT=1
-$env:DOTNET_MULTILEVEL_LOOKUP=0
-
-###########################################################################
-# INSTALL CAKE
-###########################################################################
-
-# Make sure Cake has been installed.
-[string] $CakeExePath = ''
-[string] $CakeInstalledVersion = Get-Command dotnet-cake -ErrorAction SilentlyContinue  | % {&$_.Source --version}
-
-if ($CakeInstalledVersion -eq $CakeVersion) {
-    # Cake found locally
-    $CakeExePath = (Get-Command dotnet-cake).Source
-}
-else {
-    $CakePath = Join-Path $ToolPath ".store\cake.tool\$CakeVersion"
-    $CakeExePath = (Get-ChildItem -Path $ToolPath -Filter "dotnet-cake*" -File| ForEach-Object FullName | Select-Object -First 1)
-
-
-    if ((!(Test-Path -Path $CakePath -PathType Container)) -or (!(Test-Path $CakeExePath -PathType Leaf))) {
-
-        if ((![string]::IsNullOrEmpty($CakeExePath)) -and (Test-Path $CakeExePath -PathType Leaf))
-        {
-            & dotnet tool uninstall --tool-path $ToolPath Cake.Tool
-        }
-
-        & dotnet tool install --tool-path $ToolPath --version $CakeVersion Cake.Tool
-        if ($LASTEXITCODE -ne 0)
-        {
-            'Failed to install cake'
-            exit 1
-        }
-        $CakeExePath = (Get-ChildItem -Path $ToolPath -Filter "dotnet-cake*" -File| ForEach-Object FullName | Select-Object -First 1)
-    }
-}
+$env:DOTNET_ROOT=$InstallPath
 
 ###########################################################################
 # RUN BUILD SCRIPT
 ###########################################################################
-& "$CakeExePath" ./build.cake --bootstrap
-if ($LASTEXITCODE -eq 0)
-{
-    & "$CakeExePath" ./build.cake $args
-}
-exit $LASTEXITCODE
+& dotnet run --project build/Build.csproj -- $args
+
+exit $LASTEXITCODE;

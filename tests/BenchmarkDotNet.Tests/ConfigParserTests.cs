@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
@@ -12,8 +11,6 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
-using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Mathematics.StatisticalTesting;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.XUnit;
@@ -25,6 +22,9 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 using Xunit;
 using Xunit.Abstractions;
 using BenchmarkDotNet.Portability;
+using Perfolizer.Horology;
+using Perfolizer.Mathematics.SignificanceTesting;
+using Perfolizer.Mathematics.Thresholds;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -276,7 +276,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(timeoutInSeconds, ((DotNetCliBuilder)toolchain.Builder).Timeout.TotalSeconds);
+            Assert.Equal(timeoutInSeconds, config.BuildTimeout.TotalSeconds);
         }
 
         [Fact]
@@ -287,7 +287,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(NetCoreAppSettings.DefaultBuildTimeout, ((DotNetCliBuilder)toolchain.Builder).Timeout);
+            Assert.Equal(DefaultConfig.Instance.BuildTimeout, config.BuildTimeout);
         }
 
         [Theory]
@@ -306,6 +306,33 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(tfm, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
         }
 
+        [Theory]
+        [InlineData("net50")]
+        [InlineData("net60")]
+        [InlineData("net70")]
+        public void NetMonikersAreRecognizedAsNetCoreMonikers(string tfm)
+        {
+            var config = ConfigParser.Parse(new[] { "-r", tfm }, new OutputLogger(Output)).config;
+
+            Assert.Single(config.GetJobs());
+            CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
+            Assert.NotNull(toolchain);
+            Assert.Equal(tfm, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
+        }
+
+        [Theory]
+        [InlineData("net5.0-windows")]
+        [InlineData("net5.0-ios")]
+        public void PlatformSpecificMonikersAreSupported(string msBuildMoniker)
+        {
+            var config = ConfigParser.Parse(new[] { "-r", msBuildMoniker }, new OutputLogger(Output)).config;
+
+            Assert.Single(config.GetJobs());
+            CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
+            Assert.NotNull(toolchain);
+            Assert.Equal(msBuildMoniker, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
+        }
+
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
@@ -314,8 +341,8 @@ namespace BenchmarkDotNet.Tests
             Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net461"));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime));
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRuntime.TargetFrameworkMoniker == TargetFrameworkMoniker.NetCoreApp30));
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRtRuntime coreRtRuntime && coreRtRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRtRuntime.TargetFrameworkMoniker == TargetFrameworkMoniker.CoreRt30));
+            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp30));
+            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRtRuntime coreRtRuntime && coreRtRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRtRuntime.RuntimeMoniker == RuntimeMoniker.CoreRt30));
         }
 
         [Theory]
@@ -341,7 +368,7 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void SpecyfingInvalidStatisticalTestsThresholdMeansFailure()
+        public void SpecifyingInvalidStatisticalTestsThresholdMeansFailure()
         {
             Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "not a number" }, new OutputLogger(Output)).isSuccess);
             Assert.False(ConfigParser.Parse(new[] {"--statisticalTest", "1unknownUnit" }, new OutputLogger(Output)).isSuccess);
@@ -380,8 +407,7 @@ namespace BenchmarkDotNet.Tests
 
             var diagnoser = config.GetDiagnosers().OfType<DisassemblyDiagnoser>().Single();
 
-            Assert.Equal(depth, diagnoser.Config.RecursiveDepth);
-            Assert.True(diagnoser.Config.PrintPrologAndEpilog); // we want this option to be enabled by default for command line users
+            Assert.Equal(depth, diagnoser.Config.MaxDepth);
         }
 
         [Fact]
@@ -396,7 +422,7 @@ namespace BenchmarkDotNet.Tests
         public void UserCanSpecifyCustomDefaultJobAndOverwriteItsSettingsViaConsoleArgs()
         {
             var globalConfig = DefaultConfig.Instance
-                .With(Job.Default
+                .AddJob(Job.Default
                     .WithWarmupCount(1)
                     .AsDefault());
 
@@ -407,17 +433,54 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void UserCanSpecifyCustomMaxParamterColumnWidth()
+        public void UserCanSpecifyCustomMaxParameterColumnWidth()
         {
             const int customValue = 1234;
 
             var globalConfig = DefaultConfig.Instance;
 
-            Assert.NotEqual(customValue, globalConfig.SummaryStyle.MaxParamterColumnWidth);
+            Assert.NotEqual(customValue, globalConfig.SummaryStyle.MaxParameterColumnWidth);
 
             var parsedConfig = ConfigParser.Parse(new[] { "--maxWidth", customValue.ToString() }, new OutputLogger(Output), globalConfig).config;
 
-            Assert.Equal(customValue, parsedConfig.SummaryStyle.MaxParamterColumnWidth);
+            Assert.Equal(customValue, parsedConfig.SummaryStyle.MaxParameterColumnWidth);
+        }
+
+        [Fact]
+        public void UserCanSpecifyEnvironmentVariables()
+        {
+            const string key = "A_VERY_NICE_ENV_VAR";
+            const string value = "enabled";
+
+            var parsedConfig = ConfigParser.Parse(new[] { "--envVars", $"{key}:{value}" }, new OutputLogger(Output)).config;
+
+            var job = parsedConfig.GetJobs().Single();
+            var envVar = job.Environment.EnvironmentVariables.Single();
+
+            Assert.Equal(key, envVar.Key);
+            Assert.Equal(value, envVar.Value);
+        }
+
+        [Theory]
+        [InlineData(Platform.AnyCpu)]
+        [InlineData(Platform.X86)]
+        [InlineData(Platform.X64)]
+        [InlineData(Platform.Arm)]
+        [InlineData(Platform.Arm64)]
+        public void UserCanSpecifyProcessPlatform(Platform platform)
+        {
+            var parsedConfig = ConfigParser.Parse(new[] { "--platform", platform.ToString() }, new OutputLogger(Output)).config;
+
+            var job = parsedConfig.GetJobs().Single();
+            var parsed = job.Environment.Platform;
+
+            Assert.Equal(platform, parsed);
+        }
+
+        [Fact]
+        public void InvalidEnvVarAreRecognized()
+        {
+            Assert.False(ConfigParser.Parse(new[] { "--envVars", "INVALID_NO_SEPARATOR" }, new OutputLogger(Output)).isSuccess);
         }
     }
 }

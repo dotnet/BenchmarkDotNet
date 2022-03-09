@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Horology;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Reports
             }
 
             // Ensure we have all required data for styling
-            style = style ?? SummaryStyle.Default;
+            style = style ?? summary.Style ?? SummaryStyle.Default;
             if (style.TimeUnit == null)
             {
                 style = style.WithTimeUnit(TimeUnit.GetBestTimeUnit(summary.Reports.Where(r => r.ResultStatistics != null).Select(r => r.ResultStatistics.Mean)
@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Reports
 
             if (style.SizeUnit == null)
             {
-                style = style.WithSizeUnit(SizeUnit.GetBestSizeUnit(summary.Reports.Select(r => r.GcStats.BytesAllocatedPerOperation).ToArray()));
+                style = style.WithSizeUnit(SizeUnit.GetBestSizeUnit(summary.Reports.Select(r => r.GcStats.GetBytesAllocatedPerOperation(r.BenchmarkCase)).ToArray()));
             }
 
             var columns = summary.GetColumns();

@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -38,14 +39,22 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         string ArtifactsPath { get; }
 
-        /// <summary>
-        /// the default value is ASCII
-        /// </summary>
-        Encoding Encoding { get; }
+        [CanBeNull]
+        CultureInfo CultureInfo { get; }
 
         /// <summary>
         /// a set of custom flags that can enable/disable various settings
         /// </summary>
         ConfigOptions Options { get; }
+
+        /// <summary>
+        /// the auto-generated project build timeout
+        /// </summary>
+        TimeSpan BuildTimeout { get; }
+        
+        /// <summary>
+        /// Collect any errors or warnings when composing the configuration
+        /// </summary>
+        IReadOnlyList<Conclusion> ConfigAnalysisConclusion { get; }
     }
 }

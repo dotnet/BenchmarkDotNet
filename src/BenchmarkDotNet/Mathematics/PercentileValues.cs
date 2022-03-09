@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.QuantileEstimators;
 
 namespace BenchmarkDotNet.Mathematics
 {
@@ -28,22 +29,14 @@ namespace BenchmarkDotNet.Mathematics
             if (percentile < 0 || percentile > 100)
             {
                 throw new ArgumentOutOfRangeException(
-                     nameof(percentile), percentile,
-                     "The percentile arg should be in range of 0 - 100.");
+                    nameof(percentile), percentile,
+                    "The percentile arg should be in range of 0 - 100.");
             }
 
             if (sortedValues.Count == 0)
                 return 0;
 
-            // DONTTOUCH: the following code was taken from http://stackoverflow.com/a/8137526 and it is proven
-            // to work in the same way the excel's counterpart does.
-            // So it's better to leave it as it is unless you do not want to reimplement it from scratch:)
-            double realIndex = percentile / 100.0 * (sortedValues.Count - 1);
-            int index = (int)realIndex;
-            double frac = realIndex - index;
-            if (index + 1 < sortedValues.Count)
-                return sortedValues[index] * (1 - frac) + sortedValues[index + 1] * frac;
-            return sortedValues[index];
+            return SimpleQuantileEstimator.Instance.GetQuantileFromSorted(sortedValues, percentile / 100.0);
         }
 
         [PublicAPI] public double Percentile(int percentile) => Percentile(SortedValues, percentile);
@@ -76,11 +69,26 @@ namespace BenchmarkDotNet.Mathematics
             P100 = Percentile(100);
         }
 
-        public string ToStr() => $"[P95: {P95.ToStr()}] [P0: {P0.ToStr()}]; [P50: {P50.ToStr()}]; [P100: {P100.ToStr()}]";
-        [PublicAPI] public string ToTimeStr(TimeUnit unit = null, Encoding encoding = null)
+        public override string ToString() => ToString(DefaultCultureInfo.Instance);
+
+        public string ToString(Func<double, string> formatter)
         {
-            encoding = encoding ?? Encoding.ASCII;
-            return $"[P95: {P95.ToTimeStr(unit, encoding)}] [P0: {P0.ToTimeStr(unit, encoding)}]; [P50: {P50.ToTimeStr(unit, encoding)}]; [P100: {P100.ToTimeStr(unit, encoding)})]";
+            var builder = new StringBuilder();
+            builder.Append("[P95: ");
+            builder.Append(formatter(P95));
+            builder.Append("]; [P0: ");
+            builder.Append(formatter(P0));
+            builder.Append("]; [P50: ");
+            builder.Append(formatter(P50));
+            builder.Append("]; [P100: ");
+            builder.Append(formatter(P100));
+            builder.Append("]");
+            return builder.ToString();
+        }
+
+        public string ToString([CanBeNull] CultureInfo cultureInfo, string format = "0.##")
+        {
+            return ToString(x => x.ToString(format, cultureInfo));
         }
     }
 }

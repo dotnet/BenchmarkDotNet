@@ -5,6 +5,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.Common;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -62,6 +63,11 @@ namespace BenchmarkDotNet.Columns
                     bool hide = stdDevColumnValues.All(value => value == "0.00" || value == "0.01");
                     if (!hide)
                         yield return BaselineRatioColumn.RatioStdDev;
+
+                    if (HasMemoryDiagnoser(summary))
+                    {
+                        yield return new BaselineAllocationRatioColumn();
+                    }
                 }
             }
 
@@ -69,15 +75,20 @@ namespace BenchmarkDotNet.Columns
             {
                 return summary.Reports != null && summary.Reports.Any(r => r.ResultStatistics != null && check(r.ResultStatistics));
             }
+
+            private static bool HasMemoryDiagnoser(Summary summary)
+            {
+                return summary.BenchmarksCases.Any(c => c.Config.HasMemoryDiagnoser());
+            }
         }
 
         private class ParamsColumnProvider : IColumnProvider
         {
             public IEnumerable<IColumn> GetColumns(Summary summary) => summary
                 .BenchmarksCases
-                .SelectMany(b => b.Parameters.Items.Select(item => item.Name))
+                .SelectMany(b => b.Parameters.Items.Select(item => item.Definition))
                 .Distinct()
-                .Select(name => new ParamColumn(name));
+                .Select(definition => new ParamColumn(definition.Name, definition.PriorityInCategory));
         }
 
         private class MetricsColumnProvider : IColumnProvider

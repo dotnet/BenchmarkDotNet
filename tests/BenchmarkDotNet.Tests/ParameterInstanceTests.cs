@@ -1,5 +1,4 @@
-﻿using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Parameters;
+﻿using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
 using System;
 using System.Collections.Generic;
@@ -9,7 +8,7 @@ namespace BenchmarkDotNet.Tests
 {
     public class ParameterInstanceTests
     {
-        private static readonly ParameterDefinition definition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>(), isArgument: false, parameterType: null);
+        private static readonly ParameterDefinition definition = new ParameterDefinition("Testing", isStatic: false, values: Array.Empty<object>(), isArgument: false, parameterType: null, 0);
 
         [Theory]
         [InlineData(5)]
@@ -64,7 +63,11 @@ namespace BenchmarkDotNet.Tests
         [Theory]
         [InlineData("012345678901234567890", 21, "012345678901234567890")] // the default is 20
         [InlineData("0123456789012345678901234567890123456789", 30, "0123456789(...)0123456789 [40]")]
-        public void MaxParamterColumnWidthCanBeCustomized(string initialLongText, int maxParameterColumnWidth, string expectedDisplayText)
+        [InlineData("😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀", 20, "😀😀(...)😀😀 [54]")]
+        [InlineData("a😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀", 20, "a😀😀(...)😀😀 [55]")]
+        [InlineData("😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀b", 20, "😀😀(...)😀😀b [55]")]
+        [InlineData("a😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀b", 20, "a😀😀(...)😀😀b [56]")]
+        public void MaxParameterColumnWidthCanBeCustomized(string initialLongText, int maxParameterColumnWidth, string expectedDisplayText)
         {
             var summaryStyle = SummaryStyle.Default.WithMaxParameterColumnWidth(maxParameterColumnWidth);
             var parameter = new ParameterInstance(definition, initialLongText, summaryStyle);
@@ -76,7 +79,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(-100)]
         [InlineData(0)]
         [InlineData(10)]
-        public void MaxParamterColumnWidthCanNotBeSetToValueLessThanDefault(int newWidth)
+        public void MaxParameterColumnWidthCanNotBeSetToValueLessThanDefault(int newWidth)
             => Assert.Throws<ArgumentOutOfRangeException>(() => SummaryStyle.Default.WithMaxParameterColumnWidth(newWidth));
     }
 

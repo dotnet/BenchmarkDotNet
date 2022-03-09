@@ -8,9 +8,9 @@ namespace BenchmarkDotNet.Engines
     public sealed class ConsoleHost : IHost
     {
         private readonly TextWriter outWriter;
-        private readonly TextReader inReader;
+        private readonly StreamReader inReader;
 
-        public ConsoleHost([NotNull]TextWriter outWriter, [NotNull]TextReader inReader)
+        public ConsoleHost([NotNull]TextWriter outWriter, [NotNull]StreamReader inReader)
         {
             this.outWriter = outWriter ?? throw new ArgumentNullException(nameof(outWriter));
             this.inReader = inReader ?? throw new ArgumentNullException(nameof(inReader));
@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Engines
             // I did not use Mutexes because they are not supported for Linux/MacOs for .NET Core
             // this solution is stupid simple and it works
             string acknowledgment = inReader.ReadLine();
-            if(acknowledgment != Engine.Signals.Acknowledgment)
+            if (acknowledgment != Engine.Signals.Acknowledgment)
                 throw new NotSupportedException($"Unknown Acknowledgment: {acknowledgment}");
         }
 

@@ -2,7 +2,10 @@
 
 To get started with BenchmarkDotNet, please follow these steps. 
 
-## Step 1. Installation
+## Step 1. Create a project
+Create a new console application.
+
+## Step 2. Installation
 
 Install BenchmarkDotNet via the NuGet package: [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/)
 
@@ -12,8 +15,8 @@ PM> Install-Package BenchmarkDotNet
 
 Read more about BenchmarkDotNet NuGet packages: @docs.nuget
 
-## Step 2. Design a benchmark
-Create a new console application, write a class with methods that you want to measure and mark them with the `Benchmark` attribute. In the following example, we 
+## Step 3. Design a benchmark
+Write a class with methods that you want to measure and mark them with the `Benchmark` attribute. In the following example, we 
 compare [MD5](https://en.wikipedia.org/wiki/MD5) and [SHA256](https://en.wikipedia.org/wiki/SHA-2) cryptographic hash functions:
 
 ```cs
@@ -57,24 +60,26 @@ namespace MyBenchmarks
 
 The `BenchmarkRunner.Run<Md5VsSha256>()` call runs your benchmarks and print results to console output.
 
-## Step 3. View results
+## Step 4. View results
 View the results. Here is an example of output from the above benchmark:
 
-```ini
-BenchmarkDotNet=v0.10.1, OS=Microsoft Windows NT 6.2.9200.0
-Processor=Intel(R) Core(TM) i7-4702MQ CPU 2.20GHz, ProcessorCount=8
-Frequency=2143476 Hz, Resolution=466.5319 ns, Timer=TSC
-  [Host]     : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
-  DefaultJob : Clr 4.0.30319.42000, 64bit RyuJIT-v4.6.1586.0
+```
+BenchmarkDotNet=v0.11.3, OS=Windows 10.0.17134.472 (1803/April2018Update/Redstone4)
+Intel Core i7-2630QM CPU 2.00GHz (Sandy Bridge), 1 CPU, 8 logical and 4 physical cores
+Frequency=1948699 Hz, Resolution=513.1629 ns, Timer=TSC
+.NET Core SDK=2.1.502
+  [Host]     : .NET Core 2.1.6 (CoreCLR 4.6.27019.06, CoreFX 4.6.27019.05), 64bit RyuJIT
+  DefaultJob : .NET Core 2.1.6 (CoreCLR 4.6.27019.06, CoreFX 4.6.27019.05), 64bit RyuJIT
+
+
+| Method |      Mean |     Error |    StdDev |
+|------- |----------:|----------:|----------:|
+| Sha256 | 100.90 us | 0.5070 us | 0.4494 us |
+|    Md5 |  37.66 us | 0.1290 us | 0.1207 us |
 ```
 
-| Method | Mean        | StdDev    | Allocated |
-| ------ | ----------- | --------- | --------- |
-| Sha256 | 130.5169 us | 1.8489 us | 188 B     |
-| Md5    | 25.8010 us  | 0.1757 us | 113 B     |
 
-
-## Step 4. Analyze results
+## Step 5. Analyze results
 
 Analyze it. In your bin directory, you can find a lot of useful files with detailed information. For example:
 

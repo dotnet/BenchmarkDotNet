@@ -3,7 +3,10 @@
     {
       "src": [
         {
-          "files": "src/BenchmarkDotNet/*.csproj",
+          "files": [
+            "src/BenchmarkDotNet/*.csproj",
+            "src/BenchmarkDotNet.Annotations/*.csproj"
+          ],
           "exclude": [
             "**/obj/**",
             "**/bin/**"
@@ -61,7 +64,7 @@
     "globalMetadata" :
     {
       "_appTitle" : "BenchmarkDotNet",
-      "_appFooter" : "Copyright &copy; 2013–2019 .NET Foundation and contributors",
+      "_appFooter" : "Copyright &copy; 2013–2021 .NET Foundation and contributors",
       "_appLogoPath" : "logo/icon.svg",
       "_appFaviconPath": "logo/icon-32.png",
       "_enableSearch": false

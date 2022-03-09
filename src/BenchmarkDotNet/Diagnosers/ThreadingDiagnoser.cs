@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance);
 
-                if (runtime.TargetFrameworkMoniker < TargetFrameworkMoniker.NetCoreApp30)
+                if (runtime.RuntimeMoniker < RuntimeMoniker.NetCoreApp30)
                 {
                     yield return new ValidationError(true, $"{nameof(ThreadingDiagnoser)} supports only .NET Core 3.0+", benchmark);
                 }
@@ -61,6 +61,7 @@ namespace BenchmarkDotNet.Diagnosers
             public UnitType UnitType => UnitType.Dimensionless;
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
+            public int PriorityInCategory => 0;
         }
 
         private class LockContentionCountMetricDescriptor : IMetricDescriptor
@@ -74,6 +75,7 @@ namespace BenchmarkDotNet.Diagnosers
             public UnitType UnitType => UnitType.Dimensionless;
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
+            public int PriorityInCategory => 0;
         }
     }
 }

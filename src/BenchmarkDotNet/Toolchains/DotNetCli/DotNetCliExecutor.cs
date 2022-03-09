@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
@@ -31,7 +30,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 foreach (var file in new DirectoryInfo(executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
                     executeParameters.Logger.WriteLineError(file.Name);
 
-                return new ExecuteResult(false, -1, default, Array.Empty<string>(), Array.Empty<string>());
+                return ExecuteResult.CreateFailed();
             }
 
             try
@@ -43,7 +42,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     executeParameters.BuildResult.ArtifactsPaths,
                     executeParameters.Diagnoser,
                     Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath),
-                    executeParameters.Resolver);
+                    executeParameters.Resolver,
+                    executeParameters.LaunchIndex);
             }
             finally
             {
@@ -59,18 +59,20 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                                       ArtifactsPaths artifactsPaths,
                                       IDiagnoser diagnoser,
                                       string executableName,
-                                      IResolver resolver)
+                                      IResolver resolver,
+                                      int launchIndex)
         {
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
                 CustomDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
                 $"{executableName.Escape()} {benchmarkId.ToArguments()}",
-                redirectStandardInput: true);
+                redirectStandardInput: true,
+                redirectStandardError: false); // #1629
 
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
             using (var process = new Process { StartInfo = startInfo })
-            using (new ConsoleExitHandler(process, logger))
+            using (var consoleExitHandler = new ConsoleExitHandler(process, logger))
             {
                 var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId);
 
@@ -87,21 +89,20 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 }
 
                 loggerWithDiagnoser.ProcessInput();
-                string standardError = process.StandardError.ReadToEnd();
 
-                process.WaitForExit(); // should we add timeout here?
-
-                if (process.ExitCode == 0)
+                if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                 {
-                    return new ExecuteResult(true, process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
+                    logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
+
+                    consoleExitHandler.KillProcessTree();
                 }
 
-                if (!string.IsNullOrEmpty(standardError))
-                {
-                    logger.WriteError(standardError);
-                }
-
-                return new ExecuteResult(true, process.ExitCode, process.Id, Array.Empty<string>(), Array.Empty<string>());
+                return new ExecuteResult(true,
+                    process.HasExited ? process.ExitCode : null,
+                    process.Id,
+                    loggerWithDiagnoser.LinesWithResults,
+                    loggerWithDiagnoser.LinesWithExtraOutput,
+                    launchIndex);
             }
         }
     }

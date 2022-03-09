@@ -54,13 +54,13 @@ namespace BenchmarkDotNet.IntegrationTests
                 config = CreateSimpleConfig();
 
             if (!config.GetLoggers().OfType<OutputLogger>().Any())
-                config = config.With(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default);
+                config = config.AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default);
 
             if (!config.GetColumnProviders().Any())
-                config = config.With(DefaultColumnProviders.Instance);
+                config = config.AddColumnProvider(DefaultColumnProviders.Instance);
 
             // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
-            var summary = BenchmarkRunner.Run(type, BenchmarkConverter.GetFullConfig(type, config));
+            var summary = BenchmarkRunner.Run(type, config);
 
             if (fullValidation)
             {
@@ -69,18 +69,15 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.True(summary.Reports.Any(), "The \"Summary\" should contain at least one \"BenchmarkReport\" in the \"Reports\" collection");
 
                 Assert.True(summary.Reports.All(r => r.BuildResult.IsBuildSuccess),
-                    "The following benchmarks are failed to build: " +
+                    "The following benchmarks have failed to build: " +
                     string.Join(", ", summary.Reports.Where(r => !r.BuildResult.IsBuildSuccess).Select(r => r.BenchmarkCase.DisplayInfo)));
 
                 Assert.True(summary.Reports.All(r => r.ExecuteResults != null),
                     "The following benchmarks don't have any execution results: " +
                     string.Join(", ", summary.Reports.Where(r => r.ExecuteResults == null).Select(r => r.BenchmarkCase.DisplayInfo)));
 
-                Assert.True(summary.Reports.All(r => r.ExecuteResults.Any(er => er.FoundExecutable && er.Data.Any())),
-                    "All reports should have at least one \"ExecuteResult\" with \"FoundExecutable\" = true and at least one \"Data\" item");
-
-                Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()),
-                    "All reports should have at least one \"Measurement\" in the \"AllMeasurements\" collection");
+                Assert.True(summary.Reports.All(r => r.ExecuteResults.All(er => er.IsSuccess)),
+                    "All reports should have succeeded to execute");
             }
 
             return summary;
@@ -90,9 +87,9 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var baseConfig = job == null ? (IConfig)new SingleRunFastConfig() : new SingleJobConfig(job);
             return baseConfig
-                .With(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
-                .With(DefaultColumnProviders.Instance)
-                .With(DefaultConfig.Instance.GetAnalysers().ToArray());
+                .AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray());
         }
     }
 }

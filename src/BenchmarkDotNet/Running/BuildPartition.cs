@@ -1,10 +1,15 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.CoreRt;
+using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.MonoWasm;
+using BenchmarkDotNet.Toolchains.Roslyn;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
@@ -31,7 +36,7 @@ namespace BenchmarkDotNet.Running
 
         public IResolver Resolver { get; }
 
-        public string AssemblyLocation => RepresentativeBenchmarkCase.Descriptor.Type.Assembly.Location;
+        public string AssemblyLocation => GetResolvedAssemblyLocation(RepresentativeBenchmarkCase.Descriptor.Type.Assembly);
 
         public string BuildConfiguration => RepresentativeBenchmarkCase.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, Resolver);
 
@@ -41,14 +46,30 @@ namespace BenchmarkDotNet.Running
         public Jit Jit => RepresentativeBenchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, Resolver);
 
         public bool IsCoreRT => Runtime is CoreRtRuntime
-            || RepresentativeBenchmarkCase.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic) && RepresentativeBenchmarkCase.Job.Infrastructure.Toolchain is CoreRtToolchain; // given job can have CoreRT toolchain set, but Runtime == default ;)
+            // given job can have CoreRT toolchain set, but Runtime == default ;)
+            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is CoreRtToolchain);
+
+        public bool IsWasm => Runtime is WasmRuntime // given job can have Wasm toolchain set, but Runtime == default ;)
+            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is WasmToolChain);
+
+        public bool IsNetFramework => Runtime is ClrRuntime
+            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && (toolchain is RoslynToolchain || toolchain is CsProjClassicNetToolchain));
 
         public Runtime Runtime => RepresentativeBenchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
-                ? RepresentativeBenchmarkCase.Job.Environment.Runtime
-                : RuntimeInformation.GetCurrentRuntime();
+            ? RepresentativeBenchmarkCase.Job.Environment.Runtime
+            : RuntimeInformation.GetCurrentRuntime();
 
         public bool IsCustomBuildConfiguration => BuildConfiguration != InfrastructureMode.ReleaseConfigurationName;
 
+        public TimeSpan Timeout => IsCoreRT && RepresentativeBenchmarkCase.Config.BuildTimeout == DefaultConfig.Instance.BuildTimeout
+            ? TimeSpan.FromMinutes(5) // downloading all CoreRT dependencies can take a LOT of time
+            : RepresentativeBenchmarkCase.Config.BuildTimeout;
+
         public override string ToString() => RepresentativeBenchmarkCase.Job.DisplayInfo;
+
+        private static string GetResolvedAssemblyLocation(Assembly assembly) =>
+            // in case of SingleFile, location.Length returns 0, so we use GetName() and
+            // manually construct the path.
+            assembly.Location.Length == 0 ? Path.Combine(AppContext.BaseDirectory, assembly.GetName().Name) : assembly.Location;
     }
 }

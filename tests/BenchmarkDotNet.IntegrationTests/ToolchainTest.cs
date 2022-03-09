@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 executeParameters.Logger.WriteLine("Executing");
                 Done = true;
-                return new ExecuteResult(true, 0, default, Array.Empty<string>(), Array.Empty<string>());
+                return new ExecuteResult(true, 0, default, Array.Empty<string>(), Array.Empty<string>(), executeParameters.LaunchIndex);
             }
         }
 
@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var executor = new MyExecutor();
             var myToolchain = new Toolchain("My", generator, builder, executor);
             var job = new Job(Job.Dry) { Infrastructure = { Toolchain = myToolchain} };
-            var config = CreateSimpleConfig(logger).With(job);
+            var config = CreateSimpleConfig(logger).AddJob(job);
 
             CanExecute<ToolchainBenchmark>(config, fullValidation: false);
 

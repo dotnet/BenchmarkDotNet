@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public ReferencesTests(ITestOutputHelper output) : base(output) { }
 
-#if CLASSIC
+#if NETFRAMEWORK
         [Fact]
         public void BenchmarksThatUseTypeFromCustomPathDllAreSupported()
             => CanExecute<BenchmarkDotNet.IntegrationTests.CustomPaths.BenchmarksThatUseTypeFromCustomPathDll>();
@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.IntegrationTests
             => CanExecute<BenchmarkDotNet.IntegrationTests.CustomPaths.BenchmarksThatReturnTypeFromCustomPathDll>();
 #endif
         [Fact]
-        public void FSharpIsSupported() => CanExecute<FSharpBenchmark.Db>();
+        public void FSharpIsSupported() => CanExecute<FSharpBenchmarks.Db>();
 
         [Fact]
         public void VisualBasicIsSupported() => CanExecute<VisualBasic.Sample>();

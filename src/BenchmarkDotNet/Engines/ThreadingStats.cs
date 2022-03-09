@@ -3,13 +3,13 @@ using System.Threading;
 
 namespace BenchmarkDotNet.Engines
 {
-    public struct ThreadingStats
+    public struct ThreadingStats : IEquatable<ThreadingStats>
     {
         internal const string ResultsLinePrefix = "Threading: ";
 
         // BDN targets .NET Standard 2.0, these properties are not part of .NET Standard 2.0, were added in .NET Core 3.0
-        private static readonly Func<long> GetCompletedWorkItemCountDelegate = CreateGetterDelegate(typeof(ThreadPool), "CompletedWorkItemCount");
-        private static readonly Func<long> GetLockContentionCountDelegate = CreateGetterDelegate(typeof(Monitor), "LockContentionCount");
+        private static readonly Func<long> GetCompletedWorkItemCountDelegate = CreateGetterDelegate(typeof(ThreadPool), nameof(CompletedWorkItemCount));
+        private static readonly Func<long> GetLockContentionCountDelegate = CreateGetterDelegate(typeof(Monitor), nameof(LockContentionCount));
 
         public static ThreadingStats Empty => new ThreadingStats(0, 0, 0);
 
@@ -80,6 +80,21 @@ namespace BenchmarkDotNet.Engines
 
             // we create delegate to avoid boxing, IMPORTANT!
             return property != null ? (Func<long>)property.GetGetMethod().CreateDelegate(typeof(Func<long>)) : () => 0;
+        }
+
+        public bool Equals(ThreadingStats other) => CompletedWorkItemCount == other.CompletedWorkItemCount && LockContentionCount == other.LockContentionCount && TotalOperations == other.TotalOperations;
+
+        public override bool Equals(object obj) => obj is ThreadingStats other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = CompletedWorkItemCount.GetHashCode();
+                hashCode = (hashCode * 397) ^ LockContentionCount.GetHashCode();
+                hashCode = (hashCode * 397) ^ TotalOperations.GetHashCode();
+                return hashCode;
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Disassemblers;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests
@@ -50,29 +50,29 @@ chmarkDotNet_Samples_CPU_Cpu_Atomics_NoLock:
                         {
                             new Map()
                             {
-                                Instructions = new[]
+                                SourceCodes = new MonoCode[]
                                 {
-                                    new Diagnosers.Code { TextRepresentation = "subq\t$0x8, %rsp" },
+                                    new MonoCode { Text = "subq\t$0x8, %rsp" },
 
-                                    new Diagnosers.Code { TextRepresentation = "movq\t%r15, (%rsp)" },
-                                    new Diagnosers.Code { TextRepresentation = "movq\t%rdi, %r15" },
-                                    new Diagnosers.Code { TextRepresentation = "movslq\t0x18(%r15), %rax" },
+                                    new MonoCode { Text = "movq\t%r15, (%rsp)" },
+                                    new MonoCode { Text = "movq\t%rdi, %r15" },
+                                    new MonoCode { Text = "movslq\t0x18(%r15), %rax" },
 
-                                    new Diagnosers.Code { TextRepresentation = "incl\t%eax" },
-                                    new Diagnosers.Code { TextRepresentation = "movl\t%eax, 0x18(%r15)" },
+                                    new MonoCode { Text = "incl\t%eax" },
+                                    new MonoCode { Text = "movl\t%eax, 0x18(%r15)" },
 
-                                    new Diagnosers.Code { TextRepresentation = "incl\t%eax" },
-                                    new Diagnosers.Code { TextRepresentation = "movl\t%eax, 0x18(%r15)" },
+                                    new MonoCode { Text = "incl\t%eax" },
+                                    new MonoCode { Text = "movl\t%eax, 0x18(%r15)" },
 
-                                    new Diagnosers.Code { TextRepresentation = "incl\t%eax" },
-                                    new Diagnosers.Code { TextRepresentation = "movl\t%eax, 0x18(%r15)" },
+                                    new MonoCode { Text = "incl\t%eax" },
+                                    new MonoCode { Text = "movl\t%eax, 0x18(%r15)" },
 
-                                    new Diagnosers.Code { TextRepresentation = "incl\t%eax" },
-                                    new Diagnosers.Code { TextRepresentation = "movl\t%eax, 0x18(%r15)" },
+                                    new MonoCode { Text = "incl\t%eax" },
+                                    new MonoCode { Text = "movl\t%eax, 0x18(%r15)" },
 
-                                    new Diagnosers.Code { TextRepresentation = "movq\t(%rsp), %r15" },
-                                    new Diagnosers.Code { TextRepresentation = "addq\t$0x8, %rsp" },
-                                    new Diagnosers.Code { TextRepresentation = "retq" }
+                                    new MonoCode { Text = "movq\t(%rsp), %r15" },
+                                    new MonoCode { Text = "addq\t$0x8, %rsp" },
+                                    new MonoCode { Text = "retq" }
                                 }
                             }
                         }
@@ -152,37 +152,37 @@ Disassembly of section .text:
                         {
                             new Map()
                             {
-                                Instructions = new[]
+                                SourceCodes = new SourceCode[]
                                 {
-                                    new Diagnosers.Code { TextRepresentation = "sub    $0x28,%rsp" },
-                                    new Diagnosers.Code { TextRepresentation = "mov    %rsi,(%rsp)" },
-                                    new Diagnosers.Code { TextRepresentation = "mov    %r14,0x8(%rsp)" },
-                                    new Diagnosers.Code { TextRepresentation = "mov    %r15,0x10(%rsp)" },
-                                    new Diagnosers.Code { TextRepresentation = "xor    %r15d,%r15d" },
-                                    new Diagnosers.Code { TextRepresentation = "xor    %r14d,%r14d" },
-                                    new Diagnosers.Code { TextRepresentation = "jmp    37 <chmarkDotNet_Samples_My_NoLock+0x37>" },
-                                    new Diagnosers.Code { TextRepresentation = "lea    0x0(%rsp),%rsp" },
-                                    new Diagnosers.Code { TextRepresentation = "nop" },
-                                    new Diagnosers.Code { TextRepresentation = "mov    %r15,%rax" },
-                                    new Diagnosers.Code { TextRepresentation = "mov    %r14,%rcx" },
-                                    new Diagnosers.Code { TextRepresentation = "mov    $0x2,%edx" },
-                                    new Diagnosers.Code { TextRepresentation = "imul   %edx,%ecx" },
-                                    new Diagnosers.Code { TextRepresentation = "mov    %rax,%r15" },
-                                    new Diagnosers.Code { TextRepresentation = "add    %ecx,%r15d" },
-                                    new Diagnosers.Code { TextRepresentation = "inc    %r14d" },
-                                    new Diagnosers.Code { TextRepresentation = "cmp    $0xd,%r14d" },
-                                    new Diagnosers.Code { TextRepresentation = "setl   %sil" },
-                                    new Diagnosers.Code { TextRepresentation = "movzbq %sil,%rsi" },
-                                    new Diagnosers.Code { TextRepresentation = "mov    %rsi,%rax" },
-                                    new Diagnosers.Code { TextRepresentation = "test   %eax,%eax" },
-                                    new Diagnosers.Code { TextRepresentation = "jne    20 <chmarkDotNet_Samples_My_NoLock+0x20>" },
-                                    new Diagnosers.Code { TextRepresentation = "mov    %r15d,0x18(%rsp)" },
-                                    new Diagnosers.Code { TextRepresentation = "mov    %r15,%rax" },
-                                    new Diagnosers.Code { TextRepresentation = "mov    (%rsp),%rsi" },
-                                    new Diagnosers.Code { TextRepresentation = "mov    0x8(%rsp),%r14" },
-                                    new Diagnosers.Code { TextRepresentation = "mov    0x10(%rsp),%r15" },
-                                    new Diagnosers.Code { TextRepresentation = "add    $0x28,%rsp" },
-                                    new Diagnosers.Code { TextRepresentation = "retq" },
+                                    new MonoCode { Text = "sub    $0x28,%rsp" },
+                                    new MonoCode { Text = "mov    %rsi,(%rsp)" },
+                                    new MonoCode { Text = "mov    %r14,0x8(%rsp)" },
+                                    new MonoCode { Text = "mov    %r15,0x10(%rsp)" },
+                                    new MonoCode { Text = "xor    %r15d,%r15d" },
+                                    new MonoCode { Text = "xor    %r14d,%r14d" },
+                                    new MonoCode { Text = "jmp    37 <chmarkDotNet_Samples_My_NoLock+0x37>" },
+                                    new MonoCode { Text = "lea    0x0(%rsp),%rsp" },
+                                    new MonoCode { Text = "nop" },
+                                    new MonoCode { Text = "mov    %r15,%rax" },
+                                    new MonoCode { Text = "mov    %r14,%rcx" },
+                                    new MonoCode { Text = "mov    $0x2,%edx" },
+                                    new MonoCode { Text = "imul   %edx,%ecx" },
+                                    new MonoCode { Text = "mov    %rax,%r15" },
+                                    new MonoCode { Text = "add    %ecx,%r15d" },
+                                    new MonoCode { Text = "inc    %r14d" },
+                                    new MonoCode { Text = "cmp    $0xd,%r14d" },
+                                    new MonoCode { Text = "setl   %sil" },
+                                    new MonoCode { Text = "movzbq %sil,%rsi" },
+                                    new MonoCode { Text = "mov    %rsi,%rax" },
+                                    new MonoCode { Text = "test   %eax,%eax" },
+                                    new MonoCode { Text = "jne    20 <chmarkDotNet_Samples_My_NoLock+0x20>" },
+                                    new MonoCode { Text = "mov    %r15d,0x18(%rsp)" },
+                                    new MonoCode { Text = "mov    %r15,%rax" },
+                                    new MonoCode { Text = "mov    (%rsp),%rsi" },
+                                    new MonoCode { Text = "mov    0x8(%rsp),%r14" },
+                                    new MonoCode { Text = "mov    0x10(%rsp),%r15" },
+                                    new MonoCode { Text = "add    $0x28,%rsp" },
+                                    new MonoCode { Text = "retq" },
                                 }
                             }
                         }
@@ -222,10 +222,10 @@ operable program or batch file.
                         {
                             new Map
                             {
-                                Instructions = input
+                                SourceCodes = input
                                     .Split('\r', '\n')
                                     .Where(line => !string.IsNullOrWhiteSpace(line))
-                                    .Select(line => new Diagnosers.Code { TextRepresentation = line })
+                                    .Select(line => new MonoCode{ Text = line })
                                     .ToArray()
                             }
                         }
@@ -258,10 +258,10 @@ operable program or batch file.
                         {
                             new Map
                             {
-                                Instructions = input
+                                SourceCodes = input
                                     .Split('\r', '\n')
                                     .Where(line => !string.IsNullOrWhiteSpace(line))
-                                    .Select(line => new Diagnosers.Code { TextRepresentation = line })
+                                    .Select(line => new MonoCode { Text = line })
                                     .ToArray()
                             }
                         }
@@ -284,11 +284,11 @@ operable program or batch file.
                 methodName, commandLine: string.Empty);
 
             Assert.Equal(expected.Methods.Single().Name, disassemblyResult.Methods.Single().Name);
-            Assert.Equal(expected.Methods[0].Maps[0].Instructions.Length, disassemblyResult.Methods[0].Maps[0].Instructions.Length);
+            Assert.Equal(expected.Methods[0].Maps[0].SourceCodes.Length, disassemblyResult.Methods[0].Maps[0].SourceCodes.Length);
 
-            for (int i = 0; i < expected.Methods[0].Maps[0].Instructions.Length; i++)
-                Assert.Equal(expected.Methods[0].Maps[0].Instructions[i].TextRepresentation,
-                    disassemblyResult.Methods[0].Maps[0].Instructions[i].TextRepresentation);
+            for (int i = 0; i < expected.Methods[0].Maps[0].SourceCodes.Length; i++)
+                Assert.Equal(((MonoCode)expected.Methods[0].Maps[0].SourceCodes[i]).Text,
+                    ((MonoCode)disassemblyResult.Methods[0].Maps[0].SourceCodes[i]).Text);
 
             Assert.Equal(expected.Errors.Length, disassemblyResult.Errors.Length);
             for (int i = 0; i < expected.Errors.Length; i++)

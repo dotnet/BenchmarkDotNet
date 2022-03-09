@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -40,6 +42,7 @@ namespace BenchmarkDotNet.Reports
             string resultsDirectoryPath,
             string logFilePath,
             TimeSpan totalTime,
+            CultureInfo cultureInfo,
             ImmutableArray<ValidationError> validationErrors)
         {
             Title = title;
@@ -56,7 +59,7 @@ namespace BenchmarkDotNet.Reports
             BenchmarksCases = Orderer.GetSummaryOrder(reports.Select(report => report.BenchmarkCase).ToImmutableArray(), this).ToImmutableArray(); // we sort it first
             Reports = BenchmarksCases.Select(b => ReportMap[b]).ToImmutableArray(); // we use sorted collection to re-create reports list
             BaseliningStrategy = BaseliningStrategy.Create(BenchmarksCases);
-            Style = GetConfiguredSummaryStyleOrNull(BenchmarksCases);
+            Style = GetConfiguredSummaryStyleOrDefaultOne(BenchmarksCases).WithCultureInfo(cultureInfo);
             Table = GetTable(Style);
             AllRuntimes = BuildAllRuntimes(HostEnvironmentInfo, Reports);
         }
@@ -73,19 +76,20 @@ namespace BenchmarkDotNet.Reports
         public int GetNumberOfExecutedBenchmarks() => Reports.Count(report => report.ExecuteResults.Any(result => result.FoundExecutable));
 
         internal static Summary NothingToRun(string title, string resultsDirectoryPath, string logFilePath)
-            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, ImmutableArray<ValidationError>.Empty);
+            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, DefaultCultureInfo.Instance, ImmutableArray<ValidationError>.Empty);
 
         internal static Summary ValidationFailed(string title, string resultsDirectoryPath, string logFilePath, ImmutableArray<ValidationError> validationErrors)
-            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, validationErrors);
+            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, DefaultCultureInfo.Instance, validationErrors);
 
         internal static Summary Join(List<Summary> summaries, ClockSpan clockSpan)
             => new Summary(
-                $"BenchmarkRun-joined-{DateTime.Now:yyyy-MM-dd-hh-mm-ss}",
+                $"BenchmarkRun-joined-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}",
                 summaries.SelectMany(summary => summary.Reports).ToImmutableArray(),
                 HostEnvironmentInfo.GetCurrent(),
                 summaries.First().ResultsDirectoryPath,
                 summaries.First().LogFilePath,
                 clockSpan.GetTimeSpan(),
+                summaries.First().GetCultureInfo(),
                 summaries.SelectMany(summary => summary.ValidationErrors).ToImmutableArray());
 
         internal static string BuildAllRuntimes(HostEnvironmentInfo hostEnvironmentInfo, IEnumerable<BenchmarkReport> reports)
@@ -147,7 +151,13 @@ namespace BenchmarkDotNet.Reports
                    .SingleOrDefault()
                ?? DefaultOrderer.Instance;
 
-        private static SummaryStyle GetConfiguredSummaryStyleOrNull(ImmutableArray<BenchmarkCase> benchmarkCases)
-            => benchmarkCases.Select(benchmark => benchmark.Config.SummaryStyle).Distinct().SingleOrDefault();
+        private static SummaryStyle GetConfiguredSummaryStyleOrDefaultOne(ImmutableArray<BenchmarkCase> benchmarkCases)
+            => benchmarkCases
+                   .Where(benchmark => benchmark.Config.SummaryStyle != SummaryStyle.Default
+                          && benchmark.Config.SummaryStyle != null) // Paranoid
+                   .Select(benchmark => benchmark.Config.SummaryStyle)
+                   .Distinct()
+                   .SingleOrDefault()
+               ?? SummaryStyle.Default;
     }
 }

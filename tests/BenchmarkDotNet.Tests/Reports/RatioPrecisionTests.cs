@@ -29,9 +29,9 @@ namespace BenchmarkDotNet.Tests.Reports
         }
 
         [Theory]
-        [InlineData(new [] { 140, 1, 50 })]
-        [InlineData(new [] { 40, 1, 20 })]
-        [InlineData(new [] { 0, 1, 20 })]
+        [InlineData(new[] { 140, 1, 50 })]
+        [InlineData(new[] { 40, 1, 20 })]
+        [InlineData(new[] { 0, 1, 20 })]
         // First value is baseline, others are benchmark measurements
         public void RatioPrecisionTestWithBaseline(int[] values)
         {
@@ -71,6 +71,7 @@ namespace BenchmarkDotNet.Tests.Reports
                 string.Empty,
                 string.Empty,
                 TimeSpan.FromMinutes(1),
+                TestCultureInfo.Instance,
                 ImmutableArray<ValidationError>.Empty);
             MarkdownExporter.Default.ExportToLog(summary, logger);
             output.WriteLine(logger.GetLog());
@@ -80,7 +81,6 @@ namespace BenchmarkDotNet.Tests.Reports
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, int measurementValue)
         {
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
-            var executeResult = new ExecuteResult(true, 0, default, Array.Empty<string>(), Array.Empty<string>());
             var measurements = new List<Measurement>
                 {
                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, measurementValue),
@@ -90,7 +90,8 @@ namespace BenchmarkDotNet.Tests.Reports
                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, measurementValue),
                     new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, measurementValue),
                 };
-            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default, Array.Empty<Metric>());
+            var executeResult = new ExecuteResult(measurements, default, default);
+            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, Array.Empty<Metric>());
         }
 
         private static IEnumerable<BenchmarkCase> CreateBenchmarks(IConfig config) =>

@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Tests.XUnit
         // ReSharper disable once VirtualMemberCallInConstructor
         public TheoryNetCore30Attribute(string skipReason)
         {
-            if (RuntimeInformation.GetCurrentRuntime().TargetFrameworkMoniker != TargetFrameworkMoniker.NetCoreApp30)
+            if (RuntimeInformation.GetCurrentRuntime().RuntimeMoniker != RuntimeMoniker.NetCoreApp30)
                 Skip = skipReason;
         }
     }

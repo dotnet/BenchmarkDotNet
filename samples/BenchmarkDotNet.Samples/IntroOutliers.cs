@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Mathematics;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -14,8 +14,8 @@ namespace BenchmarkDotNet.Samples
             public Config()
             {
                 var jobBase = Job.Default.WithWarmupCount(0).WithIterationCount(10).WithInvocationCount(1).WithUnrollFactor(1);
-                Add(jobBase.WithOutlierMode(OutlierMode.DontRemove).WithId("DontRemoveOutliers"));
-                Add(jobBase.WithOutlierMode(OutlierMode.RemoveUpper).WithId("RemoveUpperOutliers"));
+                AddJob(jobBase.WithOutlierMode(OutlierMode.DontRemove).WithId("DontRemoveOutliers"));
+                AddJob(jobBase.WithOutlierMode(OutlierMode.RemoveUpper).WithId("RemoveUpperOutliers"));
             }
         }
 

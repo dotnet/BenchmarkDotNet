@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using System;
 
@@ -15,40 +14,21 @@ namespace BenchmarkDotNet.Attributes
         /// <summary>
         /// defines a new Dry Job that targets specified Framework
         /// </summary>
-        /// <param name="targetFrameworkMoniker">Target Framework to test.</param>
-        public DryJobAttribute(TargetFrameworkMoniker targetFrameworkMoniker)
-            : base(GetJob(targetFrameworkMoniker, null, null))
+        /// <param name="runtimeMoniker">Target Framework to test.</param>
+        public DryJobAttribute(RuntimeMoniker runtimeMoniker)
+            : base(GetJob(Job.Dry, runtimeMoniker, null, null))
         {
         }
 
         /// <summary>
         /// defines a new Dry Job that targets specified Framework, JIT and Platform
         /// </summary>
-        /// <param name="targetFrameworkMoniker">Target Framework to test.</param>
-        public DryJobAttribute(TargetFrameworkMoniker targetFrameworkMoniker, Jit jit, Platform platform)
-            : base(GetJob(targetFrameworkMoniker, jit, platform))
+        /// <param name="runtimeMoniker">Target Framework to test.</param>
+        /// <param name="jit">Jit to test.</param>
+        /// <param name="platform">Platform to test.</param>
+        public DryJobAttribute(RuntimeMoniker runtimeMoniker, Jit jit, Platform platform)
+            : base(GetJob(Job.Dry, runtimeMoniker, jit, platform))
         {
-        }
-
-        private static Job GetJob(TargetFrameworkMoniker targetFrameworkMoniker, Jit? jit, Platform? platform)
-        {
-            var runtime = targetFrameworkMoniker.GetRuntime();
-            var baseJob = Job.Dry.With(runtime).WithId($"Dry-{runtime.Name}");
-            var id = baseJob.Id;
-
-            if (jit.HasValue)
-            {
-                baseJob = baseJob.With(jit.Value);
-                id += "-" + jit.Value;
-            }
-
-            if (platform.HasValue)
-            {
-                baseJob = baseJob.With(platform.Value);
-                id += "-" + platform.Value;
-            }
-
-            return baseJob.WithId(id).Freeze();
         }
     }
 }

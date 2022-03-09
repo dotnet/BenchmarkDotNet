@@ -1,6 +1,6 @@
 using System;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Engines
                 throw new ArgumentNullException(nameof(engineParameters.OverheadActionNoUnroll));
             if (engineParameters.OverheadActionUnroll == null)
                 throw new ArgumentNullException(nameof(engineParameters.OverheadActionUnroll));
-            if(engineParameters.TargetJob == null)
+            if (engineParameters.TargetJob == null)
                 throw new ArgumentNullException(nameof(engineParameters.TargetJob));
 
             engineParameters.GlobalSetupAction?.Invoke(); // whatever the settings are, we MUST call global setup here, the global cleanup is part of Engine's Dispose
@@ -43,6 +43,14 @@ namespace BenchmarkDotNet.Engines
 
             var singleActionEngine = CreateSingleActionEngine(engineParameters);
             var singleInvocationTime = Jit(singleActionEngine, ++jitIndex, invokeCount: 1, unrollFactor: 1);
+
+            if (singleInvocationTime > engineParameters.IterationTime && singleInvocationTime < TimeInterval.FromSeconds(1.0))
+            {
+                // if the Jitting took more than IterationTime but still less than 1s (a magic number based on observations of the reported bug)
+                // we call it one more time to see if Jitting itself has not dominated the first invocation
+                // if it did, it shoud NOT be a single invocation engine (see #837, #1337 and #1338)
+                singleInvocationTime = Jit(singleActionEngine, ++jitIndex, invokeCount: 1, unrollFactor: 1);
+            }
 
             if (singleInvocationTime > engineParameters.IterationTime)
                 return singleActionEngine; // executing once takes longer than iteration time => long running benchmark, needs no pilot and no overhead
@@ -119,7 +127,6 @@ namespace BenchmarkDotNet.Engines
                 engineParameters.IterationCleanupAction,
                 engineParameters.OperationsPerInvoke,
                 engineParameters.MeasureExtraStats,
-                engineParameters.Encoding,
                 engineParameters.BenchmarkName);
     }
 }

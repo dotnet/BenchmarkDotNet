@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Portability.Cpu;
@@ -11,6 +10,7 @@ using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -20,8 +20,6 @@ namespace BenchmarkDotNet.Environments
     public class HostEnvironmentInfo : BenchmarkEnvironmentInfo
     {
         public const string BenchmarkDotNetCaption = "BenchmarkDotNet";
-
-        public static readonly CultureInfo MainCultureInfo;
 
         // TODO: API to GlobalSetup the logger.
         /// <summary>
@@ -67,15 +65,9 @@ namespace BenchmarkDotNet.Environments
 
         public Lazy<VirtualMachineHypervisor> VirtualMachineHypervisor { get; protected set; }
 
-        static HostEnvironmentInfo()
-        {
-            MainCultureInfo = (CultureInfo)CultureInfo.InvariantCulture.Clone();
-            MainCultureInfo.NumberFormat.NumberDecimalSeparator = ".";
-        }
-
         protected HostEnvironmentInfo()
         {
-            BenchmarkDotNetVersion = GetBenchmarkDotNetVersion();
+            BenchmarkDotNetVersion = BenchmarkDotNetInfo.FullVersion;
             OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
             CpuInfo = new Lazy<CpuInfo>(RuntimeInformation.GetCpuInfo);
             ChronometerFrequency = Chronometer.Frequency;
@@ -91,23 +83,31 @@ namespace BenchmarkDotNet.Environments
         public override IEnumerable<string> ToFormattedString()
         {
             string vmName = VirtualMachineHypervisor.Value?.Name;
-            if (vmName == null)
-                yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}";
-            else
+
+            if (!string.IsNullOrEmpty(vmName))
                 yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}, VM={vmName}";
+            else if (RuntimeInformation.IsRunningInContainer)
+                yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value} (container)";
+            else
+                yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}";
 
             yield return CpuInfoFormatter.Format(CpuInfo.Value);
+            var cultureInfo = DefaultCultureInfo.Instance;
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
-                yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution}, Timer={HardwareTimerKind.ToString().ToUpper()}";
+                yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution.ToString(cultureInfo)}, Timer={HardwareTimerKind.ToString().ToUpper()}";
 
             if (RuntimeInformation.IsNetCore && IsDotNetCliInstalled())
-                yield return $".NET Core SDK={DotNetSdkVersion.Value}";
+            {
+                // this wonderfull version number contains words like "preview" and ... 5 segments so it can not be parsed by Version.Parse. Example: "5.0.100-preview.8.20362.3"
+                if (int.TryParse(new string(DotNetSdkVersion.Value.TrimStart().TakeWhile(char.IsDigit).ToArray()), out int major) && major >= 5)
+                    yield return $".NET SDK={DotNetSdkVersion.Value}";
+                else
+                    yield return $".NET Core SDK={DotNetSdkVersion.Value}";
+            }
         }
 
         [PublicAPI]
         public bool IsDotNetCliInstalled() => !string.IsNullOrEmpty(DotNetSdkVersion.Value);
-
-        private static string GetBenchmarkDotNetVersion() => BenchmarkDotNetInfo.FullVersion;
 
         /// <summary>
         /// Return string representation of CPU and environment configuration including BenchmarkDotNet, OS and .NET version

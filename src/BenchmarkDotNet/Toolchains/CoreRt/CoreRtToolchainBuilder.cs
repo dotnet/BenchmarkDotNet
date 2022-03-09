@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
@@ -14,7 +15,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         private bool useCppCodeGenerator;
         private string packagesRestorePath;
         // we set those default values on purpose https://github.com/dotnet/BenchmarkDotNet/pull/1057#issuecomment-461832612
-        private bool rootAllApplicationAssemblies = false;
+        private bool rootAllApplicationAssemblies;
         private bool ilcGenerateCompleteTypeMetadata = true;
         private bool ilcGenerateStackTraceData = true;
 
@@ -22,12 +23,12 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 
         /// <summary>
         /// creates a CoreRT toolchain targeting NuGet build of CoreRT
-        /// Based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld/README.md#add-corert-to-your-project
+        /// Based on https://github.com/dotnet/runtimelab/blob/d0a37893a67c125f9b0cd8671846ff7d867df241/samples/HelloWorld/README.md#add-corert-to-your-project
         /// </summary>
-        /// <param name="microsoftDotNetILCompilerVersion">the version of Microsoft.DotNet.ILCompiler which should be used. The default is: "1.0.0-alpha-*"</param>
-        /// <param name="nuGetFeedUrl">url to NuGet CoreRT feed, The default is: "https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json"</param>
+        /// <param name="microsoftDotNetILCompilerVersion">the version of Microsoft.DotNet.ILCompiler which should be used. The default is: "6.0.0-*"</param>
+        /// <param name="nuGetFeedUrl">url to NuGet CoreRT feed, The default is: "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json"</param>
         [PublicAPI]
-        public CoreRtToolchainBuilder UseCoreRtNuGet(string microsoftDotNetILCompilerVersion = "1.0.0-alpha-*", string nuGetFeedUrl = "https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json")
+        public CoreRtToolchainBuilder UseCoreRtNuGet(string microsoftDotNetILCompilerVersion = "6.0.0-*", string nuGetFeedUrl = "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json")
         {
             coreRtVersion = microsoftDotNetILCompilerVersion ?? throw new ArgumentNullException(nameof(microsoftDotNetILCompilerVersion));
 
@@ -75,6 +76,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         /// The directory to restore packages to (optional).
         /// </summary>
         [PublicAPI]
+        [SuppressMessage("ReSharper", "ParameterHidesMember")]
         public CoreRtToolchainBuilder PackagesRestorePath(string packagesRestorePath)
         {
             this.packagesRestorePath = packagesRestorePath;
@@ -142,7 +144,6 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
                 feeds: Feeds,
                 useNuGetClearTag: useNuGetClearTag,
                 useTempFolderForRestore: useTempFolderForRestore,
-                timeout: timeout ?? TimeSpan.FromMinutes(5),  // downloading all CoreRT dependencies can take a LOT of time
                 rootAllApplicationAssemblies: rootAllApplicationAssemblies,
                 ilcGenerateCompleteTypeMetadata: ilcGenerateCompleteTypeMetadata,
                 ilcGenerateStackTraceData: ilcGenerateStackTraceData

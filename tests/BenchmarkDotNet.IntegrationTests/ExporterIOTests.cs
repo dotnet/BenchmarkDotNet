@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             string resultsDirectoryPath = Path.GetTempPath();
             var exporter = new MockExporter();
-            var joinConfig = ManualConfig.CreateEmpty().With(ConfigOptions.JoinSummary);
+            var joinConfig = ManualConfig.CreateEmpty().WithOptions(ConfigOptions.JoinSummary);
             var mockSummary = GetMockSummary(resultsDirectoryPath, joinConfig, typeof(ClassA), typeof(ClassB));
             var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, mockSummary.Title)}-report.txt";
             string actualFilePath = null;
@@ -127,13 +127,14 @@ namespace BenchmarkDotNet.IntegrationTests
                 resultsDirectoryPath: resultsDirectoryPath,
                 logFilePath: string.Empty,
                 totalTime: System.TimeSpan.Zero,
+                cultureInfo: TestCultureInfo.Instance,
                 validationErrors: ImmutableArray<ValidationError>.Empty
             );
         }
 
         private class MockExporter : ExporterBase
         {
-            public int ExportCount = 0;
+            public int ExportCount;
 
             public override void ExportToLog(Summary summary, ILogger logger)
             {
@@ -156,8 +157,6 @@ namespace BenchmarkDotNet.IntegrationTests
                                        generateResult: null,
                                        buildResult: null,
                                        executeResults: null,
-                                       allMeasurements: null,
-                                       gcStats: default,
                                        metrics: null);
         }
     }

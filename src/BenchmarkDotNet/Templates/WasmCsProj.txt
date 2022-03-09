@@ -1,0 +1,42 @@
+﻿<Project Sdk="$SDKNAME$" DefaultTargets="publish">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <OutputPath>bin</OutputPath>
+    <RuntimeSrcDir>$RUNTIMESRCDIR$</RuntimeSrcDir>
+    <RuntimeConfig>Release</RuntimeConfig>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TargetFramework>$TFM$</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AppDir>$(MSBuildThisFileDirectory)\bin\$TFM$\browser-wasm\publish</AppDir>
+    <AssemblyName>$PROGRAMNAME$</AssemblyName>
+    <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+    <PublishTrimmed>false</PublishTrimmed>
+    <RunAOTCompilation>false</RunAOTCompilation>
+    <WasmMainJSPath>$(RuntimeSrcDir)\src\mono\wasm\$MAINJS$</WasmMainJSPath>
+    <WasmGenerateRunV8Script>true</WasmGenerateRunV8Script>
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+    <WasmNativeWorkload>false</WasmNativeWorkload>
+    <UsingBrowserRuntimeWorkload>false</UsingBrowserRuntimeWorkload>
+    $COPIEDSETTINGS$
+  </PropertyGroup>
+
+  <Import Project="$(RuntimeSrcDir)/src/mono/wasm/build/WasmApp.LocalBuild.props" />
+  <Import Project="$(RuntimeSrcDir)/src/mono/wasm/build/WasmApp.LocalBuild.targets" />
+
+  <ItemGroup>
+    <Compile Include="$CODEFILENAME$" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$CSPROJPATH$" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <WasmBuildAppAfterThisTarget>PrepareForWasmBuild</WasmBuildAppAfterThisTarget>
+  </PropertyGroup>
+  <Target Name="PrepareForWasmBuild" AfterTargets="Publish">
+    <ItemGroup>
+      <WasmAssembliesToBundle Include="$(TargetDir)publish\*.dll" />
+    </ItemGroup>
+  </Target>
+</Project>

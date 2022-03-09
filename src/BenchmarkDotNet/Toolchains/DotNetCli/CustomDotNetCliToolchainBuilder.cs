@@ -19,7 +19,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         protected string runtimeFrameworkVersion;
 
         protected bool useNuGetClearTag, useTempFolderForRestore;
-        protected TimeSpan? timeout;
         private string targetFrameworkMoniker;
 
         public abstract IToolchain ToToolchain();
@@ -50,6 +49,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         /// <param name="targetFrameworkMoniker">TFM, example: netcoreapp2.1</param>
         [PublicAPI]
+        [SuppressMessage("ReSharper", "ParameterHidesMember")]
         public CustomDotNetCliToolchainBuilder TargetFrameworkMoniker(string targetFrameworkMoniker)
         {
             this.targetFrameworkMoniker = targetFrameworkMoniker ?? throw new ArgumentNullException(nameof(targetFrameworkMoniker));
@@ -120,18 +120,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return this;
         }
 
-        /// <summary>
-        /// sets provided timeout for build
-        /// </summary>
-        [PublicAPI]
-        public CustomDotNetCliToolchainBuilder Timeout(TimeSpan timeout)
-        {
-            this.timeout = timeout;
-
-            return this;
-        }
-
-        protected static string GetPortableRuntimeIdentifier()
+        internal static string GetPortableRuntimeIdentifier()
         {
             // Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.GetRuntimeIdentifier()
             // returns win10-x64, we want the simpler form win-x64

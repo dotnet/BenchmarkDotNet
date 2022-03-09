@@ -6,7 +6,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.XUnit;
-#if CLASSIC
+#if NETFRAMEWORK
 using BenchmarkDotNet.Environments;
 #endif
 
@@ -16,13 +16,17 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public GcModeTests(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
-        private IConfig CreateConfig(GcMode gc) => ManualConfig.CreateEmpty().With(new Job(Job.Dry, gc));
+        private IConfig CreateConfig(GcMode gc) => ManualConfig.CreateEmpty().AddJob(new Job(Job.Dry, gc));
 
         [Fact]
-        public void CanHostGcMode()
+        public void HostProcessSettingsAreCopiedByDefault()
         {
             var config = CreateConfig(GcMode.Default);
-            CanExecute<WorkstationGcOnly>(config);
+
+            if (GCSettings.IsServerGC)
+                CanExecute<ServerModeEnabled>(config);
+            else
+                CanExecute<WorkstationGcOnly>(config);
         }
 
         [Fact]
@@ -60,11 +64,11 @@ namespace BenchmarkDotNet.IntegrationTests
             CanExecute<AvoidForcingGarbageCollection>(config);
         }
 
-#if CLASSIC // not supported by project.json so far
+#if NETFRAMEWORK // not supported by project.json so far
         [Fact]
         public void CanAllowToCreateVeryLargeObjectsFor64Bit()
         {
-            var config = ManualConfig.CreateEmpty().With(
+            var config = ManualConfig.CreateEmpty().AddJob(
                 new Job(Job.Dry)
                 {
                     Environment =
@@ -132,8 +136,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
     public class AvoidForcingGarbageCollection
     {
-        int initialCollectionCountGen1;
-        int initialCollectionCountGen2;
+        private int initialCollectionCountGen1;
+        private int initialCollectionCountGen2;
 
         [GlobalSetup]
         public void GlobalSetup()

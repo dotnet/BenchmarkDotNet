@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
+using Perfolizer.Common;
+using Perfolizer.Horology;
+using Perfolizer.Mathematics.Common;
+using Perfolizer.Mathematics.Multimodality;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -64,7 +67,7 @@ namespace BenchmarkDotNet.Columns
         /// See http://www.brendangregg.com/FrequencyTrails/modes.html
         /// </summary>
         public static readonly IColumn MValue = new StatisticColumn("MValue", "Modal value, see http://www.brendangregg.com/FrequencyTrails/modes.html",
-            MathHelper.CalculateMValue, Priority.Additional, UnitType.Dimensionless);
+            s => MValueCalculator.Calculate(s.OriginalValues), Priority.Additional, UnitType.Dimensionless);
 
         public static readonly IColumn Iterations = new StatisticColumn("Iterations", "Number of target iterations",
             s => s.N, Priority.Additional, UnitType.Dimensionless);
@@ -149,8 +152,13 @@ namespace BenchmarkDotNet.Columns
             if (double.IsNaN(value))
                 return "NA";
             return UnitType == UnitType.Time
-                   ? value.ToTimeStr(style.TimeUnit, config.Encoding, format, 1, style.PrintUnitsInContent)
-                   : value.ToStr(format);
+                ? TimeInterval.FromNanoseconds(value)
+                    .ToString(
+                        style.TimeUnit,
+                        style.CultureInfo,
+                        format,
+                        UnitPresentation.FromVisibility(style.PrintUnitsInContent))
+                : value.ToString(format, style.CultureInfo);
         }
 
         public override string ToString() => ColumnName;
