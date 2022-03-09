@@ -22,5 +22,8 @@ steps:
 - name: build
   image: mcr.microsoft.com/dotnet/runtime:6.0-bullseye-slim-arm32v7
   commands:
+  - sudo apt update
+  - sudo apt upgrade
+  - sudo apt install curl
   - chmod +x build.sh
   - bash ./build.sh
