@@ -22,24 +22,5 @@ steps:
 - name: build
   image: mcr.microsoft.com/dotnet/runtime:5.0-alpine3.14-arm32v7
   commands:
-  - apt-get update 
-  - apt-get --yes install sudo
-  - sudo apt install libseccomp2 -t buster-backports
-  - apt-get install -y --no-install-recommends gnupg dirmngr
-    && rm -rf /var/lib/apt/lists/* 
-    && export GNUPGHOME="$(mktemp -d)" 
-    && gpg --batch --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF 
-    && gpg --batch --export --armor 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF > /etc/apt/trusted.gpg.d/mono.gpg.asc 
-    && gpgconf --kill all 
-    && rm -rf "$GNUPGHOME" 
-    && apt-key list | grep Xamarin 
-    && apt-get purge -y --auto-remove gnupg dirmngr
-  - echo "deb http://download.mono-project.com/repo/debian stable-stretch main" > /etc/apt/sources.list.d/mono-official-stable.list 
-    && apt-get update 
-    && apt-get install -y mono-runtime 
-    && rm -rf /var/lib/apt/lists/* /tmp/*
-  - apt-get update 
-    && apt-get install -y binutils curl mono-devel ca-certificates-mono fsharp mono-vbnc nuget gettext libcurl4-openssl-dev libicu-dev libssl-dev libunwind8 clang-3.9 referenceassemblies-pcl 
-    && rm -rf /var/lib/apt/lists/* /tmp/*
   - chmod +x build.sh
   - bash ./build.sh
