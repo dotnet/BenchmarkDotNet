@@ -21,7 +21,8 @@ platform:
 steps:
 - name: build
   image: mcr.microsoft.com/dotnet/runtime:6.0-alpine3.15-arm32v7
-  - apt-get update
+  commands:
+  - apt-get update 
   - apt-get --yes install sudo
   - sudo apt install libseccomp2 -t buster-backports
   - apt-get install -y --no-install-recommends gnupg dirmngr
