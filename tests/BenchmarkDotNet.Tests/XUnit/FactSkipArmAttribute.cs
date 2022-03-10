@@ -2,7 +2,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Portability;
 using Xunit;
 
-namespace BenchmarkDotNet.Tests.XUnit 
+namespace BenchmarkDotNet.Tests.XUnit
 {
     public class FactSkipArmAttribute : FactAttribute
     {

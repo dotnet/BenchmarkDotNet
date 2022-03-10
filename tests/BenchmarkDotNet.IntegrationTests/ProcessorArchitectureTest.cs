@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 Verify(Platform.X64, typeof(X64Benchmark), X64FailedCaption);
             }
-            
+
             Verify(Platform.AnyCpu, typeof(AnyCpuBenchmark), "nvm");
         }
 
@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 Console.WriteLine(AnyCpuOkCaption);
             }
         }
-        
+
         public class ArmBenchmark
         {
             [Benchmark]

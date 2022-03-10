@@ -3,6 +3,7 @@ using System.Linq;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Builders;
+using BenchmarkDotNet.Tests.XUnit;
 using JetBrains.Annotations;
 using Xunit;
 
