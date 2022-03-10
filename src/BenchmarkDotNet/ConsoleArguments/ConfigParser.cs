@@ -131,12 +131,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 {
                      logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{ options.AOTCompilerPath }\" does NOT exist. It MUST be provided.");
                 }
-                else if (MonikerIsWasm(runtimeMoniker) && (options.RuntimeSrcDir == null || options.RuntimeSrcDir.IsNotNullButDoesNotExist()))
-
-                {
-                    logger.WriteLineError($"The provided {nameof(options.RuntimeSrcDir)} \"{options.RuntimeSrcDir}\" does NOT exist. It MUST be provided for wasm-aot.");
-                    return false;
-                }
             }
 
             foreach (string exporter in options.Exporters)
@@ -447,7 +441,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
                 javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
                 aot: wasmAot,
-                runtimeSrcDir: options.RuntimeSrcDir,
                 moniker: moniker);
 
             var toolChain = WasmToolChain.From(new NetCoreAppSettings(
