@@ -97,21 +97,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 settings.MaximumDisplayWidth = Math.Max(MinimumDisplayWidth, GetMaximumDisplayWidth());
             });
 
-        private static bool MonikerIsWasm(RuntimeMoniker moniker)
-
-        {
-            switch (moniker)
-            {
-                case RuntimeMoniker.Wasm:
-                case RuntimeMoniker.WasmNet50:
-                case RuntimeMoniker.WasmNet60:
-                case RuntimeMoniker.WasmNet70:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
         private static bool Validate(CommandLineOptions options, ILogger logger)
         {
             if (!AvailableJobs.ContainsKey(options.BaseJob))
