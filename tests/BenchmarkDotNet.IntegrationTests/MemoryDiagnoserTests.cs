@@ -143,7 +143,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public ValueTask<int> CompletedValueTaskOfT() => new ValueTask<int>(default(int));
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [TheorySkipOnArm("It is not supported by ARM"), MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AwaitingTasksShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
