@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Tests.Environments
         [UsedImplicitly]
         public static TheoryData<string> HypervisorNames => TheoryDataHelper.Create(Hypervisors.Keys);
 
-        [Fact]
+        [FactSkipArm("It is not supported by ARM")]
         public void DoesntReturnHypervisorNameWhenItsNotDetected()
         {
             var info = new HostEnvironmentInfoBuilder()
