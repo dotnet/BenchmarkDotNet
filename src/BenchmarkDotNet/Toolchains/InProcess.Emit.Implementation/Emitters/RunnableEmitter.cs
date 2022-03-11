@@ -427,7 +427,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private void DefineFields()
         {
             awaitHelperField =
-                runnableBuilder.DefineField(AwaitHelperFieldName, typeof(Helpers.AwaitHelper), FieldAttributes.Private);
+                runnableBuilder.DefineField(AwaitHelperFieldName, typeof(Helpers.AwaitHelper), FieldAttributes.Private | FieldAttributes.InitOnly);
             globalSetupActionField =
                 runnableBuilder.DefineField(GlobalSetupActionFieldName, typeof(Action), FieldAttributes.Private);
             globalCleanupActionField =
