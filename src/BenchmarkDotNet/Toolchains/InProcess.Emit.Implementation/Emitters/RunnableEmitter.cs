@@ -909,7 +909,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     ilBuilder.EmitStloc(callResultLocal);
                     ilBuilder.Emit(OpCodes.Ldarg_0);
                     ilBuilder.Emit(OpCodes.Ldfld, awaitHelperField);
-                    ilBuilder.Emit(OpCodes.Ldloc_0);
+                    ilBuilder.EmitLdloc(callResultLocal);
                     ilBuilder.Emit(OpCodes.Callvirt, consumableInfo.GetResultMethod);
                 }
 
