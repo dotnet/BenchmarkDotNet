@@ -971,19 +971,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 IL_0000: call string [BenchmarkDotNet]BenchmarkDotNet.Samples.SampleBenchmark::GlobalCleanup()
                 IL_0005: pop
             */
-            LocalBuilder callResultLocal;
+            ilBuilder.Emit(OpCodes.Ldarg_0);
+            /*
+                IL_0026: ldarg.0
+                IL_0027: ldfld class BenchmarkDotNet.Helpers.AwaitHelper BenchmarkDotNet.Helpers.Runnable_0::awaitHelper
+            */
+            ilBuilder.Emit(OpCodes.Ldarg_0);
+            ilBuilder.Emit(OpCodes.Ldfld, awaitHelperField);
             if (targetMethod.IsStatic)
             {
-                ilBuilder.Emit(OpCodes.Ldarg_0);
-                var callResultType = returnTypeInfo.OriginMethodReturnType;
-
-                /*
-                    .locals init (
-                        [0] class [System.Private.CoreLib]System.Threading.Tasks.Task task
-                    )
-                 */
-                callResultLocal = ilBuilder.DeclareLocal(callResultType);
-
                 ilBuilder.Emit(OpCodes.Call, targetMethod);
 
             }
@@ -995,32 +991,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             else
             {
                 ilBuilder.Emit(OpCodes.Ldarg_0);
-                var callResultType = returnTypeInfo.OriginMethodReturnType;
-
-                /*
-                    .locals init (
-                        [0] class [System.Private.CoreLib]System.Threading.Tasks.Task task
-                    )
-                 */
-                callResultLocal = ilBuilder.DeclareLocal(callResultType);
-
-                ilBuilder.Emit(OpCodes.Ldarg_0);
                 ilBuilder.Emit(OpCodes.Call, targetMethod);
             }
 
             /*
                 // awaitHelper.GetResult(...);
-                IL_0006: stloc.0
-                IL_0007: ldarg.0
-                IL_0008: ldfld class BenchmarkDotNet.Helpers.AwaitHelper BenchmarkDotNet.Helpers.Runnable_0::awaitHelper
-                IL_000d: ldloc.0
                 IL_000e: callvirt instance void BenchmarkDotNet.Helpers.AwaitHelper::GetResult(class [System.Private.CoreLib]System.Threading.Tasks.Task)
             */
-
-            ilBuilder.EmitStloc(callResultLocal);
-            ilBuilder.Emit(OpCodes.Ldarg_0);
-            ilBuilder.Emit(OpCodes.Ldfld, awaitHelperField);
-            ilBuilder.Emit(OpCodes.Ldloc_0);
             ilBuilder.Emit(OpCodes.Callvirt, returnTypeInfo.GetResultMethod);
 
             if (targetMethod.ReturnType != typeof(void))
