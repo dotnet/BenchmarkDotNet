@@ -69,6 +69,8 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
+        public bool NeedsSignals(BenchmarkCase benchmarkCase) => true;
+
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
             if (signal != HostSignal.BeforeAnythingElse)
