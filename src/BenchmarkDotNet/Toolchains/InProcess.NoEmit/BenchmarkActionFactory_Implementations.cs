@@ -150,6 +150,46 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             public override object LastRunResult => result;
         }
 
+        internal class BenchmarkActionValueTask : BenchmarkActionBase
+        {
+            private readonly Helpers.AwaitHelper awaitHelper = new Helpers.AwaitHelper();
+            private readonly Func<ValueTask> startTaskCallback;
+            private readonly Action callback;
+            private readonly Action unrolledCallback;
+
+            public BenchmarkActionValueTask(object instance, MethodInfo method, int unrollFactor)
+            {
+                bool isIdle = method == null;
+                if (!isIdle)
+                {
+                    startTaskCallback = CreateWorkload<Func<ValueTask>>(instance, method);
+                    callback = ExecuteBlocking;
+                }
+                else
+                {
+                    callback = Overhead;
+                }
+
+                InvokeSingle = callback;
+
+                unrolledCallback = Unroll(callback, unrollFactor);
+                InvokeMultiple = InvokeMultipleHardcoded;
+
+            }
+
+            // must be kept in sync with VoidDeclarationsProvider.IdleImplementation
+            private void Overhead() { }
+
+            // must be kept in sync with TaskDeclarationsProvider.TargetMethodDelegate
+            private void ExecuteBlocking() => awaitHelper.GetResult(startTaskCallback.Invoke());
+
+            private void InvokeMultipleHardcoded(long repeatCount)
+            {
+                for (long i = 0; i < repeatCount; i++)
+                    unrolledCallback();
+            }
+        }
+
         internal class BenchmarkActionValueTask<T> : BenchmarkActionBase
         {
             private readonly Helpers.AwaitHelper awaitHelper = new Helpers.AwaitHelper();

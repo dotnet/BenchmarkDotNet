@@ -245,6 +245,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private TypeBuilder runnableBuilder;
         private ConsumableTypeInfo consumableInfo;
         private ConsumeEmitter consumeEmitter;
+        private ConsumableTypeInfo globalSetupReturnInfo;
+        private ConsumableTypeInfo globalCleanupReturnInfo;
+        private ConsumableTypeInfo iterationSetupReturnInfo;
+        private ConsumableTypeInfo iterationCleanupReturnInfo;
 
         private FieldBuilder awaitHelperField;
         private FieldBuilder globalSetupActionField;
@@ -358,11 +362,20 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             consumableInfo = new ConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.WorkloadMethod.ReturnType);
             consumeEmitter = ConsumeEmitter.GetConsumeEmitter(consumableInfo);
+            globalSetupReturnInfo = GetConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.GlobalSetupMethod?.ReturnType);
+            globalCleanupReturnInfo = GetConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.GlobalCleanupMethod?.ReturnType);
+            iterationSetupReturnInfo = GetConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.IterationSetupMethod?.ReturnType);
+            iterationCleanupReturnInfo = GetConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.IterationCleanupMethod?.ReturnType);
 
             // Init types
             runnableBuilder = DefineRunnableTypeBuilder(benchmark, moduleBuilder);
             overheadDelegateType = EmitOverheadDelegateType();
             workloadDelegateType = EmitWorkloadDelegateType();
+        }
+
+        private static ConsumableTypeInfo GetConsumableTypeInfo(Type methodReturnType)
+        {
+            return methodReturnType == null ? null : new ConsumableTypeInfo(methodReturnType);
         }
 
         private Type EmitOverheadDelegateType()
@@ -924,32 +937,110 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         {
             // Emit Setup/Cleanup methods
             // We emit empty method instead of EmptyAction = "() => { }"
-            globalSetupMethod = EmitWrapperMethod(
-                GlobalSetupMethodName,
-                Descriptor.GlobalSetupMethod);
-            globalCleanupMethod = EmitWrapperMethod(
-                GlobalCleanupMethodName,
-                Descriptor.GlobalCleanupMethod);
-            iterationSetupMethod = EmitWrapperMethod(
-                IterationSetupMethodName,
-                Descriptor.IterationSetupMethod);
-            iterationCleanupMethod = EmitWrapperMethod(
-                IterationCleanupMethodName,
-                Descriptor.IterationCleanupMethod);
+            globalSetupMethod = EmitWrapperMethod(GlobalSetupMethodName, Descriptor.GlobalSetupMethod, globalSetupReturnInfo);
+            globalCleanupMethod = EmitWrapperMethod(GlobalCleanupMethodName, Descriptor.GlobalCleanupMethod, globalCleanupReturnInfo);
+            iterationSetupMethod = EmitWrapperMethod(IterationSetupMethodName, Descriptor.IterationSetupMethod, iterationSetupReturnInfo);
+            iterationCleanupMethod = EmitWrapperMethod(IterationCleanupMethodName, Descriptor.IterationCleanupMethod, iterationCleanupReturnInfo);
         }
 
-        private MethodBuilder EmitWrapperMethod(string methodName, MethodInfo optionalTargetMethod)
+        private MethodBuilder EmitWrapperMethod(string methodName, MethodInfo optionalTargetMethod, ConsumableTypeInfo returnTypeInfo)
         {
             var methodBuilder = runnableBuilder.DefinePrivateVoidInstanceMethod(methodName);
 
             var ilBuilder = methodBuilder.GetILGenerator();
 
             if (optionalTargetMethod != null)
-                EmitNoArgsMethodCallPopReturn(methodBuilder, optionalTargetMethod, ilBuilder, forceDirectCall: true);
+            {
+                if (returnTypeInfo?.IsAwaitable == true)
+                {
+                    EmitAwaitableSetupTeardown(methodBuilder, optionalTargetMethod, ilBuilder, returnTypeInfo);
+                }
+                else
+                {
+                    EmitNoArgsMethodCallPopReturn(methodBuilder, optionalTargetMethod, ilBuilder, forceDirectCall: true);
+                }
+            }
 
             ilBuilder.EmitVoidReturn(methodBuilder);
 
             return methodBuilder;
+        }
+
+        private void EmitAwaitableSetupTeardown(
+            MethodBuilder methodBuilder,
+            MethodInfo targetMethod,
+            ILGenerator ilBuilder,
+            ConsumableTypeInfo returnTypeInfo)
+        {
+            if (targetMethod == null)
+                throw new ArgumentNullException(nameof(targetMethod));
+
+            /*
+                // call for instance void
+                // GlobalSetup();
+                IL_0000: ldarg.0
+                IL_0001: call instance void [BenchmarkDotNet]BenchmarkDotNet.Samples.SampleBenchmark::GlobalSetup()
+            */
+            /*
+                // call for static with return value
+                // GlobalSetup();
+                IL_0000: call string [BenchmarkDotNet]BenchmarkDotNet.Samples.SampleBenchmark::GlobalCleanup()
+                IL_0005: pop
+            */
+            LocalBuilder callResultLocal;
+            if (targetMethod.IsStatic)
+            {
+                ilBuilder.Emit(OpCodes.Ldarg_0);
+                var callResultType = returnTypeInfo.OriginMethodReturnType;
+
+                /*
+                    .locals init (
+                        [0] class [System.Private.CoreLib]System.Threading.Tasks.Task task
+                    )
+                 */
+                callResultLocal = ilBuilder.DeclareLocal(callResultType);
+
+                ilBuilder.Emit(OpCodes.Call, targetMethod);
+
+            }
+            else if (methodBuilder.IsStatic)
+            {
+                throw new InvalidOperationException(
+                    $"[BUG] Static method {methodBuilder.Name} tries to call instance member {targetMethod.Name}");
+            }
+            else
+            {
+                ilBuilder.Emit(OpCodes.Ldarg_0);
+                var callResultType = returnTypeInfo.OriginMethodReturnType;
+
+                /*
+                    .locals init (
+                        [0] class [System.Private.CoreLib]System.Threading.Tasks.Task task
+                    )
+                 */
+                callResultLocal = ilBuilder.DeclareLocal(callResultType);
+
+                ilBuilder.Emit(OpCodes.Ldarg_0);
+                ilBuilder.Emit(OpCodes.Call, targetMethod);
+            }
+
+            /*
+                // awaitHelper.GetResult(...);
+                IL_0006: stloc.0
+                IL_0007: ldarg.0
+                IL_0008: ldfld class BenchmarkDotNet.Helpers.AwaitHelper BenchmarkDotNet.Helpers.Runnable_0::awaitHelper
+                IL_000d: ldloc.0
+                IL_000e: callvirt instance void BenchmarkDotNet.Helpers.AwaitHelper::GetResult(class [System.Private.CoreLib]System.Threading.Tasks.Task)
+            */
+
+            ilBuilder.EmitStloc(callResultLocal);
+            ilBuilder.Emit(OpCodes.Ldarg_0);
+            ilBuilder.Emit(OpCodes.Ldfld, awaitHelperField);
+            ilBuilder.Emit(OpCodes.Ldloc_0);
+            ilBuilder.Emit(OpCodes.Callvirt, returnTypeInfo.GetResultMethod);
+
+            if (targetMethod.ReturnType != typeof(void))
+                ilBuilder.Emit(OpCodes.Pop);
         }
 
         private void EmitCtorBody()
