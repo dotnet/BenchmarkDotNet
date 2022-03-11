@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 resultLogger.Write(line.Kind, line.Text);
         }
 
-        public bool RequiresBlockingAcknowledgments(BenchmarkCase benchmarkCase) => true;
+        public bool RequiresBlockingAcknowledgments(BenchmarkCase benchmarkCase) => etwProfiler.RequiresBlockingAcknowledgments(benchmarkCase);
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) => etwProfiler.Handle(signal, parameters);
 
