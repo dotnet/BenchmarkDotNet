@@ -60,6 +60,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             logger.WriteLineInfo("DO remember that this Diagnoser just tries to mimic the CVCollectionCmd.exe and you need to have Visual Studio with Concurrency Visualizer plugin installed to visualize the data.");
         }
 
+        public bool RequiresBlockingAcknowledgments(BenchmarkCase benchmarkCase) => true;
+
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
             etwProfiler.Handle(signal, parameters);

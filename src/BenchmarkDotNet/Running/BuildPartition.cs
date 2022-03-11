@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
@@ -64,6 +65,11 @@ namespace BenchmarkDotNet.Running
         public TimeSpan Timeout => IsCoreRT && RepresentativeBenchmarkCase.Config.BuildTimeout == DefaultConfig.Instance.BuildTimeout
             ? TimeSpan.FromMinutes(5) // downloading all CoreRT dependencies can take a LOT of time
             : RepresentativeBenchmarkCase.Config.BuildTimeout;
+
+        public bool NoAcknowledgments
+            => !Benchmarks
+                    .Any(bennchmark => bennchmark.Config.GetDiagnosers()
+                    .Any(diagnoser => diagnoser.RequiresBlockingAcknowledgments(bennchmark.BenchmarkCase)));
 
         public override string ToString() => RepresentativeBenchmarkCase.Job.DisplayInfo;
 
