@@ -143,7 +143,7 @@ namespace BenchmarkDotNet.Validators
             }
             else if (result is ValueTask valueTask)
             {
-                valueTask.GetAwaiter().GetResult();
+                valueTask.AsTask().GetAwaiter().GetResult();
             }
         }
 
