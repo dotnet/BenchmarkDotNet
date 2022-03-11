@@ -187,6 +187,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("AOTCompilerMode", Required = false, Default = MonoAotCompilerMode.mini, HelpText = "Mono AOT compiler mode, either 'mini' or 'llvm'")]
         public MonoAotCompilerMode AOTCompilerMode { get; set; }
 
+        [Option("wasmDataDir", Required = false, HelpText = "Wasm data directory")]
+        public DirectoryInfo WasmDataDirectory { get; set; }
+
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
         [Usage(ApplicationAlias = "")]
