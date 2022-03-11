@@ -426,6 +426,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
                 javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
                 aot: wasmAot,
+                wasmDataDir: options.WasmDataDirectory?.FullName,
                 moniker: moniker);
 
             var toolChain = WasmToolChain.From(new NetCoreAppSettings(
