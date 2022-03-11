@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Helpers
 {
-    internal class AwaitHelper
+    public class AwaitHelper
     {
 
         private readonly object awaiterLock = new object();

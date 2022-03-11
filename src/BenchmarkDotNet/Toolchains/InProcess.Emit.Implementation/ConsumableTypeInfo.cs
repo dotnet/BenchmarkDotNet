@@ -1,6 +1,8 @@
 ﻿using BenchmarkDotNet.Engines;
 using JetBrains.Annotations;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -23,18 +25,36 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     && (methodReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
                     || methodReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)));
 
-            var getAwaiterMethod = methodReturnType.GetMethod(nameof(Task<int>.GetAwaiter), BindingFlagsPublicInstance);
-            if (!IsAwaitable || getAwaiterMethod == null)
+            if (!IsAwaitable)
             {
                 WorkloadMethodReturnType = methodReturnType;
             }
             else
             {
-                GetResultMethod = typeof(Helpers.AwaitHelper).GetMethod(nameof(Helpers.AwaitHelper.GetResult), BindingFlagsPublicInstance, null, new Type[1] { methodReturnType }, null);
-                WorkloadMethodReturnType = getAwaiterMethod
+                WorkloadMethodReturnType = methodReturnType
+                    .GetMethod(nameof(Task.GetAwaiter), BindingFlagsPublicInstance)
                     .ReturnType
                     .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlagsPublicInstance)
                     .ReturnType;
+                if (methodReturnType.GetTypeInfo().IsGenericType)
+                {
+                    Type compareType = methodReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
+                        ? typeof(Task<>)
+                        : typeof(ValueTask<>);
+                    GetResultMethod = typeof(Helpers.AwaitHelper).GetMethods(BindingFlagsPublicInstance)
+                        .First(m =>
+                        {
+                            if (m.Name != nameof(Helpers.AwaitHelper.GetResult)) return false;
+                            Type paramType = m.GetParameters().First().ParameterType;
+                            // We have to compare the types indirectly, == check doesn't work.
+                            return paramType.Assembly == compareType.Assembly && paramType.Namespace == compareType.Namespace && paramType.Name == compareType.Name;
+                        })
+                        .MakeGenericMethod(new Type[1] { WorkloadMethodReturnType });
+                }
+                else
+                {
+                    GetResultMethod = typeof(Helpers.AwaitHelper).GetMethod(nameof(Helpers.AwaitHelper.GetResult), BindingFlagsPublicInstance, null, new Type[1] { methodReturnType }, null);
+                }
             }
 
             if (WorkloadMethodReturnType == null)
