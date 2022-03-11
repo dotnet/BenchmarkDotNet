@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        public bool NeedsSignals(BenchmarkCase benchmarkCase) => true;
+        public bool RequiresBlockingAcknowledgments(BenchmarkCase benchmarkCase) => true;
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {

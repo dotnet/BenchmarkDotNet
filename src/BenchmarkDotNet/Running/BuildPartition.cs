@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Running
         public bool NoAcknowledgments
             => !Benchmarks
                     .Any(bennchmark => bennchmark.Config.GetDiagnosers()
-                    .Any(diagnoser => diagnoser.NeedsSignals(bennchmark.BenchmarkCase)));
+                    .Any(diagnoser => diagnoser.RequiresBlockingAcknowledgments(bennchmark.BenchmarkCase)));
 
         public override string ToString() => RepresentativeBenchmarkCase.Job.DisplayInfo;
 

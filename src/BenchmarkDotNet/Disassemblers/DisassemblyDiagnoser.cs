@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Diagnosers
             return RunMode.None;
         }
 
-        public bool NeedsSignals(BenchmarkCase benchmarkCase) => GetRunMode(benchmarkCase) != RunMode.None;
+        public bool RequiresBlockingAcknowledgments(BenchmarkCase benchmarkCase) => GetRunMode(benchmarkCase) != RunMode.None;
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
