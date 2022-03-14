@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Loggers
     internal class AsyncProcessOutputReader : IDisposable
     {
         private readonly Process process;
-        private readonly ConcurrentStack<string> output, error;
+        private readonly ConcurrentQueue<string> output, error;
 
         private long status;
 
@@ -22,8 +22,8 @@ namespace BenchmarkDotNet.Loggers
                 throw new NotSupportedException("set RedirectStandardError to true first");
 
             this.process = process;
-            output = new ConcurrentStack<string>();
-            error = new ConcurrentStack<string>();
+            output = new ConcurrentQueue<string>();
+            error = new ConcurrentQueue<string>();
             status = (long)Status.Created;
         }
 
@@ -89,13 +89,13 @@ namespace BenchmarkDotNet.Loggers
         private void ProcessOnOutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (!string.IsNullOrEmpty(e.Data))
-                output.Push(e.Data);
+                output.Enqueue(e.Data);
         }
 
         private void ProcessOnErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (!string.IsNullOrEmpty(e.Data))
-                error.Push(e.Data);
+                error.Enqueue(e.Data);
         }
 
         private T ReturnIfStopped<T>(Func<T> getter)
