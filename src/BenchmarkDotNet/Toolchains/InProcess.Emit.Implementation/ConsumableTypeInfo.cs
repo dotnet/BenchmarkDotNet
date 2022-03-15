@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         [NotNull]
         public Type OverheadMethodReturnType { get; }
 
-        [NotNull]
+        [CanBeNull]
         public MethodInfo GetResultMethod { get; }
 
         public bool IsVoid { get; }

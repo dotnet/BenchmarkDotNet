@@ -44,11 +44,11 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
 
         public static void EmitSetFieldToNewInstance(
             this ILGenerator ilBuilder,
-            FieldBuilder delegateField,
+            FieldBuilder field,
             Type instanceType)
         {
-            if (delegateField.IsStatic)
-                throw new ArgumentException("The field should be instance field", nameof(delegateField));
+            if (field.IsStatic)
+                throw new ArgumentException("The field should be instance field", nameof(field));
 
             if (instanceType != null)
             {
@@ -63,13 +63,13 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
 
                 ilBuilder.Emit(OpCodes.Ldarg_0);
                 ilBuilder.Emit(OpCodes.Newobj, ctor);
-                ilBuilder.Emit(OpCodes.Stfld, delegateField);
+                ilBuilder.Emit(OpCodes.Stfld, field);
             }
             else
             {
                 ilBuilder.Emit(OpCodes.Ldarg_0);
                 ilBuilder.Emit(OpCodes.Ldnull);
-                ilBuilder.Emit(OpCodes.Stfld, delegateField);
+                ilBuilder.Emit(OpCodes.Stfld, field);
             }
         }
 
