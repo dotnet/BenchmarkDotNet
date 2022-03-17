@@ -41,7 +41,9 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                         netCoreAppSettings.CustomRuntimePack,
                         netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm),
                     new DotNetCliBuilder(netCoreAppSettings.TargetFrameworkMoniker,
-                        netCoreAppSettings.CustomDotNetCliPath),
+                        netCoreAppSettings.CustomDotNetCliPath,
+                        // aot builds can be very slow
+                        logOutput: netCoreAppSettings.AOTCompilerMode == MonoAotLLVM.MonoAotCompilerMode.wasm),
                     new Executor(),
                     netCoreAppSettings.CustomDotNetCliPath);
     }

@@ -23,12 +23,19 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public static DotNetCliCommandResult Execute(DotNetCliCommand parameters)
         {
             using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
-            using (var outputReader = new AsyncProcessOutputReader(process))
+            using (var outputReader = new AsyncProcessOutputReader(process, parameters.LogOutput, parameters.Logger))
             using (new ConsoleExitHandler(process, parameters.Logger))
             {
                 parameters.Logger.WriteLineInfo($"// start {parameters.CliPath ?? "dotnet"} {parameters.Arguments} in {parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath}");
 
                 var stopwatch = Stopwatch.StartNew();
+
+                if (parameters.LogOutput && process.StartInfo.EnvironmentVariables.Keys.Count > 0)
+                {
+                    parameters.Logger.WriteLineInfo("Environment Variables:");
+                    foreach (string name in process.StartInfo.EnvironmentVariables.Keys)
+                        parameters.Logger.WriteLineInfo($"\t[{name}] = {process.StartInfo.EnvironmentVariables[name]}");
+                }
 
                 process.Start();
                 outputReader.BeginRead();
