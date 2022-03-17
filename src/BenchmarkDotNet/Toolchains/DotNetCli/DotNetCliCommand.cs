@@ -62,7 +62,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             var buildResult = BuildNoRestore();
             if (!buildResult.IsSuccess) // if we fail to do the full build, we try with --no-dependencies
+            {
+                Logger.WriteLineInfo(buildResult.StandardOutput);
+                Logger.WriteLineInfo(buildResult.StandardError);
+                Logger.WriteLineInfo("Build failed. Trying with --no-dependencies");
                 buildResult = BuildNoRestoreNoDependencies();
+            }
 
             return buildResult.ToBuildResult(GenerateResult);
         }
