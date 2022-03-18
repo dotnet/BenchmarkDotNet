@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Loggers
         private bool logOutput;
         private ILogger logger;
 
-        internal AsyncProcessOutputReader(Process process, bool logOutput=false, ILogger logger=null)
+        internal AsyncProcessOutputReader(Process process, bool logOutput = false, ILogger logger = null)
         {
             if (!process.StartInfo.RedirectStandardOutput)
                 throw new NotSupportedException("set RedirectStandardOutput to true first");
@@ -98,7 +98,7 @@ namespace BenchmarkDotNet.Loggers
             {
                 output.Enqueue(e.Data);
                 if (logOutput)
-                    logger.WriteLineInfo(e.Data);
+                    logger.WriteLine(e.Data);
             }
         }
 
@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Loggers
             {
                 error.Enqueue(e.Data);
                 if (logOutput)
-                    logger.WriteLineInfo(e.Data);
+                    logger.WriteLineError(e.Data);
             }
         }
 
