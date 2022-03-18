@@ -160,6 +160,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .Append(extraArguments)
                 .Append(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .Append(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $" /p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
+                .Append($" --output \"{artifactsPaths.BinariesDirectoryPath}\"")
                 .ToString();
 
         private static string GetCustomMsBuildArguments(BenchmarkCase benchmarkCase, IResolver resolver)
