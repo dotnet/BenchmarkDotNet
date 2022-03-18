@@ -31,7 +31,7 @@ If the error message is not clear enough, you need to investigate it further.
 
 How to troubleshoot the build process:
 
-1. Run the benchmarks.
+1. Run the benchmarks with `--logBuildOutput` command line argument.
 2. Read the error message. If it does not contain the answer to your problem, please continue to the next step.
 3. Go to the build artifacts folder (path printed by BDN).
 4. The folder should contain: 
