@@ -32,7 +32,11 @@ namespace BenchmarkDotNet.Configs
         /// <summary>
         /// Determines if the log file should be disabled.
         /// </summary>
-        DisableLogFile = 1 << 5
+        DisableLogFile = 1 << 5,
+        /// <summary>
+        /// Determines whether build output should be logged.
+        /// </summary>
+        LogBuildOutput = 1 << 6
     }
 
     internal static class ConfigOptionsExtensions

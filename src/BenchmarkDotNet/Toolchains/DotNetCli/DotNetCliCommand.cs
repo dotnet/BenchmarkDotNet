@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             BuildPartition = buildPartition;
             EnvironmentVariables = environmentVariables;
             Timeout = timeout;
-            LogOutput = logOutput;
+            LogOutput = logOutput || buildPartition.LogBuildOutput;
         }
 
         public DotNetCliCommand WithArguments(string arguments)
