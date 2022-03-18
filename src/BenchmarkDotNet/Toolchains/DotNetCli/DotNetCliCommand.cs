@@ -49,6 +49,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI]
         public BuildResult RestoreThenBuild()
         {
+            DotNetCliCommandExecutor.LogEnvVars(WithArguments(null));
+
             var packagesResult = AddPackages();
             if (!packagesResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, packagesResult.AllInformation);
@@ -73,6 +75,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI]
         public BuildResult RestoreThenBuildThenPublish()
         {
+            DotNetCliCommandExecutor.LogEnvVars(WithArguments(null));
+
             var packagesResult = AddPackages();
             if (!packagesResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, packagesResult.AllInformation);

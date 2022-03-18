@@ -30,13 +30,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 var stopwatch = Stopwatch.StartNew();
 
-                if (parameters.LogOutput && process.StartInfo.EnvironmentVariables.Keys.Count > 0)
-                {
-                    parameters.Logger.WriteLineInfo("Environment Variables:");
-                    foreach (string name in process.StartInfo.EnvironmentVariables.Keys)
-                        parameters.Logger.WriteLineInfo($"\t[{name}] = {process.StartInfo.EnvironmentVariables[name]}");
-                }
-
                 process.Start();
                 outputReader.BeginRead();
 
@@ -82,6 +75,26 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 // first line contains something like ".NET Command Line Tools (1.0.0-beta-001603)"
                 return Regex.Split(output, Environment.NewLine, RegexOptions.Compiled)
                     .FirstOrDefault(line => !string.IsNullOrEmpty(line));
+            }
+        }
+
+        internal static void LogEnvVars(DotNetCliCommand command)
+        {
+            if (!command.LogOutput)
+            {
+                return;
+            }
+
+            ProcessStartInfo startInfo = BuildStartInfo(
+                command.CliPath, command.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, command.Arguments, command.EnvironmentVariables);
+
+            if (startInfo.EnvironmentVariables.Keys.Count > 0)
+            {
+                command.Logger.WriteLineInfo("// Environment Variables:");
+                foreach (string name in startInfo.EnvironmentVariables.Keys)
+                {
+                    command.Logger.WriteLine($"\t[{name}] = {startInfo.EnvironmentVariables[name]}");
+                }
             }
         }
 
