@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 command.Logger.WriteLineInfo("// Environment Variables:");
                 foreach (string name in startInfo.EnvironmentVariables.Keys)
                 {
-                    command.Logger.WriteLine($"\t[{name}] = {startInfo.EnvironmentVariables[name]}");
+                    command.Logger.WriteLine($"\t[{name}] = \"{startInfo.EnvironmentVariables[name]}\"");
                 }
             }
         }
