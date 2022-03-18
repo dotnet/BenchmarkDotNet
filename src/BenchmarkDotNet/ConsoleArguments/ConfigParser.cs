@@ -136,7 +136,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 {
                     if (Directory.Exists(coreRunPath.FullName))
                     {
-                        logger.WriteLineError($"The provided path to CoreRun: \"{coreRunPath}\" exists but it's a directory, not an executable. You need to provide path to CoreRun.exe (corerun on Unix), not to the Core_Root folder.");
+                        logger.WriteLineError($"The provided path to CoreRun: \"{coreRunPath}\" exists but it's a directory, not an executable. You need to include CoreRun.exe (corerun on Unix) in the path.");
                     }
                     else
                     {
