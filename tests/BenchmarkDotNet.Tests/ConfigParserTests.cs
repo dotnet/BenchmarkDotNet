@@ -238,6 +238,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(ConfigOptions.DontOverwriteResults, "--noOverwrite")]
         [InlineData(ConfigOptions.StopOnFirstError, "--stopOnFirstError")]
         [InlineData(ConfigOptions.DisableLogFile, "--disableLogFile" )]
+        [InlineData(ConfigOptions.LogBuildOutput, "--logBuildOutput")]
         [InlineData(
             ConfigOptions.JoinSummary |
             ConfigOptions.KeepBenchmarkFiles |
@@ -253,6 +254,13 @@ namespace BenchmarkDotNet.Tests
             var config = ConfigParser.Parse(configOptionArgs, new OutputLogger(Output)).config;
             Assert.Equal(expectedConfigOption, config.Options);
             Assert.NotEqual(ConfigOptions.Default, config.Options);
+        }
+
+        [Fact]
+        public void WhenConfigOptionsFlagsAreNotSpecifiedTheyAreNotSet()
+        {
+            var config = ConfigParser.Parse(Array.Empty<string>(), new OutputLogger(Output)).config;
+            Assert.Equal(ConfigOptions.Default, config.Options);
         }
 
         [Fact]

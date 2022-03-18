@@ -23,6 +23,7 @@ namespace BenchmarkDotNet.Running
             RepresentativeBenchmarkCase = benchmarks[0].BenchmarkCase;
             Benchmarks = benchmarks;
             ProgramName = benchmarks[0].Config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles) ? RepresentativeBenchmarkCase.Job.FolderInfo : Guid.NewGuid().ToString();
+            LogBuildOutput = benchmarks[0].Config.Options.IsSet(ConfigOptions.LogBuildOutput);
         }
 
         public BenchmarkBuildInfo[] Benchmarks { get; }
@@ -65,6 +66,8 @@ namespace BenchmarkDotNet.Running
         public TimeSpan Timeout => IsCoreRT && RepresentativeBenchmarkCase.Config.BuildTimeout == DefaultConfig.Instance.BuildTimeout
             ? TimeSpan.FromMinutes(5) // downloading all CoreRT dependencies can take a LOT of time
             : RepresentativeBenchmarkCase.Config.BuildTimeout;
+
+        public bool LogBuildOutput { get; }
 
         public bool NoAcknowledgments
             => !Benchmarks
