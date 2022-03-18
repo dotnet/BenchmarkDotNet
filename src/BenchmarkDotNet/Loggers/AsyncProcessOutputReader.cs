@@ -13,18 +13,24 @@ namespace BenchmarkDotNet.Loggers
         private readonly ConcurrentQueue<string> output, error;
 
         private long status;
+        private bool logOutput;
+        private ILogger logger;
 
-        internal AsyncProcessOutputReader(Process process)
+        internal AsyncProcessOutputReader(Process process, bool logOutput = false, ILogger logger = null)
         {
             if (!process.StartInfo.RedirectStandardOutput)
                 throw new NotSupportedException("set RedirectStandardOutput to true first");
             if (!process.StartInfo.RedirectStandardError)
                 throw new NotSupportedException("set RedirectStandardError to true first");
+            if (logOutput && logger == null)
+                throw new ArgumentException($"{nameof(logger)} cannot be null when {nameof(logOutput)} is true");
 
             this.process = process;
             output = new ConcurrentQueue<string>();
             error = new ConcurrentQueue<string>();
             status = (long)Status.Created;
+            this.logOutput = logOutput;
+            this.logger = logger;
         }
 
         public void Dispose()
@@ -89,13 +95,21 @@ namespace BenchmarkDotNet.Loggers
         private void ProcessOnOutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (!string.IsNullOrEmpty(e.Data))
+            {
                 output.Enqueue(e.Data);
+                if (logOutput)
+                    logger.WriteLine(e.Data);
+            }
         }
 
         private void ProcessOnErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (!string.IsNullOrEmpty(e.Data))
+            {
                 error.Enqueue(e.Data);
+                if (logOutput)
+                    logger.WriteLineError(e.Data);
+            }
         }
 
         private T ReturnIfStopped<T>(Func<T> getter)
