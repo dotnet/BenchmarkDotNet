@@ -28,8 +28,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [PublicAPI] public TimeSpan Timeout { get; }
 
+        [PublicAPI] public bool LogOutput { get; }
+
         public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger,
-            BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout)
+            BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout, bool logOutput = false)
         {
             CliPath = cliPath ?? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value;
             Arguments = arguments;
@@ -38,14 +40,17 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             BuildPartition = buildPartition;
             EnvironmentVariables = environmentVariables;
             Timeout = timeout;
+            LogOutput = logOutput;
         }
 
         public DotNetCliCommand WithArguments(string arguments)
-            => new DotNetCliCommand(CliPath, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout);
+            => new (CliPath, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, logOutput: LogOutput);
 
         [PublicAPI]
         public BuildResult RestoreThenBuild()
         {
+            DotNetCliCommandExecutor.LogEnvVars(WithArguments(null));
+
             var packagesResult = AddPackages();
             if (!packagesResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, packagesResult.AllInformation);
@@ -70,6 +75,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI]
         public BuildResult RestoreThenBuildThenPublish()
         {
+            DotNetCliCommandExecutor.LogEnvVars(WithArguments(null));
+
             var packagesResult = AddPackages();
             if (!packagesResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, packagesResult.AllInformation);
