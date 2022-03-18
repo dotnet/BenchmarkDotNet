@@ -151,6 +151,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("disasmDiff", Required = false, Default = false, HelpText = "Generates diff reports for the disassembler.")]
         public bool DisassemblerDiff { get; set; }
 
+        [Option("logBuildOutput", Required = false, HelpText = "Log Build output.")]
+        public bool LogBuildOutput { get; set; }
+
         [Option("buildTimeout", Required = false, HelpText = "Build timeout in seconds.")]
         public int? TimeOutInSeconds { get; set; }
 
