@@ -154,6 +154,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("logBuildOutput", Required = false, HelpText = "Log Build output.")]
         public bool LogBuildOutput { get; set; }
 
+        [Option("justBuild", Required = false, HelpText = "Generates the code and builds it, but does NOT run it.")]
+        public bool JustBuild { get; set; }
+
         [Option("buildTimeout", Required = false, HelpText = "Build timeout in seconds.")]
         public int? TimeOutInSeconds { get; set; }
 

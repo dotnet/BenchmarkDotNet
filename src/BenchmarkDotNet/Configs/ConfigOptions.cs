@@ -36,7 +36,11 @@ namespace BenchmarkDotNet.Configs
         /// <summary>
         /// Determines whether build output should be logged.
         /// </summary>
-        LogBuildOutput = 1 << 6
+        LogBuildOutput = 1 << 6,
+        /// <summary>
+        /// Generates the code and builds it, but does NOT run it.
+        /// </summary>
+        JustBuild = 1 << 7,
     }
 
     internal static class ConfigOptionsExtensions

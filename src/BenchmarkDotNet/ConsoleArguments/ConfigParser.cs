@@ -239,12 +239,19 @@ namespace BenchmarkDotNet.ConsoleArguments
             else
                 config.AddFilter(filters);
 
+            if (options.JustBuild)
+            {
+                options.KeepBenchmarkFiles = true; // keep the files if user asked to just build
+                options.LogBuildOutput = true; // print the output path provided by MSBuild
+            }
+
             config.WithOption(ConfigOptions.JoinSummary, options.Join);
             config.WithOption(ConfigOptions.KeepBenchmarkFiles, options.KeepBenchmarkFiles);
             config.WithOption(ConfigOptions.DontOverwriteResults, options.DontOverwriteResults);
             config.WithOption(ConfigOptions.StopOnFirstError, options.StopOnFirstError);
             config.WithOption(ConfigOptions.DisableLogFile, options.DisableLogFile);
             config.WithOption(ConfigOptions.LogBuildOutput, options.LogBuildOutput);
+            config.WithOption(ConfigOptions.JustBuild, options.JustBuild);
 
             if (options.MaxParameterColumnWidth.HasValue)
                 config.WithSummaryStyle(SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParameterColumnWidth.Value));
