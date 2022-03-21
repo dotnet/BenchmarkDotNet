@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -19,17 +20,17 @@ namespace BenchmarkDotNet.Engines
         public const int MinInvokeCount = 4;
 
         [PublicAPI] public IHost Host { get; }
-        [PublicAPI] public Action<long> WorkloadAction { get; }
+        [PublicAPI] public Func<long, IClock, ValueTask<ClockSpan>> WorkloadAction { get; }
         [PublicAPI] public Action Dummy1Action { get; }
         [PublicAPI] public Action Dummy2Action { get; }
         [PublicAPI] public Action Dummy3Action { get; }
-        [PublicAPI] public Action<long> OverheadAction { get; }
+        [PublicAPI] public Func<long, IClock, ValueTask<ClockSpan>> OverheadAction { get; }
         [PublicAPI] public Job TargetJob { get; }
         [PublicAPI] public long OperationsPerInvoke { get; }
-        [PublicAPI] public Action GlobalSetupAction { get; }
-        [PublicAPI] public Action GlobalCleanupAction { get; }
-        [PublicAPI] public Action IterationSetupAction { get; }
-        [PublicAPI] public Action IterationCleanupAction { get; }
+        [PublicAPI] public Func<ValueTask> GlobalSetupAction { get; }
+        [PublicAPI] public Func<ValueTask> GlobalCleanupAction { get; }
+        [PublicAPI] public Func<ValueTask> IterationSetupAction { get; }
+        [PublicAPI] public Func<ValueTask> IterationCleanupAction { get; }
         [PublicAPI] public IResolver Resolver { get; }
         [PublicAPI] public CultureInfo CultureInfo { get; }
         [PublicAPI] public string BenchmarkName { get; }
@@ -46,13 +47,14 @@ namespace BenchmarkDotNet.Engines
         private readonly EngineActualStage actualStage;
         private readonly bool includeExtraStats;
         private readonly Random random;
+        private readonly Helpers.AwaitHelper awaitHelper;
 
         internal Engine(
             IHost host,
             IResolver resolver,
-            Action dummy1Action, Action dummy2Action, Action dummy3Action, Action<long> overheadAction, Action<long> workloadAction, Job targetJob,
-            Action globalSetupAction, Action globalCleanupAction, Action iterationSetupAction, Action iterationCleanupAction, long operationsPerInvoke,
-            bool includeExtraStats, string benchmarkName)
+            Action dummy1Action, Action dummy2Action, Action dummy3Action, Func<long, IClock, ValueTask<ClockSpan>> overheadAction, Func<long, IClock, ValueTask<ClockSpan>> workloadAction,
+            Job targetJob, Func<ValueTask> globalSetupAction, Func<ValueTask> globalCleanupAction, Func<ValueTask> iterationSetupAction, Func<ValueTask> iterationCleanupAction,
+            long operationsPerInvoke, bool includeExtraStats, string benchmarkName)
         {
 
             Host = host;
@@ -84,13 +86,14 @@ namespace BenchmarkDotNet.Engines
             actualStage = new EngineActualStage(this);
 
             random = new Random(12345); // we are using constant seed to try to get repeatable results
+            awaitHelper = new Helpers.AwaitHelper();
         }
 
         public void Dispose()
         {
             try
             {
-                GlobalCleanupAction?.Invoke();
+                awaitHelper.GetResult(GlobalCleanupAction.Invoke());
             }
             catch (Exception e)
             {
@@ -165,9 +168,8 @@ namespace BenchmarkDotNet.Engines
             Span<byte> stackMemory = randomizeMemory ? stackalloc byte[random.Next(32)] : Span<byte>.Empty;
 
             // Measure
-            var clock = Clock.Start();
-            action(invokeCount / unrollFactor);
-            var clockSpan = clock.GetElapsed();
+            var op = action(invokeCount / unrollFactor, Clock);
+            var clockSpan = awaitHelper.GetResult(op);
 
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStop(data.IterationMode, data.IterationStage, totalOperations);
@@ -201,7 +203,8 @@ namespace BenchmarkDotNet.Engines
             var initialThreadingStats = ThreadingStats.ReadInitial(); // this method might allocate
             var initialGcStats = GcStats.ReadInitial();
 
-            WorkloadAction(data.InvokeCount / data.UnrollFactor);
+            var op = WorkloadAction(data.InvokeCount / data.UnrollFactor, Clock);
+            awaitHelper.GetResult(op);
 
             var finalGcStats = GcStats.ReadFinal();
             var finalThreadingStats = ThreadingStats.ReadFinal();

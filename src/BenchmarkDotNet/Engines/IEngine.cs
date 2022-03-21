@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
-using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -24,16 +25,16 @@ namespace BenchmarkDotNet.Engines
         long OperationsPerInvoke { get; }
 
         [CanBeNull]
-        Action GlobalSetupAction { get; }
+        Func<ValueTask> GlobalSetupAction { get; }
 
         [CanBeNull]
-        Action GlobalCleanupAction { get; }
+        Func<ValueTask> GlobalCleanupAction { get; }
 
         [NotNull]
-        Action<long> WorkloadAction { get; }
+        Func<long, IClock, ValueTask<ClockSpan>> WorkloadAction { get; }
 
         [NotNull]
-        Action<long> OverheadAction { get; }
+        Func<long, IClock, ValueTask<ClockSpan>> OverheadAction { get; }
 
         IResolver Resolver { get; }
 

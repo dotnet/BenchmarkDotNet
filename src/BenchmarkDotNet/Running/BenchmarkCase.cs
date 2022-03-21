@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Running
     public class BenchmarkCase : IComparable<BenchmarkCase>, IDisposable
     {
         public Descriptor Descriptor { get; }
-        public Job Job { get; }
+        public Job Job { get; private set; }
         public ParameterInstances Parameters { get; }
         public ImmutableConfig Config { get; }
 
@@ -31,6 +31,11 @@ namespace BenchmarkDotNet.Running
         public Runtime GetRuntime() => Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
                 ? Job.Environment.Runtime
                 : RuntimeInformation.GetCurrentRuntime();
+
+        internal void ForceUnrollFactorForAsync()
+        {
+            Job = Job.WithUnrollFactor(1);
+        }
 
         public void Dispose() => Parameters.Dispose();
 

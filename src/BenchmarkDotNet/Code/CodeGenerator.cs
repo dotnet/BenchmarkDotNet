@@ -49,6 +49,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$WorkloadMethodReturnType$", provider.WorkloadMethodReturnTypeName)
                     .Replace("$WorkloadMethodReturnTypeModifiers$", provider.WorkloadMethodReturnTypeModifiers)
                     .Replace("$OverheadMethodReturnTypeName$", provider.OverheadMethodReturnTypeName)
+                    .Replace("$AwaiterTypeName$", provider.AwaiterTypeName)
                     .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)
                     .Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName)
                     .Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName)
@@ -155,15 +156,12 @@ namespace BenchmarkDotNet.Code
         {
             var method = descriptor.WorkloadMethod;
 
-            if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask))
-            {
-                return new TaskDeclarationsProvider(descriptor);
-            }
-            if (method.ReturnType.GetTypeInfo().IsGenericType
-                && (method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
+            if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask)
+                || method.ReturnType.GetTypeInfo().IsGenericType
+                    && (method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
                     || method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)))
             {
-                return new GenericTaskDeclarationsProvider(descriptor);
+                return new TaskDeclarationsProvider(descriptor);
             }
 
             if (method.ReturnType == typeof(void))

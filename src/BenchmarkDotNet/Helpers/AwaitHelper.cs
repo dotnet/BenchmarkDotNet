@@ -75,5 +75,28 @@ namespace BenchmarkDotNet.Helpers
             }
             return awaiter.GetResult();
         }
+
+        public static ValueTask ToValueTaskVoid(Task task)
+        {
+            return new ValueTask(task);
+        }
+
+        public static ValueTask ToValueTaskVoid<T>(Task<T> task)
+        {
+            return new ValueTask(task);
+        }
+
+        public static ValueTask ToValueTaskVoid(ValueTask task)
+        {
+            return task;
+        }
+
+        // ValueTask<T> unfortunately can't be converted to a ValueTask for free, so we must create a state machine.
+        // It's not a big deal though, as this is only used for Setup/Cleanup where allocations aren't measured.
+        // And in practice, this should never be used, as (Value)Task<T> Setup/Cleanup methods have no utility.
+        public static async ValueTask ToValueTaskVoid<T>(ValueTask<T> task)
+        {
+            _ = await task.ConfigureAwait(false);
+        }
     }
 }

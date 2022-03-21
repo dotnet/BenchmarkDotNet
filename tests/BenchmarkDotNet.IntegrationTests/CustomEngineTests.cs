@@ -10,6 +10,8 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Characteristics;
 using Perfolizer.Mathematics.OutlierDetection;
+using System.Threading.Tasks;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -90,10 +92,10 @@ namespace BenchmarkDotNet.IntegrationTests
             public void WriteLine(string line) { }
             public Job TargetJob { get; }
             public long OperationsPerInvoke { get; }
-            public Action GlobalSetupAction { get; set; }
-            public Action GlobalCleanupAction { get; set; }
-            public Action<long> WorkloadAction { get; }
-            public Action<long> OverheadAction { get; }
+            public Func<ValueTask> GlobalSetupAction { get; set; }
+            public Func<ValueTask> GlobalCleanupAction { get; set; }
+            public Func<long, IClock, ValueTask<ClockSpan>> WorkloadAction { get; }
+            public Func<long, IClock, ValueTask<ClockSpan>> OverheadAction { get; }
             public IResolver Resolver { get; }
 
             public Measurement RunIteration(IterationData data) { throw new NotImplementedException(); }

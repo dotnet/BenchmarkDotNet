@@ -355,12 +355,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             // Init current state
             argFields = new List<ArgFieldInfo>();
             benchmark = newBenchmark;
-            jobUnrollFactor = benchmark.BenchmarkCase.Job.ResolveValue(
-                RunMode.UnrollFactorCharacteristic,
-                buildPartition.Resolver);
             dummyUnrollFactor = DummyUnrollFactor;
 
             consumableInfo = new ConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.WorkloadMethod.ReturnType);
+            if (consumableInfo.IsAwaitable)
+            {
+                benchmark.BenchmarkCase.ForceUnrollFactorForAsync();
+            }
+
+            jobUnrollFactor = benchmark.BenchmarkCase.Job.ResolveValue(
+                RunMode.UnrollFactorCharacteristic,
+                buildPartition.Resolver);
+
             consumeEmitter = ConsumeEmitter.GetConsumeEmitter(consumableInfo);
             globalSetupReturnInfo = GetConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.GlobalSetupMethod?.ReturnType);
             globalCleanupReturnInfo = GetConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.GlobalCleanupMethod?.ReturnType);

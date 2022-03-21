@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Jobs;
 using Perfolizer.Horology;
 
@@ -109,7 +110,7 @@ namespace BenchmarkDotNet.Engines
                 engineParameters.OverheadActionNoUnroll,
                 engineParameters.WorkloadActionNoUnroll);
 
-        private static Engine CreateEngine(EngineParameters engineParameters, Job job, Action<long> idle, Action<long> main)
+        private static Engine CreateEngine(EngineParameters engineParameters, Job job, Func<long, IClock, ValueTask<ClockSpan>> idle, Func<long, IClock, ValueTask<ClockSpan>> main)
             => new Engine(
                 engineParameters.Host,
                 EngineParameters.DefaultResolver,
