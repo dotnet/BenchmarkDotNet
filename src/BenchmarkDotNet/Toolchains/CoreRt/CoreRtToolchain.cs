@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 
         public static CoreRtToolchainBuilder CreateBuilder() => CoreRtToolchainBuilder.Create();
 
-        private static string GetExtraArguments(bool useCppCodeGenerator, string runtimeIdentifier)
+        public static string GetExtraArguments(bool useCppCodeGenerator, string runtimeIdentifier)
             => useCppCodeGenerator ? $"-r {runtimeIdentifier} /p:NativeCodeGen=cpp" : $"-r {runtimeIdentifier}";
 
         // https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built

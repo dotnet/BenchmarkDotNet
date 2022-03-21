@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -144,29 +145,30 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         internal static string GetRestoreCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null)
             => new StringBuilder()
-                .Append("restore ")
-                .Append(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\" ")
-                .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
-                .Append(extraArguments)
-                .Append(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
+                .AppendArgument("restore")
+                .AppendArgument(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"--packages \"{artifactsPaths.PackagesDirectoryName}\"")
+                .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
+                .AppendArgument(extraArguments)
+                .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
                 .ToString();
 
         internal static string GetBuildCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null)
             => new StringBuilder()
-                .Append($"build -c {buildPartition.BuildConfiguration} ") // we don't need to specify TFM, our auto-generated project contains always single one
-                .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
-                .Append(extraArguments)
-                .Append(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
-                .Append(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $" /p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
+                .AppendArgument($"build -c {buildPartition.BuildConfiguration}") // we don't need to specify TFM, our auto-generated project contains always single one
+                .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
+                .AppendArgument(extraArguments)
+                .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
+                .AppendArgument(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"/p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
                 .ToString();
 
         internal static string GetPublishCommand(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, string extraArguments = null)
             => new StringBuilder()
-                .Append($"publish -c {buildPartition.BuildConfiguration} ") // we don't need to specify TFM, our auto-generated project contains always single one
-                .Append(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
-                .Append(extraArguments)
-                .Append(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
-                .Append(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $" /p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
+                .AppendArgument($"publish -c {buildPartition.BuildConfiguration}") // we don't need to specify TFM, our auto-generated project contains always single one
+                .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
+                .AppendArgument(extraArguments)
+                .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
+                .AppendArgument(string.IsNullOrEmpty(artifactsPaths.PackagesDirectoryName) ? string.Empty : $"/p:NuGetPackageRoot=\"{artifactsPaths.PackagesDirectoryName}\"")
+                .AppendArgument($"--output \"{artifactsPaths.BinariesDirectoryPath}\"")
                 .ToString();
 
         private static string GetCustomMsBuildArguments(BenchmarkCase benchmarkCase, IResolver resolver)
@@ -193,7 +195,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         {
             // we use these settings to make sure that MSBuild does the job and simply quits without spawning any long living processes
             // we want to avoid "file in use" and "zombie processes" issues
-            const string NoMsBuildZombieProcesses = " /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true";
+            const string NoMsBuildZombieProcesses = "/p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true";
             const string EnforceOptimizations = "/p:Optimize=true";
 
             if (string.Equals(buildConfiguration, RuntimeInformation.DebugConfigurationName, StringComparison.OrdinalIgnoreCase))
@@ -207,21 +209,21 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private static string BuildAddPackageCommand(NuGetReference reference)
         {
             var commandBuilder = new StringBuilder();
-            commandBuilder.Append("add package ");
-            commandBuilder.Append(reference.PackageName);
+            commandBuilder.AppendArgument("add package");
+            commandBuilder.AppendArgument(reference.PackageName);
             if (!string.IsNullOrWhiteSpace(reference.PackageVersion))
             {
-                commandBuilder.Append(" -v ");
-                commandBuilder.Append(reference.PackageVersion);
+                commandBuilder.AppendArgument("-v");
+                commandBuilder.AppendArgument(reference.PackageVersion);
             }
             if (reference.PackageSource != null)
             {
-                commandBuilder.Append(" -s ");
-                commandBuilder.Append(reference.PackageSource);
+                commandBuilder.AppendArgument("-s");
+                commandBuilder.AppendArgument(reference.PackageSource);
             }
             if (reference.Prerelease)
             {
-                commandBuilder.Append(" --prerelease");
+                commandBuilder.AppendArgument("--prerelease");
             }
             return commandBuilder.ToString();
         }
