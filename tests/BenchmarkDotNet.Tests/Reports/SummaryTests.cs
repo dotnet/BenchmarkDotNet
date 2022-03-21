@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Tests.Reports
 
         private static BenchmarkReport CreateSuccessReport(BenchmarkCase benchmark)
         {
-            GenerateResult generateResult = GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>());
+            GenerateResult generateResult = GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>(), false);
             BuildResult buildResult = BuildResult.Success(generateResult);
             var metrics = new[] { new Metric(new FakeMetricDescriptor(), Math.E) };
             return new BenchmarkReport(true, benchmark, generateResult, buildResult, Array.Empty<ExecuteResult>(), metrics);
