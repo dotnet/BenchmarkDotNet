@@ -5,7 +5,6 @@ namespace BenchmarkDotNet.Helpers
 {
     public class AwaitHelper
     {
-
         private readonly object awaiterLock = new object();
         private readonly Action awaiterCallback;
         private bool awaiterCompleted;
@@ -47,7 +46,7 @@ namespace BenchmarkDotNet.Helpers
                     awaiterCompleted = false;
                     awaiter.UnsafeOnCompleted(awaiterCallback);
                     // Check if the callback executed synchronously before blocking.
-                    if (awaiterCompleted)
+                    if (!awaiterCompleted)
                     {
                         System.Threading.Monitor.Wait(awaiterLock);
                     }
@@ -66,7 +65,7 @@ namespace BenchmarkDotNet.Helpers
                     awaiterCompleted = false;
                     awaiter.UnsafeOnCompleted(awaiterCallback);
                     // Check if the callback executed synchronously before blocking.
-                    if (awaiterCompleted)
+                    if (!awaiterCompleted)
                     {
                         System.Threading.Monitor.Wait(awaiterLock);
                     }
