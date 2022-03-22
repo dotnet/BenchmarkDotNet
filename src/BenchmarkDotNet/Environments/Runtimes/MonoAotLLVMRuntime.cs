@@ -13,6 +13,8 @@ namespace BenchmarkDotNet.Environments
 
         public FileInfo AOTCompilerPath { get; }
 
+        public override bool IsAOT => true;
+
         /// <summary>
         /// creates new instance of MonoAotLLVMRuntime
         /// </summary>

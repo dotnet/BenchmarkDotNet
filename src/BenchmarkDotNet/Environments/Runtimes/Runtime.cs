@@ -22,6 +22,8 @@ namespace BenchmarkDotNet.Environments
         /// </summary>
         public string MsBuildMoniker { get; }
 
+        public virtual bool IsAOT => false;
+
         protected Runtime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
         {
             if (string.IsNullOrEmpty(displayName)) throw new ArgumentNullException(nameof(displayName));

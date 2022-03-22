@@ -1,7 +1,6 @@
 ﻿using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using System;
-using System.Linq;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -39,6 +38,8 @@ namespace BenchmarkDotNet.Environments
         /// CoreRT compiled as net7.0
         /// </summary>
         public static readonly CoreRtRuntime CoreRt70 = new CoreRtRuntime(RuntimeMoniker.CoreRt70, "net7.0", "CoreRT 7.0");
+
+        public override bool IsAOT => true;
 
         private CoreRtRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
             : base(runtimeMoniker, msBuildMoniker, displayName)
