@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Engines
             if (engineParameters.TargetJob == null)
                 throw new ArgumentNullException(nameof(engineParameters.TargetJob));
 
-            engineParameters.GlobalSetupAction?.Invoke(); // whatever the settings are, we MUST call global setup here, the global cleanup is part of Engine's Dispose
+            engineParameters.GlobalSetupAction.Invoke().AsTask().GetAwaiter().GetResult(); // whatever the settings are, we MUST call global setup here, the global cleanup is part of Engine's Dispose
 
             if (!engineParameters.NeedsJitting) // just create the engine, do NOT jit
                 return CreateMultiActionEngine(engineParameters);

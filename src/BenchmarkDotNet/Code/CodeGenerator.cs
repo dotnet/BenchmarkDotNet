@@ -35,6 +35,8 @@ namespace BenchmarkDotNet.Code
 
                 var provider = GetDeclarationsProvider(benchmark.Descriptor);
 
+                provider.OverrideUnrollFactor(benchmark);
+
                 string passArguments = GetPassArguments(benchmark);
 
                 string compilationId = $"{provider.ReturnsDefinition}_{buildInfo.Id}";

@@ -158,7 +158,7 @@ namespace BenchmarkDotNet.Engines
             var action = isOverhead ? OverheadAction : WorkloadAction;
 
             if (!isOverhead)
-                IterationSetupAction();
+                awaitHelper.GetResult(IterationSetupAction());
 
             GcCollect();
 
@@ -175,7 +175,7 @@ namespace BenchmarkDotNet.Engines
                 EngineEventSource.Log.IterationStop(data.IterationMode, data.IterationStage, totalOperations);
 
             if (!isOverhead)
-                IterationCleanupAction();
+                awaitHelper.GetResult(IterationCleanupAction());
 
             if (randomizeMemory)
                 RandomizeManagedHeapMemory();
@@ -198,7 +198,7 @@ namespace BenchmarkDotNet.Engines
             // it does not matter, because we have already obtained the results!
             EnableMonitoring();
 
-            IterationSetupAction(); // we run iteration setup first, so even if it allocates, it is not included in the results
+            awaitHelper.GetResult(IterationSetupAction()); // we run iteration setup first, so even if it allocates, it is not included in the results
 
             var initialThreadingStats = ThreadingStats.ReadInitial(); // this method might allocate
             var initialGcStats = GcStats.ReadInitial();
@@ -209,7 +209,7 @@ namespace BenchmarkDotNet.Engines
             var finalGcStats = GcStats.ReadFinal();
             var finalThreadingStats = ThreadingStats.ReadFinal();
 
-            IterationCleanupAction(); // we run iteration cleanup after collecting GC stats
+            awaitHelper.GetResult(IterationCleanupAction()); // we run iteration cleanup after collecting GC stats
 
             GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
             ThreadingStats threadingStats = (finalThreadingStats - initialThreadingStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
@@ -223,14 +223,14 @@ namespace BenchmarkDotNet.Engines
         private void RandomizeManagedHeapMemory()
         {
             // invoke global cleanup before global setup
-            GlobalCleanupAction?.Invoke();
+            awaitHelper.GetResult(GlobalCleanupAction.Invoke());
 
             var gen0object = new byte[random.Next(32)];
             var lohObject = new byte[85 * 1024 + random.Next(32)];
 
             // we expect the key allocations to happen in global setup (not ctor)
             // so we call it while keeping the random-size objects alive
-            GlobalSetupAction?.Invoke();
+            awaitHelper.GetResult(GlobalSetupAction.Invoke());
 
             GC.KeepAlive(gen0object);
             GC.KeepAlive(lohObject);
