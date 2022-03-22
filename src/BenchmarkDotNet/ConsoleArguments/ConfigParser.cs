@@ -363,11 +363,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                         .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
                 case RuntimeMoniker.Mono:
                     return baseJob.WithRuntime(new MonoRuntime("Mono", options.MonoPath?.FullName));
-                case RuntimeMoniker.CoreRt20:
-                case RuntimeMoniker.CoreRt21:
-                case RuntimeMoniker.CoreRt22:
-                case RuntimeMoniker.CoreRt30:
-                case RuntimeMoniker.CoreRt31:
                 case RuntimeMoniker.CoreRt50:
                 case RuntimeMoniker.CoreRt60:
                 case RuntimeMoniker.CoreRt70:

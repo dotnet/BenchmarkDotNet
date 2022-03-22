@@ -43,16 +43,6 @@ namespace BenchmarkDotNet.Extensions
                     return CoreRuntime.Core70;
                 case RuntimeMoniker.Mono:
                     return MonoRuntime.Default;
-                case RuntimeMoniker.CoreRt20:
-                    return CoreRtRuntime.CoreRt20;
-                case RuntimeMoniker.CoreRt21:
-                    return CoreRtRuntime.CoreRt21;
-                case RuntimeMoniker.CoreRt22:
-                    return CoreRtRuntime.CoreRt22;
-                case RuntimeMoniker.CoreRt30:
-                    return CoreRtRuntime.CoreRt30;
-                case RuntimeMoniker.CoreRt31:
-                    return CoreRtRuntime.CoreRt31;
                 case RuntimeMoniker.CoreRt50:
                     return CoreRtRuntime.CoreRt50;
                 case RuntimeMoniker.CoreRt60:
