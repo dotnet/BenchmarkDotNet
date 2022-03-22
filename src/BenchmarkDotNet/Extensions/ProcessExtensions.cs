@@ -10,7 +10,9 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CoreRun;
+using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using JetBrains.Annotations;
+
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -131,6 +133,17 @@ namespace BenchmarkDotNet.Extensions
 
             if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
                 return;
+
+            if (benchmarkCase.Job.Infrastructure.Toolchain is MonoAotLLVMToolChain)
+            {
+                MonoAotLLVMRuntime aotruntime = (MonoAotLLVMRuntime)benchmarkCase.GetRuntime();
+
+                if (aotruntime.AOTCompilerMode == MonoAotCompilerMode.llvm)
+                {
+                    start.EnvironmentVariables["MONO_ENV_OPTIONS"] = "--llvm";
+                }
+
+            }
 
             foreach (var environmentVariable in benchmarkCase.Job.Environment.EnvironmentVariables)
                 start.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -12,11 +13,12 @@ namespace BenchmarkDotNet.Environments
         internal static readonly MonoAotLLVMRuntime Default = new MonoAotLLVMRuntime();
 
         public FileInfo AOTCompilerPath { get; }
+        public MonoAotCompilerMode AOTCompilerMode { get;  }
 
         /// <summary>
         /// creates new instance of MonoAotLLVMRuntime
         /// </summary>
-        public MonoAotLLVMRuntime(FileInfo aotCompilerPath, string msBuildMoniker = "net6.0", string displayName = "MonoAOTLLVM") : base(RuntimeMoniker.MonoAOTLLVM, msBuildMoniker, displayName)
+        public MonoAotLLVMRuntime(FileInfo aotCompilerPath, MonoAotCompilerMode aotCompilerMode, string msBuildMoniker = "net6.0", string displayName = "MonoAOTLLVM") : base(RuntimeMoniker.MonoAOTLLVM, msBuildMoniker, displayName)
         {
             if (aotCompilerPath == null)
                 throw new ArgumentNullException(paramName: nameof(aotCompilerPath));
@@ -24,6 +26,7 @@ namespace BenchmarkDotNet.Environments
                 throw new FileNotFoundException($"Provided {nameof(aotCompilerPath)} file: \"{aotCompilerPath.FullName}\" doest NOT exist");
 
             AOTCompilerPath = aotCompilerPath;
+            AOTCompilerMode = aotCompilerMode;
         }
 
         // this ctor exists only for the purpose of having .Default property that returns something consumable by RuntimeInformation.GetCurrentRuntime()
