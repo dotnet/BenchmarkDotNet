@@ -10,19 +10,17 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         /// <summary>
         /// compiled as net5.0, targets experimental 6.0.0-* CoreRT build from the https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json
         /// </summary>
-        public static readonly IToolchain Core50 = GetBuilderForOldDefaults().TargetFrameworkMoniker("net5.0").ToToolchain();
+        public static readonly IToolchain Core50 = GetBuilderForOldExperimentalFeed().TargetFrameworkMoniker("net5.0").ToToolchain();
         /// <summary>
         /// compiled as net6.0, targets experimental 6.0.0-* CoreRT build from the https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json
         /// </summary>
-        public static readonly IToolchain Core60 = GetBuilderForOldDefaults().TargetFrameworkMoniker("net6.0").ToToolchain();
+        public static readonly IToolchain Core60 = GetBuilderForOldExperimentalFeed().TargetFrameworkMoniker("net6.0").ToToolchain();
         /// <summary>
         /// compiled as net7.0, targets latest (7.0.0-*) NativeAOT build from the .NET 7 feed: https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json
         /// </summary>
-        /// <summary>
-        /// compiled as net7.0, targets latest (6.0.0-*) CoreRT build from the new feed: https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json
-        /// </summary>
         public static readonly IToolchain Core70 = CreateBuilder().UseCoreRtNuGet().TargetFrameworkMoniker("net7.0").ToToolchain();
-        private static CoreRtToolchainBuilder GetBuilderForOldDefaults()
+
+        private static CoreRtToolchainBuilder GetBuilderForOldExperimentalFeed()
             => CreateBuilder().UseCoreRtNuGet("6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json");
 
         internal CoreRtToolchain(string displayName,

@@ -207,7 +207,7 @@ namespace BenchmarkDotNet.Tests
         public void CoreRtPathParsedCorrectly()
         {
             var fakeCoreRtPath =  new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory;
-            var config = ConfigParser.Parse(new[] { "-r", "corert30", "--ilcPath", fakeCoreRtPath.FullName }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "-r", "corert50", "--ilcPath", fakeCoreRtPath.FullName }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
             CoreRtToolchain toolchain = config.GetJobs().Single().GetToolchain() as CoreRtToolchain;
