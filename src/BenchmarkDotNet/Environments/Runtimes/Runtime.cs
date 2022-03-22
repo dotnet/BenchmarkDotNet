@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using BenchmarkDotNet.Jobs;
 using JetBrains.Annotations;
 
@@ -7,22 +6,6 @@ namespace BenchmarkDotNet.Environments
 {
     public abstract class Runtime : IEquatable<Runtime>
     {
-        [Obsolete("Please use ClrRuntime.Net$Version instead", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)] // hide from intellisense
-        public static readonly Runtime Clr;
-
-        [Obsolete("Please use new MonoRuntime() instead", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly Runtime Mono;
-
-        [Obsolete("Please use CoreRuntime.Core$Version instead", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly Runtime Core;
-
-        [Obsolete("Please use CoreRtRuntime.CoreRt$Version instead", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly Runtime CoreRT;
-
         /// <summary>
         /// Display name
         /// </summary>
@@ -38,6 +21,8 @@ namespace BenchmarkDotNet.Environments
         /// MsBuild Target Framework Moniker, example: net461, netcoreapp2.1
         /// </summary>
         public string MsBuildMoniker { get; }
+
+        public virtual bool IsAOT => false;
 
         protected Runtime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
         {

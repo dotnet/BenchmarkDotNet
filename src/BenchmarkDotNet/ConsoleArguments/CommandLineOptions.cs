@@ -94,8 +94,8 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("clrVersion", Required = false, HelpText = "Optional version of private CLR build used as the value of COMPLUS_Version env var.")]
         public string ClrVersion { get; set; }
 
-        [Option("coreRtVersion", Required = false, HelpText = "Optional version of Microsoft.DotNet.ILCompiler which should be used to run with CoreRT. Example: \"1.0.0-alpha-26414-01\"")]
-        public string CoreRtVersion { get; set; }
+        [Option("ilCompilerVersion", Required = false, HelpText = "Optional version of Microsoft.DotNet.ILCompiler which should be used to run with CoreRT/NativeAOT. Example: \"7.0.0-preview.3.22123.2\"")]
+        public string ILCompilerVersion { get; set; }
 
         [Option("ilcPath", Required = false, HelpText = "Optional IlcPath which should be used to run with private CoreRT build.")]
         public DirectoryInfo CoreRtPath { get; set; }

@@ -115,6 +115,7 @@ namespace BenchmarkDotNet.Toolchains
                 case ClrRuntime _:
                 case CoreRuntime _:
                 case CoreRtRuntime _:
+                case NativeAotRuntime _:
                     start.FileName = exePath;
                     start.Arguments = args;
                     break;

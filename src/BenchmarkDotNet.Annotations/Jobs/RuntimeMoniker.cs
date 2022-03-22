@@ -96,31 +96,6 @@ namespace BenchmarkDotNet.Jobs
         Net70,
 
         /// <summary>
-        /// CoreRT compiled as netcoreapp2.0
-        /// </summary>
-        CoreRt20,
-
-        /// <summary>
-        /// CoreRT compiled as netcoreapp2.1
-        /// </summary>
-        CoreRt21,
-
-        /// <summary>
-        /// CoreRT compiled as netcoreapp2.2
-        /// </summary>
-        CoreRt22,
-
-        /// <summary>
-        /// CoreRT compiled as netcoreapp3.0
-        /// </summary>
-        CoreRt30,
-
-        /// <summary>
-        /// CoreRT compiled as netcoreapp3.1
-        /// </summary>
-        CoreRt31,
-
-        /// <summary>
         /// CoreRT compiled as net5.0
         /// </summary>
         CoreRt50,
@@ -131,9 +106,9 @@ namespace BenchmarkDotNet.Jobs
         CoreRt60,
 
         /// <summary>
-        /// CoreRT compiled as net7.0
+        /// NativeAOT compiled as net7.0
         /// </summary>
-        CoreRt70,
+        NativeAot70,
 
         /// <summary>
         /// WebAssembly with default .Net version
