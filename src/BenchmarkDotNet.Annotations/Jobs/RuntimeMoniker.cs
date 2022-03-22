@@ -106,9 +106,9 @@ namespace BenchmarkDotNet.Jobs
         CoreRt60,
 
         /// <summary>
-        /// CoreRT compiled as net7.0
+        /// NativeAOT compiled as net7.0
         /// </summary>
-        CoreRt70,
+        NativeAot70,
 
         /// <summary>
         /// WebAssembly with default .Net version

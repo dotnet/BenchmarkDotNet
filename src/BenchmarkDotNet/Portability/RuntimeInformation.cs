@@ -42,6 +42,9 @@ namespace BenchmarkDotNet.Portability
             => ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
                && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
 
+        public static bool IsNativeAOT
+            => Environment.Version.Major >= 7 && string.IsNullOrEmpty(typeof(object).Assembly.Location);
+
         public static bool IsWasm => IsOSPlatform(OSPlatform.Create("BROWSER"));
 
         public static bool IsAot { get; } = IsAotMethod(); // This allocates, so we only want to call it once statically.
@@ -204,6 +207,10 @@ namespace BenchmarkDotNet.Portability
                     return $".NET Core {runtimeVersion} (CoreCLR {coreclrAssemblyInfo.FileVersion}, CoreFX {corefxAssemblyInfo.FileVersion})";
                 }
             }
+            else if (IsNativeAOT)
+            {
+                return FrameworkDescription;
+            }
             else if (IsCoreRT)
             {
                 return FrameworkDescription.Replace("Core ", "CoreRT ");
@@ -225,6 +232,8 @@ namespace BenchmarkDotNet.Portability
                 return WasmRuntime.Default;
             if (IsNetCore)
                 return CoreRuntime.GetCurrentVersion();
+            if (IsNativeAOT)
+                return NativeAotRuntime.GetCurrentVersion();
             if (IsCoreRT)
                 return CoreRtRuntime.GetCurrentVersion();
 
@@ -275,6 +284,8 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetJitInfo()
         {
+            if (IsNativeAOT)
+                return "NativeAOT";
             if (IsCoreRT || IsNetNative || IsAot)
                 return "AOT";
             if (IsMono || IsWasm)
