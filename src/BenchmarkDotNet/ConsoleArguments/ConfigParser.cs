@@ -363,32 +363,11 @@ namespace BenchmarkDotNet.ConsoleArguments
                         .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
                 case RuntimeMoniker.Mono:
                     return baseJob.WithRuntime(new MonoRuntime("Mono", options.MonoPath?.FullName));
-                case RuntimeMoniker.CoreRt20:
-                case RuntimeMoniker.CoreRt21:
-                case RuntimeMoniker.CoreRt22:
-                case RuntimeMoniker.CoreRt30:
-                case RuntimeMoniker.CoreRt31:
                 case RuntimeMoniker.CoreRt50:
                 case RuntimeMoniker.CoreRt60:
-                case RuntimeMoniker.CoreRt70:
-                    var builder = CoreRtToolchain.CreateBuilder();
-
-                    if (options.CliPath != null)
-                        builder.DotNetCli(options.CliPath.FullName);
-                    if (options.RestorePath != null)
-                        builder.PackagesRestorePath(options.RestorePath.FullName);
-
-                    if (options.CoreRtPath != null)
-                        builder.UseCoreRtLocal(options.CoreRtPath.FullName);
-                    else if (!string.IsNullOrEmpty(options.CoreRtVersion))
-                        builder.UseCoreRtNuGet(options.CoreRtVersion);
-                    else
-                        builder.UseCoreRtNuGet();
-
-                    var runtime = runtimeMoniker.GetRuntime();
-                    builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
-
-                    return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
+                    return CreateAotJob(baseJob, options, runtimeMoniker, "6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json");
+                case RuntimeMoniker.NativeAot70:
+                    return CreateAotJob(baseJob, options, runtimeMoniker, "7.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json");
                 case RuntimeMoniker.Wasm:
                     return MakeWasmJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0", runtimeMoniker);
                 case RuntimeMoniker.WasmNet50:
@@ -406,6 +385,28 @@ namespace BenchmarkDotNet.ConsoleArguments
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
+        }
+
+        private static Job CreateAotJob(Job baseJob, CommandLineOptions options, RuntimeMoniker runtimeMoniker, string ilCompilerVersion, string nuGetFeedUrl)
+        {
+            var builder = CoreRtToolchain.CreateBuilder();
+
+            if (options.CliPath != null)
+                builder.DotNetCli(options.CliPath.FullName);
+            if (options.RestorePath != null)
+                builder.PackagesRestorePath(options.RestorePath.FullName);
+
+            if (options.CoreRtPath != null)
+                builder.UseCoreRtLocal(options.CoreRtPath.FullName);
+            else if (!string.IsNullOrEmpty(options.ILCompilerVersion))
+                builder.UseCoreRtNuGet(options.ILCompilerVersion, nuGetFeedUrl);
+            else
+                builder.UseCoreRtNuGet(ilCompilerVersion, nuGetFeedUrl);
+
+            var runtime = runtimeMoniker.GetRuntime();
+            builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
+
+            return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
         }
 
         private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker)

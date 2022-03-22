@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
     {
         public static CoreRtToolchainBuilder Create() => new CoreRtToolchainBuilder();
 
-        private string coreRtVersion;
+        private string ilCompilerVersion;
         private string ilcPath;
         private bool useCppCodeGenerator;
         private string packagesRestorePath;
@@ -22,15 +22,15 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         private bool isCoreRtConfigured;
 
         /// <summary>
-        /// creates a CoreRT toolchain targeting NuGet build of CoreRT
+        /// creates a NativeAOT (CoreRT) toolchain targeting NuGet build of Microsoft.DotNet.ILCompiler
         /// Based on https://github.com/dotnet/runtimelab/blob/d0a37893a67c125f9b0cd8671846ff7d867df241/samples/HelloWorld/README.md#add-corert-to-your-project
         /// </summary>
-        /// <param name="microsoftDotNetILCompilerVersion">the version of Microsoft.DotNet.ILCompiler which should be used. The default is: "6.0.0-*"</param>
-        /// <param name="nuGetFeedUrl">url to NuGet CoreRT feed, The default is: "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json"</param>
+        /// <param name="microsoftDotNetILCompilerVersion">the version of Microsoft.DotNet.ILCompiler which should be used. The default is: "7.0.0-*"</param>
+        /// <param name="nuGetFeedUrl">url to NuGet feed, The default is: "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json"</param>
         [PublicAPI]
-        public CoreRtToolchainBuilder UseCoreRtNuGet(string microsoftDotNetILCompilerVersion = "6.0.0-*", string nuGetFeedUrl = "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json")
+        public CoreRtToolchainBuilder UseCoreRtNuGet(string microsoftDotNetILCompilerVersion = "7.0.0-*", string nuGetFeedUrl = "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json")
         {
-            coreRtVersion = microsoftDotNetILCompilerVersion ?? throw new ArgumentNullException(nameof(microsoftDotNetILCompilerVersion));
+            ilCompilerVersion = microsoftDotNetILCompilerVersion ?? throw new ArgumentNullException(nameof(microsoftDotNetILCompilerVersion));
 
             Feeds[Generator.CoreRtNuGetFeed] = nuGetFeedUrl ?? throw new ArgumentNullException(nameof(nuGetFeedUrl));
 
@@ -38,7 +38,6 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 
             return this;
         }
-
 
         /// <summary>
         /// creates a CoreRT toolchain targeting local build for CoreRT
@@ -132,8 +131,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
                 throw new InvalidOperationException("You need to use one of the UseCoreRt* methods to tell us which CoreRT to use.");
 
             return new CoreRtToolchain(
-                displayName: displayName ?? (coreRtVersion != null ? $"Core RT {coreRtVersion}" : "local Core RT"),
-                coreRtVersion: coreRtVersion,
+                displayName: displayName ?? (ilCompilerVersion != null ? $"ILCompiler {ilCompilerVersion}" : "local Core RT"),
+                coreRtVersion: ilCompilerVersion,
                 ilcPath: ilcPath,
                 useCppCodeGenerator: useCppCodeGenerator,
                 runtimeFrameworkVersion: runtimeFrameworkVersion,

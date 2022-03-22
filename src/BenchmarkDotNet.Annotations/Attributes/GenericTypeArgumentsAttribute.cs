@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Attributes
 {
@@ -11,6 +12,6 @@ namespace BenchmarkDotNet.Attributes
         // CLS-Compliant Code requires a constructor without an array in the argument list
         [PublicAPI] public GenericTypeArgumentsAttribute() => GenericTypeArguments = new Type[0];
 
-        public GenericTypeArgumentsAttribute(params Type[] genericTypeArguments) => GenericTypeArguments = genericTypeArguments;
+        public GenericTypeArgumentsAttribute([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] params Type[] genericTypeArguments) => GenericTypeArguments = genericTypeArguments;
     }
 }
