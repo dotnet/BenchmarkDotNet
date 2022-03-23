@@ -35,15 +35,9 @@ namespace BenchmarkDotNet.Portability
             => ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
                 && !string.IsNullOrEmpty(typeof(object).Assembly.Location);
 
-        /// <summary>
-        /// "The north star for CoreRT is to be a flavor of .NET Core" -> CoreRT reports .NET Core everywhere
-        /// </summary>
-        public static bool IsCoreRT
-            => ((Environment.Version.Major >= 5 && Environment.Version.Major <= 6) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
-               && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
-
         public static bool IsNativeAOT
-            => Environment.Version.Major >= 7 && string.IsNullOrEmpty(typeof(object).Assembly.Location);
+            => Environment.Version.Major >= 5
+                && string.IsNullOrEmpty(typeof(object).Assembly.Location); // it's merged to a single .exe and .Location returns null
 
         public static bool IsWasm => IsOSPlatform(OSPlatform.Create("BROWSER"));
 
@@ -211,10 +205,6 @@ namespace BenchmarkDotNet.Portability
             {
                 return FrameworkDescription;
             }
-            else if (IsCoreRT)
-            {
-                return FrameworkDescription.Replace("Core ", "CoreRT ");
-            }
 
             return Unknown;
         }
@@ -234,8 +224,6 @@ namespace BenchmarkDotNet.Portability
                 return CoreRuntime.GetCurrentVersion();
             if (IsNativeAOT)
                 return NativeAotRuntime.GetCurrentVersion();
-            if (IsCoreRT)
-                return CoreRtRuntime.GetCurrentVersion();
 
             throw new NotSupportedException("Unknown .NET Runtime");
         }
@@ -286,7 +274,7 @@ namespace BenchmarkDotNet.Portability
         {
             if (IsNativeAOT)
                 return "NativeAOT";
-            if (IsCoreRT || IsNetNative || IsAot)
+            if (IsNetNative || IsAot)
                 return "AOT";
             if (IsMono || IsWasm)
                 return ""; // There is no helpful information about JIT on Mono

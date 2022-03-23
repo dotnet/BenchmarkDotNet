@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('j', "job", Required = false, Default = "Default", HelpText = "Dry/Short/Medium/Long or Default")]
         public string BaseJob { get; set; }
 
-        [Option('r', "runtimes", Required = false, HelpText = "Full target framework moniker for .NET Core and .NET. For Mono just 'Mono', for CoreRT just 'CoreRT'. First one will be marked as baseline!")]
+        [Option('r', "runtimes", Required = false, HelpText = "Full target framework moniker for .NET Core and .NET. For Mono just 'Mono'. For NativeAOT please append target runtime version (example: 'nativeaot7.0'). First one will be marked as baseline!")]
         public IEnumerable<string> Runtimes { get; set; }
 
         [Option('e', "exporters", Required = false, HelpText = "GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML")]
@@ -94,11 +94,11 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("clrVersion", Required = false, HelpText = "Optional version of private CLR build used as the value of COMPLUS_Version env var.")]
         public string ClrVersion { get; set; }
 
-        [Option("ilCompilerVersion", Required = false, HelpText = "Optional version of Microsoft.DotNet.ILCompiler which should be used to run with CoreRT/NativeAOT. Example: \"7.0.0-preview.3.22123.2\"")]
+        [Option("ilCompilerVersion", Required = false, HelpText = "Optional version of Microsoft.DotNet.ILCompiler which should be used to run with NativeAOT. Example: \"7.0.0-preview.3.22123.2\"")]
         public string ILCompilerVersion { get; set; }
 
-        [Option("ilcPath", Required = false, HelpText = "Optional IlcPath which should be used to run with private CoreRT build.")]
-        public DirectoryInfo CoreRtPath { get; set; }
+        [Option("ilcPath", Required = false, HelpText = "Optional IlcPath which should be used to run with private NativeAOT build.")]
+        public DirectoryInfo IlcPath { get; set; }
 
         [Option("launchCount", Required = false, HelpText = "How many times we should launch process with target benchmark. The default is 1.")]
         public int? LaunchCount { get; set; }

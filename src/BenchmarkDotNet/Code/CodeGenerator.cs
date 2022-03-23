@@ -71,8 +71,8 @@ namespace BenchmarkDotNet.Code
                 benchmarksCode.Add(benchmarkTypeCode);
             }
 
-            if (buildPartition.IsCoreRT)
-                extraDefines.Add("#define CORERT");
+            if (buildPartition.IsNativeAot)
+                extraDefines.Add("#define NATIVEAOT");
             else if (buildPartition.IsNetFramework)
                 extraDefines.Add("#define NETFRAMEWORK");
             else if (buildPartition.IsWasm)
@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Code
                 .Replace("$AdditionalLogic$", string.Join(Environment.NewLine, additionalLogic))
                 .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))
                 .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmarkCase.Descriptor))
-                .Replace("$CoreRtSwitch$", GetCoreRtSwitch(buildPartition))
+                .Replace("$NativeAotSwitch$", GetNativeAotSwitch(buildPartition))
                 .ToString();
 
             return benchmarkProgramContent;
@@ -259,11 +259,11 @@ namespace BenchmarkDotNet.Code
         }
 
         /// <summary>
-        /// for CoreRT we can't use reflection to load type and run a method, so we simply generate a switch for all types..
+        /// for NativeAOT we can't use reflection to load type and run a method, so we simply generate a switch for all types..
         /// </summary>
-        private static string GetCoreRtSwitch(BuildPartition buildPartition)
+        private static string GetNativeAotSwitch(BuildPartition buildPartition)
         {
-            if (!buildPartition.IsCoreRT)
+            if (!buildPartition.IsNativeAot)
                 return default;
 
             var @switch = new StringBuilder(buildPartition.Benchmarks.Length * 30);

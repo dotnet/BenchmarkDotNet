@@ -4,7 +4,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.CoreRt;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess;
@@ -60,10 +60,10 @@ namespace BenchmarkDotNet.Toolchains
 
                     return CsProjCoreToolchain.From(new NetCoreAppSettings(coreRuntime.MsBuildMoniker, null, coreRuntime.Name));
 
-                case CoreRtRuntime coreRtRuntime:
-                    return coreRtRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
-                            ? GetToolchain(coreRtRuntime.RuntimeMoniker)
-                            : CoreRtToolchain.CreateBuilder().UseCoreRtNuGet().TargetFrameworkMoniker(coreRtRuntime.MsBuildMoniker).ToToolchain();
+                case NativeAotRuntime nativeAotRuntime:
+                    return nativeAotRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
+                            ? GetToolchain(nativeAotRuntime.RuntimeMoniker)
+                            : NativeAotToolchain.CreateBuilder().UseNuGet().TargetFrameworkMoniker(nativeAotRuntime.MsBuildMoniker).ToToolchain();
 
                 case WasmRuntime wasmRuntime:
                     return WasmToolChain.From(new NetCoreAppSettings(targetFrameworkMoniker: wasmRuntime.MsBuildMoniker, name: wasmRuntime.Name, runtimeFrameworkVersion: null));
@@ -108,12 +108,12 @@ namespace BenchmarkDotNet.Toolchains
                     return CsProjCoreToolchain.NetCoreApp60;
                 case RuntimeMoniker.Net70:
                     return CsProjCoreToolchain.NetCoreApp70;
-                case RuntimeMoniker.CoreRt50:
-                    return CoreRtToolchain.Core50;
-                case RuntimeMoniker.CoreRt60:
-                    return CoreRtToolchain.Core60;
+                case RuntimeMoniker.NativeAot50:
+                    return NativeAotToolchain.Net50;
+                case RuntimeMoniker.NativeAot60:
+                    return NativeAotToolchain.Net60;
                 case RuntimeMoniker.NativeAot70:
-                    return CoreRtToolchain.Core70;
+                    return NativeAotToolchain.Net70;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "RuntimeMoniker not supported");
             }

@@ -15,7 +15,7 @@ using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.CoreRt;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -204,15 +204,15 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void CoreRtPathParsedCorrectly()
+        public void IlCompilerPathParsedCorrectly()
         {
-            var fakeCoreRtPath =  new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory;
-            var config = ConfigParser.Parse(new[] { "-r", "corert50", "--ilcPath", fakeCoreRtPath.FullName }, new OutputLogger(Output)).config;
+            var fakePath =  new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory;
+            var config = ConfigParser.Parse(new[] { "-r", "nativeaot50", "--ilcPath", fakePath.FullName }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
-            CoreRtToolchain toolchain = config.GetJobs().Single().GetToolchain() as CoreRtToolchain;
+            NativeAotToolchain toolchain = config.GetJobs().Single().GetToolchain() as NativeAotToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(fakeCoreRtPath.FullName, toolchain.IlcPath);
+            Assert.Equal(fakePath.FullName, toolchain.IlcPath);
         }
 
         [Theory]
@@ -344,14 +344,14 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
-            var config = ConfigParser.Parse(new[] { "--runtimes", "net461", "MONO", "netcoreapp3.0", "coreRT6.0", "nativeAOT7.0"}, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "--runtimes", "net461", "MONO", "netcoreapp3.0", "nativeaot6.0", "nativeAOT7.0"}, new OutputLogger(Output)).config;
 
             Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net461"));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp30));
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRtRuntime coreRtRuntime && coreRtRuntime.MsBuildMoniker == "net6.0" && coreRtRuntime.RuntimeMoniker == RuntimeMoniker.CoreRt60));
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is NativeAotRuntime nativeAOTRuntime && nativeAOTRuntime.MsBuildMoniker == "net7.0" && nativeAOTRuntime.RuntimeMoniker == RuntimeMoniker.NativeAot70));
+            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net6.0" && nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot60));
+            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net7.0" && nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot70));
         }
 
         [Theory]

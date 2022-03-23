@@ -7,7 +7,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains.CoreRt;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.Roslyn;
@@ -47,9 +47,9 @@ namespace BenchmarkDotNet.Running
         [PublicAPI]
         public Jit Jit => RepresentativeBenchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, Resolver);
 
-        public bool IsCoreRT => Runtime is CoreRtRuntime
-            // given job can have CoreRT toolchain set, but Runtime == default ;)
-            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is CoreRtToolchain);
+        public bool IsNativeAot => Runtime is NativeAotRuntime
+            // given job can have NativeAOT toolchain set, but Runtime == default
+            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is NativeAotToolchain);
 
         public bool IsWasm => Runtime is WasmRuntime // given job can have Wasm toolchain set, but Runtime == default ;)
             || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is WasmToolChain);
@@ -63,8 +63,8 @@ namespace BenchmarkDotNet.Running
 
         public bool IsCustomBuildConfiguration => BuildConfiguration != InfrastructureMode.ReleaseConfigurationName;
 
-        public TimeSpan Timeout => IsCoreRT && RepresentativeBenchmarkCase.Config.BuildTimeout == DefaultConfig.Instance.BuildTimeout
-            ? TimeSpan.FromMinutes(5) // downloading all CoreRT dependencies can take a LOT of time
+        public TimeSpan Timeout => IsNativeAot && RepresentativeBenchmarkCase.Config.BuildTimeout == DefaultConfig.Instance.BuildTimeout
+            ? TimeSpan.FromMinutes(5) // downloading all NativeAOT dependencies can take a LOT of time
             : RepresentativeBenchmarkCase.Config.BuildTimeout;
 
         public bool LogBuildOutput { get; }

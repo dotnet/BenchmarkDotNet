@@ -96,14 +96,14 @@ namespace BenchmarkDotNet.Jobs
         Net70,
 
         /// <summary>
-        /// CoreRT compiled as net5.0
+        /// NativeAOT compiled as net5.0
         /// </summary>
-        CoreRt50,
+        NativeAot50,
 
         /// <summary>
-        /// CoreRT compiled as net6.0
+        /// NativeAOT compiled as net6.0
         /// </summary>
-        CoreRt60,
+        NativeAot60,
 
         /// <summary>
         /// NativeAOT compiled as net7.0
