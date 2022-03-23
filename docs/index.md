@@ -38,7 +38,7 @@ It's [easy](#simplicity) to start writing benchmarks, check out an example
 ```cs
 [SimpleJob(RuntimeMoniker.Net472, baseline: true)]
 [SimpleJob(RuntimeMoniker.NetCoreApp30)]
-[SimpleJob(RuntimeMoniker.CoreRt30)]
+[SimpleJob(RuntimeMoniker.NativeAot70)]
 [SimpleJob(RuntimeMoniker.Mono)]
 [RPlotExporter]
 public class Md5VsSha256
@@ -108,7 +108,7 @@ The measured data can be exported to different formats (md, html, csv, xml, json
 
 ![](images/v0.12.0/rplot.png)
 
-*Supported runtimes:* .NET 5+, .NET Framework 4.6.1+, .NET Core 2.0+, Mono, CoreRT  
+*Supported runtimes:* .NET 5+, .NET Framework 4.6.1+, .NET Core 2.0+, Mono, NativeAOT  
 *Supported languages:* C#, F#, Visual Basic  
 *Supported OS:* Windows, Linux, macOS  
 *Supported architectures:* x86, x64, ARM, ARM64 and Wasm

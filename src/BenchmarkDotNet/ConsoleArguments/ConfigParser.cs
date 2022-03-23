@@ -17,8 +17,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.CoreRt;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -158,9 +157,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return false;
             }
 
-            if (options.CoreRtPath.IsNotNullButDoesNotExist())
+            if (options.IlcPath.IsNotNullButDoesNotExist())
             {
-                logger.WriteLineError($"The provided {nameof(options.CoreRtPath)} \"{options.CoreRtPath}\" does NOT exist.");
+                logger.WriteLineError($"The provided {nameof(options.IlcPath)} \"{options.IlcPath}\" does NOT exist.");
                 return false;
             }
 
@@ -363,8 +362,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                         .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
                 case RuntimeMoniker.Mono:
                     return baseJob.WithRuntime(new MonoRuntime("Mono", options.MonoPath?.FullName));
-                case RuntimeMoniker.CoreRt50:
-                case RuntimeMoniker.CoreRt60:
+                case RuntimeMoniker.NativeAot50:
+                case RuntimeMoniker.NativeAot60:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json");
                 case RuntimeMoniker.NativeAot70:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "7.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json");
@@ -389,19 +388,19 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static Job CreateAotJob(Job baseJob, CommandLineOptions options, RuntimeMoniker runtimeMoniker, string ilCompilerVersion, string nuGetFeedUrl)
         {
-            var builder = CoreRtToolchain.CreateBuilder();
+            var builder = NativeAotToolchain.CreateBuilder();
 
             if (options.CliPath != null)
                 builder.DotNetCli(options.CliPath.FullName);
             if (options.RestorePath != null)
                 builder.PackagesRestorePath(options.RestorePath.FullName);
 
-            if (options.CoreRtPath != null)
-                builder.UseCoreRtLocal(options.CoreRtPath.FullName);
+            if (options.IlcPath != null)
+                builder.UseLocalBuild(options.IlcPath.FullName);
             else if (!string.IsNullOrEmpty(options.ILCompilerVersion))
-                builder.UseCoreRtNuGet(options.ILCompilerVersion, nuGetFeedUrl);
+                builder.UseNuGet(options.ILCompilerVersion, nuGetFeedUrl);
             else
-                builder.UseCoreRtNuGet(ilCompilerVersion, nuGetFeedUrl);
+                builder.UseNuGet(ilCompilerVersion, nuGetFeedUrl);
 
             var runtime = runtimeMoniker.GetRuntime();
             builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);

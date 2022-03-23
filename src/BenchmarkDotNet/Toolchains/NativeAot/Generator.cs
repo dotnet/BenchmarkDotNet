@@ -10,25 +10,25 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 
-namespace BenchmarkDotNet.Toolchains.CoreRt
+namespace BenchmarkDotNet.Toolchains.NativeAot
 {
     /// <summary>
-    /// generates new csproj file for self-contained .NET Core RT app
+    /// generates new csproj file for self-contained NativeAOT app
     /// based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built
     /// and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project
     /// </summary>
     public class Generator : CsProjGenerator
     {
-        internal const string CoreRtNuGetFeed = "coreRtNuGetFeed";
+        internal const string NativeAotNuGetFeed = "nativeAotNuGetFeed";
 
-        internal Generator(string coreRtVersion, bool useCppCodeGenerator,
+        internal Generator(string ilCompilerVersion, bool useCppCodeGenerator,
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string cliPath,
             string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag,
             bool useTempFolderForRestore, string packagesRestorePath,
             bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData)
             : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore, packagesRestorePath), runtimeFrameworkVersion)
         {
-            this.coreRtVersion = coreRtVersion;
+            this.ilCompilerVersion = ilCompilerVersion;
             this.useCppCodeGenerator = useCppCodeGenerator;
             this.targetFrameworkMoniker = targetFrameworkMoniker;
             this.runtimeIdentifier = runtimeIdentifier;
@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
             this.ilcGenerateStackTraceData = ilcGenerateStackTraceData;
         }
 
-        private readonly string coreRtVersion;
+        private readonly string ilCompilerVersion;
         private readonly bool useCppCodeGenerator;
         [SuppressMessage("ReSharper", "NotAccessedField.Local")]
         private readonly string targetFrameworkMoniker;
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         private readonly bool ilcGenerateCompleteTypeMetadata;
         private readonly bool ilcGenerateStackTraceData;
 
-        private bool IsNuGetCoreRt => feeds.ContainsKey(CoreRtNuGetFeed) && !string.IsNullOrWhiteSpace(coreRtVersion);
+        private bool IsNuGet => feeds.ContainsKey(NativeAotNuGetFeed) && !string.IsNullOrWhiteSpace(ilCompilerVersion);
 
         protected override string GetExecutableExtension() => RuntimeInformation.ExecutableExtension;
 
@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
-            string extraArguments = CoreRtToolchain.GetExtraArguments(useCppCodeGenerator, runtimeIdentifier);
+            string extraArguments = NativeAotToolchain.GetExtraArguments(useCppCodeGenerator, runtimeIdentifier);
 
             var content = new StringBuilder(300)
                 .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, extraArguments)}")
@@ -109,7 +109,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
             File.WriteAllText(artifactsPaths.ProjectFilePath,
-                IsNuGetCoreRt
+                IsNuGet
                     ? GenerateProjectForNuGetBuild(buildPartition, artifactsPaths, logger)
                     : GenerateProjectForLocalBuild(buildPartition, artifactsPaths, logger));
 
@@ -144,7 +144,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{coreRtVersion}"" />
+    <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
   <ItemGroup>

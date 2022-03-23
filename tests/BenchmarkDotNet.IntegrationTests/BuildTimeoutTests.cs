@@ -4,7 +4,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains.CoreRt;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -17,22 +17,26 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenBuildTakesMoreTimeThanTheTimeoutTheBuildIsCancelled()
         {
-            if (!RuntimeInformation.Is64BitPlatform()) // CoreRT does not support 32bit yet
+            if (!RuntimeInformation.Is64BitPlatform()) // NativeAOT does not support 32bit yet
+                return;
+            if (GitHubActions.IsRunningOnWindows()) // no native dependencies installed
                 return;
 
-            // we use CoreRT on purpose because it takes a LOT of time to build it
+            // we use NativeAOT on purpose because it takes a LOT of time to build it
             // so we can be sure that timeout = 1s should fail!
             var timeout = TimeSpan.FromSeconds(1);
 
             var config = ManualConfig.CreateEmpty()
                 .WithBuildTimeout(timeout)
                 .AddJob(Job.Dry
-                    .WithRuntime(CoreRtRuntime.CoreRt50)
-                    .WithToolchain(CoreRtToolchain.CreateBuilder()
-                        .UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "6.0.0-preview.1.21074.3") // we test against specific version to keep this test stable
+                    .WithRuntime(NativeAotRuntime.Net50)
+                    .WithToolchain(NativeAotToolchain.CreateBuilder()
+                        .UseNuGet(
+                            "6.0.0-rc.1.21420.1", // we test against specific version to keep this test stable
+                            "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json") // using old feed that supports net5.0
                         .ToToolchain()));
 
-            var summary = CanExecute<CoreRtBenchmark>(config, fullValidation: false);
+            var summary = CanExecute<NativeAotBenchmark>(config, fullValidation: false);
 
             Assert.All(summary.Reports, report => Assert.False(report.BuildResult.IsBuildSuccess));
             Assert.All(summary.Reports, report => Assert.Contains("The configured timeout", report.BuildResult.ErrorMessage));
@@ -42,6 +46,6 @@ namespace BenchmarkDotNet.IntegrationTests
     public class Impossible
     {
         [Benchmark]
-        public void Check() => Environment.FailFast("This benchmark should have been never executed because 1s is not enough to build CoreRT benchmark!");
+        public void Check() => Environment.FailFast("This benchmark should have been never executed because 1s is not enough to build NativeAOT benchmark!");
     }
 }
