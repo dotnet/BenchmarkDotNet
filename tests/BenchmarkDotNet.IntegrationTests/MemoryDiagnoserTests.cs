@@ -41,7 +41,10 @@ namespace BenchmarkDotNet.IntegrationTests
 #if !NETFRAMEWORK
                     // we don't want to test NativeAOT twice (for .NET 4.6 and 5.0) when running the integration tests (these tests take a lot of time)
                     // we test against specific version to keep this test stable
-                    new object[] { NativeAotToolchain.CreateBuilder().UseNuGet(microsoftDotNetILCompilerVersion: "6.0.0-preview.1.21074.3").ToToolchain() }
+                    new object[] { NativeAotToolchain.CreateBuilder()
+                        .UseNuGet(
+                            "6.0.0-rc.1.21420.1",
+                            "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json").ToToolchain() }
 #endif
                 };
 

@@ -29,7 +29,9 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddJob(Job.Dry
                     .WithRuntime(NativeAotRuntime.Net50)
                     .WithToolchain(NativeAotToolchain.CreateBuilder()
-                        .UseNuGet(microsoftDotNetILCompilerVersion: "6.0.0-preview.1.21074.3") // we test against specific version to keep this test stable
+                        .UseNuGet(
+                            "6.0.0-rc.1.21420.1", // we test against specific version to keep this test stable
+                            "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json") // using old feed that supports net5.0
                         .ToToolchain()));
 
             var summary = CanExecute<NativeAotBenchmark>(config, fullValidation: false);

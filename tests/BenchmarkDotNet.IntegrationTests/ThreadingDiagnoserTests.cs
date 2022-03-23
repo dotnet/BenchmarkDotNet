@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using BenchmarkDotNet.Portability;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -30,12 +29,10 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             yield return new object[] { Job.Default.GetToolchain() };
 
-            // Currently, NativeAotToolchain.Core50 produces the following error on Unix without installed clang:
-            //   Standard error:
-            //   ~/.nuget/packages/microsoft.dotnet.ilcompiler/6.0.0-preview.5.21269.1/build/Microsoft.NETCore.Native.Unix.props(99,5):
-            //   error : Platform linker ('clang') not found. Try installing clang or the appropriate package for your platform to resolve the problem.
-            if (RuntimeInformation.IsWindows())
-                yield return new object[] { NativeAotToolchain.Net50 };
+            yield return new object[] { NativeAotToolchain.CreateBuilder()
+                .UseNuGet(
+                    "6.0.0-rc.1.21420.1",
+                    "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json").ToToolchain() };
 
             // TODO: Support InProcessEmitToolchain.Instance
             // yield return new object[] { InProcessEmitToolchain.Instance };
