@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Equal(HardwareCounter.CacheMisses, final.GetHardwareCounters().Single());
         }
 
-        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because CoreRT compiler goes crazy when some dependency has reference to TraceEvent...")]
+        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because NativeAOT compiler goes crazy when some dependency has reference to TraceEvent...")]
         public void WhenUserDefinesHardwareCountersWeChooseTheRightDiagnoser()
         {
             var mutable = ManualConfig.CreateEmpty();
@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Single(final.GetDiagnosers().OfType<IHardwareCountersDiagnoser>());
         }
 
-        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because CoreRT compiler goes crazy when some dependency has reference to TraceEvent...")]
+        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because NativeAOT compiler goes crazy when some dependency has reference to TraceEvent...")]
         public void WhenUserDefinesHardwareCountersAndUsesDisassemblyDiagnoserWeAddInstructionPointerExporter()
         {
             var mutable = ManualConfig.CreateEmpty();
