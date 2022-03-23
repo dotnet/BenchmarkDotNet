@@ -2,7 +2,7 @@
 
 ## BenchmarkDotNet
 
-You need to be aware of the fact that to ensure process-level isolation BenchmarkDotNet generates, builds and executes every benchmark in a dedicated process. For .NET and Mono we generate a C# file and compile it using Roslyn. For .NET Core and CoreRT we generate not only C# file but also a project file which later is restored and build with dotnet cli. If your project has some non-trivial build settings like a `.props` and `.target` files or native dependencies things might not work well out of the box.
+You need to be aware of the fact that to ensure process-level isolation BenchmarkDotNet generates, builds and executes every benchmark in a dedicated process. For .NET and Mono we generate a C# file and compile it using Roslyn. For .NET Core and NativeAOT we generate not only C# file but also a project file which later is restored and build with dotnet cli. If your project has some non-trivial build settings like a `.props` and `.target` files or native dependencies things might not work well out of the box.
 
 How do you know that BenchmarkDotNet has failed to build the project? BDN is going to tell you about it. An example:
 
