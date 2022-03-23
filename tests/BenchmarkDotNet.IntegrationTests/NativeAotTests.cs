@@ -18,6 +18,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             if (!RuntimeInformation.Is64BitPlatform()) // NativeAOT does not support 32bit yet
                 return;
+            if (GitHubActions.IsRunningOnWindows()) // no native dependencies installed
+                return;
 
             var config = ManualConfig.CreateEmpty()
                 .AddJob(Job.Dry

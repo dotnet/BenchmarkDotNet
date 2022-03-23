@@ -29,11 +29,11 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             yield return new object[] { Job.Default.GetToolchain() };
 
-            yield return new object[] { NativeAotToolchain.CreateBuilder()
-                .UseNuGet(
-                    "6.0.0-rc.1.21420.1",
-                    "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json").ToToolchain() };
-
+            if (!GitHubActions.IsRunningOnWindows())
+                yield return new object[]{ NativeAotToolchain.CreateBuilder()
+                    .UseNuGet(
+                        "6.0.0-rc.1.21420.1",
+                        "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json").ToToolchain() };
             // TODO: Support InProcessEmitToolchain.Instance
             // yield return new object[] { InProcessEmitToolchain.Instance };
         }

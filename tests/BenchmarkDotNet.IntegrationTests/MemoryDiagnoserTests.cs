@@ -32,21 +32,25 @@ namespace BenchmarkDotNet.IntegrationTests
         public MemoryDiagnoserTests(ITestOutputHelper outputHelper) => output = outputHelper;
 
         public static IEnumerable<object[]> GetToolchains()
-            => RuntimeInformation.IsMono // https://github.com/mono/mono/issues/8397
-                ? Array.Empty<object[]>()
-                : new[]
-                {
-                    new object[] { Job.Default.GetToolchain() },
-                    new object[] { InProcessEmitToolchain.Instance },
+        {
+            if (RuntimeInformation.IsMono) // https://github.com/mono/mono/issues/8397
+                yield break;
+
+            yield return new object[] { Job.Default.GetToolchain() };
+            yield return new object[] { InProcessEmitToolchain.Instance };
+
 #if !NETFRAMEWORK
-                    // we don't want to test NativeAOT twice (for .NET 4.6 and 5.0) when running the integration tests (these tests take a lot of time)
-                    // we test against specific version to keep this test stable
-                    new object[] { NativeAotToolchain.CreateBuilder()
-                        .UseNuGet(
-                            "6.0.0-rc.1.21420.1",
-                            "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json").ToToolchain() }
+            if (!GitHubActions.IsRunningOnWindows())
+            {
+                // we don't want to test NativeAOT twice (for .NET 4.6 and 5.0) when running the integration tests (these tests take a lot of time)
+                // we test against specific version to keep this test stable
+                yield return new object[] { NativeAotToolchain.CreateBuilder()
+                .UseNuGet(
+                    "6.0.0-rc.1.21420.1",
+                    "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json").ToToolchain() };
+            }
 #endif
-                };
+        }
 
         public class AccurateAllocations
         {
