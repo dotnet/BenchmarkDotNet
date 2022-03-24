@@ -48,7 +48,7 @@
 
    <ItemGroup>
      <AotInputAssemblies Include="$(PublishDirFullPath)\*.dll">
-        <AotArguments>@(MonoAOTCompilerDefaultAotArguments, ';')</AotArguments>
+        <AotArguments>@(MonoAOTCompilerDefaultAotArguments, ';')mcpu=native</AotArguments>
         <ProcessArguments>@(MonoAOTCompilerDefaultProcessArguments, ';')</ProcessArguments>
      </AotInputAssemblies>
    </ItemGroup>
