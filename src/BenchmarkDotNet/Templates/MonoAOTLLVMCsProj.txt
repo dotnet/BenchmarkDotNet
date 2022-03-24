@@ -40,6 +40,10 @@
 
    <PropertyGroup>
       <PublishDirFullPath>$([System.IO.Path]::GetFullPath($(PublishDir)))</PublishDirFullPath>
+      <SharedLibraryType Condition="$([MSBuild]::IsOSPlatform('OSX'))">dylib</SharedLibraryType>
+      <SharedLibraryType Condition="$([MSBuild]::IsOSPlatform('Windows'))">dll</SharedLibraryType>
+      <SharedLibraryType Condition="$([MSBuild]::IsOSPlatform('Linux'))">so</SharedLibraryType>
+      <SharedLibraryType Condition="$([MSBuild]::IsOSPlatform('FreeBSD'))">so</SharedLibraryType>
    </PropertyGroup>
 
    <ItemGroup>
@@ -48,15 +52,18 @@
         <ProcessArguments>@(MonoAOTCompilerDefaultProcessArguments, ';')</ProcessArguments>
      </AotInputAssemblies>
    </ItemGroup>
+   
+
 
    <MonoAOTCompiler
         CompilerBinaryPath="$COMPILERBINARYPATH$"
-        Mode="Normal"
-        OutputType="Normal"
+        Mode="Full"
+        OutputType="Library"
+        LibraryFormat="$(SharedLibraryType)"
         Assemblies="@(AotInputAssemblies)"
         UseLLVM="$USELLVM$"
         LLVMPath="$(MicrosoftNetCoreAppRuntimePackDir)\runtimes\$(RuntimeIdentifier)\native"
-	    OutputDir="$(PublishDir)"
+	      OutputDir="$(PublishDir)"
         UseAotDataFile="false"
         IntermediateOutputPath="$(IntermediateOutputPath)">
         <Output TaskParameter="CompiledAssemblies" ItemName="BundleAssemblies" />
