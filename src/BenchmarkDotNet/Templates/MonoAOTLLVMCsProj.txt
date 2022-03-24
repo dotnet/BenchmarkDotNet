@@ -48,7 +48,7 @@
 
    <ItemGroup>
      <AotInputAssemblies Include="$(PublishDirFullPath)\*.dll">
-        <AotArguments>@(MonoAOTCompilerDefaultAotArguments, ';')mcpu=native</AotArguments>
+        <AotArguments>@(MonoAOTCompilerDefaultAotArguments, ';');mcpu=native</AotArguments>
         <ProcessArguments>@(MonoAOTCompilerDefaultProcessArguments, ';')</ProcessArguments>
      </AotInputAssemblies>
    </ItemGroup>
@@ -63,7 +63,7 @@
         Assemblies="@(AotInputAssemblies)"
         UseLLVM="$USELLVM$"
         LLVMPath="$(MicrosoftNetCoreAppRuntimePackDir)\runtimes\$(RuntimeIdentifier)\native"
-	      OutputDir="$(PublishDir)"
+        OutputDir="$(PublishDir)"
         UseAotDataFile="false"
         IntermediateOutputPath="$(IntermediateOutputPath)">
         <Output TaskParameter="CompiledAssemblies" ItemName="BundleAssemblies" />
