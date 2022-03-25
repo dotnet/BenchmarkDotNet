@@ -131,19 +131,19 @@ namespace BenchmarkDotNet.Extensions
             // disable ReSharper's Dynamic Program Analysis (see https://github.com/dotnet/BenchmarkDotNet/issues/1871 for details)
             start.EnvironmentVariables["JETBRAINS_DPA_AGENT_ENABLE"] = "0";
 
-            if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
-                return;
-
             if (benchmarkCase.Job.Infrastructure.Toolchain is MonoAotLLVMToolChain)
             {
                 MonoAotLLVMRuntime aotruntime = (MonoAotLLVMRuntime)benchmarkCase.GetRuntime();
 
                 if (aotruntime.AOTCompilerMode == MonoAotCompilerMode.llvm)
                 {
-                    start.EnvironmentVariables["MONO_ENV_OPTIONS"] = "--llvm,--full-aot";
+                    start.EnvironmentVariables["MONO_ENV_OPTIONS"] = "--full-aot";
                 }
-
             }
+
+            if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
+                return;
+
 
             foreach (var environmentVariable in benchmarkCase.Job.Environment.EnvironmentVariables)
                 start.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;
