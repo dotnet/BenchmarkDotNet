@@ -144,7 +144,6 @@ namespace BenchmarkDotNet.Extensions
             if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
                 return;
 
-
             foreach (var environmentVariable in benchmarkCase.Job.Environment.EnvironmentVariables)
                 start.EnvironmentVariables[environmentVariable.Key] = environmentVariable.Value;
         }
