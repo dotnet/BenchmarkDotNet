@@ -52,7 +52,6 @@
         <ProcessArguments>@(MonoAOTCompilerDefaultProcessArguments, ';')</ProcessArguments>
      </AotInputAssemblies>
    </ItemGroup>
-   
 
 
    <MonoAOTCompiler
