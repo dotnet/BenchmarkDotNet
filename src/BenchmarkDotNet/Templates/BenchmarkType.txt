@@ -146,11 +146,10 @@
             }
             catch (System.Exception)
             {
+                BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
                 throw;
             }
-            var elapsed = startedClock.GetElapsed();
-            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
-            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(elapsed);
+            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(startedClock.GetElapsed());
         }
 
         private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> WorkloadActionUnroll(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)

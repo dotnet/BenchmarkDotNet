@@ -141,16 +141,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private ValueTask<ClockSpan> InvokeNoUnrollHardcodedOverhead(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
+                Task value = default;
                 startedClock = clock?.Start() ?? default;
                 try
                 {
                     while (--repeatsRemaining >= 0)
                     {
-                        callback();
+                        value = callback();
                     }
                 }
                 catch (Exception)
                 {
+                    Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
                     throw;
                 }
                 return new ValueTask<ClockSpan>(startedClock.GetElapsed());
@@ -258,16 +260,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private ValueTask<ClockSpan> InvokeNoUnrollHardcodedOverhead(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
+                Task<T> value = default;
                 startedClock = clock?.Start() ?? default;
                 try
                 {
                     while (--repeatsRemaining >= 0)
                     {
-                        callback();
+                        value = callback();
                     }
                 }
                 catch (Exception)
                 {
+                    Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
                     throw;
                 }
                 return new ValueTask<ClockSpan>(startedClock.GetElapsed());
@@ -376,16 +380,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private ValueTask<ClockSpan> InvokeNoUnrollHardcodedOverhead(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
+                ValueTask value = default;
                 startedClock = clock?.Start() ?? default;
                 try
                 {
                     while (--repeatsRemaining >= 0)
                     {
-                        callback();
+                        value = callback();
                     }
                 }
                 catch (Exception)
                 {
+                    Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
                     throw;
                 }
                 return new ValueTask<ClockSpan>(startedClock.GetElapsed());
@@ -493,16 +499,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private ValueTask<ClockSpan> InvokeNoUnrollHardcodedOverhead(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
+                ValueTask<T> value = default;
                 startedClock = clock?.Start() ?? default;
                 try
                 {
                     while (--repeatsRemaining >= 0)
                     {
-                        callback();
+                        value = callback();
                     }
                 }
                 catch (Exception)
                 {
+                    Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
                     throw;
                 }
                 return new ValueTask<ClockSpan>(startedClock.GetElapsed());
