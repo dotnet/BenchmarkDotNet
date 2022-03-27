@@ -166,14 +166,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             private ValueTask InvokeSingleHardcodedOverhead()
             {
-                InvokeNoUnrollHardcodedOverhead(1, null);
+                callback();
                 return new ValueTask();
             }
 
             private ValueTask<ClockSpan> InvokeNoUnrollHardcodedOverhead(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
-                startedClock = clock?.Start() ?? default;
+                startedClock = clock.Start();
                 try
                 {
                     while (--repeatsRemaining >= 0)
@@ -190,15 +190,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             private ValueTask InvokeSingleHardcoded()
             {
-                InvokeNoUnrollHardcoded(1, null);
-                return new ValueTask(valueTaskSource, valueTaskSource.Version);
+                return AwaitHelper.ToValueTaskVoid(callback());
             }
 
             private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
                 valueTaskSource.Reset();
-                startedClock = clock?.Start() ?? default;
+                startedClock = clock.Start();
                 RunTask();
                 return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
             }
@@ -283,14 +282,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             private ValueTask InvokeSingleHardcodedOverhead()
             {
-                InvokeNoUnrollHardcodedOverhead(1, null);
+                callback();
                 return new ValueTask();
             }
 
             private ValueTask<ClockSpan> InvokeNoUnrollHardcodedOverhead(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
-                startedClock = clock?.Start() ?? default;
+                startedClock = clock.Start();
                 try
                 {
                     while (--repeatsRemaining >= 0)
@@ -307,15 +306,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             private ValueTask InvokeSingleHardcoded()
             {
-                InvokeNoUnrollHardcoded(1, null);
-                return new ValueTask(valueTaskSource, valueTaskSource.Version);
+                return AwaitHelper.ToValueTaskVoid(callback());
             }
 
             private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
                 valueTaskSource.Reset();
-                startedClock = clock?.Start() ?? default;
+                startedClock = clock.Start();
                 RunTask();
                 return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
             }
@@ -401,14 +399,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             private ValueTask InvokeSingleHardcodedOverhead()
             {
-                InvokeNoUnrollHardcodedOverhead(1, null);
+                callback();
                 return new ValueTask();
             }
 
             private ValueTask<ClockSpan> InvokeNoUnrollHardcodedOverhead(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
-                startedClock = clock?.Start() ?? default;
+                startedClock = clock.Start();
                 try
                 {
                     while (--repeatsRemaining >= 0)
@@ -425,15 +423,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             private ValueTask InvokeSingleHardcoded()
             {
-                InvokeNoUnrollHardcoded(1, null);
-                return new ValueTask(valueTaskSource, valueTaskSource.Version);
+                return AwaitHelper.ToValueTaskVoid(callback());
             }
 
             private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
                 valueTaskSource.Reset();
-                startedClock = clock?.Start() ?? default;
+                startedClock = clock.Start();
                 RunTask();
                 return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
             }
@@ -518,14 +515,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             private ValueTask InvokeSingleHardcodedOverhead()
             {
-                InvokeNoUnrollHardcodedOverhead(1, null);
+                callback();
                 return new ValueTask();
             }
 
             private ValueTask<ClockSpan> InvokeNoUnrollHardcodedOverhead(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
-                startedClock = clock?.Start() ?? default;
+                startedClock = clock.Start();
                 try
                 {
                     while (--repeatsRemaining >= 0)
@@ -542,15 +539,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 
             private ValueTask InvokeSingleHardcoded()
             {
-                InvokeNoUnrollHardcoded(1, null);
-                return new ValueTask(valueTaskSource, valueTaskSource.Version);
+                return AwaitHelper.ToValueTaskVoid(callback());
             }
 
             private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
                 valueTaskSource.Reset();
-                startedClock = clock?.Start() ?? default;
+                startedClock = clock.Start();
                 RunTask();
                 return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
             }
