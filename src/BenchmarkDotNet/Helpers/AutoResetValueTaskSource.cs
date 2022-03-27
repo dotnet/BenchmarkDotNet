@@ -1,40 +1,26 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using System;
 using System.Diagnostics;
 using System.Runtime.ExceptionServices;
-using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Threading.Tasks.Sources;
 
 namespace BenchmarkDotNet.Helpers
 {
-    /// <summary>Provides the core logic for implementing a manual-reset <see cref="IValueTaskSource"/> or <see cref="IValueTaskSource{TResult}"/>.</summary>
-    /// <typeparam name="TResult"></typeparam>
-    [StructLayout(LayoutKind.Auto)]
-    public class ManualResetValueTaskSource<TResult> : IValueTaskSource<TResult>, IValueTaskSource
+    /// <summary>
+    /// Implementation for <see cref="IValueTaskSource{TResult}"/> that will reset itself when awaited so that it can be re-used.
+    /// </summary>
+    public class AutoResetValueTaskSource<TResult> : IValueTaskSource<TResult>, IValueTaskSource
     {
-        /// <summary>
-        /// The callback to invoke when the operation completes if <see cref="OnCompleted"/> was called before the operation completed,
-        /// or <see cref="ManualResetValueTaskSourceCoreShared.s_sentinel"/> if the operation completed before a callback was supplied,
-        /// or null if a callback hasn't yet been provided and the operation hasn't yet completed.
-        /// </summary>
         [CanBeNull] private Action<object> _continuation;
-        /// <summary>State to pass to <see cref="_continuation"/>.</summary>
         [CanBeNull] private object _continuationState;
-        /// <summary>Whether the current operation has completed.</summary>
         private bool _completed;
-        /// <summary>The result with which the operation succeeded, or the default value if it hasn't yet completed or failed.</summary>
         [CanBeNull] private TResult _result;
-        /// <summary>The exception with which the operation failed, or null if it hasn't yet completed or completed successfully.</summary>
         [CanBeNull] private ExceptionDispatchInfo _error;
-        /// <summary>The current version of this value, used to help prevent misuse.</summary>
         private short _version;
 
-        /// <summary>Resets to prepare for the next operation.</summary>
-        public void Reset()
+        private void Reset()
         {
             // Reset/update state for the next use/await of this instance.
             _version++;
@@ -86,8 +72,11 @@ namespace BenchmarkDotNet.Helpers
                 throw new InvalidOperationException();
             }
 
-            _error?.Throw();
-            return _result;
+            var result = _result;
+            var error = _error;
+            Reset();
+            error?.Throw();
+            return result;
         }
 
         public void OnCompleted(Action<object> continuation, object state, short token, ValueTaskSourceOnCompletedFlags flags)
@@ -116,7 +105,7 @@ namespace BenchmarkDotNet.Helpers
             if (oldContinuation != null)
             {
                 // Operation already completed, so we need to call the supplied callback.
-                if (!ReferenceEquals(oldContinuation, ManualResetValueTaskSourceCoreShared.s_sentinel))
+                if (!ReferenceEquals(oldContinuation, AutoResetValueTaskSourceCoreShared.s_sentinel))
                 {
                     throw new InvalidOperationException();
                 }
@@ -125,8 +114,6 @@ namespace BenchmarkDotNet.Helpers
             }
         }
 
-        /// <summary>Ensures that the specified token matches the current version.</summary>
-        /// <param name="token">The token supplied by <see cref="ValueTask"/>.</param>
         private void ValidateToken(short token)
         {
             if (token != _version)
@@ -135,7 +122,6 @@ namespace BenchmarkDotNet.Helpers
             }
         }
 
-        /// <summary>Signals that the operation has completed.  Invoked after the result or error has been set.</summary>
         private void SignalCompletion()
         {
             if (_completed)
@@ -144,21 +130,8 @@ namespace BenchmarkDotNet.Helpers
             }
             _completed = true;
 
-            if (_continuation != null || Interlocked.CompareExchange(ref _continuation, ManualResetValueTaskSourceCoreShared.s_sentinel, null) != null)
-            {
-                InvokeContinuation();
-            }
-        }
-
-        /// <summary>
-        /// Invokes the continuation with the appropriate captured context / scheduler.
-        /// This assumes that if <see cref="_executionContext"/> is not null we're already
-        /// running within that <see cref="ExecutionContext"/>.
-        /// </summary>
-        private void InvokeContinuation()
-        {
-            Debug.Assert(_continuation != null);
-            _continuation(_continuationState);
+            Interlocked.CompareExchange(ref _continuation, AutoResetValueTaskSourceCoreShared.s_sentinel, null)
+                ?.Invoke(_continuationState);
         }
 
         void IValueTaskSource.GetResult(short token)
@@ -167,7 +140,7 @@ namespace BenchmarkDotNet.Helpers
         }
     }
 
-    internal static class ManualResetValueTaskSourceCoreShared // separated out of generic to avoid unnecessary duplication
+    internal static class AutoResetValueTaskSourceCoreShared // separated out of generic to avoid unnecessary duplication
     {
         internal static readonly Action<object> s_sentinel = CompletionSentinel;
         private static void CompletionSentinel(object _) // named method to aid debugging

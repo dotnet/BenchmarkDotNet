@@ -137,7 +137,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         internal class BenchmarkActionTask : BenchmarkActionBase
         {
             private readonly Func<Task> callback;
-            private readonly ManualResetValueTaskSource<ClockSpan> valueTaskSource = new ManualResetValueTaskSource<ClockSpan>();
+            private readonly AutoResetValueTaskSource<ClockSpan> valueTaskSource = new AutoResetValueTaskSource<ClockSpan>();
             private long repeatsRemaining;
             private readonly Action continuation;
             private StartedClock startedClock;
@@ -195,7 +195,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
-                valueTaskSource.Reset();
                 startedClock = clock.Start();
                 RunTask();
                 return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
@@ -252,7 +251,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         internal class BenchmarkActionTask<T> : BenchmarkActionBase
         {
             private readonly Func<Task<T>> callback;
-            private readonly ManualResetValueTaskSource<ClockSpan> valueTaskSource = new ManualResetValueTaskSource<ClockSpan>();
+            private readonly AutoResetValueTaskSource<ClockSpan> valueTaskSource = new AutoResetValueTaskSource<ClockSpan>();
             private long repeatsRemaining;
             private readonly Action continuation;
             private StartedClock startedClock;
@@ -311,7 +310,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
-                valueTaskSource.Reset();
                 startedClock = clock.Start();
                 RunTask();
                 return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
@@ -370,7 +368,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         internal class BenchmarkActionValueTask : BenchmarkActionBase
         {
             private readonly Func<ValueTask> callback;
-            private readonly ManualResetValueTaskSource<ClockSpan> valueTaskSource = new ManualResetValueTaskSource<ClockSpan>();
+            private readonly AutoResetValueTaskSource<ClockSpan> valueTaskSource = new AutoResetValueTaskSource<ClockSpan>();
             private long repeatsRemaining;
             private readonly Action continuation;
             private StartedClock startedClock;
@@ -428,7 +426,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
-                valueTaskSource.Reset();
                 startedClock = clock.Start();
                 RunTask();
                 return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
@@ -485,7 +482,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         internal class BenchmarkActionValueTask<T> : BenchmarkActionBase
         {
             private readonly Func<ValueTask<T>> callback;
-            private readonly ManualResetValueTaskSource<ClockSpan> valueTaskSource = new ManualResetValueTaskSource<ClockSpan>();
+            private readonly AutoResetValueTaskSource<ClockSpan> valueTaskSource = new AutoResetValueTaskSource<ClockSpan>();
             private long repeatsRemaining;
             private readonly Action continuation;
             private StartedClock startedClock;
@@ -544,7 +541,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
             private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
             {
                 repeatsRemaining = repeatCount;
-                valueTaskSource.Reset();
                 startedClock = clock.Start();
                 RunTask();
                 return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);

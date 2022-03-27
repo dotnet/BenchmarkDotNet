@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         private LocalBuilder disassemblyDiagnoserLocal;
         /*
-            private readonly BenchmarkDotNet.Helpers.ManualResetValueTaskSource<Perfolizer.Horology.ClockSpan> valueTaskSource = new BenchmarkDotNet.Helpers.ManualResetValueTaskSource<Perfolizer.Horology.ClockSpan>();
+            private readonly BenchmarkDotNet.Helpers.AutoResetValueTaskSource<Perfolizer.Horology.ClockSpan> valueTaskSource = new BenchmarkDotNet.Helpers.AutoResetValueTaskSource<Perfolizer.Horology.ClockSpan>();
             private System.Int64 repeatsRemaining;
             private readonly System.Action continuation;
             private Perfolizer.Horology.StartedClock startedClock;
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     && !m.GetParameterTypes().First().IsByRef)
                 .MakeGenericMethod(ConsumableInfo.OverheadMethodReturnType);
 
-            valueTaskSourceField = runnableBuilder.DefineField(ValueTaskSourceFieldName, typeof(Helpers.ManualResetValueTaskSource<ClockSpan>), FieldAttributes.Private | FieldAttributes.InitOnly);
+            valueTaskSourceField = runnableBuilder.DefineField(ValueTaskSourceFieldName, typeof(Helpers.AutoResetValueTaskSource<ClockSpan>), FieldAttributes.Private | FieldAttributes.InitOnly);
             repeatsRemainingField = runnableBuilder.DefineField(RepeatsRemainingFieldName, typeof(long), FieldAttributes.Private);
             continuationField = runnableBuilder.DefineField(ContinuationFieldName, typeof(Action), FieldAttributes.Private | FieldAttributes.InitOnly);
             startedClockField = runnableBuilder.DefineField(StartedClockFieldName, typeof(StartedClock), FieldAttributes.Private);
@@ -72,15 +72,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         protected override void OnEmitCtorBodyOverride(ConstructorBuilder constructorBuilder, ILGenerator ilBuilder)
         {
-            var ctor = typeof(Helpers.ManualResetValueTaskSource<ClockSpan>).GetConstructor(Array.Empty<Type>());
+            var ctor = typeof(Helpers.AutoResetValueTaskSource<ClockSpan>).GetConstructor(Array.Empty<Type>());
             if (ctor == null)
-                throw new InvalidOperationException($"Cannot get default .ctor for {typeof(Helpers.ManualResetValueTaskSource<ClockSpan>)}");
+                throw new InvalidOperationException($"Cannot get default .ctor for {typeof(Helpers.AutoResetValueTaskSource<ClockSpan>)}");
 
             /*
-                // valueTaskSourceField = new BenchmarkDotNet.Helpers.ManualResetValueTaskSource<Perfolizer.Horology.ClockSpan>();
+                // valueTaskSourceField = new BenchmarkDotNet.Helpers.AutoResetValueTaskSource<Perfolizer.Horology.ClockSpan>();
                 IL_0000: ldarg.0
-                IL_0001: newobj instance void class BenchmarkDotNet.Helpers.ManualResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan>::.ctor()
-                IL_0006: stfld class BenchmarkDotNet.Helpers.ManualResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan> BenchmarkRunner_0::valueTaskSource
+                IL_0001: newobj instance void class BenchmarkDotNet.Helpers.AutoResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan>::.ctor()
+                IL_0006: stfld class BenchmarkDotNet.Helpers.AutoResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan> BenchmarkRunner_0::valueTaskSource
              */
             ilBuilder.Emit(OpCodes.Ldarg_0);
             ilBuilder.Emit(OpCodes.Newobj, ctor);
@@ -294,16 +294,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             ilBuilder.EmitLdarg(toArg);
             ilBuilder.Emit(OpCodes.Stfld, repeatsRemainingField);
             /*
-                // valueTaskSource.Reset();
-                IL_0007: ldarg.0
-                IL_0008: ldfld class BenchmarkDotNet.Helpers.ManualResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan> BenchmarkRunner_0::valueTaskSource
-                IL_000d: callvirt instance void class BenchmarkDotNet.Helpers.ManualResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan>::Reset()
-            */
-            ilBuilder.Emit(OpCodes.Ldarg_0);
-            ilBuilder.Emit(OpCodes.Ldfld, valueTaskSourceField);
-            var resetMethod = valueTaskSourceField.FieldType.GetMethod(nameof(Helpers.ManualResetValueTaskSource<ClockSpan>.Reset), BindingFlagsPublicInstance);
-            ilBuilder.Emit(OpCodes.Callvirt, resetMethod);
-            /*
                 // startedClock = Perfolizer.Horology.ClockExtensions.Start(clock);
                 IL_0012: ldarg.0
                 IL_0013: ldarg.2
@@ -324,10 +314,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             /*
                 // return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(valueTaskSource, valueTaskSource.Version);
                 IL_0024: ldarg.0
-                IL_0025: ldfld class BenchmarkDotNet.Helpers.ManualResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan> BenchmarkRunner_0::valueTaskSource
+                IL_0025: ldfld class BenchmarkDotNet.Helpers.AutoResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan> BenchmarkRunner_0::valueTaskSource
                 IL_002a: ldarg.0
-                IL_002b: ldfld class BenchmarkDotNet.Helpers.ManualResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan> BenchmarkRunner_0::valueTaskSource
-                IL_0030: callvirt instance int16 class BenchmarkDotNet.Helpers.ManualResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan>::get_Version()
+                IL_002b: ldfld class BenchmarkDotNet.Helpers.AutoResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan> BenchmarkRunner_0::valueTaskSource
+                IL_0030: callvirt instance int16 class BenchmarkDotNet.Helpers.AutoResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan>::get_Version()
                 IL_0035: newobj instance void valuetype [System.Private.CoreLib]System.Threading.Tasks.ValueTask`1<valuetype Perfolizer.Horology.ClockSpan>::.ctor(class [System.Private.CoreLib]System.Threading.Tasks.Sources.IValueTaskSource`1<!0>, int16)
                 IL_003a: ret
             */
@@ -335,7 +325,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             ilBuilder.Emit(OpCodes.Ldfld, valueTaskSourceField);
             ilBuilder.Emit(OpCodes.Ldarg_0);
             ilBuilder.Emit(OpCodes.Ldfld, valueTaskSourceField);
-            var getVersionMethod = valueTaskSourceField.FieldType.GetProperty(nameof(Helpers.ManualResetValueTaskSource<ClockSpan>.Version), BindingFlagsPublicInstance).GetGetMethod(true);
+            var getVersionMethod = valueTaskSourceField.FieldType.GetProperty(nameof(Helpers.AutoResetValueTaskSource<ClockSpan>.Version), BindingFlagsPublicInstance).GetGetMethod(true);
             ilBuilder.Emit(OpCodes.Callvirt, getVersionMethod);
             var ctor = actionMethodBuilder.ReturnType.GetConstructor(new[] { valueTaskSourceField.FieldType, getVersionMethod.ReturnType });
             ilBuilder.Emit(OpCodes.Newobj, ctor);
@@ -504,14 +494,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             /*
                 // valueTaskSource.SetResult(clockspan);
                 IL_008d: ldarg.0
-                IL_008e: ldfld class BenchmarkDotNet.Helpers.ManualResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan> BenchmarkRunner_0::valueTaskSource
+                IL_008e: ldfld class BenchmarkDotNet.Helpers.AutoResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan> BenchmarkRunner_0::valueTaskSource
                 IL_0093: ldloc.0
-                IL_0094: callvirt instance void class BenchmarkDotNet.Helpers.ManualResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan>::SetResult(!0)
+                IL_0094: callvirt instance void class BenchmarkDotNet.Helpers.AutoResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan>::SetResult(!0)
             */
             ilBuilder.Emit(OpCodes.Ldarg_0);
             ilBuilder.Emit(OpCodes.Ldfld, valueTaskSourceField);
             ilBuilder.EmitLdloc(clockspanLocal);
-            ilBuilder.Emit(OpCodes.Callvirt, valueTaskSourceField.FieldType.GetMethod(nameof(Helpers.ManualResetValueTaskSource<ClockSpan>.SetResult), BindingFlagsPublicInstance));
+            ilBuilder.Emit(OpCodes.Callvirt, valueTaskSourceField.FieldType.GetMethod(nameof(Helpers.AutoResetValueTaskSource<ClockSpan>.SetResult), BindingFlagsPublicInstance));
 
             ilBuilder.MarkLabel(returnLabel);
             ilBuilder.Emit(OpCodes.Ret);
@@ -627,15 +617,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             /*
                 // valueTaskSource.SetException(e);
                 IL_0018: ldarg.0
-                IL_0019: ldfld class BenchmarkDotNet.Helpers.ManualResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan> BenchmarkRunner_0::valueTaskSource
+                IL_0019: ldfld class BenchmarkDotNet.Helpers.AutoResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan> BenchmarkRunner_0::valueTaskSource
                 IL_001e: ldarg.1
-                IL_001f: callvirt instance void class BenchmarkDotNet.Helpers.ManualResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan>::SetException(class [System.Private.CoreLib]System.Exception)
+                IL_001f: callvirt instance void class BenchmarkDotNet.Helpers.AutoResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan>::SetException(class [System.Private.CoreLib]System.Exception)
                 IL_0024: ret
             */
             ilBuilder.Emit(OpCodes.Ldarg_0);
             ilBuilder.Emit(OpCodes.Ldfld, valueTaskSourceField);
             ilBuilder.EmitLdarg(exceptionArg);
-            var setExceptionMethod = valueTaskSourceField.FieldType.GetMethod(nameof(Helpers.ManualResetValueTaskSource<ClockSpan>.SetException), BindingFlagsPublicInstance);
+            var setExceptionMethod = valueTaskSourceField.FieldType.GetMethod(nameof(Helpers.AutoResetValueTaskSource<ClockSpan>.SetException), BindingFlagsPublicInstance);
             ilBuilder.Emit(OpCodes.Callvirt, setExceptionMethod);
             ilBuilder.Emit(OpCodes.Ret);
 

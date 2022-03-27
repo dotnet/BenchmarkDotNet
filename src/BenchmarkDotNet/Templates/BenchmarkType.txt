@@ -114,7 +114,7 @@
 
 #if RETURNS_AWAITABLE_$ID$
 
-        private readonly BenchmarkDotNet.Helpers.ManualResetValueTaskSource<Perfolizer.Horology.ClockSpan> valueTaskSource = new BenchmarkDotNet.Helpers.ManualResetValueTaskSource<Perfolizer.Horology.ClockSpan>();
+        private readonly BenchmarkDotNet.Helpers.AutoResetValueTaskSource<Perfolizer.Horology.ClockSpan> valueTaskSource = new BenchmarkDotNet.Helpers.AutoResetValueTaskSource<Perfolizer.Horology.ClockSpan>();
         private System.Int64 repeatsRemaining;
         private readonly System.Action continuation;
         private Perfolizer.Horology.StartedClock startedClock;
@@ -165,7 +165,6 @@
         private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> WorkloadActionImpl(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)
         {
             repeatsRemaining = invokeCount;
-            valueTaskSource.Reset();
             startedClock = Perfolizer.Horology.ClockExtensions.Start(clock);
             __RunTask();
             return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(valueTaskSource, valueTaskSource.Version);
