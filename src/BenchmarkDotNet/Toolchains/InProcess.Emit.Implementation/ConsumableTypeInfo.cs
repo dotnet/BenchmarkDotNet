@@ -29,7 +29,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 throw new InvalidOperationException("Bug: (WorkloadMethodReturnType == null");
 
             var consumableField = default(FieldInfo);
-            if (WorkloadMethodReturnType == typeof(void))
+            if (IsAwaitable)
+            {
+                OverheadMethodReturnType = WorkloadMethodReturnType;
+            }
+            else if (WorkloadMethodReturnType == typeof(void))
             {
                 IsVoid = true;
                 OverheadMethodReturnType = WorkloadMethodReturnType;

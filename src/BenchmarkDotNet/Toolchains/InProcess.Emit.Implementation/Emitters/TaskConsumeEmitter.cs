@@ -93,8 +93,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         {
             MethodBuilder actionImpl = actionKind switch
             {
-                RunnableActionKind.Overhead => EmitWorkloadActionImpl(runnableEmitter),
-                RunnableActionKind.Workload => EmitOverheadActionImpl(runnableEmitter),
+                RunnableActionKind.Overhead => EmitOverheadActionImpl(runnableEmitter),
+                RunnableActionKind.Workload => EmitWorkloadActionImpl(runnableEmitter),
                 _ => throw new ArgumentOutOfRangeException(nameof(actionKind), actionKind, null),
             };
 
@@ -195,8 +195,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             ilBuilder.Emit(OpCodes.Call, runnableEmitter.startClockMethod);
             ilBuilder.Emit(OpCodes.Stfld, startedClockField);
 
-            var exitExceptionBlockLabel = ilBuilder.DefineLabel();
-
             // try { ... }
             ilBuilder.BeginExceptionBlock();
             {
@@ -217,12 +215,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     */
                     ilBuilder.Emit(OpCodes.Ldarg_0);
                     ilBuilder.Emit(OpCodes.Ldfld, actionDelegateField);
-                    ilBuilder.EmitInstanceCallThisValueOnStack(null, actionInvokeMethod, argLocals);
                     ilBuilder.Emit(OpCodes.Callvirt, actionInvokeMethod);
+                    ilBuilder.EmitStloc(valueLocal);
                 }
                 ilBuilder.EmitLoopEndFromFldTo0(loopStartLabel, loopHeadLabel, repeatsRemainingField, indexLocal);
-
-                ilBuilder.Emit(OpCodes.Leave_S, exitExceptionBlockLabel);
             }
             // catch (System.Exception) { ... }
             ilBuilder.BeginCatchBlock(typeof(Exception));
@@ -239,7 +235,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 ilBuilder.Emit(OpCodes.Rethrow);
             }
             ilBuilder.EndExceptionBlock();
-            ilBuilder.MarkLabel(exitExceptionBlockLabel);
 
             /*
                 // return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(startedClock.GetElapsed());
@@ -380,7 +375,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             var indexLocal = ilBuilder.DeclareLocal(typeof(long));
             var exceptionLocal = ilBuilder.DeclareLocal(typeof(Exception));
 
-            var exitExceptionBlockLabel = ilBuilder.DefineLabel();
             var returnLabel = ilBuilder.DefineLabel();
 
             // try { ... }
@@ -450,7 +444,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                         IL_0046: pop
                     */
                     ilBuilder.Emit(OpCodes.Ldarg_0);
-                    ilBuilder.Emit(OpCodes.Ldfld, currentAwaiterField);
+                    ilBuilder.Emit(OpCodes.Ldflda, currentAwaiterField);
                     ilBuilder.Emit(OpCodes.Call, getResultMethod);
                     if (getResultMethod.ReturnType != typeof(void))
                     {
@@ -458,8 +452,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     }
                 }
                 ilBuilder.EmitLoopEndFromFldTo0(loopStartLabel, loopHeadLabel, repeatsRemainingField, indexLocal);
-
-                ilBuilder.Emit(OpCodes.Leave_S, exitExceptionBlockLabel);
             }
             // catch (System.Exception) { ... }
             ilBuilder.BeginCatchBlock(typeof(Exception));
@@ -479,7 +471,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 ilBuilder.Emit(OpCodes.Leave_S, returnLabel);
             }
             ilBuilder.EndExceptionBlock();
-            ilBuilder.MarkLabel(exitExceptionBlockLabel);
 
             /*
                 // var clockspan = startedClock.GetElapsed();
@@ -518,7 +509,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 IL_0094: callvirt instance void class BenchmarkDotNet.Helpers.ManualResetValueTaskSource`1<valuetype Perfolizer.Horology.ClockSpan>::SetResult(!0)
             */
             ilBuilder.Emit(OpCodes.Ldarg_0);
-            ilBuilder.Emit(OpCodes.Ldflda, valueTaskSourceField);
+            ilBuilder.Emit(OpCodes.Ldfld, valueTaskSourceField);
             ilBuilder.EmitLdloc(clockspanLocal);
             ilBuilder.Emit(OpCodes.Callvirt, valueTaskSourceField.FieldType.GetMethod(nameof(Helpers.ManualResetValueTaskSource<ClockSpan>.SetResult), BindingFlagsPublicInstance));
 
@@ -544,7 +535,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             // init locals
             var exceptionLocal = ilBuilder.DeclareLocal(typeof(Exception));
 
-            var exitExceptionBlockLabel = ilBuilder.DefineLabel();
             var returnLabel = ilBuilder.DefineLabel();
 
             // try { ... }
@@ -558,14 +548,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     IL_000b: pop
                 */
                 ilBuilder.Emit(OpCodes.Ldarg_0);
-                ilBuilder.Emit(OpCodes.Ldfld, currentAwaiterField);
+                ilBuilder.Emit(OpCodes.Ldflda, currentAwaiterField);
                 ilBuilder.Emit(OpCodes.Call, getResultMethod);
                 if (getResultMethod.ReturnType != typeof(void))
                 {
                     ilBuilder.Emit(OpCodes.Pop);
                 }
-
-                ilBuilder.Emit(OpCodes.Leave_S, exitExceptionBlockLabel);
             }
             // catch (System.Exception e) { ... }
             ilBuilder.BeginCatchBlock(typeof(Exception));
@@ -585,7 +573,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 ilBuilder.Emit(OpCodes.Leave_S, returnLabel);
             }
             ilBuilder.EndExceptionBlock();
-            ilBuilder.MarkLabel(exitExceptionBlockLabel);
 
             /*
                 // __RunTask();
