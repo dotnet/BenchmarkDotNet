@@ -194,7 +194,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
             ilBuilder.EmitLdloc(counterLocal);
             ilBuilder.Emit(OpCodes.Ldc_I4_0);
             ilBuilder.Emit(OpCodes.Conv_I8);
-            ilBuilder.Emit(OpCodes.Bge_S, loopStartLabel);
+            ilBuilder.Emit(OpCodes.Bge, loopStartLabel);
         }
     }
 }

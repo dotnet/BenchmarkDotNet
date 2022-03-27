@@ -164,8 +164,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             var ilBuilder = actionMethodBuilder.GetILGenerator();
 
             // init locals
-            var argLocals = runnableEmitter.EmitDeclareArgLocals(ilBuilder);
             var valueLocal = ilBuilder.DeclareLocal(ConsumableInfo.OverheadMethodReturnType);
+            var argLocals = runnableEmitter.EmitDeclareArgLocals(ilBuilder);
             var indexLocal = ilBuilder.DeclareLocal(typeof(long));
 
             /*
@@ -215,7 +215,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     */
                     ilBuilder.Emit(OpCodes.Ldarg_0);
                     ilBuilder.Emit(OpCodes.Ldfld, actionDelegateField);
-                    ilBuilder.Emit(OpCodes.Callvirt, actionInvokeMethod);
+                    ilBuilder.EmitInstanceCallThisValueOnStack(null, actionInvokeMethod, argLocals);
                     ilBuilder.EmitStloc(valueLocal);
                 }
                 ilBuilder.EmitLoopEndFromFldTo0(loopStartLabel, loopHeadLabel, repeatsRemainingField, indexLocal);
@@ -367,8 +367,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             //    [1] int64,
             //    [2] class [System.Private.CoreLib]System.Exception e
             //)
-            var argLocals = runnableEmitter.EmitDeclareArgLocals(ilBuilder);
             var clockspanLocal = ilBuilder.DeclareLocal(typeof(ClockSpan));
+            var argLocals = runnableEmitter.EmitDeclareArgLocals(ilBuilder);
             LocalBuilder maybeValueTaskLocal = actionInvokeMethod.ReturnType.IsValueType
                 ? ilBuilder.DeclareLocal(actionInvokeMethod.ReturnType)
                 : null;
@@ -417,7 +417,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     ilBuilder.Emit(OpCodes.Ldarg_0);
                     ilBuilder.Emit(OpCodes.Ldflda, currentAwaiterField);
                     ilBuilder.Emit(OpCodes.Call, currentAwaiterField.FieldType.GetProperty(nameof(TaskAwaiter.IsCompleted), BindingFlagsAllInstance).GetGetMethod(true));
-                    ilBuilder.Emit(OpCodes.Brtrue_S, isCompletedLabel);
+                    ilBuilder.Emit(OpCodes.Brtrue, isCompletedLabel);
                     {
                         /*
                             // currentAwaiter.UnsafeOnCompleted(continuation);
@@ -433,7 +433,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                         ilBuilder.Emit(OpCodes.Ldfld, continuationField);
                         ilBuilder.Emit(OpCodes.Call, currentAwaiterField.FieldType.GetMethod(nameof(TaskAwaiter.UnsafeOnCompleted), BindingFlagsAllInstance));
                         // return;
-                        ilBuilder.Emit(OpCodes.Leave_S, returnLabel);
+                        ilBuilder.Emit(OpCodes.Leave, returnLabel);
                     }
                     ilBuilder.MarkLabel(isCompletedLabel);
                     /*
@@ -468,7 +468,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 ilBuilder.EmitLdloc(exceptionLocal);
                 ilBuilder.Emit(OpCodes.Call, setExceptionMethod);
                 // return;
-                ilBuilder.Emit(OpCodes.Leave_S, returnLabel);
+                ilBuilder.Emit(OpCodes.Leave, returnLabel);
             }
             ilBuilder.EndExceptionBlock();
 
@@ -570,7 +570,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 ilBuilder.EmitLdloc(exceptionLocal);
                 ilBuilder.Emit(OpCodes.Call, setExceptionMethod);
                 // return;
-                ilBuilder.Emit(OpCodes.Leave_S, returnLabel);
+                ilBuilder.Emit(OpCodes.Leave, returnLabel);
             }
             ilBuilder.EndExceptionBlock();
 
