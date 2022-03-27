@@ -113,7 +113,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 var startedClock = clock.Start();
                 for (long i = 0; i < repeatCount; i++)
                     result = unrolledCallback();
-                unrolledCallback();
                 return new ValueTask<ClockSpan>(startedClock.GetElapsed());
             }
 

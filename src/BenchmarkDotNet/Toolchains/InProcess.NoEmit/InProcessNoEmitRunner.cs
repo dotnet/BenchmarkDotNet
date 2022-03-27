@@ -104,9 +104,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         {
             public static void RunCore(IHost host, BenchmarkCase benchmarkCase)
             {
+                int unrollFactor = BenchmarkActionFactory.GetUnrollFactor(benchmarkCase);
                 var target = benchmarkCase.Descriptor;
                 var job = benchmarkCase.Job; // TODO: filter job (same as SourceCodePresenter does)?
-                int unrollFactor = BenchmarkActionFactory.GetUnrollFactor(benchmarkCase);
 
                 // DONTTOUCH: these should be allocated together
                 var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type);

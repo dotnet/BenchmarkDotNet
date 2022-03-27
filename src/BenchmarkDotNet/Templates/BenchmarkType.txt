@@ -302,9 +302,8 @@
             {
                 result = overheadDelegate($PassArguments$);@Unroll@
             }
-            var elapsed = startedClock.GetElapsed();
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
-            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(elapsed);
+            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(startedClock.GetElapsed());
         }
 
         private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> OverheadActionNoUnroll(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)
@@ -316,9 +315,8 @@
             {
                 result = overheadDelegate($PassArguments$);
             }
-            var elapsed = startedClock.GetElapsed();
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
-            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(elapsed);
+            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(startedClock.GetElapsed());
         }
 
         private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> WorkloadActionUnroll(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)
@@ -330,9 +328,8 @@
             {
                 result = workloadDelegate($PassArguments$);@Unroll@
             }
-            var elapsed = startedClock.GetElapsed();
             NonGenericKeepAliveWithoutBoxing(result);
-            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(elapsed);
+            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(startedClock.GetElapsed());
         }
 
         private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> WorkloadActionNoUnroll(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)
@@ -344,9 +341,8 @@
             {
                 result = workloadDelegate($PassArguments$);
             }
-            var elapsed = startedClock.GetElapsed();
             NonGenericKeepAliveWithoutBoxing(result);
-            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(elapsed);
+            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(startedClock.GetElapsed());
         }
 
         // we must not simply use DeadCodeEliminationHelper.KeepAliveWithoutBoxing<T> because it's generic method
@@ -377,9 +373,8 @@
             {
                 value = overheadDelegate($PassArguments$);@Unroll@
             }
-            var elapsed = startedClock.GetElapsed();
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
-            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(elapsed);
+            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(startedClock.GetElapsed());
         }
 
         private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> OverheadActionNoUnroll(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)
@@ -391,9 +386,8 @@
             {
                 value = overheadDelegate($PassArguments$);
             }
-            var elapsed = startedClock.GetElapsed();
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
-            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(elapsed);
+            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(startedClock.GetElapsed());
         }
 
         private $WorkloadMethodReturnType$ workloadDefaultValueHolder = default($WorkloadMethodReturnType$);
@@ -407,9 +401,8 @@
             {
                 alias = workloadDelegate($PassArguments$);@Unroll@
             }
-            var elapsed = startedClock.GetElapsed();
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
-            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(elapsed);
+            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(startedClock.GetElapsed());
         }
         
         private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> WorkloadActionNoUnroll(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)
@@ -421,9 +414,8 @@
             {
                 alias = workloadDelegate($PassArguments$);
             }
-            var elapsed = startedClock.GetElapsed();
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
-            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(elapsed);
+            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(startedClock.GetElapsed());
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
@@ -448,9 +440,8 @@
             {
                 value = overheadDelegate($PassArguments$);@Unroll@
             }
-            var elapsed = startedClock.GetElapsed();
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
-            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(elapsed);
+            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(startedClock.GetElapsed());
         }
 
         private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> OverheadActionNoUnroll(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)
@@ -462,9 +453,8 @@
             {
                 value = overheadDelegate($PassArguments$);
             }
-            var elapsed = startedClock.GetElapsed();
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
-            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(elapsed);
+            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(startedClock.GetElapsed());
         }
 
         private $WorkloadMethodReturnType$ workloadDefaultValueHolder = default($WorkloadMethodReturnType$);
@@ -478,9 +468,8 @@
             {
                 alias = workloadDelegate($PassArguments$);@Unroll@
             }
-            var elapsed = startedClock.GetElapsed();
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(alias);
-            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(elapsed);
+            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(startedClock.GetElapsed());
         }
         
         private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> WorkloadActionNoUnroll(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)
@@ -492,9 +481,8 @@
             {
                 alias = workloadDelegate($PassArguments$);
             }
-            var elapsed = startedClock.GetElapsed();
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(alias);
-            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(elapsed);
+            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(startedClock.GetElapsed());
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
