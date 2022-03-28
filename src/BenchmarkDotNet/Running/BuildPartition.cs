@@ -24,6 +24,7 @@ namespace BenchmarkDotNet.Running
             Benchmarks = benchmarks;
             ProgramName = benchmarks[0].Config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles) ? RepresentativeBenchmarkCase.Job.FolderInfo : Guid.NewGuid().ToString();
             LogBuildOutput = benchmarks[0].Config.Options.IsSet(ConfigOptions.LogBuildOutput);
+            GenerateMSBuildBinLog = benchmarks[0].Config.Options.IsSet(ConfigOptions.GenerateMSBuildBinLog);
         }
 
         public BenchmarkBuildInfo[] Benchmarks { get; }
@@ -68,6 +69,8 @@ namespace BenchmarkDotNet.Running
             : RepresentativeBenchmarkCase.Config.BuildTimeout;
 
         public bool LogBuildOutput { get; }
+
+        public bool GenerateMSBuildBinLog { get; }
 
         public bool NoAcknowledgments
             => !Benchmarks

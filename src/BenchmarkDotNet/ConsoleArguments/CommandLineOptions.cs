@@ -154,6 +154,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("logBuildOutput", Required = false, HelpText = "Log Build output.")]
         public bool LogBuildOutput { get; set; }
 
+        [Option("generateBinLog", Required = false, HelpText = "Generate msbuild binlog for builds")]
+        public bool GenerateMSBuildBinLog { get; set; }
+
         [Option("buildTimeout", Required = false, HelpText = "Build timeout in seconds.")]
         public int? TimeOutInSeconds { get; set; }
 
