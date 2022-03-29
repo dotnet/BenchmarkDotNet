@@ -54,8 +54,8 @@ namespace BenchmarkDotNet.Helpers
 
             if (finalResult.Length > limit)
             {
-                throw new NotSupportedException($"The full benchmark name: \"{fileName}\" combined with artifiacts path: \"{details.Config.ArtifactsPath}\" is too long. " +
-                   $"Please enable long paths support, set the value of {nameof(details.Config)}.{nameof(details.Config.ArtifactsPath)} to shorter path or rename the type or method.");
+                throw new NotSupportedException($"The full benchmark name: \"{fileName}\" combined with artifacts path: \"{details.Config.ArtifactsPath}\" is too long. " +
+                   $"Please set the value of {nameof(details.Config)}.{nameof(details.Config.ArtifactsPath)} to shorter path or rename the type or method.");
             }
 
             return finalResult;
