@@ -234,6 +234,7 @@ namespace BenchmarkDotNet.Portability
             // https://github.com/dotnet/runtime/blob/d81ad044fa6830f5f31f6b6e8224ebf66a3c298c/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/Architecture.cs#L12-L13
             const Architecture Wasm = (Architecture)4;
             const Architecture S390x = (Architecture)5;
+            const Architecture LoongArch64 = (Architecture)6;
 
             switch (ProcessArchitecture)
             {
@@ -249,6 +250,8 @@ namespace BenchmarkDotNet.Portability
                     return Platform.Wasm;
                 case S390x:
                     return Platform.S390x;
+                case LoongArch64:
+                    return Platform.LoongArch64;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
