@@ -42,8 +42,7 @@
       <PublishDirFullPath>$([System.IO.Path]::GetFullPath($(PublishDir)))</PublishDirFullPath>
       <SharedLibraryType Condition="$([MSBuild]::IsOSPlatform('OSX'))">Dylib</SharedLibraryType>
       <SharedLibraryType Condition="$([MSBuild]::IsOSPlatform('Windows'))">Dll</SharedLibraryType>
-      <SharedLibraryType Condition="$([MSBuild]::IsOSPlatform('Linux'))">So</SharedLibraryType>
-      <SharedLibraryType Condition="$([MSBuild]::IsOSPlatform('FreeBSD'))">Dll</SharedLibraryType>
+      <SharedLibraryType Condition="'$(SharedLibraryType)' == ''">So</SharedLibraryType>
    </PropertyGroup>
 
    <ItemGroup>
