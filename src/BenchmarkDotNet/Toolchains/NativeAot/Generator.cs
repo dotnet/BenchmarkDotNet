@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string cliPath,
             string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag,
             bool useTempFolderForRestore, string packagesRestorePath,
-            bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData, string trimmerDefaultAction)
+            bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData)
             : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore, packagesRestorePath), runtimeFrameworkVersion)
         {
             this.ilCompilerVersion = ilCompilerVersion;
@@ -38,7 +38,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             this.rootAllApplicationAssemblies = rootAllApplicationAssemblies;
             this.ilcGenerateCompleteTypeMetadata = ilcGenerateCompleteTypeMetadata;
             this.ilcGenerateStackTraceData = ilcGenerateStackTraceData;
-            this.trimmerDefaultAction = trimmerDefaultAction;
         }
 
         private readonly string ilCompilerVersion;
@@ -52,7 +51,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private readonly bool rootAllApplicationAssemblies;
         private readonly bool ilcGenerateCompleteTypeMetadata;
         private readonly bool ilcGenerateStackTraceData;
-        private readonly string trimmerDefaultAction;
 
         private bool IsNuGet => feeds.ContainsKey(NativeAotNuGetFeed) && !string.IsNullOrWhiteSpace(ilCompilerVersion);
 
@@ -190,18 +188,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 </Project>";
 
         private string GetTrimmingSettings()
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.AppendLine(rootAllApplicationAssemblies ? "<PublishTrimmed>false</PublishTrimmed>" : "<TrimMode>link</TrimMode>");
-
-            if (!string.IsNullOrEmpty(trimmerDefaultAction))
-            {
-                sb.Append($"<TrimmerDefaultAction>{trimmerDefaultAction}</TrimmerDefaultAction>");
-            }
-
-            return sb.ToString();
-        }
+            => rootAllApplicationAssemblies ? "" : "<TrimMode>link</TrimMode><TrimmerDefaultAction>link</TrimmerDefaultAction>";
 
         /// <summary>
         /// mandatory to make it possible to call GC.GetAllocatedBytesForCurrentThread() using reflection (not part of .NET Standard)
