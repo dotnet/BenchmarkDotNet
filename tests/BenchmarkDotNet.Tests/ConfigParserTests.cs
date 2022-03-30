@@ -477,6 +477,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(Platform.X64)]
         [InlineData(Platform.Arm)]
         [InlineData(Platform.Arm64)]
+        [InlineData(Platform.LoongArch64)]
         public void UserCanSpecifyProcessPlatform(Platform platform)
         {
             var parsedConfig = ConfigParser.Parse(new[] { "--platform", platform.ToString() }, new OutputLogger(Output)).config;

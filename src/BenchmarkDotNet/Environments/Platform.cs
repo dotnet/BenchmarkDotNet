@@ -35,6 +35,11 @@
         /// <summary>
         /// S390x
         /// </summary>
-        S390x
+        S390x,
+
+        /// <summary>
+        /// LOONGARCH64
+        /// </summary>
+        LoongArch64
     }
 }
