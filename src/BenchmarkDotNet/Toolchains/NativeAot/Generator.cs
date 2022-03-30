@@ -188,7 +188,10 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 </Project>";
 
         private string GetTrimmingSettings()
-            => rootAllApplicationAssemblies ? "" : "<TrimMode>link</TrimMode><TrimmerDefaultAction>link</TrimmerDefaultAction>";
+            => rootAllApplicationAssemblies
+                ? "" // use the defaults
+                // TrimMode is set in explicit way as for older versions it might have different default value
+                : "<TrimMode>link</TrimMode><TrimmerDefaultAction>link</TrimmerDefaultAction>";
 
         /// <summary>
         /// mandatory to make it possible to call GC.GetAllocatedBytesForCurrentThread() using reflection (not part of .NET Standard)
