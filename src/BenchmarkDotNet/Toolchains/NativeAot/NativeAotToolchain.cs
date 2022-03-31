@@ -24,16 +24,16 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             => CreateBuilder().UseNuGet("6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json");
 
         internal NativeAotToolchain(string displayName,
-            string ilCompilerVersion, string ilcPath, bool useCppCodeGenerator,
+            string ilCompilerVersion, string ilcPath,
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string runtimeIdentifier,
             string customDotNetCliPath, string packagesRestorePath,
             Dictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore,
             bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData, string trimmerDefaultAction)
             : base(displayName,
-                new Generator(ilCompilerVersion, useCppCodeGenerator, runtimeFrameworkVersion, targetFrameworkMoniker, customDotNetCliPath,
+                new Generator(ilCompilerVersion, runtimeFrameworkVersion, targetFrameworkMoniker, customDotNetCliPath,
                     runtimeIdentifier, feeds, useNuGetClearTag, useTempFolderForRestore, packagesRestorePath,
                     rootAllApplicationAssemblies, ilcGenerateCompleteTypeMetadata, ilcGenerateStackTraceData, trimmerDefaultAction),
-                new DotNetCliPublisher(customDotNetCliPath, GetExtraArguments(useCppCodeGenerator, runtimeIdentifier), GetEnvironmentVariables(ilcPath)),
+                new DotNetCliPublisher(customDotNetCliPath, GetExtraArguments(runtimeIdentifier), GetEnvironmentVariables(ilcPath)),
                 new Executor())
         {
             IlcPath = ilcPath;
@@ -43,8 +43,8 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
 
         public static NativeAotToolchainBuilder CreateBuilder() => NativeAotToolchainBuilder.Create();
 
-        public static string GetExtraArguments(bool useCppCodeGenerator, string runtimeIdentifier)
-            => useCppCodeGenerator ? $"-r {runtimeIdentifier} /p:NativeCodeGen=cpp" : $"-r {runtimeIdentifier}";
+        public static string GetExtraArguments(string runtimeIdentifier)
+            => $"-r {runtimeIdentifier}";
 
         // https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built
         // we have to pass IlcPath env var to get it working
