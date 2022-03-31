@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         internal const string NativeAotNuGetFeed = "nativeAotNuGetFeed";
         internal const string GeneratedRdXmlFileName = "bdn_generated.rd.xml";
 
-        internal Generator(string ilCompilerVersion, bool useCppCodeGenerator,
+        internal Generator(string ilCompilerVersion,
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string cliPath,
             string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag,
             bool useTempFolderForRestore, string packagesRestorePath,
@@ -30,7 +30,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore, packagesRestorePath), runtimeFrameworkVersion)
         {
             this.ilCompilerVersion = ilCompilerVersion;
-            this.useCppCodeGenerator = useCppCodeGenerator;
             this.targetFrameworkMoniker = targetFrameworkMoniker;
             this.runtimeIdentifier = runtimeIdentifier;
             this.feeds = feeds;
@@ -43,7 +42,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         }
 
         private readonly string ilCompilerVersion;
-        private readonly bool useCppCodeGenerator;
         [SuppressMessage("ReSharper", "NotAccessedField.Local")]
         private readonly string targetFrameworkMoniker;
         private readonly string runtimeIdentifier;
@@ -69,7 +67,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
-            string extraArguments = NativeAotToolchain.GetExtraArguments(useCppCodeGenerator, runtimeIdentifier);
+            string extraArguments = NativeAotToolchain.GetExtraArguments(runtimeIdentifier);
 
             var content = new StringBuilder(300)
                 .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, extraArguments)}")
