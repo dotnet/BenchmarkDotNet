@@ -20,6 +20,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
     public class Generator : CsProjGenerator
     {
         internal const string NativeAotNuGetFeed = "nativeAotNuGetFeed";
+        internal const string GeneratedRdXmlFileName = "bdn_generated.rd.xml";
 
         internal Generator(string ilCompilerVersion, bool useCppCodeGenerator,
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string cliPath,
@@ -150,7 +151,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
   <ItemGroup>
-    <RdXmlFile Include=""rd.xml"" />
+    {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
 </Project>";
 
@@ -185,7 +186,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
   <ItemGroup>
-    <RdXmlFile Include=""rd.xml"" />
+    {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
 </Project>";
 
@@ -201,6 +202,23 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             }
 
             return sb.ToString();
+        }
+
+        public IEnumerable<string> GetRdXmlFiles(Type benchmarkTarget, ILogger logger)
+        {
+            var projectFile = GetProjectFilePath(benchmarkTarget, logger);
+            var projectFileFolder = projectFile.DirectoryName;
+            yield return GeneratedRdXmlFileName;
+            var rdXml = Path.Combine(projectFileFolder, "rd.xml");
+            if (File.Exists(rdXml))
+            {
+                yield return rdXml;
+            }
+
+            foreach (var item in Directory.GetFiles(projectFileFolder, "*.rd.xml"))
+            {
+                yield return item;
+            }
         }
 
         /// <summary>
@@ -226,7 +244,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             string directoryName = Path.GetDirectoryName(artifactsPaths.ProjectFilePath);
             if (directoryName != null)
-                File.WriteAllText(Path.Combine(directoryName, "rd.xml"), content);
+                File.WriteAllText(Path.Combine(directoryName, GeneratedRdXmlFileName), content);
             else
                 throw new InvalidOperationException($"Can't get directory of projectFilePath ('{artifactsPaths.ProjectFilePath}')");
         }
