@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         {
             var config = ManualConfig.CreateEmpty()
                 .AddJob(Job.Dry
-                    .WithRuntime(NativeAotRuntime.Net50)
+                    .WithRuntime(NativeAotRuntime.Net60)
                     .WithToolchain(
                         NativeAotToolchain.CreateBuilder()
                             .UseLocalBuild(IlcPath)

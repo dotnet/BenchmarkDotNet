@@ -21,7 +21,7 @@ skip_tags: true
 #    environment configuration    #
 #---------------------------------#
 
-os: Visual Studio 2019
+os: Visual Studio 2022
 
 # scripts that are called at very beginning, before repo cloning
 init:
