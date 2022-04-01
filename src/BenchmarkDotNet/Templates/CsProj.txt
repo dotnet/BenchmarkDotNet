@@ -24,8 +24,7 @@
     <!-- we set LangVersion after $COPIEDSETTINGS$ which might contain LangVersion copied from the benchmarks project -->
     <LangVersion Condition="'$(LangVersion)' == '' Or ($([System.Char]::IsDigit('$(LangVersion)', 0)) And '$(LangVersion)' &lt; '7.3')">latest</LangVersion>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
-    <!-- fix for NETSDK1150: https://docs.microsoft.com/en-us/dotnet/core/compatibility/sdk/5.0/referencing-executable-generates-error so the tests can be run
-    even if there is a reference to the .exe project -->
+    <!-- fix for NETSDK1150: https://docs.microsoft.com/en-us/dotnet/core/compatibility/sdk/5.0/referencing-executable-generates-error -->
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
   </PropertyGroup>
 
