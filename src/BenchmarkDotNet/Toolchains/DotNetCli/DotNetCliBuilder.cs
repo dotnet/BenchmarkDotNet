@@ -32,7 +32,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     buildPartition,
                     Array.Empty<EnvironmentVariable>(),
                     buildPartition.Timeout,
-                    logOutput: LogOutput)
+                    logOutput: LogOutput,
+                    retryFailedBuildWithNoDeps: false)
                 .RestoreThenBuild();
     }
 }

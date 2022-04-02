@@ -31,8 +31,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [PublicAPI] public bool LogOutput { get; }
 
+        [PublicAPI] public bool RetryFailedBuildWithNoDeps { get; }
+
         public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger,
-            BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout, bool logOutput = false)
+            BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout, bool logOutput = false,
+            bool retryFailedBuildWithNoDeps = true)
         {
             CliPath = cliPath ?? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value;
             Arguments = arguments;
@@ -42,6 +45,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             EnvironmentVariables = environmentVariables;
             Timeout = timeout;
             LogOutput = logOutput || buildPartition.LogBuildOutput;
+            RetryFailedBuildWithNoDeps = retryFailedBuildWithNoDeps;
         }
 
         public DotNetCliCommand WithArguments(string arguments)
@@ -67,7 +71,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
             var buildResult = BuildNoRestore();
-            if (!buildResult.IsSuccess) // if we fail to do the full build, we try with --no-dependencies
+            if (!buildResult.IsSuccess && RetryFailedBuildWithNoDeps) // if we fail to do the full build, we try with --no-dependencies
                 buildResult = BuildNoRestoreNoDependencies();
 
             return buildResult.ToBuildResult(GenerateResult);
@@ -93,7 +97,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
             var buildResult = BuildNoRestore();
-            if (!buildResult.IsSuccess) // if we fail to do the full build, we try with --no-dependencies
+            if (!buildResult.IsSuccess && RetryFailedBuildWithNoDeps) // if we fail to do the full build, we try with --no-dependencies
                 buildResult = BuildNoRestoreNoDependencies();
 
             if (!buildResult.IsSuccess)
