@@ -29,7 +29,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             return BuildResult.Success(
                 GenerateResult.Success(
                     new InProcessEmitArtifactsPath(assembly, generateResult.ArtifactsPaths),
-                    generateResult.ArtifactsToCleanup));
+                    generateResult.ArtifactsToCleanup,
+                    generateResult.NoAcknowledgments));
         }
     }
 }

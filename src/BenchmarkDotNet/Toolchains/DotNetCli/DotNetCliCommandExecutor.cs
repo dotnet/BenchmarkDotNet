@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public static DotNetCliCommandResult Execute(DotNetCliCommand parameters)
         {
             using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
-            using (var outputReader = new AsyncProcessOutputReader(process))
+            using (var outputReader = new AsyncProcessOutputReader(process, parameters.LogOutput, parameters.Logger))
             using (new ConsoleExitHandler(process, parameters.Logger))
             {
                 parameters.Logger.WriteLineInfo($"// start {parameters.CliPath ?? "dotnet"} {parameters.Arguments} in {parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath}");
@@ -75,6 +75,26 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 // first line contains something like ".NET Command Line Tools (1.0.0-beta-001603)"
                 return Regex.Split(output, Environment.NewLine, RegexOptions.Compiled)
                     .FirstOrDefault(line => !string.IsNullOrEmpty(line));
+            }
+        }
+
+        internal static void LogEnvVars(DotNetCliCommand command)
+        {
+            if (!command.LogOutput)
+            {
+                return;
+            }
+
+            ProcessStartInfo startInfo = BuildStartInfo(
+                command.CliPath, command.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, command.Arguments, command.EnvironmentVariables);
+
+            if (startInfo.EnvironmentVariables.Keys.Count > 0)
+            {
+                command.Logger.WriteLineInfo("// Environment Variables:");
+                foreach (string name in startInfo.EnvironmentVariables.Keys)
+                {
+                    command.Logger.WriteLine($"\t[{name}] = \"{startInfo.EnvironmentVariables[name]}\"");
+                }
             }
         }
 

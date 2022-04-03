@@ -110,12 +110,12 @@ You can also filter the benchmarks by categories:
 
 The `--runtimes` or just `-r` allows you to run the benchmarks for selected Runtimes. Available options are: 
 
-* Clr - BDN will either use Roslyn (if you run it as .NET app) or latest installed .NET SDK to build the benchmarks (if you run it as .NET Core app)
-* Core - if you run it as .NET Core app, BDN will use the same target framework moniker, if you run it as .NET app it's going to use netcoreapp2.1
-* Mono - it's going to use the Mono from `$Path`, you can override  it with `--monoPath`
-* CoreRT - it's going to use latest CoreRT. Can be customized with additional options: `--ilcPath`, `--coreRtVersion` 
-* net46, net461, net462, net47, net471, net472 - to build and run benchmarks against specific .NET framework version 
-* netcoreapp2.0, netcoreapp2.1, netcoreapp2.2, netcoreapp3.0 - to build and run benchmarks against specific .NET Core version
+* Clr - BDN will either use Roslyn (if you run it as .NET app) or latest installed .NET SDK to build the benchmarks (if you run it as .NET Core app).
+* Core - if you run it as .NET Core app, BDN will use the same target framework moniker, if you run it as .NET app it's going to use netcoreapp2.1.
+* Mono - it's going to use the Mono from `$Path`, you can override  it with `--monoPath`.
+* net46, net461, net462, net47, net471, net472 - to build and run benchmarks against specific .NET framework version.
+* netcoreapp2.0, netcoreapp2.1, netcoreapp2.2, netcoreapp3.0, netcoreapp3.1, net5.0, net6.0, net7.0 - to build and run benchmarks against specific .NET Core version.
+* nativeaot5.0, nativeaot6.0, nativeaot7.0 - to build and run benchmarks using NativeAOT. Can be customized with additional options: `--ilcPath`, `--ilCompilerVersion`.
 
 Example: run the benchmarks for .NET 4.7.2 and .NET Core 2.1:
 
@@ -207,7 +207,7 @@ dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --sta
 * `--cli` path to dotnet cli (optional).
 * `--packages` the directory to restore packages to (optional).
 * `--coreRun` path(s) to CoreRun (optional).
-* `--coreRt` path to ILCompiler for CoreRT
+* `--ilcPath` path to ILCompiler for NativeAOT.
 * `--info` prints environment configuration including BenchmarkDotNet, OS, CPU and .NET version
 * `--stopOnFirstError` stop on first error.
 * `--help` display this help screen.
@@ -218,7 +218,7 @@ dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --sta
 * `--maxWidth` max parameter column width, the default is 20.
 * `--envVars` colon separated environment variables (key:value).
 * `--strategy` the RunStrategy that should be used. Throughput/ColdStart/Monitoring.
-* `--platform` the Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64.
+* `--platform` the Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64/LoongArch64.
 * `--runOncePerIteration` run the benchmark exactly once per iteration.
 * `--buildTimeout` build timeout in seconds.
 * `--wasmEngine` full path to a java script engine used to run the benchmarks, used by Wasm toolchain.

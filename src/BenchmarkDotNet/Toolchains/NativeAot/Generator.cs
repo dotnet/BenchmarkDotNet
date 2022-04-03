@@ -10,26 +10,26 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 
-namespace BenchmarkDotNet.Toolchains.CoreRt
+namespace BenchmarkDotNet.Toolchains.NativeAot
 {
     /// <summary>
-    /// generates new csproj file for self-contained .NET Core RT app
+    /// generates new csproj file for self-contained NativeAOT app
     /// based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built
     /// and https://github.com/dotnet/corert/tree/7f902d4d8b1c3280e60f5e06c71951a60da173fb/samples/HelloWorld#add-corert-to-your-project
     /// </summary>
     public class Generator : CsProjGenerator
     {
-        internal const string CoreRtNuGetFeed = "coreRtNuGetFeed";
+        internal const string NativeAotNuGetFeed = "nativeAotNuGetFeed";
+        internal const string GeneratedRdXmlFileName = "bdn_generated.rd.xml";
 
-        internal Generator(string coreRtVersion, bool useCppCodeGenerator,
+        internal Generator(string ilCompilerVersion,
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string cliPath,
             string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag,
             bool useTempFolderForRestore, string packagesRestorePath,
-            bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData)
+            bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData, string trimmerDefaultAction)
             : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore, packagesRestorePath), runtimeFrameworkVersion)
         {
-            this.coreRtVersion = coreRtVersion;
-            this.useCppCodeGenerator = useCppCodeGenerator;
+            this.ilCompilerVersion = ilCompilerVersion;
             this.targetFrameworkMoniker = targetFrameworkMoniker;
             this.runtimeIdentifier = runtimeIdentifier;
             this.feeds = feeds;
@@ -38,10 +38,10 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
             this.rootAllApplicationAssemblies = rootAllApplicationAssemblies;
             this.ilcGenerateCompleteTypeMetadata = ilcGenerateCompleteTypeMetadata;
             this.ilcGenerateStackTraceData = ilcGenerateStackTraceData;
+            this.trimmerDefaultAction = trimmerDefaultAction;
         }
 
-        private readonly string coreRtVersion;
-        private readonly bool useCppCodeGenerator;
+        private readonly string ilCompilerVersion;
         [SuppressMessage("ReSharper", "NotAccessedField.Local")]
         private readonly string targetFrameworkMoniker;
         private readonly string runtimeIdentifier;
@@ -51,8 +51,9 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
         private readonly bool rootAllApplicationAssemblies;
         private readonly bool ilcGenerateCompleteTypeMetadata;
         private readonly bool ilcGenerateStackTraceData;
+        private readonly string trimmerDefaultAction;
 
-        private bool IsNuGetCoreRt => feeds.ContainsKey(CoreRtNuGetFeed) && !string.IsNullOrWhiteSpace(coreRtVersion);
+        private bool IsNuGet => feeds.ContainsKey(NativeAotNuGetFeed) && !string.IsNullOrWhiteSpace(ilCompilerVersion);
 
         protected override string GetExecutableExtension() => RuntimeInformation.ExecutableExtension;
 
@@ -66,12 +67,12 @@ namespace BenchmarkDotNet.Toolchains.CoreRt
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
-            string extraArguments = useCppCodeGenerator ? $"-r {runtimeIdentifier} /p:NativeCodeGen=cpp" : $"-r {runtimeIdentifier}";
+            string extraArguments = NativeAotToolchain.GetExtraArguments(runtimeIdentifier);
 
             var content = new StringBuilder(300)
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition)} {extraArguments}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition)} {extraArguments}")
-                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition)} {extraArguments}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, extraArguments)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition, extraArguments)}")
+                .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, extraArguments)}")
                 .ToString();
 
             File.WriteAllText(artifactsPaths.BuildScriptFilePath, content);
@@ -109,7 +110,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
             File.WriteAllText(artifactsPaths.ProjectFilePath,
-                IsNuGetCoreRt
+                IsNuGet
                     ? GenerateProjectForNuGetBuild(buildPartition, artifactsPaths, logger)
                     : GenerateProjectForLocalBuild(buildPartition, artifactsPaths, logger));
 
@@ -144,11 +145,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{coreRtVersion}"" />
+    <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
   <ItemGroup>
-    <RdXmlFile Include=""rd.xml"" />
+    {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
 </Project>";
 
@@ -183,14 +184,40 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
   <ItemGroup>
-    <RdXmlFile Include=""rd.xml"" />
+    {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
 </Project>";
 
         private string GetTrimmingSettings()
-            => rootAllApplicationAssemblies
-                ? "<PublishTrimmed>false</PublishTrimmed>"
-                : "<TrimMode>link</TrimMode>";
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine(rootAllApplicationAssemblies ? "<PublishTrimmed>false</PublishTrimmed>" : "<TrimMode>link</TrimMode>");
+
+            if (!string.IsNullOrEmpty(trimmerDefaultAction))
+            {
+                sb.Append($"<TrimmerDefaultAction>{trimmerDefaultAction}</TrimmerDefaultAction>");
+            }
+
+            return sb.ToString();
+        }
+
+        public IEnumerable<string> GetRdXmlFiles(Type benchmarkTarget, ILogger logger)
+        {
+            var projectFile = GetProjectFilePath(benchmarkTarget, logger);
+            var projectFileFolder = projectFile.DirectoryName;
+            yield return GeneratedRdXmlFileName;
+            var rdXml = Path.Combine(projectFileFolder, "rd.xml");
+            if (File.Exists(rdXml))
+            {
+                yield return rdXml;
+            }
+
+            foreach (var item in Directory.GetFiles(projectFileFolder, "*.rd.xml"))
+            {
+                yield return item;
+            }
+        }
 
         /// <summary>
         /// mandatory to make it possible to call GC.GetAllocatedBytesForCurrentThread() using reflection (not part of .NET Standard)
@@ -215,7 +242,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             string directoryName = Path.GetDirectoryName(artifactsPaths.ProjectFilePath);
             if (directoryName != null)
-                File.WriteAllText(Path.Combine(directoryName, "rd.xml"), content);
+                File.WriteAllText(Path.Combine(directoryName, GeneratedRdXmlFileName), content);
             else
                 throw new InvalidOperationException($"Can't get directory of projectFilePath ('{artifactsPaths.ProjectFilePath}')");
         }

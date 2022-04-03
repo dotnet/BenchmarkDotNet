@@ -35,12 +35,9 @@ namespace BenchmarkDotNet.Portability
             => ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
                 && !string.IsNullOrEmpty(typeof(object).Assembly.Location);
 
-        /// <summary>
-        /// "The north star for CoreRT is to be a flavor of .NET Core" -> CoreRT reports .NET Core everywhere
-        /// </summary>
-        public static bool IsCoreRT
-            => ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
-               && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
+        public static bool IsNativeAOT
+            => Environment.Version.Major >= 5
+                && string.IsNullOrEmpty(typeof(object).Assembly.Location); // it's merged to a single .exe and .Location returns null
 
         public static bool IsWasm => IsOSPlatform(OSPlatform.Create("BROWSER"));
 
@@ -204,9 +201,9 @@ namespace BenchmarkDotNet.Portability
                     return $".NET Core {runtimeVersion} (CoreCLR {coreclrAssemblyInfo.FileVersion}, CoreFX {corefxAssemblyInfo.FileVersion})";
                 }
             }
-            else if (IsCoreRT)
+            else if (IsNativeAOT)
             {
-                return FrameworkDescription.Replace("Core ", "CoreRT ");
+                return FrameworkDescription;
             }
 
             return Unknown;
@@ -225,8 +222,8 @@ namespace BenchmarkDotNet.Portability
                 return WasmRuntime.Default;
             if (IsNetCore)
                 return CoreRuntime.GetCurrentVersion();
-            if (IsCoreRT)
-                return CoreRtRuntime.GetCurrentVersion();
+            if (IsNativeAOT)
+                return NativeAotRuntime.GetCurrentVersion();
 
             throw new NotSupportedException("Unknown .NET Runtime");
         }
@@ -237,6 +234,7 @@ namespace BenchmarkDotNet.Portability
             // https://github.com/dotnet/runtime/blob/d81ad044fa6830f5f31f6b6e8224ebf66a3c298c/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/Architecture.cs#L12-L13
             const Architecture Wasm = (Architecture)4;
             const Architecture S390x = (Architecture)5;
+            const Architecture LoongArch64 = (Architecture)6;
 
             switch (ProcessArchitecture)
             {
@@ -252,6 +250,8 @@ namespace BenchmarkDotNet.Portability
                     return Platform.Wasm;
                 case S390x:
                     return Platform.S390x;
+                case LoongArch64:
+                    return Platform.LoongArch64;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -275,7 +275,9 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetJitInfo()
         {
-            if (IsCoreRT || IsNetNative || IsAot)
+            if (IsNativeAOT)
+                return "NativeAOT";
+            if (IsNetNative || IsAot)
                 return "AOT";
             if (IsMono || IsWasm)
                 return ""; // There is no helpful information about JIT on Mono

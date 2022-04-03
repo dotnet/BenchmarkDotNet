@@ -103,5 +103,32 @@ namespace BenchmarkDotNet.Extensions
         {
             return path.Replace(directory, string.Empty).Trim('/', '\\');
         }
+
+        /// <summary>
+        /// Standardizes the whitespace before/after arguments so that all arguments are separated by a single space
+        /// </summary>
+        /// <param name="stringBuilder">The string builder that will hold the arguments</param>
+        /// <param name="argument">The argument to append to this string builder</param>
+        /// <returns>The string builder with the arguments added</returns>
+        internal static StringBuilder AppendArgument(this StringBuilder stringBuilder, string argument)
+        {
+            if (string.IsNullOrWhiteSpace(argument))
+            {
+                return stringBuilder;
+            }
+            argument = " " + argument.Trim();
+            stringBuilder.Append(argument);
+
+            return stringBuilder;
+        }
+
+        /// <summary>
+        /// Standardizes the whitespace before/after arguments so that all arguments are separated by a single space
+        /// </summary>
+        /// <param name="stringBuilder">The string builder that will hold the arguments</param>
+        /// <param name="argument">The argument to append to this string builder</param>
+        /// <returns>The string builder with the arguments added</returns>
+        internal static StringBuilder AppendArgument(this StringBuilder stringBuilder, object argument)
+            => argument == null ? stringBuilder : AppendArgument(stringBuilder, argument.ToString());
     }
 }
