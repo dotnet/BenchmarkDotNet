@@ -2,17 +2,15 @@
 
 There are two recommended options to build BenchmarkDotNet from source:
 
-## Option A (Windows only) - Visual Studio
+## Visual Studio
 
-- [Visual Studio 2017 version 15.7 Preview 4 or higher](https://www.visualstudio.com/downloads/) (Community, Professional, Enterprise).
+- [Visual Studio](https://www.visualstudio.com/downloads/) (Community, Professional, Enterprise) with .NET 4.6.1 SDK and F# support.
 
-- Visual Studio 2017 doesn't have installed necessary the .NET Core SDK 2.1 Preview 1, but you can get it from the [Installing the .Net Core SDK page](https://www.microsoft.com/net/download/dotnet-core/sdk-2.1.300-preview1). You may also need [.NET Core Runtime 2.1 Preview 1](https://www.microsoft.com/net/download/dotnet-core/runtime-2.1.0-preview1).
-
-- Visual Studio 2017 should have installed “F# language support” feature. You can also install the support [directly as a separate download](https://www.microsoft.com/en-us/download/details.aspx?id=48179).
+- [.NET 5 SDK](https://dotnet.microsoft.com/download).
 
 Once all the necessary tools are in place, building is trivial. Simply open solution file **BenchmarkDotNet.sln** that lives at the base of the repository and run Build action.
 
-## Option B (Windows, Linux, macOS) - Cake (C# Make)
+## Cake (C# Make)
 
 [Cake (C# Make)](http://cakebuild.net/) is a cross platform build automation system with a C# DSL to do things like compiling code, copy files/folders, running unit tests, compress files and build NuGet packages.
 
