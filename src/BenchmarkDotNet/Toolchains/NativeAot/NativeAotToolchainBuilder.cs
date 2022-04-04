@@ -19,7 +19,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private bool ilcGenerateStackTraceData = true;
 
         private bool isIlCompilerConfigured;
-        private string trimmerDefaultAction = "link";
 
         /// <summary>
         /// creates a NativeAOT toolchain targeting NuGet build of Microsoft.DotNet.ILCompiler
@@ -111,19 +110,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             return this;
         }
 
-        /// <summary>
-        /// By using the default value ("link") this ensures that the trimmer only analyzes the parts of the library's dependencies that are used.
-        /// It tells the trimmer that any code that is not part of a "root" can be trimmed if it is unused.
-        /// </summary>
-        /// <remarks>Pass null or empty string to NOT set TrimmerDefaultAction to any value.</remarks>
-        [PublicAPI]
-        public NativeAotToolchainBuilder SeTrimmerDefaultAction(string value = "link")
-        {
-            trimmerDefaultAction = value;
-
-            return this;
-        }
-
         [PublicAPI]
         public override IToolchain ToToolchain()
         {
@@ -144,8 +130,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 useTempFolderForRestore: useTempFolderForRestore,
                 rootAllApplicationAssemblies: rootAllApplicationAssemblies,
                 ilcGenerateCompleteTypeMetadata: ilcGenerateCompleteTypeMetadata,
-                ilcGenerateStackTraceData: ilcGenerateStackTraceData,
-                trimmerDefaultAction: trimmerDefaultAction
+                ilcGenerateStackTraceData: ilcGenerateStackTraceData
             );
         }
     }

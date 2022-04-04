@@ -43,8 +43,6 @@ namespace BenchmarkDotNet.Extensions
                     return CoreRuntime.Core70;
                 case RuntimeMoniker.Mono:
                     return MonoRuntime.Default;
-                case RuntimeMoniker.NativeAot50:
-                    return NativeAotRuntime.Net50;
                 case RuntimeMoniker.NativeAot60:
                     return NativeAotRuntime.Net60;
                 case RuntimeMoniker.NativeAot70:
