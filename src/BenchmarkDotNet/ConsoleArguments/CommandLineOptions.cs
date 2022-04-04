@@ -133,7 +133,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("strategy", Required = false, HelpText = "The RunStrategy that should be used. Throughput/ColdStart/Monitoring.")]
         public RunStrategy? RunStrategy { get; set; }
 
-        [Option("platform", Required = false, HelpText = "The Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64.")]
+        [Option("platform", Required = false, HelpText = "The Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64/LoongArch64.")]
         public Platform? Platform { get; set; }
 
         [Option("runOncePerIteration", Required = false, Default = false, HelpText = "Run the benchmark exactly once per iteration.")]
@@ -153,6 +153,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("logBuildOutput", Required = false, HelpText = "Log Build output.")]
         public bool LogBuildOutput { get; set; }
+
+        [Option("generateBinLog", Required = false, HelpText = "Generate msbuild binlog for builds")]
+        public bool GenerateMSBuildBinLog { get; set; }
 
         [Option("buildTimeout", Required = false, HelpText = "Build timeout in seconds.")]
         public int? TimeOutInSeconds { get; set; }

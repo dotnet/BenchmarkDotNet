@@ -20,8 +20,9 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
     public class Generator : CsProjGenerator
     {
         internal const string NativeAotNuGetFeed = "nativeAotNuGetFeed";
+        internal const string GeneratedRdXmlFileName = "bdn_generated.rd.xml";
 
-        internal Generator(string ilCompilerVersion, bool useCppCodeGenerator,
+        internal Generator(string ilCompilerVersion,
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string cliPath,
             string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag,
             bool useTempFolderForRestore, string packagesRestorePath,
@@ -29,7 +30,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore, packagesRestorePath), runtimeFrameworkVersion)
         {
             this.ilCompilerVersion = ilCompilerVersion;
-            this.useCppCodeGenerator = useCppCodeGenerator;
             this.targetFrameworkMoniker = targetFrameworkMoniker;
             this.runtimeIdentifier = runtimeIdentifier;
             this.feeds = feeds;
@@ -41,7 +41,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         }
 
         private readonly string ilCompilerVersion;
-        private readonly bool useCppCodeGenerator;
         [SuppressMessage("ReSharper", "NotAccessedField.Local")]
         private readonly string targetFrameworkMoniker;
         private readonly string runtimeIdentifier;
@@ -66,7 +65,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
 
         protected override void GenerateBuildScript(BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
         {
-            string extraArguments = NativeAotToolchain.GetExtraArguments(useCppCodeGenerator, runtimeIdentifier);
+            string extraArguments = NativeAotToolchain.GetExtraArguments(runtimeIdentifier);
 
             var content = new StringBuilder(300)
                 .AppendLine($"call {CliPath ?? "dotnet"} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, extraArguments)}")
@@ -148,7 +147,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
   <ItemGroup>
-    <RdXmlFile Include=""rd.xml"" />
+    {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
 </Project>";
 
@@ -183,7 +182,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
   <ItemGroup>
-    <RdXmlFile Include=""rd.xml"" />
+    {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
 </Project>";
 
@@ -192,6 +191,23 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 ? "" // use the defaults
                 // TrimMode is set in explicit way as for older versions it might have different default value
                 : "<TrimMode>link</TrimMode><TrimmerDefaultAction>link</TrimmerDefaultAction>";
+
+        public IEnumerable<string> GetRdXmlFiles(Type benchmarkTarget, ILogger logger)
+        {
+            var projectFile = GetProjectFilePath(benchmarkTarget, logger);
+            var projectFileFolder = projectFile.DirectoryName;
+            yield return GeneratedRdXmlFileName;
+            var rdXml = Path.Combine(projectFileFolder, "rd.xml");
+            if (File.Exists(rdXml))
+            {
+                yield return rdXml;
+            }
+
+            foreach (var item in Directory.GetFiles(projectFileFolder, "*.rd.xml"))
+            {
+                yield return item;
+            }
+        }
 
         /// <summary>
         /// mandatory to make it possible to call GC.GetAllocatedBytesForCurrentThread() using reflection (not part of .NET Standard)
@@ -216,7 +232,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             string directoryName = Path.GetDirectoryName(artifactsPaths.ProjectFilePath);
             if (directoryName != null)
-                File.WriteAllText(Path.Combine(directoryName, "rd.xml"), content);
+                File.WriteAllText(Path.Combine(directoryName, GeneratedRdXmlFileName), content);
             else
                 throw new InvalidOperationException($"Can't get directory of projectFilePath ('{artifactsPaths.ProjectFilePath}')");
         }

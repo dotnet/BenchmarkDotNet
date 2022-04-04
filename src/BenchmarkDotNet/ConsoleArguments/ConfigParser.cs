@@ -244,6 +244,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.WithOption(ConfigOptions.StopOnFirstError, options.StopOnFirstError);
             config.WithOption(ConfigOptions.DisableLogFile, options.DisableLogFile);
             config.WithOption(ConfigOptions.LogBuildOutput, options.LogBuildOutput);
+            config.WithOption(ConfigOptions.GenerateMSBuildBinLog, options.GenerateMSBuildBinLog);
 
             if (options.MaxParameterColumnWidth.HasValue)
                 config.WithSummaryStyle(SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParameterColumnWidth.Value));

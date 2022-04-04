@@ -5,7 +5,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net461;net5.0</TargetFrameworks>
+    <TargetFrameworks>net461;net6.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Program.fs" />
