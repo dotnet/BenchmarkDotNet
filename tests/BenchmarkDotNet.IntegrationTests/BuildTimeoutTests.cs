@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty()
                 .WithBuildTimeout(timeout)
                 .AddJob(Job.Dry
-                    .WithRuntime(NativeAotRuntime.Net50)
+                    .WithRuntime(NativeAotRuntime.Net60)
                     .WithToolchain(NativeAotToolchain.CreateBuilder()
                         .UseNuGet(
                             "6.0.0-rc.1.21420.1", // we test against specific version to keep this test stable
