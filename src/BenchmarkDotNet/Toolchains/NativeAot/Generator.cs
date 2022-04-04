@@ -194,9 +194,10 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
         public IEnumerable<string> GetRdXmlFiles(Type benchmarkTarget, ILogger logger)
         {
+            yield return GeneratedRdXmlFileName;
+
             var projectFile = GetProjectFilePath(benchmarkTarget, logger);
             var projectFileFolder = projectFile.DirectoryName;
-            yield return GeneratedRdXmlFileName;
             var rdXml = Path.Combine(projectFileFolder, "rd.xml");
             if (File.Exists(rdXml))
             {
