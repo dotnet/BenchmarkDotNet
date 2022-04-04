@@ -207,7 +207,7 @@ namespace BenchmarkDotNet.Tests
         public void IlCompilerPathParsedCorrectly()
         {
             var fakePath =  new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory;
-            var config = ConfigParser.Parse(new[] { "-r", "nativeaot50", "--ilcPath", fakePath.FullName }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "-r", "nativeaot60", "--ilcPath", fakePath.FullName }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
             NativeAotToolchain toolchain = config.GetJobs().Single().GetToolchain() as NativeAotToolchain;
