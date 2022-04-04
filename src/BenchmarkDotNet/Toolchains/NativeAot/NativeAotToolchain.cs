@@ -8,20 +8,20 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
     public class NativeAotToolchain : Toolchain
     {
         /// <summary>
-        /// compiled as net5.0, targets experimental 6.0.0-* NativeAOT build from the https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json
-        /// </summary>
-        public static readonly IToolchain Net50 = GetBuilderForOldExperimentalFeed().TargetFrameworkMoniker("net5.0").ToToolchain();
-        /// <summary>
         /// compiled as net6.0, targets experimental 6.0.0-* NativeAOT build from the https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json
         /// </summary>
-        public static readonly IToolchain Net60 = GetBuilderForOldExperimentalFeed().TargetFrameworkMoniker("net6.0").ToToolchain();
+        public static readonly IToolchain Net60 = CreateBuilder()
+            .UseNuGet("6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json")
+            .TargetFrameworkMoniker("net6.0")
+            .ToToolchain();
+
         /// <summary>
         /// compiled as net7.0, targets latest (7.0.0-*) NativeAOT build from the .NET 7 feed: https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json
         /// </summary>
-        public static readonly IToolchain Net70 = CreateBuilder().UseNuGet().TargetFrameworkMoniker("net7.0").ToToolchain();
-
-        private static NativeAotToolchainBuilder GetBuilderForOldExperimentalFeed()
-            => CreateBuilder().UseNuGet("6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json");
+        public static readonly IToolchain Net70 = CreateBuilder()
+            .UseNuGet("7.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json")
+            .TargetFrameworkMoniker("net7.0")
+            .ToToolchain();
 
         internal NativeAotToolchain(string displayName,
             string ilCompilerVersion, string ilcPath,

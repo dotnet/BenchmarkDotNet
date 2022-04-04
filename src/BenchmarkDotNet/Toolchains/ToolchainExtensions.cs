@@ -108,8 +108,6 @@ namespace BenchmarkDotNet.Toolchains
                     return CsProjCoreToolchain.NetCoreApp60;
                 case RuntimeMoniker.Net70:
                     return CsProjCoreToolchain.NetCoreApp70;
-                case RuntimeMoniker.NativeAot50:
-                    return NativeAotToolchain.Net50;
                 case RuntimeMoniker.NativeAot60:
                     return NativeAotToolchain.Net60;
                 case RuntimeMoniker.NativeAot70:
