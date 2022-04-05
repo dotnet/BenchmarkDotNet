@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Code
 
                 string passArguments = GetPassArguments(benchmark);
 
-                extraDefines.Add($"{provider.ExtraDefines}_{buildInfo.Id}");
+                string compilationId = $"{provider.ReturnsDefinition}_{buildInfo.Id}";
 
                 AddNonEmptyUnique(additionalLogic, benchmark.Descriptor.AdditionalLogic);
 
@@ -64,7 +64,8 @@ namespace BenchmarkDotNet.Code
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
                     .Replace("$MeasureExtraStats$", buildInfo.Config.HasExtraStatsDiagnoser() ? "true" : "false")
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
-                    .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments)).ToString();
+                    .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments))
+                    .RemoveRedundantIfDefines(compilationId);
 
                 benchmarkTypeCode = Unroll(benchmarkTypeCode, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance));
 
@@ -304,6 +305,31 @@ namespace BenchmarkDotNet.Code
                 else
                     builder.Append($"\n// '{oldValue}' not found");
                 return this;
+            }
+
+            public string RemoveRedundantIfDefines(string id)
+            {
+                var oldLines = builder.ToString().Split('\n');
+                var newLines = new List<string>();
+                bool keepAdding = true;
+
+                foreach (string line in oldLines)
+                {
+                    if (line.StartsWith("#if RETURNS") || line.StartsWith("#elif RETURNS"))
+                    {
+                        keepAdding = line.Contains(id);
+                    }
+                    else if (line.StartsWith("#endif // RETURNS"))
+                    {
+                        keepAdding = true;
+                    }
+                    else if (keepAdding)
+                    {
+                        newLines.Add(line);
+                    }
+                }
+
+                return string.Join("\n", newLines);
             }
 
             public override string ToString() => builder.ToString();

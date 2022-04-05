@@ -449,5 +449,5 @@
                 $WorkloadMethodCall$;
             }
         }
-#endif
+#endif // RETURNS
     }
