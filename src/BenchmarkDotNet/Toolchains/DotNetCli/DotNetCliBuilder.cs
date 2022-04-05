@@ -14,13 +14,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private string CustomDotNetCliPath { get; }
         private bool LogOutput { get; }
+        private bool RetryFailedBuildWithNoDeps { get; }
 
         [PublicAPI]
-        public DotNetCliBuilder(string targetFrameworkMoniker, string customDotNetCliPath = null, bool logOutput = false)
+        public DotNetCliBuilder(string targetFrameworkMoniker, string customDotNetCliPath = null, bool logOutput = false, bool retryFailedBuildWithNoDeps = true)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
             CustomDotNetCliPath = customDotNetCliPath;
             LogOutput = logOutput;
+            RetryFailedBuildWithNoDeps = retryFailedBuildWithNoDeps;
         }
 
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
@@ -32,7 +34,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     buildPartition,
                     Array.Empty<EnvironmentVariable>(),
                     buildPartition.Timeout,
-                    logOutput: LogOutput)
+                    logOutput: LogOutput,
+                    retryFailedBuildWithNoDeps: RetryFailedBuildWithNoDeps)
                 .RestoreThenBuild();
     }
 }
