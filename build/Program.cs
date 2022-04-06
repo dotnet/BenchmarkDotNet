@@ -8,6 +8,8 @@ using Cake.Common.Diagnostics;
 using Cake.Common.IO;
 using Cake.Common.Net;
 using Cake.Common.Tools.DotNet;
+using Cake.Common.Tools.DotNet.MSBuild;
+using Cake.Common.Tools.DotNet.Restore;
 using Cake.Common.Tools.DotNet.Run;
 using Cake.Common.Tools.DotNetCore.Build;
 using Cake.Common.Tools.DotNetCore.MSBuild;
@@ -260,7 +262,24 @@ public class RestoreTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        context.DotNetRestore(context.SolutionFile.FullPath);
+        if (context.IsRunningOnWindows())
+        {
+            // NativeAOT build requires VS C++ tools to be added to $path via vcvars64.bat
+            // but once we do that, dotnet restore fails with:
+            // "Please specify a valid solution configuration using the Configuration and Platform properties"
+            var msBuildSettings = new DotNetMSBuildSettings();
+            msBuildSettings.Properties.Add("Platform", new[] { "Any CPU" });
+
+            context.DotNetRestore(context.SolutionFile.FullPath,
+                new DotNetRestoreSettings
+                {
+                    MSBuildSettings = msBuildSettings
+                });
+        }
+        else
+        {
+            context.DotNetRestore(context.SolutionFile.FullPath);
+        }
     }
 }
 
