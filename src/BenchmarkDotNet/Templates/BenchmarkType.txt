@@ -89,19 +89,19 @@
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         private void Dummy1()
         {
-            dummyVar++;@DummyUnroll@
+            @DummyUnroll@
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         private void Dummy2()
         {
-            dummyVar++;@DummyUnroll@
+            @DummyUnroll@
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         private void Dummy3()
         {
-            dummyVar++;@DummyUnroll@
+            @DummyUnroll@
         }
 
         private $OverheadMethodReturnTypeName$ __Overhead($ArgumentsDefinition$) // __ is to avoid possible name conflict
@@ -449,5 +449,5 @@
                 $WorkloadMethodCall$;
             }
         }
-#endif
+#endif // RETURNS
     }
