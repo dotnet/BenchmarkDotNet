@@ -247,6 +247,22 @@ public static class DocumentationHelper
     public const string BdnFirstCommit = "6eda98ab1e83a0d185d09ff8b24c795711af8db1";
 }
 
+public static class Extensions
+{
+    public static DotNetCoreMSBuildSettings SetPlatformIfNeeded(this BuildContext context)
+    {
+        // NativeAOT build requires VS C++ tools to be added to $path via vcvars64.bat
+        // but once we do that, dotnet restore fails with:
+        // "Please specify a valid solution configuration using the Configuration and Platform properties"
+        if (context.IsRunningOnWindows())
+        {
+            context.MsBuildSettings.Properties["Platform"] = new[] { "Any CPU" };
+        }
+
+        return context.MsBuildSettings;
+    }
+}
+
 [TaskName("Clean")]
 public class CleanTask : FrostingTask<BuildContext>
 {
@@ -262,24 +278,11 @@ public class RestoreTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        if (context.IsRunningOnWindows())
-        {
-            // NativeAOT build requires VS C++ tools to be added to $path via vcvars64.bat
-            // but once we do that, dotnet restore fails with:
-            // "Please specify a valid solution configuration using the Configuration and Platform properties"
-            var msBuildSettings = new DotNetMSBuildSettings();
-            msBuildSettings.Properties.Add("Platform", new[] { "Any CPU" });
-
-            context.DotNetRestore(context.SolutionFile.FullPath,
-                new DotNetRestoreSettings
-                {
-                    MSBuildSettings = msBuildSettings
-                });
-        }
-        else
-        {
-            context.DotNetRestore(context.SolutionFile.FullPath);
-        }
+        context.DotNetRestore(context.SolutionFile.FullPath,
+            new DotNetRestoreSettings
+            {
+                MSBuildSettings = context.SetPlatformIfNeeded()
+            });
     }
 }
 
@@ -294,7 +297,7 @@ public class BuildTask : FrostingTask<BuildContext>
             Configuration = context.BuildConfiguration,
             NoRestore = true,
             DiagnosticOutput = true,
-            MSBuildSettings = context.MsBuildSettings,
+            MSBuildSettings = context.SetPlatformIfNeeded(),
             Verbosity = DotNetVerbosity.Minimal
         });
     }
