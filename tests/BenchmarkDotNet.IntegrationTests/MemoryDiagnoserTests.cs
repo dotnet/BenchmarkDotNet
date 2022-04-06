@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactDotNetCoreOnly("We don't want to test NativeAOT twice (for .NET Framework 4.6.1 and .NET 6.0)")]
         public void MemoryDiagnoserSupportsNativeAOT()
         {
-            if (GitHubActions.IsRunningOnWindows())
+            if (ContinuousIntegration.IsGitHubActionsOnWindows())
                 return;
 
             MemoryDiagnoserIsAccurate(
