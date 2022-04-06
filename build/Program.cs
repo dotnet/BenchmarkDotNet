@@ -366,12 +366,14 @@ public class PackTask : FrostingTask<BuildContext>
         {
             Configuration = context.BuildConfiguration,
             OutputDirectory = context.ArtifactsDirectory.FullPath,
-            ArgumentCustomization = args => args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg")
+            ArgumentCustomization = args => args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg"),
+            MSBuildSettings = context.MsBuildSettings
         };
         var settingsTemplate = new DotNetCorePackSettings
         {
             Configuration = context.BuildConfiguration,
-            OutputDirectory = context.ArtifactsDirectory.FullPath
+            OutputDirectory = context.ArtifactsDirectory.FullPath,
+            MSBuildSettings = context.MsBuildSettings
         };
 
         foreach (var project in context.AllPackableSrcProjects)
