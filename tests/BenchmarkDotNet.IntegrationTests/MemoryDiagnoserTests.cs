@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public byte[] EightBytesArray() => new byte[8];
             [Benchmark] public byte[] SixtyFourBytesArray() => new byte[64];
 
-            [Benchmark] public Task<int> AllocateTask() => Task.FromResult(default(int));
+            [Benchmark] public Task<int> AllocateTask() => Task.FromResult<int>(-12345);
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
