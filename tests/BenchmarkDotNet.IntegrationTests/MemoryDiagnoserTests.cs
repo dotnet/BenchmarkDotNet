@@ -38,18 +38,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
             yield return new object[] { Job.Default.GetToolchain() };
             yield return new object[] { InProcessEmitToolchain.Instance };
-
-#if !NETFRAMEWORK
-            if (!GitHubActions.IsRunningOnWindows())
-            {
-                // we don't want to test NativeAOT twice (for .NET 4.6 and 5.0) when running the integration tests (these tests take a lot of time)
-                // we test against specific version to keep this test stable
-                yield return new object[] { NativeAotToolchain.CreateBuilder()
-                .UseNuGet(
-                    "6.0.0-rc.1.21420.1",
-                    "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json").ToToolchain() };
-            }
-#endif
         }
 
         public class AccurateAllocations
@@ -74,6 +62,20 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 { nameof(AccurateAllocations.AllocateTask), CalculateRequiredSpace<Task<int>>() },
             });
+        }
+
+        [FactDotNetCoreOnly("We don't want to test NativeAOT twice (for .NET Framework 4.6.1 and .NET 6.0)")]
+        public void MemoryDiagnoserSupportsNativeAOT()
+        {
+            if (ContinuousIntegration.IsGitHubActionsOnWindows())
+                return;
+
+            MemoryDiagnoserIsAccurate(
+                NativeAotToolchain.CreateBuilder()
+                    .UseNuGet(
+                        "6.0.0-rc.1.21420.1", // we test against specific version to keep this test stable
+                        "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json")
+                    .ToToolchain());
         }
 
         public class AllocatingGlobalSetupAndCleanup
