@@ -54,9 +54,14 @@ namespace BenchmarkDotNet.IntegrationTests
         [Benchmark]
         public void Ensure()
         {
-            if (Process.GetCurrentProcess().ProcessorAffinity != Value)
+#if NET6_0_OR_GREATER
+            if (OperatingSystem.IsWindows())
+#endif
             {
-                throw new InvalidOperationException("Did not set custom affinity");
+                if (Process.GetCurrentProcess().ProcessorAffinity != Value)
+                {
+                    throw new InvalidOperationException("Did not set custom affinity");
+                }
             }
         }
     }
