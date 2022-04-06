@@ -95,11 +95,19 @@ public class BuildContext : FrostingContext
             MaxCpuCount = 1
         };
         MsBuildSettings.WithProperty("UseSharedCompilation", "false");
+
+        // NativeAOT build requires VS C++ tools to be added to $path via vcvars64.bat
+        // but once we do that, dotnet restore fails with:
+        // "Please specify a valid solution configuration using the Configuration and Platform properties"
+        if (context.IsRunningOnWindows())
+        {
+            MsBuildSettings.WithProperty("Platform", "Any CPU");
+        }
     }
 
     private DotNetCoreTestSettings GetTestSettingsParameters(FilePath logFile, string tfm)
     {
-        return new DotNetCoreTestSettings
+        var settings = new DotNetCoreTestSettings
         {
             Configuration = BuildConfiguration,
             Framework = tfm,
@@ -107,6 +115,9 @@ public class BuildContext : FrostingContext
             NoRestore = true,
             Loggers = new[] { "trx", $"trx;LogFileName={logFile.FullPath}" }
         };
+        // force the tool to not look for the .dll in platform-specific directory
+        settings.EnvironmentVariables["Platform"] = "";
+        return settings;
     }
 
     public void RunTests(FilePath projectFile, string alias, string tfm)
@@ -247,22 +258,6 @@ public static class DocumentationHelper
     public const string BdnFirstCommit = "6eda98ab1e83a0d185d09ff8b24c795711af8db1";
 }
 
-public static class Extensions
-{
-    public static DotNetCoreMSBuildSettings SetPlatformIfNeeded(this BuildContext context)
-    {
-        // NativeAOT build requires VS C++ tools to be added to $path via vcvars64.bat
-        // but once we do that, dotnet restore fails with:
-        // "Please specify a valid solution configuration using the Configuration and Platform properties"
-        if (context.IsRunningOnWindows())
-        {
-            context.MsBuildSettings.Properties["Platform"] = new[] { "Any CPU" };
-        }
-
-        return context.MsBuildSettings;
-    }
-}
-
 [TaskName("Clean")]
 public class CleanTask : FrostingTask<BuildContext>
 {
@@ -281,7 +276,7 @@ public class RestoreTask : FrostingTask<BuildContext>
         context.DotNetRestore(context.SolutionFile.FullPath,
             new DotNetRestoreSettings
             {
-                MSBuildSettings = context.SetPlatformIfNeeded()
+                MSBuildSettings = context.MsBuildSettings
             });
     }
 }
@@ -297,7 +292,7 @@ public class BuildTask : FrostingTask<BuildContext>
             Configuration = context.BuildConfiguration,
             NoRestore = true,
             DiagnosticOutput = true,
-            MSBuildSettings = context.SetPlatformIfNeeded(),
+            MSBuildSettings = context.MsBuildSettings,
             Verbosity = DotNetVerbosity.Minimal
         });
     }
