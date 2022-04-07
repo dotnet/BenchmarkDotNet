@@ -128,10 +128,10 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <AssemblyTitle>{artifactsPaths.ProgramName}</AssemblyTitle>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <DebugType>pdbonly</DebugType>
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>false</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
     <Deterministic>true</Deterministic>
+    <RunAnalyzers>false</RunAnalyzers>
     {GetTrimmingSettings()}
     <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
@@ -163,10 +163,10 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <AssemblyTitle>{artifactsPaths.ProgramName}</AssemblyTitle>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <DebugType>pdbonly</DebugType>
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>false</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
     <Deterministic>true</Deterministic>
+    <RunAnalyzers>false</RunAnalyzers>
     {GetTrimmingSettings()}
     <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
