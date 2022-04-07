@@ -104,14 +104,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         {
         }
 
-        public void OnEmitCtorBody(ConstructorBuilder constructorBuilder, ILGenerator ilBuilder)
+        public void OnEmitCtorBody(ConstructorBuilder constructorBuilder, ILGenerator ilBuilder, RunnableEmitter runnableEmitter)
         {
             AssertNoBuilder();
 
-            OnEmitCtorBodyOverride(constructorBuilder, ilBuilder);
+            OnEmitCtorBodyOverride(constructorBuilder, ilBuilder, runnableEmitter);
         }
 
-        protected virtual void OnEmitCtorBodyOverride(ConstructorBuilder constructorBuilder, ILGenerator ilBuilder)
+        protected virtual void OnEmitCtorBodyOverride(ConstructorBuilder constructorBuilder, ILGenerator ilBuilder, RunnableEmitter runnableEmitter)
         {
         }
 

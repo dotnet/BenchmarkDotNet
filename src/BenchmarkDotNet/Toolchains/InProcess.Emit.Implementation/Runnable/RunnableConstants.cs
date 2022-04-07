@@ -51,6 +51,7 @@
         public const string CurrentAwaiterFieldName = "currentAwaiter";
         public const string OverheadActionImplMethodName = "OverheadActionImpl";
         public const string WorkloadActionImplMethodName = "WorkloadActionImpl";
+        public const string SetContinuationMethodName = "__SetContinuation";
         public const string RunTaskMethodName = "__RunTask";
         public const string ContinuationMethodName = "__Continuation";
         public const string SetExceptionMethodName = "__SetException";

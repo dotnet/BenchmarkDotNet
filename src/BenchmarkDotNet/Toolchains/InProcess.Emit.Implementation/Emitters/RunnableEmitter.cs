@@ -890,7 +890,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             ilBuilder.EmitCallBaseParameterlessCtor(ctorMethod);
 
-            consumeEmitter.OnEmitCtorBody(ctorMethod, ilBuilder);
+            consumeEmitter.OnEmitCtorBody(ctorMethod, ilBuilder, this);
 
             ilBuilder.EmitSetDelegateToThisField(globalSetupActionField, globalSetupMethod);
             ilBuilder.EmitSetDelegateToThisField(globalCleanupActionField, globalCleanupMethod);

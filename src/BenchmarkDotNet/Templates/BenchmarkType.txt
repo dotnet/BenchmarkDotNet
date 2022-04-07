@@ -1,5 +1,5 @@
     // the type name must be in sync with WindowsDisassembler.BuildArguments
-    public unsafe class Runnable_$ID$ : global::$WorkloadTypeName$
+    public unsafe partial class Runnable_$ID$ : global::$WorkloadTypeName$
     {
         public static void Run(BenchmarkDotNet.Engines.IHost host, System.String benchmarkName)
         {
@@ -57,9 +57,6 @@
 
         public Runnable_$ID$()
         {
-#if RETURNS_AWAITABLE_$ID$
-            continuation = __Continuation;
-#endif
             globalSetupAction = $GlobalSetupMethodName$;
             globalCleanupAction = $GlobalCleanupMethodName$;
             iterationSetupAction = $IterationSetupMethodName$;
@@ -67,6 +64,7 @@
             overheadDelegate = __Overhead;
             workloadDelegate = $WorkloadMethodDelegate$;
             $InitializeArgumentFields$
+            __SetContinuation();
         }
 
         private System.Func<System.Threading.Tasks.ValueTask> globalSetupAction;
@@ -112,13 +110,17 @@
             $OverheadImplementation$
         }
 
+        partial void __SetContinuation();
+
 #if RETURNS_AWAITABLE_$ID$
 
         private readonly BenchmarkDotNet.Helpers.AutoResetValueTaskSource<Perfolizer.Horology.ClockSpan> valueTaskSource = new BenchmarkDotNet.Helpers.AutoResetValueTaskSource<Perfolizer.Horology.ClockSpan>();
         private System.Int64 repeatsRemaining;
-        private readonly System.Action continuation;
+        private System.Action continuation;
         private Perfolizer.Horology.StartedClock startedClock;
         private $AwaiterTypeName$ currentAwaiter;
+
+        partial void __SetContinuation() => continuation = __Continuation;
 
         // Awaits are not unrolled.
         private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> OverheadActionUnroll(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)
