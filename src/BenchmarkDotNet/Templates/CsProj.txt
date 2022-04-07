@@ -11,9 +11,8 @@
     <OutputType>Exe</OutputType>
     <OutputPath>bin\$CONFIGURATIONNAME$</OutputPath>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <!-- nice to have for EtwProfiler, but not mandatory. On x86 and ARM disabled due to bug in Roslyn. -->
-    <DebugType Condition=" '$(PlatformTarget)' != 'x86' And '$(PlatformTarget)' != 'ARM' ">pdbonly</DebugType>
-    <DebugSymbols Condition=" '$(PlatformTarget)' != 'x86' And '$(PlatformTarget)' != 'ARM' ">true</DebugSymbols>
+    <!-- disabled due to https://github.com/dotnet/roslyn/issues/59240 -->
+    <DebugSymbols>false</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
     <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
     <RunAnalyzers>false</RunAnalyzers>
