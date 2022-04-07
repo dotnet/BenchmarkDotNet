@@ -128,9 +128,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <AssemblyTitle>{artifactsPaths.ProgramName}</AssemblyTitle>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <DebugType Condition=""'$(PlatformTarget)' == 'x64'"">pdbonly</DebugType>
-    <DebugSymbols Condition=""'$(PlatformTarget)' == 'x64'"">true</DebugSymbols>
-    <DebugSymbols Condition=""'$(PlatformTarget)' != 'x64'"">false</DebugSymbols>
+    <DebugSymbols>false</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
     <Deterministic>true</Deterministic>
     <RunAnalyzers>false</RunAnalyzers>
@@ -165,9 +163,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <AssemblyTitle>{artifactsPaths.ProgramName}</AssemblyTitle>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <DebugType Condition=""'$(PlatformTarget)' == 'x64'"">pdbonly</DebugType>
-    <DebugSymbols Condition=""'$(PlatformTarget)' == 'x64'"">true</DebugSymbols>
-    <DebugSymbols Condition=""'$(PlatformTarget)' != 'x64'"">false</DebugSymbols>
+    <DebugSymbols>false</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
     <Deterministic>true</Deterministic>
     <RunAnalyzers>false</RunAnalyzers>
