@@ -18,7 +18,9 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             if (!RuntimeInformation.Is64BitPlatform()) // NativeAOT does not support 32bit yet
                 return;
-            if (GitHubActions.IsRunningOnWindows()) // no native dependencies installed
+            if (ContinuousIntegration.IsGitHubActionsOnWindows()) // no native dependencies installed
+                return;
+            if (ContinuousIntegration.IsAppVeyorOnWindows()) // too time consuming for AppVeyor (1h limit)
                 return;
 
             var config = ManualConfig.CreateEmpty()
