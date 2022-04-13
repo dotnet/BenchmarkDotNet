@@ -20,7 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="snapshot.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

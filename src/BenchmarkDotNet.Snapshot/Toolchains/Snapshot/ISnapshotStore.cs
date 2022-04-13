@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Toolchains.Snapshot
         public string Name { get; }
         string Filename { get; }
 
-        public ExecuteResult GetResult(ExecuteParameters executeParameters);
+        public ExecuteResult? GetResult(ExecuteParameters executeParameters);
         void ExportBegin(ILogger logger);
         void ExportEnd(ILogger logger);
         void Export(Summary summary, ILogger logger);

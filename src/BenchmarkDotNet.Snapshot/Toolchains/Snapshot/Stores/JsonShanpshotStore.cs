@@ -29,10 +29,9 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
 
         public static ISnapshotStore From(string filename)
         {
-            return new JsonShanpshotStore(filename, false);
+            return new JsonShanpshotStore(filename);
         }
 
-        private readonly bool inport;
 
         private class BenchmarkStoreInfo
         {
@@ -66,10 +65,9 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
         private BenchmarkSummaryStoreInfo? storeInfo;
         private string ResultsDirectoryPath;
 
-        internal JsonShanpshotStore(string filepath, bool inport)
+        internal JsonShanpshotStore(string filepath)
         {
             Filename = filepath;
-            this.inport = inport;
         }
 
 
@@ -127,14 +125,15 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
         }
 
         void ISnapshotStore.ExportEnd(ILogger logger)
-        {            
+        {
+            System.Diagnostics.Debug.WriteLine(Environment.CurrentDirectory);
             System.IO.File.WriteAllText(Filename, JsonConvert.SerializeObject(storeInfo));
         }
 
-        ExecuteResult ISnapshotStore.GetResult(ExecuteParameters executeParameters)
+        ExecuteResult? ISnapshotStore.GetResult(ExecuteParameters executeParameters)
         {
             var id = executeParameters.BenchmarkCase.Descriptor.ToHash();
-            var benchmarkResult =  storeInfo?.Benchmarks?.FirstOrDefault(b=>b.Id == id);
+            var benchmarkResult = storeInfo?.Benchmarks?.FirstOrDefault(b => b.Id == id);
             if (benchmarkResult is { })
             {
                 var ai = benchmarkResult.ExecuteResults.FirstOrDefault(e => e.LunchIndex == executeParameters.LaunchIndex);
@@ -142,7 +141,6 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
                 {
                     return new ExecuteResult(ai.FoundExecutable, ai.ExitCode, default, ai.Data, ai.ExtraOutput, ai.LunchIndex);
                 }
-
             }
             executeParameters.Logger.WriteError($"Cannot find Snapshot for BenchmarkCase {executeParameters.BenchmarkId}");
             return default;
