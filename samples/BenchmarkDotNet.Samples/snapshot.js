@@ -1,54 +1,156 @@
 {
-   "Title":"BenchmarkDotNet.Samples.IntroSnapshot-20220413-120640",
-   "Benchmarks":[
-      {
-         "FullName":"IntroSnapshot",
-         "DisplayInfo":"IntroSnapshot.Sleep: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)",
-         "Namespace":"BenchmarkDotNet.Samples",
-         "Type":"IntroSnapshot",
-         "Method":"Sleep",
-         "MethodTitle":"Sleep",
-         "Parameters":"",
-         "ExecuteResults":[
-            {
-               "FoundExecutable":true,
-               "ExitCode":0,
-               "Data":[
-                  "","","OverheadJitting  1: 1 op, 213600.00 ns, 213.6000 us/op","WorkloadJitting  1: 1 op, 13981700.00 ns, 13.9817 ms/op","","OverheadJitting  2: 16 op, 210900.00 ns, 13.1813 us/op","WorkloadJitting  2: 16 op, 254823100.00 ns, 15.9264 ms/op","","WorkloadPilot    1: 16 op, 264546300.00 ns, 16.5341 ms/op","WorkloadPilot    2: 32 op, 537420500.00 ns, 16.7944 ms/op","","OverheadWarmup   1: 32 op, 1200.00 ns, 37.5000 ns/op","OverheadWarmup   2: 32 op, 400.00 ns, 12.5000 ns/op","OverheadWarmup   3: 32 op, 300.00 ns, 9.3750 ns/op","OverheadWarmup   4: 32 op, 300.00 ns, 9.3750 ns/op","OverheadWarmup   5: 32 op, 300.00 ns, 9.3750 ns/op","OverheadWarmup   6: 32 op, 400.00 ns, 12.5000 ns/op","OverheadWarmup   7: 32 op, 300.00 ns, 9.3750 ns/op","","OverheadActual   1: 32 op, 400.00 ns, 12.5000 ns/op","OverheadActual   2: 32 op, 500.00 ns, 15.6250 ns/op","OverheadActual   3: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual   4: 32 op, 400.00 ns, 12.5000 ns/op","OverheadActual   5: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual   6: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual   7: 32 op, 400.00 ns, 12.5000 ns/op","OverheadActual   8: 32 op, 400.00 ns, 12.5000 ns/op","OverheadActual   9: 32 op, 400.00 ns, 12.5000 ns/op","OverheadActual  10: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual  11: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual  12: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual  13: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual  14: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual  15: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual  16: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual  17: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual  18: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual  19: 32 op, 700.00 ns, 21.8750 ns/op","OverheadActual  20: 32 op, 400.00 ns, 12.5000 ns/op","","WorkloadWarmup   1: 32 op, 542246900.00 ns, 16.9452 ms/op","WorkloadWarmup   2: 32 op, 537242600.00 ns, 16.7888 ms/op","WorkloadWarmup   3: 32 op, 533025700.00 ns, 16.6571 ms/op","","WorkloadActual   1: 32 op, 523265100.00 ns, 16.3520 ms/op","WorkloadActual   2: 32 op, 565168100.00 ns, 17.6615 ms/op","WorkloadActual   3: 32 op, 557436000.00 ns, 17.4199 ms/op","","WorkloadResult   1: 32 op, 523264800.00 ns, 16.3520 ms/op","WorkloadResult   2: 32 op, 565167800.00 ns, 17.6615 ms/op","WorkloadResult   3: 32 op, 557435700.00 ns, 17.4199 ms/op",""
-               ],
-               "Errors":[
-                  
-               ],
-               "ExtraOutput":[
-                  "// Benchmark Process Environment Information:","// Runtime=.NET Framework 4.8 (4.8.4470.0), X64 RyuJIT","// GC=Concurrent Workstation","// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)"
-               ],
-               "LunchIndex":1
-            }
-         ]
-      },{
-         "FullName":"IntroSnapshot",
-         "DisplayInfo":"IntroSnapshot.Thread.Sleep(15): ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)",
-         "Namespace":"BenchmarkDotNet.Samples",
-         "Type":"IntroSnapshot",
-         "Method":"SleepWithDescription",
-         "MethodTitle":"Thread.Sleep(15)",
-         "Parameters":"",
-         "ExecuteResults":[
-            {
-               "FoundExecutable":true,
-               "ExitCode":0,
-               "Data":[
-                  "","","OverheadJitting  1: 1 op, 203600.00 ns, 203.6000 us/op","WorkloadJitting  1: 1 op, 20763600.00 ns, 20.7636 ms/op","","OverheadJitting  2: 16 op, 192700.00 ns, 12.0438 us/op","WorkloadJitting  2: 16 op, 296813700.00 ns, 18.5509 ms/op","","WorkloadPilot    1: 16 op, 304966800.00 ns, 19.0604 ms/op","WorkloadPilot    2: 32 op, 555954800.00 ns, 17.3736 ms/op","","OverheadWarmup   1: 32 op, 1300.00 ns, 40.6250 ns/op","OverheadWarmup   2: 32 op, 400.00 ns, 12.5000 ns/op","OverheadWarmup   3: 32 op, 300.00 ns, 9.3750 ns/op","OverheadWarmup   4: 32 op, 300.00 ns, 9.3750 ns/op","OverheadWarmup   5: 32 op, 300.00 ns, 9.3750 ns/op","OverheadWarmup   6: 32 op, 300.00 ns, 9.3750 ns/op","OverheadWarmup   7: 32 op, 300.00 ns, 9.3750 ns/op","","OverheadActual   1: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual   2: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual   3: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual   4: 32 op, 400.00 ns, 12.5000 ns/op","OverheadActual   5: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual   6: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual   7: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual   8: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual   9: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual  10: 32 op, 400.00 ns, 12.5000 ns/op","OverheadActual  11: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual  12: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual  13: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual  14: 32 op, 300.00 ns, 9.3750 ns/op","OverheadActual  15: 32 op, 300.00 ns, 9.3750 ns/op","","WorkloadWarmup   1: 32 op, 529131000.00 ns, 16.5353 ms/op","WorkloadWarmup   2: 32 op, 570889100.00 ns, 17.8403 ms/op","WorkloadWarmup   3: 32 op, 592679300.00 ns, 18.5212 ms/op","","WorkloadActual   1: 32 op, 559760600.00 ns, 17.4925 ms/op","WorkloadActual   2: 32 op, 544505800.00 ns, 17.0158 ms/op","WorkloadActual   3: 32 op, 565748300.00 ns, 17.6796 ms/op","","WorkloadResult   1: 32 op, 559760300.00 ns, 17.4925 ms/op","WorkloadResult   2: 32 op, 544505500.00 ns, 17.0158 ms/op","WorkloadResult   3: 32 op, 565748000.00 ns, 17.6796 ms/op",""
-               ],
-               "Errors":[
-                  
-               ],
-               "ExtraOutput":[
-                  "// Benchmark Process Environment Information:","// Runtime=.NET Framework 4.8 (4.8.4470.0), X64 RyuJIT","// GC=Concurrent Workstation","// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)"
-               ],
-               "LunchIndex":1
-            }
-         ]
-      }
-   ]
+	"Title": "BenchmarkDotNet.Samples.IntroSnapshot-20220413-174739",
+	"Benchmarks": [
+		{
+			"Id": "fhmeAz3hn/kZrccqhKp5+l9XR81MKnbXucoB/GtuV3M=",
+			"FullName": "BenchmarkDotNet.Samples.IntroSnapshot.Sleep",
+			"DisplayInfo": "IntroSnapshot.Sleep: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)",
+			"Namespace": "BenchmarkDotNet.Samples",
+			"Type": "IntroSnapshot",
+			"Method": "Sleep",
+			"MethodTitle": "Sleep",
+			"Parameters": "",
+			"ExecuteResults": [
+				{
+					"FoundExecutable": true,
+					"ExitCode": 0,
+					"Data": [
+						"",
+						"",
+						"OverheadJitting  1: 1 op, 187600.00 ns, 187.6000 us/op",
+						"WorkloadJitting  1: 1 op, 13326700.00 ns, 13.3267 ms/op",
+						"",
+						"OverheadJitting  2: 16 op, 172400.00 ns, 10.7750 us/op",
+						"WorkloadJitting  2: 16 op, 251112200.00 ns, 15.6945 ms/op",
+						"",
+						"WorkloadPilot    1: 16 op, 244716200.00 ns, 15.2948 ms/op",
+						"WorkloadPilot    2: 32 op, 502831100.00 ns, 15.7135 ms/op",
+						"",
+						"OverheadWarmup   1: 32 op, 1300.00 ns, 40.6250 ns/op",
+						"OverheadWarmup   2: 32 op, 300.00 ns, 9.3750 ns/op",
+						"OverheadWarmup   3: 32 op, 400.00 ns, 12.5000 ns/op",
+						"OverheadWarmup   4: 32 op, 500.00 ns, 15.6250 ns/op",
+						"OverheadWarmup   5: 32 op, 400.00 ns, 12.5000 ns/op",
+						"OverheadWarmup   6: 32 op, 400.00 ns, 12.5000 ns/op",
+						"OverheadWarmup   7: 32 op, 400.00 ns, 12.5000 ns/op",
+						"",
+						"OverheadActual   1: 32 op, 400.00 ns, 12.5000 ns/op",
+						"OverheadActual   2: 32 op, 400.00 ns, 12.5000 ns/op",
+						"OverheadActual   3: 32 op, 500.00 ns, 15.6250 ns/op",
+						"OverheadActual   4: 32 op, 500.00 ns, 15.6250 ns/op",
+						"OverheadActual   5: 32 op, 400.00 ns, 12.5000 ns/op",
+						"OverheadActual   6: 32 op, 400.00 ns, 12.5000 ns/op",
+						"OverheadActual   7: 32 op, 400.00 ns, 12.5000 ns/op",
+						"OverheadActual   8: 32 op, 500.00 ns, 15.6250 ns/op",
+						"OverheadActual   9: 32 op, 400.00 ns, 12.5000 ns/op",
+						"OverheadActual  10: 32 op, 400.00 ns, 12.5000 ns/op",
+						"OverheadActual  11: 32 op, 400.00 ns, 12.5000 ns/op",
+						"OverheadActual  12: 32 op, 400.00 ns, 12.5000 ns/op",
+						"OverheadActual  13: 32 op, 400.00 ns, 12.5000 ns/op",
+						"OverheadActual  14: 32 op, 400.00 ns, 12.5000 ns/op",
+						"OverheadActual  15: 32 op, 400.00 ns, 12.5000 ns/op",
+						"",
+						"WorkloadWarmup   1: 32 op, 511354500.00 ns, 15.9798 ms/op",
+						"WorkloadWarmup   2: 32 op, 498113100.00 ns, 15.5660 ms/op",
+						"WorkloadWarmup   3: 32 op, 499812800.00 ns, 15.6191 ms/op",
+						"",
+						"WorkloadActual   1: 32 op, 496054600.00 ns, 15.5017 ms/op",
+						"WorkloadActual   2: 32 op, 502147700.00 ns, 15.6921 ms/op",
+						"WorkloadActual   3: 32 op, 499829800.00 ns, 15.6197 ms/op",
+						"",
+						"WorkloadResult   1: 32 op, 496054200.00 ns, 15.5017 ms/op",
+						"WorkloadResult   2: 32 op, 502147300.00 ns, 15.6921 ms/op",
+						"WorkloadResult   3: 32 op, 499829400.00 ns, 15.6197 ms/op",
+						""
+					],
+					"Errors": [],
+					"ExtraOutput": [
+						"// Benchmark Process Environment Information:",
+						"// Runtime=.NET 6.0.2 (6.0.222.6406), X64 RyuJIT",
+						"// GC=Concurrent Workstation",
+						"// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)"
+					],
+					"LunchIndex": 1
+				}
+			]
+		},
+		{
+			"Id": "qZpoXJbS7KXnqr/Al6Fz4nVl2dScJC5I9kSBRU937+g=",
+			"FullName": "BenchmarkDotNet.Samples.IntroSnapshot.SleepWithDescription",
+			"DisplayInfo": "IntroSnapshot.Thread.Sleep(15): ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)",
+			"Namespace": "BenchmarkDotNet.Samples",
+			"Type": "IntroSnapshot",
+			"Method": "SleepWithDescription",
+			"MethodTitle": "Thread.Sleep(15)",
+			"Parameters": "",
+			"ExecuteResults": [
+				{
+					"FoundExecutable": true,
+					"ExitCode": 0,
+					"Data": [
+						"",
+						"",
+						"OverheadJitting  1: 1 op, 216900.00 ns, 216.9000 us/op",
+						"WorkloadJitting  1: 1 op, 22456100.00 ns, 22.4561 ms/op",
+						"",
+						"OverheadJitting  2: 16 op, 145100.00 ns, 9.0687 us/op",
+						"WorkloadJitting  2: 16 op, 260614000.00 ns, 16.2884 ms/op",
+						"",
+						"WorkloadPilot    1: 16 op, 279834600.00 ns, 17.4897 ms/op",
+						"WorkloadPilot    2: 32 op, 498830200.00 ns, 15.5884 ms/op",
+						"WorkloadPilot    3: 64 op, 1003973900.00 ns, 15.6871 ms/op",
+						"",
+						"OverheadWarmup   1: 64 op, 1400.00 ns, 21.8750 ns/op",
+						"OverheadWarmup   2: 64 op, 400.00 ns, 6.2500 ns/op",
+						"OverheadWarmup   3: 64 op, 400.00 ns, 6.2500 ns/op",
+						"OverheadWarmup   4: 64 op, 500.00 ns, 7.8125 ns/op",
+						"OverheadWarmup   5: 64 op, 500.00 ns, 7.8125 ns/op",
+						"OverheadWarmup   6: 64 op, 400.00 ns, 6.2500 ns/op",
+						"",
+						"OverheadActual   1: 64 op, 500.00 ns, 7.8125 ns/op",
+						"OverheadActual   2: 64 op, 500.00 ns, 7.8125 ns/op",
+						"OverheadActual   3: 64 op, 400.00 ns, 6.2500 ns/op",
+						"OverheadActual   4: 64 op, 1100.00 ns, 17.1875 ns/op",
+						"OverheadActual   5: 64 op, 500.00 ns, 7.8125 ns/op",
+						"OverheadActual   6: 64 op, 400.00 ns, 6.2500 ns/op",
+						"OverheadActual   7: 64 op, 500.00 ns, 7.8125 ns/op",
+						"OverheadActual   8: 64 op, 400.00 ns, 6.2500 ns/op",
+						"OverheadActual   9: 64 op, 400.00 ns, 6.2500 ns/op",
+						"OverheadActual  10: 64 op, 500.00 ns, 7.8125 ns/op",
+						"OverheadActual  11: 64 op, 500.00 ns, 7.8125 ns/op",
+						"OverheadActual  12: 64 op, 400.00 ns, 6.2500 ns/op",
+						"OverheadActual  13: 64 op, 500.00 ns, 7.8125 ns/op",
+						"OverheadActual  14: 64 op, 500.00 ns, 7.8125 ns/op",
+						"OverheadActual  15: 64 op, 400.00 ns, 6.2500 ns/op",
+						"OverheadActual  16: 64 op, 400.00 ns, 6.2500 ns/op",
+						"OverheadActual  17: 64 op, 400.00 ns, 6.2500 ns/op",
+						"OverheadActual  18: 64 op, 500.00 ns, 7.8125 ns/op",
+						"OverheadActual  19: 64 op, 500.00 ns, 7.8125 ns/op",
+						"OverheadActual  20: 64 op, 800.00 ns, 12.5000 ns/op",
+						"",
+						"WorkloadWarmup   1: 64 op, 1037222600.00 ns, 16.2066 ms/op",
+						"WorkloadWarmup   2: 64 op, 1041282600.00 ns, 16.2700 ms/op",
+						"WorkloadWarmup   3: 64 op, 1028644100.00 ns, 16.0726 ms/op",
+						"",
+						"WorkloadActual   1: 64 op, 1025557500.00 ns, 16.0243 ms/op",
+						"WorkloadActual   2: 64 op, 1054332800.00 ns, 16.4740 ms/op",
+						"WorkloadActual   3: 64 op, 1029628700.00 ns, 16.0879 ms/op",
+						"",
+						"WorkloadResult   1: 64 op, 1025557000.00 ns, 16.0243 ms/op",
+						"WorkloadResult   2: 64 op, 1054332300.00 ns, 16.4739 ms/op",
+						"WorkloadResult   3: 64 op, 1029628200.00 ns, 16.0879 ms/op",
+						""
+					],
+					"Errors": [],
+					"ExtraOutput": [
+						"// Benchmark Process Environment Information:",
+						"// Runtime=.NET 6.0.2 (6.0.222.6406), X64 RyuJIT",
+						"// GC=Concurrent Workstation",
+						"// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)"
+					],
+					"LunchIndex": 1
+				}
+			]
+		}
+	]
 }

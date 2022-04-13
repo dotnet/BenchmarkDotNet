@@ -33,5 +33,16 @@ namespace BenchmarkDotNet.Samples
         // You can write a description for your method.
         [Benchmark(Description = "Thread.Sleep(15)")]
         public void SleepWithDescription() => Thread.Sleep(15);
+
+        /*
+        [Params(100, 200)]
+        public int A { get; set; }
+
+        [Params(10, 20)]
+        public int B { get; set; }
+
+        [Benchmark]
+        public void Benchmark() => Thread.Sleep(A + B + 5);
+        */
     }
 }

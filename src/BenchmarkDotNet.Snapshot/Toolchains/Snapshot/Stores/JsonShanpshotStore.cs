@@ -7,11 +7,12 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
+using Newtonsoft.Json;
 using Perfolizer.Horology;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JsonSerializer = SimpleJson.SimpleJson;
+
 
 namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
 {
@@ -35,6 +36,7 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
 
         private class BenchmarkStoreInfo
         {
+            public string Id { get; set; }
             public string FullName { get; set; }
             public string DisplayInfo { get; set; }
             public string Namespace { get; set; }
@@ -92,7 +94,8 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
                         var list = new List<BenchmakrStoreExecutionInfo>();
                         var info = new BenchmarkStoreInfo()
                         {
-                            FullName = FullNameProvider.GetTypeName(report.BenchmarkCase.Descriptor.Type),
+                            Id = report.BenchmarkCase.Descriptor.ToHash(),
+                            FullName = FullNameProvider.GetBenchmarkName(report.BenchmarkCase),
                             DisplayInfo = report.BenchmarkCase.DisplayInfo,
                             Namespace = report.BenchmarkCase.Descriptor.Type.Namespace,
                             Type = FullNameProvider.GetTypeName(report.BenchmarkCase.Descriptor.Type),
@@ -124,15 +127,14 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
         }
 
         void ISnapshotStore.ExportEnd(ILogger logger)
-        {
-            JsonSerializer.CurrentJsonSerializerStrategy.Indent = true;
-            System.IO.File.WriteAllText(Filename, JsonSerializer.SerializeObject(storeInfo));
+        {            
+            System.IO.File.WriteAllText(Filename, JsonConvert.SerializeObject(storeInfo));
         }
 
         ExecuteResult ISnapshotStore.GetResult(ExecuteParameters executeParameters)
         {
-            var fullname = executeParameters.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo;
-            var benchmarkResult =  storeInfo?.Benchmarks?.FirstOrDefault(b=>b.MethodTitle == fullname);
+            var id = executeParameters.BenchmarkCase.Descriptor.ToHash();
+            var benchmarkResult =  storeInfo?.Benchmarks?.FirstOrDefault(b=>b.Id == id);
             if (benchmarkResult is { })
             {
                 var ai = benchmarkResult.ExecuteResults.FirstOrDefault(e => e.LunchIndex == executeParameters.LaunchIndex);
@@ -152,14 +154,15 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
             {
                 if (System.IO.File.Exists(Filename))
                 {
-                    storeInfo = JsonSerializer.DeserializeObject<BenchmarkSummaryStoreInfo>(System.IO.File.ReadAllText(Filename));
+                    storeInfo = JsonConvert.DeserializeObject<BenchmarkSummaryStoreInfo>(System.IO.File.ReadAllText(Filename));
                 }
                 else
                 {
                     storeInfo = new BenchmarkSummaryStoreInfo();
                 }
             }
-            var suuport = storeInfo?.Benchmarks?.FirstOrDefault(b => b.MethodTitle == benchmarkCase.Descriptor.WorkloadMethodDisplayInfo) is { };
+            var id = benchmarkCase.Descriptor.ToHash();
+            var suuport = storeInfo?.Benchmarks?.FirstOrDefault(b => b.Id == id) is { };
             return suuport;
         }
     }
