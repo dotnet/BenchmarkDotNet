@@ -18,6 +18,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private bool ilcGenerateCompleteTypeMetadata = true;
         private bool ilcGenerateStackTraceData = true;
         private string ilcOptimizationPreference = "Speed";
+        private string ilcInstructionSet;
 
         private bool isIlCompilerConfigured;
 
@@ -123,6 +124,23 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             return this;
         }
 
+        /// <summary>
+        /// By default, the compiler targets the minimum instruction set supported by the target OS and architecture.
+        /// This option allows targeting newer instruction sets for better performance.
+        /// The native binary will require the instruction sets to be supported by the hardware in order to run.
+        /// For example, `avx2,bmi2,fma,pclmul,popcnt,aes` will produce binary that takes advantage of instruction sets
+        /// that are typically present on current Intel and AMD processors. Run `ilc.exe --help` for the full list of available instruction sets
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        [PublicAPI]
+        public NativeAotToolchainBuilder IlcInstructionSet(string value)
+        {
+            ilcInstructionSet = value;
+
+            return this;
+        }
+
         [PublicAPI]
         public override IToolchain ToToolchain()
         {
@@ -144,7 +162,8 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 rootAllApplicationAssemblies: rootAllApplicationAssemblies,
                 ilcGenerateCompleteTypeMetadata: ilcGenerateCompleteTypeMetadata,
                 ilcGenerateStackTraceData: ilcGenerateStackTraceData,
-                ilcOptimizationPreference: ilcOptimizationPreference
+                ilcOptimizationPreference: ilcOptimizationPreference,
+                ilcInstructionSet: ilcInstructionSet
             );
         }
     }

@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag,
             bool useTempFolderForRestore, string packagesRestorePath,
             bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData,
-            string ilcOptimizationPreference)
+            string ilcOptimizationPreference, string ilcInstructionSet)
             : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore, packagesRestorePath), runtimeFrameworkVersion)
         {
             this.ilCompilerVersion = ilCompilerVersion;
@@ -40,6 +40,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             this.ilcGenerateCompleteTypeMetadata = ilcGenerateCompleteTypeMetadata;
             this.ilcGenerateStackTraceData = ilcGenerateStackTraceData;
             this.ilcOptimizationPreference = ilcOptimizationPreference;
+            this.ilcInstructionSet = ilcInstructionSet;
         }
 
         private readonly string ilCompilerVersion;
@@ -53,6 +54,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private readonly bool ilcGenerateCompleteTypeMetadata;
         private readonly bool ilcGenerateStackTraceData;
         private readonly string ilcOptimizationPreference;
+        private readonly string ilcInstructionSet;
 
         private bool IsNuGet => feeds.ContainsKey(NativeAotNuGetFeed) && !string.IsNullOrWhiteSpace(ilCompilerVersion);
 
@@ -153,6 +155,9 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   <ItemGroup>
     {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
+  <ItemGroup>
+    {GetInstructionSetSettings()}
+  </ItemGroup>
 </Project>";
 
         private string GenerateProjectForLocalBuild(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
@@ -189,6 +194,9 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   <ItemGroup>
     {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
+  <ItemGroup>
+    {GetInstructionSetSettings()}
+  </ItemGroup>
 </Project>";
 
         private string GetTrimmingSettings()
@@ -196,6 +204,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 ? "" // use the defaults
                 // TrimMode is set in explicit way as for older versions it might have different default value
                 : "<TrimMode>link</TrimMode><TrimmerDefaultAction>link</TrimmerDefaultAction>";
+
+        private string GetInstructionSetSettings()
+            => !string.IsNullOrEmpty(ilcInstructionSet)
+                ? $@"<IlcArg Include=""--instructionset:{ilcInstructionSet}"" />"
+                : "";
 
         public IEnumerable<string> GetRdXmlFiles(Type benchmarkTarget, ILogger logger)
         {
