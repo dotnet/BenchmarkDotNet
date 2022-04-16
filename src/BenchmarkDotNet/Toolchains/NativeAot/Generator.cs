@@ -26,7 +26,8 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string cliPath,
             string runtimeIdentifier, IReadOnlyDictionary<string, string> feeds, bool useNuGetClearTag,
             bool useTempFolderForRestore, string packagesRestorePath,
-            bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData)
+            bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData,
+            string ilcOptimizationPreference)
             : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore, packagesRestorePath), runtimeFrameworkVersion)
         {
             this.ilCompilerVersion = ilCompilerVersion;
@@ -38,6 +39,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             this.rootAllApplicationAssemblies = rootAllApplicationAssemblies;
             this.ilcGenerateCompleteTypeMetadata = ilcGenerateCompleteTypeMetadata;
             this.ilcGenerateStackTraceData = ilcGenerateStackTraceData;
+            this.ilcOptimizationPreference = ilcOptimizationPreference;
         }
 
         private readonly string ilCompilerVersion;
@@ -50,6 +52,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private readonly bool rootAllApplicationAssemblies;
         private readonly bool ilcGenerateCompleteTypeMetadata;
         private readonly bool ilcGenerateStackTraceData;
+        private readonly string ilcOptimizationPreference;
 
         private bool IsNuGet => feeds.ContainsKey(NativeAotNuGetFeed) && !string.IsNullOrWhiteSpace(ilCompilerVersion);
 
@@ -132,6 +135,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <UseSharedCompilation>false</UseSharedCompilation>
     <Deterministic>true</Deterministic>
     <RunAnalyzers>false</RunAnalyzers>
+    <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
     {GetTrimmingSettings()}
     <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
@@ -167,6 +171,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <UseSharedCompilation>false</UseSharedCompilation>
     <Deterministic>true</Deterministic>
     <RunAnalyzers>false</RunAnalyzers>
+    <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
     {GetTrimmingSettings()}
     <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>

@@ -17,6 +17,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private bool rootAllApplicationAssemblies;
         private bool ilcGenerateCompleteTypeMetadata = true;
         private bool ilcGenerateStackTraceData = true;
+        private string ilcOptimizationPreference = "Speed";
 
         private bool isIlCompilerConfigured;
 
@@ -110,6 +111,18 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             return this;
         }
 
+        /// <summary>
+        /// Options related to code generation.
+        /// </summary>
+        /// <param name="value">"Speed" to favor code execution speed (default), "Size" to favor smaller code size</param>
+        [PublicAPI]
+        public NativeAotToolchainBuilder IlcOptimizationPreference(string value = "Speed")
+        {
+            ilcOptimizationPreference = value;
+
+            return this;
+        }
+
         [PublicAPI]
         public override IToolchain ToToolchain()
         {
@@ -130,7 +143,8 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 useTempFolderForRestore: useTempFolderForRestore,
                 rootAllApplicationAssemblies: rootAllApplicationAssemblies,
                 ilcGenerateCompleteTypeMetadata: ilcGenerateCompleteTypeMetadata,
-                ilcGenerateStackTraceData: ilcGenerateStackTraceData
+                ilcGenerateStackTraceData: ilcGenerateStackTraceData,
+                ilcOptimizationPreference: ilcOptimizationPreference
             );
         }
     }
