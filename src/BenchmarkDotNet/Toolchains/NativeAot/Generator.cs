@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -158,7 +159,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
   <ItemGroup>
-    {GetInstructionSetSettings()}
+    {GetInstructionSetSettings(buildPartition)}
   </ItemGroup>
 </Project>";
 
@@ -198,7 +199,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
   <ItemGroup>
-    {GetInstructionSetSettings()}
+    {GetInstructionSetSettings(buildPartition)}
   </ItemGroup>
 </Project>";
 
@@ -208,10 +209,13 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 // TrimMode is set in explicit way as for older versions it might have different default value
                 : "<TrimMode>link</TrimMode><TrimmerDefaultAction>link</TrimmerDefaultAction>";
 
-        private string GetInstructionSetSettings()
-            => !string.IsNullOrEmpty(ilcInstructionSet)
-                ? $@"<IlcArg Include=""--instructionset:{ilcInstructionSet}"" />"
+        private string GetInstructionSetSettings(BuildPartition buildPartition)
+        {
+            string instructionSet = ilcInstructionSet ?? GetCurrentInstructionSet(buildPartition.Platform);
+            return !string.IsNullOrEmpty(instructionSet)
+                ? $@"<IlcArg Include=""--instructionset:{instructionSet}"" />"
                 : "";
+        }
 
         public IEnumerable<string> GetRdXmlFiles(Type benchmarkTarget, ILogger logger)
         {
@@ -257,6 +261,56 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 File.WriteAllText(Path.Combine(directoryName, GeneratedRdXmlFileName), content);
             else
                 throw new InvalidOperationException($"Can't get directory of projectFilePath ('{artifactsPaths.ProjectFilePath}')");
+        }
+
+        private string GetCurrentInstructionSet(Platform platform)
+            => string.Join(",", GetHostProcessInstructionSets(platform));
+
+        private static IEnumerable<string> GetHostProcessInstructionSets(Platform platform)
+        {
+            switch (platform)
+            {
+                case Platform.X86:
+                case Platform.X64:
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.X86Base")) yield return "base";
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Sse")) yield return "sse";
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Sse2")) yield return "sse2";
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Sse3")) yield return "sse3";
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Sse41")) yield return "sse4.1";
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Sse42")) yield return "sse4.2";
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Avx")) yield return "avx";
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Avx2")) yield return "avx2";
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Aes")) yield return "aes";
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Bmi1")) yield return "bmi";
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Bmi2")) yield return "bmi2";
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Fma")) yield return "fma";
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Lzcnt")) yield return "lzcnt";
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Pclmulqdq")) yield return "pclmul";
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Popcnt")) yield return "popcnt";
+                    if (GetIsSupported("System.Runtime.Intrinsics.X86.AvxVnni")) yield return "avxvnni";
+                    break;
+                case Platform.Arm64:
+                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.ArmBase")) yield return "base";
+                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.AdvSimd")) yield return "neon";
+                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.Aes")) yield return "aes";
+                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.Crc32")) yield return "crc";
+                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.Dp")) yield return "dotprod";
+                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.Rdm")) yield return "rdma";
+                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.Sha1")) yield return "sha1";
+                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.Sha256")) yield return "sha2";
+                    // todo: handle "lse"
+                    break;
+                default:
+                    yield break;
+            }
+        }
+
+        private static bool GetIsSupported(string typeName)
+        {
+            Type type = Type.GetType(typeName);
+            if (type == null) return false;
+
+            return (bool)type.GetProperty("IsSupported", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).GetValue(null, null);
         }
     }
 }
