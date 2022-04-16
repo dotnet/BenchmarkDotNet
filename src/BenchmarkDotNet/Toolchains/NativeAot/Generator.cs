@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -132,6 +133,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <AssemblyName>{artifactsPaths.ProgramName}</AssemblyName>
     <AssemblyTitle>{artifactsPaths.ProgramName}</AssemblyTitle>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>{buildPartition.Platform.ToConfig()}</PlatformTarget>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <DebugSymbols>false</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
@@ -171,6 +173,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <AssemblyName>{artifactsPaths.ProgramName}</AssemblyName>
     <AssemblyTitle>{artifactsPaths.ProgramName}</AssemblyTitle>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>{buildPartition.Platform.ToConfig()}</PlatformTarget>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <DebugSymbols>false</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
