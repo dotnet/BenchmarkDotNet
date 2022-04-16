@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         /// For example, `avx2,bmi2,fma,pclmul,popcnt,aes` will produce binary that takes advantage of instruction sets
         /// that are typically present on current Intel and AMD processors.
         /// </summary>
-        /// <param name="value">Specify null to use the defaults.</param>
+        /// <param name="value">Specify empty string ("", not null) to use the defaults.</param>
         [PublicAPI]
         public NativeAotToolchainBuilder IlcInstructionSet(string value)
         {
