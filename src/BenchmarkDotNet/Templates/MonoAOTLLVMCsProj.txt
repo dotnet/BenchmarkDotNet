@@ -47,15 +47,14 @@
 
    <ItemGroup>
      <AotInputAssemblies Include="$(PublishDirFullPath)\*.dll">
-        <AotArguments>@(MonoAOTCompilerDefaultAotArguments, ';');mcpu=native</AotArguments>
-        <ProcessArguments>@(MonoAOTCompilerDefaultProcessArguments, ';')</ProcessArguments>
+        <AotArguments>mcpu=native</AotArguments>
      </AotInputAssemblies>
    </ItemGroup>
 
 
    <MonoAOTCompiler
         CompilerBinaryPath="$COMPILERBINARYPATH$"
-        Mode="Full"
+        Mode="Normal"
         OutputType="Library"
         LibraryFormat="$(SharedLibraryType)"
         Assemblies="@(AotInputAssemblies)"
