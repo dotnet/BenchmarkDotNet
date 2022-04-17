@@ -17,6 +17,8 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private bool rootAllApplicationAssemblies;
         private bool ilcGenerateCompleteTypeMetadata = true;
         private bool ilcGenerateStackTraceData = true;
+        private string ilcOptimizationPreference = "Speed";
+        private string ilcInstructionSet = null;
 
         private bool isIlCompilerConfigured;
 
@@ -110,6 +112,34 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             return this;
         }
 
+        /// <summary>
+        /// Options related to code generation.
+        /// </summary>
+        /// <param name="value">"Speed" to favor code execution speed (default), "Size" to favor smaller code size</param>
+        [PublicAPI]
+        public NativeAotToolchainBuilder IlcOptimizationPreference(string value = "Speed")
+        {
+            ilcOptimizationPreference = value;
+
+            return this;
+        }
+
+        /// <summary>
+        /// By default, the compiler targets the minimum instruction set supported by the target OS and architecture.
+        /// This option allows targeting newer instruction sets for better performance.
+        /// The native binary will require the instruction sets to be supported by the hardware in order to run.
+        /// For example, `avx2,bmi2,fma,pclmul,popcnt,aes` will produce binary that takes advantage of instruction sets
+        /// that are typically present on current Intel and AMD processors.
+        /// </summary>
+        /// <param name="value">Specify empty string ("", not null) to use the defaults.</param>
+        [PublicAPI]
+        public NativeAotToolchainBuilder IlcInstructionSet(string value)
+        {
+            ilcInstructionSet = value;
+
+            return this;
+        }
+
         [PublicAPI]
         public override IToolchain ToToolchain()
         {
@@ -130,7 +160,9 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 useTempFolderForRestore: useTempFolderForRestore,
                 rootAllApplicationAssemblies: rootAllApplicationAssemblies,
                 ilcGenerateCompleteTypeMetadata: ilcGenerateCompleteTypeMetadata,
-                ilcGenerateStackTraceData: ilcGenerateStackTraceData
+                ilcGenerateStackTraceData: ilcGenerateStackTraceData,
+                ilcOptimizationPreference: ilcOptimizationPreference,
+                ilcInstructionSet: ilcInstructionSet
             );
         }
     }

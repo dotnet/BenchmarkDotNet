@@ -28,11 +28,13 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string runtimeIdentifier,
             string customDotNetCliPath, string packagesRestorePath,
             Dictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore,
-            bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData)
+            bool rootAllApplicationAssemblies, bool ilcGenerateCompleteTypeMetadata, bool ilcGenerateStackTraceData,
+            string ilcOptimizationPreference, string ilcInstructionSet)
             : base(displayName,
                 new Generator(ilCompilerVersion, runtimeFrameworkVersion, targetFrameworkMoniker, customDotNetCliPath,
                     runtimeIdentifier, feeds, useNuGetClearTag, useTempFolderForRestore, packagesRestorePath,
-                    rootAllApplicationAssemblies, ilcGenerateCompleteTypeMetadata, ilcGenerateStackTraceData),
+                    rootAllApplicationAssemblies, ilcGenerateCompleteTypeMetadata, ilcGenerateStackTraceData,
+                    ilcOptimizationPreference, ilcInstructionSet),
                 new DotNetCliPublisher(customDotNetCliPath, GetExtraArguments(runtimeIdentifier), GetEnvironmentVariables(ilcPath)),
                 new Executor())
         {
