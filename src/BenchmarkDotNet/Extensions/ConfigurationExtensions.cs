@@ -20,8 +20,6 @@ namespace BenchmarkDotNet.Extensions
                     return "ARM";
                 case Platform.Arm64:
                     return "ARM64";
-                case Platform.S390x:
-                    return "S390x";
                 default:
                     return "AnyCPU";
             }
