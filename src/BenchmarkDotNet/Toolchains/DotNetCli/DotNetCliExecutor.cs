@@ -54,6 +54,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
+        public ProcessStartInfo GetProcessStartInfo(ExecuteParameters executeParameters)
+            => DotNetCliCommandExecutor.BuildStartInfo(
+                CustomDotNetCliPath,
+                executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath,
+                $"{Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath).Escape()} {executeParameters.BenchmarkId.ToArguments()}",
+                redirectStandardOutput: false,
+                redirectStandardInput: false,
+                redirectStandardError: false); // #1629
+
         private ExecuteResult Execute(BenchmarkCase benchmarkCase,
                                       BenchmarkId benchmarkId,
                                       ILogger logger,

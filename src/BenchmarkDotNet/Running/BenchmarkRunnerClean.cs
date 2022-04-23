@@ -74,6 +74,13 @@ namespace BenchmarkDotNet.Running
                     // used to estimate finish time, in contrary to globalChronometer it does not include build time
                     var runsChronometer = Chronometer.Start();
 
+                    if (Environment.ProcessorCount > 1)
+                    {
+                        ParallelBenchmarkRunner.Run(supportedBenchmarks, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup, resultsFolderPath, logFilePath);
+                        LogTotalTime(compositeLogger, globalChronometer.GetElapsed().GetTimeSpan(), 0, "Global total time");
+                        return Array.Empty<Summary>();
+                    }
+
                     foreach (var benchmarkRunInfo in supportedBenchmarks) // we run them in the old order now using the new build artifacts
                     {
                         var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup,
