@@ -50,6 +50,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public IOrderer Orderer { get; set; }
         [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
         [PublicAPI] public TimeSpan BuildTimeout { get; set; } = DefaultConfig.Instance.BuildTimeout;
+        [PublicAPI] public int MaxDegreeOfParallelism { get; set; } = DefaultConfig.Instance.MaxDegreeOfParallelism;
 
         public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
 
@@ -229,6 +230,7 @@ namespace BenchmarkDotNet.Configs
             logicalGroupRules.AddRange(config.GetLogicalGroupRules());
             Options |= config.Options;
             BuildTimeout = GetBuildTimeout(BuildTimeout, config.BuildTimeout);
+            MaxDegreeOfParallelism = Math.Max(MaxDegreeOfParallelism, config.MaxDegreeOfParallelism);
         }
 
         /// <summary>

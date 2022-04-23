@@ -110,6 +110,25 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(RunStrategy.ColdStart, job.Run.RunStrategy);
         }
 
+        [Fact]
+        public void UserCanSpecifyMaxDegreeOfParallelism()
+        {
+            Verify(7, "7");
+            Verify(12345, "12345");
+            Verify(Environment.ProcessorCount - 1, "max");
+            Verify(Environment.ProcessorCount - 1, "MAX");
+
+            void Verify(int expected, string argument)
+                => Assert.Equal(expected, ConfigParser.Parse(new[] { "--parallel", argument }, new OutputLogger(Output)).config.MaxDegreeOfParallelism);
+        }
+
+        [Fact]
+        public void MaxDegreeOfParallelismIsSetToOneByDefault()
+        {
+            var config = ConfigParser.Parse(Array.Empty<string>(), new OutputLogger(Output)).config;
+            Assert.Equal(1, config.MaxDegreeOfParallelism);
+        }
+
         [FactDotNetCoreOnly("When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..")]
         public void UnknownConfigMeansFailure()
         {

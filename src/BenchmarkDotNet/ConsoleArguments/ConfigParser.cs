@@ -209,6 +209,11 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (config.GetJobs().IsEmpty() && baseJob != Job.Default)
                 config.AddJob(baseJob);
 
+            if (!string.IsNullOrEmpty(options.Parallel))
+                config.MaxDegreeOfParallelism = options.Parallel.Equals("max", StringComparison.OrdinalIgnoreCase)
+                    ? Environment.ProcessorCount - 1
+                    : int.Parse(options.Parallel);
+
             config.AddExporter(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
 
             config.AddHardwareCounters(options.HardwareCounters

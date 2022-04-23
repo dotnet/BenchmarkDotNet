@@ -130,6 +130,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("unrollFactor", Required = false, HelpText = "How many times the benchmark method will be invoked per one iteration of a generated loop. 16 by default")]
         public int? UnrollFactor { get; set; }
 
+        [Option("parallel", Required = false, HelpText = "Sets the maximum number of concurrently executed benchmarks. Use word 'max' or an integer specifying processor count. Disabled by default.")]
+        public string Parallel { get; set; }
+
         [Option("strategy", Required = false, HelpText = "The RunStrategy that should be used. Throughput/ColdStart/Monitoring.")]
         public RunStrategy? RunStrategy { get; set; }
 

@@ -56,5 +56,10 @@ namespace BenchmarkDotNet.Configs
         /// Collect any errors or warnings when composing the configuration
         /// </summary>
         IReadOnlyList<Conclusion> ConfigAnalysisConclusion { get; }
+
+        /// <summary>
+        /// Gets the maximum number of concurrently executed benchmarks.
+        /// </summary>
+        int MaxDegreeOfParallelism { get; }
     }
 }

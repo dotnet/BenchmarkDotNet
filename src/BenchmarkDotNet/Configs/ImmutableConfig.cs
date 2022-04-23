@@ -51,7 +51,8 @@ namespace BenchmarkDotNet.Configs
             SummaryStyle summaryStyle,
             ConfigOptions options,
             TimeSpan buildTimeout,
-            IReadOnlyList<Conclusion> configAnalysisConclusion)
+            IReadOnlyList<Conclusion> configAnalysisConclusion,
+            int maxDegreeOfParallelism)
         {
             columnProviders = uniqueColumnProviders;
             loggers = uniqueLoggers;
@@ -71,6 +72,7 @@ namespace BenchmarkDotNet.Configs
             Options = options;
             BuildTimeout = buildTimeout;
             ConfigAnalysisConclusion = configAnalysisConclusion;
+            MaxDegreeOfParallelism = maxDegreeOfParallelism;
         }
 
         public ConfigUnionRule UnionRule { get; }
@@ -80,6 +82,7 @@ namespace BenchmarkDotNet.Configs
         [NotNull] public IOrderer Orderer { get; }
         public SummaryStyle SummaryStyle { get; }
         public TimeSpan BuildTimeout { get; }
+        public int MaxDegreeOfParallelism { get; }
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;

@@ -81,6 +81,8 @@ namespace BenchmarkDotNet.Configs
 
         public TimeSpan BuildTimeout => TimeSpan.FromSeconds(120);
 
+        public int MaxDegreeOfParallelism => 1;
+
         public string ArtifactsPath
         {
             get
