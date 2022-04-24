@@ -11,7 +11,8 @@ namespace BenchmarkDotNet.Toolchains.Parameters
     {
         internal static readonly TimeSpan ProcessExitTimeout = TimeSpan.FromSeconds(2);
 
-        public ExecuteParameters(BuildResult buildResult, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, IResolver resolver, int launchIndex, IDiagnoser diagnoser = null)
+        public ExecuteParameters(BuildResult buildResult, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger,
+            IResolver resolver, int launchIndex, IDiagnoser diagnoser = null, string outputFilePath = null)
         {
             BuildResult = buildResult;
             BenchmarkCase = benchmarkCase;
@@ -20,6 +21,7 @@ namespace BenchmarkDotNet.Toolchains.Parameters
             Resolver = resolver;
             Diagnoser = diagnoser;
             LaunchIndex = launchIndex;
+            OutputFilePath = outputFilePath;
         }
 
         public BuildResult BuildResult { get;  }
@@ -35,5 +37,7 @@ namespace BenchmarkDotNet.Toolchains.Parameters
         public IDiagnoser Diagnoser { get; }
 
         public int LaunchIndex { get; }
+
+        public string OutputFilePath { get; }
     }
 }

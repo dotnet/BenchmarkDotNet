@@ -1,9 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -18,7 +15,7 @@ namespace BenchmarkDotNet.Samples
         }
 
         [ParamsSource(nameof(GetParams))]
-        public string CoreId { get; set; }
+        public string Id { get; set; }
 
         [Benchmark]
         public int Run()

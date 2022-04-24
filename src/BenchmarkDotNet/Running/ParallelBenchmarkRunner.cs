@@ -9,6 +9,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -53,6 +54,8 @@ namespace BenchmarkDotNet.Running
                 {
                     var toolchain = data.benchmark.GetToolchain();
 
+                    var outputFilePath = Path.Combine(resultsFolderPath, $"{data.id.BenchmarkName}_{data.id.Value}.txt");
+
                     var processStartInfo = toolchain.Executor.GetProcessStartInfo(
                         new ExecuteParameters(
                             data.buildResult,
@@ -61,7 +64,8 @@ namespace BenchmarkDotNet.Running
                             logger,
                             resolver,
                             1,
-                            diagnoser: null)); // custom diagnosers not supported TODO: extend config validation
+                            diagnoser: null, // custom diagnosers not supported TODO: extend config validation
+                            outputFilePath: outputFilePath));
 
                     processStartInfo.RedirectStandardInput = false;
                     processStartInfo.RedirectStandardOutput = false;
@@ -70,14 +74,12 @@ namespace BenchmarkDotNet.Running
                     processStartInfo.SetEnvironmentVariables(data.benchmark, resolver);
 
                     Process process = Process.Start(processStartInfo);
+                    process.TrySetAffinity(coreId, logger); // TODO: handle failures
+                    process.EnsureHighPriority(logger);
                     processToBenchmark.TryAdd(process, (data.benchmark, coreId));
                     process.EnableRaisingEvents = true; // required by process.Exited
                     logger.WriteLine($"{data.benchmark.DisplayInfo} has started on core " +
                         $"{Convert.ToString(coreId.ToInt32(), 2).PadLeft(Environment.ProcessorCount).Replace(" ", "0")}!");
-                    process.Start();
-
-                    process.TrySetAffinity(coreId, logger); // TODO: handle failures
-                    process.EnsureHighPriority(logger);
 
                     process.Exited += Process_Exited;
                 }
@@ -90,6 +92,9 @@ namespace BenchmarkDotNet.Running
                 BenchmarkCase benchmark = data.benchmark;
                 IntPtr coreId = data.coreId;
                 logger.WriteLine($"{benchmark.DisplayInfo} has exited!");
+                processToBenchmark.TryRemove(process, out _);
+                process.Exited -= Process_Exited;
+                process.Dispose();
                 Interlocked.Decrement(ref counter);
                 StartNewProcess(coreId);
             }

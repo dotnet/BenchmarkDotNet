@@ -58,7 +58,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             => DotNetCliCommandExecutor.BuildStartInfo(
                 CustomDotNetCliPath,
                 executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath,
-                $"{Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath).Escape()} {executeParameters.BenchmarkId.ToArguments()}",
+                $"{Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath).Escape()} {executeParameters.BenchmarkId.ToArguments(executeParameters.OutputFilePath)}",
                 redirectStandardOutput: false,
                 redirectStandardInput: false,
                 redirectStandardError: false); // #1629

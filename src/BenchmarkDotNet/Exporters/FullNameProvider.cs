@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Exporters
         };
 
         [PublicAPI("used by the dotnet/performance repository")]
-        public static string GetBenchmarkName(BenchmarkCase benchmarkCase)
+        public static string GetBenchmarkName(BenchmarkCase benchmarkCase, bool includeArguments = true)
         {
             var type = benchmarkCase.Descriptor.Type;
 
@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Exporters
 
             name.Append(GetTypeName(type)).Append('.');
 
-            name.Append(GetMethodName(benchmarkCase));
+            name.Append(GetMethodName(benchmarkCase, includeArguments));
 
             return name.ToString();
         }
@@ -92,11 +92,11 @@ namespace BenchmarkDotNet.Exporters
             return $"{mainName}<{args}>";
         }
 
-        internal static string GetMethodName(BenchmarkCase benchmarkCase)
+        internal static string GetMethodName(BenchmarkCase benchmarkCase, bool includeArguments = true)
         {
             var name = new StringBuilder(benchmarkCase.Descriptor.WorkloadMethod.Name);
 
-            if (benchmarkCase.HasParameters)
+            if (benchmarkCase.HasParameters && includeArguments)
                 name.Append(GetBenchmarkParameters(benchmarkCase.Descriptor.WorkloadMethod, benchmarkCase.Parameters));
 
             return name.ToString();
