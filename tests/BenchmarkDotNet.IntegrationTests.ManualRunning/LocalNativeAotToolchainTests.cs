@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
     /// </summary>
     public class LocalNativeAotToolchainTests : BenchmarkTestExecutor
     {
-        private const string IlcPath = @"C:\Projects\corert\bin\Windows_NT.x64.Release";
+        private const string IlcPath = @"D:\projects\runtime\artifacts\packages\Release\Shipping";
 
         public LocalNativeAotToolchainTests(ITestOutputHelper output) : base(output) { }
 
@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                     .WithRuntime(NativeAotRuntime.Net60)
                     .WithToolchain(
                         NativeAotToolchain.CreateBuilder()
-                            .UseLocalBuild(IlcPath)
+                            .UseLocalBuild(new System.IO.DirectoryInfo(IlcPath))
                             .ToToolchain()));
 
             CanExecute<NativeAotBenchmark>(config);

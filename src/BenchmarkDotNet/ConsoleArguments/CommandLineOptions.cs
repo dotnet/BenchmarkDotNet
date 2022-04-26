@@ -97,8 +97,8 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("ilCompilerVersion", Required = false, HelpText = "Optional version of Microsoft.DotNet.ILCompiler which should be used to run with NativeAOT. Example: \"7.0.0-preview.3.22123.2\"")]
         public string ILCompilerVersion { get; set; }
 
-        [Option("ilcPath", Required = false, HelpText = "Optional IlcPath which should be used to run with private NativeAOT build.")]
-        public DirectoryInfo IlcPath { get; set; }
+        [Option("ilcPackages", Required = false, HelpText = @"Optional path to shipping packages produced by local dotnet/runtime build. Example: 'D:\projects\runtime\artifacts\packages\Release\Shipping\'")]
+        public DirectoryInfo IlcPackages { get; set; }
 
         [Option("launchCount", Required = false, HelpText = "How many times we should launch process with target benchmark. The default is 1.")]
         public int? LaunchCount { get; set; }

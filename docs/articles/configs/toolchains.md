@@ -190,14 +190,21 @@ Example: `dotnet run -c Release -- --coreRun "C:\Projects\corefx\bin\testhost\ne
 
 ## NativeAOT
 
-BenchmarkDotNet supports [NativeAOT](https://github.com/dotnet/runtime/tree/main/src/coreclr/nativeaot/docs)! However, you might want to know how it works to get a better understanding of the results that you get.
+BenchmarkDotNet supports [NativeAOT](https://github.com/dotnet/runtime/tree/main/src/coreclr/nativeaot)! However, you might want to know how it works to get a better understanding of the results that you get.
 
-* NativeAOT is a flavor of .NET Core. Which means that:
-  *  you have to target .NET Core to be able to build NativeAOT benchmarks (example: `<TargetFramework>net7.0</TargetFramework>` in the .csproj file)
-  *  you have to specify the NativeAOT runtime in an explicit way, either by using `[SimpleJob]` attribute or by using the fluent Job config API `Job.ShortRun.With(NativeAotRuntime.$version)` or console line arguments `--runtimes nativeaot7.0`
-  *  to run NativeAOT benchmark you run the app as a .NET Core/.NET process (example: `dotnet run -c Release -f net5.01`) and BenchmarkDotNet does all the NativeAOT compilation for you. If you want to check what files are generated you need to apply `[KeepBenchmarkFiles]` attribute to the class which defines benchmarks.
+As every AOT solution, NativeAOT has some [limitations](https://github.com/dotnet/runtime/blob/main/src/coreclr/nativeaot/docs/limitations.md) like limited reflection support or lack of dynamic assembly loading. Because of that, the host process (what you run from command line) is never an AOT process, but just a regular .NET process. This process (called Host process) uses reflection to read benchmarks metadata (find all `[Benchmark]` methods etc), generates a new project that references the benchmarks and compiles it using ILCompiler. Such compilation produces a native executable, which is later started by the Host process. This process (called Benchmark or Child process) performs the actual benchmarking and reports the results back to the Host process. By default BenchmarkDotNet uses the latest version of `Microsoft.DotNet.ILCompiler` to build the NativeAOT benchmark according to [this instructions](https://github.com/dotnet/runtime/blob/main/src/coreclr/nativeaot/docs/compiling.md).
 
-By default BenchmarkDotNet uses the latest version of `Microsoft.DotNet.ILCompiler` to build the NativeAOT benchmark according to [this instructions](https://github.com/dotnet/runtime/blob/main/src/coreclr/nativeaot/docs/compiling.md).
+This is why you need to:
+- install [pre-requisites](https://github.com/dotnet/runtime/blob/main/src/coreclr/nativeaot/docs/prerequisites.md) required by NativeAOT compiler
+- target .NET to be able to run NativeAOT benchmarks (example: `<TargetFramework>net7.0</TargetFramework>` in the .csproj file)
+- run the app as a .NET process (example: `dotnet run -c Release -f net7.0`).
+- specify the NativeAOT runtime in an explicit way, either by using console line arguments `--runtimes nativeaot7.0` (the recommended approach), or by using`[SimpleJob]` attribute or by using the fluent Job config API `Job.ShortRun.With(NativeAotRuntime.Net70)`:
+
+```cmd
+dotnet run -c Release -f net7.0 --runtimes nativeaot7.0
+```
+
+or:
 
 ```cs
 var config = DefaultConfig.Instance
@@ -208,6 +215,8 @@ BenchmarkSwitcher
     .Run(args, config);
 ```
 
+or:
+
 ```cs
 [SimpleJob(RuntimeMoniker.NativeAot70)] // compiles the benchmarks as net7.0 and uses the latest NativeAOT to build a native app
 public class TheTypeWithBenchmarks
@@ -216,7 +225,7 @@ public class TheTypeWithBenchmarks
 }
 ```
 
-**Note**: BenchmarkDotNet is going to run `dotnet restore` on the auto-generated project. The first time it does so, it's going to take a **LOT** of time to download all the dependencies (few minutes). Just give it some time and don't press `Ctrl+C` too fast ;)
+### Customization
 
 If you want to benchmark some particular version of NativeAOT (or from a different NuGet feed) you have to specify it in an explicit way:
 
@@ -228,45 +237,119 @@ var config = DefaultConfig.Instance
                 microsoftDotNetILCompilerVersion: "7.0.0-*", // the version goes here
                 nuGetFeedUrl: "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json") // this address might change over time
             .DisplayName("NativeAOT NuGet")
-            .TargetFrameworkMoniker("net5.0")
+            .TargetFrameworkMoniker("net7.0")
             .ToToolchain()));
+```
+
+The builder allows to configure more settings:
+- specify packages restore path by using `PackagesRestorePath($path)`
+- rooting all application assemblies by using `RootAllApplicationAssemblies($bool)`. This is disabled by default.
+- generating complete type metadata by using `IlcGenerateCompleteTypeMetadata($bool)`. This option is enabled by default.
+- generating stack trace metadata by using `IlcGenerateStackTraceData($bool)`. This option is enabled by default.
+- set optimization preference by using `IlcOptimizationPreference($value)`. The default is `Speed`, you can configure it to `Size` or nothing
+- set instruction set for the target OS, architecture and hardware by using `IlcInstructionSet($value)`. By default BDN recognizes most of the instruction sets on your machine and enables them.
+
+BenchmarkDotNet supports [rd.xml](https://github.com/dotnet/runtime/blob/main/src/coreclr/nativeaot/docs/rd-xml-format.md) files. To get given file respected by BenchmarkDotNet you need to place it in the same folder as the project that defines benchmarks and name it `rd.xml` or in case of multiple files give them `.rd.xml` extension. The alternative to `rd.xml` files is annotating types with [DynamicallyAccessedMembers](https://devblogs.microsoft.com/dotnet/app-trimming-in-net-5/) attribute.
+
+If given benchmark is not supported by NativeAOT, you need to apply `[AotFilter]` attribute for it. Example:
+
+```cs
+[Benchmark]
+[AotFilter("Not supported by design.")]
+public object CreateInstanceNames() => System.Activator.CreateInstance(_assemblyName, _typeName);
+```
+
+### Generated files
+
+By default BenchmarkDotNet removes the generates files after finishing the run. To keep them on the disk  you need to pass `--keepFiles true` command line argument or apply `[KeepBenchmarkFiles]` attribute to the class which defines benchmark(s). Then, read the folder from the tool output. In the example below it's `D:\projects\performance\artifacts\bin\MicroBenchmarks\Release\net7.0\Job-KRLVKQ`:
+
+```log
+// ***** Building 1 exe(s) in Parallel: Start   *****
+// start dotnet  restore -r win-x64 /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in D:\projects\performance\artifacts\bin\MicroBenchmarks\Release\net7.0\Job-KRLVKQ
+// command took 2.74s and exited with 0
+// start dotnet  build -c Release -r win-x64 --no-restore /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in D:\projects\performance\artifacts\bin\MicroBenchmarks\Release\net7.0\Job-KRLVKQ
+// command took 3.82s and exited with 0
+```
+
+If you go to `D:\projects\performance\artifacts\bin\MicroBenchmarks\Release\net7.0\Job-KRLVKQ`, you can see the generated project file (named `BenchmarkDotNet.Autogenerated.csproj`), code (file name ends with `.notcs`) and find the native executable (in the `bin\**\native` subfolder). Example:
+
+```cmd
+cd D:\projects\performance\artifacts\bin\MicroBenchmarks\Release\net7.0\Job-KRLVKQ
+cat .\BenchmarkDotNet.Autogenerated.csproj
+```
+
+```log
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
+    <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <RuntimeFrameworkVersion></RuntimeFrameworkVersion>
+    <AssemblyName>Job-KRLVKQ</AssemblyName>
+    <AssemblyTitle>Job-KRLVKQ</AssemblyTitle>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugSymbols>false</DebugSymbols>
+    <UseSharedCompilation>false</UseSharedCompilation>
+    <Deterministic>true</Deterministic>
+    <RunAnalyzers>false</RunAnalyzers>
+    <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
+    <TrimMode>link</TrimMode><TrimmerDefaultAction>link</TrimmerDefaultAction>
+    <IlcGenerateCompleteTypeMetadata>True</IlcGenerateCompleteTypeMetadata>
+    <IlcGenerateStackTraceData>True</IlcGenerateStackTraceData>
+    <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime>
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Job-KRLVKQ.notcs" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="7.0.0-*" />
+    <ProjectReference Include="D:\projects\performance\src\benchmarks\micro\MicroBenchmarks.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <RdXmlFile Include="bdn_generated.rd.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <IlcArg Include="--instructionset:base,sse,sse2,sse3,sse4.1,sse4.2,avx,avx2,aes,bmi,bmi2,fma,lzcnt,pclmul,popcnt" />
+  </ItemGroup>
+</Project>
 ```
 
 ### Compiling source to native code using the ILCompiler you built
 
-If you are a NativeAOT contributor and you want to benchmark your local build of NativeAOT you have to provide necessary info (IlcPath):
+If you are a NativeAOT contributor and you want to benchmark your local build of NativeAOT you have to provide necessary info (path to shipping packages).
+
+You can do that from command line:
+
+```cmd
+dotnet run -c Release -f net7.0 --runtimes nativeaot7.0 --ilcPackages D:\projects\runtime\artifacts\packages\Release\Shipping\
+```
+
+or explicitly in the code:
+
 
 ```cs
 var config = DefaultConfig.Instance
     .With(Job.ShortRun
         .With(NativeAotToolchain.CreateBuilder()
-            .UseLocalBuild(@"C:\Projects\corert\bin\Windows_NT.x64.Release") // IlcPath
+            .UseLocalBuild(@"C:\Projects\runtime\artifacts\packages\Release\Shipping\")
             .DisplayName("NativeAOT local build")
             .TargetFrameworkMoniker("net7.0")
             .ToToolchain()));
 ```
 
-BenchmarkDotNet is going to follow [these instructrions](https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built) to get it working for you.
+BenchmarkDotNet is going to follow [these instructrions](https://github.com/dotnet/runtime/blob/main/docs/workflow/building/coreclr/nativeaot.md#building) to get it working for you.
 
-### Using CPP Code Generator
+**Note**: BenchmarkDotNet is going to run `dotnet restore` on the auto-generated project and restore the packages to a temporary folder. It might take some time, but the next time you rebuild dotnet/runtime repo and run the same command BenchmarkDotNet is going to use the new ILCompiler package.
 
-> This approach uses transpiler to convert IL to C++, and then uses platform specific C++ compiler and linker for compiling/linking the application. The transpiler is a lot less mature than the RyuJIT path. If you came here to give CoreRT a try on your .NET Core program, use the RyuJIT option above.
-
-If you want to test [CPP Code Generator](https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#using-cpp-code-generator) you have to use `UseCppCodeGenerator` method:
-
-```cs
-var config = DefaultConfig.Instance
-    .With(Job.Default
-        .With(
-            NativeAotToolchain.CreateBuilder()
-                .UseLocalBuild(@"C:\Projects\corert\bin\Windows_NT.x64.Release") // IlcPath
-                .UseCppCodeGenerator() // ENABLE IT
-                .TargetFrameworkMoniker("net7.0")
-                .DisplayName("CPP")
-                .ToToolchain()));
-```
-
-**Note**: You might get some `The method or operation is not implemented.` errors as of today if the code that you are trying to benchmark is using some features that are not implemented by NativeAOT/transpiler yet...
 
 ## Wasm
 
