@@ -161,5 +161,10 @@ namespace BenchmarkDotNet.Toolchains
 
             return builder.ToString();
         }
+
+        public ProcessStartInfo GetProcessStartInfo(ExecuteParameters executeParameters)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

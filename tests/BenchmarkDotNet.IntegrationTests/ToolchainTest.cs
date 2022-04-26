@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
@@ -50,6 +51,11 @@ namespace BenchmarkDotNet.IntegrationTests
                 executeParameters.Logger.WriteLine("Executing");
                 Done = true;
                 return new ExecuteResult(true, 0, default, Array.Empty<string>(), Array.Empty<string>(), executeParameters.LaunchIndex);
+            }
+
+            public ProcessStartInfo GetProcessStartInfo(ExecuteParameters executeParameters)
+            {
+                throw new NotImplementedException();
             }
         }
 

@@ -116,5 +116,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
             return exitCode;
         }
+
+        public ProcessStartInfo GetProcessStartInfo(ExecuteParameters executeParameters)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
