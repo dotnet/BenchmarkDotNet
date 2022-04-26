@@ -197,8 +197,8 @@ As every AOT solution, NativeAOT has some [limitations](https://github.com/dotne
 This is why you need to:
 - install [pre-requisites](https://github.com/dotnet/runtime/blob/main/src/coreclr/nativeaot/docs/prerequisites.md) required by NativeAOT compiler
 - target .NET to be able to run NativeAOT benchmarks (example: `<TargetFramework>net7.0</TargetFramework>` in the .csproj file)
-- run the app as a .NET Core/.NET process (example: `dotnet run -c Release -f net7.0`).
-- specify the NativeAOT runtime in an explicit way, either by using console line arguments `--runtimes nativeaot7.0` (the recommended approach), or by using`[SimpleJob]` attribute or by using the fluent Job config API `Job.ShortRun.With(NativeAotRuntime.$version)`:
+- run the app as a .NET process (example: `dotnet run -c Release -f net7.0`).
+- specify the NativeAOT runtime in an explicit way, either by using console line arguments `--runtimes nativeaot7.0` (the recommended approach), or by using`[SimpleJob]` attribute or by using the fluent Job config API `Job.ShortRun.With(NativeAotRuntime.Net70)`:
 
 ```cmd
 dotnet run -c Release -f net7.0 --runtimes nativeaot7.0
