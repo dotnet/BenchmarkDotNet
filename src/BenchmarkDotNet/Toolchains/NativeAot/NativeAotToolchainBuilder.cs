@@ -11,7 +11,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         public static NativeAotToolchainBuilder Create() => new NativeAotToolchainBuilder();
 
         private string ilCompilerVersion;
-        private string ilcPath;
         private string packagesRestorePath;
         // we set those default values on purpose https://github.com/dotnet/BenchmarkDotNet/pull/1057#issuecomment-461832612
         private bool rootAllApplicationAssemblies;
@@ -41,17 +40,19 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         }
 
         /// <summary>
-        /// creates a Native toolchain targeting local build of ILCompiler
-        /// Based on https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built
+        /// creates a NativeAOT toolchain targeting local build of ILCompiler
+        /// Based on https://github.com/dotnet/runtime/blob/main/docs/workflow/building/coreclr/nativeaot.md
         /// </summary>
-        /// <param name="newIlcPath">the ilcPath, an example: "C:\Projects\corert\bin\Windows_NT.x64.Release"</param>
+        /// <param name="ilcPackages">the path to shipping packages, example: "C:\runtime\artifacts\packages\Release\Shipping"</param>
         [PublicAPI]
-        public NativeAotToolchainBuilder UseLocalBuild(string newIlcPath)
+        public NativeAotToolchainBuilder UseLocalBuild(DirectoryInfo ilcPackages)
         {
-            if (newIlcPath == null) throw new ArgumentNullException(nameof(newIlcPath));
-            if (!Directory.Exists(newIlcPath)) throw new DirectoryNotFoundException($"{newIlcPath} provided as {nameof(newIlcPath)} does NOT exist");
+            if (ilcPackages == null) throw new ArgumentNullException(nameof(ilcPackages));
+            if (!ilcPackages.Exists) throw new DirectoryNotFoundException($"{ilcPackages} provided as {nameof(ilcPackages)} does NOT exist");
 
-            ilcPath = newIlcPath;
+            Feeds["local"] = ilcPackages.FullName;
+            ilCompilerVersion = "7.0.0-dev";
+            Feeds["dotnet7"] = "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json";
             useTempFolderForRestore = true;
 
             isIlCompilerConfigured = true;
@@ -149,7 +150,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             return new NativeAotToolchain(
                 displayName: displayName ?? (ilCompilerVersion != null ? $"ILCompiler {ilCompilerVersion}" : "local ILCompiler build"),
                 ilCompilerVersion: ilCompilerVersion,
-                ilcPath: ilcPath,
                 runtimeFrameworkVersion: runtimeFrameworkVersion,
                 targetFrameworkMoniker: GetTargetFrameworkMoniker(),
                 runtimeIdentifier: runtimeIdentifier ?? GetPortableRuntimeIdentifier(),

@@ -157,9 +157,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return false;
             }
 
-            if (options.IlcPath.IsNotNullButDoesNotExist())
+            if (options.IlcPackages.IsNotNullButDoesNotExist())
             {
-                logger.WriteLineError($"The provided {nameof(options.IlcPath)} \"{options.IlcPath}\" does NOT exist.");
+                logger.WriteLineError($"The provided {nameof(options.IlcPackages)} \"{options.IlcPackages}\" does NOT exist.");
                 return false;
             }
 
@@ -395,8 +395,8 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.RestorePath != null)
                 builder.PackagesRestorePath(options.RestorePath.FullName);
 
-            if (options.IlcPath != null)
-                builder.UseLocalBuild(options.IlcPath.FullName);
+            if (options.IlcPackages != null)
+                builder.UseLocalBuild(options.IlcPackages);
             else if (!string.IsNullOrEmpty(options.ILCompilerVersion))
                 builder.UseNuGet(options.ILCompilerVersion, nuGetFeedUrl);
             else

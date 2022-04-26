@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BenchmarkDotNet.Jobs;
+﻿using System.Collections.Generic;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 
 namespace BenchmarkDotNet.Toolchains.NativeAot
@@ -24,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             .ToToolchain();
 
         internal NativeAotToolchain(string displayName,
-            string ilCompilerVersion, string ilcPath,
+            string ilCompilerVersion,
             string runtimeFrameworkVersion, string targetFrameworkMoniker, string runtimeIdentifier,
             string customDotNetCliPath, string packagesRestorePath,
             Dictionary<string, string> feeds, bool useNuGetClearTag, bool useTempFolderForRestore,
@@ -35,21 +33,13 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                     runtimeIdentifier, feeds, useNuGetClearTag, useTempFolderForRestore, packagesRestorePath,
                     rootAllApplicationAssemblies, ilcGenerateCompleteTypeMetadata, ilcGenerateStackTraceData,
                     ilcOptimizationPreference, ilcInstructionSet),
-                new DotNetCliPublisher(customDotNetCliPath, GetExtraArguments(runtimeIdentifier), GetEnvironmentVariables(ilcPath)),
+                new DotNetCliPublisher(customDotNetCliPath, GetExtraArguments(runtimeIdentifier)),
                 new Executor())
         {
-            IlcPath = ilcPath;
         }
-
-        public string IlcPath { get; }
 
         public static NativeAotToolchainBuilder CreateBuilder() => NativeAotToolchainBuilder.Create();
 
         public static string GetExtraArguments(string runtimeIdentifier) => $"-r {runtimeIdentifier}";
-
-        // https://github.com/dotnet/corert/blob/7f902d4d8b1c3280e60f5e06c71951a60da173fb/Documentation/how-to-build-and-run-ilcompiler-in-console-shell-prompt.md#compiling-source-to-native-code-using-the-ilcompiler-you-built
-        // we have to pass IlcPath env var to get it working
-        private static IReadOnlyList<EnvironmentVariable> GetEnvironmentVariables(string ilcPath)
-            => ilcPath == null ? Array.Empty<EnvironmentVariable>() : new[] { new EnvironmentVariable("IlcPath", ilcPath) };
     }
 }
