@@ -33,9 +33,8 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             : base(targetFrameworkMoniker, cliPath, GetPackagesDirectoryPath(useTempFolderForRestore, packagesRestorePath), runtimeFrameworkVersion)
         {
             this.ilCompilerVersion = ilCompilerVersion;
-            this.targetFrameworkMoniker = targetFrameworkMoniker;
             this.runtimeIdentifier = runtimeIdentifier;
-            this.feeds = feeds;
+            this.Feeds = feeds;
             this.useNuGetClearTag = useNuGetClearTag;
             this.useTempFolderForRestore = useTempFolderForRestore;
             this.rootAllApplicationAssemblies = rootAllApplicationAssemblies;
@@ -45,11 +44,9 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             this.ilcInstructionSet = ilcInstructionSet;
         }
 
+        internal readonly IReadOnlyDictionary<string, string> Feeds;
         private readonly string ilCompilerVersion;
-        [SuppressMessage("ReSharper", "NotAccessedField.Local")]
-        private readonly string targetFrameworkMoniker;
         private readonly string runtimeIdentifier;
-        private readonly IReadOnlyDictionary<string, string> feeds;
         private readonly bool useNuGetClearTag;
         private readonly bool useTempFolderForRestore;
         private readonly bool rootAllApplicationAssemblies;
@@ -57,8 +54,6 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private readonly bool ilcGenerateStackTraceData;
         private readonly string ilcOptimizationPreference;
         private readonly string ilcInstructionSet;
-
-        private bool IsNuGet => feeds.ContainsKey(NativeAotNuGetFeed) && !string.IsNullOrWhiteSpace(ilCompilerVersion);
 
         protected override string GetExecutableExtension() => RuntimeInformation.ExecutableExtension;
 
@@ -97,7 +92,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
 
         protected override void GenerateNuGetConfig(ArtifactsPaths artifactsPaths)
         {
-            if (!feeds.Any())
+            if (!Feeds.Any())
                 return;
 
             string content =
@@ -105,7 +100,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 <configuration>
   <packageSources>
     {(useNuGetClearTag ? "<clear/>" : string.Empty)}
-    {string.Join(Environment.NewLine + "    ", feeds.Select(feed => $"<add key=\"{feed.Key}\" value=\"{feed.Value}\" />"))}
+    {string.Join(Environment.NewLine + "    ", Feeds.Select(feed => $"<add key=\"{feed.Key}\" value=\"{feed.Value}\" />"))}
   </packageSources>
 </configuration>";
 
@@ -114,11 +109,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
-            File.WriteAllText(artifactsPaths.ProjectFilePath,
-                IsNuGet
-                    ? GenerateProjectForNuGetBuild(buildPartition, artifactsPaths, logger)
-                    : GenerateProjectForLocalBuild(buildPartition, artifactsPaths, logger));
-
+            File.WriteAllText(artifactsPaths.ProjectFilePath, GenerateProjectForNuGetBuild(buildPartition, artifactsPaths, logger));
             GenerateReflectionFile(artifactsPaths);
         }
 
@@ -153,46 +144,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />
-    <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
-  </ItemGroup>
-  <ItemGroup>
-    {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
-  </ItemGroup>
-  <ItemGroup>
-    {GetInstructionSetSettings(buildPartition)}
-  </ItemGroup>
-</Project>";
-
-        private string GenerateProjectForLocalBuild(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger) => $@"
-<Project>
-  <Import Project=""$(MSBuildSDKsPath)\Microsoft.NET.Sdk\Sdk\Sdk.props"" />
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>{TargetFrameworkMoniker}</TargetFramework>
-    <RuntimeIdentifier>{runtimeIdentifier}</RuntimeIdentifier>
-    <RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>
-    <AssemblyName>{artifactsPaths.ProgramName}</AssemblyName>
-    <AssemblyTitle>{artifactsPaths.ProgramName}</AssemblyTitle>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>{buildPartition.Platform.ToConfig()}</PlatformTarget>
-    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <DebugSymbols>false</DebugSymbols>
-    <UseSharedCompilation>false</UseSharedCompilation>
-    <Deterministic>true</Deterministic>
-    <RunAnalyzers>false</RunAnalyzers>
-    <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
-    {GetTrimmingSettings()}
-    <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
-    <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
-    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
-  </PropertyGroup>
-  <Import Project=""$(MSBuildSDKsPath)\Microsoft.NET.Sdk\Sdk\Sdk.targets"" />
-  <Import Project=""$(IlcPath)\build\Microsoft.NETCore.Native.targets"" />
-  {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
-  <ItemGroup>
-    <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
   <ItemGroup>
