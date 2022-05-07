@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 parser
                     .ParseArguments<CommandLineOptions>(args)
-                    .WithParsed(options => result = Validate(options, logger) ? (true, CreateConfig(options, globalConfig), options) : (false, default, default))
+                    .WithParsed(options => result = Validate(options, logger) ? (true, CreateConfig(options, globalConfig, args), options) : (false, default, default))
                     .WithNotParsed(errors => result = (false, default, default));
             }
 
@@ -163,9 +163,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return false;
             }
 
-            if (options.Runtimes.Count() > 1 && !options.CoreRunPaths.IsNullOrEmpty())
+            if (!options.CoreRunPaths.IsNullOrEmpty() && !RuntimeInformation.IsNetCore)
             {
-                logger.WriteLineError("CoreRun path can't be combined with multiple .NET Runtimes");
+                logger.WriteLineError("CoreRun path can be used only for .NET Core host processes.");
                 return false;
             }
 
@@ -197,12 +197,12 @@ namespace BenchmarkDotNet.ConsoleArguments
             return true;
         }
 
-        private static IConfig CreateConfig(CommandLineOptions options, IConfig globalConfig)
+        private static IConfig CreateConfig(CommandLineOptions options, IConfig globalConfig, string[] args)
         {
             var config = new ManualConfig();
 
             var baseJob = GetBaseJob(options, globalConfig);
-            var expanded = Expand(baseJob.UnfreezeCopy(), options).ToArray(); // UnfreezeCopy ensures that each of the expanded jobs will have it's own ID
+            var expanded = Expand(baseJob.UnfreezeCopy(), options, args).ToArray(); // UnfreezeCopy ensures that each of the expanded jobs will have it's own ID
             if (expanded.Length > 1)
                 expanded[0] = expanded[0].AsBaseline(); // if the user provides multiple jobs, then the first one should be a baseline
             config.AddJob(expanded);
@@ -313,20 +313,46 @@ namespace BenchmarkDotNet.ConsoleArguments
                 .AsMutator(); // we mark it as mutator so it will be applied to other jobs defined via attributes and merged later in GetRunnableJobs method
         }
 
-        private static IEnumerable<Job> Expand(Job baseJob, CommandLineOptions options)
+        private static IEnumerable<Job> Expand(Job baseJob, CommandLineOptions options, string[] args)
         {
             if (options.RunInProcess)
+            {
                 yield return baseJob.WithToolchain(InProcessEmitToolchain.Instance);
+            }
             else if (!string.IsNullOrEmpty(options.ClrVersion))
+            {
                 yield return baseJob.WithRuntime(ClrRuntime.CreateForLocalFullNetFrameworkBuild(options.ClrVersion)); // local builds of .NET Runtime
-            else if (options.CoreRunPaths.Any())
-                foreach (var coreRunPath in options.CoreRunPaths)
-                    yield return CreateCoreRunJob(baseJob, options, coreRunPath); // local CoreFX and CoreCLR builds
-            else if (options.CliPath != null && options.Runtimes.IsEmpty())
+            }
+            else if (options.CliPath != null && options.Runtimes.IsEmpty() && options.CoreRunPaths.IsEmpty())
+            {
                 yield return CreateCoreJobWithCli(baseJob, options);
+            }
             else
-                foreach (string runtime in options.Runtimes) // known runtimes
-                    yield return CreateJobForGivenRuntime(baseJob, runtime, options);
+            {
+                // in case both --runtimes and --corerun are specified, the first one is returned first and becomes a baseline job
+                string first = args.FirstOrDefault(arg =>
+                    arg.Equals("--runtimes", StringComparison.OrdinalIgnoreCase)
+                    || arg.Equals("-r", StringComparison.OrdinalIgnoreCase)
+
+                    || arg.Equals("--corerun", StringComparison.OrdinalIgnoreCase));
+
+                if (first is null || first.Equals("--corerun", StringComparison.OrdinalIgnoreCase))
+                {
+                    foreach (var coreRunPath in options.CoreRunPaths)
+                        yield return CreateCoreRunJob(baseJob, options, coreRunPath); // local dotnet/runtime builds
+
+                    foreach (string runtime in options.Runtimes) // known runtimes
+                        yield return CreateJobForGivenRuntime(baseJob, runtime, options);
+                }
+                else
+                {
+                    foreach (string runtime in options.Runtimes) // known runtimes
+                        yield return CreateJobForGivenRuntime(baseJob, runtime, options);
+
+                    foreach (var coreRunPath in options.CoreRunPaths)
+                        yield return CreateCoreRunJob(baseJob, options, coreRunPath); // local dotnet/runtime builds
+                }
+            }
         }
 
         private static Job CreateJobForGivenRuntime(Job baseJob, string runtimeId, CommandLineOptions options)
@@ -479,7 +505,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 .WithToolchain(new CoreRunToolchain(
                     coreRunPath,
                     createCopy: true,
-                    targetFrameworkMoniker: options.Runtimes.SingleOrDefault() ?? RuntimeInformation.GetCurrentRuntime().MsBuildMoniker,
+                    targetFrameworkMoniker: RuntimeInformation.GetCurrentRuntime().MsBuildMoniker,
                     customDotNetCliPath: options.CliPath,
                     restorePath: options.RestorePath,
                     displayName: GetCoreRunToolchainDisplayName(options.CoreRunPaths, coreRunPath)));

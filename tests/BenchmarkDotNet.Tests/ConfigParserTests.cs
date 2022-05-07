@@ -150,25 +150,70 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(fakeRestorePackages, toolchain.RestorePath.FullName);
         }
 
-        [Fact]
-        public void CoreRunConfigParsedCorrectlyWhenRuntimeSpecified()
+        [FactClassicDotNetOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        public void SpecifyingCoreRunWithFullFrameworkHostGivesError()
         {
-            const string runtime = "netcoreapp3.0";
+            var fakePath = typeof(object).Assembly.Location;
+            Assert.False(ConfigParser.Parse(new[] { "--corerun", fakePath }, new OutputLogger(Output)).isSuccess);
+        }
+
+        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        public void SpecifyingCoreRunAndRuntimeCreatesTwoJobs()
+        {
+            const string runtime = "net7.0";
             var fakeDotnetCliPath = typeof(object).Assembly.Location;
             var fakeCoreRunPath = typeof(ConfigParserTests).Assembly.Location;
             var fakeRestorePackages = Path.GetTempPath();
             var config = ConfigParser.Parse(new[] { "--job=Dry", "--coreRun", fakeCoreRunPath, "--cli", fakeDotnetCliPath, "--packages", fakeRestorePackages, "-r", runtime }, new OutputLogger(Output)).config;
 
-            Assert.Single(config.GetJobs());
-            CoreRunToolchain toolchain = config.GetJobs().Single().GetToolchain() as CoreRunToolchain;
-            Assert.NotNull(toolchain);
-            Assert.Equal(runtime, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker); // runtime was provided and used
-            Assert.Equal(fakeCoreRunPath, toolchain.SourceCoreRun.FullName);
-            Assert.Equal(fakeDotnetCliPath, toolchain.CustomDotNetCliPath.FullName);
-            Assert.Equal(fakeRestorePackages, toolchain.RestorePath.FullName);
+            Assert.Equal(2, config.GetJobs().Count());
+
+            Job coreRunJob = config.GetJobs().Single(job => job.GetToolchain() is CoreRunToolchain);
+            Job runtimeJob = config.GetJobs().Single(job => job.GetToolchain() is CsProjCoreToolchain);
+
+            CoreRunToolchain coreRunToolchain = (CoreRunToolchain)coreRunJob.GetToolchain();
+            DotNetCliGenerator generator = (DotNetCliGenerator)coreRunToolchain.Generator;
+            Assert.Equal(RuntimeInformation.GetCurrentRuntime().MsBuildMoniker, generator.TargetFrameworkMoniker);
+            Assert.Equal(fakeCoreRunPath, coreRunToolchain.SourceCoreRun.FullName);
+            Assert.Equal(fakeDotnetCliPath, coreRunToolchain.CustomDotNetCliPath.FullName);
+            Assert.Equal(fakeRestorePackages, coreRunToolchain.RestorePath.FullName);
+
+            CsProjCoreToolchain coreToolchain = (CsProjCoreToolchain)runtimeJob.GetToolchain();
+            generator = (DotNetCliGenerator)coreToolchain.Generator;
+            Assert.Equal(runtime, ((DotNetCliGenerator)coreToolchain.Generator).TargetFrameworkMoniker);
+            Assert.Equal(fakeDotnetCliPath, coreToolchain.CustomDotNetCliPath);
+            Assert.Equal(fakeRestorePackages, generator.PackagesPath);
         }
 
-        [Fact]
+        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        public void FirstJobIsBaseline_RuntimesCoreRun()
+        {
+            const string runtime1 = "net5.0";
+            const string runtime2 = "net6.0";
+            string fakePath = typeof(object).Assembly.Location;
+            var config = ConfigParser.Parse(new[] { "--runtimes", runtime1, runtime2, "--coreRun", fakePath }, new OutputLogger(Output)).config;
+
+            Assert.Equal(3, config.GetJobs().Count());
+            Job baselineJob = config.GetJobs().Single(job => job.Meta.Baseline == true);
+            Assert.False(baselineJob.GetToolchain() is CoreRunToolchain);
+            Assert.Equal(runtime1, ((DotNetCliGenerator)baselineJob.GetToolchain().Generator).TargetFrameworkMoniker);
+        }
+
+        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        public void FirstJobIsBaseline_CoreRunsRuntimes()
+        {
+            const string runtime1 = "net5.0";
+            const string runtime2 = "net6.0";
+            string fakePath1 = typeof(object).Assembly.Location;
+            string fakePath2 = typeof(FactAttribute).Assembly.Location;
+            var config = ConfigParser.Parse(new[] { "--coreRun", fakePath1, fakePath2, "--runtimes", runtime1, runtime2 }, new OutputLogger(Output)).config;
+
+            Assert.Equal(4, config.GetJobs().Count());
+            Job baselineJob = config.GetJobs().Single(job => job.Meta.Baseline == true);
+            Assert.Equal(fakePath1, ((CoreRunToolchain)baselineJob.GetToolchain()).SourceCoreRun.FullName);
+        }
+
+        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
         public void UserCanSpecifyMultipleCoreRunPaths()
         {
             var fakeCoreRunPath_1 = typeof(object).Assembly.Location;
