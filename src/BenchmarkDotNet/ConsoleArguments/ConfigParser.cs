@@ -332,7 +332,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 // in case both --runtimes and --corerun are specified, the first one is returned first and becomes a baseline job
                 string first = args.FirstOrDefault(arg =>
                     arg.Equals("--runtimes", StringComparison.OrdinalIgnoreCase)
-                    || arg.Equals("--r", StringComparison.OrdinalIgnoreCase)
+                    || arg.Equals("-r", StringComparison.OrdinalIgnoreCase)
+
                     || arg.Equals("--corerun", StringComparison.OrdinalIgnoreCase));
 
                 if (first is null || first.Equals("--corerun", StringComparison.OrdinalIgnoreCase))
