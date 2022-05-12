@@ -139,6 +139,5 @@ namespace BenchmarkDotNet.Jobs
         /// Mono with the Ahead of Time LLVM Compiler backend and .net7.0
         /// </summary>
         MonoAOTLLVMNet70
-
     }
 }
