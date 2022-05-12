@@ -151,10 +151,16 @@ namespace BenchmarkDotNet.Tests
         }
 
         [FactClassicDotNetOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
-        public void SpecifyingCoreRunWithFullFrameworkHostGivesError()
+        public void SpecifyingCoreRunWithFullFrameworkTargetsMostRecentTfm()
         {
             var fakePath = typeof(object).Assembly.Location;
-            Assert.False(ConfigParser.Parse(new[] { "--corerun", fakePath }, new OutputLogger(Output)).isSuccess);
+            var config = ConfigParser.Parse(new[] { "--corerun", fakePath }, new OutputLogger(Output)).config;
+
+            Job coreRunJob = config.GetJobs().Single();
+
+            CoreRunToolchain coreRunToolchain = (CoreRunToolchain)coreRunJob.GetToolchain();
+            DotNetCliGenerator generator = (DotNetCliGenerator)coreRunToolchain.Generator;
+            Assert.Equal("net7.0", generator.TargetFrameworkMoniker);
         }
 
         [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]

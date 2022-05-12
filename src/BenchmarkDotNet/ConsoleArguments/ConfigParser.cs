@@ -163,12 +163,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return false;
             }
 
-            if (!options.CoreRunPaths.IsNullOrEmpty() && !RuntimeInformation.IsNetCore)
-            {
-                logger.WriteLineError("CoreRun path can be used only for .NET Core host processes.");
-                return false;
-            }
-
             if (options.HardwareCounters.Count() > 3)
             {
                 logger.WriteLineError("You can't use more than 3 HardwareCounters at the same time.");
@@ -505,7 +499,10 @@ namespace BenchmarkDotNet.ConsoleArguments
                 .WithToolchain(new CoreRunToolchain(
                     coreRunPath,
                     createCopy: true,
-                    targetFrameworkMoniker: RuntimeInformation.GetCurrentRuntime().MsBuildMoniker,
+                    targetFrameworkMoniker:
+                        RuntimeInformation.IsNetCore
+                            ? RuntimeInformation.GetCurrentRuntime().MsBuildMoniker
+                            : CoreRuntime.Latest.MsBuildMoniker, // use most recent tfm, as the toolchain is being used only by dotnet/runtime contributors
                     customDotNetCliPath: options.CliPath,
                     restorePath: options.RestorePath,
                     displayName: GetCoreRunToolchainDisplayName(options.CoreRunPaths, coreRunPath)));
