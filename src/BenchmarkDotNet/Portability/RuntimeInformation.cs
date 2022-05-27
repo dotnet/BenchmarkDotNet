@@ -329,6 +329,8 @@ namespace BenchmarkDotNet.Portability
         // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/
         private class JitHelper
         {
+            [SuppressMessage("IDE0052", "IDE0052")]
+            [SuppressMessage("IDE0079", "IDE0079")]
             [SuppressMessage("ReSharper", "NotAccessedField.Local")]
             private int bar;
 
