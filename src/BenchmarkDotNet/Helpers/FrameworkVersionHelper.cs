@@ -49,6 +49,7 @@ namespace BenchmarkDotNet.Helpers
             if (string.Compare(servicingVersion, "4.8") < 0)
                 return "4.7.2";
 
+            // TODO Add support for .NET Framework 4.8.1
             return "4.8"; // most probably the last major release of Full .NET Framework
         }
 
