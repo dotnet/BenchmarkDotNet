@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 using BenchmarkDotNet.Extensions;
+using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
 
 namespace BenchmarkDotNet.Portability.Cpu
 {

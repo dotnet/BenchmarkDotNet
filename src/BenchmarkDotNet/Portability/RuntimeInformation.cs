@@ -14,7 +14,9 @@ using BenchmarkDotNet.Portability.Cpu;
 using JetBrains.Annotations;
 using Microsoft.Win32;
 using static System.Runtime.InteropServices.RuntimeInformation;
+#if NETSTANDARD
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
+#endif
 
 namespace BenchmarkDotNet.Portability
 {
@@ -26,6 +28,9 @@ namespace BenchmarkDotNet.Portability
 
         public static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null; // it allocates a lot of memory, we need to check it once in order to keep Engine non-allocating!
 
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("windows")]
+#endif
         public static bool IsFullFramework => FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
 
         [PublicAPI]
@@ -67,10 +72,19 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetArchitecture() => GetCurrentPlatform().ToString();
 
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("windows")]
+#endif
         internal static bool IsWindows() => IsOSPlatform(OSPlatform.Windows);
 
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("linux")]
+#endif
         internal static bool IsLinux() => IsOSPlatform(OSPlatform.Linux);
 
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("osx")]
+#endif
         internal static bool IsMacOSX() => IsOSPlatform(OSPlatform.OSX);
 
         internal static bool IsAndroid() => Type.GetType("Java.Lang.Object, Mono.Android") != null;
@@ -87,9 +101,20 @@ namespace BenchmarkDotNet.Portability
                     return OsBrandStringHelper.PrettifyMacOSX(systemVersion, kernelVersion);
             }
 
+            string operatingSystem;
+            string operatingSystemVersion;
+
+#if NETSTANDARD
+            operatingSystem = RuntimeEnvironment.OperatingSystem;
+            operatingSystemVersion = RuntimeEnvironment.OperatingSystemVersion;
+#else
+            operatingSystem = OSDescription;
+            operatingSystemVersion = Environment.OSVersion.VersionString;
+#endif
+
             return OsBrandStringHelper.Prettify(
-                RuntimeEnvironment.OperatingSystem,
-                RuntimeEnvironment.OperatingSystemVersion,
+                operatingSystem,
+                operatingSystemVersion,
                 GetWindowsUbr());
         }
 

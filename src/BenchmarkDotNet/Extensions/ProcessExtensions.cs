@@ -85,6 +85,9 @@ namespace BenchmarkDotNet.Extensions
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
 
+            if (!RuntimeInformation.IsWindows() && !RuntimeInformation.IsLinux())
+                return false;
+
             try
             {
                 process.ProcessorAffinity = FixAffinity(processorAffinity);
@@ -103,6 +106,9 @@ namespace BenchmarkDotNet.Extensions
         {
             if (process == null)
                 throw new ArgumentNullException(nameof(process));
+
+            if (!RuntimeInformation.IsWindows() && !RuntimeInformation.IsLinux())
+                return null;
 
             try
             {

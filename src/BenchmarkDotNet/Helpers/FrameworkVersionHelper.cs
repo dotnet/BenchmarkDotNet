@@ -53,6 +53,9 @@ namespace BenchmarkDotNet.Helpers
         }
 
 
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#endif
         private static int? GetReleaseNumberFromWindowsRegistry()
         {
             using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
@@ -64,6 +67,9 @@ namespace BenchmarkDotNet.Helpers
             }
         }
 
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#endif
         internal static string GetLatestNetDeveloperPackVersion()
         {
             if (!(GetReleaseNumberFromWindowsRegistry() is int releaseNumber))

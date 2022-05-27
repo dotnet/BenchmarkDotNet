@@ -5,7 +5,9 @@ using System.IO;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
+#if NETSTANDARD
 using Microsoft.DotNet.PlatformAbstractions;
+#endif
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
@@ -127,7 +129,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             // the values taken from https://docs.microsoft.com/en-us/dotnet/core/rid-catalog#macos-rids
             string osPart = RuntimeInformation.IsWindows() ? "win" : (RuntimeInformation.IsMacOSX() ? "osx" : "linux");
 
-            return $"{osPart}-{RuntimeEnvironment.RuntimeArchitecture}";
+            string architecture =
+#if NETSTANDARD
+                RuntimeEnvironment.RuntimeArchitecture;
+#else
+                System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
+#endif
+
+            return $"{osPart}-{architecture}";
         }
     }
 }
