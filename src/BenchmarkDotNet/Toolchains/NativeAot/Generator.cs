@@ -133,6 +133,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <RunAnalyzers>false</RunAnalyzers>
     <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
     {GetTrimmingSettings()}
+    <IlcTrimMetadata>false</IlcTrimMetadata>
     <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
     <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
