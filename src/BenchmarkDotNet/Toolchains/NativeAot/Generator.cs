@@ -133,7 +133,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <RunAnalyzers>false</RunAnalyzers>
     <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
     {GetTrimmingSettings()}
-    <IlcTrimMetadata>false</IlcTrimMetadata>
     <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
     <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
@@ -142,6 +141,9 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
   <ItemGroup>
     <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
+  </ItemGroup>
+  <ItemGroup>
+    <TrimmerRootAssembly Include="BenchmarkDotNet" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />
