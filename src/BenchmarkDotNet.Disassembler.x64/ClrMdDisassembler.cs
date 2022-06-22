@@ -218,14 +218,11 @@ namespace BenchmarkDotNet.Disassemblers
                     case OpKind.Immediate64:
                         referencedAddress = instruction.GetImmediate(i);
                         return referencedAddress > ushort.MaxValue;
-                    case OpKind.Memory64:
-                        referencedAddress = instruction.MemoryAddress64;
-                        return referencedAddress > ushort.MaxValue;
                     case OpKind.Memory when instruction.IsIPRelativeMemoryOperand:
                         referencedAddress = instruction.IPRelativeMemoryAddress;
                         return referencedAddress > ushort.MaxValue;
                     case OpKind.Memory:
-                        referencedAddress = instruction.MemoryDisplacement;
+                        referencedAddress = instruction.MemoryDisplacement64;
                         return referencedAddress > ushort.MaxValue;
                 }
             }
