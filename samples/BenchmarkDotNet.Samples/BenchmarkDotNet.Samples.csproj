@@ -9,7 +9,6 @@
     <PackageId>BenchmarkDotNet.Samples</PackageId>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <NoWarn>$(NoWarn);CA1018;CA5351</NoWarn>
   </PropertyGroup>
