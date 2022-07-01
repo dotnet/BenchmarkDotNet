@@ -110,8 +110,8 @@ namespace BenchmarkDotNet.Portability
             operatingSystem = RuntimeEnvironment.OperatingSystem;
             operatingSystemVersion = RuntimeEnvironment.OperatingSystemVersion;
 #else
-            operatingSystem = OSDescription;
-            operatingSystemVersion = Environment.OSVersion.VersionString;
+            operatingSystem = PlatformApis.GetOSName();
+            operatingSystemVersion = PlatformApis.GetOSVersion();
 #endif
 
             return OsBrandStringHelper.Prettify(
