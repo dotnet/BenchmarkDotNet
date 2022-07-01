@@ -11,7 +11,7 @@
     <OutputType>Exe</OutputType>
     <OutputPath>bin\$CONFIGURATIONNAME$</OutputPath>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <!-- disabled due to https://github.com/dotnet/roslyn/issues/59240 -->
+    <!-- disabled due to https://github.com/dotnet/roslyn/issues/59421 -->
     <DebugSymbols>false</DebugSymbols>
     <UseSharedCompilation>false</UseSharedCompilation>
     <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
