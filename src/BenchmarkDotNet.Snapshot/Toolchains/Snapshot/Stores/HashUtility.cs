@@ -1,14 +1,12 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
 {
     internal static class HashUtility
     {
-        readonly static JsonSerializerSettings settings = new JsonSerializerSettings()
+        private readonly static JsonSerializerSettings settings = new JsonSerializerSettings()
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
         };

@@ -1,14 +1,11 @@
 ﻿using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using Newtonsoft.Json;
-using Perfolizer.Horology;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -160,8 +157,8 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
                 }
             }
             var id = benchmarkCase.Descriptor.ToHash();
-            var suuport = storeInfo?.Benchmarks?.FirstOrDefault(b => b.Id == id) is { };
-            return suuport;
+            var support = storeInfo?.Benchmarks?.FirstOrDefault(b => b.Id == id) is { };
+            return support;
         }
     }
 }

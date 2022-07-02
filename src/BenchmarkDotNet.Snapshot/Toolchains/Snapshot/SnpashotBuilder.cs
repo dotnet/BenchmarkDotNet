@@ -1,9 +1,6 @@
 ﻿using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BenchmarkDotNet.Toolchains.Snapshot
 {

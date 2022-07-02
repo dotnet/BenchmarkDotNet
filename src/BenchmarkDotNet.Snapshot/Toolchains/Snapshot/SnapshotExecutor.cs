@@ -1,8 +1,5 @@
 ﻿using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BenchmarkDotNet.Toolchains.Snapshot
 {
@@ -16,6 +13,6 @@ namespace BenchmarkDotNet.Toolchains.Snapshot
         }
 
         public ExecuteResult Execute(ExecuteParameters executeParameters) =>
-            store.GetResult(executeParameters);
+            store?.GetResult(executeParameters) ?? ExecuteResult.CreateFailed();
     }
 }
