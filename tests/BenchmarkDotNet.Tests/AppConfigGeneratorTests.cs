@@ -148,7 +148,7 @@ namespace BenchmarkDotNet.Tests
             const string input =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<configuration>" +
-                "<startup><supportedRuntime version=\"v4.0\" sku=\".NETFramework,Version=v4.6.1\" /></startup>" +
+                "<startup><supportedRuntime version=\"v4.0\" sku=\".NETFramework,Version=v4.6.2\" /></startup>" +
                 "</configuration>";
 
             string withoutStartup =
@@ -172,20 +172,20 @@ namespace BenchmarkDotNet.Tests
             const string input =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<configuration>" +
-                "<startup><supportedRuntime version=\"v4.0\" sku=\".NETFramework,Version=v4.6.1\" /></startup>" +
+                "<startup><supportedRuntime version=\"v4.0\" sku=\".NETFramework,Version=v4.6.2\" /></startup>" +
                 "</configuration>";
 
             string withoutStartup =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<configuration>" +
-                "<startup><supportedRuntime version=\"v4.0\" sku=\".NETFramework,Version=v4.6.1\" /></startup>" +
+                "<startup><supportedRuntime version=\"v4.0\" sku=\".NETFramework,Version=v4.6.2\" /></startup>" +
                 $"<runtime>{GcSettings}</runtime>" +
                 "</configuration>" + Environment.NewLine;
 
             using (var source = new StringReader(input))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(new Job { Environment = { Runtime = ClrRuntime.Net461 } }.Freeze(), source, destination, Resolver);
+                AppConfigGenerator.Generate(new Job { Environment = { Runtime = ClrRuntime.Net462 } }.Freeze(), source, destination, Resolver);
 
                 AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
             }

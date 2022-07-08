@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Helpers
 
         private static string GetFilePath(string fileName, DiagnoserActionParameters details, DateTime creationTime, string fileExtension)
         {
-            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
+            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net462 vs netcoreapp2.1 etc
             if (details.Config.GetJobs().Select(job => ToolchainExtensions.GetToolchain(job)).Distinct().Count() > 1)
                 fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
 
