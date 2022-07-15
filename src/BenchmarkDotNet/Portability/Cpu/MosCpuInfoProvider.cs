@@ -9,9 +9,15 @@ namespace BenchmarkDotNet.Portability.Cpu
 {
     internal static class MosCpuInfoProvider
     {
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#endif
         internal static readonly Lazy<CpuInfo> MosCpuInfo = new Lazy<CpuInfo>(Load);
 
         [NotNull]
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#endif
         private static CpuInfo Load()
         {
             var processorModelNames = new HashSet<string>();

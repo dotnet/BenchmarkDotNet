@@ -42,12 +42,15 @@ namespace BenchmarkDotNet.Extensions
                 hashSet.Add(item);
         }
 
+#if NETSTANDARD
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
             => dictionary.TryGetValue(key, out var value) ? value : default;
+#endif
 
         public static double Sqr(this double x) => x * x;
         public static double Pow(this double x, double k) => Math.Pow(x, k);
 
+#if NETSTANDARD
         internal static IEnumerable<TItem> DistinctBy<TItem, TValue>(this IEnumerable<TItem> items, Func<TItem, TValue> selector)
             => DistinctBy(items, selector, EqualityComparer<TValue>.Default);
 
@@ -60,6 +63,7 @@ namespace BenchmarkDotNet.Extensions
                 if (seen.Add(selector(item)))
                     yield return item;
         }
+#endif
 
         internal static void ForEach<T>(this IList<T> source, Action<T> command)
         {

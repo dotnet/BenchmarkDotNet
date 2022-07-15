@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet</AssemblyTitle>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NoWarn>$(NoWarn);1701;1702;1705;1591;3005;NU1702;CS3001;CS3003</NoWarn>
     <AssemblyName>BenchmarkDotNet</AssemblyName>
@@ -17,17 +17,18 @@
     <PackageReference Include="CommandLineParser" Version="2.4.3" />
     <PackageReference Include="Iced" Version="1.17.0" />
     <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="1.1.126102" />
-    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="2.1.0" />
-    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="Perfolizer" Version="0.2.1" />
-    <PackageReference Include="System.Management" Version="5.0.0" />
-    <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
-    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.2" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
+    <PackageReference Include="System.Management" Version="6.0.0" />
+    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.0.0" />
     <PackageReference Include="Microsoft.Diagnostics.NETCore.Client" Version="0.2.61701" />
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="2.0.61" PrivateAssets="contentfiles;analyzers" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
     <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x64\BenchmarkDotNet.Disassembler.x64.csproj">

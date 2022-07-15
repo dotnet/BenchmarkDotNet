@@ -49,10 +49,14 @@ namespace BenchmarkDotNet.Helpers
             if (string.Compare(servicingVersion, "4.8") < 0)
                 return "4.7.2";
 
+            // TODO Add support for .NET Framework 4.8.1
             return "4.8"; // most probably the last major release of Full .NET Framework
         }
 
 
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#endif
         private static int? GetReleaseNumberFromWindowsRegistry()
         {
             using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
@@ -64,6 +68,9 @@ namespace BenchmarkDotNet.Helpers
             }
         }
 
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#endif
         internal static string GetLatestNetDeveloperPackVersion()
         {
             if (!(GetReleaseNumberFromWindowsRegistry() is int releaseNumber))
