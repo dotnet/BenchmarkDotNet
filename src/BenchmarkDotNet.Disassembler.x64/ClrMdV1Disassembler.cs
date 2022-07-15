@@ -7,7 +7,8 @@ using System.Linq;
 
 namespace BenchmarkDotNet.Disassemblers
 {
-    internal static class ClrMdDisassembler
+    // This Disassembler uses ClrMd v1x. Please keep it in sync with ClrMdV2Disassembler (if possible).
+    internal static class ClrMdV1Disassembler
     {
         internal static DisassemblyResult AttachAndDisassemble(Settings settings)
         {
