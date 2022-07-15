@@ -122,7 +122,6 @@ namespace BenchmarkDotNet.Portability
         /// Returns null if the value is not available
         /// </summary>
         /// <returns></returns>
-        [CanBeNull]
         private static int? GetWindowsUbr()
         {
             if (IsWindows())

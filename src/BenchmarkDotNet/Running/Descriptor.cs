@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Running
 
         public override string ToString() => DisplayInfo;
 
-        private static string FormatDescription([CanBeNull] string description)
+        private static string FormatDescription(string? description)
         {
             var specialSymbols = new[] { ' ', '\'', '[', ']' };
             return description != null && specialSymbols.Any(description.Contains)

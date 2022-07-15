@@ -277,7 +277,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private MethodBuilder runMethod;
         // ReSharper restore NotAccessedField.Local
 
-        private RunnableEmitter([NotNull] BuildPartition buildPartition, [NotNull] ModuleBuilder moduleBuilder)
+        private RunnableEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder)
         {
             if (buildPartition == null)
                 throw new ArgumentNullException(nameof(buildPartition));
@@ -288,7 +288,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             this.moduleBuilder = moduleBuilder;
         }
 
-        [NotNull]
         private Descriptor Descriptor => benchmark.BenchmarkCase.Descriptor;
 
         // ReSharper disable once UnusedMethodReturnValue.Local

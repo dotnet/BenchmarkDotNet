@@ -12,12 +12,11 @@ namespace BenchmarkDotNet.Engines
         /// <summary>
         /// Checks do we have enough iterations
         /// </summary>
-        StoppingResult Evaluate([NotNull] IReadOnlyList<Measurement> measurements);
+        StoppingResult Evaluate(IReadOnlyList<Measurement> measurements);
 
         /// <summary>
         /// Title which can be used in logs and diagnostics methods
         /// </summary>
-        [NotNull]
         string Title { get; }
 
         /// <summary>
@@ -30,7 +29,6 @@ namespace BenchmarkDotNet.Engines
         /// <summary>
         /// An array of user-friendly warnings which notify about incorrect parameters.
         /// </summary>
-        [NotNull]
         IReadOnlyList<string> Warnings { get; }
     }
 }

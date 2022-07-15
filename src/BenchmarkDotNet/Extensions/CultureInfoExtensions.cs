@@ -6,8 +6,7 @@ namespace BenchmarkDotNet.Extensions
 {
     internal static class CultureInfoExtensions
     {
-        [NotNull]
-        public static string GetActualListSeparator([CanBeNull] this CultureInfo cultureInfo)
+        public static string GetActualListSeparator(this CultureInfo? cultureInfo)
         {
             cultureInfo = cultureInfo ?? DefaultCultureInfo.Instance;
             string listSeparator = cultureInfo.TextInfo.ListSeparator;

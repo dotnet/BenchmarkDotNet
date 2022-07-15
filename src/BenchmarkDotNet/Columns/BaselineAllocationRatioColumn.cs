@@ -63,8 +63,8 @@ namespace BenchmarkDotNet.Columns
         }
 
         private static double? GetAllocationRatio(
-            [CanBeNull] IReadOnlyDictionary<string, Metric> current,
-            [CanBeNull] IReadOnlyDictionary<string, Metric> baseline)
+            IReadOnlyDictionary<string, Metric>? current,
+            IReadOnlyDictionary<string, Metric>? baseline)
         {
             double? currentBytes = GetAllocatedBytes(current);
             double? baselineBytes = GetAllocatedBytes(baseline);
@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Columns
             return currentBytes / baselineBytes;
         }
 
-        private static double? GetAllocatedBytes([CanBeNull] IReadOnlyDictionary<string, Metric> metrics)
+        private static double? GetAllocatedBytes(IReadOnlyDictionary<string, Metric>? metrics)
         {
             var metric = metrics?.Values.FirstOrDefault(m => m.Descriptor is AllocatedMemoryMetricDescriptor);
             return metric?.Value;

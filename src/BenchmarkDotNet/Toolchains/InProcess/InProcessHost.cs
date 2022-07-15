@@ -17,14 +17,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess
     /// <seealso cref="IHost"/>
     public sealed class InProcessHost : IHost
     {
-        [NotNull]
         private readonly ILogger logger;
 
-        [CanBeNull]
-        private readonly IDiagnoser diagnoser;
+        private readonly IDiagnoser? diagnoser;
 
-        [CanBeNull]
-        private readonly DiagnoserActionParameters diagnoserActionParameters;
+        private readonly DiagnoserActionParameters? diagnoserActionParameters;
 
         /// <summary>Creates a new instance of <see cref="InProcessHost"/>.</summary>
         /// <param name="benchmarkCase">Current benchmark.</param>

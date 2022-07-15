@@ -21,12 +21,11 @@ namespace BenchmarkDotNet.Reports
         public SizeUnit SizeUnit { get; }
         internal SizeUnit CodeSizeUnit { get; }
         public TimeUnit TimeUnit { get; }
-        [NotNull]
         public CultureInfo CultureInfo { get; }
 
         public RatioStyle RatioStyle { get; }
 
-        public SummaryStyle([CanBeNull] CultureInfo cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true,
+        public SummaryStyle(CultureInfo? cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true,
             bool printZeroValuesInContent = false, int maxParameterColumnWidth = DefaultMaxParameterColumnWidth, RatioStyle ratioStyle = RatioStyle.Value)
         {
             if (maxParameterColumnWidth < DefaultMaxParameterColumnWidth)

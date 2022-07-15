@@ -343,8 +343,8 @@ namespace BenchmarkDotNet.Characteristics
                 GetCharacteristicsToApply(other));
 
         private CharacteristicObject ApplyCore(
-            [CanBeNull] CharacteristicObject other,
-            [NotNull] IEnumerable<Characteristic> characteristicsToApply)
+            CharacteristicObject? other,
+            IEnumerable<Characteristic> characteristicsToApply)
         {
             AssertNotFrozen();
 

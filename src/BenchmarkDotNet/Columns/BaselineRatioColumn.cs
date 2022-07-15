@@ -118,8 +118,7 @@ namespace BenchmarkDotNet.Columns
             return nonBaselines.Any(x => GetRatioStatistics(summary[x].ResultStatistics, baselineStat)?.Mean < 0.01);
         }
 
-        [CanBeNull]
-        private static Statistics GetRatioStatistics([CanBeNull] Statistics current, [CanBeNull] Statistics baseline)
+        private static Statistics? GetRatioStatistics(Statistics? current, Statistics? baseline)
         {
             if (current == null || current.N < 1)
                 return null;

@@ -14,8 +14,7 @@ namespace BenchmarkDotNet.Portability.Cpu
     {
         internal static readonly Lazy<CpuInfo> ProcCpuInfo = new Lazy<CpuInfo>(Load);
 
-        [CanBeNull]
-        private static CpuInfo Load()
+        private static CpuInfo? Load()
         {
             if (RuntimeInformation.IsLinux())
             {

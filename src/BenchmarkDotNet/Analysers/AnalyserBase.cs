@@ -21,11 +21,11 @@ namespace BenchmarkDotNet.Analysers
         [PublicAPI] protected virtual IEnumerable<Conclusion> AnalyseSummary(Summary summary) => Enumerable.Empty<Conclusion>();
         [PublicAPI] protected virtual IEnumerable<Conclusion> AnalyseReport(BenchmarkReport report, Summary summary) => Enumerable.Empty<Conclusion>();
 
-        protected Conclusion CreateHint(string message, [CanBeNull] BenchmarkReport report = null, bool mergeable = true)
+        protected Conclusion CreateHint(string message, BenchmarkReport? report = null, bool mergeable = true)
             => Conclusion.CreateHint(Id, message, report, mergeable);
-        protected Conclusion CreateWarning(string message, [CanBeNull] BenchmarkReport report = null, bool mergeable = true)
+        protected Conclusion CreateWarning(string message, BenchmarkReport? report = null, bool mergeable = true)
             => Conclusion.CreateWarning(Id, message, report, mergeable);
-        protected Conclusion CreateError(string message, [CanBeNull] BenchmarkReport report = null, bool mergeable = true)
+        protected Conclusion CreateError(string message, BenchmarkReport? report = null, bool mergeable = true)
             => Conclusion.CreateError(Id, message, report, mergeable);
     }
 }

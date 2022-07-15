@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Reports
         /// <summary>
         /// Returns the best amount of decimal digits for the given column.
         /// </summary>
-        public int GetPrecision(SummaryStyle summaryStyle, [NotNull] IStatisticColumn column, [CanBeNull] IStatisticColumn parentColumn = null)
+        public int GetPrecision(SummaryStyle summaryStyle, IStatisticColumn column, IStatisticColumn? parentColumn = null)
         {
             if (!precision.ContainsKey(column.Id))
             {
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Reports
             return precision[column.Id];
         }
 
-        internal static int CalcPrecision([NotNull] IList<double> values)
+        internal static int CalcPrecision(IList<double> values)
         {
             if (values.IsEmpty())
                 return MinPrecision;
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Reports
             return MathHelper.Clamp((int) Math.Truncate(-Math.Log10(minValue)) + 3, MinPrecision, MaxPrecision);
         }
 
-        internal static int CalcPrecision([NotNull] IList<double> values, int parentPrecision)
+        internal static int CalcPrecision(IList<double> values, int parentPrecision)
         {
             return MathHelper.Clamp(CalcPrecision(values), parentPrecision, parentPrecision + 1);
         }

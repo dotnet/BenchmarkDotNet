@@ -14,7 +14,6 @@ namespace BenchmarkDotNet.Portability.Cpu
 #endif
         internal static readonly Lazy<CpuInfo> MosCpuInfo = new Lazy<CpuInfo>(Load);
 
-        [NotNull]
 #if NET6_0_OR_GREATER
         [System.Runtime.Versioning.SupportedOSPlatform("windows")]
 #endif

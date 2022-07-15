@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using JetBrains.Annotations;
 using BenchmarkDotNet.Extensions;
-using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -108,16 +107,16 @@ namespace BenchmarkDotNet.Environments
 
         private class Windows1XVersion
         {
-            [CanBeNull] private string CodeVersion { get; }
-            [CanBeNull] private string CodeName { get; }
-            [CanBeNull] private string MarketingName { get; }
+            private string? CodeVersion { get; }
+            private string? CodeName { get; }
+            private string? MarketingName { get; }
             private int BuildNumber { get; }
 
-            [NotNull] private string MarketingNumber => BuildNumber >= 22000 ? "11" : "10";
-            [CanBeNull] private string ShortifiedCodeName => CodeName?.Replace(" ", "");
-            [CanBeNull] private string ShortifiedMarketingName => MarketingName?.Replace(" ", "");
+            private string MarketingNumber => BuildNumber >= 22000 ? "11" : "10";
+            private string? ShortifiedCodeName => CodeName?.Replace(" ", "");
+            private string? ShortifiedMarketingName => MarketingName?.Replace(" ", "");
 
-            private Windows1XVersion([CanBeNull] string codeVersion, [CanBeNull] string codeName, [CanBeNull] string marketingName, int buildNumber)
+            private Windows1XVersion(string? codeVersion, string? codeName, string? marketingName, int buildNumber)
             {
                 CodeVersion = codeVersion;
                 CodeName = codeName;
@@ -125,7 +124,7 @@ namespace BenchmarkDotNet.Environments
                 BuildNumber = buildNumber;
             }
 
-            private string ToFullVersion([CanBeNull] int? ubr = null)
+            private string ToFullVersion(int? ubr = null)
                 => ubr == null ? $"10.0.{BuildNumber}" : $"10.0.{BuildNumber}.{ubr}";
 
             private static string Collapse(params string[] values) => string.Join("/", values.Where(v => !string.IsNullOrEmpty(v)));
@@ -133,7 +132,7 @@ namespace BenchmarkDotNet.Environments
             // The line with OsBrandString is one of the longest lines in the summary.
             // When people past in on GitHub, it can be a reason of an ugly horizontal scrollbar.
             // To avoid this, we are trying to minimize this line and use the minimum possible number of characters.
-            public string ToPrettifiedString([CanBeNull] int? ubr)
+            public string ToPrettifiedString(int? ubr)
                 => CodeVersion == ShortifiedCodeName
                     ? $"{MarketingNumber} ({Collapse(ToFullVersion(ubr), CodeVersion, ShortifiedMarketingName)})"
                     : $"{MarketingNumber} ({Collapse(ToFullVersion(ubr), CodeVersion, ShortifiedMarketingName, ShortifiedCodeName)})";
@@ -161,8 +160,7 @@ namespace BenchmarkDotNet.Environments
                 new Windows1XVersion("21H2", "21H2", null, 22000),
             };
 
-            [CanBeNull]
-            public static Windows1XVersion Resolve([NotNull] string osVersionString)
+            public static Windows1XVersion? Resolve(string osVersionString)
             {
                 var windows1XVersion = WellKnownVersions.FirstOrDefault(v => osVersionString == $"10.0.{v.BuildNumber}");
                 if (windows1XVersion != null)
@@ -183,16 +181,14 @@ namespace BenchmarkDotNet.Environments
         /// <param name="osVersion">Original operation system version</param>
         /// <param name="windowsUbr">UBR (Update Build Revision), the revision number of Windows version (if available)</param>
         /// <returns>Prettified operation system title</returns>
-        [NotNull]
-        public static string Prettify([NotNull] string osName, [NotNull] string osVersion, [CanBeNull] int? windowsUbr = null)
+        public static string Prettify(string osName, string osVersion, int? windowsUbr = null)
         {
             if (osName == "Windows")
                 return PrettifyWindows(osVersion, windowsUbr);
             return $"{osName} {osVersion}";
         }
 
-        [NotNull]
-        private static string PrettifyWindows([NotNull] string osVersion, [CanBeNull] int? windowsUbr)
+        private static string PrettifyWindows(string osVersion, int? windowsUbr)
         {
             var windows1XVersion = Windows1XVersion.Resolve(osVersion);
             if (windows1XVersion != null)
@@ -209,9 +205,9 @@ namespace BenchmarkDotNet.Environments
         private class MacOSXVersion
         {
             private int DarwinVersion { get; }
-            [NotNull]private string CodeName { get; }
+            private string CodeName { get; }
 
-            private MacOSXVersion(int darwinVersion, [NotNull] string codeName)
+            private MacOSXVersion(int darwinVersion, string codeName)
             {
                 DarwinVersion = darwinVersion;
                 CodeName = codeName;
@@ -237,8 +233,7 @@ namespace BenchmarkDotNet.Environments
                 new MacOSXVersion(21, "Monterey")
             };
 
-            [CanBeNull]
-            public static string ResolveCodeName([NotNull] string kernelVersion)
+            public static string? ResolveCodeName(string kernelVersion)
             {
                 if (string.IsNullOrWhiteSpace(kernelVersion))
                     return null;
@@ -257,8 +252,7 @@ namespace BenchmarkDotNet.Environments
             }
         }
 
-        [NotNull]
-        public static string PrettifyMacOSX([NotNull] string systemVersion, [NotNull] string kernelVersion)
+        public static string PrettifyMacOSX(string systemVersion, string kernelVersion)
         {
             string codeName = MacOSXVersion.ResolveCodeName(kernelVersion);
             if (codeName != null)

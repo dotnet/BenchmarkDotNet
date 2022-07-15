@@ -8,8 +8,7 @@ namespace BenchmarkDotNet.Helpers
 {
     internal static class SectionsHelper
     {
-        [NotNull]
-        public static Dictionary<string, string> ParseSection([CanBeNull] string content, char separator)
+        public static Dictionary<string, string> ParseSection(string? content, char separator)
         {
             var values = new Dictionary<string, string>();
             var list = content?.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
@@ -24,8 +23,7 @@ namespace BenchmarkDotNet.Helpers
             return values;
         }
 
-        [NotNull]
-        public static List<Dictionary<string, string>> ParseSections([CanBeNull] string content, char separator)
+        public static List<Dictionary<string, string>> ParseSections(string? content, char separator)
         {
             // wmic doubles the carriage return character due to a bug.
             // Therefore, the * quantifier should be used to workaround it.

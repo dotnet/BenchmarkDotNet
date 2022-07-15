@@ -1,17 +1,14 @@
 ﻿﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Helpers;
-using JetBrains.Annotations;
 using BenchmarkDotNet.Extensions;
-using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
 
 namespace BenchmarkDotNet.Portability.Cpu
 {
     internal static class SysctlCpuInfoParser
     {
-        [NotNull]
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
-        internal static CpuInfo ParseOutput([CanBeNull] string content)
+        internal static CpuInfo ParseOutput(string? content)
         {
             var sysctl = SectionsHelper.ParseSection(content, ':');
             string processorName = sysctl.GetValueOrDefault("machdep.cpu.brand_string");
@@ -24,8 +21,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             return new CpuInfo(processorName, physicalProcessorCount, physicalCoreCount, logicalCoreCount, nominalFrequency, minFrequency, maxFrequency);
         }
 
-        [CanBeNull]
-        private static int? GetPositiveIntValue([NotNull] Dictionary<string, string> sysctl, [NotNull] string keyName)
+        private static int? GetPositiveIntValue(Dictionary<string, string> sysctl, string keyName)
         {
             if (sysctl.TryGetValue(keyName, out string value) &&
                 int.TryParse(value, out int result) &&
@@ -34,8 +30,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             return null;
         }
 
-        [CanBeNull]
-        private static long? GetPositiveLongValue([NotNull] Dictionary<string, string> sysctl, [NotNull] string keyName)
+        private static long? GetPositiveLongValue(Dictionary<string, string> sysctl, string keyName)
         {
             if (sysctl.TryGetValue(keyName, out string value) &&
                 long.TryParse(value, out long result) &&

@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Reflection;
 
-using JetBrains.Annotations;
-
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /*
@@ -29,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         /// <summary>Base class that provides reusable API for final implementations.</summary>
         internal abstract class BenchmarkActionBase : BenchmarkAction
         {
-            protected static TDelegate CreateWorkload<TDelegate>([CanBeNull] object targetInstance, MethodInfo workloadMethod)
+            protected static TDelegate CreateWorkload<TDelegate>(object? targetInstance, MethodInfo workloadMethod)
             {
                 if (workloadMethod.IsStatic)
                     return (TDelegate)(object)workloadMethod.CreateDelegate(typeof(TDelegate));
@@ -38,10 +36,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             }
 
             protected static TDelegate CreateWorkloadOrOverhead<TDelegate>(
-                [CanBeNull] object targetInstance,
-                [CanBeNull] MethodInfo workloadMethod,
-                [NotNull] TDelegate overheadStaticCallback,
-                [NotNull] TDelegate overheadInstanceCallback)
+                object? targetInstance,
+                MethodInfo? workloadMethod,
+                TDelegate overheadStaticCallback,
+                TDelegate overheadInstanceCallback) where TDelegate : notnull
             {
                 if (workloadMethod == null)
                     return targetInstance == null ? overheadStaticCallback : overheadInstanceCallback;

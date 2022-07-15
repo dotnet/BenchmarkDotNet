@@ -7,23 +7,20 @@ namespace BenchmarkDotNet.Analysers
     // TODO: Find a better name
     public sealed class Conclusion : IEquatable<Conclusion>
     {
-        [NotNull]
         public string AnalyserId { get; }
 
         public ConclusionKind Kind { get; }
 
         public bool Mergeable { get; }
 
-        [NotNull]
         public string Message { get; }
 
-        [CanBeNull]
-        public BenchmarkReport Report { get; }
+        public BenchmarkReport? Report { get; }
 
-        private Conclusion([NotNull] string analyserId,
+        private Conclusion(string analyserId,
                            ConclusionKind kind,
-                           [NotNull] string message,
-                           [CanBeNull] BenchmarkReport report,
+                           string message,
+                           BenchmarkReport? report,
                            bool mergeable)
         {
             AnalyserId = analyserId;
@@ -33,13 +30,13 @@ namespace BenchmarkDotNet.Analysers
             Mergeable = mergeable;
         }
 
-        public static Conclusion CreateHint(string analyserId, string message, [CanBeNull] BenchmarkReport report = null, bool mergeable = true)
+        public static Conclusion CreateHint(string analyserId, string message, BenchmarkReport? report = null, bool mergeable = true)
             => new Conclusion(analyserId, ConclusionKind.Hint, message, report, mergeable);
 
-        public static Conclusion CreateWarning(string analyserId, string message, [CanBeNull] BenchmarkReport report = null, bool mergeable = true)
+        public static Conclusion CreateWarning(string analyserId, string message, BenchmarkReport? report = null, bool mergeable = true)
             => new Conclusion(analyserId, ConclusionKind.Warning, message, report, mergeable);
 
-        public static Conclusion CreateError(string analyserId, string message, [CanBeNull] BenchmarkReport report = null, bool mergeable = true)
+        public static Conclusion CreateError(string analyserId, string message, BenchmarkReport? report = null, bool mergeable = true)
             => new Conclusion(analyserId, ConclusionKind.Error, message, report, mergeable);
 
         public bool Equals(Conclusion other)

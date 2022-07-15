@@ -13,18 +13,18 @@ namespace BenchmarkDotNet.Engines
     {
         private readonly OutlierMode outlierMode;
 
-        [CanBeNull, PublicAPI]
-        public IReadOnlyList<Measurement> Overhead { get; }
+        [PublicAPI]
+        public IReadOnlyList<Measurement>? Overhead { get; }
 
-        [NotNull, PublicAPI]
+        [PublicAPI]
         public IReadOnlyList<Measurement> Workload { get; }
 
         public GcStats GCStats { get; }
 
         public ThreadingStats ThreadingStats { get; }
 
-        public RunResults([CanBeNull] IReadOnlyList<Measurement> overhead,
-                          [NotNull] IReadOnlyList<Measurement> workload,
+        public RunResults(IReadOnlyList<Measurement>? overhead,
+                          IReadOnlyList<Measurement> workload,
                           OutlierMode outlierMode,
                           GcStats gcStats,
                           ThreadingStats threadingStats)
