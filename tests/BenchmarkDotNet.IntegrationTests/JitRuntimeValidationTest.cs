@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData(Jit.RyuJit, Platform.X64, OkCaption)]
         public void CheckClrOnWindows(Jit jit, Platform platform, string expectedText)
         {
-            Verify(ClrRuntime.Net461, jit, platform, expectedText);
+            Verify(ClrRuntime.Net462, jit, platform, expectedText);
         }
 
 //        [TheoryWindowsOnly("CLR is a valid job only on Windows")]

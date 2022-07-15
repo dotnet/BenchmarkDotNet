@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net462</TargetFramework>
     <OutputType>Exe</OutputType>
     <AssemblyTitle>BenchmarkDotNet.Disassembler.x64</AssemblyTitle>
     <AssemblyName>BenchmarkDotNet.Disassembler.x64</AssemblyName>
