@@ -36,10 +36,10 @@
     <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x86\BenchmarkDotNet.Disassembler.x86.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <EmbeddedResource Include="Disassemblers\net461\win7-x86\BenchmarkDotNet.Disassembler.x86.exe" />
-    <EmbeddedResource Include="Disassemblers\net461\win7-x64\BenchmarkDotNet.Disassembler.x64.exe" />
-    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Microsoft.Diagnostics.Runtime.dll" />
-    <EmbeddedResource Include="Disassemblers\net461\win7-x64\Iced.dll" />
+    <EmbeddedResource Include="Disassemblers\net462\win7-x86\BenchmarkDotNet.Disassembler.x86.exe" />
+    <EmbeddedResource Include="Disassemblers\net462\win7-x64\BenchmarkDotNet.Disassembler.x64.exe" />
+    <EmbeddedResource Include="Disassemblers\net462\win7-x64\Microsoft.Diagnostics.Runtime.dll" />
+    <EmbeddedResource Include="Disassemblers\net462\win7-x64\Iced.dll" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj" />

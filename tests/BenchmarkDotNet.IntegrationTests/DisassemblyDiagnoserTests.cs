@@ -28,10 +28,10 @@ namespace BenchmarkDotNet.IntegrationTests
             => new[]
             {
 #if NETFRAMEWORK
-                new object[] { Jit.LegacyJit, Platform.X86, ClrRuntime.Net461 }, // 32bit LegacyJit for desktop .NET
-                new object[] { Jit.LegacyJit, Platform.X64, ClrRuntime.Net461 }, // 64bit LegacyJit for desktop .NET
+                new object[] { Jit.LegacyJit, Platform.X86, ClrRuntime.Net462 }, // 32bit LegacyJit for desktop .NET
+                new object[] { Jit.LegacyJit, Platform.X64, ClrRuntime.Net462 }, // 64bit LegacyJit for desktop .NET
 
-                new object[] { Jit.RyuJit, Platform.X64, ClrRuntime.Net461 }, // RyuJit for desktop .NET
+                new object[] { Jit.RyuJit, Platform.X64, ClrRuntime.Net462 }, // RyuJit for desktop .NET
 #endif
                 new object[] { Jit.RyuJit, Platform.X64, CoreRuntime.Core60 }, // .NET Core
 

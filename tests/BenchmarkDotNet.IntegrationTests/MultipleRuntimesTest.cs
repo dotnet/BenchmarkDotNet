@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Run<C>(
                     ManualConfig.CreateEmpty()
                         .AddJob(Job.Dry.WithRuntime(CoreRuntime.Core60).WithPlatform(Platform.X64).WithId("Core"))
-                        .AddJob(Job.Dry.WithRuntime(ClrRuntime.Net461).WithId("Framework"))
+                        .AddJob(Job.Dry.WithRuntime(ClrRuntime.Net462).WithId("Framework"))
                         .AddColumnProvider(DefaultColumnProviders.Instance)
                         .AddLogger(new OutputLogger(output)));
 

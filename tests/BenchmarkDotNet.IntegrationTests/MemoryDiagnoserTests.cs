@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
-        [FactDotNetCoreOnly("We don't want to test NativeAOT twice (for .NET Framework 4.6.1 and .NET 6.0)")]
+        [FactDotNetCoreOnly("We don't want to test NativeAOT twice (for .NET Framework 4.6.2 and .NET 6.0)")]
         public void MemoryDiagnoserSupportsNativeAOT()
         {
             if (ContinuousIntegration.IsAppVeyorOnWindows()) // too time consuming for AppVeyor (1h limit)
