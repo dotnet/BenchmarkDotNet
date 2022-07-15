@@ -96,44 +96,14 @@ namespace BenchmarkDotNet.Jobs
         Net70,
 
         /// <summary>
-        /// CoreRT compiled as netcoreapp2.0
+        /// NativeAOT compiled as net6.0
         /// </summary>
-        CoreRt20,
+        NativeAot60,
 
         /// <summary>
-        /// CoreRT compiled as netcoreapp2.1
+        /// NativeAOT compiled as net7.0
         /// </summary>
-        CoreRt21,
-
-        /// <summary>
-        /// CoreRT compiled as netcoreapp2.2
-        /// </summary>
-        CoreRt22,
-
-        /// <summary>
-        /// CoreRT compiled as netcoreapp3.0
-        /// </summary>
-        CoreRt30,
-
-        /// <summary>
-        /// CoreRT compiled as netcoreapp3.1
-        /// </summary>
-        CoreRt31,
-
-        /// <summary>
-        /// CoreRT compiled as net5.0
-        /// </summary>
-        CoreRt50,
-
-        /// <summary>
-        /// CoreRT compiled as net6.0
-        /// </summary>
-        CoreRt60,
-
-        /// <summary>
-        /// CoreRT compiled as net7.0
-        /// </summary>
-        CoreRt70,
+        NativeAot70,
 
         /// <summary>
         /// WebAssembly with default .Net version
@@ -169,6 +139,5 @@ namespace BenchmarkDotNet.Jobs
         /// Mono with the Ahead of Time LLVM Compiler backend and .net7.0
         /// </summary>
         MonoAOTLLVMNet70
-
     }
 }

@@ -17,8 +17,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.CoreRt;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -79,7 +78,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 parser
                     .ParseArguments<CommandLineOptions>(args)
-                    .WithParsed(options => result = Validate(options, logger) ? (true, CreateConfig(options, globalConfig), options) : (false, default, default))
+                    .WithParsed(options => result = Validate(options, logger) ? (true, CreateConfig(options, globalConfig, args), options) : (false, default, default))
                     .WithNotParsed(errors => result = (false, default, default));
             }
 
@@ -116,11 +115,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 {
                      logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{ options.AOTCompilerPath }\" does NOT exist. It MUST be provided.");
                 }
-                else if (runtimeMoniker == RuntimeMoniker.Wasm && (options.RuntimeSrcDir == null || options.RuntimeSrcDir.IsNotNullButDoesNotExist()))
-                {
-                    logger.WriteLineError($"The provided {nameof(options.RuntimeSrcDir)} \"{options.RuntimeSrcDir}\" does NOT exist. It MUST be provided for wasm-aot.");
-                    return false;
-                }
             }
 
             foreach (string exporter in options.Exporters)
@@ -139,7 +133,15 @@ namespace BenchmarkDotNet.ConsoleArguments
             foreach (var coreRunPath in options.CoreRunPaths)
                 if (coreRunPath.IsNotNullButDoesNotExist())
                 {
-                    logger.WriteLineError($"The provided path to CoreRun: \"{coreRunPath}\" does NOT exist. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.");
+                    if (Directory.Exists(coreRunPath.FullName))
+                    {
+                        logger.WriteLineError($"The provided path to CoreRun: \"{coreRunPath}\" exists but it's a directory, not an executable. You need to include CoreRun.exe (corerun on Unix) in the path.");
+                    }
+                    else
+                    {
+                        logger.WriteLineError($"The provided path to CoreRun: \"{coreRunPath}\" does NOT exist.");
+                    }
+
                     return false;
                 }
 
@@ -155,15 +157,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return false;
             }
 
-            if (options.CoreRtPath.IsNotNullButDoesNotExist())
+            if (options.IlcPackages.IsNotNullButDoesNotExist())
             {
-                logger.WriteLineError($"The provided {nameof(options.CoreRtPath)} \"{options.CoreRtPath}\" does NOT exist.");
-                return false;
-            }
-
-            if (options.Runtimes.Count() > 1 && !options.CoreRunPaths.IsNullOrEmpty())
-            {
-                logger.WriteLineError("CoreRun path can't be combined with multiple .NET Runtimes");
+                logger.WriteLineError($"The provided {nameof(options.IlcPackages)} \"{options.IlcPackages}\" does NOT exist.");
                 return false;
             }
 
@@ -195,12 +191,12 @@ namespace BenchmarkDotNet.ConsoleArguments
             return true;
         }
 
-        private static IConfig CreateConfig(CommandLineOptions options, IConfig globalConfig)
+        private static IConfig CreateConfig(CommandLineOptions options, IConfig globalConfig, string[] args)
         {
             var config = new ManualConfig();
 
             var baseJob = GetBaseJob(options, globalConfig);
-            var expanded = Expand(baseJob.UnfreezeCopy(), options).ToArray(); // UnfreezeCopy ensures that each of the expanded jobs will have it's own ID
+            var expanded = Expand(baseJob.UnfreezeCopy(), options, args).ToArray(); // UnfreezeCopy ensures that each of the expanded jobs will have it's own ID
             if (expanded.Length > 1)
                 expanded[0] = expanded[0].AsBaseline(); // if the user provides multiple jobs, then the first one should be a baseline
             config.AddJob(expanded);
@@ -241,9 +237,14 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.WithOption(ConfigOptions.DontOverwriteResults, options.DontOverwriteResults);
             config.WithOption(ConfigOptions.StopOnFirstError, options.StopOnFirstError);
             config.WithOption(ConfigOptions.DisableLogFile, options.DisableLogFile);
+            config.WithOption(ConfigOptions.LogBuildOutput, options.LogBuildOutput);
+            config.WithOption(ConfigOptions.GenerateMSBuildBinLog, options.GenerateMSBuildBinLog);
 
             if (options.MaxParameterColumnWidth.HasValue)
                 config.WithSummaryStyle(SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParameterColumnWidth.Value));
+
+            if (options.TimeOutInSeconds.HasValue)
+                config.WithBuildTimeout(TimeSpan.FromSeconds(options.TimeOutInSeconds.Value));
 
             return config;
         }
@@ -306,26 +307,50 @@ namespace BenchmarkDotNet.ConsoleArguments
                 .AsMutator(); // we mark it as mutator so it will be applied to other jobs defined via attributes and merged later in GetRunnableJobs method
         }
 
-        private static IEnumerable<Job> Expand(Job baseJob, CommandLineOptions options)
+        private static IEnumerable<Job> Expand(Job baseJob, CommandLineOptions options, string[] args)
         {
             if (options.RunInProcess)
+            {
                 yield return baseJob.WithToolchain(InProcessEmitToolchain.Instance);
+            }
             else if (!string.IsNullOrEmpty(options.ClrVersion))
+            {
                 yield return baseJob.WithRuntime(ClrRuntime.CreateForLocalFullNetFrameworkBuild(options.ClrVersion)); // local builds of .NET Runtime
-            else if (options.CoreRunPaths.Any())
-                foreach (var coreRunPath in options.CoreRunPaths)
-                    yield return CreateCoreRunJob(baseJob, options, coreRunPath); // local CoreFX and CoreCLR builds
-            else if (options.CliPath != null && options.Runtimes.IsEmpty())
+            }
+            else if (options.CliPath != null && options.Runtimes.IsEmpty() && options.CoreRunPaths.IsEmpty())
+            {
                 yield return CreateCoreJobWithCli(baseJob, options);
+            }
             else
-                foreach (string runtime in options.Runtimes) // known runtimes
-                    yield return CreateJobForGivenRuntime(baseJob, runtime, options);
+            {
+                // in case both --runtimes and --corerun are specified, the first one is returned first and becomes a baseline job
+                string first = args.FirstOrDefault(arg =>
+                    arg.Equals("--runtimes", StringComparison.OrdinalIgnoreCase)
+                    || arg.Equals("-r", StringComparison.OrdinalIgnoreCase)
+
+                    || arg.Equals("--corerun", StringComparison.OrdinalIgnoreCase));
+
+                if (first is null || first.Equals("--corerun", StringComparison.OrdinalIgnoreCase))
+                {
+                    foreach (var coreRunPath in options.CoreRunPaths)
+                        yield return CreateCoreRunJob(baseJob, options, coreRunPath); // local dotnet/runtime builds
+
+                    foreach (string runtime in options.Runtimes) // known runtimes
+                        yield return CreateJobForGivenRuntime(baseJob, runtime, options);
+                }
+                else
+                {
+                    foreach (string runtime in options.Runtimes) // known runtimes
+                        yield return CreateJobForGivenRuntime(baseJob, runtime, options);
+
+                    foreach (var coreRunPath in options.CoreRunPaths)
+                        yield return CreateCoreRunJob(baseJob, options, coreRunPath); // local dotnet/runtime builds
+                }
+            }
         }
 
         private static Job CreateJobForGivenRuntime(Job baseJob, string runtimeId, CommandLineOptions options)
         {
-            TimeSpan? timeOut = options.TimeOutInSeconds.HasValue ? TimeSpan.FromSeconds(options.TimeOutInSeconds.Value) : default(TimeSpan?);
-
             if (!TryParse(runtimeId, out RuntimeMoniker runtimeMoniker))
             {
                 throw new InvalidOperationException("Impossible, already validated by the Validate method");
@@ -341,7 +366,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net48:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
-                        .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName, timeOut));
+                        .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName));
                 case RuntimeMoniker.NetCoreApp20:
                 case RuntimeMoniker.NetCoreApp21:
                 case RuntimeMoniker.NetCoreApp22:
@@ -355,60 +380,57 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net70:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
-                        .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName, timeOut)));
+                        .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
                 case RuntimeMoniker.Mono:
                     return baseJob.WithRuntime(new MonoRuntime("Mono", options.MonoPath?.FullName));
-                case RuntimeMoniker.CoreRt20:
-                case RuntimeMoniker.CoreRt21:
-                case RuntimeMoniker.CoreRt22:
-                case RuntimeMoniker.CoreRt30:
-                case RuntimeMoniker.CoreRt31:
-                case RuntimeMoniker.CoreRt50:
-                case RuntimeMoniker.CoreRt60:
-                case RuntimeMoniker.CoreRt70:
-                    var builder = CoreRtToolchain.CreateBuilder();
-
-                    if (options.CliPath != null)
-                        builder.DotNetCli(options.CliPath.FullName);
-                    if (options.RestorePath != null)
-                        builder.PackagesRestorePath(options.RestorePath.FullName);
-
-                    if (options.CoreRtPath != null)
-                        builder.UseCoreRtLocal(options.CoreRtPath.FullName);
-                    else if (!string.IsNullOrEmpty(options.CoreRtVersion))
-                        builder.UseCoreRtNuGet(options.CoreRtVersion);
-                    else
-                        builder.UseCoreRtNuGet();
-
-                    if (timeOut.HasValue)
-                        builder.Timeout(timeOut.Value);
-
-                    var runtime = runtimeMoniker.GetRuntime();
-                    builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
-
-                    return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
+                case RuntimeMoniker.NativeAot60:
+                    return CreateAotJob(baseJob, options, runtimeMoniker, "6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json");
+                case RuntimeMoniker.NativeAot70:
+                    return CreateAotJob(baseJob, options, runtimeMoniker, "7.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json");
                 case RuntimeMoniker.Wasm:
-                    return MakeWasmJob(baseJob, options, timeOut, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0");
+                    return MakeWasmJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0", runtimeMoniker);
                 case RuntimeMoniker.WasmNet50:
-                    return MakeWasmJob(baseJob, options, timeOut, "net5.0");
+                    return MakeWasmJob(baseJob, options, "net5.0", runtimeMoniker);
                 case RuntimeMoniker.WasmNet60:
-                    return MakeWasmJob(baseJob, options, timeOut, "net6.0");
+                    return MakeWasmJob(baseJob, options, "net6.0", runtimeMoniker);
                 case RuntimeMoniker.WasmNet70:
-                    return MakeWasmJob(baseJob, options, timeOut, "net7.0");
+                    return MakeWasmJob(baseJob, options, "net7.0", runtimeMoniker);
                 case RuntimeMoniker.MonoAOTLLVM:
-                    return MakeMonoAOTLLVMJob(baseJob, options, timeOut, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0");
                 case RuntimeMoniker.MonoAOTLLVMNet60:
-                    return MakeMonoAOTLLVMJob(baseJob, options, timeOut, "net6.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net6.0");
                 case RuntimeMoniker.MonoAOTLLVMNet70:
-                    return MakeMonoAOTLLVMJob(baseJob, options, timeOut, "net7.0");
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net7.0");
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
         }
 
-        private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, TimeSpan? timeOut, string msBuildMoniker)
+        private static Job CreateAotJob(Job baseJob, CommandLineOptions options, RuntimeMoniker runtimeMoniker, string ilCompilerVersion, string nuGetFeedUrl)
         {
-            var monoAotLLVMRuntime = new MonoAotLLVMRuntime(aotCompilerPath: options.AOTCompilerPath, msBuildMoniker: msBuildMoniker);
+            var builder = NativeAotToolchain.CreateBuilder();
+
+            if (options.CliPath != null)
+                builder.DotNetCli(options.CliPath.FullName);
+            if (options.RestorePath != null)
+                builder.PackagesRestorePath(options.RestorePath.FullName);
+
+            if (options.IlcPackages != null)
+                builder.UseLocalBuild(options.IlcPackages);
+            else if (!string.IsNullOrEmpty(options.ILCompilerVersion))
+                builder.UseNuGet(options.ILCompilerVersion, nuGetFeedUrl);
+            else
+                builder.UseNuGet(ilCompilerVersion, nuGetFeedUrl);
+
+            var runtime = runtimeMoniker.GetRuntime();
+            builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
+
+            return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
+        }
+
+        private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker)
+        {
+            var monoAotLLVMRuntime = new MonoAotLLVMRuntime(aotCompilerPath: options.AOTCompilerPath, aotCompilerMode: options.AOTCompilerMode, msBuildMoniker: msBuildMoniker);
 
             var toolChain = MonoAotLLVMToolChain.From(
             new NetCoreAppSettings(
@@ -417,7 +439,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 name: monoAotLLVMRuntime.Name,
                 customDotNetCliPath: options.CliPath?.FullName,
                 packagesPath: options.RestorePath?.FullName,
-                timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
                 customRuntimePack: options.CustomRuntimePack,
                 aotCompilerPath: options.AOTCompilerPath.ToString(),
                 aotCompilerMode: options.AOTCompilerMode));
@@ -425,7 +446,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             return baseJob.WithRuntime(monoAotLLVMRuntime).WithToolchain(toolChain);
         }
 
-        private static Job MakeWasmJob(Job baseJob, CommandLineOptions options, TimeSpan? timeOut, string msBuildMoniker)
+        private static Job MakeWasmJob(Job baseJob, CommandLineOptions options, string msBuildMoniker, RuntimeMoniker moniker)
         {
             bool wasmAot = options.AOTCompilerMode == MonoAotCompilerMode.wasm;
 
@@ -434,7 +455,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 javaScriptEngine: options.WasmJavascriptEngine?.FullName ?? "v8",
                 javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
                 aot: wasmAot,
-                runtimeSrcDir: options.RuntimeSrcDir);
+                wasmDataDir: options.WasmDataDirectory?.FullName,
+                moniker: moniker);
 
             var toolChain = WasmToolChain.From(new NetCoreAppSettings(
                 targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
@@ -442,7 +464,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 name: wasmRuntime.Name,
                 customDotNetCliPath: options.CliPath?.FullName,
                 packagesPath: options.RestorePath?.FullName,
-                timeout: timeOut ?? NetCoreAppSettings.DefaultBuildTimeout,
                 customRuntimePack: options.CustomRuntimePack,
                 aotCompilerMode: options.AOTCompilerMode));
 
@@ -478,7 +499,10 @@ namespace BenchmarkDotNet.ConsoleArguments
                 .WithToolchain(new CoreRunToolchain(
                     coreRunPath,
                     createCopy: true,
-                    targetFrameworkMoniker: options.Runtimes.SingleOrDefault() ?? RuntimeInformation.GetCurrentRuntime().MsBuildMoniker,
+                    targetFrameworkMoniker:
+                        RuntimeInformation.IsNetCore
+                            ? RuntimeInformation.GetCurrentRuntime().MsBuildMoniker
+                            : CoreRuntime.Latest.MsBuildMoniker, // use most recent tfm, as the toolchain is being used only by dotnet/runtime contributors
                     customDotNetCliPath: options.CliPath,
                     restorePath: options.RestorePath,
                     displayName: GetCoreRunToolchainDisplayName(options.CoreRunPaths, coreRunPath)));

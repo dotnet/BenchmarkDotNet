@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
@@ -48,7 +49,9 @@ namespace BenchmarkDotNet.Configs
             CultureInfo cultureInfo,
             IOrderer orderer,
             SummaryStyle summaryStyle,
-            ConfigOptions options)
+            ConfigOptions options,
+            TimeSpan buildTimeout,
+            IReadOnlyList<Conclusion> configAnalysisConclusion)
         {
             columnProviders = uniqueColumnProviders;
             loggers = uniqueLoggers;
@@ -66,6 +69,8 @@ namespace BenchmarkDotNet.Configs
             Orderer = orderer;
             SummaryStyle = summaryStyle;
             Options = options;
+            BuildTimeout = buildTimeout;
+            ConfigAnalysisConclusion = configAnalysisConclusion;
         }
 
         public ConfigUnionRule UnionRule { get; }
@@ -74,6 +79,7 @@ namespace BenchmarkDotNet.Configs
         public ConfigOptions Options { get; }
         [NotNull] public IOrderer Orderer { get; }
         public SummaryStyle SummaryStyle { get; }
+        public TimeSpan BuildTimeout { get; }
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
@@ -104,5 +110,7 @@ namespace BenchmarkDotNet.Configs
 
             return diagnosersForGivenMode.Any() ? new CompositeDiagnoser(diagnosersForGivenMode) : null;
         }
+
+        public IReadOnlyList<Conclusion> ConfigAnalysisConclusion { get; private set; }
     }
 }

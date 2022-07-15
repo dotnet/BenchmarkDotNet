@@ -1,12 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains.CoreRt;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.Roslyn;
@@ -22,6 +23,8 @@ namespace BenchmarkDotNet.Running
             RepresentativeBenchmarkCase = benchmarks[0].BenchmarkCase;
             Benchmarks = benchmarks;
             ProgramName = benchmarks[0].Config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles) ? RepresentativeBenchmarkCase.Job.FolderInfo : Guid.NewGuid().ToString();
+            LogBuildOutput = benchmarks[0].Config.Options.IsSet(ConfigOptions.LogBuildOutput);
+            GenerateMSBuildBinLog = benchmarks[0].Config.Options.IsSet(ConfigOptions.GenerateMSBuildBinLog);
         }
 
         public BenchmarkBuildInfo[] Benchmarks { get; }
@@ -45,9 +48,9 @@ namespace BenchmarkDotNet.Running
         [PublicAPI]
         public Jit Jit => RepresentativeBenchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, Resolver);
 
-        public bool IsCoreRT => Runtime is CoreRtRuntime
-            // given job can have CoreRT toolchain set, but Runtime == default ;)
-            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is CoreRtToolchain);
+        public bool IsNativeAot => Runtime is NativeAotRuntime
+            // given job can have NativeAOT toolchain set, but Runtime == default
+            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is NativeAotToolchain);
 
         public bool IsWasm => Runtime is WasmRuntime // given job can have Wasm toolchain set, but Runtime == default ;)
             || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is WasmToolChain);
@@ -56,10 +59,23 @@ namespace BenchmarkDotNet.Running
             || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && (toolchain is RoslynToolchain || toolchain is CsProjClassicNetToolchain));
 
         public Runtime Runtime => RepresentativeBenchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
-                ? RepresentativeBenchmarkCase.Job.Environment.Runtime
-                : RuntimeInformation.GetCurrentRuntime();
+            ? RepresentativeBenchmarkCase.Job.Environment.Runtime
+            : RuntimeInformation.GetCurrentRuntime();
 
         public bool IsCustomBuildConfiguration => BuildConfiguration != InfrastructureMode.ReleaseConfigurationName;
+
+        public TimeSpan Timeout => IsNativeAot && RepresentativeBenchmarkCase.Config.BuildTimeout == DefaultConfig.Instance.BuildTimeout
+            ? TimeSpan.FromMinutes(5) // downloading all NativeAOT dependencies can take a LOT of time
+            : RepresentativeBenchmarkCase.Config.BuildTimeout;
+
+        public bool LogBuildOutput { get; }
+
+        public bool GenerateMSBuildBinLog { get; }
+
+        public bool NoAcknowledgments
+            => !Benchmarks
+                    .Any(bennchmark => bennchmark.Config.GetDiagnosers()
+                    .Any(diagnoser => diagnoser.RequiresBlockingAcknowledgments(bennchmark.BenchmarkCase)));
 
         public override string ToString() => RepresentativeBenchmarkCase.Job.DisplayInfo;
 

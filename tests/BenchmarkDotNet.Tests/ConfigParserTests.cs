@@ -15,7 +15,7 @@ using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.CoreRt;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -150,25 +150,76 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(fakeRestorePackages, toolchain.RestorePath.FullName);
         }
 
-        [Fact]
-        public void CoreRunConfigParsedCorrectlyWhenRuntimeSpecified()
+        [FactClassicDotNetOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        public void SpecifyingCoreRunWithFullFrameworkTargetsMostRecentTfm()
         {
-            const string runtime = "netcoreapp3.0";
+            var fakePath = typeof(object).Assembly.Location;
+            var config = ConfigParser.Parse(new[] { "--corerun", fakePath }, new OutputLogger(Output)).config;
+
+            Job coreRunJob = config.GetJobs().Single();
+
+            CoreRunToolchain coreRunToolchain = (CoreRunToolchain)coreRunJob.GetToolchain();
+            DotNetCliGenerator generator = (DotNetCliGenerator)coreRunToolchain.Generator;
+            Assert.Equal("net7.0", generator.TargetFrameworkMoniker);
+        }
+
+        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        public void SpecifyingCoreRunAndRuntimeCreatesTwoJobs()
+        {
+            const string runtime = "net7.0";
             var fakeDotnetCliPath = typeof(object).Assembly.Location;
             var fakeCoreRunPath = typeof(ConfigParserTests).Assembly.Location;
             var fakeRestorePackages = Path.GetTempPath();
             var config = ConfigParser.Parse(new[] { "--job=Dry", "--coreRun", fakeCoreRunPath, "--cli", fakeDotnetCliPath, "--packages", fakeRestorePackages, "-r", runtime }, new OutputLogger(Output)).config;
 
-            Assert.Single(config.GetJobs());
-            CoreRunToolchain toolchain = config.GetJobs().Single().GetToolchain() as CoreRunToolchain;
-            Assert.NotNull(toolchain);
-            Assert.Equal(runtime, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker); // runtime was provided and used
-            Assert.Equal(fakeCoreRunPath, toolchain.SourceCoreRun.FullName);
-            Assert.Equal(fakeDotnetCliPath, toolchain.CustomDotNetCliPath.FullName);
-            Assert.Equal(fakeRestorePackages, toolchain.RestorePath.FullName);
+            Assert.Equal(2, config.GetJobs().Count());
+
+            Job coreRunJob = config.GetJobs().Single(job => job.GetToolchain() is CoreRunToolchain);
+            Job runtimeJob = config.GetJobs().Single(job => job.GetToolchain() is CsProjCoreToolchain);
+
+            CoreRunToolchain coreRunToolchain = (CoreRunToolchain)coreRunJob.GetToolchain();
+            DotNetCliGenerator generator = (DotNetCliGenerator)coreRunToolchain.Generator;
+            Assert.Equal(RuntimeInformation.GetCurrentRuntime().MsBuildMoniker, generator.TargetFrameworkMoniker);
+            Assert.Equal(fakeCoreRunPath, coreRunToolchain.SourceCoreRun.FullName);
+            Assert.Equal(fakeDotnetCliPath, coreRunToolchain.CustomDotNetCliPath.FullName);
+            Assert.Equal(fakeRestorePackages, coreRunToolchain.RestorePath.FullName);
+
+            CsProjCoreToolchain coreToolchain = (CsProjCoreToolchain)runtimeJob.GetToolchain();
+            generator = (DotNetCliGenerator)coreToolchain.Generator;
+            Assert.Equal(runtime, ((DotNetCliGenerator)coreToolchain.Generator).TargetFrameworkMoniker);
+            Assert.Equal(fakeDotnetCliPath, coreToolchain.CustomDotNetCliPath);
+            Assert.Equal(fakeRestorePackages, generator.PackagesPath);
         }
 
-        [Fact]
+        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        public void FirstJobIsBaseline_RuntimesCoreRun()
+        {
+            const string runtime1 = "net5.0";
+            const string runtime2 = "net6.0";
+            string fakePath = typeof(object).Assembly.Location;
+            var config = ConfigParser.Parse(new[] { "--runtimes", runtime1, runtime2, "--coreRun", fakePath }, new OutputLogger(Output)).config;
+
+            Assert.Equal(3, config.GetJobs().Count());
+            Job baselineJob = config.GetJobs().Single(job => job.Meta.Baseline == true);
+            Assert.False(baselineJob.GetToolchain() is CoreRunToolchain);
+            Assert.Equal(runtime1, ((DotNetCliGenerator)baselineJob.GetToolchain().Generator).TargetFrameworkMoniker);
+        }
+
+        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        public void FirstJobIsBaseline_CoreRunsRuntimes()
+        {
+            const string runtime1 = "net5.0";
+            const string runtime2 = "net6.0";
+            string fakePath1 = typeof(object).Assembly.Location;
+            string fakePath2 = typeof(FactAttribute).Assembly.Location;
+            var config = ConfigParser.Parse(new[] { "--coreRun", fakePath1, fakePath2, "--runtimes", runtime1, runtime2 }, new OutputLogger(Output)).config;
+
+            Assert.Equal(4, config.GetJobs().Count());
+            Job baselineJob = config.GetJobs().Single(job => job.Meta.Baseline == true);
+            Assert.Equal(fakePath1, ((CoreRunToolchain)baselineJob.GetToolchain()).SourceCoreRun.FullName);
+        }
+
+        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
         public void UserCanSpecifyMultipleCoreRunPaths()
         {
             var fakeCoreRunPath_1 = typeof(object).Assembly.Location;
@@ -204,15 +255,16 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void CoreRtPathParsedCorrectly()
+        public void IlCompilerPathParsedCorrectly()
         {
-            var fakeCoreRtPath =  new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory;
-            var config = ConfigParser.Parse(new[] { "-r", "corert30", "--ilcPath", fakeCoreRtPath.FullName }, new OutputLogger(Output)).config;
+            var fakePath =  new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory;
+            var config = ConfigParser.Parse(new[] { "-r", "nativeaot60", "--ilcPackages", fakePath.FullName }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
-            CoreRtToolchain toolchain = config.GetJobs().Single().GetToolchain() as CoreRtToolchain;
+            NativeAotToolchain toolchain = config.GetJobs().Single().GetToolchain() as NativeAotToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(fakeCoreRtPath.FullName, toolchain.IlcPath);
+            Generator generator = (Generator)toolchain.Generator;
+            Assert.Equal(fakePath.FullName, generator.Feeds["local"]);
         }
 
         [Theory]
@@ -238,6 +290,8 @@ namespace BenchmarkDotNet.Tests
         [InlineData(ConfigOptions.DontOverwriteResults, "--noOverwrite")]
         [InlineData(ConfigOptions.StopOnFirstError, "--stopOnFirstError")]
         [InlineData(ConfigOptions.DisableLogFile, "--disableLogFile" )]
+        [InlineData(ConfigOptions.LogBuildOutput, "--logBuildOutput")]
+        [InlineData(ConfigOptions.GenerateMSBuildBinLog, "--generateBinLog")]
         [InlineData(
             ConfigOptions.JoinSummary |
             ConfigOptions.KeepBenchmarkFiles |
@@ -253,6 +307,13 @@ namespace BenchmarkDotNet.Tests
             var config = ConfigParser.Parse(configOptionArgs, new OutputLogger(Output)).config;
             Assert.Equal(expectedConfigOption, config.Options);
             Assert.NotEqual(ConfigOptions.Default, config.Options);
+        }
+
+        [Fact]
+        public void WhenConfigOptionsFlagsAreNotSpecifiedTheyAreNotSet()
+        {
+            var config = ConfigParser.Parse(Array.Empty<string>(), new OutputLogger(Output)).config;
+            Assert.Equal(ConfigOptions.Default, config.Options);
         }
 
         [Fact]
@@ -276,7 +337,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(timeoutInSeconds, ((DotNetCliBuilder)toolchain.Builder).Timeout.TotalSeconds);
+            Assert.Equal(timeoutInSeconds, config.BuildTimeout.TotalSeconds);
         }
 
         [Fact]
@@ -287,7 +348,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(NetCoreAppSettings.DefaultBuildTimeout, ((DotNetCliBuilder)toolchain.Builder).Timeout);
+            Assert.Equal(DefaultConfig.Instance.BuildTimeout, config.BuildTimeout);
         }
 
         [Theory]
@@ -336,13 +397,14 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
-            var config = ConfigParser.Parse(new[] { "--runtimes", "net461", "MONO", "netcoreapp3.0", "CoreRT30"}, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "--runtimes", "net462", "MONO", "netcoreapp3.0", "nativeaot6.0", "nativeAOT7.0"}, new OutputLogger(Output)).config;
 
             Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net461"));
+            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net462"));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp30));
-            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRtRuntime coreRtRuntime && coreRtRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRtRuntime.RuntimeMoniker == RuntimeMoniker.CoreRt30));
+            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net6.0" && nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot60));
+            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net7.0" && nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot70));
         }
 
         [Theory]
@@ -467,6 +529,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(Platform.X64)]
         [InlineData(Platform.Arm)]
         [InlineData(Platform.Arm64)]
+        [InlineData(Platform.LoongArch64)]
         public void UserCanSpecifyProcessPlatform(Platform platform)
         {
             var parsedConfig = ConfigParser.Parse(new[] { "--platform", platform.ToString() }, new OutputLogger(Output)).config;

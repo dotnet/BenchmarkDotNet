@@ -34,5 +34,27 @@ namespace BenchmarkDotNet.Characteristics
                 return (T)resolver(obj);
             throw new InvalidOperationException($"There is no default resolver for {characteristic.FullId}");
         }
+
+        public object Resolve(CharacteristicObject obj, Characteristic characteristic, object defaultValue)
+        {
+            if (obj.HasValue(characteristic))
+                return characteristic[obj];
+
+            if (resolvers.TryGetValue(characteristic, out var resolver))
+                return resolver(obj);
+
+            return defaultValue;
+        }
+
+        public T Resolve<T>(CharacteristicObject obj, Characteristic<T> characteristic, T defaultValue)
+        {
+            if (obj.HasValue(characteristic))
+                return characteristic[obj];
+
+            if (resolvers.TryGetValue(characteristic, out var resolver))
+                return (T)resolver(obj);
+
+            return defaultValue;
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
@@ -57,7 +58,7 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Equal(HardwareCounter.CacheMisses, final.GetHardwareCounters().Single());
         }
 
-        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because CoreRT compiler goes crazy when some dependency has reference to TraceEvent...")]
+        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because NativeAOT compiler goes crazy when some dependency has reference to TraceEvent...")]
         public void WhenUserDefinesHardwareCountersWeChooseTheRightDiagnoser()
         {
             var mutable = ManualConfig.CreateEmpty();
@@ -70,7 +71,7 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Single(final.GetDiagnosers().OfType<IHardwareCountersDiagnoser>());
         }
 
-        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because CoreRT compiler goes crazy when some dependency has reference to TraceEvent...")]
+        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because NativeAOT compiler goes crazy when some dependency has reference to TraceEvent...")]
         public void WhenUserDefinesHardwareCountersAndUsesDisassemblyDiagnoserWeAddInstructionPointerExporter()
         {
             var mutable = ManualConfig.CreateEmpty();
@@ -205,7 +206,7 @@ namespace BenchmarkDotNet.Tests.Configs
         public void WhenTwoConfigsAreAddedTheRegularJobsAreJustAdded()
         {
             var configWithClrJob = CreateConfigFromJobs(Job.Default.WithRuntime(CoreRuntime.Core21));
-            var configWithCoreJob = CreateConfigFromJobs(Job.Default.WithRuntime(ClrRuntime.Net461));
+            var configWithCoreJob = CreateConfigFromJobs(Job.Default.WithRuntime(ClrRuntime.Net462));
 
             foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithClrJob, configWithCoreJob))
             {
@@ -223,7 +224,7 @@ namespace BenchmarkDotNet.Tests.Configs
             const int warmupCount = 2;
             var configWithMutatorJob = CreateConfigFromJobs(Job.Default.WithWarmupCount(warmupCount).AsMutator());
             var configWithTwoStandardJobs = CreateConfigFromJobs(
-                Job.Default.WithRuntime(ClrRuntime.Net461),
+                Job.Default.WithRuntime(ClrRuntime.Net462),
                 Job.Default.WithRuntime(CoreRuntime.Core21));
 
             foreach (var added in AddLeftToTheRightAndRightToTheLef(configWithTwoStandardJobs, configWithMutatorJob))
@@ -295,6 +296,42 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Equal(final.SummaryStyle, SummaryStyle.Default);
         }
 
+        [Fact]
+        public void WhenTimeoutIsNotSpecifiedTheDefaultValueIsUsed()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+            var final = ImmutableConfigBuilder.Create(mutable);
+            Assert.Equal(DefaultConfig.Instance.BuildTimeout, final.BuildTimeout);
+        }
+
+        [Fact]
+        public void CustomTimeoutHasPrecedenceOverDefaultTimeout()
+        {
+            TimeSpan customTimeout = TimeSpan.FromSeconds(1);
+            var mutable = ManualConfig.CreateEmpty().WithBuildTimeout(customTimeout);
+
+            var final = ImmutableConfigBuilder.Create(mutable);
+
+            Assert.Equal(customTimeout, final.BuildTimeout);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void WhenTwoCustomTimeoutsAreProvidedTheLongerOneIsUsed(bool direction)
+        {
+            var oneSecond = ManualConfig.CreateEmpty().WithBuildTimeout(TimeSpan.FromSeconds(1));
+            var twoSeconds = ManualConfig.CreateEmpty().WithBuildTimeout(TimeSpan.FromSeconds(2));
+
+            if (direction)
+                oneSecond.Add(twoSeconds);
+            else
+                twoSeconds.Add(oneSecond);
+
+            var final = ImmutableConfigBuilder.Create(direction ? oneSecond : twoSeconds);
+            Assert.Equal(TimeSpan.FromSeconds(2), final.BuildTimeout);
+        }
+
         private static ManualConfig CreateConfigFromJobs(params Job[] jobs)
         {
             var config = ManualConfig.CreateEmpty();
@@ -338,6 +375,38 @@ namespace BenchmarkDotNet.Tests.Configs
 
             public string Name => nameof(TestExporterDependency);
             public void ExportToLog(Summary summary, ILogger logger) { }
+        }
+
+        [Fact]
+        public void GenerateWarningWhenExporterDependencyAlreadyExistInConfig()
+        {
+            System.Globalization.CultureInfo currentCulture = default;
+            System.Globalization.CultureInfo currentUICulture = default;
+            {
+                var ct = System.Threading.Thread.CurrentThread;
+                currentCulture = ct.CurrentCulture;
+                currentUICulture = ct.CurrentUICulture;
+                ct.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+                ct.CurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;
+            }
+            try
+            {
+                var mutable = ManualConfig.CreateEmpty();
+                mutable.AddExporter(new BenchmarkDotNet.Exporters.Csv.CsvMeasurementsExporter(BenchmarkDotNet.Exporters.Csv.CsvSeparator.Comma));
+                mutable.AddExporter(RPlotExporter.Default);
+
+                var final = ImmutableConfigBuilder.Create(mutable);
+
+                Assert.Equal(1, final.ConfigAnalysisConclusion.Count);
+            }
+            finally
+            {
+                var ct = System.Threading.Thread.CurrentThread;
+                ct.CurrentCulture = currentCulture;
+                ct.CurrentUICulture = currentUICulture;
+
+            }
+
         }
     }
 }

@@ -4,8 +4,6 @@
   href: debugging.md
 - name: Running tests
   href: running-tests.md
-- name: Development
-  href: development.md
 - name: Miscellaneous topics
   href: miscellaneous.md
 - name: Disassembler

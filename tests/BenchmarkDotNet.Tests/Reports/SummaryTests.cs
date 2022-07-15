@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Tests.Reports
         {
             // We use runtime as selector later. It is chosen as selector just to be close to initial issue. Nothing particularly special about it.
             Job coreJob = new Job(Job.Default).WithRuntime(CoreRuntime.Core20).ApplyAndFreeze(RunMode.Dry);
-            Job clrJob = new Job(Job.Default).WithRuntime(ClrRuntime.Net461).ApplyAndFreeze(RunMode.Dry);
+            Job clrJob = new Job(Job.Default).WithRuntime(ClrRuntime.Net462).ApplyAndFreeze(RunMode.Dry);
             return ManualConfig.Create(DefaultConfig.Instance).AddJob(coreJob).AddJob(clrJob);
         }
 
@@ -59,16 +59,15 @@ namespace BenchmarkDotNet.Tests.Reports
             BuildResult buildResult = BuildResult.Failure(generateResult, string.Empty);
             // Null may be legitimately passed as metrics to BenchmarkReport ctor here:
             // https://github.com/dotnet/BenchmarkDotNet/blob/89255c9fceb1b27c475a93d08c152349be4199e9/src/BenchmarkDotNet/Running/BenchmarkRunner.cs#L197
-            return new BenchmarkReport(false, benchmark, generateResult, buildResult, default, default, default, default);
+            return new BenchmarkReport(false, benchmark, generateResult, buildResult, default, default);
         }
 
         private static BenchmarkReport CreateSuccessReport(BenchmarkCase benchmark)
         {
-            GenerateResult generateResult = GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>());
+            GenerateResult generateResult = GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>(), false);
             BuildResult buildResult = BuildResult.Success(generateResult);
             var metrics = new[] { new Metric(new FakeMetricDescriptor(), Math.E) };
-            return new BenchmarkReport(true, benchmark, generateResult, buildResult,
-                Array.Empty<ExecuteResult>(), Array.Empty<Measurement>(), default, metrics);
+            return new BenchmarkReport(true, benchmark, generateResult, buildResult, Array.Empty<ExecuteResult>(), metrics);
         }
 
         private static Summary CreateSummary(IList<BenchmarkReport> reports)

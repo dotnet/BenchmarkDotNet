@@ -36,8 +36,6 @@ namespace BenchmarkDotNet.Reports
             GenerateResult generateResult,
             BuildResult buildResult,
             IReadOnlyList<ExecuteResult> executeResults,
-            IReadOnlyList<Measurement> allMeasurements,
-            GcStats gcStats,
             IReadOnlyList<Metric> metrics)
         {
             Success = success;
@@ -45,8 +43,8 @@ namespace BenchmarkDotNet.Reports
             GenerateResult = generateResult;
             BuildResult = buildResult;
             ExecuteResults = executeResults ?? Array.Empty<ExecuteResult>();
-            AllMeasurements = allMeasurements ?? Array.Empty<Measurement>();
-            GcStats = gcStats;
+            AllMeasurements = ExecuteResults.SelectMany((results, index) => results.Measurements).ToArray();
+            GcStats = ExecuteResults.Count > 0 ? executeResults[executeResults.Count -1].GcStats : default;
             Metrics = metrics?.ToDictionary(metric => metric.Descriptor.Id)
                 ?? (IReadOnlyDictionary<string, Metric>)ImmutableDictionary<string, Metric>.Empty;
         }

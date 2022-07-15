@@ -16,30 +16,40 @@ namespace BenchmarkDotNet.Running
 {
     public static partial class BenchmarkConverter
     {
+        private const BindingFlags AllMethodsFlags =  BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
         public static BenchmarkRunInfo TypeToBenchmarks(Type type, IConfig config = null)
         {
             if (type.IsGenericTypeDefinition)
                 throw new ArgumentException($"{type.Name} is generic type definition, use BenchmarkSwitcher for it"); // for "open generic types" should be used BenchmarkSwitcher
 
             // We should check all methods including private to notify users about private methods with the [Benchmark] attribute
-            var bindingFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-            var benchmarkMethods = type.GetMethods(bindingFlags).Where(method => method.HasAttribute<BenchmarkAttribute>()).ToArray();
+            var benchmarkMethods = GetOrderedBenchmarkMethods(type.GetMethods(AllMethodsFlags));
 
             return MethodsToBenchmarksWithFullConfig(type, benchmarkMethods, config);
         }
 
         public static BenchmarkRunInfo MethodsToBenchmarks(Type containingType, MethodInfo[] benchmarkMethods, IConfig config = null)
-            => MethodsToBenchmarksWithFullConfig(containingType, benchmarkMethods, config);
+            => MethodsToBenchmarksWithFullConfig(containingType, GetOrderedBenchmarkMethods(benchmarkMethods), config);
+
+        private static MethodInfo[] GetOrderedBenchmarkMethods(MethodInfo[] methods)
+            => methods
+                .Select(method => (method, attribute: method.ResolveAttribute<BenchmarkAttribute>()))
+                .Where(pair => pair.attribute is not null)
+                .OrderBy(pair => pair.attribute.SourceCodeFile)
+                .ThenBy(pair => pair.attribute.SourceCodeLineNumber)
+                .Select(pair => pair.method)
+                .ToArray();
 
         private static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type type, MethodInfo[] benchmarkMethods, IConfig config)
         {
-            var allPublicMethods = type.GetMethods(); // benchmarkMethods can be filtered, without Setups, look #564
+            var allMethods = type.GetMethods(AllMethodsFlags); // benchmarkMethods can be filtered, without Setups, look #564
             var configPerType = GetFullTypeConfig(type, config);
 
-            var globalSetupMethods = GetAttributedMethods<GlobalSetupAttribute>(allPublicMethods, "GlobalSetup");
-            var globalCleanupMethods = GetAttributedMethods<GlobalCleanupAttribute>(allPublicMethods, "GlobalCleanup");
-            var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(allPublicMethods, "IterationSetup");
-            var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(allPublicMethods, "IterationCleanup");
+            var globalSetupMethods = GetAttributedMethods<GlobalSetupAttribute>(allMethods, "GlobalSetup");
+            var globalCleanupMethods = GetAttributedMethods<GlobalCleanupAttribute>(allMethods, "GlobalCleanup");
+            var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(allMethods, "IterationSetup");
+            var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(allMethods, "IterationCleanup");
 
             var targets = GetTargets(benchmarkMethods, type, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
 
@@ -79,7 +89,7 @@ namespace BenchmarkDotNet.Running
             var typeAttributes = type.GetCustomAttributes(true).OfType<IConfigSource>();
             var assemblyAttributes = type.Assembly.GetCustomAttributes().OfType<IConfigSource>();
 
-            foreach (var configFromAttribute in typeAttributes.Concat(assemblyAttributes))
+            foreach (var configFromAttribute in assemblyAttributes.Concat(typeAttributes))
                 config = ManualConfig.Union(config, configFromAttribute.Config);
 
             return ImmutableConfigBuilder.Create(config);
@@ -108,7 +118,6 @@ namespace BenchmarkDotNet.Running
             Tuple<MethodInfo, TargetedAttribute>[] iterationCleanupMethods)
         {
             return targetMethods
-                .Where(m => m.HasAttribute<BenchmarkAttribute>())
                 .Select(methodInfo => CreateDescriptor(type,
                                                    GetTargetedMatchingMethod(methodInfo, globalSetupMethods),
                                                    methodInfo,
@@ -127,8 +136,8 @@ namespace BenchmarkDotNet.Running
             return methods.SelectMany(m => m.GetCustomAttributes<T>()
                 .Select(attr =>
                 {
-                    AssertMethodHasCorrectSignature(methodName, m);
                     AssertMethodIsAccessible(methodName, m);
+                    AssertMethodHasCorrectSignature(methodName, m);
                     AssertMethodIsNotGeneric(methodName, m);
 
                     return new Tuple<MethodInfo, TargetedAttribute>(m, attr);

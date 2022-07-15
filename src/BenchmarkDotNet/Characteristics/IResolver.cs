@@ -10,5 +10,9 @@
         object Resolve(CharacteristicObject obj, Characteristic characteristic);
 
         T Resolve<T>(CharacteristicObject obj, Characteristic<T> characteristic);
+
+        object Resolve(CharacteristicObject obj, Characteristic characteristic, object defaultValue);
+
+        T Resolve<T>(CharacteristicObject obj, Characteristic<T> characteristic, T defaultValue);
     }
 }

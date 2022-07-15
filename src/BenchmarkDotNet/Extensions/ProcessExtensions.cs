@@ -10,7 +10,9 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CoreRun;
+using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using JetBrains.Annotations;
+
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -83,6 +85,9 @@ namespace BenchmarkDotNet.Extensions
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
 
+            if (!RuntimeInformation.IsWindows() && !RuntimeInformation.IsLinux())
+                return false;
+
             try
             {
                 process.ProcessorAffinity = FixAffinity(processorAffinity);
@@ -101,6 +106,9 @@ namespace BenchmarkDotNet.Extensions
         {
             if (process == null)
                 throw new ArgumentNullException(nameof(process));
+
+            if (!RuntimeInformation.IsWindows() && !RuntimeInformation.IsLinux())
+                return null;
 
             try
             {
@@ -128,6 +136,16 @@ namespace BenchmarkDotNet.Extensions
 
             // disable ReSharper's Dynamic Program Analysis (see https://github.com/dotnet/BenchmarkDotNet/issues/1871 for details)
             start.EnvironmentVariables["JETBRAINS_DPA_AGENT_ENABLE"] = "0";
+
+            if (benchmarkCase.Job.Infrastructure.Toolchain is MonoAotLLVMToolChain)
+            {
+                MonoAotLLVMRuntime aotruntime = (MonoAotLLVMRuntime)benchmarkCase.GetRuntime();
+
+                if (aotruntime.AOTCompilerMode == MonoAotCompilerMode.llvm)
+                {
+                    start.EnvironmentVariables["MONO_ENV_OPTIONS"] = "--llvm";
+                }
+            }
 
             if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
                 return;
