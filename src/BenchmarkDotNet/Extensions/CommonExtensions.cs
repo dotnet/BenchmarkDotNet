@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Extensions
                 hashSet.Add(item);
         }
 
-#if NETSTANDARD
+#if NETSTANDARD2_0
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
             => dictionary.TryGetValue(key, out var value) ? value : default;
 #endif
