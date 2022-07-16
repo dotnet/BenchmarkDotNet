@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Jobs
         public EnvironmentVariable(string key, string value)
         {
             Key = key ?? throw new ArgumentNullException(nameof(key));
-            Value = value ?? throw new ArgumentNullException(nameof(Value));
+            Value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         public string Key { get; }
