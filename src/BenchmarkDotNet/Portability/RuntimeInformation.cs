@@ -47,6 +47,7 @@ namespace BenchmarkDotNet.Portability
 
         public static bool IsWasm => IsOSPlatform(OSPlatform.Create("BROWSER"));
 
+#if NETSTANDARD2_0
         public static bool IsAot { get; } = IsAotMethod(); // This allocates, so we only want to call it once statically.
 
         private static bool IsAotMethod()
@@ -64,6 +65,9 @@ namespace BenchmarkDotNet.Portability
 
             return false;
         }
+#else
+        public static bool IsAot => !System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
+#endif
 
         public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
 
