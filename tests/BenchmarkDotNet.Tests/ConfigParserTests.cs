@@ -357,6 +357,8 @@ namespace BenchmarkDotNet.Tests
         [InlineData("net47")]
         [InlineData("net471")]
         [InlineData("net472")]
+        [InlineData("net48")]
+        [InlineData("net481")]
         public void NetFrameworkMonikerParsedCorrectly(string tfm)
         {
             var config = ConfigParser.Parse(new[] { "-r", tfm }, new OutputLogger(Output)).config;
