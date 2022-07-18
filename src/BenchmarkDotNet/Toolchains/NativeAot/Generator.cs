@@ -167,7 +167,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         {
             string instructionSet = ilcInstructionSet ?? GetCurrentInstructionSet(buildPartition.Platform);
             return !string.IsNullOrEmpty(instructionSet)
-                ? $@"<IlcArg Include=""--instructionset:{instructionSet}"" />"
+                ? $@"<IlcArg Include=""--instruction-set:{instructionSet}"" />"
                 : "";
         }
 
