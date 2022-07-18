@@ -20,6 +20,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI] public static readonly IToolchain Net471 = new CsProjClassicNetToolchain("net471", ".NET Framework 4.7.1");
         [PublicAPI] public static readonly IToolchain Net472 = new CsProjClassicNetToolchain("net472", ".NET Framework 4.7.2");
         [PublicAPI] public static readonly IToolchain Net48 = new CsProjClassicNetToolchain("net48", ".NET Framework 4.8");
+        [PublicAPI] public static readonly IToolchain Net481 = new CsProjClassicNetToolchain("net481", ".NET Framework 4.8.1");
 
         private CsProjClassicNetToolchain(string targetFrameworkMoniker, string name, string packagesPath = null)
             : base(name,
