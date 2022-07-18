@@ -22,6 +22,8 @@ namespace BenchmarkDotNet.Extensions
                     return ClrRuntime.Net472;
                 case RuntimeMoniker.Net48:
                     return ClrRuntime.Net48;
+                case RuntimeMoniker.Net481:
+                    return ClrRuntime.Net481;
                 case RuntimeMoniker.NetCoreApp20:
                     return CoreRuntime.Core20;
                 case RuntimeMoniker.NetCoreApp21:

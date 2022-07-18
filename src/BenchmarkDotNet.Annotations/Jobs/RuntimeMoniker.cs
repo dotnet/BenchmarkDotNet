@@ -50,6 +50,11 @@ namespace BenchmarkDotNet.Jobs
         Net48,
 
         /// <summary>
+        /// .NET 4.8.1
+        /// </summary>
+        Net481,
+
+        /// <summary>
         /// .NET Core 2.0
         /// </summary>
         NetCoreApp20,
