@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Portability.Cpu
 {
     /// <summary>
-    /// CPU information from output of the `wmic get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List` command.
+    /// CPU information from output of the `wmic cpu get Name, NumberOfCores, NumberOfLogicalProcessors /Format:List` command.
     /// Windows only.
     /// </summary>
     internal static class WmicCpuInfoProvider
