@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Disassemblers
         internal LinuxDisassembler(DisassemblyDiagnoserConfig config) => this.config = config;
 
         internal DisassemblyResult Disassemble(DiagnoserActionParameters parameters)
-            => ClrMdDisassembler.AttachAndDisassemble(BuildDisassemblerSettings(parameters));
+            => ClrMdV2Disassembler.AttachAndDisassemble(BuildDisassemblerSettings(parameters));
 
         private Settings BuildDisassemblerSettings(DiagnoserActionParameters parameters)
             => new Settings(
