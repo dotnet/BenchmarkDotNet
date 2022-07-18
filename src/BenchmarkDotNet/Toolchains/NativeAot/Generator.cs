@@ -137,6 +137,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
     <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+    {GetInstructionSetSettings(buildPartition)}
   </PropertyGroup>
   {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
   <ItemGroup>
@@ -152,9 +153,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
   <ItemGroup>
     {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
-  <ItemGroup>
-    {GetInstructionSetSettings(buildPartition)}
-  </ItemGroup>
 </Project>";
 
         private string GetTrimmingSettings()
@@ -166,9 +164,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         private string GetInstructionSetSettings(BuildPartition buildPartition)
         {
             string instructionSet = ilcInstructionSet ?? GetCurrentInstructionSet(buildPartition.Platform);
-            return !string.IsNullOrEmpty(instructionSet)
-                ? $@"<IlcArg Include=""--instructionset:{instructionSet}"" />"
-                : "";
+            return !string.IsNullOrEmpty(instructionSet) ? $"<IlcInstructionSet>{instructionSet}</IlcInstructionSet>" : "";
         }
 
         public IEnumerable<string> GetRdXmlFiles(Type benchmarkTarget, ILogger logger)
