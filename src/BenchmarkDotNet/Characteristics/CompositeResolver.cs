@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace BenchmarkDotNet.Characteristics
@@ -25,7 +26,7 @@ namespace BenchmarkDotNet.Characteristics
             throw new InvalidOperationException($"There is no default resolver for {characteristic.FullId}");
         }
 
-        public T Resolve<T>(CharacteristicObject obj, Characteristic<T> characteristic)
+        public T Resolve<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(CharacteristicObject obj, Characteristic<T> characteristic)
         {
             if (obj.HasValue(characteristic))
                 return characteristic[obj];
@@ -47,7 +48,7 @@ namespace BenchmarkDotNet.Characteristics
             return defaultValue;
         }
 
-        public T Resolve<T>(CharacteristicObject obj, Characteristic<T> characteristic, T defaultValue)
+        public T Resolve<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(CharacteristicObject obj, Characteristic<T> characteristic, T defaultValue)
         {
             if (obj.HasValue(characteristic))
                 return characteristic[obj];

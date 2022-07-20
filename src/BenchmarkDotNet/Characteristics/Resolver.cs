@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Characteristics
 {
@@ -7,10 +8,10 @@ namespace BenchmarkDotNet.Characteristics
     {
         private readonly Dictionary<Characteristic, Func<CharacteristicObject, object>> resolvers = new Dictionary<Characteristic, Func<CharacteristicObject, object>>();
 
-        protected void Register<T>(Characteristic<T> characteristic, Func<T> resolver) =>
+        protected void Register<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, Func<T> resolver) =>
             resolvers[characteristic] = obj => resolver();
 
-        protected void Register<T>(Characteristic<T> characteristic, Func<CharacteristicObject, T> resolver) =>
+        protected void Register<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, Func<CharacteristicObject, T> resolver) =>
             resolvers[characteristic] = obj => resolver(obj);
 
         public bool CanResolve(Characteristic characteristic) => resolvers.ContainsKey(characteristic);
@@ -25,7 +26,7 @@ namespace BenchmarkDotNet.Characteristics
             throw new InvalidOperationException($"There is no default resolver for {characteristic.FullId}");
         }
 
-        public T Resolve<T>(CharacteristicObject obj, Characteristic<T> characteristic)
+        public T Resolve<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(CharacteristicObject obj, Characteristic<T> characteristic)
         {
             if (obj.HasValue(characteristic))
                 return characteristic[obj];
@@ -46,7 +47,7 @@ namespace BenchmarkDotNet.Characteristics
             return defaultValue;
         }
 
-        public T Resolve<T>(CharacteristicObject obj, Characteristic<T> characteristic, T defaultValue)
+        public T Resolve<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(CharacteristicObject obj, Characteristic<T> characteristic, T defaultValue)
         {
             if (obj.HasValue(characteristic))
                 return characteristic[obj];

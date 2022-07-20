@@ -44,6 +44,10 @@
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj" />
   </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <Compile Include="..\BenchmarkDotNet.Annotations\Attributes\DynamicallyAccessedMembersAttribute.cs" Link="Properties\DynamicallyAccessedMembersAttribute.cs" />
+    <Compile Include="..\BenchmarkDotNet.Annotations\Attributes\DynamicallyAccessedMemberTypes.cs" Link="Properties\DynamicallyAccessedMemberTypes.cs" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="..\BenchmarkDotNet.Disassembler.x64\DataContracts.cs" Link="Disassemblers\DataContracts.cs" />
   </ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
@@ -39,14 +40,16 @@ namespace BenchmarkDotNet.Characteristics
         [PublicAPI] public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(this CharacteristicObject obj) =>
             GetThisTypeCharacteristics(obj.GetType());
 
-        public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(Type characteristicObjectType)
+        public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(
+            [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] Type characteristicObjectType)
         {
             if (!IsCharacteristicObjectSubclass(characteristicObjectType))
                 return EmptyCharacteristics;
             return ThisTypeCharacteristics.GetOrAdd(characteristicObjectType, GetThisTypeCharacteristicsCore);
         }
 
-        private static IReadOnlyList<Characteristic> GetThisTypeCharacteristicsCore(Type characteristicObjectType)
+        private static IReadOnlyList<Characteristic> GetThisTypeCharacteristicsCore(
+            [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] Type characteristicObjectType)
         {
             var fieldValues = characteristicObjectType.GetTypeInfo()
                 .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Static)
@@ -73,14 +76,16 @@ namespace BenchmarkDotNet.Characteristics
         public static IReadOnlyList<Characteristic> GetAllCharacteristics(this CharacteristicObject obj) =>
             GetAllCharacteristics(obj.GetType());
 
-        public static IReadOnlyList<Characteristic> GetAllCharacteristics(Type characteristicObjectType)
+        public static IReadOnlyList<Characteristic> GetAllCharacteristics(
+            [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] Type characteristicObjectType)
         {
             if (!IsCharacteristicObjectSubclass(characteristicObjectType))
                 return EmptyCharacteristics;
             return AllTypeCharacteristics.GetOrAdd(characteristicObjectType, GetAllCharacteristicsCore);
         }
 
-        private static IReadOnlyList<Characteristic> GetAllCharacteristicsCore(Type characteristicObjectType)
+        private static IReadOnlyList<Characteristic> GetAllCharacteristicsCore(
+            [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] Type characteristicObjectType)
         {
             var result = new List<Characteristic>();
 
@@ -90,7 +95,8 @@ namespace BenchmarkDotNet.Characteristics
         }
 
         private static void FillAllCharacteristicsCore(
-            Type characteristicObjectType, List<Characteristic> result, HashSet<Characteristic> visited)
+            [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] Type characteristicObjectType,
+            List<Characteristic> result, HashSet<Characteristic> visited)
         {
             // DONTTOUCH: DO NOT change the order of characteristic as it may break logic of some operations.
 
@@ -113,7 +119,9 @@ namespace BenchmarkDotNet.Characteristics
             }
         }
 
-        public static IReadOnlyList<Characteristic> GetAllPresentableCharacteristics(Type characteristicObjectType, bool includeIgnoreOnApply = false) =>
+        public static IReadOnlyList<Characteristic> GetAllPresentableCharacteristics(
+            [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] Type characteristicObjectType,
+            bool includeIgnoreOnApply = false) =>
             GetAllCharacteristics(characteristicObjectType)
                 .Where(c => c.IsPresentableCharacteristic(includeIgnoreOnApply))
                 .ToArray();
