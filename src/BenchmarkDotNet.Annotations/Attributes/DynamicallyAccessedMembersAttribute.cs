@@ -23,7 +23,7 @@ namespace System.Diagnostics.CodeAnalysis
     /// </remarks>
     [AttributeUsage(
         AttributeTargets.Field | AttributeTargets.ReturnValue | AttributeTargets.GenericParameter |
-        AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Method,
+        AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Class,
         Inherited = false)]
     internal sealed class DynamicallyAccessedMembersAttribute : Attribute
     {
