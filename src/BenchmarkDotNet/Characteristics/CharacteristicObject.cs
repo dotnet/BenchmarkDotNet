@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 
+using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
+
 namespace BenchmarkDotNet.Characteristics
 {
     // TODO: better naming.
