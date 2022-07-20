@@ -189,7 +189,8 @@ namespace BenchmarkDotNet.Code
             return new NonVoidDeclarationsProvider(descriptor);
         }
 
-        private static string GetParamsContent(BenchmarkCase benchmarkCase)
+        // internal for tests
+        internal static string GetParamsContent(BenchmarkCase benchmarkCase)
             => string.Join(
                 string.Empty,
                 benchmarkCase.Parameters.Items

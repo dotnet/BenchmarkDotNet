@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
@@ -54,18 +54,16 @@ namespace BenchmarkDotNet.IntegrationTests
         private Summary CanExecuteWithExtraInfo(Type type, IToolchain toolchain)
         {
             IConfig config = CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain));
-            // Show the relevant codegen excerpt in test results (the *.notcs is not part of the logs)
-            // This uses the private static CodeGenerator.GetParamsContent() method.
-            // Method changes there must be applied here - or consider making the method internal.
-            // TODO Should we omit the extra info if (toolchain.IsInProcess)? Doesn't use GetParamsContent().
-            Output.WriteLine("// Benchmarks and CodeGenerator.GetParamsContent()");
-            BenchmarkRunInfo runInfo = BenchmarkConverter.TypeToBenchmarks(type, config);
-            MethodInfo getParamsContent = typeof(Code.CodeGenerator).GetMethod("GetParamsContent", BindingFlags.Static | BindingFlags.NonPublic, null, new[] { typeof(BenchmarkCase) }, null);
-            Assert.NotNull(getParamsContent);
-            foreach (BenchmarkCase benchmarkCase in runInfo.BenchmarksCases)
+            if (!toolchain.IsInProcess)
             {
-                Output.WriteLine("//   " + benchmarkCase.DisplayInfo);
-                Output.WriteLine((string)getParamsContent.Invoke(null, new object[] { benchmarkCase }));
+                // Show the relevant codegen excerpt in test results (the *.notcs is not part of the logs)
+                Output.WriteLine("// Benchmarks and CodeGenerator.GetParamsContent()");
+                BenchmarkRunInfo runInfo = BenchmarkConverter.TypeToBenchmarks(type, config);
+                foreach (BenchmarkCase benchmarkCase in runInfo.BenchmarksCases)
+                {
+                    Output.WriteLine("//   " + benchmarkCase.DisplayInfo);
+                    Output.WriteLine(CodeGenerator.GetParamsContent(benchmarkCase));
+                }
             }
             return CanExecute(type, config);
         }
@@ -125,7 +123,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public IEnumerable<IEnumerable<ITargetInterface>> GetSource()
             {
-                IEnumerable<ITargetInterface> YieldNull() { yield return null; }
+                static IEnumerable<ITargetInterface> YieldNull() { yield return null; }
                 yield return null;
                 yield return Enumerable.Empty<NonPublicSource>();
                 yield return YieldNull();
@@ -165,9 +163,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public int Data { get; }
             public PublicSource(int data) => Data = data;
-            // Notes:
-            // - op_Implicit would be meaningless since codegen wouldn't have to do anything.
-            // - TODO op_Explicit is currently not supported by InProcessEmitToolchain (See TryChangeType() in Toolchains/InProcess.Emit.Implementation/Runnable/RunnableReflectionHelpers.cs)
+            // op_Implicit would be meaningless because codegen wouldn't have to do anything.
             public static explicit operator TargetType(PublicSource @this) => @this != null ? new TargetType(@this.Data) : null;
             public override string ToString() => "src " + Data.ToString();
         }
@@ -201,7 +197,11 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void SourceWithExplicitCastToTarget_InProcessToolchain_Throws()
         {
-            // See notes on op_Explicit above.
+            // op_Explicit is currently not supported by InProcessEmitToolchain
+            // See TryChangeType() in Toolchains/InProcess.Emit.Implementation/Runnable/RunnableReflectionHelpers.cs
+            // If that changes, this test and the one above should be merged into:
+            //   [Theory, MemberData(nameof(GetToolchains))]
+            //   public void SourceWithExplicitCastToTarget_Succeeds(IToolchain toolchain) => CanExecuteWithExtraInfo(typeof(SourceWithExplicitCastToTarget), toolchain);
             Assert.ThrowsAny<Exception>(() => CanExecuteWithExtraInfo(typeof(SourceWithExplicitCastToTarget), InProcessEmitToolchain.Instance));
         }
     }
