@@ -144,9 +144,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
   </ItemGroup>
   <ItemGroup>
-    <TrimmerRootAssembly Include=""BenchmarkDotNet"" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
