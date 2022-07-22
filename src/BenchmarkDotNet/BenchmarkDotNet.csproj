@@ -8,6 +8,8 @@
     <AssemblyName>BenchmarkDotNet</AssemblyName>
     <PackageId>BenchmarkDotNet</PackageId>
     <RootNamespace>BenchmarkDotNet</RootNamespace>
+    <!-- needed for docfx xref resolver -->
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\*" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
