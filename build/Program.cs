@@ -453,8 +453,11 @@ public class DocfxChangelogGenerateTask : FrostingTask<BuildContext>
     }
 }
 
+// In order to work around xref issues in DocFx, BenchmarkDotNet and BenchmarkDotNet.Annotations must be build
+// before running the DocFX_Build target. However, including a dependency on BuildTask here may have unwanted
+// side effects (CleanTask).
+// TODO: Define dependencies when a CI workflow scenario for using the "DocFX_Build" target exists.
 [TaskName("DocFX_Build")]
-[IsDependentOn(typeof(BuildTask))] // Required to fix dofx xref issues
 [IsDependentOn(typeof(DocfxInstallTask))]
 [IsDependentOn(typeof(DocfxChangelogGenerateTask))]
 public class DocfxChangelogBuildTask : FrostingTask<BuildContext>
