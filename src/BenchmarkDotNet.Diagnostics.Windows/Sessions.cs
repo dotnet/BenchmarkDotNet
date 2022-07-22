@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             try
             {
-                TraceEventSession.EnableKernelProvider(keywords, KernelTraceEventParser.Keywords.Profile);
+                TraceEventSession.EnableKernelProvider(keywords, Config.KernelStackKeywords);
             }
             catch (Win32Exception)
             {

@@ -18,6 +18,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public float CpuSampleIntervalInMilliseconds { get; }
 
         public KernelTraceEventParser.Keywords KernelKeywords { get; }
+        public KernelTraceEventParser.Keywords KernelStackKeywords { get; }
 
         public IReadOnlyDictionary<HardwareCounter, Func<ProfileSourceInfo, int>> IntervalSelectors { get; }
 
@@ -37,12 +38,14 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             int bufferSizeInMb = 256,
             float cpuSampleIntervalInMilliseconds = 1.0f,
             KernelTraceEventParser.Keywords kernelKeywords = KernelTraceEventParser.Keywords.ImageLoad | KernelTraceEventParser.Keywords.Profile,
+            KernelTraceEventParser.Keywords kernelStackKeywords = KernelTraceEventParser.Keywords.Profile,
             IReadOnlyDictionary<HardwareCounter, Func<ProfileSourceInfo, int>> intervalSelectors = null,
             IReadOnlyCollection<(Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)> providers = null,
             bool createHeapSession = false)
         {
             CreateHeapSession = createHeapSession;
             KernelKeywords = kernelKeywords;
+            KernelStackKeywords = kernelStackKeywords;
             PerformExtraBenchmarksRun = performExtraBenchmarksRun;
             BufferSizeInMb = bufferSizeInMb;
             CpuSampleIntervalInMilliseconds = cpuSampleIntervalInMilliseconds;
