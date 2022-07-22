@@ -58,6 +58,7 @@ public class BuildContext : FrostingContext
 
     private IAppVeyorProvider AppVeyor => this.BuildSystem().AppVeyor;
     public bool IsOnAppVeyorAndNotPr => AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest;
+    public bool IsOnAppVeyorAndBdnNightlyCiCd => IsOnAppVeyorAndNotPr && AppVeyor.Environment.Repository.Branch == "master" && this.IsRunningOnWindows();
     public bool IsLocalBuild => this.BuildSystem().IsLocalBuild;
     public bool IsCiBuild => !this.BuildSystem().IsLocalBuild;
 
@@ -360,6 +361,11 @@ public class AllTestsTask : FrostingTask<BuildContext>
 [IsDependentOn(typeof(BuildTask))]
 public class PackTask : FrostingTask<BuildContext>
 {
+    public override bool ShouldRun(BuildContext context)
+    {
+        return context.IsOnAppVeyorAndBdnNightlyCiCd;
+    }
+
     public override void Run(BuildContext context)
     {
         var settingsSrc = new DotNetCorePackSettings
