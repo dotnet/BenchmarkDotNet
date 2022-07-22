@@ -1,0 +1,4 @@
+apiRules:
+- exclude:
+    uidRegex: ^System\.Object
+    type: member # Avoid list of inherited Object members for each type.

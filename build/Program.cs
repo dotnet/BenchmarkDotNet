@@ -202,7 +202,7 @@ public class BuildContext : FrostingContext
 
 public static class DocumentationHelper
 {
-    public const string DocFxVersion = "2.57.2";
+    public const string DocFxVersion = "2.59.3";
 
     public static readonly string[] BdnAllVersions =
     {
@@ -454,6 +454,7 @@ public class DocfxChangelogGenerateTask : FrostingTask<BuildContext>
 }
 
 [TaskName("DocFX_Build")]
+[IsDependentOn(typeof(BuildTask))] // Required to fix dofx xref issues
 [IsDependentOn(typeof(DocfxInstallTask))]
 [IsDependentOn(typeof(DocfxChangelogGenerateTask))]
 public class DocfxChangelogBuildTask : FrostingTask<BuildContext>

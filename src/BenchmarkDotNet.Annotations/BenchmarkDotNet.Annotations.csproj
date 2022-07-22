@@ -7,6 +7,8 @@
     <AssemblyName>BenchmarkDotNet.Annotations</AssemblyName>
     <PackageId>BenchmarkDotNet.Annotations</PackageId>
     <RootNamespace>BenchmarkDotNet</RootNamespace>
+    <!-- needed for docfx xref resolver -->
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\BenchmarkDotNet\Helpers\CodeAnnotations.cs" Link="Attributes\CodeAnnotations.cs" />
