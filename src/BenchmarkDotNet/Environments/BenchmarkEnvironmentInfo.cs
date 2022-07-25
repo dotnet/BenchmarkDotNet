@@ -6,7 +6,6 @@ using System.Runtime;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
@@ -23,6 +22,7 @@ namespace BenchmarkDotNet.Environments
         [PublicAPI] public bool HasAttachedDebugger { get; protected set; }
         [PublicAPI] public bool HasRyuJit { get; protected set; }
         [PublicAPI] public string JitInfo { get; protected set; }
+        [PublicAPI] public string HardwareIntrinsics { get; protected set; }
         [PublicAPI] public bool IsServerGC { get; protected set; }
         [PublicAPI] public bool IsConcurrentGC { get; protected set; }
         [PublicAPI] public long GCAllocationQuantum { get; protected set; }
@@ -35,6 +35,7 @@ namespace BenchmarkDotNet.Environments
             Configuration = RuntimeInformation.GetConfiguration();
             HasRyuJit = RuntimeInformation.HasRyuJit();
             JitInfo = RuntimeInformation.GetJitInfo();
+            HardwareIntrinsics = RuntimeInformation.GetHardwareIntrinsics();
             IsServerGC = GCSettings.IsServerGC;
             IsConcurrentGC = GCSettings.LatencyMode != GCLatencyMode.Batch;
             HasAttachedDebugger = Debugger.IsAttached;
@@ -62,7 +63,7 @@ namespace BenchmarkDotNet.Environments
 
         internal string GetRuntimeInfo()
         {
-            string jitInfo = string.Join(" ", new[] { JitInfo, GetHardwareIntrinsics(), GetConfigurationFlag(), GetDebuggerFlag() }.Where(title => title != ""));
+            string jitInfo = string.Join(" ", new[] { JitInfo, HardwareIntrinsics, GetConfigurationFlag(), GetDebuggerFlag() }.Where(title => title != ""));
             return $"{RuntimeVersion}, {Architecture} {jitInfo}";
         }
 
@@ -74,30 +75,6 @@ namespace BenchmarkDotNet.Environments
             var currentRuntime = RuntimeInformation.GetCurrentRuntime();
             if (job.Environment.Jit == Jit.LegacyJit && !(currentRuntime is ClrRuntime))
                 yield return new ValidationError(true, $"LegacyJIT is requested but it is not available for {currentRuntime}");
-        }
-
-        private static string GetHardwareIntrinsics()
-        {
-            if (HardwareIntrinsics.IsX86Avx2Supported)
-                return "AVX2";
-            else if (HardwareIntrinsics.IsX86AvxSupported)
-                return "AVX";
-            else if (HardwareIntrinsics.IsX86Sse42Supported)
-                return "SSE4.2";
-            else if (HardwareIntrinsics.IsX86Sse41Supported)
-                return "SSE4.1";
-            else if (HardwareIntrinsics.IsX86Sse3Supported)
-                return "SSE3";
-            else if (HardwareIntrinsics.IsX86Sse2Supported)
-                return "SSE2";
-            else if (HardwareIntrinsics.IsX86SseSupported)
-                return "SSE";
-            else if (HardwareIntrinsics.IsArmAdvSimdSupported)
-                return "AdvSIMD";
-            else if (HardwareIntrinsics.IsArmBaseSupported)
-                return "base";
-            else
-                return string.Empty;
         }
     }
 }
