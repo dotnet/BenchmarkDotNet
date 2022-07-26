@@ -319,39 +319,6 @@ namespace BenchmarkDotNet.Portability
             return isDebug.Value ? DebugConfigurationName : ReleaseConfigurationName;
         }
 
-        internal static string GetHardwareIntrinsics()
-        {
-            if (HardwareIntrinsics.IsX86Avx2Supported)
-                return "AVX2";
-            else if (HardwareIntrinsics.IsX86AvxSupported)
-                return "AVX";
-            else if (HardwareIntrinsics.IsX86Sse42Supported)
-                return "SSE4.2";
-            else if (HardwareIntrinsics.IsX86Sse41Supported)
-                return "SSE4.1";
-            else if (HardwareIntrinsics.IsX86Sse3Supported)
-                return "SSE3";
-            else if (HardwareIntrinsics.IsX86Sse2Supported)
-                return "SSE2";
-            else if (HardwareIntrinsics.IsX86SseSupported)
-                return "SSE";
-            else if (HardwareIntrinsics.IsArmAdvSimdSupported)
-                return "AdvSIMD";
-            else if (HardwareIntrinsics.IsArmBaseSupported)
-                return "base";
-            else
-                return string.Empty;
-        }
-
-        internal static string GetVectorSize()
-        {
-#if NET6_0_OR_GREATER
-            if (Vector.IsHardwareAccelerated)
-                return $"VectorSize={Vector<byte>.Count*8}";
-#endif
-            return string.Empty;
-        }
-
         // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/
         private class JitHelper
         {

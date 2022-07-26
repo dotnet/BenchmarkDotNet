@@ -212,10 +212,10 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         }
 
         private string GetCurrentInstructionSet(Platform platform)
-            => string.Join(",", GetHostProcessInstructionSets(platform));
+            => string.Join(",", GetCurrentProcessInstructionSets(platform));
 
         // based on https://github.com/dotnet/runtime/blob/ce61c09a5f6fc71d8f717d3fc4562f42171869a0/src/coreclr/tools/Common/JitInterface/CorInfoInstructionSet.cs#L727
-        private static IEnumerable<string> GetHostProcessInstructionSets(Platform platform)
+        private static IEnumerable<string> GetCurrentProcessInstructionSets(Platform platform)
         {
             switch (platform)
             {

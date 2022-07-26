@@ -1,6 +1,9 @@
-﻿#if NET6_0_OR_GREATER
+﻿using System.Collections.Generic;
+using BenchmarkDotNet.Environments;
+#if NET6_0_OR_GREATER
 using System.Runtime.Intrinsics.X86;
 using System.Runtime.Intrinsics.Arm;
+using System.Numerics;
 #elif NETSTANDARD2_0_OR_GREATER
 using System;
 #endif
@@ -9,6 +12,83 @@ namespace BenchmarkDotNet.Portability.Cpu
 {
     internal static class HardwareIntrinsics
     {
+        internal static string GetVectorSize()
+        {
+#if NET6_0_OR_GREATER
+            if (Vector.IsHardwareAccelerated)
+                return $"VectorSize={Vector<byte>.Count * 8}";
+#endif
+            return string.Empty;
+        }
+
+        internal static string GetShortInfo()
+        {
+            if (IsX86Avx2Supported)
+                return "AVX2";
+            else if (IsX86AvxSupported)
+                return "AVX";
+            else if (IsX86Sse42Supported)
+                return "SSE4.2";
+            else if (IsX86Sse41Supported)
+                return "SSE4.1";
+            else if (IsX86Sse3Supported)
+                return "SSE3";
+            else if (IsX86Sse2Supported)
+                return "SSE2";
+            else if (IsX86SseSupported)
+                return "SSE";
+            else if (IsArmAdvSimdSupported)
+                return "AdvSIMD";
+            else if (IsArmBaseSupported)
+                return "base";
+            else
+                return string.Empty;
+        }
+
+        internal static string GetFullInfo(Platform platform)
+        {
+            return string.Join(",", GetCurrentProcessInstructionSets(platform));
+
+            static IEnumerable<string> GetCurrentProcessInstructionSets(Platform platform)
+            {
+                switch (platform)
+                {
+                    case Platform.X86:
+                    case Platform.X64:
+                        if (IsX86Avx2Supported) yield return "AVX2";
+                        else if (IsX86AvxSupported) yield return "AVX";
+                        else if (IsX86Sse42Supported) yield return "SSE4.2";
+                        else if (IsX86Sse41Supported) yield return "SSE4.1";
+                        else if (IsX86Sse3Supported) yield return "SSE3";
+                        else if (IsX86Sse2Supported) yield return "SSE2";
+                        else if (IsX86SseSupported) yield return "SSE";
+
+                        if (IsX86AesSupported) yield return "AES";
+                        if (IsX86Bmi1Supported) yield return "BMI1";
+                        if (IsX86Bmi2Supported) yield return "BMI2";
+                        if (IsX86FmaSupported) yield return "FMA";
+                        if (IsX86LzcntSupported) yield return "LZCNT";
+                        if (IsX86PclmulqdqSupported) yield return "PCLMUL";
+                        if (IsX86PopcntSupported) yield return "POPCNT";
+                        if (IsX86AvxVnniSupported) yield return "AvxVnni";
+                        // TODO: Add MOVBE when API is added.
+                        break;
+                    case Platform.Arm64:
+                        if (IsArmAdvSimdSupported) yield return "AdvSIMD";
+
+                        if (IsArmAesSupported) yield return "AES";
+                        if (IsArmCrc32Supported) yield return "CRC32";
+                        if (IsArmDpSupported) yield return "DP";
+                        if (IsArmRdmSupported) yield return "RDM";
+                        if (IsArmSha1Supported) yield return "SHA1";
+                        if (IsArmSha256Supported) yield return "SHA256";
+                        break;
+                    default:
+                        yield break;
+                }
+            }
+        }
+
         internal static bool IsX86BaseSupported =>
 #if NET6_0_OR_GREATER
             X86Base.IsSupported;
