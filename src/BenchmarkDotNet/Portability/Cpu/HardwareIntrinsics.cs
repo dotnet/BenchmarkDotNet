@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Numerics;
 using BenchmarkDotNet.Environments;
 #if NET6_0_OR_GREATER
 using System.Runtime.Intrinsics.X86;
 using System.Runtime.Intrinsics.Arm;
-using System.Numerics;
 #elif NETSTANDARD2_0_OR_GREATER
 using System;
 #endif
@@ -12,14 +12,7 @@ namespace BenchmarkDotNet.Portability.Cpu
 {
     internal static class HardwareIntrinsics
     {
-        internal static string GetVectorSize()
-        {
-#if NET6_0_OR_GREATER
-            if (Vector.IsHardwareAccelerated)
-                return $"VectorSize={Vector<byte>.Count * 8}";
-#endif
-            return string.Empty;
-        }
+        internal static string GetVectorSize() => Vector.IsHardwareAccelerated ? $"VectorSize={Vector<byte>.Count * 8}" : string.Empty;
 
         internal static string GetShortInfo()
         {
