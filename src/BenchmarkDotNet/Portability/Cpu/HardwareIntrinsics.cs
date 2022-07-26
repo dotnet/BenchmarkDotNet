@@ -39,12 +39,14 @@ namespace BenchmarkDotNet.Portability.Cpu
                 return "SSE2";
             else if (IsX86SseSupported)
                 return "SSE";
+            else if (IsX86BaseSupported)
+                return "X86Base";
             else if (IsArmAdvSimdSupported)
                 return "AdvSIMD";
             else if (IsArmBaseSupported)
-                return "base";
+                return "ArmBase";
             else
-                return string.Empty;
+                return string.Empty; // Runtimes prior to .NET Core 3.0 (APIs did not exist)
         }
 
         internal static string GetFullInfo(Platform platform)
@@ -65,6 +67,7 @@ namespace BenchmarkDotNet.Portability.Cpu
                         else if (IsX86Sse3Supported) yield return "SSE3";
                         else if (IsX86Sse2Supported) yield return "SSE2";
                         else if (IsX86SseSupported) yield return "SSE";
+                        else if (IsX86BaseSupported) yield return "X86Base";
 
                         if (IsX86AesSupported) yield return "AES";
                         if (IsX86Bmi1Supported) yield return "BMI1";
@@ -78,6 +81,7 @@ namespace BenchmarkDotNet.Portability.Cpu
                         break;
                     case Platform.Arm64:
                         if (IsArmAdvSimdSupported) yield return "AdvSIMD";
+                        else if (IsArmBaseSupported) yield return "ArmBase";
 
                         if (IsArmAesSupported) yield return "AES";
                         if (IsArmCrc32Supported) yield return "CRC32";
