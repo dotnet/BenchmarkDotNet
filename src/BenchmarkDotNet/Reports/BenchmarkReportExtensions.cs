@@ -8,12 +8,16 @@ namespace BenchmarkDotNet.Reports
     {
         private const string DisplayedRuntimeInfoPrefix = "// " + BenchmarkEnvironmentInfo.RuntimeInfoPrefix;
         private const string DisplayedGcInfoPrefix = "// " + BenchmarkEnvironmentInfo.GcInfoPrefix;
+        private const string DisplayedHardwareIntrinsicsPrefix = "// " + BenchmarkEnvironmentInfo.HardwareIntrinsicsPrefix;
 
         [CanBeNull]
         public static string GetRuntimeInfo(this BenchmarkReport report) => report.GetInfoFromOutput(DisplayedRuntimeInfoPrefix);
 
         [CanBeNull]
         public static string GetGcInfo(this BenchmarkReport report) => report.GetInfoFromOutput(DisplayedGcInfoPrefix);
+
+        [CanBeNull]
+        public static string GetHardwareIntrinsicsInfo(this BenchmarkReport report) => report.GetInfoFromOutput(DisplayedHardwareIntrinsicsPrefix);
 
         [CanBeNull]
         private static string GetInfoFromOutput(this BenchmarkReport report, string prefix)
