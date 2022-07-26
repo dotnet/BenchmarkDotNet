@@ -79,6 +79,7 @@ namespace BenchmarkDotNet.Tests.Builders
             IsServerGC = isServerGC;
             JitInfo = jitInfo;
             HardwareIntrinsics = "";
+            VectorSize = "";
             OsVersion = new Lazy<string>(() => osVersion);
             CpuInfo = new Lazy<CpuInfo>(() => cpuInfo);
             RuntimeVersion = runtimeVersion;

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Management;
+using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -340,6 +341,15 @@ namespace BenchmarkDotNet.Portability
                 return "base";
             else
                 return string.Empty;
+        }
+
+        internal static string GetVectorSize()
+        {
+#if NET6_0_OR_GREATER
+            if (Vector.IsHardwareAccelerated)
+                return $"VectorSize={Vector<byte>.Count*8}";
+#endif
+            return string.Empty;
         }
 
         // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/

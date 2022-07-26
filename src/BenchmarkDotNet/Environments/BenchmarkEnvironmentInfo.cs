@@ -23,6 +23,7 @@ namespace BenchmarkDotNet.Environments
         [PublicAPI] public bool HasRyuJit { get; protected set; }
         [PublicAPI] public string JitInfo { get; protected set; }
         [PublicAPI] public string HardwareIntrinsics { get; protected set; }
+        [PublicAPI] public string VectorSize { get; protected set; }
         [PublicAPI] public bool IsServerGC { get; protected set; }
         [PublicAPI] public bool IsConcurrentGC { get; protected set; }
         [PublicAPI] public long GCAllocationQuantum { get; protected set; }
@@ -36,6 +37,7 @@ namespace BenchmarkDotNet.Environments
             HasRyuJit = RuntimeInformation.HasRyuJit();
             JitInfo = RuntimeInformation.GetJitInfo();
             HardwareIntrinsics = RuntimeInformation.GetHardwareIntrinsics();
+            VectorSize = RuntimeInformation.GetVectorSize();
             IsServerGC = GCSettings.IsServerGC;
             IsConcurrentGC = GCSettings.LatencyMode != GCLatencyMode.Batch;
             HasAttachedDebugger = Debugger.IsAttached;
@@ -63,7 +65,7 @@ namespace BenchmarkDotNet.Environments
 
         internal string GetRuntimeInfo()
         {
-            string jitInfo = string.Join(" ", new[] { JitInfo, HardwareIntrinsics, GetConfigurationFlag(), GetDebuggerFlag() }.Where(title => title != ""));
+            string jitInfo = string.Join(" ", new[] { JitInfo, HardwareIntrinsics, VectorSize, GetConfigurationFlag(), GetDebuggerFlag() }.Where(title => title != ""));
             return $"{RuntimeVersion}, {Architecture} {jitInfo}";
         }
 
