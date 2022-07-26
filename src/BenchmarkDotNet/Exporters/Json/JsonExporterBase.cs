@@ -58,6 +58,8 @@ namespace BenchmarkDotNet.Exporters.Json
                     { "MethodTitle", report.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo },
                     { "Parameters", report.BenchmarkCase.Parameters.PrintInfo },
                     { "FullName", FullNameProvider.GetBenchmarkName(report.BenchmarkCase) }, // do NOT remove this property, it is used for xunit-performance migration
+                    // Hardware Intrinsics can be disabled using env vars, that is why they might be different per benchmark and are not exported as part of HostEnvironmentInfo
+                    { "HardwareIntrinsics", report.GetHardwareIntrinsicsInfo() ?? "" },
                     // { "Properties", r.Benchmark.Job.ToSet().ToDictionary(p => p.Name, p => p.Value) }, // TODO
                     { "Statistics", report.ResultStatistics }
                 };

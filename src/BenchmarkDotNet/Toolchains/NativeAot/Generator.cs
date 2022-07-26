@@ -8,6 +8,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
@@ -211,54 +212,46 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         }
 
         private string GetCurrentInstructionSet(Platform platform)
-            => string.Join(",", GetHostProcessInstructionSets(platform));
+            => string.Join(",", GetCurrentProcessInstructionSets(platform));
 
         // based on https://github.com/dotnet/runtime/blob/ce61c09a5f6fc71d8f717d3fc4562f42171869a0/src/coreclr/tools/Common/JitInterface/CorInfoInstructionSet.cs#L727
-        private static IEnumerable<string> GetHostProcessInstructionSets(Platform platform)
+        private static IEnumerable<string> GetCurrentProcessInstructionSets(Platform platform)
         {
             switch (platform)
             {
                 case Platform.X86:
                 case Platform.X64:
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.X86Base")) yield return "base";
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Sse")) yield return "sse";
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Sse2")) yield return "sse2";
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Sse3")) yield return "sse3";
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Sse41")) yield return "sse4.1";
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Sse42")) yield return "sse4.2";
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Avx")) yield return "avx";
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Avx2")) yield return "avx2";
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Aes")) yield return "aes";
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Bmi1")) yield return "bmi";
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Bmi2")) yield return "bmi2";
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Fma")) yield return "fma";
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Lzcnt")) yield return "lzcnt";
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Pclmulqdq")) yield return "pclmul";
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.Popcnt")) yield return "popcnt";
-                    if (GetIsSupported("System.Runtime.Intrinsics.X86.AvxVnni")) yield return "avxvnni";
+                    if (HardwareIntrinsics.IsX86BaseSupported) yield return "base";
+                    if (HardwareIntrinsics.IsX86SseSupported) yield return "sse";
+                    if (HardwareIntrinsics.IsX86Sse2Supported) yield return "sse2";
+                    if (HardwareIntrinsics.IsX86Sse3Supported) yield return "sse3";
+                    if (HardwareIntrinsics.IsX86Sse41Supported) yield return "sse4.1";
+                    if (HardwareIntrinsics.IsX86Sse42Supported) yield return "sse4.2";
+                    if (HardwareIntrinsics.IsX86AvxSupported) yield return "avx";
+                    if (HardwareIntrinsics.IsX86Avx2Supported) yield return "avx2";
+                    if (HardwareIntrinsics.IsX86AesSupported) yield return "aes";
+                    if (HardwareIntrinsics.IsX86Bmi1Supported) yield return "bmi";
+                    if (HardwareIntrinsics.IsX86Bmi2Supported) yield return "bmi2";
+                    if (HardwareIntrinsics.IsX86FmaSupported) yield return "fma";
+                    if (HardwareIntrinsics.IsX86LzcntSupported) yield return "lzcnt";
+                    if (HardwareIntrinsics.IsX86PclmulqdqSupported) yield return "pclmul";
+                    if (HardwareIntrinsics.IsX86PopcntSupported) yield return "popcnt";
+                    if (HardwareIntrinsics.IsX86AvxVnniSupported) yield return "avxvnni";
                     break;
                 case Platform.Arm64:
-                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.ArmBase")) yield return "base";
-                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.AdvSimd")) yield return "neon";
-                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.Aes")) yield return "aes";
-                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.Crc32")) yield return "crc";
-                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.Dp")) yield return "dotprod";
-                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.Rdm")) yield return "rdma";
-                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.Sha1")) yield return "sha1";
-                    if (GetIsSupported("System.Runtime.Intrinsics.Arm.Sha256")) yield return "sha2";
+                    if (HardwareIntrinsics.IsArmBaseSupported) yield return "base";
+                    if (HardwareIntrinsics.IsArmAdvSimdSupported) yield return "neon";
+                    if (HardwareIntrinsics.IsArmAesSupported) yield return "aes";
+                    if (HardwareIntrinsics.IsArmCrc32Supported) yield return "crc";
+                    if (HardwareIntrinsics.IsArmDpSupported) yield return "dotprod";
+                    if (HardwareIntrinsics.IsArmRdmSupported) yield return "rdma";
+                    if (HardwareIntrinsics.IsArmSha1Supported) yield return "sha1";
+                    if (HardwareIntrinsics.IsArmSha256Supported) yield return "sha2";
                     // todo: handle "lse"
                     break;
                 default:
                     yield break;
             }
-        }
-
-        private static bool GetIsSupported(string typeName)
-        {
-            Type type = Type.GetType(typeName);
-            if (type == null) return false;
-
-            return (bool)type.GetProperty("IsSupported", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).GetValue(null, null);
         }
     }
 }
