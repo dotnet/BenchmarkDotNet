@@ -31,6 +31,8 @@ namespace BenchmarkDotNet.Portability.Cpu
                 return "SSE4.2";
             else if (IsX86Sse41Supported)
                 return "SSE4.1";
+            else if (IsX86Ssse3Supported)
+                return "SSSE3";
             else if (IsX86Sse3Supported)
                 return "SSE3";
             else if (IsX86Sse2Supported)
@@ -59,6 +61,7 @@ namespace BenchmarkDotNet.Portability.Cpu
                         else if (IsX86AvxSupported) yield return "AVX";
                         else if (IsX86Sse42Supported) yield return "SSE4.2";
                         else if (IsX86Sse41Supported) yield return "SSE4.1";
+                        else if (IsX86Ssse3Supported) yield return "SSSE3";
                         else if (IsX86Sse3Supported) yield return "SSE3";
                         else if (IsX86Sse2Supported) yield return "SSE2";
                         else if (IsX86SseSupported) yield return "SSE";
@@ -115,6 +118,13 @@ namespace BenchmarkDotNet.Portability.Cpu
             Sse3.IsSupported;
 #elif NETSTANDARD
             GetIsSupported("System.Runtime.Intrinsics.X86.Sse3");
+#endif
+
+        internal static bool IsX86Ssse3Supported =>
+#if NET6_0_OR_GREATER
+            Ssse3.IsSupported;
+#elif NETSTANDARD
+            GetIsSupported("System.Runtime.Intrinsics.X86.Ssse3");
 #endif
 
         internal static bool IsX86Sse41Supported =>
