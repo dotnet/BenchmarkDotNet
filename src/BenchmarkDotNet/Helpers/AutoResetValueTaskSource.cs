@@ -1,8 +1,4 @@
-﻿using JetBrains.Annotations;
-using System;
-using System.Diagnostics;
-using System.Runtime.ExceptionServices;
-using System.Threading;
+﻿using System;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Sources;
 
@@ -13,140 +9,45 @@ namespace BenchmarkDotNet.Helpers
     /// </summary>
     public class AutoResetValueTaskSource<TResult> : IValueTaskSource<TResult>, IValueTaskSource
     {
-        [CanBeNull] private Action<object> _continuation;
-        [CanBeNull] private object _continuationState;
-        private bool _completed;
-        [CanBeNull] private TResult _result;
-        [CanBeNull] private ExceptionDispatchInfo _error;
-        private short _version;
-
-        private void Reset()
-        {
-            // Reset/update state for the next use/await of this instance.
-            _version++;
-            _completed = false;
-            _result = default;
-            _error = null;
-            _continuation = null;
-            _continuationState = null;
-        }
+        private ManualResetValueTaskSourceCore<TResult> _sourceCore;
 
         /// <summary>Completes with a successful result.</summary>
         /// <param name="result">The result.</param>
-        public void SetResult(TResult result)
-        {
-            _result = result;
-            SignalCompletion();
-        }
+        public void SetResult(TResult result) => _sourceCore.SetResult(result);
 
         /// <summary>Completes with an error.</summary>
         /// <param name="error">The exception.</param>
-        public void SetException(Exception error)
-        {
-            _error = ExceptionDispatchInfo.Capture(error);
-            SignalCompletion();
-        }
+        public void SetException(Exception error) => _sourceCore.SetException(error);
 
         /// <summary>Gets the operation version.</summary>
-        public short Version => _version;
+        public short Version => _sourceCore.Version;
 
-        /// <summary>Gets the status of the operation.</summary>
-        /// <param name="token">Opaque value that was provided to the <see cref="ValueTask"/>'s constructor.</param>
-        public ValueTaskSourceStatus GetStatus(short token)
+        private TResult GetResult(short token)
         {
-            ValidateToken(token);
-            return
-                _continuation == null || !_completed ? ValueTaskSourceStatus.Pending :
-                _error == null ? ValueTaskSourceStatus.Succeeded :
-                _error.SourceException is OperationCanceledException ? ValueTaskSourceStatus.Canceled :
-                ValueTaskSourceStatus.Faulted;
-        }
-
-        /// <summary>Gets the result of the operation.</summary>
-        /// <param name="token">Opaque value that was provided to the <see cref="ValueTask"/>'s constructor.</param>
-        public TResult GetResult(short token)
-        {
-            ValidateToken(token);
-            if (!_completed)
+            // We don't want to reset this if the token is invalid.
+            if (token != Version)
             {
                 throw new InvalidOperationException();
             }
-
-            var result = _result;
-            var error = _error;
-            Reset();
-            error?.Throw();
-            return result;
-        }
-
-        public void OnCompleted(Action<object> continuation, object state, short token, ValueTaskSourceOnCompletedFlags flags)
-        {
-            if (continuation == null)
+            try
             {
-                throw new ArgumentNullException(nameof(continuation));
+                return _sourceCore.GetResult(token);
             }
-            ValidateToken(token);
-
-            // We need to set the continuation state before we swap in the delegate, so that
-            // if there's a race between this and SetResult/Exception and SetResult/Exception
-            // sees the _continuation as non-null, it'll be able to invoke it with the state
-            // stored here.  However, this also means that if this is used incorrectly (e.g.
-            // awaited twice concurrently), _continuationState might get erroneously overwritten.
-            // To minimize the chances of that, we check preemptively whether _continuation
-            // is already set to something other than the completion sentinel.
-
-            object oldContinuation = _continuation;
-            if (oldContinuation == null)
+            finally
             {
-                _continuationState = state;
-                oldContinuation = Interlocked.CompareExchange(ref _continuation, continuation, null);
-            }
-
-            if (oldContinuation != null)
-            {
-                // Operation already completed, so we need to call the supplied callback.
-                if (!ReferenceEquals(oldContinuation, AutoResetValueTaskSourceCoreShared.s_sentinel))
-                {
-                    throw new InvalidOperationException();
-                }
-
-                continuation(state);
+                _sourceCore.Reset();
             }
         }
 
-        private void ValidateToken(short token)
-        {
-            if (token != _version)
-            {
-                throw new InvalidOperationException();
-            }
-        }
+        void IValueTaskSource.GetResult(short token) => GetResult(token);
+        TResult IValueTaskSource<TResult>.GetResult(short token) => GetResult(token);
 
-        private void SignalCompletion()
-        {
-            if (_completed)
-            {
-                throw new InvalidOperationException();
-            }
-            _completed = true;
+        ValueTaskSourceStatus IValueTaskSource.GetStatus(short token) => _sourceCore.GetStatus(token);
+        ValueTaskSourceStatus IValueTaskSource<TResult>.GetStatus(short token) => _sourceCore.GetStatus(token);
 
-            Interlocked.CompareExchange(ref _continuation, AutoResetValueTaskSourceCoreShared.s_sentinel, null)
-                ?.Invoke(_continuationState);
-        }
-
-        void IValueTaskSource.GetResult(short token)
-        {
-            GetResult(token);
-        }
-    }
-
-    internal static class AutoResetValueTaskSourceCoreShared // separated out of generic to avoid unnecessary duplication
-    {
-        internal static readonly Action<object> s_sentinel = CompletionSentinel;
-        private static void CompletionSentinel(object _) // named method to aid debugging
-        {
-            Debug.Fail("The sentinel delegate should never be invoked.");
-            throw new InvalidOperationException();
-        }
+        // Don't pass the flags, we don't want to schedule the continuation on the current SynchronizationContext or TaskScheduler if the user runs this in-process, as that may cause a deadlock when this is waited on synchronously.
+        // And we don't want to capture the ExecutionContext (we don't use it, and it causes allocations in the full framework).
+        void IValueTaskSource.OnCompleted(Action<object> continuation, object state, short token, ValueTaskSourceOnCompletedFlags flags) => _sourceCore.OnCompleted(continuation, state, token, ValueTaskSourceOnCompletedFlags.None);
+        void IValueTaskSource<TResult>.OnCompleted(Action<object> continuation, object state, short token, ValueTaskSourceOnCompletedFlags flags) => _sourceCore.OnCompleted(continuation, state, token, ValueTaskSourceOnCompletedFlags.None);
     }
 }
