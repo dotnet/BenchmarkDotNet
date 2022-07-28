@@ -225,6 +225,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     if (HardwareIntrinsics.IsX86SseSupported) yield return "sse";
                     if (HardwareIntrinsics.IsX86Sse2Supported) yield return "sse2";
                     if (HardwareIntrinsics.IsX86Sse3Supported) yield return "sse3";
+                    if (HardwareIntrinsics.IsX86Ssse3Supported) yield return "ssse3";
                     if (HardwareIntrinsics.IsX86Sse41Supported) yield return "sse4.1";
                     if (HardwareIntrinsics.IsX86Sse42Supported) yield return "sse4.2";
                     if (HardwareIntrinsics.IsX86AvxSupported) yield return "avx";
