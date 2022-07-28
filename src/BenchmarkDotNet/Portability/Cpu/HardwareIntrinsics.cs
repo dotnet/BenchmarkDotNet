@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using BenchmarkDotNet.Environments;
+using System.Diagnostics.CodeAnalysis;
 #if NET6_0_OR_GREATER
 using System.Runtime.Intrinsics.X86;
 using System.Runtime.Intrinsics.Arm;
-#elif NETSTANDARD2_0_OR_GREATER
-using System;
 #endif
 
 namespace BenchmarkDotNet.Portability.Cpu
@@ -70,6 +70,7 @@ namespace BenchmarkDotNet.Portability.Cpu
                         if (IsX86PclmulqdqSupported) yield return "PCLMUL";
                         if (IsX86PopcntSupported) yield return "POPCNT";
                         if (IsX86AvxVnniSupported) yield return "AvxVnni";
+                        if (IsX86SerializeSupported) yield return "SERIALIZE";
                         // TODO: Add MOVBE when API is added.
                         break;
                     case Platform.Arm64:
@@ -210,6 +211,9 @@ namespace BenchmarkDotNet.Portability.Cpu
             GetIsSupported("System.Runtime.Intrinsics.X86.AvxVnni");
 #endif
 
+        // X86Serialize was introduced in .NET 7.0, BDN does not target it so we need to use reflection
+        internal static bool IsX86SerializeSupported => GetIsSupported("System.Runtime.Intrinsics.X86.X86Serialize");
+
         internal static bool IsArmBaseSupported =>
 #if NET6_0_OR_GREATER
             ArmBase.IsSupported;
@@ -266,14 +270,12 @@ namespace BenchmarkDotNet.Portability.Cpu
             GetIsSupported("System.Runtime.Intrinsics.Arm.Sha256");
 #endif
 
-#if NETSTANDARD
-        private static bool GetIsSupported(string typeName)
+        private static bool GetIsSupported([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] string typeName)
         {
             Type type = Type.GetType(typeName);
             if (type == null) return false;
 
             return (bool)type.GetProperty("IsSupported", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).GetValue(null, null);
         }
-#endif
     }
 }
