@@ -19,6 +19,9 @@ namespace BenchmarkDotNet.Tests
         [InlineData("4.7.3324.0", "4.7.2")]
         [InlineData("4.8", "4.8")]
         [InlineData("4.8.024", "4.8")]
+        [InlineData("4.8.4510.0", "4.8")]
+        [InlineData("4.8.4526.0", "4.8")]
+        [InlineData("4.8.9032.0", "4.8.1")]
         public void ServicingVersionsAreMappedToCorrespondingReleaseVersions(string servicingVersion, string expectedReleaseVersion)
         {
             Assert.Equal(expectedReleaseVersion, FrameworkVersionHelper.MapToReleaseVersion(servicingVersion));
