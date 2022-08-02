@@ -15,6 +15,7 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnosers
@@ -102,9 +103,13 @@ namespace BenchmarkDotNet.Diagnosers
 
             foreach (var benchmark in validationParameters.Benchmarks)
             {
-                if (benchmark.Job.Infrastructure.HasValue(InfrastructureMode.ToolchainCharacteristic) && benchmark.Job.Infrastructure.Toolchain is InProcessNoEmitToolchain)
+                if (benchmark.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is InProcessNoEmitToolchain)
                 {
                     yield return new ValidationError(true, "InProcessToolchain has no DisassemblyDiagnoser support", benchmark);
+                }
+                else if (benchmark.Job.IsNativeAOT())
+                {
+                    yield return new ValidationError(true, "Currently NativeAOT has no DisassemblyDiagnoser support", benchmark);
                 }
 
                 if (ShouldUseLinuxDisassembler(benchmark))
