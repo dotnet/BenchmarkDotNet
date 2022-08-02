@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Portability.Cpu
             else if (IsArmBaseSupported)
                 return "ArmBase";
             else
-                return string.Empty; // Runtimes prior to .NET Core 3.0 (APIs did not exist)
+                return GetVectorSize(); // Runtimes prior to .NET Core 3.0 (APIs did not exist so we print non-exact Vector info)
         }
 
         internal static string GetFullInfo(Platform platform)
