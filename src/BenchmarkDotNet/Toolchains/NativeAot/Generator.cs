@@ -238,6 +238,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     if (HardwareIntrinsics.IsX86PclmulqdqSupported) yield return "pclmul";
                     if (HardwareIntrinsics.IsX86PopcntSupported) yield return "popcnt";
                     if (HardwareIntrinsics.IsX86AvxVnniSupported) yield return "avxvnni";
+                    if (HardwareIntrinsics.IsX86SerializeSupported) yield return "serialize";
                     break;
                 case Platform.Arm64:
                     if (HardwareIntrinsics.IsArmBaseSupported) yield return "base";
