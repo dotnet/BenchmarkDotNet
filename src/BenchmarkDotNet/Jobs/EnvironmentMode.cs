@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Jobs
@@ -110,5 +111,7 @@ namespace BenchmarkDotNet.Jobs
             newVariables.Add(variable);
             EnvironmentVariables = newVariables;
         }
+
+        internal Runtime GetRuntime() => HasValue(RuntimeCharacteristic) ? Runtime : RuntimeInformation.GetCurrentRuntime();
     }
 }
