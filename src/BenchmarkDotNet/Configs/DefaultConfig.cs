@@ -13,6 +13,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Configs
@@ -103,5 +104,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
 
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
+
+        public IEnumerable<IBenchmarkEventHandler> GetEventHandlers() => Array.Empty<IBenchmarkEventHandler>();
     }
 }

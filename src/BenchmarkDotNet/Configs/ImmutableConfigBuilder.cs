@@ -49,6 +49,7 @@ namespace BenchmarkDotNet.Configs
             var uniqueRules = source.GetLogicalGroupRules().ToImmutableArray();
 
             var uniqueRunnableJobs = GetRunnableJobs(source.GetJobs()).ToImmutableHashSet();
+            var uniqueEventHandlers = source.GetEventHandlers().ToImmutableHashSet();
 
             return new ImmutableConfig(
                 uniqueColumnProviders,
@@ -61,6 +62,7 @@ namespace BenchmarkDotNet.Configs
                 uniqueFilters,
                 uniqueRules,
                 uniqueRunnableJobs,
+                uniqueEventHandlers,
                 source.UnionRule,
                 source.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath,
                 source.CultureInfo,

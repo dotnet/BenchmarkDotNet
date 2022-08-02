@@ -12,6 +12,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Validators;
 
@@ -62,8 +63,8 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
         public IEnumerable<IAnalyser> GetAnalysers() => Array.Empty<IAnalyser>();
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
+        public IEnumerable<IBenchmarkEventHandler> GetEventHandlers() => Array.Empty<IBenchmarkEventHandler>();
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
-
         public IOrderer Orderer => DefaultOrderer.Instance;
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;

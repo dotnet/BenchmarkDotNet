@@ -13,6 +13,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
@@ -30,6 +31,7 @@ namespace BenchmarkDotNet.Configs
         private readonly HashSet<HardwareCounter> hardwareCounters = new HashSet<HardwareCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
         private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = new List<BenchmarkLogicalGroupRule>();
+        private readonly List<IBenchmarkEventHandler> eventHandlers = new List<IBenchmarkEventHandler>();
         private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
@@ -42,6 +44,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
+        public IEnumerable<IBenchmarkEventHandler> GetEventHandlers() => eventHandlers;
 
         [PublicAPI] public ConfigOptions Options { get; set; }
         [PublicAPI] public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
@@ -207,6 +210,12 @@ namespace BenchmarkDotNet.Configs
                     logicalGroupRules.Remove(rule);
                 logicalGroupRules.Add(rule);
             }
+            return this;
+        }
+
+        public ManualConfig AddEventHandler(params IBenchmarkEventHandler[] eventHandlers)
+        {
+            this.eventHandlers.AddRange(eventHandlers);
             return this;
         }
 

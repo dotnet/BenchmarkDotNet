@@ -10,6 +10,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
@@ -27,6 +28,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<HardwareCounter> GetHardwareCounters();
         IEnumerable<IFilter> GetFilters();
         IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
+        IEnumerable<IBenchmarkEventHandler> GetEventHandlers();
 
         [CanBeNull] IOrderer Orderer { get; }
 
