@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Disassemblers.Exporters;
 using Iced.Intel;
 using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Diagnosers
@@ -8,6 +9,7 @@ namespace BenchmarkDotNet.Diagnosers
     public class DisassemblyDiagnoserConfig
     {
         /// <param name="maxDepth">Includes called methods to given level. 1 by default, indexed from 1. To print just the benchmark set it to 0.</param>
+        /// <param name="filters">Glob patterns applied to full method signatures by the the disassembler.</param>
         /// <param name="formatter">Assembly code formatter. If not provided, MasmFormatter with the recommended settings will be used.</param>
         /// <param name="printSource">C#|F#|VB source code will be printed. False by default.</param>
         /// <param name="printInstructionAddresses">Print instruction addresses. False by default</param>
@@ -18,6 +20,7 @@ namespace BenchmarkDotNet.Diagnosers
         [PublicAPI]
         public DisassemblyDiagnoserConfig(
             int maxDepth = 1,
+            string[] filters = null,
             Formatter formatter = null,
             bool printSource = false,
             bool printInstructionAddresses = false,
@@ -27,6 +30,7 @@ namespace BenchmarkDotNet.Diagnosers
             bool exportDiff = false)
         {
             MaxDepth = maxDepth;
+            Filters = filters ?? Array.Empty<string>();
             Formatter = formatter ?? CreateDefaultFormatter();
             PrintSource = printSource;
             PrintInstructionAddresses = printInstructionAddresses;
@@ -39,6 +43,7 @@ namespace BenchmarkDotNet.Diagnosers
         public bool PrintSource { get; }
         public bool PrintInstructionAddresses { get; }
         public int MaxDepth { get; }
+        public string[] Filters { get; }
         public bool ExportGithubMarkdown { get; }
         public bool ExportHtml { get; }
         public bool ExportCombinedDisassemblyReport { get; }
