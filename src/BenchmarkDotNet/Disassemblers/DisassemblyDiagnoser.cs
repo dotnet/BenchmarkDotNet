@@ -15,7 +15,6 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
-using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnosers
@@ -24,16 +23,16 @@ namespace BenchmarkDotNet.Diagnosers
     {
         private static readonly Lazy<string> ptrace_scope = new Lazy<string>(() => ProcessHelper.RunAndReadOutput("cat", "/proc/sys/kernel/yama/ptrace_scope").Trim());
 
-        private readonly WindowsDisassembler windowsDisassembler;
-        private readonly LinuxDisassembler linuxDisassembler;
+        private readonly WindowsDisassembler windowsDifferentArchitectureDisassembler;
+        private readonly SameArchitectureDisassembler sameArchitectureDisassembler;
         private readonly MonoDisassembler monoDisassembler;
         private readonly Dictionary<BenchmarkCase, DisassemblyResult> results;
 
         public DisassemblyDiagnoser(DisassemblyDiagnoserConfig config)
         {
             Config = config;
-            windowsDisassembler = new WindowsDisassembler(config);
-            linuxDisassembler = new LinuxDisassembler(config);
+            windowsDifferentArchitectureDisassembler = new WindowsDisassembler(config);
+            sameArchitectureDisassembler = new SameArchitectureDisassembler(config);
             monoDisassembler = new MonoDisassembler(config);
 
             results = new Dictionary<BenchmarkCase, DisassemblyResult>();
@@ -58,9 +57,9 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase)
         {
-            if (ShouldUseWindowsDisassembler(benchmarkCase) || ShouldUseLinuxDisassembler(benchmarkCase))
+            if (ShouldUseClrMdDisassembler(benchmarkCase))
                 return RunMode.NoOverhead;
-            if (ShouldUseMonoDisassembler(benchmarkCase))
+            else if (ShouldUseMonoDisassembler(benchmarkCase))
                 return RunMode.SeparateLogic;
 
             return RunMode.None;
@@ -74,11 +73,11 @@ namespace BenchmarkDotNet.Diagnosers
 
             switch (signal)
             {
-                case HostSignal.AfterAll when ShouldUseWindowsDisassembler(benchmark):
-                    results.Add(benchmark, windowsDisassembler.Disassemble(parameters));
+                case HostSignal.AfterAll when ShouldUseSameArchitectureDisassembler(benchmark, parameters):
+                    results.Add(benchmark, sameArchitectureDisassembler.Disassemble(parameters));
                     break;
-                case HostSignal.AfterAll when ShouldUseLinuxDisassembler(benchmark):
-                    results.Add(benchmark, linuxDisassembler.Disassemble(parameters));
+                case HostSignal.AfterAll when RuntimeInformation.IsWindows() && !ShouldUseMonoDisassembler(benchmark):
+                    results.Add(benchmark, windowsDifferentArchitectureDisassembler.Disassemble(parameters));
                     break;
                 case HostSignal.SeparateLogic when ShouldUseMonoDisassembler(benchmark):
                     results.Add(benchmark, monoDisassembler.Disassemble(benchmark, benchmark.Job.Environment.Runtime as MonoRuntime));
@@ -112,7 +111,7 @@ namespace BenchmarkDotNet.Diagnosers
                     yield return new ValidationError(true, "Currently NativeAOT has no DisassemblyDiagnoser support", benchmark);
                 }
 
-                if (ShouldUseLinuxDisassembler(benchmark))
+                if (RuntimeInformation.IsLinux() && ShouldUseClrMdDisassembler(benchmark))
                 {
                     var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance);
 
@@ -136,11 +135,27 @@ namespace BenchmarkDotNet.Diagnosers
         private static bool ShouldUseMonoDisassembler(BenchmarkCase benchmarkCase)
             => benchmarkCase.Job.Environment.Runtime is MonoRuntime || RuntimeInformation.IsMono;
 
-        private static bool ShouldUseWindowsDisassembler(BenchmarkCase benchmarkCase)
-            => !(benchmarkCase.Job.Environment.Runtime is MonoRuntime) && RuntimeInformation.IsWindows();
+        // when we add  macOS support, RuntimeInformation.IsMacOSX() needs to be added here
+        private static bool ShouldUseClrMdDisassembler(BenchmarkCase benchmarkCase)
+            => !ShouldUseMonoDisassembler(benchmarkCase) && (RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux());
 
-        private static bool ShouldUseLinuxDisassembler(BenchmarkCase benchmarkCase)
-            => !(benchmarkCase.Job.Environment.Runtime is MonoRuntime) && RuntimeInformation.IsLinux();
+        private static bool ShouldUseSameArchitectureDisassembler(BenchmarkCase benchmarkCase, DiagnoserActionParameters parameters)
+        {
+            if (ShouldUseClrMdDisassembler(benchmarkCase))
+            {
+                if (RuntimeInformation.IsWindows())
+                {
+                    return WindowsDisassembler.GetDisassemblerArchitecture(parameters.Process, benchmarkCase.Job.Environment.Platform)
+                        == RuntimeInformation.GetCurrentPlatform();
+                }
+
+                // on Unix currently host process architecture is always the same as benchmark process architecture
+                // (no official x86 support)
+                return true;
+            }
+
+            return false;
+        }
 
         private static IEnumerable<IExporter> GetExporters(Dictionary<BenchmarkCase, DisassemblyResult> results, DisassemblyDiagnoserConfig config)
         {

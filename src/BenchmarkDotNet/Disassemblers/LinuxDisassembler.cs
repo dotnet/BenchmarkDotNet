@@ -2,11 +2,11 @@ using BenchmarkDotNet.Diagnosers;
 
 namespace BenchmarkDotNet.Disassemblers
 {
-    internal class LinuxDisassembler
+    internal class SameArchitectureDisassembler
     {
         private readonly DisassemblyDiagnoserConfig config;
 
-        internal LinuxDisassembler(DisassemblyDiagnoserConfig config) => this.config = config;
+        internal SameArchitectureDisassembler(DisassemblyDiagnoserConfig config) => this.config = config;
 
         internal DisassemblyResult Disassemble(DiagnoserActionParameters parameters)
             => ClrMdV2Disassembler.AttachAndDisassemble(BuildDisassemblerSettings(parameters));
