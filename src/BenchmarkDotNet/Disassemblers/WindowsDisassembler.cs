@@ -141,8 +141,12 @@ namespace BenchmarkDotNet.Disassemblers
                 .Append(DisassemblerConstants.DisassemblerEntryMethodName).Append(' ')
                 .Append(config.PrintSource).Append(' ')
                 .Append(config.MaxDepth).Append(' ')
-                .Append($"\"{resultsPath}\"")
+                .Append(Escape(resultsPath))
+                .Append(' ')
+                .Append(string.Join(" ", config.Filters.Select(Escape)))
                 .ToString();
+
+        private static string Escape(string value) => $"\"{value}\"";
 
         // code copied from https://stackoverflow.com/a/33206186/5852046
         private static class NativeMethods
