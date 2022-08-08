@@ -18,6 +18,7 @@ namespace BenchmarkDotNet.Disassemblers
                 methodName: DisassemblerConstants.DisassemblerEntryMethodName,
                 printSource: config.PrintSource,
                 maxDepth: config.MaxDepth,
+                filters: config.Filters,
                 resultsPath: default
             );
     }
