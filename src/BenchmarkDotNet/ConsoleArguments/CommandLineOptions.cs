@@ -148,6 +148,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("disasmDepth", Required = false, Default = 1, HelpText = "Sets the recursive depth for the disassembler.")]
         public int DisassemblerRecursiveDepth { get; set; }
 
+        [Option("disasmFilter", Required = false, HelpText = "Glob patterns applied to full method signatures by the the disassembler.")]
+        public IEnumerable<string> DisassemblerFilters { get; set; }
+
         [Option("disasmDiff", Required = false, Default = false, HelpText = "Generates diff reports for the disassembler.")]
         public bool DisassemblerDiff { get; set; }
 

@@ -4,6 +4,7 @@ using Microsoft.Diagnostics.Runtime.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace BenchmarkDotNet.Disassemblers
 {
@@ -26,13 +27,20 @@ namespace BenchmarkDotNet.Disassemblers
 
                 var state = new State(runtime);
 
-                var typeWithBenchmark = state.Runtime.Heap.GetTypeByName(settings.TypeName);
+                if (settings.Filters.Length > 0)
+                {
+                    FilterAndEnqueue(state, settings);
+                }
+                else
+                {
+                    var typeWithBenchmark = state.Runtime.Heap.GetTypeByName(settings.TypeName);
 
-                state.Todo.Enqueue(
-                    new MethodInfo(
-                        // the Disassembler Entry Method is always parameterless, so check by name is enough
-                        typeWithBenchmark.Methods.Single(method => method.IsPublic && method.Name == settings.MethodName),
-                        0));
+                    state.Todo.Enqueue(
+                        new MethodInfo(
+                            // the Disassembler Entry Method is always parameterless, so check by name is enough
+                            typeWithBenchmark.Methods.Single(method => method.IsPublic && method.Name == settings.MethodName),
+                            0));
+                }
 
                 var disassembledMethods = Disassemble(settings, state);
 
@@ -59,6 +67,28 @@ namespace BenchmarkDotNet.Disassemblers
             control?.Execute(DEBUG_OUTCTL.NOT_LOGGED, ".reload", DEBUG_EXECUTE.NOT_LOGGED);
         }
 
+        private static void FilterAndEnqueue(State state, Settings settings)
+        {
+            Regex[] filters = settings.Filters
+                .Select(pattern => new Regex(WildcardToRegex(pattern), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).ToArray();
+
+            foreach (ClrModule module in state.Runtime.Modules)
+                foreach (ClrType type in module.EnumerateTypes())
+                    foreach (ClrMethod method in type.Methods.Where(method => CanBeDisassembled(method) && method.GetFullSignature() != null))
+                        foreach (Regex filter in filters)
+                        {
+                            if (filter.IsMatch(method.GetFullSignature()))
+                            {
+                                state.Todo.Enqueue(new MethodInfo(method,
+                                    depth: settings.MaxDepth)); // don't allow for recursive disassembling
+                                break;
+                            }
+                        }
+        }
+
+        // copied from GlobFilter type (this type must not reference BDN)
+        private static string WildcardToRegex(string pattern) => $"^{Regex.Escape(pattern).Replace(@"\*", ".*").Replace(@"\?", ".")}$";
+
         private static DisassembledMethod[] Disassemble(Settings settings, State state)
         {
             var result = new List<DisassembledMethod>();
@@ -77,11 +107,14 @@ namespace BenchmarkDotNet.Disassemblers
             return result.ToArray();
         }
 
+        private static bool CanBeDisassembled(ClrMethod method)
+            => !((method.ILOffsetMap is null || method.ILOffsetMap.Length == 0) && (method.HotColdInfo is null || method.HotColdInfo.HotStart == 0 || method.HotColdInfo.HotSize == 0));
+
         private static DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings)
         {
             var method = methodInfo.Method;
 
-            if ((method.ILOffsetMap is null || method.ILOffsetMap.Length == 0) && (method.HotColdInfo is null || method.HotColdInfo.HotStart == 0 || method.HotColdInfo.HotSize == 0))
+            if (!CanBeDisassembled(method))
             {
                 if (method.IsPInvoke)
                     return CreateEmpty(method, "PInvoke method");
