@@ -61,23 +61,20 @@ namespace BenchmarkDotNet.Disassemblers
             }
         }
 
-        private static string GetDisassemblerPath(Process process, Platform platform)
-        {
-            switch (platform)
+        internal static Platform GetDisassemblerArchitecture(Process process, Platform platform)
+            => platform switch
             {
-                case Platform.AnyCpu:
-                    return GetDisassemblerPath(process,
-                        NativeMethods.Is64Bit(process)
-                            ? Platform.X64
-                            : Platform.X86);
-                case Platform.X86:
-                    return GetDisassemblerPath("x86");
-                case Platform.X64:
-                    return GetDisassemblerPath("x64");
-                default:
-                    throw new NotSupportedException($"Platform {platform} not supported!");
-            }
-        }
+                Platform.AnyCpu => NativeMethods.Is64Bit(process) ? Platform.X64 : Platform.X86, // currently ARM is not supported
+                _ => platform
+            };
+
+        private static string GetDisassemblerPath(Process process, Platform platform)
+            => GetDisassemblerArchitecture(process, platform) switch
+            {
+                Platform.X86 => GetDisassemblerPath("x86"),
+                Platform.X64 => GetDisassemblerPath("x64"),
+                _ => throw new NotSupportedException($"Platform {platform} not supported!")
+            };
 
         private static string GetDisassemblerPath(string architectureName)
         {
