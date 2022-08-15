@@ -6,6 +6,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
+using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
 
 namespace BenchmarkDotNet.Engines
 {

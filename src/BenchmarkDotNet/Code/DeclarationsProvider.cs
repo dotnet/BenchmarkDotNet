@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.Code
     {
         public TaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
-        public override string ExtraDefines => "#define RETURNS_AWAITABLE";
+        public override string ReturnsDefinition => "RETURNS_AWAITABLE";
 
         public override string AwaiterTypeName => WorkloadMethodReturnType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance).ReturnType.GetCorrectCSharpTypeName();
 
