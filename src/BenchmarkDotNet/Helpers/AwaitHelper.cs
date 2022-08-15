@@ -38,7 +38,8 @@ namespace BenchmarkDotNet.Helpers
         // It is illegal to call GetResult from an uncomplete ValueTask, so we must hook up a callback.
         public void GetResult(ValueTask task)
         {
-            var awaiter = task.GetAwaiter();
+            // Don't continue on the captured context, as that may result in a deadlock if the user runs this in-process.
+            var awaiter = task.ConfigureAwait(false).GetAwaiter();
             if (!awaiter.IsCompleted)
             {
                 lock (awaiterLock)
@@ -57,7 +58,8 @@ namespace BenchmarkDotNet.Helpers
 
         public T GetResult<T>(ValueTask<T> task)
         {
-            var awaiter = task.GetAwaiter();
+            // Don't continue on the captured context, as that may result in a deadlock if the user runs this in-process.
+            var awaiter = task.ConfigureAwait(false).GetAwaiter();
             if (!awaiter.IsCompleted)
             {
                 lock (awaiterLock)
