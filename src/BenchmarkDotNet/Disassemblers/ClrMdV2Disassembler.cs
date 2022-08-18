@@ -97,8 +97,7 @@ namespace BenchmarkDotNet.Disassemblers
             return result.ToArray();
         }
 
-        private static bool CanBeDisassembled(ClrMethod method)
-            => !(method.ILOffsetMap.Length == 0 && (method.HotColdInfo.HotStart == 0 || method.HotColdInfo.HotSize == 0));
+        private static bool CanBeDisassembled(ClrMethod method) => method.ILOffsetMap.Length > 0 && method.NativeCode > 0;
 
         private static DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings)
         {
@@ -129,9 +128,10 @@ namespace BenchmarkDotNet.Disassemblers
                 codes.AddRange(uniqueSourceCodeLines);
             }
 
-            // for getting ASM we try to use data from HotColdInfo if available (better for decoding)
             foreach (var map in GetCompleteNativeMap(method))
-                codes.AddRange(Decode(map.StartAddress, (uint)(map.EndAddress - map.StartAddress), state, methodInfo.Depth, method));
+            {
+                codes.AddRange(Decode(map, state, methodInfo.Depth, method));
+            }
 
             Map[] maps = settings.PrintSource
                 ? codes.GroupBy(code => code.InstructionPointer).OrderBy(group => group.Key).Select(group => new Map() { SourceCodes = group.ToArray() }).ToArray()
@@ -145,8 +145,11 @@ namespace BenchmarkDotNet.Disassemblers
             };
         }
 
-        private static IEnumerable<Asm> Decode(ulong startAddress, uint size, State state, int depth, ClrMethod currentMethod)
+        private static IEnumerable<Asm> Decode(ILToNativeMap map, State state, int depth, ClrMethod currentMethod)
         {
+            ulong startAddress = map.StartAddress;
+            uint size = (uint)(map.EndAddress - map.StartAddress);
+
             byte[] code = new byte[size];
 
             int totalBytesRead = 0;
@@ -173,7 +176,7 @@ namespace BenchmarkDotNet.Disassemblers
                 // Most likely ClrMd provided us with incomplete data and we disassembled too much.
                 if (instruction.IsInvalid)
                 {
-                    return GetValidInstructions(instructions);
+                    break;
                 }
 
                 TryTranslateAddressToName(instruction, state, depth, currentMethod);
@@ -185,19 +188,21 @@ namespace BenchmarkDotNet.Disassemblers
                 });
             }
 
-            return instructions;
+            return GetValidInstructions(instructions);
         }
 
         private static IEnumerable<Asm> GetValidInstructions(List<Asm> disassembled)
         {
-            // We are now going to search for the last valid instruction (ret).
-            // In theory we could also search for interrupts, but that would produce a lot of garbage in the output.
-
+            // We are now going to search for the last valid instruction which is just ret or something before interrupt.
             for (int i = 0; i < disassembled.Count - 1; i++)
             {
                 if (disassembled[i].Instruction.FlowControl is FlowControl.Return)
                 {
-                    return disassembled.Take(i + 1); // indexed from 0
+                    return disassembled.Take(i + 1); // include the ret itself
+                }
+                else if (disassembled[i].Instruction.FlowControl is FlowControl.Interrupt)
+                {
+                    return disassembled.Take(i); // don't include the interrupt, it creates too much garbage in the output
                 }
             }
 
@@ -290,22 +295,12 @@ namespace BenchmarkDotNet.Disassemblers
             return false;
         }
 
+        // HotSize can be missing or be invalid, we are not using it https://github.com/microsoft/clrmd/issues/1036
         private static ILToNativeMap[] GetCompleteNativeMap(ClrMethod method)
-        {
-            var hotColdInfo = method.HotColdInfo;
-            ulong start = hotColdInfo.HotStart;
-            ulong end = hotColdInfo.HotStart > 0 && hotColdInfo.HotSize > 0 // HotSize can be missing https://github.com/microsoft/clrmd/issues/1036
-                            ? hotColdInfo.HotStart + hotColdInfo.HotSize
-                            : hotColdInfo.ColdStart > 0
-                                ? hotColdInfo.ColdStart
-                                : ulong.MaxValue;
-
-            // we care only about the maps that belong to the Hot region, as the rest might contain some garbage (#2074)
-            return method.ILOffsetMap
-                .Where(map => start <= map.StartAddress && map.EndAddress <= end && map.StartAddress < map.EndAddress) // some maps have 0 length?
+            => method.ILOffsetMap
+                .Where(map => method.NativeCode <= map.StartAddress && map.StartAddress < map.EndAddress) // some maps have 0 length?
                 .OrderBy(map => map.StartAddress) // we need to print in the machine code order, not IL! #536
                 .ToArray();
-        }
 
         private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
             => DisassembledMethod.Empty(method.Signature, method.NativeCode, reason);
