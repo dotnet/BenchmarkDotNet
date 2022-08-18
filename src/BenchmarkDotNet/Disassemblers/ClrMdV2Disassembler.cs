@@ -155,7 +155,7 @@ namespace BenchmarkDotNet.Disassemblers
                 int bytesRead = state.Runtime.DataTarget.DataReader.Read(startAddress + (ulong)totalBytesRead, new Span<byte>(code, totalBytesRead, (int)size - totalBytesRead));
                 if (bytesRead <= 0)
                 {
-                    throw new EndOfStreamException($"Tried to read {size} for {currentMethod.Signature}, got only {totalBytesRead}");
+                    throw new EndOfStreamException($"Tried to read {size} bytes for {currentMethod.Signature}, got only {totalBytesRead}");
                 }
                 totalBytesRead += bytesRead;
             } while (totalBytesRead != size);
@@ -171,7 +171,7 @@ namespace BenchmarkDotNet.Disassemblers
                 decoder.Decode(out var instruction);
 
                 // Most likely ClrMd provided us with incomplete data and we disassembled too much.
-                if (instruction.Code == Iced.Intel.Code.INVALID)
+                if (instruction.IsInvalid)
                 {
                     return GetValidInstructions(instructions);
                 }
@@ -193,17 +193,15 @@ namespace BenchmarkDotNet.Disassemblers
             // We are now going to search for the last valid instruction (ret).
             // In theory we could also search for interrupts, but that would produce a lot of garbage in the output.
 
-            int lastValidInstructionIndex = 0;
             for (int i = 0; i < disassembled.Count - 1; i++)
             {
                 if (disassembled[i].Instruction.FlowControl is FlowControl.Return)
                 {
-                    lastValidInstructionIndex = i;
-                    break;
+                    return disassembled.Take(i + 1); // indexed from 0
                 }
             }
 
-            return disassembled.Take(lastValidInstructionIndex + 1); // indexed from 0
+            return disassembled;
         }
 
         private static void TryTranslateAddressToName(Instruction instruction, State state, int depth, ClrMethod currentMethod)
