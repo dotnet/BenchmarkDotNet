@@ -257,24 +257,19 @@ namespace BenchmarkDotNet.Disassemblers
 
         private static ILToNativeMap[] GetCompleteNativeMap(ClrMethod method)
         {
-            // it's better to use one single map rather than few small ones
-            // it's simply easier to get next instruction when decoding ;)
             var hotColdInfo = method.HotColdInfo;
-            if (hotColdInfo.HotSize > 0 && hotColdInfo.HotStart > 0)
-            {
-                return hotColdInfo.ColdSize <= 0
-                    ? new[] { new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 } }
-                    : new[]
-                      {
-                            new ILToNativeMap() { StartAddress = hotColdInfo.HotStart, EndAddress = hotColdInfo.HotStart + hotColdInfo.HotSize, ILOffset = -1 },
-                            new ILToNativeMap() { StartAddress = hotColdInfo.ColdStart, EndAddress = hotColdInfo.ColdStart + hotColdInfo.ColdSize, ILOffset = -1 }
-                      };
-            }
+            ulong start = hotColdInfo.HotStart;
+            ulong end = hotColdInfo.HotStart > 0 && hotColdInfo.HotSize > 0 // HotSize can be missing https://github.com/microsoft/clrmd/issues/1036
+                            ? hotColdInfo.HotStart + hotColdInfo.HotSize
+                            : hotColdInfo.ColdStart > 0
+                                ? hotColdInfo.ColdStart
+                                : ulong.MaxValue;
 
+            // we care only about the maps that belong to the Hot region, as the rest might contain some garbage (#2074)
             return method.ILOffsetMap
-                    .Where(map => map.StartAddress < map.EndAddress) // some maps have 0 length?
-                    .OrderBy(map => map.StartAddress) // we need to print in the machine code order, not IL! #536
-                    .ToArray();
+                .Where(map => start <= map.StartAddress && map.EndAddress <= end && map.StartAddress < map.EndAddress) // some maps have 0 length?
+                .OrderBy(map => map.StartAddress) // we need to print in the machine code order, not IL! #536
+                .ToArray();
         }
 
         private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
