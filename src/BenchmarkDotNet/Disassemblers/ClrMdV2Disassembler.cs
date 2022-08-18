@@ -190,13 +190,13 @@ namespace BenchmarkDotNet.Disassemblers
 
         private static IEnumerable<Asm> GetValidInstructions(List<Asm> disassembled)
         {
-            // We are now going to search for the last valid instruction (ret or int).
-            // It's important to loop from the end, as return can be followed by interrupt.
+            // We are now going to search for the last valid instruction (ret).
+            // In theory we could also search for interrupts, but that would produce a lot of garbage in the output.
 
             int lastValidInstructionIndex = 0;
-            for (int i = disassembled.Count - 1; i >= 0; i--)
+            for (int i = 0; i < disassembled.Count - 1; i++)
             {
-                if (disassembled[i].Instruction.FlowControl is FlowControl.Interrupt or FlowControl.Return)
+                if (disassembled[i].Instruction.FlowControl is FlowControl.Return)
                 {
                     lastValidInstructionIndex = i;
                     break;
