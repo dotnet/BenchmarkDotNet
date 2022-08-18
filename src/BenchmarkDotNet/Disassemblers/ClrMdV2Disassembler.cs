@@ -148,25 +148,53 @@ namespace BenchmarkDotNet.Disassemblers
         {
             byte[] code = new byte[size];
             int bytesRead = state.Runtime.DataTarget.DataReader.Read(startAddress, code);
-            if (bytesRead == 0 || bytesRead != size)
-                yield break;
+            if (bytesRead <= 0)
+                return Array.Empty<Asm>();
 
             var reader = new ByteArrayCodeReader(code, 0, bytesRead);
             var decoder = Decoder.Create(state.Runtime.DataTarget.DataReader.PointerSize * 8, reader);
             decoder.IP = startAddress;
 
+            List<Asm> instructions = new ();
+
             while (reader.CanReadByte)
             {
                 decoder.Decode(out var instruction);
 
+                // Most likely ClrMd provided us with incomplete data and we disassembled too much.
+                if (instruction.Code == Iced.Intel.Code.INVALID)
+                {
+                    return GetValidInstructions(instructions);
+                }
+
                 TryTranslateAddressToName(instruction, state, depth, currentMethod);
 
-                yield return new Asm
+                instructions.Add(new Asm
                 {
                     InstructionPointer = instruction.IP,
                     Instruction = instruction
-                };
+                });
             }
+
+            return instructions;
+        }
+
+        private static IEnumerable<Asm> GetValidInstructions(List<Asm> disassembled)
+        {
+            // We are now going to search for the last valid instruction (ret or int).
+            // It's important to loop from the end, as return can be followed by interrupt.
+
+            int lastValidInstructionIndex = 0;
+            for (int i = disassembled.Count - 1; i >= 0; i--)
+            {
+                if (disassembled[i].Instruction.FlowControl is FlowControl.Interrupt or FlowControl.Return)
+                {
+                    lastValidInstructionIndex = i;
+                    break;
+                }
+            }
+
+            return disassembled.Take(lastValidInstructionIndex + 1); // indexed from 0
         }
 
         private static void TryTranslateAddressToName(Instruction instruction, State state, int depth, ClrMethod currentMethod)
