@@ -3,6 +3,7 @@ using Iced.Intel;
 using Microsoft.Diagnostics.Runtime;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -147,11 +148,19 @@ namespace BenchmarkDotNet.Disassemblers
         private static IEnumerable<Asm> Decode(ulong startAddress, uint size, State state, int depth, ClrMethod currentMethod)
         {
             byte[] code = new byte[size];
-            int bytesRead = state.Runtime.DataTarget.DataReader.Read(startAddress, code);
-            if (bytesRead <= 0)
-                return Array.Empty<Asm>();
 
-            var reader = new ByteArrayCodeReader(code, 0, bytesRead);
+            int totalBytesRead = 0;
+            do
+            {
+                int bytesRead = state.Runtime.DataTarget.DataReader.Read(startAddress + (ulong)totalBytesRead, new Span<byte>(code, totalBytesRead, (int)size - totalBytesRead));
+                if (bytesRead <= 0)
+                {
+                    throw new EndOfStreamException($"Tried to read {size} for {currentMethod.Signature}, got only {totalBytesRead}");
+                }
+                totalBytesRead += bytesRead;
+            } while (totalBytesRead != size);
+
+            var reader = new ByteArrayCodeReader(code, 0, (int)size);
             var decoder = Decoder.Create(state.Runtime.DataTarget.DataReader.PointerSize * 8, reader);
             decoder.IP = startAddress;
 
