@@ -230,7 +230,15 @@ namespace BenchmarkDotNet.Disassemblers
             if (method is null && (address & ((uint)runtime.DataTarget.DataReader.PointerSize - 1)) == 0)
             {
                 if (runtime.DataTarget.DataReader.ReadPointer(address, out ulong newAddress) && newAddress > ushort.MaxValue)
+                {
                     method = runtime.GetMethodByInstructionPointer(newAddress);
+
+                    method = WorkaroundGetMethodByInstructionPointerBug(runtime, method, newAddress);
+                }
+            }
+            else
+            {
+                method = WorkaroundGetMethodByInstructionPointerBug(runtime, method, address);
             }
 
             if (method is null)
@@ -247,6 +255,13 @@ namespace BenchmarkDotNet.Disassemblers
                 methodName = $"{method.Type.Name}.{method.Signature}";
             state.AddressToNameMapping.Add(address, methodName);
         }
+
+        // GetMethodByInstructionPointer sometimes returns wrong methods.
+        // In case given address does not belong to the methods range, null is returned.
+        private static ClrMethod WorkaroundGetMethodByInstructionPointerBug(ClrRuntime runtime, ClrMethod method, ulong newAddress)
+            => TryReadNativeCodeAddresses(runtime, method, out ulong startAddress, out ulong endAddress) && !(startAddress >= newAddress && newAddress <= endAddress)
+            ? null
+            : method;
 
         internal static bool TryGetReferencedAddress(Instruction instruction, uint pointerSize, out ulong referencedAddress)
         {
@@ -283,14 +298,10 @@ namespace BenchmarkDotNet.Disassemblers
 
         private static ILToNativeMap[] GetCompleteNativeMap(ClrMethod method, ClrRuntime runtime)
         {
-            ulong startAddress = method.NativeCode, endAddress = ulong.MaxValue;
-            if (runtime.DacLibrary.SOSDacInterface.GetCodeHeaderData(method.NativeCode, out var codeHeaderData) == HResult.S_OK
-                && codeHeaderData.MethodSize > 0) // false for extern methods!
+            if (!TryReadNativeCodeAddresses(runtime, method, out ulong startAddress, out ulong endAddress))
             {
-                // HotSize can be missing or be invalid (https://github.com/microsoft/clrmd/issues/1036).
-                // So we fetch the method size on our own.
-                startAddress = codeHeaderData.MethodStart;
-                endAddress = codeHeaderData.MethodStart + codeHeaderData.MethodSize;
+                startAddress = method.NativeCode;
+                endAddress = ulong.MaxValue;
             }
 
             ILToNativeMap[] sortedMaps = method.ILOffsetMap // CanBeDisassembled ensures that there is at least one map in ILOffsetMap
@@ -314,6 +325,23 @@ namespace BenchmarkDotNet.Disassemblers
             }
 
             return sortedMaps;
+        }
+
+        private static bool TryReadNativeCodeAddresses(ClrRuntime runtime, ClrMethod method, out ulong startAddress, out ulong endAddress)
+        {
+            if (method is not null
+                && runtime.DacLibrary.SOSDacInterface.GetCodeHeaderData(method.NativeCode, out var codeHeaderData) == HResult.S_OK
+                && codeHeaderData.MethodSize > 0) // false for extern methods!
+            {
+                // HotSize can be missing or be invalid (https://github.com/microsoft/clrmd/issues/1036).
+                // So we fetch the method size on our own.
+                startAddress = codeHeaderData.MethodStart;
+                endAddress = codeHeaderData.MethodStart + codeHeaderData.MethodSize;
+                return true;
+            }
+
+            startAddress = endAddress = 0;
+            return false;
         }
 
         private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
