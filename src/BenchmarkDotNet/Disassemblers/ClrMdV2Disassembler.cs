@@ -298,7 +298,7 @@ namespace BenchmarkDotNet.Disassemblers
         // HotSize can be missing or be invalid, we are not using it https://github.com/microsoft/clrmd/issues/1036
         private static ILToNativeMap[] GetCompleteNativeMap(ClrMethod method)
             => method.ILOffsetMap
-                .Where(map => method.NativeCode <= map.StartAddress && map.StartAddress < map.EndAddress) // some maps have 0 length?
+                .Where(map => map.StartAddress < map.EndAddress) // some maps have 0 length?
                 .OrderBy(map => map.StartAddress) // we need to print in the machine code order, not IL! #536
                 .ToArray();
 
