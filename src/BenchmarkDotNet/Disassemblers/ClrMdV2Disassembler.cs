@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Filters;
 using Iced.Intel;
 using Microsoft.Diagnostics.Runtime;
+using Microsoft.Diagnostics.Runtime.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -67,16 +68,29 @@ namespace BenchmarkDotNet.Disassemblers
 
             foreach (ClrModule module in state.Runtime.EnumerateModules())
                 foreach (ClrType type in module.EnumerateTypeDefToMethodTableMap().Select(map => state.Runtime.GetTypeByMethodTable(map.MethodTable)).Where(type => type is not null))
-                    foreach (ClrMethod method in type.Methods.Where(method => CanBeDisassembled(method) && method.Signature != null))
-                        foreach (Regex filter in filters)
+                    foreach (ClrMethod method in type.Methods.Where(method => method.Signature != null))
+                    {
+                        if (method.NativeCode > 0)
                         {
-                            if (filter.IsMatch(method.Signature))
+                            if (!state.AddressToNameMapping.TryGetValue(method.NativeCode, out _))
                             {
-                                state.Todo.Enqueue(new MethodInfo(method,
-                                    depth: settings.MaxDepth)); // don't allow for recursive disassembling
-                                break;
+                                state.AddressToNameMapping.Add(method.NativeCode, method.Signature);
                             }
                         }
+
+                        if (CanBeDisassembled(method))
+                        {
+                            foreach (Regex filter in filters)
+                            {
+                                if (filter.IsMatch(method.Signature))
+                                {
+                                    state.Todo.Enqueue(new MethodInfo(method,
+                                        depth: settings.MaxDepth)); // don't allow for recursive disassembling
+                                    break;
+                                }
+                            }
+                        }
+                    }
         }
 
         private static DisassembledMethod[] Disassemble(Settings settings, State state)
@@ -128,7 +142,7 @@ namespace BenchmarkDotNet.Disassemblers
                 codes.AddRange(uniqueSourceCodeLines);
             }
 
-            foreach (var map in GetCompleteNativeMap(method))
+            foreach (var map in GetCompleteNativeMap(method, state.Runtime))
             {
                 codes.AddRange(Decode(map, state, methodInfo.Depth, method));
             }
@@ -167,46 +181,18 @@ namespace BenchmarkDotNet.Disassemblers
             var decoder = Decoder.Create(state.Runtime.DataTarget.DataReader.PointerSize * 8, reader);
             decoder.IP = startAddress;
 
-            List<Asm> instructions = new ();
-
             while (reader.CanReadByte)
             {
                 decoder.Decode(out var instruction);
 
-                // Most likely ClrMd provided us with incomplete data and we disassembled too much.
-                if (instruction.IsInvalid)
-                {
-                    break;
-                }
-
                 TryTranslateAddressToName(instruction, state, depth, currentMethod);
 
-                instructions.Add(new Asm
+                yield return new Asm
                 {
                     InstructionPointer = instruction.IP,
                     Instruction = instruction
-                });
+                };
             }
-
-            return GetValidInstructions(instructions);
-        }
-
-        private static IEnumerable<Asm> GetValidInstructions(List<Asm> disassembled)
-        {
-            // We are now going to search for the last valid instruction which is just ret or something before interrupt.
-            for (int i = 0; i < disassembled.Count - 1; i++)
-            {
-                if (disassembled[i].Instruction.FlowControl is FlowControl.Return)
-                {
-                    return disassembled.Take(i + 1); // include the ret itself
-                }
-                else if (disassembled[i].Instruction.FlowControl is FlowControl.Interrupt)
-                {
-                    return disassembled.Take(i); // don't include the interrupt, it creates too much garbage in the output
-                }
-            }
-
-            return disassembled;
         }
 
         private static void TryTranslateAddressToName(Instruction instruction, State state, int depth, ClrMethod currentMethod)
@@ -295,12 +281,40 @@ namespace BenchmarkDotNet.Disassemblers
             return false;
         }
 
-        // HotSize can be missing or be invalid, we are not using it https://github.com/microsoft/clrmd/issues/1036
-        private static ILToNativeMap[] GetCompleteNativeMap(ClrMethod method)
-            => method.ILOffsetMap
-                .Where(map => map.StartAddress < map.EndAddress) // some maps have 0 length?
+        private static ILToNativeMap[] GetCompleteNativeMap(ClrMethod method, ClrRuntime runtime)
+        {
+            ulong startAddress = method.NativeCode, endAddress = ulong.MaxValue;
+            if (runtime.DacLibrary.SOSDacInterface.GetCodeHeaderData(method.NativeCode, out var codeHeaderData) == HResult.S_OK
+                && codeHeaderData.MethodSize > 0) // false for extern methods!
+            {
+                // HotSize can be missing or be invalid (https://github.com/microsoft/clrmd/issues/1036).
+                // So we fetch the method size on our own.
+                startAddress = codeHeaderData.MethodStart;
+                endAddress = codeHeaderData.MethodStart + codeHeaderData.MethodSize;
+            }
+
+            ILToNativeMap[] sortedMaps = method.ILOffsetMap // CanBeDisassembled ensures that there is at least one map in ILOffsetMap
+                .Where(map => map.StartAddress >= startAddress && map.StartAddress < endAddress) // can be false for Tier 0 maps, EndAddress is not checked on purpose here
+                .Where(map => map.StartAddress < map.EndAddress) // some maps have 0 length (they don't have corresponding assembly code?)
                 .OrderBy(map => map.StartAddress) // we need to print in the machine code order, not IL! #536
+                .Select(map => new ILToNativeMap()
+                {
+                    StartAddress = map.StartAddress,
+                    // some maps have EndAddress > codeHeaderData.MethodStart + codeHeaderData.MethodSize and contain garbage (#2074). They need to be fixed!
+                    EndAddress = Math.Min(map.EndAddress, endAddress),
+                    ILOffset = map.ILOffset
+                })
                 .ToArray();
+
+            if (sortedMaps.Length == 0)
+            {
+                // In such situation ILOffsetMap most likely describes Tier 0, while CodeHeaderData Tier 1.
+                // Since we care about Tier 1 (if it's present), we "fake" a Tier 1 map.
+                return new[] { new ILToNativeMap() { StartAddress = startAddress, EndAddress = endAddress }};
+            }
+
+            return sortedMaps;
+        }
 
         private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
             => DisassembledMethod.Empty(method.Signature, method.NativeCode, reason);
