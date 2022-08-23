@@ -19,6 +19,9 @@ namespace BenchmarkDotNet.ConsoleArguments
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
     public class CommandLineOptions
     {
+        private const int DefaultDisassemblerRecursiveDepth = 1;
+        private bool useDisassemblyDiagnoser;
+
         [Option('j', "job", Required = false, Default = "Default", HelpText = "Dry/Short/Medium/Long or Default")]
         public string BaseJob { get; set; }
 
@@ -35,7 +38,11 @@ namespace BenchmarkDotNet.ConsoleArguments
         public bool UseThreadingDiagnoser { get; set; }
 
         [Option('d', "disasm", Required = false, Default = false, HelpText = "Gets disassembly of benchmarked code")]
-        public bool UseDisassemblyDiagnoser { get; set; }
+        public bool UseDisassemblyDiagnoser
+        {
+            get => useDisassemblyDiagnoser || DisassemblerRecursiveDepth != DefaultDisassemblerRecursiveDepth || DisassemblerFilters.Any();
+            set => useDisassemblyDiagnoser = value;
+        }
 
         [Option('p', "profiler", Required = false, HelpText = "Profiles benchmarked code using selected profiler. Available options: EP/ETW/CV/NativeMemory")]
         public string Profiler { get; set; }
@@ -145,7 +152,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("list", Required = false, Default = ListBenchmarkCaseMode.Disabled, HelpText = "Prints all of the available benchmark names. Flat/Tree")]
         public ListBenchmarkCaseMode ListBenchmarkCaseMode { get; set; }
 
-        [Option("disasmDepth", Required = false, Default = 1, HelpText = "Sets the recursive depth for the disassembler.")]
+        [Option("disasmDepth", Required = false, Default = DefaultDisassemblerRecursiveDepth, HelpText = "Sets the recursive depth for the disassembler.")]
         public int DisassemblerRecursiveDepth { get; set; }
 
         [Option("disasmFilter", Required = false, HelpText = "Glob patterns applied to full method signatures by the the disassembler.")]
