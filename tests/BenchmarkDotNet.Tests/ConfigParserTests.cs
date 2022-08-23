@@ -475,6 +475,19 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
+        public void WhenCustomDisassemblerSettingsAreProvidedItsEnabledByDefault()
+        {
+            Verify(new[] { "--disasmDepth", "2" });
+            Verify(new[] { "--disasmFilter", "*" });
+
+            void Verify(string[] args)
+            {
+                var config = ConfigParser.Parse(args, new OutputLogger(Output)).config;
+                Assert.Single(config.GetDiagnosers().OfType<DisassemblyDiagnoser>());
+            }
+        }
+
+        [Fact]
         public void CanParseInfo()
         {
             var config = ConfigParser.Parse(new[] { "--info" }, new OutputLogger(Output)).options;
