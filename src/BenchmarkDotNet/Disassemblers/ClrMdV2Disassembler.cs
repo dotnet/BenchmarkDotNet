@@ -323,6 +323,11 @@ namespace BenchmarkDotNet.Disassemblers
                 // Since we care about Tier 1 (if it's present), we "fake" a Tier 1 map.
                 return new[] { new ILToNativeMap() { StartAddress = startAddress, EndAddress = endAddress }};
             }
+            else if (sortedMaps[0].StartAddress != startAddress || (sortedMaps[sortedMaps.Length - 1].EndAddress != endAddress && endAddress != ulong.MaxValue))
+            {
+                // In such situation ILOffsetMap most likely is missing few bytes. We just "extend" it to avoid producing "bad" instructions.
+                return new[] { new ILToNativeMap() { StartAddress = startAddress, EndAddress = endAddress } };
+            }
 
             return sortedMaps;
         }
