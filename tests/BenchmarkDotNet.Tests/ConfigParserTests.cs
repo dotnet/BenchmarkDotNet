@@ -357,6 +357,8 @@ namespace BenchmarkDotNet.Tests
         [InlineData("net47")]
         [InlineData("net471")]
         [InlineData("net472")]
+        [InlineData("net48")]
+        [InlineData("net481")]
         public void NetFrameworkMonikerParsedCorrectly(string tfm)
         {
             var config = ConfigParser.Parse(new[] { "-r", tfm }, new OutputLogger(Output)).config;
@@ -470,6 +472,19 @@ namespace BenchmarkDotNet.Tests
             var diagnoser = config.GetDiagnosers().OfType<DisassemblyDiagnoser>().Single();
 
             Assert.Equal(depth, diagnoser.Config.MaxDepth);
+        }
+
+        [Fact]
+        public void WhenCustomDisassemblerSettingsAreProvidedItsEnabledByDefault()
+        {
+            Verify(new[] { "--disasmDepth", "2" });
+            Verify(new[] { "--disasmFilter", "*" });
+
+            void Verify(string[] args)
+            {
+                var config = ConfigParser.Parse(args, new OutputLogger(Output)).config;
+                Assert.Single(config.GetDiagnosers().OfType<DisassemblyDiagnoser>());
+            }
         }
 
         [Fact]

@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             // first of all, we search of referenced addresses (jump|calls)
             var referencedAddresses = new HashSet<ulong>();
             foreach (var asm in asmInstructions)
-                if (ClrMdDisassembler.TryGetReferencedAddress(asm.Instruction, disassemblyResult.PointerSize, out ulong referencedAddress))
+                if (ClrMdV2Disassembler.TryGetReferencedAddress(asm.Instruction, disassemblyResult.PointerSize, out ulong referencedAddress))
                     referencedAddresses.Add(referencedAddress);
 
             // for every IP that is referenced, we emit a uinque label
@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                             prettified.Add(new Label(label));
                         }
 
-                        if (ClrMdDisassembler.TryGetReferencedAddress(asm.Instruction, disassemblyResult.PointerSize, out ulong referencedAddress))
+                        if (ClrMdV2Disassembler.TryGetReferencedAddress(asm.Instruction, disassemblyResult.PointerSize, out ulong referencedAddress))
                         {
                             // jump or a call within same method
                             if (addressesToLabels.TryGetValue(referencedAddress, out string translated))

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Management;
+using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -14,9 +15,7 @@ using BenchmarkDotNet.Portability.Cpu;
 using JetBrains.Annotations;
 using Microsoft.Win32;
 using static System.Runtime.InteropServices.RuntimeInformation;
-#if NETSTANDARD
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
-#endif
 
 namespace BenchmarkDotNet.Portability
 {
@@ -103,16 +102,8 @@ namespace BenchmarkDotNet.Portability
                     return OsBrandStringHelper.PrettifyMacOSX(systemVersion, kernelVersion);
             }
 
-            string operatingSystem;
-            string operatingSystemVersion;
-
-#if NETSTANDARD
-            operatingSystem = RuntimeEnvironment.OperatingSystem;
-            operatingSystemVersion = RuntimeEnvironment.OperatingSystemVersion;
-#else
-            operatingSystem = PlatformApis.GetOSName();
-            operatingSystemVersion = PlatformApis.GetOSVersion();
-#endif
+            string operatingSystem = RuntimeEnvironment.OperatingSystem;
+            string operatingSystemVersion = RuntimeEnvironment.OperatingSystemVersion;
 
             return OsBrandStringHelper.Prettify(
                 operatingSystem,

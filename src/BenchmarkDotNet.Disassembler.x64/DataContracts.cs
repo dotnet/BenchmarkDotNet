@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Disassemblers
 
     internal class Settings
     {
-        internal Settings(int processId, string typeName, string methodName, bool printSource, int maxDepth, string resultsPath)
+        internal Settings(int processId, string typeName, string methodName, bool printSource, int maxDepth, string resultsPath, string[] filters)
         {
             ProcessId = processId;
             TypeName = typeName;
@@ -109,6 +109,7 @@ namespace BenchmarkDotNet.Disassemblers
             PrintSource = printSource;
             MaxDepth = methodName == DisassemblerConstants.DisassemblerEntryMethodName && maxDepth != int.MaxValue ? maxDepth + 1 : maxDepth;
             ResultsPath = resultsPath;
+            Filters = filters;
         }
 
         internal int ProcessId { get; }
@@ -116,6 +117,7 @@ namespace BenchmarkDotNet.Disassemblers
         internal string MethodName { get; }
         internal bool PrintSource { get; }
         internal int MaxDepth { get; }
+        internal string[] Filters;
         internal string ResultsPath { get; }
 
         internal static Settings FromArgs(string[] args)
@@ -125,7 +127,8 @@ namespace BenchmarkDotNet.Disassemblers
                 methodName: args[2],
                 printSource: bool.Parse(args[3]),
                 maxDepth: int.Parse(args[4]),
-                resultsPath: args[5]
+                resultsPath: args[5],
+                filters: args.Skip(6).ToArray()
             );
     }
 

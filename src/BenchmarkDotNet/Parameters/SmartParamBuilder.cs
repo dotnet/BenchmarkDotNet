@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Parameters
     internal static class SmartParamBuilder
     {
         [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
-        internal static object[] CreateForParams(MemberInfo source, object[] values)
+        internal static object[] CreateForParams(Type parameterType, MemberInfo source, object[] values)
         {
             // IEnumerable<object>
             if (values.IsEmpty() || values.All(SourceCodeHelper.IsCompilationTimeConstant))
@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Parameters
             if (values.All(value => value is object[] array && array.Length == 1 && SourceCodeHelper.IsCompilationTimeConstant(array[0])))
                 return values.Select(x => ((object[])x)[0]).ToArray();
 
-            return values.Select((value, index) => new SmartParameter(source, value, index)).ToArray();
+            return values.Select((value, index) => new SmartParameter(parameterType, source, value, index)).ToArray();
         }
 
         internal static ParameterInstances CreateForArguments(MethodInfo benchmark, ParameterDefinition[] parameterDefinitions, (MemberInfo source, object[] values) valuesInfo, int sourceIndex, SummaryStyle summaryStyle)
@@ -106,12 +106,14 @@ namespace BenchmarkDotNet.Parameters
 
     internal class SmartParameter : IParam
     {
+        private readonly Type parameterType;
         private readonly MemberInfo source;
         private readonly MethodBase method;
         private readonly int index;
 
-        public SmartParameter(MemberInfo source, object value, int index)
+        public SmartParameter(Type parameterType, MemberInfo source, object value, int index)
         {
+            this.parameterType = parameterType;
             this.source = source;
             method = source is PropertyInfo property ? property.GetMethod : source as MethodInfo;
             Value = value;
@@ -124,7 +126,7 @@ namespace BenchmarkDotNet.Parameters
 
         public string ToSourceCode()
         {
-            string cast = Value == null ? string.Empty : $"({Value.GetType().GetCorrectCSharpTypeName()})";
+            string cast = $"({parameterType.GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
 
             string instancePrefix = method.IsStatic ? source.DeclaringType.GetCorrectCSharpTypeName() : "instance";
 

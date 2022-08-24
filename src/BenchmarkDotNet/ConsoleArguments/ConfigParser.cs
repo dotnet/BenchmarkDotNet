@@ -214,7 +214,10 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.UseThreadingDiagnoser)
                 config.AddDiagnoser(ThreadingDiagnoser.Default);
             if (options.UseDisassemblyDiagnoser)
-                config.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(maxDepth: options.DisassemblerRecursiveDepth, exportDiff: options.DisassemblerDiff)));
+                config.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(
+                    maxDepth: options.DisassemblerRecursiveDepth,
+                    filters: options.DisassemblerFilters.ToArray(),
+                    exportDiff: options.DisassemblerDiff)));
             if (!string.IsNullOrEmpty(options.Profiler))
                 config.AddDiagnoser(DiagnosersLoader.GetImplementation<IProfiler>(profiler => profiler.ShortName.EqualsWithIgnoreCase(options.Profiler)));
 
@@ -364,6 +367,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net471:
                 case RuntimeMoniker.Net472:
                 case RuntimeMoniker.Net48:
+                case RuntimeMoniker.Net481:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
                         .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName));

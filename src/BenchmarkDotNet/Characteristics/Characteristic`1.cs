@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Characteristics
 {
-    public class Characteristic<T> : Characteristic
+    public class Characteristic<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T> : Characteristic
     {
         internal Characteristic(
             string id,

@@ -58,6 +58,7 @@ public class BuildContext : FrostingContext
 
     private IAppVeyorProvider AppVeyor => this.BuildSystem().AppVeyor;
     public bool IsOnAppVeyorAndNotPr => AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest;
+    public bool IsOnAppVeyorAndBdnNightlyCiCd => IsOnAppVeyorAndNotPr && AppVeyor.Environment.Repository.Branch == "master" && this.IsRunningOnWindows();
     public bool IsLocalBuild => this.BuildSystem().IsLocalBuild;
     public bool IsCiBuild => !this.BuildSystem().IsLocalBuild;
 
@@ -201,7 +202,7 @@ public class BuildContext : FrostingContext
 
 public static class DocumentationHelper
 {
-    public const string DocFxVersion = "2.57.2";
+    public const string DocFxVersion = "2.59.3";
 
     public static readonly string[] BdnAllVersions =
     {
@@ -360,6 +361,11 @@ public class AllTestsTask : FrostingTask<BuildContext>
 [IsDependentOn(typeof(BuildTask))]
 public class PackTask : FrostingTask<BuildContext>
 {
+    public override bool ShouldRun(BuildContext context)
+    {
+        return context.IsOnAppVeyorAndBdnNightlyCiCd;
+    }
+
     public override void Run(BuildContext context)
     {
         var settingsSrc = new DotNetCorePackSettings
@@ -447,6 +453,10 @@ public class DocfxChangelogGenerateTask : FrostingTask<BuildContext>
     }
 }
 
+// In order to work around xref issues in DocFx, BenchmarkDotNet and BenchmarkDotNet.Annotations must be build
+// before running the DocFX_Build target. However, including a dependency on BuildTask here may have unwanted
+// side effects (CleanTask).
+// TODO: Define dependencies when a CI workflow scenario for using the "DocFX_Build" target exists.
 [TaskName("DocFX_Build")]
 [IsDependentOn(typeof(DocfxInstallTask))]
 [IsDependentOn(typeof(DocfxChangelogGenerateTask))]

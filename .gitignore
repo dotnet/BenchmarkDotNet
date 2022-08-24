@@ -48,7 +48,7 @@ tests/output/*
 artifacts/*
 BDN.Generated
 BenchmarkDotNet.Samples/Properties/launchSettings.json
-src/BenchmarkDotNet/Disassemblers/net461/*
+src/BenchmarkDotNet/Disassemblers/net462/*
 src/BenchmarkDotNet/Disassemblers/BenchmarkDotNet.Disassembler.*.nupkg
 
 # Visual Studio 2015 cache/options directory

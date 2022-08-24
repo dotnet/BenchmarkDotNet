@@ -15,7 +15,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\BenchmarkDotNet.Disassembler.x64\DataContracts.cs" Link="DataContracts.cs" />
-    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\ClrMdDisassembler.cs" Link="ClrMdDisassembler.cs" />
+    <Compile Include="..\BenchmarkDotNet.Disassembler.x64\ClrMdV1Disassembler.cs" Link="ClrMdV1Disassembler.cs" />
     <Compile Include="..\BenchmarkDotNet.Disassembler.x64\SourceCodeProvider.cs" Link="SourceCodeProvider.cs" />
     <Compile Include="..\BenchmarkDotNet.Disassembler.x64\Program.cs" Link="Program.cs" />
   </ItemGroup>

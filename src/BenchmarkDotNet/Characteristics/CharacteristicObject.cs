@@ -1,15 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 
+using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
+
 namespace BenchmarkDotNet.Characteristics
 {
     // TODO: better naming.
+    [DynamicallyAccessedMembers(CharacteristicMemberTypes)]
     public abstract class CharacteristicObject
     {
         #region IdCharacteristic
+
+        internal const DynamicallyAccessedMemberTypes CharacteristicMemberTypes =
+            DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.NonPublicProperties
+            | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields;
 
         protected static string ResolveId(CharacteristicObject obj, string actual)
         {
@@ -134,7 +142,7 @@ namespace BenchmarkDotNet.Characteristics
             return false;
         }
 
-        internal T GetValue<T>(Characteristic<T> characteristic)
+        internal T GetValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic)
         {
             return (T)GetValue((Characteristic)characteristic);
         }
@@ -154,12 +162,12 @@ namespace BenchmarkDotNet.Characteristics
         #endregion
 
         #region Resolve
-        public T ResolveValue<T>(Characteristic<T> characteristic, IResolver resolver)
+        public T ResolveValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, IResolver resolver)
         {
             return resolver.Resolve(this, characteristic);
         }
 
-        public T ResolveValue<T>(Characteristic<T> characteristic, IResolver resolver, T defaultValue)
+        public T ResolveValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, IResolver resolver, T defaultValue)
         {
             return resolver.Resolve(this, characteristic, defaultValue);
         }
@@ -174,7 +182,7 @@ namespace BenchmarkDotNet.Characteristics
             return resolver.Resolve(this, characteristic, defaultValue);
         }
 
-        public T ResolveValue<T>(Characteristic<T> characteristic, T defaultValue)
+        public T ResolveValue<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, T defaultValue)
         {
             return HasValue(characteristic) ? GetValue(characteristic) : (T)characteristic.ResolveValueCore(this, defaultValue);
         }
@@ -185,14 +193,14 @@ namespace BenchmarkDotNet.Characteristics
             return HasValue(characteristic) ? GetValue(characteristic) : characteristic.ResolveValueCore(this, defaultValue);
         }
 
-        public T? ResolveValueAsNullable<T>(Characteristic<T> characteristic) where T : struct
+        public T? ResolveValueAsNullable<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic) where T : struct
         {
             return HasValue(characteristic) ? GetValue(characteristic) : (T?)null;
         }
         #endregion
 
         #region Set value
-        internal void SetValue<T>(Characteristic<T> characteristic, T value)
+        internal void SetValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, T value)
         {
             SetValue((Characteristic)characteristic, value);
         }

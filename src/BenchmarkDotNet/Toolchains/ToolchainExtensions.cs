@@ -89,6 +89,8 @@ namespace BenchmarkDotNet.Toolchains
                     return CsProjClassicNetToolchain.Net472;
                 case RuntimeMoniker.Net48:
                     return CsProjClassicNetToolchain.Net48;
+                case RuntimeMoniker.Net481:
+                    return CsProjClassicNetToolchain.Net481;
                 case RuntimeMoniker.NetCoreApp20:
                     return CsProjCoreToolchain.NetCoreApp20;
                 case RuntimeMoniker.NetCoreApp21:
