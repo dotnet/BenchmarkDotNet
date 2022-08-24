@@ -3,7 +3,7 @@ using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Samples
 {
-    [SimpleJob(runtimeMoniker: RuntimeMoniker.Net461, baseline: true)]
+    [SimpleJob(runtimeMoniker: RuntimeMoniker.Net462, baseline: true)]
     [SimpleJob(runtimeMoniker: RuntimeMoniker.Mono)]
     [SimpleJob(runtimeMoniker: RuntimeMoniker.Net50)]
     public class IntroJobBaseline

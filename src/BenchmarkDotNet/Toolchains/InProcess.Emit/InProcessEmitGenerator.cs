@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             {
                 artifactsPaths = GetArtifactsPaths(buildPartition, rootArtifactsFolderPath);
 
-                return GenerateResult.Success(artifactsPaths, new List<string>());
+                return GenerateResult.Success(artifactsPaths, new List<string>(), buildPartition.NoAcknowledgments);
             }
             catch (Exception ex)
             {

@@ -2,14 +2,14 @@ using BenchmarkDotNet.Diagnosers;
 
 namespace BenchmarkDotNet.Disassemblers
 {
-    internal class LinuxDisassembler
+    internal class SameArchitectureDisassembler
     {
         private readonly DisassemblyDiagnoserConfig config;
 
-        internal LinuxDisassembler(DisassemblyDiagnoserConfig config) => this.config = config;
+        internal SameArchitectureDisassembler(DisassemblyDiagnoserConfig config) => this.config = config;
 
         internal DisassemblyResult Disassemble(DiagnoserActionParameters parameters)
-            => ClrMdDisassembler.AttachAndDisassemble(BuildDisassemblerSettings(parameters));
+            => ClrMdV2Disassembler.AttachAndDisassemble(BuildDisassemblerSettings(parameters));
 
         private Settings BuildDisassemblerSettings(DiagnoserActionParameters parameters)
             => new Settings(
@@ -18,6 +18,7 @@ namespace BenchmarkDotNet.Disassemblers
                 methodName: DisassemblerConstants.DisassemblerEntryMethodName,
                 printSource: config.PrintSource,
                 maxDepth: config.MaxDepth,
+                filters: config.Filters,
                 resultsPath: default
             );
     }

@@ -54,8 +54,8 @@ namespace BenchmarkDotNet.Helpers
 
             if (finalResult.Length > limit)
             {
-                throw new NotSupportedException($"The full benchmark name: \"{fileName}\" combined with artifiacts path: \"{details.Config.ArtifactsPath}\" is too long. " +
-                   $"Please enable long paths support, set the value of {nameof(details.Config)}.{nameof(details.Config.ArtifactsPath)} to shorter path or rename the type or method.");
+                throw new NotSupportedException($"The full benchmark name: \"{fileName}\" combined with artifacts path: \"{details.Config.ArtifactsPath}\" is too long. " +
+                   $"Please set the value of {nameof(details.Config)}.{nameof(details.Config.ArtifactsPath)} to shorter path or rename the type or method.");
             }
 
             return finalResult;
@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Helpers
 
         private static string GetFilePath(string fileName, DiagnoserActionParameters details, DateTime creationTime, string fileExtension)
         {
-            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net461 vs netcoreapp2.1 etc
+            // if we run for more than one toolchain, the output file name should contain the name too so we can differ net462 vs netcoreapp2.1 etc
             if (details.Config.GetJobs().Select(job => ToolchainExtensions.GetToolchain(job)).Distinct().Count() > 1)
                 fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
 

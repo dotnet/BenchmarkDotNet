@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using static BenchmarkDotNet.Characteristics.CharacteristicHelper;
 
 namespace BenchmarkDotNet.Characteristics
@@ -7,7 +8,7 @@ namespace BenchmarkDotNet.Characteristics
     {
         public static readonly object EmptyValue = new object();
 
-        public static Characteristic<T> Create<TOwner, T>(string memberName)
+        public static Characteristic<T> Create<TOwner, [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(string memberName)
             where TOwner : CharacteristicObject
             => new Characteristic<T>(
                 memberName,
@@ -15,7 +16,7 @@ namespace BenchmarkDotNet.Characteristics
                 null, default,
                 false);
 
-        public static Characteristic<T> Create<TOwner, T>(string memberName, T fallbackValue)
+        public static Characteristic<T> Create<TOwner, [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(string memberName, T fallbackValue)
             where TOwner : CharacteristicObject
             => new Characteristic<T>(
                 memberName,
@@ -23,7 +24,7 @@ namespace BenchmarkDotNet.Characteristics
                 null, fallbackValue,
                 false);
 
-        public static Characteristic<T> Create<TOwner, T>(string memberName, Func<CharacteristicObject, T, T> resolver, T fallbackValue, bool ignoreOnApply)
+        public static Characteristic<T> Create<TOwner, [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(string memberName, Func<CharacteristicObject, T, T> resolver, T fallbackValue, bool ignoreOnApply)
             where TOwner : CharacteristicObject
             => new Characteristic<T>(
                 memberName,
@@ -31,7 +32,7 @@ namespace BenchmarkDotNet.Characteristics
                 resolver, fallbackValue,
                 ignoreOnApply);
 
-        public static Characteristic<T> CreateHidden<TOwner, T>(string memberName)
+        public static Characteristic<T> CreateHidden<TOwner, [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(string memberName)
             where TOwner : CharacteristicObject
             => new Characteristic<T>(
                 memberName,
@@ -39,7 +40,7 @@ namespace BenchmarkDotNet.Characteristics
                 null, default,
                 false, true);
 
-        public static Characteristic<T> CreateIgnoreOnApply<TOwner, T>(string memberName)
+        public static Characteristic<T> CreateIgnoreOnApply<TOwner, [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(string memberName)
             where TOwner : CharacteristicObject
             => new Characteristic<T>(
                 memberName,
@@ -49,7 +50,7 @@ namespace BenchmarkDotNet.Characteristics
 
         protected Characteristic(
             string id,
-            Type characteristicType,
+            [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] Type characteristicType,
             Type declaringType,
             object fallbackValue,
             bool ignoreOnApply,
@@ -78,6 +79,7 @@ namespace BenchmarkDotNet.Characteristics
 
         public bool DontShowInSummary { get; }
 
+        [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)]
         public Type CharacteristicType { get; }
 
         public Type DeclaringType { get; }

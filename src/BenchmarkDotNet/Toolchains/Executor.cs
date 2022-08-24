@@ -32,18 +32,18 @@ namespace BenchmarkDotNet.Toolchains
             }
 
             return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
-                args, executeParameters.Diagnoser, executeParameters.Resolver, executeParameters.LaunchIndex);
+                args, executeParameters.Diagnoser, executeParameters.Resolver, executeParameters.LaunchIndex, executeParameters.BuildResult.NoAcknowledgments);
         }
 
         private ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
-            string args, IDiagnoser diagnoser, IResolver resolver, int launchIndex)
+            string args, IDiagnoser diagnoser, IResolver resolver, int launchIndex, bool noAcknowledgments)
         {
             try
             {
-                using (var process = new Process { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) })
+                using (var process = new Process { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver, noAcknowledgments) })
                 using (var consoleExitHandler = new ConsoleExitHandler(process, logger))
                 {
-                    var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId);
+                    var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, noAcknowledgments);
 
                     diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 
@@ -81,16 +81,22 @@ namespace BenchmarkDotNet.Toolchains
             if (loggerWithDiagnoser.LinesWithResults.Any(line => line.Contains("BadImageFormatException")))
                 logger.WriteLineError("You are probably missing <PlatformTarget>AnyCPU</PlatformTarget> in your .csproj file.");
 
-            return new ExecuteResult(true, process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput, launchIndex);
+            return new ExecuteResult(true,
+                process.HasExited ? process.ExitCode : null,
+                process.Id,
+                loggerWithDiagnoser.LinesWithResults,
+                loggerWithDiagnoser.LinesWithExtraOutput,
+                launchIndex);
         }
 
-        private ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, string args, IResolver resolver)
+        private ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths,
+            string args, IResolver resolver, bool noAcknowledgments)
         {
             var start = new ProcessStartInfo
             {
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
-                RedirectStandardInput = true,
+                RedirectStandardInput = !noAcknowledgments,
                 RedirectStandardError = false, // #1629
                 CreateNoWindow = true,
                 StandardOutputEncoding = Encoding.UTF8, // #1713
@@ -108,7 +114,7 @@ namespace BenchmarkDotNet.Toolchains
             {
                 case ClrRuntime _:
                 case CoreRuntime _:
-                case CoreRtRuntime _:
+                case NativeAotRuntime _:
                     start.FileName = exePath;
                     start.Arguments = args;
                     break;

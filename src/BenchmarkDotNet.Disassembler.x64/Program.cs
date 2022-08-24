@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Disassemblers
 
             try
             {
-                var methodsToExport = ClrMdDisassembler.AttachAndDisassemble(options);
+                var methodsToExport = ClrMdV1Disassembler.AttachAndDisassemble(options);
 
                 SaveToFile(methodsToExport, options.ResultsPath);
             }

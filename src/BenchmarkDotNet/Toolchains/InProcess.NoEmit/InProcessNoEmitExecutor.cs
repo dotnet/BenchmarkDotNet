@@ -58,7 +58,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             int exitCode = -1;
             var runThread = new Thread(() => exitCode = ExecuteCore(host, executeParameters));
 
-            if (executeParameters.BenchmarkCase.Descriptor.WorkloadMethod.GetCustomAttributes<STAThreadAttribute>(false).Any())
+            if (executeParameters.BenchmarkCase.Descriptor.WorkloadMethod.GetCustomAttributes<STAThreadAttribute>(false).Any() &&
+                Portability.RuntimeInformation.IsWindows())
             {
                 runThread.SetApartmentState(ApartmentState.STA);
             }

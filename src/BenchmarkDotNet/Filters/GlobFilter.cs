@@ -9,18 +9,20 @@ namespace BenchmarkDotNet.Filters
     /// </summary>
     public class GlobFilter : IFilter
     {
-        private readonly (string userValue, Regex regex)[] patterns;
+        private readonly Regex[] patterns;
 
-        public GlobFilter(string[] patterns)
-            => this.patterns = patterns.Select(pattern => (pattern, new Regex(WildcardToRegex(pattern), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))).ToArray();
+        public GlobFilter(string[] patterns) => this.patterns = ToRegex(patterns);
 
         public bool Predicate(BenchmarkCase benchmarkCase)
         {
             var benchmark = benchmarkCase.Descriptor.WorkloadMethod;
             string fullBenchmarkName = benchmarkCase.Descriptor.GetFilterName();
 
-            return patterns.Any(pattern => pattern.regex.IsMatch(fullBenchmarkName));
+            return patterns.Any(pattern => pattern.IsMatch(fullBenchmarkName));
         }
+
+        internal static Regex[] ToRegex(string[] patterns)
+            => patterns.Select(pattern => new Regex(WildcardToRegex(pattern), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).ToArray();
 
         // https://stackoverflow.com/a/6907849/5852046 not perfect but should work for all we need
         private static string WildcardToRegex(string pattern) => $"^{Regex.Escape(pattern).Replace(@"\*", ".*").Replace(@"\?", ".")}$";

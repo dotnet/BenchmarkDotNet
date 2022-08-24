@@ -56,7 +56,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 
             if (executeParameters.BenchmarkCase.Descriptor.WorkloadMethod
                 .GetCustomAttributes<STAThreadAttribute>(false)
-                .Any())
+                .Any() &&
+                Portability.RuntimeInformation.IsWindows())
             {
                 runThread.SetApartmentState(ApartmentState.STA);
             }

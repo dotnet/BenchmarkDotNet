@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Environments
 
         public bool Aot { get;  }
 
-        public DirectoryInfo RuntimeSrcDir { get;  }
+        public string WasmDataDir { get; }
 
         /// <summary>
         /// creates new instance of WasmRuntime
@@ -26,8 +26,9 @@ namespace BenchmarkDotNet.Environments
         /// <param name="msBuildMoniker">moniker, default: "net5.0"</param>
         /// <param name="displayName">default: "Wasm"</param>
         /// <param name="aot">Specifies whether AOT or Interpreter (default) project should be generated.</param>
-        /// <param name="runtimeSrcDir">The path to runtime source directory.</param>
-        public WasmRuntime(string msBuildMoniker = "net5.0", string displayName = "Wasm", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm", bool aot = false, DirectoryInfo runtimeSrcDir = null, RuntimeMoniker moniker = RuntimeMoniker.Wasm) : base(moniker, msBuildMoniker, displayName)
+        /// <param name="wasmDataDir">Specifies a wasm data directory surfaced as $(WasmDataDir) for the project</param>
+        /// <param name="moniker">Runtime moniker</param>
+        public WasmRuntime(string msBuildMoniker = "net5.0", string displayName = "Wasm", string javaScriptEngine = "v8", string javaScriptEngineArguments = "--expose_wasm", bool aot = false, string wasmDataDir = null, RuntimeMoniker moniker = RuntimeMoniker.Wasm) : base(moniker, msBuildMoniker, displayName)
         {
             if (!string.IsNullOrEmpty(javaScriptEngine) && javaScriptEngine != "v8" && !File.Exists(javaScriptEngine))
                 throw new FileNotFoundException($"Provided {nameof(javaScriptEngine)} file: \"{javaScriptEngine}\" doest NOT exist");
@@ -35,16 +36,16 @@ namespace BenchmarkDotNet.Environments
             JavaScriptEngine = javaScriptEngine;
             JavaScriptEngineArguments = javaScriptEngineArguments;
             Aot = aot;
-            RuntimeSrcDir = runtimeSrcDir;
+            WasmDataDir = wasmDataDir;
         }
 
         public override bool Equals(object obj)
             => obj is WasmRuntime other && Equals(other);
 
         public bool Equals(WasmRuntime other)
-            => other != null && base.Equals(other) && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments && other.Aot == Aot && other.RuntimeSrcDir == RuntimeSrcDir;
+            => other != null && base.Equals(other) && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments && other.Aot == Aot;
 
         public override int GetHashCode()
-            => base.GetHashCode() ^ (JavaScriptEngine?.GetHashCode() ?? 0) ^ (JavaScriptEngineArguments?.GetHashCode() ?? 0 ^ Aot.GetHashCode() ^ (RuntimeSrcDir?.GetHashCode() ?? 0));
+            => base.GetHashCode() ^ (JavaScriptEngine?.GetHashCode() ?? 0) ^ (JavaScriptEngineArguments?.GetHashCode() ?? 0 ^ Aot.GetHashCode());
     }
 }

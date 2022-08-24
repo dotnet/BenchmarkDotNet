@@ -22,6 +22,7 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<string> Ids => Array.Empty<string>();
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
+        public bool RequiresBlockingAcknowledgments(BenchmarkCase benchmarkCase) => false;
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
         public IEnumerable<Metric> ProcessResults(DiagnoserResults _) => Array.Empty<Metric>();
 

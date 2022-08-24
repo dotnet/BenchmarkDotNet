@@ -8,6 +8,8 @@ using Cake.Common.Diagnostics;
 using Cake.Common.IO;
 using Cake.Common.Net;
 using Cake.Common.Tools.DotNet;
+using Cake.Common.Tools.DotNet.MSBuild;
+using Cake.Common.Tools.DotNet.Restore;
 using Cake.Common.Tools.DotNet.Run;
 using Cake.Common.Tools.DotNetCore.Build;
 using Cake.Common.Tools.DotNetCore.MSBuild;
@@ -56,6 +58,7 @@ public class BuildContext : FrostingContext
 
     private IAppVeyorProvider AppVeyor => this.BuildSystem().AppVeyor;
     public bool IsOnAppVeyorAndNotPr => AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest;
+    public bool IsOnAppVeyorAndBdnNightlyCiCd => IsOnAppVeyorAndNotPr && AppVeyor.Environment.Repository.Branch == "master" && this.IsRunningOnWindows();
     public bool IsLocalBuild => this.BuildSystem().IsLocalBuild;
     public bool IsCiBuild => !this.BuildSystem().IsLocalBuild;
 
@@ -93,11 +96,19 @@ public class BuildContext : FrostingContext
             MaxCpuCount = 1
         };
         MsBuildSettings.WithProperty("UseSharedCompilation", "false");
+
+        // NativeAOT build requires VS C++ tools to be added to $path via vcvars64.bat
+        // but once we do that, dotnet restore fails with:
+        // "Please specify a valid solution configuration using the Configuration and Platform properties"
+        if (context.IsRunningOnWindows())
+        {
+            MsBuildSettings.WithProperty("Platform", "Any CPU");
+        }
     }
 
     private DotNetCoreTestSettings GetTestSettingsParameters(FilePath logFile, string tfm)
     {
-        return new DotNetCoreTestSettings
+        var settings = new DotNetCoreTestSettings
         {
             Configuration = BuildConfiguration,
             Framework = tfm,
@@ -105,6 +116,9 @@ public class BuildContext : FrostingContext
             NoRestore = true,
             Loggers = new[] { "trx", $"trx;LogFileName={logFile.FullPath}" }
         };
+        // force the tool to not look for the .dll in platform-specific directory
+        settings.EnvironmentVariables["Platform"] = "";
+        return settings;
     }
 
     public void RunTests(FilePath projectFile, string alias, string tfm)
@@ -188,7 +202,7 @@ public class BuildContext : FrostingContext
 
 public static class DocumentationHelper
 {
-    public const string DocFxVersion = "2.57.2";
+    public const string DocFxVersion = "2.59.3";
 
     public static readonly string[] BdnAllVersions =
     {
@@ -260,7 +274,11 @@ public class RestoreTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        context.DotNetRestore(context.SolutionFile.FullPath);
+        context.DotNetRestore(context.SolutionFile.FullPath,
+            new DotNetRestoreSettings
+            {
+                MSBuildSettings = context.MsBuildSettings
+            });
     }
 }
 
@@ -293,8 +311,8 @@ public class FastTestsTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context)
     {
         var targetFrameworks = context.IsRunningOnWindows()
-            ? new[] { "net461", "net5.0" }
-            : new[] { "net5.0" };
+            ? new[] { "net461", "net6.0" }
+            : new[] { "net6.0" };
 
         foreach (var targetFramework in targetFrameworks) 
             context.RunTests(context.UnitTestsProjectFile, "UnitTests", targetFramework);
@@ -327,7 +345,7 @@ public class SlowTestsNet5Task : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
-        context.RunTests(context.IntegrationTestsProjectFile, "IntegrationTests", "net5.0");
+        context.RunTests(context.IntegrationTestsProjectFile, "IntegrationTests", "net6.0");
     }
 }
 
@@ -343,18 +361,25 @@ public class AllTestsTask : FrostingTask<BuildContext>
 [IsDependentOn(typeof(BuildTask))]
 public class PackTask : FrostingTask<BuildContext>
 {
+    public override bool ShouldRun(BuildContext context)
+    {
+        return context.IsOnAppVeyorAndBdnNightlyCiCd;
+    }
+
     public override void Run(BuildContext context)
     {
         var settingsSrc = new DotNetCorePackSettings
         {
             Configuration = context.BuildConfiguration,
             OutputDirectory = context.ArtifactsDirectory.FullPath,
-            ArgumentCustomization = args => args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg")
+            ArgumentCustomization = args => args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg"),
+            MSBuildSettings = context.MsBuildSettings
         };
         var settingsTemplate = new DotNetCorePackSettings
         {
             Configuration = context.BuildConfiguration,
-            OutputDirectory = context.ArtifactsDirectory.FullPath
+            OutputDirectory = context.ArtifactsDirectory.FullPath,
+            MSBuildSettings = context.MsBuildSettings
         };
 
         foreach (var project in context.AllPackableSrcProjects)
@@ -428,6 +453,10 @@ public class DocfxChangelogGenerateTask : FrostingTask<BuildContext>
     }
 }
 
+// In order to work around xref issues in DocFx, BenchmarkDotNet and BenchmarkDotNet.Annotations must be build
+// before running the DocFX_Build target. However, including a dependency on BuildTask here may have unwanted
+// side effects (CleanTask).
+// TODO: Define dependencies when a CI workflow scenario for using the "DocFX_Build" target exists.
 [TaskName("DocFX_Build")]
 [IsDependentOn(typeof(DocfxInstallTask))]
 [IsDependentOn(typeof(DocfxChangelogGenerateTask))]

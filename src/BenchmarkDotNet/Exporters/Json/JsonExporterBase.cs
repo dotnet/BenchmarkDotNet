@@ -74,25 +74,25 @@ namespace BenchmarkDotNet.Exporters.Json
                 { "Method", report.BenchmarkCase.Descriptor.WorkloadMethod.Name },
                 { "MethodTitle", report.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo },
                 { "Parameters", report.BenchmarkCase.Parameters.PrintInfo },
-                {
-                    "FullName", FullNameProvider.GetBenchmarkName(report.BenchmarkCase)
-                }, // do NOT remove this property, it is used for xunit-performance migration
+                { "FullName", FullNameProvider.GetBenchmarkName(report.BenchmarkCase) }, // do NOT remove this property, it is used for xunit-performance migration
+                // Hardware Intrinsics can be disabled using env vars, that is why they might be different per benchmark and are not exported as part of HostEnvironmentInfo
+                { "HardwareIntrinsics", report.GetHardwareIntrinsicsInfo() ?? "" },
                 // { "Properties", r.Benchmark.Job.ToSet().ToDictionary(p => p.Name, p => p.Value) }, // TODO
                 { "Statistics", report.ResultStatistics }
             };
 
-                // We show MemoryDiagnoser's results only if it is being used
-                if (report.BenchmarkCase.Config.HasMemoryDiagnoser())
+            // We show MemoryDiagnoser's results only if it is being used
+            if (report.BenchmarkCase.Config.HasMemoryDiagnoser())
+            {
+                benchmark.Add("Memory", new
                 {
-                    benchmark.Add("Memory", new
-                    {
-                        report.GcStats.Gen0Collections,
-                        report.GcStats.Gen1Collections,
-                        report.GcStats.Gen2Collections,
-                        report.GcStats.TotalOperations,
-                        BytesAllocatedPerOperation = report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase)
-                    });
-                }
+                    report.GcStats.Gen0Collections,
+                    report.GcStats.Gen1Collections,
+                    report.GcStats.Gen2Collections,
+                    report.GcStats.TotalOperations,
+                    BytesAllocatedPerOperation = report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase)
+                });
+            }
 
             if (ExcludeMeasurements == false)
             {

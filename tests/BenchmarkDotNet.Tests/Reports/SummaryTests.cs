@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Tests.Reports
         {
             // We use runtime as selector later. It is chosen as selector just to be close to initial issue. Nothing particularly special about it.
             Job coreJob = new Job(Job.Default).WithRuntime(CoreRuntime.Core20).ApplyAndFreeze(RunMode.Dry);
-            Job clrJob = new Job(Job.Default).WithRuntime(ClrRuntime.Net461).ApplyAndFreeze(RunMode.Dry);
+            Job clrJob = new Job(Job.Default).WithRuntime(ClrRuntime.Net462).ApplyAndFreeze(RunMode.Dry);
             return ManualConfig.Create(DefaultConfig.Instance).AddJob(coreJob).AddJob(clrJob);
         }
 
@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Tests.Reports
 
         private static BenchmarkReport CreateSuccessReport(BenchmarkCase benchmark)
         {
-            GenerateResult generateResult = GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>());
+            GenerateResult generateResult = GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>(), false);
             BuildResult buildResult = BuildResult.Success(generateResult);
             var metrics = new[] { new Metric(new FakeMetricDescriptor(), Math.E) };
             return new BenchmarkReport(true, benchmark, generateResult, buildResult, Array.Empty<ExecuteResult>(), metrics);

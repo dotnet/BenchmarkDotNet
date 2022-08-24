@@ -61,23 +61,20 @@ namespace BenchmarkDotNet.Disassemblers
             }
         }
 
-        private static string GetDisassemblerPath(Process process, Platform platform)
-        {
-            switch (platform)
+        internal static Platform GetDisassemblerArchitecture(Process process, Platform platform)
+            => platform switch
             {
-                case Platform.AnyCpu:
-                    return GetDisassemblerPath(process,
-                        NativeMethods.Is64Bit(process)
-                            ? Platform.X64
-                            : Platform.X86);
-                case Platform.X86:
-                    return GetDisassemblerPath("x86");
-                case Platform.X64:
-                    return GetDisassemblerPath("x64");
-                default:
-                    throw new NotSupportedException($"Platform {platform} not supported!");
-            }
-        }
+                Platform.AnyCpu => NativeMethods.Is64Bit(process) ? Platform.X64 : Platform.X86, // currently ARM is not supported
+                _ => platform
+            };
+
+        private static string GetDisassemblerPath(Process process, Platform platform)
+            => GetDisassemblerArchitecture(process, platform) switch
+            {
+                Platform.X86 => GetDisassemblerPath("x86"),
+                Platform.X64 => GetDisassemblerPath("x64"),
+                _ => throw new NotSupportedException($"Platform {platform} not supported!")
+            };
 
         private static string GetDisassemblerPath(string architectureName)
         {
@@ -100,7 +97,7 @@ namespace BenchmarkDotNet.Disassemblers
             // the disassembler has not been yet retrieved from the resources
             CopyFromResources(
                 assemblyWithDisassemblersInResources,
-                $"BenchmarkDotNet.Disassemblers.net461.win7_{architectureName}.{exeName}",
+                $"BenchmarkDotNet.Disassemblers.net462.win7_{architectureName}.{exeName}",
                 disassemblerPath);
 
             CopyAllRequiredDependencies(assemblyWithDisassemblersInResources, Path.GetDirectoryName(disassemblerPath));
@@ -113,8 +110,8 @@ namespace BenchmarkDotNet.Disassemblers
             // ClrMD and Iced are also embedded in the resources, we need to copy them as well
             foreach (string dependency in assemblyWithDisassemblersInResources.GetManifestResourceNames().Where(name => name.EndsWith(".dll")))
             {
-                // dependency is sth like "BenchmarkDotNet.Disassemblers.net461.win7_x64.Microsoft.Diagnostics.Runtime.dll"
-                string fileName = dependency.Replace("BenchmarkDotNet.Disassemblers.net461.win7_x64.", string.Empty);
+                // dependency is sth like "BenchmarkDotNet.Disassemblers.net462.win7_x64.Microsoft.Diagnostics.Runtime.dll"
+                string fileName = dependency.Replace("BenchmarkDotNet.Disassemblers.net462.win7_x64.", string.Empty);
                 string dllPath = Path.Combine(destinationFolder, fileName);
 
                 if (!File.Exists(dllPath))
@@ -144,8 +141,12 @@ namespace BenchmarkDotNet.Disassemblers
                 .Append(DisassemblerConstants.DisassemblerEntryMethodName).Append(' ')
                 .Append(config.PrintSource).Append(' ')
                 .Append(config.MaxDepth).Append(' ')
-                .Append($"\"{resultsPath}\"")
+                .Append(Escape(resultsPath))
+                .Append(' ')
+                .Append(string.Join(" ", config.Filters.Select(Escape)))
                 .ToString();
+
+        private static string Escape(string value) => $"\"{value}\"";
 
         // code copied from https://stackoverflow.com/a/33206186/5852046
         private static class NativeMethods

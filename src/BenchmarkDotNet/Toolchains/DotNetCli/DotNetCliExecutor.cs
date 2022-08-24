@@ -43,7 +43,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     executeParameters.Diagnoser,
                     Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath),
                     executeParameters.Resolver,
-                    executeParameters.LaunchIndex);
+                    executeParameters.LaunchIndex,
+                    executeParameters.BuildResult.NoAcknowledgments);
             }
             finally
             {
@@ -60,13 +61,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                                       IDiagnoser diagnoser,
                                       string executableName,
                                       IResolver resolver,
-                                      int launchIndex)
+                                      int launchIndex,
+                                      bool noAcknowledgments)
         {
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
                 CustomDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
                 $"{executableName.Escape()} {benchmarkId.ToArguments()}",
-                redirectStandardInput: true,
+                redirectStandardInput: !noAcknowledgments,
                 redirectStandardError: false); // #1629
 
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
@@ -74,7 +76,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             using (var process = new Process { StartInfo = startInfo })
             using (var consoleExitHandler = new ConsoleExitHandler(process, logger))
             {
-                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId);
+                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, noAcknowledgments);
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 

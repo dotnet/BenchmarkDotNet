@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Code
 
         public string IterationCleanupMethodName => Descriptor.IterationCleanupMethod?.Name ?? EmptyAction;
 
-        public abstract string ExtraDefines { get; }
+        public abstract string ReturnsDefinition { get; }
 
         protected virtual Type WorkloadMethodReturnType => Descriptor.WorkloadMethod.ReturnType;
 
@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.Code
     {
         public VoidDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
-        public override string ExtraDefines => "#define RETURNS_VOID";
+        public override string ReturnsDefinition => "RETURNS_VOID";
 
         protected override Type OverheadMethodReturnType => typeof(void);
 
@@ -113,10 +113,10 @@ namespace BenchmarkDotNet.Code
             }
         }
 
-        public override string ExtraDefines
+        public override string ReturnsDefinition
             => Consumer.IsConsumable(WorkloadMethodReturnType) || Consumer.HasConsumableField(WorkloadMethodReturnType, out _)
-                ? "#define RETURNS_CONSUMABLE"
-                : "#define RETURNS_NON_CONSUMABLE_STRUCT";
+                ? "RETURNS_CONSUMABLE"
+                : "RETURNS_NON_CONSUMABLE_STRUCT";
     }
 
     internal class ByRefDeclarationsProvider : NonVoidDeclarationsProvider
@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.Code
 
         public override string OverheadImplementation => $"return default(System.{nameof(IntPtr)});";
 
-        public override string ExtraDefines => "#define RETURNS_BYREF";
+        public override string ReturnsDefinition => "RETURNS_BYREF";
 
         public override string WorkloadMethodReturnTypeModifiers => "ref";
     }
@@ -140,7 +140,7 @@ namespace BenchmarkDotNet.Code
     {
         public ByReadOnlyRefDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
-        public override string ExtraDefines => "#define RETURNS_BYREF_READONLY";
+        public override string ReturnsDefinition => "RETURNS_BYREF_READONLY";
 
         public override string WorkloadMethodReturnTypeModifiers => "ref readonly";
     }
