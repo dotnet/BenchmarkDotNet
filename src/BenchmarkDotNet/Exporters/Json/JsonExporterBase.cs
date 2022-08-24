@@ -3,6 +3,7 @@ using System.Linq;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
+using Perfolizer.Horology;
 using JsonSerializer = SimpleJson.SimpleJson;
 
 namespace BenchmarkDotNet.Exporters.Json
@@ -22,52 +23,70 @@ namespace BenchmarkDotNet.Exporters.Json
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
-            // We construct HostEnvironmentInfo manually, so that we can have the HardwareTimerKind enum as text, rather than an integer
-            // SimpleJson serializer doesn't seem to have an enum String/Value option (to-be-fair, it is meant to be "Simple")
-            var environmentInfo = new
-            {
-                HostEnvironmentInfo.BenchmarkDotNetCaption,
-                summary.HostEnvironmentInfo.BenchmarkDotNetVersion,
-                OsVersion = summary.HostEnvironmentInfo.OsVersion.Value,
-                ProcessorName = ProcessorBrandStringHelper.Prettify(summary.HostEnvironmentInfo.CpuInfo.Value),
-                summary.HostEnvironmentInfo.CpuInfo.Value?.PhysicalProcessorCount,
-                summary.HostEnvironmentInfo.CpuInfo.Value?.PhysicalCoreCount,
-                summary.HostEnvironmentInfo.CpuInfo.Value?.LogicalCoreCount,
-                summary.HostEnvironmentInfo.RuntimeVersion,
-                summary.HostEnvironmentInfo.Architecture,
-                summary.HostEnvironmentInfo.HasAttachedDebugger,
-                summary.HostEnvironmentInfo.HasRyuJit,
-                summary.HostEnvironmentInfo.Configuration,
-                DotNetCliVersion = summary.HostEnvironmentInfo.DotNetSdkVersion.Value,
-                summary.HostEnvironmentInfo.ChronometerFrequency,
-                HardwareTimerKind = summary.HostEnvironmentInfo.HardwareTimerKind.ToString()
-            };
+            JsonSerializer.CurrentJsonSerializerStrategy.Indent = IndentJson;
+            logger.WriteLine(JsonSerializer.SerializeObject(GetDataToSerialize(summary)));
+        }
 
+        protected virtual IReadOnlyDictionary<string, object> GetDataToSerialize(Summary summary)
+        {
             // If we just ask SimpleJson to serialize the entire "summary" object it throws several errors.
             // So we are more specific in what we serialize (plus some fields/properties aren't relevant)
-
-            var benchmarks = summary.Reports.Select(report =>
+            return new Dictionary<string, object>
             {
-                var data = new Dictionary<string, object>
+                { "Title", summary.Title },
+                { "HostEnvironmentInfo", GetDataToSerialize(summary.HostEnvironmentInfo) },
+                { "Benchmarks", summary.Reports.Select(GetDataToSerialize) }
+            };
+        }
+
+        protected virtual IReadOnlyDictionary<string, object> GetDataToSerialize(HostEnvironmentInfo environmentInfo)
+        {
+            // We construct HostEnvironmentInfo manually, so that we can have the HardwareTimerKind enum as text, rather than an integer
+            // SimpleJson serializer doesn't seem to have an enum String/Value option (to-be-fair, it is meant to be "Simple")
+            return new Dictionary<string, object>
+            {
+                { nameof(HostEnvironmentInfo.BenchmarkDotNetCaption), HostEnvironmentInfo.BenchmarkDotNetCaption },
+                { nameof(environmentInfo.BenchmarkDotNetVersion), environmentInfo.BenchmarkDotNetVersion },
+                { "OsVersion", environmentInfo.OsVersion.Value },
+                { "ProcessorName", ProcessorBrandStringHelper.Prettify(environmentInfo.CpuInfo.Value) },
+                { "PhysicalProcessorCount", environmentInfo.CpuInfo.Value?.PhysicalProcessorCount },
+                { "PhysicalCoreCount", environmentInfo.CpuInfo.Value?.PhysicalCoreCount },
+                { "LogicalCoreCount", environmentInfo.CpuInfo.Value?.LogicalCoreCount },
+                { nameof(environmentInfo.RuntimeVersion), environmentInfo.RuntimeVersion },
+                { nameof(environmentInfo.Architecture), environmentInfo.Architecture },
+                { nameof(environmentInfo.HasAttachedDebugger), environmentInfo.HasAttachedDebugger },
+                { nameof(environmentInfo.HasRyuJit), environmentInfo.HasRyuJit },
+                { nameof(environmentInfo.Configuration), environmentInfo.Configuration },
+                { "DotNetCliVersion", environmentInfo.DotNetSdkVersion.Value },
+                { nameof(environmentInfo.ChronometerFrequency), environmentInfo.ChronometerFrequency },
+                { nameof(HardwareTimerKind), environmentInfo.HardwareTimerKind.ToString() },
+            };
+        }
+
+        protected virtual IReadOnlyDictionary<string, object> GetDataToSerialize(BenchmarkReport report)
+        {
+            var benchmark = new Dictionary<string, object>
+            {
+                // We don't need Benchmark.ShortInfo, that info is available via Benchmark.Parameters below
+                { "DisplayInfo", report.BenchmarkCase.DisplayInfo },
+                { "Namespace", report.BenchmarkCase.Descriptor.Type.Namespace },
+                { "Type", FullNameProvider.GetTypeName(report.BenchmarkCase.Descriptor.Type) },
+                { "Method", report.BenchmarkCase.Descriptor.WorkloadMethod.Name },
+                { "MethodTitle", report.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo },
+                { "Parameters", report.BenchmarkCase.Parameters.PrintInfo },
                 {
-                    // We don't need Benchmark.ShortInfo, that info is available via Benchmark.Parameters below
-                    { "DisplayInfo", report.BenchmarkCase.DisplayInfo },
-                    { "Namespace", report.BenchmarkCase.Descriptor.Type.Namespace },
-                    { "Type", FullNameProvider.GetTypeName(report.BenchmarkCase.Descriptor.Type) },
-                    { "Method", report.BenchmarkCase.Descriptor.WorkloadMethod.Name },
-                    { "MethodTitle", report.BenchmarkCase.Descriptor.WorkloadMethodDisplayInfo },
-                    { "Parameters", report.BenchmarkCase.Parameters.PrintInfo },
-                    { "FullName", FullNameProvider.GetBenchmarkName(report.BenchmarkCase) }, // do NOT remove this property, it is used for xunit-performance migration
-                    // Hardware Intrinsics can be disabled using env vars, that is why they might be different per benchmark and are not exported as part of HostEnvironmentInfo
-                    { "HardwareIntrinsics", report.GetHardwareIntrinsicsInfo() ?? "" },
-                    // { "Properties", r.Benchmark.Job.ToSet().ToDictionary(p => p.Name, p => p.Value) }, // TODO
-                    { "Statistics", report.ResultStatistics }
-                };
+                    "FullName", FullNameProvider.GetBenchmarkName(report.BenchmarkCase)
+                }, // do NOT remove this property, it is used for xunit-performance migration
+                // Hardware Intrinsics can be disabled using env vars, that is why they might be different per benchmark and are not exported as part of HostEnvironmentInfo
+                { "HardwareIntrinsics", report.GetHardwareIntrinsicsInfo() ?? "" },
+                // { "Properties", r.Benchmark.Job.ToSet().ToDictionary(p => p.Name, p => p.Value) }, // TODO
+                { "Statistics", report.ResultStatistics }
+            };
 
                 // We show MemoryDiagnoser's results only if it is being used
                 if (report.BenchmarkCase.Config.HasMemoryDiagnoser())
                 {
-                    data.Add("Memory", new
+                    benchmark.Add("Memory", new
                     {
                         report.GcStats.Gen0Collections,
                         report.GcStats.Gen1Collections,
@@ -80,7 +99,7 @@ namespace BenchmarkDotNet.Exporters.Json
                 if (ExcludeMeasurements == false)
                 {
                     // We construct Measurements manually, so that we can have the IterationMode enum as text, rather than an integer
-                    data.Add("Measurements",
+                    benchmark.Add("Measurements",
                         report.AllMeasurements.Select(m => new
                         {
                             IterationMode = m.IterationMode.ToString(),
@@ -93,20 +112,11 @@ namespace BenchmarkDotNet.Exporters.Json
 
                     if (report.Metrics.Any())
                     {
-                        data.Add("Metrics", report.Metrics.Values);
+                        benchmark.Add("Metrics", report.Metrics.Values);
                     }
                 }
 
-                return data;
-            });
-
-            JsonSerializer.CurrentJsonSerializerStrategy.Indent = IndentJson;
-            logger.WriteLine(JsonSerializer.SerializeObject(new Dictionary<string, object>
-            {
-                { "Title", summary.Title },
-                { "HostEnvironmentInfo", environmentInfo },
-                { "Benchmarks", benchmarks }
-            }));
+                return benchmark;
         }
     }
 }
