@@ -11,6 +11,7 @@ using System.Net;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using Microsoft.CSharp;
 
 namespace BenchmarkDotNet.Running
@@ -23,6 +24,9 @@ namespace BenchmarkDotNet.Running
 
         public static BenchmarkRunInfo[] UrlToBenchmarks(string url, IConfig config = null)
         {
+            if (!RuntimeInformation.IsFullFramework)
+                throw new NotSupportedException("Supported only on Full .NET Framework.");
+
             var logger = HostEnvironmentInfo.FallbackLogger;
 
             url = GetRawUrl(url);
@@ -63,6 +67,9 @@ namespace BenchmarkDotNet.Running
 
         public static BenchmarkRunInfo[] SourceToBenchmarks(string source, IConfig config = null)
         {
+            if (!RuntimeInformation.IsFullFramework)
+                throw new NotSupportedException("Supported only on Full .NET Framework.");
+
             string benchmarkContent = source;
             CompilerResults compilerResults;
             using (var cSharpCodeProvider = new CSharpCodeProvider()) {
