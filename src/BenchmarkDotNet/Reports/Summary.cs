@@ -30,10 +30,11 @@ namespace BenchmarkDotNet.Reports
         [PublicAPI] public ImmutableArray<BenchmarkCase> BenchmarksCases { get; }
         [PublicAPI] public ImmutableArray<BenchmarkReport> Reports { get; }
 
-        private ImmutableDictionary<BenchmarkCase, BenchmarkReport> ReportMap {get; }
-        private BaseliningStrategy BaseliningStrategy {get; }
-
         internal DisplayPrecisionManager DisplayPrecisionManager { get; }
+
+        private ImmutableDictionary<BenchmarkCase, BenchmarkReport> ReportMap { get; }
+        private BaseliningStrategy BaseliningStrategy { get; }
+        private bool? isMultipleRuntimes;
 
         public Summary(
             string title,
@@ -74,6 +75,9 @@ namespace BenchmarkDotNet.Reports
         public bool HasCriticalValidationErrors => ValidationErrors.Any(validationError => validationError.IsCritical);
 
         public int GetNumberOfExecutedBenchmarks() => Reports.Count(report => report.ExecuteResults.Any(result => result.FoundExecutable));
+
+        public bool IsMultipleRuntimes
+            => isMultipleRuntimes ??= BenchmarksCases.Length > 1 ? BenchmarksCases.Select(benchmark => benchmark.GetRuntime()).Distinct().Count() > 1 : false;
 
         internal static Summary NothingToRun(string title, string resultsDirectoryPath, string logFilePath)
             => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, DefaultCultureInfo.Instance, ImmutableArray<ValidationError>.Empty);
