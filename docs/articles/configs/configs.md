@@ -22,13 +22,17 @@ public class MyClassWithBenchmarks
     {
         public Config()
         {
-            Add(new Job1(), new Job2());
-            Add(new Column1(), new Column2());
-            Add(new Exporter1(), new Exporter2());
-            Add(new Logger1(), new Logger2());
-            Add(new Diagnoser1(), new Diagnoser2());
-            Add(new Analyser1(), new Analyser2());
-            Add(new Filter1(), new Filter2());
+            AddJob(new Job1(), new Job2());
+            AddColumn(new Column1(), new Column2());
+            AddColumnProvider(new ColumnProvider1(), new ColumnProvider2());
+            AddExporter(new Exporter1(), new Exporter2());
+            AddLogger(new Logger1(), new Logger2());
+            AddDiagnoser(new Diagnoser1(), new Diagnoser2());
+            AddAnalyser(new Analyser1(), new Analyser2());
+            AddValidator(new Validator2(),new Validator2());
+            AddHardwareCounters(HardwareCounter enum1, HardwareCounter enum2);
+            AddFilter(new Filter1(), new Filter2());
+            AddLogicalGroupRules(BenchmarkLogicalGroupRule enum1, BenchmarkLogicalGroupRule enum2);
         }
     }
     

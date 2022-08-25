@@ -100,15 +100,15 @@ namespace BenchmarkDotNet.Toolchains
 
         private static void GenerateGCSettings(XmlDocument xmlDocument, XmlNode runtimeElement, GcMode gcMode, IResolver resolver)
         {
-            if (!gcMode.HasChanges)
-                return;
-
             CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcConcurrent", "enabled", gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase());
             CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcServer", "enabled", gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase());
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCCpuGroup", "enabled", gcMode.ResolveValue(GcMode.CpuGroupsCharacteristic, resolver).ToLowerCase());
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcAllowVeryLargeObjects", "enabled", gcMode.ResolveValue(GcMode.AllowVeryLargeObjectsCharacteristic, resolver).ToLowerCase());
-            CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCNoAffinitize", "enabled", gcMode.ResolveValue(GcMode.NoAffinitizeCharacteristic, resolver).ToLowerCase());
 
+            if (gcMode.HasValue(GcMode.CpuGroupsCharacteristic))
+                CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCCpuGroup", "enabled", gcMode.ResolveValue(GcMode.CpuGroupsCharacteristic, resolver).ToLowerCase());
+            if (gcMode.HasValue(GcMode.AllowVeryLargeObjectsCharacteristic))
+                CreateNodeWithAttribute(xmlDocument, runtimeElement, "gcAllowVeryLargeObjects", "enabled", gcMode.ResolveValue(GcMode.AllowVeryLargeObjectsCharacteristic, resolver).ToLowerCase());
+            if (gcMode.HasValue(GcMode.NoAffinitizeCharacteristic))
+                CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCNoAffinitize", "enabled", gcMode.ResolveValue(GcMode.NoAffinitizeCharacteristic, resolver).ToLowerCase());
             if (gcMode.HasValue(GcMode.HeapAffinitizeMaskCharacteristic))
                 CreateNodeWithAttribute(xmlDocument, runtimeElement, "GCHeapAffinitizeMask", "enabled", gcMode.ResolveValue(GcMode.HeapAffinitizeMaskCharacteristic, resolver).ToString());
             if (gcMode.HasValue(GcMode.HeapCountCharacteristic))

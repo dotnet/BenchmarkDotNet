@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Jobs
@@ -14,7 +15,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<IntPtr> AffinityCharacteristic = CreateCharacteristic<IntPtr>(nameof(Affinity));
         public static readonly Characteristic<GcMode> GcCharacteristic = CreateCharacteristic<GcMode>(nameof(Gc));
         public static readonly Characteristic<IReadOnlyList<EnvironmentVariable>> EnvironmentVariablesCharacteristic = CreateCharacteristic<IReadOnlyList<EnvironmentVariable>>(nameof(EnvironmentVariables));
-        public static readonly Characteristic<Guid> PowerPlanModeCharacteristic = CreateCharacteristic<Guid>(nameof(PowerPlanMode));
+        public static readonly Characteristic<Guid?> PowerPlanModeCharacteristic = CreateCharacteristic<Guid?>(nameof(PowerPlanMode));
 
         public static readonly EnvironmentMode LegacyJitX86 = new EnvironmentMode(nameof(LegacyJitX86), Jit.LegacyJit, Platform.X86).Freeze();
         public static readonly EnvironmentMode LegacyJitX64 = new EnvironmentMode(nameof(LegacyJitX64), Jit.LegacyJit, Platform.X64).Freeze();
@@ -89,7 +90,7 @@ namespace BenchmarkDotNet.Jobs
         /// Power Plan Mode
         /// </summary>
         /// <remarks>Supported only on Windows.</remarks>
-        public Guid PowerPlanMode
+        public Guid? PowerPlanMode
         {
             get => PowerPlanModeCharacteristic[this];
             set => PowerPlanModeCharacteristic[this] = value;
@@ -110,5 +111,7 @@ namespace BenchmarkDotNet.Jobs
             newVariables.Add(variable);
             EnvironmentVariables = newVariables;
         }
+
+        internal Runtime GetRuntime() => HasValue(RuntimeCharacteristic) ? Runtime : RuntimeInformation.GetCurrentRuntime();
     }
 }

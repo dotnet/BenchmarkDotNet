@@ -9,9 +9,10 @@ namespace BenchmarkDotNet.Attributes
     {
         public IConfig Config { get; }
 
-        public MemoryDiagnoserAttribute()
+        /// <param name="displayGenColumns">Display Garbage Collections per Generation columns (Gen 0, Gen 1, Gen 2). True by default.</param>
+        public MemoryDiagnoserAttribute(bool displayGenColumns = true)
         {
-            Config = ManualConfig.CreateEmpty().AddDiagnoser(MemoryDiagnoser.Default);
+            Config = ManualConfig.CreateEmpty().AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(displayGenColumns)));
         }
     }
 }

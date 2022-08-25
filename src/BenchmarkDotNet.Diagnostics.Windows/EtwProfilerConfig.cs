@@ -19,6 +19,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public KernelTraceEventParser.Keywords KernelKeywords { get; }
 
+        public KernelTraceEventParser.Keywords KernelStackKeywords { get; }
+
         public IReadOnlyDictionary<HardwareCounter, Func<ProfileSourceInfo, int>> IntervalSelectors { get; }
 
         public IReadOnlyCollection<(Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)> Providers { get; }
@@ -30,6 +32,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         /// <param name="cpuSampleIntervalInMilliseconds">The rate at which CPU samples are collected. By default this is 1 (once a millisecond per CPU). There is a lower bound on this (typically 0.125 ms)</param>
         /// <param name="intervalSelectors">interval per hardware counter, if not provided then default values will be used.</param>
         /// <param name="kernelKeywords">kernel session keywords, ImageLoad (for native stack frames) and Profile (for CPU Stacks) are the defaults</param>
+        /// <param name="kernelStackKeywords">This is passed to TraceEventSession.EnableKernelProvider to enable particular sets of events. See https://docs.microsoft.com/windows/win32/api/evntrace/ns-evntrace-event_trace_properties#members for more information on them.</param>
         /// <param name="providers">providers that should be enabled, if not provided then default values will be used</param>
         /// <param name="createHeapSession">value indicating whether to create heap session. False by default, used internally by NativeMemoryProfiler.</param>
         public EtwProfilerConfig(
@@ -37,12 +40,14 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             int bufferSizeInMb = 256,
             float cpuSampleIntervalInMilliseconds = 1.0f,
             KernelTraceEventParser.Keywords kernelKeywords = KernelTraceEventParser.Keywords.ImageLoad | KernelTraceEventParser.Keywords.Profile,
+            KernelTraceEventParser.Keywords kernelStackKeywords = KernelTraceEventParser.Keywords.Profile,
             IReadOnlyDictionary<HardwareCounter, Func<ProfileSourceInfo, int>> intervalSelectors = null,
             IReadOnlyCollection<(Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)> providers = null,
             bool createHeapSession = false)
         {
             CreateHeapSession = createHeapSession;
             KernelKeywords = kernelKeywords;
+            KernelStackKeywords = kernelStackKeywords;
             PerformExtraBenchmarksRun = performExtraBenchmarksRun;
             BufferSizeInMb = bufferSizeInMb;
             CpuSampleIntervalInMilliseconds = cpuSampleIntervalInMilliseconds;

@@ -103,16 +103,13 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void CanSelectClassesUsingTypeNames()
+        public void CanNotSelectClassesUsingTypeNames()
         {
             var benchmarks = Filter(
                 new[] { typeof(ClassA), typeof(ClassB) },
                 new[] { "--filter", "ClassC", "ClassA" });
 
-            // ClassC not matched as it has NO methods with the [Benchmark] attribute
-            Assert.Equal(2, benchmarks.Count);
-            Assert.Contains("ClassA.Method1", benchmarks);
-            Assert.Contains("ClassA.Method2", benchmarks);
+            Assert.Empty(benchmarks); // it's not supported anymore
         }
 
         [Fact]

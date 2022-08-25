@@ -18,6 +18,9 @@ namespace BenchmarkDotNet.Environments
         public static readonly CoreRuntime Core31 = new CoreRuntime(RuntimeMoniker.NetCoreApp31, "netcoreapp3.1", ".NET Core 3.1");
         public static readonly CoreRuntime Core50 = new CoreRuntime(RuntimeMoniker.Net50, "net5.0", ".NET 5.0");
         public static readonly CoreRuntime Core60 = new CoreRuntime(RuntimeMoniker.Net60, "net6.0", ".NET 6.0");
+        public static readonly CoreRuntime Core70 = new CoreRuntime(RuntimeMoniker.Net70, "net7.0", ".NET 7.0");
+
+        public static CoreRuntime Latest => Core70; // when dotnet/runtime branches for 8.0, this will need to get updated
 
         private CoreRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
             : base(runtimeMoniker, msBuildMoniker, displayName)
@@ -66,6 +69,7 @@ namespace BenchmarkDotNet.Environments
                 case Version v when v.Major == 3 && v.Minor == 1: return Core31;
                 case Version v when v.Major == 5 && v.Minor == 0: return GetPlatformSpecific(Core50);
                 case Version v when v.Major == 6 && v.Minor == 0: return GetPlatformSpecific(Core60);
+                case Version v when v.Major == 7 && v.Minor == 0: return GetPlatformSpecific(Core70);
                 default:
                     return CreateForNewVersion($"net{version.Major}.{version.Minor}", $".NET {version.Major}.{version.Minor}");
             }
@@ -208,9 +212,7 @@ namespace BenchmarkDotNet.Environments
             if (!(platformNameProperty.GetValue(attributeInstance) is string platformName))
                 return fallback;
 
-            // it's something like "Windows7.0";
-            var justName = new string(platformName.TakeWhile(char.IsLetter).ToArray());
-            return new CoreRuntime(fallback.RuntimeMoniker, $"{fallback.MsBuildMoniker}-{justName}", fallback.Name);
+            return new CoreRuntime(fallback.RuntimeMoniker, $"{fallback.MsBuildMoniker}-{platformName}", fallback.Name);
         }
     }
 }

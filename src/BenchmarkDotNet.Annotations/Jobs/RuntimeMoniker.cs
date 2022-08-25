@@ -50,6 +50,11 @@ namespace BenchmarkDotNet.Jobs
         Net48,
 
         /// <summary>
+        /// .NET 4.8.1
+        /// </summary>
+        Net481,
+
+        /// <summary>
         /// .NET Core 2.0
         /// </summary>
         NetCoreApp20,
@@ -88,42 +93,22 @@ namespace BenchmarkDotNet.Jobs
         /// <summary>
         /// .NET 6.0
         /// </summary>
-        Net60, // it's after NetCoreApp50 and Net50 in the enum definition because the value of enumeration is used for framework version comparison using > < operators
+        Net60,
 
         /// <summary>
-        /// CoreRT compiled as netcoreapp2.0
+        /// .NET 7.0
         /// </summary>
-        CoreRt20,
+        Net70,
 
         /// <summary>
-        /// CoreRT compiled as netcoreapp2.1
+        /// NativeAOT compiled as net6.0
         /// </summary>
-        CoreRt21,
+        NativeAot60,
 
         /// <summary>
-        /// CoreRT compiled as netcoreapp2.2
+        /// NativeAOT compiled as net7.0
         /// </summary>
-        CoreRt22,
-
-        /// <summary>
-        /// CoreRT compiled as netcoreapp3.0
-        /// </summary>
-        CoreRt30,
-
-        /// <summary>
-        /// CoreRT compiled as netcoreapp3.1
-        /// </summary>
-        CoreRt31,
-
-        /// <summary>
-        /// CoreRT compiled as net5.0
-        /// </summary>
-        CoreRt50,
-
-        /// <summary>
-        /// CoreRT compiled as net6.0
-        /// </summary>
-        CoreRt60,
+        NativeAot70,
 
         /// <summary>
         /// WebAssembly with default .Net version
@@ -138,6 +123,26 @@ namespace BenchmarkDotNet.Jobs
         /// <summary>
         /// WebAssembly with .net6.0
         /// </summary>
-        WasmNet60
+        WasmNet60,
+
+        /// <summary>
+        /// WebAssembly with .net7.0
+        /// </summary>
+        WasmNet70,
+
+        /// <summary>
+        /// Mono with the Ahead of Time LLVM Compiler backend
+        /// </summary>
+        MonoAOTLLVM,
+
+        /// <summary>
+        /// Mono with the Ahead of Time LLVM Compiler backend and .net6.0
+        /// </summary>
+        MonoAOTLLVMNet60,
+
+        /// <summary>
+        /// Mono with the Ahead of Time LLVM Compiler backend and .net7.0
+        /// </summary>
+        MonoAOTLLVMNet70
     }
 }

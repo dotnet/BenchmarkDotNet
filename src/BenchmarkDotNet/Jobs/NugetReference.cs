@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Jobs
 {
     public class NuGetReference : IEquatable<NuGetReference>
     {
-        public NuGetReference(string packageName, string packageVersion)
+        public NuGetReference(string packageName, string packageVersion, Uri source = null, bool prerelease = false)
         {
             if (string.IsNullOrWhiteSpace(packageName))
                 throw new ArgumentException("message", nameof(packageName));
@@ -16,12 +16,15 @@ namespace BenchmarkDotNet.Jobs
             if (!string.IsNullOrWhiteSpace(PackageVersion) && !IsValidVersion(packageVersion))
                 throw new InvalidOperationException($"Invalid version specified: {packageVersion}");
 
-            PackageVersion = packageVersion;
-
+            PackageVersion = packageVersion ?? string.Empty;
+            PackageSource = source;
+            Prerelease = prerelease;
         }
 
         public string PackageName { get; }
         public string PackageVersion { get; }
+        public bool Prerelease { get; }
+        public Uri PackageSource { get; }
 
         public override bool Equals(object obj)
         {

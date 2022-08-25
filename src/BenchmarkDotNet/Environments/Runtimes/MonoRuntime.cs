@@ -11,6 +11,8 @@ namespace BenchmarkDotNet.Environments
 
         public string AotArgs { get; }
 
+        public override bool IsAOT => !string.IsNullOrEmpty(AotArgs);
+
         public string MonoBclPath { get; }
 
         private MonoRuntime(string name) : base(RuntimeMoniker.Mono, "mono", name) { }

@@ -20,5 +20,6 @@ namespace BenchmarkDotNet.Diagnosers
         public string NumberFormat => "N0";
         public UnitType UnitType => UnitType.Dimensionless;
         public string Unit => "Count";
+        public int PriorityInCategory => 0;
     }
 }

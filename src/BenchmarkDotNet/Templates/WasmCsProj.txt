@@ -1,32 +1,53 @@
-﻿<Project Sdk="$SDKNAME$" DefaultTargets="$TARGET$">
+﻿<Project Sdk="$SDKNAME$" DefaultTargets="publish">
+  <PropertyGroup>
+    <OriginalCSProjPath>$CSPROJPATH$</OriginalCSProjPath>
+    <WasmPropsPath>$([System.IO.Path]::ChangeExtension('$(OriginalCSProjPath)', '.Wasm.props'))</WasmPropsPath>
+    <WasmTargetsPath>$([System.IO.Path]::ChangeExtension('$(OriginalCSProjPath)', '.Wasm.targets'))</WasmTargetsPath>
+    <WasmDataDir>$WASMDATADIR$</WasmDataDir>
+    <WasmDataDir Condition="'$(WasmDataDir)' != ''">$([MSBuild]::NormalizeDirectory($(WasmDataDir)))</WasmDataDir>
+  </PropertyGroup>
+
+  <Import Project="$(WasmPropsPath)" Condition="Exists($(WasmPropsPath))" />
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <OutputPath>bin</OutputPath>
+    <RuntimeConfig>Release</RuntimeConfig>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <TargetFramework>$TFM$</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AppDir>$(MSBuildThisFileDirectory)\bin\$TFM$\browser-wasm\publish</AppDir>
     <AssemblyName>$PROGRAMNAME$</AssemblyName>
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
-    <MicrosoftNetCoreAppRuntimePackDir>$RUNTIMEPACK$</MicrosoftNetCoreAppRuntimePackDir>
+    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
+    <RunAOTCompilation>$RUN_AOT$</RunAOTCompilation>
+    <PublishTrimmed>$(RunAOTCompilation)</PublishTrimmed>
+    <WasmGenerateRunV8Script>true</WasmGenerateRunV8Script>
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+    <EnableDefaultWasmAssembliesToBundle>false</EnableDefaultWasmAssembliesToBundle>
     $COPIEDSETTINGS$
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="$CODEFILENAME$" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+    <!-- move this too? -->
+    <TrimmerRootDescriptor Include="WasmLinkerDescription.xml" Condition="'$(RunAOTCompilation)' == 'true'" />
   </ItemGroup>
 
-  <Target Name="UpdateRuntimePack"
-          DependsOnTargets="ResolveFrameworkReferences" Condition="'$(MicrosoftNetCoreAppRuntimePackDir)' != ''">
+  <ItemGroup>
+    <ProjectReference Include="$(OriginalCSProjPath)" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <WasmBuildAppAfterThisTarget>PrepareForWasmBuild</WasmBuildAppAfterThisTarget>
+  </PropertyGroup>
+
+  <Target Name="PrepareForWasmBuild" AfterTargets="Publish">
     <ItemGroup>
-      <ResolvedRuntimePack Update="@(ResolvedRuntimePack)" PackageDirectory="$(MicrosoftNetCoreAppRuntimePackDir)" />
+      <WasmAssembliesToBundle Include="$(TargetDir)publish\*.dll" Condition="'$(RunAOTCompilation)' != 'true'" />
+      <WasmAssembliesToBundle Include="$(TargetDir)publish\*.dll" Exclude="$(TargetDir)publish\KernelTraceControl.dll" Condition="'$(RunAOTCompilation)' == 'true'" />
     </ItemGroup>
   </Target>
 
-  <Target Name="PublishWithCustomRuntimePack"
-          AfterTargets="Build"
-          DependsOnTargets="UpdateRuntimePack;Publish" />
-
-  <ItemGroup>
-    <ProjectReference Include="$CSPROJPATH$" />
-  </ItemGroup>
+  <Import Project="$(WasmTargetsPath)" Condition="Exists($(WasmTargetsPath))" />
 </Project>

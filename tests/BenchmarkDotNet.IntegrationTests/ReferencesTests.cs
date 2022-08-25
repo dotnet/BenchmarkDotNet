@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public ReferencesTests(ITestOutputHelper output) : base(output) { }
 
-#if CLASSIC
+#if NETFRAMEWORK
         [Fact]
         public void BenchmarksThatUseTypeFromCustomPathDllAreSupported()
             => CanExecute<BenchmarkDotNet.IntegrationTests.CustomPaths.BenchmarksThatUseTypeFromCustomPathDll>();

@@ -7,6 +7,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability.Cpu;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
+using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
 
 namespace BenchmarkDotNet.Environments
 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Extensions;
@@ -16,11 +17,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
     [PublicAPI]
     public static class DotNetCliCommandExecutor
     {
+        internal static readonly Lazy<string> DefaultDotNetCliPath = new Lazy<string>(GetDefaultDotNetCliPath);
+
         [PublicAPI]
         public static DotNetCliCommandResult Execute(DotNetCliCommand parameters)
         {
             using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
-            using (var outputReader = new AsyncProcessOutputReader(process))
+            using (var outputReader = new AsyncProcessOutputReader(process, parameters.LogOutput, parameters.Logger))
             using (new ConsoleExitHandler(process, parameters.Logger))
             {
                 parameters.Logger.WriteLineInfo($"// start {parameters.CliPath ?? "dotnet"} {parameters.Arguments} in {parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath}");
@@ -32,7 +35,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
                 if (!process.WaitForExit((int)parameters.Timeout.TotalMilliseconds))
                 {
-                    parameters.Logger.WriteLineError($"// command took more that the timeout: {parameters.Timeout.TotalSeconds:0.##}s. Killing the process tree!");
+                    parameters.Logger.WriteLineError($"// command took longer than the timeout: {parameters.Timeout.TotalSeconds:0.##}s. Killing the process tree!");
 
                     outputReader.CancelRead();
                     process.KillTree();
@@ -75,24 +78,48 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
+        internal static void LogEnvVars(DotNetCliCommand command)
+        {
+            if (!command.LogOutput)
+            {
+                return;
+            }
+
+            ProcessStartInfo startInfo = BuildStartInfo(
+                command.CliPath, command.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, command.Arguments, command.EnvironmentVariables);
+
+            if (startInfo.EnvironmentVariables.Keys.Count > 0)
+            {
+                command.Logger.WriteLineInfo("// Environment Variables:");
+                foreach (string name in startInfo.EnvironmentVariables.Keys)
+                {
+                    command.Logger.WriteLine($"\t[{name}] = \"{startInfo.EnvironmentVariables[name]}\"");
+                }
+            }
+        }
+
         internal static ProcessStartInfo BuildStartInfo(string customDotNetCliPath, string workingDirectory, string arguments,
-            IReadOnlyList<EnvironmentVariable> environmentVariables = null, bool redirectStandardInput = false)
+            IReadOnlyList<EnvironmentVariable> environmentVariables = null, bool redirectStandardInput = false, bool redirectStandardError = true)
         {
             const string dotnetMultiLevelLookupEnvVarName = "DOTNET_MULTILEVEL_LOOKUP";
 
             var startInfo = new ProcessStartInfo
             {
-                FileName = customDotNetCliPath ?? "dotnet",
+                FileName = customDotNetCliPath ?? DefaultDotNetCliPath.Value,
                 WorkingDirectory = workingDirectory,
                 Arguments = arguments,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
-                RedirectStandardError = true,
+                RedirectStandardError = redirectStandardError,
                 RedirectStandardInput = redirectStandardInput,
-                StandardErrorEncoding = Encoding.UTF8,
                 StandardOutputEncoding = Encoding.UTF8,
             };
+
+            if (redirectStandardError) // StandardErrorEncoding is only supported when standard error is redirected
+            {
+                startInfo.StandardErrorEncoding = Encoding.UTF8;
+            }
 
             if (environmentVariables != null)
                 foreach (var environmentVariable in environmentVariables)
@@ -103,5 +130,27 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             return startInfo;
         }
+
+        private static string GetDefaultDotNetCliPath()
+        {
+            if (!Portability.RuntimeInformation.IsLinux())
+                return "dotnet";
+
+            using (var parentProcess = Process.GetProcessById(getppid()))
+            {
+                string parentPath = parentProcess.MainModule?.FileName ?? string.Empty;
+                // sth like /snap/dotnet-sdk/112/dotnet and we should use the exact path instead of just "dotnet"
+                if (parentPath.StartsWith("/snap/", StringComparison.Ordinal) &&
+                    parentPath.EndsWith("/dotnet", StringComparison.Ordinal))
+                {
+                    return parentPath;
+                }
+
+                return "dotnet";
+            }
+        }
+
+        [DllImport("libc")]
+        private static extern int getppid();
     }
 }

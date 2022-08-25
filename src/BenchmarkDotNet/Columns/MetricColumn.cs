@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using Perfolizer.Common;
 using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Columns
@@ -16,7 +17,7 @@ namespace BenchmarkDotNet.Columns
         public string Legend => descriptor.Legend;
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Metric;
-        public int PriorityInCategory => 0;
+        public int PriorityInCategory => descriptor.PriorityInCategory;
         public bool IsNumeric => true;
         public UnitType UnitType => descriptor.UnitType;
 
@@ -32,10 +33,16 @@ namespace BenchmarkDotNet.Columns
                 return "-";
 
             var cultureInfo = summary.GetCultureInfo();
-            if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Size)
-                return SizeValue.FromBytes((long)metric.Value).ToString(style.SizeUnit, cultureInfo, descriptor.NumberFormat);
-            if (style.PrintUnitsInContent && descriptor.UnitType == UnitType.Time)
-                return TimeInterval.FromNanoseconds(metric.Value).ToString(style.TimeUnit, cultureInfo);
+
+            bool printUnits = style.PrintUnitsInContent || style.PrintUnitsInHeader;
+            UnitPresentation unitPresentation = UnitPresentation.FromVisibility(style.PrintUnitsInContent);
+
+            if (printUnits && descriptor.UnitType == UnitType.CodeSize)
+                return SizeValue.FromBytes((long)metric.Value).ToString(style.CodeSizeUnit, cultureInfo, descriptor.NumberFormat, unitPresentation);
+            if (printUnits && descriptor.UnitType == UnitType.Size)
+                return SizeValue.FromBytes((long)metric.Value).ToString(style.SizeUnit, cultureInfo, descriptor.NumberFormat, unitPresentation);
+            if (printUnits && descriptor.UnitType == UnitType.Time)
+                return TimeInterval.FromNanoseconds(metric.Value).ToString(style.TimeUnit, cultureInfo, descriptor.NumberFormat, unitPresentation);
 
             return metric.Value.ToString(descriptor.NumberFormat, cultureInfo);
         }

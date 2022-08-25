@@ -1,4 +1,4 @@
-#if CLASSIC
+#if NETFRAMEWORK
 using BenchmarkDotNet.IntegrationTests.CustomPaths;
 using Xunit;
 using Xunit.Abstractions;

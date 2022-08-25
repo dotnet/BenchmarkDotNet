@@ -1,0 +1,73 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" DefaultTarget="Publish">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <OutputPath>bin</OutputPath>
+    <TargetFramework>$TFM$</TargetFramework>
+    <MicrosoftNetCoreAppRuntimePackDir>$RUNTIMEPACK$</MicrosoftNetCoreAppRuntimePackDir>
+    <RuntimeIdentifier>$RUNTIMEIDENTIFIER$</RuntimeIdentifier>
+    <EnableTargetingPackDownload>false</EnableTargetingPackDownload>
+    <PublishTrimmed>false</PublishTrimmed>
+    <AssemblyName>$PROGRAMNAME$</AssemblyName>
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Runtime.MonoAOTCompiler.Task" version="6.0.0-*" GeneratePathProperty="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$CODEFILENAME$" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$CSPROJPATH$" />
+  </ItemGroup>
+
+  <!-- Redirect 'dotnet publish' to in-tree runtime pack -->
+  <Target Name="TrickRuntimePackLocation" AfterTargets="ProcessFrameworkReferences">
+    <ItemGroup>
+      <RuntimePack>
+        <PackageDirectory>$(MicrosoftNetCoreAppRuntimePackDir)</PackageDirectory>
+      </RuntimePack>
+    </ItemGroup>
+    <Message Text="Packaged ID: %(RuntimePack.PackageDirectory)" Importance="high" />
+  </Target>
+
+  <UsingTask TaskName="MonoAOTCompiler" AssemblyFile="$(PkgMicrosoft_NET_Runtime_MonoAOTCompiler_Task)/MonoAOTCompiler.dll" /> 
+
+  <Target Name="AotApp" AfterTargets="Build" DependsOnTargets="Publish">
+
+   <PropertyGroup>
+      <PublishDirFullPath>$([System.IO.Path]::GetFullPath($(PublishDir)))</PublishDirFullPath>
+      <SharedLibraryType Condition="$([MSBuild]::IsOSPlatform('OSX'))">Dylib</SharedLibraryType>
+      <SharedLibraryType Condition="$([MSBuild]::IsOSPlatform('Windows'))">Dll</SharedLibraryType>
+      <SharedLibraryType Condition="'$(SharedLibraryType)' == ''">So</SharedLibraryType>
+   </PropertyGroup>
+
+   <ItemGroup>
+     <AotInputAssemblies Include="$(PublishDirFullPath)\*.dll">
+        <AotArguments>mcpu=native</AotArguments>
+     </AotInputAssemblies>
+   </ItemGroup>
+
+
+   <MonoAOTCompiler
+        CompilerBinaryPath="$COMPILERBINARYPATH$"
+        Mode="Normal"
+        OutputType="Library"
+        LibraryFormat="$(SharedLibraryType)"
+        Assemblies="@(AotInputAssemblies)"
+        UseLLVM="$USELLVM$"
+        LLVMPath="$(MicrosoftNetCoreAppRuntimePackDir)\runtimes\$(RuntimeIdentifier)\native"
+        OutputDir="$(PublishDir)"
+        UseAotDataFile="false"
+        IntermediateOutputPath="$(IntermediateOutputPath)">
+        <Output TaskParameter="CompiledAssemblies" ItemName="BundleAssemblies" />
+    </MonoAOTCompiler>
+
+   <Message Text="CompiledAssemblies: $(BundleAssemblies)" Importance="high"/>
+
+   </Target>
+
+</Project>

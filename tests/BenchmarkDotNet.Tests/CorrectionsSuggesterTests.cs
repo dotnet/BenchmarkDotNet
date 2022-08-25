@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Tests
                 typeof(NamespaceB.NamespaceC.MyClassC),
                 typeof(AnotherNamespace.InnerNamespaceA.MyClassA)
             }).SuggestFor("NmespaceB.NamespaceC");
-            Assert.Equal(new[] { "NamespaceB.NamespaceC", "NamespaceA.NamespaceC" }, suggestedNames);
+            Assert.Equal(new[] { "NamespaceB.NamespaceC*", "NamespaceA.NamespaceC*" }, suggestedNames);
         }
 
         [Fact]
@@ -74,7 +74,7 @@ namespace BenchmarkDotNet.Tests
                 typeof(AnotherNamespace.MyClassZ),
                 typeof(NamespaceB.NamespaceC.MyClassC)
             }).SuggestFor("Nmespace");
-            Assert.Equal(new[] { "NamespaceA", "NamespaceB", "NamespaceC" }, suggestedNames);
+            Assert.Equal(new[] { "NamespaceA*", "NamespaceB*" }, suggestedNames);
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace BenchmarkDotNet.Tests
                 typeof(AnotherNamespace.InnerNamespaceB.MyClassA),
                 typeof(Lexicographical.MyClassLexicAACDE)
             }).SuggestFor("InerNamespaceB");
-            Assert.Equal(new[] { "InnerNamespaceB", "InnerNamespaceA" }, suggestedNames);
+            Assert.Equal(new[] { "*InnerNamespaceB*" }, suggestedNames);
         }
 
         [Fact]
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Tests
         {
             var suggestedNames = new CorrectionsSuggester(new[] { typeof(MyClassA), typeof(NamespaceA.MyClassA) })
                 .SuggestFor("MyClasA");
-            Assert.Equal(new[] { "MyClassA" }, suggestedNames);
+            Assert.Equal(new[] { "*MyClassA*" }, suggestedNames);
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.Tests
                 typeof(MyClassA), typeof(MyClassB), typeof(MyClassC), typeof(MyClassZ), typeof(NamespaceB.NamespaceC.MyClassA),
                 typeof(MyClassZ.MyClassY)
             }).SuggestFor("MyClasZ");
-            Assert.Equal(new[] { "MyClassZ", "MyClassA", "MyClassB", "MyClassC", "MyClassY" }, suggestedNames);
+            Assert.Equal(new[] { "*MyClassZ*" }, suggestedNames);
         }
 
         [Fact]
@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.Tests
         {
             var suggestedNames = new CorrectionsSuggester(new[]
             {
-                typeof(MyClassA),
+                typeof(NamespaceB.MyClassA),
                 typeof(NamespaceA.MyClassA),
                 typeof(NamespaceB.NamespaceC.MyClassA)
             }).SuggestFor("NamespaceA.MyClasA.MethodA");
@@ -122,8 +122,6 @@ namespace BenchmarkDotNet.Tests
                 "NamespaceA.MyClassA.MethodA",
                 "NamespaceA.MyClassA.MethodB",
                 "NamespaceB.MyClassA.MethodA",
-                "NamespaceC.MyClassA.MethodA",
-                "NamespaceC.MyClassA.MethodB"
             }, suggestedNames);
         }
 
@@ -135,7 +133,7 @@ namespace BenchmarkDotNet.Tests
                 typeof(Generics.GenericA<int>),
                 typeof(Generics.GenericB<int>)
             }).SuggestFor("GeneriA<Int32>");
-            Assert.Equal(new[] { "GenericA<Int32>", "GenericB<Int32>" }, suggestedNames);
+            Assert.Equal(new[] { "*GenericA<Int32>*" }, suggestedNames);
         }
     }
 }

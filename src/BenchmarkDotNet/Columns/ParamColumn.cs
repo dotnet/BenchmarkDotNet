@@ -10,9 +10,10 @@ namespace BenchmarkDotNet.Columns
         public string Id => nameof(ParamColumn) + "." + ColumnName;
         public string ColumnName { get; }
 
-        public ParamColumn(string columnName)
+        public ParamColumn(string columnName, int priorityInCategory = 0)
         {
             ColumnName = columnName;
+            PriorityInCategory = priorityInCategory;
         }
 
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
@@ -23,7 +24,7 @@ namespace BenchmarkDotNet.Columns
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Params;
-        public int PriorityInCategory => 0;
+        public int PriorityInCategory { get; private set; }
         public override string ToString() => ColumnName;
         public bool IsNumeric => false;
         public UnitType UnitType => UnitType.Dimensionless;

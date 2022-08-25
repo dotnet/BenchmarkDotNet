@@ -49,9 +49,10 @@ namespace BenchmarkDotNet.Helpers
             foreach (char invalidPathChar in Path.GetInvalidFileNameChars())
                 builder.Replace(invalidPathChar, '_');
 
-            // > and < are valid on Unix, but not on Windows. File names should be consistent across all OSes #981
+            // >, <, and : are valid on Unix, but not on Windows. File names should be consistent across all OSes #981
             builder.Replace('<', '_');
             builder.Replace('>', '_');
+            builder.Replace(':', '_');
 
             return builder.ToString();
         }

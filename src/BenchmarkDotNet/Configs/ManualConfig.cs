@@ -29,7 +29,8 @@ namespace BenchmarkDotNet.Configs
         private readonly List<Job> jobs = new List<Job>();
         private readonly HashSet<HardwareCounter> hardwareCounters = new HashSet<HardwareCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
-        private readonly HashSet<BenchmarkLogicalGroupRule> logicalGroupRules = new HashSet<BenchmarkLogicalGroupRule>();
+        private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = new List<BenchmarkLogicalGroupRule>();
+        private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
@@ -48,6 +49,9 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public CultureInfo CultureInfo { get; set; }
         [PublicAPI] public IOrderer Orderer { get; set; }
         [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
+        [PublicAPI] public TimeSpan BuildTimeout { get; set; } = DefaultConfig.Instance.BuildTimeout;
+
+        public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
 
         public ManualConfig WithOption(ConfigOptions option, bool value)
         {
@@ -82,6 +86,12 @@ namespace BenchmarkDotNet.Configs
         public ManualConfig WithOrderer(IOrderer orderer)
         {
             Orderer = orderer;
+            return this;
+        }
+
+        public ManualConfig WithBuildTimeout(TimeSpan buildTimeout)
+        {
+            BuildTimeout = buildTimeout;
             return this;
         }
 
@@ -191,7 +201,12 @@ namespace BenchmarkDotNet.Configs
 
         public ManualConfig AddLogicalGroupRules(params BenchmarkLogicalGroupRule[] rules)
         {
-            logicalGroupRules.AddRange(rules);
+            foreach (var rule in rules)
+            {
+                if (logicalGroupRules.Contains(rule))
+                    logicalGroupRules.Remove(rule);
+                logicalGroupRules.Add(rule);
+            }
             return this;
         }
 
@@ -213,9 +228,22 @@ namespace BenchmarkDotNet.Configs
             SummaryStyle = config.SummaryStyle ?? SummaryStyle;
             logicalGroupRules.AddRange(config.GetLogicalGroupRules());
             Options |= config.Options;
+            BuildTimeout = GetBuildTimeout(BuildTimeout, config.BuildTimeout);
         }
 
+        /// <summary>
+        /// Creates a completely EMPTY config with no predefined settings.
+        /// </summary>
+        /// <remarks>You should most probably use the <see cref="CreateMinimumViable"></see> method instead.</remarks>
         public static ManualConfig CreateEmpty() => new ManualConfig();
+
+        /// <summary>
+        /// Creates a minimum viable config with predefined columns provider and console logger.
+        /// </summary>
+        public static ManualConfig CreateMinimumViable()
+            => CreateEmpty()
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddLogger(ConsoleLogger.Default);
 
         public static ManualConfig Create(IConfig config)
         {
@@ -246,5 +274,10 @@ namespace BenchmarkDotNet.Configs
             }
             return manualConfig;
         }
+
+        private static TimeSpan GetBuildTimeout(TimeSpan current, TimeSpan other)
+            => current == DefaultConfig.Instance.BuildTimeout
+                ? other
+                : TimeSpan.FromMilliseconds(Math.Max(current.TotalMilliseconds, other.TotalMilliseconds));
     }
 }

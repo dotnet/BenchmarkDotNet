@@ -29,6 +29,8 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
 
+        public bool RequiresBlockingAcknowledgments(BenchmarkCase benchmarkCase) => false;
+
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
@@ -61,6 +63,7 @@ namespace BenchmarkDotNet.Diagnosers
             public UnitType UnitType => UnitType.Dimensionless;
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
+            public int PriorityInCategory => 0;
         }
 
         private class LockContentionCountMetricDescriptor : IMetricDescriptor
@@ -74,6 +77,7 @@ namespace BenchmarkDotNet.Diagnosers
             public UnitType UnitType => UnitType.Dimensionless;
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
+            public int PriorityInCategory => 0;
         }
     }
 }

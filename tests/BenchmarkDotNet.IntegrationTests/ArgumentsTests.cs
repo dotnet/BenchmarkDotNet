@@ -770,6 +770,18 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void ComplexStringPattersAreSupported(IToolchain toolchain) => CanExecute<Perf_Regex_Industry_RustLang_Sherlock>(toolchain);
+
+        public class Perf_Regex_Industry_RustLang_Sherlock
+        {
+            [Params(@"[""'][^""']{0,30}[?!.][""']")]
+            public string Pattern { get; set; }
+
+            [Benchmark]
+            public int Consume() => Pattern.Length;
+        }
+
         [Fact]
         public void UnusedDisposableParamsAreDisposed() => CanExecute<WithDisposableArguments>(Job.Default.GetToolchain());
 

@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Code
 
                 string passArguments = GetPassArguments(benchmark);
 
-                extraDefines.Add($"{provider.ExtraDefines}_{buildInfo.Id}");
+                string compilationId = $"{provider.ReturnsDefinition}_{buildInfo.Id}";
 
                 AddNonEmptyUnique(additionalLogic, benchmark.Descriptor.AdditionalLogic);
 
@@ -64,19 +64,23 @@ namespace BenchmarkDotNet.Code
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
                     .Replace("$MeasureExtraStats$", buildInfo.Config.HasExtraStatsDiagnoser() ? "true" : "false")
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
-                    .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments)).ToString();
+                    .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments))
+                    .RemoveRedundantIfDefines(compilationId);
 
                 benchmarkTypeCode = Unroll(benchmarkTypeCode, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance));
 
                 benchmarksCode.Add(benchmarkTypeCode);
             }
 
-            if (buildPartition.IsCoreRT)
-                extraDefines.Add("#define CORERT");
+            if (buildPartition.IsNativeAot)
+                extraDefines.Add("#define NATIVEAOT");
             else if (buildPartition.IsNetFramework)
                 extraDefines.Add("#define NETFRAMEWORK");
             else if (buildPartition.IsWasm)
                 extraDefines.Add("#define WASM");
+
+            if (buildPartition.NoAcknowledgments)
+                extraDefines.Add("#define NO_ACK");
 
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
                 .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
@@ -84,7 +88,7 @@ namespace BenchmarkDotNet.Code
                 .Replace("$AdditionalLogic$", string.Join(Environment.NewLine, additionalLogic))
                 .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))
                 .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmarkCase.Descriptor))
-                .Replace("$CoreRtSwitch$", GetCoreRtSwitch(buildPartition))
+                .Replace("$NativeAotSwitch$", GetNativeAotSwitch(buildPartition))
                 .ToString();
 
             return benchmarkProgramContent;
@@ -119,6 +123,7 @@ namespace BenchmarkDotNet.Code
             const string unrollDirective = "@Unroll@";
             const string dummyUnrollDirective = "@DummyUnroll@";
             const int dummyUnrollFactor = 1 << 6;
+            string dummyUnrolled = string.Join("", Enumerable.Repeat("dummyVar++;", dummyUnrollFactor));
             var oldLines = text.Split('\n');
             var newLines = new List<string>();
             foreach (string line in oldLines)
@@ -131,9 +136,7 @@ namespace BenchmarkDotNet.Code
                 }
                 else if (line.Contains(dummyUnrollDirective))
                 {
-                    string newLine = line.Replace(dummyUnrollDirective, "");
-                    for (int i = 0; i < dummyUnrollFactor; i++)
-                        newLines.Add(newLine);
+                    newLines.Add(line.Replace(dummyUnrollDirective, dummyUnrolled));
                 }
                 else
                     newLines.Add(line);
@@ -186,7 +189,8 @@ namespace BenchmarkDotNet.Code
             return new NonVoidDeclarationsProvider(descriptor);
         }
 
-        private static string GetParamsContent(BenchmarkCase benchmarkCase)
+        // internal for tests
+        internal static string GetParamsContent(BenchmarkCase benchmarkCase)
             => string.Join(
                 string.Empty,
                 benchmarkCase.Parameters.Items
@@ -256,11 +260,11 @@ namespace BenchmarkDotNet.Code
         }
 
         /// <summary>
-        /// for CoreRT we can't use reflection to load type and run a method, so we simply generate a switch for all types..
+        /// for NativeAOT we can't use reflection to load type and run a method, so we simply generate a switch for all types..
         /// </summary>
-        private static string GetCoreRtSwitch(BuildPartition buildPartition)
+        private static string GetNativeAotSwitch(BuildPartition buildPartition)
         {
-            if (!buildPartition.IsCoreRT)
+            if (!buildPartition.IsNativeAot)
                 return default;
 
             var @switch = new StringBuilder(buildPartition.Benchmarks.Length * 30);
@@ -302,6 +306,31 @@ namespace BenchmarkDotNet.Code
                 else
                     builder.Append($"\n// '{oldValue}' not found");
                 return this;
+            }
+
+            public string RemoveRedundantIfDefines(string id)
+            {
+                var oldLines = builder.ToString().Split('\n');
+                var newLines = new List<string>();
+                bool keepAdding = true;
+
+                foreach (string line in oldLines)
+                {
+                    if (line.StartsWith("#if RETURNS") || line.StartsWith("#elif RETURNS"))
+                    {
+                        keepAdding = line.Contains(id);
+                    }
+                    else if (line.StartsWith("#endif // RETURNS"))
+                    {
+                        keepAdding = true;
+                    }
+                    else if (keepAdding)
+                    {
+                        newLines.Add(line);
+                    }
+                }
+
+                return string.Join("\n", newLines);
             }
 
             public override string ToString() => builder.ToString();

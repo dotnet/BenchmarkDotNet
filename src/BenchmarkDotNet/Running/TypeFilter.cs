@@ -9,9 +9,9 @@ using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Running
 {
-    internal static class TypeFilter
+    public static class TypeFilter
     {
-        internal static (bool allTypesValid, IReadOnlyList<Type> runnable) GetTypesWithRunnableBenchmarks(IEnumerable<Type> types, IEnumerable<Assembly> assemblies, ILogger logger)
+        public static (bool allTypesValid, IReadOnlyList<Type> runnable) GetTypesWithRunnableBenchmarks(IEnumerable<Type> types, IEnumerable<Assembly> assemblies, ILogger logger)
         {
             var validRunnableTypes = new List<Type>();
 
@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Running
             return (true, validRunnableTypes);
         }
 
-        internal static BenchmarkRunInfo[] Filter(IConfig effectiveConfig, IEnumerable<Type> types)
+        public static BenchmarkRunInfo[] Filter(IConfig effectiveConfig, IEnumerable<Type> types)
             => types
                 .Select(type => BenchmarkConverter.TypeToBenchmarks(type, effectiveConfig))
                 .Where(info => info.BenchmarksCases.Any())

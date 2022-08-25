@@ -19,10 +19,11 @@ namespace BenchmarkDotNet.Reports
         public bool PrintZeroValuesInContent { get; }
         public int MaxParameterColumnWidth { get; }
         public SizeUnit SizeUnit { get; }
+        internal SizeUnit CodeSizeUnit { get; }
         public TimeUnit TimeUnit { get; }
         [NotNull]
         public CultureInfo CultureInfo { get; }
-        
+
         public RatioStyle RatioStyle { get; }
 
         public SummaryStyle([CanBeNull] CultureInfo cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true,
@@ -39,6 +40,7 @@ namespace BenchmarkDotNet.Reports
             PrintZeroValuesInContent = printZeroValuesInContent;
             MaxParameterColumnWidth = maxParameterColumnWidth;
             RatioStyle = ratioStyle;
+            CodeSizeUnit = SizeUnit.B;
         }
 
         public SummaryStyle WithTimeUnit(TimeUnit timeUnit)
@@ -70,8 +72,10 @@ namespace BenchmarkDotNet.Reports
                    && PrintUnitsInContent == other.PrintUnitsInContent
                    && PrintZeroValuesInContent == other.PrintZeroValuesInContent
                    && Equals(SizeUnit, other.SizeUnit)
+                   && Equals(CodeSizeUnit, other.CodeSizeUnit)
                    && Equals(TimeUnit, other.TimeUnit)
-                   && MaxParameterColumnWidth == other.MaxParameterColumnWidth;
+                   && MaxParameterColumnWidth == other.MaxParameterColumnWidth
+                   && RatioStyle == other.RatioStyle;
         }
 
         public override bool Equals(object obj) => obj is SummaryStyle summary && Equals(summary);
@@ -84,8 +88,10 @@ namespace BenchmarkDotNet.Reports
                 hashCode = (hashCode * 397) ^ PrintUnitsInContent.GetHashCode();
                 hashCode = (hashCode * 397) ^ PrintZeroValuesInContent.GetHashCode();
                 hashCode = (hashCode * 397) ^ (SizeUnit != null ? SizeUnit.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (CodeSizeUnit != null ? CodeSizeUnit.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (TimeUnit != null ? TimeUnit.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ MaxParameterColumnWidth;
+                hashCode = (hashCode * 397) ^ RatioStyle.GetHashCode();
                 return hashCode;
             }
         }
