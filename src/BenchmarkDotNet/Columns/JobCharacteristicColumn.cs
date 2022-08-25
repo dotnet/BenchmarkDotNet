@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Columns
                 }
                 if (nameof(Job).Equals(ColumnName))
                 {
-                    return summary.BenchmarksCases.Any(x => !x.Job.IsGeneratedJobId());
+                    return summary.BenchmarksCases.Any(x => x.Job.HasValue(CharacteristicObject.IdCharacteristic));
                 }
             }
 
