@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsAvailable(Summary summary)
         {
-            if (summary.IsMultipleRuntime)
+            if (summary.IsMultipleRuntimes)
             {
                 if (nameof(Toolchains.Toolchain).Equals(ColumnName))
                 {
