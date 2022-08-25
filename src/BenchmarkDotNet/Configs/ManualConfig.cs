@@ -20,6 +20,8 @@ namespace BenchmarkDotNet.Configs
 {
     public class ManualConfig : IConfig
     {
+        private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
+
         private readonly List<IColumnProvider> columnProviders = new List<IColumnProvider>();
         private readonly List<IExporter> exporters = new List<IExporter>();
         private readonly List<ILogger> loggers = new List<ILogger>();
@@ -50,6 +52,9 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public CultureInfo CultureInfo { get; set; }
         [PublicAPI] public IOrderer Orderer { get; set; }
         [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
+        [PublicAPI] public TimeSpan BuildTimeout { get; set; } = DefaultConfig.Instance.BuildTimeout;
+
+        public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
 
         public ManualConfig WithOption(ConfigOptions option, bool value)
         {
@@ -84,6 +89,12 @@ namespace BenchmarkDotNet.Configs
         public ManualConfig WithOrderer(IOrderer orderer)
         {
             Orderer = orderer;
+            return this;
+        }
+
+        public ManualConfig WithBuildTimeout(TimeSpan buildTimeout)
+        {
+            BuildTimeout = buildTimeout;
             return this;
         }
 
@@ -242,6 +253,7 @@ namespace BenchmarkDotNet.Configs
             logicalGroupRules.AddRange(config.GetLogicalGroupRules());
             columnHidingRules.AddRange(config.GetColumnHidingRules());
             Options |= config.Options;
+            BuildTimeout = GetBuildTimeout(BuildTimeout, config.BuildTimeout);
         }
 
         /// <summary>
@@ -287,5 +299,10 @@ namespace BenchmarkDotNet.Configs
             }
             return manualConfig;
         }
+
+        private static TimeSpan GetBuildTimeout(TimeSpan current, TimeSpan other)
+            => current == DefaultConfig.Instance.BuildTimeout
+                ? other
+                : TimeSpan.FromMilliseconds(Math.Max(current.TotalMilliseconds, other.TotalMilliseconds));
     }
 }

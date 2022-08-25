@@ -5,7 +5,9 @@ using System.IO;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
+#if NETSTANDARD
 using Microsoft.DotNet.PlatformAbstractions;
+#endif
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
@@ -19,7 +21,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         protected string runtimeFrameworkVersion;
 
         protected bool useNuGetClearTag, useTempFolderForRestore;
-        protected TimeSpan? timeout;
         private string targetFrameworkMoniker;
 
         public abstract IToolchain ToToolchain();
@@ -121,18 +122,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return this;
         }
 
-        /// <summary>
-        /// sets provided timeout for build
-        /// </summary>
-        [PublicAPI]
-        [SuppressMessage("ReSharper", "ParameterHidesMember")]
-        public CustomDotNetCliToolchainBuilder Timeout(TimeSpan timeout)
-        {
-            this.timeout = timeout;
-
-            return this;
-        }
-
         internal static string GetPortableRuntimeIdentifier()
         {
             // Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.GetRuntimeIdentifier()
@@ -140,7 +129,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             // the values taken from https://docs.microsoft.com/en-us/dotnet/core/rid-catalog#macos-rids
             string osPart = RuntimeInformation.IsWindows() ? "win" : (RuntimeInformation.IsMacOSX() ? "osx" : "linux");
 
-            return $"{osPart}-{RuntimeEnvironment.RuntimeArchitecture}";
+            string architecture =
+#if NETSTANDARD
+                RuntimeEnvironment.RuntimeArchitecture;
+#else
+                System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
+#endif
+
+            return $"{osPart}-{architecture}";
         }
     }
 }

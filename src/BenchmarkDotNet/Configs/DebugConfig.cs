@@ -52,6 +52,7 @@ namespace BenchmarkDotNet.Configs
 
     public abstract class DebugConfig : IConfig
     {
+        private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
         public abstract IEnumerable<Job> GetJobs();
 
         public IEnumerable<IValidator> GetValidators() => Array.Empty<IValidator>();
@@ -67,6 +68,7 @@ namespace BenchmarkDotNet.Configs
         public IOrderer Orderer => DefaultOrderer.Instance;
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
+        public TimeSpan BuildTimeout => DefaultConfig.Instance.BuildTimeout;
 
         public string ArtifactsPath
         {
@@ -83,5 +85,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
 
         public ConfigOptions Options => ConfigOptions.KeepBenchmarkFiles | ConfigOptions.DisableOptimizationsValidator;
+
+        public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
     }
 }

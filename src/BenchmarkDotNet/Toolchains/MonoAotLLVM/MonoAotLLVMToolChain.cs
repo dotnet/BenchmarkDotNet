@@ -18,8 +18,7 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
                         netCoreAppSettings.AOTCompilerPath,
                         netCoreAppSettings.AOTCompilerMode),
                     new DotNetCliBuilder(netCoreAppSettings.TargetFrameworkMoniker,
-                        netCoreAppSettings.CustomDotNetCliPath,
-                        netCoreAppSettings.Timeout),
+                        netCoreAppSettings.CustomDotNetCliPath),
                     new Executor());
     }
 }

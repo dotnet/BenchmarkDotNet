@@ -3,27 +3,45 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+#if NET6_0_OR_GREATER
+using System.Net.Http;
+#else
 using System.Net;
+#endif
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using Microsoft.CSharp;
 
 namespace BenchmarkDotNet.Running
 {
     public static partial class BenchmarkConverter
     {
+#if NET6_0_OR_GREATER
+        private static readonly HttpClient Client = new HttpClient();
+#endif
+
         public static BenchmarkRunInfo[] UrlToBenchmarks(string url, IConfig config = null)
         {
+            if (!RuntimeInformation.IsFullFramework)
+                throw new NotSupportedException("Supported only on Full .NET Framework.");
+
             var logger = HostEnvironmentInfo.FallbackLogger;
 
             url = GetRawUrl(url);
             string benchmarkContent;
             try
             {
+#if NET6_0_OR_GREATER
+                using (var request = new HttpRequestMessage(HttpMethod.Get, url))
+                using (var response = Client.Send(request))
+                using (var content = response.Content.ReadAsStream())
+#else
                 var webRequest = WebRequest.Create(url);
                 using (var response = webRequest.GetResponse())
                 using (var content = response.GetResponseStream())
+#endif
                 {
                     if (content == null)
                     {
@@ -49,6 +67,9 @@ namespace BenchmarkDotNet.Running
 
         public static BenchmarkRunInfo[] SourceToBenchmarks(string source, IConfig config = null)
         {
+            if (!RuntimeInformation.IsFullFramework)
+                throw new NotSupportedException("Supported only on Full .NET Framework.");
+
             string benchmarkContent = source;
             CompilerResults compilerResults;
             using (var cSharpCodeProvider = new CSharpCodeProvider()) {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
@@ -46,5 +47,15 @@ namespace BenchmarkDotNet.Configs
         /// a set of custom flags that can enable/disable various settings
         /// </summary>
         ConfigOptions Options { get; }
+
+        /// <summary>
+        /// the auto-generated project build timeout
+        /// </summary>
+        TimeSpan BuildTimeout { get; }
+
+        /// <summary>
+        /// Collect any errors or warnings when composing the configuration
+        /// </summary>
+        IReadOnlyList<Conclusion> ConfigAnalysisConclusion { get; }
     }
 }

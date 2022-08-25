@@ -7,6 +7,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
@@ -416,6 +417,11 @@ namespace BenchmarkDotNet.Jobs
 
             return job;
         }
+
+        internal static bool IsNativeAOT(this Job job)
+            => job.Environment.GetRuntime() is NativeAotRuntime
+            // given job can have NativeAOT toolchain set, but Runtime == default
+            || (job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is NativeAotToolchain);
 
         private static Job WithCore(this Job job, Action<Job> updateCallback)
         {

@@ -6,6 +6,7 @@ using System.Runtime;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Portability.Cpu;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
@@ -15,6 +16,7 @@ namespace BenchmarkDotNet.Environments
     {
         internal const string RuntimeInfoPrefix = "Runtime=";
         internal const string GcInfoPrefix = "GC=";
+        internal const string HardwareIntrinsicsPrefix = "HardwareIntrinsics=";
 
         [PublicAPI] public string Architecture { get; protected set; }
         [PublicAPI] public string Configuration { get; protected set; }
@@ -22,6 +24,7 @@ namespace BenchmarkDotNet.Environments
         [PublicAPI] public bool HasAttachedDebugger { get; protected set; }
         [PublicAPI] public bool HasRyuJit { get; protected set; }
         [PublicAPI] public string JitInfo { get; protected set; }
+        [PublicAPI] public string HardwareIntrinsicsShort { get; protected set; }
         [PublicAPI] public bool IsServerGC { get; protected set; }
         [PublicAPI] public bool IsConcurrentGC { get; protected set; }
         [PublicAPI] public long GCAllocationQuantum { get; protected set; }
@@ -34,6 +37,7 @@ namespace BenchmarkDotNet.Environments
             Configuration = RuntimeInformation.GetConfiguration();
             HasRyuJit = RuntimeInformation.HasRyuJit();
             JitInfo = RuntimeInformation.GetJitInfo();
+            HardwareIntrinsicsShort = HardwareIntrinsics.GetShortInfo();
             IsServerGC = GCSettings.IsServerGC;
             IsConcurrentGC = GCSettings.LatencyMode != GCLatencyMode.Batch;
             HasAttachedDebugger = Debugger.IsAttached;
@@ -49,6 +53,7 @@ namespace BenchmarkDotNet.Environments
             yield return "Benchmark Process Environment Information:";
             yield return $"{RuntimeInfoPrefix}{GetRuntimeInfo()}";
             yield return $"{GcInfoPrefix}{GetGcConcurrentFlag()} {GetGcServerFlag()}";
+            yield return $"{HardwareIntrinsicsPrefix}{HardwareIntrinsics.GetFullInfo(RuntimeInformation.GetCurrentPlatform())} {HardwareIntrinsics.GetVectorSize()}";
         }
 
         [PublicAPI] protected string GetConfigurationFlag() => Configuration == RuntimeInformation.Unknown || Configuration == RuntimeInformation.ReleaseConfigurationName
@@ -61,7 +66,7 @@ namespace BenchmarkDotNet.Environments
 
         internal string GetRuntimeInfo()
         {
-            string jitInfo = string.Join(" ", new[] { JitInfo, GetConfigurationFlag(), GetDebuggerFlag() }.Where(title => title != ""));
+            string jitInfo = string.Join(" ", new[] { JitInfo, HardwareIntrinsicsShort, GetConfigurationFlag(), GetDebuggerFlag() }.Where(title => title != ""));
             return $"{RuntimeVersion}, {Architecture} {jitInfo}";
         }
 

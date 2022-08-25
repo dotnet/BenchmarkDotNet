@@ -14,6 +14,7 @@ namespace BenchmarkDotNet.Attributes
         /// <param name="exportHtml">Exports to HTML with clickable links. False by default.</param>
         /// <param name="exportCombinedDisassemblyReport">Exports all benchmarks to a single HTML report. Makes it easy to compare different runtimes or methods (each becomes a column in HTML table).</param>
         /// <param name="exportDiff">Exports a diff of the assembly code to the Github markdown format. False by default.</param>
+        /// <param name="filters">Glob patterns applied to full method signatures by the the disassembler.</param>
         public DisassemblyDiagnoserAttribute(
             int maxDepth = 1,
             bool printSource = false,
@@ -21,18 +22,28 @@ namespace BenchmarkDotNet.Attributes
             bool exportGithubMarkdown = true,
             bool exportHtml = false,
             bool exportCombinedDisassemblyReport = false,
-            bool exportDiff = false)
+            bool exportDiff = false,
+            params string[] filters)
         {
             Config = ManualConfig.CreateEmpty().AddDiagnoser(
                 new DisassemblyDiagnoser(
                     new DisassemblyDiagnoserConfig(
                         maxDepth: maxDepth,
+                        filters: filters,
                         printSource: printSource,
                         printInstructionAddresses: printInstructionAddresses,
                         exportGithubMarkdown: exportGithubMarkdown,
                         exportHtml: exportHtml,
                         exportCombinedDisassemblyReport: exportCombinedDisassemblyReport,
                         exportDiff: exportDiff)));
+        }
+
+        // CLS-Compliant Code requires a constructor without an array in the argument list
+        protected DisassemblyDiagnoserAttribute()
+        {
+            Config = ManualConfig.CreateEmpty().AddDiagnoser(
+                new DisassemblyDiagnoser(
+                    new DisassemblyDiagnoserConfig()));
         }
 
         public IConfig Config { get; }

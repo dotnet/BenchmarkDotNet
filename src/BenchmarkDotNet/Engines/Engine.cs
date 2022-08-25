@@ -39,7 +39,6 @@ namespace BenchmarkDotNet.Engines
         private int UnrollFactor { get; }
         private RunStrategy Strategy { get; }
         private bool EvaluateOverhead { get; }
-        private int InvocationCount { get; }
         private bool MemoryRandomization { get; }
 
         private readonly EnginePilotStage pilotStage;
@@ -78,7 +77,6 @@ namespace BenchmarkDotNet.Engines
             UnrollFactor = targetJob.ResolveValue(RunMode.UnrollFactorCharacteristic, Resolver);
             Strategy = targetJob.ResolveValue(RunMode.RunStrategyCharacteristic, Resolver);
             EvaluateOverhead = targetJob.ResolveValue(AccuracyMode.EvaluateOverheadCharacteristic, Resolver);
-            InvocationCount = targetJob.ResolveValue(RunMode.InvocationCountCharacteristic, Resolver);
             MemoryRandomization = targetJob.ResolveValue(RunMode.MemoryRandomizationCharacteristic, Resolver);
 
             warmupStage = new EngineWarmupStage(this);
@@ -106,7 +104,7 @@ namespace BenchmarkDotNet.Engines
 
         public RunResults Run()
         {
-            long invokeCount = InvocationCount;
+            long invokeCount = TargetJob.ResolveValue(RunMode.InvocationCountCharacteristic, Resolver, 1);
             IReadOnlyList<Measurement> idle = null;
 
             if (EngineEventSource.Log.IsEnabled())

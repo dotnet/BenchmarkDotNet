@@ -112,7 +112,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
                 foreach (string setting in SettingsWeWantToCopy)
                     if (trimmedLine.Contains(setting))
-                        customProperties.Append(trimmedLine);
+                        customProperties.AppendLine(trimmedLine);
 
                 if (trimmedLine.StartsWith("<Import Project"))
                 {

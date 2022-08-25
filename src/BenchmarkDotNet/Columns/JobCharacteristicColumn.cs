@@ -28,7 +28,6 @@ namespace BenchmarkDotNet.Columns
 
         public string Id { get; }
         public string ColumnName { get; }
-        public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => false;
         public ColumnCategory Category => ColumnCategory.Job;
         public int PriorityInCategory => 0;
@@ -37,6 +36,23 @@ namespace BenchmarkDotNet.Columns
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);
 
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => !benchmarkCase.Job.HasValue(characteristic);
+
+        public bool IsAvailable(Summary summary)
+        {
+            if (summary.IsMultipleRuntimes)
+            {
+                if (nameof(Toolchains.Toolchain).Equals(ColumnName))
+                {
+                    return false;
+                }
+                if (nameof(Job).Equals(ColumnName))
+                {
+                    return summary.BenchmarksCases.Any(x => x.Job.HasValue(CharacteristicObject.IdCharacteristic));
+                }
+            }
+
+            return true;
+        }
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
         {

@@ -11,6 +11,7 @@ namespace BenchmarkDotNet.Helpers
         // should be ordered by release number
         private static readonly (int minReleaseNumber, string version)[] FrameworkVersions =
         {
+            (533320, "4.8.1"), // value taken from Windows 11 arm64 insider build
             (528040, "4.8"),
             (461808, "4.7.2"),
             (461308, "4.7.1"),
@@ -48,11 +49,16 @@ namespace BenchmarkDotNet.Helpers
                 return "4.7.1";
             if (string.Compare(servicingVersion, "4.8") < 0)
                 return "4.7.2";
+            if (string.Compare(servicingVersion, "4.8.9") < 0)
+                return "4.8";
 
-            return "4.8"; // most probably the last major release of Full .NET Framework
+            return "4.8.1"; // most probably the last major release of Full .NET Framework
         }
 
 
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#endif
         private static int? GetReleaseNumberFromWindowsRegistry()
         {
             using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
@@ -64,6 +70,9 @@ namespace BenchmarkDotNet.Helpers
             }
         }
 
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#endif
         internal static string GetLatestNetDeveloperPackVersion()
         {
             if (!(GetReleaseNumberFromWindowsRegistry() is int releaseNumber))

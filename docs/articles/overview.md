@@ -10,7 +10,7 @@ name: Overview
 Create new console application and install the [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/) NuGet package. We support:
 
 * *Projects:* classic and modern with PackageReferences
-* *Runtimes:* Full .NET Framework (4.6+), .NET Core (2.0+), Mono, CoreRT
+* *Runtimes:* Full .NET Framework (4.6+), .NET Core (2.0+), Mono, NativeAOT
 * *OS:* Windows, Linux, MacOS
 * *Languages:* C#, F#, VB
 
@@ -82,10 +82,10 @@ Frequency=1948699 Hz, Resolution=513.1629 ns, Timer=TSC
 
 ## Jobs
 
-You can check several environments at once. For example, you can compare performance of Full .NET Framework, .NET Core, Mono and CoreRT. Just add the `ClrJob`, `MonoJob`, `CoreJob`, `CoreRtJob` attributes before the class declaration (it requires a .NETCore project, installed CoreCLR and Mono):
+You can check several environments at once. For example, you can compare performance of Full .NET Framework, .NET Core, Mono and NativeAOT. Just add the `ClrJob`, `MonoJob`, `CoreJob`, attributes before the class declaration (it requires .NET SDK and Mono to be installed and added to $PATH):
 
 ```cs
-[ClrJob, MonoJob, CoreJob, CoreRtJob]
+[ClrJob, MonoJob, CoreJob]
 public class Md5VsSha256
 ```
 

@@ -2,7 +2,7 @@
 
 ## BenchmarkDotNet
 
-You need to be aware of the fact that to ensure process-level isolation BenchmarkDotNet generates, builds and executes every benchmark in a dedicated process. For .NET and Mono we generate a C# file and compile it using Roslyn. For .NET Core and CoreRT we generate not only C# file but also a project file which later is restored and build with dotnet cli. If your project has some non-trivial build settings like a `.props` and `.target` files or native dependencies things might not work well out of the box.
+You need to be aware of the fact that to ensure process-level isolation BenchmarkDotNet generates, builds and executes every benchmark in a dedicated process. For .NET and Mono we generate a C# file and compile it using Roslyn. For .NET Core and NativeAOT we generate not only C# file but also a project file which later is restored and build with dotnet cli. If your project has some non-trivial build settings like a `.props` and `.target` files or native dependencies things might not work well out of the box.
 
 How do you know that BenchmarkDotNet has failed to build the project? BDN is going to tell you about it. An example:
 
@@ -31,7 +31,7 @@ If the error message is not clear enough, you need to investigate it further.
 
 How to troubleshoot the build process:
 
-1. Run the benchmarks.
+1. Run the benchmarks with `--logBuildOutput` command line argument.
 2. Read the error message. If it does not contain the answer to your problem, please continue to the next step.
 3. Go to the build artifacts folder (path printed by BDN).
 4. The folder should contain: 

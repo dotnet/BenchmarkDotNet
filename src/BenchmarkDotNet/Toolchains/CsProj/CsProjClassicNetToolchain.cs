@@ -1,5 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Characteristics;
+﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -21,17 +20,18 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI] public static readonly IToolchain Net471 = new CsProjClassicNetToolchain("net471", ".NET Framework 4.7.1");
         [PublicAPI] public static readonly IToolchain Net472 = new CsProjClassicNetToolchain("net472", ".NET Framework 4.7.2");
         [PublicAPI] public static readonly IToolchain Net48 = new CsProjClassicNetToolchain("net48", ".NET Framework 4.8");
+        [PublicAPI] public static readonly IToolchain Net481 = new CsProjClassicNetToolchain("net481", ".NET Framework 4.8.1");
 
-        private CsProjClassicNetToolchain(string targetFrameworkMoniker, string name, string packagesPath = null, TimeSpan? timeout = null)
+        private CsProjClassicNetToolchain(string targetFrameworkMoniker, string name, string packagesPath = null)
             : base(name,
                 new CsProjGenerator(targetFrameworkMoniker, cliPath: null, packagesPath: packagesPath, runtimeFrameworkVersion: null, isNetCore: false),
-                new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath: null, timeout: timeout),
+                new DotNetCliBuilder(targetFrameworkMoniker, customDotNetCliPath: null),
                 new Executor())
         {
         }
 
-        public static IToolchain From(string targetFrameworkMoniker, string packagesPath = null, TimeSpan? timeout = null)
-            => new CsProjClassicNetToolchain(targetFrameworkMoniker, targetFrameworkMoniker, packagesPath, timeout);
+        public static IToolchain From(string targetFrameworkMoniker, string packagesPath = null)
+            => new CsProjClassicNetToolchain(targetFrameworkMoniker, targetFrameworkMoniker, packagesPath);
 
         public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
         {

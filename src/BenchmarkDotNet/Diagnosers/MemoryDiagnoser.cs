@@ -29,8 +29,8 @@ namespace BenchmarkDotNet.Diagnosers
         public void DisplayResults(ILogger logger) { }
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Array.Empty<ValidationError>();
 
-        // the following methods are left empty on purpose
         // the action takes places in other process, and the values are gathered by Engine
+        public bool RequiresBlockingAcknowledgments(BenchmarkCase benchmarkCase) => false;
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults diagnoserResults)

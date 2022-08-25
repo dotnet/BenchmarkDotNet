@@ -159,8 +159,6 @@ namespace BenchmarkDotNet.IntegrationTests
                                        generateResult: null,
                                        buildResult: null,
                                        executeResults: null,
-                                       allMeasurements: null,
-                                       gcStats: default,
                                        metrics: null);
         }
     }

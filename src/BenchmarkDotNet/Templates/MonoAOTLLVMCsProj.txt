@@ -40,23 +40,27 @@
 
    <PropertyGroup>
       <PublishDirFullPath>$([System.IO.Path]::GetFullPath($(PublishDir)))</PublishDirFullPath>
+      <SharedLibraryType Condition="$([MSBuild]::IsOSPlatform('OSX'))">Dylib</SharedLibraryType>
+      <SharedLibraryType Condition="$([MSBuild]::IsOSPlatform('Windows'))">Dll</SharedLibraryType>
+      <SharedLibraryType Condition="'$(SharedLibraryType)' == ''">So</SharedLibraryType>
    </PropertyGroup>
 
    <ItemGroup>
      <AotInputAssemblies Include="$(PublishDirFullPath)\*.dll">
-        <AotArguments>@(MonoAOTCompilerDefaultAotArguments, ';')</AotArguments>
-        <ProcessArguments>@(MonoAOTCompilerDefaultProcessArguments, ';')</ProcessArguments>
+        <AotArguments>mcpu=native</AotArguments>
      </AotInputAssemblies>
    </ItemGroup>
+
 
    <MonoAOTCompiler
         CompilerBinaryPath="$COMPILERBINARYPATH$"
         Mode="Normal"
-        OutputType="Normal"
+        OutputType="Library"
+        LibraryFormat="$(SharedLibraryType)"
         Assemblies="@(AotInputAssemblies)"
         UseLLVM="$USELLVM$"
         LLVMPath="$(MicrosoftNetCoreAppRuntimePackDir)\runtimes\$(RuntimeIdentifier)\native"
-	    OutputDir="$(PublishDir)"
+        OutputDir="$(PublishDir)"
         UseAotDataFile="false"
         IntermediateOutputPath="$(IntermediateOutputPath)">
         <Output TaskParameter="CompiledAssemblies" ItemName="BundleAssemblies" />

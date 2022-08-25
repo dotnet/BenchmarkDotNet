@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -65,14 +66,22 @@ namespace BenchmarkDotNet.Running
                 return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(benchmarkRunInfos));
         }
 
+        /// <summary>
+        /// Supported only on Full .NET Framework. Not recommended.
+        /// </summary>
         [PublicAPI]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static Summary RunUrl(string url, IConfig config = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
                 return RunWithExceptionHandling(() => RunUrlWithDirtyAssemblyResolveHelper(url, config));
         }
 
+        /// <summary>
+        /// Supported only on Full .NET Framework. Not recommended.
+        /// </summary>
         [PublicAPI]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static Summary RunSource(string source, IConfig config = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
@@ -110,13 +119,13 @@ namespace BenchmarkDotNet.Running
         private static Summary RunUrlWithDirtyAssemblyResolveHelper(string url, IConfig config = null)
             => RuntimeInformation.IsFullFramework
                 ? BenchmarkRunnerClean.Run(BenchmarkConverter.UrlToBenchmarks(url, config)).Single()
-                : throw new NotSupportedException("Supported only on Full .NET Framework");
+                : throw new InvalidBenchmarkDeclarationException("Supported only on Full .NET Framework");
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunSourceWithDirtyAssemblyResolveHelper(string source, IConfig config = null)
             => RuntimeInformation.IsFullFramework
                 ? BenchmarkRunnerClean.Run(BenchmarkConverter.SourceToBenchmarks(source, config)).Single()
-                : throw new NotSupportedException("Supported only on Full .NET Framework");
+                : throw new InvalidBenchmarkDeclarationException("Supported only on Full .NET Framework");
 
         private static Summary RunWithExceptionHandling(Func<Summary> run)
         {

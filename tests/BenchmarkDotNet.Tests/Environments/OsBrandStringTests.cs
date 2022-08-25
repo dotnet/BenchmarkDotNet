@@ -58,6 +58,7 @@ namespace BenchmarkDotNet.Tests.Environments
         [InlineData("macOS 10.15.4 (19E266)", "Darwin 19.4.0", "macOS Catalina 10.15.4 (19E266) [Darwin 19.4.0]")]
         [InlineData("macOS 11.1 (20C69)", "Darwin 20.2.0", "macOS Big Sur 11.1 (20C69) [Darwin 20.2.0]")]
         [InlineData("macOS 11.3.1 (20E241)", "Darwin 20.4.0", "macOS Big Sur 11.3.1 (20E241) [Darwin 20.4.0]")]
+        [InlineData("macOS 12.1 (21C52)", "Darwin 21.2.0", "macOS Monterey 12.1 (21C52) [Darwin 21.2.0]")]
         public void MacOSXIsPrettified(string systemVersion, string kernelVersion, string prettifiedName)
             => Check(OsBrandStringHelper.PrettifyMacOSX(systemVersion, kernelVersion), prettifiedName);
     }

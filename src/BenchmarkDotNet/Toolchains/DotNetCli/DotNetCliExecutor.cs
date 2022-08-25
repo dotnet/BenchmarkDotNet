@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 foreach (var file in new DirectoryInfo(executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
                     executeParameters.Logger.WriteLineError(file.Name);
 
-                return new ExecuteResult(false, -1, default, Array.Empty<string>(), Array.Empty<string>());
+                return ExecuteResult.CreateFailed();
             }
 
             try
@@ -42,7 +42,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     executeParameters.BuildResult.ArtifactsPaths,
                     executeParameters.Diagnoser,
                     Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath),
-                    executeParameters.Resolver);
+                    executeParameters.Resolver,
+                    executeParameters.LaunchIndex,
+                    executeParameters.BuildResult.NoAcknowledgments);
             }
             finally
             {
@@ -58,13 +60,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                                       ArtifactsPaths artifactsPaths,
                                       IDiagnoser diagnoser,
                                       string executableName,
-                                      IResolver resolver)
+                                      IResolver resolver,
+                                      int launchIndex,
+                                      bool noAcknowledgments)
         {
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
                 CustomDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
                 $"{executableName.Escape()} {benchmarkId.ToArguments()}",
-                redirectStandardInput: true,
+                redirectStandardInput: !noAcknowledgments,
                 redirectStandardError: false); // #1629
 
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
@@ -72,7 +76,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             using (var process = new Process { StartInfo = startInfo })
             using (var consoleExitHandler = new ConsoleExitHandler(process, logger))
             {
-                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId);
+                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, noAcknowledgments);
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
@@ -95,7 +99,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     consoleExitHandler.KillProcessTree();
                 }
 
-                return new ExecuteResult(true, process.HasExited ? process.ExitCode : null, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
+                return new ExecuteResult(true,
+                    process.HasExited ? process.ExitCode : null,
+                    process.Id,
+                    loggerWithDiagnoser.LinesWithResults,
+                    loggerWithDiagnoser.LinesWithExtraOutput,
+                    launchIndex);
             }
         }
     }
