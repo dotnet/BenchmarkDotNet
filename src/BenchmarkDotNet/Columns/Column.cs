@@ -3,7 +3,7 @@
 namespace BenchmarkDotNet.Columns
 {
     // ReSharper disable once InconsistentNaming
-    [PublicAPI]
+    [PublicAPI] // this type is public, so the users can do things like [HideColumns(Column.$)] and get suggestions from IDE
     public static class Column
     {
         public const string Namespace = "Namespace";

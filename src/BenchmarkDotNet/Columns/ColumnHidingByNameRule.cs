@@ -3,7 +3,7 @@
 namespace BenchmarkDotNet.Columns
 {
     [PublicAPI]
-    internal class ColumnHidingByNameRule: IColumnHidingRule
+    public class ColumnHidingByNameRule: IColumnHidingRule
     {
         public string Name { get; }
 

@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Reports
             public TextJustification Justify { get; }
             public IColumn OriginalColumn { get; }
 
-            internal bool IsCommonColumn { get; }
+            internal bool IsCommon { get; }
             internal bool WasHidden { get; }
 
             public SummaryTableColumn(SummaryTable table, int index, IColumn column, bool hide = false)
@@ -126,8 +126,8 @@ namespace BenchmarkDotNet.Reports
                 NeedToShow = !hide && needToShow;
                 WasHidden = hide && needToShow;
 
-                bool isCommonColumn = !NeedToShow && !IsDefault;
-                IsCommonColumn = (!hide && isCommonColumn) || (hide && Content.Distinct().Count() == 1);
+                bool isCommon = !NeedToShow && !IsDefault;
+                IsCommon = (!hide && isCommon) || (hide && Content.Distinct().Count() == 1);
             }
 
             public override string ToString() => Header;

@@ -12,6 +12,7 @@ namespace BenchmarkDotNet.Columns
     public class BaselineAllocationRatioColumn : BaselineCustomColumn
     {
         public override string Id => nameof(BaselineAllocationRatioColumn);
+
         public override string ColumnName => Column.AllocRatio;
 
         public static readonly IColumn RatioMean = new BaselineAllocationRatioColumn();
