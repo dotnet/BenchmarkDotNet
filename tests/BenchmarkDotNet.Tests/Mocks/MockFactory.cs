@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Reports;
@@ -27,7 +28,8 @@ namespace BenchmarkDotNet.Tests.Mocks
                 string.Empty,
                 TimeSpan.FromMinutes(1),
                 TestCultureInfo.Instance,
-                ImmutableArray<ValidationError>.Empty);
+                ImmutableArray<ValidationError>.Empty,
+                ImmutableArray<IColumnHidingRule>.Empty);
         }
 
         public static Summary CreateSummary(IConfig config) => new Summary(
@@ -38,7 +40,8 @@ namespace BenchmarkDotNet.Tests.Mocks
                 string.Empty,
                 TimeSpan.FromMinutes(1),
                 config.CultureInfo,
-                ImmutableArray<ValidationError>.Empty);
+                ImmutableArray<ValidationError>.Empty,
+                ImmutableArray<IColumnHidingRule>.Empty);
 
         public static Summary CreateSummary(IConfig config, bool hugeSd, Metric[] metrics)
             => CreateSummary<MockBenchmarkClass>(config, hugeSd, metrics);
@@ -51,7 +54,8 @@ namespace BenchmarkDotNet.Tests.Mocks
                 string.Empty,
                 TimeSpan.FromMinutes(1),
                 TestCultureInfo.Instance,
-                ImmutableArray<ValidationError>.Empty);
+                ImmutableArray<ValidationError>.Empty,
+                ImmutableArray<IColumnHidingRule>.Empty);
 
         private static ImmutableArray<BenchmarkReport> CreateReports(IConfig config)
             => CreateBenchmarks<MockBenchmarkClass>(config).Select(CreateSimpleReport).ToImmutableArray();

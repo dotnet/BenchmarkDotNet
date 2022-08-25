@@ -20,6 +20,8 @@ namespace BenchmarkDotNet.Configs
 {
     public class ManualConfig : IConfig
     {
+        private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
+
         private readonly List<IColumnProvider> columnProviders = new List<IColumnProvider>();
         private readonly List<IExporter> exporters = new List<IExporter>();
         private readonly List<ILogger> loggers = new List<ILogger>();
@@ -30,7 +32,7 @@ namespace BenchmarkDotNet.Configs
         private readonly HashSet<HardwareCounter> hardwareCounters = new HashSet<HardwareCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
         private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = new List<BenchmarkLogicalGroupRule>();
-        private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
+        private readonly List<IColumnHidingRule> columnHidingRules = new List<IColumnHidingRule>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
@@ -42,6 +44,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
+        public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => columnHidingRules;
 
         [PublicAPI] public ConfigOptions Options { get; set; }
         [PublicAPI] public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
@@ -211,6 +214,27 @@ namespace BenchmarkDotNet.Configs
         }
 
         [PublicAPI]
+        public ManualConfig HideColumns(params string[] columnNames)
+        {
+            columnHidingRules.AddRange(columnNames.Select(c => new ColumnHidingByNameRule(c)));
+            return this;
+        }
+
+        [PublicAPI]
+        public ManualConfig HideColumns(params IColumn[] columns)
+        {
+            columnHidingRules.AddRange(columns.Select(c => new ColumnHidingByIdRule(c)));
+            return this;
+        }
+
+        [PublicAPI]
+        public ManualConfig HideColumns(params IColumnHidingRule[] rules)
+        {
+            columnHidingRules.AddRange(rules);
+            return this;
+        }
+
+        [PublicAPI]
         public void Add(IConfig config)
         {
             columnProviders.AddRange(config.GetColumnProviders());
@@ -227,6 +251,7 @@ namespace BenchmarkDotNet.Configs
             CultureInfo = config.CultureInfo ?? CultureInfo;
             SummaryStyle = config.SummaryStyle ?? SummaryStyle;
             logicalGroupRules.AddRange(config.GetLogicalGroupRules());
+            columnHidingRules.AddRange(config.GetColumnHidingRules());
             Options |= config.Options;
             BuildTimeout = GetBuildTimeout(BuildTimeout, config.BuildTimeout);
         }

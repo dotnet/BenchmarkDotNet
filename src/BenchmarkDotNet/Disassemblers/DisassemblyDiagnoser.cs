@@ -185,7 +185,7 @@ namespace BenchmarkDotNet.Diagnosers
             internal static readonly IMetricDescriptor Instance = new NativeCodeSizeMetricDescriptor();
 
             public string Id => "Native Code Size";
-            public string DisplayName => "Code Size";
+            public string DisplayName => Column.CodeSize;
             public string Legend => "Native code size of the disassembled method(s)";
             public string NumberFormat => "N0";
             public UnitType UnitType => UnitType.CodeSize;

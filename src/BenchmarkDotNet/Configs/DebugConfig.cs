@@ -63,6 +63,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IAnalyser> GetAnalysers() => Array.Empty<IAnalyser>();
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
+        public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
 
         public IOrderer Orderer => DefaultOrderer.Instance;
         public SummaryStyle SummaryStyle => SummaryStyle.Default;

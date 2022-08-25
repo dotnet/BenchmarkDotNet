@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
@@ -128,7 +129,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 logFilePath: string.Empty,
                 totalTime: System.TimeSpan.Zero,
                 cultureInfo: TestCultureInfo.Instance,
-                validationErrors: ImmutableArray<ValidationError>.Empty
+                validationErrors: ImmutableArray<ValidationError>.Empty,
+                columnHidingRules: ImmutableArray<IColumnHidingRule>.Empty
             );
         }
 

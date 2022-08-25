@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
@@ -226,7 +227,8 @@ namespace BenchmarkDotNet.Running
                 logFilePath,
                 runEnd.GetTimeSpan() - runStart.GetTimeSpan(),
                 cultureInfo,
-                Validate(new[] {benchmarkRunInfo }, NullLogger.Instance)); // validate them once again, but don't print the output
+                Validate(new[] {benchmarkRunInfo }, NullLogger.Instance), // validate them once again, but don't print the output
+                config.GetColumnHidingRules().ToImmutableArray());
         }
 
         private static void PrintSummary(ILogger logger, ImmutableConfig config, Summary summary)
@@ -262,8 +264,11 @@ namespace BenchmarkDotNet.Running
             }
 
             // TODO: move to conclusions
-            var columnWithLegends = summary.Table.Columns.Select(c => c.OriginalColumn).Where(c => !string.IsNullOrEmpty(c.Legend)).ToList();
-            var effectiveTimeUnit = summary.Table.EffectiveSummaryStyle.TimeUnit;
+            var columnWithLegends = summary.Table.Columns.Where(c => c.NeedToShow && !string.IsNullOrEmpty(c.OriginalColumn.Legend)).Select(c => c.OriginalColumn).ToArray();
+
+            bool needToShowTimeLegend = summary.Table.Columns.Any(c => c.NeedToShow && c.OriginalColumn.UnitType == UnitType.Time);
+            var effectiveTimeUnit = needToShowTimeLegend ? summary.Table.EffectiveSummaryStyle.TimeUnit : null;
+
             if (columnWithLegends.Any() || effectiveTimeUnit != null)
             {
                 logger.WriteLine();

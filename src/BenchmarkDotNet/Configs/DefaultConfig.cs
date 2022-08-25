@@ -54,6 +54,7 @@ namespace BenchmarkDotNet.Configs
             yield return RuntimeErrorAnalyser.Default;
             yield return ZeroMeasurementAnalyser.Default;
             yield return BaselineCustomAnalyzer.Default;
+            yield return HideColumnsAnalyser.Default;
         }
 
         public IEnumerable<IValidator> GetValidators()
@@ -103,5 +104,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
 
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
+
+        public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
     }
 }

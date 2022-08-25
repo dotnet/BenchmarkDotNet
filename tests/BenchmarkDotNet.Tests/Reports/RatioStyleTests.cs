@@ -93,7 +93,8 @@ namespace BenchmarkDotNet.Tests.Reports
                 string.Empty,
                 TimeSpan.FromMinutes(1),
                 TestCultureInfo.Instance,
-                ImmutableArray<ValidationError>.Empty);
+                ImmutableArray<ValidationError>.Empty,
+                ImmutableArray<IColumnHidingRule>.Empty);
             MarkdownExporter.Default.ExportToLog(summary, logger);
             output.WriteLine(logger.GetLog());
             return summary;

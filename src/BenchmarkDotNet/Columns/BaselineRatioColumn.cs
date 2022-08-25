@@ -35,9 +35,9 @@ namespace BenchmarkDotNet.Columns
                 switch (Metric)
                 {
                     case RatioMetric.Mean:
-                        return "Ratio";
+                        return Column.Ratio;
                     case RatioMetric.StdDev:
-                        return "RatioSD";
+                        return Column.RatioSD;
                     default:
                         throw new NotSupportedException();
                 }

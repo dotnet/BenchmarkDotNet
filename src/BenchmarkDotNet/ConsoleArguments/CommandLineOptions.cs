@@ -50,6 +50,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('f', "filter", Required = false, HelpText = "Glob patterns")]
         public IEnumerable<string> Filters { get; set; }
 
+        [Option('h', "hide", Required = false, HelpText = "Hides columns by name")]
+        public IEnumerable<string> HiddenColumns { get; set; }
+
         [Option('i', "inProcess", Required = false, Default = false, HelpText = "Run benchmarks in Process")]
         public bool RunInProcess { get; set; }
 
@@ -179,7 +182,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("disableLogFile", Required = false, HelpText = "Disables the logfile.")]
         public bool DisableLogFile { get; set; }
 
-        [Option("maxWidth", Required = false, HelpText = "Max paramter column width, the default is 20.")]
+        [Option("maxWidth", Required = false, HelpText = "Max parameter column width, the default is 20.")]
         public int? MaxParameterColumnWidth { get; set; }
 
         [Option("envVars", Required = false, HelpText = "Colon separated environment variables (key:value)")]
@@ -236,6 +239,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     new CommandLineOptions { Filters = new[] { "*"}, Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1" }, StatisticalTestThreshold = "5%" });
                 yield return new Example("Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2'", longName,
                     new CommandLineOptions { EnvironmentVariables = new[] { "ENV_VAR_KEY_1:value_1", "ENV_VAR_KEY_2:value_2" } });
+                yield return new Example("Hide Mean and Ratio columns (use double quotes for multi-word columns: \"Alloc Ratio\")", shortName, new CommandLineOptions { HiddenColumns = new[] { "Mean", "Ratio" }, });
             }
         }
 

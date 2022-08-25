@@ -235,6 +235,8 @@ namespace BenchmarkDotNet.ConsoleArguments
             else
                 config.AddFilter(filters);
 
+            config.HideColumns(options.HiddenColumns.ToArray());
+
             config.WithOption(ConfigOptions.JoinSummary, options.Join);
             config.WithOption(ConfigOptions.KeepBenchmarkFiles, options.KeepBenchmarkFiles);
             config.WithOption(ConfigOptions.DontOverwriteResults, options.DontOverwriteResults);
