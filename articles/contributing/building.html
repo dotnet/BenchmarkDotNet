@@ -8,7 +8,7 @@
     <title>Building | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Building | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -112,17 +112,15 @@
 <h1 id="building">Building</h1>
 
 <p>There are two recommended options to build BenchmarkDotNet from source:</p>
-<h2 id="option-a-windows-only---visual-studio">Option A (Windows only) - Visual Studio</h2>
+<h2 id="visual-studio">Visual Studio</h2>
 <ul>
-<li><p><a href="https://www.visualstudio.com/downloads/">Visual Studio 2017 version 15.7 Preview 4 or higher</a> (Community, Professional, Enterprise).</p>
+<li><p><a href="https://www.visualstudio.com/downloads/">Visual Studio</a> (Community, Professional, Enterprise) with .NET 4.6.1 SDK and F# support.</p>
 </li>
-<li><p>Visual Studio 2017 doesn't have installed necessary the .NET Core SDK 2.1 Preview 1, but you can get it from the <a href="https://www.microsoft.com/net/download/dotnet-core/sdk-2.1.300-preview1">Installing the .Net Core SDK page</a>. You may also need <a href="https://www.microsoft.com/net/download/dotnet-core/runtime-2.1.0-preview1">.NET Core Runtime 2.1 Preview 1</a>.</p>
-</li>
-<li><p>Visual Studio 2017 should have installed “F# language support” feature. You can also install the support <a href="https://www.microsoft.com/en-us/download/details.aspx?id=48179">directly as a separate download</a>.</p>
+<li><p><a href="https://dotnet.microsoft.com/download">.NET 5 SDK</a>.</p>
 </li>
 </ul>
 <p>Once all the necessary tools are in place, building is trivial. Simply open solution file <strong>BenchmarkDotNet.sln</strong> that lives at the base of the repository and run Build action.</p>
-<h2 id="option-b-windows-linux-macos---cake-c-make">Option B (Windows, Linux, macOS) - Cake (C# Make)</h2>
+<h2 id="cake-c-make">Cake (C# Make)</h2>
 <p><a href="http://cakebuild.net/">Cake (C# Make)</a> is a cross platform build automation system with a C# DSL to do things like compiling code, copy files/folders, running unit tests, compress files and build NuGet packages.</p>
 <p>The build currently depends on the following prerequisites:</p>
 <ul>

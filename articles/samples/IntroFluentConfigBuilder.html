@@ -8,7 +8,7 @@
     <title>Sample: IntroFluentConfigBuilder | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroFluentConfigBuilder | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -152,7 +152,7 @@ namespace BenchmarkDotNet.Samples
             BenchmarkRunner
                 .Run&lt;Algo_Md5VsSha256&gt;(
                     DefaultConfig.Instance
-                        .AddJob(Job.Default.WithRuntime(ClrRuntime.Net461))
+                        .AddJob(Job.Default.WithRuntime(ClrRuntime.Net462))
                         .AddJob(Job.Default.WithRuntime(CoreRuntime.Core21))
                         .AddValidator(ExecutionValidator.FailOnError));
         }

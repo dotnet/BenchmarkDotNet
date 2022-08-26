@@ -8,7 +8,7 @@
     <title>Orderers | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Orderers | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -166,7 +166,8 @@ namespace BenchmarkDotNet.Samples
 
             private class FastestToSlowestOrderer : IOrderer
             {
-                public IEnumerable&lt;BenchmarkCase&gt; GetExecutionOrder(ImmutableArray&lt;BenchmarkCase&gt; benchmarksCase) =&gt;
+                public IEnumerable&lt;BenchmarkCase&gt; GetExecutionOrder(ImmutableArray&lt;BenchmarkCase&gt; benchmarksCase,
+                    IEnumerable&lt;BenchmarkLogicalGroupRule&gt; order = null) =&gt;
                     from benchmark in benchmarksCase
                     orderby benchmark.Parameters[&quot;X&quot;] descending,
                         benchmark.Descriptor.WorkloadMethodDisplayInfo
@@ -182,7 +183,8 @@ namespace BenchmarkDotNet.Samples
                 public string GetLogicalGroupKey(ImmutableArray&lt;BenchmarkCase&gt; allBenchmarksCases, BenchmarkCase benchmarkCase) =&gt;
                     benchmarkCase.Job.DisplayInfo + &quot;_&quot; + benchmarkCase.Parameters.DisplayInfo;
 
-                public IEnumerable&lt;IGrouping&lt;string, BenchmarkCase&gt;&gt; GetLogicalGroupOrder(IEnumerable&lt;IGrouping&lt;string, BenchmarkCase&gt;&gt; logicalGroups) =&gt;
+                public IEnumerable&lt;IGrouping&lt;string, BenchmarkCase&gt;&gt; GetLogicalGroupOrder(IEnumerable&lt;IGrouping&lt;string, BenchmarkCase&gt;&gt; logicalGroups,
+                    IEnumerable&lt;BenchmarkLogicalGroupRule&gt; order = null) =&gt;
                     logicalGroups.OrderBy(it =&gt; it.Key);
 
                 public bool SeparateLogicalGroups =&gt; true;

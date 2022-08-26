@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class ExecuteResult
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -119,29 +119,8 @@
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
-    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
     <div class="level1"><span class="xref">ExecuteResult</span></div>
-  </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.Results.html">BenchmarkDotNet.Toolchains.Results</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
@@ -154,12 +133,12 @@
   
   
   <a id="BenchmarkDotNet_Toolchains_Results_ExecuteResult__ctor_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_Results_ExecuteResult__ctor_System_Boolean_System_Int32_System_Nullable_System_Int32__System_Collections_Generic_IReadOnlyList_System_String__System_Collections_Generic_IReadOnlyList_System_String__" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.#ctor(System.Boolean,System.Int32,System.Nullable{System.Int32},System.Collections.Generic.IReadOnlyList{System.String},System.Collections.Generic.IReadOnlyList{System.String})">ExecuteResult(Boolean, Int32, Nullable&lt;Int32&gt;, IReadOnlyList&lt;String&gt;, IReadOnlyList&lt;String&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_ExecuteResult__ctor_System_Boolean_System_Nullable_System_Int32__System_Nullable_System_Int32__System_Collections_Generic_IReadOnlyList_System_String__System_Collections_Generic_IReadOnlyList_System_String__System_Int32_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.#ctor(System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Collections.Generic.IReadOnlyList{System.String},System.Collections.Generic.IReadOnlyList{System.String},System.Int32)">ExecuteResult(Boolean, Nullable&lt;Int32&gt;, Nullable&lt;Int32&gt;, IReadOnlyList&lt;String&gt;, IReadOnlyList&lt;String&gt;, Int32)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ExecuteResult(bool foundExecutable, int exitCode, int? processId, IReadOnlyList&lt;string&gt; data, IReadOnlyList&lt;string&gt; linesWithExtraOutput)</code></pre>
+    <pre><code class="lang-csharp hljs">public ExecuteResult(bool foundExecutable, int? exitCode, int? processId, IReadOnlyList&lt;string&gt; data, IReadOnlyList&lt;string&gt; linesWithExtraOutput, int launchIndex)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -172,28 +151,33 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
         <td><span class="parametername">foundExecutable</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Int32</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.nullable-1">Nullable</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a>&gt;</td>
         <td><span class="parametername">exitCode</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.Int32</span>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.nullable-1">Nullable</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a>&gt;</td>
         <td><span class="parametername">processId</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a>&gt;</td>
         <td><span class="parametername">data</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a>&gt;</td>
         <td><span class="parametername">linesWithExtraOutput</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td><span class="parametername">launchIndex</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -202,13 +186,13 @@
   </h3>
   
   
-  <a id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_Data_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.Data*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_Data" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.Data">Data</h4>
+  <a id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_Errors_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.Errors*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_Errors" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.Errors">Errors</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;string&gt; Data { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;string&gt; Errors { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -220,7 +204,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -233,7 +217,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int ExitCode { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int? ExitCode { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -245,7 +229,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Int32</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.nullable-1">Nullable</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -270,7 +254,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<span class="xref">System.String</span>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -295,7 +279,57 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_IsSuccess_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.IsSuccess*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_IsSuccess" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.IsSuccess">IsSuccess</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsSuccess { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_Measurements_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.Measurements*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_Measurements" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.Measurements">Measurements</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;Measurement&gt; Measurements { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Reports.Measurement.html">Measurement</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -320,13 +354,45 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.Int32</span>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.nullable-1">Nullable</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
   </table>
   <h3 id="methods">Methods
   </h3>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_LogIssues_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.LogIssues*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_LogIssues_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Toolchains_Results_BuildResult_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.LogIssues(BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Toolchains.Results.BuildResult)">LogIssues(ILogger, BuildResult)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void LogIssues(ILogger logger, BuildResult buildResult)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></td>
+        <td><span class="parametername">logger</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.Results.BuildResult.html">BuildResult</a></td>
+        <td><span class="parametername">buildResult</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_ToString_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.ToString*"></a>
@@ -347,13 +413,13 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.Object.ToString()</span></div>
+  <div><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.tostring#system-object-tostring">Object.ToString()</a></div>
 </article>
           </div>
           

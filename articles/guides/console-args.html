@@ -8,7 +8,7 @@
     <title>How to use console arguments | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="How to use console arguments | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -209,12 +209,12 @@ BenchmarkDotNet.Samples.IntroSetupCleanupTarget.BenchmarkD
 <h2 id="runtimes">Runtimes</h2>
 <p>The <code>--runtimes</code> or just <code>-r</code> allows you to run the benchmarks for selected Runtimes. Available options are:</p>
 <ul>
-<li>Clr - BDN will either use Roslyn (if you run it as .NET app) or latest installed .NET SDK to build the benchmarks (if you run it as .NET Core app)</li>
-<li>Core - if you run it as .NET Core app, BDN will use the same target framework moniker, if you run it as .NET app it's going to use netcoreapp2.1</li>
-<li>Mono - it's going to use the Mono from <code>$Path</code>, you can override  it with <code>--monoPath</code></li>
-<li>CoreRT - it's going to use latest CoreRT. Can be customized with additional options: <code>--ilcPath</code>, <code>--coreRtVersion</code></li>
-<li>net46, net461, net462, net47, net471, net472 - to build and run benchmarks against specific .NET framework version</li>
-<li>netcoreapp2.0, netcoreapp2.1, netcoreapp2.2, netcoreapp3.0 - to build and run benchmarks against specific .NET Core version</li>
+<li>Clr - BDN will either use Roslyn (if you run it as .NET app) or latest installed .NET SDK to build the benchmarks (if you run it as .NET Core app).</li>
+<li>Core - if you run it as .NET Core app, BDN will use the same target framework moniker, if you run it as .NET app it's going to use netcoreapp2.1.</li>
+<li>Mono - it's going to use the Mono from <code>$Path</code>, you can override  it with <code>--monoPath</code>.</li>
+<li>net46, net461, net462, net47, net471, net472 - to build and run benchmarks against specific .NET framework version.</li>
+<li>netcoreapp2.0, netcoreapp2.1, netcoreapp2.2, netcoreapp3.0, netcoreapp3.1, net5.0, net6.0, net7.0 - to build and run benchmarks against specific .NET Core version.</li>
+<li>nativeaot5.0, nativeaot6.0, nativeaot7.0 - to build and run benchmarks using NativeAOT. Can be customized with additional options: <code>--ilcPath</code>, <code>--ilCompilerVersion</code>.</li>
 </ul>
 <p>Example: run the benchmarks for .NET 4.7.2 and .NET Core 2.1:</p>
 <pre><code class="lang-log">dotnet run -c Release -- --runtimes net472 netcoreapp2.1
@@ -282,7 +282,7 @@ static IConfig GetGlobalConfig()
 <li><code>--cli</code> path to dotnet cli (optional).</li>
 <li><code>--packages</code> the directory to restore packages to (optional).</li>
 <li><code>--coreRun</code> path(s) to CoreRun (optional).</li>
-<li><code>--coreRt</code> path to ILCompiler for CoreRT</li>
+<li><code>--ilcPath</code> path to ILCompiler for NativeAOT.</li>
 <li><code>--info</code> prints environment configuration including BenchmarkDotNet, OS, CPU and .NET version</li>
 <li><code>--stopOnFirstError</code> stop on first error.</li>
 <li><code>--help</code> display this help screen.</li>
@@ -293,11 +293,11 @@ static IConfig GetGlobalConfig()
 <li><code>--maxWidth</code> max parameter column width, the default is 20.</li>
 <li><code>--envVars</code> colon separated environment variables (key:value).</li>
 <li><code>--strategy</code> the RunStrategy that should be used. Throughput/ColdStart/Monitoring.</li>
-<li><code>--platform</code> the Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64.</li>
+<li><code>--platform</code> the Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64/LoongArch64.</li>
 <li><code>--runOncePerIteration</code> run the benchmark exactly once per iteration.</li>
 <li><code>--buildTimeout</code> build timeout in seconds.</li>
 <li><code>--wasmEngine</code> full path to a java script engine used to run the benchmarks, used by Wasm toolchain.</li>
-<li><code>--wasmMainJS</code> path to the main.js file used by Wasm toolchain. Mandatory when using &quot;--runtimes wasm&quot;</li>
+<li><code>--wasmMainJS</code> path to the test-main.js file used by Wasm toolchain. Mandatory when using &quot;--runtimes wasm&quot;</li>
 <li><code>--expose_wasm</code> arguments for the JavaScript engine used by Wasm toolchain.</li>
 <li><code>--customRuntimePack</code> specify the path to a custom runtime pack. Only used for wasm currently.</li>
 </ul>

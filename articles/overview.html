@@ -8,7 +8,7 @@
     <title>Overview | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Overview | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -115,7 +115,7 @@
 <p>Create new console application and install the <a href="https://www.nuget.org/packages/BenchmarkDotNet/">BenchmarkDotNet</a> NuGet package. We support:</p>
 <ul>
 <li><em>Projects:</em> classic and modern with PackageReferences</li>
-<li><em>Runtimes:</em> Full .NET Framework (4.6+), .NET Core (2.0+), Mono, CoreRT</li>
+<li><em>Runtimes:</em> Full .NET Framework (4.6+), .NET Core (2.0+), Mono, NativeAOT</li>
 <li><em>OS:</em> Windows, Linux, MacOS</li>
 <li><em>Languages:</em> C#, F#, VB</li>
 </ul>
@@ -178,8 +178,8 @@ Frequency=1948699 Hz, Resolution=513.1629 ns, Timer=TSC
 |    Md5 |  37.66 us | 0.1290 us | 0.1207 us |
 </code></pre>
 <h2 id="jobs">Jobs</h2>
-<p>You can check several environments at once. For example, you can compare performance of Full .NET Framework, .NET Core, Mono and CoreRT. Just add the <code>ClrJob</code>, <code>MonoJob</code>, <code>CoreJob</code>, <code>CoreRtJob</code> attributes before the class declaration (it requires a .NETCore project, installed CoreCLR and Mono):</p>
-<pre><code class="lang-cs">[ClrJob, MonoJob, CoreJob, CoreRtJob]
+<p>You can check several environments at once. For example, you can compare performance of Full .NET Framework, .NET Core, Mono and NativeAOT. Just add the <code>ClrJob</code>, <code>MonoJob</code>, <code>CoreJob</code>, attributes before the class declaration (it requires .NET SDK and Mono to be installed and added to $PATH):</p>
+<pre><code class="lang-cs">[ClrJob, MonoJob, CoreJob]
 public class Md5VsSha256
 </code></pre>
 <p>Example of the result:</p>

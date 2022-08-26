@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Interface IOrderer
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -145,7 +145,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -155,12 +155,12 @@
   
   
   <a id="BenchmarkDotNet_Order_IOrderer_GetExecutionOrder_" data-uid="BenchmarkDotNet.Order.IOrderer.GetExecutionOrder*"></a>
-  <h4 id="BenchmarkDotNet_Order_IOrderer_GetExecutionOrder_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Running_BenchmarkCase__" data-uid="BenchmarkDotNet.Order.IOrderer.GetExecutionOrder(System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Running.BenchmarkCase})">GetExecutionOrder(ImmutableArray&lt;BenchmarkCase&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Order_IOrderer_GetExecutionOrder_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Running_BenchmarkCase__System_Collections_Generic_IEnumerable_BenchmarkDotNet_Configs_BenchmarkLogicalGroupRule__" data-uid="BenchmarkDotNet.Order.IOrderer.GetExecutionOrder(System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Running.BenchmarkCase},System.Collections.Generic.IEnumerable{BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule})">GetExecutionOrder(ImmutableArray&lt;BenchmarkCase&gt;, IEnumerable&lt;BenchmarkLogicalGroupRule&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">IEnumerable&lt;BenchmarkCase&gt; GetExecutionOrder(ImmutableArray&lt;BenchmarkCase&gt; benchmarksCase)</code></pre>
+    <pre><code class="lang-csharp hljs">IEnumerable&lt;BenchmarkCase&gt; GetExecutionOrder(ImmutableArray&lt;BenchmarkCase&gt; benchmarksCase, IEnumerable&lt;BenchmarkLogicalGroupRule&gt; order = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -173,8 +173,13 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Immutable.ImmutableArray</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
         <td><span class="parametername">benchmarksCase</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule.html">BenchmarkLogicalGroupRule</a>&gt;</td>
+        <td><span class="parametername">order</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -189,7 +194,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -231,7 +236,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -257,7 +262,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Immutable.ImmutableArray</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
         <td><span class="parametername">allBenchmarksCases</span></td>
         <td></td>
       </tr>
@@ -278,7 +283,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -286,12 +291,12 @@
   
   
   <a id="BenchmarkDotNet_Order_IOrderer_GetLogicalGroupOrder_" data-uid="BenchmarkDotNet.Order.IOrderer.GetLogicalGroupOrder*"></a>
-  <h4 id="BenchmarkDotNet_Order_IOrderer_GetLogicalGroupOrder_System_Collections_Generic_IEnumerable_System_Linq_IGrouping_System_String_BenchmarkDotNet_Running_BenchmarkCase___" data-uid="BenchmarkDotNet.Order.IOrderer.GetLogicalGroupOrder(System.Collections.Generic.IEnumerable{System.Linq.IGrouping{System.String,BenchmarkDotNet.Running.BenchmarkCase}})">GetLogicalGroupOrder(IEnumerable&lt;IGrouping&lt;String, BenchmarkCase&gt;&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Order_IOrderer_GetLogicalGroupOrder_System_Collections_Generic_IEnumerable_System_Linq_IGrouping_System_String_BenchmarkDotNet_Running_BenchmarkCase___System_Collections_Generic_IEnumerable_BenchmarkDotNet_Configs_BenchmarkLogicalGroupRule__" data-uid="BenchmarkDotNet.Order.IOrderer.GetLogicalGroupOrder(System.Collections.Generic.IEnumerable{System.Linq.IGrouping{System.String,BenchmarkDotNet.Running.BenchmarkCase}},System.Collections.Generic.IEnumerable{BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule})">GetLogicalGroupOrder(IEnumerable&lt;IGrouping&lt;String, BenchmarkCase&gt;&gt;, IEnumerable&lt;BenchmarkLogicalGroupRule&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">IEnumerable&lt;IGrouping&lt;string, BenchmarkCase&gt;&gt; GetLogicalGroupOrder(IEnumerable&lt;IGrouping&lt;string, BenchmarkCase&gt;&gt; logicalGroups)</code></pre>
+    <pre><code class="lang-csharp hljs">IEnumerable&lt;IGrouping&lt;string, BenchmarkCase&gt;&gt; GetLogicalGroupOrder(IEnumerable&lt;IGrouping&lt;string, BenchmarkCase&gt;&gt; logicalGroups, IEnumerable&lt;BenchmarkLogicalGroupRule&gt; order = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -304,8 +309,13 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<span class="xref">System.Linq.IGrouping</span>&lt;<span class="xref">System.String</span>, <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.linq.igrouping-2">IGrouping</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a>, <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;&gt;</td>
         <td><span class="parametername">logicalGroups</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule.html">BenchmarkLogicalGroupRule</a>&gt;</td>
+        <td><span class="parametername">order</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -320,7 +330,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<span class="xref">System.Linq.IGrouping</span>&lt;<span class="xref">System.String</span>, <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.linq.igrouping-2">IGrouping</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a>, <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -346,7 +356,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Immutable.ImmutableArray</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
         <td><span class="parametername">benchmarksCases</span></td>
         <td></td>
       </tr>
@@ -367,7 +377,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class WasmGenerator
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -119,16 +119,16 @@
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
-    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
     <div class="level1"><a class="xref" href="BenchmarkDotNet.Toolchains.GeneratorBase.html">GeneratorBase</a></div>
     <div class="level2"><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliGenerator.html">DotNetCliGenerator</a></div>
     <div class="level3"><a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html">CsProjGenerator</a></div>
     <div class="level4"><span class="xref">WasmGenerator</span></div>
   </div>
-  <div classs="implements">
+  <div class="implements">
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Toolchains.IGenerator.html">IGenerator</a></div>
-    <div><span class="xref">System.IEquatable</span>&lt;<a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html">CsProjGenerator</a>&gt;</div>
+    <div><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html">CsProjGenerator</a>&gt;</div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -195,21 +195,6 @@
     <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.GeneratorBase.html#BenchmarkDotNet_Toolchains_GeneratorBase_GenerateCode_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Toolchains_ArtifactsPaths_">GeneratorBase.GenerateCode(BuildPartition, ArtifactsPaths)</a>
     </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.MonoWasm.html">BenchmarkDotNet.Toolchains.MonoWasm</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
@@ -222,12 +207,12 @@
   
   
   <a id="BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator__ctor_" data-uid="BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator__ctor_System_String_System_String_System_String_System_String_" data-uid="BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.#ctor(System.String,System.String,System.String,System.String)">WasmGenerator(String, String, String, String)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator__ctor_System_String_System_String_System_String_System_String_System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.#ctor(System.String,System.String,System.String,System.String,System.Boolean)">WasmGenerator(String, String, String, String, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public WasmGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack)</code></pre>
+    <pre><code class="lang-csharp hljs">public WasmGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string customRuntimePack, bool aot)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -240,23 +225,28 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">targetFrameworkMoniker</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">cliPath</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">packagesPath</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">customRuntimePack</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><span class="parametername">aot</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -304,6 +294,48 @@
   <div><a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.CsProjGenerator.html#BenchmarkDotNet_Toolchains_CsProj_CsProjGenerator_GenerateProject_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Toolchains_ArtifactsPaths_BenchmarkDotNet_Loggers_ILogger_">CsProjGenerator.GenerateProject(BuildPartition, ArtifactsPaths, ILogger)</a></div>
   
   
+  <a id="BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator_GenerateProjectFile_" data-uid="BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GenerateProjectFile*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator_GenerateProjectFile_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Toolchains_ArtifactsPaths_System_Boolean_BenchmarkDotNet_Loggers_ILogger_" data-uid="BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GenerateProjectFile(BenchmarkDotNet.Running.BuildPartition,BenchmarkDotNet.Toolchains.ArtifactsPaths,System.Boolean,BenchmarkDotNet.Loggers.ILogger)">GenerateProjectFile(BuildPartition, ArtifactsPaths, Boolean, ILogger)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void GenerateProjectFile(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, bool aot, ILogger logger)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Running.BuildPartition.html">BuildPartition</a></td>
+        <td><span class="parametername">buildPartition</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.ArtifactsPaths.html">ArtifactsPaths</a></td>
+        <td><span class="parametername">artifactsPaths</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><span class="parametername">aot</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></td>
+        <td><span class="parametername">logger</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator_GetBinariesDirectoryPath_" data-uid="BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GetBinariesDirectoryPath*"></a>
   <h4 id="BenchmarkDotNet_Toolchains_MonoWasm_WasmGenerator_GetBinariesDirectoryPath_System_String_System_String_" data-uid="BenchmarkDotNet.Toolchains.MonoWasm.WasmGenerator.GetBinariesDirectoryPath(System.String,System.String)">GetBinariesDirectoryPath(String, String)</h4>
   <div class="markdown level1 summary"></div>
@@ -323,12 +355,12 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">buildArtifactsDirectoryPath</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">configuration</span></td>
         <td></td>
       </tr>
@@ -344,7 +376,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -372,12 +404,12 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">binariesDirectoryPath</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">programName</span></td>
         <td></td>
       </tr>
@@ -393,7 +425,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -405,7 +437,7 @@
       <a class="xref" href="BenchmarkDotNet.Toolchains.IGenerator.html">IGenerator</a>
   </div>
   <div>
-      <span class="xref">System.IEquatable&lt;T&gt;</span>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">System.IEquatable&lt;T&gt;</a>
   </div>
 </article>
           </div>

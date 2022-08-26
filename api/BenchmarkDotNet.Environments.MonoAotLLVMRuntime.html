@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class MonoAotLLVMRuntime
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -119,14 +119,14 @@
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
-    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
     <div class="level1"><a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a></div>
     <div class="level2"><span class="xref">MonoAotLLVMRuntime</span></div>
   </div>
-  <div classs="implements">
+  <div class="implements">
     <h5>Implements</h5>
-    <div><span class="xref">System.IEquatable</span>&lt;<a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a>&gt;</div>
-    <div><span class="xref">System.IEquatable</span>&lt;<a class="xref" href="BenchmarkDotNet.Environments.MonoAotLLVMRuntime.html">MonoAotLLVMRuntime</a>&gt;</div>
+    <div><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a>&gt;</div>
+    <div><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="BenchmarkDotNet.Environments.MonoAotLLVMRuntime.html">MonoAotLLVMRuntime</a>&gt;</div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -145,18 +145,6 @@
     <div>
       <a class="xref" href="BenchmarkDotNet.Environments.Runtime.html#BenchmarkDotNet_Environments_Runtime_Equals_BenchmarkDotNet_Environments_Runtime_">Runtime.Equals(Runtime)</a>
     </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Environments.html">BenchmarkDotNet.Environments</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
@@ -169,13 +157,13 @@
   
   
   <a id="BenchmarkDotNet_Environments_MonoAotLLVMRuntime__ctor_" data-uid="BenchmarkDotNet.Environments.MonoAotLLVMRuntime.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Environments_MonoAotLLVMRuntime__ctor_System_IO_FileInfo_System_String_System_String_" data-uid="BenchmarkDotNet.Environments.MonoAotLLVMRuntime.#ctor(System.IO.FileInfo,System.String,System.String)">MonoAotLLVMRuntime(FileInfo, String, String)</h4>
+  <h4 id="BenchmarkDotNet_Environments_MonoAotLLVMRuntime__ctor_System_IO_FileInfo_BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotCompilerMode_System_String_System_String_" data-uid="BenchmarkDotNet.Environments.MonoAotLLVMRuntime.#ctor(System.IO.FileInfo,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode,System.String,System.String)">MonoAotLLVMRuntime(FileInfo, MonoAotCompilerMode, String, String)</h4>
   <div class="markdown level1 summary"><p>creates new instance of MonoAotLLVMRuntime</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MonoAotLLVMRuntime(FileInfo aotCompilerPath, string msBuildMoniker = &quot;net6.0&quot;, string displayName = &quot;MonoAOTLLVM&quot;)</code></pre>
+    <pre><code class="lang-csharp hljs">public MonoAotLLVMRuntime(FileInfo aotCompilerPath, MonoAotCompilerMode aotCompilerMode, string msBuildMoniker = &quot;net6.0&quot;, string displayName = &quot;MonoAOTLLVM&quot;)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -188,17 +176,22 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.io.fileinfo">FileInfo</a></td>
         <td><span class="parametername">aotCompilerPath</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode.html">MonoAotCompilerMode</a></td>
+        <td><span class="parametername">aotCompilerMode</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">msBuildMoniker</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">displayName</span></td>
         <td></td>
       </tr>
@@ -206,6 +199,31 @@
   </table>
   <h3 id="properties">Properties
   </h3>
+  
+  
+  <a id="BenchmarkDotNet_Environments_MonoAotLLVMRuntime_AOTCompilerMode_" data-uid="BenchmarkDotNet.Environments.MonoAotLLVMRuntime.AOTCompilerMode*"></a>
+  <h4 id="BenchmarkDotNet_Environments_MonoAotLLVMRuntime_AOTCompilerMode" data-uid="BenchmarkDotNet.Environments.MonoAotLLVMRuntime.AOTCompilerMode">AOTCompilerMode</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MonoAotCompilerMode AOTCompilerMode { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode.html">MonoAotCompilerMode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="BenchmarkDotNet_Environments_MonoAotLLVMRuntime_AOTCompilerPath_" data-uid="BenchmarkDotNet.Environments.MonoAotLLVMRuntime.AOTCompilerPath*"></a>
@@ -226,11 +244,38 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.io.fileinfo">FileInfo</a></td>
         <td></td>
       </tr>
     </tbody>
   </table>
+  
+  
+  <a id="BenchmarkDotNet_Environments_MonoAotLLVMRuntime_IsAOT_" data-uid="BenchmarkDotNet.Environments.MonoAotLLVMRuntime.IsAOT*"></a>
+  <h4 id="BenchmarkDotNet_Environments_MonoAotLLVMRuntime_IsAOT" data-uid="BenchmarkDotNet.Environments.MonoAotLLVMRuntime.IsAOT">IsAOT</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool IsAOT { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="BenchmarkDotNet.Environments.Runtime.html#BenchmarkDotNet_Environments_Runtime_IsAOT">Runtime.IsAOT</a></div>
   <h3 id="methods">Methods
   </h3>
   
@@ -270,7 +315,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -296,7 +341,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Object</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></td>
         <td><span class="parametername">obj</span></td>
         <td></td>
       </tr>
@@ -312,7 +357,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -339,7 +384,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Int32</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -348,10 +393,10 @@
   <div><a class="xref" href="BenchmarkDotNet.Environments.Runtime.html#BenchmarkDotNet_Environments_Runtime_GetHashCode">Runtime.GetHashCode()</a></div>
   <h3 id="implements">Implements</h3>
   <div>
-      <span class="xref">System.IEquatable&lt;T&gt;</span>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">System.IEquatable&lt;T&gt;</a>
   </div>
   <div>
-      <span class="xref">System.IEquatable&lt;T&gt;</span>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">System.IEquatable&lt;T&gt;</a>
   </div>
 </article>
           </div>

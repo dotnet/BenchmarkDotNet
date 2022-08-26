@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class CoreRunToolchain
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -119,33 +119,12 @@
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
-    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
     <div class="level1"><span class="xref">CoreRunToolchain</span></div>
   </div>
-  <div classs="implements">
+  <div class="implements">
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a></div>
-  </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.CoreRun.html">BenchmarkDotNet.Toolchains.CoreRun</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
@@ -158,13 +137,13 @@
   
   
   <a id="BenchmarkDotNet_Toolchains_CoreRun_CoreRunToolchain__ctor_" data-uid="BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_CoreRun_CoreRunToolchain__ctor_System_IO_FileInfo_System_Boolean_System_String_System_IO_FileInfo_System_IO_DirectoryInfo_System_String_System_Nullable_System_TimeSpan__" data-uid="BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.#ctor(System.IO.FileInfo,System.Boolean,System.String,System.IO.FileInfo,System.IO.DirectoryInfo,System.String,System.Nullable{System.TimeSpan})">CoreRunToolchain(FileInfo, Boolean, String, FileInfo, DirectoryInfo, String, Nullable&lt;TimeSpan&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_CoreRun_CoreRunToolchain__ctor_System_IO_FileInfo_System_Boolean_System_String_System_IO_FileInfo_System_IO_DirectoryInfo_System_String_" data-uid="BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.#ctor(System.IO.FileInfo,System.Boolean,System.String,System.IO.FileInfo,System.IO.DirectoryInfo,System.String)">CoreRunToolchain(FileInfo, Boolean, String, FileInfo, DirectoryInfo, String)</h4>
   <div class="markdown level1 summary"><p>creates a CoreRunToolchain which is using provided CoreRun to execute .NET Core apps</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public CoreRunToolchain(FileInfo coreRun, bool createCopy = true, string targetFrameworkMoniker = &quot;netcoreapp2.1&quot;, FileInfo customDotNetCliPath = null, DirectoryInfo restorePath = null, string displayName = &quot;CoreRun&quot;, TimeSpan? timeout = default(TimeSpan? ))</code></pre>
+    <pre><code class="lang-csharp hljs">public CoreRunToolchain(FileInfo coreRun, bool createCopy = true, string targetFrameworkMoniker = &quot;netcoreapp2.1&quot;, FileInfo customDotNetCliPath = null, DirectoryInfo restorePath = null, string displayName = &quot;CoreRun&quot;)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -177,45 +156,39 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.io.fileinfo">FileInfo</a></td>
         <td><span class="parametername">coreRun</span></td>
         <td><p>the path to CoreRun</p>
 </td>
       </tr>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
         <td><span class="parametername">createCopy</span></td>
         <td><p>should a copy of CoreRun be performed? True by default. <remarks>The toolchain replaces old dependencies in CoreRun folder with newer versions if used by the benchmarks.</remarks></p>
 </td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">targetFrameworkMoniker</span></td>
         <td><p>TFM, netcoreapp2.1 is the default</p>
 </td>
       </tr>
       <tr>
-        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.io.fileinfo">FileInfo</a></td>
         <td><span class="parametername">customDotNetCliPath</span></td>
         <td><p>path to dotnet cli, if not provided the one from PATH will be used</p>
 </td>
       </tr>
       <tr>
-        <td><span class="xref">System.IO.DirectoryInfo</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.io.directoryinfo">DirectoryInfo</a></td>
         <td><span class="parametername">restorePath</span></td>
         <td><p>the directory to restore packages to</p>
 </td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">displayName</span></td>
         <td><p>display name, CoreRun is the default value</p>
-</td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.TimeSpan</span>&gt;</td>
-        <td><span class="parametername">timeout</span></td>
-        <td><p>the timeout for building the benchmarks</p>
 </td>
       </tr>
     </tbody>
@@ -267,7 +240,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.io.fileinfo">FileInfo</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -292,7 +265,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.io.fileinfo">FileInfo</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -367,7 +340,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -392,7 +365,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -417,7 +390,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.IO.DirectoryInfo</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.io.directoryinfo">DirectoryInfo</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -442,7 +415,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.IO.FileInfo</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.io.fileinfo">FileInfo</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -496,7 +469,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -521,13 +494,13 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
-  <div><span class="xref">System.Object.ToString()</span></div>
+  <div><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.tostring#system-object-tostring">Object.ToString()</a></div>
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a>

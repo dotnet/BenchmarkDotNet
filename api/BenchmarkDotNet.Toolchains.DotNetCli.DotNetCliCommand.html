@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class DotNetCliCommand
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -119,32 +119,8 @@
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
-    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
     <div class="level1"><span class="xref">DotNetCliCommand</span></div>
-  </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.html">BenchmarkDotNet.Toolchains.DotNetCli</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
@@ -157,12 +133,12 @@
   
   
   <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand__ctor_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand__ctor_System_String_System_String_BenchmarkDotNet_Toolchains_Results_GenerateResult_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Running_BuildPartition_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Jobs_EnvironmentVariable__System_TimeSpan_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.#ctor(System.String,System.String,BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Running.BuildPartition,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable},System.TimeSpan)">DotNetCliCommand(String, String, GenerateResult, ILogger, BuildPartition, IReadOnlyList&lt;EnvironmentVariable&gt;, TimeSpan)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand__ctor_System_String_System_String_BenchmarkDotNet_Toolchains_Results_GenerateResult_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Running_BuildPartition_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Jobs_EnvironmentVariable__System_TimeSpan_System_Boolean_System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.#ctor(System.String,System.String,BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Running.BuildPartition,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable},System.TimeSpan,System.Boolean,System.Boolean)">DotNetCliCommand(String, String, GenerateResult, ILogger, BuildPartition, IReadOnlyList&lt;EnvironmentVariable&gt;, TimeSpan, Boolean, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger, BuildPartition buildPartition, IReadOnlyList&lt;EnvironmentVariable&gt; environmentVariables, TimeSpan timeout)</code></pre>
+    <pre><code class="lang-csharp hljs">public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger, BuildPartition buildPartition, IReadOnlyList&lt;EnvironmentVariable&gt; environmentVariables, TimeSpan timeout, bool logOutput = false, bool retryFailedBuildWithNoDeps = true)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -175,12 +151,12 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">cliPath</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">arguments</span></td>
         <td></td>
       </tr>
@@ -200,13 +176,23 @@
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>&gt;</td>
         <td><span class="parametername">environmentVariables</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.TimeSpan</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
         <td><span class="parametername">timeout</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><span class="parametername">logOutput</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><span class="parametername">retryFailedBuildWithNoDeps</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -233,7 +219,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -283,7 +269,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -308,7 +294,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -365,6 +351,56 @@
   </table>
   
   
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_LogOutput_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.LogOutput*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_LogOutput" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.LogOutput">LogOutput</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool LogOutput { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RetryFailedBuildWithNoDeps_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RetryFailedBuildWithNoDeps*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RetryFailedBuildWithNoDeps" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RetryFailedBuildWithNoDeps">RetryFailedBuildWithNoDeps</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool RetryFailedBuildWithNoDeps { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Timeout_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Timeout*"></a>
   <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Timeout" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Timeout">Timeout</h4>
   <div class="markdown level1 summary"></div>
@@ -383,7 +419,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.TimeSpan</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -636,7 +672,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">arguments</span></td>
         <td></td>
       </tr>

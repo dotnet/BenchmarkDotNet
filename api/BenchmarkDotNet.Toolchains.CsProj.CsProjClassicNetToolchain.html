@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class CsProjClassicNetToolchain
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -121,11 +121,11 @@ it does not work with the old .csprojs or project.json!</p>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
-    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
     <div class="level1"><a class="xref" href="BenchmarkDotNet.Toolchains.Toolchain.html">Toolchain</a></div>
     <div class="level2"><span class="xref">CsProjClassicNetToolchain</span></div>
   </div>
-  <div classs="implements">
+  <div class="implements">
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a></div>
   </div>
@@ -148,24 +148,6 @@ it does not work with the old .csprojs or project.json!</p>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.Toolchain.html#BenchmarkDotNet_Toolchains_Toolchain_ToString">Toolchain.ToString()</a>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
     </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.CsProj.html">BenchmarkDotNet.Toolchains.CsProj</a></h6>
@@ -320,17 +302,41 @@ it does not work with the old .csprojs or project.json!</p>
       </tr>
     </tbody>
   </table>
+  
+  
+  <h4 id="BenchmarkDotNet_Toolchains_CsProj_CsProjClassicNetToolchain_Net481" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.Net481">Net481</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly IToolchain Net481</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="methods">Methods
   </h3>
   
   
   <a id="BenchmarkDotNet_Toolchains_CsProj_CsProjClassicNetToolchain_From_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_CsProj_CsProjClassicNetToolchain_From_System_String_System_String_System_Nullable_System_TimeSpan__" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From(System.String,System.String,System.Nullable{System.TimeSpan})">From(String, String, Nullable&lt;TimeSpan&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_CsProj_CsProjClassicNetToolchain_From_System_String_System_String_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From(System.String,System.String)">From(String, String)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static IToolchain From(string targetFrameworkMoniker, string packagesPath = null, TimeSpan? timeout = default(TimeSpan? ))</code></pre>
+    <pre><code class="lang-csharp hljs">public static IToolchain From(string targetFrameworkMoniker, string packagesPath = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -343,18 +349,13 @@ it does not work with the old .csprojs or project.json!</p>
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">targetFrameworkMoniker</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">packagesPath</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.TimeSpan</span>&gt;</td>
-        <td><span class="parametername">timeout</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -421,7 +422,7 @@ it does not work with the old .csprojs or project.json!</p>
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
         <td></td>
       </tr>
     </tbody>

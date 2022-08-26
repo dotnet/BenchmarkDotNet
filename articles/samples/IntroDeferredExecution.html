@@ -8,7 +8,7 @@
     <title>Sample: IntroDeferredExecution | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroDeferredExecution | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -115,7 +115,7 @@
 <p>This is why we decided to warn you about this issue whenever it happens:</p>
 <pre><code class="lang-log">Benchmark IntroDeferredExecution.Wrong returns a deferred execution result (IEnumerable&lt;Int32&gt;). You need to either change the method declaration to return a materialized result or consume it on your own. You can use .Consume() extension method to do that.
 </code></pre>
-<p>Don't worry! We are also providing you with a <code>Consume</code> extension method which can execute given <code>IEnumerable</code> or <code>IQueryable</code> and consume its results. All you need to do is to create a <a href="xref:BenchmarkDotNet.Engines.Consumer"><code>Consumer</code></a> instance, preferably store it in a field (to exclude the cost of creating Consumer from the benchmark itself) and pass it to <code>Consume</code> extension method.</p>
+<p>Don't worry! We are also providing you with a <code>Consume</code> extension method which can execute given <code>IEnumerable</code> or <code>IQueryable</code> and consume its results. All you need to do is to create a <a class="xref" href="../../api/BenchmarkDotNet.Engines.Consumer.html"><code>Consumer</code></a> instance, preferably store it in a field (to exclude the cost of creating Consumer from the benchmark itself) and pass it to <code>Consume</code> extension method.</p>
 <p><strong>Do not call <code>.ToArray()</code> because it's an expensive operation and it might dominate given benchmark!</strong></p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroDeferredExecution.cs">using System.Collections.Generic;

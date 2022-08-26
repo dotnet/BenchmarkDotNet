@@ -990,7 +990,7 @@ $(function () {
     }
 
     function readTabsQueryStringParam() {
-      var qs = parseQueryString();
+      var qs = parseQueryString(window.location.search);
       var t = qs.tabs;
       if (t === undefined || t === '') {
         return [];
@@ -999,7 +999,7 @@ $(function () {
     }
 
     function updateTabsQueryStringParam(state) {
-      var qs = parseQueryString();
+      var qs = parseQueryString(window.location.search);
       qs.tabs = state.selectedTabs.join();
       var url = location.protocol + "//" + location.host + location.pathname + "?" + toQueryString(qs) + location.hash;
       if (location.href === url) {

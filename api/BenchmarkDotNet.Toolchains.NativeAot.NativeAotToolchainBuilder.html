@@ -1,0 +1,649 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class NativeAotToolchainBuilder
+   | BenchmarkDotNet </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class NativeAotToolchainBuilder
+   | BenchmarkDotNet ">
+    <meta name="generator" content="docfx 2.59.3.0">
+    
+    <link rel="shortcut icon" href="../logo/icon-32.png">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  
+      ga('create', 'UA-41419012-6', 'auto');
+      ga('send', 'pageview');
+  
+    </script>
+    <!-- /Google Analytics -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter40812449 = new Ya.Metrika({
+                        id:40812449,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+  
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+  
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+    <!-- at the end of the HEAD -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
+    <link rel="stylesheet" href="../styles/search.css">
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <div class="navbar-right navbar-form">
+                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
+              </div>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder">
+  
+  
+  <h1 id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder" class="text-break">Class NativeAotToolchainBuilder
+  </h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
+    <div class="level1"><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html">CustomDotNetCliToolchainBuilder</a></div>
+    <div class="level2"><span class="xref">NativeAotToolchainBuilder</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_Feeds">CustomDotNetCliToolchainBuilder.Feeds</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_runtimeIdentifier">CustomDotNetCliToolchainBuilder.runtimeIdentifier</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_customDotNetCliPath">CustomDotNetCliToolchainBuilder.customDotNetCliPath</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_displayName">CustomDotNetCliToolchainBuilder.displayName</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_runtimeFrameworkVersion">CustomDotNetCliToolchainBuilder.runtimeFrameworkVersion</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_useNuGetClearTag">CustomDotNetCliToolchainBuilder.useNuGetClearTag</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_useTempFolderForRestore">CustomDotNetCliToolchainBuilder.useTempFolderForRestore</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_AdditionalNuGetFeed_System_String_System_String_">CustomDotNetCliToolchainBuilder.AdditionalNuGetFeed(String, String)</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_UseNuGetClearTag_System_Boolean_">CustomDotNetCliToolchainBuilder.UseNuGetClearTag(Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_TargetFrameworkMoniker_System_String_">CustomDotNetCliToolchainBuilder.TargetFrameworkMoniker(String)</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_GetTargetFrameworkMoniker">CustomDotNetCliToolchainBuilder.GetTargetFrameworkMoniker()</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_DotNetCli_System_String_">CustomDotNetCliToolchainBuilder.DotNetCli(String)</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_RuntimeIdentifier_System_String_">CustomDotNetCliToolchainBuilder.RuntimeIdentifier(String)</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_RuntimeFrameworkVersion_System_String_">CustomDotNetCliToolchainBuilder.RuntimeFrameworkVersion(String)</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_DisplayName_System_String_">CustomDotNetCliToolchainBuilder.DisplayName(String)</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_UseTempFolderForRestore_System_Boolean_">CustomDotNetCliToolchainBuilder.UseTempFolderForRestore(Boolean)</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.NativeAot.html">BenchmarkDotNet.Toolchains.NativeAot</a></h6>
+  <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
+  <h5 id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class NativeAotToolchainBuilder : CustomDotNetCliToolchainBuilder</code></pre>
+  </div>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_Create_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.Create*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_Create" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.Create">Create()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static NativeAotToolchainBuilder Create()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.html">NativeAotToolchainBuilder</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_IlcGenerateCompleteTypeMetadata_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.IlcGenerateCompleteTypeMetadata*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_IlcGenerateCompleteTypeMetadata_System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.IlcGenerateCompleteTypeMetadata(System.Boolean)">IlcGenerateCompleteTypeMetadata(Boolean)</h4>
+  <div class="markdown level1 summary"><p>This controls the generation of complete type metadata.
+This option is enabled by default.
+This is a compilation mode that prevents a situation where some members of a type are visible to reflection at runtime, but others aren't, because they weren't compiled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativeAotToolchainBuilder IlcGenerateCompleteTypeMetadata(bool value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.html">NativeAotToolchainBuilder</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_IlcGenerateStackTraceData_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.IlcGenerateStackTraceData*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_IlcGenerateStackTraceData_System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.IlcGenerateStackTraceData(System.Boolean)">IlcGenerateStackTraceData(Boolean)</h4>
+  <div class="markdown level1 summary"><p>This controls generation of stack trace metadata that provides textual names in stack traces.
+This option is enabled by default.
+This is for example the text string one gets by calling Exception.ToString() on a caught exception.
+With this option disabled, stack traces will still be generated, but will be based on reflection metadata alone (they might be less complete).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativeAotToolchainBuilder IlcGenerateStackTraceData(bool value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.html">NativeAotToolchainBuilder</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_IlcInstructionSet_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.IlcInstructionSet*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_IlcInstructionSet_System_String_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.IlcInstructionSet(System.String)">IlcInstructionSet(String)</h4>
+  <div class="markdown level1 summary"><p>By default, the compiler targets the minimum instruction set supported by the target OS and architecture.
+This option allows targeting newer instruction sets for better performance.
+The native binary will require the instruction sets to be supported by the hardware in order to run.
+For example, <code>avx2,bmi2,fma,pclmul,popcnt,aes</code> will produce binary that takes advantage of instruction sets
+that are typically present on current Intel and AMD processors.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativeAotToolchainBuilder IlcInstructionSet(string value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
+        <td><span class="parametername">value</span></td>
+        <td><p>Specify empty string (&quot;&quot;, not null) to use the defaults.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.html">NativeAotToolchainBuilder</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_IlcOptimizationPreference_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.IlcOptimizationPreference*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_IlcOptimizationPreference_System_String_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.IlcOptimizationPreference(System.String)">IlcOptimizationPreference(String)</h4>
+  <div class="markdown level1 summary"><p>Options related to code generation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativeAotToolchainBuilder IlcOptimizationPreference(string value = &quot;Speed&quot;)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
+        <td><span class="parametername">value</span></td>
+        <td><p>&quot;Speed&quot; to favor code execution speed (default), &quot;Size&quot; to favor smaller code size</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.html">NativeAotToolchainBuilder</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_PackagesRestorePath_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.PackagesRestorePath*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_PackagesRestorePath_System_String_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.PackagesRestorePath(System.String)">PackagesRestorePath(String)</h4>
+  <div class="markdown level1 summary"><p>The directory to restore packages to (optional).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativeAotToolchainBuilder PackagesRestorePath(string packagesRestorePath)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
+        <td><span class="parametername">packagesRestorePath</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.html">NativeAotToolchainBuilder</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_RootAllApplicationAssemblies_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.RootAllApplicationAssemblies*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_RootAllApplicationAssemblies_System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.RootAllApplicationAssemblies(System.Boolean)">RootAllApplicationAssemblies(Boolean)</h4>
+  <div class="markdown level1 summary"><p>This controls the compiler behavior where all code in the application assemblies is considered dynamically reachable.
+This option is disabled by default.
+Enabling this option (true) has a significant effect on the size of the resulting executable because it prevents removal of unused code that would otherwise happen.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativeAotToolchainBuilder RootAllApplicationAssemblies(bool value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.html">NativeAotToolchainBuilder</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_ToToolchain_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.ToToolchain*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_ToToolchain" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.ToToolchain">ToToolchain()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override IToolchain ToToolchain()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.CustomDotNetCliToolchainBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_CustomDotNetCliToolchainBuilder_ToToolchain">CustomDotNetCliToolchainBuilder.ToToolchain()</a></div>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_UseLocalBuild_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.UseLocalBuild*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_UseLocalBuild_System_IO_DirectoryInfo_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.UseLocalBuild(System.IO.DirectoryInfo)">UseLocalBuild(DirectoryInfo)</h4>
+  <div class="markdown level1 summary"><p>creates a NativeAOT toolchain targeting local build of ILCompiler
+Based on <a href="https://github.com/dotnet/runtime/blob/main/docs/workflow/building/coreclr/nativeaot.md">https://github.com/dotnet/runtime/blob/main/docs/workflow/building/coreclr/nativeaot.md</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativeAotToolchainBuilder UseLocalBuild(DirectoryInfo ilcPackages)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.io.directoryinfo">DirectoryInfo</a></td>
+        <td><span class="parametername">ilcPackages</span></td>
+        <td><p>the path to shipping packages, example: &quot;C:\runtime\artifacts\packages\Release\Shipping&quot;</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.html">NativeAotToolchainBuilder</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_UseNuGet_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.UseNuGet*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchainBuilder_UseNuGet_System_String_System_String_" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.UseNuGet(System.String,System.String)">UseNuGet(String, String)</h4>
+  <div class="markdown level1 summary"><p>creates a NativeAOT toolchain targeting NuGet build of Microsoft.DotNet.ILCompiler
+Based on <a href="https://github.com/dotnet/runtimelab/blob/d0a37893a67c125f9b0cd8671846ff7d867df241/samples/HelloWorld/README.md#add-corert-to-your-project">https://github.com/dotnet/runtimelab/blob/d0a37893a67c125f9b0cd8671846ff7d867df241/samples/HelloWorld/README.md#add-corert-to-your-project</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NativeAotToolchainBuilder UseNuGet(string microsoftDotNetILCompilerVersion = &quot;7.0.0-*&quot;, string nuGetFeedUrl = &quot;https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json&quot;)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
+        <td><span class="parametername">microsoftDotNetILCompilerVersion</span></td>
+        <td><p>the version of Microsoft.DotNet.ILCompiler which should be used. The default is: &quot;7.0.0-*&quot;</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
+        <td><span class="parametername">nuGetFeedUrl</span></td>
+        <td><p>url to NuGet feed, The default is: &quot;https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json&quot;</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.html">NativeAotToolchainBuilder</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright &copy; 2013–2021 .NET Foundation and contributors
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <!-- at the end of the BODY -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+    <script type="text/javascript">
+        docsearch({
+            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
+            indexName: 'benchmarkdotnet',
+            inputSelector: '#search-query',
+            debug: false // Set debug to true if you want to inspect the dropdown
+        });
+    </script>  </body>
+</html>

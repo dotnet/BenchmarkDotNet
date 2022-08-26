@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class Summary
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -119,32 +119,8 @@
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
-    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
     <div class="level1"><span class="xref">Summary</span></div>
-  </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Reports.html">BenchmarkDotNet.Reports</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
@@ -157,12 +133,12 @@
   
   
   <a id="BenchmarkDotNet_Reports_Summary__ctor_" data-uid="BenchmarkDotNet.Reports.Summary.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary__ctor_System_String_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Reports_BenchmarkReport__BenchmarkDotNet_Environments_HostEnvironmentInfo_System_String_System_String_System_TimeSpan_System_Globalization_CultureInfo_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Validators_ValidationError__" data-uid="BenchmarkDotNet.Reports.Summary.#ctor(System.String,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Reports.BenchmarkReport},BenchmarkDotNet.Environments.HostEnvironmentInfo,System.String,System.String,System.TimeSpan,System.Globalization.CultureInfo,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Validators.ValidationError})">Summary(String, ImmutableArray&lt;BenchmarkReport&gt;, HostEnvironmentInfo, String, String, TimeSpan, CultureInfo, ImmutableArray&lt;ValidationError&gt;)</h4>
+  <h4 id="BenchmarkDotNet_Reports_Summary__ctor_System_String_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Reports_BenchmarkReport__BenchmarkDotNet_Environments_HostEnvironmentInfo_System_String_System_String_System_TimeSpan_System_Globalization_CultureInfo_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Validators_ValidationError__System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Columns_IColumnHidingRule__" data-uid="BenchmarkDotNet.Reports.Summary.#ctor(System.String,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Reports.BenchmarkReport},BenchmarkDotNet.Environments.HostEnvironmentInfo,System.String,System.String,System.TimeSpan,System.Globalization.CultureInfo,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Validators.ValidationError},System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Columns.IColumnHidingRule})">Summary(String, ImmutableArray&lt;BenchmarkReport&gt;, HostEnvironmentInfo, String, String, TimeSpan, CultureInfo, ImmutableArray&lt;ValidationError&gt;, ImmutableArray&lt;IColumnHidingRule&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Summary(string title, ImmutableArray&lt;BenchmarkReport&gt; reports, HostEnvironmentInfo hostEnvironmentInfo, string resultsDirectoryPath, string logFilePath, TimeSpan totalTime, CultureInfo cultureInfo, ImmutableArray&lt;ValidationError&gt; validationErrors)</code></pre>
+    <pre><code class="lang-csharp hljs">public Summary(string title, ImmutableArray&lt;BenchmarkReport&gt; reports, HostEnvironmentInfo hostEnvironmentInfo, string resultsDirectoryPath, string logFilePath, TimeSpan totalTime, CultureInfo cultureInfo, ImmutableArray&lt;ValidationError&gt; validationErrors, ImmutableArray&lt;IColumnHidingRule&gt; columnHidingRules)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -175,12 +151,12 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">title</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Collections.Immutable.ImmutableArray</span>&lt;<a class="xref" href="BenchmarkDotNet.Reports.BenchmarkReport.html">BenchmarkReport</a>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Reports.BenchmarkReport.html">BenchmarkReport</a>&gt;</td>
         <td><span class="parametername">reports</span></td>
         <td></td>
       </tr>
@@ -190,28 +166,33 @@
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">resultsDirectoryPath</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">logFilePath</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.TimeSpan</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
         <td><span class="parametername">totalTime</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Globalization.CultureInfo</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.globalization.cultureinfo">CultureInfo</a></td>
         <td><span class="parametername">cultureInfo</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Collections.Immutable.ImmutableArray</span>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</td>
         <td><span class="parametername">validationErrors</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Columns.IColumnHidingRule.html">IColumnHidingRule</a>&gt;</td>
+        <td><span class="parametername">columnHidingRules</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -238,7 +219,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -263,7 +244,32 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Immutable.ImmutableArray</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Reports_Summary_ColumnHidingRules_" data-uid="BenchmarkDotNet.Reports.Summary.ColumnHidingRules*"></a>
+  <h4 id="BenchmarkDotNet_Reports_Summary_ColumnHidingRules" data-uid="BenchmarkDotNet.Reports.Summary.ColumnHidingRules">ColumnHidingRules</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ImmutableArray&lt;IColumnHidingRule&gt; ColumnHidingRules { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Columns.IColumnHidingRule.html">IColumnHidingRule</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -288,7 +294,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -314,6 +320,31 @@
     <tbody>
       <tr>
         <td><a class="xref" href="BenchmarkDotNet.Environments.HostEnvironmentInfo.html">HostEnvironmentInfo</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Reports_Summary_IsMultipleRuntimes_" data-uid="BenchmarkDotNet.Reports.Summary.IsMultipleRuntimes*"></a>
+  <h4 id="BenchmarkDotNet_Reports_Summary_IsMultipleRuntimes" data-uid="BenchmarkDotNet.Reports.Summary.IsMultipleRuntimes">IsMultipleRuntimes</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsMultipleRuntimes { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -381,7 +412,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -431,7 +462,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Immutable.ImmutableArray</span>&lt;<a class="xref" href="BenchmarkDotNet.Reports.BenchmarkReport.html">BenchmarkReport</a>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Reports.BenchmarkReport.html">BenchmarkReport</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -456,7 +487,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -531,7 +562,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -556,7 +587,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.TimeSpan</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -581,7 +612,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Immutable.ImmutableArray</span>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -609,7 +640,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">logicalGroupKey</span></td>
         <td></td>
       </tr>
@@ -667,7 +698,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -693,7 +724,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">logicalGroupKey</span></td>
         <td></td>
       </tr>
@@ -709,7 +740,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -734,7 +765,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Int32</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -759,7 +790,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -801,7 +832,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -843,7 +874,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.Boolean</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
         <td></td>
       </tr>
     </tbody>

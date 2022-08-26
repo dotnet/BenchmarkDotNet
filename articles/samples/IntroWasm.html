@@ -8,7 +8,7 @@
     <title>Sample: IntroWasm | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroWasm | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -133,8 +133,6 @@ namespace BenchmarkDotNet.Samples
         // --runtimes Wasm
         // path to dotnet cli
         // --cli /home/adam/projects/runtime/dotnet.sh
-        // path to main js:
-        // --wasmMainJs /home/adam/projects/runtime/src/mono/wasm/runtime-test.js
         public static void Run(string[] args) =&gt; BenchmarkSwitcher.FromAssembly(typeof(IntroWasmCmdConfig).Assembly).Run(args);
 
         [Benchmark]
@@ -150,10 +148,9 @@ namespace BenchmarkDotNet.Samples
         public static void Run()
         {
             // the Wasm Toolchain requires two mandatory arguments:
-            const string mainJsPath = @&quot;/home/adam/projects/runtime/src/mono/wasm/runtime-test.js&quot;;
             const string cliPath = @&quot;/home/adam/projects/runtime/dotnet.sh&quot;;
 
-            WasmRuntime runtime = new WasmRuntime(mainJs: new FileInfo(mainJsPath), msBuildMoniker: &quot;net5.0&quot;);
+            WasmRuntime runtime = new WasmRuntime(msBuildMoniker: &quot;net5.0&quot;);
             NetCoreAppSettings netCoreAppSettings = new NetCoreAppSettings(
                 targetFrameworkMoniker: &quot;net5.0&quot;, runtimeFrameworkVersion: null, name: &quot;Wasm&quot;,
                 customDotNetCliPath: cliPath);

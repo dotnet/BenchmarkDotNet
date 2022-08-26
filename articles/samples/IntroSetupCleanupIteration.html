@@ -8,7 +8,7 @@
     <title>Sample: IntroSetupCleanupIteration | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Sample: IntroSetupCleanupIteration | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../../logo/icon-32.png">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -111,16 +111,16 @@
             <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Samples.IntroSetupCleanupIteration">
 <h2 id="sample-introsetupcleanupiteration">Sample: IntroSetupCleanupIteration</h2>
 
-<p>A method which is marked by the <a href="xref:BenchmarkDotNet.Attributes.IterationSetupAttribute"><code>[IterationSetup]</code></a>
-attribute will be executed exactly once <em>before each benchmark invocation</em> (we have changed that in 0.11.0).
+<p>A method which is marked by the <a class="xref" href="../../api/BenchmarkDotNet.Attributes.IterationSetupAttribute.html"><code>[IterationSetup]</code></a>
+attribute will be executed exactly once <em>before each benchmark invocation</em>, forcing <code>UnrollFactor=1</code> and <code>InvocationCount=1</code> (we have changed that in 0.11.0).
 It's not recommended to use this attribute in microbenchmarks because it can spoil the results.
 However, if you are writing a macrobenchmark (e.g. a benchmark which takes at least 100ms) and
 you want to prepare some data before each invocation,
-<a href="xref:BenchmarkDotNet.Attributes.IterationSetupAttribute"><code>[IterationSetup]</code></a> can be useful.</p>
-<p>A method which is marked by the <a href="xref:BenchmarkDotNet.Attributes.IterationCleanupAttribute"><code>[IterationCleanup]</code></a>
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.IterationSetupAttribute.html"><code>[IterationSetup]</code></a> can be useful.</p>
+<p>A method which is marked by the <a class="xref" href="../../api/BenchmarkDotNet.Attributes.IterationCleanupAttribute.html"><code>[IterationCleanup]</code></a>
 attribute will be executed exactly once <em>after each invocation</em>.
 This attribute has the same set of constraint with <code>[IterationSetup]</code>: it's not recommended to use
-<a href="xref:BenchmarkDotNet.Attributes.IterationCleanupAttribute"><code>[IterationCleanup]</code></a> in microbenchmarks.</p>
+<a class="xref" href="../../api/BenchmarkDotNet.Attributes.IterationCleanupAttribute.html"><code>[IterationCleanup]</code></a> in microbenchmarks.</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroSetupCleanupIteration.cs">using System;
 using BenchmarkDotNet.Attributes;

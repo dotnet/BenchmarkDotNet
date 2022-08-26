@@ -8,7 +8,7 @@
     <title>BenchmarkDotNet v0.11.2 | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="BenchmarkDotNet v0.11.2 | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -238,7 +238,7 @@ public class IntroNuGet
 <p>This is why we decided to warn you about this issue whenever it happens:</p>
 <pre><code class="lang-log">Benchmark IntroDeferredExecution.Wrong returns a deferred execution result (IEnumerable&lt;Int32&gt;). You need to either change the method declaration to return a materialized result or consume it on your own. You can use .Consume() extension method to do that.
 </code></pre>
-<p>Don't worry! We are also providing you with a <code>Consume</code> extension method which can execute given <code>IEnumerable</code> or <code>IQueryable</code> and consume its results. All you need to do is to create a <a href="xref:BenchmarkDotNet.Engines.Consumer"><code>Consumer</code></a> instance, preferably store it in a field (to exclude the cost of creating Consumer from the benchmark itself) and pass it to <code>Consume</code> extension method.</p>
+<p>Don't worry! We are also providing you with a <code>Consume</code> extension method which can execute given <code>IEnumerable</code> or <code>IQueryable</code> and consume its results. All you need to do is to create a <a class="xref" href="../api/BenchmarkDotNet.Engines.Consumer.html"><code>Consumer</code></a> instance, preferably store it in a field (to exclude the cost of creating Consumer from the benchmark itself) and pass it to <code>Consume</code> extension method.</p>
 <p><strong>Do not call <code>.ToArray()</code> because it's an expensive operation and it might dominate given benchmark!</strong></p>
 <p>See also: <a class="xref" href="../articles/samples/IntroDeferredExecution.html">Sample: IntroDeferredExecution</a></p>
 <ul>
@@ -529,7 +529,7 @@ Here is an example of such string in the previous version of BenchmarkDotNet:</p
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e4c7b852e5593bb280881e28ece51d26687c5ba9">e4c7b8</a> Added support for async GlobalCleanup. (#926), fixes #521 (by <a href="https://github.com/dlemstra">@dlemstra</a>)</li>
 </ul>
 <h3 id="introduced-paramsallvalues">Introduced ParamsAllValues</h3>
-<p>If you want to use all possible values of an <code>enum</code> or another type with a small number of values, you can use the <a href="xref:BenchmarkDotNet.Attributes.ParamsAllValuesAttribute"><code>[ParamsAllValues]</code></a> attribute, instead of listing all the values by hand. The types supported by the attribute are:</p>
+<p>If you want to use all possible values of an <code>enum</code> or another type with a small number of values, you can use the <a class="xref" href="../api/BenchmarkDotNet.Attributes.ParamsAllValuesAttribute.html"><code>[ParamsAllValues]</code></a> attribute, instead of listing all the values by hand. The types supported by the attribute are:</p>
 <ul>
 <li><code>bool</code></li>
 <li>any <code>enum</code> that is not marked with <code>[Flags]</code></li>

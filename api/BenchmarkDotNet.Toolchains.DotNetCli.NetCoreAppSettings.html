@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class NetCoreAppSettings
    | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.57.2.0">
+    <meta name="generator" content="docfx 2.59.3.0">
     
     <link rel="shortcut icon" href="../logo/icon-32.png">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
@@ -120,32 +120,8 @@
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
-    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
     <div class="level1"><span class="xref">NetCoreAppSettings</span></div>
-  </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.html">BenchmarkDotNet.Toolchains.DotNetCli</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
@@ -158,7 +134,7 @@
   
   
   <a id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings__ctor_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings__ctor_System_String_System_String_System_String_System_String_System_String_System_Nullable_System_TimeSpan__System_String_System_String_BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotCompilerMode_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor(System.String,System.String,System.String,System.String,System.String,System.Nullable{System.TimeSpan},System.String,System.String,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)">NetCoreAppSettings(String, String, String, String, String, Nullable&lt;TimeSpan&gt;, String, String, MonoAotCompilerMode)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings__ctor_System_String_System_String_System_String_System_String_System_String_System_String_System_String_BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotCompilerMode_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.String,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)">NetCoreAppSettings(String, String, String, String, String, String, String, MonoAotCompilerMode)</h4>
   <div class="markdown level1 summary"><param name="targetFrameworkMoniker">
 sample values: netcoreapp2.0, netcoreapp2.1
 
@@ -174,7 +150,6 @@ customize dotnet cli path if default is not desired
 simply ignored if null
 
 <param name="packagesPath">the directory to restore packages to
-<param name="timeout">timeout to build the benchmark
 <param name="customRuntimePack">path to a custom runtime pack
 <param name="aotCompilerPath">path to Mono AOT compiler
 <param name="aotCompilerMode">Mono AOT compiler moder
@@ -182,7 +157,7 @@ simply ignored if null
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public NetCoreAppSettings(string targetFrameworkMoniker, string runtimeFrameworkVersion, string name, string customDotNetCliPath = null, string packagesPath = null, TimeSpan? timeout = default(TimeSpan? ), string customRuntimePack = null, string aotCompilerPath = null, MonoAotCompilerMode aotCompilerMode = MonoAotCompilerMode.mini)</code></pre>
+    <pre><code class="lang-csharp hljs">public NetCoreAppSettings(string targetFrameworkMoniker, string runtimeFrameworkVersion, string name, string customDotNetCliPath = null, string packagesPath = null, string customRuntimePack = null, string aotCompilerPath = null, MonoAotCompilerMode aotCompilerMode = MonoAotCompilerMode.mini)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -195,42 +170,37 @@ simply ignored if null
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">targetFrameworkMoniker</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">runtimeFrameworkVersion</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">name</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">customDotNetCliPath</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">packagesPath</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.TimeSpan</span>&gt;</td>
-        <td><span class="parametername">timeout</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">customRuntimePack</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">aotCompilerPath</span></td>
         <td></td>
       </tr>
@@ -243,30 +213,6 @@ simply ignored if null
   </table>
   <h3 id="fields">Fields
   </h3>
-  
-  
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_DefaultBuildTimeout" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.DefaultBuildTimeout">DefaultBuildTimeout</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static readonly TimeSpan DefaultBuildTimeout</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.TimeSpan</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
   
   
   <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_NetCoreApp20" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreApp20">NetCoreApp20</h4>
@@ -435,6 +381,30 @@ simply ignored if null
       </tr>
     </tbody>
   </table>
+  
+  
+  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_NetCoreApp70" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreApp70">NetCoreApp70</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly NetCoreAppSettings NetCoreApp70</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html">NetCoreAppSettings</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="properties">Properties
   </h3>
   
@@ -484,7 +454,7 @@ simply ignored if null
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -509,7 +479,7 @@ simply ignored if null
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -535,7 +505,7 @@ simply ignored if null
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -561,7 +531,7 @@ simply ignored if null
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -587,7 +557,7 @@ simply ignored if null
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -612,7 +582,7 @@ simply ignored if null
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -638,33 +608,7 @@ simply ignored if null
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_Timeout_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.Timeout*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_Timeout" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.Timeout">Timeout</h4>
-  <div class="markdown level1 summary"><p>timeout to build the benchmark</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TimeSpan Timeout { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.TimeSpan</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -692,12 +636,12 @@ simply ignored if null
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">customDotNetCliPath</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">displayName</span></td>
         <td></td>
       </tr>
@@ -739,55 +683,13 @@ simply ignored if null
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">packagesPath</span></td>
         <td></td>
       </tr>
       <tr>
-        <td><span class="xref">System.String</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">displayName</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html">NetCoreAppSettings</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_WithTimeout_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithTimeout*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_WithTimeout_System_Nullable_System_TimeSpan__" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithTimeout(System.Nullable{System.TimeSpan})">WithTimeout(Nullable&lt;TimeSpan&gt;)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public NetCoreAppSettings WithTimeout(TimeSpan? timeOut)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">System.TimeSpan</span>&gt;</td>
-        <td><span class="parametername">timeOut</span></td>
         <td></td>
       </tr>
     </tbody>
