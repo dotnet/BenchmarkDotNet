@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Toolchains
                 GenerateProject(buildPartition, artifactsPaths, logger);
                 GenerateBuildScript(buildPartition, artifactsPaths);
 
-                return GenerateResult.Success(artifactsPaths, GetArtifactsToCleanup(artifactsPaths), buildPartition.NoAcknowledgments);
+                return GenerateResult.Success(artifactsPaths, GetArtifactsToCleanup(artifactsPaths));
             }
             catch (Exception ex)
             {

@@ -44,8 +44,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     executeParameters.Diagnoser,
                     Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath),
                     executeParameters.Resolver,
-                    executeParameters.LaunchIndex,
-                    executeParameters.BuildResult.NoAcknowledgments);
+                    executeParameters.LaunchIndex);
             }
             finally
             {
@@ -62,8 +61,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                                       IDiagnoser diagnoser,
                                       string executableName,
                                       IResolver resolver,
-                                      int launchIndex,
-                                      bool noAcknowledgments)
+                                      int launchIndex)
         {
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
                 CustomDotNetCliPath,

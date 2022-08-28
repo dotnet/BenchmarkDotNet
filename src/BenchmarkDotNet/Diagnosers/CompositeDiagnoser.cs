@@ -31,9 +31,6 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<IAnalyser> Analysers
             => diagnosers.SelectMany(diagnoser => diagnoser.Analysers);
 
-        public bool RequiresBlockingAcknowledgments(BenchmarkCase benchmarkCase)
-            => diagnosers.Any(diagnoser => diagnoser.RequiresBlockingAcknowledgments(benchmarkCase));
-
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
             foreach (var diagnoser in diagnosers)
