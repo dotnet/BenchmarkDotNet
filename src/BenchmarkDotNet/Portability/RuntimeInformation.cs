@@ -76,7 +76,12 @@ namespace BenchmarkDotNet.Portability
 #if NET6_0_OR_GREATER
         [System.Runtime.Versioning.SupportedOSPlatformGuard("windows")]
 #endif
-        internal static bool IsWindows() => IsOSPlatform(OSPlatform.Windows);
+        internal static bool IsWindows() =>
+#if NET6_0_OR_GREATER
+            OperatingSystem.IsWindows(); // prefer linker-friendly OperatingSystem APIs
+#else
+            IsOSPlatform(OSPlatform.Windows);
+#endif
 
 #if NET6_0_OR_GREATER
         [System.Runtime.Versioning.SupportedOSPlatformGuard("linux")]

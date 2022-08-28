@@ -1,4 +1,5 @@
 ﻿using System;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
@@ -15,9 +16,14 @@ namespace BenchmarkDotNet.Running
             Value = value;
             FullBenchmarkName = GetBenchmarkName(benchmarkCase);
             JobId = benchmarkCase.Job.Id;
+            (NamedPipeServer, NamedPipeClient) = NamedPipeHost.GenerateNamedPipeNames();
         }
 
         public int Value { get; }
+
+        internal string NamedPipeServer { get; }
+
+        private string NamedPipeClient { get; }
 
         private string JobId { get; }
 
@@ -29,7 +35,7 @@ namespace BenchmarkDotNet.Running
 
         public override int GetHashCode() => Value;
 
-        public string ToArguments() => $"--benchmarkName {FullBenchmarkName.Escape()} --job {JobId.Escape()} --benchmarkId {Value}";
+        public string ToArguments() => $"{NamedPipeHost.NamedPipeArgument} {NamedPipeClient.Escape()} --benchmarkName {FullBenchmarkName.Escape()} --job {JobId.Escape()} --benchmarkId {Value}";
 
         public override string ToString() => Value.ToString();
 

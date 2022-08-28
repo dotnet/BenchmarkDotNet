@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Pipes;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Loggers
@@ -13,19 +13,16 @@ namespace BenchmarkDotNet.Loggers
         private readonly ILogger logger;
         private readonly Process process;
         private readonly IDiagnoser diagnoser;
+        private readonly NamedPipeServerStream namedPipeServer;
         private readonly DiagnoserActionParameters diagnoserActionParameters;
 
         public SynchronousProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser,
-            BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, bool noAcknowledgments)
+            BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, NamedPipeServerStream namedPipeServer)
         {
-            if (!process.StartInfo.RedirectStandardOutput)
-                throw new NotSupportedException("set RedirectStandardOutput to true first");
-            if (!(process.StartInfo.RedirectStandardInput || benchmarkCase.GetRuntime() is WasmRuntime || noAcknowledgments))
-                throw new NotSupportedException("set RedirectStandardInput to true first");
-
             this.logger = logger;
             this.process = process;
             this.diagnoser = diagnoser;
+            this.namedPipeServer = namedPipeServer;
             diagnoserActionParameters = new DiagnoserActionParameters(process, benchmarkCase, benchmarkId);
 
             LinesWithResults = new List<string>();
@@ -38,15 +35,16 @@ namespace BenchmarkDotNet.Loggers
 
         internal void ProcessInput()
         {
-            // Peek -1 or 0 can indicate internal error.
-            while (!process.StandardOutput.EndOfStream && process.StandardOutput.Peek() > 0)
+            namedPipeServer.WaitForConnection(); // wait for the benchmark app to connect first!
+
+            using StreamReader reader = new (namedPipeServer, NamedPipeHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
+            using StreamWriter writer = new (namedPipeServer, NamedPipeHost.UTF8NoBOM, bufferSize: 1);
+            // Flush the data to the Stream after each write, otherwise the client will wait for input endlessly!
+            writer.AutoFlush = true;
+            string line = null;
+
+            while ((line = reader.ReadLine()) is not null)
             {
-                // ReadLine() can actually return string.Empty and null as valid values.
-                string line = process.StandardOutput.ReadLine();
-
-                if (line == null)
-                    continue;
-
                 logger.WriteLine(LogKind.Default, line);
 
                 if (!line.StartsWith("//"))
@@ -57,14 +55,11 @@ namespace BenchmarkDotNet.Loggers
                 {
                     diagnoser?.Handle(signal, diagnoserActionParameters);
 
-                    if (process.StartInfo.RedirectStandardInput)
-                    {
-                        process.StandardInput.WriteLine(Engine.Signals.Acknowledgment);
-                    }
+                    writer.WriteLine(Engine.Signals.Acknowledgment);
 
                     if (signal == HostSignal.AfterAll)
                     {
-                        // we have received the last signal so we can stop reading the output
+                        // we have received the last signal so we can stop reading from the pipe
                         // if the process won't exit after this, its hung and needs to be killed
                         return;
                     }

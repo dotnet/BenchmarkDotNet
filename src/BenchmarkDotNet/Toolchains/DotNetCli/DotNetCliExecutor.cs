@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Pipes;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
@@ -68,15 +69,17 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 CustomDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
                 $"{executableName.Escape()} {benchmarkId.ToArguments()}",
-                redirectStandardInput: !noAcknowledgments,
+                redirectStandardOutput: false,
+                redirectStandardInput: false,
                 redirectStandardError: false); // #1629
 
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
+            using (NamedPipeServerStream namedPipeServer = new (benchmarkId.NamedPipeServer, PipeDirection.InOut, maxNumberOfServerInstances: 1))
             using (var process = new Process { StartInfo = startInfo })
             using (var consoleExitHandler = new ConsoleExitHandler(process, logger))
             {
-                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, noAcknowledgments);
+                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, namedPipeServer);
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 

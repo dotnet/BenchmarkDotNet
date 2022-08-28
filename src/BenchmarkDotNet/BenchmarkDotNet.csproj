@@ -54,4 +54,7 @@
   <ItemGroup>
     <Compile Include="..\BenchmarkDotNet.Disassembler.x64\DataContracts.cs" Link="Disassemblers\DataContracts.cs" />
   </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0.0' ">
+    <Compile Remove=".\Portability\WindowsSyscallCallHelper.cs" />
+  </ItemGroup>
 </Project>

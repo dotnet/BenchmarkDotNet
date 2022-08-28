@@ -247,7 +247,7 @@ namespace BenchmarkDotNet.Tests.Engine
                 Dummy3Action = () => { },
                 GlobalSetupAction = GlobalSetup,
                 GlobalCleanupAction = GlobalCleanup,
-                Host = new ConsoleHost(TextWriter.Null, StreamReader.Null),
+                Host = new NoAcknowledgementConsoleHost(),
                 OverheadActionUnroll = OverheadUnroll,
                 OverheadActionNoUnroll = OverheadNoUnroll,
                 IterationCleanupAction = IterationCleanup,

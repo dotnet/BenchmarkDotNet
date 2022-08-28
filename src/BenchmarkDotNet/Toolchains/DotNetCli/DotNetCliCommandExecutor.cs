@@ -99,7 +99,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         internal static ProcessStartInfo BuildStartInfo(string customDotNetCliPath, string workingDirectory, string arguments,
-            IReadOnlyList<EnvironmentVariable> environmentVariables = null, bool redirectStandardInput = false, bool redirectStandardError = true)
+            IReadOnlyList<EnvironmentVariable> environmentVariables = null, bool redirectStandardInput = false, bool redirectStandardError = true, bool redirectStandardOutput = true)
         {
             const string dotnetMultiLevelLookupEnvVarName = "DOTNET_MULTILEVEL_LOOKUP";
 
@@ -110,11 +110,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 Arguments = arguments,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                RedirectStandardOutput = true,
+                RedirectStandardOutput = redirectStandardOutput,
                 RedirectStandardError = redirectStandardError,
                 RedirectStandardInput = redirectStandardInput,
-                StandardOutputEncoding = Encoding.UTF8,
             };
+
+            if (redirectStandardOutput)
+            {
+                startInfo.StandardOutputEncoding = Encoding.UTF8;
+            }
 
             if (redirectStandardError) // StandardErrorEncoding is only supported when standard error is redirected
             {
