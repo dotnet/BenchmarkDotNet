@@ -16,14 +16,19 @@ namespace BenchmarkDotNet.Running
             Value = value;
             FullBenchmarkName = GetBenchmarkName(benchmarkCase);
             JobId = benchmarkCase.Job.Id;
-            (NamedPipeServer, NamedPipeClient) = NamedPipeHost.GenerateNamedPipeNames();
+            (NamedPipeServer_CTS, NamedPipeClient_CTS) = NamedPipeHost.GenerateNamedPipeNames();
+            (NamedPipeServer_STC, NamedPipeClient_STC) = NamedPipeHost.GenerateNamedPipeNames();
         }
 
         public int Value { get; }
 
-        internal string NamedPipeServer { get; }
+        internal string NamedPipeServer_CTS { get; }
 
-        private string NamedPipeClient { get; }
+        internal string NamedPipeClient_CTS { get; }
+
+        internal string NamedPipeServer_STC { get; }
+
+        internal string NamedPipeClient_STC { get; }
 
         private string JobId { get; }
 
@@ -35,7 +40,7 @@ namespace BenchmarkDotNet.Running
 
         public override int GetHashCode() => Value;
 
-        public string ToArguments() => $"{NamedPipeHost.NamedPipeArgument} {NamedPipeClient.Escape()} --benchmarkName {FullBenchmarkName.Escape()} --job {JobId.Escape()} --benchmarkId {Value}";
+        public string ToArguments() => $"{NamedPipeHost.NamedPipeArgument} {NamedPipeClient_CTS.Escape()} {NamedPipeClient_STC.Escape()} --benchmarkName {FullBenchmarkName.Escape()} --job {JobId.Escape()} --benchmarkId {Value}";
 
         public override string ToString() => Value.ToString();
 

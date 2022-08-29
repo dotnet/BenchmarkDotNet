@@ -11,18 +11,17 @@ namespace BenchmarkDotNet.Loggers
     internal class SynchronousProcessOutputLoggerWithDiagnoser
     {
         private readonly ILogger logger;
-        private readonly Process process;
         private readonly IDiagnoser diagnoser;
-        private readonly NamedPipeServerStream namedPipeServer;
+        private readonly Stream inputFromBenchmark, acknowledgments;
         private readonly DiagnoserActionParameters diagnoserActionParameters;
 
         public SynchronousProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser,
-            BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, NamedPipeServerStream namedPipeServer)
+            BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, Stream inputFromBenchmark, Stream acknowledgments)
         {
             this.logger = logger;
-            this.process = process;
             this.diagnoser = diagnoser;
-            this.namedPipeServer = namedPipeServer;
+            this.inputFromBenchmark = inputFromBenchmark;
+            this.acknowledgments = acknowledgments;
             diagnoserActionParameters = new DiagnoserActionParameters(process, benchmarkCase, benchmarkId);
 
             LinesWithResults = new List<string>();
@@ -35,10 +34,13 @@ namespace BenchmarkDotNet.Loggers
 
         internal void ProcessInput()
         {
-            namedPipeServer.WaitForConnection(); // wait for the benchmark app to connect first!
+            if (inputFromBenchmark is NamedPipeServerStream windowsRead)
+            {
+                windowsRead.WaitForConnection(); // wait for the benchmark app to connect first!
+            }
 
-            using StreamReader reader = new (namedPipeServer, NamedPipeHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
-            using StreamWriter writer = new (namedPipeServer, NamedPipeHost.UTF8NoBOM, bufferSize: 1);
+            using StreamReader reader = new (inputFromBenchmark, NamedPipeHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
+            using StreamWriter writer = new (acknowledgments, NamedPipeHost.UTF8NoBOM, bufferSize: 1);
             // Flush the data to the Stream after each write, otherwise the client will wait for input endlessly!
             writer.AutoFlush = true;
             string line = null;
@@ -54,6 +56,11 @@ namespace BenchmarkDotNet.Loggers
                 else if (Engine.Signals.TryGetSignal(line, out var signal))
                 {
                     diagnoser?.Handle(signal, diagnoserActionParameters);
+
+                    if (acknowledgments is NamedPipeServerStream windowsWrite)
+                    {
+                        windowsWrite.WaitForConnection(); // wait for the benchmark app to connect first!
+                    }
 
                     writer.WriteLine(Engine.Signals.Acknowledgment);
 

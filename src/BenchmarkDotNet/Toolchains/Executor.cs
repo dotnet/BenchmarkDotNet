@@ -33,19 +33,20 @@ namespace BenchmarkDotNet.Toolchains
             }
 
             return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
-                args, executeParameters.Diagnoser, executeParameters.Resolver, executeParameters.LaunchIndex, executeParameters.BenchmarkId.NamedPipeServer);
+                args, executeParameters.Diagnoser, executeParameters.Resolver, executeParameters.LaunchIndex);
         }
 
         private ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
-            string args, IDiagnoser diagnoser, IResolver resolver, int launchIndex, string namedPipeServerName)
+            string args, IDiagnoser diagnoser, IResolver resolver, int launchIndex)
         {
             try
             {
-                using (NamedPipeServerStream namedPipeServer = new (namedPipeServerName, PipeDirection.InOut, maxNumberOfServerInstances: 1))
+                using (Stream inputFromBenchmark = NamedPipeHost.CreateServer(benchmarkId.NamedPipeServer_CTS, benchmarkId.NamedPipeClient_CTS, PipeDirection.In))
+                using (Stream acknowledgments = NamedPipeHost.CreateServer(benchmarkId.NamedPipeServer_STC, benchmarkId.NamedPipeClient_STC, PipeDirection.Out))
                 using (var process = new Process { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) })
                 using (var consoleExitHandler = new ConsoleExitHandler(process, logger))
                 {
-                    var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, namedPipeServer);
+                    var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
 
                     diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 

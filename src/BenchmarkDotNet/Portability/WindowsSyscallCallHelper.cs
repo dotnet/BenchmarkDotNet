@@ -10,10 +10,10 @@ namespace BenchmarkDotNet.Portability
         // Before https://github.com/dotnet/runtime/pull/54676 (.NET 6)
         // .NET was not allowing to open named pipes using FileStream(path)
         // So here we go, calling sys-call directly...
-        internal static FileStream OpenNamedPipe(string namePipePath)
+        internal static FileStream OpenNamedPipe(string namePipePath, FileAccess fileAccess)
         {
             // copied from https://github.com/dotnet/runtime/blob/57bfe474518ab5b7cfe6bf7424a79ce3af9d6657/src/libraries/System.IO.Pipes/src/System/IO/Pipes/NamedPipeClientStream.Windows.cs#L23-L45
-            const int access = unchecked((int)0x80000000) | 0x40000000; // Generic Read & Write
+            int access = fileAccess == FileAccess.Read ? unchecked((int)0x80000000) : 0x40000000; // Generic Read & Write
             SECURITY_ATTRIBUTES secAttrs = GetSecAttrs(HandleInheritability.None);
 
             SafeFileHandle sfh = CreateFileW(namePipePath, access, FileShare.None, ref secAttrs, FileMode.Open, 0, hTemplateFile: IntPtr.Zero);
@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Portability
                 throw new Exception($"Unable to open Named Pipe {namePipePath}. Last error: {lastError:X}");
             }
 
-            return new FileStream(sfh, FileAccess.ReadWrite);
+            return new FileStream(sfh, fileAccess);
 
             [DllImport("kernel32.dll", EntryPoint = "CreateFileW", SetLastError = true)]
             static extern SafeFileHandle CreateFileW(

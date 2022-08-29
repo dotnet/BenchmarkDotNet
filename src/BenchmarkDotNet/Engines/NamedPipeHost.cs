@@ -3,7 +3,10 @@ using BenchmarkDotNet.Validators;
 using System;
 using System.IO;
 using System.IO.Pipes;
+using System.Runtime.InteropServices;
 using System.Text;
+using JetBrains.Annotations;
+using RuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -12,42 +15,34 @@ namespace BenchmarkDotNet.Engines
         internal const string NamedPipeArgument = "--namedPipe";
         internal static readonly Encoding UTF8NoBOM = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
 
-        private readonly Stream namedPipe;
         private readonly StreamWriter outWriter;
         private readonly StreamReader inReader;
 
-        public NamedPipeHost(string namedPipePath)
+        public NamedPipeHost(string namedPipeWritePath, string namedPipeReadPath)
         {
-            namedPipe = OpenNamedPipe(namedPipePath);
-            inReader = new StreamReader(namedPipe, UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
-            outWriter = new StreamWriter(namedPipe, UTF8NoBOM);
+            outWriter = new StreamWriter(OpenNamedPipe(namedPipeWritePath, FileAccess.Write), UTF8NoBOM);
             // Flush the data to the Stream after each write, otherwise the server will wait for input endlessly!
             outWriter.AutoFlush = true;
+            inReader = new StreamReader(OpenNamedPipe(namedPipeReadPath, FileAccess.Read), UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
         }
 
-        private Stream OpenNamedPipe(string namedPipePath)
+        private Stream OpenNamedPipe(string namedPipePath, FileAccess access)
         {
+#if NETSTANDARD
             if (RuntimeInformation.IsWindows())
             {
-#if NET6_0_OR_GREATER
-                return new FileStream(namedPipePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-#else
-                return WindowsSyscallCallHelper.OpenNamedPipe(namedPipePath);
+                return WindowsSyscallCallHelper.OpenNamedPipe(namedPipePath, access);
+            }
 #endif
-            }
-            else
-            {
-                NamedPipeClientStream client = new (namedPipePath);
-                client.Connect(timeout: (int)TimeSpan.FromSeconds(10).TotalMilliseconds);
-                return client;
-            }
+
+            FileShare share = RuntimeInformation.IsWindows() ? FileShare.None : FileShare.ReadWrite;
+            return new FileStream(namedPipePath, FileMode.Open, access, share);
         }
 
         public void Dispose()
         {
             outWriter.Dispose();
             inReader.Dispose();
-            namedPipe.Dispose();
         }
 
         public void Write(string message) => outWriter.Write(message);
@@ -70,23 +65,20 @@ namespace BenchmarkDotNet.Engines
 
         public void ReportResults(RunResults runResults) => runResults.Print(outWriter);
 
-        public static bool TryGetNamedPipePath(string[] args, out string namedPipePath)
+        [PublicAPI] // called from generated code
+        public static bool TryGetNamedPipePath(string[] args, out string namedPipeWritePath, out string namedPipeReadPath)
         {
-            // This method is invoked at the beginning of every benchmarking process.
-            // We don't want to JIT any unnecessary .NET methods as this could affect their benchmarks
-            // Example: Using LINQ here would cause some LINQ methods to be JITed before their first invocation,
-            // which would make it impossible to measure their jitting time using Job.Dry for example.
-
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i] == NamedPipeArgument)
                 {
-                    namedPipePath = args[i + 1]; // IndexOutOfRangeException means a bug (incomplete data)
+                    namedPipeWritePath = args[i + 1]; // IndexOutOfRangeException means a bug (incomplete data)
+                    namedPipeReadPath = args[i + 2];
                     return true;
                 }
             }
 
-            namedPipePath = null;
+            namedPipeWritePath = namedPipeReadPath = null;
             return false;
         }
 
@@ -100,6 +92,29 @@ namespace BenchmarkDotNet.Engines
             }
 
             return ($"/tmp/{guid}", $"/tmp/{guid}");
+        }
+
+        internal static Stream CreateServer(string serverName, string filePath, PipeDirection pipeDirection)
+        {
+            if (RuntimeInformation.IsWindows())
+            {
+                return new NamedPipeServerStream(serverName, pipeDirection, maxNumberOfServerInstances: 1);
+            }
+            else
+            {
+                // mkfifo is not supported by WASM, but it's not a problem, as for WASM the host process is always .NET
+                // and the benchmark process is actual WASM (it just opens the file using FileStream)
+                int fd = mkfifo(filePath, 438); // 438 stands for 666 in octal
+                if (fd == -1)
+                {
+                    throw new Exception("Unable to create named pipe");
+                }
+
+                return new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, bufferSize: 1);
+            }
+
+            [DllImport("libc", SetLastError = true)]
+            static extern int mkfifo(string path, int mode);
         }
     }
 }

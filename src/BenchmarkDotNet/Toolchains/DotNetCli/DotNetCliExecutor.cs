@@ -73,11 +73,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
-            using (NamedPipeServerStream namedPipeServer = new (benchmarkId.NamedPipeServer, PipeDirection.InOut, maxNumberOfServerInstances: 1))
+            using (Stream inputFromBenchmark = NamedPipeHost.CreateServer(benchmarkId.NamedPipeServer_CTS, benchmarkId.NamedPipeClient_CTS, PipeDirection.In))
+            using (Stream acknowledgments = NamedPipeHost.CreateServer(benchmarkId.NamedPipeServer_STC, benchmarkId.NamedPipeClient_STC, PipeDirection.Out))
             using (var process = new Process { StartInfo = startInfo })
             using (var consoleExitHandler = new ConsoleExitHandler(process, logger))
             {
-                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, namedPipeServer);
+                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
