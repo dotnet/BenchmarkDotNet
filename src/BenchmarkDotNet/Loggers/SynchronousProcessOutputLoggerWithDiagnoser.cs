@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Pipes;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Loggers
@@ -34,9 +35,11 @@ namespace BenchmarkDotNet.Loggers
 
         internal void ProcessInput()
         {
-            if (inputFromBenchmark is NamedPipeServerStream windowsRead)
+            if (RuntimeInformation.IsWindows())
             {
-                windowsRead.WaitForConnection(); // wait for the benchmark app to connect first!
+                // wait for the benchmark app to connect first!
+                ((NamedPipeServerStream)inputFromBenchmark).WaitForConnection();
+                ((NamedPipeServerStream)acknowledgments).WaitForConnection();
             }
 
             using StreamReader reader = new (inputFromBenchmark, NamedPipeHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
@@ -56,11 +59,6 @@ namespace BenchmarkDotNet.Loggers
                 else if (Engine.Signals.TryGetSignal(line, out var signal))
                 {
                     diagnoser?.Handle(signal, diagnoserActionParameters);
-
-                    if (acknowledgments is NamedPipeServerStream windowsWrite)
-                    {
-                        windowsWrite.WaitForConnection(); // wait for the benchmark app to connect first!
-                    }
 
                     writer.WriteLine(Engine.Signals.Acknowledgment);
 
