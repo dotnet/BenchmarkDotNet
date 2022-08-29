@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Validators;
 using System;
 using System.IO;
+using System.IO.Pipes;
 using System.Text;
 
 namespace BenchmarkDotNet.Engines
@@ -11,29 +12,35 @@ namespace BenchmarkDotNet.Engines
         internal const string NamedPipeArgument = "--namedPipe";
         internal static readonly Encoding UTF8NoBOM = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
 
-        private readonly FileStream namedPipe;
+        private readonly Stream namedPipe;
         private readonly StreamWriter outWriter;
         private readonly StreamReader inReader;
 
         public NamedPipeHost(string namedPipePath)
         {
-            namedPipe = OpenFileStream(namedPipePath);
+            namedPipe = OpenNamedPipe(namedPipePath);
             inReader = new StreamReader(namedPipe, UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
             outWriter = new StreamWriter(namedPipe, UTF8NoBOM);
             // Flush the data to the Stream after each write, otherwise the server will wait for input endlessly!
             outWriter.AutoFlush = true;
         }
 
-        private FileStream OpenFileStream(string namedPipePath)
+        private Stream OpenNamedPipe(string namedPipePath)
         {
-#if NETSTANDARD
             if (RuntimeInformation.IsWindows())
             {
+#if NET6_0_OR_GREATER
+                return new FileStream(namedPipePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+#else
                 return WindowsSyscallCallHelper.OpenNamedPipe(namedPipePath);
-            }
 #endif
-
-            return new FileStream(namedPipePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+            }
+            else
+            {
+                NamedPipeClientStream client = new (namedPipePath);
+                client.Connect(timeout: (int)TimeSpan.FromSeconds(10).TotalMilliseconds);
+                return client;
+            }
         }
 
         public void Dispose()
