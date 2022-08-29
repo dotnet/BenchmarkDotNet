@@ -4,7 +4,7 @@ using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Engines
 {
-    // this class is used only when somebody manually launches benchmarking .exe without providing named pipe path
+    // this class is used only when somebody manually launches benchmarking .exe without providing anonymous pipes file descriptors
     public sealed class NoAcknowledgementConsoleHost : IHost
     {
         private readonly TextWriter outWriter;

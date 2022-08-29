@@ -63,18 +63,19 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                                       IResolver resolver,
                                       int launchIndex)
         {
+            using AnonymousPipeServerStream inputFromBenchmark = new AnonymousPipeServerStream(PipeDirection.In, HandleInheritability.Inheritable);
+            using AnonymousPipeServerStream acknowledgments = new AnonymousPipeServerStream(PipeDirection.Out, HandleInheritability.Inheritable);
+
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
                 CustomDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
-                $"{executableName.Escape()} {benchmarkId.ToArguments()}",
+                $"{executableName.Escape()} {benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString())}",
                 redirectStandardOutput: false,
                 redirectStandardInput: false,
                 redirectStandardError: false); // #1629
 
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
-            using (Stream inputFromBenchmark = NamedPipeHost.CreateServer(benchmarkId.NamedPipeServer_CTS, benchmarkId.NamedPipeClient_CTS, PipeDirection.In))
-            using (Stream acknowledgments = NamedPipeHost.CreateServer(benchmarkId.NamedPipeServer_STC, benchmarkId.NamedPipeClient_STC, PipeDirection.Out))
             using (var process = new Process { StartInfo = startInfo })
             using (var consoleExitHandler = new ConsoleExitHandler(process, logger))
             {

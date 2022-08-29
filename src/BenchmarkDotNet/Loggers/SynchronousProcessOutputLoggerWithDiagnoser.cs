@@ -4,7 +4,6 @@ using System.IO;
 using System.IO.Pipes;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Loggers
@@ -13,11 +12,11 @@ namespace BenchmarkDotNet.Loggers
     {
         private readonly ILogger logger;
         private readonly IDiagnoser diagnoser;
-        private readonly Stream inputFromBenchmark, acknowledgments;
+        private readonly AnonymousPipeServerStream inputFromBenchmark, acknowledgments;
         private readonly DiagnoserActionParameters diagnoserActionParameters;
 
         public SynchronousProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser,
-            BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, Stream inputFromBenchmark, Stream acknowledgments)
+            BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, AnonymousPipeServerStream inputFromBenchmark, AnonymousPipeServerStream acknowledgments)
         {
             this.logger = logger;
             this.diagnoser = diagnoser;
@@ -35,15 +34,8 @@ namespace BenchmarkDotNet.Loggers
 
         internal void ProcessInput()
         {
-            if (RuntimeInformation.IsWindows())
-            {
-                // wait for the benchmark app to connect first!
-                ((NamedPipeServerStream)inputFromBenchmark).WaitForConnection();
-                ((NamedPipeServerStream)acknowledgments).WaitForConnection();
-            }
-
-            using StreamReader reader = new (inputFromBenchmark, NamedPipeHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
-            using StreamWriter writer = new (acknowledgments, NamedPipeHost.UTF8NoBOM, bufferSize: 1);
+            using StreamReader reader = new (inputFromBenchmark, AnonymousPipesHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
+            using StreamWriter writer = new (acknowledgments, AnonymousPipesHost.UTF8NoBOM, bufferSize: 1);
             // Flush the data to the Stream after each write, otherwise the client will wait for input endlessly!
             writer.AutoFlush = true;
             string line = null;

@@ -25,7 +25,6 @@ namespace BenchmarkDotNet.Toolchains
         public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
             string exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
-            string args = executeParameters.BenchmarkId.ToArguments();
 
             if (!File.Exists(exePath))
             {
@@ -33,16 +32,19 @@ namespace BenchmarkDotNet.Toolchains
             }
 
             return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
-                args, executeParameters.Diagnoser, executeParameters.Resolver, executeParameters.LaunchIndex);
+                executeParameters.Diagnoser, executeParameters.Resolver, executeParameters.LaunchIndex);
         }
 
         private ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
-            string args, IDiagnoser diagnoser, IResolver resolver, int launchIndex)
+            IDiagnoser diagnoser, IResolver resolver, int launchIndex)
         {
             try
             {
-                using (Stream inputFromBenchmark = NamedPipeHost.CreateServer(benchmarkId.NamedPipeServer_CTS, benchmarkId.NamedPipeClient_CTS, PipeDirection.In))
-                using (Stream acknowledgments = NamedPipeHost.CreateServer(benchmarkId.NamedPipeServer_STC, benchmarkId.NamedPipeClient_STC, PipeDirection.Out))
+                using AnonymousPipeServerStream inputFromBenchmark = new AnonymousPipeServerStream(PipeDirection.In, HandleInheritability.Inheritable);
+                using AnonymousPipeServerStream acknowledgments = new AnonymousPipeServerStream(PipeDirection.Out, HandleInheritability.Inheritable);
+
+                string args = benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString());
+
                 using (var process = new Process { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) })
                 using (var consoleExitHandler = new ConsoleExitHandler(process, logger))
                 {
