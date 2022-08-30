@@ -25,10 +25,10 @@ If you have more types and you want to choose which benchmark to run (either by 
 static void Main(string[] args) => BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
 ```
 
-Also you can use the config command style to specify some config from command line (more @docs.console-args):
+Also you can use the config command style to specify some config from command line (more [](xref:docs.console-args)):
 
 ```log
-dotnet run -c Release -- --job short --runtimes net461 netcoreapp21--filter *BenchmarkClass1*
+dotnet run -c Release -- --job short --runtimes net472 net7.0 --filter *BenchmarkClass1*
 ```
 
 The most important thing about `BenchmarkSwitcher` is that you need to pass the `args` from `Main` to the `Run` method. If you don't, it won't parse the arguments.
@@ -53,6 +53,3 @@ var summary = BenchmarkRunner.RunSource(benchmarkSource);
 ```
 
 **Note:** it works only for Full .NET Framework. It's not recommended to use this approach.
-
-
-
