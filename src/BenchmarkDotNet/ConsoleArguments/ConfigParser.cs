@@ -392,7 +392,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.NativeAot60:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json");
                 case RuntimeMoniker.NativeAot70:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, "7.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json");
+                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json");
                 case RuntimeMoniker.Wasm:
                     return MakeWasmJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0", runtimeMoniker);
                 case RuntimeMoniker.WasmNet50:

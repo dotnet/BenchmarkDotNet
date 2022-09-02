@@ -132,6 +132,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <UseSharedCompilation>false</UseSharedCompilation>
     <Deterministic>true</Deterministic>
     <RunAnalyzers>false</RunAnalyzers>
+    <PublishAot Condition="" '$(TargetFramework)' != 'net6.0' "">true</PublishAot>
     <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
     {GetTrimmingSettings()}
     <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
@@ -146,13 +147,16 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />
+    {GetILCompilerPackageReference()}
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
   <ItemGroup>
     {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
 </Project>";
+
+        private string GetILCompilerPackageReference()
+            => string.IsNullOrEmpty(ilCompilerVersion) ? "" : $@"<PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />";
 
         private string GetTrimmingSettings()
             => rootAllApplicationAssemblies
