@@ -209,6 +209,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("wasmDataDir", Required = false, HelpText = "Wasm data directory")]
         public DirectoryInfo WasmDataDirectory { get; set; }
 
+        [Option("noForcedGCs", Required = false, HelpText = "Specifying would not forcefully induce any GCs.")]
+        public bool NoForcedGCs { get; set; }
+
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
         [Usage(ApplicationAlias = "")]
