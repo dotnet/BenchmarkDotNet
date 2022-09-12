@@ -14,6 +14,7 @@ namespace BenchmarkDotNet.Toolchains.Results
         public int? ExitCode { get; }
         public int? ProcessId { get; }
         public IReadOnlyList<string> Errors => errors;
+        public IReadOnlyList<string> Data => data;
         public IReadOnlyList<Measurement> Measurements => measurements;
         public IReadOnlyList<string> ExtraOutput { get; }
         internal readonly GcStats GcStats;
