@@ -15,10 +15,17 @@ namespace BenchmarkDotNet.Toolchains.Results
         public int? ProcessId { get; }
         public IReadOnlyList<string> Errors => errors;
         public IReadOnlyList<Measurement> Measurements => measurements;
-        public IReadOnlyList<string> ExtraOutput { get; }
+        /// <summary>
+        /// All lines printed to standard output by the Benchmark process
+        /// </summary>
+        public IReadOnlyList<string> StandardOutput { get; }
+        /// <summary>
+        /// Lines reported by the Benchmark process that are starting with "//"
+        /// </summary>
+        internal IReadOnlyList<string> PrefixedLines { get; }
         internal readonly GcStats GcStats;
         internal readonly ThreadingStats ThreadingStats;
-        private readonly IReadOnlyList<string> data;
+        private readonly IReadOnlyList<string> results;
         private readonly List<string> errors;
         private readonly List<Measurement> measurements;
 
@@ -26,15 +33,15 @@ namespace BenchmarkDotNet.Toolchains.Results
         // that is why we search for Workload Results as they are produced at the end
         public bool IsSuccess => Measurements.Any(m => m.Is(IterationMode.Workload, IterationStage.Result));
 
-        public ExecuteResult(bool foundExecutable, int? exitCode, int? processId, IReadOnlyList<string> data, IReadOnlyList<string> linesWithExtraOutput, int launchIndex)
+        public ExecuteResult(bool foundExecutable, int? exitCode, int? processId, IReadOnlyList<string> results, IReadOnlyList<string> prefixedLines, IReadOnlyList<string> standardOutput, int launchIndex)
         {
             FoundExecutable = foundExecutable;
-            this.data = data;
+            this.results = results;
             ProcessId = processId;
             ExitCode = exitCode;
-            ExtraOutput = linesWithExtraOutput;
-
-            Parse(data, launchIndex, out measurements, out errors, out GcStats, out ThreadingStats);
+            PrefixedLines = prefixedLines;
+            StandardOutput = standardOutput;
+            Parse(results, prefixedLines, launchIndex, out measurements, out errors, out GcStats, out ThreadingStats);
         }
 
         internal ExecuteResult(List<Measurement> measurements, GcStats gcStats, ThreadingStats threadingStats)
@@ -42,7 +49,7 @@ namespace BenchmarkDotNet.Toolchains.Results
             FoundExecutable = true;
             ExitCode = 0;
             errors = new List<string>();
-            ExtraOutput = Array.Empty<string>();
+            PrefixedLines = Array.Empty<string>();
             this.measurements = measurements;
             GcStats = gcStats;
             ThreadingStats = threadingStats;
@@ -54,7 +61,7 @@ namespace BenchmarkDotNet.Toolchains.Results
                 : new ExecuteResult(runResults.GetMeasurements().ToList(), runResults.GCStats, runResults.ThreadingStats);
 
         internal static ExecuteResult CreateFailed(int exitCode = -1)
-            => new ExecuteResult(false, exitCode, default, Array.Empty<string>(), Array.Empty<string>(), 0);
+            => new ExecuteResult(false, exitCode, default, Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), 0);
 
         public override string ToString() => "ExecuteResult: " + (FoundExecutable ? "Found executable" : "Executable not found");
 
@@ -67,7 +74,7 @@ namespace BenchmarkDotNet.Toolchains.Results
 
             // exit code can be different than 0 if the process has hanged at the end
             // so we check if some results were reported, if not then it was a failure
-            if (ExitCode != 0 && data.Count == 0)
+            if (ExitCode != 0 && results.Count == 0)
             {
                 logger.WriteLineError("ExitCode != 0 and no results reported");
             }
@@ -83,7 +90,7 @@ namespace BenchmarkDotNet.Toolchains.Results
             }
         }
 
-        private static void Parse(IReadOnlyList<string> data, int launchIndex, out List<Measurement> measurements,
+        private static void Parse(IReadOnlyList<string> results, IReadOnlyList<string> prefixedLines, int launchIndex, out List<Measurement> measurements,
             out List<string> errors, out GcStats gcStats, out ThreadingStats threadingStats)
         {
             measurements = new List<Measurement>();
@@ -91,7 +98,16 @@ namespace BenchmarkDotNet.Toolchains.Results
             gcStats = default;
             threadingStats = default;
 
-            foreach (string line in data.Where(text => !string.IsNullOrEmpty(text)))
+            foreach (string line in results.Where(text => !string.IsNullOrEmpty(text)))
+            {
+                Measurement measurement = Measurement.Parse(line, launchIndex);
+                if (measurement.IterationMode != IterationMode.Unknown)
+                {
+                    measurements.Add(measurement);
+                }
+            }
+
+            foreach (string line in prefixedLines.Where(text => !string.IsNullOrEmpty(text)))
             {
                 if (line.StartsWith(ValidationErrorReporter.ConsoleErrorPrefix))
                 {
@@ -104,14 +120,6 @@ namespace BenchmarkDotNet.Toolchains.Results
                 else if (line.StartsWith(ThreadingStats.ResultsLinePrefix))
                 {
                     threadingStats = ThreadingStats.Parse(line);
-                }
-                else
-                {
-                    Measurement measurement = Measurement.Parse(line, launchIndex);
-                    if (measurement.IterationMode != IterationMode.Unknown)
-                    {
-                        measurements.Add(measurement);
-                    }
                 }
             }
 

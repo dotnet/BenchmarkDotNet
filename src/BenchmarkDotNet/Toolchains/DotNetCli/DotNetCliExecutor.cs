@@ -70,16 +70,17 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 CustomDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
                 $"{executableName.Escape()} {benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString())}",
-                redirectStandardOutput: false,
+                redirectStandardOutput: true,
                 redirectStandardInput: false,
                 redirectStandardError: false); // #1629
 
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
-            using (var process = new Process { StartInfo = startInfo })
-            using (var consoleExitHandler = new ConsoleExitHandler(process, logger))
+            using (Process process = new () { StartInfo = startInfo })
+            using (ConsoleExitHandler consoleExitHandler = new (process, logger))
+            using (AsyncProcessOutputReader processOutputReader = new (process, logOutput: true, logger, readStandardError: false))
             {
-                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
+                var loggerWithDiagnoser = new Broker(logger, process, diagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
@@ -93,20 +94,28 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
                 }
 
-                loggerWithDiagnoser.ProcessInput();
+                processOutputReader.BeginRead();
+
+                loggerWithDiagnoser.ProcessData();
 
                 if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                 {
                     logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
 
+                    processOutputReader.StopRead();
                     consoleExitHandler.KillProcessTree();
+                }
+                else
+                {
+                    processOutputReader.StopRead();
                 }
 
                 return new ExecuteResult(true,
                     process.HasExited ? process.ExitCode : null,
                     process.Id,
-                    loggerWithDiagnoser.LinesWithResults,
-                    loggerWithDiagnoser.LinesWithExtraOutput,
+                    loggerWithDiagnoser.Results,
+                    loggerWithDiagnoser.PrefixedOutput,
+                    processOutputReader.GetOutputLines(),
                     launchIndex);
             }
         }

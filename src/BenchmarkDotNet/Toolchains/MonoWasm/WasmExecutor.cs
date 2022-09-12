@@ -108,6 +108,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                 process.Id,
                 outputLines.Where(line => !line.StartsWith("//")).ToArray(),
                 outputLines.Where(line => line.StartsWith("//")).ToArray(),
+                outputLines,
                 launchIndex);
         }
     }

@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private static void AssertMessageGotDisplayed(Summary summary, string message)
         {
-            Assert.True(summary.Reports.Any(report => report.ExecuteResults.Any(executeResult => executeResult.ExtraOutput.Any(line => line == message))), $"{message} should have been printed by custom Engine");
+            Assert.True(summary.Reports.Any(report => report.ExecuteResults.Any(executeResult => executeResult.StandardOutput.Any(line => line == message))), $"{message} should have been printed by custom Engine");
         }
 
         public class SimpleBenchmark

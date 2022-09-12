@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Reports
         {
             return (
                 from executeResults in report.ExecuteResults
-                from extraOutputLine in executeResults.ExtraOutput.Where(line => line.StartsWith(prefix))
+                from extraOutputLine in executeResults.PrefixedLines.Where(line => line.StartsWith(prefix))
                 select extraOutputLine.Substring(prefix.Length)).FirstOrDefault();
         }
     }

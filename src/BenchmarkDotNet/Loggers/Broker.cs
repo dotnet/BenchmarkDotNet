@@ -8,14 +8,14 @@ using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Loggers
 {
-    internal class SynchronousProcessOutputLoggerWithDiagnoser
+    internal class Broker
     {
         private readonly ILogger logger;
         private readonly IDiagnoser diagnoser;
         private readonly AnonymousPipeServerStream inputFromBenchmark, acknowledgments;
         private readonly DiagnoserActionParameters diagnoserActionParameters;
 
-        public SynchronousProcessOutputLoggerWithDiagnoser(ILogger logger, Process process, IDiagnoser diagnoser,
+        public Broker(ILogger logger, Process process, IDiagnoser diagnoser,
             BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, AnonymousPipeServerStream inputFromBenchmark, AnonymousPipeServerStream acknowledgments)
         {
             this.logger = logger;
@@ -24,15 +24,15 @@ namespace BenchmarkDotNet.Loggers
             this.acknowledgments = acknowledgments;
             diagnoserActionParameters = new DiagnoserActionParameters(process, benchmarkCase, benchmarkId);
 
-            LinesWithResults = new List<string>();
-            LinesWithExtraOutput = new List<string>();
+            Results = new List<string>();
+            PrefixedOutput = new List<string>();
         }
 
-        internal List<string> LinesWithResults { get; }
+        internal List<string> Results { get; }
 
-        internal List<string> LinesWithExtraOutput { get; }
+        internal List<string> PrefixedOutput { get; }
 
-        internal void ProcessInput()
+        internal void ProcessData()
         {
             using StreamReader reader = new (inputFromBenchmark, AnonymousPipesHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
             using StreamWriter writer = new (acknowledgments, AnonymousPipesHost.UTF8NoBOM, bufferSize: 1);
@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Loggers
 
                 if (!line.StartsWith("//"))
                 {
-                    LinesWithResults.Add(line);
+                    Results.Add(line);
                 }
                 else if (Engine.Signals.TryGetSignal(line, out var signal))
                 {
@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Loggers
                 }
                 else if (!string.IsNullOrEmpty(line))
                 {
-                    LinesWithExtraOutput.Add(line);
+                    PrefixedOutput.Add(line);
                 }
             }
         }
