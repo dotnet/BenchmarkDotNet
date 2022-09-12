@@ -14,10 +14,10 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
             .ToToolchain();
 
         /// <summary>
-        /// compiled as net7.0, targets latest (7.0.0-*) NativeAOT build from the .NET 7 feed: https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json
+        /// compiled as net7.0, targets latest NativeAOT build from the .NET 7 feed: https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json
         /// </summary>
         public static readonly IToolchain Net70 = CreateBuilder()
-            .UseNuGet("7.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json")
+            .UseNuGet("", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json")
             .TargetFrameworkMoniker("net7.0")
             .ToToolchain();
 

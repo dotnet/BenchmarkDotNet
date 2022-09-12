@@ -15,17 +15,24 @@ namespace BenchmarkDotNet.Toolchains.Results
         public int? ProcessId { get; }
         public IReadOnlyList<string> Errors => errors;
         public IReadOnlyList<Measurement> Measurements => measurements;
+
         /// <summary>
         /// All lines printed to standard output by the Benchmark process
         /// </summary>
         public IReadOnlyList<string> StandardOutput { get; }
+
         /// <summary>
         /// Lines reported by the Benchmark process that are starting with "//"
         /// </summary>
-        internal IReadOnlyList<string> PrefixedLines { get; }
+        public IReadOnlyList<string> PrefixedLines { get; }
+
+        /// <summary>
+        /// Lines reported by the Benchmark process that are not starting with "//"
+        /// </summary>
+        public IReadOnlyList<string> Results { get; }
+
         internal readonly GcStats GcStats;
         internal readonly ThreadingStats ThreadingStats;
-        private readonly IReadOnlyList<string> results;
         private readonly List<string> errors;
         private readonly List<Measurement> measurements;
 
@@ -36,7 +43,7 @@ namespace BenchmarkDotNet.Toolchains.Results
         public ExecuteResult(bool foundExecutable, int? exitCode, int? processId, IReadOnlyList<string> results, IReadOnlyList<string> prefixedLines, IReadOnlyList<string> standardOutput, int launchIndex)
         {
             FoundExecutable = foundExecutable;
-            this.results = results;
+            Results = results;
             ProcessId = processId;
             ExitCode = exitCode;
             PrefixedLines = prefixedLines;
@@ -74,7 +81,7 @@ namespace BenchmarkDotNet.Toolchains.Results
 
             // exit code can be different than 0 if the process has hanged at the end
             // so we check if some results were reported, if not then it was a failure
-            if (ExitCode != 0 && results.Count == 0)
+            if (ExitCode != 0 && Results.Count == 0)
             {
                 logger.WriteLineError("ExitCode != 0 and no results reported");
             }
