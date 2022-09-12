@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             {
                 using (Process process = CreateProcess(benchmarkCase, artifactsPaths, benchmarkId.ToArguments(), resolver))
                 using (ConsoleExitHandler consoleExitHandler = new (process, logger))
-                using (AsyncProcessOutputReader processOutputReader = new (process, readStandardError: false))
+                using (AsyncProcessOutputReader processOutputReader = new (process, logOutput: true, logger, readStandardError: false))
                 {
                     diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 
