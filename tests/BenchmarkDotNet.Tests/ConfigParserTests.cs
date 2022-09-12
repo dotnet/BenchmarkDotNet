@@ -569,7 +569,7 @@ namespace BenchmarkDotNet.Tests
 
             foreach (var job in parsedConfiguration.config.GetJobs())
             {
-                Assert.True(job.Environment.Gc.Force == false);
+                Assert.False(job.Environment.Gc.Force);
             }
         }
     }
