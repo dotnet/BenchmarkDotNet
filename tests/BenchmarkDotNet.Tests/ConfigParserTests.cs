@@ -560,5 +560,17 @@ namespace BenchmarkDotNet.Tests
         {
             Assert.False(ConfigParser.Parse(new[] { "--envVars", "INVALID_NO_SEPARATOR" }, new OutputLogger(Output)).isSuccess);
         }
+
+        [Fact]
+        public void UserCanSpecifyNoForceGCs()
+        {
+            var parsedConfiguration = ConfigParser.Parse(new[] { "--noForcedGCs" }, new OutputLogger(Output));
+            Assert.True(parsedConfiguration.isSuccess);
+
+            foreach (var job in parsedConfiguration.config.GetJobs())
+            {
+                Assert.False(job.Environment.Gc.Force);
+            }
+        }
     }
 }
