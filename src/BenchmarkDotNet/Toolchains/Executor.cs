@@ -111,7 +111,6 @@ namespace BenchmarkDotNet.Toolchains
             string exePath = artifactsPaths.ExecutablePath;
 
             var runtime = benchmarkCase.GetRuntime();
-            // TODO: use resolver
 
             switch (runtime)
             {
@@ -124,15 +123,6 @@ namespace BenchmarkDotNet.Toolchains
                 case MonoRuntime mono:
                     start.FileName = mono.CustomPath ?? "mono";
                     start.Arguments = GetMonoArguments(benchmarkCase.Job, exePath, args, resolver);
-                    break;
-                case WasmRuntime wasm:
-                    start.FileName = wasm.JavaScriptEngine;
-                    start.RedirectStandardInput = false;
-
-                    string main_js = runtime.RuntimeMoniker < RuntimeMoniker.WasmNet70 ? "main.js" : "test-main.js";
-
-                    start.Arguments = $"{wasm.JavaScriptEngineArguments} {main_js} -- --run {artifactsPaths.ProgramName}.dll {args} ";
-                    start.WorkingDirectory = artifactsPaths.BinariesDirectoryPath;
                     break;
                 case MonoAotLLVMRuntime _:
                     start.FileName = exePath;

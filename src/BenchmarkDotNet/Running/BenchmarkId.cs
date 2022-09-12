@@ -30,7 +30,9 @@ namespace BenchmarkDotNet.Running
 
         public override int GetHashCode() => Value;
 
-        public string ToArguments(string fromBenchmark, string toBenchmark) => $"{AnonymousPipesHost.AnonymousPipesDescriptors} {fromBenchmark} {toBenchmark} --benchmarkName {FullBenchmarkName.Escape()} --job {JobId.Escape()} --benchmarkId {Value}";
+        public string ToArguments() => $"--benchmarkName {FullBenchmarkName.Escape()} --job {JobId.Escape()} --benchmarkId {Value}";
+
+        public string ToArguments(string fromBenchmark, string toBenchmark) => $"{AnonymousPipesHost.AnonymousPipesDescriptors} {fromBenchmark} {toBenchmark} {ToArguments()}";
 
         public override string ToString() => Value.ToString();
 

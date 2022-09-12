@@ -42,6 +42,7 @@ namespace BenchmarkDotNet.Loggers
 
             while ((line = reader.ReadLine()) is not null)
             {
+                // TODO: implement Silent mode here
                 logger.WriteLine(LogKind.Default, line);
 
                 if (!line.StartsWith("//"))
