@@ -122,6 +122,23 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public nuint UnsignedNativeSizeInteger() => 0;
+
+            [Benchmark]
+            public Tuple<Outer, Outer.Inner> BenchmarkInnerClass() => Tuple.Create(new Outer(), new Outer.Inner());
+
+            [Benchmark]
+            public Tuple<Outer, Outer.InnerGeneric<string>> BenchmarkGenericInnerClass() => Tuple.Create(new Outer(), new Outer.InnerGeneric<string>());
+        }
+
+        public class Outer
+        {
+            public class Inner
+            {
+            }
+
+            public class InnerGeneric<T>
+            {
+            }
         }
     }
 }
