@@ -19,13 +19,15 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = CreateSimpleConfig(logger);
 
-            CanExecute<GlobalSetupAttributeBenchmarks>(config);
+            var summary = CanExecute<GlobalSetupAttributeBenchmarks>(config);
 
-            string log = logger.GetLog();
-            Assert.Contains(GlobalSetupCalled + Environment.NewLine, log);
-            Assert.True(
-                log.IndexOf(GlobalSetupCalled + Environment.NewLine) <
-                log.IndexOf(BenchmarkCalled + Environment.NewLine));
+            string[] expected = new string[]
+            {
+                GlobalSetupCalled,
+                BenchmarkCalled
+            };
+
+            Assert.Equal(expected, GetSingleStandardOutput(summary));
         }
 
         public class GlobalSetupAttributeBenchmarks

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
@@ -23,24 +24,21 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = CreateSimpleConfig(logger);
 
-            CanExecute<GlobalSetupAttributeTargetBenchmarks>(config);
+            var summary = CanExecute<GlobalSetupAttributeTargetBenchmarks>(config);
 
-            string log = logger.GetLog();
+            IReadOnlyList<string> standardOuput = GetCombinedStandardOutput(summary);
 
-            Assert.Contains(BaselineGlobalSetupCalled + Environment.NewLine, log);
-            Assert.True(
-                log.IndexOf(BaselineGlobalSetupCalled + Environment.NewLine) <
-                log.IndexOf(BaselineBenchmarkCalled + Environment.NewLine));
+            string[] expected = new string[]
+            {
+                BaselineGlobalSetupCalled,
+                BaselineBenchmarkCalled,
+                FirstGlobalSetupCalled,
+                FirstBenchmarkCalled,
+                SecondGlobalSetupCalled,
+                SecondBenchmarkCalled,
+            };
 
-            Assert.Contains(FirstGlobalSetupCalled + Environment.NewLine, log);
-            Assert.True(
-                log.IndexOf(FirstGlobalSetupCalled + Environment.NewLine) <
-                log.IndexOf(FirstBenchmarkCalled + Environment.NewLine));
-
-            Assert.Contains(SecondGlobalSetupCalled + Environment.NewLine, log);
-            Assert.True(
-                log.IndexOf(SecondGlobalSetupCalled + Environment.NewLine) <
-                log.IndexOf(SecondBenchmarkCalled + Environment.NewLine));
+            Assert.Equal(expected, standardOuput);
         }
 
         public class GlobalSetupAttributeTargetBenchmarks

@@ -32,11 +32,11 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = CreateSimpleConfig(logger);
 
-            CanExecute<ColdStartBench>(config);
+            var summary = CanExecute<ColdStartBench>(config);
+            var standardOutput = GetSingleStandardOutput(summary);
 
-            string log = logger.GetLog();
-            Assert.Contains($"{CounterPrefix}1", log);
-            Assert.DoesNotContain($"{CounterPrefix}2", log);
+            Assert.Contains($"{CounterPrefix}1", standardOutput);
+            Assert.DoesNotContain($"{CounterPrefix}2", standardOutput);
         }
 
         [DryJob]

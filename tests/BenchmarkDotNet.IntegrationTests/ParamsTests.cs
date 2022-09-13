@@ -17,10 +17,13 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = CreateSimpleConfig(logger);
 
-            CanExecute<ParamsTestProperty>(config);
+            var summary = CanExecute<ParamsTestProperty>(config);
+            var standardOutput = GetCombinedStandardOutput(summary);
+
             foreach (var param in new[] { 1, 2 })
-                Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
-            Assert.DoesNotContain($"// ### New Parameter {default(int)} ###" + Environment.NewLine, logger.GetLog());
+                Assert.Contains($"// ### New Parameter {param} ###", standardOutput);
+
+            Assert.DoesNotContain($"// ### New Parameter {default(int)} ###", standardOutput);
         }
 
         public class ParamsTestProperty
@@ -72,11 +75,13 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = CreateSimpleConfig(logger);
 
-            CanExecute<ParamsTestField>(config);
+            var summary = CanExecute<ParamsTestField>(config);
+            var standardOutput = GetCombinedStandardOutput(summary);
 
             foreach (var param in new[] { 1, 2 })
-                Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
-            Assert.DoesNotContain($"// ### New Parameter 0 ###" + Environment.NewLine, logger.GetLog());
+                Assert.Contains($"// ### New Parameter {param} ###", standardOutput);
+
+            Assert.DoesNotContain($"// ### New Parameter 0 ###", standardOutput);
         }
 
         public class ParamsTestField

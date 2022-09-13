@@ -40,10 +40,10 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.Throughput && b.Descriptor.WorkloadMethod.Name == "BenchmarkWithVoid"));
             Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.Throughput && b.Descriptor.WorkloadMethod.Name == "BenchmarkWithReturnValue"));
 
-            string testLog = logger.GetLog();
-            Assert.Contains("// ### Benchmark with void called ###", testLog);
-            Assert.Contains("// ### Benchmark with return value called ###", testLog);
-            Assert.DoesNotContain("No benchmarks found", logger.GetLog());
+            var standardOutput = GetCombinedStandardOutput(results);
+            Assert.Contains("// ### Benchmark with void called ###", standardOutput);
+            Assert.Contains("// ### Benchmark with return value called ###", standardOutput);
+            Assert.DoesNotContain("No benchmarks found", standardOutput);
         }
 
         public class ModeBenchmarks

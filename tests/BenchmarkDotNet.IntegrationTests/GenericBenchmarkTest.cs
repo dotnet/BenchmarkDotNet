@@ -19,14 +19,14 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = CreateSimpleConfig(logger);
 
-            CanExecute<FlatClassBenchmark>(config);
+            var summary = CanExecute<FlatClassBenchmark>(config);
             var expected1 = $"// ### Benchmark: SerializationLibrary1, Type: {typeof(FlatClassBenchmark).Name} ###";
-            Assert.Contains(expected1, logger.GetLog());
+            Assert.Contains(expected1, GetCombinedStandardOutput(summary));
 
             logger.ClearLog();
-            CanExecute<DoubleArrayBenchmark>(config);
+            summary = CanExecute<DoubleArrayBenchmark>(config);
             var expected2 = $"// ### Benchmark: SerializationLibrary2, Type: {typeof(DoubleArrayBenchmark).Name} ###";
-            Assert.Contains(expected2, logger.GetLog());
+            Assert.Contains(expected2, GetCombinedStandardOutput(summary));
         }
     }
 

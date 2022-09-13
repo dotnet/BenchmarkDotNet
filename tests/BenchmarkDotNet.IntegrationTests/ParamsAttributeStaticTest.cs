@@ -17,11 +17,12 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = CreateSimpleConfig(logger);
 
-            CanExecute<ParamsTestStaticProperty>(config);
+            var summary = CanExecute<ParamsTestStaticProperty>(config);
+            var standardOutput = GetCombinedStandardOutput(summary);
 
             foreach (var param in new[] { 1, 2 })
-                Assert.Contains($"// ### New Parameter {param} ###" + Environment.NewLine, logger.GetLog());
-            Assert.DoesNotContain($"// ### New Parameter {default(int)} ###" + Environment.NewLine, logger.GetLog());
+                Assert.Contains($"// ### New Parameter {param} ###", standardOutput);
+            Assert.DoesNotContain($"// ### New Parameter {default(int)} ###", standardOutput);
         }
 
         public class ParamsTestStaticProperty

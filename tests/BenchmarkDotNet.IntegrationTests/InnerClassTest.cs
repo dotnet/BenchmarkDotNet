@@ -10,6 +10,9 @@ namespace BenchmarkDotNet.IntegrationTests
     // https://github.com/dotnet/BenchmarkDotNet/issues/59 is also related
     public class InnerClassTest : BenchmarkTestExecutor
     {
+        private const string FirstExpectedMessage = "// ### BenchmarkInnerClass method called ###";
+        private const string SecondExpectedMessage = "// ### BenchmarkGenericInnerClass method called ###";
+
         public InnerClassTest(ITestOutputHelper output) : base(output) { }
 
         [Fact]
@@ -18,12 +21,15 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = CreateSimpleConfig(logger);
 
-            CanExecute<Inner>(config);
+            var summary = CanExecute<Inner>(config);
 
-            var testLog = logger.GetLog();
-            Assert.Contains("// ### BenchmarkInnerClass method called ###" + Environment.NewLine, testLog);
-            Assert.Contains("// ### BenchmarkGenericInnerClass method called ###" + Environment.NewLine, testLog);
-            Assert.DoesNotContain("No benchmarks found", logger.GetLog());
+            string[] expected = new string[]
+            {
+                FirstExpectedMessage,
+                SecondExpectedMessage
+            };
+
+            Assert.Equal(expected, GetCombinedStandardOutput(summary));
         }
 
         public class Inner
@@ -31,14 +37,14 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]
             public Tuple<Outer, Outer.Inner> BenchmarkInnerClass()
             {
-                Console.WriteLine("// ### BenchmarkInnerClass method called ###");
+                Console.WriteLine(FirstExpectedMessage);
                 return Tuple.Create(new Outer(), new Outer.Inner());
             }
 
             [Benchmark]
             public Tuple<Outer, Outer.InnerGeneric<string>> BenchmarkGenericInnerClass()
             {
-                Console.WriteLine("// ### BenchmarkGenericInnerClass method called ###");
+                Console.WriteLine(SecondExpectedMessage);
                 return Tuple.Create(new Outer(), new Outer.InnerGeneric<string>());
             }
         }

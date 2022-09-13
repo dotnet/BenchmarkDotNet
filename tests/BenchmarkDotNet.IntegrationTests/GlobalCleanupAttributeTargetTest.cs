@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
@@ -23,26 +24,21 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = CreateSimpleConfig(logger);
 
-            CanExecute<GlobalCleanupAttributeTargetBenchmarks>(config);
+            var summary = CanExecute<GlobalCleanupAttributeTargetBenchmarks>(config);
 
-            string log = logger.GetLog();
+            IReadOnlyList<string> standardOuput = GetCombinedStandardOutput(summary);
 
-            Assert.Contains(BaselineBenchmarkCalled + Environment.NewLine, log);
-            Assert.True(
-                log.IndexOf(BaselineBenchmarkCalled + Environment.NewLine) <
-                log.IndexOf(BaselineGlobalCleanupCalled + Environment.NewLine));
+            string[] expected = new string[]
+            {
+                BaselineBenchmarkCalled,
+                BaselineGlobalCleanupCalled,
+                FirstBenchmarkCalled,
+                FirstGlobalCleanupCalled,
+                SecondBenchmarkCalled,
+                SecondGlobalCleanupCalled
+            };
 
-            Assert.Contains(FirstGlobalCleanupCalled + Environment.NewLine, log);
-            Assert.Contains(FirstBenchmarkCalled + Environment.NewLine, log);
-            Assert.True(
-                log.IndexOf(FirstBenchmarkCalled + Environment.NewLine) <
-                log.IndexOf(FirstGlobalCleanupCalled + Environment.NewLine));
-
-            Assert.Contains(SecondGlobalCleanupCalled + Environment.NewLine, log);
-            Assert.Contains(SecondBenchmarkCalled + Environment.NewLine, log);
-            Assert.True(
-                log.IndexOf(SecondBenchmarkCalled + Environment.NewLine) <
-                log.IndexOf(SecondGlobalCleanupCalled + Environment.NewLine));
+            Assert.Equal(expected, standardOuput);
         }
 
         public class GlobalCleanupAttributeTargetBenchmarks
