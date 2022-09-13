@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddLogger(logger)
                 .AddColumnProvider(DefaultColumnProviders.Instance);
 
-            var summary = CanExecute<TestBenchmark>(config, fullValidation: errorMessage is null);
+            CanExecute<TestBenchmark>(config, fullValidation: errorMessage is null);
 
             if (errorMessage is not null)
             {
