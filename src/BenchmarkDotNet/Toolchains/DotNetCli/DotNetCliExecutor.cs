@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 {
                     logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
 
-                    processOutputReader.StopRead();
+                    processOutputReader.CancelRead();
                     consoleExitHandler.KillProcessTree();
                 }
                 else

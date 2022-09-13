@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Engines
         }
 
         private Stream OpenAnonymousPipe(string fileHandle, FileAccess access)
-            => new FileStream(new SafeFileHandle(new IntPtr(int.Parse(fileHandle)), ownsHandle: true), access);
+            => new FileStream(new SafeFileHandle(new IntPtr(int.Parse(fileHandle)), ownsHandle: true), access, bufferSize: 1);
 
         public void Dispose()
         {

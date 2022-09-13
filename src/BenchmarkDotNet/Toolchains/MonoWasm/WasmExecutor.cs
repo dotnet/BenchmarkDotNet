@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             {
                 logger.WriteLineInfo("// The benchmarking process did not finish within 10 minutes, it's going to get force killed now.");
 
-                processOutputReader.StopRead();
+                processOutputReader.CancelRead();
                 consoleExitHandler.KillProcessTree();
             }
             else

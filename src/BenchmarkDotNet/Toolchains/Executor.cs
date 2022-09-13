@@ -83,7 +83,7 @@ namespace BenchmarkDotNet.Toolchains
             {
                 logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
 
-                processOutputReader.StopRead();
+                processOutputReader.CancelRead();
                 consoleExitHandler.KillProcessTree();
             }
             else
