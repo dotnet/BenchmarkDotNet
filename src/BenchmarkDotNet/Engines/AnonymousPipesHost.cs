@@ -40,6 +40,13 @@ namespace BenchmarkDotNet.Engines
 
         public void SendSignal(HostSignal hostSignal)
         {
+            if (hostSignal == HostSignal.AfterAll)
+            {
+                // Before the last signal is reported and the benchmark process exits,
+                // add an artificial sleep to increase the chance of host process reading all std output.
+                System.Threading.Thread.Sleep(1);
+            }
+
             WriteLine(Engine.Signals.ToMessage(hostSignal));
 
             // read the response from Parent process, make the communication blocking
