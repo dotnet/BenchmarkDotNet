@@ -27,11 +27,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private void Verify(Platform platform, Type benchmark)
         {
-            var logger = new OutputLogger(Output);
-
             var config = ManualConfig.CreateEmpty()
                     .AddJob(Job.Dry.WithPlatform(platform))
-                    .AddLogger(logger); // make sure we get an output in the TestRunner log
+                    .AddLogger(new OutputLogger(Output)); // make sure we get an output in the TestRunner log
 
             // CanExecute ensures that at least one benchmark has executed successfully
             CanExecute(benchmark, config, fullValidation: true);
