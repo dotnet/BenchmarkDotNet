@@ -68,14 +68,13 @@ namespace BenchmarkDotNet.Toolchains
             logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
             process.Start();
+            processOutputReader.BeginRead();
 
             process.EnsureHighPriority(logger);
             if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
             {
                 process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
             }
-
-            processOutputReader.BeginRead();
 
             broker.ProcessData();
 

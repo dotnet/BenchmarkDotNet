@@ -80,7 +80,6 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
             process.Start();
-
             processOutputReader.BeginRead();
 
             process.EnsureHighPriority(logger);

@@ -80,13 +80,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             using (ConsoleExitHandler consoleExitHandler = new (process, logger))
             using (AsyncProcessOutputReader processOutputReader = new (process, logOutput: true, logger, readStandardError: false))
             {
-                var loggerWithDiagnoser = new Broker(logger, process, diagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
+                Broker broker = new (logger, process, diagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
                 diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 
                 process.Start();
+                processOutputReader.BeginRead();
 
                 process.EnsureHighPriority(logger);
                 if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
@@ -94,9 +95,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
                 }
 
-                processOutputReader.BeginRead();
-
-                loggerWithDiagnoser.ProcessData();
+                broker.ProcessData();
 
                 if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                 {
@@ -113,8 +112,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return new ExecuteResult(true,
                     process.HasExited ? process.ExitCode : null,
                     process.Id,
-                    loggerWithDiagnoser.Results,
-                    loggerWithDiagnoser.PrefixedOutput,
+                    broker.Results,
+                    broker.PrefixedOutput,
                     processOutputReader.GetOutputLines(),
                     launchIndex);
             }
