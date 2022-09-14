@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Engines
 {
     public struct GcStats : IEquatable<GcStats>
     {
-        internal const string ResultsLinePrefix = "GC: ";
+        internal const string ResultsLinePrefix = "// GC: ";
 
         public static readonly long AllocationQuantum = CalculateAllocationQuantumSize();
 

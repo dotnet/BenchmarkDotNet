@@ -13,6 +13,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
     {
         /// <summary>returns a success</summary>
         public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
-            => GenerateResult.Success(null, Array.Empty<string>(), buildPartition.NoAcknowledgments);
+            => GenerateResult.Success(null, Array.Empty<string>());
     }
 }

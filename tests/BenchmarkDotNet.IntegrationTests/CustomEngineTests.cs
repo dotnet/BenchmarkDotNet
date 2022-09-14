@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using Xunit;
@@ -31,14 +30,11 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summary = CanExecute<SimpleBenchmark>(config, fullValidation: false);
 
-            AssertMessageGotDisplayed(summary, GlobalSetupMessage);
-            AssertMessageGotDisplayed(summary, EngineRunMessage);
-            AssertMessageGotDisplayed(summary, GlobalCleanupMessage);
-        }
+            IReadOnlyList<string> standardOutput = GetSingleStandardOutput(summary);
 
-        private static void AssertMessageGotDisplayed(Summary summary, string message)
-        {
-            Assert.True(summary.Reports.Any(report => report.ExecuteResults.Any(executeResult => executeResult.ExtraOutput.Any(line => line == message))), $"{message} should have been printed by custom Engine");
+            Assert.Contains(GlobalSetupMessage, standardOutput);
+            Assert.Contains(EngineRunMessage, standardOutput);
+            Assert.Contains(GlobalCleanupMessage, standardOutput);
         }
 
         public class SimpleBenchmark

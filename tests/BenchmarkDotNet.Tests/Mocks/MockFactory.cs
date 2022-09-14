@@ -67,17 +67,17 @@ namespace BenchmarkDotNet.Tests.Mocks
 
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, int n, double nanoseconds)
         {
-            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>(), false));
+            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
             var measurements = Enumerable.Range(0, n)
                 .Select(index => new Measurement(1, IterationMode.Workload, IterationStage.Result, index + 1, 1, nanoseconds + index).ToString())
                 .ToList();
-            var executeResult = new ExecuteResult(true, 0, default, measurements, new[] { $"// Runtime=extra output line" }, 1);
+            var executeResult = new ExecuteResult(true, 0, default, measurements, new[] { $"// Runtime=extra output line" }, Array.Empty<string>(), 1);
             return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, Array.Empty<Metric>());
         }
 
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, bool hugeSd, Metric[] metrics)
         {
-            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>(), false));
+            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
             bool isFoo = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Foo";
             bool isBar = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Bar";
             var measurements = new List<Measurement>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Loggers;
 using Xunit.Abstractions;
 
@@ -14,12 +15,14 @@ namespace BenchmarkDotNet.Tests.Loggers
             this.testOutputHelper = testOutputHelper ?? throw new ArgumentNullException(nameof(testOutputHelper));
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public override void Write(LogKind logKind, string text)
         {
             currentLine += text;
             base.Write(logKind, text);
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public override void WriteLine()
         {
             testOutputHelper.WriteLine(currentLine);
@@ -27,6 +30,7 @@ namespace BenchmarkDotNet.Tests.Loggers
             base.WriteLine();
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public override void WriteLine(LogKind logKind, string text)
         {
             testOutputHelper.WriteLine(currentLine + text);

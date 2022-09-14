@@ -68,11 +68,6 @@ namespace BenchmarkDotNet.Running
 
         public bool GenerateMSBuildBinLog { get; }
 
-        public bool NoAcknowledgments
-            => !Benchmarks
-                    .Any(bennchmark => bennchmark.Config.GetDiagnosers()
-                    .Any(diagnoser => diagnoser.RequiresBlockingAcknowledgments(bennchmark.BenchmarkCase)));
-
         public override string ToString() => RepresentativeBenchmarkCase.Job.DisplayInfo;
 
         private static string GetResolvedAssemblyLocation(Assembly assembly) =>

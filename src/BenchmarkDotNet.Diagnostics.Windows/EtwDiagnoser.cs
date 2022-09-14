@@ -21,7 +21,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         protected readonly Dictionary<BenchmarkCase, int> BenchmarkToProcess = new Dictionary<BenchmarkCase, int>();
         protected readonly ConcurrentDictionary<int, TStats> StatsPerProcess = new ConcurrentDictionary<int, TStats>();
 
-        public bool RequiresBlockingAcknowledgments(BenchmarkCase benchmarkCase) => true;
         public virtual RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.ExtraRun;
 
         public virtual IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();

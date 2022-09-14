@@ -1,20 +1,15 @@
 ﻿using System;
 using System.IO;
 using BenchmarkDotNet.Validators;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
 {
-    /* This class is used by wasm because wasm cannot read from the console.
-     * This potentially breaks communication with Diagnosers. */
+    // this class is used only when somebody manually launches benchmarking .exe without providing anonymous pipes file descriptors
     public sealed class NoAcknowledgementConsoleHost : IHost
     {
         private readonly TextWriter outWriter;
 
-        public NoAcknowledgementConsoleHost([NotNull]TextWriter outWriter)
-        {
-            this.outWriter = outWriter ?? throw new ArgumentNullException(nameof(outWriter));
-        }
+        public NoAcknowledgementConsoleHost() => outWriter = Console.Out;
 
         public void Write(string message) => outWriter.Write(message);
 
@@ -27,5 +22,10 @@ namespace BenchmarkDotNet.Engines
         public void SendError(string message) => outWriter.WriteLine($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");
 
         public void ReportResults(RunResults runResults) => runResults.Print(outWriter);
+
+        public void Dispose()
+        {
+            // do nothing on purpose - there is no point in closing STD OUT
+        }
     }
 }
