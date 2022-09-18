@@ -34,17 +34,17 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults diagnoserResults)
         {
-            if (diagnoserResults.GcStats.Gen0Collections > 0 && Config.DisplayGenColumns)
-                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen0, diagnoserResults.GcStats.Gen0Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
-            if (diagnoserResults.GcStats.Gen1Collections > 0 && Config.DisplayGenColumns)
-                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen1, diagnoserResults.GcStats.Gen1Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
-            if (diagnoserResults.GcStats.Gen2Collections > 0 && Config.DisplayGenColumns)
-                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen2, diagnoserResults.GcStats.Gen2Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
+            if (Config.DisplayGenColumns)
+            {
+                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen0, diagnoserResults.GcStats.Gen0Collections / (double) diagnoserResults.GcStats.TotalOperations * 1000);
+                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen1, diagnoserResults.GcStats.Gen1Collections / (double) diagnoserResults.GcStats.TotalOperations * 1000);
+                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen2, diagnoserResults.GcStats.Gen2Collections / (double) diagnoserResults.GcStats.TotalOperations * 1000);
+            }
 
             yield return new Metric(AllocatedMemoryMetricDescriptor.Instance, diagnoserResults.GcStats.GetBytesAllocatedPerOperation(diagnoserResults.BenchmarkCase));
         }
 
-        private class GarbageCollectionsMetricDescriptor : IMetricDescriptor
+        internal class GarbageCollectionsMetricDescriptor : IMetricDescriptor
         {
             internal static readonly IMetricDescriptor Gen0 = new GarbageCollectionsMetricDescriptor(0, Column.Gen0);
             internal static readonly IMetricDescriptor Gen1 = new GarbageCollectionsMetricDescriptor(1, Column.Gen1);
