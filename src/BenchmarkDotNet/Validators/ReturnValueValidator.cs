@@ -137,7 +137,7 @@ namespace BenchmarkDotNet.Validators
 
                 return false;
 
-                Array ToStructuralEquatable(object obj)
+                static Array ToStructuralEquatable(object obj)
                 {
                     switch (obj)
                     {

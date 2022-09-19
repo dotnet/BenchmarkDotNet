@@ -121,9 +121,9 @@ namespace BenchmarkDotNet.Validators
             return true;
         }
 
-        private string GetAttributeName(Type type) => type.Name.Replace("Attribute", string.Empty);
+        private static string GetAttributeName(Type type) => type.Name.Replace("Attribute", string.Empty);
 
-        private void TryToGetTaskResult(object result)
+        private static void TryToGetTaskResult(object result)
         {
             if (result == null)
             {
