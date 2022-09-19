@@ -5,12 +5,15 @@ using System.Reflection;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Validators
 {
     public abstract class ExecutionValidatorBase : IValidator
     {
+        protected AwaitHelper awaitHelper = new ();
+
         protected ExecutionValidatorBase(bool failOnError)
         {
             TreatsWarningsAsErrors = failOnError;
@@ -130,21 +133,8 @@ namespace BenchmarkDotNet.Validators
                 return;
             }
 
-            var returnType = result.GetType();
-            if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ValueTask<>))
-            {
-                var asTaskMethod = result.GetType().GetMethod("AsTask");
-                result = asTaskMethod.Invoke(result, null);
-            }
-
-            if (result is Task task)
-            {
-                task.GetAwaiter().GetResult();
-            }
-            else if (result is ValueTask valueTask)
-            {
-                valueTask.GetAwaiter().GetResult();
-            }
+            AwaitHelper.GetGetResultMethod(result.GetType())
+                ?.Invoke(awaitHelper, new[] { result });
         }
 
         private bool TryToSetParamsFields(object benchmarkTypeInstance, List<ValidationError> errors)
