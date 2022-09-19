@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Disassemblers
                 disassembler.EnableInstructionDetails = true;
                 disassembler.DisassembleSyntax = DisassembleSyntax.Intel;
 
-                Arm64Instruction[] instructions = disassembler.Disassemble(code);
+                Arm64Instruction[] instructions = disassembler.Disassemble(code, (long)startAddress);
                 foreach (Arm64Instruction instruction in instructions)
                 {
                     yield return new Asm()
@@ -39,7 +39,18 @@ namespace BenchmarkDotNet.Disassemblers
 
         internal static bool TryGetReferencedAddress(Arm64Instruction instruction, uint pointerSize, out ulong referencedAddress)
         {
-            // TODO: implement something like IntelDisassembler.TryGetReferencedAddress
+            if (instruction.Details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_BRANCH_RELATIVE))
+            {
+                // One of the operands is the address
+                for (int i = 0; i < instruction.Details.Operands.Length; i++)
+                {
+                    if (instruction.Details.Operands[i].Type == Arm64OperandType.Immediate)
+                    {
+                        referencedAddress = (ulong)instruction.Details.Operands[i].Immediate;
+                        return true;
+                    }
+                }
+            }
             referencedAddress = 0;
             return false;
         }
