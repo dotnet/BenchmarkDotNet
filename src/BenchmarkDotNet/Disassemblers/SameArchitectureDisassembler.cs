@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Disassemblers
             => RuntimeInformation.GetCurrentPlatform() switch
             {
                 Platform.X86 or Platform.X64 => new IntelDisassembler(),
-                Platform.Arm or Platform.Arm64 => new ArmDisassembler(),
+                Platform.Arm64 => new Arm64Disassembler(),
                 _ => throw new NotSupportedException($"{RuntimeInformation.GetCurrentPlatform()} is not supported")
             };
 

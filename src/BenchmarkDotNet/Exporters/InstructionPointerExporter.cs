@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Exporters
             IEnumerable<ulong> Range(Asm asm)
             {
                 // most probably asm.StartAddress would be enough, but I don't want to miss any edge case
-                for (ulong instructionPointer = asm.InstructionPointer; instructionPointer < asm.InstructionPointer + (ulong)asm.Instruction.Length; instructionPointer++)
+                for (ulong instructionPointer = asm.InstructionPointer; instructionPointer < asm.InstructionPointer + (ulong)asm.InstructionLength; instructionPointer++)
                     yield return instructionPointer;
             }
 
@@ -130,7 +130,7 @@ namespace BenchmarkDotNet.Exporters
                             foreach (var hardwareCounter in pmcStats.Counters)
                             {
                                 // most probably asm.StartAddress would be enough, but I don't want to miss any edge case
-                                for (ulong instructionPointer = asm.InstructionPointer; instructionPointer < asm.InstructionPointer + (ulong)asm.Instruction.Length; instructionPointer++)
+                                for (ulong instructionPointer = asm.InstructionPointer; instructionPointer < asm.InstructionPointer + (ulong)asm.InstructionLength; instructionPointer++)
                                     if (hardwareCounter.Value.PerInstructionPointer.TryGetValue(instructionPointer, out ulong value))
                                         totalsPerCounter[hardwareCounter.Key] = totalsPerCounter[hardwareCounter.Key] + value;
                             }

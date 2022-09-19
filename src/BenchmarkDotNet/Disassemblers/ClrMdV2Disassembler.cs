@@ -182,11 +182,84 @@ namespace BenchmarkDotNet.Disassemblers
 
         protected abstract IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod);
 
-        protected static void TryTranslateAddressToName(Instruction instruction, State state, int depth, ClrMethod currentMethod)
+        private static ILToNativeMap[] GetCompleteNativeMap(ClrMethod method, ClrRuntime runtime)
+        {
+            if (!TryReadNativeCodeAddresses(runtime, method, out ulong startAddress, out ulong endAddress))
+            {
+                startAddress = method.NativeCode;
+                endAddress = ulong.MaxValue;
+            }
+
+            ILToNativeMap[] sortedMaps = method.ILOffsetMap // CanBeDisassembled ensures that there is at least one map in ILOffsetMap
+                .Where(map => map.StartAddress >= startAddress && map.StartAddress < endAddress) // can be false for Tier 0 maps, EndAddress is not checked on purpose here
+                .Where(map => map.StartAddress < map.EndAddress) // some maps have 0 length (they don't have corresponding assembly code?)
+                .OrderBy(map => map.StartAddress) // we need to print in the machine code order, not IL! #536
+                .Select(map => new ILToNativeMap()
+                {
+                    StartAddress = map.StartAddress,
+                    // some maps have EndAddress > codeHeaderData.MethodStart + codeHeaderData.MethodSize and contain garbage (#2074). They need to be fixed!
+                    EndAddress = Math.Min(map.EndAddress, endAddress),
+                    ILOffset = map.ILOffset
+                })
+                .ToArray();
+
+            if (sortedMaps.Length == 0)
+            {
+                // In such situation ILOffsetMap most likely describes Tier 0, while CodeHeaderData Tier 1.
+                // Since we care about Tier 1 (if it's present), we "fake" a Tier 1 map.
+                return new[] { new ILToNativeMap() { StartAddress = startAddress, EndAddress = endAddress } };
+            }
+            else if (sortedMaps[0].StartAddress != startAddress || (sortedMaps[sortedMaps.Length - 1].EndAddress != endAddress && endAddress != ulong.MaxValue))
+            {
+                // In such situation ILOffsetMap most likely is missing few bytes. We just "extend" it to avoid producing "bad" instructions.
+                return new[] { new ILToNativeMap() { StartAddress = startAddress, EndAddress = endAddress } };
+            }
+
+            return sortedMaps;
+        }
+
+        private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
+            => DisassembledMethod.Empty(method.Signature, method.NativeCode, reason);
+
+        protected static bool TryReadNativeCodeAddresses(ClrRuntime runtime, ClrMethod method, out ulong startAddress, out ulong endAddress)
+        {
+            if (method is not null
+                && runtime.DacLibrary.SOSDacInterface.GetCodeHeaderData(method.NativeCode, out var codeHeaderData) == HResult.S_OK
+                && codeHeaderData.MethodSize > 0) // false for extern methods!
+            {
+                // HotSize can be missing or be invalid (https://github.com/microsoft/clrmd/issues/1036).
+                // So we fetch the method size on our own.
+                startAddress = codeHeaderData.MethodStart;
+                endAddress = codeHeaderData.MethodStart + codeHeaderData.MethodSize;
+                return true;
+            }
+
+            startAddress = endAddress = 0;
+            return false;
+        }
+
+        private class SharpComparer : IEqualityComparer<Sharp>
+        {
+            public bool Equals(Sharp x, Sharp y)
+            {
+                // sometimes some C# code lines are duplicated because the same line is the best match for multiple ILToNativeMaps
+                // we don't want to confuse the users, so this must also be removed
+                return x.FilePath == y.FilePath && x.LineNumber == y.LineNumber;
+            }
+
+            public int GetHashCode(Sharp obj) => obj.FilePath.GetHashCode() ^ obj.LineNumber;
+        }
+    }
+
+    internal abstract class ClrMdV2Disassembler<T> : ClrMdV2Disassembler
+    {
+        protected abstract bool TryGetReferencedAddressT(T instruction, uint pointerSize, out ulong referencedAddress);
+
+        protected void TryTranslateAddressToName(T instruction, State state, int depth, ClrMethod currentMethod)
         {
             var runtime = state.Runtime;
 
-            if (!TryGetReferencedAddress(instruction, (uint)runtime.DataTarget.DataReader.PointerSize, out ulong address))
+            if (!TryGetReferencedAddressT(instruction, (uint)runtime.DataTarget.DataReader.PointerSize, out ulong address))
                 return;
 
             if (state.AddressToNameMapping.ContainsKey(address))
@@ -249,106 +322,5 @@ namespace BenchmarkDotNet.Disassemblers
             => TryReadNativeCodeAddresses(runtime, method, out ulong startAddress, out ulong endAddress) && !(startAddress >= newAddress && newAddress <= endAddress)
             ? null
             : method;
-
-        internal static bool TryGetReferencedAddress(Instruction instruction, uint pointerSize, out ulong referencedAddress)
-        {
-            for (int i = 0; i < instruction.OpCount; i++)
-            {
-                switch (instruction.GetOpKind(i))
-                {
-                    case OpKind.NearBranch16:
-                    case OpKind.NearBranch32:
-                    case OpKind.NearBranch64:
-                        referencedAddress = instruction.NearBranchTarget;
-                        return referencedAddress > ushort.MaxValue;
-                    case OpKind.Immediate16:
-                    case OpKind.Immediate8to16:
-                    case OpKind.Immediate8to32:
-                    case OpKind.Immediate8to64:
-                    case OpKind.Immediate32to64:
-                    case OpKind.Immediate32 when pointerSize == 4:
-                    case OpKind.Immediate64:
-                        referencedAddress = instruction.GetImmediate(i);
-                        return referencedAddress > ushort.MaxValue;
-                    case OpKind.Memory when instruction.IsIPRelativeMemoryOperand:
-                        referencedAddress = instruction.IPRelativeMemoryAddress;
-                        return referencedAddress > ushort.MaxValue;
-                    case OpKind.Memory:
-                        referencedAddress = instruction.MemoryDisplacement64;
-                        return referencedAddress > ushort.MaxValue;
-                }
-            }
-
-            referencedAddress = default;
-            return false;
-        }
-
-        private static ILToNativeMap[] GetCompleteNativeMap(ClrMethod method, ClrRuntime runtime)
-        {
-            if (!TryReadNativeCodeAddresses(runtime, method, out ulong startAddress, out ulong endAddress))
-            {
-                startAddress = method.NativeCode;
-                endAddress = ulong.MaxValue;
-            }
-
-            ILToNativeMap[] sortedMaps = method.ILOffsetMap // CanBeDisassembled ensures that there is at least one map in ILOffsetMap
-                .Where(map => map.StartAddress >= startAddress && map.StartAddress < endAddress) // can be false for Tier 0 maps, EndAddress is not checked on purpose here
-                .Where(map => map.StartAddress < map.EndAddress) // some maps have 0 length (they don't have corresponding assembly code?)
-                .OrderBy(map => map.StartAddress) // we need to print in the machine code order, not IL! #536
-                .Select(map => new ILToNativeMap()
-                {
-                    StartAddress = map.StartAddress,
-                    // some maps have EndAddress > codeHeaderData.MethodStart + codeHeaderData.MethodSize and contain garbage (#2074). They need to be fixed!
-                    EndAddress = Math.Min(map.EndAddress, endAddress),
-                    ILOffset = map.ILOffset
-                })
-                .ToArray();
-
-            if (sortedMaps.Length == 0)
-            {
-                // In such situation ILOffsetMap most likely describes Tier 0, while CodeHeaderData Tier 1.
-                // Since we care about Tier 1 (if it's present), we "fake" a Tier 1 map.
-                return new[] { new ILToNativeMap() { StartAddress = startAddress, EndAddress = endAddress }};
-            }
-            else if (sortedMaps[0].StartAddress != startAddress || (sortedMaps[sortedMaps.Length - 1].EndAddress != endAddress && endAddress != ulong.MaxValue))
-            {
-                // In such situation ILOffsetMap most likely is missing few bytes. We just "extend" it to avoid producing "bad" instructions.
-                return new[] { new ILToNativeMap() { StartAddress = startAddress, EndAddress = endAddress } };
-            }
-
-            return sortedMaps;
-        }
-
-        private static bool TryReadNativeCodeAddresses(ClrRuntime runtime, ClrMethod method, out ulong startAddress, out ulong endAddress)
-        {
-            if (method is not null
-                && runtime.DacLibrary.SOSDacInterface.GetCodeHeaderData(method.NativeCode, out var codeHeaderData) == HResult.S_OK
-                && codeHeaderData.MethodSize > 0) // false for extern methods!
-            {
-                // HotSize can be missing or be invalid (https://github.com/microsoft/clrmd/issues/1036).
-                // So we fetch the method size on our own.
-                startAddress = codeHeaderData.MethodStart;
-                endAddress = codeHeaderData.MethodStart + codeHeaderData.MethodSize;
-                return true;
-            }
-
-            startAddress = endAddress = 0;
-            return false;
-        }
-
-        private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
-            => DisassembledMethod.Empty(method.Signature, method.NativeCode, reason);
-
-        private class SharpComparer : IEqualityComparer<Sharp>
-        {
-            public bool Equals(Sharp x, Sharp y)
-            {
-                // sometimes some C# code lines are duplicated because the same line is the best match for multiple ILToNativeMaps
-                // we don't want to confuse the users, so this must also be removed
-                return x.FilePath == y.FilePath && x.LineNumber == y.LineNumber;
-            }
-
-            public int GetHashCode(Sharp obj) => obj.FilePath.GetHashCode() ^ obj.LineNumber;
-        }
     }
 }

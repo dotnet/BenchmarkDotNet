@@ -24,7 +24,12 @@ namespace BenchmarkDotNet.Disassemblers
 
     public class Asm : SourceCode
     {
-        public Instruction Instruction { get; set; }
+        public int InstructionLength { get; set; }
+        public Instruction? IntelInstruction { get; set; }
+
+#if !CLRMDV1
+        public Gee.External.Capstone.Arm64.Arm64Instruction Arm64Instruction { get; set; }
+#endif
     }
 
     public class MonoCode : SourceCode

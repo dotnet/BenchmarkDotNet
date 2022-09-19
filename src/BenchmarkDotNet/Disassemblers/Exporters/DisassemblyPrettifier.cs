@@ -39,8 +39,12 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             // first of all, we search of referenced addresses (jump|calls)
             var referencedAddresses = new HashSet<ulong>();
             foreach (var asm in asmInstructions)
-                if (ClrMdV2Disassembler.TryGetReferencedAddress(asm.Instruction, disassemblyResult.PointerSize, out ulong referencedAddress))
-                    referencedAddresses.Add(referencedAddress);
+                if (asm.IntelInstruction.HasValue)
+                    if (IntelDisassembler.TryGetReferencedAddress(asm.IntelInstruction.Value, disassemblyResult.PointerSize, out ulong referencedAddress))
+                        referencedAddresses.Add(referencedAddress);
+                else if (asm.Arm64Instruction is not null)
+                    if (Arm64Disassembler.TryGetReferencedAddress(asm.Arm64Instruction, disassemblyResult.PointerSize, out referencedAddress))
+                        referencedAddresses.Add(referencedAddress);
 
             // for every IP that is referenced, we emit a uinque label
             var addressesToLabels = new Dictionary<ulong, string>();
@@ -72,24 +76,25 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                             prettified.Add(new Label(label));
                         }
 
-                        if (ClrMdV2Disassembler.TryGetReferencedAddress(asm.Instruction, disassemblyResult.PointerSize, out ulong referencedAddress))
+                        if ((asm.IntelInstruction.HasValue && IntelDisassembler.TryGetReferencedAddress(asm.IntelInstruction.Value, disassemblyResult.PointerSize, out ulong referencedAddress))
+                            || (asm.Arm64Instruction is not null && Arm64Disassembler.TryGetReferencedAddress(asm.Arm64Instruction, disassemblyResult.PointerSize, out referencedAddress)))
                         {
                             // jump or a call within same method
                             if (addressesToLabels.TryGetValue(referencedAddress, out string translated))
                             {
-                                prettified.Add(new Reference(InstructionFormatter.Format(asm.Instruction, formatterWithLabelsSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize), translated, asm));
+                                prettified.Add(new Reference(CodeFormatter.Format(asm, formatterWithLabelsSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize), translated, asm));
                                 continue;
                             }
 
                             // call to a known method
                             if (disassemblyResult.AddressToNameMapping.ContainsKey(referencedAddress))
                             {
-                                prettified.Add(new Element(InstructionFormatter.Format(asm.Instruction, formatterWithGlobalSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize), asm));
+                                prettified.Add(new Element(CodeFormatter.Format(asm, formatterWithGlobalSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize), asm));
                                 continue;
                             }
                         }
 
-                        prettified.Add(new Element(InstructionFormatter.Format(asm.Instruction, formatterWithGlobalSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize), asm));
+                        prettified.Add(new Element(CodeFormatter.Format(asm, formatterWithGlobalSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize), asm));
                     }
                 }
 

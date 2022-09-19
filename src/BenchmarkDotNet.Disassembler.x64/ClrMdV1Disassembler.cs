@@ -174,7 +174,8 @@ namespace BenchmarkDotNet.Disassemblers
                 yield return new Asm
                 {
                     InstructionPointer = instruction.IP,
-                    Instruction = instruction
+                    InstructionLength = instruction.Length,
+                    IntelInstruction = instruction
                 };
             }
         }

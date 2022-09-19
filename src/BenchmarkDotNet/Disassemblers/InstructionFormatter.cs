@@ -9,8 +9,10 @@ namespace BenchmarkDotNet.Disassemblers
         {
             switch (sourceCode)
             {
-                case Asm asm:
-                    return InstructionFormatter.Format(asm.Instruction, formatter, printInstructionAddresses, pointerSize);
+                case Asm asm when asm.IntelInstruction.HasValue:
+                    return InstructionFormatter.Format(asm.IntelInstruction.Value, formatter, printInstructionAddresses, pointerSize);
+                case Asm asm when asm.Arm64Instruction is not null:
+                    return $"{asm.Arm64Instruction.Mnemonic} {asm.Arm64Instruction.Operand}"; // TODO: implement proper formatting
                 case Sharp sharp:
                     return sharp.Text;
                 case MonoCode mono:
