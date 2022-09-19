@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
@@ -251,6 +253,83 @@ namespace BenchmarkDotNet.Tests.Validators
 
             [Benchmark]
             public int Bar() => ++Value;
+        }
+
+        [Fact]
+        public void ArgumentsAreSupported()
+            => AssertConsistent<ArgumentsAreSupportedClass>();
+
+        public class ArgumentsAreSupportedClass
+        {
+            [Arguments(1)]
+            [Arguments(2)]
+            [Benchmark]
+            public int Foo(int arg) => arg;
+
+            [Arguments(2)]
+            [Arguments(4)]
+            [Benchmark]
+            public int Bar(int arg) => arg / 2;
+        }
+
+        [Fact]
+        public void ArgumentsSourceAreSupported()
+            => AssertConsistent<ArgumentsSourceAreSupportedClass>();
+
+        public class ArgumentsSourceAreSupportedClass
+        {
+            [ArgumentsSource(nameof(GetArguments))]
+            [Benchmark]
+            public int Foo(int arg) => arg;
+
+            [ArgumentsSource(nameof(GetArguments))]
+            [Benchmark]
+            public int Bar(int arg) => arg;
+
+            public IEnumerable<object> GetArguments()
+            {
+                yield return 1;
+                yield return 2;
+            }
+        }
+
+        [Fact]
+        public void ArgumentsWithArgumentsSourceAreSupported()
+            => AssertConsistent<ArgumentsWithArgumentsSourceAreSupportedClass>();
+
+        public class ArgumentsWithArgumentsSourceAreSupportedClass
+        {
+            [ArgumentsSource(nameof(GetArguments))]
+            [Benchmark]
+            public int Foo(int arg) => arg;
+
+            [Benchmark]
+            [Arguments(1)]
+            [Arguments(2)]
+            public int Bar(int arg) => arg;
+
+            public IEnumerable<object> GetArguments()
+            {
+                yield return 1;
+                yield return 2;
+            }
+        }
+
+        [Fact]
+        public void AsyncSetupIsSupported()
+            => AssertConsistent<AsyncSetupIsSupportedClass>();
+
+        public class AsyncSetupIsSupportedClass
+        {
+            [Benchmark]
+            public async Task<int> Foo()
+            {
+                await Task.Delay(1);
+                return 1;
+            }
+
+            [Benchmark]
+            public int Bar() => 1;
         }
 
         private static void AssertConsistent<TBenchmark>()

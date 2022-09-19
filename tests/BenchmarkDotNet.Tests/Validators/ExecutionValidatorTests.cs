@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
@@ -164,17 +165,16 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void NonFailingGlobalSetupsAreOmitted()
+        public void ParamsAreSetBeforeGlobalSetup()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(GlobalSetupThatRequiresParamsToBeSetFirst)));
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(ParamsAreSetBeforeGlobalSetupClass)));
 
             Assert.Empty(validationErrors);
         }
 
-        public class GlobalSetupThatRequiresParamsToBeSetFirst
+        public class ParamsAreSetBeforeGlobalSetupClass
         {
             [Params(100)]
-            [UsedImplicitly]
             public int Field;
 
             [GlobalSetup]
@@ -189,17 +189,45 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void NonFailingGlobalCleanupsAreOmitted()
+        public void ParamsSourceAreSetBeforeGlobalSetup()
         {
-            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(GlobalCleanupThatRequiresParamsToBeSetFirst)));
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(ParamsSourceAreSetBeforeGlobalSetupClass)));
 
             Assert.Empty(validationErrors);
         }
 
-        public class GlobalCleanupThatRequiresParamsToBeSetFirst
+        public class ParamsSourceAreSetBeforeGlobalSetupClass
+        {
+            [ParamsSource(nameof(GetParams))]
+            public int Field;
+
+            [GlobalSetup]
+            public void Failing()
+            {
+                if (Field == default)
+                    throw new Exception("This should have never happened");
+            }
+
+            [Benchmark]
+            public void NonThrowing() { }
+
+            public IEnumerable<object> GetParams()
+            {
+                yield return 100;
+            }
+        }
+
+        [Fact]
+        public void ParamsAreSetBeforeGlobalCleanup()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(ParamsAreSetBeforeGlobalCleanupClass)));
+
+            Assert.Empty(validationErrors);
+        }
+
+        public class ParamsAreSetBeforeGlobalCleanupClass
         {
             [Params(100)]
-            [UsedImplicitly]
             public int Field;
 
             [GlobalCleanup]
@@ -596,6 +624,242 @@ namespace BenchmarkDotNet.Tests.Validators
 
             [Benchmark]
             public void NonThrowing() { }
+        }
+
+        [Fact]
+        public void IterationSetupIsSupported()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(IterationSetupIsSupportedClass))).ToList();
+
+            Assert.Empty(validationErrors);
+        }
+
+        public class IterationSetupIsSupportedClass
+        {
+            [IterationSetup]
+            public void Setup() { }
+
+            [Benchmark]
+            public void Foo() { }
+        }
+
+        [Fact]
+        public void IterationCleanupIsSupported()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(IterationCleanupIsSupportedClass))).ToList();
+            Assert.Empty(validationErrors);
+        }
+
+        public class IterationCleanupIsSupportedClass
+        {
+            [IterationCleanup]
+            public void Cleanup() { }
+
+            [Benchmark]
+            public void Foo() { }
+        }
+
+        [Fact]
+        public void AsyncIterationSetupIsNotAllowed()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncIterationSetupIsNotAllowedClass))).ToList();
+
+            Assert.NotEmpty(validationErrors);
+            Assert.StartsWith("[IterationSetup] cannot be async. Error in type ", validationErrors.Single().Message);
+        }
+
+        public class AsyncIterationSetupIsNotAllowedClass
+        {
+            [IterationSetup]
+            public Task Setup() => Task.CompletedTask;
+
+            [Benchmark]
+            public void Foo() { }
+        }
+
+        [Fact]
+        public void AsyncIterationCleanupIsNotAllowed()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncIterationCleanupIsNotAllowedClass))).ToList();
+
+            Assert.NotEmpty(validationErrors);
+            Assert.StartsWith("[IterationCleanup] cannot be async. Error in type ", validationErrors.Single().Message);
+        }
+
+        public class AsyncIterationCleanupIsNotAllowedClass
+        {
+            [IterationCleanup]
+            public Task Cleanup() => Task.CompletedTask;
+
+            [Benchmark]
+            public void Foo() { }
+        }
+
+        [Fact]
+        public void SetupsWithCleanupsAreCalledInCorrectOrder()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(SetupsAndCleanups))).ToList();
+
+            Assert.True(SetupsAndCleanups.GlobalSetupIsCalled);
+            Assert.True(SetupsAndCleanups.IterationSetupIsCalled);
+            Assert.True(SetupsAndCleanups.BenchmarkIsCalled);
+            Assert.True(SetupsAndCleanups.IterationCleanupIsCalled);
+            Assert.True(SetupsAndCleanups.GlobalCleanupIsCalled);
+
+            Assert.Empty(validationErrors);
+        }
+
+        public class SetupsAndCleanups
+        {
+            public static bool GlobalSetupIsCalled;
+            public static bool IterationSetupIsCalled;
+            public static bool BenchmarkIsCalled;
+            public static bool IterationCleanupIsCalled;
+            public static bool GlobalCleanupIsCalled;
+
+            [GlobalSetup]
+            public void GlobalSetup() =>
+                GlobalSetupIsCalled = true;
+
+            [IterationSetup]
+            public void IterationSetup()
+            {
+                if (!GlobalSetupIsCalled)
+                    throw new Exception("[GlobalSetup] is not called");
+
+                IterationSetupIsCalled = true;
+            }
+
+            [Benchmark]
+            public void Benchmark()
+            {
+                if (!IterationSetupIsCalled)
+                    throw new Exception("[IterationSetup] is not called");
+
+                BenchmarkIsCalled = true;
+            }
+
+            [IterationCleanup]
+            public void IterationCleanup()
+            {
+                if (!BenchmarkIsCalled)
+                    throw new Exception("[Benchmark] is not called");
+
+                IterationCleanupIsCalled = true;
+            }
+
+            [GlobalCleanup]
+            public void GlobalCleanup()
+            {
+                if (!IterationCleanupIsCalled)
+                    throw new Exception("[IterationCleanup] is not called");
+
+                GlobalCleanupIsCalled = true;
+            }
+        }
+
+        [Fact]
+        public void AsyncSetupsWithCleanupsAreCalledInCorrectOrder()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncSetupsAndCleanups))).ToList();
+
+            Assert.True(AsyncSetupsAndCleanups.AsyncGlobalSetupIsCalled);
+            Assert.True(AsyncSetupsAndCleanups.IterationSetupIsCalled);
+            Assert.True(AsyncSetupsAndCleanups.AsyncBenchmarkIsCalled);
+            Assert.True(AsyncSetupsAndCleanups.IterationCleanupIsCalled);
+            Assert.True(AsyncSetupsAndCleanups.AsyncGlobalCleanupIsCalled);
+
+            Assert.Empty(validationErrors);
+        }
+
+        public class AsyncSetupsAndCleanups
+        {
+            public static bool AsyncGlobalSetupIsCalled;
+            public static bool IterationSetupIsCalled;
+            public static bool AsyncBenchmarkIsCalled;
+            public static bool IterationCleanupIsCalled;
+            public static bool AsyncGlobalCleanupIsCalled;
+
+            [GlobalSetup]
+            public async Task GlobalSetup()
+            {
+                await Task.Delay(1);
+                AsyncGlobalSetupIsCalled = true;
+            }
+
+            [IterationSetup]
+            public void IterationSetup()
+            {
+                if (!AsyncGlobalSetupIsCalled)
+                    throw new Exception("[GlobalSetup] is not called");
+
+                IterationSetupIsCalled = true;
+            }
+
+            [Benchmark]
+            public async Task Benchmark()
+            {
+                if (!IterationSetupIsCalled)
+                    throw new Exception("[IterationSetup] is not called");
+
+                await Task.Delay(1);
+                AsyncBenchmarkIsCalled = true;
+            }
+
+            [IterationCleanup]
+            public void IterationCleanup()
+            {
+                if (!AsyncBenchmarkIsCalled)
+                    throw new Exception("[Benchmark] is not called");
+
+                IterationCleanupIsCalled = true;
+            }
+
+            [GlobalCleanup]
+            public async Task GlobalCleanup()
+            {
+                if (!IterationCleanupIsCalled)
+                    throw new Exception("[IterationCleanup] is not called");
+
+                await Task.Delay(1);
+                AsyncGlobalCleanupIsCalled = true;
+            }
+        }
+
+        [Fact]
+        public void BenchmarksMustBeIndependent()
+        {
+            var validationErrors = ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(BenchmarksMustBeIndependentClass))).ToList();
+
+            Assert.Empty(validationErrors);
+        }
+
+        public class BenchmarksMustBeIndependentClass
+        {
+            [Params(1, 2)]
+            public int N;
+
+            private bool isBenchmarkExecuted;
+
+            [Benchmark]
+            [Arguments(1)]
+            [Arguments(2)]
+            public void Foo()
+            {
+                if (isBenchmarkExecuted)
+                    throw new Exception("Each benchmark must be called on a new instance");
+
+                isBenchmarkExecuted = true;
+            }
+
+            [Benchmark]
+            public void Bar()
+            {
+                if (isBenchmarkExecuted)
+                    throw new Exception("Each benchmark must be called on a new instance");
+
+                isBenchmarkExecuted = true;
+            }
         }
     }
 }
