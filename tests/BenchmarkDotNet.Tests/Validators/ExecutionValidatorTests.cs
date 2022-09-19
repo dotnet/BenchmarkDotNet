@@ -303,7 +303,7 @@ namespace BenchmarkDotNet.Tests.Validators
                 .ToList();
 
             Assert.NotEmpty(validationErrors);
-            Assert.StartsWith("Fields marked with [Params] must be public", validationErrors.Single().Message);
+            Assert.StartsWith($"Member \"{nameof(NonPublicFieldWithParams.Field)}\" must be public if it has the [Params]", validationErrors.Single().Message);
         }
 
         public class NonPublicFieldWithParams
