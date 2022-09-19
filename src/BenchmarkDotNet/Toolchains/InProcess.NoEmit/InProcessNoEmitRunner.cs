@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -7,6 +8,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
@@ -102,9 +104,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         {
             public static void RunCore(IHost host, BenchmarkCase benchmarkCase)
             {
+                int unrollFactor = BenchmarkActionFactory.GetUnrollFactor(benchmarkCase);
                 var target = benchmarkCase.Descriptor;
                 var job = benchmarkCase.Job; // TODO: filter job (same as SourceCodePresenter does)?
-                int unrollFactor = benchmarkCase.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance);
 
                 // DONTTOUCH: these should be allocated together
                 var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type);
@@ -129,21 +131,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 var engineParameters = new EngineParameters
                 {
                     Host = host,
-                    WorkloadActionNoUnroll = invocationCount =>
-                    {
-                        for (int i = 0; i < invocationCount; i++)
-                            workloadAction.InvokeSingle();
-                    },
-                    WorkloadActionUnroll = workloadAction.InvokeMultiple,
-                    Dummy1Action = dummy1.InvokeSingle,
-                    Dummy2Action = dummy2.InvokeSingle,
-                    Dummy3Action = dummy3.InvokeSingle,
-                    OverheadActionNoUnroll = invocationCount =>
-                    {
-                        for (int i = 0; i < invocationCount; i++)
-                            overheadAction.InvokeSingle();
-                    },
-                    OverheadActionUnroll = overheadAction.InvokeMultiple,
+                    WorkloadActionNoUnroll = workloadAction.InvokeNoUnroll,
+                    WorkloadActionUnroll = workloadAction.InvokeUnroll,
+                    Dummy1Action = () => dummy1.InvokeSingle(),
+                    Dummy2Action = () => dummy2.InvokeSingle(),
+                    Dummy3Action = () => dummy3.InvokeSingle(),
+                    OverheadActionNoUnroll = overheadAction.InvokeNoUnroll,
+                    OverheadActionUnroll = overheadAction.InvokeUnroll,
                     GlobalSetupAction = globalSetupAction.InvokeSingle,
                     GlobalCleanupAction = globalCleanupAction.InvokeSingle,
                     IterationSetupAction = iterationSetupAction.InvokeSingle,

@@ -1,5 +1,8 @@
-﻿using System;
+﻿using BenchmarkDotNet.Helpers;
+using Perfolizer.Horology;
+using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
@@ -22,19 +25,36 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             public BenchmarkActionVoid(object instance, MethodInfo method, int unrollFactor)
             {
                 callback = CreateWorkloadOrOverhead<Action>(instance, method, OverheadStatic, OverheadInstance);
-                InvokeSingle = callback;
+                InvokeSingle = InvokeSingleHardcoded;
 
                 unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
+                InvokeUnroll = InvokeUnrollHardcoded;
+                InvokeNoUnroll = InvokeNoUnrollHardcoded;
             }
 
             private static void OverheadStatic() { }
             private void OverheadInstance() { }
 
-            private void InvokeMultipleHardcoded(long repeatCount)
+            private ValueTask InvokeSingleHardcoded()
             {
+                callback();
+                return new ValueTask();
+            }
+
+            private ValueTask<ClockSpan> InvokeUnrollHardcoded(long repeatCount, IClock clock)
+            {
+                var startedClock = clock.Start();
                 for (long i = 0; i < repeatCount; i++)
                     unrolledCallback();
+                return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+            }
+
+            private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
+            {
+                var startedClock = clock.Start();
+                for (long i = 0; i < repeatCount; i++)
+                    callback();
+                return new ValueTask<ClockSpan>(startedClock.GetElapsed());
             }
         }
 
@@ -50,18 +70,34 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 InvokeSingle = InvokeSingleHardcoded;
 
                 unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
+                InvokeUnroll = InvokeUnrollHardcoded;
+                InvokeNoUnroll = InvokeNoUnrollHardcoded;
             }
 
             private static T OverheadStatic() => default;
             private T OverheadInstance() => default;
 
-            private void InvokeSingleHardcoded() => result = callback();
-
-            private void InvokeMultipleHardcoded(long repeatCount)
+            private ValueTask InvokeSingleHardcoded()
             {
+                result = callback();
+                return new ValueTask();
+            }
+
+            private ValueTask<ClockSpan> InvokeUnrollHardcoded(long repeatCount, IClock clock)
+            {
+                var startedClock = clock.Start();
                 for (long i = 0; i < repeatCount; i++)
                     result = unrolledCallback();
+                    unrolledCallback();
+                return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+            }
+
+            private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
+            {
+                var startedClock = clock.Start();
+                for (long i = 0; i < repeatCount; i++)
+                    callback();
+                return new ValueTask<ClockSpan>(startedClock.GetElapsed());
             }
 
             public override object LastRunResult => result;
@@ -69,80 +105,234 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
         internal class BenchmarkActionTask : BenchmarkActionBase
         {
-            private readonly Func<Task> startTaskCallback;
-            private readonly Action callback;
-            private readonly Action unrolledCallback;
+            private readonly Func<Task> callback;
+            private readonly AutoResetValueTaskSource<ClockSpan> valueTaskSource = new AutoResetValueTaskSource<ClockSpan>();
+            private long repeatsRemaining;
+            private readonly Action continuation;
+            private StartedClock startedClock;
+            private TaskAwaiter currentAwaiter;
 
             public BenchmarkActionTask(object instance, MethodInfo method, int unrollFactor)
             {
+                continuation = Continuation;
                 bool isIdle = method == null;
                 if (!isIdle)
                 {
-                    startTaskCallback = CreateWorkload<Func<Task>>(instance, method);
-                    callback = ExecuteBlocking;
+                    callback = CreateWorkload<Func<Task>>(instance, method);
+                    InvokeSingle = InvokeSingleHardcoded;
+                    InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcoded;
                 }
                 else
                 {
                     callback = Overhead;
+                    InvokeSingle = InvokeSingleHardcodedOverhead;
+                    InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcodedOverhead;
                 }
-
-                InvokeSingle = callback;
-
-                unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
-
             }
 
-            // must be kept in sync with VoidDeclarationsProvider.IdleImplementation
-            private void Overhead() { }
+            private Task Overhead() => default;
 
-            // must be kept in sync with TaskDeclarationsProvider.TargetMethodDelegate
-            private void ExecuteBlocking() => Helpers.AwaitHelper.GetResult(startTaskCallback.Invoke());
-
-            private void InvokeMultipleHardcoded(long repeatCount)
+            private ValueTask InvokeSingleHardcodedOverhead()
             {
-                for (long i = 0; i < repeatCount; i++)
-                    unrolledCallback();
+                callback();
+                return new ValueTask();
+            }
+
+            private ValueTask<ClockSpan> InvokeNoUnrollHardcodedOverhead(long repeatCount, IClock clock)
+            {
+                repeatsRemaining = repeatCount;
+                Task value = default;
+                startedClock = clock.Start();
+                try
+                {
+                    while (--repeatsRemaining >= 0)
+                    {
+                        value = callback();
+                    }
+                }
+                catch (Exception)
+                {
+                    Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
+                    throw;
+                }
+                return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+            }
+
+            private ValueTask InvokeSingleHardcoded()
+            {
+                return AwaitHelper.ToValueTaskVoid(callback());
+            }
+
+            private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
+            {
+                repeatsRemaining = repeatCount;
+                startedClock = clock.Start();
+                RunTask();
+                return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
+            }
+
+            private void RunTask()
+            {
+                try
+                {
+                    while (--repeatsRemaining >= 0)
+                    {
+                        currentAwaiter = callback().GetAwaiter();
+                        if (!currentAwaiter.IsCompleted)
+                        {
+                            currentAwaiter.UnsafeOnCompleted(continuation);
+                            return;
+                        }
+                        currentAwaiter.GetResult();
+                    }
+                }
+                catch (Exception e)
+                {
+                    SetException(e);
+                    return;
+                }
+                var clockspan = startedClock.GetElapsed();
+                currentAwaiter = default;
+                startedClock = default;
+                valueTaskSource.SetResult(clockspan);
+            }
+
+            private void Continuation()
+            {
+                try
+                {
+                    currentAwaiter.GetResult();
+                }
+                catch (Exception e)
+                {
+                    SetException(e);
+                    return;
+                }
+                RunTask();
+            }
+
+            private void SetException(Exception e)
+            {
+                currentAwaiter = default;
+                startedClock = default;
+                valueTaskSource.SetException(e);
             }
         }
 
         internal class BenchmarkActionTask<T> : BenchmarkActionBase
         {
-            private readonly Func<Task<T>> startTaskCallback;
-            private readonly Func<T> callback;
-            private readonly Func<T> unrolledCallback;
+            private readonly Func<Task<T>> callback;
+            private readonly AutoResetValueTaskSource<ClockSpan> valueTaskSource = new AutoResetValueTaskSource<ClockSpan>();
+            private long repeatsRemaining;
+            private readonly Action continuation;
+            private StartedClock startedClock;
+            private TaskAwaiter<T> currentAwaiter;
             private T result;
 
             public BenchmarkActionTask(object instance, MethodInfo method, int unrollFactor)
             {
-                bool isOverhead = method == null;
-                if (!isOverhead)
+                continuation = Continuation;
+                bool isIdle = method == null;
+                if (!isIdle)
                 {
-                    startTaskCallback = CreateWorkload<Func<Task<T>>>(instance, method);
-                    callback = ExecuteBlocking;
+                    callback = CreateWorkload<Func<Task<T>>>(instance, method);
+                    InvokeSingle = InvokeSingleHardcoded;
+                    InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcoded;
                 }
                 else
                 {
                     callback = Overhead;
+                    InvokeSingle = InvokeSingleHardcodedOverhead;
+                    InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcodedOverhead;
                 }
-
-                InvokeSingle = InvokeSingleHardcoded;
-
-                unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
             }
 
-            private T Overhead() => default;
+            private Task<T> Overhead() => default;
 
-            // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
-            private T ExecuteBlocking() => Helpers.AwaitHelper.GetResult(startTaskCallback.Invoke());
-
-            private void InvokeSingleHardcoded() => result = callback();
-
-            private void InvokeMultipleHardcoded(long repeatCount)
+            private ValueTask InvokeSingleHardcodedOverhead()
             {
-                for (long i = 0; i < repeatCount; i++)
-                    result = unrolledCallback();
+                callback();
+                return new ValueTask();
+            }
+
+            private ValueTask<ClockSpan> InvokeNoUnrollHardcodedOverhead(long repeatCount, IClock clock)
+            {
+                repeatsRemaining = repeatCount;
+                Task<T> value = default;
+                startedClock = clock.Start();
+                try
+                {
+                    while (--repeatsRemaining >= 0)
+                    {
+                        value = callback();
+                    }
+                }
+                catch (Exception)
+                {
+                    Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
+                    throw;
+                }
+                return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+            }
+
+            private ValueTask InvokeSingleHardcoded()
+            {
+                return AwaitHelper.ToValueTaskVoid(callback());
+            }
+
+            private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
+            {
+                repeatsRemaining = repeatCount;
+                startedClock = clock.Start();
+                RunTask();
+                return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
+            }
+
+            private void RunTask()
+            {
+                try
+                {
+                    while (--repeatsRemaining >= 0)
+                    {
+                        currentAwaiter = callback().GetAwaiter();
+                        if (!currentAwaiter.IsCompleted)
+                        {
+                            currentAwaiter.UnsafeOnCompleted(continuation);
+                            return;
+                        }
+                        result = currentAwaiter.GetResult();
+                    }
+                }
+                catch (Exception e)
+                {
+                    SetException(e);
+                    return;
+                }
+                var clockspan = startedClock.GetElapsed();
+                currentAwaiter = default;
+                startedClock = default;
+                valueTaskSource.SetResult(clockspan);
+            }
+
+            private void Continuation()
+            {
+                try
+                {
+                    result = currentAwaiter.GetResult();
+                }
+                catch (Exception e)
+                {
+                    SetException(e);
+                    return;
+                }
+                RunTask();
+            }
+
+            private void SetException(Exception e)
+            {
+                currentAwaiter = default;
+                startedClock = default;
+                valueTaskSource.SetException(e);
             }
 
             public override object LastRunResult => result;
@@ -150,81 +340,234 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
         internal class BenchmarkActionValueTask : BenchmarkActionBase
         {
-            private readonly Func<ValueTask> startTaskCallback;
-            private readonly Action callback;
-            private readonly Action unrolledCallback;
+            private readonly Func<ValueTask> callback;
+            private readonly AutoResetValueTaskSource<ClockSpan> valueTaskSource = new AutoResetValueTaskSource<ClockSpan>();
+            private long repeatsRemaining;
+            private readonly Action continuation;
+            private StartedClock startedClock;
+            private ValueTaskAwaiter currentAwaiter;
 
             public BenchmarkActionValueTask(object instance, MethodInfo method, int unrollFactor)
             {
+                continuation = Continuation;
                 bool isIdle = method == null;
                 if (!isIdle)
                 {
-                    startTaskCallback = CreateWorkload<Func<ValueTask>>(instance, method);
-                    callback = ExecuteBlocking;
+                    callback = CreateWorkload<Func<ValueTask>>(instance, method);
+                    InvokeSingle = InvokeSingleHardcoded;
+                    InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcoded;
                 }
                 else
                 {
                     callback = Overhead;
+                    InvokeSingle = InvokeSingleHardcodedOverhead;
+                    InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcodedOverhead;
                 }
-
-                InvokeSingle = callback;
-
-                unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
-
             }
 
-            // must be kept in sync with VoidDeclarationsProvider.IdleImplementation
-            private void Overhead() { }
+            private ValueTask Overhead() => default;
 
-            // must be kept in sync with TaskDeclarationsProvider.TargetMethodDelegate
-            private void ExecuteBlocking() => Helpers.AwaitHelper.GetResult(startTaskCallback.Invoke());
-
-            private void InvokeMultipleHardcoded(long repeatCount)
+            private ValueTask InvokeSingleHardcodedOverhead()
             {
-                for (long i = 0; i < repeatCount; i++)
-                    unrolledCallback();
+                callback();
+                return new ValueTask();
+            }
+
+            private ValueTask<ClockSpan> InvokeNoUnrollHardcodedOverhead(long repeatCount, IClock clock)
+            {
+                repeatsRemaining = repeatCount;
+                ValueTask value = default;
+                startedClock = clock.Start();
+                try
+                {
+                    while (--repeatsRemaining >= 0)
+                    {
+                        value = callback();
+                    }
+                }
+                catch (Exception)
+                {
+                    Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
+                    throw;
+                }
+                return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+            }
+
+            private ValueTask InvokeSingleHardcoded()
+            {
+                return AwaitHelper.ToValueTaskVoid(callback());
+            }
+
+            private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
+            {
+                repeatsRemaining = repeatCount;
+                startedClock = clock.Start();
+                RunTask();
+                return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
+            }
+
+            private void RunTask()
+            {
+                try
+                {
+                    while (--repeatsRemaining >= 0)
+                    {
+                        currentAwaiter = callback().GetAwaiter();
+                        if (!currentAwaiter.IsCompleted)
+                        {
+                            currentAwaiter.UnsafeOnCompleted(continuation);
+                            return;
+                        }
+                        currentAwaiter.GetResult();
+                    }
+                }
+                catch (Exception e)
+                {
+                    SetException(e);
+                    return;
+                }
+                var clockspan = startedClock.GetElapsed();
+                currentAwaiter = default;
+                startedClock = default;
+                valueTaskSource.SetResult(clockspan);
+            }
+
+            private void Continuation()
+            {
+                try
+                {
+                    currentAwaiter.GetResult();
+                }
+                catch (Exception e)
+                {
+                    SetException(e);
+                    return;
+                }
+                RunTask();
+            }
+
+            private void SetException(Exception e)
+            {
+                currentAwaiter = default;
+                startedClock = default;
+                valueTaskSource.SetException(e);
             }
         }
 
         internal class BenchmarkActionValueTask<T> : BenchmarkActionBase
         {
-            private readonly Func<ValueTask<T>> startTaskCallback;
-            private readonly Func<T> callback;
-            private readonly Func<T> unrolledCallback;
+            private readonly Func<ValueTask<T>> callback;
+            private readonly AutoResetValueTaskSource<ClockSpan> valueTaskSource = new AutoResetValueTaskSource<ClockSpan>();
+            private long repeatsRemaining;
+            private readonly Action continuation;
+            private StartedClock startedClock;
+            private ValueTaskAwaiter<T> currentAwaiter;
             private T result;
 
             public BenchmarkActionValueTask(object instance, MethodInfo method, int unrollFactor)
             {
-                bool isOverhead = method == null;
-                if (!isOverhead)
+                continuation = Continuation;
+                bool isIdle = method == null;
+                if (!isIdle)
                 {
-                    startTaskCallback = CreateWorkload<Func<ValueTask<T>>>(instance, method);
-                    callback = ExecuteBlocking;
+                    callback = CreateWorkload<Func<ValueTask<T>>>(instance, method);
+                    InvokeSingle = InvokeSingleHardcoded;
+                    InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcoded;
                 }
                 else
                 {
                     callback = Overhead;
+                    InvokeSingle = InvokeSingleHardcodedOverhead;
+                    InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcodedOverhead;
                 }
-
-                InvokeSingle = InvokeSingleHardcoded;
-
-
-                unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
             }
 
-            private T Overhead() => default;
+            private ValueTask<T> Overhead() => default;
 
-            // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
-            private T ExecuteBlocking() => Helpers.AwaitHelper.GetResult(startTaskCallback.Invoke());
-
-            private void InvokeSingleHardcoded() => result = callback();
-
-            private void InvokeMultipleHardcoded(long repeatCount)
+            private ValueTask InvokeSingleHardcodedOverhead()
             {
-                for (long i = 0; i < repeatCount; i++)
-                    result = unrolledCallback();
+                callback();
+                return new ValueTask();
+            }
+
+            private ValueTask<ClockSpan> InvokeNoUnrollHardcodedOverhead(long repeatCount, IClock clock)
+            {
+                repeatsRemaining = repeatCount;
+                ValueTask<T> value = default;
+                startedClock = clock.Start();
+                try
+                {
+                    while (--repeatsRemaining >= 0)
+                    {
+                        value = callback();
+                    }
+                }
+                catch (Exception)
+                {
+                    Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
+                    throw;
+                }
+                return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+            }
+
+            private ValueTask InvokeSingleHardcoded()
+            {
+                return AwaitHelper.ToValueTaskVoid(callback());
+            }
+
+            private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
+            {
+                repeatsRemaining = repeatCount;
+                startedClock = clock.Start();
+                RunTask();
+                return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
+            }
+
+            private void RunTask()
+            {
+                try
+                {
+                    while (--repeatsRemaining >= 0)
+                    {
+                        currentAwaiter = callback().GetAwaiter();
+                        if (!currentAwaiter.IsCompleted)
+                        {
+                            currentAwaiter.UnsafeOnCompleted(continuation);
+                            return;
+                        }
+                        result = currentAwaiter.GetResult();
+                    }
+                }
+                catch (Exception e)
+                {
+                    SetException(e);
+                    return;
+                }
+                var clockspan = startedClock.GetElapsed();
+                currentAwaiter = default;
+                startedClock = default;
+                valueTaskSource.SetResult(clockspan);
+            }
+
+            private void Continuation()
+            {
+                try
+                {
+                    result = currentAwaiter.GetResult();
+                }
+                catch (Exception e)
+                {
+                    SetException(e);
+                    return;
+                }
+                RunTask();
+            }
+
+            private void SetException(Exception e)
+            {
+                currentAwaiter = default;
+                startedClock = default;
+                valueTaskSource.SetException(e);
             }
 
             public override object LastRunResult => result;

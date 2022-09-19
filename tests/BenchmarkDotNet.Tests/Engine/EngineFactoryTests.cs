@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
@@ -21,32 +22,72 @@ namespace BenchmarkDotNet.Tests.Engine
 
         private IResolver DefaultResolver => BenchmarkRunnerClean.DefaultResolver;
 
-        private void GlobalSetup() => timesGlobalSetupCalled++;
-        private void IterationSetup() => timesIterationSetupCalled++;
-        private void IterationCleanup() => timesIterationCleanupCalled++;
-        private void GlobalCleanup() => timesGlobalCleanupCalled++;
-
-        private void Throwing(long _) => throw new InvalidOperationException("must NOT be called");
-
-        private void VeryTimeConsumingSingle(long _)
+        private ValueTask GlobalSetup()
         {
-            timesBenchmarkCalled++;
-            Thread.Sleep(IterationTime);
+            timesGlobalSetupCalled++;
+            return new ValueTask();
+        }
+        private ValueTask IterationSetup()
+        {
+            timesIterationSetupCalled++;
+            return new ValueTask();
+        }
+        private ValueTask IterationCleanup()
+        {
+            timesIterationCleanupCalled++;
+            return new ValueTask();
+        }
+        private ValueTask GlobalCleanup()
+        {
+            timesGlobalCleanupCalled++;
+            return new ValueTask();
         }
 
-        private void TimeConsumingOnlyForTheFirstCall(long _)
+        private ValueTask<ClockSpan> Throwing(long _, IClock __) => throw new InvalidOperationException("must NOT be called");
+
+        private ValueTask<ClockSpan> VeryTimeConsumingSingle(long _, IClock clock)
         {
+            var startedClock = clock.Start();
+            timesBenchmarkCalled++;
+            Thread.Sleep(IterationTime);
+            return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+        }
+
+        private ValueTask<ClockSpan> TimeConsumingOnlyForTheFirstCall(long _, IClock clock)
+        {
+            var startedClock = clock.Start();
             if (timesBenchmarkCalled++ == 0)
             {
                 Thread.Sleep(IterationTime);
             }
+            return new ValueTask<ClockSpan>(startedClock.GetElapsed());
         }
 
-        private void InstantNoUnroll(long invocationCount) => timesBenchmarkCalled += (int) invocationCount;
-        private void InstantUnroll(long _) => timesBenchmarkCalled += 16;
+        private ValueTask<ClockSpan> InstantNoUnroll(long invocationCount, IClock clock)
+        {
+            var startedClock = clock.Start();
+            timesBenchmarkCalled += (int) invocationCount;
+            return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+        }
+        private ValueTask<ClockSpan> InstantUnroll(long _, IClock clock)
+        {
+            var startedClock = clock.Start();
+            timesBenchmarkCalled += 16;
+            return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+        }
 
-        private void OverheadNoUnroll(long invocationCount) => timesOverheadCalled += (int) invocationCount;
-        private void OverheadUnroll(long _) => timesOverheadCalled += 16;
+        private ValueTask<ClockSpan> OverheadNoUnroll(long invocationCount, IClock clock)
+        {
+            var startedClock = clock.Start();
+            timesOverheadCalled += (int) invocationCount;
+            return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+        }
+        private ValueTask<ClockSpan> OverheadUnroll(long _, IClock clock)
+        {
+            var startedClock = clock.Start();
+            timesOverheadCalled += 16;
+            return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+        }
 
         private static readonly Dictionary<string, Job> JobsWhichDontRequireJitting = new Dictionary<string, Job>
         {
@@ -197,22 +238,26 @@ namespace BenchmarkDotNet.Tests.Engine
 
             var mediumTime = TimeSpan.FromMilliseconds(IterationTime.TotalMilliseconds / times);
 
-            void MediumNoUnroll(long invocationCount)
+            ValueTask<ClockSpan> MediumNoUnroll(long invocationCount, IClock clock)
             {
+                var startedClock = clock.Start();
                 for (int i = 0; i < invocationCount; i++)
                 {
                     timesBenchmarkCalled++;
 
                     Thread.Sleep(mediumTime);
                 }
+                return new ValueTask<ClockSpan>(startedClock.GetElapsed());
             }
 
-            void MediumUnroll(long _)
+            ValueTask<ClockSpan> MediumUnroll(long _, IClock clock)
             {
+                var startedClock = clock.Start();
                 timesBenchmarkCalled += unrollFactor;
 
                 for (int i = 0; i < unrollFactor; i++) // the real unroll factor obviously does not use loop ;)
                     Thread.Sleep(mediumTime);
+                return new ValueTask<ClockSpan>(startedClock.GetElapsed());
             }
 
             var engineParameters = CreateEngineParameters(mainNoUnroll: MediumNoUnroll, mainUnroll: MediumUnroll, job: Job.Default);
@@ -239,7 +284,7 @@ namespace BenchmarkDotNet.Tests.Engine
             Assert.Equal(1, timesGlobalCleanupCalled);
         }
 
-        private EngineParameters CreateEngineParameters(Action<long> mainNoUnroll, Action<long> mainUnroll, Job job)
+        private EngineParameters CreateEngineParameters(Func<long, IClock, ValueTask<ClockSpan>> mainNoUnroll, Func<long, IClock, ValueTask<ClockSpan>> mainUnroll, Job job)
             => new EngineParameters
             {
                 Dummy1Action = () => { },

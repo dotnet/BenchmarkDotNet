@@ -37,11 +37,24 @@
         public const string WorkloadActionNoUnrollMethodName = "WorkloadActionNoUnroll";
         public const string ForDisassemblyDiagnoserMethodName = "__ForDisassemblyDiagnoser__";
         public const string InvokeCountParamName = "invokeCount";
+        public const string ClockParamName = "clock";
 
         public const string ConsumerFieldName = "consumer";
         public const string NonGenericKeepAliveWithoutBoxingMethodName = "NonGenericKeepAliveWithoutBoxing";
         public const string DummyParamName = "_";
         public const string WorkloadDefaultValueHolderFieldName = "workloadDefaultValueHolder";
+
+        public const string ValueTaskSourceFieldName = "valueTaskSource";
+        public const string RepeatsRemainingFieldName = "repeatsRemaining";
+        public const string ContinuationFieldName = "continuation";
+        public const string StartedClockFieldName = "startedClock";
+        public const string CurrentAwaiterFieldName = "currentAwaiter";
+        public const string OverheadActionImplMethodName = "OverheadActionImpl";
+        public const string WorkloadActionImplMethodName = "WorkloadActionImpl";
+        public const string SetContinuationMethodName = "__SetContinuation";
+        public const string RunTaskMethodName = "__RunTask";
+        public const string ContinuationMethodName = "__Continuation";
+        public const string SetExceptionMethodName = "__SetException";
 
         public const string GlobalSetupMethodName = "GlobalSetup";
         public const string GlobalCleanupMethodName = "GlobalCleanup";

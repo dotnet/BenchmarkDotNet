@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             if (methodReturnType == null)
                 throw new ArgumentNullException(nameof(methodReturnType));
 
-            OriginMethodReturnType = methodReturnType;
+            WorkloadMethodReturnType = methodReturnType;
 
             // Only support (Value)Task for parity with other toolchains (and so we can use AwaitHelper).
             IsAwaitable = methodReturnType == typeof(Task) || methodReturnType == typeof(ValueTask)
@@ -25,25 +25,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                     && (methodReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
                     || methodReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)));
 
-            if (!IsAwaitable)
-            {
-                WorkloadMethodReturnType = methodReturnType;
-            }
-            else
-            {
-                WorkloadMethodReturnType = methodReturnType
-                    .GetMethod(nameof(Task.GetAwaiter), BindingFlagsPublicInstance)
-                    .ReturnType
-                    .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlagsPublicInstance)
-                    .ReturnType;
-                GetResultMethod = Helpers.AwaitHelper.GetGetResultMethod(methodReturnType);
-            }
-
             if (WorkloadMethodReturnType == null)
                 throw new InvalidOperationException("Bug: (WorkloadMethodReturnType == null");
 
             var consumableField = default(FieldInfo);
-            if (WorkloadMethodReturnType == typeof(void))
+            if (IsAwaitable)
+            {
+                OverheadMethodReturnType = WorkloadMethodReturnType;
+            }
+            else if (WorkloadMethodReturnType == typeof(void))
             {
                 IsVoid = true;
                 OverheadMethodReturnType = WorkloadMethodReturnType;
@@ -70,14 +60,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         }
 
         [NotNull]
-        public Type OriginMethodReturnType { get; }
-        [NotNull]
         public Type WorkloadMethodReturnType { get; }
         [NotNull]
         public Type OverheadMethodReturnType { get; }
-
-        [CanBeNull]
-        public MethodInfo GetResultMethod { get; }
 
         public bool IsVoid { get; }
         public bool IsByRef { get; }

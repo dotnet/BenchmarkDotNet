@@ -92,6 +92,29 @@ namespace BenchmarkDotNet.Helpers
             return awaiter.GetResult();
         }
 
+        public static ValueTask ToValueTaskVoid(Task task)
+        {
+            return new ValueTask(task);
+        }
+
+        public static ValueTask ToValueTaskVoid<T>(Task<T> task)
+        {
+            return new ValueTask(task);
+        }
+
+        public static ValueTask ToValueTaskVoid(ValueTask task)
+        {
+            return task;
+        }
+
+        // ValueTask<T> unfortunately can't be converted to a ValueTask for free, so we must create a state machine.
+        // It's not a big deal though, as this is only used for Setup/Cleanup where allocations aren't measured.
+        // And in practice, this should never be used, as (Value)Task<T> Setup/Cleanup methods have no utility.
+        public static async ValueTask ToValueTaskVoid<T>(ValueTask<T> task)
+        {
+            _ = await task.ConfigureAwait(false);
+        }
+
         internal static MethodInfo GetGetResultMethod(Type taskType)
         {
             if (!taskType.IsGenericType)
@@ -106,11 +129,6 @@ namespace BenchmarkDotNet.Helpers
             {
                 return null;
             }
-            var resultType = taskType
-                .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)
-                .ReturnType
-                .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)
-                .ReturnType;
             return typeof(AwaitHelper).GetMethods(BindingFlags.Public | BindingFlags.Static)
                 .First(m =>
                 {
@@ -119,7 +137,40 @@ namespace BenchmarkDotNet.Helpers
                     // We have to compare the types indirectly, == check doesn't work.
                     return paramType.Assembly == compareType.Assembly && paramType.Namespace == compareType.Namespace && paramType.Name == compareType.Name;
                 })
-                .MakeGenericMethod(new[] { resultType });
+                .MakeGenericMethod(new[] { GetTaskResultType(taskType) });
         }
+
+        internal static MethodInfo GetToValueTaskMethod(Type taskType)
+        {
+            if (!taskType.IsGenericType)
+            {
+                return typeof(AwaitHelper).GetMethod(nameof(AwaitHelper.ToValueTaskVoid), BindingFlags.Public | BindingFlags.Static, null, new Type[1] { taskType }, null);
+            }
+
+            Type compareType = taskType.GetGenericTypeDefinition() == typeof(ValueTask<>) ? typeof(ValueTask<>)
+                : typeof(Task).IsAssignableFrom(taskType.GetGenericTypeDefinition()) ? typeof(Task<>)
+                : null;
+            if (compareType == null)
+            {
+                return null;
+            }
+            return compareType == null
+                ? null
+                : typeof(AwaitHelper).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .First(m =>
+                {
+                    if (m.Name != nameof(AwaitHelper.ToValueTaskVoid)) return false;
+                    Type paramType = m.GetParameters().First().ParameterType;
+                    // We have to compare the types indirectly, == check doesn't work.
+                    return paramType.Assembly == compareType.Assembly && paramType.Namespace == compareType.Namespace && paramType.Name == compareType.Name;
+                })
+                .MakeGenericMethod(new[] { GetTaskResultType(taskType) });
+        }
+
+        private static Type GetTaskResultType(Type taskType) => taskType
+            .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)
+            .ReturnType
+            .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)
+            .ReturnType;
     }
 }

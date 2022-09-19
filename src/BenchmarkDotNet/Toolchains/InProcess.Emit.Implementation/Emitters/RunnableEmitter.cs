@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Security;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
@@ -15,6 +16,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
 
@@ -240,9 +242,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private int jobUnrollFactor;
         private int dummyUnrollFactor;
 
-        private Type overheadDelegateType;
-        private Type workloadDelegateType;
-        private TypeBuilder runnableBuilder;
+        public Type overheadDelegateType;
+        public Type workloadDelegateType;
+        public TypeBuilder runnableBuilder;
         private ConsumableTypeInfo consumableInfo;
         private ConsumeEmitter consumeEmitter;
         private ConsumableTypeInfo globalSetupReturnInfo;
@@ -254,8 +256,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private FieldBuilder globalCleanupActionField;
         private FieldBuilder iterationSetupActionField;
         private FieldBuilder iterationCleanupActionField;
-        private FieldBuilder overheadDelegateField;
-        private FieldBuilder workloadDelegateField;
+        public FieldBuilder overheadDelegateField;
+        public FieldBuilder workloadDelegateField;
         private FieldBuilder notElevenField;
         private FieldBuilder dummyVarField;
 
@@ -265,7 +267,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private MethodBuilder dummy1Method;
         private MethodBuilder dummy2Method;
         private MethodBuilder dummy3Method;
-        private MethodInfo workloadImplementationMethod;
         private MethodBuilder overheadImplementationMethod;
         private MethodBuilder overheadActionUnrollMethod;
         private MethodBuilder overheadActionNoUnrollMethod;
@@ -281,6 +282,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private MethodBuilder runMethod;
         // ReSharper restore NotAccessedField.Local
 
+        public readonly MethodInfo getElapsedMethod;
+        public readonly MethodInfo startClockMethod;
+
         private RunnableEmitter([NotNull] BuildPartition buildPartition, [NotNull] ModuleBuilder moduleBuilder)
         {
             if (buildPartition == null)
@@ -290,6 +294,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             this.buildPartition = buildPartition;
             this.moduleBuilder = moduleBuilder;
+            getElapsedMethod = typeof(StartedClock).GetMethod(nameof(StartedClock.GetElapsed), BindingFlagsPublicInstance);
+            startClockMethod = typeof(ClockExtensions).GetMethod(nameof(ClockExtensions.Start), BindingFlagsPublicStatic);
         }
 
         [NotNull]
@@ -324,7 +330,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             overheadActionNoUnrollMethod = EmitOverheadAction(OverheadActionNoUnrollMethodName, 1);
 
             // Workload impl
-            workloadImplementationMethod = EmitWorkloadImplementation(WorkloadImplementationMethodName);
             workloadActionUnrollMethod = EmitWorkloadAction(WorkloadActionUnrollMethodName, jobUnrollFactor);
             workloadActionNoUnrollMethod = EmitWorkloadAction(WorkloadActionNoUnrollMethodName, 1);
 
@@ -354,12 +359,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             // Init current state
             argFields = new List<ArgFieldInfo>();
             benchmark = newBenchmark;
-            jobUnrollFactor = benchmark.BenchmarkCase.Job.ResolveValue(
-                RunMode.UnrollFactorCharacteristic,
-                buildPartition.Resolver);
             dummyUnrollFactor = DummyUnrollFactor;
 
             consumableInfo = new ConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.WorkloadMethod.ReturnType);
+            if (consumableInfo.IsAwaitable)
+            {
+                benchmark.BenchmarkCase.ForceUnrollFactorForAsync();
+            }
+
+            jobUnrollFactor = benchmark.BenchmarkCase.Job.ResolveValue(
+                RunMode.UnrollFactorCharacteristic,
+                buildPartition.Resolver);
+
             consumeEmitter = ConsumeEmitter.GetConsumeEmitter(consumableInfo);
             globalSetupReturnInfo = GetConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.GlobalSetupMethod?.ReturnType);
             globalCleanupReturnInfo = GetConsumableTypeInfo(benchmark.BenchmarkCase.Descriptor.GlobalCleanupMethod?.ReturnType);
@@ -426,13 +437,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private void DefineFields()
         {
             globalSetupActionField =
-                runnableBuilder.DefineField(GlobalSetupActionFieldName, typeof(Action), FieldAttributes.Private);
+                runnableBuilder.DefineField(GlobalSetupActionFieldName, typeof(Func<ValueTask>), FieldAttributes.Private);
             globalCleanupActionField =
-                runnableBuilder.DefineField(GlobalCleanupActionFieldName, typeof(Action), FieldAttributes.Private);
+                runnableBuilder.DefineField(GlobalCleanupActionFieldName, typeof(Func<ValueTask>), FieldAttributes.Private);
             iterationSetupActionField =
-                runnableBuilder.DefineField(IterationSetupActionFieldName, typeof(Action), FieldAttributes.Private);
+                runnableBuilder.DefineField(IterationSetupActionFieldName, typeof(Func<ValueTask>), FieldAttributes.Private);
             iterationCleanupActionField =
-                runnableBuilder.DefineField(IterationCleanupActionFieldName, typeof(Action), FieldAttributes.Private);
+                runnableBuilder.DefineField(IterationCleanupActionFieldName, typeof(Func<ValueTask>), FieldAttributes.Private);
             overheadDelegateField =
                 runnableBuilder.DefineField(OverheadDelegateFieldName, overheadDelegateType, FieldAttributes.Private);
             workloadDelegateField =
@@ -577,148 +588,17 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             return methodBuilder;
         }
 
-        private MethodInfo EmitWorkloadImplementation(string methodName)
-        {
-            // Shortcut: DO NOT emit method if the result type is not awaitable
-            if (!consumableInfo.IsAwaitable)
-                return Descriptor.WorkloadMethod;
-
-            var workloadInvokeMethod = TypeBuilderExtensions.GetDelegateInvokeMethod(workloadDelegateType);
-
-            //.method private hidebysig
-            //   instance int32 __Workload(int64 arg0) cil managed
-            var args = workloadInvokeMethod.GetParameters();
-            var methodBuilder = runnableBuilder.DefineNonVirtualInstanceMethod(
-                methodName,
-                MethodAttributes.Private,
-                workloadInvokeMethod.ReturnParameter,
-                args);
-            args = methodBuilder.GetEmitParameters(args);
-
-            var ilBuilder = methodBuilder.GetILGenerator();
-
-            /*
-                IL_0026: ldarg.0
-                IL_0027: ldloc.0
-                IL_0028: ldloc.1
-                IL_0029: ldloc.2
-                IL_002a: ldloc.3
-                IL_002b: call instance class [System.Private.CoreLib]System.Threading.Tasks.Task`1<object> BenchmarkDotNet.Helpers.Runnable_0::WorkloadMethod(string, string, string, string)
-            */
-            if (!Descriptor.WorkloadMethod.IsStatic)
-                ilBuilder.Emit(OpCodes.Ldarg_0);
-            ilBuilder.EmitLdargs(args);
-            ilBuilder.Emit(OpCodes.Call, Descriptor.WorkloadMethod);
-
-            /*
-                // BenchmarkDotNet.Helpers.AwaitHelper.GetResult(...);
-                IL_000e: call !!0 BenchmarkDotNet.Helpers.AwaitHelper::GetResult<int32>(valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<!!0>)
-            */
-
-            ilBuilder.Emit(OpCodes.Call, consumableInfo.GetResultMethod);
-
-            /*
-                IL_0014: ret
-             */
-            ilBuilder.Emit(OpCodes.Ret);
-
-            return methodBuilder;
-        }
-
         private MethodBuilder EmitOverheadAction(string methodName, int unrollFactor)
         {
-            return EmitActionImpl(methodName, RunnableActionKind.Overhead, unrollFactor);
+            return consumeEmitter.EmitActionImpl(this, methodName, RunnableActionKind.Overhead, unrollFactor);
         }
 
         private MethodBuilder EmitWorkloadAction(string methodName, int unrollFactor)
         {
-            return EmitActionImpl(methodName, RunnableActionKind.Workload, unrollFactor);
+            return consumeEmitter.EmitActionImpl(this, methodName, RunnableActionKind.Workload, unrollFactor);
         }
 
-        private MethodBuilder EmitActionImpl(string methodName, RunnableActionKind actionKind, int unrollFactor)
-        {
-            FieldInfo actionDelegateField;
-            MethodInfo actionInvokeMethod;
-            switch (actionKind)
-            {
-                case RunnableActionKind.Overhead:
-                    actionDelegateField = overheadDelegateField;
-                    actionInvokeMethod = TypeBuilderExtensions.GetDelegateInvokeMethod(overheadDelegateType);
-                    break;
-                case RunnableActionKind.Workload:
-                    actionDelegateField = workloadDelegateField;
-                    actionInvokeMethod = TypeBuilderExtensions.GetDelegateInvokeMethod(workloadDelegateType);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(actionKind), actionKind, null);
-            }
-
-            // .method private hidebysig
-            //    instance void OverheadActionUnroll(int64 invokeCount) cil managed
-            var toArg = new EmitParameterInfo(0, InvokeCountParamName, typeof(long));
-            var actionMethodBuilder = runnableBuilder.DefineNonVirtualInstanceMethod(
-                methodName,
-                MethodAttributes.Private,
-                EmitParameterInfo.CreateReturnVoidParameter(),
-                toArg);
-            toArg.SetMember(actionMethodBuilder);
-
-            // Emit impl
-            var ilBuilder = actionMethodBuilder.GetILGenerator();
-            consumeEmitter.BeginEmitAction(actionMethodBuilder, ilBuilder, actionInvokeMethod, actionKind);
-
-            // init locals
-            var argLocals = EmitDeclareArgLocals(ilBuilder);
-            consumeEmitter.DeclareActionLocals(ilBuilder);
-            var indexLocal = ilBuilder.DeclareLocal(typeof(long));
-
-            // load fields
-            EmitLoadArgFieldsToLocals(ilBuilder, argLocals);
-            consumeEmitter.EmitActionBeforeLoop(ilBuilder);
-
-            // loop
-            var loopStartLabel = ilBuilder.DefineLabel();
-            var loopHeadLabel = ilBuilder.DefineLabel();
-            ilBuilder.EmitLoopBeginFromLocToArg(loopStartLabel, loopHeadLabel, indexLocal, toArg);
-            {
-                /*
-                    // overheadDelegate();
-                    IL_0005: ldarg.0
-                    IL_0006: ldfld class BenchmarkDotNet.Autogenerated.Runnable_0/OverheadDelegate BenchmarkDotNet.Autogenerated.Runnable_0::overheadDelegate
-                    IL_000b: callvirt instance void BenchmarkDotNet.Autogenerated.Runnable_0/OverheadDelegate::Invoke()
-                    // -or-
-                    // consumer.Consume(overheadDelegate(_argField));
-                    IL_000c: ldarg.0
-                    IL_000d: ldfld class [BenchmarkDotNet]BenchmarkDotNet.Engines.Consumer BenchmarkDotNet.Autogenerated.Runnable_0::consumer
-                    IL_0012: ldarg.0
-                    IL_0013: ldfld class BenchmarkDotNet.Autogenerated.Runnable_0/OverheadDelegate BenchmarkDotNet.Autogenerated.Runnable_0::overheadDelegate
-                    IL_0018: ldloc.0
-                    IL_0019: callvirt instance int32 BenchmarkDotNet.Autogenerated.Runnable_0/OverheadDelegate::Invoke(int64)
-                    IL_001e: callvirt instance void [BenchmarkDotNet]BenchmarkDotNet.Engines.Consumer::Consume(int32)
-                 */
-                for (int u = 0; u < unrollFactor; u++)
-                {
-                    consumeEmitter.EmitActionBeforeCall(ilBuilder);
-
-                    ilBuilder.Emit(OpCodes.Ldarg_0);
-                    ilBuilder.Emit(OpCodes.Ldfld, actionDelegateField);
-                    ilBuilder.EmitInstanceCallThisValueOnStack(null, actionInvokeMethod, argLocals);
-
-                    consumeEmitter.EmitActionAfterCall(ilBuilder);
-                }
-            }
-            ilBuilder.EmitLoopEndFromLocToArg(loopStartLabel, loopHeadLabel, indexLocal, toArg);
-
-            consumeEmitter.EmitActionAfterLoop(ilBuilder);
-            consumeEmitter.CompleteEmitAction(ilBuilder);
-
-            // IL_003a: ret
-            ilBuilder.EmitVoidReturn(actionMethodBuilder);
-
-            return actionMethodBuilder;
-        }
-
-        private IReadOnlyList<LocalBuilder> EmitDeclareArgLocals(ILGenerator ilBuilder, bool skipFirst = false)
+        public IReadOnlyList<LocalBuilder> EmitDeclareArgLocals(ILGenerator ilBuilder, bool skipFirst = false)
         {
             // NB: c# compiler does not store first arg in locals for static calls
             /*
@@ -746,7 +626,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             return argLocals;
         }
 
-        private void EmitLoadArgFieldsToLocals(ILGenerator ilBuilder, IReadOnlyList<LocalBuilder> argLocals, bool skipFirstArg = false)
+        public void EmitLoadArgFieldsToLocals(ILGenerator ilBuilder, IReadOnlyList<LocalBuilder> argLocals, bool skipFirstArg = false)
         {
             // NB: c# compiler does not store first arg in locals for static calls
             int localsOffset = argFields.Count > 0 && skipFirstArg ? -1 : 0;
@@ -868,15 +748,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 ilBuilder.EmitLdLocals(argLocals);
                 ilBuilder.Emit(OpCodes.Call, workloadMethod);
 
-                if (consumableInfo.IsAwaitable)
-                {
-                    /*
-                        // BenchmarkDotNet.Helpers.AwaitHelper.GetResult(...);
-                        IL_000e: call !!0 BenchmarkDotNet.Helpers.AwaitHelper::GetResult<int32>(valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<!!0>)
-                    */
-                    ilBuilder.Emit(OpCodes.Call, consumableInfo.GetResultMethod);
-                }
-
                 /*
                     IL_0018: ret
                 */
@@ -900,7 +771,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private void EmitSetupCleanupMethods()
         {
             // Emit Setup/Cleanup methods
-            // We emit empty method instead of EmptyAction = "() => { }"
+            // We emit simple method instead of simple Action = "() => new System.Threading.Tasks.ValueTask()"
             globalSetupMethod = EmitWrapperMethod(GlobalSetupMethodName, Descriptor.GlobalSetupMethod, globalSetupReturnInfo);
             globalCleanupMethod = EmitWrapperMethod(GlobalCleanupMethodName, Descriptor.GlobalCleanupMethod, globalCleanupReturnInfo);
             iterationSetupMethod = EmitWrapperMethod(IterationSetupMethodName, Descriptor.IterationSetupMethod, iterationSetupReturnInfo);
@@ -909,23 +780,37 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         private MethodBuilder EmitWrapperMethod(string methodName, MethodInfo optionalTargetMethod, ConsumableTypeInfo returnTypeInfo)
         {
-            var methodBuilder = runnableBuilder.DefinePrivateVoidInstanceMethod(methodName);
+            var methodBuilder = runnableBuilder.DefineNonVirtualInstanceMethod(
+                    methodName,
+                    MethodAttributes.Private,
+                    EmitParameterInfo.CreateReturnParameter(typeof(ValueTask)));
 
             var ilBuilder = methodBuilder.GetILGenerator();
 
-            if (optionalTargetMethod != null)
+            if (returnTypeInfo?.IsAwaitable == true)
             {
-                if (returnTypeInfo?.IsAwaitable == true)
-                {
-                    EmitAwaitableSetupTeardown(methodBuilder, optionalTargetMethod, ilBuilder, returnTypeInfo);
-                }
-                else
+                EmitAwaitableSetupTeardown(methodBuilder, optionalTargetMethod, ilBuilder, returnTypeInfo);
+            }
+            else
+            {
+                var valueTaskLocal = ilBuilder.DeclareLocal(typeof(ValueTask));
+
+                if (optionalTargetMethod != null)
                 {
                     EmitNoArgsMethodCallPopReturn(methodBuilder, optionalTargetMethod, ilBuilder, forceDirectCall: true);
                 }
+                /*
+                    // return new ValueTask();
+                    IL_0000: ldloca.s 0
+                    IL_0002: initobj [System.Private.CoreLib]System.Threading.Tasks.ValueTask
+                    IL_0008: ldloc.0
+                */
+                ilBuilder.EmitLdloca(valueTaskLocal);
+                ilBuilder.Emit(OpCodes.Initobj, typeof(ValueTask));
+                ilBuilder.EmitLdloc(valueTaskLocal);
             }
 
-            ilBuilder.EmitVoidReturn(methodBuilder);
+            ilBuilder.Emit(OpCodes.Ret);
 
             return methodBuilder;
         }
@@ -939,20 +824,19 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             if (targetMethod == null)
                 throw new ArgumentNullException(nameof(targetMethod));
 
-            if (returnTypeInfo.WorkloadMethodReturnType == typeof(void))
-            {
-                ilBuilder.Emit(OpCodes.Ldarg_0);
-            }
+            // BenchmarkDotNet.Helpers.AwaitHelper.ToValueTaskVoid(workloadDelegate());
             /*
                 // call for instance
                 // GlobalSetup();
-                IL_0006: ldarg.0
-                IL_0007: call instance void [BenchmarkDotNet]BenchmarkDotNet.Samples.SampleBenchmark::GlobalSetup()
+                IL_0000: ldarg.0
+                IL_0001: call instance class [BenchmarkDotNet]BenchmarkDotNet.Samples.SampleBenchmark::GlobalSetup()
+                IL_0006: call valuetype [System.Private.CoreLib]System.Threading.Tasks.ValueTask BenchmarkDotNet.Helpers.AwaitHelper::ToValueTaskVoid(class [System.Private.CoreLib]System.Threading.Tasks.Task)
             */
             /*
                 // call for static
                 // GlobalSetup();
-                IL_0006: call string [BenchmarkDotNet]BenchmarkDotNet.Samples.SampleBenchmark::GlobalCleanup()
+                IL_0000: call class [BenchmarkDotNet]BenchmarkDotNet.Samples.SampleBenchmark::GlobalCleanup()
+                IL_0005: call valuetype [System.Private.CoreLib]System.Threading.Tasks.ValueTask BenchmarkDotNet.Helpers.AwaitHelper::ToValueTaskVoid(class [System.Private.CoreLib]System.Threading.Tasks.Task)
             */
             if (targetMethod.IsStatic)
             {
@@ -969,14 +853,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 ilBuilder.Emit(OpCodes.Ldarg_0);
                 ilBuilder.Emit(OpCodes.Call, targetMethod);
             }
-
-            /*
-                // BenchmarkDotNet.Helpers.AwaitHelper.GetResult(...);
-                IL_000e: call !!0 BenchmarkDotNet.Helpers.AwaitHelper::GetResult<int32>(valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<!!0>)
-            */
-
-            ilBuilder.Emit(OpCodes.Call, consumableInfo.GetResultMethod);
-            ilBuilder.Emit(OpCodes.Pop);
+            ilBuilder.Emit(OpCodes.Call, Helpers.AwaitHelper.GetToValueTaskMethod(returnTypeInfo.WorkloadMethodReturnType));
         }
 
         private void EmitCtorBody()
@@ -985,18 +862,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             ilBuilder.EmitCallBaseParameterlessCtor(ctorMethod);
 
-            consumeEmitter.OnEmitCtorBody(ctorMethod, ilBuilder);
+            consumeEmitter.OnEmitCtorBody(ctorMethod, ilBuilder, this);
 
             ilBuilder.EmitSetDelegateToThisField(globalSetupActionField, globalSetupMethod);
             ilBuilder.EmitSetDelegateToThisField(globalCleanupActionField, globalCleanupMethod);
             ilBuilder.EmitSetDelegateToThisField(iterationSetupActionField, iterationSetupMethod);
             ilBuilder.EmitSetDelegateToThisField(iterationCleanupActionField, iterationCleanupMethod);
             ilBuilder.EmitSetDelegateToThisField(overheadDelegateField, overheadImplementationMethod);
-
-            if (workloadImplementationMethod == null)
-                ilBuilder.EmitSetDelegateToThisField(workloadDelegateField, Descriptor.WorkloadMethod);
-            else
-                ilBuilder.EmitSetDelegateToThisField(workloadDelegateField, workloadImplementationMethod);
+            ilBuilder.EmitSetDelegateToThisField(workloadDelegateField, Descriptor.WorkloadMethod);
 
             ilBuilder.EmitCtorReturn(ctorMethod);
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Engines;
@@ -11,9 +10,6 @@ namespace BenchmarkDotNet.Code
 {
     internal abstract class DeclarationsProvider
     {
-        // "GlobalSetup" or "GlobalCleanup" methods are optional, so default to an empty delegate, so there is always something that can be invoked
-        private const string EmptyAction = "() => { }";
-
         protected readonly Descriptor Descriptor;
 
         internal DeclarationsProvider(Descriptor descriptor) => Descriptor = descriptor;
@@ -26,9 +22,9 @@ namespace BenchmarkDotNet.Code
 
         public string GlobalCleanupMethodName => GetMethodName(Descriptor.GlobalCleanupMethod);
 
-        public string IterationSetupMethodName => Descriptor.IterationSetupMethod?.Name ?? EmptyAction;
+        public string IterationSetupMethodName => GetMethodName(Descriptor.IterationSetupMethod);
 
-        public string IterationCleanupMethodName => Descriptor.IterationCleanupMethod?.Name ?? EmptyAction;
+        public string IterationCleanupMethodName => GetMethodName(Descriptor.IterationCleanupMethod);
 
         public abstract string ReturnsDefinition { get; }
 
@@ -48,13 +44,18 @@ namespace BenchmarkDotNet.Code
 
         public string OverheadMethodReturnTypeName => OverheadMethodReturnType.GetCorrectCSharpTypeName();
 
+        public virtual string AwaiterTypeName => string.Empty;
+
+        public virtual void OverrideUnrollFactor(BenchmarkCase benchmarkCase) { }
+
         public abstract string OverheadImplementation { get; }
 
         private string GetMethodName(MethodInfo method)
         {
+            // "Setup" or "Cleanup" methods are optional, so default to a simple delegate, so there is always something that can be invoked
             if (method == null)
             {
-                return EmptyAction;
+                return "() => new System.Threading.Tasks.ValueTask()";
             }
 
             if (method.ReturnType == typeof(Task) ||
@@ -63,10 +64,10 @@ namespace BenchmarkDotNet.Code
                     (method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>) ||
                      method.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>))))
             {
-                return $"() => BenchmarkDotNet.Helpers.AwaitHelper.GetResult({method.Name}())";
+                return $"() => BenchmarkDotNet.Helpers.AwaitHelper.ToValueTaskVoid({method.Name}())";
             }
 
-            return method.Name;
+            return $"() => {{ {method.Name}(); return new System.Threading.Tasks.ValueTask(); }}";
         }
     }
 
@@ -145,30 +146,18 @@ namespace BenchmarkDotNet.Code
         public override string WorkloadMethodReturnTypeModifiers => "ref readonly";
     }
 
-    internal class TaskDeclarationsProvider : VoidDeclarationsProvider
+    internal class TaskDeclarationsProvider : DeclarationsProvider
     {
         public TaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
-        public override string WorkloadMethodDelegate(string passArguments)
-            => $"({passArguments}) => {{ BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments})); }}";
+        public override string ReturnsDefinition => "RETURNS_AWAITABLE";
 
-        public override string GetWorkloadMethodCall(string passArguments) => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments}))";
+        public override string AwaiterTypeName => WorkloadMethodReturnType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance).ReturnType.GetCorrectCSharpTypeName();
 
-        protected override Type WorkloadMethodReturnType => typeof(void);
-    }
+        public override string OverheadImplementation => $"return default({OverheadMethodReturnType.GetCorrectCSharpTypeName()});";
 
-    /// <summary>
-    /// declarations provider for <see cref="Task{TResult}" /> and <see cref="ValueTask{TResult}" />
-    /// </summary>
-    internal class GenericTaskDeclarationsProvider : NonVoidDeclarationsProvider
-    {
-        public GenericTaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
+        protected override Type OverheadMethodReturnType => WorkloadMethodReturnType;
 
-        protected override Type WorkloadMethodReturnType => Descriptor.WorkloadMethod.ReturnType.GetTypeInfo().GetGenericArguments().Single();
-
-        public override string WorkloadMethodDelegate(string passArguments)
-            => $"({passArguments}) => {{ return BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments})); }}";
-
-        public override string GetWorkloadMethodCall(string passArguments) => $"BenchmarkDotNet.Helpers.AwaitHelper.GetResult({Descriptor.WorkloadMethod.Name}({passArguments}))";
+        public override void OverrideUnrollFactor(BenchmarkCase benchmarkCase) => benchmarkCase.ForceUnrollFactorForAsync();
     }
 }

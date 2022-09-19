@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
@@ -32,16 +33,16 @@ namespace BenchmarkDotNet.Tests.Mocks
         public long OperationsPerInvoke { get; } = 1;
 
         [UsedImplicitly]
-        public Action GlobalSetupAction { get; set; }
+        public Func<ValueTask> GlobalSetupAction { get; set; }
 
         [UsedImplicitly]
-        public Action GlobalCleanupAction { get; set; }
+        public Func<ValueTask> GlobalCleanupAction { get; set; }
 
         [UsedImplicitly]
         public bool IsDiagnoserAttached { get; set; }
 
-        public Action<long> WorkloadAction { get; } = _ => { };
-        public Action<long> OverheadAction { get; } = _ => { };
+        public Func<long, IClock, ValueTask<ClockSpan>> WorkloadAction { get; } = (invokeCount, clock) => default;
+        public Func<long, IClock, ValueTask<ClockSpan>> OverheadAction { get; } = (invokeCount, clock) => default;
 
         [UsedImplicitly]
         public IEngineFactory Factory => null;
