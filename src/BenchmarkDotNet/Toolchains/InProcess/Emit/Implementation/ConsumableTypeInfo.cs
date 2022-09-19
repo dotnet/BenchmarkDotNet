@@ -1,5 +1,7 @@
 ﻿using BenchmarkDotNet.Engines;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -16,28 +18,24 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             OriginMethodReturnType = methodReturnType;
 
-            // Please note this code does not support await over extension methods.
-            var getAwaiterMethod = methodReturnType.GetMethod(nameof(Task<int>.GetAwaiter), BindingFlagsPublicInstance);
-            if (getAwaiterMethod == null)
+            // Only support (Value)Task for parity with other toolchains (and so we can use AwaitHelper).
+            IsAwaitable = methodReturnType == typeof(Task) || methodReturnType == typeof(ValueTask)
+                || (methodReturnType.GetTypeInfo().IsGenericType
+                    && (methodReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
+                    || methodReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)));
+
+            if (!IsAwaitable)
             {
                 WorkloadMethodReturnType = methodReturnType;
             }
             else
             {
-                var getResultMethod = getAwaiterMethod
+                WorkloadMethodReturnType = methodReturnType
+                    .GetMethod(nameof(Task.GetAwaiter), BindingFlagsPublicInstance)
                     .ReturnType
-                    .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlagsPublicInstance);
-
-                if (getResultMethod == null)
-                {
-                    WorkloadMethodReturnType = methodReturnType;
-                }
-                else
-                {
-                    WorkloadMethodReturnType = getResultMethod.ReturnType;
-                    GetAwaiterMethod = getAwaiterMethod;
-                    GetResultMethod = getResultMethod;
-                }
+                    .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlagsPublicInstance)
+                    .ReturnType;
+                GetResultMethod = Helpers.AwaitHelper.GetGetResultMethod(methodReturnType);
             }
 
             if (WorkloadMethodReturnType == null)
@@ -74,7 +72,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         public Type WorkloadMethodReturnType { get; }
         public Type OverheadMethodReturnType { get; }
 
-        public MethodInfo? GetAwaiterMethod { get; }
         public MethodInfo? GetResultMethod { get; }
 
         public bool IsVoid { get; }
@@ -82,6 +79,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         public bool IsConsumable { get; }
         public FieldInfo? WorkloadConsumableField { get; }
 
-        public bool IsAwaitable => GetAwaiterMethod != null && GetResultMethod != null;
+        public bool IsAwaitable { get; }
     }
 }

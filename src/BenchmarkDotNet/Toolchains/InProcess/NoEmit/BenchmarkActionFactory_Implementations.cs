@@ -89,6 +89,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
         internal class BenchmarkActionTask : BenchmarkActionBase
         {
+            private readonly Helpers.AwaitHelper awaitHelper = new Helpers.AwaitHelper();
             private readonly Func<Task> startTaskCallback;
             private readonly Action callback;
             private readonly Action unrolledCallback;
@@ -118,7 +119,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private void Overhead() { }
 
             // must be kept in sync with TaskDeclarationsProvider.TargetMethodDelegate
-            private void ExecuteBlocking() => startTaskCallback.Invoke().GetAwaiter().GetResult();
+            private void ExecuteBlocking() => awaitHelper.GetResult(startTaskCallback.Invoke());
 
             [MethodImpl(CodeGenHelper.AggressiveOptimizationOption)]
             private void WorkloadActionUnroll(long repeatCount)
@@ -137,6 +138,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
         internal class BenchmarkActionTask<T> : BenchmarkActionBase
         {
+            private readonly Helpers.AwaitHelper awaitHelper = new Helpers.AwaitHelper();
             private readonly Func<Task<T>> startTaskCallback;
             private readonly Func<T> callback;
             private readonly Func<T> unrolledCallback;
@@ -165,7 +167,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private T Overhead() => default;
 
             // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
-            private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
+            private T ExecuteBlocking() => awaitHelper.GetResult(startTaskCallback.Invoke());
 
             private void InvokeSingleHardcoded() => result = callback();
 
@@ -188,6 +190,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
         internal class BenchmarkActionValueTask<T> : BenchmarkActionBase
         {
+            private readonly Helpers.AwaitHelper awaitHelper = new Helpers.AwaitHelper();
             private readonly Func<ValueTask<T>> startTaskCallback;
             private readonly Func<T> callback;
             private readonly Func<T> unrolledCallback;
@@ -217,7 +220,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             private T Overhead() => default;
 
             // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
-            private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
+            private T ExecuteBlocking() => awaitHelper.GetResult(startTaskCallback.Invoke());
 
             private void InvokeSingleHardcoded() => result = callback();
 
