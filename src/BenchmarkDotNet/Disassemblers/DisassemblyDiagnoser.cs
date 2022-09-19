@@ -92,9 +92,9 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
             var currentPlatform = RuntimeInformation.GetCurrentPlatform();
-            if (currentPlatform != Platform.X64 && currentPlatform != Platform.X86)
+            if (!(currentPlatform is Platform.X64 or Platform.X86 or Platform.Arm64 or Platform.Arm))
             {
-                yield return new ValidationError(true, $"{currentPlatform} is not supported (Iced library limitation)");
+                yield return new ValidationError(true, $"{currentPlatform} is not supported");
                 yield break;
             }
 

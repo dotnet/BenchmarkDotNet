@@ -11,9 +11,9 @@ using System.Text.RegularExpressions;
 namespace BenchmarkDotNet.Disassemblers
 {
     // This Disassembler uses ClrMd v2x. Please keep it in sync with ClrMdV1Disassembler (if possible).
-    internal static class ClrMdV2Disassembler
+    internal abstract class ClrMdV2Disassembler
     {
-        internal static DisassemblyResult AttachAndDisassemble(Settings settings)
+        internal DisassemblyResult AttachAndDisassemble(Settings settings)
         {
             using (var dataTarget = DataTarget.AttachToProcess(
                 settings.ProcessId,
@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.Disassemblers
                     }
         }
 
-        private static DisassembledMethod[] Disassemble(Settings settings, State state)
+        private DisassembledMethod[] Disassemble(Settings settings, State state)
         {
             var result = new List<DisassembledMethod>();
 
@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.Disassemblers
 
         private static bool CanBeDisassembled(ClrMethod method) => method.ILOffsetMap.Length > 0 && method.NativeCode > 0;
 
-        private static DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings)
+        private DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings)
         {
             var method = methodInfo.Method;
 
@@ -159,7 +159,7 @@ namespace BenchmarkDotNet.Disassemblers
             };
         }
 
-        private static IEnumerable<Asm> Decode(ILToNativeMap map, State state, int depth, ClrMethod currentMethod)
+        private IEnumerable<Asm> Decode(ILToNativeMap map, State state, int depth, ClrMethod currentMethod)
         {
             ulong startAddress = map.StartAddress;
             uint size = (uint)(map.EndAddress - map.StartAddress);
@@ -177,25 +177,12 @@ namespace BenchmarkDotNet.Disassemblers
                 totalBytesRead += bytesRead;
             } while (totalBytesRead != size);
 
-            var reader = new ByteArrayCodeReader(code, 0, (int)size);
-            var decoder = Decoder.Create(state.Runtime.DataTarget.DataReader.PointerSize * 8, reader);
-            decoder.IP = startAddress;
-
-            while (reader.CanReadByte)
-            {
-                decoder.Decode(out var instruction);
-
-                TryTranslateAddressToName(instruction, state, depth, currentMethod);
-
-                yield return new Asm
-                {
-                    InstructionPointer = instruction.IP,
-                    Instruction = instruction
-                };
-            }
+            return Decode(code, startAddress, state, depth, currentMethod);
         }
 
-        private static void TryTranslateAddressToName(Instruction instruction, State state, int depth, ClrMethod currentMethod)
+        protected abstract IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod);
+
+        protected static void TryTranslateAddressToName(Instruction instruction, State state, int depth, ClrMethod currentMethod)
         {
             var runtime = state.Runtime;
 
