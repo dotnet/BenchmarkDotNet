@@ -46,6 +46,9 @@ namespace BenchmarkDotNet.IntegrationTests
         public void BenchmarkActionTaskSupported() => TestInvoke(x => x.InvokeOnceTaskAsync(), UnrollFactor, null);
 
         [Fact]
+        public void BenchmarkActionValueTaskSupported() => TestInvoke(x => x.InvokeOnceValueTaskAsync(), UnrollFactor, null);
+
+        [Fact]
         public void BenchmarkActionRefTypeSupported() => TestInvoke(x => x.InvokeOnceRefType(), UnrollFactor, StringResult);
 
         [Fact]
@@ -56,6 +59,18 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Fact]
         public void BenchmarkActionValueTaskOfTSupported() => TestInvoke(x => x.InvokeOnceValueTaskOfT(), UnrollFactor, DecimalResult);
+
+        [Fact]
+        public void BenchmarkActionGlobalSetupTaskSupported() => TestInvokeSetupCleanupTask(x => BenchmarkSetupCleanupTask.GlobalSetup(), UnrollFactor);
+
+        [Fact]
+        public void BenchmarkActionGlobalCleanupTaskSupported() => TestInvokeSetupCleanupTask(x => x.GlobalCleanup(), UnrollFactor);
+
+        [Fact]
+        public void BenchmarkActionGlobalSetupValueTaskSupported() => TestInvokeSetupCleanupValueTask(x => BenchmarkSetupCleanupValueTask.GlobalSetup(), UnrollFactor);
+
+        [Fact]
+        public void BenchmarkActionGlobalCleanupValueTaskSupported() => TestInvokeSetupCleanupValueTask(x => x.GlobalCleanup(), UnrollFactor);
 
         [Fact]
         public void BenchmarkDifferentPlatformReturnsValidationError()
@@ -83,30 +98,30 @@ namespace BenchmarkDotNet.IntegrationTests
 
             // Run mode
             var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), unrollFactor);
-            TestInvoke(action, unrollFactor, false, null);
+            TestInvoke(action, unrollFactor, false, null, ref BenchmarkAllCases.Counter);
 
             // Idle mode
             action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), unrollFactor);
-            TestInvoke(action, unrollFactor, true, null);
+            TestInvoke(action, unrollFactor, true, null, ref BenchmarkAllCases.Counter);
 
             // GlobalSetup/GlobalCleanup
             action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkAllCases());
-            TestInvoke(action, 1, false, null);
+            TestInvoke(action, 1, false, null, ref BenchmarkAllCases.Counter);
             action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkAllCases());
-            TestInvoke(action, 1, false, null);
+            TestInvoke(action, 1, false, null, ref BenchmarkAllCases.Counter);
 
             // GlobalSetup/GlobalCleanup (empty)
             descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod);
             action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkAllCases());
-            TestInvoke(action, unrollFactor, true, null);
+            TestInvoke(action, unrollFactor, true, null, ref BenchmarkAllCases.Counter);
             action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkAllCases());
-            TestInvoke(action, unrollFactor, true, null);
+            TestInvoke(action, unrollFactor, true, null, ref BenchmarkAllCases.Counter);
 
             // Dummy (just in case something may broke)
             action = BenchmarkActionFactory.CreateDummy();
-            TestInvoke(action, unrollFactor, true, null);
+            TestInvoke(action, unrollFactor, true, null, ref BenchmarkAllCases.Counter);
             action = BenchmarkActionFactory.CreateDummy();
-            TestInvoke(action, unrollFactor, true, null);
+            TestInvoke(action, unrollFactor, true, null, ref BenchmarkAllCases.Counter);
         }
 
         [AssertionMethod]
@@ -117,7 +132,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             // Run mode
             var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), unrollFactor);
-            TestInvoke(action, unrollFactor, false, expectedResult);
+            TestInvoke(action, unrollFactor, false, expectedResult, ref BenchmarkAllCases.Counter);
 
             // Idle mode
 
@@ -126,15 +141,83 @@ namespace BenchmarkDotNet.IntegrationTests
             object idleExpected;
             if (isValueTask)
                 idleExpected = GetDefault(typeof(T).GetGenericArguments()[0]);
+            else if (expectedResult == null || typeof(T) == typeof(Task) || typeof(T) == typeof(ValueTask))
+                idleExpected = null;
             else if (typeof(T).GetTypeInfo().IsValueType)
                 idleExpected = 0;
-            else if (expectedResult == null || typeof(T) == typeof(Task))
-                idleExpected = null;
             else
                 idleExpected = GetDefault(expectedResult.GetType());
 
             action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), unrollFactor);
-            TestInvoke(action, unrollFactor, true, idleExpected);
+            TestInvoke(action, unrollFactor, true, idleExpected, ref BenchmarkAllCases.Counter);
+        }
+
+        [AssertionMethod]
+        private void TestInvokeSetupCleanupTask(Expression<Func<BenchmarkSetupCleanupTask, Task>> methodCall, int unrollFactor)
+        {
+            var targetMethod = ((MethodCallExpression) methodCall.Body).Method;
+            var descriptor = new Descriptor(typeof(BenchmarkSetupCleanupTask), targetMethod, targetMethod, targetMethod, targetMethod, targetMethod);
+
+            // Run mode
+            var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkSetupCleanupTask(), unrollFactor);
+            TestInvoke(action, unrollFactor, false, null, ref BenchmarkSetupCleanupTask.Counter);
+
+            // Idle mode
+            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkSetupCleanupTask(), unrollFactor);
+            TestInvoke(action, unrollFactor, true, null, ref BenchmarkSetupCleanupTask.Counter);
+
+            // GlobalSetup/GlobalCleanup
+            action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkSetupCleanupTask());
+            TestInvoke(action, 1, false, null, ref BenchmarkSetupCleanupTask.Counter);
+            action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkSetupCleanupTask());
+            TestInvoke(action, 1, false, null, ref BenchmarkSetupCleanupTask.Counter);
+
+            // GlobalSetup/GlobalCleanup (empty)
+            descriptor = new Descriptor(typeof(BenchmarkSetupCleanupTask), targetMethod);
+            action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkSetupCleanupTask());
+            TestInvoke(action, unrollFactor, true, null, ref BenchmarkSetupCleanupTask.Counter);
+            action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkSetupCleanupTask());
+            TestInvoke(action, unrollFactor, true, null, ref BenchmarkSetupCleanupTask.Counter);
+
+            // Dummy (just in case something may broke)
+            action = BenchmarkActionFactory.CreateDummy();
+            TestInvoke(action, unrollFactor, true, null, ref BenchmarkSetupCleanupTask.Counter);
+            action = BenchmarkActionFactory.CreateDummy();
+            TestInvoke(action, unrollFactor, true, null, ref BenchmarkSetupCleanupTask.Counter);
+        }
+
+        [AssertionMethod]
+        private void TestInvokeSetupCleanupValueTask(Expression<Func<BenchmarkSetupCleanupValueTask, ValueTask>> methodCall, int unrollFactor)
+        {
+            var targetMethod = ((MethodCallExpression) methodCall.Body).Method;
+            var descriptor = new Descriptor(typeof(BenchmarkSetupCleanupValueTask), targetMethod, targetMethod, targetMethod, targetMethod, targetMethod);
+
+            // Run mode
+            var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkSetupCleanupValueTask(), unrollFactor);
+            TestInvoke(action, unrollFactor, false, null, ref BenchmarkSetupCleanupValueTask.Counter);
+
+            // Idle mode
+            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkSetupCleanupValueTask(), unrollFactor);
+            TestInvoke(action, unrollFactor, true, null, ref BenchmarkSetupCleanupValueTask.Counter);
+
+            // GlobalSetup/GlobalCleanup
+            action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkSetupCleanupValueTask());
+            TestInvoke(action, 1, false, null, ref BenchmarkSetupCleanupValueTask.Counter);
+            action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkSetupCleanupValueTask());
+            TestInvoke(action, 1, false, null, ref BenchmarkSetupCleanupValueTask.Counter);
+
+            // GlobalSetup/GlobalCleanup (empty)
+            descriptor = new Descriptor(typeof(BenchmarkSetupCleanupValueTask), targetMethod);
+            action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkSetupCleanupValueTask());
+            TestInvoke(action, unrollFactor, true, null, ref BenchmarkSetupCleanupValueTask.Counter);
+            action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkSetupCleanupValueTask());
+            TestInvoke(action, unrollFactor, true, null, ref BenchmarkSetupCleanupValueTask.Counter);
+
+            // Dummy (just in case something may broke)
+            action = BenchmarkActionFactory.CreateDummy();
+            TestInvoke(action, unrollFactor, true, null, ref BenchmarkSetupCleanupValueTask.Counter);
+            action = BenchmarkActionFactory.CreateDummy();
+            TestInvoke(action, unrollFactor, true, null, ref BenchmarkSetupCleanupValueTask.Counter);
         }
 
         private static object GetDefault(Type type)
@@ -147,36 +230,36 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [AssertionMethod]
-        private void TestInvoke(BenchmarkAction benchmarkAction, int unrollFactor, bool isIdle, object expectedResult)
+        private void TestInvoke(BenchmarkAction benchmarkAction, int unrollFactor, bool isIdle, object expectedResult, ref int counter)
         {
             try
             {
-                BenchmarkAllCases.Counter = 0;
+                counter = 0;
 
                 if (isIdle)
                 {
                     benchmarkAction.InvokeSingle();
-                    Assert.Equal(0, BenchmarkAllCases.Counter);
+                    Assert.Equal(0, counter);
                     benchmarkAction.InvokeMultiple(0);
-                    Assert.Equal(0, BenchmarkAllCases.Counter);
+                    Assert.Equal(0, counter);
                     benchmarkAction.InvokeMultiple(11);
-                    Assert.Equal(0, BenchmarkAllCases.Counter);
+                    Assert.Equal(0, counter);
                 }
                 else
                 {
                     benchmarkAction.InvokeSingle();
-                    Assert.Equal(1, BenchmarkAllCases.Counter);
+                    Assert.Equal(1, counter);
                     benchmarkAction.InvokeMultiple(0);
-                    Assert.Equal(1, BenchmarkAllCases.Counter);
+                    Assert.Equal(1, counter);
                     benchmarkAction.InvokeMultiple(11);
-                    Assert.Equal(BenchmarkAllCases.Counter, 1 + unrollFactor * 11);
+                    Assert.Equal(1 + unrollFactor * 11, counter);
                 }
 
                 Assert.Equal(benchmarkAction.LastRunResult, expectedResult);
             }
             finally
             {
-                BenchmarkAllCases.Counter = 0;
+                counter = 0;
             }
         }
 
@@ -245,6 +328,13 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [Benchmark]
+            public async ValueTask InvokeOnceValueTaskAsync()
+            {
+                await Task.Yield();
+                Interlocked.Increment(ref Counter);
+            }
+
+            [Benchmark]
             public string InvokeOnceRefType()
             {
                 Interlocked.Increment(ref Counter);
@@ -271,6 +361,58 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 Interlocked.Increment(ref Counter);
                 return new ValueTask<decimal>(DecimalResult);
+            }
+        }
+
+        [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+        public class BenchmarkSetupCleanupTask
+        {
+            public static int Counter;
+
+            [GlobalSetup]
+            public static async Task GlobalSetup()
+            {
+                await Task.Yield();
+                Interlocked.Increment(ref Counter);
+            }
+
+            [GlobalCleanup]
+            public async Task GlobalCleanup()
+            {
+                await Task.Yield();
+                Interlocked.Increment(ref Counter);
+            }
+
+            [Benchmark]
+            public void InvokeOnceVoid()
+            {
+                Interlocked.Increment(ref Counter);
+            }
+        }
+
+        [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+        public class BenchmarkSetupCleanupValueTask
+        {
+            public static int Counter;
+
+            [GlobalSetup]
+            public static async ValueTask GlobalSetup()
+            {
+                await Task.Yield();
+                Interlocked.Increment(ref Counter);
+            }
+
+            [GlobalCleanup]
+            public async ValueTask GlobalCleanup()
+            {
+                await Task.Yield();
+                Interlocked.Increment(ref Counter);
+            }
+
+            [Benchmark]
+            public void InvokeOnceVoid()
+            {
+                Interlocked.Increment(ref Counter);
             }
         }
     }

@@ -32,6 +32,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             if (resultType == typeof(Task))
                 return new BenchmarkActionTask(resultInstance, targetMethod, unrollFactor);
 
+            if (resultType == typeof(ValueTask))
+                return new BenchmarkActionValueTask(resultInstance, targetMethod, unrollFactor);
+
             if (resultType.GetTypeInfo().IsGenericType)
             {
                 var genericType = resultType.GetGenericTypeDefinition();
