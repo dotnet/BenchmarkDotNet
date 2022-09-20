@@ -4,6 +4,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 
 using JetBrains.Annotations;
@@ -61,39 +62,43 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             }
         }
 
-        /// <summary>Fills the properties of the instance of the object used to run the benchmark.</summary>
-        /// <param name="instance">The instance.</param>
-        /// <param name="benchmarkCase">The benchmark.</param>
+        /// <summary>Fills the properties of the instance of the object used to run the benchmark. Arguments are not supported</summary>
         internal static void FillMembers(object instance, BenchmarkCase benchmarkCase)
         {
             foreach (var parameter in benchmarkCase.Parameters.Items)
             {
-                var flags = BindingFlags.Public;
-                flags |= parameter.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
+                FillMember(instance, benchmarkCase, parameter);
+            }
+        }
 
-                var targetType = benchmarkCase.Descriptor.Type;
-                var paramProperty = targetType.GetProperty(parameter.Name, flags);
+        /// <summary>Fills the property of the instance of the object used to run the benchmark. Arguments are not supported</summary>
+        internal static void FillMember(object instance, BenchmarkCase benchmarkCase, ParameterInstance parameter)
+        {
+            var flags = BindingFlags.Public;
+            flags |= parameter.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
 
-                if (paramProperty == null)
-                {
-                    var paramField = targetType.GetField(parameter.Name, flags);
-                    if (paramField == null)
-                        throw new InvalidOperationException(
-                            $"Type {targetType.FullName}: no property or field {parameter.Name} found.");
+            var targetType = benchmarkCase.Descriptor.Type;
+            var paramProperty = targetType.GetProperty(parameter.Name, flags);
 
-                    var callInstance = paramField.IsStatic ? null : instance;
-                    paramField.SetValue(callInstance, parameter.Value);
-                }
-                else
-                {
-                    var setter = paramProperty.GetSetMethod();
-                    if (setter == null)
-                        throw new InvalidOperationException(
-                            $"Type {targetType.FullName}: no settable property {parameter.Name} found.");
+            if (paramProperty == null)
+            {
+                var paramField = targetType.GetField(parameter.Name, flags);
+                if (paramField == null)
+                    throw new InvalidOperationException(
+                        $"Type {targetType.FullName}: no property or field {parameter.Name} found.");
 
-                    var callInstance = setter.IsStatic ? null : instance;
-                    setter.Invoke(callInstance, new[] { parameter.Value });
-                }
+                var callInstance = paramField.IsStatic ? null : instance;
+                paramField.SetValue(callInstance, parameter.Value);
+            }
+            else
+            {
+                var setter = paramProperty.GetSetMethod();
+                if (setter == null)
+                    throw new InvalidOperationException(
+                        $"Type {targetType.FullName}: no settable property {parameter.Name} found.");
+
+                var callInstance = setter.IsStatic ? null : instance;
+                setter.Invoke(callInstance, new[] { parameter.Value });
             }
         }
 
