@@ -17,23 +17,23 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Diagnosers
 {
-    public class LttngProfiler : IProfiler
+    public class PerfCollectProfiler : IProfiler
     {
         private const int SuccesExitCode = 0;
         private const string PerfCollectFileName = "perfcollect";
 
-        public static readonly IDiagnoser Default = new LttngProfiler(new LttngProfilerConfig(performExtraBenchmarksRun: false));
+        public static readonly IDiagnoser Default = new PerfCollectProfiler(new PerfCollectProfilerConfig(performExtraBenchmarksRun: false));
 
-        private readonly LttngProfilerConfig config;
+        private readonly PerfCollectProfilerConfig config;
         private readonly DateTime creationTime = DateTime.Now;
         private readonly Dictionary<BenchmarkCase, FileInfo> benchmarkToTraceFile = new Dictionary<BenchmarkCase, FileInfo>();
 
         [PublicAPI]
-        public LttngProfiler(LttngProfilerConfig config) => this.config = config;
+        public PerfCollectProfiler(PerfCollectProfilerConfig config) => this.config = config;
 
-        public string ShortName => "LTTng";
+        public string ShortName => "PC";
 
-        public IEnumerable<string> Ids => new[] { nameof(LttngProfiler) };
+        public IEnumerable<string> Ids => new[] { nameof(PerfCollectProfiler) };
 
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
 
@@ -47,19 +47,19 @@ namespace BenchmarkDotNet.Diagnosers
         {
             if (!RuntimeInformation.IsLinux())
             {
-                yield return new ValidationError(true, "The LttngProfiler works only on Linux!");
+                yield return new ValidationError(true, "The PerfCollectProfiler works only on Linux!");
                 yield break;
             }
 
             if (Mono.Unix.Native.Syscall.getuid() != 0)
             {
-                yield return new ValidationError(true, "You must run as root to use LttngProfiler.");
+                yield return new ValidationError(true, "You must run as root to use PerfCollectProfiler.");
                 yield break;
             }
 
             if (validationParameters.Benchmarks.Any() && !TryInstallPerfCollect(validationParameters))
             {
-                yield return new ValidationError(true, "Failed to install perfcollect script. Please follow the instructions from https://github.com/dotnet/runtime/blob/master/docs/project/linux-performance-tracing.md");
+                yield return new ValidationError(true, "Failed to install perfcollect script. Please follow the instructions from https://github.com/dotnet/runtime/blob/main/docs/project/linux-performance-tracing.md");
             }
         }
 
@@ -163,7 +163,7 @@ namespace BenchmarkDotNet.Diagnosers
                     var logger = parameters.Config.GetCompositeLogger();
 
                     logger.WriteLineError($"The perfcollect script did not start/stop in {config.Timeout.TotalSeconds}s.");
-                    logger.WriteLineInfo("You can create LttngProfiler providing LttngProfilerConfig with custom timeout value.");
+                    logger.WriteLineInfo("You can create PerfCollectProfiler providing PerfCollectProfilerConfig with custom timeout value.");
 
                     logger.Flush(); // flush recently logged message to disk
 
@@ -180,11 +180,11 @@ namespace BenchmarkDotNet.Diagnosers
         }
     }
 
-    public class LttngProfilerConfig
+    public class PerfCollectProfilerConfig
     {
         /// <param name="performExtraBenchmarksRun">if set to true, benchmarks will be executed one more time with the profiler attached. If set to false, there will be no extra run but the results will contain overhead. True by default.</param>
         /// <param name="timeoutInSeconds">how long should we wait for the perfcollect script to start collecting and/or finish processing the trace. 30s by default</param>
-        public LttngProfilerConfig(bool performExtraBenchmarksRun = true, int timeoutInSeconds = 60)
+        public PerfCollectProfilerConfig(bool performExtraBenchmarksRun = true, int timeoutInSeconds = 60)
         {
             RunMode = performExtraBenchmarksRun ? RunMode.ExtraRun : RunMode.NoOverhead;
             Timeout = TimeSpan.FromSeconds(timeoutInSeconds);

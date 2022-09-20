@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Diagnosers
                 yield return EventPipeProfiler.Default;
 
                 if (RuntimeInformation.IsLinux())
-                    yield return LttngProfiler.Default;
+                    yield return PerfCollectProfiler.Default;
             }
 
             if (!RuntimeInformation.IsWindows())

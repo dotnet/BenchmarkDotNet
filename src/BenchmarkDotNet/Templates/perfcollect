@@ -53,13 +53,14 @@
 # Set when we parse command line arguments to determine if we should enable specific collection options.
 collect_cpu=1
 collect_threadTime=0
+collect_offcpu=0
 
 ######################################
 ## .NET Event Categories
 ######################################
 
 # Separate GCCollectOnly list because our LTTng implementation doesn't set tracepoint verbosity.
-# Once tracepoint verbosity is set, we can set verbosity and collapse this wtih DotNETRuntime_GCKeyword.
+# Once tracepoint verbosity is set, we can set verbosity and collapse this with DotNETRuntime_GCKeyword.
 declare -a DotNETRuntime_GCKeyword_GCCollectOnly=(
     DotNETRuntime:GCStart
     DotNETRuntime:GCStart_V1
@@ -357,7 +358,7 @@ declare -a DotNETRuntime_CompilationKeyword=(
 )
 
 # Separate GCCollectOnly list because our LTTng implementation doesn't set tracepoint verbosity.
-# Once tracepoint verbosity is set, we can set verbosity and collapse this wtih DotNETRuntimePrivate_GCPrivateKeyword.
+# Once tracepoint verbosity is set, we can set verbosity and collapse this with DotNETRuntimePrivate_GCPrivateKeyword.
 declare -a DotNETRuntimePrivate_GCPrivateKeyword_GCCollectOnly=(
     DotNETRuntimePrivate:GCDecision
     DotNETRuntimePrivate:GCDecision_V1
@@ -615,10 +616,15 @@ declare -a DotNETRuntimePrivate_DynamicTypeUsageKeyword=(
     DotNETRuntimePrivate:ObjectVariantMarshallingToManaged
 )
 
-declare -a LTTng_Kernel_ProcessLifetime=(
+declare -a EventSource=(
+    DotNETRuntime:EventSource
+)
+
+declare -a LTTng_Kernel_ProcessLifetimeKeyword=(
     sched_process_exec
     sched_process_exit
 )
+
 
 ######################################
 ## Global Variables
@@ -648,7 +654,7 @@ handlerInvoked=0
 # Log file
 declare logFile
 logFilePrefix='/tmp/perfcollect'
-logEnabled=1
+logEnabled=0
 
 # Collect info to pass between processes
 collectInfoFile=$(dirname `mktemp -u`)/'perfcollect.sessioninfo'
@@ -676,6 +682,34 @@ RunSilent()
     fi
 }
 
+RunSilentBackground()
+{
+    if (( $logEnabled == 1 ))
+    then
+        echo "Running \"$*\"" >> $logFile
+        $* >> $logFile 2>&1  & sleep 1
+        echo "" >> $logFile
+    else
+        $* > /dev/null 2>&1  & sleep 1
+    fi
+
+    # When handler is invoked, kill the process.
+    pid=$!
+    for (( ; ; ))
+    do
+        if [ "$handlerInvoked" == "1" ]
+        then
+            kill -INT $pid
+            break;
+        else
+            sleep 1
+        fi	
+    done
+
+    # Wait for the process to exit.
+    wait $pid
+}
+
 InitializeLog()
 {
     # Pick the log file name.
@@ -685,6 +719,9 @@ InitializeLog()
         logFile="$logFilePrefix.$RANDOM.log"
     done
 
+    # Mark the log as enabled.
+    logEnabled=1
+
     # Start the log
     date=`date`
     echo "Log started at ${date}" > $logFile
@@ -692,8 +729,14 @@ InitializeLog()
 
     # The system information.
     LogAppend 'Machine info: '  `uname -a`
-    LogAppend 'perf version:'   `$perfcmd --version`
-    LogAppend 'LTTng version: ' `lttng --version`
+    if [ "$perfcmd" != "" ]
+    then
+        LogAppend 'perf version:'   `$perfcmd --version 2>&1`
+    fi
+    if [ "$lttngcmd" != "" ]
+    then
+        LogAppend 'LTTng version: ' `$lttngcmd --version`
+    fi
     LogAppend
 }
 
@@ -717,32 +760,52 @@ CloseLog()
 ##
 RedText()
 {
-    tput setaf 1
+    tput=`GetCommandFullPath "tput"`
+    if [ "$tput" != "" ]
+    then
+    	$tput setaf 1
+    fi
 }
 
 GreenText()
 {
-    tput setaf 2
+    tput=`GetCommandFullPath "tput"`
+    if [ "$tput" != "" ]
+    then
+        $tput setaf 2
+    fi
 }
 
 BlueText()
 {
-    tput setaf 6
+    tput=`GetCommandFullPath "tput"`
+    if [ "$tput" != "" ]
+    then
+        $tput setaf 6
+    fi
 }
 YellowText()
 {
-    tput setaf 3
+    tput=`GetCommandFullPath "tput"`
+    if [ "$tput" != "" ]
+    then
+        $tput setaf 3
+    fi
 }
 
 ResetText()
 {
-    tput sgr0
+    tput=`GetCommandFullPath "tput"`
+    if [ "$tput" != "" ]
+    then
+        $tput sgr0
+    fi
 }
 
 # $1 == Status message
 WriteStatus()
 {
-        LogAppend $*
+    LogAppend $*
     BlueText
     echo $1
     ResetText
@@ -813,9 +876,49 @@ DiscoverCommands()
             fi
         fi
     fi
+
+    # Check to see if perf is installed, but doesn't exactly match the current kernel version.
+    # This happens when the kernel gets upgraded, or when running inside of a container where the
+    # host and container OS versions don't match.
+    perfoutput=$($perfcmd 2>&1)
+    if [ $? -eq 2 ]
+    then
+        # Check the beginning of the output to see if it matches the kernel warning.
+        warningText="WARNING: perf not found for kernel"
+        if [[ "$perfoutput" == "$warningText"* ]]
+        then
+            foundWorkingPerf=0
+            WriteWarning "Perf is installed, but does not exactly match the version of the running kernel."
+            WriteWarning "This is often OK, and we'll try to workaround this."
+            WriteStatus "Attempting to find a working copy of perf."
+            # Attempt to find an existing version of perf to use.
+            # Order the search by newest directory first.
+            baseDir="/usr/lib/linux-tools"
+            searchPath="$baseDir/*/"
+            for dirName in $(ls -d --sort=time $searchPath)
+            do
+                candidatePerfPath="$dirName""perf"
+                $($candidatePerfPath > /dev/null 2>&1)
+                if [ $? -eq 1 ]
+                then
+                    # If $? == 1, then use this copy of perf.
+                    perfcmd=$candidatePerfPath
+                    foundWorkingPerf=1
+                    break;
+                fi
+            done
+            if [ $foundWorkingPerf -eq 0 ]
+            then
+                FatalError "Unable to find a working copy of perf.  Try re-installing via ./perfcollect install."
+            fi
+            WriteStatus "...FINISHED"
+        fi
+    fi
+
     lttngcmd=`GetCommandFullPath "lttng"`
     zipcmd=`GetCommandFullPath "zip"`
     unzipcmd=`GetCommandFullPath "unzip"`
+    objdumpcmd=`GetCommandFullPath "objdump"`
 }
 
 GetCommandFullPath()
@@ -826,6 +929,30 @@ GetCommandFullPath()
 ######################################
 # Prerequisite Installation
 ######################################
+IsAlpine()
+{
+    local alpine=0
+    local apk=`GetCommandFullPath "apk"`
+    if [ "$apk" != "" ]
+    then
+        alpine=1
+    fi
+
+    echo $alpine
+}
+
+InstallPerf_Alpine()
+{
+    # Disallow non-root users.
+    EnsureRoot
+
+    # Install perf
+    apk add perf --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
+
+    # Install zip and unzip
+    apk add zip unzip
+}
+
 IsRHEL()
 {
     local rhel=0
@@ -927,7 +1054,15 @@ InstallPerf_Ubuntu()
     BlueText
     echo "Installing perf_event packages."
     ResetText
-    apt-get install -y linux-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r` zip software-properties-common
+
+    # Handle Azure instances.
+    release=`uname -r`
+    if [[ "$release" == *"-azure" ]]
+    then
+        apt-get install -y linux-tools-azure zip software-properties-common
+    else
+        apt-get install -y linux-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r` zip software-properties-common
+    fi
 }
 
 InstallPerf()
@@ -944,6 +1079,9 @@ InstallPerf()
     elif [ "$(IsRHEL)" == "1" ]
     then
         InstallPerf_RHEL
+    elif [ "$(IsAlpine)" == "1" ]
+    then
+        InstallPerf_Alpine
     else
         FatalError "Auto install unsupported for this distribution.  Install perf manually to continue."
     fi
@@ -954,20 +1092,32 @@ InstallLTTng_RHEL()
     # Disallow non-root users.
     EnsureRoot
 
-    packageRepo="https://packages.efficios.com/repo.files/EfficiOS-RHEL7-x86-64.repo"
-
-    if [ "$forceInstall" != 1 ]
-    then 
-        # Prompt for confirmation, since we need to add a new repository.
-        BlueText
-        echo "LTTng installation requires that a new package repo be added to your yum configuration."
-        echo "The package repo url is: $packageRepo"
-        echo ""
-        read -p "Would you like to add the LTTng package repo to your YUM configuration? [Y/N]" resp
-        ResetText
+    local isRHEL7=0
+    local isRHEL8=0
+    if [ -e /etc/redhat-release ]; then
+        local redhatRelease=$(</etc/redhat-release)
+        if   [[ $redhatRelease == "CentOS Linux release 7."* || $redhatRelease == "Red Hat Enterprise Linux "*"release 7."* ]]; then
+            isRHEL7=1
+        elif [[ $redhatRelease == "CentOS Linux release 8."* || $redhatRelease == "Red Hat Enterprise Linux "*"release 8."* ]]; then
+            isRHEL8=1
+        fi
     fi
-    if [ "$resp" == "Y" ] || [ "$resp" == "y" ] || [ "$forceInstall" == 1 ]
+
+    if  [ "$isRHEL7" == "1" ] || [ "$isRHEL8" == "1" ]
     then
+        packageRepo="https://packages.efficios.com/repo.files/EfficiOS-RHEL7-x86-64.repo"
+
+        if [ "$forceInstall" != 1 ]
+        then
+            # Prompt for confirmation, since we need to add a new repository.
+            BlueText
+            echo "LTTng installation requires that a new package repo be added to your yum configuration."
+            echo "The package repo url is: $packageRepo"
+            echo ""
+            read -p "Would you like to add the LTTng package repo to your YUM configuration? [Y/N]" resp
+            ResetText
+        fi
+
         # Make sure that wget is installed.
         BlueText
         echo "Installing wget.  Required to add package repo."
@@ -982,9 +1132,17 @@ InstallLTTng_RHEL()
 
         # Update the yum package database.
         yum updateinfo
+    fi
 
-        # Install LTTng
-        yum install lttng-tools lttng-ust kmod-lttng-modules babeltrace
+    # Install LTTng
+    yum install -y lttng-tools lttng-ust babeltrace
+    if  [ "$isRHEL7" == "1" ]
+    then
+        yum install -y kmod-lttng-modules
+    else
+        YellowText
+        echo "LTTng kernel package (kmod-lttng-modules) is not available on this platform."
+        ResetText
     fi
 }
 
@@ -1059,6 +1217,9 @@ InstallLTTng()
     elif [ "$(IsRHEL)" == "1" ]
     then
         InstallLTTng_RHEL
+    elif [ "$(IsAlpine)" == "1" ]
+    then
+        echo "lttng-tools is not available on Alpine Linux, so no lttng-ust events will be collected."
     else
         FatalError "Auto install unsupported for this distribution.  Install lttng and lttng-ust packages manually."
     fi
@@ -1077,9 +1238,6 @@ SupportsAutoInstall()
 
 EnsurePrereqsInstalled()
 {
-    # Discover commands and then determine if they're all present.
-    DiscoverCommands
-
     # If perf is not installed, then bail, as it is currently required.
     if [ "$perfcmd" == "" ]
     then
@@ -1094,6 +1252,12 @@ EnsurePrereqsInstalled()
         fi
         ResetText
         exit 1
+    fi
+
+    # Disable LTTng use if running on Alpine.
+    if [ "$(IsAlpine)" == "1" ]
+    then
+        useLTTng=0
     fi
 
     # If LTTng is installed, consider using it.
@@ -1147,13 +1311,6 @@ events=''
 
 ProcessArguments()
 {
-    # No arguments
-    if [ "$#" == "0" ]
-    then
-        PrintUsage
-        exit 0
-    fi
-
     # Set the action
     action=$1
 
@@ -1199,8 +1356,12 @@ ProcessArguments()
         then
             local value=${args[$i+1]}
 
-            # Convert the value to lower case.
-            value=`echo $value | tr '[:upper:]' '[:lower:]'`
+            # Keep the cases of '-events' value to match keyword variables
+            if [ "-events" != "$arg" ]
+            then
+                # Convert the value to lower case.
+                value=`echo $value | tr '[:upper:]' '[:lower:]'`
+            fi
         fi
 
         # Match the arg to a known value.
@@ -1219,6 +1380,11 @@ ProcessArguments()
         elif [ "-threadtime" == "$arg" ]
         then
             collect_threadTime=1
+        elif [ "-offcpu" == "$arg" ]
+        then
+            # Perf doesn't support capturing cpu-clock events and sched events concurrently.
+            collect_cpu=0
+            collect_offcpu=1
         elif [ "-hwevents" == "$arg" ]
         then
             collect_HWevents=1
@@ -1277,9 +1443,9 @@ CreateLTTngSession()
 {
     if [ "$action" == "livetrace" ]
     then
-        output=`lttng create --live`
+        output=`$lttngcmd create --live`
     else
-        output=`lttng create`
+        output=`$lttngcmd create`
     fi
 
     lttngSessionName=`echo $output | grep -o "Session.*created." | sed 's/\(Session \| created.\)//g'`
@@ -1290,14 +1456,14 @@ SetupLTTngSession()
 {
     
     # Setup per-event context information.
-    RunSilent "lttng add-context --userspace --type vpid"
-    RunSilent "lttng add-context --userspace --type vtid"
-    RunSilent "lttng add-context --userspace --type procname"
-    RunSilent "lttng add-context --kernel -t pid -t procname"
+    RunSilent "$lttngcmd add-context --userspace --type vpid"
+    RunSilent "$lttngcmd add-context --userspace --type vtid"
+    RunSilent "$lttngcmd add-context --userspace --type procname"
+    RunSilent "$lttngcmd add-context --kernel -t pid -t procname"
 
     if [ "$action" == "livetrace" ]
     then
-        RunSilent "lttng enable-event --userspace --tracepoint DotNETRuntime:EventSource"
+        RunSilent "$lttngcmd enable-event --userspace --tracepoint DotNETRuntime:EventSource"
     elif [ "$gcCollectOnly" == "1" ]
     then
         usePerf=0
@@ -1337,18 +1503,31 @@ SetupLTTngSession()
         elif [ "$events" == "threading" ]
         then
             EnableLTTngEvents ${DotNETRuntime_ThreadingKeyword[@]}
-        elif [ "$events" == "processlifetime" ]
-        then
-            # Setup kernel events. 
-            # TODO: enable triggers of different kernel events, instead of a default set of kernel events
-            EnableLTTngKernelEvents ${LTTng_Kernel_ProcessLifetime[@]}
+        else     
+            # Enable other keywords
+            events=(${events//","/" "})
+            for event in ${events[@]}
+            do 
+                if [ "${!event}" == "" ] || [ "$( echo `declare -p $event | grep -- -a` )" == "" ]
+                then
+                    echo Invalid keyword $event, skipped...
+                    continue
+                fi
+                local -a 'keywords=("${'"$event"'[@]}")'
+                if [ "${event#"LTTng_Kernel_"}" != "$event" ]
+                then 
+                    EnableLTTngKernelEvents ${keywords[@]}
+                else
+                    EnableLTTngEvents ${keywords[@]}
+                fi
+            done
         fi
     fi
 }
 
 DestroyLTTngSession()
 {
-    RunSilent "lttng destroy $lttngSessionName"
+    RunSilent "$lttngcmd destroy $lttngSessionName"
 }
 
 StartLTTngCollection()
@@ -1356,12 +1535,12 @@ StartLTTngCollection()
     CreateLTTngSession
     SetupLTTngSession
 
-    RunSilent "lttng start $lttngSessionName"
+    RunSilent "$lttngcmd start $lttngSessionName"
 }
 
 StopLTTngCollection()
 {
-    RunSilent "lttng stop $lttngSessionName"
+    RunSilent "$lttngcmd stop $lttngSessionName"
     DestroyLTTngSession
 }
 
@@ -1371,7 +1550,7 @@ EnableLTTngEvents()
     args=( "$@" )
     for (( i=0; i<${#args[@]}; i++ ))
     do
-        RunSilent "lttng enable-event -s $lttngSessionName -u --tracepoint ${args[$i]}"
+        RunSilent "$lttngcmd enable-event -s $lttngSessionName -u --tracepoint ${args[$i]}"
     done
 }
 
@@ -1380,7 +1559,7 @@ EnableLTTngKernelEvents()
     args=( "$@" )
     for (( i=0; i<${#args[@]}; i++ ))
     do 
-        RunSilent "lttng enable-event -s $lttngSessionName -k ${args[$i]}"
+        RunSilent "$lttngcmd enable-event -s $lttngSessionName -k ${args[$i]}"
     done
 }
 
@@ -1412,8 +1591,9 @@ ProcessCollectedData()
     then
         # Get any perf-$pid.map files that were used by the
         # trace and store them alongside the trace.
+        local writeCrossgenWarning=1
         LogAppend "Saving perf.map files."
-            RunSilent "$perfcmd buildid-list --with-hits"
+        RunSilent "$perfcmd buildid-list --with-hits"
         local mapFiles=`$perfcmd buildid-list --with-hits | grep /tmp/perf- | cut -d ' ' -f 2`
         for mapFile in $mapFiles
         do
@@ -1440,6 +1620,19 @@ ProcessCollectedData()
                 fi
             else
                 LogAppend "Skipping $mapFile.  Some managed symbols may not be resolvable, but trace is still valid."
+            fi
+
+            # Also check for jit-<pid>.dump files.
+            # Convert to jit dump file name.
+            local pid=`echo $mapFile | awk -F"-" '{print $NF}' | awk -F"." '{print $1}'`
+            local path=`echo $mapFile | awk -F"/" '{OFS="/";NF--;print $0;}'`
+            local jitDumpFile="$path/jit-$pid.dump"
+
+            if [ -f $jitDumpFile ]
+            then
+                LogAppend "Saving $jitDumpFile"
+                RunSilent "cp $jitDumpFile ."
+                writeCrossgenWarning=0
             fi
         done
 
@@ -1501,100 +1694,105 @@ ProcessCollectedData()
                         LogAppend "Skipping ${path}"
                     fi
                 done
-
-            WriteStatus "...FINISHED"
-
         else
-        if [ "$buildidList" != "" ]
+        if [ "$buildidList" != "" ] && [ $writeCrossgenWarning -eq 1 ]
         then
             LogAppend "crossgen not found, skipping native image map generation."
             WriteStatus "...SKIPPED"
             WriteWarning "Crossgen not found.  Framework symbols will be unavailable."
             WriteWarning "See https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/linux-performance-tracing.md#resolving-framework-symbols for details."
-        else
-            WriteWarning "libcoreclr.so not found in perf data. Please verify that your .NET Core process is running and consuming CPU."
         fi
         fi
 
         IFS=$OLDIFS
 
-        # Create debuginfo files (separate symbols) for all modules in the trace.
-        WriteStatus "Saving native symbols"
+        WriteStatus "...FINISHED"
 
-        # Get the list of DSOs with hits in the trace file (those that are actually used).
-        # Filter out /tmp/perf-$pid.map files and files that end in .dll.
-        local dsosWithHits=`$perfcmd buildid-list --with-hits | grep -v /tmp/perf- | grep -v .dll$`
-        for dso in $dsosWithHits
-        do
-            # Build up tuples of buildid and binary path.
-            local processEntry=0
-            if [ -f $dso ]
-            then
-                local pathToBinary=$dso
-                processEntry=1
-            else
-                local buildid=$dso
-                pathToBinary=''
-            fi
+        if [ "$objdumpcmd" != "" ]
+        then
+            # Create debuginfo files (separate symbols) for all modules in the trace.
+            WriteStatus "Saving native symbols"
 
-            # Once we have a tuple for a binary path that exists, process it.
-            if [ "$processEntry" == "1" ]
-            then
-                # Get the binary name without path.
-                local binaryName=`basename $pathToBinary`
-
-                # Build the debuginfo file name.
-                local destFileName=$binaryName.debuginfo
-
-                # Build the destination directory for the debuginfo file.
-                local currentDir=`pwd`
-                local destDir=$currentDir/debuginfo/$buildid
-
-                # Build the full path to the debuginfo file.
-                local destPath=$destDir/$destFileName
-
-                # Check to see if the DSO contains symbols, and if so, build the debuginfo file.
-                local noSymbols=`objdump -t $pathToBinary | grep "no symbols" -c`
-                if [ "$noSymbols" == "0" ]
+            # Get the list of DSOs with hits in the trace file (those that are actually used).
+            # Filter out /tmp/perf-$pid.map files and files that end in .dll.
+            local dsosWithHits=`$perfcmd buildid-list --with-hits | grep -v /tmp/perf- | grep -v .dll$`
+            for dso in $dsosWithHits
+            do
+                # Build up tuples of buildid and binary path.
+                local processEntry=0
+                if [ -f $dso ]
                 then
-                    LogAppend "Generating debuginfo for $binaryName with buildid=$buildid"
-                    RunSilent "mkdir -p $destDir"
-                    RunSilent "objcopy --only-keep-debug $pathToBinary $destPath"
+                    local pathToBinary=$dso
+                    processEntry=1
                 else
-                    LogAppend "Skipping $binaryName with buildid=$buildid.  No symbol information."
+                    local buildid=$dso
+                    pathToBinary=''
                 fi
-            fi
-        done
+
+                # Once we have a tuple for a binary path that exists, process it.
+                if [ "$processEntry" == "1" ]
+                then
+                    # Get the binary name without path.
+                    local binaryName=`basename $pathToBinary`
+
+                    # Build the debuginfo file name.
+                    local destFileName=$binaryName.debuginfo
+
+                    # Build the destination directory for the debuginfo file.
+                    local currentDir=`pwd`
+                    local destDir=$currentDir/debuginfo/$buildid
+
+                    # Build the full path to the debuginfo file.
+                    local destPath=$destDir/$destFileName
+
+                    # Check to see if the DSO contains symbols, and if so, build the debuginfo file.
+                    local noSymbols=`$objdumpcmd -t $pathToBinary | grep "no symbols" -c`
+                    if [ "$noSymbols" == "0" ]
+                    then
+                        LogAppend "Generating debuginfo for $binaryName with buildid=$buildid"
+                        RunSilent "mkdir -p $destDir"
+                        RunSilent "objcopy --only-keep-debug $pathToBinary $destPath"
+                    else
+                        LogAppend "Skipping $binaryName with buildid=$buildid.  No symbol information."
+                    fi
+                fi
+            done
+
+            WriteStatus "...FINISHED"
+        fi
+
+        WriteStatus "Resolving JIT and R2R symbols"
+
+        originalFile="perf.data"
+        inputFile="perf-jit.data"
+        RunSilent $perfcmd inject --input $originalFile --jit --output $inputFile
 
         WriteStatus "...FINISHED"
 
-            WriteStatus "Exporting perf.data file"
+        WriteStatus "Exporting perf.data file"
 
-        # Merge sched_stat and sched_switch events.
         outputDumpFile="perf.data.txt"
-        mergedFile="perf.data.merged"
-        RunSilent "$perfcmd inject -v -s -i perf.data -o $mergedFile"
 
-            # I've not found a good way to get the behavior that we want here - running the command and redirecting the output
-            # when passing the command line to a function.  Thus, this case is hardcoded.
+        # I've not found a good way to get the behavior that we want here - running the command and redirecting the output
+        # when passing the command line to a function.  Thus, this case is hardcoded.
 
         # There is a breaking change where the capitalization of the -f parameter changed.
-        LogAppend "Running $perfcmd script -i $mergedFile -F comm,pid,tid,cpu,time,period,event,ip,sym,dso,trace > $outputDumpFile"
-        $perfcmd script -i $mergedFile -F comm,pid,tid,cpu,time,period,event,ip,sym,dso,trace > $outputDumpFile 2>>$logFile
+        LogAppend "Running $perfcmd script -i $inputFile -F comm,pid,tid,cpu,time,period,event,ip,sym,dso,trace > $outputDumpFile"
+        $perfcmd script -i $inputFile -F comm,pid,tid,cpu,time,period,event,ip,sym,dso,trace > $outputDumpFile 2>>$logFile
         LogAppend
 
         if [ $? -ne 0 ]
         then
-            LogAppend "Running $perfcmd script -i $mergedFile -f comm,pid,tid,cpu,time,period,event,ip,sym,dso,trace > $outputDumpFile"
-            $perfcmd script -i $mergedFile -f comm,pid,tid,cpu,time,period,event,ip,sym,dso,trace > $outputDumpFile 2>>$logFile
+            LogAppend "Running $perfcmd script -i $inputFile -f comm,pid,tid,cpu,time,period,event,ip,sym,dso,trace > $outputDumpFile"
+            $perfcmd script -i $inputFile -f comm,pid,tid,cpu,time,period,event,ip,sym,dso,trace > $outputDumpFile 2>>$logFile
             LogAppend
         fi
 
         # If the dump file is zero length, try to collect without the period field, which was added recently.
         if [ ! -s $outputDumpFile ]
         then
-            LogAppend "Running $perfcmd script -i $mergedFile -f comm,pid,tid,cpu,time,event,ip,sym,dso,trace > $outputDumpFile"
-            $perfcmd script -i $mergedFile -f comm,pid,tid,cpu,time,event,ip,sym,dso,trace > $outputDumpFile 2>>$logFile
+            LogAppend "Running $perfcmd script -i $inputFile -f comm,pid,tid,cpu,time,event,ip,sym,dso,trace > $outputDumpFile"
+            $perfcmd script -i $inputFile -f comm,pid,tid,cpu,time,event,ip,sym,dso,trace > $outputDumpFile 2>>$logFile
             LogAppend
         fi
 
@@ -1688,8 +1886,9 @@ PrintUsage()
     echo "collect options:"
     echo "By default, collection includes CPU samples collected every ms."
     echo "    -pid          : Only collect data from the specified process id."
-    echo "    -threadtime       : Collect context switch events."
-    echo "  -hwevents         : Collect (some) hardware counters."
+    echo "    -threadtime   : Collect events for thread time analysis (on and off cpu)."
+    echo "    -offcpu       : Collect events for off-cpu analysis."
+    echo "    -hwevents     : Collect (some) hardware counters."
     echo ""
     echo "start:"
     echo "    Start collection, but with Lttng trace ONLY. It needs to be used with 'stop' action."
@@ -1717,8 +1916,8 @@ PrintUsage()
 
 BuildPerfRecordArgs()
 {
-    # Start with default collection arguments that record all CPUs (-a) and collect call stacks (-g)
-    collectionArgs="record -g"
+    # Start with default collection arguments that record at realtime priority, all CPUs (-a), and collect call stacks (-g)
+    collectionArgs="record -k 1 -g"
 
     # Filter to a single process if desired
     if [ "$collectionPid" != "" ]
@@ -1731,8 +1930,15 @@ BuildPerfRecordArgs()
     # Enable CPU Collection
     if [ $collect_cpu -eq 1 ]
     then
-        collectionArgs="$collectionArgs -F 999"
+        collectionArgs="$collectionArgs"
         eventsToCollect=( "${eventsToCollect[@]}" "cpu-clock" )
+
+        # If only collecting CPU events, set the sampling rate to 1000.
+        # Otherwise, use the default sampling rate to avoid sampling sched events.
+        if [ $collect_threadTime -eq 0 ] && [ $collect_offcpu -eq 0 ]
+        then
+            collectionArgs="$collectionArgs -F 1000"
+        fi
     fi
 
     # Enable HW counters event collection
@@ -1743,6 +1949,12 @@ BuildPerfRecordArgs()
     
     # Enable context switches.
     if [ $collect_threadTime -eq 1 ]
+    then
+        eventsToCollect=( "${eventsToCollect[@]}" "sched:sched_stat_sleep" "sched:sched_switch" "sched:sched_process_exit" )
+    fi
+
+    # Enable offcpu collection
+    if [ $collect_offcpu -eq 1 ]
     then
         eventsToCollect=( "${eventsToCollect[@]}" "sched:sched_stat_sleep" "sched:sched_switch" "sched:sched_process_exit" )
     fi
@@ -1821,7 +2033,12 @@ DoCollect()
     else
         if [ "$usePerf" == "1" ]
         then
-            RunSilent $perfcmd $collectionArgs
+            if [ ! -z ${duration} ]
+            then
+                RunSilent $perfcmd $collectionArgs
+            else
+                RunSilentBackground $perfcmd $collectionArgs
+            fi
         else
             # Wait here until CTRL+C handler gets called when user types CTRL+C.
             LogAppend "Waiting for CTRL+C handler to get called."
@@ -1935,6 +2152,13 @@ DoView()
 ## Main Script Start
 #####################################
 
+# No arguments
+if [ "$#" == "0" ]
+then
+    PrintUsage
+    exit 0
+fi
+
 # Install perf if requested.  Do this before all other validation.
 if [ "$1" == "install" ]
 then
@@ -1947,8 +2171,8 @@ then
     exit 0
 fi
 
-# Ensure prerequisites are installed.
-EnsurePrereqsInstalled
+# Discover external commands that will be called by this script.
+DiscoverCommands
 
 # Initialize the log.
 if [ "$1" != "stop" ]
@@ -1958,6 +2182,9 @@ fi
 
 # Process arguments.
 ProcessArguments $@
+
+# Ensure prerequisites are installed.
+EnsurePrereqsInstalled
 
 # Take the appropriate action.
 if [ "$action" == "collect" ] || [ "$action" == "start" ]

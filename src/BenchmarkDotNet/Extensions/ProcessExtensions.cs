@@ -130,7 +130,7 @@ namespace BenchmarkDotNet.Extensions
             if (benchmarkCase.Job.Environment.Runtime is MonoRuntime monoRuntime && !string.IsNullOrEmpty(monoRuntime.MonoBclPath))
                 start.EnvironmentVariables["MONO_PATH"] = monoRuntime.MonoBclPath;
 
-            if (benchmarkCase.Config.GetDiagnosers().OfType<LttngProfiler>().Any())
+            if (benchmarkCase.Config.GetDiagnosers().OfType<PerfCollectProfiler>().Any())
             {
                 start.EnvironmentVariables["COMPlus_PerfMapEnabled"] = "1";
                 start.EnvironmentVariables["COMPlus_EnableEventLog"] = "1";
