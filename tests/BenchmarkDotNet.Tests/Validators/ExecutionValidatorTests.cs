@@ -298,12 +298,8 @@ namespace BenchmarkDotNet.Tests.Validators
         [Fact]
         public void NonPublicFieldsWithParamsAreDiscovered()
         {
-            var validationErrors = ExecutionValidator.FailOnError
-                .Validate(BenchmarkConverter.TypeToBenchmarks(typeof(NonPublicFieldWithParams)))
-                .ToList();
-
-            Assert.NotEmpty(validationErrors);
-            Assert.StartsWith($"Member \"{nameof(NonPublicFieldWithParams.Field)}\" must be public if it has the [Params]", validationErrors.Single().Message);
+            Assert.Throws<InvalidOperationException>(
+                () => ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(NonPublicFieldWithParams))));
         }
 
         public class NonPublicFieldWithParams
@@ -316,6 +312,29 @@ namespace BenchmarkDotNet.Tests.Validators
 
             [Benchmark]
             public void NonThrowing() { }
+        }
+
+        [Fact]
+        public void NonPublicFieldsWithParamsSourceAreDiscovered()
+        {
+            Assert.Throws<InvalidOperationException>(
+                () => ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(NonPublicFieldWithParamsSource))));
+        }
+
+        public class NonPublicFieldWithParamsSource
+        {
+#pragma warning disable CS0649
+            [ParamsSource(nameof(Get))]
+            internal int Field;
+#pragma warning restore CS0649
+
+            [Benchmark]
+            public void NonThrowing() { }
+
+            public IEnumerable<object> Get()
+            {
+                yield return 0;
+            }
         }
 
         [Fact]
