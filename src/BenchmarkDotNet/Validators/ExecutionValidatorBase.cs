@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -24,29 +25,34 @@ namespace BenchmarkDotNet.Validators
 
             foreach (var typeGroup in validationParameters.Benchmarks.GroupBy(benchmark => benchmark.Descriptor.Type))
             {
-                if (!TryCreateBenchmarkTypeInstance(typeGroup.Key, errors, out var benchmarkTypeInstance))
+                var executors = new List<BenchmarkExecutor>();
+
+                foreach (var benchmark in typeGroup)
                 {
-                    continue;
+                    if (!TryCreateBenchmarkTypeInstance(typeGroup.Key, errors, out var benchmarkTypeInstance))
+                        continue;
+
+                    if (!TryToFillParameters(benchmark, benchmarkTypeInstance, errors))
+                        continue;
+
+                    if (!TryToCallGlobalSetup(benchmarkTypeInstance, errors))
+                        continue;
+
+                    if (!TryToCallIterationSetup(benchmarkTypeInstance, errors))
+                        continue;
+
+                    executors.Add(new BenchmarkExecutor(benchmarkTypeInstance, benchmark));
                 }
 
-                if (!TryToSetParamsFields(benchmarkTypeInstance, errors))
+                ExecuteBenchmarks(executors, errors);
+
+                foreach (var executor in executors)
                 {
-                    continue;
+                    if (!TryToCallIterationCleanup(executor.Instance, errors))
+                        continue;
+
+                    TryToCallGlobalCleanup(executor.Instance, errors);
                 }
-
-                if (!TryToSetParamsProperties(benchmarkTypeInstance, errors))
-                {
-                    continue;
-                }
-
-                if (!TryToCallGlobalSetup(benchmarkTypeInstance, errors))
-                {
-                    continue;
-                }
-
-                ExecuteBenchmarks(benchmarkTypeInstance, typeGroup, errors);
-
-                TryToCallGlobalCleanup(benchmarkTypeInstance, errors);
             }
 
             return errors;
@@ -73,15 +79,25 @@ namespace BenchmarkDotNet.Validators
 
         private bool TryToCallGlobalSetup(object benchmarkTypeInstance, List<ValidationError> errors)
         {
-            return TryToCallGlobalMethod<GlobalSetupAttribute>(benchmarkTypeInstance, errors);
+            return TryToCallGlobalMethod<GlobalSetupAttribute>(benchmarkTypeInstance, errors, true);
         }
 
         private void TryToCallGlobalCleanup(object benchmarkTypeInstance, List<ValidationError> errors)
         {
-            TryToCallGlobalMethod<GlobalCleanupAttribute>(benchmarkTypeInstance, errors);
+            TryToCallGlobalMethod<GlobalCleanupAttribute>(benchmarkTypeInstance, errors, true);
         }
 
-        private bool TryToCallGlobalMethod<T>(object benchmarkTypeInstance, List<ValidationError> errors)
+        private bool TryToCallIterationSetup(object benchmarkTypeInstance, List<ValidationError> errors)
+        {
+            return TryToCallGlobalMethod<IterationSetupAttribute>(benchmarkTypeInstance, errors, false);
+        }
+
+        private bool TryToCallIterationCleanup(object benchmarkTypeInstance, List<ValidationError> errors)
+        {
+            return TryToCallGlobalMethod<IterationCleanupAttribute>(benchmarkTypeInstance, errors, false);
+        }
+
+        private bool TryToCallGlobalMethod<T>(object benchmarkTypeInstance, List<ValidationError> errors, bool canBeAsync) where T : Attribute
         {
             var methods = benchmarkTypeInstance
                 .GetType()
@@ -107,7 +123,16 @@ namespace BenchmarkDotNet.Validators
             {
                 var result = methods.First().Invoke(benchmarkTypeInstance, null);
 
-                TryToGetTaskResult(result);
+                var isAsyncMethod = TryAwaitTask(result, out _);
+
+                if (!canBeAsync && isAsyncMethod)
+                {
+                    errors.Add(new ValidationError(
+                        TreatsWarningsAsErrors,
+                        $"[{GetAttributeName(typeof(T))}] cannot be async. Error in type {benchmarkTypeInstance.GetType().Name}"));
+
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -121,134 +146,114 @@ namespace BenchmarkDotNet.Validators
             return true;
         }
 
-        private static string GetAttributeName(Type type) => type.Name.Replace("Attribute", string.Empty);
-
-        private static void TryToGetTaskResult(object result)
+        private static bool TryAwaitTask(object task, out object result)
         {
-            if (result == null)
+            result = null;
+
+            if (task is null)
             {
-                return;
+                return false;
             }
 
-            var returnType = result.GetType();
+            var returnType = task.GetType();
             if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ValueTask<>))
             {
-                var asTaskMethod = result.GetType().GetMethod("AsTask");
-                result = asTaskMethod.Invoke(result, null);
+                var asTaskMethod = task.GetType().GetMethod("AsTask");
+                task = asTaskMethod.Invoke(task, null);
             }
 
-            if (result is Task task)
-            {
-                task.GetAwaiter().GetResult();
-            }
-            else if (result is ValueTask valueTask)
-            {
-                valueTask.GetAwaiter().GetResult();
-            }
-        }
+            if (task is ValueTask valueTask)
+                task = valueTask.AsTask();
 
-        private bool TryToSetParamsFields(object benchmarkTypeInstance, List<ValidationError> errors)
-        {
-            var paramFields = benchmarkTypeInstance
-                .GetType()
-                .GetAllFields()
-                .Where(fieldInfo => fieldInfo.GetCustomAttributes(false).OfType<ParamsAttribute>().Any())
-                .ToArray();
-
-            if (!paramFields.Any())
+            if (task is Task t)
             {
+                if (TryGetTaskResult(t, out var taskResult))
+                    result = taskResult;
+
                 return true;
             }
 
-            foreach (var paramField in paramFields)
-            {
-                if (!paramField.IsPublic)
-                {
-                    errors.Add(new ValidationError(
-                        TreatsWarningsAsErrors,
-                        $"Fields marked with [Params] must be public, {paramField.Name} of {benchmarkTypeInstance.GetType().Name} is not"));
-
-                    return false;
-                }
-
-                var values = paramField.GetCustomAttributes(false).OfType<ParamsAttribute>().Single().Values;
-                if (!values.Any())
-                {
-                    errors.Add(new ValidationError(
-                        TreatsWarningsAsErrors,
-                        $"Fields marked with [Params] must have some values defined, {paramField.Name} of {benchmarkTypeInstance.GetType().Name} has none"));
-
-                    return false;
-                }
-
-                try
-                {
-                    paramField.SetValue(benchmarkTypeInstance, values.First());
-                }
-                catch (Exception ex)
-                {
-                    errors.Add(new ValidationError(
-                        TreatsWarningsAsErrors,
-                        $"Failed to set {paramField.Name} of {benchmarkTypeInstance.GetType().Name} to {values.First()}, exception was: {GetDisplayExceptionMessage(ex)}"));
-
-                    return false;
-                }
-            }
-
-            return true;
+            return false;
         }
 
-        private bool TryToSetParamsProperties(object benchmarkTypeInstance, List<ValidationError> errors)
+        // https://stackoverflow.com/a/52500763
+        private static bool TryGetTaskResult(Task task, out object result)
         {
-            var paramProperties = benchmarkTypeInstance
-                .GetType()
-                .GetAllProperties()
-                .Where(propertyInfo => propertyInfo.GetCustomAttributes(false).OfType<ParamsAttribute>().Any())
-                .ToArray();
+            task.GetAwaiter().GetResult();
 
-            if (!paramProperties.Any())
+            result = null;
+
+            var voidTaskType = typeof(Task<>).MakeGenericType(Type.GetType("System.Threading.Tasks.VoidTaskResult"));
+            if (voidTaskType.IsInstanceOfType(task))
             {
-                return true;
+                return false;
             }
 
-            foreach (var paramProperty in paramProperties)
+            var property = task.GetType().GetProperty("Result", BindingFlags.Public | BindingFlags.Instance);
+            if (property is null)
             {
-                var setter = paramProperty.SetMethod;
-                if (setter == null || !setter.IsPublic)
-                {
-                    errors.Add(new ValidationError(
-                        TreatsWarningsAsErrors,
-                        $"Properties marked with [Params] must have public setter, {paramProperty.Name} of {benchmarkTypeInstance.GetType().Name} has not"));
-
-                    return false;
-                }
-
-                var values = paramProperty.GetCustomAttributes(false).OfType<ParamsAttribute>().Single().Values;
-                if (!values.Any())
-                {
-                    errors.Add(new ValidationError(
-                        TreatsWarningsAsErrors,
-                        $"Properties marked with [Params] must have some values defined, {paramProperty.Name} of {benchmarkTypeInstance.GetType().Name} has not"));
-
-                    return false;
-                }
-
-                try
-                {
-                    setter.Invoke(benchmarkTypeInstance, new[] { values.First() });
-                }
-                catch (Exception ex)
-                {
-                    errors.Add(new ValidationError(
-                        TreatsWarningsAsErrors,
-                        $"Failed to set {paramProperty.Name} of {benchmarkTypeInstance.GetType().Name} to {values.First()}, exception was: {GetDisplayExceptionMessage(ex)}"));
-
-                    return false;
-                }
+                return false;
             }
 
+            result = property.GetValue(task);
             return true;
         }
+
+        private bool TryToFillParameters(BenchmarkCase benchmark, object benchmarkTypeInstance, List<ValidationError> errors)
+        {
+            if (ValidateMembers<ParamsAttribute>(benchmarkTypeInstance, errors))
+                return false;
+
+            if (ValidateMembers<ParamsSourceAttribute>(benchmarkTypeInstance, errors))
+                return false;
+
+            bool hasError = false;
+
+            foreach (var parameter in benchmark.Parameters.Items)
+            {
+                // InProcessNoEmitToolchain does not support arguments
+                if (!parameter.IsArgument)
+                {
+                    try
+                    {
+                        InProcessNoEmitRunner.FillMember(benchmarkTypeInstance, benchmark, parameter);
+                    }
+                    catch (Exception ex)
+                    {
+                        hasError = true;
+                        errors.Add(new ValidationError(
+                            TreatsWarningsAsErrors,
+                            ex.Message,
+                            benchmark));
+                    }
+                }
+            }
+
+            return !hasError;
+        }
+
+        private bool ValidateMembers<T>(object benchmarkTypeInstance, List<ValidationError> errors) where T : Attribute
+        {
+            const BindingFlags reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
+            bool hasError = false;
+
+            foreach (var member in benchmarkTypeInstance.GetType().GetTypeMembersWithGivenAttribute<T>(reflectionFlags))
+            {
+                if (!member.IsPublic)
+                {
+                    errors.Add(new ValidationError(
+                        TreatsWarningsAsErrors,
+                        $"Member \"{member.Name}\" must be public if it has the [{GetAttributeName(typeof(T))}] attribute applied to it, {member.Name} of {benchmarkTypeInstance.GetType().Name} has not"));
+
+                    hasError = true;
+                }
+            }
+
+            return hasError;
+        }
+
+        private static string GetAttributeName(Type type) => type.Name.Replace("Attribute", string.Empty);
 
         protected static string GetDisplayExceptionMessage(Exception ex)
         {
@@ -258,6 +263,33 @@ namespace BenchmarkDotNet.Validators
             return ex?.Message ?? "Unknown error";
         }
 
-        protected abstract void ExecuteBenchmarks(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors);
+        protected abstract void ExecuteBenchmarks(IEnumerable<BenchmarkExecutor> executors, List<ValidationError> errors);
+
+        protected class BenchmarkExecutor
+        {
+            public object Instance { get; }
+            public BenchmarkCase BenchmarkCase { get; }
+
+            public BenchmarkExecutor(object instance, BenchmarkCase benchmarkCase)
+            {
+                Instance = instance;
+                BenchmarkCase = benchmarkCase;
+            }
+
+            public object Invoke()
+            {
+                var arguments = BenchmarkCase.Parameters.Items
+                    .Where(parameter => parameter.IsArgument)
+                    .Select(argument => argument.Value)
+                    .ToArray();
+
+                var result = BenchmarkCase.Descriptor.WorkloadMethod.Invoke(Instance, arguments);
+
+                if (TryAwaitTask(result, out var taskResult))
+                    result = taskResult;
+
+                return result;
+            }
+        }
     }
 }

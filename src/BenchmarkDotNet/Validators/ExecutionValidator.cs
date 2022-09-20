@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -12,20 +11,20 @@ namespace BenchmarkDotNet.Validators
         private ExecutionValidator(bool failOnError)
             : base(failOnError) { }
 
-        protected override void ExecuteBenchmarks(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors)
+        protected override void ExecuteBenchmarks(IEnumerable<BenchmarkExecutor> executors, List<ValidationError> errors)
         {
-            foreach (var benchmark in benchmarks)
+            foreach (var executor in executors)
             {
                 try
                 {
-                    benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null);
+                    executor.Invoke();
                 }
                 catch (Exception ex)
                 {
                     errors.Add(new ValidationError(
                         TreatsWarningsAsErrors,
-                        $"Failed to execute benchmark '{benchmark.DisplayInfo}', exception was: '{GetDisplayExceptionMessage(ex)}'",
-                        benchmark));
+                        $"Failed to execute benchmark '{executor.BenchmarkCase.DisplayInfo}', exception was: '{GetDisplayExceptionMessage(ex)}'",
+                        executor.BenchmarkCase));
                 }
             }
         }
