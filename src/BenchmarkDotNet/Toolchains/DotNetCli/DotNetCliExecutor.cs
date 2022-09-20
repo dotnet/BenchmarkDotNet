@@ -34,24 +34,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return ExecuteResult.CreateFailed();
             }
 
-            try
-            {
-                return Execute(
-                    executeParameters.BenchmarkCase,
-                    executeParameters.BenchmarkId,
-                    executeParameters.Logger,
-                    executeParameters.BuildResult.ArtifactsPaths,
-                    executeParameters.Diagnoser,
-                    Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath),
-                    executeParameters.Resolver,
-                    executeParameters.LaunchIndex);
-            }
-            finally
-            {
-                executeParameters.Diagnoser?.Handle(
-                    HostSignal.AfterProcessExit,
-                    new DiagnoserActionParameters(null, executeParameters.BenchmarkCase, executeParameters.BenchmarkId));
-            }
+            return Execute(
+                executeParameters.BenchmarkCase,
+                executeParameters.BenchmarkId,
+                executeParameters.Logger,
+                executeParameters.BuildResult.ArtifactsPaths,
+                executeParameters.Diagnoser,
+                Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath),
+                executeParameters.Resolver,
+                executeParameters.LaunchIndex);
         }
 
         private ExecuteResult Execute(BenchmarkCase benchmarkCase,
@@ -109,13 +100,22 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     processOutputReader.StopRead();
                 }
 
-                return new ExecuteResult(true,
-                    process.HasExited ? process.ExitCode : null,
-                    process.Id,
-                    broker.Results,
-                    broker.PrefixedOutput,
-                    processOutputReader.GetOutputLines(),
-                    launchIndex);
+                try
+                {
+                    return new ExecuteResult(true,
+                        process.HasExited ? process.ExitCode : null,
+                        process.Id,
+                        broker.Results,
+                        broker.PrefixedOutput,
+                        processOutputReader.GetOutputLines(),
+                        launchIndex);
+                }
+                finally
+                {
+                    diagnoser?.Handle(
+                        HostSignal.AfterProcessExit,
+                        new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
+                }
             }
         }
     }
