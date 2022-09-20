@@ -43,7 +43,8 @@ namespace BenchmarkDotNet.Portability
 
         public static bool IsNativeAOT
             => Environment.Version.Major >= 5
-                && string.IsNullOrEmpty(typeof(object).Assembly.Location); // it's merged to a single .exe and .Location returns null
+                && string.IsNullOrEmpty(typeof(object).Assembly.Location) // it's merged to a single .exe and .Location returns null
+                && !IsWasm; // Wasm also returns "" for assembly locations
 
         public static bool IsWasm => IsOSPlatform(OSPlatform.Create("BROWSER"));
 
