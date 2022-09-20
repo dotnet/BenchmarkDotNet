@@ -156,14 +156,14 @@ namespace BenchmarkDotNet.Extensions
                 .Where(method => method.GetCustomAttributes(true).OfType<BenchmarkAttribute>().Any())
                 .ToArray();
 
-        internal static (string Name, TAttribute Attribute, bool IsPrivate, bool IsStatic, Type ParameterType)[] GetTypeMembersWithGivenAttribute<TAttribute>(this Type type, BindingFlags reflectionFlags)
+        internal static (string Name, TAttribute Attribute, bool IsPublic, bool IsStatic, Type ParameterType)[] GetTypeMembersWithGivenAttribute<TAttribute>(this Type type, BindingFlags reflectionFlags)
             where TAttribute : Attribute
         {
             var allFields = type.GetFields(reflectionFlags)
                                 .Select(f => (
                                     Name: f.Name,
                                     Attribute: f.ResolveAttribute<TAttribute>(),
-                                    IsPrivate: f.IsPrivate,
+                                    IsPublic: f.IsPublic,
                                     IsStatic: f.IsStatic,
                                     ParameterType: f.FieldType));
 
@@ -171,16 +171,12 @@ namespace BenchmarkDotNet.Extensions
                                     .Select(p => (
                                         Name: p.Name,
                                         Attribute: p.ResolveAttribute<TAttribute>(),
-                                        IsPrivate: p.GetSetMethod() == null,
+                                        IsPublic: p.GetSetMethod() != null && p.GetSetMethod().IsPublic,
                                         IsStatic: p.GetSetMethod() != null && p.GetSetMethod().IsStatic,
                                         PropertyType: p.PropertyType));
 
-            var joined = allFields.Concat(allProperties).Where(member => member.Attribute != null).ToArray();
-
-            foreach (var member in joined.Where(m => m.IsPrivate))
-                throw new InvalidOperationException($"Member \"{member.Name}\" must be public if it has the [{typeof(TAttribute).Name}] attribute applied to it");
-
-            return joined;
+            var joined = allFields.Concat(allProperties).Where(member => member.Attribute != null);
+            return joined.ToArray();
         }
 
         internal static bool IsStackOnlyWithImplicitCast(this Type argumentType, object argumentInstance)

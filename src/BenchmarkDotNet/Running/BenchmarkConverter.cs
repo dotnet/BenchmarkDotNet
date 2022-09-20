@@ -179,6 +179,10 @@ namespace BenchmarkDotNet.Running
                 const BindingFlags reflectionFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
                 var allMembers = type.GetTypeMembersWithGivenAttribute<TAttribute>(reflectionFlags);
+
+                foreach (var member in allMembers.Where(m => !m.IsPublic))
+                    throw new InvalidOperationException($"Member \"{member.Name}\" must be public if it has the [{typeof(TAttribute).Name}] attribute applied to it");
+
                 return allMembers.Select(member =>
                     new ParameterDefinition(
                         member.Name,
