@@ -1,6 +1,7 @@
 using System.Threading;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Mathematics.StatisticalTesting;
+using Perfolizer.Mathematics.SignificanceTesting;
+using Perfolizer.Mathematics.Thresholds;
 
 namespace BenchmarkDotNet.Samples
 {

@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Diagnosers;
 
-namespace BenchmarkDotNet.Samples 
+namespace BenchmarkDotNet.Samples
 {
     [ShortRunJob]
     [EventPipeProfiler(EventPipeProfile.CpuSampling)]

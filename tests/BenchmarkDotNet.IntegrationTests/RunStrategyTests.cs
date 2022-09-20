@@ -19,10 +19,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void RunStrategiesAreSupported()
         {
-            var logger = new OutputLogger(Output);
             var config = ManualConfig.CreateEmpty()
                 .AddColumnProvider(DefaultColumnProviders.Instance)
-                .AddLogger(logger)
+                .AddLogger(new OutputLogger(Output))
                 .AddJob(new Job(Job.Dry) { Run = { RunStrategy = RunStrategy.ColdStart } })
                 .AddJob(new Job(Job.Dry) { Run = { RunStrategy = RunStrategy.Monitoring } })
                 .AddJob(new Job(Job.Dry) { Run = { RunStrategy = RunStrategy.Throughput } });
@@ -40,45 +39,27 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.Throughput && b.Descriptor.WorkloadMethod.Name == "BenchmarkWithVoid"));
             Assert.Equal(1, results.BenchmarksCases.Count(b => b.Job.Run.RunStrategy == RunStrategy.Throughput && b.Descriptor.WorkloadMethod.Name == "BenchmarkWithReturnValue"));
 
-            string testLog = logger.GetLog();
-            Assert.Contains("// ### Benchmark with void called ###", testLog);
-            Assert.Contains("// ### Benchmark with return value called ###", testLog);
-            Assert.DoesNotContain("No benchmarks found", logger.GetLog());
+            Assert.Equal(6, results.Reports.Length);
+
+            Assert.Single(results.Reports.Where(r => r.BenchmarkCase.Job.Run.RunStrategy == RunStrategy.ColdStart && r.BenchmarkCase.Descriptor.WorkloadMethod.Name == "BenchmarkWithVoid"));
+            Assert.Single(results.Reports.Where(r => r.BenchmarkCase.Job.Run.RunStrategy == RunStrategy.ColdStart && r.BenchmarkCase.Descriptor.WorkloadMethod.Name == "BenchmarkWithReturnValue"));
+
+            Assert.Single(results.Reports.Where(r => r.BenchmarkCase.Job.Run.RunStrategy == RunStrategy.Monitoring && r.BenchmarkCase.Descriptor.WorkloadMethod.Name == "BenchmarkWithVoid"));
+            Assert.Single(results.Reports.Where(r => r.BenchmarkCase.Job.Run.RunStrategy == RunStrategy.Monitoring && r.BenchmarkCase.Descriptor.WorkloadMethod.Name == "BenchmarkWithReturnValue"));
+
+            Assert.Single(results.Reports.Where(r => r.BenchmarkCase.Job.Run.RunStrategy == RunStrategy.Throughput && r.BenchmarkCase.Descriptor.WorkloadMethod.Name == "BenchmarkWithVoid"));
+            Assert.Single(results.Reports.Where(r => r.BenchmarkCase.Job.Run.RunStrategy == RunStrategy.Throughput && r.BenchmarkCase.Descriptor.WorkloadMethod.Name == "BenchmarkWithReturnValue"));
+
+            Assert.True(results.Reports.All(r => r.AllMeasurements.Any()));
         }
 
         public class ModeBenchmarks
         {
-            public bool FirstTime { get; set; }
-
-            [GlobalSetup]
-            public void GlobalSetup()
-            {
-                // Ensure we only print the diagnostic messages once per run in the tests, otherwise it fills up the output log!!
-                FirstTime = true;
-            }
+            [Benchmark]
+            public void BenchmarkWithVoid() { }
 
             [Benchmark]
-            public void BenchmarkWithVoid()
-            {
-                Thread.Sleep(10);
-                if (FirstTime)
-                {
-                    Console.WriteLine("// ### Benchmark with void called ###");
-                    FirstTime = false;
-                }
-            }
-
-            [Benchmark]
-            public string BenchmarkWithReturnValue()
-            {
-                Thread.Sleep(10);
-                if (FirstTime)
-                {
-                    Console.WriteLine("// ### Benchmark with return value called ###");
-                    FirstTime = false;
-                }
-                return "okay";
-            }
+            public string BenchmarkWithReturnValue() => "okay";
         }
     }
 }

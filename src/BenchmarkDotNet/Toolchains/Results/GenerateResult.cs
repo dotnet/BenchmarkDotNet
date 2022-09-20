@@ -10,7 +10,8 @@ namespace BenchmarkDotNet.Toolchains.Results
         public Exception GenerateException { get; }
         public IReadOnlyCollection<string> ArtifactsToCleanup { get; }
 
-        public GenerateResult(ArtifactsPaths artifactsPaths, bool isGenerateSuccess, Exception generateException, IReadOnlyCollection<string> artifactsToCleanup)
+        public GenerateResult(ArtifactsPaths artifactsPaths, bool isGenerateSuccess, Exception generateException,
+            IReadOnlyCollection<string> artifactsToCleanup)
         {
             ArtifactsPaths = artifactsPaths;
             IsGenerateSuccess = isGenerateSuccess;

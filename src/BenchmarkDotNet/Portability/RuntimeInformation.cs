@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Management;
+using System.Numerics;
 using System.Reflection;
-using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Environments;
@@ -21,25 +21,49 @@ namespace BenchmarkDotNet.Portability
 {
     internal static class RuntimeInformation
     {
-        private const string DebugConfigurationName = "DEBUG";
+        internal const string DebugConfigurationName = "DEBUG";
         internal const string ReleaseConfigurationName = "RELEASE";
         internal const string Unknown = "?";
 
         public static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null; // it allocates a lot of memory, we need to check it once in order to keep Engine non-allocating!
 
-        public static bool IsFullFramework => FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
+        public static bool IsFullFramework =>
+#if NET6_0_OR_GREATER
+            false;
+#else
+            FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
+#endif
 
         [PublicAPI]
         public static bool IsNetNative => FrameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase);
 
-        public static bool IsNetCore => FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(typeof(object).Assembly.Location);
+        public static bool IsNetCore
+            => ((Environment.Version.Major >= 5) || FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
+                && !string.IsNullOrEmpty(typeof(object).Assembly.Location);
 
-        /// <summary>
-        /// "The north star for CoreRT is to be a flavor of .NET Core" -> CoreRT reports .NET Core everywhere
-        /// </summary>
-        public static bool IsCoreRT
-            => FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase)
-               && string.IsNullOrEmpty(typeof(object).Assembly.Location); // but it's merged to a single .exe and .Location returns null here ;)
+        public static bool IsNativeAOT
+            => Environment.Version.Major >= 5
+                && string.IsNullOrEmpty(typeof(object).Assembly.Location); // it's merged to a single .exe and .Location returns null
+
+        public static bool IsWasm => IsOSPlatform(OSPlatform.Create("BROWSER"));
+
+        public static bool IsAot { get; } = IsAotMethod(); // This allocates, so we only want to call it once statically.
+
+        private static bool IsAotMethod()
+        {
+            Type runtimeFeature = Type.GetType("System.Runtime.CompilerServices.RuntimeFeature");
+            if (runtimeFeature != null)
+            {
+                MethodInfo methodInfo = runtimeFeature.GetProperty("IsDynamicCodeCompiled", BindingFlags.Public | BindingFlags.Static)?.GetMethod;
+
+                if (methodInfo != null)
+                {
+                    return !(bool)methodInfo.Invoke(null, null);
+                }
+            }
+
+            return false;
+        }
 
         public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
 
@@ -49,11 +73,29 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetArchitecture() => GetCurrentPlatform().ToString();
 
-        internal static bool IsWindows() => IsOSPlatform(OSPlatform.Windows);
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("windows")]
+#endif
+        internal static bool IsWindows() =>
+#if NET6_0_OR_GREATER
+            OperatingSystem.IsWindows(); // prefer linker-friendly OperatingSystem APIs
+#else
+            IsOSPlatform(OSPlatform.Windows);
+#endif
 
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("linux")]
+#endif
         internal static bool IsLinux() => IsOSPlatform(OSPlatform.Linux);
 
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("osx")]
+#endif
         internal static bool IsMacOSX() => IsOSPlatform(OSPlatform.OSX);
+
+        internal static bool IsAndroid() => Type.GetType("Java.Lang.Object, Mono.Android") != null;
+
+        internal static bool IsiOS() => Type.GetType("Foundation.NSObject, Xamarin.iOS") != null;
 
         public static string GetOsVersion()
         {
@@ -65,9 +107,12 @@ namespace BenchmarkDotNet.Portability
                     return OsBrandStringHelper.PrettifyMacOSX(systemVersion, kernelVersion);
             }
 
+            string operatingSystem = RuntimeEnvironment.OperatingSystem;
+            string operatingSystemVersion = RuntimeEnvironment.OperatingSystemVersion;
+
             return OsBrandStringHelper.Prettify(
-                RuntimeEnvironment.OperatingSystem,
-                RuntimeEnvironment.OperatingSystemVersion,
+                operatingSystem,
+                operatingSystemVersion,
                 GetWindowsUbr());
         }
 
@@ -120,7 +165,7 @@ namespace BenchmarkDotNet.Portability
             if (IsMono)
             {
                 var monoRuntimeType = Type.GetType("Mono.Runtime");
-                var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
+                var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
                 if (monoDisplayName != null)
                 {
                     string version = monoDisplayName.Invoke(null, null)?.ToString();
@@ -143,18 +188,45 @@ namespace BenchmarkDotNet.Portability
             {
                 return FrameworkVersionHelper.GetFrameworkDescription();
             }
+            else if (IsWasm)
+            {
+                // code copied from https://github.com/dotnet/runtime/blob/2c573b59aaaf3fd17e2ecab95ad3769f195d2dbc/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/RuntimeInformation.cs#L20-L30
+                string versionString = typeof(object).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+
+                // Strip the git hash if there is one
+                if (versionString != null)
+                {
+                    int plusIndex = versionString.IndexOf('+');
+                    if (plusIndex != -1)
+                    {
+                        versionString = versionString.Substring(0, plusIndex);
+                    }
+                }
+
+                return $".NET Core (Mono) {versionString}";
+            }
             else if (IsNetCore)
             {
-                string runtimeVersion = CoreRuntime.TryGetVersion(out var version) ? version.ToString() : "?";
-
                 var coreclrAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
                 var corefxAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(Regex).GetTypeInfo().Assembly.Location);
 
-                return $".NET Core {runtimeVersion} (CoreCLR {coreclrAssemblyInfo.FileVersion}, CoreFX {corefxAssemblyInfo.FileVersion})";
+                if (CoreRuntime.TryGetVersion(out var version) && version >= new Version(5, 0))
+                {
+                    // after the merge of dotnet/corefx and dotnet/coreclr into dotnet/runtime the version should always be the same
+                    Debug.Assert(coreclrAssemblyInfo.FileVersion == corefxAssemblyInfo.FileVersion);
+
+                    return $".NET {version} ({coreclrAssemblyInfo.FileVersion})";
+                }
+                else
+                {
+                    string runtimeVersion = version != default ? version.ToString() : "?";
+
+                    return $".NET Core {runtimeVersion} (CoreCLR {coreclrAssemblyInfo.FileVersion}, CoreFX {corefxAssemblyInfo.FileVersion})";
+                }
             }
-            else if (IsCoreRT)
+            else if (IsNativeAOT)
             {
-                return FrameworkDescription.Replace("Core ", "CoreRT ");
+                return FrameworkDescription;
             }
 
             return Unknown;
@@ -163,20 +235,30 @@ namespace BenchmarkDotNet.Portability
         internal static Runtime GetCurrentRuntime()
         {
             //do not change the order of conditions because it may cause incorrect determination of runtime
+            if (IsAot && IsMono)
+                return MonoAotLLVMRuntime.Default;
             if (IsMono)
                 return MonoRuntime.Default;
             if (IsFullFramework)
                 return ClrRuntime.GetCurrentVersion();
+            if (IsWasm)
+                return WasmRuntime.Default;
             if (IsNetCore)
                 return CoreRuntime.GetCurrentVersion();
-            if (IsCoreRT)
-                return CoreRtRuntime.GetCurrentVersion();
+            if (IsNativeAOT)
+                return NativeAotRuntime.GetCurrentVersion();
 
             throw new NotSupportedException("Unknown .NET Runtime");
         }
 
         public static Platform GetCurrentPlatform()
         {
+            // these are not part of .NET Standard 2.0, so we use a hack
+            // https://github.com/dotnet/runtime/blob/d81ad044fa6830f5f31f6b6e8224ebf66a3c298c/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/Architecture.cs#L12-L13
+            const Architecture Wasm = (Architecture)4;
+            const Architecture S390x = (Architecture)5;
+            const Architecture LoongArch64 = (Architecture)6;
+
             switch (ProcessArchitecture)
             {
                 case Architecture.Arm:
@@ -187,6 +269,12 @@ namespace BenchmarkDotNet.Portability
                     return Platform.X64;
                 case Architecture.X86:
                     return Platform.X86;
+                case Wasm:
+                    return Platform.Wasm;
+                case S390x:
+                    return Platform.S390x;
+                case LoongArch64:
+                    return Platform.LoongArch64;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -210,9 +298,11 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetJitInfo()
         {
-            if (IsCoreRT || IsNetNative)
+            if (IsNativeAOT)
+                return "NativeAOT";
+            if (IsNetNative || IsAot)
                 return "AOT";
-            if (IsMono)
+            if (IsMono || IsWasm)
                 return ""; // There is no helpful information about JIT on Mono
             if (IsNetCore || HasRyuJit()) // CoreCLR supports only RyuJIT
                 return "RyuJIT";
@@ -237,6 +327,8 @@ namespace BenchmarkDotNet.Portability
         // See http://aakinshin.net/en/blog/dotnet/jit-version-determining-in-runtime/
         private class JitHelper
         {
+            [SuppressMessage("IDE0052", "IDE0052")]
+            [SuppressMessage("IDE0079", "IDE0079")]
             [SuppressMessage("ReSharper", "NotAccessedField.Local")]
             private int bar;
 

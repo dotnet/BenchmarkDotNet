@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -11,7 +11,10 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.CoreRun;
+using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using JetBrains.Annotations;
+
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -84,6 +87,9 @@ namespace BenchmarkDotNet.Extensions
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
 
+            if (!RuntimeInformation.IsWindows() && !RuntimeInformation.IsLinux())
+                return false;
+
             try
             {
                 process.ProcessorAffinity = FixAffinity(processorAffinity);
@@ -102,6 +108,9 @@ namespace BenchmarkDotNet.Extensions
         {
             if (process == null)
                 throw new ArgumentNullException(nameof(process));
+
+            if (!RuntimeInformation.IsWindows() && !RuntimeInformation.IsLinux())
+                return null;
 
             try
             {
@@ -125,6 +134,25 @@ namespace BenchmarkDotNet.Extensions
             {
                 start.EnvironmentVariables["COMPlus_PerfMapEnabled"] = "1";
                 start.EnvironmentVariables["COMPlus_EnableEventLog"] = "1";
+            }
+
+            // corerun does not understand runtimeconfig.json files;
+            // we have to set "COMPlus_GC*" environment variables as documented in
+            // https://docs.microsoft.com/en-us/dotnet/core/run-time-config/garbage-collector
+            if (benchmarkCase.Job.Infrastructure.Toolchain is CoreRunToolchain _)
+                start.SetCoreRunEnvironmentVariables(benchmarkCase, resolver);
+
+            // disable ReSharper's Dynamic Program Analysis (see https://github.com/dotnet/BenchmarkDotNet/issues/1871 for details)
+            start.EnvironmentVariables["JETBRAINS_DPA_AGENT_ENABLE"] = "0";
+
+            if (benchmarkCase.Job.Infrastructure.Toolchain is MonoAotLLVMToolChain)
+            {
+                MonoAotLLVMRuntime aotruntime = (MonoAotLLVMRuntime)benchmarkCase.GetRuntime();
+
+                if (aotruntime.AOTCompilerMode == MonoAotCompilerMode.llvm)
+                {
+                    start.EnvironmentVariables["MONO_ENV_OPTIONS"] = "--llvm";
+                }
             }
 
             if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
@@ -228,6 +256,27 @@ namespace BenchmarkDotNet.Extensions
 
                 return process.ExitCode;
             }
+        }
+
+        private static void SetCoreRunEnvironmentVariables(this ProcessStartInfo start, BenchmarkCase benchmarkCase, IResolver resolver)
+        {
+            var gcMode = benchmarkCase.Job.Environment.Gc;
+
+            start.EnvironmentVariables["COMPlus_gcServer"] = gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver) ? "1" : "0";
+            start.EnvironmentVariables["COMPlus_gcConcurrent"] = gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver) ? "1" : "0";
+
+            if (gcMode.HasValue(GcMode.CpuGroupsCharacteristic))
+                start.EnvironmentVariables["COMPlus_GCCpuGroup"] = gcMode.ResolveValue(GcMode.CpuGroupsCharacteristic, resolver) ? "1" : "0";
+            if (gcMode.HasValue(GcMode.AllowVeryLargeObjectsCharacteristic))
+                start.EnvironmentVariables["COMPlus_gcAllowVeryLargeObjects"] = gcMode.ResolveValue(GcMode.AllowVeryLargeObjectsCharacteristic, resolver) ? "1" : "0";
+            if (gcMode.HasValue(GcMode.RetainVmCharacteristic))
+                start.EnvironmentVariables["COMPlus_GCRetainVM"] = gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver) ? "1" : "0";
+            if (gcMode.HasValue(GcMode.NoAffinitizeCharacteristic))
+                start.EnvironmentVariables["COMPlus_GCNoAffinitize"] = gcMode.ResolveValue(GcMode.NoAffinitizeCharacteristic, resolver) ? "1" : "0";
+            if (gcMode.HasValue(GcMode.HeapAffinitizeMaskCharacteristic))
+                start.EnvironmentVariables["COMPlus_GCHeapAffinitizeMask"] = gcMode.HeapAffinitizeMask.ToString("X");
+            if (gcMode.HasValue(GcMode.HeapCountCharacteristic))
+                start.EnvironmentVariables["COMPlus_GCHeapCount"] = gcMode.HeapCount.ToString("X");
         }
     }
 }

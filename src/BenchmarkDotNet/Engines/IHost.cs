@@ -1,9 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Engines
 {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    public interface IHost
+    public interface IHost : IDisposable
     {
         void Write(string message);
         void WriteLine();

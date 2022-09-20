@@ -1,6 +1,6 @@
 using System;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Engines
                 throw new ArgumentNullException(nameof(engineParameters.OverheadActionNoUnroll));
             if (engineParameters.OverheadActionUnroll == null)
                 throw new ArgumentNullException(nameof(engineParameters.OverheadActionUnroll));
-            if(engineParameters.TargetJob == null)
+            if (engineParameters.TargetJob == null)
                 throw new ArgumentNullException(nameof(engineParameters.TargetJob));
 
             engineParameters.GlobalSetupAction?.Invoke(); // whatever the settings are, we MUST call global setup here, the global cleanup is part of Engine's Dispose
@@ -43,17 +43,23 @@ namespace BenchmarkDotNet.Engines
 
             var singleActionEngine = CreateSingleActionEngine(engineParameters);
             var singleInvocationTime = Jit(singleActionEngine, ++jitIndex, invokeCount: 1, unrollFactor: 1);
-
-            if (singleInvocationTime > engineParameters.IterationTime)
-                return singleActionEngine; // executing once takes longer than iteration time => long running benchmark, needs no pilot and no overhead
-
-            int defaultUnrollFactor = Job.Default.ResolveValue(RunMode.UnrollFactorCharacteristic, EngineParameters.DefaultResolver);
-
             double timesPerIteration = engineParameters.IterationTime / singleInvocationTime; // how many times can we run given benchmark per iteration
 
-            if (timesPerIteration < 1.5) // example: IterationTime is 0.5s, but single invocation takes 0.4s => we don't want to run it twice per iteration
+            if ((timesPerIteration < 1.5) && (singleInvocationTime < TimeInterval.FromSeconds(10.0)))
+            {
+                // if the Jitting took more than IterationTime/1.5 but still less than 10s (a magic number based on observations of reported bugs)
+                // we call it one more time to see if Jitting itself has not dominated the first invocation
+                // if it did, it should NOT be a single invocation engine (see #837, #1337, #1338, and #1780)
+                singleInvocationTime = Jit(singleActionEngine, ++jitIndex, invokeCount: 1, unrollFactor: 1);
+                timesPerIteration = engineParameters.IterationTime / singleInvocationTime;
+            }
+
+            // executing once takes longer than iteration time => long running benchmark, needs no pilot and no overhead
+            // Or executing twice would put us well past the iteration time ==> needs no pilot and no overhead
+            if (timesPerIteration < 1.5)
                 return singleActionEngine;
 
+            int defaultUnrollFactor = Job.Default.ResolveValue(RunMode.UnrollFactorCharacteristic, EngineParameters.DefaultResolver);
             int roundedUpTimesPerIteration = (int)Math.Ceiling(timesPerIteration);
 
             if (roundedUpTimesPerIteration < defaultUnrollFactor) // if we run it defaultUnrollFactor times per iteration, it's going to take longer than IterationTime

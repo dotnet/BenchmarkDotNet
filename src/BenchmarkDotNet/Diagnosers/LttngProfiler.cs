@@ -141,7 +141,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         private void ExecutePerfCollectCommand(DiagnoserActionParameters parameters, FileInfo perfCollectFile, string command)
         {
-            var traceName = new FileInfo(ArtifactFileNameHelper.GetFilePath(parameters, creationTime, fileExtension: null)).Name;
+            var traceName = new FileInfo(ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, fileExtension: null)).Name;
             // todo: escape characters bash does not like ' ', '(' etc
 
             var start = new ProcessStartInfo
@@ -174,7 +174,7 @@ namespace BenchmarkDotNet.Diagnosers
                 }
                 else if (command == "stop")
                 {
-                    benchmarkToTraceFile[parameters.BenchmarkCase] = new FileInfo(ArtifactFileNameHelper.GetFilePath(parameters, creationTime, ".trace.zip"));
+                    benchmarkToTraceFile[parameters.BenchmarkCase] = new FileInfo(ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, ".trace.zip"));
                 }
             }
         }

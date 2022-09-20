@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Throws<InvalidOperationException>(() =>
             {
                 new Job().WithEnvironmentVariables(
-                    new EnvironmentVariable("a", "b"), 
+                    new EnvironmentVariable("a", "b"),
                     new EnvironmentVariable("a", "c"));
             });
         }

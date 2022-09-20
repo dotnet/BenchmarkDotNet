@@ -2,14 +2,14 @@
 using System.Reflection;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
 {
     public struct GcStats : IEquatable<GcStats>
     {
-        internal const string ResultsLinePrefix = "GC: ";
+        internal const string ResultsLinePrefix = "// GC: ";
 
         public static readonly long AllocationQuantum = CalculateAllocationQuantumSize();
 
@@ -39,19 +39,15 @@ namespace BenchmarkDotNet.Engines
 
         public long TotalOperations { get; }
 
-        public long BytesAllocatedPerOperation
+        public long GetBytesAllocatedPerOperation(BenchmarkCase benchmarkCase)
         {
-            get
-            {
-                bool excludeAllocationQuantumSideEffects = !RuntimeInformation.IsNetCore
-                    || RuntimeInformation.GetCurrentRuntime().RuntimeMoniker == RuntimeMoniker.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
+            bool excludeAllocationQuantumSideEffects = benchmarkCase.GetRuntime().RuntimeMoniker <= RuntimeMoniker.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
 
-                return GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects) == 0
-                    ? 0
-                    : (long) Math.Round( // let's round it to reduce the side effects of Allocation quantum
-                        (double) GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects) / TotalOperations,
-                        MidpointRounding.ToEven);
-            }
+            return GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects) == 0
+                ? 0
+                : (long) Math.Round( // let's round it to reduce the side effects of Allocation quantum
+                    (double) GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects) / TotalOperations,
+                    MidpointRounding.ToEven);
         }
 
         public static GcStats operator +(GcStats left, GcStats right)
@@ -176,7 +172,7 @@ namespace BenchmarkDotNet.Engines
 
         public static GcStats Parse(string line)
         {
-            if(!line.StartsWith(ResultsLinePrefix))
+            if (!line.StartsWith(ResultsLinePrefix))
                 throw new NotSupportedException($"Line must start with {ResultsLinePrefix}");
 
             var measurementSplit = line.Remove(0, ResultsLinePrefix.Length).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);

@@ -27,13 +27,13 @@ namespace BenchmarkDotNet.IntegrationTests
         public static IEnumerable<object[]> GetAllJits()
             => new[]
             {
-#if CLASSIC
-                new object[] { Jit.LegacyJit, Platform.X86, ClrRuntime.Net461 }, // 32bit LegacyJit for desktop .NET
-                new object[] { Jit.LegacyJit, Platform.X64, ClrRuntime.Net461 }, // 64bit LegacyJit for desktop .NET
+#if NETFRAMEWORK
+                new object[] { Jit.LegacyJit, Platform.X86, ClrRuntime.Net462 }, // 32bit LegacyJit for desktop .NET
+                new object[] { Jit.LegacyJit, Platform.X64, ClrRuntime.Net462 }, // 64bit LegacyJit for desktop .NET
 
-                new object[] { Jit.RyuJit, Platform.X64, ClrRuntime.Net461 }, // RyuJit for desktop .NET
+                new object[] { Jit.RyuJit, Platform.X64, ClrRuntime.Net462 }, // RyuJit for desktop .NET
 #endif
-                new object[] { Jit.RyuJit, Platform.X64, CoreRuntime.Core21 }, // .NET Core
+                new object[] { Jit.RyuJit, Platform.X64, CoreRuntime.Core60 }, // .NET Core
 
                 // we could add new object[] { Jit.Llvm, Platform.X64, new MonoRuntime() } here but our CI would need to have Mono installed..
             };
@@ -78,6 +78,23 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
+
+            CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.ColdStart));
+
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Int32)");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Boolean)");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Static)}()");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Instance)}()");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Recursive)}()");
+        }
+
+        [TheoryWindowsOnly(WindowsOnly)]
+        [MemberData(nameof(GetAllJits))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void CanDisassembleAllMethodCallsUsingFilters(Jit jit, Platform platform, Runtime runtime)
+        {
+            var disassemblyDiagnoser = new DisassemblyDiagnoser(
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 1, filters: new[] { "*WithCalls*" }));
 
             CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.ColdStart));
 

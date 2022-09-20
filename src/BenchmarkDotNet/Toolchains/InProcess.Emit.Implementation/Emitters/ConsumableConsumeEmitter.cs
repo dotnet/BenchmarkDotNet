@@ -20,9 +20,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 {
                     consumeMethod = typeof(Consumer)
                         .GetMethods()
-                        .Single(m => m.Name == nameof(Consumer.Consume) && m.IsGenericMethodDefinition
-                        && m.GetParameterTypes().First().IsByRef == false);
-                    consumeMethod = consumeMethod?.MakeGenericMethod(consumableType);
+                        .Single(m =>
+                        {
+                            Type argType = m.GetParameterTypes().FirstOrDefault();
+
+                            return m.Name == nameof(Consumer.Consume) && m.IsGenericMethodDefinition
+                                && !argType.IsByRef // we are not interested in "Consume<T>(in T value)"
+                                && argType.IsPointer == consumableType.IsPointer; // use "Consume<T>(T objectValue) where T : class" or "Consume<T>(T* ptrValue) where T: unmanaged"
+                        });
+
+                    consumeMethod = consumableType.IsPointer
+                        ? consumeMethod.MakeGenericMethod(consumableType.GetElementType()) // consumableType is T*, we need T for Consume<T>(T* ptrValue)
+                        : consumeMethod.MakeGenericMethod(consumableType);
                 }
                 else
                 {

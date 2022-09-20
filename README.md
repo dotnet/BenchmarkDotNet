@@ -8,7 +8,7 @@
 
   [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/)
   [![Downloads](https://img.shields.io/nuget/dt/benchmarkdotnet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/)
-  ![Stars](https://img.shields.io/github/stars/dotnet/BenchmarkDotNet?color=brightgreen)
+  [![Stars](https://img.shields.io/github/stars/dotnet/BenchmarkDotNet?color=brightgreen)](https://github.com/dotnet/BenchmarkDotNet/stargazers)
   [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet?color=yellow)](https://gitter.im/dotnet/BenchmarkDotNet)
   [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
@@ -26,10 +26,10 @@
 
 **BenchmarkDotNet** helps you to transform methods into benchmarks, track their performance, and share reproducible measurement experiments.
 It's no harder than writing unit tests!
-Under the hood, it performs a lot of [magic](#Automation) that guarantees [reliable and precise](#Reliability) results.
+Under the hood, it performs a lot of [magic](#Automation) that guarantees [reliable and precise](#Reliability) results thanks to the [perfolizer](https://github.com/AndreyAkinshin/perfolizer) statistical engine.
 BenchmarkDotNet protects you from popular benchmarking mistakes and warns you if something is wrong with your benchmark design or obtained measurements.
 The results are presented in a [user-friendly](#Friendliness) form that highlights all the important facts about your experiment.
-The library is adopted by [3500+ projects](#who-use-benchmarkdotnet) including .NET Core and supported by the [.NET Foundation](https://dotnetfoundation.org).
+The library is adopted by [11700+ projects](#who-uses-benchmarkdotnet) including .NET Runtime and supported by the [.NET Foundation](https://dotnetfoundation.org).
 
 It's [easy](#Simplicity) to start writing benchmarks, check out an example
   (copy-pastable version is [here](https://benchmarkdotnet.org/articles/guides/getting-started.html)):
@@ -37,7 +37,7 @@ It's [easy](#Simplicity) to start writing benchmarks, check out an example
 ```cs
 [SimpleJob(RuntimeMoniker.Net472, baseline: true)]
 [SimpleJob(RuntimeMoniker.NetCoreApp30)]
-[SimpleJob(RuntimeMoniker.CoreRt30)]
+[SimpleJob(RuntimeMoniker.NativeAot70)]
 [SimpleJob(RuntimeMoniker.Mono)]
 [RPlotExporter]
 public class Md5VsSha256
@@ -75,7 +75,7 @@ Intel Core i7-7700K CPU 4.20GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cor
   [Host]       : .NET Framework 4.7.2 (4.7.3468.0), X64 RyuJIT
   Net472       : .NET Framework 4.7.2 (4.7.3468.0), X64 RyuJIT
   NetCoreApp30 : .NET Core 3.0.0 (CoreCLR 4.700.19.46205, CoreFX 4.700.19.46214), X64 RyuJIT
-  CoreRt30     : .NET CoreRT 1.0.28231.02 @Commit: 741d61493c560ba96e8151f9e56876d4d3828489, X64 AOT
+  NativeAot70  : .NET 7.0.0-preview.4.22172.7, X64 NativeAOT
   Mono         : Mono 6.4.0 (Visual Studio), X64
 
 
@@ -83,33 +83,34 @@ Intel Core i7-7700K CPU 4.20GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cor
 |------- |-------------- |------ |-----------:|----------:|----------:|------:|
 | Sha256 |    .NET 4.7.2 |  1000 |   7.735 us | 0.1913 us | 0.4034 us |  1.00 |
 | Sha256 | .NET Core 3.0 |  1000 |   3.989 us | 0.0796 us | 0.0745 us |  0.50 |
-| Sha256 |    CoreRt 3.0 |  1000 |   4.091 us | 0.0811 us | 0.1562 us |  0.53 |
+| Sha256 | NativeAOT 7.0 |  1000 |   4.091 us | 0.0811 us | 0.1562 us |  0.53 |
 | Sha256 |          Mono |  1000 |  13.117 us | 0.2485 us | 0.5019 us |  1.70 |
 |        |               |       |            |           |           |       |
 |    Md5 |    .NET 4.7.2 |  1000 |   2.872 us | 0.0552 us | 0.0737 us |  1.00 |
 |    Md5 | .NET Core 3.0 |  1000 |   1.848 us | 0.0348 us | 0.0326 us |  0.64 |
-|    Md5 |    CoreRt 3.0 |  1000 |   1.817 us | 0.0359 us | 0.0427 us |  0.63 |
+|    Md5 | NativeAOT 7.0 |  1000 |   1.817 us | 0.0359 us | 0.0427 us |  0.63 |
 |    Md5 |          Mono |  1000 |   3.574 us | 0.0678 us | 0.0753 us |  1.24 |
 |        |               |       |            |           |           |       |
 | Sha256 |    .NET 4.7.2 | 10000 |  74.509 us | 1.5787 us | 4.6052 us |  1.00 |
 | Sha256 | .NET Core 3.0 | 10000 |  36.049 us | 0.7151 us | 1.0025 us |  0.49 |
-| Sha256 |    CoreRt 3.0 | 10000 |  36.253 us | 0.7076 us | 0.7571 us |  0.49 |
+| Sha256 | NativeAOT 7.0 | 10000 |  36.253 us | 0.7076 us | 0.7571 us |  0.49 |
 | Sha256 |          Mono | 10000 | 116.350 us | 2.2555 us | 3.0110 us |  1.58 |
 |        |               |       |            |           |           |       |
 |    Md5 |    .NET 4.7.2 | 10000 |  17.308 us | 0.3361 us | 0.4250 us |  1.00 |
 |    Md5 | .NET Core 3.0 | 10000 |  15.726 us | 0.2064 us | 0.1930 us |  0.90 |
-|    Md5 |    CoreRt 3.0 | 10000 |  15.627 us | 0.2631 us | 0.2461 us |  0.89 |
+|    Md5 | NativeAOT 7.0 | 10000 |  15.627 us | 0.2631 us | 0.2461 us |  0.89 |
 |    Md5 |          Mono | 10000 |  30.205 us | 0.5868 us | 0.6522 us |  1.74 |
 
 ```
 
 The measured data can be exported to different formats (md, html, csv, xml, json, etc.) including plots:
 
-![](https://i.imgur.com/qAHMQ30.png)
+![](docs/images/v0.12.0/rplot.png)
 
-*Supported runtimes:* .NET Framework 4.6.1+, .NET Core 2.0+, Mono, CoreRT  
+*Supported runtimes:* .NET 5+, .NET Framework 4.6.1+, .NET Core 2.0+, Mono, NativeAOT  
 *Supported languages:* C#, F#, Visual Basic  
-*Supported OS:* Windows, Linux, macOS
+*Supported OS:* Windows, Linux, macOS  
+*Supported architectures:* x86, x64, ARM, ARM64, Wasm and LoongArch64
 
 ## Features
 
@@ -119,7 +120,7 @@ Four aspects define the design of these features:
 
 ### Simplicity
 
-You shouldn't be an experience performance engineer if you want to write benchmarks.
+You shouldn't be an experienced performance engineer if you want to write benchmarks.
 You can design very complicated performance experiments in the declarative style using simple APIs.
 
 For example, if you want to [parameterize](https://benchmarkdotnet.org/articles/features/parameterization.html) your benchmark,
@@ -127,7 +128,7 @@ For example, if you want to [parameterize](https://benchmarkdotnet.org/articles/
   and run benchmarks for each case.
 If you want to compare benchmarks with each other,
   mark one of the benchmark as the [baseline](https://benchmarkdotnet.org/articles/features/baselines.html)
-  via `[Benchmark(baseline: true)]`: BenchmarkDotNet will compare it with all of the other benchmarks.
+  via `[Benchmark(Baseline = true)]`: BenchmarkDotNet will compare it with all of the other benchmarks.
 If you want to compare performance in different environments, use [jobs](https://benchmarkdotnet.org/articles/configs/jobs.html).
 For example, you can run all the benchmarks on .NET Core 3.0 and Mono via
   `[SimpleJob(RuntimeMoniker.NetCoreApp30)]` and `[SimpleJob(RuntimeMoniker.Mono)]`.
@@ -136,27 +137,21 @@ If you don't like attributes, you can call most of the APIs via the fluent style
 
 ```cs
 ManualConfig.CreateEmpty() // A configuration for our benchmarks
-    .With(Job.Default // Adding first job
-            .With(ClrRuntime.Net472) // .NET Framework 4.7.2
-            .With(Platform.X64) // Run as x64 application
-            .With(Jit.LegacyJit) // Use LegacyJIT instead of the default RyuJIT
-            .WithGcServer(true) // Use Server GC
-    ).With(Job.Default // Adding second job
-            .AsBaseline() // It will be marked as baseline
-            .WithEnvironmentVariable("Key", "Value") // Setting an environment variable
-            .WithWarmupCount(0) // Disable warm-up stage
+    .AddJob(Job.Default // Adding first job
+        .WithRuntime(ClrRuntime.Net472) // .NET Framework 4.7.2
+        .WithPlatform(Platform.X64) // Run as x64 application
+        .WithJit(Jit.LegacyJit) // Use LegacyJIT instead of the default RyuJIT
+        .WithGcServer(true) // Use Server GC
+    ).AddJob(Job.Default // Adding second job
+        .AsBaseline() // It will be marked as baseline
+        .WithEnvironmentVariable("Key", "Value") // Setting an environment variable
+        .WithWarmupCount(0) // Disable warm-up stage
     );
 ```
 
 If you prefer command-line experience, you can configure your benchmarks via
   the [console arguments](https://benchmarkdotnet.org/articles/guides/console-args.html)
-  in any console application or use
-  [.NET Core command-line tool](https://benchmarkdotnet.org/articles/guides/global-dotnet-tool.html)
-  to run benchmarks from any dll:
-
-```sh
-dotnet benchmark MyAssembly.dll --runtimes net472 netcoreapp2.1 Mono
-```
+  in any console application (other types of applications are not supported).
 
 ### Automation
 
@@ -233,25 +228,25 @@ Of course, you can request any additional statistics and visualizations manually
 If you don't customize the summary view,
   the default presentation will be as much user-friendly as possible. :)
 
-## Who use BenchmarkDotNet?
+## Who uses BenchmarkDotNet?
 
 Everyone!
-BenchmarkDotNet is already adopted by more than [3500+](https://github.com/dotnet/BenchmarkDotNet/network/dependents?package_id=UGFja2FnZS0xNTY3MzExMzE%3D) projects including
+BenchmarkDotNet is already adopted by more than [11700+](https://github.com/dotnet/BenchmarkDotNet/network/dependents?package_id=UGFja2FnZS0xNTY3MzExMzE%3D) projects including
   [dotnet/performance](https://github.com/dotnet/performance) (reference benchmarks for all .NET Runtimes),
-  [dotnet/runtime](https://github.com/dotnet/runtime/issues?utf8=%E2%9C%93&q=BenchmarkDotNet) (.NET Core runtime and libraries),
+  [dotnet/runtime](https://github.com/dotnet/runtime/issues?utf8=%E2%9C%93&q=BenchmarkDotNet) (.NET runtime and libraries),
   [Roslyn](https://github.com/dotnet/roslyn/search?q=BenchmarkDotNet&type=Issues&utf8=✓) (C# and Visual Basic compiler),
   [Mono](https://github.com/mono/mono/tree/master/sdks/wasm/bench-runner),
   [ASP.NET Core](https://github.com/aspnet/AspNetCore/tree/master/src/Servers/IIS/IIS/benchmarks),
-  [ML.NET](https://github.com/dotnet/machinelearning/tree/master/test/Microsoft.ML.Benchmarks),
+  [ML.NET](https://github.com/dotnet/machinelearning/tree/main/test/Microsoft.ML.PerformanceTests),
   [Entity Framework Core](https://github.com/dotnet/efcore/tree/master/benchmark),
+  [PowerShell](https://github.com/PowerShell/PowerShell/tree/master/test/perf/benchmarks)
   [SignalR](https://github.com/aspnet/SignalR/tree/master/benchmarks/Microsoft.AspNetCore.SignalR.Microbenchmarks),
   [F#](https://github.com/fsharp/fsharp/blob/master/tests/scripts/array-perf/array-perf.fs),
   [Orleans](https://github.com/dotnet/orleans/tree/master/test/Benchmarks),
   [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json/tree/master/Src/Newtonsoft.Json.Tests/Benchmarks),
   [Elasticsearch.Net](https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/bool-queries.html#_perfomance_considerations),
-  [Dapper](https://github.com/StackExchange/Dapper/tree/master/Dapper.Tests.Performance),
+  [Dapper](https://github.com/DapperLib/Dapper/tree/main/benchmarks/Dapper.Tests.Performance),
   [Expecto](https://github.com/haf/expecto/tree/master/Expecto.BenchmarkDotNet),
-  [Accord.NET](https://github.com/accord-net/framework/tree/development/Tools/Performance),
   [ImageSharp](https://github.com/SixLabors/ImageSharp/tree/master/tests/ImageSharp.Benchmarks),
   [RavenDB](https://github.com/ravendb/ravendb/tree/v4.0/bench),
   [NodaTime](https://github.com/nodatime/nodatime/tree/master/src/NodaTime.Benchmarks),
@@ -259,18 +254,21 @@ BenchmarkDotNet is already adopted by more than [3500+](https://github.com/dotne
   [NServiceBus](https://github.com/Particular/NServiceBus/issues?utf8=✓&q=+BenchmarkDotNet+),
   [Serilog](https://github.com/serilog/serilog/tree/dev/test/Serilog.PerformanceTests),
   [Autofac](https://github.com/autofac/Autofac/tree/develop/bench/Autofac.Benchmarks),
-  [Npgsql](https://github.com/npgsql/npgsql/tree/dev/test/Npgsql.Benchmarks),
+  [Npgsql](https://github.com/npgsql/npgsql/tree/main/test/Npgsql.Benchmarks),
   [Avalonia](https://github.com/AvaloniaUI/Avalonia/tree/master/tests/Avalonia.Benchmarks),
   [ReactiveUI](https://github.com/reactiveui/ReactiveUI/tree/master/src/Benchmarks),
   [SharpZipLib](https://github.com/icsharpcode/SharpZipLib/tree/master/benchmark/ICSharpCode.SharpZipLib.Benchmark),
   [LiteDB](https://github.com/mbdavid/LiteDB/tree/master/LiteDB.Benchmarks),
   [GraphQL for .NET](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.Benchmarks),
+  [.NET Docs](https://github.com/dotnet/docs/tree/master/samples/snippets/csharp/safe-efficient-code/benchmark),
+  [RestSharp](https://github.com/restsharp/RestSharp/tree/dev/benchmarks/RestSharp.Benchmarks),
   [MediatR](https://github.com/jbogard/MediatR/tree/master/test/MediatR.Benchmarks),
-  [TensorFlow.NET](https://github.com/SciSharp/TensorFlow.NET/tree/master/src/TensorFlowNet.Benchmarks).  
+  [TensorFlow.NET](https://github.com/SciSharp/TensorFlow.NET/tree/master/src/TensorFlowNet.Benchmarks),
+  [Apache Thrift](https://github.com/apache/thrift/tree/master/lib/netstd/Benchmarks/Thrift.Benchmarks).  
 On GitHub, you can find
-  2500+ [issues](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=created&type=Issues&utf8=✓),
-  1500+ [commits](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=committer-date&type=Commits&utf8=✓), and
-  450,000+ [files](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=indexed&type=Code&utf8=✓)
+  8400+ [issues](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=created&type=Issues&utf8=✓),
+  3700+ [commits](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=committer-date&type=Commits&utf8=✓), and
+  1,200,000+ [files](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=indexed&type=Code&utf8=✓)
   that involve BenchmarkDotNet.
 
 ## Learn more about benchmarking
@@ -297,8 +295,7 @@ You will avoid common pitfalls, control the accuracy of your measurements, and i
 | Azure Pipelines | Ubuntu  | [![Azure Pipelines Ubuntu](https://dev.azure.com/dotnet/BenchmarkDotNet/_apis/build/status/BenchmarkDotNet%20-%20Ubuntu)](https://dev.azure.com/dotnet/BenchmarkDotNet/_build/latest?definitionId=56) |
 | Azure Pipelines | macOS | [![Azure Pipelines macOS](https://dev.azure.com/dotnet/BenchmarkDotNet/_apis/build/status/BenchmarkDotNet%20-%20macOS)](https://dev.azure.com/dotnet/BenchmarkDotNet/_build/latest?definitionId=57) |
 | AppVeyor | Windows | [![AppVeyor/Windows](https://img.shields.io/appveyor/ci/dotnetfoundation/benchmarkdotnet/master.svg)](https://ci.appveyor.com/project/dotnetfoundation/benchmarkdotnet/branch/master) |
-| Travis | Linux | [![Travis/Linux](https://travis-matrix-badges.herokuapp.com/repos/dotnet/BenchmarkDotNet/branches/master/1)](https://travis-ci.org/dotnet/BenchmarkDotNet) |
-| Travis | macOS | [![Travis/macOS](https://travis-matrix-badges.herokuapp.com/repos/dotnet/BenchmarkDotNet/branches/master/2)](https://travis-ci.org/dotnet/BenchmarkDotNet) |
+| GitHub Actions | * | [![build](https://github.com/dotnet/BenchmarkDotNet/actions/workflows/build.yaml/badge.svg)](https://github.com/dotnet/BenchmarkDotNet/actions/workflows/build.yaml) |
 
 ## Contributions are welcome!
 

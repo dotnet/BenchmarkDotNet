@@ -10,21 +10,28 @@ namespace BenchmarkDotNet.Loggers
     internal class AsyncProcessOutputReader : IDisposable
     {
         private readonly Process process;
-        private readonly ConcurrentStack<string> output, error;
+        private readonly ConcurrentQueue<string> output, error;
+        private readonly bool logOutput, readStandardError;
+        private readonly ILogger logger;
 
         private long status;
 
-        internal AsyncProcessOutputReader(Process process)
+        internal AsyncProcessOutputReader(Process process, bool logOutput = false, ILogger logger = null, bool readStandardError = true)
         {
             if (!process.StartInfo.RedirectStandardOutput)
                 throw new NotSupportedException("set RedirectStandardOutput to true first");
-            if (!process.StartInfo.RedirectStandardError)
+            if (readStandardError && !process.StartInfo.RedirectStandardError)
                 throw new NotSupportedException("set RedirectStandardError to true first");
+            if (logOutput && logger == null)
+                throw new ArgumentException($"{nameof(logger)} cannot be null when {nameof(logOutput)} is true");
 
             this.process = process;
-            output = new ConcurrentStack<string>();
-            error = new ConcurrentStack<string>();
+            output = new ConcurrentQueue<string>();
+            error = new ConcurrentQueue<string>();
             status = (long)Status.Created;
+            this.logOutput = logOutput;
+            this.logger = logger;
+            this.readStandardError = readStandardError;
         }
 
         public void Dispose()
@@ -42,7 +49,9 @@ namespace BenchmarkDotNet.Loggers
             Attach();
 
             process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
+
+            if (readStandardError)
+                process.BeginErrorReadLine();
         }
 
         internal void CancelRead()
@@ -51,7 +60,9 @@ namespace BenchmarkDotNet.Loggers
                 throw new InvalidOperationException("Only a started reader can be stopped");
 
             process.CancelOutputRead();
-            process.CancelErrorRead();
+
+            if (readStandardError)
+                process.CancelErrorRead();
 
             Detach();
         }
@@ -77,25 +88,37 @@ namespace BenchmarkDotNet.Loggers
         private void Attach()
         {
             process.OutputDataReceived += ProcessOnOutputDataReceived;
-            process.ErrorDataReceived += ProcessOnErrorDataReceived;
+
+            if (readStandardError)
+                process.ErrorDataReceived += ProcessOnErrorDataReceived;
         }
 
         private void Detach()
         {
             process.OutputDataReceived -= ProcessOnOutputDataReceived;
-            process.ErrorDataReceived -= ProcessOnErrorDataReceived;
+
+            if (readStandardError)
+                process.ErrorDataReceived -= ProcessOnErrorDataReceived;
         }
 
         private void ProcessOnOutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (!string.IsNullOrEmpty(e.Data))
-                output.Push(e.Data);
+            {
+                output.Enqueue(e.Data);
+                if (logOutput)
+                    logger.WriteLine(e.Data);
+            }
         }
 
         private void ProcessOnErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (!string.IsNullOrEmpty(e.Data))
-                error.Push(e.Data);
+            {
+                error.Enqueue(e.Data);
+                if (logOutput)
+                    logger.WriteLineError(e.Data);
+            }
         }
 
         private T ReturnIfStopped<T>(Func<T> getter)

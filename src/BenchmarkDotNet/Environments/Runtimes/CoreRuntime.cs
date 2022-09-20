@@ -16,12 +16,18 @@ namespace BenchmarkDotNet.Environments
         public static readonly CoreRuntime Core22 = new CoreRuntime(RuntimeMoniker.NetCoreApp22, "netcoreapp2.2", ".NET Core 2.2");
         public static readonly CoreRuntime Core30 = new CoreRuntime(RuntimeMoniker.NetCoreApp30, "netcoreapp3.0", ".NET Core 3.0");
         public static readonly CoreRuntime Core31 = new CoreRuntime(RuntimeMoniker.NetCoreApp31, "netcoreapp3.1", ".NET Core 3.1");
-        public static readonly CoreRuntime Core50 = new CoreRuntime(RuntimeMoniker.NetCoreApp50, "netcoreapp5.0", ".NET Core 5.0");
+        public static readonly CoreRuntime Core50 = new CoreRuntime(RuntimeMoniker.Net50, "net5.0", ".NET 5.0");
+        public static readonly CoreRuntime Core60 = new CoreRuntime(RuntimeMoniker.Net60, "net6.0", ".NET 6.0");
+        public static readonly CoreRuntime Core70 = new CoreRuntime(RuntimeMoniker.Net70, "net7.0", ".NET 7.0");
+
+        public static CoreRuntime Latest => Core70; // when dotnet/runtime branches for 8.0, this will need to get updated
 
         private CoreRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
             : base(runtimeMoniker, msBuildMoniker, displayName)
         {
         }
+
+        public bool IsPlatformSpecific => MsBuildMoniker.IndexOf('-') > 0;
 
         /// <summary>
         /// use this method if you want to target .NET Core version not supported by current version of BenchmarkDotNet. Example: .NET Core 10
@@ -61,9 +67,11 @@ namespace BenchmarkDotNet.Environments
                 case Version v when v.Major == 2 && v.Minor == 2: return Core22;
                 case Version v when v.Major == 3 && v.Minor == 0: return Core30;
                 case Version v when v.Major == 3 && v.Minor == 1: return Core31;
-                case Version v when v.Major == 5 && v.Minor == 0: return Core50;
+                case Version v when v.Major == 5 && v.Minor == 0: return GetPlatformSpecific(Core50);
+                case Version v when v.Major == 6 && v.Minor == 0: return GetPlatformSpecific(Core60);
+                case Version v when v.Major == 7 && v.Minor == 0: return GetPlatformSpecific(Core70);
                 default:
-                    return CreateForNewVersion($"netcoreapp{version.Major}.{version.Minor}", $".NET Core {version.Major}.{version.Minor}");
+                    return CreateForNewVersion($"net{version.Major}.{version.Minor}", $".NET {version.Major}.{version.Minor}");
             }
         }
 
@@ -71,6 +79,13 @@ namespace BenchmarkDotNet.Environments
         {
             // we can't just use System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription
             // because it can be null and it reports versions like 4.6.* for .NET Core 2.*
+
+            // for .NET 5+ we can use Environment.Version
+            if (Environment.Version.Major >= 5)
+            {
+                version = Environment.Version;
+                return true;
+            }
 
             string runtimeDirectory = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
             if (TryGetVersionFromRuntimeDirectory(runtimeDirectory, out version))
@@ -85,6 +100,9 @@ namespace BenchmarkDotNet.Environments
                 return true;
             }
 
+            // it's OK to use this method only after checking the previous ones
+            // because we might have a benchmark app build for .NET Core X but executed using CoreRun Y
+            // example: -f netcoreapp3.1 --corerun $omittedForBrevity\Microsoft.NETCore.App\6.0.0\CoreRun.exe - built as 3.1, run as 6.0 (#1576)
             string frameworkName = Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
             if (TryGetVersionFromFrameworkName(frameworkName, out version))
             {
@@ -171,5 +189,30 @@ namespace BenchmarkDotNet.Environments
 
         // Version.TryParse does not handle thing like 3.0.0-WORD
         private static string GetParsableVersionPart(string fullVersionName) => new string(fullVersionName.TakeWhile(c => char.IsDigit(c) || c == '.').ToArray());
+
+        private static CoreRuntime GetPlatformSpecific(CoreRuntime fallback)
+        {
+            // TargetPlatformAttribute is not part of .NET Standard 2.0 so as usuall we have to use some reflection hacks...
+            var targetPlatformAttributeType = typeof(object).Assembly.GetType("System.Runtime.Versioning.TargetPlatformAttribute", throwOnError: false);
+            if (targetPlatformAttributeType is null) // an old preview version of .NET 5
+                return fallback;
+
+            var exe = Assembly.GetEntryAssembly();
+            if (exe is null)
+                return fallback;
+
+            var attributeInstance = exe.GetCustomAttribute(targetPlatformAttributeType);
+            if (attributeInstance is null)
+                return fallback;
+
+            var platformNameProperty = targetPlatformAttributeType.GetProperty("PlatformName");
+            if (platformNameProperty is null)
+                return fallback;
+
+            if (!(platformNameProperty.GetValue(attributeInstance) is string platformName))
+                return fallback;
+
+            return new CoreRuntime(fallback.RuntimeMoniker, $"{fallback.MsBuildMoniker}-{platformName}", fallback.Name);
+        }
     }
 }

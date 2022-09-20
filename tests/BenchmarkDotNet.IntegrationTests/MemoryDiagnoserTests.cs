@@ -18,7 +18,7 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.CoreRt;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Xunit;
 using Xunit.Abstractions;
@@ -32,25 +32,20 @@ namespace BenchmarkDotNet.IntegrationTests
         public MemoryDiagnoserTests(ITestOutputHelper outputHelper) => output = outputHelper;
 
         public static IEnumerable<object[]> GetToolchains()
-            => RuntimeInformation.IsMono // https://github.com/mono/mono/issues/8397
-                ? Array.Empty<object[]>()
-                : new[]
-                {
-                    new object[] { Job.Default.GetToolchain() },
-                    new object[] { InProcessEmitToolchain.Instance },
-#if NETCOREAPP2_1
-                    // we don't want to test CoreRT twice (for .NET 4.6 and Core 2.1) when running the integration tests (these tests take a lot of time)
-                    // we test against specific version to keep this test stable
-                    new object[] { CoreRtToolchain.CreateBuilder().UseCoreRtNuGet(microsoftDotNetILCompilerVersion: "1.0.0-alpha-27408-02").ToToolchain() }
-#endif
-                };
+        {
+            if (RuntimeInformation.IsMono) // https://github.com/mono/mono/issues/8397
+                yield break;
+
+            yield return new object[] { Job.Default.GetToolchain() };
+            yield return new object[] { InProcessEmitToolchain.Instance };
+        }
 
         public class AccurateAllocations
         {
             [Benchmark] public byte[] EightBytesArray() => new byte[8];
             [Benchmark] public byte[] SixtyFourBytesArray() => new byte[64];
 
-            [Benchmark] public Task<int> AllocateTask() => Task.FromResult(default(int));
+            [Benchmark] public Task<int> AllocateTask() => Task.FromResult<int>(-12345);
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
@@ -63,10 +58,24 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertAllocations(toolchain, typeof(AccurateAllocations), new Dictionary<string, long>
             {
                 { nameof(AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
-                { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + + objectAllocationOverhead + arraySizeOverhead },
+                { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead },
 
                 { nameof(AccurateAllocations.AllocateTask), CalculateRequiredSpace<Task<int>>() },
             });
+        }
+
+        [FactDotNetCoreOnly("We don't want to test NativeAOT twice (for .NET Framework 4.6.2 and .NET 6.0)")]
+        public void MemoryDiagnoserSupportsNativeAOT()
+        {
+            if (ContinuousIntegration.IsAppVeyorOnWindows()) // too time consuming for AppVeyor (1h limit)
+                return;
+
+            MemoryDiagnoserIsAccurate(
+                NativeAotToolchain.CreateBuilder()
+                    .UseNuGet(
+                        "6.0.0-rc.1.21420.1", // we test against specific version to keep this test stable
+                        "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json")
+                    .ToToolchain());
         }
 
         public class AllocatingGlobalSetupAndCleanup
@@ -92,7 +101,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains))]
+        [Theory(Skip = "#1542 Tiered JIT Thread allocates memory in the background"), MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserDoesNotIncludeAllocationsFromSetupAndCleanup(IToolchain toolchain)
         {
@@ -147,6 +156,11 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AwaitingTasksShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
+            if (toolchain.IsInProcess)
+            {
+                return; // it's flaky: https://github.com/dotnet/BenchmarkDotNet/issues/1925
+            }
+
             AssertAllocations(toolchain, typeof(NonAllocatingAsynchronousBenchmarks), new Dictionary<string, long>
             {
                 { nameof(NonAllocatingAsynchronousBenchmarks.CompletedTask), 0 },
@@ -194,11 +208,12 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryNetCoreOnly("Only .NET Core 2.0+ API is bug free for this case"), MemberData(nameof(GetToolchains))]
+        [Theory(Skip = "#1542 Tiered JIT Thread allocates memory in the background"), MemberData(nameof(GetToolchains))]
+        //[TheoryNetCoreOnly("Only .NET Core 2.0+ API is bug free for this case"), MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocationQuantumIsNotAnIssueForNetCore21Plus(IToolchain toolchain)
         {
-            if (toolchain is CoreRtToolchain) // the fix has not yet been backported to CoreRT
+            if (toolchain is NativeAotToolchain) // the fix has not yet been backported to NativeAOT
                 return;
 
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
@@ -240,7 +255,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserIsAccurateForMultiThreadedBenchmarks(IToolchain toolchain)
         {
-            if (toolchain is CoreRtToolchain) // the API has not been yet ported to CoreRT
+            if (toolchain is NativeAotToolchain) // the API has not been yet ported to NativeAOT
                 return;
 
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
@@ -264,9 +279,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
             foreach (var benchmarkAllocationsValidator in benchmarksAllocationsValidators)
             {
-                // CoreRT is missing some of the CoreCLR threading/task related perf improvements, so sizeof(Task<int>) calculated for CoreCLR < sizeof(Task<int>) on CoreRT
+                // NativeAOT is missing some of the CoreCLR threading/task related perf improvements, so sizeof(Task<int>) calculated for CoreCLR < sizeof(Task<int>) on CoreRT
                 // see https://github.com/dotnet/corert/issues/5705 for more
-                if (benchmarkAllocationsValidator.Key == nameof(AccurateAllocations.AllocateTask) && toolchain is CoreRtToolchain)
+                if (benchmarkAllocationsValidator.Key == nameof(AccurateAllocations.AllocateTask) && toolchain is NativeAotToolchain)
                     continue;
 
                 var allocatingBenchmarks = benchmarks.BenchmarksCases.Where(benchmark => benchmark.DisplayInfo.Contains(benchmarkAllocationsValidator.Key));
@@ -275,7 +290,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 {
                     var benchmarkReport = summary.Reports.Single(report => report.BenchmarkCase == benchmark);
 
-                    Assert.Equal(benchmarkAllocationsValidator.Value, benchmarkReport.GcStats.BytesAllocatedPerOperation);
+                    Assert.Equal(benchmarkAllocationsValidator.Value, benchmarkReport.GcStats.GetBytesAllocatedPerOperation(benchmark));
 
                     if (benchmarkAllocationsValidator.Value == 0)
                     {
@@ -292,6 +307,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithWarmupCount(0) // don't run warmup to save some time for our CI runs
                     .WithIterationCount(1) // single iteration is enough for us
                     .WithGcForce(false)
+                    .WithEnvironmentVariable("COMPlus_TieredCompilation", "0") // Tiered JIT can allocate some memory on a background thread, let's disable it to make our tests less flaky (#1542)
                     .WithToolchain(toolchain))
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(MemoryDiagnoser.Default)

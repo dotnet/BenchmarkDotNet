@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
@@ -30,7 +29,7 @@ namespace BenchmarkDotNet.Exporters
         {
             const string scriptFileName = "BuildPlots.R";
             const string logFileName = "BuildPlots.log";
-            yield return scriptFileName;
+            yield return Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
 
             string csvFullPath = CsvMeasurementsExporter.Default.GetArtifactFullName(summary);
             string scriptFullPath = Path.Combine(summary.ResultsDirectoryPath, scriptFileName);
@@ -42,7 +41,7 @@ namespace BenchmarkDotNet.Exporters
             lock (BuildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
 
-            if(!TryFindRScript(consoleLogger, out string rscriptPath))
+            if (!TryFindRScript(consoleLogger, out string rscriptPath))
             {
                 yield break;
             }
@@ -73,7 +72,7 @@ namespace BenchmarkDotNet.Exporters
                 File.AppendAllLines(logFullPath, reader.GetErrorLines());
             }
 
-            yield return $"*{ImageExtension}";
+            yield return Path.Combine(summary.ResultsDirectoryPath, $"*{ImageExtension}");
         }
 
         public void ExportToLog(Summary summary, ILogger logger)

@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Samples
     [DisassemblyDiagnoser]
     public class IntroDisassembly
     {
-        int[] field = Enumerable.Range(0, 100).ToArray();
+        private int[] field = Enumerable.Range(0, 100).ToArray();
 
         [Benchmark]
         public int SumLocal()

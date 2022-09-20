@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Samples
     [RyuJitX64Job]
     public class IntroDisassemblyRyuJit
     {
-        int[] field = Enumerable.Range(0, 100).ToArray();
+        private int[] field = Enumerable.Range(0, 100).ToArray();
 
         [Benchmark]
         public int SumLocal()

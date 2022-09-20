@@ -3,6 +3,7 @@ using System;
 
 namespace BenchmarkDotNet.Diagnostics.Windows.Configs
 {
+    [AttributeUsage(AttributeTargets.Class)]
     public class TailCallDiagnoserAttribute : Attribute, IConfigSource
     {
         public IConfig Config { get; }

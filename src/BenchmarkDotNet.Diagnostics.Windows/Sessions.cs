@@ -11,17 +11,18 @@ using BenchmarkDotNet.Extensions;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
+using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
     internal class HeapSession : Session
     {
         public HeapSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
-            : base(FullNameProvider.GetBenchmarkName(details.BenchmarkCase) + "Heap", details, config, creationTime)
+            : base(GetSessionName(details.BenchmarkCase) + "Heap", details, config, creationTime)
         {
         }
 
-        protected override string FileExtension => ".userheap.etl";
+        protected override string FileExtension => "userheap.etl";
 
         internal override Session EnableProviders()
         {
@@ -34,11 +35,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     internal class UserSession : Session
     {
         public UserSession(DiagnoserActionParameters details, EtwProfilerConfig config, DateTime creationTime)
-            : base(FullNameProvider.GetBenchmarkName(details.BenchmarkCase), details, config, creationTime)
+            : base(GetSessionName(details.BenchmarkCase), details, config, creationTime)
         {
         }
 
-        protected override string FileExtension => ".etl";
+        protected override string FileExtension => "etl";
 
         internal override Session EnableProviders()
         {
@@ -60,7 +61,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
         }
 
-        protected override string FileExtension => ".kernel.etl";
+        protected override string FileExtension => "kernel.etl";
 
         internal override Session EnableProviders()
         {
@@ -71,9 +72,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             if (Details.Config.GetHardwareCounters().Any())
                 keywords |= KernelTraceEventParser.Keywords.PMCProfile; // Precise Machine Counters
 
+            TraceEventSession.StackCompression = true;
+
             try
             {
-                TraceEventSession.EnableKernelProvider(keywords, KernelTraceEventParser.Keywords.Profile);
+                TraceEventSession.EnableKernelProvider(keywords, Config.KernelStackKeywords);
             }
             catch (Win32Exception)
             {
@@ -89,6 +92,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
     internal abstract class Session : IDisposable
     {
+        private const int MaxSessionNameLength = 128;
+
         protected abstract string FileExtension { get; }
 
         protected TraceEventSession TraceEventSession { get; }
@@ -103,7 +108,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         {
             Details = details;
             Config = config;
-            FilePath = ArtifactFileNameHelper.GetFilePath(details, creationTime, FileExtension).EnsureFolderExists();
+            FilePath = ArtifactFileNameHelper.GetTraceFilePath(details, creationTime, FileExtension).EnsureFolderExists();
             TraceEventSession = new TraceEventSession(sessionName, FilePath)
             {
                 BufferSizeMB = config.BufferSizeInMb,
@@ -129,5 +134,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         private void OnConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e) => Stop();
 
         private void OnProcessExit(object sender, EventArgs e) => Stop();
+
+        protected static string GetSessionName(BenchmarkCase benchmarkCase)
+        {
+            string benchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase);
+            if (benchmarkName.Length <= MaxSessionNameLength)
+                return benchmarkName;
+
+            // session name is not really used by humans, we can just give it the hashcode value
+            return $"BenchmarkDotNet.EtwProfiler.Session_{Hashing.HashString(benchmarkName)}";
+        }
     }
 }

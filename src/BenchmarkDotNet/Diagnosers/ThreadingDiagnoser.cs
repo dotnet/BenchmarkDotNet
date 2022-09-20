@@ -55,12 +55,13 @@ namespace BenchmarkDotNet.Diagnosers
             internal static readonly IMetricDescriptor Instance = new CompletedWorkItemCountMetricDescriptor();
 
             public string Id => "CompletedWorkItemCount";
-            public string DisplayName => "Completed Work Items";
+            public string DisplayName => Column.CompletedWorkItems;
             public string Legend => "The number of work items that have been processed in ThreadPool (per single operation)";
             public string NumberFormat => "#0.0000";
             public UnitType UnitType => UnitType.Dimensionless;
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
+            public int PriorityInCategory => 0;
         }
 
         private class LockContentionCountMetricDescriptor : IMetricDescriptor
@@ -68,12 +69,13 @@ namespace BenchmarkDotNet.Diagnosers
             internal static readonly IMetricDescriptor Instance = new LockContentionCountMetricDescriptor();
 
             public string Id => "LockContentionCount";
-            public string DisplayName => "Lock Contentions";
+            public string DisplayName => Column.LockContentions;
             public string Legend => "The number of times there was contention upon trying to take a Monitor's lock (per single operation)";
             public string NumberFormat => "#0.0000";
             public UnitType UnitType => UnitType.Dimensionless;
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
+            public int PriorityInCategory => 0;
         }
     }
 }

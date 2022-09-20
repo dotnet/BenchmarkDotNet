@@ -5,11 +5,12 @@ using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.Jobs
 {
@@ -120,7 +121,7 @@ namespace BenchmarkDotNet.Jobs
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will soon be removed, please start using .WithStrategy instead")]
         public static Job With(this Job job, RunStrategy strategy) => job.WithCore(j => j.Run.RunStrategy = strategy);        // Run
-        
+
         /// <summary>
         /// Available values: Throughput, ColdStart and Monitoring.
         ///     Throughput: default strategy which allows to get good precision level.
@@ -210,11 +211,16 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public static Job WithPowerPlan(this Job job, Guid powerPlanGuid) => job.WithCore(j => j.Environment.PowerPlanMode = powerPlanGuid);
 
-
         /// <summary>
         /// ensures that BenchmarkDotNet does not enforce any power plan
         /// </summary>
         public static Job DontEnforcePowerPlan(this Job job) => job.WithCore(j => j.Environment.PowerPlanMode = Guid.Empty);
+
+        /// <summary>
+        /// specifies whether Engine should allocate some random-sized memory between iterations
+        /// <remarks>it makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration</remarks>
+        /// </summary>
+        public static Job WithMemoryRandomization(this Job job, bool enable = true) => job.WithCore(j => j.Run.MemoryRandomization = enable);
 
         // Infrastructure
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -226,7 +232,7 @@ namespace BenchmarkDotNet.Jobs
         [Obsolete("This method will soon be removed, please start using .WithClock instead")]
         public static Job With(this Job job, IClock clock) => job.WithClock(clock);
         [PublicAPI] public static Job WithClock(this Job job, IClock clock) => job.WithCore(j => j.Infrastructure.Clock = clock);
-        
+
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will soon be removed, please start using .WithEngineFactory instead")]
         public static Job With(this Job job, IEngineFactory engineFactory) => job.WithEngineFactory(engineFactory);
@@ -248,7 +254,7 @@ namespace BenchmarkDotNet.Jobs
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will soon be removed, please start using .WithEnvironmentVariables instead")]
         public static Job With(this Job job, IReadOnlyList<EnvironmentVariable> environmentVariables) => job.WithEnvironmentVariables(environmentVariables.ToArray());
-        
+
         /// <summary>
         /// Creates a new job based on the given job with specified environment variables.
         /// It overrides the whole list of environment variables which were defined in the original job.
@@ -324,17 +330,16 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         /// <param name="job"></param>
         /// <param name="packageName">The NuGet package name</param>
-        /// <param name="packageVersion">The NuGet package version</param>
+        /// <param name="packageVersion">(optional)The NuGet package version</param>
+        /// <param name="source">(optional)Indicate the URI of the NuGet package source to use during the restore operation.</param>
+        /// <param name="prerelease">(optional)Allows prerelease packages to be installed.</param>
         /// <returns></returns>
-        public static Job WithNuGet(this Job job, string packageName, string packageVersion) => job.WithCore(j => j.Infrastructure.NuGetReferences = new NuGetReferenceList(j.Infrastructure.NuGetReferences ?? Array.Empty<NuGetReference>()) { new NuGetReference(packageName, packageVersion) });
-
-        /// <summary>
-        /// Runs the job with a specific NuGet dependency which will be resolved during the Job build process
-        /// </summary>
-        /// <param name="job"></param>
-        /// <param name="packageName">The NuGet package name, the latest version will be resolved</param>
-        /// <returns></returns>
-        public static Job WithNuGet(this Job job, string packageName) => job.WithNuGet(packageName, string.Empty);
+        public static Job WithNuGet(this Job job, string packageName, string packageVersion = null, Uri source = null, bool prerelease = false) =>
+            job.WithCore(j => j.Infrastructure.NuGetReferences =
+                new NuGetReferenceList(j.Infrastructure.NuGetReferences ?? Array.Empty<NuGetReference>())
+                    {
+                        new NuGetReference(packageName, packageVersion, source, prerelease)
+                    });
 
         /// <summary>
         /// Runs the job with a specific NuGet dependencies which will be resolved during the Job build process
@@ -342,7 +347,8 @@ namespace BenchmarkDotNet.Jobs
         /// <param name="job"></param>
         /// <param name="nuGetReferences">A collection of NuGet dependencies</param>
         /// <returns></returns>
-        public static Job WithNuGet(this Job job, NuGetReferenceList nuGetReferences) => job.WithCore(j => j.Infrastructure.NuGetReferences = nuGetReferences);
+        public static Job WithNuGet(this Job job, NuGetReferenceList nuGetReferences) =>
+            job.WithCore(j => j.Infrastructure.NuGetReferences = nuGetReferences);
 
         // Accuracy
         /// <summary>
@@ -381,14 +387,14 @@ namespace BenchmarkDotNet.Jobs
         /// Specifies which outliers should be removed from the distribution
         /// </summary>
         public static Job WithOutlierMode(this Job job, OutlierMode value) => job.WithCore(j => j.Accuracy.OutlierMode = value);
-        
+
         [PublicAPI]
         public static Job WithAnalyzeLaunchVariance(this Job job, bool value) => job.WithCore(j => j.Accuracy.AnalyzeLaunchVariance = value);
 
         // Meta
         public static Job AsBaseline(this Job job) => job.WithCore(j => j.Meta.Baseline = true);
         public static Job WithBaseline(this Job job, bool value) => job.WithCore(j => j.Meta.Baseline = value);
-        
+
         /// <summary>
         /// mutator job should not be added to the config, but instead applied to other jobs in given config
         /// </summary>
@@ -411,6 +417,11 @@ namespace BenchmarkDotNet.Jobs
 
             return job;
         }
+
+        internal static bool IsNativeAOT(this Job job)
+            => job.Environment.GetRuntime() is NativeAotRuntime
+            // given job can have NativeAOT toolchain set, but Runtime == default
+            || (job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is NativeAotToolchain);
 
         private static Job WithCore(this Job job, Action<Job> updateCallback)
         {

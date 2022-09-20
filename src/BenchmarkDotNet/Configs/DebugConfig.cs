@@ -10,6 +10,7 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Validators;
@@ -51,6 +52,7 @@ namespace BenchmarkDotNet.Configs
 
     public abstract class DebugConfig : IConfig
     {
+        private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
         public abstract IEnumerable<Job> GetJobs();
 
         public IEnumerable<IValidator> GetValidators() => Array.Empty<IValidator>();
@@ -61,14 +63,29 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IAnalyser> GetAnalysers() => Array.Empty<IAnalyser>();
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
+        public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
 
         public IOrderer Orderer => DefaultOrderer.Instance;
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
-        public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
+        public TimeSpan BuildTimeout => DefaultConfig.Instance.BuildTimeout;
+
+        public string ArtifactsPath
+        {
+            get
+            {
+                var root = RuntimeInformation.IsAndroid () ?
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) :
+                    Directory.GetCurrentDirectory();
+                return Path.Combine(root, "BenchmarkDotNet.Artifacts");
+            }
+        }
+
         public CultureInfo CultureInfo => null;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
 
         public ConfigOptions Options => ConfigOptions.KeepBenchmarkFiles | ConfigOptions.DisableOptimizationsValidator;
+
+        public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
     }
 }

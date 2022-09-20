@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Reports
 
         public static void PrintCommonColumns(this SummaryTable table, ILogger logger)
         {
-            var commonColumns = table.Columns.Where(c => !c.NeedToShow && !c.IsDefault).ToArray();
+            var commonColumns = table.Columns.Where(c => c.IsCommon).ToArray();
             if (commonColumns.Any())
             {
                 int paramsOnLine = 0;

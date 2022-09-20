@@ -60,26 +60,55 @@ namespace BenchmarkDotNet.Attributes
             bool baseline, RuntimeMoniker runtimeMoniker = RuntimeMoniker.HostProcess)
         {
             var job = new Job(id);
+            int manualValuesCount = 0;
+
             if (launchCount != DefaultValue)
+            {
                 job.Run.LaunchCount = launchCount;
+                manualValuesCount++;
+            }
+
             if (warmupCount != DefaultValue)
+            {
                 job.Run.WarmupCount = warmupCount;
+                manualValuesCount++;
+            }
+
             if (targetCount != DefaultValue)
+            {
                 job.Run.IterationCount = targetCount;
+                manualValuesCount++;
+            }
             if (invocationCount != DefaultValue)
             {
                 job.Run.InvocationCount = invocationCount;
+                manualValuesCount++;
+
                 int unrollFactor = job.Run.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance);
                 if (invocationCount % unrollFactor != 0)
+                {
                     job.Run.UnrollFactor = 1;
+                    manualValuesCount++;
+                }
             }
 
             if (runStrategy != null)
+            {
                 job.Run.RunStrategy = runStrategy.Value;
+                manualValuesCount++;
+            }
+
             if (baseline)
                 job.Meta.Baseline = true;
+
             if (runtimeMoniker != RuntimeMoniker.HostProcess)
+            {
                 job.Environment.Runtime = runtimeMoniker.GetRuntime();
+                manualValuesCount++;
+            }
+
+            if (id == null && manualValuesCount == 1 && runtimeMoniker != RuntimeMoniker.HostProcess)
+                job = job.WithId(runtimeMoniker.GetRuntime().Name);
 
             return job.Freeze();
         }

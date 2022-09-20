@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -74,7 +69,7 @@ namespace BenchmarkDotNet.Exporters.Csv
                 new MeasurementColumn("Gen_0", (_, report, __) => report.GcStats.Gen0Collections.ToString(summary.GetCultureInfo())),
                 new MeasurementColumn("Gen_1", (_, report, __) => report.GcStats.Gen1Collections.ToString(summary.GetCultureInfo())),
                 new MeasurementColumn("Gen_2", (_, report, __) => report.GcStats.Gen2Collections.ToString(summary.GetCultureInfo())),
-                new MeasurementColumn("Allocated_Bytes", (_, report, __) => report.GcStats.BytesAllocatedPerOperation.ToString(summary.GetCultureInfo()))
+                new MeasurementColumn("Allocated_Bytes", (_, report, __) => report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase).ToString(summary.GetCultureInfo()))
             };
 
             return columns.ToArray();

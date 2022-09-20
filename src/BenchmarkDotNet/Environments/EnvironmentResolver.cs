@@ -39,7 +39,6 @@ namespace BenchmarkDotNet.Environments
                         throw new NotSupportedException($"Unknown runStrategy: {strategy}");
                 }
             });
-            Register(RunMode.InvocationCountCharacteristic, () => 1);
         }
     }
 }

@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -44,16 +46,18 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public AllSetupAndCleanupTest(ITestOutputHelper output) : base(output) { }
 
+        private static string[] GetActualLogLines(Summary summary)
+            => GetSingleStandardOutput(summary).Where(line => line.StartsWith(Prefix)).ToArray();
+
         [Fact]
         public void AllSetupAndCleanupMethodRunsTest()
         {
-            var logger = new OutputLogger(Output);
             var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
-            var config = CreateSimpleConfig(logger, miniJob);
+            var config = CreateSimpleConfig(job: miniJob);
 
-            CanExecute<AllSetupAndCleanupAttributeBenchmarks>(config);
+            var summary = CanExecute<AllSetupAndCleanupAttributeBenchmarks>(config);
 
-            var actualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(Prefix)).ToArray();
+            var actualLogLines = GetActualLogLines(summary);
             foreach (string line in actualLogLines)
                 Output.WriteLine(line);
             Assert.Equal(expectedLogLines, actualLogLines);
@@ -83,13 +87,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void AllSetupAndCleanupMethodRunsAsyncTest()
         {
-            var logger = new OutputLogger(Output);
             var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
-            var config = CreateSimpleConfig(logger, miniJob);
+            var config = CreateSimpleConfig(job: miniJob);
 
-            CanExecute<AllSetupAndCleanupAttributeBenchmarksAsync>(config);
+            var summary = CanExecute<AllSetupAndCleanupAttributeBenchmarksAsync>(config);
 
-            var actualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(Prefix)).ToArray();
+            var actualLogLines = GetActualLogLines(summary);
             foreach (string line in actualLogLines)
                 Output.WriteLine(line);
             Assert.Equal(expectedLogLines, actualLogLines);
@@ -119,13 +122,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void AllSetupAndCleanupMethodRunsAsyncTaskSetupTest()
         {
-            var logger = new OutputLogger(Output);
             var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
-            var config = CreateSimpleConfig(logger, miniJob);
+            var config = CreateSimpleConfig(job: miniJob);
 
-            CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncTaskSetup>(config);
+            var summary = CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncTaskSetup>(config);
 
-            var actualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(Prefix)).ToArray();
+            var actualLogLines = GetActualLogLines(summary);
             foreach (string line in actualLogLines)
                 Output.WriteLine(line);
             Assert.Equal(expectedLogLines, actualLogLines);
@@ -155,13 +157,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void AllSetupAndCleanupMethodRunsAsyncGenericTaskSetupTest()
         {
-            var logger = new OutputLogger(Output);
             var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
-            var config = CreateSimpleConfig(logger, miniJob);
+            var config = CreateSimpleConfig(job: miniJob);
 
-            CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncGenericTaskSetup>(config);
+            var summary = CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncGenericTaskSetup>(config);
 
-            var actualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(Prefix)).ToArray();
+            var actualLogLines = GetActualLogLines(summary);
             foreach (string line in actualLogLines)
                 Output.WriteLine(line);
             Assert.Equal(expectedLogLines, actualLogLines);
@@ -201,13 +202,12 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void AllSetupAndCleanupMethodRunsAsyncValueTaskSetupTest()
         {
-            var logger = new OutputLogger(Output);
             var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
-            var config = CreateSimpleConfig(logger, miniJob);
+            var config = CreateSimpleConfig(job: miniJob);
 
-            CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncValueTaskSetup>(config);
+            var summary = CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncValueTaskSetup>(config);
 
-            var actualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(Prefix)).ToArray();
+            var actualLogLines = GetActualLogLines(summary);
             foreach (string line in actualLogLines)
                 Output.WriteLine(line);
             Assert.Equal(expectedLogLines, actualLogLines);
@@ -234,16 +234,15 @@ namespace BenchmarkDotNet.IntegrationTests
             public void Benchmark() => Console.WriteLine(BenchmarkCalled);
         }
 
-        [Fact]
+        [FactNotGitHubActionsWindows]
         public void AllSetupAndCleanupMethodRunsAsyncGenericValueTaskSetupTest()
         {
-            var logger = new OutputLogger(Output);
             var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
-            var config = CreateSimpleConfig(logger, miniJob);
+            var config = CreateSimpleConfig(job: miniJob);
 
-            CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncGenericValueTaskSetup>(config);
+            var summary = CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncGenericValueTaskSetup>(config);
 
-            var actualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(Prefix)).ToArray();
+            var actualLogLines = GetActualLogLines(summary);
             foreach (string line in actualLogLines)
                 Output.WriteLine(line);
             Assert.Equal(expectedLogLines, actualLogLines);

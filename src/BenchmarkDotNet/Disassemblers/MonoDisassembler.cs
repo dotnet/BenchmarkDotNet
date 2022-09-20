@@ -125,8 +125,8 @@ namespace BenchmarkDotNet.Disassemblers
                 };
             }
 
-            //line example 1:  0:	48 83 ec 28          	sub    $0x28,%rsp
-            //line example 2: 0000000000000000	subq	$0x28, %rsp
+            //line example 1:  0:   48 83 ec 28             sub    $0x28,%rsp
+            //line example 2: 0000000000000000  subq    $0x28, %rsp
             private static readonly Regex InstructionRegex = new Regex(@"\s*(?<address>[0-9a-f]+)(\:\s+([0-9a-f]{2}\s+)+)?\s+(?<instruction>.*)\s*", RegexOptions.Compiled);
 
             private static bool TryParseInstruction(string line, out MonoCode instruction)

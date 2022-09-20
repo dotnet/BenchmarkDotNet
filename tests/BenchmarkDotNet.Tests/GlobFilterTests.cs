@@ -9,9 +9,9 @@ namespace BenchmarkDotNet.Tests
     public class GlobFilterTests
     {
         [Theory]
-        [InlineData(nameof(TypeWithBenchmarks), true)] // type name
-        [InlineData("typewithbenchmarks", true)] // type name lowercase
-        [InlineData("TYPEWITHBENCHMARKS", true)] // type name uppercase
+        [InlineData(nameof(TypeWithBenchmarks), false)] // type name
+        [InlineData("typewithbenchmarks", false)] // type name lowercase
+        [InlineData("TYPEWITHBENCHMARKS", false)] // type name uppercase
         [InlineData("*TypeWithBenchmarks*", true)] // regular expression
         [InlineData("*typewithbenchmarks*", true)] // regular expression lowercase
         [InlineData("*TYPEWITHBENCHMARKS*", true)] // regular expression uppercase

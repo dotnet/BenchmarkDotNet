@@ -5,11 +5,11 @@ namespace BenchmarkDotNet.Engines
 {
     public struct ThreadingStats : IEquatable<ThreadingStats>
     {
-        internal const string ResultsLinePrefix = "Threading: ";
+        internal const string ResultsLinePrefix = "// Threading: ";
 
         // BDN targets .NET Standard 2.0, these properties are not part of .NET Standard 2.0, were added in .NET Core 3.0
-        private static readonly Func<long> GetCompletedWorkItemCountDelegate = CreateGetterDelegate(typeof(ThreadPool), "CompletedWorkItemCount");
-        private static readonly Func<long> GetLockContentionCountDelegate = CreateGetterDelegate(typeof(Monitor), "LockContentionCount");
+        private static readonly Func<long> GetCompletedWorkItemCountDelegate = CreateGetterDelegate(typeof(ThreadPool), nameof(CompletedWorkItemCount));
+        private static readonly Func<long> GetLockContentionCountDelegate = CreateGetterDelegate(typeof(Monitor), nameof(LockContentionCount));
 
         public static ThreadingStats Empty => new ThreadingStats(0, 0, 0);
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Reports;
@@ -27,7 +28,8 @@ namespace BenchmarkDotNet.Tests.Mocks
                 string.Empty,
                 TimeSpan.FromMinutes(1),
                 TestCultureInfo.Instance,
-                ImmutableArray<ValidationError>.Empty);
+                ImmutableArray<ValidationError>.Empty,
+                ImmutableArray<IColumnHidingRule>.Empty);
         }
 
         public static Summary CreateSummary(IConfig config) => new Summary(
@@ -38,7 +40,8 @@ namespace BenchmarkDotNet.Tests.Mocks
                 string.Empty,
                 TimeSpan.FromMinutes(1),
                 config.CultureInfo,
-                ImmutableArray<ValidationError>.Empty);
+                ImmutableArray<ValidationError>.Empty,
+                ImmutableArray<IColumnHidingRule>.Empty);
 
         public static Summary CreateSummary(IConfig config, bool hugeSd, Metric[] metrics)
             => CreateSummary<MockBenchmarkClass>(config, hugeSd, metrics);
@@ -51,7 +54,8 @@ namespace BenchmarkDotNet.Tests.Mocks
                 string.Empty,
                 TimeSpan.FromMinutes(1),
                 TestCultureInfo.Instance,
-                ImmutableArray<ValidationError>.Empty);
+                ImmutableArray<ValidationError>.Empty,
+                ImmutableArray<IColumnHidingRule>.Empty);
 
         private static ImmutableArray<BenchmarkReport> CreateReports(IConfig config)
             => CreateBenchmarks<MockBenchmarkClass>(config).Select(CreateSimpleReport).ToImmutableArray();
@@ -64,17 +68,16 @@ namespace BenchmarkDotNet.Tests.Mocks
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, int n, double nanoseconds)
         {
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
-            var executeResult = new ExecuteResult(true, 0, default, Array.Empty<string>(), new[] { $"// Runtime=extra output line" });
             var measurements = Enumerable.Range(0, n)
-                .Select(index => new Measurement(1, IterationMode.Workload, IterationStage.Result, index + 1, 1, nanoseconds + index))
+                .Select(index => new Measurement(1, IterationMode.Workload, IterationStage.Result, index + 1, 1, nanoseconds + index).ToString())
                 .ToList();
-            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default, Array.Empty<Metric>());
+            var executeResult = new ExecuteResult(true, 0, default, measurements, new[] { $"// Runtime=extra output line" }, Array.Empty<string>(), 1);
+            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, Array.Empty<Metric>());
         }
 
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, bool hugeSd, Metric[] metrics)
         {
             var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>()));
-            var executeResult = new ExecuteResult(true, 0, default, Array.Empty<string>(), Array.Empty<string>());
             bool isFoo = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Foo";
             bool isBar = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Bar";
             var measurements = new List<Measurement>
@@ -86,7 +89,8 @@ namespace BenchmarkDotNet.Tests.Mocks
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, hugeSd && isBar ? 3 : 1),
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, 1)
             };
-            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, measurements, default, metrics);
+            var executeResult = new ExecuteResult(measurements, default, default);
+            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, metrics);
         }
 
         [LongRunJob]

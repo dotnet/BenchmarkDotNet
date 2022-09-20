@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Code
 
                 string passArguments = GetPassArguments(benchmark);
 
-                extraDefines.Add($"{provider.ExtraDefines}_{buildInfo.Id}");
+                string compilationId = $"{provider.ReturnsDefinition}_{buildInfo.Id}";
 
                 AddNonEmptyUnique(additionalLogic, benchmark.Descriptor.AdditionalLogic);
 
@@ -47,6 +47,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$WorkloadTypeName$", provider.WorkloadTypeName)
                     .Replace("$WorkloadMethodDelegate$", provider.WorkloadMethodDelegate(passArguments))
                     .Replace("$WorkloadMethodReturnType$", provider.WorkloadMethodReturnTypeName)
+                    .Replace("$WorkloadMethodReturnTypeModifiers$", provider.WorkloadMethodReturnTypeModifiers)
                     .Replace("$OverheadMethodReturnTypeName$", provider.OverheadMethodReturnTypeName)
                     .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)
                     .Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName)
@@ -61,20 +62,22 @@ namespace BenchmarkDotNet.Code
                     .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark)).Replace("$LoadArguments$", GetLoadArguments(benchmark))
                     .Replace("$PassArguments$", passArguments)
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
-                    .Replace("$Ref$", provider.UseRefKeyword ? "ref" : null)
                     .Replace("$MeasureExtraStats$", buildInfo.Config.HasExtraStatsDiagnoser() ? "true" : "false")
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
-                    .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments)).ToString();
+                    .Replace("$WorkloadMethodCall$", provider.GetWorkloadMethodCall(passArguments))
+                    .RemoveRedundantIfDefines(compilationId);
 
                 benchmarkTypeCode = Unroll(benchmarkTypeCode, benchmark.Job.ResolveValue(RunMode.UnrollFactorCharacteristic, EnvironmentResolver.Instance));
 
                 benchmarksCode.Add(benchmarkTypeCode);
             }
 
-            if (buildPartition.IsCoreRT)
-                extraDefines.Add("#define CORERT");
+            if (buildPartition.IsNativeAot)
+                extraDefines.Add("#define NATIVEAOT");
             else if (buildPartition.IsNetFramework)
                 extraDefines.Add("#define NETFRAMEWORK");
+            else if (buildPartition.IsWasm)
+                extraDefines.Add("#define WASM");
 
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
                 .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
@@ -82,7 +85,7 @@ namespace BenchmarkDotNet.Code
                 .Replace("$AdditionalLogic$", string.Join(Environment.NewLine, additionalLogic))
                 .Replace("$DerivedTypes$", string.Join(Environment.NewLine, benchmarksCode))
                 .Replace("$ExtraAttribute$", GetExtraAttributes(buildPartition.RepresentativeBenchmarkCase.Descriptor))
-                .Replace("$CoreRtSwitch$", GetCoreRtSwitch(buildPartition))
+                .Replace("$NativeAotSwitch$", GetNativeAotSwitch(buildPartition))
                 .ToString();
 
             return benchmarkProgramContent;
@@ -117,6 +120,7 @@ namespace BenchmarkDotNet.Code
             const string unrollDirective = "@Unroll@";
             const string dummyUnrollDirective = "@DummyUnroll@";
             const int dummyUnrollFactor = 1 << 6;
+            string dummyUnrolled = string.Join("", Enumerable.Repeat("dummyVar++;", dummyUnrollFactor));
             var oldLines = text.Split('\n');
             var newLines = new List<string>();
             foreach (string line in oldLines)
@@ -129,9 +133,7 @@ namespace BenchmarkDotNet.Code
                 }
                 else if (line.Contains(dummyUnrollDirective))
                 {
-                    string newLine = line.Replace(dummyUnrollDirective, "");
-                    for (int i = 0; i < dummyUnrollFactor; i++)
-                        newLines.Add(newLine);
+                    newLines.Add(line.Replace(dummyUnrollDirective, dummyUnrolled));
                 }
                 else
                     newLines.Add(line);
@@ -174,13 +176,18 @@ namespace BenchmarkDotNet.Code
 
             if (method.ReturnType.IsByRef)
             {
-                return new ByRefDeclarationsProvider(descriptor);
+                // System.Runtime.CompilerServices.IsReadOnlyAttribute is part of .NET Standard 2.1, we can't use it here..
+                if (method.ReturnParameter.GetCustomAttributes().Any(attribute => attribute.GetType().Name == "IsReadOnlyAttribute"))
+                    return new ByReadOnlyRefDeclarationsProvider(descriptor);
+                else
+                    return new ByRefDeclarationsProvider(descriptor);
             }
 
             return new NonVoidDeclarationsProvider(descriptor);
         }
 
-        private static string GetParamsContent(BenchmarkCase benchmarkCase)
+        // internal for tests
+        internal static string GetParamsContent(BenchmarkCase benchmarkCase)
             => string.Join(
                 string.Empty,
                 benchmarkCase.Parameters.Items
@@ -234,18 +241,27 @@ namespace BenchmarkDotNet.Code
         }
 
         private static string GetParameterModifier(ParameterInfo parameterInfo)
-            => parameterInfo.ParameterType.IsByRef
-                ? "ref"
-                : parameterInfo.IsOut
-                    ? "out"
-                    : string.Empty;
+        {
+            if (!parameterInfo.ParameterType.IsByRef)
+                return string.Empty;
+
+            // From https://stackoverflow.com/a/38110036/5852046 :
+            // "If you don't do the IsByRef check for out parameters, then you'll incorrectly get members decorated with the
+            // [Out] attribute from System.Runtime.InteropServices but which aren't actually C# out parameters."
+            if (parameterInfo.IsOut)
+                return "out";
+            else if (parameterInfo.IsIn)
+                return "in";
+            else
+                return "ref";
+        }
 
         /// <summary>
-        /// for CoreRT we can't use reflection to load type and run a method, so we simply generate a switch for all types..
+        /// for NativeAOT we can't use reflection to load type and run a method, so we simply generate a switch for all types..
         /// </summary>
-        private static string GetCoreRtSwitch(BuildPartition buildPartition)
+        private static string GetNativeAotSwitch(BuildPartition buildPartition)
         {
-            if (!buildPartition.IsCoreRT)
+            if (!buildPartition.IsNativeAot)
                 return default;
 
             var @switch = new StringBuilder(buildPartition.Benchmarks.Length * 30);
@@ -263,7 +279,7 @@ namespace BenchmarkDotNet.Code
         private static Type GetFieldType(Type argumentType, ParameterInstance argument)
         {
             // #774 we can't store Span in a field, so we store an array (which is later casted to Span when we load the arguments)
-            if(argumentType.IsStackOnlyWithImplicitCast(argument.Value))
+            if (argumentType.IsStackOnlyWithImplicitCast(argument.Value))
                 return argument.Value.GetType();
 
             return argumentType;
@@ -287,6 +303,31 @@ namespace BenchmarkDotNet.Code
                 else
                     builder.Append($"\n// '{oldValue}' not found");
                 return this;
+            }
+
+            public string RemoveRedundantIfDefines(string id)
+            {
+                var oldLines = builder.ToString().Split('\n');
+                var newLines = new List<string>();
+                bool keepAdding = true;
+
+                foreach (string line in oldLines)
+                {
+                    if (line.StartsWith("#if RETURNS") || line.StartsWith("#elif RETURNS"))
+                    {
+                        keepAdding = line.Contains(id);
+                    }
+                    else if (line.StartsWith("#endif // RETURNS"))
+                    {
+                        keepAdding = true;
+                    }
+                    else if (keepAdding)
+                    {
+                        newLines.Add(line);
+                    }
+                }
+
+                return string.Join("\n", newLines);
             }
 
             public override string ToString() => builder.ToString();

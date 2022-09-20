@@ -3,9 +3,9 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -129,13 +129,14 @@ namespace BenchmarkDotNet.IntegrationTests
                 logFilePath: string.Empty,
                 totalTime: System.TimeSpan.Zero,
                 cultureInfo: TestCultureInfo.Instance,
-                validationErrors: ImmutableArray<ValidationError>.Empty
+                validationErrors: ImmutableArray<ValidationError>.Empty,
+                columnHidingRules: ImmutableArray<IColumnHidingRule>.Empty
             );
         }
 
         private class MockExporter : ExporterBase
         {
-            public int ExportCount = 0;
+            public int ExportCount;
 
             public override void ExportToLog(Summary summary, ILogger logger)
             {
@@ -158,8 +159,6 @@ namespace BenchmarkDotNet.IntegrationTests
                                        generateResult: null,
                                        buildResult: null,
                                        executeResults: null,
-                                       allMeasurements: null,
-                                       gcStats: default,
                                        metrics: null);
         }
     }

@@ -21,6 +21,7 @@ namespace BenchmarkDotNet.Tests
             CheckCorrectTypeName("System.Tuple<System.Int32, System.Int32>[]", typeof(Tuple<int, int>[]));
             CheckCorrectTypeName("System.ValueTuple<System.Int32, System.Int32>[]", typeof(ValueTuple<int, int>[]));
             CheckCorrectTypeName("void", typeof(void));
+            CheckCorrectTypeName("void*", typeof(void*));
             CheckCorrectTypeName("System.IEquatable<T>", typeof(IEquatable<>));
             CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedNonGeneric2", typeof(NestedNonGeneric1.NestedNonGeneric2));
             CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedGeneric2<System.Int16, System.Boolean, System.Decimal>",
@@ -41,6 +42,27 @@ namespace BenchmarkDotNet.Tests
         public class GenericByRef
         {
             public void TheMethod(ref ValueTuple<int, short> _) { }
+        }
+
+        [Fact]
+        public void GetCorrectCSharpTypeNameSupportsNestedTypes()
+        {
+            var nestedType = typeof(Nested);
+
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.Nested", nestedType);
+        }
+
+        [Fact]
+        public void GetCorrectCSharpTypeNameSupportsNestedTypesPassedByReference()
+        {
+            var byRefNestedType = typeof(Nested).GetMethod(nameof(Nested.TheMethod)).GetParameters().Single().ParameterType;
+
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.Nested", byRefNestedType);
+        }
+
+        public class Nested
+        {
+            public void TheMethod(ref Nested _) { }
         }
 
         [AssertionMethod]

@@ -9,7 +9,6 @@ using ApprovalTests.Reporters;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Loggers;
@@ -61,7 +60,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                 exporter.ExportToLog(MockFactory.CreateSummary(config.WithCultureInfo(cultureInfo)), logger);
             }
 
-            Approvals.Verify(logger.GetLog());
+            Approvals.Verify(logger.GetLog(), x => x.Replace("\r", string.Empty));
         }
 
         private static void PrintTitle(AccumulationLogger logger, IExporter exporter)
@@ -102,7 +101,8 @@ namespace BenchmarkDotNet.Tests.Exporters
         private static readonly IConfig config = ManualConfig.Create(DefaultConfig.Instance)
             .AddColumn(StatisticColumn.Mean)
             .AddColumn(StatisticColumn.StdDev)
-            .AddColumn(StatisticColumn.P67);
+            .AddColumn(StatisticColumn.P67)
+            .AddDiagnoser(Diagnosers.MemoryDiagnoser.Default);
 
         public void Dispose()
         {

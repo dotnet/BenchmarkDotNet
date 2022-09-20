@@ -36,16 +36,17 @@ namespace BenchmarkDotNet.Extensions
         /// </summary>
         internal static string GetCorrectCSharpTypeName(this Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = true)
         {
-            if (!type.Name.EndsWith("&"))
-                while (!(type.IsPublic || type.IsNestedPublic) && type.BaseType != null)
-                    type = type.BaseType;
+            while (!(type.IsPublic || type.IsNestedPublic) && type.BaseType != null)
+                type = type.BaseType;
 
             // the reflection is missing information about types passed by ref (ie ref ValueTuple<int> is reported as NON generic type)
-            if (type.IsByRef && !type.IsGenericType && type.Name.Contains('`'))
+            if (type.IsByRef && !type.IsGenericType)
                 type = type.GetElementType() ?? throw new NullReferenceException(nameof(type.GetElementType)); // https://github.com/dotnet/corefx/issues/29975#issuecomment-393134330
 
             if (type == typeof(void))
                 return "void";
+            if (type == typeof(void*))
+                return "void*";
             string prefix = "";
             if (!string.IsNullOrEmpty(type.Namespace) && includeNamespace)
                 prefix += type.Namespace + ".";

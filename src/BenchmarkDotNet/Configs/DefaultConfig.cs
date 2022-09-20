@@ -11,6 +11,7 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Validators;
 
@@ -19,6 +20,7 @@ namespace BenchmarkDotNet.Configs
     public class DefaultConfig : IConfig
     {
         public static readonly IConfig Instance = new DefaultConfig();
+        private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
 
         private DefaultConfig()
         {
@@ -52,6 +54,7 @@ namespace BenchmarkDotNet.Configs
             yield return RuntimeErrorAnalyser.Default;
             yield return ZeroMeasurementAnalyser.Default;
             yield return BaselineCustomAnalyzer.Default;
+            yield return HideColumnsAnalyser.Default;
         }
 
         public IEnumerable<IValidator> GetValidators()
@@ -77,7 +80,20 @@ namespace BenchmarkDotNet.Configs
 
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
 
-        public string ArtifactsPath => Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts");
+        public TimeSpan BuildTimeout => TimeSpan.FromSeconds(120);
+
+        public string ArtifactsPath
+        {
+            get
+            {
+                var root = RuntimeInformation.IsAndroid() ?
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) :
+                    Directory.GetCurrentDirectory();
+                return Path.Combine(root, "BenchmarkDotNet.Artifacts");
+            }
+        }
+
+        public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
 
         public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
 
@@ -88,5 +104,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
 
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
+
+        public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
     }
 }

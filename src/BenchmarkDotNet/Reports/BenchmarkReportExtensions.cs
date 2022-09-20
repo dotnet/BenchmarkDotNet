@@ -8,6 +8,7 @@ namespace BenchmarkDotNet.Reports
     {
         private const string DisplayedRuntimeInfoPrefix = "// " + BenchmarkEnvironmentInfo.RuntimeInfoPrefix;
         private const string DisplayedGcInfoPrefix = "// " + BenchmarkEnvironmentInfo.GcInfoPrefix;
+        private const string DisplayedHardwareIntrinsicsPrefix = "// " + BenchmarkEnvironmentInfo.HardwareIntrinsicsPrefix;
 
         [CanBeNull]
         public static string GetRuntimeInfo(this BenchmarkReport report) => report.GetInfoFromOutput(DisplayedRuntimeInfoPrefix);
@@ -16,11 +17,14 @@ namespace BenchmarkDotNet.Reports
         public static string GetGcInfo(this BenchmarkReport report) => report.GetInfoFromOutput(DisplayedGcInfoPrefix);
 
         [CanBeNull]
+        public static string GetHardwareIntrinsicsInfo(this BenchmarkReport report) => report.GetInfoFromOutput(DisplayedHardwareIntrinsicsPrefix);
+
+        [CanBeNull]
         private static string GetInfoFromOutput(this BenchmarkReport report, string prefix)
         {
             return (
                 from executeResults in report.ExecuteResults
-                from extraOutputLine in executeResults.ExtraOutput.Where(line => line.StartsWith(prefix))
+                from extraOutputLine in executeResults.PrefixedLines.Where(line => line.StartsWith(prefix))
                 select extraOutputLine.Substring(prefix.Length)).FirstOrDefault();
         }
     }

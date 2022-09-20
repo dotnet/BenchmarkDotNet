@@ -5,11 +5,13 @@ using System.Linq;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using CommandLine;
 using CommandLine.Text;
 using JetBrains.Annotations;
+using Perfolizer.Mathematics.OutlierDetection;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -17,10 +19,13 @@ namespace BenchmarkDotNet.ConsoleArguments
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
     public class CommandLineOptions
     {
+        private const int DefaultDisassemblerRecursiveDepth = 1;
+        private bool useDisassemblyDiagnoser;
+
         [Option('j', "job", Required = false, Default = "Default", HelpText = "Dry/Short/Medium/Long or Default")]
         public string BaseJob { get; set; }
 
-        [Option('r', "runtimes", Required = false, HelpText = "Full target framework moniker for .NET Core and .NET. For Mono just 'Mono', for CoreRT just 'CoreRT'. First one will be marked as baseline!")]
+        [Option('r', "runtimes", Required = false, HelpText = "Full target framework moniker for .NET Core and .NET. For Mono just 'Mono'. For NativeAOT please append target runtime version (example: 'nativeaot7.0'). First one will be marked as baseline!")]
         public IEnumerable<string> Runtimes { get; set; }
 
         [Option('e', "exporters", Required = false, HelpText = "GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML")]
@@ -33,13 +38,20 @@ namespace BenchmarkDotNet.ConsoleArguments
         public bool UseThreadingDiagnoser { get; set; }
 
         [Option('d', "disasm", Required = false, Default = false, HelpText = "Gets disassembly of benchmarked code")]
-        public bool UseDisassemblyDiagnoser { get; set; }
+        public bool UseDisassemblyDiagnoser
+        {
+            get => useDisassemblyDiagnoser || DisassemblerRecursiveDepth != DefaultDisassemblerRecursiveDepth || DisassemblerFilters.Any();
+            set => useDisassemblyDiagnoser = value;
+        }
 
-        [Option('p', "profiler", Required = false, HelpText = "Profiles benchmarked code using selected profiler. Currently the only available is \"ETW\" for Windows.")]
+        [Option('p', "profiler", Required = false, HelpText = "Profiles benchmarked code using selected profiler. Available options: EP/ETW/CV/NativeMemory")]
         public string Profiler { get; set; }
 
         [Option('f', "filter", Required = false, HelpText = "Glob patterns")]
         public IEnumerable<string> Filters { get; set; }
+
+        [Option('h', "hide", Required = false, HelpText = "Hides columns by name")]
+        public IEnumerable<string> HiddenColumns { get; set; }
 
         [Option('i', "inProcess", Required = false, Default = false, HelpText = "Run benchmarks in Process")]
         public bool RunInProcess { get; set; }
@@ -92,11 +104,11 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("clrVersion", Required = false, HelpText = "Optional version of private CLR build used as the value of COMPLUS_Version env var.")]
         public string ClrVersion { get; set; }
 
-        [Option("coreRtVersion", Required = false, HelpText = "Optional version of Microsoft.DotNet.ILCompiler which should be used to run with CoreRT. Example: \"1.0.0-alpha-26414-01\"")]
-        public string CoreRtVersion { get; set; }
+        [Option("ilCompilerVersion", Required = false, HelpText = "Optional version of Microsoft.DotNet.ILCompiler which should be used to run with NativeAOT. Example: \"7.0.0-preview.3.22123.2\"")]
+        public string ILCompilerVersion { get; set; }
 
-        [Option("ilcPath", Required = false, HelpText = "Optional IlcPath which should be used to run with private CoreRT build.")]
-        public DirectoryInfo CoreRtPath { get; set; }
+        [Option("ilcPackages", Required = false, HelpText = @"Optional path to shipping packages produced by local dotnet/runtime build. Example: 'D:\projects\runtime\artifacts\packages\Release\Shipping\'")]
+        public DirectoryInfo IlcPackages { get; set; }
 
         [Option("launchCount", Required = false, HelpText = "How many times we should launch process with target benchmark. The default is 1.")]
         public int? LaunchCount { get; set; }
@@ -131,6 +143,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("strategy", Required = false, HelpText = "The RunStrategy that should be used. Throughput/ColdStart/Monitoring.")]
         public RunStrategy? RunStrategy { get; set; }
 
+        [Option("platform", Required = false, HelpText = "The Platform that should be used. If not specified, the host process platform is used (default). AnyCpu/X86/X64/Arm/Arm64/LoongArch64.")]
+        public Platform? Platform { get; set; }
+
         [Option("runOncePerIteration", Required = false, Default = false, HelpText = "Run the benchmark exactly once per iteration.")]
         public bool RunOncePerIteration { get; set; }
 
@@ -140,11 +155,20 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("list", Required = false, Default = ListBenchmarkCaseMode.Disabled, HelpText = "Prints all of the available benchmark names. Flat/Tree")]
         public ListBenchmarkCaseMode ListBenchmarkCaseMode { get; set; }
 
-        [Option("disasmDepth", Required = false, Default = 1, HelpText = "Sets the recursive depth for the disassembler.")]
+        [Option("disasmDepth", Required = false, Default = DefaultDisassemblerRecursiveDepth, HelpText = "Sets the recursive depth for the disassembler.")]
         public int DisassemblerRecursiveDepth { get; set; }
+
+        [Option("disasmFilter", Required = false, HelpText = "Glob patterns applied to full method signatures by the the disassembler.")]
+        public IEnumerable<string> DisassemblerFilters { get; set; }
 
         [Option("disasmDiff", Required = false, Default = false, HelpText = "Generates diff reports for the disassembler.")]
         public bool DisassemblerDiff { get; set; }
+
+        [Option("logBuildOutput", Required = false, HelpText = "Log Build output.")]
+        public bool LogBuildOutput { get; set; }
+
+        [Option("generateBinLog", Required = false, HelpText = "Generate msbuild binlog for builds")]
+        public bool GenerateMSBuildBinLog { get; set; }
 
         [Option("buildTimeout", Required = false, HelpText = "Build timeout in seconds.")]
         public int? TimeOutInSeconds { get; set; }
@@ -158,11 +182,35 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("disableLogFile", Required = false, HelpText = "Disables the logfile.")]
         public bool DisableLogFile { get; set; }
 
-        [Option("maxWidth", Required = false, HelpText = "Max paramter column width, the default is 20.")]
+        [Option("maxWidth", Required = false, HelpText = "Max parameter column width, the default is 20.")]
         public int? MaxParameterColumnWidth { get; set; }
 
         [Option("envVars", Required = false, HelpText = "Colon separated environment variables (key:value)")]
         public IEnumerable<string> EnvironmentVariables { get; set; }
+
+        [Option("memoryRandomization", Required = false, HelpText = "Specifies whether Engine should allocate some random-sized memory between iterations. It makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration.")]
+        public bool MemoryRandomization { get; set; }
+
+        [Option("wasmEngine", Required = false, HelpText = "Full path to a java script engine used to run the benchmarks, used by Wasm toolchain.")]
+        public FileInfo WasmJavascriptEngine { get; set; }
+
+        [Option("wasmArgs", Required = false, Default = "--expose_wasm", HelpText = "Arguments for the javascript engine used by Wasm toolchain.")]
+        public string WasmJavaScriptEngineArguments { get; set; }
+
+        [Option("customRuntimePack", Required = false, HelpText = "Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.")]
+        public string CustomRuntimePack { get; set; }
+
+        [Option("AOTCompilerPath", Required = false, HelpText = "Path to Mono AOT compiler, used for MonoAotLLVM.")]
+        public FileInfo AOTCompilerPath { get; set; }
+
+        [Option("AOTCompilerMode", Required = false, Default = MonoAotCompilerMode.mini, HelpText = "Mono AOT compiler mode, either 'mini' or 'llvm'")]
+        public MonoAotCompilerMode AOTCompilerMode { get; set; }
+
+        [Option("wasmDataDir", Required = false, HelpText = "Wasm data directory")]
+        public DirectoryInfo WasmDataDirectory { get; set; }
+
+        [Option("noForcedGCs", Required = false, HelpText = "Specifying would not forcefully induce any GCs.")]
+        public bool NoForcedGCs { get; set; }
 
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
@@ -181,7 +229,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run benchmarks for .NET Core 2.0, .NET Core 2.1 and .NET Core 2.2. .NET Core 2.0 will be baseline because it was first.", longName, new CommandLineOptions { Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1", "netcoreapp2.2" } });
                 yield return new Example("Use MemoryDiagnoser to get GC stats", shortName, new CommandLineOptions { UseMemoryDiagnoser = true });
                 yield return new Example("Use DisassemblyDiagnoser to get disassembly", shortName, new CommandLineOptions { UseDisassemblyDiagnoser = true });
-                yield return new Example("Use HardwareCountersDiagnoser to get hardware counter info", longName, new CommandLineOptions { HardwareCounters = new [] { nameof(HardwareCounter.CacheMisses), nameof(HardwareCounter.InstructionRetired) } });
+                yield return new Example("Use HardwareCountersDiagnoser to get hardware counter info", longName, new CommandLineOptions { HardwareCounters = new[] { nameof(HardwareCounter.CacheMisses), nameof(HardwareCounter.InstructionRetired) } });
                 yield return new Example("Run all benchmarks exactly once", shortName, new CommandLineOptions { BaseJob = "Dry", Filters = new[] { Escape("*") } });
                 yield return new Example("Run all benchmarks from System.Memory namespace", shortName, new CommandLineOptions { Filters = new[] { Escape("System.Memory*") } });
                 yield return new Example("Run all benchmarks from ClassA and ClassB using type names", shortName, new CommandLineOptions { Filters = new[] { "ClassA", "ClassB" } });
@@ -191,9 +239,10 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new Example("Run selected benchmarks 100 times per iteration. Perform single warmup iteration and 5 actual workload iterations", longName, new CommandLineOptions { InvocationCount = 100, WarmupIterationCount = 1, IterationCount = 5});
                 yield return new Example("Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations", longName, new CommandLineOptions { IterationTimeInMilliseconds = 250, MinIterationCount = 9, MaxIterationCount = 15});
                 yield return new Example("Run MannWhitney test with relative ratio of 5% for all benchmarks for .NET Core 2.0 (base) vs .NET Core 2.1 (diff). .NET Core 2.0 will be baseline because it was provided as first.", longName,
-                    new CommandLineOptions { Filters = new [] { "*"}, Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1" }, StatisticalTestThreshold = "5%" });
-                yield return new Example("Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2'", longName, 
+                    new CommandLineOptions { Filters = new[] { "*"}, Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1" }, StatisticalTestThreshold = "5%" });
+                yield return new Example("Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2'", longName,
                     new CommandLineOptions { EnvironmentVariables = new[] { "ENV_VAR_KEY_1:value_1", "ENV_VAR_KEY_2:value_2" } });
+                yield return new Example("Hide Mean and Ratio columns (use double quotes for multi-word columns: \"Alloc Ratio\")", shortName, new CommandLineOptions { HiddenColumns = new[] { "Mean", "Ratio" }, });
             }
         }
 

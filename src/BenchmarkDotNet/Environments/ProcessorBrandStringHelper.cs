@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Portability.Cpu;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
+using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
 
 namespace BenchmarkDotNet.Environments
 {

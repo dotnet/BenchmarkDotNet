@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
@@ -30,7 +31,8 @@ namespace BenchmarkDotNet.Configs
         private readonly ImmutableHashSet<Job> jobs;
         private readonly ImmutableHashSet<HardwareCounter> hardwareCounters;
         private readonly ImmutableHashSet<IFilter> filters;
-        private readonly ImmutableHashSet<BenchmarkLogicalGroupRule> rules;
+        private readonly ImmutableArray<BenchmarkLogicalGroupRule> rules;
+        private readonly ImmutableArray<IColumnHidingRule> columnHidingRules;
 
         internal ImmutableConfig(
             ImmutableArray<IColumnProvider> uniqueColumnProviders,
@@ -41,14 +43,17 @@ namespace BenchmarkDotNet.Configs
             ImmutableHashSet<IAnalyser> uniqueAnalyzers,
             ImmutableHashSet<IValidator> uniqueValidators,
             ImmutableHashSet<IFilter> uniqueFilters,
-            ImmutableHashSet<BenchmarkLogicalGroupRule> uniqueRules,
+            ImmutableArray<BenchmarkLogicalGroupRule> uniqueRules,
+            ImmutableArray<IColumnHidingRule> uniqueColumnHidingRules,
             ImmutableHashSet<Job> uniqueRunnableJobs,
             ConfigUnionRule unionRule,
             string artifactsPath,
             CultureInfo cultureInfo,
             IOrderer orderer,
             SummaryStyle summaryStyle,
-            ConfigOptions options)
+            ConfigOptions options,
+            TimeSpan buildTimeout,
+            IReadOnlyList<Conclusion> configAnalysisConclusion)
         {
             columnProviders = uniqueColumnProviders;
             loggers = uniqueLoggers;
@@ -59,6 +64,7 @@ namespace BenchmarkDotNet.Configs
             validators = uniqueValidators;
             filters = uniqueFilters;
             rules = uniqueRules;
+            columnHidingRules = uniqueColumnHidingRules;
             jobs = uniqueRunnableJobs;
             UnionRule = unionRule;
             ArtifactsPath = artifactsPath;
@@ -66,6 +72,8 @@ namespace BenchmarkDotNet.Configs
             Orderer = orderer;
             SummaryStyle = summaryStyle;
             Options = options;
+            BuildTimeout = buildTimeout;
+            ConfigAnalysisConclusion = configAnalysisConclusion;
         }
 
         public ConfigUnionRule UnionRule { get; }
@@ -74,6 +82,7 @@ namespace BenchmarkDotNet.Configs
         public ConfigOptions Options { get; }
         [NotNull] public IOrderer Orderer { get; }
         public SummaryStyle SummaryStyle { get; }
+        public TimeSpan BuildTimeout { get; }
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
@@ -85,6 +94,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => rules;
+        public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => columnHidingRules;
 
         public ILogger GetCompositeLogger() => new CompositeLogger(loggers);
         public IExporter GetCompositeExporter() => new CompositeExporter(exporters);
@@ -92,7 +102,7 @@ namespace BenchmarkDotNet.Configs
         public IAnalyser GetCompositeAnalyser() => new CompositeAnalyser(analysers);
         public IDiagnoser GetCompositeDiagnoser() => new CompositeDiagnoser(diagnosers);
 
-        public bool HasMemoryDiagnoser() => diagnosers.Contains(MemoryDiagnoser.Default);
+        public bool HasMemoryDiagnoser() => diagnosers.OfType<MemoryDiagnoser>().Any();
 
         public bool HasThreadingDiagnoser() => diagnosers.Contains(ThreadingDiagnoser.Default);
 
@@ -104,5 +114,7 @@ namespace BenchmarkDotNet.Configs
 
             return diagnosersForGivenMode.Any() ? new CompositeDiagnoser(diagnosersForGivenMode) : null;
         }
+
+        public IReadOnlyList<Conclusion> ConfigAnalysisConclusion { get; private set; }
     }
 }

@@ -3,7 +3,10 @@
     {
       "src": [
         {
-          "files": "src/BenchmarkDotNet/*.csproj",
+          "files": [
+            "src/BenchmarkDotNet/*.csproj",
+            "src/BenchmarkDotNet.Annotations/*.csproj"
+          ],
           "exclude": [
             "**/obj/**",
             "**/bin/**"
@@ -12,6 +15,7 @@
         }
       ],
       "dest": "api",
+      "filter": "filter.yml",
       "properties": {
         "TargetFramework": "netstandard2.0"
       },
@@ -52,6 +56,9 @@
       "default",
       "template"
     ],
+    "xrefService": [
+      "https://xref.docs.microsoft.com/query?uid={uid}"
+    ],
     "postProcessors": ["ExtractSearchIndex"],
     "markdownEngineName": "markdig",
     "noLangKeyword": false,
@@ -61,7 +68,7 @@
     "globalMetadata" :
     {
       "_appTitle" : "BenchmarkDotNet",
-      "_appFooter" : "Copyright &copy; 2013–2020 .NET Foundation and contributors",
+      "_appFooter" : "Copyright &copy; 2013–2021 .NET Foundation and contributors",
       "_appLogoPath" : "logo/icon.svg",
       "_appFaviconPath": "logo/icon-32.png",
       "_enableSearch": false

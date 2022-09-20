@@ -8,6 +8,8 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
 using Xunit.Abstractions;
+using System.Collections.Generic;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -60,7 +62,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 config = config.AddColumnProvider(DefaultColumnProviders.Instance);
 
             // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
-            var summary = BenchmarkRunner.Run(type, BenchmarkConverter.GetFullConfig(type, config));
+            var summary = BenchmarkRunner.Run(type, config);
 
             if (fullValidation)
             {
@@ -69,18 +71,15 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.True(summary.Reports.Any(), "The \"Summary\" should contain at least one \"BenchmarkReport\" in the \"Reports\" collection");
 
                 Assert.True(summary.Reports.All(r => r.BuildResult.IsBuildSuccess),
-                    "The following benchmarks are failed to build: " +
+                    "The following benchmarks have failed to build: " +
                     string.Join(", ", summary.Reports.Where(r => !r.BuildResult.IsBuildSuccess).Select(r => r.BenchmarkCase.DisplayInfo)));
 
                 Assert.True(summary.Reports.All(r => r.ExecuteResults != null),
                     "The following benchmarks don't have any execution results: " +
                     string.Join(", ", summary.Reports.Where(r => r.ExecuteResults == null).Select(r => r.BenchmarkCase.DisplayInfo)));
 
-                Assert.True(summary.Reports.All(r => r.ExecuteResults.Any(er => er.FoundExecutable && er.Data.Any())),
-                    "All reports should have at least one \"ExecuteResult\" with \"FoundExecutable\" = true and at least one \"Data\" item");
-
-                Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()),
-                    "All reports should have at least one \"Measurement\" in the \"AllMeasurements\" collection");
+                Assert.True(summary.Reports.All(r => r.ExecuteResults.All(er => er.IsSuccess)),
+                    "All reports should have succeeded to execute");
             }
 
             return summary;
@@ -94,5 +93,11 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray());
         }
+
+        protected static IReadOnlyList<string> GetSingleStandardOutput(Summary summary)
+            => summary.Reports.Single().ExecuteResults.Single().StandardOutput;
+
+        protected static IReadOnlyList<string> GetCombinedStandardOutput(Summary summary)
+            => summary.Reports.SelectMany(r => r.ExecuteResults).SelectMany(e => e.StandardOutput).ToArray();
     }
 }

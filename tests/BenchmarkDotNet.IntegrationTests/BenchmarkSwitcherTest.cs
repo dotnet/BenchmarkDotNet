@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty().AddLogger(logger);
 
             var summaries = BenchmarkSwitcher
-                .FromTypes(new [] { typeof(ClassC) })
+                .FromTypes(new[] { typeof(ClassC) })
                 .Run(new[] { "--filter", "*" }, config);
 
             Assert.Empty(summaries);
@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             const string filter = "WRONG";
             var summaries = BenchmarkSwitcher
-                .FromTypes(new [] { typeof(ClassA), typeof(ClassB) })
+                .FromTypes(new[] { typeof(ClassA), typeof(ClassB) })
                 .Run(new[] { "--filter", filter }, config);
 
             Assert.Empty(summaries);
@@ -103,7 +103,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty().AddLogger(logger);
 
             var summaries = BenchmarkSwitcher
-                .FromTypes(new [] { typeof(ClassA) })
+                .FromTypes(new[] { typeof(ClassA) })
                 .Run(new[] { "--list", "flat" }, config);
 
             Assert.Empty(summaries);
@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty().AddLogger(logger);
 
             var summaries = BenchmarkSwitcher
-                .FromTypes(new [] { typeof(ClassA) })
+                .FromTypes(new[] { typeof(ClassA) })
                 .Run(new[] { "--list", "flat", "--filter", "*.Method1" }, config);
 
             Assert.Empty(summaries);
@@ -187,7 +187,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var userInteractionMock = new UserInteractionMock(returnValue: Array.Empty<Type>());
 
             var summaries = new BenchmarkSwitcher(userInteractionMock)
-                .With(new [] { typeof(WithDryAttributeAndCategory) })
+                .With(new[] { typeof(WithDryAttributeAndCategory) })
                 .Run(Array.Empty<string>(), config);
 
             Assert.Empty(summaries); // summaries is empty because the returnValue configured for mock returns 0 types
@@ -206,7 +206,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summaries = new BenchmarkSwitcher(userInteractionMock)
                 .With(types)
-                .Run(new [] { categoriesConsoleLineArgument, TestCategory }, config);
+                .Run(new[] { categoriesConsoleLineArgument, TestCategory }, config);
 
             Assert.Single(summaries);
             Assert.Equal(0, userInteractionMock.AskUserCalledTimes);
@@ -224,7 +224,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var summaries = new BenchmarkSwitcher(userInteractionMock)
                 .With(types)
-                .Run(new [] { categoriesConsoleLineArgument, TestCategory, "--filter", "nothing" }, config);
+                .Run(new[] { categoriesConsoleLineArgument, TestCategory, "--filter", "nothing" }, config);
 
             Assert.Empty(summaries); // the summaries is empty because the provided filter returns nothing
             Assert.Equal(0, userInteractionMock.AskUserCalledTimes);

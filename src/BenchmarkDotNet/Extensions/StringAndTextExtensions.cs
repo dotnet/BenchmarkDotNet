@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace BenchmarkDotNet.Extensions
 {
@@ -14,7 +15,17 @@ namespace BenchmarkDotNet.Extensions
 
         internal static string ToLowerCase(this bool value) => value ? "true" : "false"; // to avoid .ToString().ToLower() allocation
 
-        internal static string Escape(this string path) => "\"" + path + "\"";
+        // source: https://stackoverflow.com/a/12364234/5852046
+        internal static string Escape(this string cliArg)
+        {
+            if (string.IsNullOrEmpty(cliArg))
+                return cliArg;
+
+            string value = Regex.Replace(cliArg, @"(\\*)" + "\"", @"$1\$0");
+            value = Regex.Replace(value, @"^(.*\s.*?)(\\*)$", "\"$1$2$2\"", RegexOptions.Singleline);
+
+            return value;
+        }
 
         /// <summary>
         /// replaces all invalid file name chars with their number representation
@@ -92,5 +103,32 @@ namespace BenchmarkDotNet.Extensions
         {
             return path.Replace(directory, string.Empty).Trim('/', '\\');
         }
+
+        /// <summary>
+        /// Standardizes the whitespace before/after arguments so that all arguments are separated by a single space
+        /// </summary>
+        /// <param name="stringBuilder">The string builder that will hold the arguments</param>
+        /// <param name="argument">The argument to append to this string builder</param>
+        /// <returns>The string builder with the arguments added</returns>
+        internal static StringBuilder AppendArgument(this StringBuilder stringBuilder, string argument)
+        {
+            if (string.IsNullOrWhiteSpace(argument))
+            {
+                return stringBuilder;
+            }
+            argument = " " + argument.Trim();
+            stringBuilder.Append(argument);
+
+            return stringBuilder;
+        }
+
+        /// <summary>
+        /// Standardizes the whitespace before/after arguments so that all arguments are separated by a single space
+        /// </summary>
+        /// <param name="stringBuilder">The string builder that will hold the arguments</param>
+        /// <param name="argument">The argument to append to this string builder</param>
+        /// <returns>The string builder with the arguments added</returns>
+        internal static StringBuilder AppendArgument(this StringBuilder stringBuilder, object argument)
+            => argument == null ? stringBuilder : AppendArgument(stringBuilder, argument.ToString());
     }
 }

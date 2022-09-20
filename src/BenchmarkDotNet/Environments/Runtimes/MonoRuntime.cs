@@ -11,11 +11,11 @@ namespace BenchmarkDotNet.Environments
 
         public string AotArgs { get; }
 
+        public override bool IsAOT => !string.IsNullOrEmpty(AotArgs);
+
         public string MonoBclPath { get; }
 
-        private MonoRuntime(string name) : base(RuntimeMoniker.Mono, "mono", name)
-        {
-        }
+        private MonoRuntime(string name) : base(RuntimeMoniker.Mono, "mono", name) { }
 
         public MonoRuntime(string name, string customPath) : this(name) => CustomPath = customPath;
 

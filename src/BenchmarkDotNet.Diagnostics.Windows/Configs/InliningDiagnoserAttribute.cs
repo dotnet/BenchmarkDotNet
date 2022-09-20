@@ -3,6 +3,7 @@ using BenchmarkDotNet.Configs;
 
 namespace BenchmarkDotNet.Diagnostics.Windows.Configs
 {
+    [AttributeUsage(AttributeTargets.Class)]
     public class InliningDiagnoserAttribute : Attribute, IConfigSource
     {
         /// <param name="logFailuresOnly">only the methods that failed to get inlined. True by default.</param>

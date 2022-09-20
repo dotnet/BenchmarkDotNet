@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
@@ -11,7 +12,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
@@ -25,28 +25,35 @@ namespace BenchmarkDotNet.Toolchains
         public ExecuteResult Execute(ExecuteParameters executeParameters)
         {
             string exePath = executeParameters.BuildResult.ArtifactsPaths.ExecutablePath;
-            string args = executeParameters.BenchmarkId.ToArguments();
 
             if (!File.Exists(exePath))
             {
-                return new ExecuteResult(false, -1, default, Array.Empty<string>(), Array.Empty<string>());
+                return ExecuteResult.CreateFailed();
             }
 
-            return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, exePath, null, args, executeParameters.Diagnoser, executeParameters.Resolver);
+            return Execute(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, executeParameters.Logger, executeParameters.BuildResult.ArtifactsPaths,
+                executeParameters.Diagnoser, executeParameters.Resolver, executeParameters.LaunchIndex);
         }
 
-        private ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, string exePath, string workingDirectory, string args, IDiagnoser diagnoser, IResolver resolver)
+        private static ExecuteResult Execute(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, ArtifactsPaths artifactsPaths,
+            IDiagnoser diagnoser, IResolver resolver, int launchIndex)
         {
             try
             {
-                using (var process = new Process { StartInfo = CreateStartInfo(benchmarkCase, exePath, args, workingDirectory, resolver) })
-                using (new ConsoleExitHandler(process, logger))
+                using AnonymousPipeServerStream inputFromBenchmark = new (PipeDirection.In, HandleInheritability.Inheritable);
+                using AnonymousPipeServerStream acknowledgments = new (PipeDirection.Out, HandleInheritability.Inheritable);
+
+                string args = benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString());
+
+                using (Process process = new () { StartInfo = CreateStartInfo(benchmarkCase, artifactsPaths, args, resolver) })
+                using (ConsoleExitHandler consoleExitHandler = new (process, logger))
+                using (AsyncProcessOutputReader processOutputReader = new (process, logOutput: true, logger, readStandardError: false))
                 {
-                    var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId);
+                    Broker broker = new (logger, process, diagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
 
                     diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 
-                    return Execute(process, benchmarkCase, loggerWithDiagnoser, logger);
+                    return Execute(process, benchmarkCase, broker, logger, consoleExitHandler, launchIndex, processOutputReader);
                 }
             }
             finally
@@ -55,11 +62,13 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        private ExecuteResult Execute(Process process, BenchmarkCase benchmarkCase, SynchronousProcessOutputLoggerWithDiagnoser loggerWithDiagnoser, ILogger logger)
+        private static ExecuteResult Execute(Process process, BenchmarkCase benchmarkCase, Broker broker,
+            ILogger logger, ConsoleExitHandler consoleExitHandler, int launchIndex, AsyncProcessOutputReader processOutputReader)
         {
             logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
             process.Start();
+            processOutputReader.BeginRead();
 
             process.EnsureHighPriority(logger);
             if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
@@ -67,45 +76,55 @@ namespace BenchmarkDotNet.Toolchains
                 process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
             }
 
-            loggerWithDiagnoser.ProcessInput();
+            broker.ProcessData();
 
-            process.WaitForExit(); // should we add timeout here?
-
-            if (process.ExitCode == 0)
+            if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
             {
-                return new ExecuteResult(true, process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
+                logger.WriteLineInfo("// The benchmarking process did not quit on time, it's going to get force killed now.");
+
+                processOutputReader.CancelRead();
+                consoleExitHandler.KillProcessTree();
+            }
+            else
+            {
+                processOutputReader.StopRead();
             }
 
-            if (loggerWithDiagnoser.LinesWithResults.Any(line => line.Contains("BadImageFormatException")))
+            if (broker.Results.Any(line => line.Contains("BadImageFormatException")))
                 logger.WriteLineError("You are probably missing <PlatformTarget>AnyCPU</PlatformTarget> in your .csproj file.");
 
-            return new ExecuteResult(true, process.ExitCode, process.Id, Array.Empty<string>(), Array.Empty<string>());
+            return new ExecuteResult(true,
+                process.HasExited ? process.ExitCode : null,
+                process.Id,
+                broker.Results,
+                broker.PrefixedOutput,
+                processOutputReader.GetOutputLines(),
+                launchIndex);
         }
 
-        private ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, string exePath, string args, string workingDirectory, IResolver resolver)
+        private static ProcessStartInfo CreateStartInfo(BenchmarkCase benchmarkCase, ArtifactsPaths artifactsPaths, string args, IResolver resolver)
         {
             var start = new ProcessStartInfo
             {
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
-                RedirectStandardInput = true,
-                RedirectStandardError = true,
+                RedirectStandardInput = false,
+                RedirectStandardError = false, // #1629
                 CreateNoWindow = true,
-                WorkingDirectory = workingDirectory
+                WorkingDirectory = null // by default it's null
             };
 
             start.SetEnvironmentVariables(benchmarkCase, resolver);
 
-            var runtime = benchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
-                ? benchmarkCase.Job.Environment.Runtime
-                : RuntimeInformation.GetCurrentRuntime();
-            // TODO: use resolver
+            string exePath = artifactsPaths.ExecutablePath;
+
+            var runtime = benchmarkCase.GetRuntime();
 
             switch (runtime)
             {
                 case ClrRuntime _:
                 case CoreRuntime _:
-                case CoreRtRuntime _:
+                case NativeAotRuntime _:
                     start.FileName = exePath;
                     start.Arguments = args;
                     break;
@@ -113,13 +132,18 @@ namespace BenchmarkDotNet.Toolchains
                     start.FileName = mono.CustomPath ?? "mono";
                     start.Arguments = GetMonoArguments(benchmarkCase.Job, exePath, args, resolver);
                     break;
+                case MonoAotLLVMRuntime _:
+                    start.FileName = exePath;
+                    start.Arguments = args;
+                    start.WorkingDirectory = artifactsPaths.BinariesDirectoryPath;
+                    break;
                 default:
                     throw new NotSupportedException("Runtime = " + runtime);
             }
             return start;
         }
 
-        private string GetMonoArguments(Job job, string exePath, string args, IResolver resolver)
+        private static string GetMonoArguments(Job job, string exePath, string args, IResolver resolver)
         {
             var arguments = job.HasValue(InfrastructureMode.ArgumentsCharacteristic)
                 ? job.ResolveValue(InfrastructureMode.ArgumentsCharacteristic, resolver).OfType<MonoArgument>().ToArray()

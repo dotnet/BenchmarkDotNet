@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             EventPipeSession session = diagnosticsClient.StartEventPipeSession(eventPipeProviders, true);
 
-            var fileName = ArtifactFileNameHelper.GetFilePath(parameters, DateTime.Now, "nettrace").EnsureFolderExists();
+            var fileName = ArtifactFileNameHelper.GetTraceFilePath(parameters, DateTime.Now, "nettrace").EnsureFolderExists();
             benchmarkToTraceFile[parameters.BenchmarkCase] = fileName;
 
             collectingTask = Task.Run(() => CopyEventStreamToFile(session, fileName, parameters.Config.GetCompositeLogger()));

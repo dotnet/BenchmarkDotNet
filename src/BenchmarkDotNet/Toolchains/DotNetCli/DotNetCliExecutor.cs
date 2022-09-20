@@ -1,8 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Pipes;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 foreach (var file in new DirectoryInfo(executeParameters.BuildResult.ArtifactsPaths.BinariesDirectoryPath).GetFiles("*.*"))
                     executeParameters.Logger.WriteLineError(file.Name);
 
-                return new ExecuteResult(false, -1, default, Array.Empty<string>(), Array.Empty<string>());
+                return ExecuteResult.CreateFailed();
             }
 
             try
@@ -43,7 +43,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     executeParameters.BuildResult.ArtifactsPaths,
                     executeParameters.Diagnoser,
                     Path.GetFileName(executeParameters.BuildResult.ArtifactsPaths.ExecutablePath),
-                    executeParameters.Resolver);
+                    executeParameters.Resolver,
+                    executeParameters.LaunchIndex);
             }
             finally
             {
@@ -59,26 +60,34 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                                       ArtifactsPaths artifactsPaths,
                                       IDiagnoser diagnoser,
                                       string executableName,
-                                      IResolver resolver)
+                                      IResolver resolver,
+                                      int launchIndex)
         {
+            using AnonymousPipeServerStream inputFromBenchmark = new AnonymousPipeServerStream(PipeDirection.In, HandleInheritability.Inheritable);
+            using AnonymousPipeServerStream acknowledgments = new AnonymousPipeServerStream(PipeDirection.Out, HandleInheritability.Inheritable);
+
             var startInfo = DotNetCliCommandExecutor.BuildStartInfo(
                 CustomDotNetCliPath,
                 artifactsPaths.BinariesDirectoryPath,
-                $"{executableName.Escape()} {benchmarkId.ToArguments()}",
-                redirectStandardInput: true);
+                $"{executableName.Escape()} {benchmarkId.ToArguments(inputFromBenchmark.GetClientHandleAsString(), acknowledgments.GetClientHandleAsString())}",
+                redirectStandardOutput: true,
+                redirectStandardInput: false,
+                redirectStandardError: false); // #1629
 
             startInfo.SetEnvironmentVariables(benchmarkCase, resolver);
 
-            using (var process = new Process { StartInfo = startInfo })
-            using (new ConsoleExitHandler(process, logger))
+            using (Process process = new () { StartInfo = startInfo })
+            using (ConsoleExitHandler consoleExitHandler = new (process, logger))
+            using (AsyncProcessOutputReader processOutputReader = new (process, logOutput: true, logger, readStandardError: false))
             {
-                var loggerWithDiagnoser = new SynchronousProcessOutputLoggerWithDiagnoser(logger, process, diagnoser, benchmarkCase, benchmarkId);
+                Broker broker = new (logger, process, diagnoser, benchmarkCase, benchmarkId, inputFromBenchmark, acknowledgments);
 
                 logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
                 diagnoser?.Handle(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(process, benchmarkCase, benchmarkId));
 
                 process.Start();
+                processOutputReader.BeginRead();
 
                 process.EnsureHighPriority(logger);
                 if (benchmarkCase.Job.Environment.HasValue(EnvironmentMode.AffinityCharacteristic))
@@ -86,22 +95,27 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     process.TrySetAffinity(benchmarkCase.Job.Environment.Affinity, logger);
                 }
 
-                loggerWithDiagnoser.ProcessInput();
-                string standardError = process.StandardError.ReadToEnd();
+                broker.ProcessData();
 
-                process.WaitForExit(); // should we add timeout here?
-
-                if (process.ExitCode == 0)
+                if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                 {
-                    return new ExecuteResult(true, process.ExitCode, process.Id, loggerWithDiagnoser.LinesWithResults, loggerWithDiagnoser.LinesWithExtraOutput);
+                    logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
+
+                    processOutputReader.CancelRead();
+                    consoleExitHandler.KillProcessTree();
+                }
+                else
+                {
+                    processOutputReader.StopRead();
                 }
 
-                if (!string.IsNullOrEmpty(standardError))
-                {
-                    logger.WriteError(standardError);
-                }
-
-                return new ExecuteResult(true, process.ExitCode, process.Id, Array.Empty<string>(), Array.Empty<string>());
+                return new ExecuteResult(true,
+                    process.HasExited ? process.ExitCode : null,
+                    process.Id,
+                    broker.Results,
+                    broker.PrefixedOutput,
+                    processOutputReader.GetOutputLines(),
+                    launchIndex);
             }
         }
     }

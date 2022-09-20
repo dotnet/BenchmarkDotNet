@@ -97,6 +97,21 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains))]
+        public void ArgumentsCanBePassedByReadonlyReferenceToBenchmark(IToolchain toolchain) => CanExecute<WithInArguments>(toolchain);
+
+        public class WithInArguments
+        {
+            [Benchmark]
+            [Arguments(true, 1)]
+            [Arguments(false, 2)]
+            public void Simple(in bool boolean, in int number)
+            {
+                if (boolean && number != 1 || !boolean && number != 2)
+                    throw new InvalidOperationException("Incorrect values were passed");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
         public void NonCompileTimeConstantsCanBeReturnedFromSource(IToolchain toolchain) => CanExecute<WithComplexTypesReturnedFromSources>(toolchain);
 
         public class WithComplexTypesReturnedFromSources
@@ -636,10 +651,187 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private void CanExecute<T>(IToolchain toolchain)
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void StaticMethodsAndPropertiesCanBeUsedAsSources_EnumerableOfObjects(IToolchain toolchain)
+            => CanExecute<WithStaticSources_EnumerableOfObjects>(toolchain);
+
+        public class WithStaticSources_EnumerableOfObjects
         {
-            var config = CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain));
-            CanExecute<T>(config);
+            public static IEnumerable<object> StaticMethod() { yield return 1; }
+
+            public static IEnumerable<object> StaticProperty
+            {
+                get
+                {
+                    yield return 2;
+                    yield return 3;
+                }
+            }
+
+            [ParamsSource(nameof(StaticMethod))]
+            public int ParamOne { get; set; }
+
+            [ParamsSource(nameof(StaticProperty))]
+            public int ParamTwo { get; set; }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(StaticMethod))]
+            public void TestMethod(int argument)
+            {
+                if (argument != 1)
+                    throw new ArgumentException("The argument value is incorrect!");
+                if (ParamOne != 1)
+                    throw new ArgumentException("The ParamOne value is incorrect!");
+                if (ParamTwo != 2 && ParamTwo != 3)
+                    throw new ArgumentException("The ParamTwo value is incorrect!");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(StaticProperty))]
+            public void TestProperty(int argument)
+            {
+                if (argument != 2 && argument != 3)
+                    throw new ArgumentException("The argument value is incorrect!");
+                if (ParamOne != 1)
+                    throw new ArgumentException("The ParamOne value is incorrect!");
+                if (ParamTwo != 2 && ParamTwo != 3)
+                    throw new ArgumentException("The ParamTwo value is incorrect!");
+            }
         }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void StaticMethodsAndPropertiesCanBeUsedAsSources_EnumerableOfArrayOfObjects(IToolchain toolchain)
+            => CanExecute<WithStaticSources_EnumerableOfArrayOfObjects>(toolchain);
+
+        public class WithStaticSources_EnumerableOfArrayOfObjects
+        {
+            public static IEnumerable<object[]> StaticMethod() { yield return new object[] { 1 }; }
+            public static IEnumerable<object[]> StaticProperty
+            {
+                get
+                {
+                    yield return new object[] { 2 };
+                    yield return new object[] { 3 };
+                }
+            }
+
+            [ParamsSource(nameof(StaticMethod))]
+            public int ParamOne { get; set; }
+
+            [ParamsSource(nameof(StaticProperty))]
+            public int ParamTwo { get; set; }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(StaticMethod))]
+            public void TestMethod(int argument)
+            {
+                if (argument != 1)
+                    throw new ArgumentException("The argument value is incorrect!");
+                if (ParamOne != 1)
+                    throw new ArgumentException("The ParamOne value is incorrect!");
+                if (ParamTwo != 2 && ParamTwo != 3)
+                    throw new ArgumentException("The ParamTwo value is incorrect!");
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(StaticProperty))]
+            public void TestProperty(int argument)
+            {
+                if (argument != 2 && argument != 3)
+                    throw new ArgumentException("The argument value is incorrect!");
+                if (ParamOne != 1)
+                    throw new ArgumentException("The ParamOne value is incorrect!");
+                if (ParamTwo != 2 && ParamTwo != 3)
+                    throw new ArgumentException("The ParamTwo value is incorrect!");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void VeryLongStringsAreSupported(IToolchain toolchain) => CanExecute<WithVeryLongString>(toolchain);
+
+        public class WithVeryLongString
+        {
+            private readonly string LongString = new string('a', 200_000);
+            private readonly string LongString2 = new string('a', 200_000 - 1) + "b";
+
+            public IEnumerable<object[]> Arguments()
+            {
+                yield return new object[] { LongString, LongString2 };
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Arguments))]
+            public void Test(string first, string second)
+            {
+                if (first != LongString)
+                    throw new ArgumentException($"{nameof(first)} passed string has wrong value!");
+                if (second != LongString2)
+                    throw new ArgumentException($"{nameof(second)} passed string has wrong value!");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void ComplexStringPattersAreSupported(IToolchain toolchain) => CanExecute<Perf_Regex_Industry_RustLang_Sherlock>(toolchain);
+
+        public class Perf_Regex_Industry_RustLang_Sherlock
+        {
+            [Params(@"[""'][^""']{0,30}[?!.][""']")]
+            public string Pattern { get; set; }
+
+            [Benchmark]
+            public int Consume() => Pattern.Length;
+        }
+
+        [Fact]
+        public void UnusedDisposableParamsAreDisposed() => CanExecute<WithDisposableArguments>(Job.Default.GetToolchain());
+
+        public class WithDisposableArguments
+        {
+            public IEnumerable<Disposable> GetDisposables()
+            {
+                yield return new Disposable(0);
+                yield return new Disposable(1);
+            }
+
+            [ParamsSource(nameof(GetDisposables))]
+            public Disposable used;
+
+            [Benchmark]
+            public void CheckDisposed()
+            {
+                if (used.Id == 0)
+                {
+                    if (Disposable.Created != 1)
+                        throw new ArgumentException("Only one instance should be created so far!");
+                    if (Disposable.Disposed != 0)
+                        throw new ArgumentException("None should be disposed as only one was created and is still in use");
+                }
+                if (used.Id == 1)
+                {
+                    if (Disposable.Created != 2)
+                        throw new ArgumentException("Two instances should be created so far!");
+                    if (Disposable.Disposed != 1)
+                        throw new ArgumentException("The first one should be disposed as it's not used");
+                }
+            }
+
+            public class Disposable : IDisposable
+            {
+                public static int Created = 0;
+                public static int Disposed = 0;
+
+                public int Id { get; private set; }
+
+                public Disposable(int id)
+                {
+                    Id = id;
+                    ++Created;
+                }
+
+                public void Dispose() => ++Disposed;
+            }
+        }
+
+        private void CanExecute<T>(IToolchain toolchain) => CanExecute<T>(CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain)));
     }
 }

@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -11,12 +16,18 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public ValuesReturnedByBenchmarkTest(ITestOutputHelper output) : base(output) { }
 
-        [Fact]
-        public void AnyValueCanBeReturned() => CanExecute<ValuesReturnedByBenchmark>();
+        public static IEnumerable<object[]> GetToolchains() => new[]
+        {
+            new object[] { Job.Default.GetToolchain() },
+            new object[] { InProcessEmitToolchain.Instance },
+        };
+
+        [Theory, MemberData(nameof(GetToolchains))]
+        public void AnyValueCanBeReturned(IToolchain toolchain) => CanExecute<ValuesReturnedByBenchmark>(ManualConfig.CreateEmpty().AddJob(Job.Dry.WithToolchain(toolchain)));
 
         public class ValuesReturnedByBenchmark
         {
-#if !NETCOREAPP
+#if NETFRAMEWORK
             [Benchmark]
             public System.Windows.Point? TypeFromCustomFrameworkAssembly() => new System.Windows.Point();
 
@@ -48,9 +59,24 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]
             public Jit ReturnEnum() => Jit.RyuJit;
 
-            private int field = 123;
+            private int intergerField = 123;
             [Benchmark]
-            public ref int ReturnByRef() => ref field;
+            public ref int ReturnByRef() => ref intergerField;
+
+            [Benchmark]
+            public ref readonly int ReturnByReadonlyRef() => ref intergerField;
+
+            public readonly struct ReadOnlyStruct { }
+            private ReadOnlyStruct readOnlyStructField;
+
+            [Benchmark]
+            public ReadOnlyStruct ReturnReadOnlyStruct() => new ReadOnlyStruct();
+
+            [Benchmark]
+            public ref ReadOnlyStruct ReturnReadOnlyStructByRef() => ref readOnlyStructField;
+
+            [Benchmark]
+            public ref readonly ReadOnlyStruct ReturnReadOnlyStructByReadonlyRef() => ref readOnlyStructField;
 
             [Benchmark]
             public Span<byte> ReturnStackOnlyType() => new Span<byte>(Array.Empty<byte>());
@@ -78,6 +104,41 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public NoNamespace TypeWithoutNamespace() => new NoNamespace();
+
+            [Benchmark]
+            public unsafe void* PointerToAnything() => System.IntPtr.Zero.ToPointer();
+
+            [Benchmark]
+            public unsafe int* PointerToUnmanagedType() => (int*)System.IntPtr.Zero.ToPointer();
+
+            [Benchmark]
+            public System.IntPtr IntPtr() => System.IntPtr.Zero;
+
+            [Benchmark]
+            public System.UIntPtr UIntPtr() => System.UIntPtr.Zero;
+
+            [Benchmark]
+            public nint NativeSizeInteger() => 0;
+
+            [Benchmark]
+            public nuint UnsignedNativeSizeInteger() => 0;
+
+            [Benchmark]
+            public Tuple<Outer, Outer.Inner> BenchmarkInnerClass() => Tuple.Create(new Outer(), new Outer.Inner());
+
+            [Benchmark]
+            public Tuple<Outer, Outer.InnerGeneric<string>> BenchmarkGenericInnerClass() => Tuple.Create(new Outer(), new Outer.InnerGeneric<string>());
+        }
+
+        public class Outer
+        {
+            public class Inner
+            {
+            }
+
+            public class InnerGeneric<T>
+            {
+            }
         }
     }
 }

@@ -18,25 +18,30 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Toolchains.CsProj
 {
     [PublicAPI]
-    public class CsProjGenerator : DotNetCliGenerator
+    public class CsProjGenerator : DotNetCliGenerator, IEquatable<CsProjGenerator>
     {
         private const string DefaultSdkName = "Microsoft.NET.Sdk";
 
         private static readonly ImmutableArray<string> SettingsWeWantToCopy =
-            new[] { "NetCoreAppImplicitPackageVersion", "RuntimeFrameworkVersion", "PackageTargetFallback", "LangVersion", "UseWpf", "UseWindowsForms", "CopyLocalLockFileAssemblies", "PreserveCompilationContext", "UserSecretsId" }.ToImmutableArray();
+            new[] { "NetCoreAppImplicitPackageVersion", "RuntimeFrameworkVersion", "PackageTargetFallback", "LangVersion", "UseWpf", "UseWindowsForms", "CopyLocalLockFileAssemblies", "PreserveCompilationContext", "UserSecretsId", "EnablePreviewFeatures" }.ToImmutableArray();
 
         public string RuntimeFrameworkVersion { get; }
 
-        public CsProjGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string runtimeFrameworkVersion)
-            : base(targetFrameworkMoniker, cliPath, packagesPath)
+        public CsProjGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string runtimeFrameworkVersion, bool isNetCore = true)
+            : base(targetFrameworkMoniker, cliPath, packagesPath, isNetCore)
         {
             RuntimeFrameworkVersion = runtimeFrameworkVersion;
         }
 
         protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
         {
-            string directoryName = Path.GetDirectoryName(buildPartition.AssemblyLocation)
-                ?? throw new DirectoryNotFoundException(buildPartition.AssemblyLocation);
+            string assemblyLocation = buildPartition.RepresentativeBenchmarkCase.Descriptor.Type.Assembly.Location;
+
+            //Assembles loaded from a stream will have an empty location (https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location).
+            string directoryName = assemblyLocation.IsEmpty() ?
+                Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Bin") :
+                Path.GetDirectoryName(buildPartition.AssemblyLocation);
+
             return Path.Combine(directoryName, programName);
         }
 
@@ -78,21 +83,20 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         [PublicAPI]
         protected virtual string GetRuntimeSettings(GcMode gcMode, IResolver resolver)
         {
-            if (!gcMode.HasChanges)
-                return string.Empty;
-
-            return new StringBuilder(80)
+            var builder = new StringBuilder(80)
                 .AppendLine("<PropertyGroup>")
-                    .AppendLine($"<ServerGarbageCollection>{gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()}</ServerGarbageCollection>")
-                    .AppendLine($"<ConcurrentGarbageCollection>{gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase()}</ConcurrentGarbageCollection>")
-                    .AppendLine($"<RetainVMGarbageCollection>{gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver).ToLowerCase()}</RetainVMGarbageCollection>")
-                .AppendLine("</PropertyGroup>")
-                .ToString();
+                .AppendLine($"<ServerGarbageCollection>{gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()}</ServerGarbageCollection>")
+                .AppendLine($"<ConcurrentGarbageCollection>{gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase()}</ConcurrentGarbageCollection>");
+
+            if (gcMode.HasValue(GcMode.RetainVmCharacteristic))
+                builder.AppendLine($"<RetainVMGarbageCollection>{gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver).ToLowerCase()}</RetainVMGarbageCollection>");
+
+            return builder.AppendLine("</PropertyGroup>").ToString();
         }
 
         // the host project or one of the .props file that it imports might contain some custom settings that needs to be copied, sth like
         // <NetCoreAppImplicitPackageVersion>2.0.0-beta-001607-00</NetCoreAppImplicitPackageVersion>
-	    // <RuntimeFrameworkVersion>2.0.0-beta-001607-00</RuntimeFrameworkVersion>
+        // <RuntimeFrameworkVersion>2.0.0-beta-001607-00</RuntimeFrameworkVersion>
         internal (string customProperties, string sdkName) GetSettingsThatNeedsToBeCopied(TextReader streamReader, FileInfo projectFile)
         {
             if (!string.IsNullOrEmpty(RuntimeFrameworkVersion)) // some power users knows what to configure, just do it and copy nothing more
@@ -108,7 +112,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
                 foreach (string setting in SettingsWeWantToCopy)
                     if (trimmedLine.Contains(setting))
-                        customProperties.Append(trimmedLine);
+                        customProperties.AppendLine(trimmedLine);
 
                 if (trimmedLine.StartsWith("<Import Project"))
                 {
@@ -164,5 +168,19 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             }
             return projectFile;
         }
+
+        public override bool Equals(object obj) => obj is CsProjGenerator other && Equals(other);
+
+        public bool Equals(CsProjGenerator other)
+            => TargetFrameworkMoniker == other.TargetFrameworkMoniker
+                && RuntimeFrameworkVersion == other.RuntimeFrameworkVersion
+                && CliPath == other.CliPath
+                && PackagesPath == other.PackagesPath;
+
+        public override int GetHashCode()
+            => TargetFrameworkMoniker.GetHashCode()
+                ^ (RuntimeFrameworkVersion?.GetHashCode() ?? 0)
+                ^ (CliPath?.GetHashCode() ?? 0)
+                ^ (PackagesPath?.GetHashCode() ?? 0);
     }
 }

@@ -19,8 +19,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 
         private bool NeedsCopy => SourceCoreRun != CopyCoreRun;
 
-        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath)
-            => base.PackagesPath;
+        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) => PackagesPath;
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, "publish");
@@ -35,7 +34,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 
         protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
             => NeedsCopy
-                ? base.GetArtifactsToCleanup(artifactsPaths).Concat(new [] { CopyCoreRun.Directory.FullName }).ToArray()
+                ? base.GetArtifactsToCleanup(artifactsPaths).Concat(new[] { CopyCoreRun.Directory.FullName }).ToArray()
                 : base.GetArtifactsToCleanup(artifactsPaths);
 
         // source: https://stackoverflow.com/a/58779/5852046

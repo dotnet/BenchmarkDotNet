@@ -22,6 +22,8 @@ namespace BenchmarkDotNet.Extensions
                     return ClrRuntime.Net472;
                 case RuntimeMoniker.Net48:
                     return ClrRuntime.Net48;
+                case RuntimeMoniker.Net481:
+                    return ClrRuntime.Net481;
                 case RuntimeMoniker.NetCoreApp20:
                     return CoreRuntime.Core20;
                 case RuntimeMoniker.NetCoreApp21:
@@ -32,22 +34,21 @@ namespace BenchmarkDotNet.Extensions
                     return CoreRuntime.Core30;
                 case RuntimeMoniker.NetCoreApp31:
                     return CoreRuntime.Core31;
+                case RuntimeMoniker.Net50:
+#pragma warning disable CS0618 // Type or member is obsolete
                 case RuntimeMoniker.NetCoreApp50:
+#pragma warning restore CS0618 // Type or member is obsolete
                     return CoreRuntime.Core50;
+                case RuntimeMoniker.Net60:
+                    return CoreRuntime.Core60;
+                case RuntimeMoniker.Net70:
+                    return CoreRuntime.Core70;
                 case RuntimeMoniker.Mono:
                     return MonoRuntime.Default;
-                case RuntimeMoniker.CoreRt20:
-                    return CoreRtRuntime.CoreRt20;
-                case RuntimeMoniker.CoreRt21:
-                    return CoreRtRuntime.CoreRt21;
-                case RuntimeMoniker.CoreRt22:
-                    return CoreRtRuntime.CoreRt22;
-                case RuntimeMoniker.CoreRt30:
-                    return CoreRtRuntime.CoreRt30;
-                case RuntimeMoniker.CoreRt31:
-                    return CoreRtRuntime.CoreRt31;
-                case RuntimeMoniker.CoreRt50:
-                    return CoreRtRuntime.CoreRt50;
+                case RuntimeMoniker.NativeAot60:
+                    return NativeAotRuntime.Net60;
+                case RuntimeMoniker.NativeAot70:
+                    return NativeAotRuntime.Net70;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "Runtime Moniker not supported");
             }

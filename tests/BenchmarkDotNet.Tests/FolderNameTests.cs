@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Horology;
+using Perfolizer.Horology;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests
@@ -12,6 +12,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(false, "false")]
         [InlineData(true, "true")]
         [InlineData("<MyString>", "_MyString_")]
+        [InlineData("TestCase:Arg", "TestCase_Arg")]
         [InlineData('a', "97")]
         [InlineData(0.42f, "0-42")]
         [InlineData(0.42d, "0-42")]

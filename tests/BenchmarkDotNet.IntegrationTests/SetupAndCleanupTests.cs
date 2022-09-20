@@ -78,21 +78,21 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void AllSetupAndCleanupMethodRunsForSpecificBenchmark()
         {
-            var logger = new OutputLogger(Output);
             var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
-            var config = CreateSimpleConfig(logger, miniJob);
+            var config = CreateSimpleConfig(job: miniJob);
 
-            CanExecute<Benchmarks>(config);
+            var summary = CanExecute<Benchmarks>(config);
+            var standardOutput = GetCombinedStandardOutput(summary);
             Output.WriteLine(OutputDelimiter);
             Output.WriteLine(OutputDelimiter);
             Output.WriteLine(OutputDelimiter);
 
-            var firstActualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(FirstPrefix)).ToArray();
+            var firstActualLogLines = standardOutput.Where(line => line.StartsWith(FirstPrefix)).ToArray();
             foreach (string line in firstActualLogLines)
                 Output.WriteLine(line);
             Assert.Equal(firstExpectedLogLines, firstActualLogLines);
 
-            var secondActualLogLines = logger.GetLog().Split('\r', '\n').Where(line => line.StartsWith(SecondPrefix)).ToArray();
+            var secondActualLogLines = standardOutput.Where(line => line.StartsWith(SecondPrefix)).ToArray();
             foreach (string line in secondActualLogLines)
                 Output.WriteLine(line);
             Assert.Equal(secondExpectedLogLines, secondActualLogLines);
