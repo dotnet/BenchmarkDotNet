@@ -40,7 +40,11 @@ namespace BenchmarkDotNet.Configs
         /// <summary>
         /// Determines whether to generate msbuild binlogs
         /// </summary>
-        GenerateMSBuildBinLog = 1 << 7
+        GenerateMSBuildBinLog = 1 << 7,
+        /// <summary>
+        /// Performs apples-to-apples comparison for provided benchmarks and jobs. Experimental, will change in the near future!
+        /// </summary>
+        ApplesToApples = 1 << 8
     }
 
     internal static class ConfigOptionsExtensions

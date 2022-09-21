@@ -300,6 +300,10 @@ namespace BenchmarkDotNet.Configs
             return manualConfig;
         }
 
+        internal void RemoveAllJobs() => jobs.Clear();
+
+        internal void RemoveAllDiagnosers() => diagnosers.Clear();
+
         private static TimeSpan GetBuildTimeout(TimeSpan current, TimeSpan other)
             => current == DefaultConfig.Instance.BuildTimeout
                 ? other
