@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Characteristic<RunStrategy> RunStrategyCharacteristic = Characteristic.Create<RunMode, RunStrategy>(nameof(RunStrategy), RunStrategy.Throughput);
 
         public static readonly Characteristic<int> LaunchCountCharacteristic = CreateCharacteristic<int>(nameof(LaunchCount));
-        public static readonly Characteristic<int> InvocationCountCharacteristic = CreateCharacteristic<int>(nameof(InvocationCount));
+        public static readonly Characteristic<long> InvocationCountCharacteristic = CreateCharacteristic<long>(nameof(InvocationCount));
         public static readonly Characteristic<int> UnrollFactorCharacteristic = CreateCharacteristic<int>(nameof(UnrollFactor));
         public static readonly Characteristic<int> IterationCountCharacteristic = CreateCharacteristic<int>(nameof(IterationCount));
         public static readonly Characteristic<int> MinIterationCountCharacteristic = CreateCharacteristic<int>(nameof(MinIterationCount));
@@ -125,7 +125,7 @@ namespace BenchmarkDotNet.Jobs
         /// If specified, <see cref="IterationTime"/> will be ignored.
         /// If specified, it must be a multiple of <see cref="UnrollFactor"/>.
         /// </summary>
-        public int InvocationCount
+        public long InvocationCount
         {
             get { return InvocationCountCharacteristic[this]; }
             set { InvocationCountCharacteristic[this] = value; }
