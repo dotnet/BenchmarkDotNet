@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -134,6 +135,7 @@ namespace BenchmarkDotNet.Extensions
             {
                 start.EnvironmentVariables["COMPlus_PerfMapEnabled"] = "1";
                 start.EnvironmentVariables["COMPlus_EnableEventLog"] = "1";
+                start.EnvironmentVariables["COMPlus_EventSourceFilter"] = EngineEventSource.SourceName;
             }
 
             // corerun does not understand runtimeconfig.json files;
