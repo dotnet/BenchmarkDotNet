@@ -170,7 +170,7 @@ namespace BenchmarkDotNet.Jobs
         /// If specified, <see cref="RunMode.IterationTime"/> will be ignored.
         /// If specified, it must be a multiple of <see cref="RunMode.UnrollFactor"/>.
         /// </summary>
-        public static Job WithInvocationCount(this Job job, int count) => job.WithCore(j => j.Run.InvocationCount = count);
+        public static Job WithInvocationCount(this Job job, long count) => job.WithCore(j => j.Run.InvocationCount = count);
 
         /// <summary>
         /// How many times the benchmark method will be invoked per one iteration of a generated loop.
