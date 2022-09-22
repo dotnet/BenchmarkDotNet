@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -14,19 +14,22 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
+using Mono.Unix.Native;
 
 namespace BenchmarkDotNet.Diagnosers
 {
     public class PerfCollectProfiler : IProfiler
     {
-        private const int SuccesExitCode = 0;
+        private const int SuccessExitCode = 0;
         private const string PerfCollectFileName = "perfcollect";
 
         public static readonly IDiagnoser Default = new PerfCollectProfiler(new PerfCollectProfilerConfig(performExtraBenchmarksRun: false));
 
         private readonly PerfCollectProfilerConfig config;
         private readonly DateTime creationTime = DateTime.Now;
-        private readonly Dictionary<BenchmarkCase, FileInfo> benchmarkToTraceFile = new Dictionary<BenchmarkCase, FileInfo>();
+        private readonly Dictionary<BenchmarkCase, FileInfo> benchmarkToTraceFile = new ();
+        private FileInfo perfCollectFile;
+        private Process perfCollectProcess;
 
         [PublicAPI]
         public PerfCollectProfiler(PerfCollectProfilerConfig config) => this.config = config;
@@ -51,7 +54,7 @@ namespace BenchmarkDotNet.Diagnosers
                 yield break;
             }
 
-            if (Mono.Unix.Native.Syscall.getuid() != 0)
+            if (Syscall.getuid() != 0)
             {
                 yield return new ValidationError(true, "You must run as root to use PerfCollectProfiler.");
                 yield break;
@@ -74,18 +77,17 @@ namespace BenchmarkDotNet.Diagnosers
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
-            // it's crucial to start the trace before the process starts and stop it after the benchmarked process stops to have all of the necessary events in the trace file!
-            if (signal == HostSignal.BeforeAnythingElse)
-                Start(parameters);
+            if (signal == HostSignal.BeforeProcessStart)
+                perfCollectProcess = StartCollection(parameters);
             else if (signal == HostSignal.AfterProcessExit)
-                Stop(parameters);
+                StopCollection(parameters);
         }
 
         private bool TryInstallPerfCollect(ValidationParameters validationParameters)
         {
             var scriptInstallationDirectory = new DirectoryInfo(validationParameters.Config.ArtifactsPath).CreateIfNotExists();
 
-            var perfCollectFile = scriptInstallationDirectory.GetFiles(PerfCollectFileName).SingleOrDefault();
+            perfCollectFile = scriptInstallationDirectory.GetFiles(PerfCollectFileName).SingleOrDefault();
             if (perfCollectFile != default)
             {
                 return true;
@@ -97,7 +99,7 @@ namespace BenchmarkDotNet.Diagnosers
             string script = ResourceHelper.LoadTemplate(PerfCollectFileName);
             File.WriteAllText(perfCollectFile.FullName, script);
 
-            if (Mono.Unix.Native.Syscall.chmod(perfCollectFile.FullName, Mono.Unix.Native.FilePermissions.S_IXUSR) != SuccesExitCode)
+            if (Syscall.chmod(perfCollectFile.FullName, Mono.Unix.Native.FilePermissions.S_IXUSR) != SuccessExitCode)
             {
                 logger.WriteError($"Unable to make perfcollect script an executable, the last error was: {Mono.Unix.Native.Syscall.GetLastError()}");
             }
@@ -105,8 +107,9 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 (int exitCode, var output) = ProcessHelper.RunAndReadOutputLineByLine(perfCollectFile.FullName, "install -force", perfCollectFile.Directory.FullName, null, includeErrors: true, logger);
 
-                if (exitCode == SuccesExitCode)
+                if (exitCode == SuccessExitCode)
                 {
+                    logger.WriteLine("Successfully installed perfcollect");
                     return true;
                 }
 
@@ -125,21 +128,7 @@ namespace BenchmarkDotNet.Diagnosers
             return false;
         }
 
-        private void Start(DiagnoserActionParameters parameters)
-        {
-            var perfCollectFile = new FileInfo(Directory.GetFiles(parameters.Config.ArtifactsPath, PerfCollectFileName).Single());
-
-            ExecutePerfCollectCommand(parameters, perfCollectFile, "start");
-        }
-
-        private void Stop(DiagnoserActionParameters parameters)
-        {
-            var perfCollectFile = new FileInfo(Directory.GetFiles(parameters.Config.ArtifactsPath, PerfCollectFileName).Single());
-
-            ExecutePerfCollectCommand(parameters, perfCollectFile, "stop");
-        }
-
-        private void ExecutePerfCollectCommand(DiagnoserActionParameters parameters, FileInfo perfCollectFile, string command)
+        private Process StartCollection(DiagnoserActionParameters parameters)
         {
             var traceName = new FileInfo(ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, fileExtension: null)).Name;
             // todo: escape characters bash does not like ' ', '(' etc
@@ -147,51 +136,45 @@ namespace BenchmarkDotNet.Diagnosers
             var start = new ProcessStartInfo
             {
                 FileName = perfCollectFile.FullName,
-                Arguments = $"{command} {traceName} -pid {parameters.Process.Id}",
+                Arguments = $"collect {traceName}",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,
                 WorkingDirectory = perfCollectFile.Directory.FullName
             };
 
-            using (var perfCollectProcess = new Process { StartInfo = start })
-            {
-                perfCollectProcess.Start();
+            return Process.Start(start);
+        }
 
-                if (!perfCollectProcess.WaitForExit((int)config.Timeout.TotalMilliseconds))
+        private void StopCollection(DiagnoserActionParameters parameters)
+        {
+            try
+            {
+                if (!perfCollectProcess.HasExited)
                 {
                     var logger = parameters.Config.GetCompositeLogger();
 
-                    logger.WriteLineError($"The perfcollect script did not start/stop in {config.Timeout.TotalSeconds}s.");
-                    logger.WriteLineInfo("You can create PerfCollectProfiler providing PerfCollectProfilerConfig with custom timeout value.");
-
-                    logger.Flush(); // flush recently logged message to disk
-
-                    if (!perfCollectProcess.HasExited)
+                    if (Syscall.kill(perfCollectProcess.Id, Signum.SIGINT) != 0)
                     {
+                        var lastError = Syscall.GetLastError();
+                        logger.WriteLineError($"kill(perfcollect, SIGINT) failed with {lastError}");
+                    }
+
+                    if (!perfCollectProcess.WaitForExit((int)config.Timeout.TotalMilliseconds))
+                    {
+                        logger.WriteLineError($"The perfcollect script did not stop in {config.Timeout.TotalSeconds}s. It's going to be force killed now.");
+                        logger.WriteLineInfo("You can create PerfCollectProfiler providing PerfCollectProfilerConfig with custom timeout value.");
+
                         perfCollectProcess.KillTree(); // kill the entire process tree
                     }
                 }
-                else if (command == "stop")
-                {
-                    benchmarkToTraceFile[parameters.BenchmarkCase] = new FileInfo(ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, ".trace.zip"));
-                }
+
+                benchmarkToTraceFile[parameters.BenchmarkCase] = new FileInfo(ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, "trace.zip"));
+            }
+            finally
+            {
+                perfCollectProcess.Dispose();
             }
         }
-    }
-
-    public class PerfCollectProfilerConfig
-    {
-        /// <param name="performExtraBenchmarksRun">if set to true, benchmarks will be executed one more time with the profiler attached. If set to false, there will be no extra run but the results will contain overhead. True by default.</param>
-        /// <param name="timeoutInSeconds">how long should we wait for the perfcollect script to start collecting and/or finish processing the trace. 30s by default</param>
-        public PerfCollectProfilerConfig(bool performExtraBenchmarksRun = true, int timeoutInSeconds = 60)
-        {
-            RunMode = performExtraBenchmarksRun ? RunMode.ExtraRun : RunMode.NoOverhead;
-            Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
-        }
-
-        public TimeSpan Timeout { get; }
-
-        public RunMode RunMode { get; }
     }
 }
