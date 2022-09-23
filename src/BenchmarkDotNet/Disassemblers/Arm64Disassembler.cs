@@ -121,7 +121,7 @@ namespace BenchmarkDotNet.Disassemblers
         public Arm64RegisterId RegisterId {  get {  return _registerId; } }
     }
 
-    internal class Arm64Disassembler : ClrMdV2Disassembler<Arm64Instruction>
+    internal class Arm64Disassembler : ClrMdV2Disassembler
     {
         protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod)
         {
@@ -162,7 +162,7 @@ namespace BenchmarkDotNet.Disassemblers
             }
         }
 
-        internal static bool TryGetReferencedAddress(Arm64Instruction instruction, RegisterValueAccumulator accumulator, uint pointerSize, out ulong referencedAddress, out bool isReferencedAddressIndirect)
+        private static bool TryGetReferencedAddress(Arm64Instruction instruction, RegisterValueAccumulator accumulator, uint pointerSize, out ulong referencedAddress, out bool isReferencedAddressIndirect)
         {
             if ((instruction.Id == Arm64InstructionId.ARM64_INS_BR || instruction.Id == Arm64InstructionId.ARM64_INS_BLR) && instruction.Details.Operands[0].Register.Id == accumulator.RegisterId && accumulator.HasValue)
             {

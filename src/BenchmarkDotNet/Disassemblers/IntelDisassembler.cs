@@ -8,7 +8,7 @@ using System.Net;
 
 namespace BenchmarkDotNet.Disassemblers
 {
-    internal class IntelDisassembler : ClrMdV2Disassembler<Instruction>
+    internal class IntelDisassembler : ClrMdV2Disassembler
     {
         protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod)
         {

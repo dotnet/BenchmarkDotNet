@@ -238,23 +238,6 @@ namespace BenchmarkDotNet.Disassemblers
             return false;
         }
 
-        private class SharpComparer : IEqualityComparer<Sharp>
-        {
-            public bool Equals(Sharp x, Sharp y)
-            {
-                // sometimes some C# code lines are duplicated because the same line is the best match for multiple ILToNativeMaps
-                // we don't want to confuse the users, so this must also be removed
-                return x.FilePath == y.FilePath && x.LineNumber == y.LineNumber;
-            }
-
-            public int GetHashCode(Sharp obj) => obj.FilePath.GetHashCode() ^ obj.LineNumber;
-        }
-    }
-
-    internal abstract class ClrMdV2Disassembler<T> : ClrMdV2Disassembler
-    {
-//        protected abstract bool TryGetReferencedAddressT(T instruction, uint pointerSize, out ulong referencedAddress);
-
         protected void TryTranslateAddressToName(ulong address, bool isAddressPrecodeMD, State state, bool isIndirectCallOrJump, int depth, ClrMethod currentMethod)
         {
             var runtime = state.Runtime;
@@ -326,5 +309,17 @@ namespace BenchmarkDotNet.Disassemblers
             => TryReadNativeCodeAddresses(runtime, method, out ulong startAddress, out ulong endAddress) && !(startAddress >= newAddress && newAddress <= endAddress)
             ? null
             : method;
+
+        private class SharpComparer : IEqualityComparer<Sharp>
+        {
+            public bool Equals(Sharp x, Sharp y)
+            {
+                // sometimes some C# code lines are duplicated because the same line is the best match for multiple ILToNativeMaps
+                // we don't want to confuse the users, so this must also be removed
+                return x.FilePath == y.FilePath && x.LineNumber == y.LineNumber;
+            }
+
+            public int GetHashCode(Sharp obj) => obj.FilePath.GetHashCode() ^ obj.LineNumber;
+        }
     }
 }
