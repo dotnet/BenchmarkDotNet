@@ -1,16 +1,15 @@
-﻿using BenchmarkDotNet.Environments;
+﻿using BenchmarkDotNet.Diagnosers;
 using Iced.Intel;
 using Microsoft.Diagnostics.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 
 namespace BenchmarkDotNet.Disassemblers
 {
-    internal class IntelDisassembler : ClrMdV2Disassembler<Instruction>
+    internal class IntelDisassembler : ClrMdV2Disassembler
     {
-        protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod)
+        protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax)
         {
             var reader = new ByteArrayCodeReader(code);
             var decoder = Decoder.Create(state.Runtime.DataTarget.DataReader.PointerSize * 8, reader);
@@ -96,7 +95,7 @@ namespace BenchmarkDotNet.Disassemblers
             }
         }
 
-        internal static bool TryGetReferencedAddress(Instruction instruction, uint pointerSize, out ulong referencedAddress)
+        private static bool TryGetReferencedAddress(Instruction instruction, uint pointerSize, out ulong referencedAddress)
         {
             for (int i = 0; i < instruction.OpCount; i++)
             {

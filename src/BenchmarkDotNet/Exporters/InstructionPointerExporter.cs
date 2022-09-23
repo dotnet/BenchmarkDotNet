@@ -225,7 +225,7 @@ namespace BenchmarkDotNet.Exporters
                         else
                             logger.Write("<td>");
 
-                        string formatted = CodeFormatter.Format(instruction.Code, formatterWithSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize);
+                        string formatted = CodeFormatter.Format(instruction.Code, formatterWithSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping);
                         logger.WriteLine($"<pre><code>{formatted}</pre></code></td></tr>");
                     }
 

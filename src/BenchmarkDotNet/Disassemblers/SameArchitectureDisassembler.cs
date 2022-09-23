@@ -35,6 +35,7 @@ namespace BenchmarkDotNet.Disassemblers
                 printSource: config.PrintSource,
                 maxDepth: config.MaxDepth,
                 filters: config.Filters,
+                syntax: config.Syntax.ToString(),
                 resultsPath: default
             );
     }

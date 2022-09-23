@@ -1,5 +1,5 @@
-﻿using BenchmarkDotNet.Filters;
-using Iced.Intel;
+﻿using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Filters;
 using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Utilities;
 using System;
@@ -96,6 +96,7 @@ namespace BenchmarkDotNet.Disassemblers
         private DisassembledMethod[] Disassemble(Settings settings, State state)
         {
             var result = new List<DisassembledMethod>();
+            DisassemblySyntax syntax = (DisassemblySyntax)Enum.Parse(typeof(DisassemblySyntax), settings.Syntax);
 
             while (state.Todo.Count != 0)
             {
@@ -105,7 +106,7 @@ namespace BenchmarkDotNet.Disassemblers
                     continue; // already handled
 
                 if (settings.MaxDepth >= methodInfo.Depth)
-                    result.Add(DisassembleMethod(methodInfo, state, settings));
+                    result.Add(DisassembleMethod(methodInfo, state, settings, syntax));
             }
 
             return result.ToArray();
@@ -113,7 +114,7 @@ namespace BenchmarkDotNet.Disassemblers
 
         private static bool CanBeDisassembled(ClrMethod method) => method.ILOffsetMap.Length > 0 && method.NativeCode > 0;
 
-        private DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings)
+        private DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings, DisassemblySyntax syntax)
         {
             var method = methodInfo.Method;
 
@@ -144,7 +145,7 @@ namespace BenchmarkDotNet.Disassemblers
 
             foreach (var map in GetCompleteNativeMap(method, state.Runtime))
             {
-                codes.AddRange(Decode(map, state, methodInfo.Depth, method));
+                codes.AddRange(Decode(map, state, methodInfo.Depth, method, syntax));
             }
 
             Map[] maps = settings.PrintSource
@@ -159,7 +160,7 @@ namespace BenchmarkDotNet.Disassemblers
             };
         }
 
-        private IEnumerable<Asm> Decode(ILToNativeMap map, State state, int depth, ClrMethod currentMethod)
+        private IEnumerable<Asm> Decode(ILToNativeMap map, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax)
         {
             ulong startAddress = map.StartAddress;
             uint size = (uint)(map.EndAddress - map.StartAddress);
@@ -177,10 +178,10 @@ namespace BenchmarkDotNet.Disassemblers
                 totalBytesRead += bytesRead;
             } while (totalBytesRead != size);
 
-            return Decode(code, startAddress, state, depth, currentMethod);
+            return Decode(code, startAddress, state, depth, currentMethod, syntax);
         }
 
-        protected abstract IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod);
+        protected abstract IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax);
 
         private static ILToNativeMap[] GetCompleteNativeMap(ClrMethod method, ClrRuntime runtime)
         {
@@ -237,23 +238,6 @@ namespace BenchmarkDotNet.Disassemblers
             startAddress = endAddress = 0;
             return false;
         }
-
-        private class SharpComparer : IEqualityComparer<Sharp>
-        {
-            public bool Equals(Sharp x, Sharp y)
-            {
-                // sometimes some C# code lines are duplicated because the same line is the best match for multiple ILToNativeMaps
-                // we don't want to confuse the users, so this must also be removed
-                return x.FilePath == y.FilePath && x.LineNumber == y.LineNumber;
-            }
-
-            public int GetHashCode(Sharp obj) => obj.FilePath.GetHashCode() ^ obj.LineNumber;
-        }
-    }
-
-    internal abstract class ClrMdV2Disassembler<T> : ClrMdV2Disassembler
-    {
-//        protected abstract bool TryGetReferencedAddressT(T instruction, uint pointerSize, out ulong referencedAddress);
 
         protected void TryTranslateAddressToName(ulong address, bool isAddressPrecodeMD, State state, bool isIndirectCallOrJump, int depth, ClrMethod currentMethod)
         {
@@ -326,5 +310,17 @@ namespace BenchmarkDotNet.Disassemblers
             => TryReadNativeCodeAddresses(runtime, method, out ulong startAddress, out ulong endAddress) && !(startAddress >= newAddress && newAddress <= endAddress)
             ? null
             : method;
+
+        private class SharpComparer : IEqualityComparer<Sharp>
+        {
+            public bool Equals(Sharp x, Sharp y)
+            {
+                // sometimes some C# code lines are duplicated because the same line is the best match for multiple ILToNativeMaps
+                // we don't want to confuse the users, so this must also be removed
+                return x.FilePath == y.FilePath && x.LineNumber == y.LineNumber;
+            }
+
+            public int GetHashCode(Sharp obj) => obj.FilePath.GetHashCode() ^ obj.LineNumber;
+        }
     }
 }

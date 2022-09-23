@@ -68,7 +68,6 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                     }
                     else if (instruction is Asm asm)
                     {
-                        asm.AddressToLabelMapping = addressesToLabels;
                         // this IP is referenced by some jump|call, so we add a label
                         if (addressesToLabels.TryGetValue(asm.InstructionPointer, out string label))
                         {
@@ -81,7 +80,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                             // jump or a call within same method
                             if (addressesToLabels.TryGetValue(referencedAddress, out string translated))
                             {
-                                prettified.Add(new Reference(CodeFormatter.Format(asm, formatterWithLabelsSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize), translated, asm));
+                                prettified.Add(new Reference(CodeFormatter.Format(asm, formatterWithLabelsSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize, addressesToLabels), translated, asm));
                                 continue;
                             }
 
@@ -93,12 +92,12 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                                 {
                                     comment = "; " + disassemblyResult.AddressToNameMapping[referencedAddress];
                                 }
-                                prettified.Add(new Element(CodeFormatter.Format(asm, formatterWithGlobalSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize) + comment, asm));
+                                prettified.Add(new Element(CodeFormatter.Format(asm, formatterWithGlobalSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping) + comment, asm));
                                 continue;
                             }
                         }
 
-                        prettified.Add(new Element(CodeFormatter.Format(asm, formatterWithGlobalSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize), asm));
+                        prettified.Add(new Element(CodeFormatter.Format(asm, formatterWithGlobalSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping), asm));
                     }
                 }
 
