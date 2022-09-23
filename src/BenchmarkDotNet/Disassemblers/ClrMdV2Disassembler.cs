@@ -253,14 +253,11 @@ namespace BenchmarkDotNet.Disassemblers
 
     internal abstract class ClrMdV2Disassembler<T> : ClrMdV2Disassembler
     {
-        protected abstract bool TryGetReferencedAddressT(T instruction, uint pointerSize, out ulong referencedAddress);
+//        protected abstract bool TryGetReferencedAddressT(T instruction, uint pointerSize, out ulong referencedAddress);
 
-        protected void TryTranslateAddressToName(T instruction, State state, int depth, ClrMethod currentMethod)
+        protected void TryTranslateAddressToName(ulong address, bool isAddressPrecodeMD, State state, bool isIndirectCallOrJump, int depth, ClrMethod currentMethod)
         {
             var runtime = state.Runtime;
-
-            if (!TryGetReferencedAddressT(instruction, (uint)runtime.DataTarget.DataReader.PointerSize, out ulong address))
-                return;
 
             if (state.AddressToNameMapping.ContainsKey(address))
                 return;
@@ -282,7 +279,14 @@ namespace BenchmarkDotNet.Disassemblers
             var methodDescriptor = runtime.GetMethodByHandle(address);
             if (!(methodDescriptor is null))
             {
-                state.AddressToNameMapping.Add(address, $"MD_{methodDescriptor.Signature}");
+                if (isAddressPrecodeMD)
+                {
+                    state.AddressToNameMapping.Add(address, $"Precode of {methodDescriptor.Signature}");
+                }
+                else
+                {
+                    state.AddressToNameMapping.Add(address, $"MD_{methodDescriptor.Signature}");
+                }
                 return;
             }
 

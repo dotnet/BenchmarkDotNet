@@ -27,6 +27,12 @@ namespace BenchmarkDotNet.Disassemblers
         public int InstructionLength { get; set; }
         public Instruction? IntelInstruction { get; set; }
 
+        public ulong? ReferencedAddress { get; set; }
+        public bool IsReferencedAddressIndirect { get; set; }
+        // TODO: this is a hack
+        public IReadOnlyDictionary<ulong, string> AddressToNameMapping { get; set; }
+        public IReadOnlyDictionary<ulong, string> AddressToLabelMapping { get; set; }
+
 #if !CLRMDV1
         public Gee.External.Capstone.Arm64.Arm64Instruction Arm64Instruction { get; set; }
 #endif
