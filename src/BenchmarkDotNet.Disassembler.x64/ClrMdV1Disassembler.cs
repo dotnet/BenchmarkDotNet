@@ -169,22 +169,23 @@ namespace BenchmarkDotNet.Disassemblers
             {
                 decoder.Decode(out var instruction);
 
-                TryTranslateAddressToName(instruction, state, depth, currentMethod);
+                TryTranslateAddressToName(instruction, state, depth, currentMethod, out ulong referencedAddress);
 
                 yield return new Asm
                 {
                     InstructionPointer = instruction.IP,
                     InstructionLength = instruction.Length,
-                    IntelInstruction = instruction
+                    IntelInstruction = instruction,
+                    ReferencedAddress = (referencedAddress > ushort.MaxValue) ? referencedAddress : null,
                 };
             }
         }
 
-        private static void TryTranslateAddressToName(Instruction instruction, State state, int depth, ClrMethod currentMethod)
+        private static void TryTranslateAddressToName(Instruction instruction, State state, int depth, ClrMethod currentMethod, out ulong address)
         {
             var runtime = state.Runtime;
 
-            if (!TryGetReferencedAddress(instruction, (uint)runtime.PointerSize, out ulong address))
+            if (!TryGetReferencedAddress(instruction, (uint)runtime.PointerSize, out address))
                 return;
 
             if (state.AddressToNameMapping.ContainsKey(address))
