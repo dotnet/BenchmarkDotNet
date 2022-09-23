@@ -99,7 +99,7 @@ namespace BenchmarkDotNet.Diagnosers
             string script = ResourceHelper.LoadTemplate(PerfCollectFileName);
             File.WriteAllText(perfCollectFile.FullName, script);
 
-            if (Syscall.chmod(perfCollectFile.FullName, Mono.Unix.Native.FilePermissions.S_IXUSR) != SuccessExitCode)
+            if (Syscall.chmod(perfCollectFile.FullName, FilePermissions.S_IXUSR) != SuccessExitCode)
             {
                 logger.WriteError($"Unable to make perfcollect script an executable, the last error was: {Mono.Unix.Native.Syscall.GetLastError()}");
             }
@@ -148,15 +148,15 @@ namespace BenchmarkDotNet.Diagnosers
 
         private void StopCollection(DiagnoserActionParameters parameters)
         {
+            var logger = parameters.Config.GetCompositeLogger();
+
             try
             {
                 if (!perfCollectProcess.HasExited)
                 {
-                    var logger = parameters.Config.GetCompositeLogger();
-
                     if (Syscall.kill(perfCollectProcess.Id, Signum.SIGINT) != 0)
                     {
-                        var lastError = Syscall.GetLastError();
+                        var lastError = Stdlib.GetLastError();
                         logger.WriteLineError($"kill(perfcollect, SIGINT) failed with {lastError}");
                     }
 
@@ -167,9 +167,14 @@ namespace BenchmarkDotNet.Diagnosers
 
                         perfCollectProcess.KillTree(); // kill the entire process tree
                     }
-                }
 
-                benchmarkToTraceFile[parameters.BenchmarkCase] = new FileInfo(ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, "trace.zip"));
+                    benchmarkToTraceFile[parameters.BenchmarkCase] = new FileInfo(ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, "trace.zip"));
+                }
+                else
+                {
+                    logger.WriteLineError("For some reason the perfcollect script has finished sooner than expected.");
+                    logger.WriteLineInfo($"Please run '{perfCollectFile.FullName} install' as root and re-try.");
+                }
             }
             finally
             {
