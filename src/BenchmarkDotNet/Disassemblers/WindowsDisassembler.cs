@@ -144,6 +144,8 @@ namespace BenchmarkDotNet.Disassemblers
                 .Append(config.MaxDepth).Append(' ')
                 .Append(Escape(resultsPath))
                 .Append(' ')
+                .Append(config.Syntax.ToString())
+                .Append(' ')
                 .Append(string.Join(" ", config.Filters.Select(Escape)))
                 .ToString();
 

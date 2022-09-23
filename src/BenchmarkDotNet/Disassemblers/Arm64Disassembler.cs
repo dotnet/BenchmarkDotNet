@@ -1,9 +1,8 @@
-﻿using Gee.External.Capstone;
+﻿using BenchmarkDotNet.Diagnosers;
+using Gee.External.Capstone;
 using Gee.External.Capstone.Arm64;
 using Microsoft.Diagnostics.Runtime;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BenchmarkDotNet.Disassemblers
 {
@@ -123,7 +122,7 @@ namespace BenchmarkDotNet.Disassemblers
 
     internal class Arm64Disassembler : ClrMdV2Disassembler
     {
-        protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod)
+        protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax)
         {
             const Arm64DisassembleMode disassembleMode = Arm64DisassembleMode.Arm;
             using (CapstoneArm64Disassembler disassembler = CapstoneDisassembler.CreateArm64Disassembler(disassembleMode))
@@ -131,7 +130,7 @@ namespace BenchmarkDotNet.Disassemblers
                 // Enables disassemble details, which are disabled by default, to provide more detailed information on
                 // disassembled binary code.
                 disassembler.EnableInstructionDetails = true;
-                disassembler.DisassembleSyntax = DisassembleSyntax.Intel;
+                disassembler.DisassembleSyntax = Map(syntax);
                 RegisterValueAccumulator accumulator = new RegisterValueAccumulator();
                 accumulator.Init(state.Runtime);
 
@@ -155,8 +154,7 @@ namespace BenchmarkDotNet.Disassemblers
                         InstructionLength = instruction.Bytes.Length,
                         Arm64Instruction = instruction,
                         ReferencedAddress = (address > ushort.MaxValue) ? address : null,
-                        IsReferencedAddressIndirect = isIndirect,
-                        AddressToNameMapping = state.AddressToNameMapping
+                        IsReferencedAddressIndirect = isIndirect
                     };
                 }
             }
@@ -187,5 +185,13 @@ namespace BenchmarkDotNet.Disassemblers
             isReferencedAddressIndirect = false;
             return false;
         }
+
+        private static DisassembleSyntax Map(DisassemblySyntax syntax)
+            => syntax switch
+            {
+                DisassemblySyntax.Att => DisassembleSyntax.Att,
+                DisassemblySyntax.Intel => DisassembleSyntax.Intel,
+                _ => DisassembleSyntax.Masm
+            };
     }
 }

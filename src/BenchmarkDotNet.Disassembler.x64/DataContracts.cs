@@ -25,14 +25,10 @@ namespace BenchmarkDotNet.Disassemblers
     public class Asm : SourceCode
     {
         public int InstructionLength { get; set; }
-        public Instruction? IntelInstruction { get; set; }
-
         public ulong? ReferencedAddress { get; set; }
         public bool IsReferencedAddressIndirect { get; set; }
-        // TODO: this is a hack
-        public IReadOnlyDictionary<ulong, string> AddressToNameMapping { get; set; }
-        public IReadOnlyDictionary<ulong, string> AddressToLabelMapping { get; set; }
 
+        public Instruction? IntelInstruction { get; set; }
 #if !CLRMDV1
         public Gee.External.Capstone.Arm64.Arm64Instruction Arm64Instruction { get; set; }
 #endif
@@ -112,7 +108,7 @@ namespace BenchmarkDotNet.Disassemblers
 
     internal class Settings
     {
-        internal Settings(int processId, string typeName, string methodName, bool printSource, int maxDepth, string resultsPath, string[] filters)
+        internal Settings(int processId, string typeName, string methodName, bool printSource, int maxDepth, string resultsPath, string syntax, string[] filters)
         {
             ProcessId = processId;
             TypeName = typeName;
@@ -120,6 +116,7 @@ namespace BenchmarkDotNet.Disassemblers
             PrintSource = printSource;
             MaxDepth = methodName == DisassemblerConstants.DisassemblerEntryMethodName && maxDepth != int.MaxValue ? maxDepth + 1 : maxDepth;
             ResultsPath = resultsPath;
+            Syntax = syntax;
             Filters = filters;
         }
 
@@ -129,6 +126,7 @@ namespace BenchmarkDotNet.Disassemblers
         internal bool PrintSource { get; }
         internal int MaxDepth { get; }
         internal string[] Filters;
+        internal string Syntax { get; }
         internal string ResultsPath { get; }
 
         internal static Settings FromArgs(string[] args)
@@ -139,7 +137,8 @@ namespace BenchmarkDotNet.Disassemblers
                 printSource: bool.Parse(args[3]),
                 maxDepth: int.Parse(args[4]),
                 resultsPath: args[5],
-                filters: args.Skip(6).ToArray()
+                syntax: args[6],
+                filters: args.Skip(7).ToArray()
             );
     }
 
