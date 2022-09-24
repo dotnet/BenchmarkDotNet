@@ -10,7 +10,8 @@ namespace BenchmarkDotNet.Parameters
 {
     public class ParameterInstance : IDisposable
     {
-        public const string NullParameterTextRepresentation = "?";
+        public const string NullParameterTextRepresentation = "Null";
+        public const string UnknownParameterTextRepresentation = "?";
 
         [PublicAPI] public ParameterDefinition Definition { get; }
 
