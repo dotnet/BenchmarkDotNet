@@ -131,12 +131,11 @@ namespace BenchmarkDotNet.Diagnosers
         private Process StartCollection(DiagnoserActionParameters parameters)
         {
             var traceName = new FileInfo(ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, fileExtension: null)).Name;
-            // todo: escape characters bash does not like ' ', '(' etc
 
             var start = new ProcessStartInfo
             {
                 FileName = perfCollectFile.FullName,
-                Arguments = $"collect {traceName}",
+                Arguments = $"collect \"{traceName}\"",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,
@@ -168,7 +167,11 @@ namespace BenchmarkDotNet.Diagnosers
                         perfCollectProcess.KillTree(); // kill the entire process tree
                     }
 
-                    benchmarkToTraceFile[parameters.BenchmarkCase] = new FileInfo(ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, "trace.zip"));
+                    FileInfo traceFile = new (ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, "trace.zip"));
+                    if (traceFile.Exists)
+                    {
+                        benchmarkToTraceFile[parameters.BenchmarkCase] = traceFile;
+                    }
                 }
                 else
                 {
