@@ -253,27 +253,6 @@ namespace BenchmarkDotNet.Disassemblers
                 return;
             }
 
-            var methodTableName = runtime.DacLibrary.SOSDacInterface.GetMethodTableName(address);
-            if (!string.IsNullOrEmpty(methodTableName))
-            {
-                state.AddressToNameMapping.Add(address, $"MT_{methodTableName}");
-                return;
-            }
-
-            var methodDescriptor = runtime.GetMethodByHandle(address);
-            if (!(methodDescriptor is null))
-            {
-                if (isAddressPrecodeMD)
-                {
-                    state.AddressToNameMapping.Add(address, $"Precode of {methodDescriptor.Signature}");
-                }
-                else
-                {
-                    state.AddressToNameMapping.Add(address, $"MD_{methodDescriptor.Signature}");
-                }
-                return;
-            }
-
             var method = runtime.GetMethodByInstructionPointer(address);
             if (method is null && (address & ((uint)runtime.DataTarget.DataReader.PointerSize - 1)) == 0)
             {
@@ -290,7 +269,35 @@ namespace BenchmarkDotNet.Disassemblers
             }
 
             if (method is null)
+            {
+                if (isAddressPrecodeMD || this is not Arm64Disassembler)
+                {
+                    var methodDescriptor = runtime.GetMethodByHandle(address);
+                    if (!(methodDescriptor is null))
+                    {
+                        if (isAddressPrecodeMD)
+                        {
+                            state.AddressToNameMapping.Add(address, $"Precode of {methodDescriptor.Signature}");
+                        }
+                        else
+                        {
+                            state.AddressToNameMapping.Add(address, $"MD_{methodDescriptor.Signature}");
+                        }
+                        return;
+                    }
+                }
+
+                if (this is not Arm64Disassembler)
+                {
+                    var methodTableName = runtime.DacLibrary.SOSDacInterface.GetMethodTableName(address);
+                    if (!string.IsNullOrEmpty(methodTableName))
+                    {
+                        state.AddressToNameMapping.Add(address, $"MT_{methodTableName}");
+                        return;
+                    }
+                }
                 return;
+            }
 
             if (method.NativeCode == currentMethod.NativeCode && method.Signature == currentMethod.Signature)
                 return; // in case of a call which is just a jump within the method or a recursive call
