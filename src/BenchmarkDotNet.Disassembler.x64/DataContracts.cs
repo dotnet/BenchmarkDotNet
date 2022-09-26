@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Disassemblers
 
     internal class Settings
     {
-        internal Settings(int processId, string typeName, string methodName, bool printSource, int maxDepth, string resultsPath, string syntax, string[] filters)
+        internal Settings(int processId, string typeName, string methodName, bool printSource, int maxDepth, string resultsPath, string syntax, string tfm, string[] filters)
         {
             ProcessId = processId;
             TypeName = typeName;
@@ -117,6 +117,7 @@ namespace BenchmarkDotNet.Disassemblers
             MaxDepth = methodName == DisassemblerConstants.DisassemblerEntryMethodName && maxDepth != int.MaxValue ? maxDepth + 1 : maxDepth;
             ResultsPath = resultsPath;
             Syntax = syntax;
+            TargetFrameworkMoniker = tfm;
             Filters = filters;
         }
 
@@ -127,6 +128,7 @@ namespace BenchmarkDotNet.Disassemblers
         internal int MaxDepth { get; }
         internal string[] Filters;
         internal string Syntax { get; }
+        internal string TargetFrameworkMoniker { get; }
         internal string ResultsPath { get; }
 
         internal static Settings FromArgs(string[] args)
@@ -138,24 +140,29 @@ namespace BenchmarkDotNet.Disassemblers
                 maxDepth: int.Parse(args[4]),
                 resultsPath: args[5],
                 syntax: args[6],
-                filters: args.Skip(7).ToArray()
+                tfm: args[7],
+                filters: args.Skip(8).ToArray()
             );
     }
 
     internal class State
     {
-        internal State(ClrRuntime runtime)
+        internal State(ClrRuntime runtime, string targetFrameworkMoniker)
         {
             Runtime = runtime;
+            TargetFrameworkMoniker = targetFrameworkMoniker;
             Todo = new Queue<MethodInfo>();
             HandledMethods = new HashSet<ClrMethod>(new ClrMethodComparer());
             AddressToNameMapping = new Dictionary<ulong, string>();
         }
 
         internal ClrRuntime Runtime { get; }
+        internal string TargetFrameworkMoniker { get; }
         internal Queue<MethodInfo> Todo { get; }
         internal HashSet<ClrMethod> HandledMethods { get; }
         internal Dictionary<ulong, string> AddressToNameMapping { get; }
+
+        internal bool IsNet7 => TargetFrameworkMoniker.StartsWith("net7.0"); // it can be platform specific like net7.0-windows8
 
         private sealed class ClrMethodComparer : IEqualityComparer<ClrMethod>
         {

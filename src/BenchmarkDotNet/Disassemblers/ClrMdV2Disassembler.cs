@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Disassemblers
 
                 ConfigureSymbols(dataTarget);
 
-                var state = new State(runtime);
+                var state = new State(runtime, settings.TargetFrameworkMoniker);
 
                 if (settings.Filters.Length > 0)
                 {

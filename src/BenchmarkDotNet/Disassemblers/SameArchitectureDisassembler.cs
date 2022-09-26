@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Toolchains;
 using System;
 
 namespace BenchmarkDotNet.Disassemblers
@@ -36,6 +37,7 @@ namespace BenchmarkDotNet.Disassemblers
                 maxDepth: config.MaxDepth,
                 filters: config.Filters,
                 syntax: config.Syntax.ToString(),
+                tfm: parameters.BenchmarkCase.Job.Environment.GetRuntime().MsBuildMoniker,
                 resultsPath: default
             );
     }
