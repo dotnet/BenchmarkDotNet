@@ -16,7 +16,6 @@
         public const string ArgFieldPrefix = "__argField";
         public const string ArgParamPrefix = "arg";
 
-        public const string AwaitHelperFieldName = "awaitHelper";
         public const string GlobalSetupActionFieldName = "globalSetupAction";
         public const string GlobalCleanupActionFieldName = "globalCleanupAction";
         public const string IterationSetupActionFieldName = "iterationSetupAction";

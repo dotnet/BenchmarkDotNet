@@ -246,7 +246,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private ConsumableTypeInfo consumableInfo;
         private ConsumeEmitter consumeEmitter;
 
-        private FieldBuilder awaitHelperField;
         private FieldBuilder globalSetupActionField;
         private FieldBuilder globalCleanupActionField;
         private FieldBuilder iterationSetupActionField;
@@ -413,8 +412,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         private void DefineFields()
         {
-            awaitHelperField =
-                runnableBuilder.DefineField(AwaitHelperFieldName, typeof(Helpers.AwaitHelper), FieldAttributes.Private | FieldAttributes.InitOnly);
             globalSetupActionField =
                 runnableBuilder.DefineField(GlobalSetupActionFieldName, typeof(Action), FieldAttributes.Private);
             globalCleanupActionField =
@@ -588,13 +585,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             var ilBuilder = methodBuilder.GetILGenerator();
 
             /*
-                IL_0007: ldarg.0
-                IL_0008: ldfld class BenchmarkDotNet.Helpers.AwaitHelper BenchmarkDotNet.Helpers.Runnable_0::awaitHelper
-            */
-            ilBuilder.Emit(OpCodes.Ldarg_0);
-            ilBuilder.Emit(OpCodes.Ldfld, awaitHelperField);
-
-            /*
                 IL_0026: ldarg.0
                 IL_0027: ldloc.0
                 IL_0028: ldloc.1
@@ -608,11 +598,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             ilBuilder.Emit(OpCodes.Call, Descriptor.WorkloadMethod);
 
             /*
-                // awaitHelper.GetResult(...);
-                IL_000e: callvirt instance void BenchmarkDotNet.Helpers.AwaitHelper::GetResult(class [System.Private.CoreLib]System.Threading.Tasks.Task)
+                // BenchmarkDotNet.Helpers.AwaitHelper.GetResult(...);
+                IL_000e: call !!0 BenchmarkDotNet.Helpers.AwaitHelper::GetResult<int32>(valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<!!0>)
             */
 
-            ilBuilder.Emit(OpCodes.Callvirt, consumableInfo.GetResultMethod);
+            ilBuilder.Emit(OpCodes.Call, consumableInfo.GetResultMethod);
 
             /*
                 IL_0014: ret
@@ -850,16 +840,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                  */
                 EmitLoadArgFieldsToLocals(ilBuilder, argLocals, skipFirstArg);
 
-                if (consumableInfo.IsAwaitable)
-                {
-                    /*
-                        IL_0026: ldarg.0
-                        IL_0027: ldfld class BenchmarkDotNet.Helpers.AwaitHelper BenchmarkDotNet.Helpers.Runnable_0::awaitHelper
-                    */
-                    ilBuilder.Emit(OpCodes.Ldarg_0);
-                    ilBuilder.Emit(OpCodes.Ldfld, awaitHelperField);
-                }
-
                 /*
                     IL_0026: ldarg.0
                     IL_0027: ldloc.0
@@ -878,10 +858,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 if (consumableInfo.IsAwaitable)
                 {
                     /*
-                        // awaitHelper.GetResult(...);
-                        IL_0036: callvirt instance void BenchmarkDotNet.Helpers.AwaitHelper::GetResult(class [System.Private.CoreLib]System.Threading.Tasks.Task)
+                        // BenchmarkDotNet.Helpers.AwaitHelper.GetResult(...);
+                        IL_000e: call !!0 BenchmarkDotNet.Helpers.AwaitHelper::GetResult<int32>(valuetype [System.Runtime]System.Threading.Tasks.ValueTask`1<!!0>)
                     */
-                    ilBuilder.Emit(OpCodes.Callvirt, consumableInfo.GetResultMethod);
+                    ilBuilder.Emit(OpCodes.Call, consumableInfo.GetResultMethod);
                 }
 
                 /*
@@ -944,7 +924,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             consumeEmitter.OnEmitCtorBody(ctorMethod, ilBuilder);
 
-            ilBuilder.EmitSetFieldToNewInstance(awaitHelperField, typeof(Helpers.AwaitHelper));
             ilBuilder.EmitSetDelegateToThisField(globalSetupActionField, globalSetupMethod);
             ilBuilder.EmitSetDelegateToThisField(globalCleanupActionField, globalCleanupMethod);
             ilBuilder.EmitSetDelegateToThisField(iterationSetupActionField, iterationSetupMethod);
