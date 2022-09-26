@@ -12,8 +12,6 @@ namespace BenchmarkDotNet.Validators
 {
     public abstract class ExecutionValidatorBase : IValidator
     {
-        protected AwaitHelper awaitHelper = new ();
-
         protected ExecutionValidatorBase(bool failOnError)
         {
             TreatsWarningsAsErrors = failOnError;
@@ -134,7 +132,7 @@ namespace BenchmarkDotNet.Validators
             }
 
             AwaitHelper.GetGetResultMethod(result.GetType())
-                ?.Invoke(awaitHelper, new[] { result });
+                ?.Invoke(null, new[] { result });
         }
 
         private bool TryToSetParamsFields(object benchmarkTypeInstance, List<ValidationError> errors)
