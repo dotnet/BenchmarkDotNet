@@ -22,11 +22,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI]
         public static DotNetCliCommandResult Execute(DotNetCliCommand parameters)
         {
-            using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
+            using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult?.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
             using (var outputReader = new AsyncProcessOutputReader(process, parameters.LogOutput, parameters.Logger))
             using (new ConsoleExitHandler(process, parameters.Logger))
             {
-                parameters.Logger.WriteLineInfo($"// start {parameters.CliPath ?? "dotnet"} {parameters.Arguments} in {parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath}");
+                parameters.Logger.WriteLineInfo($"// start {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
                 var stopwatch = Stopwatch.StartNew();
 

@@ -8,10 +8,16 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.CoreRun;
+using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using Mono.Unix.Native;
@@ -28,6 +34,7 @@ namespace BenchmarkDotNet.Diagnosers
         private readonly PerfCollectProfilerConfig config;
         private readonly DateTime creationTime = DateTime.Now;
         private readonly Dictionary<BenchmarkCase, FileInfo> benchmarkToTraceFile = new ();
+        private readonly HashSet<string> cliPathWithSymbolsInstalled = new ();
         private FileInfo perfCollectFile;
         private Process perfCollectProcess;
 
@@ -101,7 +108,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             if (Syscall.chmod(perfCollectFile.FullName, FilePermissions.S_IXUSR) != SuccessExitCode)
             {
-                logger.WriteError($"Unable to make perfcollect script an executable, the last error was: {Mono.Unix.Native.Syscall.GetLastError()}");
+                logger.WriteError($"Unable to make perfcollect script an executable, the last error was: {Syscall.GetLastError()}");
             }
             else
             {
@@ -130,6 +137,8 @@ namespace BenchmarkDotNet.Diagnosers
 
         private Process StartCollection(DiagnoserActionParameters parameters)
         {
+            EnsureDotnetSymbolIsInstalled(parameters);
+
             var traceName = new FileInfo(ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, fileExtension: null)).Name;
 
             var start = new ProcessStartInfo
@@ -183,6 +192,83 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 perfCollectProcess.Dispose();
             }
+        }
+
+        private void EnsureDotnetSymbolIsInstalled(DiagnoserActionParameters parameters)
+        {
+            string cliPath = parameters.BenchmarkCase.GetToolchain() switch
+            {
+                CsProjCoreToolchain core => core.CustomDotNetCliPath,
+                CoreRunToolchain coreRun => coreRun.CustomDotNetCliPath.FullName,
+                NativeAotToolchain nativeAot => nativeAot.CustomDotNetCliPath,
+                _ => null // custom toolchain, dotnet from $PATH will be used
+            };
+
+            if (cliPathWithSymbolsInstalled.Contains(cliPath))
+            {
+                return;
+            }
+
+            cliPathWithSymbolsInstalled.Add(cliPath);
+
+            ILogger logger = parameters.Config.GetCompositeLogger();
+            DotNetCliCommand cliCommand = new (
+                cliPath: cliPath,
+                arguments: "--info",
+                generateResult: null,
+                logger: logger,
+                buildPartition: null,
+                environmentVariables: Array.Empty<EnvironmentVariable>(),
+                timeout: TimeSpan.FromMinutes(3),
+                logOutput: false);
+
+            var dotnetInfoResult = DotNetCliCommandExecutor.Execute(cliCommand);
+            if (!dotnetInfoResult.IsSuccess)
+            {
+                logger.WriteError($"Unable to run `dotnet --info` for `{cliPath}`, dotnet symbol won't be installed");
+                return;
+            }
+
+            // sth like "Microsoft.NETCore.App 7.0.0-rc.2.22451.11 [/home/adam/projects/performance/tools/dotnet/x64/shared/Microsoft.NETCore.App]"
+            // or "Microsoft.NETCore.App 7.0.0-rc.1.22423.16 [/usr/share/dotnet/shared/Microsoft.NETCore.App]"
+            string netCoreAppPath = dotnetInfoResult
+                .StandardOutput.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(line => line.EndsWith("Microsoft.NETCore.App]"))
+                .Select(line => line.Split('[')[1])
+                .Distinct()
+                .Single(); // I assume there will be only one such folder
+            netCoreAppPath = netCoreAppPath.Substring(0, netCoreAppPath.Length - 1); // remove trailing `]`
+
+            string[] missingSymbols = Directory.GetFiles(netCoreAppPath, "lib*.so", SearchOption.AllDirectories)
+                .Where(nativeLibPath => !File.Exists(Path.ChangeExtension(nativeLibPath, "so.dbg")))
+                .Select(Path.GetDirectoryName)
+                .Distinct()
+                .ToArray();
+
+            if (!missingSymbols.Any())
+            {
+                return; // the symbol files are already where we need them!
+            }
+
+            cliCommand = cliCommand.WithLogOutput(true); // the following commands might take a while and fail, let's log them
+
+            // We install the tool in a dedicated directory in order to always use latest version and avoid issues with broken existing configs.
+            string toolPath = Path.Combine(Path.GetTempPath(), "BenchmarkDotNet", "symbols");
+            var installResult = DotNetCliCommandExecutor.Execute(cliCommand.WithArguments($"tool install dotnet-symbol --tool-path \"{toolPath}\""));
+            if (!installResult.IsSuccess)
+            {
+                logger.WriteError($"Unable to install dotnet symbol.");
+                return;
+            }
+
+            foreach (var directoryPath in missingSymbols)
+            {
+                DotNetCliCommandExecutor.Execute(cliCommand
+                    .WithCliPath(Path.Combine(toolPath, "dotnet-symbol"))
+                    .WithArguments($"--symbols --output {directoryPath} {directoryPath}/lib*.so"));
+            }
+
+            DotNetCliCommandExecutor.Execute(cliCommand.WithArguments($"tool uninstall dotnet-symbol --tool-path \"{toolPath}\""));
         }
     }
 }
