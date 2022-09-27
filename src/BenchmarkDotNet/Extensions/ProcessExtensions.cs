@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
@@ -131,11 +129,15 @@ namespace BenchmarkDotNet.Extensions
             if (benchmarkCase.Job.Environment.Runtime is MonoRuntime monoRuntime && !string.IsNullOrEmpty(monoRuntime.MonoBclPath))
                 start.EnvironmentVariables["MONO_PATH"] = monoRuntime.MonoBclPath;
 
-            if (benchmarkCase.Config.GetDiagnosers().OfType<PerfCollectProfiler>().Any())
+            if (benchmarkCase.Config.HasPerfCollectProfiler())
             {
+                // enable tracing configuration inside of CoreCLR (https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/linux-performance-tracing.md#collecting-a-trace)
                 start.EnvironmentVariables["COMPlus_PerfMapEnabled"] = "1";
                 start.EnvironmentVariables["COMPlus_EnableEventLog"] = "1";
+                // enable BDN Event Source (https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/linux-performance-tracing.md#filtering)
                 start.EnvironmentVariables["COMPlus_EventSourceFilter"] = EngineEventSource.SourceName;
+                // turn off precompiled code to resolve framework symbols without using crossgen(2) (https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/linux-performance-tracing.md#alternative-turn-off-use-of-precompiled-code)
+                start.EnvironmentVariables["COMPlus_ZapDisable"] = "1";
             }
 
             // corerun does not understand runtimeconfig.json files;
