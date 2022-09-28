@@ -138,6 +138,8 @@ namespace BenchmarkDotNet.Extensions
                 start.EnvironmentVariables["COMPlus_EventSourceFilter"] = EngineEventSource.SourceName;
                 // turn off precompiled code to resolve framework symbols without using crossgen(2) (https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/linux-performance-tracing.md#alternative-turn-off-use-of-precompiled-code)
                 start.EnvironmentVariables["COMPlus_ZapDisable"] = "1";
+                // workaround for https://github.com/dotnet/runtime/issues/71786, will be solved by next perf version
+                start.EnvironmentVariables["DOTNET_EnableWriteXorExecute"] = "0";
             }
 
             // corerun does not understand runtimeconfig.json files;
