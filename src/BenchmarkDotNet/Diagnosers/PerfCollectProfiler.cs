@@ -26,9 +26,6 @@ namespace BenchmarkDotNet.Diagnosers
 {
     public class PerfCollectProfiler : IProfiler
     {
-        private const int SuccessExitCode = 0;
-        private const string PerfCollectFileName = "perfcollect";
-
         public static readonly IDiagnoser Default = new PerfCollectProfiler(new PerfCollectProfilerConfig(performExtraBenchmarksRun: false));
 
         private readonly PerfCollectProfilerConfig config;
@@ -41,7 +38,7 @@ namespace BenchmarkDotNet.Diagnosers
         [PublicAPI]
         public PerfCollectProfiler(PerfCollectProfilerConfig config) => this.config = config;
 
-        public string ShortName => "PC";
+        public string ShortName => "perf";
 
         public IEnumerable<string> Ids => new[] { nameof(PerfCollectProfiler) };
 
@@ -94,19 +91,18 @@ namespace BenchmarkDotNet.Diagnosers
         {
             var scriptInstallationDirectory = new DirectoryInfo(validationParameters.Config.ArtifactsPath).CreateIfNotExists();
 
-            perfCollectFile = scriptInstallationDirectory.GetFiles(PerfCollectFileName).SingleOrDefault();
-            if (perfCollectFile != default)
+            perfCollectFile = new FileInfo(Path.Combine(scriptInstallationDirectory.FullName, "perfcollect"));
+            if (perfCollectFile.Exists)
             {
                 return true;
             }
 
             var logger = validationParameters.Config.GetCompositeLogger();
-            perfCollectFile = new FileInfo(Path.Combine(scriptInstallationDirectory.FullName, PerfCollectFileName));
 
-            string script = ResourceHelper.LoadTemplate(PerfCollectFileName);
+            string script = ResourceHelper.LoadTemplate(perfCollectFile.Name);
             File.WriteAllText(perfCollectFile.FullName, script);
 
-            if (Syscall.chmod(perfCollectFile.FullName, FilePermissions.S_IXUSR) != SuccessExitCode)
+            if (Syscall.chmod(perfCollectFile.FullName, FilePermissions.S_IXUSR) != 0)
             {
                 logger.WriteError($"Unable to make perfcollect script an executable, the last error was: {Syscall.GetLastError()}");
             }
@@ -114,7 +110,7 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 (int exitCode, var output) = ProcessHelper.RunAndReadOutputLineByLine(perfCollectFile.FullName, "install -force", perfCollectFile.Directory.FullName, null, includeErrors: true, logger);
 
-                if (exitCode == SuccessExitCode)
+                if (exitCode == 0)
                 {
                     logger.WriteLine("Successfully installed perfcollect");
                     return true;
@@ -139,7 +135,7 @@ namespace BenchmarkDotNet.Diagnosers
         {
             EnsureDotnetSymbolIsInstalled(parameters);
 
-            var traceName = new FileInfo(ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, fileExtension: null)).Name;
+            var traceName = GetTraceFile(parameters, extension: null).Name;
 
             var start = new ProcessStartInfo
             {
@@ -176,7 +172,7 @@ namespace BenchmarkDotNet.Diagnosers
                         perfCollectProcess.KillTree(); // kill the entire process tree
                     }
 
-                    FileInfo traceFile = new (ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, "trace.zip"));
+                    FileInfo traceFile = GetTraceFile(parameters, "trace.zip");
                     if (traceFile.Exists)
                     {
                         benchmarkToTraceFile[parameters.BenchmarkCase] = traceFile;
@@ -248,5 +244,9 @@ namespace BenchmarkDotNet.Diagnosers
 
             DotNetCliCommandExecutor.Execute(cliCommand.WithArguments($"tool uninstall dotnet-symbol --tool-path \"{toolPath}\""));
         }
+
+        // perfcollect does not allow for spaces in the trace file name
+        private FileInfo GetTraceFile(DiagnoserActionParameters parameters, string extension)
+            => new (ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, extension).Replace(" ", "_"));
     }
 }
