@@ -201,46 +201,18 @@ namespace BenchmarkDotNet.Diagnosers
                 CsProjCoreToolchain core => core.CustomDotNetCliPath,
                 CoreRunToolchain coreRun => coreRun.CustomDotNetCliPath.FullName,
                 NativeAotToolchain nativeAot => nativeAot.CustomDotNetCliPath,
-                _ => null // custom toolchain, dotnet from $PATH will be used
+                _ => DotNetCliCommandExecutor.DefaultDotNetCliPath.Value
             };
 
-            if (cliPathWithSymbolsInstalled.Contains(cliPath))
+            if (!cliPathWithSymbolsInstalled.Add(cliPath))
             {
                 return;
             }
 
-            cliPathWithSymbolsInstalled.Add(cliPath);
-
-            ILogger logger = parameters.Config.GetCompositeLogger();
-            DotNetCliCommand cliCommand = new (
-                cliPath: cliPath,
-                arguments: "--info",
-                generateResult: null,
-                logger: logger,
-                buildPartition: null,
-                environmentVariables: Array.Empty<EnvironmentVariable>(),
-                timeout: TimeSpan.FromMinutes(3),
-                logOutput: false);
-
-            var dotnetInfoResult = DotNetCliCommandExecutor.Execute(cliCommand);
-            if (!dotnetInfoResult.IsSuccess)
-            {
-                logger.WriteError($"Unable to run `dotnet --info` for `{cliPath}`, dotnet symbol won't be installed");
-                return;
-            }
-
-            // sth like "Microsoft.NETCore.App 7.0.0-rc.2.22451.11 [/home/adam/projects/performance/tools/dotnet/x64/shared/Microsoft.NETCore.App]"
-            // or "Microsoft.NETCore.App 7.0.0-rc.1.22423.16 [/usr/share/dotnet/shared/Microsoft.NETCore.App]"
-            string netCoreAppPath = dotnetInfoResult
-                .StandardOutput.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-                .Where(line => line.EndsWith("Microsoft.NETCore.App]"))
-                .Select(line => line.Split('[')[1])
-                .Distinct()
-                .Single(); // I assume there will be only one such folder
-            netCoreAppPath = netCoreAppPath.Substring(0, netCoreAppPath.Length - 1); // remove trailing `]`
-
-            string[] missingSymbols = Directory.GetFiles(netCoreAppPath, "lib*.so", SearchOption.AllDirectories)
-                .Where(nativeLibPath => !File.Exists(Path.ChangeExtension(nativeLibPath, "so.dbg")))
+            string sdkPath = DotNetCliCommandExecutor.GetSdkPath(cliPath); // /usr/share/dotnet/sdk/
+            string dotnetPath = Path.GetDirectoryName(sdkPath); // /usr/share/dotnet/
+            string[] missingSymbols = Directory.GetFiles(dotnetPath, "lib*.so", SearchOption.AllDirectories)
+                .Where(nativeLibPath => !nativeLibPath.Contains("FallbackFolder") && !File.Exists(Path.ChangeExtension(nativeLibPath, "so.dbg")))
                 .Select(Path.GetDirectoryName)
                 .Distinct()
                 .ToArray();
@@ -250,23 +222,29 @@ namespace BenchmarkDotNet.Diagnosers
                 return; // the symbol files are already where we need them!
             }
 
-            cliCommand = cliCommand.WithLogOutput(true); // the following commands might take a while and fail, let's log them
-
+            ILogger logger = parameters.Config.GetCompositeLogger();
             // We install the tool in a dedicated directory in order to always use latest version and avoid issues with broken existing configs.
             string toolPath = Path.Combine(Path.GetTempPath(), "BenchmarkDotNet", "symbols");
-            var installResult = DotNetCliCommandExecutor.Execute(cliCommand.WithArguments($"tool install dotnet-symbol --tool-path \"{toolPath}\""));
+            DotNetCliCommand cliCommand = new (
+                cliPath: cliPath,
+                arguments: $"tool install dotnet-symbol --tool-path \"{toolPath}\"",
+                generateResult: null,
+                logger: logger,
+                buildPartition: null,
+                environmentVariables: Array.Empty<EnvironmentVariable>(),
+                timeout: TimeSpan.FromMinutes(3),
+                logOutput: true); // the following commands might take a while and fail, let's log them
+
+            var installResult = DotNetCliCommandExecutor.Execute(cliCommand);
             if (!installResult.IsSuccess)
             {
-                logger.WriteError($"Unable to install dotnet symbol.");
+                logger.WriteError("Unable to install dotnet symbol.");
                 return;
             }
 
-            foreach (var directoryPath in missingSymbols)
-            {
-                DotNetCliCommandExecutor.Execute(cliCommand
-                    .WithCliPath(Path.Combine(toolPath, "dotnet-symbol"))
-                    .WithArguments($"--symbols --output {directoryPath} {directoryPath}/lib*.so"));
-            }
+            DotNetCliCommandExecutor.Execute(cliCommand
+                .WithCliPath(Path.Combine(toolPath, "dotnet-symbol"))
+                .WithArguments($"--recurse-subdirectories --symbols \"{dotnetPath}/dotnet\" \"{dotnetPath}/lib*.so\""));
 
             DotNetCliCommandExecutor.Execute(cliCommand.WithArguments($"tool uninstall dotnet-symbol --tool-path \"{toolPath}\""));
         }

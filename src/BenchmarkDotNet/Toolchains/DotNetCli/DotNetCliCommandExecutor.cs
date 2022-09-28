@@ -156,5 +156,28 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [DllImport("libc")]
         private static extern int getppid();
+
+        internal static string GetSdkPath(string cliPath)
+        {
+            DotNetCliCommand cliCommand = new (
+                cliPath: cliPath,
+                arguments: "--info",
+                generateResult: null,
+                logger: NullLogger.Instance,
+                buildPartition: null,
+                environmentVariables: Array.Empty<EnvironmentVariable>(),
+                timeout: TimeSpan.FromMinutes(3),
+                logOutput: false);
+
+            // sth like "  3.1.423 [/usr/share/dotnet/sdk]
+            string sdkPath = Execute(cliCommand)
+                .StandardOutput.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(line => line.EndsWith("/sdk]"))
+                .Select(line => line.Split('[')[1])
+                .Distinct()
+                .Single(); // I assume there will be only one such folder
+
+            return sdkPath.Substring(0, sdkPath.Length - 1); // remove trailing `]`
+        }
     }
 }

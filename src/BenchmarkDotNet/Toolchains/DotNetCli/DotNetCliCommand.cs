@@ -48,9 +48,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             RetryFailedBuildWithNoDeps = retryFailedBuildWithNoDeps;
         }
 
-        public DotNetCliCommand WithLogOutput(bool logOutput)
-            => new (CliPath, Arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, logOutput: logOutput);
-
         public DotNetCliCommand WithArguments(string arguments)
             => new (CliPath, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, logOutput: LogOutput);
 
