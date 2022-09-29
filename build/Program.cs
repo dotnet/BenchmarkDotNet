@@ -203,7 +203,7 @@ public class BuildContext : FrostingContext
 
 public static class DocumentationHelper
 {
-    public const string DocFxVersion = "2.59.3";
+    public const string DocFxVersion = "2.59.4";
 
     public static readonly string[] BdnAllVersions =
     {
