@@ -19,11 +19,12 @@ jobs:
     - name: Build BenchmarkDotNet
       run: ./build.bat --target Build
 
-    - name: Download changelog
-      run: ./build.bat --target DocFX_Changelog_Download --LatestVersions true --StableVersions true
-      env:
-        GITHUB_PRODUCT: ChangelogBuilder
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # Temporary disabled because of the API limit
+    # - name: Download changelog
+    #   run: ./build.bat --target DocFX_Changelog_Download --LatestVersions true --StableVersions true
+    #   env:
+    #     GITHUB_PRODUCT: ChangelogBuilder
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build documentation
       run: ./build.bat --target DocFX_Build
@@ -40,17 +41,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Download Artifacts
-        uses: actions/download-artifact@v1
-        with:
-          name: site
+    - name: Download Artifacts
+      uses: actions/download-artifact@v1
+      with:
+        name: site
 
-      - name: Deploy documentation
-        uses: JamesIves/github-pages-deploy-action@3.7.1
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: site
-          GIT_CONFIG_NAME: Andrey Akinshin
-          GIT_CONFIG_EMAIL: andrey.akinshin@gmail.com
-          CLEAN: true
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: docs-stable
+
+    - name: Deploy documentation
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: site
+        GIT_CONFIG_NAME: Andrey Akinshin
+        GIT_CONFIG_EMAIL: andrey.akinshin@gmail.com
+        CLEAN: true
