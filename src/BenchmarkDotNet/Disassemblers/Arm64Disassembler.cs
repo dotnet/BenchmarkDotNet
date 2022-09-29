@@ -78,7 +78,6 @@ namespace BenchmarkDotNet.Disassemblers
                     break;
                 case State.LookingForPossibleLdr:
                     if (instruction.Id == Arm64InstructionId.ARM64_INS_LDR &&
-                        //_registerId == details.Operands[0].Register.Id && // Target of the LDR is the register we are tracking
                         details.Operands[1].Type == Arm64OperandType.Memory &&
                         details.Operands[1].Memory.Base.Id == _registerId && // The source address is in the register we are tracking
                         details.Operands[1].Memory.Displacement == 0 && // There is no displacement
