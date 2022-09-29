@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -127,6 +128,17 @@ namespace BenchmarkDotNet.Extensions
 
             if (benchmarkCase.Job.Environment.Runtime is MonoRuntime monoRuntime && !string.IsNullOrEmpty(monoRuntime.MonoBclPath))
                 start.EnvironmentVariables["MONO_PATH"] = monoRuntime.MonoBclPath;
+
+            if (benchmarkCase.Config.HasPerfCollectProfiler())
+            {
+                // enable tracing configuration inside of CoreCLR (https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/linux-performance-tracing.md#collecting-a-trace)
+                start.EnvironmentVariables["COMPlus_PerfMapEnabled"] = "1";
+                start.EnvironmentVariables["COMPlus_EnableEventLog"] = "1";
+                // enable BDN Event Source (https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/linux-performance-tracing.md#filtering)
+                start.EnvironmentVariables["COMPlus_EventSourceFilter"] = EngineEventSource.SourceName;
+                // workaround for https://github.com/dotnet/runtime/issues/71786, will be solved by next perf version
+                start.EnvironmentVariables["DOTNET_EnableWriteXorExecute"] = "0";
+            }
 
             // corerun does not understand runtimeconfig.json files;
             // we have to set "COMPlus_GC*" environment variables as documented in

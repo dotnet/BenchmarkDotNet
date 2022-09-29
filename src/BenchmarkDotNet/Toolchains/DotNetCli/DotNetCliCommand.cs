@@ -44,12 +44,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             BuildPartition = buildPartition;
             EnvironmentVariables = environmentVariables;
             Timeout = timeout;
-            LogOutput = logOutput || buildPartition.LogBuildOutput;
+            LogOutput = logOutput || (buildPartition is not null && buildPartition.LogBuildOutput);
             RetryFailedBuildWithNoDeps = retryFailedBuildWithNoDeps;
         }
 
         public DotNetCliCommand WithArguments(string arguments)
             => new (CliPath, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, logOutput: LogOutput);
+
+        public DotNetCliCommand WithCliPath(string cliPath)
+            => new (cliPath, Arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, logOutput: LogOutput);
 
         [PublicAPI]
         public BuildResult RestoreThenBuild()
