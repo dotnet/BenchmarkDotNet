@@ -41,15 +41,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Download Artifacts
-      uses: actions/download-artifact@v1
-      with:
-        name: site
-
     - name: Checkout
       uses: actions/checkout@v3
       with:
         ref: docs-stable
+
+    - name: Download Artifacts
+      uses: actions/download-artifact@v1
+      with:
+        name: site
 
     - name: Deploy documentation
       uses: JamesIves/github-pages-deploy-action@3.7.1
