@@ -199,34 +199,31 @@ namespace BenchmarkDotNet.Disassemblers
                     ulong address = 0;
                     if (TryGetReferencedAddress(instruction, accumulator, (uint)state.Runtime.DataTarget.DataReader.PointerSize, out address, out isIndirect))
                     {
-                        if (isIndirect)
+                        if (isIndirect && state.IsNet7)
                         {
-                            if (state.IsNet7)
-                            {
                             // Check if the target is a known stub
                             // The stubs are allocated in interleaved code / data pages in memory. The data part of the stub
                             // is at an address one memory page higher than the code.
-                                byte[] buffer = new byte[12];
+                            byte[] buffer = new byte[12];
 
-                                if (state.Runtime.DataTarget.DataReader.Read(address, buffer) == buffer.Length)
+                            if (state.Runtime.DataTarget.DataReader.Read(address, buffer) == buffer.Length)
+                            {
+                                if (buffer.SequenceEqual(callCountingStubTemplate))
                                 {
-                                    if (buffer.SequenceEqual(callCountingStubTemplate))
-                                    {
-                                        const ulong TargetMethodAddressSlotOffset = 8;
-                                        address = state.Runtime.DataTarget.DataReader.ReadPointer(address + (ulong)Environment.SystemPageSize + TargetMethodAddressSlotOffset);
-                                    }
-                                    else if (buffer.SequenceEqual(stubPrecodeTemplate))
-                                    {
-                                        const ulong MethodDescSlotOffset = 0;
-                                        address = state.Runtime.DataTarget.DataReader.ReadPointer(address + (ulong)Environment.SystemPageSize + MethodDescSlotOffset);
-                                        isPrestubMD = true;
-                                    }
-                                    else if (buffer.SequenceEqual(fixupPrecodeTemplate))
-                                    {
-                                        const ulong MethodDescSlotOffset = 8;
-                                        address = state.Runtime.DataTarget.DataReader.ReadPointer(address + (ulong)Environment.SystemPageSize + MethodDescSlotOffset);
-                                        isPrestubMD = true;
-                                    }
+                                    const ulong TargetMethodAddressSlotOffset = 8;
+                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + (ulong)Environment.SystemPageSize + TargetMethodAddressSlotOffset);
+                                }
+                                else if (buffer.SequenceEqual(stubPrecodeTemplate))
+                                {
+                                    const ulong MethodDescSlotOffset = 0;
+                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + (ulong)Environment.SystemPageSize + MethodDescSlotOffset);
+                                    isPrestubMD = true;
+                                }
+                                else if (buffer.SequenceEqual(fixupPrecodeTemplate))
+                                {
+                                    const ulong MethodDescSlotOffset = 8;
+                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + (ulong)Environment.SystemPageSize + MethodDescSlotOffset);
+                                    isPrestubMD = true;
                                 }
                             }
                         }
