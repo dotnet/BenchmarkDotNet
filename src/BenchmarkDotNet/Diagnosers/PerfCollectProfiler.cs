@@ -133,7 +133,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         private Process StartCollection(DiagnoserActionParameters parameters)
         {
-            EnsureDotnetSymbolIsInstalled(parameters);
+            EnsureSymbolsForNativeRuntime(parameters);
 
             var traceName = GetTraceFile(parameters, extension: null).Name;
 
@@ -190,7 +190,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        private void EnsureDotnetSymbolIsInstalled(DiagnoserActionParameters parameters)
+        private void EnsureSymbolsForNativeRuntime(DiagnoserActionParameters parameters)
         {
             string cliPath = parameters.BenchmarkCase.GetToolchain() switch
             {
@@ -245,8 +245,8 @@ namespace BenchmarkDotNet.Diagnosers
             DotNetCliCommandExecutor.Execute(cliCommand.WithArguments($"tool uninstall dotnet-symbol --tool-path \"{toolPath}\""));
         }
 
-        // perfcollect does not allow for spaces in the trace file name
         private FileInfo GetTraceFile(DiagnoserActionParameters parameters, string extension)
-            => new (ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, extension).Replace(" ", "_"));
+            => new (ArtifactFileNameHelper.GetTraceFilePath(parameters, creationTime, extension)
+                    .Replace(" ", "_")); // perfcollect does not allow for spaces in the trace file name
     }
 }

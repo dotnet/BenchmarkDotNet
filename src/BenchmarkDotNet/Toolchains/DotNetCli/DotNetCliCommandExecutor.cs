@@ -166,13 +166,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 logger: NullLogger.Instance,
                 buildPartition: null,
                 environmentVariables: Array.Empty<EnvironmentVariable>(),
-                timeout: TimeSpan.FromMinutes(3),
+                timeout: TimeSpan.FromMinutes(1),
                 logOutput: false);
 
-            // sth like "  3.1.423 [/usr/share/dotnet/sdk]
             string sdkPath = Execute(cliCommand)
                 .StandardOutput.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-                .Where(line => line.EndsWith("/sdk]"))
+                .Where(line => line.EndsWith("/sdk]")) // sth like "  3.1.423 [/usr/share/dotnet/sdk]
                 .Select(line => line.Split('[')[1])
                 .Distinct()
                 .Single(); // I assume there will be only one such folder

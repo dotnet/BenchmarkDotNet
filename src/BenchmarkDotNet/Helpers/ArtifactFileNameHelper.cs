@@ -71,9 +71,10 @@ namespace BenchmarkDotNet.Helpers
 
             fileName = FolderNameHelper.ToFolderName(fileName);
 
-            return string.IsNullOrEmpty(fileExtension)
-                ? Path.Combine(details.Config.ArtifactsPath, fileName)
-                : Path.Combine(details.Config.ArtifactsPath, $"{fileName}.{fileExtension}");
+            if (!string.IsNullOrEmpty(fileExtension))
+                fileName = $"{fileName}.{fileExtension}";
+
+            return Path.Combine(details.Config.ArtifactsPath, fileName);
         }
     }
 }
