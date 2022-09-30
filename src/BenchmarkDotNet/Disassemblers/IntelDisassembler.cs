@@ -9,6 +9,22 @@ namespace BenchmarkDotNet.Disassemblers
 {
     internal class IntelDisassembler : ClrMdV2Disassembler
     {
+        // See dotnet/runtime src/coreclr/vm/amd64/thunktemplates.asm/.S for the stub code
+        // mov    rax,QWORD PTR [rip + DATA_SLOT(CallCountingStub, RemainingCallCountCell)]
+        // dec    WORD PTR [rax]
+        // je     LOCAL_LABEL(CountReachedZero)
+        // jmp    QWORD PTR [rip + DATA_SLOT(CallCountingStub, TargetForMethod)]
+        // LOCAL_LABEL(CountReachedZero):
+        // jmp    QWORD PTR [rip + DATA_SLOT(CallCountingStub, TargetForThresholdReached)]
+        private static byte[] callCountingStubTemplate = new byte[10] { 0x48, 0x8b, 0x05, 0xf9, 0x0f, 0x00, 0x00, 0x66, 0xff, 0x08 };
+        // mov    r10, [rip + DATA_SLOT(StubPrecode, MethodDesc)]
+        // jmp    [rip + DATA_SLOT(StubPrecode, Target)]
+        private static byte[] stubPrecodeTemplate = new byte[13] { 0x4c, 0x8b, 0x15, 0xf9, 0x0f, 0x00, 0x00, 0xff, 0x25, 0xfb, 0x0f, 0x00, 0x00 };
+        // jmp    [rip + DATA_SLOT(FixupPrecode, Target)]
+        // mov    r10, [rip + DATA_SLOT(FixupPrecode, MethodDesc)]
+        // jmp    [rip + DATA_SLOT(FixupPrecode, PrecodeFixupThunk)]
+        private static byte[] fixupPrecodeTemplate = new byte[19] { 0xff, 0x25, 0xfa, 0x0f, 0x00, 0x00, 0x4c, 0x8b, 0x15, 0xfb, 0x0f, 0x00, 0x00, 0xff, 0x25, 0xfd, 0x0f, 0x00, 0x00 };
+
         protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax)
         {
             var reader = new ByteArrayCodeReader(code);
@@ -28,48 +44,34 @@ namespace BenchmarkDotNet.Disassemblers
                     if (isIndirect)
                     {
                         address = state.Runtime.DataTarget.DataReader.ReadPointer(address);
-                        if (state.Runtime.ClrInfo.Version.Major >= 7)
+                        if (state.IsNet7)
                         {
-                            const ulong PageSize = 4096;
-                            // Check if the target is a call counting stub and if it is, extract the real target.
-                            // The call counting stub starts like this:
-                            // mov rax, qword ptr [rip+0xff9]
-                            // dec word ptr [rax]
+                            // Check if the target is a known stub
+                            // The stubs are allocated in interleaved code / data pages in memory. The data part of the stub
+                            // is at an address one memory page higher than the code.
                             byte[] buffer = new byte[10];
-                            byte[] callCountingStub = new byte[10] { 0x48, 0x8b, 0x05, 0xf9, 0x0f, 0x00, 0x00, 0x66, 0xff, 0x08 };
 
-                            if (state.Runtime.DataTarget.DataReader.Read(address, buffer) == buffer.Length && buffer.SequenceEqual(callCountingStub))
+                            if (state.Runtime.DataTarget.DataReader.Read(address, buffer) == buffer.Length && buffer.SequenceEqual(callCountingStubTemplate))
                             {
                                 const ulong TargetMethodAddressSlotOffset = 8;
-                                // The call counting stubs are allocated in interleaved code / data pages in memory. The data part of the stub
-                                // is at an address one memory page higher than the code.
-                                address = state.Runtime.DataTarget.DataReader.ReadPointer(address + PageSize + TargetMethodAddressSlotOffset);
+                                address = state.Runtime.DataTarget.DataReader.ReadPointer(address + (ulong)Environment.SystemPageSize + TargetMethodAddressSlotOffset);
                             }
                             else
                             {
                                 buffer = new byte[13];
-                                // 00000001`80157720 4c8b15f90f0000  mov     r10,qword ptr [coreclr!__scrt_initialize_onexit_tables+0x20 (00000001`80158720)]
-                                // 00000001`80157727 ff25fb0f0000 jmp     qword ptr[coreclr!__scrt_initialize_onexit_tables + 0x28(00000001`80158728)]
-                                byte[] stubPrecode = new byte[13] { 0x4c, 0x8b, 0x15, 0xf9, 0x0f, 0x00, 0x00, 0xff, 0x25, 0xfb, 0x0f, 0x00, 0x00 };
-                                if (state.Runtime.DataTarget.DataReader.Read(address, buffer) == buffer.Length && buffer.SequenceEqual(stubPrecode))
+                                if (state.Runtime.DataTarget.DataReader.Read(address, buffer) == buffer.Length && buffer.SequenceEqual(stubPrecodeTemplate))
                                 {
-                                    //Console.WriteLine("Found StubPrecode");
                                     const ulong MethodDescSlotOffset = 0;
-                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + PageSize + MethodDescSlotOffset);
+                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + (ulong)Environment.SystemPageSize + MethodDescSlotOffset);
                                     isPrestubMD = true;
                                 }
                                 else
                                 {
-                                    // 00000001`80157730 ff25fa0f0000    jmp     qword ptr [coreclr!__scrt_initialize_onexit_tables+0x30 (00000001`80158730)]
-                                    // 00000001`80157736 4c8b15fb0f0000 mov     r10,qword ptr[coreclr!__scrt_initialize_onexit_tables + 0x38(00000001`80158738)]
-                                    // 00000001`8015773d ff25fd0f0000 jmp     qword ptr[coreclr!__scrt_initialize_onexit_tables + 0x40(00000001`80158740)]
                                     buffer = new byte[19];
-                                    byte[] fixupPrecode = new byte[19] { 0xff, 0x25, 0xfa, 0x0f, 0x00, 0x00, 0x4c, 0x8b, 0x15, 0xfb, 0x0f, 0x00, 0x00, 0xff, 0x25, 0xfd, 0x0f, 0x00, 0x00 };
-                                    if (state.Runtime.DataTarget.DataReader.Read(address, buffer) == buffer.Length && buffer.SequenceEqual(fixupPrecode))
+                                    if (state.Runtime.DataTarget.DataReader.Read(address, buffer) == buffer.Length && buffer.SequenceEqual(fixupPrecodeTemplate))
                                     {
-                                        //Console.WriteLine("Found FixupPrecode");
                                         const ulong MethodDescSlotOffset = 8;
-                                        address = state.Runtime.DataTarget.DataReader.ReadPointer(address + PageSize + MethodDescSlotOffset);
+                                        address = state.Runtime.DataTarget.DataReader.ReadPointer(address + (ulong)Environment.SystemPageSize + MethodDescSlotOffset);
                                         isPrestubMD = true;
                                     }
 

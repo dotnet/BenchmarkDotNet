@@ -2,7 +2,9 @@
 using Gee.External.Capstone;
 using Gee.External.Capstone.Arm64;
 using Microsoft.Diagnostics.Runtime;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BenchmarkDotNet.Disassemblers
 {
@@ -10,8 +12,9 @@ namespace BenchmarkDotNet.Disassemblers
     {
         private enum State
         {
-            LookingForMovz,
+            LookingForPattern,
             ExpectingMovk,
+            ExpectingAdd,
             LookingForPossibleLdr
         }
 
@@ -23,7 +26,7 @@ namespace BenchmarkDotNet.Disassemblers
 
         public void Init(ClrRuntime runtime)
         {
-            _state = State.LookingForMovz;
+            _state = State.LookingForPattern;
             _expectedMovkShift = 0;
             _value = 0;
             _registerId = Arm64RegisterId.Invalid;
@@ -36,13 +39,19 @@ namespace BenchmarkDotNet.Disassemblers
 
             switch (_state)
             {
-                case State.LookingForMovz:
+                case State.LookingForPattern:
                     if (instruction.Id == Arm64InstructionId.ARM64_INS_MOVZ)
                     {
                         _registerId = details.Operands[0].Register.Id;
                         _value = details.Operands[1].Immediate;
                         _state = State.ExpectingMovk;
                         _expectedMovkShift = 16;
+                    }
+                    else if (instruction.Id == Arm64InstructionId.ARM64_INS_ADRP)
+                    {
+                        _registerId = details.Operands[0].Register.Id;
+                        _value = details.Operands[1].Immediate;
+                        _state = State.ExpectingAdd;
                     }
                     break;
                 case State.ExpectingMovk:
@@ -57,9 +66,18 @@ namespace BenchmarkDotNet.Disassemblers
                     }
                     _state = State.LookingForPossibleLdr;
                     goto case State.LookingForPossibleLdr;
+                case State.ExpectingAdd:
+                    if (instruction.Id == Arm64InstructionId.ARM64_INS_ADD &&
+                        details.Operands[0].Register.Id == _registerId &&
+                        details.Operands[1].Register.Id == _registerId &&
+                        details.Operands[2].Type == Arm64OperandType.Immediate)
+                    {
+                        _value = _value | instruction.Details.Operands[2].Immediate;
+                        _state = State.LookingForPossibleLdr;
+                    }
+                    break;
                 case State.LookingForPossibleLdr:
                     if (instruction.Id == Arm64InstructionId.ARM64_INS_LDR &&
-                        _registerId == details.Operands[0].Register.Id && // Target of the LDR is the register we are tracking
                         details.Operands[1].Type == Arm64OperandType.Memory &&
                         details.Operands[1].Memory.Base.Id == _registerId && // The source address is in the register we are tracking
                         details.Operands[1].Memory.Displacement == 0 && // There is no displacement
@@ -67,11 +85,15 @@ namespace BenchmarkDotNet.Disassemblers
                     {
                         // Simulate the LDR instruction.
                         long newValue = (long)_runtime.DataTarget.DataReader.ReadPointer((ulong)_value);
-                        //Console.WriteLine($"Reading from memory at {_value:X}, got {newValue:X}");
                         _value = newValue;
                         if (_value == 0)
                         {
-                            _state = State.LookingForMovz;
+                            _state = State.LookingForPattern;
+                        }
+                        else
+                        {
+                            // The LDR might have loaded the result in another register
+                            _registerId = details.Operands[0].Register.Id;
                         }
                     }
                     else if (instruction.Id == Arm64InstructionId.ARM64_INS_CBZ ||
@@ -79,21 +101,19 @@ namespace BenchmarkDotNet.Disassemblers
                             instruction.Id == Arm64InstructionId.ARM64_INS_B && details.ConditionCode != Arm64ConditionCode.Invalid)
                     {
                         // ignore conditional branches
-                        //Console.WriteLine($"Ignoring conditional branch {instruction.Id}");
                     }
                     else if (details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_BRANCH_RELATIVE) ||
                              details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_CALL) ||
                              details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_JUMP))
                     {
                         // We've encountered an unconditional jump or call, the accumulated registers value is not valid anymore
-                        //Console.WriteLine($"Resetting state at branch");
-                        _state = State.LookingForMovz;
+                        _state = State.LookingForPattern;
                     }
                     else if (instruction.Id == Arm64InstructionId.ARM64_INS_MOVZ)
                     {
                         // Another constant loading is starting
-                        _state = State.LookingForMovz;
-                        goto case State.LookingForMovz;
+                        _state = State.LookingForPattern;
+                        goto case State.LookingForPattern;
                     }
                     else
                     {
@@ -104,8 +124,7 @@ namespace BenchmarkDotNet.Disassemblers
                             // Some unexpected instruction overwriting the accumulated register
                             if (reg.Id == _registerId)
                             {
-                                //Console.WriteLine($"Resetting state at register writing");
-                                _state = State.LookingForMovz;
+                                _state = State.LookingForPattern;
                             }
                         }
                     }
@@ -122,6 +141,43 @@ namespace BenchmarkDotNet.Disassemblers
 
     internal class Arm64Disassembler : ClrMdV2Disassembler
     {
+        // See dotnet/runtime src/coreclr/vm/arm64/thunktemplates.asm/.S for the stub code
+        // ldr  x9, DATA_SLOT(CallCountingStub, RemainingCallCountCell)
+        // ldrh w10, [x9]
+        // subs w10, w10, #0x1
+        private static byte[] callCountingStubTemplate = new byte[12] { 0x09, 0x00, 0x00, 0x58, 0x2a, 0x01, 0x40, 0x79, 0x4a, 0x05, 0x00, 0x71 };
+        // ldr x10, DATA_SLOT(StubPrecode, Target)
+        // ldr x12, DATA_SLOT(StubPrecode, MethodDesc)
+        // br x10
+        private static byte[] stubPrecodeTemplate = new byte[12] { 0x4a, 0x00, 0x00, 0x58, 0xec, 0x00, 0x00, 0x58, 0x40, 0x01, 0x1f, 0xd6 };
+        // ldr x11, DATA_SLOT(FixupPrecode, Target)
+        // br  x11
+        // ldr x12, DATA_SLOT(FixupPrecode, MethodDesc)
+        private static byte[] fixupPrecodeTemplate = new byte[12] { 0x0b, 0x00, 0x00, 0x58, 0x60, 0x01, 0x1f, 0xd6, 0x0c, 0x00, 0x00, 0x58 };
+
+        static Arm64Disassembler()
+        {
+            // The stubs code depends on the current OS memory page size, so we need to update the templates to reflect that
+            int pageSizeShifted = Environment.SystemPageSize / 32;
+            // Calculate the ldr x9, #offset instruction with offset based on the page size
+            callCountingStubTemplate[1] = (byte)(pageSizeShifted & 0xff);
+            callCountingStubTemplate[2] = (byte)(pageSizeShifted >> 8);
+
+            // Calculate the ldr x10, #offset instruction with offset based on the page size
+            stubPrecodeTemplate[1] = (byte)(pageSizeShifted & 0xff);
+            stubPrecodeTemplate[2] = (byte)(pageSizeShifted >> 8);
+            // Calculate the ldr x12, #offset instruction with offset based on the page size
+            stubPrecodeTemplate[5] = (byte)((pageSizeShifted - 1) & 0xff);
+            stubPrecodeTemplate[6] = (byte)((pageSizeShifted - 1) >> 8);
+
+            // Calculate the ldr x11, #offset instruction with offset based on the page size
+            fixupPrecodeTemplate[1] = (byte)(pageSizeShifted & 0xff);
+            fixupPrecodeTemplate[2] = (byte)(pageSizeShifted >> 8);
+            // Calculate the ldr x12, #offset instruction with offset based on the page size
+            fixupPrecodeTemplate[9] = (byte)(pageSizeShifted & 0xff);
+            fixupPrecodeTemplate[10] = (byte)(pageSizeShifted >> 8);
+        }
+
         protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax)
         {
             const Arm64DisassembleMode disassembleMode = Arm64DisassembleMode.Arm;
@@ -137,13 +193,41 @@ namespace BenchmarkDotNet.Disassemblers
                 Arm64Instruction[] instructions = disassembler.Disassemble(code, (long)startAddress);
                 foreach (Arm64Instruction instruction in instructions)
                 {
-                    // TODO: use the accumulated address
-                    // TODO: set the isIndirect correctly
                     bool isIndirect = false;
+                    bool isPrestubMD = false;
+
                     ulong address = 0;
                     if (TryGetReferencedAddress(instruction, accumulator, (uint)state.Runtime.DataTarget.DataReader.PointerSize, out address, out isIndirect))
                     {
-                        TryTranslateAddressToName(address, isAddressPrecodeMD: false, state, isIndirect, depth, currentMethod);
+                        if (isIndirect && state.IsNet7)
+                        {
+                            // Check if the target is a known stub
+                            // The stubs are allocated in interleaved code / data pages in memory. The data part of the stub
+                            // is at an address one memory page higher than the code.
+                            byte[] buffer = new byte[12];
+
+                            if (state.Runtime.DataTarget.DataReader.Read(address, buffer) == buffer.Length)
+                            {
+                                if (buffer.SequenceEqual(callCountingStubTemplate))
+                                {
+                                    const ulong TargetMethodAddressSlotOffset = 8;
+                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + (ulong)Environment.SystemPageSize + TargetMethodAddressSlotOffset);
+                                }
+                                else if (buffer.SequenceEqual(stubPrecodeTemplate))
+                                {
+                                    const ulong MethodDescSlotOffset = 0;
+                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + (ulong)Environment.SystemPageSize + MethodDescSlotOffset);
+                                    isPrestubMD = true;
+                                }
+                                else if (buffer.SequenceEqual(fixupPrecodeTemplate))
+                                {
+                                    const ulong MethodDescSlotOffset = 8;
+                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + (ulong)Environment.SystemPageSize + MethodDescSlotOffset);
+                                    isPrestubMD = true;
+                                }
+                            }
+                        }
+                        TryTranslateAddressToName(address, isPrestubMD, state, isIndirect, depth, currentMethod);
                     }
 
                     accumulator.Feed(instruction);
@@ -164,6 +248,7 @@ namespace BenchmarkDotNet.Disassemblers
         {
             if ((instruction.Id == Arm64InstructionId.ARM64_INS_BR || instruction.Id == Arm64InstructionId.ARM64_INS_BLR) && instruction.Details.Operands[0].Register.Id == accumulator.RegisterId && accumulator.HasValue)
             {
+                // Branch via register where we have extracted the value of the register by parsing the disassembly
                 referencedAddress = (ulong)accumulator.Value;
                 isReferencedAddressIndirect = true;
                 return true;
