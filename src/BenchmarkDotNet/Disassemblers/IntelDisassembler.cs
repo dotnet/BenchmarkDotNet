@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Disassemblers
                     if (isIndirect)
                     {
                         address = state.Runtime.DataTarget.DataReader.ReadPointer(address);
-                        if (state.IsNet7)
+                        if (state.RuntimeVersion.Major >= 7)
                         {
                             // Check if the target is a known stub
                             // The stubs are allocated in interleaved code / data pages in memory. The data part of the stub

@@ -199,7 +199,7 @@ namespace BenchmarkDotNet.Disassemblers
                     ulong address = 0;
                     if (TryGetReferencedAddress(instruction, accumulator, (uint)state.Runtime.DataTarget.DataReader.PointerSize, out address, out isIndirect))
                     {
-                        if (isIndirect && state.IsNet7)
+                        if (isIndirect && state.RuntimeVersion.Major >= 7)
                         {
                             // Check if the target is a known stub
                             // The stubs are allocated in interleaved code / data pages in memory. The data part of the stub
