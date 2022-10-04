@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 foreach (var benchmarkCase in benchmarkRunInfo.BenchmarksCases)
                 {
-                    string fullBenchmarkName = benchmarkCase.Descriptor.GetFilterName();
+                    string fullBenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase);
 
                     actualFullBenchmarkNames.Add(fullBenchmarkName);
 
