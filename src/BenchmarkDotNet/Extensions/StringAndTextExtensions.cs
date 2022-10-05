@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Extensions
         internal static string ToLowerCase(this bool value) => value ? "true" : "false"; // to avoid .ToString().ToLower() allocation
 
         // source: https://stackoverflow.com/a/12364234/5852046
-        internal static string Escape(this string cliArg)
+        internal static string EscapeCommandLine(this string cliArg)
         {
             if (string.IsNullOrEmpty(cliArg))
                 return cliArg;
