@@ -140,6 +140,37 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
+        public void SpecialCharactersInStringAreSupported() => CanExecute<CompileSpecialCharactersInString>();
+
+        public class CompileSpecialCharactersInString
+        {
+            [Params("\0")] public string Null;
+            [Params("\t")] public string Tab;
+            [Params("\n")] public string NewLine;
+            [Params("\\")] public string Slash;
+            [Params("\"")] public string Quote;
+            [Params("\u0061")] public string Unicode;
+
+            [Params("\n \0 \n")] public string Combo;
+            [Params("C:\\files.txt")] public string Path;
+
+            [Benchmark]
+            public void Benchmark()
+            {
+                var isPassedAsSingleCharacter =
+                    Null.Length == 1 &&
+                    Tab.Length == 1 &&
+                    NewLine.Length == 1 &&
+                    Slash.Length == 1 &&
+                    Quote.Length == 1 &&
+                    Unicode.Length == 1;
+
+                if (!isPassedAsSingleCharacter)
+                    throw new InvalidOperationException("Some Param has an invalid escaped string");
+            }
+        }
+
+        [Fact]
         public void ParamsMustBeEscapedProperly() => CanExecute<NeedEscaping>();
 
         public class NeedEscaping
