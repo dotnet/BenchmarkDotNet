@@ -16,6 +16,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Parameters;
@@ -215,6 +216,11 @@ namespace BenchmarkDotNet.Running
                     benchmarksToRunCount -= stop ? benchmarks.Length - i : 1;
 
                     LogProgress(logger, in runsChronometer, totalBenchmarkCount, benchmarksToRunCount);
+
+                    if (RuntimeInformation.IsWindows())
+                    {
+                        UpdateTitle(in runsChronometer, totalBenchmarkCount, benchmarksToRunCount);
+                    }
                 }
             }
 
@@ -612,6 +618,15 @@ namespace BenchmarkDotNet.Running
                     // there is very little we can do about it
                 }
             }
+        }
+
+        private static void UpdateTitle(in StartedClock runsChronometer, int totalBenchmarkCount, int benchmarksToRunCount)
+        {
+            int executedBenchmarkCount = totalBenchmarkCount - benchmarksToRunCount;
+            double avgSecondsPerBenchmark = runsChronometer.GetElapsed().GetTimeSpan().TotalSeconds / executedBenchmarkCount;
+            TimeSpan fromNow = TimeSpan.FromSeconds(avgSecondsPerBenchmark * benchmarksToRunCount);
+
+            Console.Title = $"{executedBenchmarkCount}/{totalBenchmarkCount} Benchmarks runned - Estimated {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish";
         }
 
         private static void LogProgress(ILogger logger, in StartedClock runsChronometer, int totalBenchmarkCount, int benchmarksToRunCount)
