@@ -44,14 +44,14 @@ namespace BenchmarkDotNet.Parameters
                 case null:
                     return NullParameterTextRepresentation;
                 case IParam parameter:
-                    return Trim(parameter.DisplayText, maxParameterColumnWidth);
+                    return Trim(parameter.DisplayText, maxParameterColumnWidth).EscapeSpecialCharacters(false);
                 case IFormattable formattable:
-                    return Trim(formattable.ToString(null, cultureInfo), maxParameterColumnWidth);
+                    return Trim(formattable.ToString(null, cultureInfo), maxParameterColumnWidth).EscapeSpecialCharacters(false);
                 // no trimming for types!
                 case Type type:
                     return type.IsNullable() ? $"{Nullable.GetUnderlyingType(type).GetDisplayName()}?" : type.GetDisplayName();
                 default:
-                    return Trim(value.ToString(), maxParameterColumnWidth);
+                    return Trim(value.ToString(), maxParameterColumnWidth).EscapeSpecialCharacters(false);
             }
         }
 

@@ -28,6 +28,16 @@ namespace BenchmarkDotNet.Extensions
         }
 
         /// <summary>
+        /// Escapes UNICODE control characters
+        /// </summary>
+        /// <param name="str">string to escape</param>
+        /// <param name="quote">True to put (double) quotes around the string literal</param>
+        internal static string EscapeSpecialCharacters(this string str, bool quote)
+        {
+            return Microsoft.CodeAnalysis.CSharp.SymbolDisplay.FormatLiteral(str, quote);
+        }
+
+        /// <summary>
         /// replaces all invalid file name chars with their number representation
         /// </summary>
         internal static string AsValidFileName(this string inputPath)
