@@ -171,6 +171,22 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
+        public void SpecialCharactersInCharAreSupported() => CanExecute<CompileSpecialCharactersInChar>();
+
+        public class CompileSpecialCharactersInChar
+        {
+            [Params('\0')] public char Null;
+            [Params('\t')] public char Tab;
+            [Params('\n')] public char NewLine;
+            [Params('\\')] public char Slash;
+            [Params('\"')] public char Quote;
+            [Params('\u0061')] public char Unicode;
+
+            [Benchmark]
+            public void Benchmark() { }
+        }
+
+        [Fact]
         public void ParamsMustBeEscapedProperly() => CanExecute<NeedEscaping>();
 
         public class NeedEscaping

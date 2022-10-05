@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Helpers
                 case string text:
                     return "$" + text.EscapeSpecialCharacters(true).Replace("{", "{{").Replace("}", "}}");
                 case char c:
-                    return c == '\\' ? "'\\\\'" : $"'{value}'";
+                    return c.EscapeSpecialCharacter(true);
                 case float f:
                     return ToSourceCode(f);
                 case double d:

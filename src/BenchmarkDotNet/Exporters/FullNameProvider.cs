@@ -143,7 +143,7 @@ namespace BenchmarkDotNet.Exporters
                 case string text:
                     return text.EscapeSpecialCharacters(true);
                 case char character:
-                    return $"'{character}'";
+                    return character.EscapeSpecialCharacter(true);
                 case DateTime time:
                     return time.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK");
                 case Type type:
