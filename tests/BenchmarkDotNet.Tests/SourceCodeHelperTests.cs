@@ -59,5 +59,32 @@ namespace BenchmarkDotNet.Tests
 
             Assert.Equal(expected, actual);
         }
+
+        [Fact]
+        public void CanEscapeControlCharacters()
+        {
+            const string expected = @"$"" \0 \b \f \n \t \v \"" a a a a """;
+
+            var actual = SourceCodeHelper.ToSourceCode(" \0 \b \f \n \t \v \" \u0061 \x0061 \x61 \U00000061 ");
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData('\0', @"'\0'")]
+        [InlineData('\b', @"'\b'")]
+        [InlineData('\f', @"'\f'")]
+        [InlineData('\n', @"'\n'")]
+        [InlineData('\t', @"'\t'")]
+        [InlineData('\v', @"'\v'")]
+        [InlineData('\'', @"'\''")]
+        [InlineData('\u0061', "'a'")]
+        [InlineData('"', "'\"'")]
+        public void CanEscapeControlCharactersInChar(char original, string excepted)
+        {
+            var actual = SourceCodeHelper.ToSourceCode(original);
+
+            Assert.Equal(excepted, actual);
+        }
     }
 }
