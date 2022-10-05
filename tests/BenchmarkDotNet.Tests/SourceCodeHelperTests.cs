@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Tests
     // TODO: add decimal, typeof, CreateInstance, TimeValue, IntPtr, IFormattable
     public class SourceCodeHelperTests
     {
-        private ITestOutputHelper output;
+        private readonly ITestOutputHelper output;
 
         public SourceCodeHelperTests(ITestOutputHelper output) => this.output = output;
 
@@ -17,8 +17,8 @@ namespace BenchmarkDotNet.Tests
         [InlineData(null, "null")]
         [InlineData(false, "false")]
         [InlineData(true, "true")]
-        [InlineData("string", "$@\"string\"")]
-        [InlineData("string/\\", @"$@""string/\""")]
+        [InlineData("string", "$\"string\"")]
+        [InlineData("string/\\", @"$""string/\\""")]
         [InlineData('a', "'a'")]
         [InlineData('\\', "'\\\\'")]
         [InlineData(0.123f, "0.123f")]
@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanEscapeJson()
         {
-            const string expected = "$@\"{{ \"\"message\"\": \"\"Hello, World!\"\" }}\"";
+            const string expected = "$\"{{ \\\"message\\\": \\\"Hello, World!\\\" }}\"";
 
             var actual = SourceCodeHelper.ToSourceCode("{ \"message\": \"Hello, World!\" }");
 
@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanEscapePath()
         {
-            const string expected = @"$@""C:\Projects\BenchmarkDotNet\samples\BenchmarkDotNet.Samples""";
+            const string expected = @"$""C:\\Projects\\BenchmarkDotNet\\samples\\BenchmarkDotNet.Samples""";
 
             var actual = SourceCodeHelper.ToSourceCode(@"C:\Projects\BenchmarkDotNet\samples\BenchmarkDotNet.Samples");
 
