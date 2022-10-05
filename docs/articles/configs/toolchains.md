@@ -407,7 +407,7 @@ git clone https://github.com/dotnet/runtime
 cd runtime
 ```
 
-Install [all Mono prerequisites](https://github.com/dotnet/runtime/blob/mono/docs/workflow/testing/libraries/testing-wasm.md):
+Install [all Mono prerequisites](https://github.com/dotnet/runtime/blob/main/docs/workflow/testing/libraries/testing-wasm.md):
 
 ```cmd
 sudo apt-get install cmake llvm-9 clang-9 autoconf automake libtool build-essential python curl git lldb-6.0 liblldb-6.0-dev libunwind8 libunwind8-dev gettext libicu-dev liblttng-ust-dev libssl-dev libnuma-dev libkrb5-dev zlib1g-dev
