@@ -1,50 +1,19 @@
 ﻿using Iced.Intel;
 using System;
+using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Disassemblers
 {
     internal static class CodeFormatter
     {
-        internal static string Format(SourceCode sourceCode, Formatter formatter, bool printInstructionAddresses, uint pointerSize)
-        {
-            switch (sourceCode)
+        internal static string Format(SourceCode sourceCode, Formatter formatter, bool printInstructionAddresses, uint pointerSize, IReadOnlyDictionary<ulong, string> symbols)
+            => sourceCode switch
             {
-                case Asm asm:
-                    return InstructionFormatter.Format(asm.Instruction, formatter, printInstructionAddresses, pointerSize);
-                case Sharp sharp:
-                    return sharp.Text;
-                case MonoCode mono:
-                    return mono.Text;
-                default:
-                    throw new NotSupportedException();
-            }
-        }
-    }
-
-    internal static class InstructionFormatter
-    {
-        internal static string Format(Instruction instruction, Formatter formatter, bool printInstructionAddresses, uint pointerSize)
-        {
-            var output = new StringOutput();
-
-            if (printInstructionAddresses)
-            {
-                FormatInstructionPointer(instruction, formatter, pointerSize, output);
-            }
-
-            formatter.Format(instruction, output);
-
-            return output.ToString();
-        }
-
-        private static void FormatInstructionPointer(Instruction instruction, Formatter formatter, uint pointerSize, StringOutput output)
-        {
-            string ipFormat = formatter.Options.LeadingZeroes
-                ? pointerSize == 4 ? "X8" : "X16"
-                : "X";
-
-            output.Write(instruction.IP.ToString(ipFormat), FormatterTextKind.Text);
-            output.Write(" ", FormatterTextKind.Text);
-        }
+                Asm asm when asm.IntelInstruction.HasValue => IntelInstructionFormatter.Format(asm.IntelInstruction.Value, formatter, printInstructionAddresses, pointerSize),
+                Asm asm when asm.Arm64Instruction is not null => Arm64InstructionFormatter.Format(asm, formatter.Options, printInstructionAddresses, pointerSize, symbols),
+                Sharp sharp => sharp.Text,
+                MonoCode mono => mono.Text,
+                _ => throw new NotSupportedException(),
+            };
     }
 }

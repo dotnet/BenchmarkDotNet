@@ -92,9 +92,9 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
         {
             var currentPlatform = RuntimeInformation.GetCurrentPlatform();
-            if (currentPlatform != Platform.X64 && currentPlatform != Platform.X86)
+            if (!(currentPlatform is Platform.X64 or Platform.X86 or Platform.Arm64))
             {
-                yield return new ValidationError(true, $"{currentPlatform} is not supported (Iced library limitation)");
+                yield return new ValidationError(true, $"{currentPlatform} is not supported");
                 yield break;
             }
 
@@ -176,7 +176,7 @@ namespace BenchmarkDotNet.Diagnosers
         }
 
         private static long SumNativeCodeSize(DisassemblyResult disassembly)
-            => disassembly.Methods.Sum(method => method.Maps.Sum(map => map.SourceCodes.OfType<Asm>().Sum(asm => asm.Instruction.Length)));
+            => disassembly.Methods.Sum(method => method.Maps.Sum(map => map.SourceCodes.OfType<Asm>().Sum(asm => asm.InstructionLength)));
 
         private class NativeCodeSizeMetricDescriptor : IMetricDescriptor
         {

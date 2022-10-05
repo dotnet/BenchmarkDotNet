@@ -8,6 +8,7 @@
     <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
     <PlatformTarget>x86</PlatformTarget>
     <SuppressNETCoreSdkPreviewMessage>True</SuppressNETCoreSdkPreviewMessage>
+    <DefineConstants>$(DefineConstants);CLRMDV1</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <OutputPath>..\BenchmarkDotNet\Disassemblers</OutputPath>

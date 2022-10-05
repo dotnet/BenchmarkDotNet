@@ -39,8 +39,10 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
             // first of all, we search of referenced addresses (jump|calls)
             var referencedAddresses = new HashSet<ulong>();
             foreach (var asm in asmInstructions)
-                if (ClrMdV2Disassembler.TryGetReferencedAddress(asm.Instruction, disassemblyResult.PointerSize, out ulong referencedAddress))
-                    referencedAddresses.Add(referencedAddress);
+                if (asm.ReferencedAddress != null)
+                {
+                    referencedAddresses.Add(asm.ReferencedAddress.Value);
+                }
 
             // for every IP that is referenced, we emit a uinque label
             var addressesToLabels = new Dictionary<ulong, string>();
@@ -72,24 +74,30 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                             prettified.Add(new Label(label));
                         }
 
-                        if (ClrMdV2Disassembler.TryGetReferencedAddress(asm.Instruction, disassemblyResult.PointerSize, out ulong referencedAddress))
+                        if (asm.ReferencedAddress != null)
                         {
+                            ulong referencedAddress = asm.ReferencedAddress.Value;
                             // jump or a call within same method
                             if (addressesToLabels.TryGetValue(referencedAddress, out string translated))
                             {
-                                prettified.Add(new Reference(InstructionFormatter.Format(asm.Instruction, formatterWithLabelsSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize), translated, asm));
+                                prettified.Add(new Reference(CodeFormatter.Format(asm, formatterWithLabelsSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize, addressesToLabels), translated, asm));
                                 continue;
                             }
 
                             // call to a known method
                             if (disassemblyResult.AddressToNameMapping.ContainsKey(referencedAddress))
                             {
-                                prettified.Add(new Element(InstructionFormatter.Format(asm.Instruction, formatterWithGlobalSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize), asm));
+                                string comment = string.Empty;
+                                if (asm.IsReferencedAddressIndirect)
+                                {
+                                    comment = "; " + disassemblyResult.AddressToNameMapping[referencedAddress];
+                                }
+                                prettified.Add(new Element(CodeFormatter.Format(asm, formatterWithGlobalSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping) + comment, asm));
                                 continue;
                             }
                         }
 
-                        prettified.Add(new Element(InstructionFormatter.Format(asm.Instruction, formatterWithGlobalSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize), asm));
+                        prettified.Add(new Element(CodeFormatter.Format(asm, formatterWithGlobalSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping), asm));
                     }
                 }
 
