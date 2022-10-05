@@ -73,4 +73,4 @@ Contributors:
 * [@factormystic](https://github.com/factormystic)
 * [@nietras](https://github.com/nietras)
 
-[All contributors on GitHub](https://github.com/PerfDotNet/BenchmarkDotNet/graphs/contributors)
+[All contributors on GitHub](https://github.com/dotnet/BenchmarkDotNet/graphs/contributors)

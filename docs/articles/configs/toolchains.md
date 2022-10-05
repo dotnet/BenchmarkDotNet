@@ -355,7 +355,7 @@ BenchmarkDotNet is going to follow [these instructrions](https://github.com/dotn
 
 BenchmarkDotNet supports Web Assembly on Unix! However, currently you need to build the **dotnet runtime** yourself to be able to run the benchmarks.
 
-For up-to-date docs, you should visit [dotnet/runtime repository](https://github.com/dotnet/runtime/blob/master/docs/workflow/testing/libraries/testing-wasm.md).
+For up-to-date docs, you should visit [dotnet/runtime repository](https://github.com/dotnet/runtime/blob/main/docs/workflow/testing/libraries/testing-wasm.md).
 
 The docs below are specific to Ubuntu 18.04 at the moment of writing this document (16/07/2020).
 
@@ -407,7 +407,7 @@ git clone https://github.com/dotnet/runtime
 cd runtime
 ```
 
-Install [all Mono prerequisites](https://github.com/dotnet/runtime/blob/master/docs/workflow/testing/libraries/testing-wasm.md):
+Install [all Mono prerequisites](https://github.com/dotnet/runtime/blob/mono/docs/workflow/testing/libraries/testing-wasm.md):
 
 ```cmd
 sudo apt-get install cmake llvm-9 clang-9 autoconf automake libtool build-essential python curl git lldb-6.0 liblldb-6.0-dev libunwind8 libunwind8-dev gettext libicu-dev liblttng-ust-dev libssl-dev libnuma-dev libkrb5-dev zlib1g-dev
