@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("*", 2)]
         [InlineData("WRONG", 0)]
         [InlineData("*stillWRONG*", 0)]
-        [InlineData("BenchmarkDotNet.Tests.TypeWithBenchmarksAndParams", 2)]
+        [InlineData("BenchmarkDotNet.Tests.TypeWithBenchmarksAndParams.TheBenchmark", 2)]
         [InlineData("BenchmarkDotNet.Tests.TypeWithBenchmarksAndParams.TheBenchmark(A: 100)", 1)]
         public void TheFilterWorksWithParams(string pattern, int expectedBenchmarks)
         {

@@ -13,18 +13,16 @@ namespace BenchmarkDotNet.Filters
     {
         private readonly Regex[] patterns;
 
-        public GlobFilter(string[] patterns) => this.patterns = ToRegex(AddWildcardCharacterToEnd(patterns));
+        public GlobFilter(string[] patterns) => this.patterns = ToRegex(patterns);
 
         public bool Predicate(BenchmarkCase benchmarkCase)
         {
             var benchmark = benchmarkCase.Descriptor.WorkloadMethod;
+            string nameWithoutArgs = benchmarkCase.Descriptor.GetFilterName();
             string fullBenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase);
 
-            return patterns.Any(pattern => pattern.IsMatch(fullBenchmarkName));
+            return patterns.Any(pattern => pattern.IsMatch(fullBenchmarkName) || pattern.IsMatch(nameWithoutArgs));
         }
-
-        internal static string[] AddWildcardCharacterToEnd(string[] patterns)
-            => Array.ConvertAll(patterns, pattern => pattern.EndsWith("*") ? pattern : $"{pattern}*");
 
         internal static Regex[] ToRegex(string[] patterns)
             => patterns.Select(pattern => new Regex(WildcardToRegex(pattern), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).ToArray();
