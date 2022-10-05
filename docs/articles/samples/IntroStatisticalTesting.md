@@ -9,7 +9,7 @@ uid: BenchmarkDotNet.Samples.IntroStatisticalTesting
 [!code-csharp[IntroStatisticalTesting.cs](../../../samples/BenchmarkDotNet.Samples/IntroStatisticalTesting.cs)]
 
 ### Output
-
+```markdown
 |   Method |      Mean |     Error |    StdDev | Ratio |   Welch(1us)/p-values |    Welch(3%)/p-values | MannWhitney(1us)/p-values | MannWhitney(3%)/p-values |
 |--------- |----------:|----------:|----------:|------:|---------------------- |---------------------- |-------------------------- |------------------------- |
 |  Sleep50 |  53.13 ms | 0.5901 ms | 0.1532 ms |  0.51 | Faster: 1.0000/0.0000 | Faster: 1.0000/0.0000 |     Faster: 1.0000/0.0040 |    Faster: 1.0000/0.0040 |
@@ -21,15 +21,15 @@ uid: BenchmarkDotNet.Samples.IntroStatisticalTesting
 | Sleep150 | 153.16 ms | 3.4929 ms | 0.9071 ms |  1.48 | Slower: 0.0000/1.0000 | Slower: 0.0000/1.0000 |     Slower: 0.0040/1.0000 |    Slower: 0.0040/1.0000 |
 
 // * Legends *
-  Mean                      : Arithmetic mean of all measurements  
-  Error                     : Half of 99.9% confidence interval  
-  StdDev                    : Standard deviation of all measurements  
-  Ratio                     : Mean of the ratio distribution ([Current]/[Baseline])  
-  Welch(1us)/p-values       : Welch-based TOST equivalence test with 1 us threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'  
-  Welch(3%)/p-values        : Welch-based TOST equivalence test with 3% threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'  
-  MannWhitney(1us)/p-values : MannWhitney-based TOST equivalence test with 1 us threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'  
-  MannWhitney(3%)/p-values  : MannWhitney-based TOST equivalence test with 3% threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'  
-  1 ms                      : 1 Millisecond (0.001 sec)  
+  Mean                      : Arithmetic mean of all measurements
+  Error                     : Half of 99.9% confidence interval
+  StdDev                    : Standard deviation of all measurements
+  Ratio                     : Mean of the ratio distribution ([Current]/[Baseline])
+  Welch(1us)/p-values       : Welch-based TOST equivalence test with 1 us threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
+  Welch(3%)/p-values        : Welch-based TOST equivalence test with 3% threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
+  MannWhitney(1us)/p-values : MannWhitney-based TOST equivalence test with 1 us threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
+  MannWhitney(3%)/p-values  : MannWhitney-based TOST equivalence test with 3% threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
+  1 ms                      : 1 Millisecond (0.001 sec)
 ```
 
 ### Links
