@@ -17,8 +17,8 @@ namespace BenchmarkDotNet.Tests
         [InlineData(null, "null")]
         [InlineData(false, "false")]
         [InlineData(true, "true")]
-        [InlineData("string", "$\"string\"")]
-        [InlineData("string/\\", @"$""string/\\""")]
+        [InlineData("string", "\"string\"")]
+        [InlineData("string/\\", @"""string/\\""")]
         [InlineData('a', "'a'")]
         [InlineData('\\', "'\\\\'")]
         [InlineData(0.123f, "0.123f")]
@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanEscapeJson()
         {
-            const string expected = "$\"{{ \\\"message\\\": \\\"Hello, World!\\\" }}\"";
+            const string expected = "\"{{ \\\"message\\\": \\\"Hello, World!\\\" }}\"";
 
             var actual = SourceCodeHelper.ToSourceCode("{ \"message\": \"Hello, World!\" }");
 
@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanEscapePath()
         {
-            const string expected = @"$""C:\\Projects\\BenchmarkDotNet\\samples\\BenchmarkDotNet.Samples""";
+            const string expected = @"""C:\\Projects\\BenchmarkDotNet\\samples\\BenchmarkDotNet.Samples""";
 
             var actual = SourceCodeHelper.ToSourceCode(@"C:\Projects\BenchmarkDotNet\samples\BenchmarkDotNet.Samples");
 
@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanEscapeControlCharacters()
         {
-            const string expected = @"$"" \0 \b \f \n \t \v \"" a a a a """;
+            const string expected = @""" \0 \b \f \n \t \v \"" a a a a """;
 
             var actual = SourceCodeHelper.ToSourceCode(" \0 \b \f \n \t \v \" \u0061 \x0061 \x61 \U00000061 ");
 
