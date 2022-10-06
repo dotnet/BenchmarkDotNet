@@ -153,7 +153,9 @@ namespace BenchmarkDotNet.IntegrationTests
             [Params("{")] public string Bracket;
 
             [Params("\n \0 \n")] public string Combo;
-            [Params("C:\\files.txt")] public string Path;
+
+            [Params("C:\\file1.txt")] public string Path1;
+            [Params(@"C:\file2.txt")] public string Path2;
 
             [Benchmark]
             public void Benchmark()
