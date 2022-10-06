@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Portability
         internal const string ReleaseConfigurationName = "RELEASE";
         internal const string Unknown = "?";
 
-        public static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null; // it allocates a lot of memory, we need to check it once in order to keep Engine non-allocating!
+        public static bool IsMono { get; } = Type.GetType("Mono.RuntimeStructs") != null; // it allocates a lot of memory, we need to check it once in order to keep Engine non-allocating!
 
         public static bool IsFullFramework =>
 #if NET6_0_OR_GREATER

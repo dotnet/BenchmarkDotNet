@@ -384,6 +384,18 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Theory]
+        [InlineData("mono70", "net7.0")]
+        public void MonoMonikersAreRecognizedAsNetCoreMonikers(string tfm, string actualRuntimeId)
+        {
+            var config = ConfigParser.Parse(new[] { "-r", tfm }, new OutputLogger(Output)).config;
+
+            Assert.Single(config.GetJobs());
+            CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
+            Assert.NotNull(toolchain);
+            Assert.Equal(actualRuntimeId, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
+        }
+
+        [Theory]
         [InlineData("net5.0-windows")]
         [InlineData("net5.0-ios")]
         public void PlatformSpecificMonikersAreSupported(string msBuildMoniker)

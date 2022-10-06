@@ -387,9 +387,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net50:
                 case RuntimeMoniker.Net60:
                 case RuntimeMoniker.Net70:
-                    return baseJob
-                        .WithRuntime(runtimeMoniker.GetRuntime())
-                        .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
+                    return CreateCoreJob(baseJob, runtimeId, runtimeId, options, runtimeMoniker.GetRuntime());
                 case RuntimeMoniker.Mono:
                     return baseJob.WithRuntime(new MonoRuntime("Mono", options.MonoPath?.FullName));
                 case RuntimeMoniker.NativeAot60:
@@ -410,9 +408,19 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return MakeMonoAOTLLVMJob(baseJob, options, "net6.0");
                 case RuntimeMoniker.MonoAOTLLVMNet70:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net7.0");
+                case RuntimeMoniker.Mono70:
+                    return CreateCoreJob(baseJob, "net7.0", "Mono with .NET 7.0", options, CoreRuntime.Core70)
+                        .WithArguments(new Argument[] { new MsBuildArgument("/p:UseMonoRuntime=true") });
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
+        }
+
+        private static Job CreateCoreJob(Job baseJob, string runtimeId, string runtimeName, CommandLineOptions options, Runtime runtime)
+        {
+            return baseJob
+                .WithRuntime(runtime)
+                .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeName, options.CliPath?.FullName, options.RestorePath?.FullName)));
         }
 
         private static Job CreateAotJob(Job baseJob, CommandLineOptions options, RuntimeMoniker runtimeMoniker, string ilCompilerVersion, string nuGetFeedUrl)
