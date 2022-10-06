@@ -150,6 +150,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [Params("\\")] public string Slash;
             [Params("\"")] public string Quote;
             [Params("\u0061")] public string Unicode;
+            [Params("{")] public string Bracket;
 
             [Params("\n \0 \n")] public string Combo;
             [Params("C:\\files.txt")] public string Path;
@@ -163,7 +164,8 @@ namespace BenchmarkDotNet.IntegrationTests
                     NewLine.Length == 1 &&
                     Slash.Length == 1 &&
                     Quote.Length == 1 &&
-                    Unicode.Length == 1;
+                    Unicode.Length == 1 &&
+                    Bracket.Length == 1;
 
                 if (!isPassedAsSingleCharacter)
                     throw new InvalidOperationException("Some Param has an invalid escaped string");
