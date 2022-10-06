@@ -6,7 +6,7 @@ name: BenchmarkDotNet templates
 # BenchmarkDotNet templates
 
 BenchmarkDotNet provides project templates to setup your benchmarks easily 
-The template exists for each major .NET language ([C#](https://docs.microsoft.com/en-us/dotnet/csharp/), [F#](https://docs.microsoft.com/en-us/dotnet/fsharp/) and [VB](https://docs.microsoft.com/en-us/dotnet/visual-basic/)) with equivalent features and structure.
+The template exists for each major .NET language ([C#](https://learn.microsoft.com/dotnet/csharp/), [F#](https://learn.microsoft.com/dotnet/fsharp/) and [VB](https://learn.microsoft.com/dotnet/visual-basic/)) with equivalent features and structure.
 
 ## How to install the templates
 
@@ -97,5 +97,5 @@ For instance, the template version `0.11.5` is referencing [BenchmarkDotnet 0.11
 
 ## References
 
-For more info about the `dotnet new` CLI, please read [the documentation](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet).
+For more info about the `dotnet new` CLI, please read [the documentation](https://learn.microsoft.com/dotnet/core/tools/dotnet).
 

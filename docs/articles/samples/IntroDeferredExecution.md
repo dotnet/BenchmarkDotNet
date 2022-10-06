@@ -4,7 +4,7 @@ uid: BenchmarkDotNet.Samples.IntroDeferredExecution
 
 ## Sample: IntroDeferredExecution
 
-In LINQ, execution of a query is usually [deferred](https://blogs.msdn.microsoft.com/charlie/2007/12/10/linq-and-deferred-execution/) until the moment when you actually request the data. If your benchmark just returns `IEnumerable` or `IQueryable` it's not measuring the execution of the query, just the creation.
+In LINQ, execution of a query is usually [deferred](https://learn.microsoft.com/dotnet/standard/linq/deferred-execution-example) until the moment when you actually request the data. If your benchmark just returns `IEnumerable` or `IQueryable` it's not measuring the execution of the query, just the creation.
 
 This is why we decided to warn you about this issue whenever it happens:
 

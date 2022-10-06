@@ -8,6 +8,7 @@ namespace BenchmarkDotNet.Attributes
     public class DisassemblyDiagnoserAttribute : Attribute, IConfigSource
     {
         /// <param name="maxDepth">Includes called methods to given level. 1 by default, indexed from 1. To print just the benchmark set it to 0.</param>
+        /// <param name="syntax">The disassembly syntax. MASM is the default.</param>
         /// <param name="printSource">C#|F#|VB source code will be printed. False by default.</param>
         /// <param name="printInstructionAddresses">Print instruction addresses. False by default</param>
         /// <param name="exportGithubMarkdown">Exports to GitHub markdown. True by default.</param>
@@ -17,6 +18,7 @@ namespace BenchmarkDotNet.Attributes
         /// <param name="filters">Glob patterns applied to full method signatures by the the disassembler.</param>
         public DisassemblyDiagnoserAttribute(
             int maxDepth = 1,
+            DisassemblySyntax syntax = DisassemblySyntax.Masm,
             bool printSource = false,
             bool printInstructionAddresses = false,
             bool exportGithubMarkdown = true,
@@ -29,6 +31,7 @@ namespace BenchmarkDotNet.Attributes
                 new DisassemblyDiagnoser(
                     new DisassemblyDiagnoserConfig(
                         maxDepth: maxDepth,
+                        syntax: syntax,
                         filters: filters,
                         printSource: printSource,
                         printInstructionAddresses: printInstructionAddresses,

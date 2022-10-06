@@ -22,8 +22,8 @@ Other notes:
 
 ### Links
 
-* [Xamarin.Android linker settings](https://docs.microsoft.com/xamarin/android/deploy-test/linker#linker-behavior)
-* [Xamarin.iOS linker settings](https://docs.microsoft.com/xamarin/ios/deploy-test/linker#dont-link)
+* [Xamarin.Android linker settings](https://learn.microsoft.com/xamarin/android/deploy-test/linker#linker-behavior)
+* [Xamarin.iOS linker settings](https://learn.microsoft.com/xamarin/ios/deploy-test/linker#dont-link)
 * The permanent link to this sample: @BenchmarkDotNet.Samples.Xamarin
 
 ---
