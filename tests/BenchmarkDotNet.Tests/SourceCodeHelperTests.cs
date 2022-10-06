@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanEscapeJson()
         {
-            const string expected = "\"{{ \\\"message\\\": \\\"Hello, World!\\\" }}\"";
+            const string expected = "\"{ \\\"message\\\": \\\"Hello, World!\\\" }\"";
 
             var actual = SourceCodeHelper.ToSourceCode("{ \"message\": \"Hello, World!\" }");
 
@@ -63,9 +63,9 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanEscapeControlCharacters()
         {
-            const string expected = @""" \0 \b \f \n \t \v \"" a a a a """;
+            const string expected = @""" \0 \b \f \n \t \v \"" a a a a { } """;
 
-            var actual = SourceCodeHelper.ToSourceCode(" \0 \b \f \n \t \v \" \u0061 \x0061 \x61 \U00000061 ");
+            var actual = SourceCodeHelper.ToSourceCode(" \0 \b \f \n \t \v \" \u0061 \x0061 \x61 \U00000061 { } ");
 
             Assert.Equal(expected, actual);
         }
@@ -80,6 +80,8 @@ namespace BenchmarkDotNet.Tests
         [InlineData('\'', @"'\''")]
         [InlineData('\u0061', "'a'")]
         [InlineData('"', "'\"'")]
+        [InlineData('{', "'{'")]
+        [InlineData('}', "'}'")]
         public void CanEscapeControlCharactersInChar(char original, string excepted)
         {
             var actual = SourceCodeHelper.ToSourceCode(original);

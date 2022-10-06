@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Helpers
                 case bool b:
                     return b.ToLowerCase();
                 case string text:
-                    return text.EscapeSpecialCharacters(true).Replace("{", "{{").Replace("}", "}}");
+                    return text.EscapeSpecialCharacters(true);
                 case char c:
                     return c.EscapeSpecialCharacter(true);
                 case float f:
