@@ -9,7 +9,7 @@ uid: BenchmarkDotNet.Samples.IntroStatisticalTesting
 [!code-csharp[IntroStatisticalTesting.cs](../../../samples/BenchmarkDotNet.Samples/IntroStatisticalTesting.cs)]
 
 ### Output
-
+```markdown
 |   Method |      Mean |     Error |    StdDev | Ratio |   Welch(1us)/p-values |    Welch(3%)/p-values | MannWhitney(1us)/p-values | MannWhitney(3%)/p-values |
 |--------- |----------:|----------:|----------:|------:|---------------------- |---------------------- |-------------------------- |------------------------- |
 |  Sleep50 |  53.13 ms | 0.5901 ms | 0.1532 ms |  0.51 | Faster: 1.0000/0.0000 | Faster: 1.0000/0.0000 |     Faster: 1.0000/0.0040 |    Faster: 1.0000/0.0040 |

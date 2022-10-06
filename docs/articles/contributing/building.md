@@ -12,7 +12,7 @@ Once all the necessary tools are in place, building is trivial. Simply open solu
 
 ## Cake (C# Make)
 
-[Cake (C# Make)](http://cakebuild.net/) is a cross platform build automation system with a C# DSL to do things like compiling code, copy files/folders, running unit tests, compress files and build NuGet packages.
+[Cake (C# Make)](https://cakebuild.net/) is a cross platform build automation system with a C# DSL to do things like compiling code, copy files/folders, running unit tests, compress files and build NuGet packages.
 
 The build currently depends on the following prerequisites:
 
@@ -22,8 +22,8 @@ The build currently depends on the following prerequisites:
   - .NET Framework 4.6 or higher
 
 - Linux:
-  - Install [Mono version 5 or higher](http://www.mono-project.com/download/#download-lin)
-  - Install [fsharp package](http://fsharp.org/use/linux/)
+  - Install [Mono version 5 or higher](https://www.mono-project.com/download/stable/#download-lin)
+  - Install [fsharp package](https://fsharp.org/use/linux/)
   - Install packages required to .NET Core SDK
     - gettext
     - libcurl4-openssl-dev
@@ -32,9 +32,9 @@ The build currently depends on the following prerequisites:
     - libunwind8
 
 - macOS
-  - Install [Mono version 5 or higher](http://www.mono-project.com/download/#download-mac)
-  - Install [fsharp package](http://fsharp.org/use/mac/)
-  - Install the latest version of [OpenSSL](https://www.microsoft.com/net/core#macos).
+  - Install [Mono version 5 or higher](https://www.mono-project.com/download/stable/#download-mac)
+  - Install [fsharp package](https://fsharp.org/use/mac/)
+  - Install the latest version of [OpenSSL](https://www.openssl.org/source/).
 
 After you have installed these pre-requisites, you can build the BenchmarkDotNet by invoking the build script (`build.ps1` on Windows, or `build.sh` on Linux and macOS) at the base of the BenchmarkDotNet repository. By default the build process also run all the tests. There are quite a few tests, taking a significant amount of time that is not necessary if you just want to experiment with changes. You can skip the tests phase by adding the `skiptests` argument to the build script, e.g. `.\build.ps1 --SkipTests=True` or `./build.sh --skiptests=true`.
 
