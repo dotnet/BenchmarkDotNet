@@ -18,8 +18,8 @@ namespace BenchmarkDotNet.Tests
             CheckCorrectTypeName("System.Int32[]", typeof(int[]));
             CheckCorrectTypeName("System.Int32[][]", typeof(int[][]));
             CheckCorrectTypeName("System.Int32[,]", typeof(int[,]));
-            CheckCorrectTypeName("System.Tuple<System.Int32, System.Int32>[]", typeof(Tuple<int, int>[]));
-            CheckCorrectTypeName("System.ValueTuple<System.Int32, System.Int32>[]", typeof(ValueTuple<int, int>[]));
+            CheckCorrectTypeName("System.Tuple<System.Int16, System.Int32>[]", typeof(Tuple<short, int>[]));
+            CheckCorrectTypeName("System.ValueTuple<System.Int16, System.Int32>[]", typeof(ValueTuple<short, int>[]));
             CheckCorrectTypeName("void", typeof(void));
             CheckCorrectTypeName("void*", typeof(void*));
             CheckCorrectTypeName("System.IEquatable<T>", typeof(IEquatable<>));
