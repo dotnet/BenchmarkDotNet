@@ -65,17 +65,17 @@ namespace BenchmarkDotNet.Tests
             public void TheMethod(ref Nested _) { }
         }
 
-        [AssertionMethod]
-        private static void CheckCorrectTypeName(string expectedName, Type type)
-        {
-            Assert.Equal(expectedName, type.GetCorrectCSharpTypeName());
-        }
-
         public class NestedNonGeneric1
         {
             public class NestedNonGeneric2 { }
 
             public class NestedGeneric2<TA, TB, TC> { }
+        }
+
+        [AssertionMethod]
+        private static void CheckCorrectTypeName(string expectedName, Type type)
+        {
+            Assert.Equal(expectedName, type.GetCorrectCSharpTypeName());
         }
 
         [Fact]
