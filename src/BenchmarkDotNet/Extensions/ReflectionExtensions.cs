@@ -51,31 +51,43 @@ namespace BenchmarkDotNet.Extensions
             if (!string.IsNullOrEmpty(type.Namespace) && includeNamespace)
                 prefix += type.Namespace + ".";
 
-            string nestedTypes = "";
-            Type child = type, parent = type.DeclaringType;
-            while (child.IsNested && parent != null)
-            {
-                nestedTypes = parent.Name + "." + nestedTypes;
-
-                child = parent;
-                parent = parent.DeclaringType;
-            }
-            prefix += nestedTypes;
-
-
             if (type.GetTypeInfo().IsGenericParameter)
                 return type.Name;
-            if (type.GetTypeInfo().IsGenericType)
-            {
-                string mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
-                string args = string.Join(", ", type.GetGenericArguments().Select(T => GetCorrectCSharpTypeName(T, includeGenericArgumentsNamespace, includeGenericArgumentsNamespace)).ToArray());
-                return $"{prefix}{mainName}<{args}>";
-            }
 
             if (type.IsArray)
                 return GetCorrectCSharpTypeName(type.GetElementType()) + "[" + new string(',', type.GetArrayRank() - 1) + "]";
 
-            return prefix + type.Name.Replace("&", string.Empty);
+            return prefix + string.Join(".", GetNestedTypeNames(type, includeGenericArgumentsNamespace).Reverse());
+        }
+
+        // from least nested to most
+        private static IEnumerable<string> GetNestedTypeNames(Type type, bool includeGenericArgumentsNamespace)
+        {
+            var allTypeParameters = new Stack<Type>(type.GetGenericArguments());
+
+            Type currentType = type;
+            while (currentType != null)
+            {
+                string name = currentType.Name.Replace("&", string.Empty);
+
+                if (name.Contains('`'))
+                {
+                    var parts = name.Split('`');
+                    var mainName = parts[0];
+                    var parameterCount = int.Parse(parts[1]);
+
+                    var typeParameters = Enumerable
+                        .Range(0, parameterCount)
+                        .Select(_ => allTypeParameters.Pop())
+                        .Reverse();
+
+                    var args = string.Join(", ", typeParameters.Select(T => GetCorrectCSharpTypeName(T, includeGenericArgumentsNamespace, includeGenericArgumentsNamespace)));
+                    name = $"{mainName}<{args}>";
+                }
+
+                yield return name;
+                currentType = currentType.DeclaringType;
+            }
         }
 
         /// <summary>
