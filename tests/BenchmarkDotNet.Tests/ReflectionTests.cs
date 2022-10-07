@@ -50,6 +50,27 @@ namespace BenchmarkDotNet.Tests
                 typeof(NestedNonGeneric1.NestedNonGeneric2));
             CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedGeneric2<System.Int16, System.Boolean, System.Decimal>",
                 typeof(NestedNonGeneric1.NestedGeneric2<short, bool, decimal>));
+
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedGeneric2<System.Int16, System.Boolean, System.Decimal>.NestedNonGeneric3",
+                typeof(NestedNonGeneric1.NestedGeneric2<short, bool, decimal>.NestedNonGeneric3));
+
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<System.Byte, System.SByte>",
+                typeof(NestedGeneric1<byte, sbyte>));
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<System.Byte, System.SByte>.NonGeneric2",
+                typeof(NestedGeneric1<byte, sbyte>.NonGeneric2));
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<System.Byte, System.SByte>.NonGeneric2.Generic3<System.Int16, System.Int32, System.Int64>",
+                typeof(NestedGeneric1<byte, sbyte>.NonGeneric2.Generic3<short, int, long>));
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<System.Byte, System.SByte>.NonGeneric2.Generic3<System.Int16, System.Int32, System.Int64>.NonGeneric4",
+                typeof(NestedGeneric1<byte, sbyte>.NonGeneric2.Generic3<short, int, long>.NonGeneric4));
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<System.Byte, System.SByte>.NonGeneric2.Generic3<System.Int16, System.Int32, System.Int64>.Generic4<System.Single, System.Double>",
+                typeof(NestedGeneric1<byte, sbyte>.NonGeneric2.Generic3<short, int, long>.Generic4<float, double>));
+
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<T1, T2>",
+                typeof(NestedGeneric1<,>));
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<T1, T2>.NonGeneric2.Generic3<V1, V2, V3>.NonGeneric4",
+                typeof(NestedGeneric1<,>.NonGeneric2.Generic3<,,>.NonGeneric4));
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<T1, T2>.NonGeneric2.Generic3<V1, V2, V3>.Generic4<W1, W2>",
+                typeof(NestedGeneric1<,>.NonGeneric2.Generic3<,,>.Generic4<,>));
         }
 
         [Fact]
@@ -69,7 +90,23 @@ namespace BenchmarkDotNet.Tests
         {
             public class NestedNonGeneric2 { }
 
-            public class NestedGeneric2<TA, TB, TC> { }
+            public class NestedGeneric2<TA, TB, TC>
+            {
+                public class NestedNonGeneric3 { }
+            }
+        }
+
+        public class NestedGeneric1<T1, T2>
+        {
+            public class NonGeneric2
+            {
+                public class Generic3<V1, V2, V3>
+                {
+                    public class NonGeneric4 { }
+
+                    public class Generic4<W1, W2> { }
+                }
+            }
         }
 
         [AssertionMethod]
