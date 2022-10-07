@@ -23,9 +23,6 @@ namespace BenchmarkDotNet.Tests
             CheckCorrectTypeName("void", typeof(void));
             CheckCorrectTypeName("void*", typeof(void*));
             CheckCorrectTypeName("System.IEquatable<T>", typeof(IEquatable<>));
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedNonGeneric2", typeof(NestedNonGeneric1.NestedNonGeneric2));
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedGeneric2<System.Int16, System.Boolean, System.Decimal>",
-                typeof(NestedNonGeneric1.NestedGeneric2<short, bool, decimal>));
             CheckCorrectTypeName("System.Type", typeof(Type));
             // ReSharper disable once PossibleMistakenCallToGetType.2
             CheckCorrectTypeName("System.Reflection.TypeInfo", typeof(string).GetType()); // typeof(string).GetType() == System.RuntimeType which is not public
@@ -47,9 +44,12 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void GetCorrectCSharpTypeNameSupportsNestedTypes()
         {
-            var nestedType = typeof(Nested);
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.Nested", typeof(Nested));
 
-            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.Nested", nestedType);
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedNonGeneric2",
+                typeof(NestedNonGeneric1.NestedNonGeneric2));
+            CheckCorrectTypeName("BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedGeneric2<System.Int16, System.Boolean, System.Decimal>",
+                typeof(NestedNonGeneric1.NestedGeneric2<short, bool, decimal>));
         }
 
         [Fact]
