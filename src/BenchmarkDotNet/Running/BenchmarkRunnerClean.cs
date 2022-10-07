@@ -165,6 +165,8 @@ namespace BenchmarkDotNet.Running
                     var info = buildResults[benchmark];
                     var buildResult = info.buildResult;
 
+                    UpdateTitle(in runsChronometer, totalBenchmarkCount, benchmarksToRunCount);
+
                     if (buildResult.IsBuildSuccess)
                     {
                         if (!config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
@@ -216,12 +218,12 @@ namespace BenchmarkDotNet.Running
                     benchmarksToRunCount -= stop ? benchmarks.Length - i : 1;
 
                     LogProgress(logger, in runsChronometer, totalBenchmarkCount, benchmarksToRunCount);
-
-                    if (RuntimeInformation.IsWindows())
-                    {
-                        UpdateTitle(in runsChronometer, totalBenchmarkCount, benchmarksToRunCount);
-                    }
                 }
+            }
+
+            if (RuntimeInformation.IsWindows())
+            {
+                Console.Title = string.Empty;
             }
 
             var runEnd = runsChronometer.GetElapsed();
@@ -233,7 +235,7 @@ namespace BenchmarkDotNet.Running
                 logFilePath,
                 runEnd.GetTimeSpan() - runStart.GetTimeSpan(),
                 cultureInfo,
-                Validate(new[] {benchmarkRunInfo }, NullLogger.Instance), // validate them once again, but don't print the output
+                Validate(new[] { benchmarkRunInfo }, NullLogger.Instance), // validate them once again, but don't print the output
                 config.GetColumnHidingRules().ToImmutableArray());
         }
 
@@ -622,22 +624,36 @@ namespace BenchmarkDotNet.Running
 
         private static void UpdateTitle(in StartedClock runsChronometer, int totalBenchmarkCount, int benchmarksToRunCount)
         {
-            int executedBenchmarkCount = totalBenchmarkCount - benchmarksToRunCount;
-            double avgSecondsPerBenchmark = runsChronometer.GetElapsed().GetTimeSpan().TotalSeconds / executedBenchmarkCount;
-            TimeSpan fromNow = TimeSpan.FromSeconds(avgSecondsPerBenchmark * benchmarksToRunCount);
+            if (RuntimeInformation.IsWindows())
+            {
+                int executedBenchmarkCount = totalBenchmarkCount - benchmarksToRunCount;
+                TimeSpan fromNow = GetEstimatedFinishTime(runsChronometer, benchmarksToRunCount, executedBenchmarkCount);
+                string toFinish = string.Empty;
 
-            Console.Title = $"{executedBenchmarkCount}/{totalBenchmarkCount} Benchmarks runned - Estimated {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish";
+                if (executedBenchmarkCount > 0)
+                {
+                    toFinish = $"- {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish";
+                }
+
+                Console.Title = $"{benchmarksToRunCount} Remaining {toFinish}";
+            }
         }
 
         private static void LogProgress(ILogger logger, in StartedClock runsChronometer, int totalBenchmarkCount, int benchmarksToRunCount)
         {
             int executedBenchmarkCount = totalBenchmarkCount - benchmarksToRunCount;
-            double avgSecondsPerBenchmark = runsChronometer.GetElapsed().GetTimeSpan().TotalSeconds / executedBenchmarkCount;
-            TimeSpan fromNow = TimeSpan.FromSeconds(avgSecondsPerBenchmark * benchmarksToRunCount);
+            TimeSpan fromNow = GetEstimatedFinishTime(runsChronometer, benchmarksToRunCount, executedBenchmarkCount);
             DateTime estimatedEnd = DateTime.Now.Add(fromNow);
             string message = $"// ** Remained {benchmarksToRunCount} ({(double)benchmarksToRunCount / totalBenchmarkCount:P1}) benchmark(s) to run." +
                 $" Estimated finish {estimatedEnd:yyyy-MM-dd H:mm} ({(int)fromNow.TotalHours}h {fromNow.Minutes}m from now) **";
             logger.WriteLineHeader(message);
+        }
+
+        private static TimeSpan GetEstimatedFinishTime(in StartedClock runsChronometer, int benchmarksToRunCount, int executedBenchmarkCount)
+        {
+            double avgSecondsPerBenchmark = executedBenchmarkCount > 0 ? runsChronometer.GetElapsed().GetTimeSpan().TotalSeconds / executedBenchmarkCount : 0;
+            TimeSpan fromNow = TimeSpan.FromSeconds(avgSecondsPerBenchmark * benchmarksToRunCount);
+            return fromNow;
         }
     }
 }
