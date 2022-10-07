@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Extensions
             return prefix + string.Join(".", GetNestedTypeNames(type, includeGenericArgumentsNamespace).Reverse());
         }
 
-        // from least nested to most
+        // from most nested to least
         private static IEnumerable<string> GetNestedTypeNames(Type type, bool includeGenericArgumentsNamespace)
         {
             var allTypeParameters = new Stack<Type>(type.GetGenericArguments());
