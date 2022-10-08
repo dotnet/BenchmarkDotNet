@@ -145,6 +145,7 @@ namespace BenchmarkDotNet.Running
             var cultureInfo = config.CultureInfo ?? DefaultCultureInfo.Instance;
             var reports = new List<BenchmarkReport>();
             string title = GetTitle(new[] { benchmarkRunInfo });
+            var consoleTitle =  RuntimeInformation.IsWindows() ?  Console.Title : string.Empty;
 
             logger.WriteLineInfo($"// Found {benchmarks.Length} benchmarks:");
             foreach (var benchmark in benchmarks)
@@ -223,7 +224,7 @@ namespace BenchmarkDotNet.Running
 
             if (RuntimeInformation.IsWindows())
             {
-                Console.Title = string.Empty;
+                Console.Title = consoleTitle;
             }
 
             var runEnd = runsChronometer.GetElapsed();
@@ -635,7 +636,7 @@ namespace BenchmarkDotNet.Running
                     toFinish = $"- {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish";
                 }
 
-                Console.Title = $"{benchmarksToRunCount} Remaining {toFinish}";
+                Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining {toFinish}";
             }
         }
 
