@@ -2,9 +2,15 @@
   "version": "0.2",
   "language": "en",
   "words": [
+    "Alloc",
+    "Diagnoser",
+    "diagnosers",
+    "Gitter",
+    "microbenchmarks",
+    "Newtonsoft",
+    "unmanaged"
   ],
-  "ignoreWords": [
-  ],
+  "ignoreWords": [],
   "patterns": [
     {
       "name": "Markdown links",
