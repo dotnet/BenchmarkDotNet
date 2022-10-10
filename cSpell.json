@@ -18,6 +18,7 @@
     "Jits",
     "Jitting",
     "LINQ",
+    "macrobenchmark",
     "MediatR",
     "microbenchmarks",
     "Mispredict",
