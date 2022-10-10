@@ -220,7 +220,7 @@ dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --sta
 * `--version` display version information.
 * `--keepFiles` (default: false) determines if all auto-generated files should be kept or removed after running the benchmarks.
 * `--noOverwrite` (default: false) determines if the exported result files should not be overwritten.
-* `--disableLogFile` disables the logfile.
+* `--disableLogFile` disables the log file.
 * `--maxWidth` max parameter column width, the default is 20.
 * `--envVars` colon separated environment variables (key:value).
 * `--strategy` the RunStrategy that should be used. Throughput/ColdStart/Monitoring.
