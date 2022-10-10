@@ -10,16 +10,16 @@ In this case, you can *filter* some of them with the help of *filters*.
 
 Predefined filters:
 
-| Filter Type         | Filters benchmarks by       | Console argument | Console example                  |
-|---------------------|-----------------------------|------------------|----------------------------------|
-| GlobFilter          | Provided glob pattern       | filter           | --filter *Serializer*.ToStream   |
-| AttributesFilter    | Provided attribute names    | attribute        | --attribute STAThread            |
-| AllCategoriesFilter | All Provided category names | categories       | --allCategories Priority1 CoreFX |
-| AnyCategoriesFilter | Any provided category names | anycategories    | --anyCategories Json Xml         |
-| SimpleFilter        | Provided lambda predicate   | -                |                                  |
-| NameFilter          | Provided lambda predicate   | -                |                                  |
-| UnionFilter         | Logical AND                 | -                |                                  |
-| DisjunctionFilter   | Logical OR                  | -                |                                  |
+| Filter Type         | Filters benchmarks by       | Console argument   | Console example                  |
+|---------------------|-----------------------------|--------------------|----------------------------------|
+| GlobFilter          | Provided glob pattern       | `filter`           | --filter *Serializer*.ToStream   |
+| AttributesFilter    | Provided attribute names    | `attribute`        | --attribute STAThread            |
+| AllCategoriesFilter | All Provided category names | `categories`       | --allCategories Priority1 CoreFX |
+| AnyCategoriesFilter | Any provided category names | `anycategories`    | --anyCategories Json Xml         |
+| SimpleFilter        | Provided lambda predicate   | -                  |                                  |
+| NameFilter          | Provided lambda predicate   | -                  |                                  |
+| UnionFilter         | Logical AND                 | -                  |                                  |
+| DisjunctionFilter   | Logical OR                  | -                  |                                  |
 
 ---
 
