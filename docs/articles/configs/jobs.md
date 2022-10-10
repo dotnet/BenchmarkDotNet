@@ -41,7 +41,7 @@ BenchmarkDotNet will use host process environment characteristics for non specif
 
 ### Run
 
-In this category, you can specifiy how to benchmark each method.
+In this category, you can specify how to benchmark each method.
 
 * `RunStrategy`:
   * `Throughput`: default strategy which allows to get good precision level
