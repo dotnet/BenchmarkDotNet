@@ -83,6 +83,7 @@
     "HTML Tags"
   ],
   "ignorePaths": [
+    "docs/_changelog/**/*.md",
     "docs/articles/team.md"
   ]
 }
