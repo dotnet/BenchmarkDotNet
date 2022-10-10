@@ -57,5 +57,6 @@
     "HTML Tags"
   ],
   "ignorePaths": [
+    "docs/articles/team.md"
   ]
 }
