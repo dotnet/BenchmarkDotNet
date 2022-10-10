@@ -25,11 +25,11 @@ The build currently depends on the following prerequisites:
   - Install [Mono version 5 or higher](https://www.mono-project.com/download/stable/#download-lin)
   - Install [fsharp package](https://fsharp.org/use/linux/)
   - Install packages required to .NET Core SDK
-    - gettext
-    - libcurl4-openssl-dev
-    - libicu-dev
-    - libssl-dev
-    - libunwind8
+    - `gettext`
+    - `libcurl4-openssl-dev`
+    - `libicu-dev`
+    - `libssl-dev`
+    - `libunwind8`
 
 - macOS
   - Install [Mono version 5 or higher](https://www.mono-project.com/download/stable/#download-mac)
