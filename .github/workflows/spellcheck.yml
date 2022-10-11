@@ -3,12 +3,12 @@ name: Documentation Checks
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - "docs/**/*"
   pull_request:
     branches:
-      - main
+      - master
     paths:
       - "docs/**/*"
 jobs:
