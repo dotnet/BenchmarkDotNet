@@ -98,9 +98,9 @@ namespace BenchmarkDotNet.Jobs
         }
 
         /// <summary>
-        /// Specifies that BenchmarkDotNet's benchmark runner can handle addresses larger than 2 gigabytes.
-        /// <value>false: Benchmark runner uses the default (64-bit: enabled; 32-bit:disabled). This is the default.</value>
-        /// <value>true: Explicitly specify that BenchmarkDotNet's benchmark runner can handle addresses larger than 2 gigabytes.</value>
+        /// Specifies that benchmark can handle addresses larger than 2 gigabytes.
+        /// <value>false: Benchmark uses the default (64-bit: enabled; 32-bit:disabled). This is the default.</value>
+        /// <value>true: Explicitly specify that benchmark can handle addresses larger than 2 gigabytes.</value>
         /// </summary>
         public bool LargeAddressAware
         {

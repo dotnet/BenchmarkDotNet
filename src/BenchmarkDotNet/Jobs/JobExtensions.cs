@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithGcAllowVeryLargeObjects(this Job job, bool value) => job.WithCore(j => j.Environment.Gc.AllowVeryLargeObjects = value);
 
         /// <summary>
-        /// Specifies that BenchmarkDotNet's benchmark runner can handle addresses larger than 2 gigabytes.
+        /// Specifies that benchmark can handle addresses larger than 2 gigabytes.
         /// </summary>
         public static Job WithLargeAddressAware(this Job job, bool value = true) => job.WithCore(j => j.Environment.LargeAddressAware = value);
 
