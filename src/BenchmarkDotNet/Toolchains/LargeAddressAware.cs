@@ -4,14 +4,8 @@ using System.IO;
 namespace BenchmarkDotNet.Toolchains
 {
     // From https://github.com/KirillOsenkov/LargeAddressAware/blob/95e5fc6024438f94325df4bac6ef73c77bf90e71/SetLargeAddressAware/LargeAddressAware.cs
-    public class LargeAddressAware
+    internal class LargeAddressAware
     {
-        public static bool IsLargeAddressAware(string filePath)
-        {
-            bool isLargeAddressAware = false;
-            PrepareStream(filePath, (stream, binaryReader) => isLargeAddressAware = (binaryReader.ReadInt16() & 0x20) != 0);
-            return isLargeAddressAware;
-        }
 
         public static void SetLargeAddressAware(string filePath)
         {

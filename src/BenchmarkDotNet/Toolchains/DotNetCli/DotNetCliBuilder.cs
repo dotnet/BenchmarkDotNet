@@ -38,8 +38,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     logOutput: LogOutput,
                     retryFailedBuildWithNoDeps: RetryFailedBuildWithNoDeps)
                 .RestoreThenBuild();
-            if (
-                buildResult.IsBuildSuccess &&
+            if (buildResult.IsBuildSuccess &&
                 buildPartition.RepresentativeBenchmarkCase.Job.Environment.LargeAddressAware)
             {
                 LargeAddressAware.SetLargeAddressAware(generateResult.ArtifactsPaths.ExecutablePath);
