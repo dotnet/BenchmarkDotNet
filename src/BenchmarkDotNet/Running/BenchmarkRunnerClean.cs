@@ -16,6 +16,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Parameters;
@@ -144,11 +145,14 @@ namespace BenchmarkDotNet.Running
             var cultureInfo = config.CultureInfo ?? DefaultCultureInfo.Instance;
             var reports = new List<BenchmarkReport>();
             string title = GetTitle(new[] { benchmarkRunInfo });
+            var consoleTitle =  RuntimeInformation.IsWindows() ?  Console.Title : string.Empty;
 
             logger.WriteLineInfo($"// Found {benchmarks.Length} benchmarks:");
             foreach (var benchmark in benchmarks)
                 logger.WriteLineInfo($"//   {benchmark.DisplayInfo}");
             logger.WriteLine();
+
+            UpdateTitle(totalBenchmarkCount, benchmarksToRunCount);
 
             using (var powerManagementApplier = new PowerManagementApplier(logger))
             {
@@ -218,6 +222,11 @@ namespace BenchmarkDotNet.Running
                 }
             }
 
+            if (RuntimeInformation.IsWindows())
+            {
+                Console.Title = consoleTitle;
+            }
+
             var runEnd = runsChronometer.GetElapsed();
 
             return new Summary(title,
@@ -227,7 +236,7 @@ namespace BenchmarkDotNet.Running
                 logFilePath,
                 runEnd.GetTimeSpan() - runStart.GetTimeSpan(),
                 cultureInfo,
-                Validate(new[] {benchmarkRunInfo }, NullLogger.Instance), // validate them once again, but don't print the output
+                Validate(new[] { benchmarkRunInfo }, NullLogger.Instance), // validate them once again, but don't print the output
                 config.GetColumnHidingRules().ToImmutableArray());
         }
 
@@ -614,15 +623,34 @@ namespace BenchmarkDotNet.Running
             }
         }
 
+        private static void UpdateTitle(int totalBenchmarkCount, int benchmarksToRunCount)
+        {
+            if (!Console.IsOutputRedirected && (RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux() || RuntimeInformation.IsMacOSX()))
+            {
+                Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining";
+            }
+        }
+
         private static void LogProgress(ILogger logger, in StartedClock runsChronometer, int totalBenchmarkCount, int benchmarksToRunCount)
         {
             int executedBenchmarkCount = totalBenchmarkCount - benchmarksToRunCount;
-            double avgSecondsPerBenchmark = runsChronometer.GetElapsed().GetTimeSpan().TotalSeconds / executedBenchmarkCount;
-            TimeSpan fromNow = TimeSpan.FromSeconds(avgSecondsPerBenchmark * benchmarksToRunCount);
+            TimeSpan fromNow = GetEstimatedFinishTime(runsChronometer, benchmarksToRunCount, executedBenchmarkCount);
             DateTime estimatedEnd = DateTime.Now.Add(fromNow);
             string message = $"// ** Remained {benchmarksToRunCount} ({(double)benchmarksToRunCount / totalBenchmarkCount:P1}) benchmark(s) to run." +
                 $" Estimated finish {estimatedEnd:yyyy-MM-dd H:mm} ({(int)fromNow.TotalHours}h {fromNow.Minutes}m from now) **";
             logger.WriteLineHeader(message);
+
+            if (!Console.IsOutputRedirected && (RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux() || RuntimeInformation.IsMacOSX()))
+            {
+                Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining - {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish";
+            }
+        }
+
+        private static TimeSpan GetEstimatedFinishTime(in StartedClock runsChronometer, int benchmarksToRunCount, int executedBenchmarkCount)
+        {
+            double avgSecondsPerBenchmark = executedBenchmarkCount > 0 ? runsChronometer.GetElapsed().GetTimeSpan().TotalSeconds / executedBenchmarkCount : 0;
+            TimeSpan fromNow = TimeSpan.FromSeconds(avgSecondsPerBenchmark * benchmarksToRunCount);
+            return fromNow;
         }
     }
 }
