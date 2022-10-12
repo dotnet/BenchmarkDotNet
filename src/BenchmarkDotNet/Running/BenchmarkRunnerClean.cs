@@ -152,6 +152,8 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineInfo($"//   {benchmark.DisplayInfo}");
             logger.WriteLine();
 
+            UpdateTitle(totalBenchmarkCount, benchmarksToRunCount);
+
             using (var powerManagementApplier = new PowerManagementApplier(logger))
             {
                 bool stop = false;
@@ -165,8 +167,6 @@ namespace BenchmarkDotNet.Running
 
                     var info = buildResults[benchmark];
                     var buildResult = info.buildResult;
-
-                    UpdateTitle(in runsChronometer, totalBenchmarkCount, benchmarksToRunCount);
 
                     if (buildResult.IsBuildSuccess)
                     {
@@ -623,20 +623,11 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static void UpdateTitle(in StartedClock runsChronometer, int totalBenchmarkCount, int benchmarksToRunCount)
+        private static void UpdateTitle(int totalBenchmarkCount, int benchmarksToRunCount)
         {
-            if (RuntimeInformation.IsWindows())
+            if (!Console.IsOutputRedirected && (RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux() || RuntimeInformation.IsMacOSX()))
             {
-                int executedBenchmarkCount = totalBenchmarkCount - benchmarksToRunCount;
-                TimeSpan fromNow = GetEstimatedFinishTime(runsChronometer, benchmarksToRunCount, executedBenchmarkCount);
-                string toFinish = string.Empty;
-
-                if (executedBenchmarkCount > 0)
-                {
-                    toFinish = $"- {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish";
-                }
-
-                Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining {toFinish}";
+                Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining";
             }
         }
 
@@ -648,6 +639,11 @@ namespace BenchmarkDotNet.Running
             string message = $"// ** Remained {benchmarksToRunCount} ({(double)benchmarksToRunCount / totalBenchmarkCount:P1}) benchmark(s) to run." +
                 $" Estimated finish {estimatedEnd:yyyy-MM-dd H:mm} ({(int)fromNow.TotalHours}h {fromNow.Minutes}m from now) **";
             logger.WriteLineHeader(message);
+
+            if (!Console.IsOutputRedirected && (RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux() || RuntimeInformation.IsMacOSX()))
+            {
+                Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining - {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish";
+            }
         }
 
         private static TimeSpan GetEstimatedFinishTime(in StartedClock runsChronometer, int benchmarksToRunCount, int executedBenchmarkCount)
