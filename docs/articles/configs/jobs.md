@@ -33,6 +33,9 @@ It's a single string characteristic. It allows to name your job. This name will 
   * `CpuGroups`:  Specifies whether garbage collection supports multiple CPU groups
   * `Force`: Specifies whether the BenchmarkDotNet's benchmark runner forces full garbage collection after each benchmark invocation
   * `AllowVeryLargeObjects`:  On 64-bit platforms, enables arrays that are greater than 2 gigabytes (GB) in total size
+* `LargeAddressAware`: Specifies that benchmark can handle addresses larger than 2 gigabytes. See also: @BenchmarkDotNet.Samples.IntroLargeAddressAware and [LARGEADDRESSAWARE](https://learn.microsoft.com/cpp/build/reference/largeaddressaware-handle-large-addresses)
+  * `false`: Benchmark uses the defaults (64-bit: enabled; 32-bit: disabled).
+  * `true`: Explicitly specify that benchmark can handle addresses larger than 2 gigabytes.
 * `EnvironmentVariables`: customized environment variables for target benchmark. See also: @BenchmarkDotNet.Samples.IntroEnvVars
 
 BenchmarkDotNet will use host process environment characteristics for non specified values.
