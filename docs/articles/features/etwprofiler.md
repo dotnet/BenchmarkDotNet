@@ -1,4 +1,5 @@
 ---
+#cspell:ignore etwprofiler
 uid: docs.etwprofiler
 name: EtwProfiler
 ---
@@ -59,7 +60,6 @@ class Program
 ```
 
 * Passing `-p ETW` or `--profiler ETW` command line argument to `BenchmarkSwitcher`
-
 
 ## Configuration
 
