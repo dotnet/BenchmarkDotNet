@@ -1,8 +1,9 @@
-﻿using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Loggers;
+﻿using System.Collections.Generic;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.CsProj
@@ -33,21 +34,22 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         public static IToolchain From(string targetFrameworkMoniker, string packagesPath = null)
             => new CsProjClassicNetToolchain(targetFrameworkMoniker, targetFrameworkMoniker, packagesPath);
 
-        public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
+        public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            if (!base.IsSupported(benchmarkCase, logger, resolver))
-                return false;
+            foreach (var validationError in base.Validate(benchmarkCase, resolver))
+            {
+                yield return validationError;
+            }
 
             if (!RuntimeInformation.IsWindows())
             {
-                logger.WriteLineError($"Classic .NET toolchain is supported only for Windows, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
-                return false;
+                yield return
+                    new ValidationError(true, $"Classic .NET toolchain is supported only for Windows, benchmark '{benchmarkCase.DisplayInfo}' will not be executed", benchmarkCase);
             }
-
-            if (InvalidCliPath(customDotNetCliPath: null, benchmarkCase, logger))
-                return false;
-
-            return true;
+            else if (IsCliPathInvalid(customDotNetCliPath: null, benchmarkCase, out var invalidCliError))
+            {
+                yield return invalidCliError;
+            }
         }
     }
 }
