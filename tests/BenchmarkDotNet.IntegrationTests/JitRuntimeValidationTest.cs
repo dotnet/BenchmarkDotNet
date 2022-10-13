@@ -1,10 +1,9 @@
-﻿using System;
+﻿using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
@@ -12,79 +11,63 @@ using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-    public class JitRuntimeValidationTest
+    public class JitRuntimeValidationTest : BenchmarkTestExecutor
     {
-        protected readonly ITestOutputHelper Output;
+        public JitRuntimeValidationTest(ITestOutputHelper output) : base(output) { }
 
-        private class PlatformConfig : ManualConfig
-        {
-            public PlatformConfig(Runtime runtime, Jit jit, Platform platform)
-            {
-                AddJob(new Job(Job.Dry, new EnvironmentMode()
-                {
-                    Runtime = runtime,
-                    Jit = jit,
-                    Platform = platform
-                }));
-            }
-        }
-
-        private const string OkCaption = "// OkCaption";
-        // private const string LegacyJitNotAvailableForMono = "// ERROR:  LegacyJIT is requested but it is not available for Mono";
+//      private const string LegacyJitNotAvailableForMono = "// ERROR:  LegacyJIT is requested but it is not available for Mono";
         private const string RyuJitNotAvailable = "// ERROR:  RyuJIT is requested but it is not available in current environment";
         private const string ToolchainSupportsOnlyRyuJit = "Currently dotnet cli toolchain supports only RyuJit";
 
-        public JitRuntimeValidationTest(ITestOutputHelper outputHelper)
-        {
-            Output = outputHelper;
-        }
-
         [TheoryWindowsOnly("CLR is a valid job only on Windows")]
-        [InlineData(Jit.LegacyJit, Platform.X86, OkCaption)]
-        [InlineData(Jit.LegacyJit, Platform.X64, OkCaption)]
+        [InlineData(Jit.LegacyJit, Platform.X86, null)]
+        [InlineData(Jit.LegacyJit, Platform.X64, null)]
         [InlineData(Jit.RyuJit, Platform.X86, RyuJitNotAvailable)]
-        [InlineData(Jit.RyuJit, Platform.X64, OkCaption)]
-        public void CheckClrOnWindows(Jit jit, Platform platform, string expectedText)
+        [InlineData(Jit.RyuJit, Platform.X64, null)]
+        public void CheckClrOnWindows(Jit jit, Platform platform, string errorMessage)
         {
-            Verify(ClrRuntime.Net462, jit, platform, expectedText);
+            Verify(ClrRuntime.Net462, jit, platform, errorMessage);
         }
 
-//        [TheoryWindowsOnly("CLR is a valid job only on Windows")]
-//        [InlineData(Jit.LegacyJit, Platform.X86, LegacyJitNotAvailableForMono)]
-//        [InlineData(Jit.LegacyJit, Platform.X64, LegacyJitNotAvailableForMono)]
-//        [InlineData(Jit.RyuJit, Platform.X86, RyuJitNotAvailable)]
-//        [InlineData(Jit.RyuJit, Platform.X64, RyuJitNotAvailable)]
-//        public void CheckMono(Jit jit, Platform platform, string expectedText)
-//        {
-//            Verify(Runtime.Mono, jit, platform, expectedText);
-//        }
+//      [TheoryWindowsOnly("CLR is a valid job only on Windows")]
+//      [InlineData(Jit.LegacyJit, Platform.X86, LegacyJitNotAvailableForMono)]
+//      [InlineData(Jit.LegacyJit, Platform.X64, LegacyJitNotAvailableForMono)]
+//      [InlineData(Jit.RyuJit, Platform.X86, RyuJitNotAvailable)]
+//      [InlineData(Jit.RyuJit, Platform.X64, RyuJitNotAvailable)]
+//      public void CheckMono(Jit jit, Platform platform, string errorMessage)
+//      {
+//          Verify(Runtime.Mono, jit, platform, errorMessage);
+//      }
 
         [Theory]
         [InlineData(Jit.LegacyJit, Platform.X86, ToolchainSupportsOnlyRyuJit)]
         [InlineData(Jit.LegacyJit, Platform.X64, ToolchainSupportsOnlyRyuJit)]
-        [InlineData(Jit.RyuJit, Platform.X64, OkCaption)]
-        public void CheckCore(Jit jit, Platform platform, string expectedText)
+        [InlineData(Jit.RyuJit, Platform.X64, null)]
+        public void CheckCore(Jit jit, Platform platform, string errorMessage)
         {
-            Verify(CoreRuntime.Core60, jit, platform, expectedText);
+            Verify(CoreRuntime.Core60, jit, platform, errorMessage);
         }
 
-        private void Verify(Runtime runtime, Jit jit, Platform platform, string expectedText)
+        private void Verify(Runtime runtime, Jit jit, Platform platform, string errorMessage)
         {
             var logger = new OutputLogger(Output);
-            var config = new PlatformConfig(runtime, jit, platform).AddLogger(logger).AddColumnProvider(DefaultColumnProviders.Instance);
+            var config = ManualConfig.CreateEmpty()
+                .AddJob(Job.Dry.WithPlatform(platform).WithJit(jit).WithRuntime(runtime))
+                .AddLogger(logger)
+                .AddColumnProvider(DefaultColumnProviders.Instance);
 
-            BenchmarkRunner.Run(new[] { BenchmarkConverter.TypeToBenchmarks(typeof(TestBenchmark), config) });
+            CanExecute<TestBenchmark>(config, fullValidation: errorMessage is null);
 
-            Assert.Contains(expectedText, logger.GetLog());
+            if (errorMessage is not null)
+            {
+                Assert.Contains(errorMessage, logger.GetLog());
+            }
         }
 
         public class TestBenchmark
         {
             [Benchmark]
-            public void Benchmark()
-            {
-                Console.WriteLine(OkCaption);
-            }
+            public void Benchmark() { }
         }
     }
 }

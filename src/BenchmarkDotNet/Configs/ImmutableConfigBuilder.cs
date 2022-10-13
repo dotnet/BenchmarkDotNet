@@ -47,6 +47,7 @@ namespace BenchmarkDotNet.Configs
 
             var uniqueFilters = source.GetFilters().ToImmutableHashSet();
             var uniqueRules = source.GetLogicalGroupRules().ToImmutableArray();
+            var uniqueHidingRules = source.GetColumnHidingRules().ToImmutableArray();
 
             var uniqueRunnableJobs = GetRunnableJobs(source.GetJobs()).ToImmutableHashSet();
             var uniqueEventHandlers = source.GetEventHandlers().ToImmutableHashSet();
@@ -61,6 +62,7 @@ namespace BenchmarkDotNet.Configs
                 uniqueValidators,
                 uniqueFilters,
                 uniqueRules,
+                uniqueHidingRules,
                 uniqueRunnableJobs,
                 uniqueEventHandlers,
                 source.UnionRule,

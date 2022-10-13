@@ -26,7 +26,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
-            => new DotNetCliCommand(
+        {
+            BuildResult buildResult = new DotNetCliCommand(
                     CustomDotNetCliPath,
                     string.Empty,
                     generateResult,
@@ -37,5 +38,12 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     logOutput: LogOutput,
                     retryFailedBuildWithNoDeps: RetryFailedBuildWithNoDeps)
                 .RestoreThenBuild();
+            if (buildResult.IsBuildSuccess &&
+                buildPartition.RepresentativeBenchmarkCase.Job.Environment.LargeAddressAware)
+            {
+                LargeAddressAware.SetLargeAddressAware(generateResult.ArtifactsPaths.ExecutablePath);
+            }
+            return buildResult;
+        }
     }
 }

@@ -24,7 +24,14 @@ namespace BenchmarkDotNet.Disassemblers
 
     public class Asm : SourceCode
     {
-        public Instruction Instruction { get; set; }
+        public int InstructionLength { get; set; }
+        public ulong? ReferencedAddress { get; set; }
+        public bool IsReferencedAddressIndirect { get; set; }
+
+        public Instruction? IntelInstruction { get; set; }
+#if !CLRMDV1
+        public Gee.External.Capstone.Arm64.Arm64Instruction Arm64Instruction { get; set; }
+#endif
     }
 
     public class MonoCode : SourceCode
@@ -101,7 +108,7 @@ namespace BenchmarkDotNet.Disassemblers
 
     internal class Settings
     {
-        internal Settings(int processId, string typeName, string methodName, bool printSource, int maxDepth, string resultsPath)
+        internal Settings(int processId, string typeName, string methodName, bool printSource, int maxDepth, string resultsPath, string syntax, string tfm, string[] filters)
         {
             ProcessId = processId;
             TypeName = typeName;
@@ -109,6 +116,9 @@ namespace BenchmarkDotNet.Disassemblers
             PrintSource = printSource;
             MaxDepth = methodName == DisassemblerConstants.DisassemblerEntryMethodName && maxDepth != int.MaxValue ? maxDepth + 1 : maxDepth;
             ResultsPath = resultsPath;
+            Syntax = syntax;
+            TargetFrameworkMoniker = tfm;
+            Filters = filters;
         }
 
         internal int ProcessId { get; }
@@ -116,6 +126,9 @@ namespace BenchmarkDotNet.Disassemblers
         internal string MethodName { get; }
         internal bool PrintSource { get; }
         internal int MaxDepth { get; }
+        internal string[] Filters;
+        internal string Syntax { get; }
+        internal string TargetFrameworkMoniker { get; }
         internal string ResultsPath { get; }
 
         internal static Settings FromArgs(string[] args)
@@ -125,24 +138,55 @@ namespace BenchmarkDotNet.Disassemblers
                 methodName: args[2],
                 printSource: bool.Parse(args[3]),
                 maxDepth: int.Parse(args[4]),
-                resultsPath: args[5]
+                resultsPath: args[5],
+                syntax: args[6],
+                tfm: args[7],
+                filters: args.Skip(8).ToArray()
             );
     }
 
     internal class State
     {
-        internal State(ClrRuntime runtime)
+        internal State(ClrRuntime runtime, string targetFrameworkMoniker)
         {
             Runtime = runtime;
             Todo = new Queue<MethodInfo>();
             HandledMethods = new HashSet<ClrMethod>(new ClrMethodComparer());
             AddressToNameMapping = new Dictionary<ulong, string>();
+            RuntimeVersion = ParseVersion(targetFrameworkMoniker);
         }
 
         internal ClrRuntime Runtime { get; }
+        internal string TargetFrameworkMoniker { get; }
         internal Queue<MethodInfo> Todo { get; }
         internal HashSet<ClrMethod> HandledMethods { get; }
         internal Dictionary<ulong, string> AddressToNameMapping { get; }
+        internal Version RuntimeVersion { get; }
+
+        internal static Version ParseVersion(string targetFrameworkMoniker)
+        {
+            int firstDigit = -1, lastDigit = -1;
+            for (int i = 0; i < targetFrameworkMoniker.Length; i++)
+            {
+                if (char.IsDigit(targetFrameworkMoniker[i]))
+                {
+                    if (firstDigit == -1)
+                        firstDigit = i;
+
+                    lastDigit = i;
+                }
+                else if (targetFrameworkMoniker[i] == '-')
+                {
+                    break; // it can be platform specific like net7.0-windows8
+                }
+            }
+
+            string versionToParse = targetFrameworkMoniker.Substring(firstDigit, lastDigit - firstDigit + 1);
+            if (!versionToParse.Contains(".")) // Full .NET Framework (net48 etc)
+                versionToParse = string.Join(".", versionToParse.ToCharArray());
+
+            return Version.Parse(versionToParse);
+        }
 
         private sealed class ClrMethodComparer : IEqualityComparer<ClrMethod>
         {

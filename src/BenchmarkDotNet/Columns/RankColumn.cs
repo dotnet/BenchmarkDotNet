@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Columns
         [PublicAPI] public static readonly IColumn Stars = new RankColumn(NumeralSystem.Stars);
 
         public string Id => nameof(RankColumn) + "." + numeralSystem;
-        public string ColumnName => "Rank";
+        public string ColumnName => Column.Rank;
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
         {

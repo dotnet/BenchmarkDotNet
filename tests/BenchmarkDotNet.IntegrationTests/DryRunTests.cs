@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Engines;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -12,7 +13,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public DryRunTests(ITestOutputHelper output) : base(output) { }
 
         [Fact]
-        public void WelchTTest() => CanExecute<WelchTTestBench>(CreateSimpleConfig());
+        public void WelchTTest() => CanExecute<WelchTTestBench>();
 
         [DryJob, StatisticalTestColumn]
         public class WelchTTestBench
@@ -24,19 +25,22 @@ namespace BenchmarkDotNet.IntegrationTests
             public void B() => Thread.Sleep(10);
         }
 
-        private const string CounterPrefix = "// Counter = ";
-
         [Fact]
         public void ColdStart()
         {
-            var logger = new OutputLogger(Output);
-            var config = CreateSimpleConfig(logger);
+            var summary = CanExecute<ColdStartBench>();
 
-            CanExecute<ColdStartBench>(config);
+            var report = summary.Reports.Single();
 
-            string log = logger.GetLog();
-            Assert.Contains($"{CounterPrefix}1", log);
-            Assert.DoesNotContain($"{CounterPrefix}2", log);
+            Assert.Equal(2, report.AllMeasurements.Count);
+
+            foreach (var measurement in report.AllMeasurements)
+            {
+                Assert.Equal(1, measurement.LaunchIndex);
+                Assert.Equal(1, measurement.IterationIndex);
+                Assert.Equal(IterationMode.Workload, measurement.IterationMode);
+                Assert.True(measurement.IterationStage is IterationStage.Actual or IterationStage.Result);
+            }
         }
 
         [DryJob]
@@ -47,8 +51,10 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark]
             public void Foo()
             {
-                counter++;
-                Console.WriteLine($"{CounterPrefix}{counter}");
+                if (++counter > 1)
+                {
+                    throw new InvalidOperationException("Benchmark was executed more than once");
+                }
             }
         }
     }

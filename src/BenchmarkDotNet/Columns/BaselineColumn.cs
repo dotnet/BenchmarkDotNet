@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Columns
         [PublicAPI] public static readonly IColumn Default = new BaselineColumn();
 
         public string Id => nameof(BaselineColumn);
-        public string ColumnName => "Baseline";
+        public string ColumnName => Column.Baseline;
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => summary.IsBaseline(benchmarkCase) ? "Yes" : "No";
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);

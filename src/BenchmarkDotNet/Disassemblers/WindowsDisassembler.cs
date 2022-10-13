@@ -61,23 +61,21 @@ namespace BenchmarkDotNet.Disassemblers
             }
         }
 
-        private static string GetDisassemblerPath(Process process, Platform platform)
-        {
-            switch (platform)
+        internal static Platform GetDisassemblerArchitecture(Process process, Platform platform)
+            => platform switch
             {
-                case Platform.AnyCpu:
-                    return GetDisassemblerPath(process,
-                        NativeMethods.Is64Bit(process)
-                            ? Platform.X64
-                            : Platform.X86);
-                case Platform.X86:
-                    return GetDisassemblerPath("x86");
-                case Platform.X64:
-                    return GetDisassemblerPath("x64");
-                default:
-                    throw new NotSupportedException($"Platform {platform} not supported!");
-            }
-        }
+                Platform.AnyCpu when System.Runtime.InteropServices.RuntimeInformation.OSArchitecture is Architecture.Arm or Architecture.Arm64 => RuntimeInformation.GetCurrentPlatform(),
+                Platform.AnyCpu => NativeMethods.Is64Bit(process) ? Platform.X64 : Platform.X86,
+                _ => platform
+            };
+
+        private static string GetDisassemblerPath(Process process, Platform platform)
+            => GetDisassemblerArchitecture(process, platform) switch
+            {
+                Platform.X86 => GetDisassemblerPath("x86"),
+                Platform.X64 => GetDisassemblerPath("x64"),
+                _ => throw new NotSupportedException($"Platform {platform} not supported!")
+            };
 
         private static string GetDisassemblerPath(string architectureName)
         {
@@ -144,8 +142,14 @@ namespace BenchmarkDotNet.Disassemblers
                 .Append(DisassemblerConstants.DisassemblerEntryMethodName).Append(' ')
                 .Append(config.PrintSource).Append(' ')
                 .Append(config.MaxDepth).Append(' ')
-                .Append($"\"{resultsPath}\"")
+                .Append(Escape(resultsPath))
+                .Append(' ')
+                .Append(config.Syntax.ToString())
+                .Append(' ')
+                .Append(string.Join(" ", config.Filters.Select(Escape)))
                 .ToString();
+
+        private static string Escape(string value) => $"\"{value}\"";
 
         // code copied from https://stackoverflow.com/a/33206186/5852046
         private static class NativeMethods

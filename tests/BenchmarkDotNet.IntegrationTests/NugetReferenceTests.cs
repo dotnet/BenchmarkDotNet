@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests
             CanExecute<WithCallToNewtonsoft>(config);
         }
 
-        [Fact]
+        [FactClassicDotNetOnly("Roslyn toolchain does not support .NET Core")]
         public void RoslynToolchainDoesNotSupportNuGetPackageDependency()
         {
             var toolchain = RoslynToolchain.Instance;

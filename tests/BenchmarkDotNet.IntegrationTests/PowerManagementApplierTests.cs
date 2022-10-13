@@ -18,8 +18,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void TestSettingAndRevertingBackGuid()
         {
             var userPlan = PowerManagementHelper.CurrentPlan;
-            var logger = new OutputLogger(Output);
-            var powerManagementApplier = new PowerManagementApplier(logger);
+            var powerManagementApplier = new PowerManagementApplier(new OutputLogger(Output));
 
             powerManagementApplier.ApplyPerformancePlan(PowerManagementApplier.Map(PowerPlan.HighPerformance));
 
@@ -34,8 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void TestPowerPlanShouldNotChange()
         {
             var userPlan = PowerManagementHelper.CurrentPlan;
-            var logger = new OutputLogger(Output);
-            var powerManagementApplier = new PowerManagementApplier(logger);
+            var powerManagementApplier = new PowerManagementApplier(new OutputLogger(Output));
 
             powerManagementApplier.ApplyPerformancePlan(PowerManagementApplier.Map(PowerPlan.UserPowerPlan));
 

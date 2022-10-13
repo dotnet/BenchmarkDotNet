@@ -29,8 +29,6 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.NoOverhead;
 
-        public bool RequiresBlockingAcknowledgments(BenchmarkCase benchmarkCase) => false;
-
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
@@ -57,7 +55,7 @@ namespace BenchmarkDotNet.Diagnosers
             internal static readonly IMetricDescriptor Instance = new CompletedWorkItemCountMetricDescriptor();
 
             public string Id => "CompletedWorkItemCount";
-            public string DisplayName => "Completed Work Items";
+            public string DisplayName => Column.CompletedWorkItems;
             public string Legend => "The number of work items that have been processed in ThreadPool (per single operation)";
             public string NumberFormat => "#0.0000";
             public UnitType UnitType => UnitType.Dimensionless;
@@ -71,7 +69,7 @@ namespace BenchmarkDotNet.Diagnosers
             internal static readonly IMetricDescriptor Instance = new LockContentionCountMetricDescriptor();
 
             public string Id => "LockContentionCount";
-            public string DisplayName => "Lock Contentions";
+            public string DisplayName => Column.LockContentions;
             public string Legend => "The number of times there was contention upon trying to take a Monitor's lock (per single operation)";
             public string NumberFormat => "#0.0000";
             public UnitType UnitType => UnitType.Dimensionless;

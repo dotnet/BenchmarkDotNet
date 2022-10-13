@@ -19,6 +19,9 @@ namespace BenchmarkDotNet.ConsoleArguments
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
     public class CommandLineOptions
     {
+        private const int DefaultDisassemblerRecursiveDepth = 1;
+        private bool useDisassemblyDiagnoser;
+
         [Option('j', "job", Required = false, Default = "Default", HelpText = "Dry/Short/Medium/Long or Default")]
         public string BaseJob { get; set; }
 
@@ -35,13 +38,20 @@ namespace BenchmarkDotNet.ConsoleArguments
         public bool UseThreadingDiagnoser { get; set; }
 
         [Option('d', "disasm", Required = false, Default = false, HelpText = "Gets disassembly of benchmarked code")]
-        public bool UseDisassemblyDiagnoser { get; set; }
+        public bool UseDisassemblyDiagnoser
+        {
+            get => useDisassemblyDiagnoser || DisassemblerRecursiveDepth != DefaultDisassemblerRecursiveDepth || DisassemblerFilters.Any();
+            set => useDisassemblyDiagnoser = value;
+        }
 
         [Option('p', "profiler", Required = false, HelpText = "Profiles benchmarked code using selected profiler. Available options: EP/ETW/CV/NativeMemory")]
         public string Profiler { get; set; }
 
         [Option('f', "filter", Required = false, HelpText = "Glob patterns")]
         public IEnumerable<string> Filters { get; set; }
+
+        [Option('h', "hide", Required = false, HelpText = "Hides columns by name")]
+        public IEnumerable<string> HiddenColumns { get; set; }
 
         [Option('i', "inProcess", Required = false, Default = false, HelpText = "Run benchmarks in Process")]
         public bool RunInProcess { get; set; }
@@ -125,7 +135,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public int? MaxIterationCount { get; set; }
 
         [Option("invocationCount", Required = false, HelpText = "Invocation count in a single iteration. By default calculated by the heuristic.")]
-        public int? InvocationCount { get; set; }
+        public long? InvocationCount { get; set; }
 
         [Option("unrollFactor", Required = false, HelpText = "How many times the benchmark method will be invoked per one iteration of a generated loop. 16 by default")]
         public int? UnrollFactor { get; set; }
@@ -142,11 +152,17 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("info", Required = false, Default = false, HelpText = "Print environment information.")]
         public bool PrintInformation { get; set; }
 
+        [Option("apples", Required = false, Default = false, HelpText = "Runs apples-to-apples comparison for specified Jobs.")]
+        public bool ApplesToApples { get; set; }
+
         [Option("list", Required = false, Default = ListBenchmarkCaseMode.Disabled, HelpText = "Prints all of the available benchmark names. Flat/Tree")]
         public ListBenchmarkCaseMode ListBenchmarkCaseMode { get; set; }
 
-        [Option("disasmDepth", Required = false, Default = 1, HelpText = "Sets the recursive depth for the disassembler.")]
+        [Option("disasmDepth", Required = false, Default = DefaultDisassemblerRecursiveDepth, HelpText = "Sets the recursive depth for the disassembler.")]
         public int DisassemblerRecursiveDepth { get; set; }
+
+        [Option("disasmFilter", Required = false, HelpText = "Glob patterns applied to full method signatures by the the disassembler.")]
+        public IEnumerable<string> DisassemblerFilters { get; set; }
 
         [Option("disasmDiff", Required = false, Default = false, HelpText = "Generates diff reports for the disassembler.")]
         public bool DisassemblerDiff { get; set; }
@@ -169,7 +185,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("disableLogFile", Required = false, HelpText = "Disables the logfile.")]
         public bool DisableLogFile { get; set; }
 
-        [Option("maxWidth", Required = false, HelpText = "Max paramter column width, the default is 20.")]
+        [Option("maxWidth", Required = false, HelpText = "Max parameter column width, the default is 20.")]
         public int? MaxParameterColumnWidth { get; set; }
 
         [Option("envVars", Required = false, HelpText = "Colon separated environment variables (key:value)")]
@@ -195,6 +211,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("wasmDataDir", Required = false, HelpText = "Wasm data directory")]
         public DirectoryInfo WasmDataDirectory { get; set; }
+
+        [Option("noForcedGCs", Required = false, HelpText = "Specifying would not forcefully induce any GCs.")]
+        public bool NoForcedGCs { get; set; }
 
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
@@ -226,6 +245,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     new CommandLineOptions { Filters = new[] { "*"}, Runtimes = new[] { "netcoreapp2.0", "netcoreapp2.1" }, StatisticalTestThreshold = "5%" });
                 yield return new Example("Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2'", longName,
                     new CommandLineOptions { EnvironmentVariables = new[] { "ENV_VAR_KEY_1:value_1", "ENV_VAR_KEY_2:value_2" } });
+                yield return new Example("Hide Mean and Ratio columns (use double quotes for multi-word columns: \"Alloc Ratio\")", shortName, new CommandLineOptions { HiddenColumns = new[] { "Mean", "Ratio" }, });
             }
         }
 

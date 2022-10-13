@@ -48,9 +48,7 @@ namespace BenchmarkDotNet.Running
         [PublicAPI]
         public Jit Jit => RepresentativeBenchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, Resolver);
 
-        public bool IsNativeAot => Runtime is NativeAotRuntime
-            // given job can have NativeAOT toolchain set, but Runtime == default
-            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is NativeAotToolchain);
+        public bool IsNativeAot => RepresentativeBenchmarkCase.Job.IsNativeAOT();
 
         public bool IsWasm => Runtime is WasmRuntime // given job can have Wasm toolchain set, but Runtime == default ;)
             || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is WasmToolChain);
@@ -58,9 +56,7 @@ namespace BenchmarkDotNet.Running
         public bool IsNetFramework => Runtime is ClrRuntime
             || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && (toolchain is RoslynToolchain || toolchain is CsProjClassicNetToolchain));
 
-        public Runtime Runtime => RepresentativeBenchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic)
-            ? RepresentativeBenchmarkCase.Job.Environment.Runtime
-            : RuntimeInformation.GetCurrentRuntime();
+        public Runtime Runtime => RepresentativeBenchmarkCase.Job.Environment.GetRuntime();
 
         public bool IsCustomBuildConfiguration => BuildConfiguration != InfrastructureMode.ReleaseConfigurationName;
 
@@ -71,11 +67,6 @@ namespace BenchmarkDotNet.Running
         public bool LogBuildOutput { get; }
 
         public bool GenerateMSBuildBinLog { get; }
-
-        public bool NoAcknowledgments
-            => !Benchmarks
-                    .Any(bennchmark => bennchmark.Config.GetDiagnosers()
-                    .Any(diagnoser => diagnoser.RequiresBlockingAcknowledgments(bennchmark.BenchmarkCase)));
 
         public override string ToString() => RepresentativeBenchmarkCase.Job.DisplayInfo;
 

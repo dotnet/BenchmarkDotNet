@@ -14,8 +14,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void ParamsSupportPropertyWithPublicSetter()
         {
-            var logger = new OutputLogger(Output);
-            var config = CreateSimpleConfig(logger);
+            var config = CreateSimpleConfig();
 
             var summary = CanExecute<PriorityBenchmark>(config);
             var columns = summary.Table.Columns;

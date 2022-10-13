@@ -20,7 +20,7 @@ But to allow benchmarking any target platform architecture the project which def
 
 ### Output
 
-The disassembly result can be obtained [here](http://adamsitnik.com/files/disasm/Jit_Devirtualization-disassembly-report.html).
+The disassembly result can be obtained [here](https://adamsitnik.com/files/disasm/Jit_Devirtualization-disassembly-report.html).
 The file was too big to embed it in this doc page.
 
 ### Links

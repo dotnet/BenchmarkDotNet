@@ -60,8 +60,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => HardwareCounters.Validate(validationParameters, mandatory: false);
 
-        public bool RequiresBlockingAcknowledgments(BenchmarkCase benchmarkCase) => false;
-
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
             // it's crucial to start the trace before the process starts and stop it after the benchmarked process stops to have all of the necessary events in the trace file!

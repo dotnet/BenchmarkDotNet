@@ -132,11 +132,13 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <UseSharedCompilation>false</UseSharedCompilation>
     <Deterministic>true</Deterministic>
     <RunAnalyzers>false</RunAnalyzers>
+    <PublishAot Condition="" '$(TargetFramework)' != 'net6.0' "">true</PublishAot>
     <IlcOptimizationPreference>{ilcOptimizationPreference}</IlcOptimizationPreference>
     {GetTrimmingSettings()}
     <IlcGenerateCompleteTypeMetadata>{ilcGenerateCompleteTypeMetadata}</IlcGenerateCompleteTypeMetadata>
     <IlcGenerateStackTraceData>{ilcGenerateStackTraceData}</IlcGenerateStackTraceData>
     <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles> <!-- workaround for 'Found multiple publish output files with the same relative path.' error -->
     <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
     {GetInstructionSetSettings(buildPartition)}
   </PropertyGroup>
@@ -145,13 +147,16 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <Compile Include=""{Path.GetFileName(artifactsPaths.ProgramCodePath)}"" Exclude=""bin\**;obj\**;**\*.xproj;packages\**"" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />
+    {GetILCompilerPackageReference()}
     <ProjectReference Include=""{GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).FullName}"" />
   </ItemGroup>
   <ItemGroup>
     {string.Join(Environment.NewLine, GetRdXmlFiles(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger).Select(file => $"<RdXmlFile Include=\"{file}\" />"))}
   </ItemGroup>
 </Project>";
+
+        private string GetILCompilerPackageReference()
+            => string.IsNullOrEmpty(ilCompilerVersion) ? "" : $@"<PackageReference Include=""Microsoft.DotNet.ILCompiler"" Version=""{ilCompilerVersion}"" />";
 
         private string GetTrimmingSettings()
             => rootAllApplicationAssemblies
@@ -225,6 +230,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     if (HardwareIntrinsics.IsX86SseSupported) yield return "sse";
                     if (HardwareIntrinsics.IsX86Sse2Supported) yield return "sse2";
                     if (HardwareIntrinsics.IsX86Sse3Supported) yield return "sse3";
+                    if (HardwareIntrinsics.IsX86Ssse3Supported) yield return "ssse3";
                     if (HardwareIntrinsics.IsX86Sse41Supported) yield return "sse4.1";
                     if (HardwareIntrinsics.IsX86Sse42Supported) yield return "sse4.2";
                     if (HardwareIntrinsics.IsX86AvxSupported) yield return "avx";
@@ -237,6 +243,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     if (HardwareIntrinsics.IsX86PclmulqdqSupported) yield return "pclmul";
                     if (HardwareIntrinsics.IsX86PopcntSupported) yield return "popcnt";
                     if (HardwareIntrinsics.IsX86AvxVnniSupported) yield return "avxvnni";
+                    if (HardwareIntrinsics.IsX86SerializeSupported) yield return "serialize";
                     break;
                 case Platform.Arm64:
                     if (HardwareIntrinsics.IsArmBaseSupported) yield return "base";

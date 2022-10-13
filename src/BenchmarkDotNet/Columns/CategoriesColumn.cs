@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Columns
         public static readonly IColumn Default = new CategoriesColumn();
 
         public string Id => nameof(CategoriesColumn);
-        public string ColumnName => "Categories";
+        public string ColumnName => Column.Categories;
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => string.Join(",", benchmarkCase.Descriptor.Categories);
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;

@@ -86,7 +86,14 @@ namespace BenchmarkDotNet.Reports
             full.AddRange(FullContent);
             FullContentWithHeader = full.ToArray();
 
-            Columns = Enumerable.Range(0, columns.Length).Select(i => new SummaryTableColumn(this, i, columns[i])).ToArray();
+            Columns = new SummaryTableColumn[columns.Length];
+            for (int i = 0; i < columns.Length; i++)
+            {
+                var column = columns[i];
+                bool hide = summary.ColumnHidingRules.Any(rule => rule.NeedToHide(column));
+                Columns[i] = new SummaryTableColumn(this, i, column, hide);
+            }
+
             EffectiveSummaryStyle = style;
         }
 
@@ -101,17 +108,26 @@ namespace BenchmarkDotNet.Reports
             public TextJustification Justify { get; }
             public IColumn OriginalColumn { get; }
 
-            public SummaryTableColumn(SummaryTable table, int index, IColumn column)
+            internal bool IsCommon { get; }
+            internal bool WasHidden { get; }
+
+            public SummaryTableColumn(SummaryTable table, int index, IColumn column, bool hide = false)
             {
                 Index = index;
                 Header = table.FullHeader[index];
                 Content = table.FullContent.Select(line => line[index]).ToArray();
-                NeedToShow = column.AlwaysShow || Content.Distinct().Count() > 1;
                 Width = Math.Max(Header.Length, Content.Any() ? Content.Max(line => line.Length) : 0) + 1;
                 IsDefault = table.IsDefault[index];
                 OriginalColumn = column;
 
                 Justify = column.IsNumeric ? TextJustification.Right : TextJustification.Left;
+
+                bool needToShow = column.AlwaysShow || Content.Distinct().Count() > 1;
+                NeedToShow = !hide && needToShow;
+                WasHidden = hide && needToShow;
+
+                bool isCommon = !NeedToShow && !IsDefault;
+                IsCommon = (!hide && isCommon) || (hide && Content.Distinct().Count() == 1);
             }
 
             public override string ToString() => Header;

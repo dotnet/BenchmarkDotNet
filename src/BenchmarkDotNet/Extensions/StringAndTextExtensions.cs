@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.Extensions
         internal static string ToLowerCase(this bool value) => value ? "true" : "false"; // to avoid .ToString().ToLower() allocation
 
         // source: https://stackoverflow.com/a/12364234/5852046
-        internal static string Escape(this string cliArg)
+        internal static string EscapeCommandLine(this string cliArg)
         {
             if (string.IsNullOrEmpty(cliArg))
                 return cliArg;
@@ -25,6 +25,26 @@ namespace BenchmarkDotNet.Extensions
             value = Regex.Replace(value, @"^(.*\s.*?)(\\*)$", "\"$1$2$2\"", RegexOptions.Singleline);
 
             return value;
+        }
+
+        /// <summary>
+        /// Escapes UNICODE control characters
+        /// </summary>
+        /// <param name="str">string to escape</param>
+        /// <param name="quote">True to put (double) quotes around the string literal</param>
+        internal static string EscapeSpecialCharacters(this string str, bool quote)
+        {
+            return Microsoft.CodeAnalysis.CSharp.SymbolDisplay.FormatLiteral(str, quote);
+        }
+
+        /// <summary>
+        /// Escapes UNICODE control character
+        /// </summary>
+        /// <param name="c">char to escape</param>
+        /// <param name="quote">True to put (single) quotes around the character literal.</param>
+        internal static string EscapeSpecialCharacter(this char c, bool quote)
+        {
+            return Microsoft.CodeAnalysis.CSharp.SymbolDisplay.FormatLiteral(c, quote);
         }
 
         /// <summary>

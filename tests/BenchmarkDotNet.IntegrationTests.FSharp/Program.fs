@@ -28,13 +28,9 @@ type Db() =
 type TestEnum = | A = 0 | B = 1 | C = 2
 
 type EnumParamsTest() =
-    let mutable collectedParams = HashSet<TestEnum>()
-
-    [<Params(TestEnum.A, TestEnum.B)>]
+    [<Params(TestEnum.B)>]
     member val EnumParamValue = TestEnum.A with get, set
 
     [<Benchmark>]
     member this.Benchmark() =
-        if not <| collectedParams.Contains(this.EnumParamValue) then
-            printfn "// ### New Parameter %A ###" this.EnumParamValue
-            collectedParams.Add(this.EnumParamValue) |> ignore
+        if not (this.EnumParamValue = TestEnum.B) then failwith "Invalid Params value assigned"

@@ -475,6 +475,19 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
+        public void WhenCustomDisassemblerSettingsAreProvidedItsEnabledByDefault()
+        {
+            Verify(new[] { "--disasmDepth", "2" });
+            Verify(new[] { "--disasmFilter", "*" });
+
+            void Verify(string[] args)
+            {
+                var config = ConfigParser.Parse(args, new OutputLogger(Output)).config;
+                Assert.Single(config.GetDiagnosers().OfType<DisassemblyDiagnoser>());
+            }
+        }
+
+        [Fact]
         public void CanParseInfo()
         {
             var config = ConfigParser.Parse(new[] { "--info" }, new OutputLogger(Output)).options;
@@ -546,6 +559,18 @@ namespace BenchmarkDotNet.Tests
         public void InvalidEnvVarAreRecognized()
         {
             Assert.False(ConfigParser.Parse(new[] { "--envVars", "INVALID_NO_SEPARATOR" }, new OutputLogger(Output)).isSuccess);
+        }
+
+        [Fact]
+        public void UserCanSpecifyNoForceGCs()
+        {
+            var parsedConfiguration = ConfigParser.Parse(new[] { "--noForcedGCs" }, new OutputLogger(Output));
+            Assert.True(parsedConfiguration.isSuccess);
+
+            foreach (var job in parsedConfiguration.config.GetJobs())
+            {
+                Assert.False(job.Environment.Gc.Force);
+            }
         }
     }
 }

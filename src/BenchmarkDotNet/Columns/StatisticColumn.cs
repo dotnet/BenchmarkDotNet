@@ -28,59 +28,59 @@ namespace BenchmarkDotNet.Columns
             Additional
         }
 
-        public static readonly IStatisticColumn Mean = new StatisticColumn("Mean", "Arithmetic mean of all measurements",
+        public static readonly IStatisticColumn Mean = new StatisticColumn(Column.Mean, "Arithmetic mean of all measurements",
             s => s.Mean, Priority.Main);
 
-        public static readonly IColumn StdErr = new StatisticColumn("StdErr", "Standard error of all measurements",
+        public static readonly IColumn StdErr = new StatisticColumn(Column.StdErr, "Standard error of all measurements",
             s => s.StandardError, Priority.Main, parentColumn: Mean);
 
-        public static readonly IColumn StdDev = new StatisticColumn("StdDev", "Standard deviation of all measurements",
+        public static readonly IColumn StdDev = new StatisticColumn(Column.StdDev, "Standard deviation of all measurements",
             s => s.StandardDeviation, Priority.Main, parentColumn: Mean);
 
-        public static readonly IColumn Error = new StatisticColumn("Error", "Half of 99.9% confidence interval",
+        public static readonly IColumn Error = new StatisticColumn(Column.Error, "Half of 99.9% confidence interval",
             s => new ConfidenceInterval(s.Mean, s.StandardError, s.N, ConfidenceLevel.L999).Margin, Priority.Main, parentColumn: Mean);
 
-        public static readonly IColumn OperationsPerSecond = new StatisticColumn("Op/s", "Operation per second",
+        public static readonly IColumn OperationsPerSecond = new StatisticColumn(Column.OperationPerSecond, "Operation per second",
             s => 1.0 * 1000 * 1000 * 1000 / s.Mean, Priority.Additional, UnitType.Dimensionless);
 
-        public static readonly IColumn Min = new StatisticColumn("Min", "Minimum",
+        public static readonly IColumn Min = new StatisticColumn(Column.Min, "Minimum",
             s => s.Min, Priority.Quartile);
 
-        public static readonly IColumn Q1 = new StatisticColumn("Q1", "Quartile 1 (25th percentile)",
+        public static readonly IColumn Q1 = new StatisticColumn(Column.Q1, "Quartile 1 (25th percentile)",
             s => s.Q1, Priority.Quartile);
 
-        public static readonly IColumn Median = new StatisticColumn("Median", "Value separating the higher half of all measurements (50th percentile)",
+        public static readonly IColumn Median = new StatisticColumn(Column.Median, "Value separating the higher half of all measurements (50th percentile)",
             s => s.Median, Priority.Quartile);
 
-        public static readonly IColumn Q3 = new StatisticColumn("Q3", "Quartile 3 (75th percentile)",
+        public static readonly IColumn Q3 = new StatisticColumn(Column.Q3, "Quartile 3 (75th percentile)",
             s => s.Q3, Priority.Quartile);
 
-        public static readonly IColumn Max = new StatisticColumn("Max", "Maximum", s => s.Max, Priority.Quartile);
+        public static readonly IColumn Max = new StatisticColumn(Column.Max, "Maximum", s => s.Max, Priority.Quartile);
 
-        public static readonly IColumn Skewness = new StatisticColumn("Skewness", "Measure of the asymmetry (third standardized moment)",
+        public static readonly IColumn Skewness = new StatisticColumn(Column.Skewness, "Measure of the asymmetry (third standardized moment)",
             s => s.Skewness, Priority.Additional, UnitType.Dimensionless);
 
-        public static readonly IColumn Kurtosis = new StatisticColumn("Kurtosis", "Measure of the tailedness ( fourth standardized moment)",
+        public static readonly IColumn Kurtosis = new StatisticColumn(Column.Kurtosis, "Measure of the tailedness ( fourth standardized moment)",
             s => s.Kurtosis, Priority.Additional, UnitType.Dimensionless);
 
         /// <summary>
         /// See http://www.brendangregg.com/FrequencyTrails/modes.html
         /// </summary>
-        public static readonly IColumn MValue = new StatisticColumn("MValue", "Modal value, see http://www.brendangregg.com/FrequencyTrails/modes.html",
+        public static readonly IColumn MValue = new StatisticColumn(Column.MValue, "Modal value, see http://www.brendangregg.com/FrequencyTrails/modes.html",
             s => MValueCalculator.Calculate(s.OriginalValues), Priority.Additional, UnitType.Dimensionless);
 
-        public static readonly IColumn Iterations = new StatisticColumn("Iterations", "Number of target iterations",
+        public static readonly IColumn Iterations = new StatisticColumn(Column.Iterations, "Number of target iterations",
             s => s.N, Priority.Additional, UnitType.Dimensionless);
 
-        public static readonly IColumn P0 = CreatePercentileColumn(0, s => s.Percentiles.P0);
-        public static readonly IColumn P25 = CreatePercentileColumn(25, s => s.Percentiles.P25);
-        public static readonly IColumn P50 = CreatePercentileColumn(50, s => s.Percentiles.P50);
-        public static readonly IColumn P67 = CreatePercentileColumn(67, s => s.Percentiles.P67);
-        public static readonly IColumn P80 = CreatePercentileColumn(80, s => s.Percentiles.P80);
-        public static readonly IColumn P85 = CreatePercentileColumn(85, s => s.Percentiles.P85);
-        public static readonly IColumn P90 = CreatePercentileColumn(90, s => s.Percentiles.P90);
-        public static readonly IColumn P95 = CreatePercentileColumn(95, s => s.Percentiles.P95);
-        public static readonly IColumn P100 = CreatePercentileColumn(100, s => s.Percentiles.P100);
+        public static readonly IColumn P0 = CreatePercentileColumn(0, Column.P0, s => s.Percentiles.P0);
+        public static readonly IColumn P25 = CreatePercentileColumn(25, Column.P25, s => s.Percentiles.P25);
+        public static readonly IColumn P50 = CreatePercentileColumn(50, Column.P50, s => s.Percentiles.P50);
+        public static readonly IColumn P67 = CreatePercentileColumn(67, Column.P67, s => s.Percentiles.P67);
+        public static readonly IColumn P80 = CreatePercentileColumn(80, Column.P80, s => s.Percentiles.P80);
+        public static readonly IColumn P85 = CreatePercentileColumn(85, Column.P85, s => s.Percentiles.P85);
+        public static readonly IColumn P90 = CreatePercentileColumn(90, Column.P90, s => s.Percentiles.P90);
+        public static readonly IColumn P95 = CreatePercentileColumn(95, Column.P95, s => s.Percentiles.P95);
+        public static readonly IColumn P100 = CreatePercentileColumn(100, Column.P100, s => s.Percentiles.P100);
 
         [PublicAPI]
         public static IColumn CiLower(ConfidenceLevel level) => new StatisticColumn(
@@ -165,7 +165,7 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
 
-        private static IColumn CreatePercentileColumn(int percentiles, Func<Statistics, double> calc) => new StatisticColumn(
-            "P" + percentiles, "Percentile " + percentiles, calc, Priority.Percentiles);
+        private static IColumn CreatePercentileColumn(int percentiles, string columnName, Func<Statistics, double> calc) => new StatisticColumn(
+            columnName, "Percentile " + percentiles, calc, Priority.Percentiles);
     }
 }

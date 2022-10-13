@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
 {
-    public class Descriptor
+    public class Descriptor : IEquatable<Descriptor>
     {
         public Type Type { get; }
         public MethodInfo WorkloadMethod { get; }
@@ -70,5 +70,11 @@ namespace BenchmarkDotNet.Running
         public bool HasCategory(string category) => Categories.Any(c => c.EqualsWithIgnoreCase(category));
 
         public string GetFilterName() => $"{Type.GetCorrectCSharpTypeName(includeGenericArgumentsNamespace: false)}.{WorkloadMethod.Name}";
+
+        public bool Equals(Descriptor other) => GetFilterName().Equals(other.GetFilterName());
+
+        public override bool Equals(object obj) => obj is Descriptor && Equals((Descriptor)obj);
+
+        public override int GetHashCode() => GetFilterName().GetHashCode();
     }
 }

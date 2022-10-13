@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Validators
                 }
                 else if (run.HasValue(RunMode.InvocationCountCharacteristic))
                 {
-                    int invocationCount = run.InvocationCount;
+                    long invocationCount = run.InvocationCount;
                     if (invocationCount % unrollFactor != 0)
                     {
                         string message = $"Specified InvocationCount ({invocationCount}) must be a multiple of UnrollFactor ({unrollFactor})";

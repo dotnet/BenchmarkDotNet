@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Tests.Columns
                 metric
             });
             return new Summary("", new[] { benchmarkReport }.ToImmutableArray(), HostEnvironmentInfo.GetCurrent(),
-                "", "", TimeSpan.Zero, CultureInfo.InvariantCulture, ImmutableArray<ValidationError>.Empty);
+                "", "", TimeSpan.Zero, CultureInfo.InvariantCulture, ImmutableArray<ValidationError>.Empty, ImmutableArray<IColumnHidingRule>.Empty);
         }
 
         [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]

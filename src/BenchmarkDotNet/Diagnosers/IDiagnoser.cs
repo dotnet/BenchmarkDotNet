@@ -20,8 +20,6 @@ namespace BenchmarkDotNet.Diagnosers
 
         RunMode GetRunMode(BenchmarkCase benchmarkCase);
 
-        bool RequiresBlockingAcknowledgments(BenchmarkCase benchmarkCase);
-
         void Handle(HostSignal signal, DiagnoserActionParameters parameters);
 
         IEnumerable<Metric> ProcessResults(DiagnoserResults results);

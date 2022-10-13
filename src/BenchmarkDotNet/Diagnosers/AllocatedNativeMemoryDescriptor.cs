@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Diagnosers
     internal class AllocatedNativeMemoryDescriptor : IMetricDescriptor
     {
         public string Id => nameof(AllocatedNativeMemoryDescriptor);
-        public string DisplayName => $"Allocated native memory";
+        public string DisplayName => Column.AllocatedNativeMemory;
         public string Legend => $"Allocated native memory per single operation";
         public string NumberFormat => "N0";
         public UnitType UnitType => UnitType.Size;
@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Diagnosers
     internal class NativeMemoryLeakDescriptor : IMetricDescriptor
     {
         public string Id => nameof(NativeMemoryLeakDescriptor);
-        public string DisplayName => $"Native memory leak";
+        public string DisplayName => Column.NativeMemoryLeak;
         public string Legend => $"Native memory leak size in byte.";
         public string NumberFormat => "N0";
         public UnitType UnitType => UnitType.Size;

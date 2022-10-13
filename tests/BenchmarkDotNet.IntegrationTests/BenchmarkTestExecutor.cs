@@ -8,6 +8,8 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
 using Xunit.Abstractions;
+using System.Collections.Generic;
+using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -91,5 +93,11 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray());
         }
+
+        protected static IReadOnlyList<string> GetSingleStandardOutput(Summary summary)
+            => summary.Reports.Single().ExecuteResults.Single().StandardOutput;
+
+        protected static IReadOnlyList<string> GetCombinedStandardOutput(Summary summary)
+            => summary.Reports.SelectMany(r => r.ExecuteResults).SelectMany(e => e.StandardOutput).ToArray();
     }
 }

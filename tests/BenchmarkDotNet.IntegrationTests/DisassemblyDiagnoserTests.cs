@@ -88,6 +88,23 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Recursive)}()");
         }
 
+        [TheoryWindowsOnly(WindowsOnly)]
+        [MemberData(nameof(GetAllJits))]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void CanDisassembleAllMethodCallsUsingFilters(Jit jit, Platform platform, Runtime runtime)
+        {
+            var disassemblyDiagnoser = new DisassemblyDiagnoser(
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 1, filters: new[] { "*WithCalls*" }));
+
+            CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.ColdStart));
+
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Int32)");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Boolean)");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Static)}()");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Instance)}()");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Recursive)}()");
+        }
+
         public class Generic<T> where T : new()
         {
             [Benchmark]
@@ -126,7 +143,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var disassemblyResult = disassemblyDiagnoser.Results.Values.Single(result => result.Methods.Count(method => method.Name.Contains(nameof(WithInlineable.JustReturn))) == 1);
 
-            Assert.Contains(disassemblyResult.Methods, method => method.Maps.Any(map => map.SourceCodes.OfType<Asm>().All(asm => asm.Instruction.ToString().Contains("ret"))));
+            Assert.Contains(disassemblyResult.Methods, method => method.Maps.Any(map => map.SourceCodes.OfType<Asm>().All(asm => asm.IntelInstruction.ToString().Contains("ret"))));
         }
 
         private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, IDiagnoser disassemblyDiagnoser, RunStrategy runStrategy)

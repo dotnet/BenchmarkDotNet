@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Toolchains.Results
         public string ErrorMessage { get; }
 
         private BuildResult(GenerateResult generateResult, bool isBuildSuccess, string errorMessage)
-            : base(generateResult.ArtifactsPaths, generateResult.IsGenerateSuccess, generateResult.GenerateException, generateResult.ArtifactsToCleanup, generateResult.NoAcknowledgments)
+            : base(generateResult.ArtifactsPaths, generateResult.IsGenerateSuccess, generateResult.GenerateException, generateResult.ArtifactsToCleanup)
         {
             IsBuildSuccess = isBuildSuccess;
             ErrorMessage = errorMessage;

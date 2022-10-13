@@ -79,9 +79,6 @@ namespace BenchmarkDotNet.Code
             else if (buildPartition.IsWasm)
                 extraDefines.Add("#define WASM");
 
-            if (buildPartition.NoAcknowledgments)
-                extraDefines.Add("#define NO_ACK");
-
             string benchmarkProgramContent = new SmartStringBuilder(ResourceHelper.LoadTemplate("BenchmarkProgram.txt"))
                 .Replace("$ShadowCopyDefines$", useShadowCopy ? "#define SHADOWCOPY" : null).Replace("$ShadowCopyFolderPath$", shadowCopyFolderPath)
                 .Replace("$ExtraDefines$", string.Join(Environment.NewLine, extraDefines))

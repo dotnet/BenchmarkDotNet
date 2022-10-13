@@ -214,7 +214,10 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.UseThreadingDiagnoser)
                 config.AddDiagnoser(ThreadingDiagnoser.Default);
             if (options.UseDisassemblyDiagnoser)
-                config.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(maxDepth: options.DisassemblerRecursiveDepth, exportDiff: options.DisassemblerDiff)));
+                config.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(
+                    maxDepth: options.DisassemblerRecursiveDepth,
+                    filters: options.DisassemblerFilters.ToArray(),
+                    exportDiff: options.DisassemblerDiff)));
             if (!string.IsNullOrEmpty(options.Profiler))
                 config.AddDiagnoser(DiagnosersLoader.GetImplementation<IProfiler>(profiler => profiler.ShortName.EqualsWithIgnoreCase(options.Profiler)));
 
@@ -232,6 +235,8 @@ namespace BenchmarkDotNet.ConsoleArguments
             else
                 config.AddFilter(filters);
 
+            config.HideColumns(options.HiddenColumns.ToArray());
+
             config.WithOption(ConfigOptions.JoinSummary, options.Join);
             config.WithOption(ConfigOptions.KeepBenchmarkFiles, options.KeepBenchmarkFiles);
             config.WithOption(ConfigOptions.DontOverwriteResults, options.DontOverwriteResults);
@@ -239,6 +244,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.WithOption(ConfigOptions.DisableLogFile, options.DisableLogFile);
             config.WithOption(ConfigOptions.LogBuildOutput, options.LogBuildOutput);
             config.WithOption(ConfigOptions.GenerateMSBuildBinLog, options.GenerateMSBuildBinLog);
+            config.WithOption(ConfigOptions.ApplesToApples, options.ApplesToApples);
 
             if (options.MaxParameterColumnWidth.HasValue)
                 config.WithSummaryStyle(SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParameterColumnWidth.Value));
@@ -289,6 +295,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.RunOncePerIteration();
             if (options.MemoryRandomization)
                 baseJob = baseJob.WithMemoryRandomization();
+            if (options.NoForcedGCs)
+                baseJob = baseJob.WithGcForce(false);
 
             if (options.EnvironmentVariables.Any())
             {
@@ -387,7 +395,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.NativeAot60:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json");
                 case RuntimeMoniker.NativeAot70:
-                    return CreateAotJob(baseJob, options, runtimeMoniker, "7.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json");
+                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json");
                 case RuntimeMoniker.Wasm:
                     return MakeWasmJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0", runtimeMoniker);
                 case RuntimeMoniker.WasmNet50:

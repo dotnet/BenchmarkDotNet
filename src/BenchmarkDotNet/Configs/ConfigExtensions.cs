@@ -111,6 +111,10 @@ namespace BenchmarkDotNet.Configs
         [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.AddLogicalGroupRules(rules);
         [PublicAPI] public static ManualConfig AddLogicalGroupRules(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.With(c => c.AddLogicalGroupRules(rules));
 
+        [PublicAPI] public static ManualConfig HideColumns(this IConfig config, params string[] columnNames) => config.With(c => c.HideColumns(columnNames));
+        [PublicAPI] public static ManualConfig HideColumns(this IConfig config, params IColumn[] columns) => config.With(c => c.HideColumns(columns));
+        [PublicAPI] public static ManualConfig HideColumns(this IConfig config, params IColumnHidingRule[] rules) => config.With(c => c.HideColumns(rules));
+
         public static ImmutableConfig CreateImmutableConfig(this IConfig config) => ImmutableConfigBuilder.Create(config);
 
         internal static ILogger GetNonNullCompositeLogger(this IConfig config)

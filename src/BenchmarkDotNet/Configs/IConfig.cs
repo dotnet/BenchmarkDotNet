@@ -29,6 +29,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IFilter> GetFilters();
         IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
         IEnumerable<IBenchmarkEventHandler> GetEventHandlers();
+        IEnumerable<IColumnHidingRule> GetColumnHidingRules();
 
         [CanBeNull] IOrderer Orderer { get; }
 

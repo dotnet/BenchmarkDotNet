@@ -69,7 +69,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <param name="message">Text to write.</param>
         public void WriteLine(string message) => logger.WriteLine(message);
 
-
         /// <summary>Sends notification signal to the host.</summary>
         /// <param name="hostSignal">The signal to send.</param>
         public void SendSignal(HostSignal hostSignal)
@@ -96,6 +95,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 runResults.Print(w);
                 logger.Write(w.GetStringBuilder().ToString());
             }
+        }
+
+        public void Dispose()
+        {
+            // do nothing on purpose
         }
     }
 }

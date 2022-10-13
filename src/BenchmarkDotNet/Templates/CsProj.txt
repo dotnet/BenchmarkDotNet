@@ -19,8 +19,10 @@
     <Deterministic>true</Deterministic>
     <!-- needed for custom build configurations (only "Release" builds are optimized by default) -->
     <Optimize Condition=" '$(Configuration)' != 'Debug' ">true</Optimize>
+    <!-- Begin copied settings from benchmarks project -->
     $COPIEDSETTINGS$
-    <!-- we set LangVersion after $COPIEDSETTINGS$ which might contain LangVersion copied from the benchmarks project -->
+    <!-- End copied settings -->
+    <!-- we set LangVersion after any copied settings which might contain LangVersion copied from the benchmarks project -->
     <LangVersion Condition="'$(LangVersion)' == '' Or ($([System.Char]::IsDigit('$(LangVersion)', 0)) And '$(LangVersion)' &lt; '7.3')">latest</LangVersion>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
     <!-- fix for NETSDK1150: https://docs.microsoft.com/en-us/dotnet/core/compatibility/sdk/5.0/referencing-executable-generates-error -->

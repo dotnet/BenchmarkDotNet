@@ -195,7 +195,7 @@ BenchmarkDotNet supports [NativeAOT](https://github.com/dotnet/runtime/tree/main
 As every AOT solution, NativeAOT has some [limitations](https://github.com/dotnet/runtime/blob/main/src/coreclr/nativeaot/docs/limitations.md) like limited reflection support or lack of dynamic assembly loading. Because of that, the host process (what you run from command line) is never an AOT process, but just a regular .NET process. This process (called Host process) uses reflection to read benchmarks metadata (find all `[Benchmark]` methods etc), generates a new project that references the benchmarks and compiles it using ILCompiler. Such compilation produces a native executable, which is later started by the Host process. This process (called Benchmark or Child process) performs the actual benchmarking and reports the results back to the Host process. By default BenchmarkDotNet uses the latest version of `Microsoft.DotNet.ILCompiler` to build the NativeAOT benchmark according to [this instructions](https://github.com/dotnet/runtime/blob/main/src/coreclr/nativeaot/docs/compiling.md).
 
 This is why you need to:
-- install [pre-requisites](https://github.com/dotnet/runtime/blob/main/src/coreclr/nativeaot/docs/prerequisites.md) required by NativeAOT compiler
+- install [pre-requisites](https://docs.microsoft.com/en-us/dotnet/core/deploying/native-aot/#prerequisites) required by NativeAOT compiler
 - target .NET to be able to run NativeAOT benchmarks (example: `<TargetFramework>net7.0</TargetFramework>` in the .csproj file)
 - run the app as a .NET process (example: `dotnet run -c Release -f net7.0`).
 - specify the NativeAOT runtime in an explicit way, either by using console line arguments `--runtimes nativeaot7.0` (the recommended approach), or by using`[SimpleJob]` attribute or by using the fluent Job config API `Job.ShortRun.With(NativeAotRuntime.Net70)`:
@@ -355,7 +355,7 @@ BenchmarkDotNet is going to follow [these instructrions](https://github.com/dotn
 
 BenchmarkDotNet supports Web Assembly on Unix! However, currently you need to build the **dotnet runtime** yourself to be able to run the benchmarks.
 
-For up-to-date docs, you should visit [dotnet/runtime repository](https://github.com/dotnet/runtime/blob/master/docs/workflow/testing/libraries/testing-wasm.md).
+For up-to-date docs, you should visit [dotnet/runtime repository](https://github.com/dotnet/runtime/blob/main/docs/workflow/testing/libraries/testing-wasm.md).
 
 The docs below are specific to Ubuntu 18.04 at the moment of writing this document (16/07/2020).
 
@@ -407,7 +407,7 @@ git clone https://github.com/dotnet/runtime
 cd runtime
 ```
 
-Install [all Mono prerequisites](https://github.com/dotnet/runtime/blob/master/docs/workflow/testing/libraries/testing-wasm.md):
+Install [all Mono prerequisites](https://github.com/dotnet/runtime/blob/main/docs/workflow/testing/libraries/testing-wasm.md):
 
 ```cmd
 sudo apt-get install cmake llvm-9 clang-9 autoconf automake libtool build-essential python curl git lldb-6.0 liblldb-6.0-dev libunwind8 libunwind8-dev gettext libicu-dev liblttng-ust-dev libssl-dev libnuma-dev libkrb5-dev zlib1g-dev

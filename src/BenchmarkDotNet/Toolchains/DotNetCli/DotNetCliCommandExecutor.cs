@@ -22,11 +22,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI]
         public static DotNetCliCommandResult Execute(DotNetCliCommand parameters)
         {
-            using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
+            using (var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult?.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) })
             using (var outputReader = new AsyncProcessOutputReader(process, parameters.LogOutput, parameters.Logger))
             using (new ConsoleExitHandler(process, parameters.Logger))
             {
-                parameters.Logger.WriteLineInfo($"// start {parameters.CliPath ?? "dotnet"} {parameters.Arguments} in {parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath}");
+                parameters.Logger.WriteLineInfo($"// start {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
                 var stopwatch = Stopwatch.StartNew();
 
@@ -99,7 +99,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         internal static ProcessStartInfo BuildStartInfo(string customDotNetCliPath, string workingDirectory, string arguments,
-            IReadOnlyList<EnvironmentVariable> environmentVariables = null, bool redirectStandardInput = false, bool redirectStandardError = true)
+            IReadOnlyList<EnvironmentVariable> environmentVariables = null, bool redirectStandardInput = false, bool redirectStandardError = true, bool redirectStandardOutput = true)
         {
             const string dotnetMultiLevelLookupEnvVarName = "DOTNET_MULTILEVEL_LOOKUP";
 
@@ -110,11 +110,15 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 Arguments = arguments,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                RedirectStandardOutput = true,
+                RedirectStandardOutput = redirectStandardOutput,
                 RedirectStandardError = redirectStandardError,
                 RedirectStandardInput = redirectStandardInput,
-                StandardOutputEncoding = Encoding.UTF8,
             };
+
+            if (redirectStandardOutput)
+            {
+                startInfo.StandardOutputEncoding = Encoding.UTF8;
+            }
 
             if (redirectStandardError) // StandardErrorEncoding is only supported when standard error is redirected
             {
@@ -152,5 +156,27 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [DllImport("libc")]
         private static extern int getppid();
+
+        internal static string GetSdkPath(string cliPath)
+        {
+            DotNetCliCommand cliCommand = new (
+                cliPath: cliPath,
+                arguments: "--info",
+                generateResult: null,
+                logger: NullLogger.Instance,
+                buildPartition: null,
+                environmentVariables: Array.Empty<EnvironmentVariable>(),
+                timeout: TimeSpan.FromMinutes(1),
+                logOutput: false);
+
+            string sdkPath = Execute(cliCommand)
+                .StandardOutput.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(line => line.EndsWith("/sdk]")) // sth like "  3.1.423 [/usr/share/dotnet/sdk]
+                .Select(line => line.Split('[')[1])
+                .Distinct()
+                .Single(); // I assume there will be only one such folder
+
+            return sdkPath.Substring(0, sdkPath.Length - 1); // remove trailing `]`
+        }
     }
 }

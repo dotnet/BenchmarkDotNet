@@ -65,6 +65,8 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
         public IEnumerable<IBenchmarkEventHandler> GetEventHandlers() => Array.Empty<IBenchmarkEventHandler>();
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
+        public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
+
         public IOrderer Orderer => DefaultOrderer.Instance;
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;

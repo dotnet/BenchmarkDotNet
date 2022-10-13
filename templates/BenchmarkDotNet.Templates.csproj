@@ -14,6 +14,9 @@
 
     <SignAssembly>false</SignAssembly>
     <PublicSign>false</PublicSign>
+
+    <!-- this package does not have any dependencies, avoid getting a NU5128 warning -->
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
   </PropertyGroup>
 
   <ItemGroup>

@@ -33,6 +33,7 @@ namespace BenchmarkDotNet.Configs
         private readonly ImmutableHashSet<IFilter> filters;
         private readonly ImmutableArray<BenchmarkLogicalGroupRule> rules;
         private readonly ImmutableHashSet<IBenchmarkEventHandler> eventHandlers;
+        private readonly ImmutableArray<IColumnHidingRule> columnHidingRules;
 
         internal ImmutableConfig(
             ImmutableArray<IColumnProvider> uniqueColumnProviders,
@@ -44,6 +45,7 @@ namespace BenchmarkDotNet.Configs
             ImmutableHashSet<IValidator> uniqueValidators,
             ImmutableHashSet<IFilter> uniqueFilters,
             ImmutableArray<BenchmarkLogicalGroupRule> uniqueRules,
+            ImmutableArray<IColumnHidingRule> uniqueColumnHidingRules,
             ImmutableHashSet<Job> uniqueRunnableJobs,
             ImmutableHashSet<IBenchmarkEventHandler> uniqueEventHandlers,
             ConfigUnionRule unionRule,
@@ -64,6 +66,7 @@ namespace BenchmarkDotNet.Configs
             validators = uniqueValidators;
             filters = uniqueFilters;
             rules = uniqueRules;
+            columnHidingRules = uniqueColumnHidingRules;
             jobs = uniqueRunnableJobs;
             eventHandlers = uniqueEventHandlers;
             UnionRule = unionRule;
@@ -95,6 +98,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => rules;
         public IEnumerable<IBenchmarkEventHandler> GetEventHandlers() => eventHandlers;
+        public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => columnHidingRules;
 
         public ILogger GetCompositeLogger() => new CompositeLogger(loggers);
         public IExporter GetCompositeExporter() => new CompositeExporter(exporters);
@@ -106,6 +110,8 @@ namespace BenchmarkDotNet.Configs
         public bool HasMemoryDiagnoser() => diagnosers.OfType<MemoryDiagnoser>().Any();
 
         public bool HasThreadingDiagnoser() => diagnosers.Contains(ThreadingDiagnoser.Default);
+
+        internal bool HasPerfCollectProfiler() => diagnosers.OfType<PerfCollectProfiler>().Any();
 
         public bool HasExtraStatsDiagnoser() => HasMemoryDiagnoser() || HasThreadingDiagnoser();
 

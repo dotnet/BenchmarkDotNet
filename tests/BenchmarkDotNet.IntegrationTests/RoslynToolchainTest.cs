@@ -31,9 +31,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 CultureInfo.CurrentCulture = overrideCulture;
                 CultureInfo.CurrentUICulture = overrideCulture;
 
-                var logger = new OutputLogger(Output);
                 var miniJob = Job.Dry.WithToolchain(RoslynToolchain.Instance);
-                var config = CreateSimpleConfig(logger, miniJob);
+                var config = CreateSimpleConfig(job: miniJob);
 
                 CanExecute<SimpleBenchmarks>(config);
             }

@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
@@ -24,6 +25,12 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         {
             if (!base.IsSupported(benchmarkCase, logger, resolver))
             {
+                return false;
+            }
+
+            if (!RuntimeInformation.IsFullFramework)
+            {
+                logger.WriteLineError("The Roslyn toolchain is only supported on .NET Framework");
                 return false;
             }
 

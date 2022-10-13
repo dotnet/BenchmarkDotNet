@@ -30,7 +30,6 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Array.Empty<ValidationError>();
 
         // the action takes places in other process, and the values are gathered by Engine
-        public bool RequiresBlockingAcknowledgments(BenchmarkCase benchmarkCase) => false;
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults diagnoserResults)
@@ -47,14 +46,14 @@ namespace BenchmarkDotNet.Diagnosers
 
         private class GarbageCollectionsMetricDescriptor : IMetricDescriptor
         {
-            internal static readonly IMetricDescriptor Gen0 = new GarbageCollectionsMetricDescriptor(0);
-            internal static readonly IMetricDescriptor Gen1 = new GarbageCollectionsMetricDescriptor(1);
-            internal static readonly IMetricDescriptor Gen2 = new GarbageCollectionsMetricDescriptor(2);
+            internal static readonly IMetricDescriptor Gen0 = new GarbageCollectionsMetricDescriptor(0, Column.Gen0);
+            internal static readonly IMetricDescriptor Gen1 = new GarbageCollectionsMetricDescriptor(1, Column.Gen1);
+            internal static readonly IMetricDescriptor Gen2 = new GarbageCollectionsMetricDescriptor(2, Column.Gen2);
 
-            private GarbageCollectionsMetricDescriptor(int generationId)
+            private GarbageCollectionsMetricDescriptor(int generationId, string columnName)
             {
                 Id = $"Gen{generationId}Collects";
-                DisplayName = $"Gen {generationId}";
+                DisplayName = columnName;
                 Legend = $"GC Generation {generationId} collects per 1000 operations";
                 PriorityInCategory = generationId;
             }

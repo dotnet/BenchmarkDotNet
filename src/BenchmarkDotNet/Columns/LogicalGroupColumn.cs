@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Columns
         [PublicAPI] public static readonly IColumn Default = new LogicalGroupColumn();
 
         public string Id => nameof(LogicalGroupColumn);
-        public string ColumnName => "LogicalGroup";
+        public string ColumnName => Column.LogicalGroup;
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => summary.GetLogicalGroupKey(benchmarkCase);
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);

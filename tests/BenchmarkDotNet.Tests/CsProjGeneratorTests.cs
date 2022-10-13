@@ -1,4 +1,5 @@
-﻿using System.IO;
+using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Characteristics;
@@ -82,7 +83,7 @@ namespace BenchmarkDotNet.Tests
             {
                 var (customProperties, sdkName) = sut.GetSettingsThatNeedsToBeCopied(reader, TestAssemblyFileInfo);
 
-                Assert.Equal("<UseWpf>true</UseWpf>", customProperties);
+                Assert.Equal("<UseWpf>true</UseWpf>" + Environment.NewLine, customProperties);
                 Assert.Equal("Microsoft.NET.Sdk", sdkName);
             }
         }
@@ -111,7 +112,7 @@ namespace BenchmarkDotNet.Tests
             {
                 var (customProperties, sdkName) = sut.GetSettingsThatNeedsToBeCopied(reader, TestAssemblyFileInfo);
 
-                Assert.Equal("<LangVersion>9.9</LangVersion>", customProperties);
+                Assert.Equal("<LangVersion>9.9</LangVersion>" + Environment.NewLine, customProperties);
                 Assert.Equal("Microsoft.NET.Sdk", sdkName);
             }
 
@@ -142,7 +143,7 @@ namespace BenchmarkDotNet.Tests
             {
                 var (customProperties, sdkName) = sut.GetSettingsThatNeedsToBeCopied(reader, TestAssemblyFileInfo);
 
-                Assert.Equal("<LangVersion>9.9</LangVersion>", customProperties);
+                Assert.Equal("<LangVersion>9.9</LangVersion>" + Environment.NewLine, customProperties);
                 Assert.Equal("Microsoft.NET.Sdk", sdkName);
             }
 

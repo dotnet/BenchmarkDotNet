@@ -72,8 +72,44 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         }
 
         private static FileInfo GetShadowCopyPath(FileInfo coreRunPath)
-            => coreRunPath.Directory.Parent != null
-                ? new FileInfo(Path.Combine(coreRunPath.Directory.Parent.FullName, Guid.NewGuid().ToString(), coreRunPath.Name))
-                : new FileInfo(Path.Combine(coreRunPath.Directory.FullName, Guid.NewGuid().ToString(), coreRunPath.Name)); // C:\CoreRun.exe case
+        {
+            string randomSubfolderName = Guid.NewGuid().ToString();
+
+            FileInfo coreRunCopy = coreRunPath.Directory.Parent != null
+                ? new FileInfo(Path.Combine(coreRunPath.Directory.Parent.FullName, randomSubfolderName, coreRunPath.Name))
+                : new FileInfo(Path.Combine(coreRunPath.Directory.FullName, randomSubfolderName, coreRunPath.Name)); // C:\CoreRun.exe case
+
+            if (!TryToCreateSubfolder(coreRunCopy.Directory))
+            {
+                // we are most likely missing permissions to write to given folder (it can be readonly etc)
+                // in such case, CoreRun copy is going to be stored in TEMP
+                coreRunCopy = new FileInfo(Path.Combine(Path.GetTempPath(), randomSubfolderName, coreRunPath.Name));
+
+                if (!TryToCreateSubfolder(coreRunCopy.Directory))
+                {
+                    // if even that is impossible, we return the original path and nothing is going to be copied
+                    return coreRunPath;
+                }
+            }
+
+            return coreRunCopy;
+
+            static bool TryToCreateSubfolder(DirectoryInfo directory)
+            {
+                try
+                {
+                    if (!directory.Exists)
+                    {
+                        directory.Create();
+                    }
+
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
     }
 }
