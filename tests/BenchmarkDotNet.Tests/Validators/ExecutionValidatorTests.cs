@@ -10,6 +10,7 @@ using Xunit;
 
 namespace BenchmarkDotNet.Tests.Validators
 {
+    [Collection("Disable parallelism due to a bug: https://github.com/xunit/xunit/issues/2587")]
     public class ExecutionValidatorTests
     {
         [Fact]
