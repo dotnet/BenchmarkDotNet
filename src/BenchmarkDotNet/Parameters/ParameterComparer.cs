@@ -24,11 +24,33 @@ namespace BenchmarkDotNet.Parameters
             if (x == null) return -1;
             for (int i = 0; i < Math.Min(x.Count, y.Count); i++)
             {
+                //todo: compare non-primitive types too
                 int compareTo = PrimitiveComparer.CompareTo(x[i]?.Value, y[i]?.Value);
                 if (compareTo != 0)
                     return compareTo;
+
+                int arrayCompareTo = CompareArrays(x[i]?.Value, y[i]?.Value);
+                if (arrayCompareTo != 0)
+                    return arrayCompareTo;
             }
             return string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo);
+        }
+
+        private static int CompareArrays(object x, object y)
+        {
+            if (x is Array xArray && y is Array yArray)
+            {
+                for (int i = 0; i < Math.Min(xArray.Length, yArray.Length); i++)
+                {
+                    //todo: compare non-primitive types too
+                    int compareTo = PrimitiveComparer.CompareTo(xArray.GetValue(i), yArray.GetValue(i));
+                    if (compareTo != 0)
+                        return compareTo;
+                }
+                if (xArray.Length != yArray.Length)
+                    return xArray.Length.CompareTo(yArray.Length);
+            }
+            return 0;
         }
 
         private class Comparer

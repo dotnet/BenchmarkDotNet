@@ -31,9 +31,25 @@ namespace BenchmarkDotNet.Parameters
 
         public string DisplayInfo =>  Items.Any() ? "[" + string.Join(", ", Items.Select(p => $"{p.Name}={p.ToDisplayText()}")) + "]" : "";
 
-        public string ValueInfo => Items.Any() ? "[" + string.Join(", ", Items.Select(p => $"{p.Name}={p.Value?.ToString() ?? ParameterInstance.NullParameterTextRepresentation}")) + "]" : "";
+        public string ValueInfo => Items.Any() ? "[" + string.Join(", ", Items.Select(p => $"{p.Name}={GetValueInfo(p.Value)}")) + "]" : "";
 
         public string PrintInfo => printInfo ?? (printInfo = string.Join("&", Items.Select(p => $"{p.Name}={p.ToDisplayText()}")));
+
+        private static string GetValueInfo(object value)
+        {
+            if (value is not Array array)
+                return value?.ToString() ?? "null";
+
+            //why it passes array values to cmd?
+            var strings = new List<string>(array.Length); //test array of array
+            for (int i = 0; i < array.Length; i++)
+            {
+                string str = GetValueInfo(array.GetValue(i));
+                strings.Add(str);
+            }
+
+            return string.Join(",", strings);
+        }
 
         public ParameterInstance GetArgument(string name) => Items.Single(parameter => parameter.IsArgument && parameter.Name == name);
 
