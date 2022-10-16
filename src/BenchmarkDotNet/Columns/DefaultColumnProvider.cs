@@ -95,7 +95,11 @@ namespace BenchmarkDotNet.Columns
         {
             public IEnumerable<IColumn> GetColumns(Summary summary) => summary
                 .Reports
-                .SelectMany(report => report.Metrics.Values.Select(metric => metric.Descriptor))
+                .SelectMany(report =>
+                    report.Metrics.Values
+                    .Select(metric => metric.Descriptor)
+                    // Force add AllocatedMemoryMetricDescriptor if the memory diagnoser is attached, in case no measurements were able to be made, so we still show the column.
+                    .Concat(report.BenchmarkCase.Config.HasMemoryDiagnoser() ? new[] { Diagnosers.AllocatedMemoryMetricDescriptor.Instance } : Array.Empty<IMetricDescriptor>()))
                 .Distinct(MetricDescriptorEqualityComparer.Instance)
                 .Select(descriptor => new MetricColumn(descriptor));
         }

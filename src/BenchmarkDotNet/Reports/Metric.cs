@@ -6,11 +6,11 @@ namespace BenchmarkDotNet.Reports
 {
     public class Metric
     {
-        public double? Value { get; }
+        public double Value { get; }
 
         public IMetricDescriptor Descriptor { get; }
 
-        public Metric(IMetricDescriptor descriptor, double? value)
+        public Metric(IMetricDescriptor descriptor, double value)
         {
             Descriptor = descriptor;
             Value = value;

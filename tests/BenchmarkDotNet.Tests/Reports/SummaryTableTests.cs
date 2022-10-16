@@ -110,19 +110,28 @@ namespace BenchmarkDotNet.Tests.Reports
         }
 
         [Fact] // Issue #1783
-        public void NullValueInMetricColumnIsQuestionMark()
+        public void MissingValueInMetricColumnIsQuestionMark()
         {
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
-            var metrics = new[] { new Metric(new FakeMetricDescriptor("metric1", "some legend", "0.0"), null) };
+            var metrics = new[] { new Metric(new FakeMetricDescriptor("metric1", "some legend", "0.0"), 0.0) };
+            bool firstMetricsUsed = false;
 
             // act
-            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var summary = MockFactory.CreateSummary<MockFactory.MockBenchmarkClass>(config, hugeSd: false, benchmarkCase =>
+            {
+                if (!firstMetricsUsed)
+                {
+                    firstMetricsUsed = true;
+                    return metrics;
+                }
+                return System.Array.Empty<Metric>();
+            });
             var table = new SummaryTable(summary);
             var actual = table.Columns.First(c => c.Header == "metric1").Content;
 
             // assert
-            Assert.True(actual.All(value => "?" == value));
+            Assert.Equal(new[] { "-", "?" }, actual);
         }
     }
 }

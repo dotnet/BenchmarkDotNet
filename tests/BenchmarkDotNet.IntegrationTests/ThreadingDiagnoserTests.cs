@@ -159,7 +159,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 // precision is set to 2 because CoreCLR might schedule some work item on it's own and hence affect the results..
                 // precision = 3 is not enough (e.g., sometimes the actual value may be equal 1.0009765625 while the expected value is 1.0)
-                Assert.Equal(assertion.Value.expectedValue, metric.Value.Value ?? double.NaN, precision: 2);
+                Assert.Equal(assertion.Value.expectedValue, metric.Value.Value, precision: 2);
             }
         }
     }

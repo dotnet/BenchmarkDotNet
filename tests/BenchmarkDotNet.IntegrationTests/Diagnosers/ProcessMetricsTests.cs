@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.IntegrationTests.Diagnosers
 
             const ulong expected = (4 * interval - interval) / totalOperations; // every workload was 4 events, the overhead was one and totalOperations times per iteration
 
-            Assert.Equal(expected, metrics.Single().Value ?? double.NaN);
+            Assert.Equal(expected, metrics.Single().Value);
         }
     }
 }

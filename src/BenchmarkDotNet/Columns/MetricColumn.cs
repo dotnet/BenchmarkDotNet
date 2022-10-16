@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
 
-        public bool IsAvailable(Summary summary) => summary.Reports.Any(IsAvailable);
+        public bool IsAvailable(Summary summary) => descriptor is Diagnosers.AllocatedMemoryMetricDescriptor || summary.Reports.Any(IsAvailable);
 
         private bool IsAvailable(BenchmarkReport report)
         {
@@ -42,25 +42,24 @@ namespace BenchmarkDotNet.Columns
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style)
         {
-            if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase].Metrics.TryGetValue(descriptor.Id, out Metric metric) || metric.Value == null)
+            if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase].Metrics.TryGetValue(descriptor.Id, out Metric metric))
                 return "?";
             if (metric.Value == 0.0 && !style.PrintZeroValuesInContent)
                 return "-";
 
-            double value = metric.Value.Value;
             var cultureInfo = summary.GetCultureInfo();
 
             bool printUnits = style.PrintUnitsInContent || style.PrintUnitsInHeader;
             UnitPresentation unitPresentation = UnitPresentation.FromVisibility(style.PrintUnitsInContent);
 
             if (printUnits && descriptor.UnitType == UnitType.CodeSize)
-                return SizeValue.FromBytes((long) value).ToString(style.CodeSizeUnit, cultureInfo, descriptor.NumberFormat, unitPresentation);
+                return SizeValue.FromBytes((long) metric.Value).ToString(style.CodeSizeUnit, cultureInfo, descriptor.NumberFormat, unitPresentation);
             if (printUnits && descriptor.UnitType == UnitType.Size)
-                return SizeValue.FromBytes((long) value).ToString(style.SizeUnit, cultureInfo, descriptor.NumberFormat, unitPresentation);
+                return SizeValue.FromBytes((long) metric.Value).ToString(style.SizeUnit, cultureInfo, descriptor.NumberFormat, unitPresentation);
             if (printUnits && descriptor.UnitType == UnitType.Time)
-                return TimeInterval.FromNanoseconds(value).ToString(style.TimeUnit, cultureInfo, descriptor.NumberFormat, unitPresentation);
+                return TimeInterval.FromNanoseconds(metric.Value).ToString(style.TimeUnit, cultureInfo, descriptor.NumberFormat, unitPresentation);
 
-            return value.ToString(descriptor.NumberFormat, cultureInfo);
+            return metric.Value.ToString(descriptor.NumberFormat, cultureInfo);
         }
 
         public override string ToString() => descriptor.DisplayName;

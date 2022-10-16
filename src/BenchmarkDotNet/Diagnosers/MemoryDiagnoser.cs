@@ -41,7 +41,11 @@ namespace BenchmarkDotNet.Diagnosers
                 yield return new Metric(GarbageCollectionsMetricDescriptor.Gen2, diagnoserResults.GcStats.Gen2Collections / (double) diagnoserResults.GcStats.TotalOperations * 1000);
             }
 
-            yield return new Metric(AllocatedMemoryMetricDescriptor.Instance, diagnoserResults.GcStats.GetBytesAllocatedPerOperation(diagnoserResults.BenchmarkCase));
+            var allocatedBytes = diagnoserResults.GcStats.GetBytesAllocatedPerOperation(diagnoserResults.BenchmarkCase);
+            if (allocatedBytes != null)
+            {
+                yield return new Metric(AllocatedMemoryMetricDescriptor.Instance, allocatedBytes.Value);
+            }
         }
 
         internal class GarbageCollectionsMetricDescriptor : IMetricDescriptor
