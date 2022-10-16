@@ -1,0 +1,19 @@
+﻿=== ParamArray ===
+
+BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
+MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
+Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
+  [Host]     : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
+  DefaultJob : extra output line
+
+
+ Method |   Param |     Mean |   Error |  StdDev | Ratio | RatioSD |                     LogicalGroup | Baseline |
+------- |-------- |---------:|--------:|--------:|------:|--------:|--------------------------------- |--------- |
+    Foo | Byte[1] | 102.0 ns | 6.09 ns | 1.58 ns |  1.00 |    0.00 | [Param=System.Byte[]]-DefaultJob |      Yes |
+    Foo | Byte[1] | 202.0 ns | 6.09 ns | 1.58 ns |  1.98 |    0.02 | [Param=System.Byte[]]-DefaultJob |      Yes |
+    Foo | Byte[1] | 302.0 ns | 6.09 ns | 1.58 ns |  2.96 |    0.03 | [Param=System.Byte[]]-DefaultJob |      Yes |
+    Bar | Byte[1] | 402.0 ns | 6.09 ns | 1.58 ns |  3.94 |    0.05 | [Param=System.Byte[]]-DefaultJob |       No |
+    Bar | Byte[1] | 502.0 ns | 6.09 ns | 1.58 ns |  4.92 |    0.06 | [Param=System.Byte[]]-DefaultJob |       No |
+    Bar | Byte[1] | 602.0 ns | 6.09 ns | 1.58 ns |  5.90 |    0.08 | [Param=System.Byte[]]-DefaultJob |       No |
+
+Errors: 0
