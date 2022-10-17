@@ -539,11 +539,9 @@ namespace BenchmarkDotNet.Running
             var benchmarksRunInfo = benchmarkRunInfos.Select(info => new BenchmarkRunInfo(
                     info.BenchmarksCases.Where(benchmark =>
                     {
-                        var benchmarkValidationErrors = benchmark.GetToolchain().Validate(benchmark, resolver);
-
-                        validationErrors.AddRange(benchmarkValidationErrors);
-
-                        return !benchmarkValidationErrors.Any();
+                        var errors = benchmark.GetToolchain().Validate(benchmark, resolver).ToArray();
+                        validationErrors.AddRange(errors);
+                        return !errors.Any();
                     }).ToArray(),
                     info.Type,
                     info.Config))
