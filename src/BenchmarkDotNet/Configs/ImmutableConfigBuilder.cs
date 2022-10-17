@@ -97,13 +97,11 @@ namespace BenchmarkDotNet.Configs
             var result = new List<IExporter>();
 
             foreach (var exporter in exporters)
-                if (!result.Contains(exporter))
-                    result.Add(exporter);
+                result.Add(exporter);
 
             foreach (var diagnoser in uniqueDiagnosers)
             foreach (var exporter in diagnoser.Exporters)
-                if (!result.Contains(exporter))
-                    result.Add(exporter);
+                result.Add(exporter);
 
             var hardwareCounterDiagnoser = uniqueDiagnosers.OfType<IHardwareCountersDiagnoser>().SingleOrDefault();
             var disassemblyDiagnoser = uniqueDiagnosers.OfType<DisassemblyDiagnoser>().SingleOrDefault();
@@ -112,15 +110,20 @@ namespace BenchmarkDotNet.Configs
             if (hardwareCounterDiagnoser != default(IHardwareCountersDiagnoser) && disassemblyDiagnoser != default(DisassemblyDiagnoser))
                 result.Add(new InstructionPointerExporter(hardwareCounterDiagnoser, disassemblyDiagnoser));
 
-            for (int i = result.Count - 1; i >=0; i--)
+            for (int i = result.Count - 1; i >= 0; i--)
                 if (result[i] is IExporterDependencies exporterDependencies)
                     foreach (var dependency in exporterDependencies.Dependencies)
-                        if (!result.Contains(dependency))
-                            result.Insert(i, dependency); // All the exporter dependencies should be added before the exporter
+                        result.Insert(i, dependency); // All the exporter dependencies should be added before the exporter
 
             result.Sort((left, right) => (left is IExporterDependencies).CompareTo(right is IExporterDependencies)); // the case when they were defined by user in wrong order ;)
 
-            return result.ToImmutableArray();
+            var uniqueExporters = new List<IExporter>();
+
+            foreach (var exporter in result)
+                if (!uniqueExporters.Contains(exporter, ExporterComparer.Instance))
+                    uniqueExporters.Add(exporter);
+
+            return uniqueExporters.ToImmutableArray();
         }
 
         private static ImmutableHashSet<IAnalyser> GetAnalysers(IEnumerable<IAnalyser> analysers, ImmutableHashSet<IDiagnoser> uniqueDiagnosers)
@@ -197,6 +200,15 @@ namespace BenchmarkDotNet.Configs
             public bool Equals(TInterface x, TInterface y) => x.GetType() == y.GetType();
 
             public int GetHashCode(TInterface obj) => obj.GetType().GetHashCode();
+        }
+
+        private class ExporterComparer : IEqualityComparer<IExporter>
+        {
+            public static readonly ExporterComparer Instance = new ExporterComparer();
+
+            public bool Equals(IExporter x, IExporter y) => x.GetType() == y.GetType() && x.Name == y.Name;
+
+            public int GetHashCode(IExporter obj) => obj.GetType().GetHashCode();
         }
     }
 }
