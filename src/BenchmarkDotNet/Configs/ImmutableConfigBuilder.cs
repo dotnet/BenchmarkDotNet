@@ -94,30 +94,30 @@ namespace BenchmarkDotNet.Configs
 
         private static ImmutableArray<IExporter> GetExporters(IEnumerable<IExporter> exporters, ImmutableHashSet<IDiagnoser> uniqueDiagnosers)
         {
-            var result = new List<IExporter>();
+            var allExporters = new List<IExporter>();
 
             foreach (var exporter in exporters)
-                result.Add(exporter);
+                allExporters.Add(exporter);
 
             foreach (var diagnoser in uniqueDiagnosers)
             foreach (var exporter in diagnoser.Exporters)
-                result.Add(exporter);
+                allExporters.Add(exporter);
 
             var hardwareCounterDiagnoser = uniqueDiagnosers.OfType<IHardwareCountersDiagnoser>().SingleOrDefault();
             var disassemblyDiagnoser = uniqueDiagnosers.OfType<DisassemblyDiagnoser>().SingleOrDefault();
 
             // we can use InstructionPointerExporter only when we have both IHardwareCountersDiagnoser and DisassemblyDiagnoser
             if (hardwareCounterDiagnoser != default(IHardwareCountersDiagnoser) && disassemblyDiagnoser != default(DisassemblyDiagnoser))
-                result.Add(new InstructionPointerExporter(hardwareCounterDiagnoser, disassemblyDiagnoser));
+                allExporters.Add(new InstructionPointerExporter(hardwareCounterDiagnoser, disassemblyDiagnoser));
 
-            for (int i = result.Count - 1; i >= 0; i--)
-                if (result[i] is IExporterDependencies exporterDependencies)
+            for (int i = allExporters.Count - 1; i >= 0; i--)
+                if (allExporters[i] is IExporterDependencies exporterDependencies)
                     foreach (var dependency in exporterDependencies.Dependencies)
-                        result.Insert(i, dependency); // All the exporter dependencies should be added before the exporter
+                        allExporters.Insert(i, dependency); // All the exporter dependencies should be added before the exporter
 
             var uniqueExporters = new List<IExporter>();
 
-            foreach (var exporter in result)
+            foreach (var exporter in allExporters)
                 if (!uniqueExporters.Contains(exporter, ExporterComparer.Instance))
                     uniqueExporters.Add(exporter);
 
