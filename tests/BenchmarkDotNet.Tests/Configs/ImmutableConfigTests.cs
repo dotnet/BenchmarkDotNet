@@ -7,6 +7,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
@@ -378,35 +379,17 @@ namespace BenchmarkDotNet.Tests.Configs
         }
 
         [Fact]
-        public void GenerateWarningWhenExporterDependencyAlreadyExistInConfig()
+        public void TheFirstCsvExporterHasPrecedence()
         {
-            System.Globalization.CultureInfo currentCulture = default;
-            System.Globalization.CultureInfo currentUICulture = default;
-            {
-                var ct = System.Threading.Thread.CurrentThread;
-                currentCulture = ct.CurrentCulture;
-                currentUICulture = ct.CurrentUICulture;
-                ct.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-                ct.CurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;
-            }
-            try
-            {
-                var mutable = ManualConfig.CreateEmpty();
-                mutable.AddExporter(new BenchmarkDotNet.Exporters.Csv.CsvMeasurementsExporter(BenchmarkDotNet.Exporters.Csv.CsvSeparator.Comma));
-                mutable.AddExporter(RPlotExporter.Default);
+            var config = ManualConfig.CreateEmpty();
+            config.AddExporter(CsvMeasurementsExporter.Default);
+            config.AddExporter(new CsvMeasurementsExporter(CsvSeparator.Comma));
 
-                var final = ImmutableConfigBuilder.Create(mutable);
+            var immutableConfig = config.CreateImmutableConfig();
+            var csvExporters = immutableConfig.GetExporters().Cast<CsvMeasurementsExporter>().Where(e => e != null).ToArray();
 
-                Assert.Equal(1, final.ConfigAnalysisConclusion.Count);
-            }
-            finally
-            {
-                var ct = System.Threading.Thread.CurrentThread;
-                ct.CurrentCulture = currentCulture;
-                ct.CurrentUICulture = currentUICulture;
-
-            }
-
+            Assert.Single(csvExporters);
+            Assert.True(csvExporters.First() == CsvMeasurementsExporter.Default);
         }
     }
 }
