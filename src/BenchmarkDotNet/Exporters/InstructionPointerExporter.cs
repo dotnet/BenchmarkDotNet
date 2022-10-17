@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Exporters
             this.disassemblyDiagnoser = disassemblyDiagnoser;
         }
 
-        public string Name => nameof(InstructionPointerExporter);
+        public string Id => nameof(InstructionPointerExporter);
 
         public void ExportToLog(Summary summary, ILogger logger) { }
 

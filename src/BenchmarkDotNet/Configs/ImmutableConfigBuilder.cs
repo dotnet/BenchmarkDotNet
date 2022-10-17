@@ -204,7 +204,7 @@ namespace BenchmarkDotNet.Configs
         {
             public static readonly ExporterComparer Instance = new ExporterComparer();
 
-            public bool Equals(IExporter x, IExporter y) => x.GetType() == y.GetType() && x.Name == y.Name;
+            public bool Equals(IExporter x, IExporter y) => x.GetType() == y.GetType() && x.Id == y.Id;
 
             public int GetHashCode(IExporter obj) => obj.GetType().GetHashCode();
         }

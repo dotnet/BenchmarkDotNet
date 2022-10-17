@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Exporters
     public class RPlotExporter : IExporter, IExporterDependencies
     {
         public static readonly IExporter Default = new RPlotExporter();
-        public string Name => nameof(RPlotExporter);
+        public string Id => nameof(RPlotExporter);
 
         private const string ImageExtension = ".png";
         private static readonly object BuildScriptLock = new object();

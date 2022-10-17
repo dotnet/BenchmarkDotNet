@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Exporters
 
         public CompositeExporter(ImmutableArray<IExporter> exporters) => this.exporters = exporters;
 
-        public string Name => nameof(CompositeExporter);
+        public string Id => nameof(CompositeExporter);
 
         public void ExportToLog(Summary summary, ILogger logger)
         {
