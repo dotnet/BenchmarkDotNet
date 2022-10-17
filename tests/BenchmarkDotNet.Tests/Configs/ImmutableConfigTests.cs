@@ -387,10 +387,10 @@ namespace BenchmarkDotNet.Tests.Configs
             config.AddExporter(new CsvMeasurementsExporter(CsvSeparator.Comma));
 
             var immutableConfig = config.CreateImmutableConfig();
-            var csvExporters = immutableConfig.GetExporters().Cast<CsvMeasurementsExporter>().Where(e => e != null).ToArray();
+            var exporters = immutableConfig.GetExporters().Cast<CsvMeasurementsExporter>().Where(e => e != null).ToArray();
 
-            Assert.Single(csvExporters);
-            Assert.True(csvExporters.First() == CsvMeasurementsExporter.Default);
+            Assert.Single(exporters);
+            Assert.True(exporters.First() == CsvMeasurementsExporter.Default);
         }
 
         [Fact]
@@ -401,11 +401,11 @@ namespace BenchmarkDotNet.Tests.Configs
             config.AddExporter(MarkdownExporter.GitHub);
 
             var immutableConfig = config.CreateImmutableConfig();
-            var csvExporters = immutableConfig.GetExporters().Cast<MarkdownExporter>().Where(e => e != null).ToArray();
+            var exporters = immutableConfig.GetExporters().Cast<MarkdownExporter>().Where(e => e != null).ToArray();
 
-            Assert.Equal(2, csvExporters.Length);
-            Assert.True(csvExporters[0] == MarkdownExporter.Default);
-            Assert.True(csvExporters[1] == MarkdownExporter.GitHub);
+            Assert.Equal(2, exporters.Length);
+            Assert.True(exporters[0] == MarkdownExporter.Default);
+            Assert.True(exporters[1] == MarkdownExporter.GitHub);
         }
 
         [Fact]
@@ -417,12 +417,12 @@ namespace BenchmarkDotNet.Tests.Configs
             config.AddExporter(XmlExporter.FullCompressed);
 
             var immutableConfig = config.CreateImmutableConfig();
-            var csvExporters = immutableConfig.GetExporters().Cast<XmlExporter>().Where(e => e != null).ToArray();
+            var exporters = immutableConfig.GetExporters().Cast<XmlExporter>().Where(e => e != null).ToArray();
 
-            Assert.Equal(3, csvExporters.Length);
-            Assert.True(csvExporters[0] == XmlExporter.Default);
-            Assert.True(csvExporters[1] == XmlExporter.Full);
-            Assert.True(csvExporters[2] == XmlExporter.FullCompressed);
+            Assert.Equal(3, exporters.Length);
+            Assert.True(exporters[0] == XmlExporter.Default);
+            Assert.True(exporters[1] == XmlExporter.Full);
+            Assert.True(exporters[2] == XmlExporter.FullCompressed);
         }
     }
 }
