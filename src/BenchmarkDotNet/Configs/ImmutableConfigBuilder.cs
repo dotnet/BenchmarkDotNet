@@ -107,7 +107,7 @@ namespace BenchmarkDotNet.Configs
             var disassemblyDiagnoser = uniqueDiagnosers.OfType<DisassemblyDiagnoser>().SingleOrDefault();
 
             // we can use InstructionPointerExporter only when we have both IHardwareCountersDiagnoser and DisassemblyDiagnoser
-            if (hardwareCounterDiagnoser != default(IHardwareCountersDiagnoser) && disassemblyDiagnoser != default(DisassemblyDiagnoser))
+            if (hardwareCounterDiagnoser != null && disassemblyDiagnoser != null)
                 allExporters.Add(new InstructionPointerExporter(hardwareCounterDiagnoser, disassemblyDiagnoser));
 
             for (int i = allExporters.Count - 1; i >= 0; i--)
