@@ -6,9 +6,9 @@ namespace BenchmarkDotNet.Exporters
 {
     public class AsciiDocExporter : ExporterBase
     {
-        protected override string FileExtension => "asciidoc";
-
         public static readonly IExporter Default = new AsciiDocExporter();
+
+        protected override string FileExtension => "asciidoc";
 
         private AsciiDocExporter()
         {

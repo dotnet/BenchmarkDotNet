@@ -6,11 +6,11 @@ namespace BenchmarkDotNet.Exporters.Csv
 {
     public class CsvExporter : ExporterBase
     {
+        public static readonly IExporter Default = new CsvExporter(CsvSeparator.CurrentCulture, SummaryStyle.Default.WithZeroMetricValuesInContent());
+
         private readonly SummaryStyle style;
         private readonly CsvSeparator separator;
         protected override string FileExtension => "csv";
-
-        public static readonly IExporter Default = new CsvExporter(CsvSeparator.CurrentCulture, SummaryStyle.Default.WithZeroMetricValuesInContent());
 
         public CsvExporter(CsvSeparator separator) : this (separator, SummaryStyle.Default.WithZeroMetricValuesInContent())
         {
