@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
@@ -95,26 +93,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary>The instance of validator that DOES fail on error.</summary>
         public static readonly IValidator FailOnError = new InProcessValidator(true);
 
-        public static bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger)
+        public static IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase)
         {
-            var result = new List<ValidationError>();
-            result.AddRange(ValidateJob(benchmarkCase.Job, true));
-            if (benchmarkCase.HasArguments)
-                result.Add(new ValidationError(true, "Arguments are not supported by the InProcessToolchain yet, see #687 for more details"));
-
-            if (result.Any())
+            foreach (var validationError in ValidateJob(benchmarkCase.Job, true))
             {
-                logger.WriteLineInfo($"// Benchmark {benchmarkCase.DisplayInfo}");
-                logger.WriteLineInfo("// cannot be run in-process. Validation errors:");
-                foreach (var validationError in result)
-                {
-                    logger.WriteLineInfo($"//    * {validationError.Message}");
-                }
-                logger.WriteLine();
-
-                return false;
+                yield return new ValidationError(
+                    validationError.IsCritical,
+                    validationError.Message,
+                    benchmarkCase);
             }
-            return true;
+
+            if (benchmarkCase.HasArguments)
+                yield return new ValidationError(true, "Arguments are not supported by the InProcessToolchain yet, see #687 for more details", benchmarkCase);
         }
 
         private static IEnumerable<ValidationError> ValidateJob(Job job, bool isCritical)
@@ -139,7 +129,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 #endif
             }
         }
-
 
         private InProcessValidator(bool failOnErrors)
         {

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
@@ -140,7 +140,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (!Portability.RuntimeInformation.IsLinux())
                 return "dotnet";
 
-            using (var parentProcess = Process.GetProcessById(getppid()))
+            using (var parentProcess = Process.GetProcessById(libc.getppid()))
             {
                 string parentPath = parentProcess.MainModule?.FileName ?? string.Empty;
                 // sth like /snap/dotnet-sdk/112/dotnet and we should use the exact path instead of just "dotnet"
@@ -153,9 +153,6 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 return "dotnet";
             }
         }
-
-        [DllImport("libc")]
-        private static extern int getppid();
 
         internal static string GetSdkPath(string cliPath)
         {

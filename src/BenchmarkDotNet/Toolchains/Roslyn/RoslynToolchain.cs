@@ -1,8 +1,9 @@
-﻿using BenchmarkDotNet.Characteristics;
+﻿using System.Collections.Generic;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.Roslyn
@@ -21,39 +22,41 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
         }
 
         [PublicAPI]
-        public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
+        public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            if (!base.IsSupported(benchmarkCase, logger, resolver))
+            foreach (var validationError in base.Validate(benchmarkCase, resolver))
             {
-                return false;
+                yield return validationError;
             }
 
             if (!RuntimeInformation.IsFullFramework)
             {
-                logger.WriteLineError("The Roslyn toolchain is only supported on .NET Framework");
-                return false;
+                yield return new ValidationError(true,
+                    "The Roslyn toolchain is only supported on .NET Framework",
+                    benchmarkCase);
             }
 
             if (benchmarkCase.Job.ResolveValue(GcMode.RetainVmCharacteristic, resolver))
             {
-                logger.WriteLineError($"Currently App.config does not support RetainVM option, benchmark '{benchmarkCase.DisplayInfo}' will not be executed");
-                return false;
+                yield return new ValidationError(true,
+                    $"Currently App.config does not support RetainVM option, benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
+                    benchmarkCase);
             }
 
             if (benchmarkCase.Job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic)
                 && benchmarkCase.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver) != InfrastructureMode.ReleaseConfigurationName)
             {
-                logger.WriteLineError("The Roslyn toolchain does not allow to rebuild source project, so defining custom build configuration makes no sense");
-                return false;
+                yield return new ValidationError(true,
+                    "The Roslyn toolchain does not allow to rebuild source project, so defining custom build configuration makes no sense",
+                    benchmarkCase);
             }
 
             if (benchmarkCase.Job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic))
             {
-                logger.WriteLineError("The Roslyn toolchain does not allow specifying NuGet package dependencies");
-                return false;
+                yield return new ValidationError(true,
+                    "The Roslyn toolchain does not allow specifying NuGet package dependencies",
+                    benchmarkCase);
             }
-
-            return true;
         }
     }
 }
