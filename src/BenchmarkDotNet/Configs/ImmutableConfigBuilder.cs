@@ -115,8 +115,6 @@ namespace BenchmarkDotNet.Configs
                     foreach (var dependency in exporterDependencies.Dependencies)
                         result.Insert(i, dependency); // All the exporter dependencies should be added before the exporter
 
-            result.Sort((left, right) => (left is IExporterDependencies).CompareTo(right is IExporterDependencies)); // the case when they were defined by user in wrong order ;)
-
             var uniqueExporters = new List<IExporter>();
 
             foreach (var exporter in result)
