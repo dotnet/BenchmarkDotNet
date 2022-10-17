@@ -266,12 +266,6 @@ namespace BenchmarkDotNet.Running
             // TODO: make exporter
             ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).Distinct().ToList());
 
-            if (config.ConfigAnalysisConclusion.Any())
-            {
-                logger.WriteLineHeader("// * Config Issues *");
-                ConclusionHelper.Print(logger, config.ConfigAnalysisConclusion);
-            }
-
             // TODO: move to conclusions
             var columnWithLegends = summary.Table.Columns.Where(c => c.NeedToShow && !string.IsNullOrEmpty(c.OriginalColumn.Legend)).Select(c => c.OriginalColumn).ToArray();
 

@@ -52,10 +52,5 @@ namespace BenchmarkDotNet.Configs
         /// the auto-generated project build timeout
         /// </summary>
         TimeSpan BuildTimeout { get; }
-
-        /// <summary>
-        /// Collect any errors or warnings when composing the configuration
-        /// </summary>
-        IReadOnlyList<Conclusion> ConfigAnalysisConclusion { get; }
     }
 }

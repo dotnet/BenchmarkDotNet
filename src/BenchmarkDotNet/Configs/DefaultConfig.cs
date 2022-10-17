@@ -20,7 +20,6 @@ namespace BenchmarkDotNet.Configs
     public class DefaultConfig : IConfig
     {
         public static readonly IConfig Instance = new DefaultConfig();
-        private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
 
         private DefaultConfig()
         {
@@ -92,8 +91,6 @@ namespace BenchmarkDotNet.Configs
                 return Path.Combine(root, "BenchmarkDotNet.Artifacts");
             }
         }
-
-        public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
 
         public IEnumerable<Job> GetJobs() => Array.Empty<Job>();
 

@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Running
             var typeAttributes = type.GetCustomAttributes(true).OfType<IConfigSource>();
             var assemblyAttributes = type.Assembly.GetCustomAttributes().OfType<IConfigSource>();
 
-            foreach (var configFromAttribute in assemblyAttributes.Concat(typeAttributes))
+            foreach (var configFromAttribute in typeAttributes.Concat(assemblyAttributes))
                 config = ManualConfig.Union(config, configFromAttribute.Config);
 
             return ImmutableConfigBuilder.Create(config);
