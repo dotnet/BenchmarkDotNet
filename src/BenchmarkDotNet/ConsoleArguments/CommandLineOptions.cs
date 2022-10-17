@@ -155,6 +155,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("apples", Required = false, Default = false, HelpText = "Runs apples-to-apples comparison for specified Jobs.")]
         public bool ApplesToApples { get; set; }
 
+        [Option("quiet", Required = false, Default = false, HelpText = "Run benchmars in quiet mode.")]
+        public bool QuietMode { get; set; }
+
         [Option("list", Required = false, Default = ListBenchmarkCaseMode.Disabled, HelpText = "Prints all of the available benchmark names. Flat/Tree")]
         public ListBenchmarkCaseMode ListBenchmarkCaseMode { get; set; }
 

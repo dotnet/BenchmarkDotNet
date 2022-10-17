@@ -76,6 +76,11 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static ManualConfig WithCultureInfo(this IConfig config, CultureInfo cultureInfo) => config.With(m => m.CultureInfo = cultureInfo);
 
         /// <summary>
+        /// Run benchmars in quiet mode.
+        /// </summary>
+        [PublicAPI] public static IConfig QuietMode(this IConfig config, bool value = true) => config.WithOption(ConfigOptions.QuietMode, value);
+
+        /// <summary>
         /// determines if all auto-generated files should be kept or removed after running the benchmarks
         /// </summary>
         [PublicAPI] public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.WithOption(ConfigOptions.KeepBenchmarkFiles, value);
