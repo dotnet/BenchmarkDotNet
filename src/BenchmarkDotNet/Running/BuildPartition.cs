@@ -1,13 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.Roslyn;
@@ -51,7 +48,7 @@ namespace BenchmarkDotNet.Running
         public bool IsNativeAot => RepresentativeBenchmarkCase.Job.IsNativeAOT();
 
         public bool IsWasm => Runtime is WasmRuntime // given job can have Wasm toolchain set, but Runtime == default ;)
-            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is WasmToolChain);
+            || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is WasmToolchain);
 
         public bool IsNetFramework => Runtime is ClrRuntime
             || (RepresentativeBenchmarkCase.Job.Infrastructure.TryGetToolchain(out var toolchain) && (toolchain is RoslynToolchain || toolchain is CsProjClassicNetToolchain));

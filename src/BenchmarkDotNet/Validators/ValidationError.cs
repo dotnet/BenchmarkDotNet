@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
 
@@ -36,7 +37,7 @@ namespace BenchmarkDotNet.Validators
                 return true;
             if (obj.GetType() != this.GetType())
                 return false;
-            return Equals((ValidationError) obj);
+            return Equals((ValidationError)obj);
         }
 
         public override int GetHashCode()
@@ -49,6 +50,7 @@ namespace BenchmarkDotNet.Validators
                 return hashCode;
             }
         }
+
 
         public static bool operator ==(ValidationError left, ValidationError right) => Equals(left, right);
 
