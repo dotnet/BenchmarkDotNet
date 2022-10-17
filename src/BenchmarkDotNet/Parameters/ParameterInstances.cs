@@ -40,7 +40,6 @@ namespace BenchmarkDotNet.Parameters
             if (value is not Array array)
                 return value?.ToString() ?? "null";
 
-            //why it passes array values to cmd?
             var strings = new List<string>(array.Length); //test array of array
             for (int i = 0; i < array.Length; i++)
             {
