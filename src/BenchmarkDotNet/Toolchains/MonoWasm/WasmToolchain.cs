@@ -28,14 +28,14 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
             if (RuntimeInformation.IsWindows())
             {
-                yield return
-                    new ValidationError(true, $"{nameof(WasmToolchain)} is supported only on Unix, benchmark '{benchmarkCase.DisplayInfo}' might not work correctly", benchmarkCase);
-            } else if (IsCliPathInvalid(CustomDotNetCliPath, benchmarkCase, out var invalidCliError))
+                yield return new ValidationError(true,
+                    $"{nameof(WasmToolchain)} is supported only on Unix, benchmark '{benchmarkCase.DisplayInfo}' might not work correctly",
+                    benchmarkCase);
+            }
+            else if (IsCliPathInvalid(CustomDotNetCliPath, benchmarkCase, out var invalidCliError))
             {
                 yield return invalidCliError;
             }
-
-
         }
 
         [PublicAPI]

@@ -62,8 +62,9 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         {
             if (!SourceCoreRun.Exists)
             {
-                yield return
-                    new ValidationError(true, $"Provided CoreRun path does not exist, benchmark '{benchmark.DisplayInfo}' will not be executed. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.", benchmark);
+                yield return new ValidationError(true,
+                    $"Provided CoreRun path does not exist, benchmark '{benchmark.DisplayInfo}' will not be executed. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.",
+                    benchmark);
             }
             else if (Toolchain.IsCliPathInvalid(CustomDotNetCliPath?.FullName, benchmark, out var invalidCliError))
             {

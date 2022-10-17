@@ -43,8 +43,9 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             if (!RuntimeInformation.IsWindows())
             {
-                yield return
-                    new ValidationError(true, $"Classic .NET toolchain is supported only for Windows, benchmark '{benchmarkCase.DisplayInfo}' will not be executed", benchmarkCase);
+                yield return new ValidationError(true,
+                    $"Classic .NET toolchain is supported only for Windows, benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
+                    benchmarkCase);
             }
             else if (IsCliPathInvalid(customDotNetCliPath: null, benchmarkCase, out var invalidCliError))
             {

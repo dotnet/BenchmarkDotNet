@@ -54,25 +54,29 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             if (benchmarkCase.Job.HasValue(EnvironmentMode.JitCharacteristic) && benchmarkCase.Job.ResolveValue(EnvironmentMode.JitCharacteristic, resolver) == Jit.LegacyJit)
             {
-                yield return
-                    new ValidationError(true, $"Currently dotnet cli toolchain supports only RyuJit, benchmark '{benchmarkCase.DisplayInfo}' will not be executed", benchmarkCase);
+                yield return new ValidationError(true,
+                    $"Currently dotnet cli toolchain supports only RyuJit, benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
+                    benchmarkCase);
             }
             if (benchmarkCase.Job.ResolveValue(GcMode.CpuGroupsCharacteristic, resolver))
             {
-                yield return
-                    new ValidationError(true, $"Currently project.json does not support CpuGroups (app.config does), benchmark '{benchmarkCase.DisplayInfo}' will not be executed", benchmarkCase);
+                yield return new ValidationError(true,
+                    $"Currently project.json does not support CpuGroups (app.config does), benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
+                    benchmarkCase);
             }
             if (benchmarkCase.Job.ResolveValue(GcMode.AllowVeryLargeObjectsCharacteristic, resolver))
             {
-                yield return
-                    new ValidationError(true, $"Currently project.json does not support gcAllowVeryLargeObjects (app.config does), benchmark '{benchmarkCase.DisplayInfo}' will not be executed", benchmarkCase);
+                yield return new ValidationError(true,
+                    $"Currently project.json does not support gcAllowVeryLargeObjects (app.config does), benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
+                    benchmarkCase);
             }
 
             var benchmarkAssembly = benchmarkCase.Descriptor.Type.Assembly;
             if (benchmarkAssembly.IsLinqPad())
             {
-                yield return
-                    new ValidationError(true, $"Currently CsProjCoreToolchain does not support LINQPad 6+. Please use {nameof(InProcessEmitToolchain)} instead.", benchmarkCase);
+                yield return new ValidationError(true,
+                    $"Currently CsProjCoreToolchain does not support LINQPad 6+. Please use {nameof(InProcessEmitToolchain)} instead.",
+                    benchmarkCase);
             }
         }
 

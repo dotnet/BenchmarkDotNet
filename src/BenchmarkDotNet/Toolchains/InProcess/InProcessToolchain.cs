@@ -43,8 +43,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <param name="benchmarkCase">The benchmark.</param>
         /// <param name="resolver">The resolver.</param>
         /// <returns>Collection of validation errors, when not empty means that toolchain does not support provided benchmark.</returns>
-        public IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
-            => InProcessValidator.Validate(benchmarkCase);
+        public IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver) =>
+            InProcessValidator.Validate(benchmarkCase);
 
         /// <summary>Name of the toolchain.</summary>
         /// <value>The name of the toolchain.</value>

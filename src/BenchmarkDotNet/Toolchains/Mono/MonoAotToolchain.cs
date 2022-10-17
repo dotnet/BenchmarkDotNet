@@ -26,28 +26,33 @@ namespace BenchmarkDotNet.Toolchains.Mono
                 yield return validationError;
             }
 
-            if (!benchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic) || !(benchmarkCase.Job.Environment.Runtime is MonoRuntime))
+            if (!benchmarkCase.Job.Environment.HasValue(EnvironmentMode.RuntimeCharacteristic) || benchmarkCase.Job.Environment.Runtime is not MonoRuntime)
             {
-                yield return
-                    new ValidationError(true, "The MonoAOT toolchain requires the Runtime property to be configured explicitly to an instance of MonoRuntime class", benchmarkCase);
+                yield return new ValidationError(true,
+                    "The MonoAOT toolchain requires the Runtime property to be configured explicitly to an instance of MonoRuntime class",
+                    benchmarkCase);
             }
 
             if ((benchmarkCase.Job.Environment.Runtime is MonoRuntime monoRuntime) && !string.IsNullOrEmpty(monoRuntime.MonoBclPath) && !Directory.Exists(monoRuntime.MonoBclPath))
             {
-                yield return
-                    new ValidationError(true, $"The MonoBclPath provided for MonoAOT toolchain: {monoRuntime.MonoBclPath} does NOT exist.", benchmarkCase);
+                yield return new ValidationError(true,
+                    $"The MonoBclPath provided for MonoAOT toolchain: {monoRuntime.MonoBclPath} does NOT exist.",
+                    benchmarkCase);
             }
 
             if (benchmarkCase.Job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic)
                 && benchmarkCase.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver) != InfrastructureMode.ReleaseConfigurationName)
             {
-                yield return
-                    new ValidationError(true, "The MonoAOT toolchain does not allow to rebuild source project, so defining custom build configuration makes no sense", benchmarkCase);
+                yield return new ValidationError(true,
+                    "The MonoAOT toolchain does not allow to rebuild source project, so defining custom build configuration makes no sense",
+                    benchmarkCase);
             }
 
             if (benchmarkCase.Job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic))
             {
-                yield return new ValidationError(true, "The MonoAOT toolchain does not allow specifying NuGet package dependencies", benchmarkCase);
+                yield return new ValidationError(true,
+                    "The MonoAOT toolchain does not allow specifying NuGet package dependencies",
+                    benchmarkCase);
             }
         }
     }
