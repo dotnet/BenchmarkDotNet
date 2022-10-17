@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
@@ -17,7 +18,7 @@ namespace BenchmarkDotNet.Samples
                 AddJob(Job.Default
                     .WithRuntime(ClrRuntime.Net462)
                     .WithPlatform(Platform.X86)
-                    .WithLargeAddressAware()
+                    .WithLargeAddressAware(value: RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     .WithId("Framework"));
             }
         }
