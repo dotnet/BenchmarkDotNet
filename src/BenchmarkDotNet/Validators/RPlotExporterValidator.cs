@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Validators
 
         private static bool ValidateCsvExporter(IEnumerable<IExporter> exporters)
         {
-            var exporter = exporters.Cast<CsvMeasurementsExporter>().FirstOrDefault();
+            var exporter = exporters.OfType<CsvMeasurementsExporter>().FirstOrDefault();
             if (exporter == null)
                 return false;
 
