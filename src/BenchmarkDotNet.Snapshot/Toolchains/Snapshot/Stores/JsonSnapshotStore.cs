@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
     /// <summary>
     ///
     /// </summary>
-    public class JsonShanpshotStore : ISnapshotStore
+    public class JsonSnapshotStore : ISnapshotStore
     {
         /// <summary>
         ///
@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
         /// <returns></returns>
         public static ISnapshotStore From(string filename)
         {
-            return new JsonShanpshotStore(filename);
+            return new JsonSnapshotStore(filename);
         }
 
         private record BenchmarkStoreInfo
@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
         private BenchmarkSummaryStoreInfo? storeInfo = default;
 
 
-        internal JsonShanpshotStore(string filepath)
+        internal JsonSnapshotStore(string filepath)
         {
             Filename = filepath;
         }
@@ -68,7 +68,7 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
         ///
         /// </summary>
         public string Name { get; }
-            = nameof(JsonShanpshotStore);
+            = nameof(JsonSnapshotStore);
 
         /// <summary>
         ///

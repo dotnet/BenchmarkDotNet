@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Toolchains.Snapshot
         string Filename { get; }
 
         /// <summary>
-        /// Ger benchmark reuslt from store
+        /// Ger benchmark result from store
         /// </summary>
         /// <param name="executeParameters"></param>
         /// <returns></returns>

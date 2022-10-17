@@ -16,14 +16,14 @@ namespace BenchmarkDotNet.Toolchains.Snapshot
         private SnapshotToolchain(string name, ISnapshotStore store, IExecutor executor) :
             base(name,
                 SnapshotGenerator.Default,
-                SnpashotBuilder.Default,
+                SnapshotBuilder.Default,
                 executor)
         {
             _store = store;
         }
 
         /// <summary>
-        /// Innstace new <see cref="SnapshotToolchain"/>  from <see cref="ISnapshotStore"/>
+        /// Instance new <see cref="SnapshotToolchain"/>  from <see cref="ISnapshotStore"/>
         /// </summary>
         /// <param name="store">The store with contains the benchmark.</param>
         /// <returns></returns>

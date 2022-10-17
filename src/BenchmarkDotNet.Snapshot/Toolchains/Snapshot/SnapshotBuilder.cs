@@ -5,20 +5,20 @@ using BenchmarkDotNet.Toolchains.Results;
 namespace BenchmarkDotNet.Toolchains.Snapshot
 {
     /// <summary>
-    /// Snapshot toolchain builder
+    /// Snapshot tool chain builder
     /// </summary>
     /// <seealso cref="BenchmarkDotNet.Toolchains.IBuilder" />
-    internal class SnpashotBuilder : IBuilder
+    internal class SnapshotBuilder : IBuilder
     {
-        private SnpashotBuilder()
+        private SnapshotBuilder()
         {
 
         }
 
         /// <summary>
-        /// Get default instance of <see cref="SnpashotBuilder"/>
+        /// Get default instance of <see cref="SnapshotBuilder"/>
         /// </summary>
-        public static IBuilder Default { get; } = new SnpashotBuilder();
+        public static IBuilder Default { get; } = new SnapshotBuilder();
 
         /// <summary>always returns success</summary>
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)

@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                var store = Toolchains.Snapshot.Stores.JsonShanpshotStore.From("./snapshot.js");
+                var store = Toolchains.Snapshot.Stores.JsonSnapshotStore.From("./snapshot.js");
                 var toolchain = SnapshotToolchain.From(store);
                 AddJob(Job.Default.WithToolchain(toolchain).WithBaseline(true).WithId("Baseline"));
                 AddJob(Job.ShortRun);

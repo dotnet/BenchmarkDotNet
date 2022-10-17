@@ -6,7 +6,7 @@ using System;
 namespace BenchmarkDotNet.Toolchains.Snapshot
 {
     /// <summary>
-    ///  Implementation of <see cref="IGenerator"/> for Snapshot toolchain.
+    ///  Implementation of <see cref="IGenerator"/> for Snapshot tool chain.
     /// </summary>
     internal class SnapshotGenerator : IGenerator
     {

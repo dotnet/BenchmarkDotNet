@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
                 var bytes = hashCalulator.ComputeHash(memory);
                 return Convert.ToBase64String(bytes);
 
-                throw new Exception("Can not serilizze");
+                throw new Exception("Can not serialize");
             }
             finally
             {
