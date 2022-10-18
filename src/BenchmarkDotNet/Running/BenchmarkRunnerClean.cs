@@ -144,13 +144,12 @@ namespace BenchmarkDotNet.Running
             var cultureInfo = config.CultureInfo ?? DefaultCultureInfo.Instance;
             var reports = new List<BenchmarkReport>();
             string title = GetTitle(new[] { benchmarkRunInfo });
+            var quietLogger = GetQuietLogger(config, logger);
 
             logger.WriteLineInfo($"// Found {benchmarks.Length} benchmarks:");
             foreach (var benchmark in benchmarks)
                 logger.WriteLineInfo($"//   {benchmark.DisplayInfo}");
             logger.WriteLine();
-
-            ILogger quietLogger = !config.Options.IsSet(ConfigOptions.QuietMode) ? logger : NullLogger.Instance;
 
             using (var powerManagementApplier = new PowerManagementApplier(quietLogger))
             {
@@ -179,7 +178,7 @@ namespace BenchmarkDotNet.Running
                         {
                             var statistics = report.GetResultRuns().GetStatistics();
                             var formatter = statistics.CreateNanosecondFormatter(cultureInfo);
-                            logger.WriteLineStatistic(statistics.ToString(cultureInfo, formatter));
+                            quietLogger.WriteLineStatistic(statistics.ToString(cultureInfo, formatter));
                         }
 
                         if (!report.Success && config.Options.IsSet(ConfigOptions.StopOnFirstError))
@@ -215,7 +214,7 @@ namespace BenchmarkDotNet.Running
                     logger.WriteLine();
 
                     benchmarksToRunCount -= stop ? benchmarks.Length - i : 1;
-                    LogProgress(benchmarksToRunCount == 0 ? logger : quietLogger, in runsChronometer, totalBenchmarkCount, benchmarksToRunCount);
+                    LogProgress(logger, in runsChronometer, totalBenchmarkCount, benchmarksToRunCount);
                 }
             }
 
@@ -397,7 +396,7 @@ namespace BenchmarkDotNet.Running
         {
             var executeResults = new List<ExecuteResult>();
             var metrics = new List<Metric>();
-            ILogger quietLogger = !benchmarkCase.Config.Options.IsSet(ConfigOptions.QuietMode) ? logger : NullLogger.Instance;
+            var quietLogger = GetQuietLogger(benchmarkCase.Config, logger);
 
             quietLogger.WriteLineInfo("// *** Execute ***");
             bool analyzeRunToRunVariance = benchmarkCase.Job.ResolveValue(AccuracyMode.AnalyzeLaunchVarianceCharacteristic, resolver);
@@ -492,8 +491,7 @@ namespace BenchmarkDotNet.Running
         private static ExecuteResult RunExecute(ILogger logger, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IToolchain toolchain,
             BuildResult buildResult, IResolver resolver, IDiagnoser diagnoser, int launchIndex)
         {
-            ILogger quietLogger = !benchmarkCase.Config.Options.IsSet(ConfigOptions.QuietMode) ? logger : NullLogger.Instance;
-
+            var quietLogger = GetQuietLogger(benchmarkCase.Config, logger);
             var executeResult = toolchain.Executor.Execute(
                 new ExecuteParameters(
                     buildResult,
@@ -513,11 +511,11 @@ namespace BenchmarkDotNet.Running
             {
                 if (executeResult.ExitCode is int exitCode)
                 {
-                    logger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} has exited with code {exitCode}.");
+                    quietLogger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} has exited with code {exitCode}.");
                 }
                 else
                 {
-                    logger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} failed to exit.");
+                    quietLogger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} failed to exit.");
                 }
             }
 
@@ -629,5 +627,9 @@ namespace BenchmarkDotNet.Running
                 $" Estimated finish {estimatedEnd:yyyy-MM-dd H:mm} ({(int)fromNow.TotalHours}h {fromNow.Minutes}m from now) **";
             logger.WriteLineHeader(message);
         }
+
+        private static ILogger GetQuietLogger(ImmutableConfig config, ILogger logger)
+            => !config.Options.IsSet(ConfigOptions.QuietMode) ? logger : NullLogger.Instance;
+
     }
 }
