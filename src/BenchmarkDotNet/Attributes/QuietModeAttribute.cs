@@ -5,7 +5,7 @@ using System;
 namespace BenchmarkDotNet.Attributes
 {
     /// <summary>
-    /// determines if all auto-generated files should be kept or removed after running the benchmarks
+    /// Run benchmars in quiet mode.
     /// </summary>
     [PublicAPI]
     [AttributeUsage(AttributeTargets.Class)]
