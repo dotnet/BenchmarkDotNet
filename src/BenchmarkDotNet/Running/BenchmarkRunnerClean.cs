@@ -33,8 +33,6 @@ namespace BenchmarkDotNet.Running
 
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvironmentResolver.Instance, InfrastructureResolver.Instance);
 
-        private static TaskbarProgress s_taskbarProgress;
-
         internal static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos)
         {
             var resolver = DefaultResolver;
@@ -44,9 +42,6 @@ namespace BenchmarkDotNet.Running
             var rootArtifactsFolderPath = GetRootArtifactsFolderPath(benchmarkRunInfos);
             var resultsFolderPath = GetResultsFolderPath(rootArtifactsFolderPath, benchmarkRunInfos);
             var logFilePath = Path.Combine(rootArtifactsFolderPath, title + ".log");
-
-            using var taskbarProgress = new TaskbarProgress();
-            s_taskbarProgress = taskbarProgress;
 
             using (var streamLogger = new StreamLogger(GetLogFileStreamWriter(benchmarkRunInfos, logFilePath)))
             {
@@ -133,8 +128,6 @@ namespace BenchmarkDotNet.Running
                     compositeLogger.WriteLineHeader("// * Artifacts cleanup *");
                     Cleanup(new HashSet<string>(artifactsToCleanup.Distinct()));
                     compositeLogger.Flush();
-
-                    s_taskbarProgress = null;
                 }
             }
         }
@@ -166,6 +159,8 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
 
             UpdateTitle(totalBenchmarkCount, benchmarksToRunCount);
+
+            using var taskbarProgress = new TaskbarProgress();
 
             using (var powerManagementApplier = new PowerManagementApplier(logger))
             {
@@ -231,7 +226,7 @@ namespace BenchmarkDotNet.Running
 
                     benchmarksToRunCount -= stop ? benchmarks.Length - i : 1;
 
-                    LogProgress(logger, in runsChronometer, totalBenchmarkCount, benchmarksToRunCount);
+                    LogProgress(logger, in runsChronometer, totalBenchmarkCount, benchmarksToRunCount, taskbarProgress);
                 }
             }
 
@@ -650,7 +645,7 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static void LogProgress(ILogger logger, in StartedClock runsChronometer, int totalBenchmarkCount, int benchmarksToRunCount)
+        private static void LogProgress(ILogger logger, in StartedClock runsChronometer, int totalBenchmarkCount, int benchmarksToRunCount, TaskbarProgress taskbarProgress)
         {
             int executedBenchmarkCount = totalBenchmarkCount - benchmarksToRunCount;
             TimeSpan fromNow = GetEstimatedFinishTime(runsChronometer, benchmarksToRunCount, executedBenchmarkCount);
@@ -663,7 +658,7 @@ namespace BenchmarkDotNet.Running
             {
                 Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining - {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish";
             }
-            s_taskbarProgress.SetProgress(executedBenchmarkCount, totalBenchmarkCount);
+            taskbarProgress.SetProgress(executedBenchmarkCount, totalBenchmarkCount);
         }
 
         private static TimeSpan GetEstimatedFinishTime(in StartedClock runsChronometer, int benchmarksToRunCount, int executedBenchmarkCount)
