@@ -141,7 +141,7 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
             return default;
         }
 
-        bool ISnapshotStore.IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
+        bool ISnapshotStore.IsSupported(BenchmarkCase benchmarkCase, IResolver resolver)
         {
             if (storeInfo is null)
             {

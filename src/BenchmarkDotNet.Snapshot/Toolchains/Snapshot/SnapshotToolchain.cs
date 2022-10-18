@@ -1,7 +1,10 @@
 ﻿using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Validators;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 
 namespace BenchmarkDotNet.Toolchains.Snapshot
 {
@@ -31,15 +34,19 @@ namespace BenchmarkDotNet.Toolchains.Snapshot
             new SnapshotToolchain(store.Name, store, new SnapshotExecutor(store));
 
         /// <summary>
-        /// Check is benchmark case is supported.
+        /// Validate benchmark case
         /// </summary>
         /// <param name="benchmarkCase">The benchmark to validate</param>
-        /// <param name="logger">The logger instance</param>
         /// <param name="resolver">The resolver</param>
-        /// <returns>Return true if benchmark case is valid.</returns>
-        public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
+        /// <returns></returns>
+        public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            return _store.IsSupported(benchmarkCase, logger, resolver);
+            if (_store.IsSupported(benchmarkCase, resolver))
+            {
+                yield return new ValidationError(false,
+                    $"This benchmark '{benchmarkCase.DisplayInfo}' do not have a Snapshot, it will not be executed",
+                    benchmarkCase);
+            }
         }
 
 

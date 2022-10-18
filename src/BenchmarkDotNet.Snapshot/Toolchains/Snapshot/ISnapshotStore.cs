@@ -52,9 +52,8 @@ namespace BenchmarkDotNet.Toolchains.Snapshot
         ///
         /// </summary>
         /// <param name="benchmarkCase"></param>
-        /// <param name="logger"></param>
         /// <param name="resolver"></param>
         /// <returns></returns>
-        bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver);
+        bool IsSupported(BenchmarkCase benchmarkCase, IResolver resolver);
     }
 }
