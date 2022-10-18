@@ -19,8 +19,11 @@ namespace BenchmarkDotNet.Helpers
             if (OsVersionIsSupported)
             {
                 consoleWindowHandle = GetConsoleWindow();
-                TaskbarProgressCom.SetState(consoleWindowHandle, TaskbarProgressState.Normal);
-                Console.CancelKeyPress += OnConsoleCancelEvent;
+                if (consoleWindowHandle != IntPtr.Zero)
+                {
+                    TaskbarProgressCom.SetState(consoleWindowHandle, TaskbarProgressState.Normal);
+                    Console.CancelKeyPress += OnConsoleCancelEvent;
+                }
             }
         }
 
