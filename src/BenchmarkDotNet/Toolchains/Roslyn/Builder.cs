@@ -12,6 +12,7 @@ using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 using OurPlatform = BenchmarkDotNet.Environments.Platform;
 
 namespace BenchmarkDotNet.Toolchains.Roslyn
@@ -70,17 +71,17 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 .Select(uniqueMetadata => uniqueMetadata.GetReference())
                 .ToList();
 
-            var (result, missingReferences) = Build(generateResult, syntaxTree, compilationOptions, references, cancellationToken);
+            var (result, missingReferences) = Build(generateResult, buildPartition, syntaxTree, compilationOptions, references, cancellationToken);
 
             if (result.IsBuildSuccess || !missingReferences.Any())
                 return result;
 
             var withMissingReferences = references.Union(missingReferences.Select(assemblyMetadata => assemblyMetadata.GetReference()));
 
-            return Build(generateResult, syntaxTree, compilationOptions, withMissingReferences, cancellationToken).result;
+            return Build(generateResult, buildPartition, syntaxTree, compilationOptions, withMissingReferences, cancellationToken).result;
         }
 
-        private static (BuildResult result, AssemblyMetadata[] missingReference) Build(GenerateResult generateResult, SyntaxTree syntaxTree,
+        private static (BuildResult result, AssemblyMetadata[] missingReference) Build(GenerateResult generateResult, BuildPartition buildPartition, SyntaxTree syntaxTree,
             CSharpCompilationOptions compilationOptions, IEnumerable<PortableExecutableReference> references, CancellationToken cancellationToken)
         {
             var compilation = CSharpCompilation
@@ -89,25 +90,31 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 .WithOptions(compilationOptions)
                 .AddReferences(references);
 
+            EmitResult emitResult;
             using (var executable = File.Create(generateResult.ArtifactsPaths.ExecutablePath))
             {
-                var emitResult = compilation.Emit(executable, cancellationToken: cancellationToken);
-
-                if (emitResult.Success)
-                    return (BuildResult.Success(generateResult), default);
-
-                var compilationErrors = emitResult.Diagnostics
-                    .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error)
-                    .ToArray();
-
-                var errors = new StringBuilder("The build has failed!").AppendLine();
-                foreach (var diagnostic in compilationErrors)
-                    errors.AppendLine($"{diagnostic.Id}: {diagnostic.GetMessage(CultureInfo.InvariantCulture)}");
-
-                var missingReferences = GetMissingReferences(compilationErrors);
-
-                return (BuildResult.Failure(generateResult, errors.ToString()), missingReferences);
+                emitResult = compilation.Emit(executable, cancellationToken: cancellationToken);
             }
+            if (emitResult.Success)
+            {
+                if (buildPartition.RepresentativeBenchmarkCase.Job.Environment.LargeAddressAware)
+                {
+                    LargeAddressAware.SetLargeAddressAware(generateResult.ArtifactsPaths.ExecutablePath);
+                }
+                return (BuildResult.Success(generateResult), default);
+            }
+
+            var compilationErrors = emitResult.Diagnostics
+                .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error)
+                .ToArray();
+
+            var errors = new StringBuilder("The build has failed!").AppendLine();
+            foreach (var diagnostic in compilationErrors)
+                errors.AppendLine($"{diagnostic.Id}: {diagnostic.GetMessage(CultureInfo.InvariantCulture)}");
+
+            var missingReferences = GetMissingReferences(compilationErrors);
+
+            return (BuildResult.Failure(generateResult, errors.ToString()), missingReferences);
         }
 
         private Platform GetPlatform(OurPlatform platform)

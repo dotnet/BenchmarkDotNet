@@ -106,8 +106,14 @@ namespace BenchmarkDotNet.Loggers
             if (!string.IsNullOrEmpty(e.Data))
             {
                 output.Enqueue(e.Data);
+
                 if (logOutput)
-                    logger.WriteLine(e.Data);
+                {
+                    lock (this) // #2125
+                    {
+                        logger.WriteLine(e.Data);
+                    }
+                }
             }
         }
 
@@ -116,8 +122,14 @@ namespace BenchmarkDotNet.Loggers
             if (!string.IsNullOrEmpty(e.Data))
             {
                 error.Enqueue(e.Data);
+
                 if (logOutput)
-                    logger.WriteLineError(e.Data);
+                {
+                    lock (this) // #2125
+                    {
+                        logger.WriteLineError(e.Data);
+                    }
+                }
             }
         }
 

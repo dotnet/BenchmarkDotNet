@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -20,7 +21,7 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
-using Mono.Unix.Native;
+using RuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -58,7 +59,7 @@ namespace BenchmarkDotNet.Diagnosers
                 yield break;
             }
 
-            if (Syscall.getuid() != 0)
+            if (libc.getuid() != 0)
             {
                 yield return new ValidationError(true, "You must run as root to use PerfCollectProfiler.");
                 yield break;
@@ -102,9 +103,10 @@ namespace BenchmarkDotNet.Diagnosers
             string script = ResourceHelper.LoadTemplate(perfCollectFile.Name);
             File.WriteAllText(perfCollectFile.FullName, script);
 
-            if (Syscall.chmod(perfCollectFile.FullName, FilePermissions.S_IXUSR) != 0)
+            if (libc.chmod(perfCollectFile.FullName, libc.FilePermissions.S_IXUSR) != 0)
             {
-                logger.WriteError($"Unable to make perfcollect script an executable, the last error was: {Syscall.GetLastError()}");
+                int lastError = Marshal.GetLastWin32Error();
+                logger.WriteError($"Unable to make perfcollect script an executable, the last error was: {lastError}");
             }
             else
             {
@@ -158,9 +160,9 @@ namespace BenchmarkDotNet.Diagnosers
             {
                 if (!perfCollectProcess.HasExited)
                 {
-                    if (Syscall.kill(perfCollectProcess.Id, Signum.SIGINT) != 0)
+                    if (libc.kill(perfCollectProcess.Id, libc.Signals.SIGINT) != 0)
                     {
-                        var lastError = Stdlib.GetLastError();
+                        int lastError = Marshal.GetLastWin32Error();
                         logger.WriteLineError($"kill(perfcollect, SIGINT) failed with {lastError}");
                     }
 

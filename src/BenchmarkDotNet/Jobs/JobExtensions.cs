@@ -77,6 +77,11 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithGcAllowVeryLargeObjects(this Job job, bool value) => job.WithCore(j => j.Environment.Gc.AllowVeryLargeObjects = value);
 
         /// <summary>
+        /// Specifies that benchmark can handle addresses larger than 2 gigabytes.
+        /// </summary>
+        public static Job WithLargeAddressAware(this Job job, bool value = true) => job.WithCore(j => j.Environment.LargeAddressAware = value);
+
+        /// <summary>
         /// Put segments that should be deleted on a standby list for future use instead of releasing them back to the OS
         /// <remarks>The default is false</remarks>
         /// </summary>

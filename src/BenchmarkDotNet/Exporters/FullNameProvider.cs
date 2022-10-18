@@ -141,9 +141,9 @@ namespace BenchmarkDotNet.Exporters
                 case object[] array when array.Length == 1:
                     return GetArgument(array[0], argumentType);
                 case string text:
-                    return $"\"{EscapeWhitespaces(text)}\"";
+                    return text.EscapeSpecialCharacters(true);
                 case char character:
-                    return $"'{character}'";
+                    return character.EscapeSpecialCharacter(true);
                 case DateTime time:
                     return time.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK");
                 case Type type:
@@ -182,10 +182,6 @@ namespace BenchmarkDotNet.Exporters
 
             return buffer.ToString();
         }
-
-        private static string EscapeWhitespaces(string text)
-            => text.Replace("\t", "\\t")
-                   .Replace("\r\n", "\\r\\n");
 
         private static string GetTypeArgumentName(Type type)
         {

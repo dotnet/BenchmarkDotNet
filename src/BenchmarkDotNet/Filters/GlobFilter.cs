@@ -1,5 +1,7 @@
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Filters
@@ -16,9 +18,10 @@ namespace BenchmarkDotNet.Filters
         public bool Predicate(BenchmarkCase benchmarkCase)
         {
             var benchmark = benchmarkCase.Descriptor.WorkloadMethod;
-            string fullBenchmarkName = benchmarkCase.Descriptor.GetFilterName();
+            string nameWithoutArgs = benchmarkCase.Descriptor.GetFilterName();
+            string fullBenchmarkName = FullNameProvider.GetBenchmarkName(benchmarkCase);
 
-            return patterns.Any(pattern => pattern.IsMatch(fullBenchmarkName));
+            return patterns.Any(pattern => pattern.IsMatch(fullBenchmarkName) || pattern.IsMatch(nameWithoutArgs));
         }
 
         internal static Regex[] ToRegex(string[] patterns)

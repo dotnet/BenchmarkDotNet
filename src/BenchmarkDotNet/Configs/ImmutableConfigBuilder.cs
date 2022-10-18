@@ -26,7 +26,8 @@ namespace BenchmarkDotNet.Configs
             ConfigValidator.DontFailOnError,
             ShadowCopyValidator.DontFailOnError,
             JitOptimizationsValidator.DontFailOnError,
-            DeferredExecutionValidator.DontFailOnError
+            DeferredExecutionValidator.DontFailOnError,
+            ParamsAllValuesValidator.FailOnError
         };
 
         /// <summary>

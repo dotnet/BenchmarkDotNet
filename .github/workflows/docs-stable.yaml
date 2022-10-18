@@ -6,6 +6,8 @@ on:
       - docs-stable
   workflow_dispatch:
 
+permissions: write-all
+
 jobs:
   build:
     runs-on: windows-latest
