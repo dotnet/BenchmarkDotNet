@@ -22,6 +22,7 @@ using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
+using Microsoft.WindowsAPICodePack.Taskbar;
 using Perfolizer.Horology;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
@@ -32,6 +33,14 @@ namespace BenchmarkDotNet.Running
         internal const string DateTimeFormat = "yyyyMMdd-HHmmss";
 
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvironmentResolver.Instance, InfrastructureResolver.Instance);
+
+        private static IntPtr ConsoleWindowHandle;
+        private static ConsoleCancelEventHandler OnConsoleCancelEvent = delegate {
+            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, ConsoleWindowHandle);
+        };
+
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+        private static extern IntPtr GetConsoleWindow();
 
         internal static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos)
         {
@@ -128,6 +137,9 @@ namespace BenchmarkDotNet.Running
                     compositeLogger.WriteLineHeader("// * Artifacts cleanup *");
                     Cleanup(new HashSet<string>(artifactsToCleanup.Distinct()));
                     compositeLogger.Flush();
+
+                    Console.CancelKeyPress -= OnConsoleCancelEvent;
+                    ConsoleWindowHandle = IntPtr.Zero;
                 }
             }
         }
@@ -231,6 +243,10 @@ namespace BenchmarkDotNet.Running
             if (RuntimeInformation.IsWindows())
             {
                 Console.Title = consoleTitle;
+            }
+            if (TaskbarManager.IsPlatformSupported)
+            {
+                TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, ConsoleWindowHandle);
             }
 
             var runEnd = runsChronometer.GetElapsed();
@@ -641,6 +657,12 @@ namespace BenchmarkDotNet.Running
             {
                 Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining";
             }
+            if (TaskbarManager.IsPlatformSupported)
+            {
+                ConsoleWindowHandle = GetConsoleWindow();
+                TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, ConsoleWindowHandle);
+                Console.CancelKeyPress += OnConsoleCancelEvent;
+            }
         }
 
         private static void LogProgress(ILogger logger, in StartedClock runsChronometer, int totalBenchmarkCount, int benchmarksToRunCount)
@@ -655,6 +677,10 @@ namespace BenchmarkDotNet.Running
             if (!Console.IsOutputRedirected && (RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux() || RuntimeInformation.IsMacOSX()))
             {
                 Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining - {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish";
+            }
+            if (TaskbarManager.IsPlatformSupported)
+            {
+                TaskbarManager.Instance.SetProgressValue(executedBenchmarkCount, totalBenchmarkCount, ConsoleWindowHandle);
             }
         }
 
