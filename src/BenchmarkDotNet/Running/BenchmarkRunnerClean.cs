@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Columns;
@@ -84,6 +85,26 @@ namespace BenchmarkDotNet.Running
 
                     foreach (var benchmarkRunInfo in supportedBenchmarks) // we run them in the old order now using the new build artifacts
                     {
+                        if (benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.Resume))
+                        {
+                            var directoryInfo = new DirectoryInfo(rootArtifactsFolderPath);
+                            var lastFiles = directoryInfo.GetFiles($"{title.Split('-')[0]}*");
+                            if (lastFiles.Count() > 1)
+                            {
+                                var lastUpdatedFile = lastFiles[lastFiles.Length - 2];
+                                var text = File.ReadAllText(lastUpdatedFile.FullName);
+                                var regex = new Regex("--benchmarkId (.*?) in");
+                                var match = regex.Match(text);
+                                if (match.Success)
+                                {
+                                    var parsedId = int.Parse(match.Groups[1].Value);
+                                    var benchmarkWithHighestIdForGivenType = benchmarkRunInfo.BenchmarksCases.Last();
+                                    if (benchmarkToBuildResult[benchmarkWithHighestIdForGivenType].Id.Value < parsedId)
+                                        continue;
+                                }
+                            }
+                        }
+
                         var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup,
                             resultsFolderPath, logFilePath, totalBenchmarkCount, in runsChronometer, ref benchmarksToRunCount);
 
