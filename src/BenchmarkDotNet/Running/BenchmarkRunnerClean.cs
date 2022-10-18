@@ -22,7 +22,6 @@ using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
-using Microsoft.WindowsAPICodePack.Taskbar;
 using Perfolizer.Horology;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
@@ -34,13 +33,7 @@ namespace BenchmarkDotNet.Running
 
         internal static readonly IResolver DefaultResolver = new CompositeResolver(EnvironmentResolver.Instance, InfrastructureResolver.Instance);
 
-        private static IntPtr ConsoleWindowHandle;
-        private static ConsoleCancelEventHandler OnConsoleCancelEvent = delegate {
-            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, ConsoleWindowHandle);
-        };
-
-        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
-        private static extern IntPtr GetConsoleWindow();
+        private static TaskbarProgress s_taskbarProgress;
 
         internal static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos)
         {
@@ -51,6 +44,9 @@ namespace BenchmarkDotNet.Running
             var rootArtifactsFolderPath = GetRootArtifactsFolderPath(benchmarkRunInfos);
             var resultsFolderPath = GetResultsFolderPath(rootArtifactsFolderPath, benchmarkRunInfos);
             var logFilePath = Path.Combine(rootArtifactsFolderPath, title + ".log");
+
+            using var taskbarProgress = new TaskbarProgress();
+            s_taskbarProgress = taskbarProgress;
 
             using (var streamLogger = new StreamLogger(GetLogFileStreamWriter(benchmarkRunInfos, logFilePath)))
             {
@@ -138,8 +134,7 @@ namespace BenchmarkDotNet.Running
                     Cleanup(new HashSet<string>(artifactsToCleanup.Distinct()));
                     compositeLogger.Flush();
 
-                    Console.CancelKeyPress -= OnConsoleCancelEvent;
-                    ConsoleWindowHandle = IntPtr.Zero;
+                    s_taskbarProgress = null;
                 }
             }
         }
@@ -243,10 +238,6 @@ namespace BenchmarkDotNet.Running
             if (RuntimeInformation.IsWindows())
             {
                 Console.Title = consoleTitle;
-            }
-            if (TaskbarManager.IsPlatformSupported)
-            {
-                TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, ConsoleWindowHandle);
             }
 
             var runEnd = runsChronometer.GetElapsed();
@@ -657,12 +648,6 @@ namespace BenchmarkDotNet.Running
             {
                 Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining";
             }
-            if (TaskbarManager.IsPlatformSupported)
-            {
-                ConsoleWindowHandle = GetConsoleWindow();
-                TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, ConsoleWindowHandle);
-                Console.CancelKeyPress += OnConsoleCancelEvent;
-            }
         }
 
         private static void LogProgress(ILogger logger, in StartedClock runsChronometer, int totalBenchmarkCount, int benchmarksToRunCount)
@@ -678,10 +663,7 @@ namespace BenchmarkDotNet.Running
             {
                 Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining - {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish";
             }
-            if (TaskbarManager.IsPlatformSupported)
-            {
-                TaskbarManager.Instance.SetProgressValue(executedBenchmarkCount, totalBenchmarkCount, ConsoleWindowHandle);
-            }
+            s_taskbarProgress.SetProgress(executedBenchmarkCount, totalBenchmarkCount);
         }
 
         private static TimeSpan GetEstimatedFinishTime(in StartedClock runsChronometer, int benchmarksToRunCount, int executedBenchmarkCount)
