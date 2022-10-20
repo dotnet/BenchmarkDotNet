@@ -135,7 +135,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public int? MaxIterationCount { get; set; }
 
         [Option("invocationCount", Required = false, HelpText = "Invocation count in a single iteration. By default calculated by the heuristic.")]
-        public int? InvocationCount { get; set; }
+        public long? InvocationCount { get; set; }
 
         [Option("unrollFactor", Required = false, HelpText = "How many times the benchmark method will be invoked per one iteration of a generated loop. 16 by default")]
         public int? UnrollFactor { get; set; }
@@ -151,6 +151,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("info", Required = false, Default = false, HelpText = "Print environment information.")]
         public bool PrintInformation { get; set; }
+
+        [Option("apples", Required = false, Default = false, HelpText = "Runs apples-to-apples comparison for specified Jobs.")]
+        public bool ApplesToApples { get; set; }
 
         [Option("list", Required = false, Default = ListBenchmarkCaseMode.Disabled, HelpText = "Prints all of the available benchmark names. Flat/Tree")]
         public ListBenchmarkCaseMode ListBenchmarkCaseMode { get; set; }

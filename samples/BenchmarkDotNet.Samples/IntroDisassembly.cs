@@ -1,9 +1,10 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Diagnosers;
 using System.Linq;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DisassemblyDiagnoser]
+    [DisassemblyDiagnoser(printInstructionAddresses: true, syntax: DisassemblySyntax.Masm)]
     public class IntroDisassembly
     {
         private int[] field = Enumerable.Range(0, 100).ToArray();

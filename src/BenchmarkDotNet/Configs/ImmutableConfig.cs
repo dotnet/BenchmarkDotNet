@@ -106,6 +106,8 @@ namespace BenchmarkDotNet.Configs
 
         public bool HasThreadingDiagnoser() => diagnosers.Contains(ThreadingDiagnoser.Default);
 
+        internal bool HasPerfCollectProfiler() => diagnosers.OfType<PerfCollectProfiler>().Any();
+
         public bool HasExtraStatsDiagnoser() => HasMemoryDiagnoser() || HasThreadingDiagnoser();
 
         public IDiagnoser GetCompositeDiagnoser(BenchmarkCase benchmarkCase, RunMode runMode)

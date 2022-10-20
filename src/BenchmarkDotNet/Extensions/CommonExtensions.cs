@@ -79,6 +79,14 @@ namespace BenchmarkDotNet.Extensions
             return directoryPath;
         }
 
+        internal static DirectoryInfo CreateIfNotExists(this DirectoryInfo directory)
+        {
+            if (!directory.Exists)
+                directory.Create();
+
+            return directory;
+        }
+
         internal static string DeleteFileIfExists(this string filePath)
         {
             if (File.Exists(filePath))

@@ -18,9 +18,9 @@ namespace BenchmarkDotNet.Helpers
                 case bool b:
                     return b.ToLowerCase();
                 case string text:
-                    return $"$@\"{text.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}")}\"";
+                    return text.EscapeSpecialCharacters(true);
                 case char c:
-                    return c == '\\' ? "'\\\\'" : $"'{value}'";
+                    return c.EscapeSpecialCharacter(true);
                 case float f:
                     return ToSourceCode(f);
                 case double d:

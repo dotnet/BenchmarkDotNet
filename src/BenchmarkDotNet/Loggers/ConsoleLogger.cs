@@ -53,8 +53,7 @@ namespace BenchmarkDotNet.Loggers
             }
             finally
             {
-                if (colorBefore != Console.ForegroundColor && colorBefore != Console.BackgroundColor)
-                    Console.ForegroundColor = colorBefore;
+                Console.ForegroundColor = colorBefore;
             }
         }
 
