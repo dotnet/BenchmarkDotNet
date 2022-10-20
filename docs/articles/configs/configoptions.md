@@ -1,4 +1,5 @@
 ---
+#cspell:ignore configoptions
 uid: docs.configoptions
 name: Configoptions
 ---

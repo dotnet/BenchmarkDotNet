@@ -1,11 +1,12 @@
 ---
+#cspell:ignore etwprofiler
 uid: docs.etwprofiler
 name: EtwProfiler
 ---
 
 # EtwProfiler
 
-`EtwProfiler` allows to profile the benchmarked .NET code on Windows and exports the data to a trace file which can be opened with [PerfView](https://github.com/Microsoft/perfview) or [Windows Performance Analyzer](https://docs.microsoft.com/en-us/windows-hardware/test/wpt/windows-performance-analyzer).
+`EtwProfiler` allows to profile the benchmarked .NET code on Windows and exports the data to a trace file which can be opened with [PerfView](https://github.com/Microsoft/perfview) or [Windows Performance Analyzer](https://learn.microsoft.com/windows-hardware/test/wpt/windows-performance-analyzer).
 
 ![](https://adamsitnik.com/images/etwprofiler/flamegraph.png)
 
@@ -59,7 +60,6 @@ class Program
 ```
 
 * Passing `-p ETW` or `--profiler ETW` command line argument to `BenchmarkSwitcher`
-
 
 ## Configuration
 

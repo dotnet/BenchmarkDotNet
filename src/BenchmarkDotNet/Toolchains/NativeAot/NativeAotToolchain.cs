@@ -36,7 +36,10 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
                 new DotNetCliPublisher(customDotNetCliPath, GetExtraArguments(runtimeIdentifier)),
                 new Executor())
         {
+            CustomDotNetCliPath = customDotNetCliPath;
         }
+
+        internal string CustomDotNetCliPath { get; }
 
         public static NativeAotToolchainBuilder CreateBuilder() => NativeAotToolchainBuilder.Create();
 

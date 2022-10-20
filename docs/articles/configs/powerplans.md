@@ -11,8 +11,8 @@ Please note. During an execution, BenchmarkDotNet saves the current power plan a
 
 ### Links
 
-* Power policy settings: https://docs.microsoft.com/en-us/windows/desktop/power/power-policy-settings
-* Powercfg command: https://docs.microsoft.com/en-us/windows-hardware/design/device-experiences/powercfg-command-line-options
+* Power policy settings: https://learn.microsoft.com/windows/win32/power/power-policy-settings
+* Powercfg command: https://learn.microsoft.com/windows-hardware/design/device-experiences/powercfg-command-line-options
 * @BenchmarkDotNet.Samples.IntroPowerPlan
 
 ---

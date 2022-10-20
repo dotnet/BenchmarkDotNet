@@ -13,10 +13,9 @@ We have 3 disassemblers:
 The MonoDisassembler is very simple: it spawns Mono with the right arguments to get the asm, Mono prints the output to the console and we just parse it. Single class does the job: `MonoDisassembler`.
 
 When it comes to Windows disassemblers it's not so easy. To obtain the disassm we are using ClrMD. ClrMD can attach only to the process of same bitness (architecture).
-This is why we have two dissasemblers: x64 and x86. The code is the same (single class, linked in two projects) but compiled for two different architectures. We keep both disassemblers in the resources of the BenchmarkDotNet.dll. When we need the disassembler, we search for it in the resources, copy it to the disk and run (it's an exe).
+This is why we have two disassemblers: x64 and x86. The code is the same (single class, linked in two projects) but compiled for two different architectures. We keep both disassemblers in the resources of the BenchmarkDotNet.dll. When we need the disassembler, we search for it in the resources, copy it to the disk and run (it's an exe).
 
 On Linux it's simpler (only x64 is supported) and we don't spawn a new process (everything is done in-proc).
-
 
 ### How to debug the disassembler
 

@@ -1,40 +1,46 @@
-﻿using BenchmarkDotNet.Toolchains.DotNetCli;
-using JetBrains.Annotations;
+﻿using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Validators;
+using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.MonoWasm
 {
     [PublicAPI]
-    public class WasmToolChain : Toolchain
+    public class WasmToolchain : Toolchain
     {
         private string CustomDotNetCliPath { get; }
 
-        private WasmToolChain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath)
+        private WasmToolchain(string name, IGenerator generator, IBuilder builder, IExecutor executor, string customDotNetCliPath)
             : base(name, generator, builder, executor)
         {
             CustomDotNetCliPath = customDotNetCliPath;
         }
 
-        public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)
+        public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            if (!base.IsSupported(benchmarkCase, logger, resolver))
-                return false;
-
-            if (InvalidCliPath(CustomDotNetCliPath, benchmarkCase, logger))
-                return false;
+            foreach (var validationError in base.Validate(benchmarkCase, resolver))
+            {
+                yield return validationError;
+            }
 
             if (RuntimeInformation.IsWindows())
-                logger.WriteLineInfo($"{nameof(WasmToolChain)} is supported only on Unix, benchmark '{benchmarkCase.DisplayInfo}' might not work correctly");
-
-            return true;
+            {
+                yield return new ValidationError(true,
+                    $"{nameof(WasmToolchain)} is supported only on Unix, benchmark '{benchmarkCase.DisplayInfo}' might not work correctly",
+                    benchmarkCase);
+            }
+            else if (IsCliPathInvalid(CustomDotNetCliPath, benchmarkCase, out var invalidCliError))
+            {
+                yield return invalidCliError;
+            }
         }
 
         [PublicAPI]
         public static IToolchain From(NetCoreAppSettings netCoreAppSettings)
-            => new WasmToolChain(netCoreAppSettings.Name,
+            => new WasmToolchain(netCoreAppSettings.Name,
                     new WasmGenerator(netCoreAppSettings.TargetFrameworkMoniker,
                         netCoreAppSettings.CustomDotNetCliPath,
                         netCoreAppSettings.PackagesPath,

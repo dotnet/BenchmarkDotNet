@@ -64,7 +64,8 @@ namespace BenchmarkDotNet.Disassemblers
         internal static Platform GetDisassemblerArchitecture(Process process, Platform platform)
             => platform switch
             {
-                Platform.AnyCpu => NativeMethods.Is64Bit(process) ? Platform.X64 : Platform.X86, // currently ARM is not supported
+                Platform.AnyCpu when System.Runtime.InteropServices.RuntimeInformation.OSArchitecture is Architecture.Arm or Architecture.Arm64 => RuntimeInformation.GetCurrentPlatform(),
+                Platform.AnyCpu => NativeMethods.Is64Bit(process) ? Platform.X64 : Platform.X86,
                 _ => platform
             };
 
@@ -142,6 +143,8 @@ namespace BenchmarkDotNet.Disassemblers
                 .Append(config.PrintSource).Append(' ')
                 .Append(config.MaxDepth).Append(' ')
                 .Append(Escape(resultsPath))
+                .Append(' ')
+                .Append(config.Syntax.ToString())
                 .Append(' ')
                 .Append(string.Join(" ", config.Filters.Select(Escape)))
                 .ToString();

@@ -8,6 +8,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -70,11 +71,29 @@ namespace BenchmarkDotNet.IntegrationTests
 
         [Fact]
         public void BenchmarkActionGlobalCleanupValueTaskSupported() => TestInvokeSetupCleanupValueTask(x => x.GlobalCleanup(), UnrollFactor);
+        
+        [Fact]
+        public void BenchmarkDifferentPlatformReturnsValidationError()
+        {
+            var otherPlatform = IntPtr.Size == 8
+                ? Platform.X86
+                : Platform.X64;
+
+            var otherPlatformConfig = new ManualConfig()
+                .With(Job.Dry.With(InProcessToolchain.Instance).With(otherPlatform))
+                .With(new OutputLogger(Output))
+                .With(DefaultColumnProviders.Instance);
+
+            var runInfo = BenchmarkConverter.TypeToBenchmarks(typeof(BenchmarkAllCases), otherPlatformConfig);
+            var summary = BenchmarkRunner.Run(runInfo);
+
+            Assert.NotEmpty(summary.ValidationErrors);
+        }
 
         [AssertionMethod]
         private void TestInvoke(Expression<Action<BenchmarkAllCases>> methodCall, int unrollFactor)
         {
-            var targetMethod = ((MethodCallExpression) methodCall.Body).Method;
+            var targetMethod = ((MethodCallExpression)methodCall.Body).Method;
             var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod, targetMethod, targetMethod);
 
             // Run mode
@@ -112,7 +131,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [AssertionMethod]
         private void TestInvoke<T>(Expression<Func<BenchmarkAllCases, T>> methodCall, int unrollFactor, object expectedResult)
         {
-            var targetMethod = ((MethodCallExpression) methodCall.Body).Method;
+            var targetMethod = ((MethodCallExpression)methodCall.Body).Method;
             var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod);
 
             // Run mode

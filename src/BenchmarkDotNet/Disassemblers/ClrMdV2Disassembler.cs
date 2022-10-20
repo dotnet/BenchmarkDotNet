@@ -1,5 +1,5 @@
-﻿using BenchmarkDotNet.Filters;
-using Iced.Intel;
+﻿using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Filters;
 using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Utilities;
 using System;
@@ -11,9 +11,9 @@ using System.Text.RegularExpressions;
 namespace BenchmarkDotNet.Disassemblers
 {
     // This Disassembler uses ClrMd v2x. Please keep it in sync with ClrMdV1Disassembler (if possible).
-    internal static class ClrMdV2Disassembler
+    internal abstract class ClrMdV2Disassembler
     {
-        internal static DisassemblyResult AttachAndDisassemble(Settings settings)
+        internal DisassemblyResult AttachAndDisassemble(Settings settings)
         {
             using (var dataTarget = DataTarget.AttachToProcess(
                 settings.ProcessId,
@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Disassemblers
 
                 ConfigureSymbols(dataTarget);
 
-                var state = new State(runtime);
+                var state = new State(runtime, settings.TargetFrameworkMoniker);
 
                 if (settings.Filters.Length > 0)
                 {
@@ -93,9 +93,10 @@ namespace BenchmarkDotNet.Disassemblers
                     }
         }
 
-        private static DisassembledMethod[] Disassemble(Settings settings, State state)
+        private DisassembledMethod[] Disassemble(Settings settings, State state)
         {
             var result = new List<DisassembledMethod>();
+            DisassemblySyntax syntax = (DisassemblySyntax)Enum.Parse(typeof(DisassemblySyntax), settings.Syntax);
 
             while (state.Todo.Count != 0)
             {
@@ -105,7 +106,7 @@ namespace BenchmarkDotNet.Disassemblers
                     continue; // already handled
 
                 if (settings.MaxDepth >= methodInfo.Depth)
-                    result.Add(DisassembleMethod(methodInfo, state, settings));
+                    result.Add(DisassembleMethod(methodInfo, state, settings, syntax));
             }
 
             return result.ToArray();
@@ -113,7 +114,7 @@ namespace BenchmarkDotNet.Disassemblers
 
         private static bool CanBeDisassembled(ClrMethod method) => method.ILOffsetMap.Length > 0 && method.NativeCode > 0;
 
-        private static DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings)
+        private DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, Settings settings, DisassemblySyntax syntax)
         {
             var method = methodInfo.Method;
 
@@ -144,7 +145,7 @@ namespace BenchmarkDotNet.Disassemblers
 
             foreach (var map in GetCompleteNativeMap(method, state.Runtime))
             {
-                codes.AddRange(Decode(map, state, methodInfo.Depth, method));
+                codes.AddRange(Decode(map, state, methodInfo.Depth, method, syntax));
             }
 
             Map[] maps = settings.PrintSource
@@ -159,7 +160,7 @@ namespace BenchmarkDotNet.Disassemblers
             };
         }
 
-        private static IEnumerable<Asm> Decode(ILToNativeMap map, State state, int depth, ClrMethod currentMethod)
+        private IEnumerable<Asm> Decode(ILToNativeMap map, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax)
         {
             ulong startAddress = map.StartAddress;
             uint size = (uint)(map.EndAddress - map.StartAddress);
@@ -177,124 +178,10 @@ namespace BenchmarkDotNet.Disassemblers
                 totalBytesRead += bytesRead;
             } while (totalBytesRead != size);
 
-            var reader = new ByteArrayCodeReader(code, 0, (int)size);
-            var decoder = Decoder.Create(state.Runtime.DataTarget.DataReader.PointerSize * 8, reader);
-            decoder.IP = startAddress;
-
-            while (reader.CanReadByte)
-            {
-                decoder.Decode(out var instruction);
-
-                TryTranslateAddressToName(instruction, state, depth, currentMethod);
-
-                yield return new Asm
-                {
-                    InstructionPointer = instruction.IP,
-                    Instruction = instruction
-                };
-            }
+            return Decode(code, startAddress, state, depth, currentMethod, syntax);
         }
 
-        private static void TryTranslateAddressToName(Instruction instruction, State state, int depth, ClrMethod currentMethod)
-        {
-            var runtime = state.Runtime;
-
-            if (!TryGetReferencedAddress(instruction, (uint)runtime.DataTarget.DataReader.PointerSize, out ulong address))
-                return;
-
-            if (state.AddressToNameMapping.ContainsKey(address))
-                return;
-
-            var jitHelperFunctionName = runtime.GetJitHelperFunctionName(address);
-            if (!string.IsNullOrEmpty(jitHelperFunctionName))
-            {
-                state.AddressToNameMapping.Add(address, jitHelperFunctionName);
-                return;
-            }
-
-            var methodTableName = runtime.DacLibrary.SOSDacInterface.GetMethodTableName(address);
-            if (!string.IsNullOrEmpty(methodTableName))
-            {
-                state.AddressToNameMapping.Add(address, $"MT_{methodTableName}");
-                return;
-            }
-
-            var methodDescriptor = runtime.GetMethodByHandle(address);
-            if (!(methodDescriptor is null))
-            {
-                state.AddressToNameMapping.Add(address, $"MD_{methodDescriptor.Signature}");
-                return;
-            }
-
-            var method = runtime.GetMethodByInstructionPointer(address);
-            if (method is null && (address & ((uint)runtime.DataTarget.DataReader.PointerSize - 1)) == 0)
-            {
-                if (runtime.DataTarget.DataReader.ReadPointer(address, out ulong newAddress) && newAddress > ushort.MaxValue)
-                {
-                    method = runtime.GetMethodByInstructionPointer(newAddress);
-
-                    method = WorkaroundGetMethodByInstructionPointerBug(runtime, method, newAddress);
-                }
-            }
-            else
-            {
-                method = WorkaroundGetMethodByInstructionPointerBug(runtime, method, address);
-            }
-
-            if (method is null)
-                return;
-
-            if (method.NativeCode == currentMethod.NativeCode && method.Signature == currentMethod.Signature)
-                return; // in case of a call which is just a jump within the method or a recursive call
-
-            if (!state.HandledMethods.Contains(method))
-                state.Todo.Enqueue(new MethodInfo(method, depth + 1));
-
-            var methodName = method.Signature;
-            if (!methodName.Any(c => c == '.')) // the method name does not contain namespace and type name
-                methodName = $"{method.Type.Name}.{method.Signature}";
-            state.AddressToNameMapping.Add(address, methodName);
-        }
-
-        // GetMethodByInstructionPointer sometimes returns wrong methods.
-        // In case given address does not belong to the methods range, null is returned.
-        private static ClrMethod WorkaroundGetMethodByInstructionPointerBug(ClrRuntime runtime, ClrMethod method, ulong newAddress)
-            => TryReadNativeCodeAddresses(runtime, method, out ulong startAddress, out ulong endAddress) && !(startAddress >= newAddress && newAddress <= endAddress)
-            ? null
-            : method;
-
-        internal static bool TryGetReferencedAddress(Instruction instruction, uint pointerSize, out ulong referencedAddress)
-        {
-            for (int i = 0; i < instruction.OpCount; i++)
-            {
-                switch (instruction.GetOpKind(i))
-                {
-                    case OpKind.NearBranch16:
-                    case OpKind.NearBranch32:
-                    case OpKind.NearBranch64:
-                        referencedAddress = instruction.NearBranchTarget;
-                        return referencedAddress > ushort.MaxValue;
-                    case OpKind.Immediate16:
-                    case OpKind.Immediate8to16:
-                    case OpKind.Immediate8to32:
-                    case OpKind.Immediate8to64:
-                    case OpKind.Immediate32to64:
-                    case OpKind.Immediate32 when pointerSize == 4:
-                    case OpKind.Immediate64:
-                        referencedAddress = instruction.GetImmediate(i);
-                        return referencedAddress > ushort.MaxValue;
-                    case OpKind.Memory when instruction.IsIPRelativeMemoryOperand:
-                        referencedAddress = instruction.IPRelativeMemoryAddress;
-                        return referencedAddress > ushort.MaxValue;
-                    case OpKind.Memory:
-                        referencedAddress = instruction.MemoryDisplacement64;
-                        return referencedAddress > ushort.MaxValue;
-                }
-            }
-
-            referencedAddress = default;
-            return false;
-        }
+        protected abstract IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax);
 
         private static ILToNativeMap[] GetCompleteNativeMap(ClrMethod method, ClrRuntime runtime)
         {
@@ -321,7 +208,7 @@ namespace BenchmarkDotNet.Disassemblers
             {
                 // In such situation ILOffsetMap most likely describes Tier 0, while CodeHeaderData Tier 1.
                 // Since we care about Tier 1 (if it's present), we "fake" a Tier 1 map.
-                return new[] { new ILToNativeMap() { StartAddress = startAddress, EndAddress = endAddress }};
+                return new[] { new ILToNativeMap() { StartAddress = startAddress, EndAddress = endAddress } };
             }
             else if (sortedMaps[0].StartAddress != startAddress || (sortedMaps[sortedMaps.Length - 1].EndAddress != endAddress && endAddress != ulong.MaxValue))
             {
@@ -332,7 +219,10 @@ namespace BenchmarkDotNet.Disassemblers
             return sortedMaps;
         }
 
-        private static bool TryReadNativeCodeAddresses(ClrRuntime runtime, ClrMethod method, out ulong startAddress, out ulong endAddress)
+        private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
+            => DisassembledMethod.Empty(method.Signature, method.NativeCode, reason);
+
+        protected static bool TryReadNativeCodeAddresses(ClrRuntime runtime, ClrMethod method, out ulong startAddress, out ulong endAddress)
         {
             if (method is not null
                 && runtime.DacLibrary.SOSDacInterface.GetCodeHeaderData(method.NativeCode, out var codeHeaderData) == HResult.S_OK
@@ -349,8 +239,84 @@ namespace BenchmarkDotNet.Disassemblers
             return false;
         }
 
-        private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
-            => DisassembledMethod.Empty(method.Signature, method.NativeCode, reason);
+        protected void TryTranslateAddressToName(ulong address, bool isAddressPrecodeMD, State state, bool isIndirectCallOrJump, int depth, ClrMethod currentMethod)
+        {
+            var runtime = state.Runtime;
+
+            if (state.AddressToNameMapping.ContainsKey(address))
+                return;
+
+            var jitHelperFunctionName = runtime.GetJitHelperFunctionName(address);
+            if (!string.IsNullOrEmpty(jitHelperFunctionName))
+            {
+                state.AddressToNameMapping.Add(address, jitHelperFunctionName);
+                return;
+            }
+
+            var method = runtime.GetMethodByInstructionPointer(address);
+            if (method is null && (address & ((uint)runtime.DataTarget.DataReader.PointerSize - 1)) == 0)
+            {
+                if (runtime.DataTarget.DataReader.ReadPointer(address, out ulong newAddress) && newAddress > ushort.MaxValue)
+                {
+                    method = runtime.GetMethodByInstructionPointer(newAddress);
+
+                    method = WorkaroundGetMethodByInstructionPointerBug(runtime, method, newAddress);
+                }
+            }
+            else
+            {
+                method = WorkaroundGetMethodByInstructionPointerBug(runtime, method, address);
+            }
+
+            if (method is null)
+            {
+                if (isAddressPrecodeMD || this is not Arm64Disassembler)
+                {
+                    var methodDescriptor = runtime.GetMethodByHandle(address);
+                    if (!(methodDescriptor is null))
+                    {
+                        if (isAddressPrecodeMD)
+                        {
+                            state.AddressToNameMapping.Add(address, $"Precode of {methodDescriptor.Signature}");
+                        }
+                        else
+                        {
+                            state.AddressToNameMapping.Add(address, $"MD_{methodDescriptor.Signature}");
+                        }
+                        return;
+                    }
+                }
+
+                if (this is not Arm64Disassembler)
+                {
+                    var methodTableName = runtime.DacLibrary.SOSDacInterface.GetMethodTableName(address);
+                    if (!string.IsNullOrEmpty(methodTableName))
+                    {
+                        state.AddressToNameMapping.Add(address, $"MT_{methodTableName}");
+                        return;
+                    }
+                }
+                return;
+            }
+
+            if (method.NativeCode == currentMethod.NativeCode && method.Signature == currentMethod.Signature)
+                return; // in case of a call which is just a jump within the method or a recursive call
+
+            if (!state.HandledMethods.Contains(method))
+                state.Todo.Enqueue(new MethodInfo(method, depth + 1));
+
+            var methodName = method.Signature;
+            if (!methodName.Any(c => c == '.')) // the method name does not contain namespace and type name
+                methodName = $"{method.Type.Name}.{method.Signature}";
+            state.AddressToNameMapping.Add(address, methodName);
+        }
+
+        // GetMethodByInstructionPointer sometimes returns wrong methods.
+        // In case given address does not belong to the methods range, null is returned.
+        private static ClrMethod WorkaroundGetMethodByInstructionPointerBug(ClrRuntime runtime, ClrMethod method, ulong newAddress)
+            => TryReadNativeCodeAddresses(runtime, method, out ulong startAddress, out ulong endAddress) && !(startAddress >= newAddress && newAddress <= endAddress)
+            ? null
+            : method;
 
         private class SharpComparer : IEqualityComparer<Sharp>
         {

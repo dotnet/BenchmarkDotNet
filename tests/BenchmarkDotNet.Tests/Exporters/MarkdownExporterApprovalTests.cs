@@ -255,6 +255,17 @@ namespace BenchmarkDotNet.Tests.Exporters
                 [Benchmark] public void Foo() {}
                 [Benchmark] public void Bar() {}
             }
+
+            /* Escape Params */
+
+            public class Escape_ParamsAndArguments
+            {
+                [Params("\t", "\n"), UsedImplicitly] public string StringParam;
+
+                [Arguments('\t')] [Arguments('\n')]
+                [Benchmark] public void Foo(char charArg) {}
+                [Benchmark] public void Bar() {}
+            }
         }
     }
 }

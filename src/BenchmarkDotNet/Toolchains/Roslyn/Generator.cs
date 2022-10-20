@@ -38,8 +38,8 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             list.Add("/unsafe");
             list.Add("/deterministic");
             list.Add("/platform:" + buildPartition.Platform.ToConfig());
-            list.Add("/appconfig:" + artifactsPaths.AppConfigPath.Escape());
-            var references = GetAllReferences(buildPartition.RepresentativeBenchmarkCase).Select(assembly => assembly.Location.Escape());
+            list.Add("/appconfig:" + artifactsPaths.AppConfigPath.EscapeCommandLine());
+            var references = GetAllReferences(buildPartition.RepresentativeBenchmarkCase).Select(assembly => assembly.Location.EscapeCommandLine());
             list.Add("/reference:" + string.Join(",", references));
             list.Add(Path.GetFileName(artifactsPaths.ProgramCodePath));
 

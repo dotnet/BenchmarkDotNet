@@ -1,9 +1,8 @@
 ﻿using System;
-
+using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
-
+using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
@@ -39,13 +38,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             Executor = new InProcessNoEmitExecutor(timeout, logOutput);
         }
 
-        /// <summary>Determines whether the specified benchmark is supported.</summary>
-        /// <param name="benchmarkCase">The benchmark.</param>
-        /// <param name="logger">The logger.</param>
-        /// <param name="resolver">The resolver.</param>
-        /// <returns><c>true</c> if the benchmark can be run with the toolchain.</returns>
-        public bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver) =>
-            InProcessValidator.IsSupported(benchmarkCase, logger);
+        public IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver) =>
+            InProcessValidator.Validate(benchmarkCase);
 
         /// <summary>Name of the toolchain.</summary>
         /// <value>The name of the toolchain.</value>

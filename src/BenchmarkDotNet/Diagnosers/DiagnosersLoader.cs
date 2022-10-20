@@ -37,7 +37,12 @@ namespace BenchmarkDotNet.Diagnosers
             yield return new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig());
 
             if (RuntimeInformation.IsNetCore)
+            {
                 yield return EventPipeProfiler.Default;
+
+                if (RuntimeInformation.IsLinux())
+                    yield return PerfCollectProfiler.Default;
+            }
 
             if (!RuntimeInformation.IsWindows())
                 yield break;

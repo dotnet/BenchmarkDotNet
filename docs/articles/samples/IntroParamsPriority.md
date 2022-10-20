@@ -4,7 +4,7 @@ uid: BenchmarkDotNet.Samples.IntroParamsPriority
 
 ## Sample: IntroParamsPriority
 
-In order to sort columns of parameters in the results table you can use the Property `Priority` inside the params attribute. The priority range is `[Int32.MinValue;Int32.MaxValue]`, lower priorites will appear earlier in the column order. The default priority is set to `0`.
+In order to sort columns of parameters in the results table you can use the Property `Priority` inside the params attribute. The priority range is `[Int32.MinValue;Int32.MaxValue]`, lower priorities will appear earlier in the column order. The default priority is set to `0`.
 
 ### Source code
 
