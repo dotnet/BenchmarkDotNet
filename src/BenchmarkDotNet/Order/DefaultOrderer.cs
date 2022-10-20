@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.Order
             bool hasJobBaselines = allBenchmarksCases.Any(b => b.Job.Meta.Baseline);
             bool hasDescriptorBaselines = allBenchmarksCases.Any(b => b.Descriptor.Baseline);
 
-            if (hasMultipleTypes)
+            if (hasMultipleTypes && !hasJobBaselines && !hasDescriptorBaselines)
             {
                 implicitRules.Add(BenchmarkLogicalGroupRule.ByType);
             }
