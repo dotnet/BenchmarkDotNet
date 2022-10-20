@@ -49,8 +49,8 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
         [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
-        private static readonly IReadOnlyDictionary<string, IExporter[]> AvailableExporters =
-            new Dictionary<string, IExporter[]>(StringComparer.InvariantCultureIgnoreCase)
+        private static readonly Dictionary<string, IExporter[]> AvailableExporters =
+            new (StringComparer.InvariantCultureIgnoreCase)
             {
                 { "csv", new[] { CsvExporter.Default } },
                 { "csvmeasurements", new[] { CsvMeasurementsExporter.Default } },
@@ -69,6 +69,39 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "briefxml", new[] { XmlExporter.Brief } },
                 { "fullxml", new[] { XmlExporter.Full } }
             };
+
+        public static void RegisterCustomExporter(string commandLineName, IExporter exporter)
+        {
+            if (!AvailableExporters.TryGetValue(commandLineName, out var array))
+            {
+                AvailableExporters[commandLineName] = new[] { exporter };
+                return;
+            }
+            AvailableExporters[commandLineName] = new IExporter[array.Length + 1];
+            for (int i = 0; i < array.Length; i++)
+            {
+                AvailableExporters[commandLineName][i] = array[i];
+            }
+            AvailableExporters[commandLineName][array.Length] = exporter;
+        }
+
+        public static void RegisterCustomExporter(string commandLineName, IExporter[] exporters)
+        {
+            if (!AvailableExporters.TryGetValue(commandLineName, out var array))
+            {
+                AvailableExporters[commandLineName] = (IExporter[])exporters.Clone();
+                return;
+            }
+            AvailableExporters[commandLineName] = new IExporter[array.Length + exporters.Length];
+            for (int i = 0; i < array.Length; i++)
+            {
+                AvailableExporters[commandLineName][i] = array[i];
+            }
+            for (int i = 0; i < exporters.Length; i++)
+            {
+                AvailableExporters[commandLineName][i+array.Length] = exporters[i];
+            }
+        }
 
         public static (bool isSuccess, IConfig config, CommandLineOptions options) Parse(string[] args, ILogger logger, IConfig globalConfig = null)
         {
