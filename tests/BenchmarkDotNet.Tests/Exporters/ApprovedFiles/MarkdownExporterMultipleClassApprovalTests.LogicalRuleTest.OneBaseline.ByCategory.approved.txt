@@ -7,18 +7,18 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   DefaultJob : extra output line
 
 
-   Type | Method | Categories | Param |     Mean |   Error |  StdDev | Ratio | RatioSD |            LogicalGroup | Baseline |
-------- |------- |----------- |------ |---------:|--------:|--------:|------:|--------:|------------------------ |--------- |
- Bench1 |    Foo |          A |    10 | 102.0 ns | 6.09 ns | 1.58 ns |  1.00 |    0.00 | A-[Param=10]-DefaultJob |      Yes | ^
- Bench1 |    Bar |          A |    10 | 202.0 ns | 6.09 ns | 1.58 ns |  1.98 |    0.02 | A-[Param=10]-DefaultJob |       No |
-        |        |            |       |          |         |         |       |         |                         |          |
- Bench1 |    Foo |          A |    20 | 302.0 ns | 6.09 ns | 1.58 ns |  1.00 |    0.00 | A-[Param=20]-DefaultJob |      Yes | ^
- Bench1 |    Bar |          A |    20 | 402.0 ns | 6.09 ns | 1.58 ns |  1.33 |    0.00 | A-[Param=20]-DefaultJob |       No |
-        |        |            |       |          |         |         |       |         |                         |          |
- Bench2 |    Foo |          B |    10 | 102.0 ns | 6.09 ns | 1.58 ns |     ? |       ? | B-[Param=10]-DefaultJob |       No | ^
- Bench2 |    Bar |          B |    10 | 202.0 ns | 6.09 ns | 1.58 ns |     ? |       ? | B-[Param=10]-DefaultJob |       No |
-        |        |            |       |          |         |         |       |         |                         |          |
- Bench2 |    Foo |          B |    20 | 302.0 ns | 6.09 ns | 1.58 ns |     ? |       ? | B-[Param=20]-DefaultJob |       No | ^
- Bench2 |    Bar |          B |    20 | 402.0 ns | 6.09 ns | 1.58 ns |     ? |       ? | B-[Param=20]-DefaultJob |       No |
+   Type | Method | Categories | Param |     Mean |   Error |  StdDev | Ratio | RatioSD |                   LogicalGroup | Baseline |
+------- |------- |----------- |------ |---------:|--------:|--------:|------:|--------:|------------------------------- |--------- |
+ Bench1 |    Foo |          A |    10 | 102.0 ns | 6.09 ns | 1.58 ns |  1.00 |    0.00 | A-Bench1-[Param=10]-DefaultJob |      Yes | ^
+ Bench1 |    Bar |          A |    10 | 202.0 ns | 6.09 ns | 1.58 ns |  1.98 |    0.02 | A-Bench1-[Param=10]-DefaultJob |       No |
+        |        |            |       |          |         |         |       |         |                                |          |
+ Bench1 |    Foo |          A |    20 | 302.0 ns | 6.09 ns | 1.58 ns |  1.00 |    0.00 | A-Bench1-[Param=20]-DefaultJob |      Yes | ^
+ Bench1 |    Bar |          A |    20 | 402.0 ns | 6.09 ns | 1.58 ns |  1.33 |    0.00 | A-Bench1-[Param=20]-DefaultJob |       No |
+        |        |            |       |          |         |         |       |         |                                |          |
+ Bench2 |    Foo |          B |    10 | 102.0 ns | 6.09 ns | 1.58 ns |     ? |       ? | B-Bench2-[Param=10]-DefaultJob |       No | ^
+ Bench2 |    Bar |          B |    10 | 202.0 ns | 6.09 ns | 1.58 ns |     ? |       ? | B-Bench2-[Param=10]-DefaultJob |       No |
+        |        |            |       |          |         |         |       |         |                                |          |
+ Bench2 |    Foo |          B |    20 | 302.0 ns | 6.09 ns | 1.58 ns |     ? |       ? | B-Bench2-[Param=20]-DefaultJob |       No | ^
+ Bench2 |    Bar |          B |    20 | 402.0 ns | 6.09 ns | 1.58 ns |     ? |       ? | B-Bench2-[Param=20]-DefaultJob |       No |
 
 Errors: 0
