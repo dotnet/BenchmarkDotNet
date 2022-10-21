@@ -470,7 +470,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 builder.UseNuGet(ilCompilerVersion, nuGetFeedUrl);
 
             var runtime = runtimeMoniker.GetRuntime();
-            builder.DisplayName(runtime.Name);
             builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
 
             return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
