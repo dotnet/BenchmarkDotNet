@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 using ApprovalTests;
 using ApprovalTests.Namers;
 using ApprovalTests.Reporters;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.ConsoleArguments;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
+using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using JetBrains.Annotations;
 using Xunit;
@@ -80,6 +85,62 @@ namespace BenchmarkDotNet.Tests.Columns
         public void Dispose() => Thread.CurrentThread.CurrentCulture = initCulture;
 
         public class BenchmarkClass
+        {
+            [Benchmark] public void Method() { }
+        }
+
+        [FactDotNetCoreOnly("In the .Net Framework cmd job uses CsProjClassicNetToolchain while fluent and attribute jobs use RoslynToolchain by default")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public void MultipleInputColumnsDisplayTest()
+        {
+            var cmdConfig = ConfigParser.Parse(
+                "--join --runtimes net481 net6.0 nativeaot6.0".Split(), NullLogger.Instance).config;
+
+            var fluentConfig = ManualConfig.CreateEmpty().AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddJob(Job.Dry.WithRuntime(CoreRuntime.Core60))
+                .AddJob(Job.Dry.WithRuntime(ClrRuntime.Net481))
+                .AddJob(Job.Dry.WithRuntime(NativeAotRuntime.Net60));
+
+            var config = ManualConfig.Union(cmdConfig, fluentConfig);
+
+            NamerFactory.AdditionalInformation = nameof(MultipleInputColumnsDisplayTest);
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+
+            var logger = new AccumulationLogger();
+            logger.WriteLine("=== " + nameof(MultipleInputColumnsDisplayTest) + " ===");
+
+            var exporter = MarkdownExporter.Mock;
+            var summary = MockFactory.CreateSummary<BenchmarkClass1>(config);
+            exporter.ExportToLog(summary, logger);
+
+            var log = logger.GetLog();
+            log = ReplaceRandomIDs(log);
+            Approvals.Verify(log);
+        }
+
+        private static string ReplaceRandomIDs(string log)
+        {
+            var regex = new Regex(@"Job-\w*");
+
+            var index = 0;
+            foreach (Match match in regex.Matches(log))
+            {
+                var randomGeneratedJobName = match.Value;
+
+                // JobIdGenerator.GenerateRandomId() generates Job-ABCDEF
+                // respect the length for proper table formatting
+                var persistantName = $"Job-rndId{index}";
+                log = log.Replace(randomGeneratedJobName, persistantName);
+                index++;
+            }
+
+            return log;
+        }
+
+        [SimpleJob(RunStrategy.ColdStart, RuntimeMoniker.Net60)]
+        [SimpleJob(RunStrategy.ColdStart, RuntimeMoniker.Net481)]
+        [SimpleJob(RunStrategy.ColdStart, RuntimeMoniker.NativeAot60)]
+        public class BenchmarkClass1
         {
             [Benchmark] public void Method() { }
         }
