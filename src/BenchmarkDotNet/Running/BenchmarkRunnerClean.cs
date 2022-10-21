@@ -91,7 +91,8 @@ namespace BenchmarkDotNet.Running
                             var lastFiles = directoryInfo.GetFiles($"{title.Split('-')[0]}*");
                             if (lastFiles.Count() > 1)
                             {
-                                var lastUpdatedFile = lastFiles[lastFiles.Length - 2];
+                                var lastFilesSorted = lastFiles.OrderBy(o => o.LastWriteTime).ToArray();
+                                var lastUpdatedFile = lastFilesSorted[lastFiles.Length - 2];
                                 var text = File.ReadAllText(lastUpdatedFile.FullName);
                                 var regex = new Regex("--benchmarkId (.*?) in");
                                 var match = regex.Match(text);
