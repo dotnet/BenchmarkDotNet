@@ -8,8 +8,8 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   net7   : extra output line
 
 
- Method |  Job |  Runtime |     Mean | Error |
-------- |----- |--------- |---------:|------:|
- Method | net6 | .NET 6.0 | 1.000 ns |    NA |
- Method | net6 | .NET 6.0 | 1.000 ns |    NA |
- Method | net7 | .NET 7.0 | 1.000 ns |    NA |
+ Method |  Runtime |              Toolchain |     Mean | Error |
+------- |--------- |----------------------- |---------:|------:|
+ Method | .NET 6.0 |                Default | 1.000 ns |    NA |
+ Method | .NET 6.0 | InProcessEmitToolchain | 1.000 ns |    NA |
+ Method | .NET 7.0 |                Default | 1.000 ns |    NA |

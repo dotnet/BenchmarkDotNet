@@ -6,9 +6,8 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
   net7   : extra output line
 
-Job=net7  Runtime=.NET 7.0  IterationCount=1  
-LaunchCount=1  RunStrategy=ColdStart  UnrollFactor=1  
-WarmupCount=1  
+Runtime=.NET 7.0  IterationCount=1  LaunchCount=1  
+RunStrategy=ColdStart  UnrollFactor=1  WarmupCount=1  
 
  Method |     Mean | Error |
 ------- |---------:|------:|
