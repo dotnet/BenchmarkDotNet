@@ -5,6 +5,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -39,19 +40,21 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsAvailable(Summary summary)
         {
-            if (summary.IsMultipleRuntimes)
+            switch (ColumnName)
             {
-                if (nameof(Toolchains.Toolchain).Equals(ColumnName))
-                {
+                case Column.Job:
                     return false;
-                }
-                if (nameof(Job).Equals(ColumnName))
-                {
-                    return summary.BenchmarksCases.Any(x => x.Job.HasValue(CharacteristicObject.IdCharacteristic));
-                }
-            }
+                case Column.Toolchain:
+                    var groups = summary.BenchmarksCases.GroupBy(b => b.GetRuntime(), b => b.GetToolchain().Name).ToArray();
 
-            return true;
+                    bool isOneRuntime = groups.Length <= 1;
+                    if (isOneRuntime)
+                        return true;
+
+                    return groups.Any(toolchainNames => toolchainNames.Distinct().Count() > 1);
+                default:
+                    return true;
+            }
         }
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
