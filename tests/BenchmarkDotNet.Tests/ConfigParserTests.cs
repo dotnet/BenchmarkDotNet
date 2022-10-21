@@ -387,7 +387,6 @@ namespace BenchmarkDotNet.Tests
         [Theory]
         [InlineData("net481", ".NET Framework 4.8.1")]
         [InlineData("net7.0", ".NET 7.0")]
-        [InlineData("nativeaot7.0", "NativeAOT 7.0")]
         public void NetMonikersHaveNiceNames(string input, string expected)
         {
             // CoreRuntime.
@@ -397,7 +396,22 @@ namespace BenchmarkDotNet.Tests
             var job = config.GetJobs().Single();
             Assert.NotNull(job);
             Assert.Equal(expected, job.Environment.Runtime.Name);
-            Assert.Equal(expected, job.Infrastructure.Toolchain.Name);
+            Assert.Equal(expected, job.GetToolchain().Name);
+        }
+
+        [Theory]
+        [InlineData("nativeaot6.0", "NativeAOT 6.0", "ILCompiler 6.0.0-*")]
+        [InlineData("nativeaot7.0", "NativeAOT 7.0", "Latest ILCompiler")]
+        public void NativeAotMonikersHaveNiceNames(string input, string runtimeName, string toolchainName)
+        {
+            // CoreRuntime.
+            var config = ConfigParser.Parse(new[] { "-r", input }, new OutputLogger(Output)).config;
+
+            Assert.Single(config.GetJobs());
+            var job = config.GetJobs().Single();
+            Assert.NotNull(job);
+            Assert.Equal(runtimeName, job.Environment.Runtime.Name);
+            Assert.Equal(toolchainName, job.GetToolchain().Name);
         }
 
         [Theory]
@@ -426,7 +440,7 @@ namespace BenchmarkDotNet.Tests
             var job = config.GetJobs().Single();
             Assert.NotNull(job);
             //todo: add postfix to runtime name instead toolchain name
-            Assert.Equal(expected, job.Infrastructure.Toolchain.Name);
+            Assert.Equal(expected, job.GetToolchain().Name);
         }
 
         [Fact]
