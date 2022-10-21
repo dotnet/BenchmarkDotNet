@@ -370,23 +370,40 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Theory]
-        [InlineData("net50")]
-        [InlineData("net60")]
-        [InlineData("net70")]
-        [InlineData("net80")]
-        public void NetMonikersAreRecognizedAsNetCoreMonikers(string tfm)
+        [InlineData("net50", "net5.0")]
+        [InlineData("net60", "net6.0")]
+        [InlineData("net70", "net7.0")]
+        [InlineData("net80", "net8.0")]
+        public void NetMonikersAreRecognizedAsNetCoreMonikers(string input, string expected)
         {
-            var config = ConfigParser.Parse(new[] { "-r", tfm }, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "-r", input }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
             CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(tfm, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
+            Assert.Equal(expected, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
+        }
+
+        [Theory]
+        [InlineData("net481", ".NET Framework 4.8.1")]
+        [InlineData("net7.0", ".NET 7.0")]
+        [InlineData("nativeaot7.0", "NativeAOT 7.0")]
+        public void NetMonikersHaveNiceNames(string input, string expected)
+        {
+            // CoreRuntime.
+            var config = ConfigParser.Parse(new[] { "-r", input }, new OutputLogger(Output)).config;
+
+            Assert.Single(config.GetJobs());
+            var job = config.GetJobs().Single();
+            Assert.NotNull(job);
+            Assert.Equal(expected, job.Environment.Runtime.Name);
+            Assert.Equal(expected, job.Infrastructure.Toolchain.Name);
         }
 
         [Theory]
         [InlineData("net5.0-windows")]
         [InlineData("net5.0-ios")]
+        [InlineData("net5.0-ios15.0")]
         public void PlatformSpecificMonikersAreSupported(string msBuildMoniker)
         {
             var config = ConfigParser.Parse(new[] { "-r", msBuildMoniker }, new OutputLogger(Output)).config;
@@ -395,6 +412,21 @@ namespace BenchmarkDotNet.Tests
             CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
             Assert.NotNull(toolchain);
             Assert.Equal(msBuildMoniker, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
+        }
+
+        [Theory]
+        [InlineData("net7.0-ios", ".NET 7.0-ios")]
+        [InlineData("net7.0-IOS", ".NET 7.0-ios")]
+        [InlineData("net7.0-ios15.0", ".NET 7.0-ios15.0")]
+        public void PlatformSpecificMonikersHaveNiceNames(string input, string expected)
+        {
+            var config = ConfigParser.Parse(new[] { "-r", input }, new OutputLogger(Output)).config;
+
+            Assert.Single(config.GetJobs());
+            var job = config.GetJobs().Single();
+            Assert.NotNull(job);
+            //todo: add postfix to runtime name instead toolchain name
+            Assert.Equal(expected, job.Infrastructure.Toolchain.Name);
         }
 
         [Fact]
