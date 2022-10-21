@@ -35,6 +35,9 @@ namespace BenchmarkDotNet.Running
 
         internal static Summary[] Run(BenchmarkRunInfo[] benchmarkRunInfos)
         {
+            using var taskbarProgress = new TaskbarProgress();
+            taskbarProgress.SetState(TaskbarProgressState.Indeterminate);
+
             var resolver = DefaultResolver;
             var artifactsToCleanup = new List<string>();
 
@@ -85,7 +88,8 @@ namespace BenchmarkDotNet.Running
                     foreach (var benchmarkRunInfo in supportedBenchmarks) // we run them in the old order now using the new build artifacts
                     {
                         var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup,
-                            resultsFolderPath, logFilePath, totalBenchmarkCount, in runsChronometer, ref benchmarksToRunCount);
+                            resultsFolderPath, logFilePath, totalBenchmarkCount, in runsChronometer, ref benchmarksToRunCount,
+                            taskbarProgress);
 
                         if (!benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.JoinSummary))
                             PrintSummary(compositeLogger, benchmarkRunInfo.Config, summary);
@@ -141,7 +145,8 @@ namespace BenchmarkDotNet.Running
                                    string logFilePath,
                                    int totalBenchmarkCount,
                                    in StartedClock runsChronometer,
-                                   ref int benchmarksToRunCount)
+                                   ref int benchmarksToRunCount,
+                                   TaskbarProgress taskbarProgress)
         {
             var runStart = runsChronometer.GetElapsed();
 
@@ -159,8 +164,6 @@ namespace BenchmarkDotNet.Running
             logger.WriteLine();
 
             UpdateTitle(totalBenchmarkCount, benchmarksToRunCount);
-
-            using var taskbarProgress = new TaskbarProgress();
 
             using (var powerManagementApplier = new PowerManagementApplier(logger))
             {

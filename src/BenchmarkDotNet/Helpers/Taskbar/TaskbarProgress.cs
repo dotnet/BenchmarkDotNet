@@ -14,9 +14,6 @@ namespace BenchmarkDotNet.Helpers
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetConsoleWindow();
 
-        [DllImport("user32.dll", ExactSpelling = true)]
-        private static extern IntPtr GetAncestor(IntPtr hwnd, GetAncestorFlags flags);
-
         internal TaskbarProgress()
         {
             if (OsVersionIsSupported)
@@ -24,14 +21,16 @@ namespace BenchmarkDotNet.Helpers
                 consoleWindowHandle = GetConsoleWindow();
                 if (consoleWindowHandle != IntPtr.Zero)
                 {
-                    IntPtr rootOwnerHandle = GetAncestor(consoleWindowHandle, GetAncestorFlags.RootOwner);
-                    if (rootOwnerHandle != IntPtr.Zero)
-                    {
-                        consoleWindowHandle = rootOwnerHandle;
-                    }
-                    TaskbarProgressCom.SetState(consoleWindowHandle, TaskbarProgressState.Normal);
                     Console.CancelKeyPress += OnConsoleCancelEvent;
                 }
+            }
+        }
+
+        internal void SetState(TaskbarProgressState state)
+        {
+            if (consoleWindowHandle != IntPtr.Zero)
+            {
+                TaskbarProgressCom.SetState(consoleWindowHandle, state);
             }
         }
 
@@ -57,13 +56,6 @@ namespace BenchmarkDotNet.Helpers
                 Console.CancelKeyPress -= OnConsoleCancelEvent;
             }
         }
-    }
-
-    internal enum GetAncestorFlags : uint
-    {
-        Parent = 1,
-        Root = 2,
-        RootOwner = 3
     }
 
     internal enum TaskbarProgressState
