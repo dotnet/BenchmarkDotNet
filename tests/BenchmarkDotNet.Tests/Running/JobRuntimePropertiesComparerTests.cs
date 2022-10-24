@@ -166,8 +166,8 @@ namespace BenchmarkDotNet.Tests.Running
 
             Assert.Equal(2, grouped.Length);
 
-            Assert.Single(grouped, group => group.Count() == 3); // Plain1 (3 methods) runing against "net5.0"
-            Assert.Single(grouped, group => group.Count() == 6); // Plain2 (3 methods) and Plain3 (3 methods) runing against "net5.0-windows"
+            Assert.Single(grouped, group => group.Count() == 3); // Plain1 (3 methods) running against "net5.0"
+            Assert.Single(grouped, group => group.Count() == 6); // Plain2 (3 methods) and Plain3 (3 methods) running against "net5.0-windows"
         }
     }
 }

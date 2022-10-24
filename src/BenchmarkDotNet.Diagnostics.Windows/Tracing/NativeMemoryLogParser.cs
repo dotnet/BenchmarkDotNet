@@ -217,7 +217,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                     return;
                 }
 
-                // Heap is dieing, kill all objects in it.
+                // Heap is dying, kill all objects in it.
                 var allocs = lastHeapAllocs;
                 if (data.HeapHandle != lastHeapHandle)
                 {
