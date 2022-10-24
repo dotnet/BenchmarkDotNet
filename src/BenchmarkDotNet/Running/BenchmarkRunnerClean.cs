@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Running
 
                 compositeLogger.WriteLineInfo("// Validating benchmarks:");
 
-                var (supportedBenchmarks, validationErrors) = GetSupportedBenchmarks(benchmarkRunInfos, compositeLogger, resolver);
+                var (supportedBenchmarks, validationErrors) = GetSupportedBenchmarks(benchmarkRunInfos, resolver);
 
                 validationErrors.AddRange(Validate(supportedBenchmarks));
 
@@ -532,11 +532,11 @@ namespace BenchmarkDotNet.Running
         private static void LogTotalTime(ILogger logger, TimeSpan time, int executedBenchmarksCount, string message = "Total time")
             => logger.WriteLineStatistic($"{message}: {time.ToFormattedTotalTime(DefaultCultureInfo.Instance)}, executed benchmarks: {executedBenchmarksCount}");
 
-        private static (BenchmarkRunInfo[], List<ValidationError>) GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, ILogger logger, IResolver resolver)
+        private static (BenchmarkRunInfo[], List<ValidationError>) GetSupportedBenchmarks(BenchmarkRunInfo[] benchmarkRunInfos, IResolver resolver)
         {
             List<ValidationError> validationErrors = new ();
 
-            var benchmarksRunInfo = benchmarkRunInfos.Select(info => new BenchmarkRunInfo(
+            var runInfos = benchmarkRunInfos.Select(info => new BenchmarkRunInfo(
                     info.BenchmarksCases.Where(benchmark =>
                     {
                         var errors = benchmark.GetToolchain().Validate(benchmark, resolver).ToArray();
@@ -548,7 +548,7 @@ namespace BenchmarkDotNet.Running
                 .Where(infos => infos.BenchmarksCases.Any())
                 .ToArray();
 
-            return (benchmarkRunInfos, validationErrors);
+            return (runInfos, validationErrors);
         }
 
         private static string GetRootArtifactsFolderPath(BenchmarkRunInfo[] benchmarkRunInfos)

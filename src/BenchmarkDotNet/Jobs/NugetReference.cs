@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Jobs
 
             PackageName = packageName;
 
-            if (!string.IsNullOrWhiteSpace(PackageVersion) && !IsValidVersion(packageVersion))
+            if (!string.IsNullOrWhiteSpace(packageVersion) && !IsValidVersion(packageVersion))
                 throw new InvalidOperationException($"Invalid version specified: {packageVersion}");
 
             PackageVersion = packageVersion ?? string.Empty;
