@@ -43,6 +43,7 @@ namespace BenchmarkDotNet.Running
             var rootArtifactsFolderPath = GetRootArtifactsFolderPath(benchmarkRunInfos);
             var resultsFolderPath = GetResultsFolderPath(rootArtifactsFolderPath, benchmarkRunInfos);
             var logFilePath = Path.Combine(rootArtifactsFolderPath, title + ".log");
+            var parsedIdToResume = 0;
 
             using (var streamLogger = new StreamLogger(GetLogFileStreamWriter(benchmarkRunInfos, logFilePath)))
             {
@@ -83,27 +84,29 @@ namespace BenchmarkDotNet.Running
                     // used to estimate finish time, in contrary to globalChronometer it does not include build time
                     var runsChronometer = Chronometer.Start();
 
+                    if (supportedBenchmarks.Any(benchmark => benchmark.Config.Options.IsSet(ConfigOptions.Resume)))
+                    {
+                        var directoryInfo = new DirectoryInfo(rootArtifactsFolderPath);
+                        var lastFiles = directoryInfo.GetFiles($"{title.Split('-')[0]}*");
+                        if (lastFiles.Count() > 1)
+                        {
+                            var lastFilesSorted = lastFiles.OrderBy(o => o.LastWriteTime).ToArray();
+                            var lastUpdatedFile = lastFilesSorted[lastFiles.Length - 2];
+                            var text = File.ReadAllText(lastUpdatedFile.FullName);
+                            var regex = new Regex("--benchmarkId (.*?) in");
+                            var match = regex.Match(text);
+                            if (match.Success)
+                                parsedIdToResume = int.Parse(match.Groups[1].Value);
+                        }
+                    }
+
                     foreach (var benchmarkRunInfo in supportedBenchmarks) // we run them in the old order now using the new build artifacts
                     {
                         if (benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.Resume))
                         {
-                            var directoryInfo = new DirectoryInfo(rootArtifactsFolderPath);
-                            var lastFiles = directoryInfo.GetFiles($"{title.Split('-')[0]}*");
-                            if (lastFiles.Count() > 1)
-                            {
-                                var lastFilesSorted = lastFiles.OrderBy(o => o.LastWriteTime).ToArray();
-                                var lastUpdatedFile = lastFilesSorted[lastFiles.Length - 2];
-                                var text = File.ReadAllText(lastUpdatedFile.FullName);
-                                var regex = new Regex("--benchmarkId (.*?) in");
-                                var match = regex.Match(text);
-                                if (match.Success)
-                                {
-                                    var parsedId = int.Parse(match.Groups[1].Value);
-                                    var benchmarkWithHighestIdForGivenType = benchmarkRunInfo.BenchmarksCases.Last();
-                                    if (benchmarkToBuildResult[benchmarkWithHighestIdForGivenType].Id.Value < parsedId)
-                                        continue;
-                                }
-                            }
+                            var benchmarkWithHighestIdForGivenType = benchmarkRunInfo.BenchmarksCases.Last();
+                            if (benchmarkToBuildResult[benchmarkWithHighestIdForGivenType].Id.Value < parsedIdToResume)
+                                continue;
                         }
 
                         var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup,
