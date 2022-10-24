@@ -146,7 +146,12 @@ namespace BenchmarkDotNet.Jobs
         MonoAOTLLVMNet70,
 
         /// <summary>
-        /// Mono with .net7.0
+        /// .NET 6 using MonoVM (not CLR which is the default)
+        /// </summary>
+        Mono60,
+
+        /// <summary>
+        /// .NET 7 using MonoVM (not CLR which is the default)
         /// </summary>
         Mono70,
     }

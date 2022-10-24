@@ -6,6 +6,8 @@ namespace BenchmarkDotNet.Environments
     public class MonoRuntime : Runtime, IEquatable<MonoRuntime>
     {
         public static readonly MonoRuntime Default = new MonoRuntime("Mono");
+        public static readonly MonoRuntime Mono60 = new MonoRuntime("Mono with .NET 6.0", RuntimeMoniker.Mono60, isDotNetBuiltIn: true);
+        public static readonly MonoRuntime Mono70 = new MonoRuntime("Mono with .NET 7.0", RuntimeMoniker.Mono70, isDotNetBuiltIn: true);
 
         public string CustomPath { get; }
 
@@ -15,7 +17,14 @@ namespace BenchmarkDotNet.Environments
 
         public string MonoBclPath { get; }
 
+        public bool IsDotNetBuiltIn { get; set; }
+
         private MonoRuntime(string name) : base(RuntimeMoniker.Mono, "mono", name) { }
+
+        private MonoRuntime(string name, RuntimeMoniker runtimeMoniker, bool isDotNetBuiltIn) : base(runtimeMoniker, "mono", name)
+        {
+            IsDotNetBuiltIn = isDotNetBuiltIn;
+        }
 
         public MonoRuntime(string name, string customPath) : this(name) => CustomPath = customPath;
 

@@ -19,7 +19,6 @@ namespace BenchmarkDotNet.Environments
         public static readonly CoreRuntime Core50 = new CoreRuntime(RuntimeMoniker.Net50, "net5.0", ".NET 5.0");
         public static readonly CoreRuntime Core60 = new CoreRuntime(RuntimeMoniker.Net60, "net6.0", ".NET 6.0");
         public static readonly CoreRuntime Core70 = new CoreRuntime(RuntimeMoniker.Net70, "net7.0", ".NET 7.0");
-        public static readonly CoreRuntime Mono70 = new CoreRuntime(RuntimeMoniker.Mono70, "mono7.0", "Mono with .NET 7.0");
 
         public static CoreRuntime Latest => Core70; // when dotnet/runtime branches for 8.0, this will need to get updated
 

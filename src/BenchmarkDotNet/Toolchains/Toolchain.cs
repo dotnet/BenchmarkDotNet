@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Toolchains
                 return false;
             }
 
-            if (runtime is MonoRuntime mono && !benchmarkCase.GetToolchain().IsInProcess)
+            if (runtime is MonoRuntime mono && !mono.IsDotNetBuiltIn && !benchmarkCase.GetToolchain().IsInProcess)
             {
                 if (string.IsNullOrEmpty(mono.CustomPath) && !HostEnvironmentInfo.GetCurrent().IsMonoInstalled.Value)
                 {

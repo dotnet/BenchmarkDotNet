@@ -29,6 +29,7 @@ using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
 using Perfolizer.Mathematics.SignificanceTesting;
 using Perfolizer.Mathematics.Thresholds;
+using BenchmarkDotNet.Toolchains.Mono;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -113,7 +114,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 }
                 else if (runtimeMoniker == RuntimeMoniker.MonoAOTLLVM && (options.AOTCompilerPath == null || options.AOTCompilerPath.IsNotNullButDoesNotExist()))
                 {
-                     logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{ options.AOTCompilerPath }\" does NOT exist. It MUST be provided.");
+                    logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{options.AOTCompilerPath}\" does NOT exist. It MUST be provided.");
                 }
             }
 
@@ -265,7 +266,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithOutlierMode(options.Outliers);
 
             if (options.Affinity.HasValue)
-                baseJob = baseJob.WithAffinity((IntPtr) options.Affinity.Value);
+                baseJob = baseJob.WithAffinity((IntPtr)options.Affinity.Value);
 
             if (options.LaunchCount.HasValue)
                 baseJob = baseJob.WithLaunchCount(options.LaunchCount.Value);
@@ -387,7 +388,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net50:
                 case RuntimeMoniker.Net60:
                 case RuntimeMoniker.Net70:
-                    return CreateCoreJob(baseJob, runtimeId, runtimeId, options, runtimeMoniker.GetRuntime());
+                    return baseJob
+                        .WithRuntime(runtimeMoniker.GetRuntime())
+                        .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
                 case RuntimeMoniker.Mono:
                     return baseJob.WithRuntime(new MonoRuntime("Mono", options.MonoPath?.FullName));
                 case RuntimeMoniker.NativeAot60:
@@ -408,19 +411,13 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return MakeMonoAOTLLVMJob(baseJob, options, "net6.0");
                 case RuntimeMoniker.MonoAOTLLVMNet70:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net7.0");
+                case RuntimeMoniker.Mono60:
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono70, "net6.0");
                 case RuntimeMoniker.Mono70:
-                    return CreateCoreJob(baseJob, "net7.0", "Mono with .NET 7.0", options, CoreRuntime.Core70)
-                        .WithArguments(new Argument[] { new MsBuildArgument("/p:UseMonoRuntime=true") });
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono70, "net7.0");
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
-        }
-
-        private static Job CreateCoreJob(Job baseJob, string runtimeId, string runtimeName, CommandLineOptions options, Runtime runtime)
-        {
-            return baseJob
-                .WithRuntime(runtime)
-                .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeName, options.CliPath?.FullName, options.RestorePath?.FullName)));
         }
 
         private static Job CreateAotJob(Job baseJob, CommandLineOptions options, RuntimeMoniker runtimeMoniker, string ilCompilerVersion, string nuGetFeedUrl)
@@ -443,6 +440,13 @@ namespace BenchmarkDotNet.ConsoleArguments
             builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
 
             return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
+        }
+
+        private static Job MakeMonoJob(Job baseJob, CommandLineOptions options, MonoRuntime runtime, string msBuildMoniker)
+        {
+            return baseJob
+                .WithRuntime(runtime)
+                .WithToolchain(MonoToolchain.From(new NetCoreAppSettings(msBuildMoniker, null, runtime.Name, options.CliPath?.FullName, options.RestorePath?.FullName)));
         }
 
         private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker)
