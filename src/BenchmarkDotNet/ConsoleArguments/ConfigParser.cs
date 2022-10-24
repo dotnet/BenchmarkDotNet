@@ -424,10 +424,10 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return MakeMonoAOTLLVMJob(baseJob, options, "net7.0");
 
                 case RuntimeMoniker.Mono60:
-                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono70, "net6.0");
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono60);
 
                 case RuntimeMoniker.Mono70:
-                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono70, "net7.0");
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono70);
 
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
@@ -456,11 +456,11 @@ namespace BenchmarkDotNet.ConsoleArguments
             return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
         }
 
-        private static Job MakeMonoJob(Job baseJob, CommandLineOptions options, MonoRuntime runtime, string msBuildMoniker)
+        private static Job MakeMonoJob(Job baseJob, CommandLineOptions options, MonoRuntime runtime)
         {
             return baseJob
                 .WithRuntime(runtime)
-                .WithToolchain(MonoToolchain.From(new NetCoreAppSettings(msBuildMoniker, null, runtime.Name, options.CliPath?.FullName, options.RestorePath?.FullName)));
+                .WithToolchain(MonoToolchain.From(new NetCoreAppSettings(runtime.MsBuildMoniker, null, runtime.Name, options.CliPath?.FullName, options.RestorePath?.FullName)));
         }
 
         private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker)
