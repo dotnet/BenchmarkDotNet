@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Loggers
 
         public static void WriteLineHint(this ILogger logger, string text) => logger.WriteLine(LogKind.Hint, text);
 
-        public static void Write(this ILogger logger, string text) =>  logger.Write(LogKind.Default, text);
+        public static void Write(this ILogger logger, string text) => logger.Write(LogKind.Default, text);
 
         [PublicAPI]
         public static void WriteHelp(this ILogger logger, string text) => logger.Write(LogKind.Help, text);

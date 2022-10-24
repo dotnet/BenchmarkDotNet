@@ -17,13 +17,13 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
-using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.MonoAotLLVM;
+using BenchmarkDotNet.Toolchains.MonoWasm;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using CommandLine;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
@@ -377,6 +377,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
                         .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName));
+
                 case RuntimeMoniker.NetCoreApp20:
                 case RuntimeMoniker.NetCoreApp21:
                 case RuntimeMoniker.NetCoreApp22:
@@ -391,30 +392,43 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
                         .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
+
                 case RuntimeMoniker.Mono:
                     return baseJob.WithRuntime(new MonoRuntime("Mono", options.MonoPath?.FullName));
+
                 case RuntimeMoniker.NativeAot60:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json");
+
                 case RuntimeMoniker.NativeAot70:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json");
+
                 case RuntimeMoniker.Wasm:
                     return MakeWasmJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0", runtimeMoniker);
+
                 case RuntimeMoniker.WasmNet50:
                     return MakeWasmJob(baseJob, options, "net5.0", runtimeMoniker);
+
                 case RuntimeMoniker.WasmNet60:
                     return MakeWasmJob(baseJob, options, "net6.0", runtimeMoniker);
+
                 case RuntimeMoniker.WasmNet70:
                     return MakeWasmJob(baseJob, options, "net7.0", runtimeMoniker);
+
                 case RuntimeMoniker.MonoAOTLLVM:
                     return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0");
+
                 case RuntimeMoniker.MonoAOTLLVMNet60:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net6.0");
+
                 case RuntimeMoniker.MonoAOTLLVMNet70:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net7.0");
+
                 case RuntimeMoniker.Mono60:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono70, "net6.0");
+
                 case RuntimeMoniker.Mono70:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono70, "net7.0");
+
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
@@ -479,7 +493,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 wasmDataDir: options.WasmDataDirectory?.FullName,
                 moniker: moniker);
 
-            var toolChain = WasmToolChain.From(new NetCoreAppSettings(
+            var toolChain = WasmToolchain.From(new NetCoreAppSettings(
                 targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
                 runtimeFrameworkVersion: null,
                 name: wasmRuntime.Name,
@@ -566,7 +580,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                         break;
                     }
             }
-
 
             if (commonLongestPrefixIndex <= 1)
                 return coreRunPath.FullName;

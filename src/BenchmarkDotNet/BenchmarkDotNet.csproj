@@ -21,7 +21,6 @@
     <PackageReference Include="Iced" Version="1.17.0" />
     <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="2.2.332302" />
     <PackageReference Include="Perfolizer" Version="0.2.1" />
-    <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />
     <PackageReference Include="System.Management" Version="6.0.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />

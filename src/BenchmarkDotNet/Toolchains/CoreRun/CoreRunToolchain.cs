@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Toolchains.CoreRun
 {
@@ -57,18 +58,18 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 
         public override string ToString() => Name;
 
-        public bool IsSupported(BenchmarkCase benchmark, ILogger logger, IResolver resolver)
+        public IEnumerable<ValidationError> Validate(BenchmarkCase benchmark, IResolver resolver)
         {
             if (!SourceCoreRun.Exists)
             {
-                logger.WriteLineError($"Provided CoreRun path does not exist, benchmark '{benchmark.DisplayInfo}' will not be executed. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.");
-                return false;
+                yield return new ValidationError(true,
+                    $"Provided CoreRun path does not exist, benchmark '{benchmark.DisplayInfo}' will not be executed. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.",
+                    benchmark);
             }
-
-            if (Toolchain.InvalidCliPath(CustomDotNetCliPath?.FullName, benchmark, logger))
-                return false;
-
-            return true;
+            else if (Toolchain.IsCliPathInvalid(CustomDotNetCliPath?.FullName, benchmark, out var invalidCliError))
+            {
+                yield return invalidCliError;
+            }
         }
 
         private static FileInfo GetShadowCopyPath(FileInfo coreRunPath)

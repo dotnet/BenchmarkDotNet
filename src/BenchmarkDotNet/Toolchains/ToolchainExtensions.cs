@@ -4,15 +4,14 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
-using BenchmarkDotNet.Toolchains.InProcess;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Toolchains.Mono;
-using BenchmarkDotNet.Toolchains.Roslyn;
 using BenchmarkDotNet.Toolchains.MonoWasm;
+using BenchmarkDotNet.Toolchains.NativeAot;
+using BenchmarkDotNet.Toolchains.Roslyn;
 
 namespace BenchmarkDotNet.Toolchains
 {
@@ -66,7 +65,7 @@ namespace BenchmarkDotNet.Toolchains
                             : NativeAotToolchain.CreateBuilder().UseNuGet().TargetFrameworkMoniker(nativeAotRuntime.MsBuildMoniker).ToToolchain();
 
                 case WasmRuntime wasmRuntime:
-                    return WasmToolChain.From(new NetCoreAppSettings(targetFrameworkMoniker: wasmRuntime.MsBuildMoniker, name: wasmRuntime.Name, runtimeFrameworkVersion: null));
+                    return WasmToolchain.From(new NetCoreAppSettings(targetFrameworkMoniker: wasmRuntime.MsBuildMoniker, name: wasmRuntime.Name, runtimeFrameworkVersion: null));
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtime), runtime, "Runtime not supported");
@@ -79,26 +78,37 @@ namespace BenchmarkDotNet.Toolchains
             {
                 case RuntimeMoniker.Net461:
                     return CsProjClassicNetToolchain.Net461;
+
                 case RuntimeMoniker.Net462:
                     return CsProjClassicNetToolchain.Net462;
+
                 case RuntimeMoniker.Net47:
                     return CsProjClassicNetToolchain.Net47;
+
                 case RuntimeMoniker.Net471:
                     return CsProjClassicNetToolchain.Net471;
+
                 case RuntimeMoniker.Net472:
                     return CsProjClassicNetToolchain.Net472;
+
                 case RuntimeMoniker.Net48:
                     return CsProjClassicNetToolchain.Net48;
+
                 case RuntimeMoniker.Net481:
                     return CsProjClassicNetToolchain.Net481;
+
                 case RuntimeMoniker.NetCoreApp20:
                     return CsProjCoreToolchain.NetCoreApp20;
+
                 case RuntimeMoniker.NetCoreApp21:
                     return CsProjCoreToolchain.NetCoreApp21;
+
                 case RuntimeMoniker.NetCoreApp22:
                     return CsProjCoreToolchain.NetCoreApp22;
+
                 case RuntimeMoniker.NetCoreApp30:
                     return CsProjCoreToolchain.NetCoreApp30;
+
                 case RuntimeMoniker.NetCoreApp31:
                     return CsProjCoreToolchain.NetCoreApp31;
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -106,16 +116,25 @@ namespace BenchmarkDotNet.Toolchains
 #pragma warning restore CS0618 // Type or member is obsolete
                 case RuntimeMoniker.Net50:
                     return CsProjCoreToolchain.NetCoreApp50;
+
                 case RuntimeMoniker.Net60:
                     return CsProjCoreToolchain.NetCoreApp60;
+
                 case RuntimeMoniker.Net70:
                     return CsProjCoreToolchain.NetCoreApp70;
+
                 case RuntimeMoniker.NativeAot60:
                     return NativeAotToolchain.Net60;
+
                 case RuntimeMoniker.NativeAot70:
                     return NativeAotToolchain.Net70;
+
+                case RuntimeMoniker.Mono60:
+                    return CsProjCoreToolchain.NetCoreApp60;
+
                 case RuntimeMoniker.Mono70:
                     return CsProjCoreToolchain.NetCoreApp70;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "RuntimeMoniker not supported");
             }

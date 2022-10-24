@@ -83,11 +83,8 @@ namespace BenchmarkDotNet.Reports
         public bool IsMultipleRuntimes
             => isMultipleRuntimes ??= BenchmarksCases.Length > 1 ? BenchmarksCases.Select(benchmark => benchmark.GetRuntime()).Distinct().Count() > 1 : false;
 
-        internal static Summary NothingToRun(string title, string resultsDirectoryPath, string logFilePath)
-            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, DefaultCultureInfo.Instance, ImmutableArray<ValidationError>.Empty, ImmutableArray<IColumnHidingRule>.Empty);
-
-        internal static Summary ValidationFailed(string title, string resultsDirectoryPath, string logFilePath, ImmutableArray<ValidationError> validationErrors)
-            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, DefaultCultureInfo.Instance, validationErrors, ImmutableArray<IColumnHidingRule>.Empty);
+        internal static Summary ValidationFailed(string title, string resultsDirectoryPath, string logFilePath, ImmutableArray<ValidationError>? validationErrors = null)
+            => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, DefaultCultureInfo.Instance, validationErrors ?? ImmutableArray<ValidationError>.Empty, ImmutableArray<IColumnHidingRule>.Empty);
 
         internal static Summary Join(List<Summary> summaries, ClockSpan clockSpan)
             => new Summary(
