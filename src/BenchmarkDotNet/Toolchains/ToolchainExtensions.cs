@@ -130,10 +130,10 @@ namespace BenchmarkDotNet.Toolchains
                     return NativeAotToolchain.Net70;
 
                 case RuntimeMoniker.Mono60:
-                    return CsProjCoreToolchain.NetCoreApp60;
+                    return MonoToolchain.Mono60;
 
                 case RuntimeMoniker.Mono70:
-                    return CsProjCoreToolchain.NetCoreApp70;
+                    return MonoToolchain.Mono70;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "RuntimeMoniker not supported");
