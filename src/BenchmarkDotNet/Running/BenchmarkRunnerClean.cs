@@ -93,7 +93,6 @@ namespace BenchmarkDotNet.Running
                             var lastFilesSorted = lastFiles.OrderBy(o => o.LastWriteTime).ToArray();
                             // The last is the current file and we need one before the last where we can get the last benchmarkId to skip in the current run until the benchmarkId that was found.
                             var lastUpdatedFile = lastFilesSorted[lastFiles.Length - 2];
-                            var text = File.ReadAllText(lastUpdatedFile.FullName);
                             var regex = new Regex("--benchmarkId (.*?) in", RegexOptions.Compiled);
                             foreach (var line in File.ReadLines(lastUpdatedFile.FullName).Reverse())
                             {

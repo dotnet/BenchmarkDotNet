@@ -341,10 +341,12 @@ namespace BenchmarkDotNet.IntegrationTests
             var types = new[] { typeof(WithDryAttributeAndCategory) };
             var switcher = new BenchmarkSwitcher(types);
 
-            var results = switcher.Run(new[] { "--resume", "--filter", "*WithDryAttribute*" }, config);
+            var firstResults = switcher.Run(new[] { "--filter", "*WithDryAttribute*" }, config);
 
-            Assert.Single(results);
-            Assert.Single(results.SelectMany(r => r.BenchmarksCases));
+            var secondResults = switcher.Run(new[] { "--resume", "--filter", "*WithDryAttribute*" }, config);
+
+            Assert.Single(firstResults);
+            Assert.Single(secondResults);
         }
 
         private class UserInteractionMock : IUserInteraction
