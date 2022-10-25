@@ -151,6 +151,7 @@ namespace BenchmarkDotNet.Running
             var cultureInfo = config.CultureInfo ?? DefaultCultureInfo.Instance;
             var reports = new List<BenchmarkReport>();
             string title = GetTitle(new[] { benchmarkRunInfo });
+            var quietLogger = GetQuietLogger(config, logger);
             var consoleTitle = RuntimeInformation.IsWindows() ? Console.Title : string.Empty;
 
             logger.WriteLineInfo($"// Found {benchmarks.Length} benchmarks:");
@@ -160,8 +161,9 @@ namespace BenchmarkDotNet.Running
 
             UpdateTitle(totalBenchmarkCount, benchmarksToRunCount);
 
-            using (var powerManagementApplier = new PowerManagementApplier(logger))
+            using (var powerManagementApplier = new PowerManagementApplier(quietLogger))
             {
+
                 bool stop = false;
 
                 for (int i = 0; i < benchmarks.Length && !stop; i++)
@@ -187,7 +189,7 @@ namespace BenchmarkDotNet.Running
                         {
                             var statistics = report.GetResultRuns().GetStatistics();
                             var formatter = statistics.CreateNanosecondFormatter(cultureInfo);
-                            logger.WriteLineStatistic(statistics.ToString(cultureInfo, formatter));
+                            quietLogger.WriteLineStatistic(statistics.ToString(cultureInfo, formatter));
                         }
 
                         if (!report.Success && config.Options.IsSet(ConfigOptions.StopOnFirstError))
@@ -223,7 +225,6 @@ namespace BenchmarkDotNet.Running
                     logger.WriteLine();
 
                     benchmarksToRunCount -= stop ? benchmarks.Length - i : 1;
-
                     LogProgress(logger, in runsChronometer, totalBenchmarkCount, benchmarksToRunCount);
                 }
             }
@@ -391,9 +392,10 @@ namespace BenchmarkDotNet.Running
         private static BenchmarkReport RunCore(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, ILogger logger, IResolver resolver, BuildResult buildResult)
         {
             var toolchain = benchmarkCase.GetToolchain();
+            ILogger quietLogger = !benchmarkCase.Config.Options.IsSet(ConfigOptions.QuietMode) ? logger : NullLogger.Instance;
 
-            logger.WriteLineHeader("// **************************");
-            logger.WriteLineHeader("// Benchmark: " + benchmarkCase.DisplayInfo);
+            quietLogger.WriteLineHeader("// **************************");
+            quietLogger.WriteLineHeader("// Benchmark: " + benchmarkCase.DisplayInfo);
 
             var (success, executeResults, metrics) = Execute(logger, benchmarkCase, benchmarkId, toolchain, buildResult, resolver);
 
@@ -405,8 +407,9 @@ namespace BenchmarkDotNet.Running
         {
             var executeResults = new List<ExecuteResult>();
             var metrics = new List<Metric>();
+            var quietLogger = GetQuietLogger(benchmarkCase.Config, logger);
 
-            logger.WriteLineInfo("// *** Execute ***");
+            quietLogger.WriteLineInfo("// *** Execute ***");
             bool analyzeRunToRunVariance = benchmarkCase.Job.ResolveValue(AccuracyMode.AnalyzeLaunchVarianceCharacteristic, resolver);
             bool autoLaunchCount = !benchmarkCase.Job.HasValue(RunMode.LaunchCountCharacteristic);
             int defaultValue = analyzeRunToRunVariance ? 2 : 1;
@@ -421,7 +424,7 @@ namespace BenchmarkDotNet.Running
                 string printedLaunchCount = analyzeRunToRunVariance && autoLaunchCount && launchIndex <= 2
                     ? ""
                     : " / " + launchCount;
-                logger.WriteLineInfo($"// Launch: {launchIndex}{printedLaunchCount}");
+                quietLogger.WriteLineInfo($"// Launch: {launchIndex}{printedLaunchCount}");
 
                 // use diagnoser only for the last run (we need single result, not many)
                 bool useDiagnoser = launchIndex == launchCount && noOverheadCompositeDiagnoser != null;
@@ -499,12 +502,13 @@ namespace BenchmarkDotNet.Running
         private static ExecuteResult RunExecute(ILogger logger, BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, IToolchain toolchain,
             BuildResult buildResult, IResolver resolver, IDiagnoser diagnoser, int launchIndex)
         {
+            var quietLogger = GetQuietLogger(benchmarkCase.Config, logger);
             var executeResult = toolchain.Executor.Execute(
                 new ExecuteParameters(
                     buildResult,
                     benchmarkCase,
                     benchmarkId,
-                    logger,
+                    quietLogger,
                     resolver,
                     launchIndex,
                     diagnoser));
@@ -518,11 +522,11 @@ namespace BenchmarkDotNet.Running
             {
                 if (executeResult.ExitCode is int exitCode)
                 {
-                    logger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} has exited with code {exitCode}.");
+                    quietLogger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} has exited with code {exitCode}.");
                 }
                 else
                 {
-                    logger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} failed to exit.");
+                    quietLogger.WriteLineInfo($"// Benchmark Process {executeResult.ProcessId} failed to exit.");
                 }
             }
 
@@ -678,5 +682,9 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLine();
             }
         }
+
+        private static ILogger GetQuietLogger(ImmutableConfig config, ILogger logger)
+            => !config.Options.IsSet(ConfigOptions.QuietMode) ? logger : NullLogger.Instance;
+
     }
 }
