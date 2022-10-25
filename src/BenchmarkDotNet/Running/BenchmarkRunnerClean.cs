@@ -94,16 +94,22 @@ namespace BenchmarkDotNet.Running
                             // The last is the current file and we need one before the last where we can get the last benchmarkId to skip in the current run until the benchmarkId that was found.
                             var lastUpdatedFile = lastFilesSorted[lastFiles.Length - 2];
                             var text = File.ReadAllText(lastUpdatedFile.FullName);
-                            var regex = new Regex("--benchmarkId (.*?) in");
-                            var match = regex.Match(text);
-                            if (match.Success)
-                                parsedIdToResume = int.Parse(match.Groups[1].Value);
+                            var regex = new Regex("--benchmarkId (.*?) in", RegexOptions.Compiled);
+                            foreach (var line in File.ReadLines(lastUpdatedFile.FullName).Reverse())
+                            {
+                                var match = regex.Match(line);
+                                if (match.Success)
+                                {
+                                    parsedIdToResume = int.Parse(match.Groups[1].Value);
+                                    break;
+                                }
+                            }
                         }
                     }
 
                     foreach (var benchmarkRunInfo in supportedBenchmarks) // we run them in the old order now using the new build artifacts
                     {
-                        if (benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.Resume))
+                        if (parsedIdToResume > 0)
                         {
                             var benchmarkWithHighestIdForGivenType = benchmarkRunInfo.BenchmarksCases.Last();
                             if (benchmarkToBuildResult[benchmarkWithHighestIdForGivenType].Id.Value < parsedIdToResume)
