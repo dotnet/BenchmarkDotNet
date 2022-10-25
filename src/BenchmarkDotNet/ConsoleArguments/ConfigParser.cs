@@ -213,6 +213,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 config.AddDiagnoser(MemoryDiagnoser.Default);
             if (options.UseThreadingDiagnoser)
                 config.AddDiagnoser(ThreadingDiagnoser.Default);
+            if (options.UseExceptionDiagnoser)
+                config.AddDiagnoser(ExceptionDiagnoser.Default);
             if (options.UseDisassemblyDiagnoser)
                 config.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(
                     maxDepth: options.DisassemblerRecursiveDepth,
