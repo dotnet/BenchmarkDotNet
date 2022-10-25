@@ -44,6 +44,6 @@ namespace BenchmarkDotNet.Environments
             => other != null && base.Equals(other) && other.AOTCompilerPath == AOTCompilerPath;
 
         public override int GetHashCode()
-            => base.GetHashCode() ^ AOTCompilerPath.GetHashCode();
+            => HashCode.Combine(base.GetHashCode(), AOTCompilerPath);
     }
 }

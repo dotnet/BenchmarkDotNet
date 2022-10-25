@@ -122,8 +122,6 @@ namespace BenchmarkDotNet.Jobs
                 && other.RetainVm == RetainVm
                 && other.Server == Server;
 
-        public override int GetHashCode()
-            => AllowVeryLargeObjects.GetHashCode() ^ Concurrent.GetHashCode() ^ CpuGroups.GetHashCode() ^ Force.GetHashCode() ^ NoAffinitize.GetHashCode() ^
-               RetainVm.GetHashCode() ^ Server.GetHashCode();
+        public override int GetHashCode() => HashCode.Combine(AllowVeryLargeObjects, Concurrent, CpuGroups, Force, NoAffinitize, RetainVm, Server);
     }
 }

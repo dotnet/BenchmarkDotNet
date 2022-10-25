@@ -65,16 +65,10 @@ namespace BenchmarkDotNet.Jobs
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                int hashCode = 0;
-                foreach (var nuGetReference in references)
-                {
-                    hashCode = hashCode * 397 + nuGetReference.GetHashCode();
-                }
-
-                return hashCode;
-            }
+            var hashCode = new HashCode();
+            foreach (var reference in references)
+                hashCode.Add(reference);
+            return hashCode.ToHashCode();
         }
 
         private class PackageNameComparer : IComparer<NuGetReference>
