@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Toolchains.Mono
 {
     public class MonoGenerator : CsProjGenerator
     {
-        public MonoGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string runtimeFrameworkVersion, bool isNetCore = true) : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion, isNetCore)
+        public MonoGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, string runtimeFrameworkVersion) : base(targetFrameworkMoniker, cliPath, packagesPath, runtimeFrameworkVersion, true)
         {
         }
 
