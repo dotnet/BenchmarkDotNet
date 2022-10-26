@@ -46,7 +46,7 @@ In this category, you can specifiy how to benchmark each method.
   * `Monitoring`: A mode without overhead evaluating, with several target iterations
 * `LaunchCount`: how many times we should launch process with target benchmark
 * `WarmupCount`: how many warmup iterations should be performed
-* `IterationCount`: how many target iterations should be performed (if specified, `BenchmarkDotNet.Jobs.RunMode.MinIterationCount` and `BenchmarkDotNet.Jobs.RunMode.MaxIterationCount` will be ignored)
+* `IterationCount`: how many target iterations should be performed (if specified, `BenchmarkDotNet.Jobs.RunMode.MinIterationCount` and `BenchmarkDotNet.Jobs.RunMode.MaxIterationCount` will be ignored). Controlled via `TargetCount` when using the `SimpleJob` attribute.
 * `IterationTime`: desired time of a single iteration
 * `UnrollFactor`: how many times the benchmark method will be invoked per one iteration of a generated loop
 * `InvocationCount`: count of invocation in a single iteration (if specified, `IterationTime` will be ignored), must be a multiple of `UnrollFactor`
@@ -55,7 +55,7 @@ In this category, you can specifiy how to benchmark each method.
 * `MinWarmupIterationCount`: Minimum count of warmup iterations that should be performed, the default value is 6
 * `MaxWarmupIterationCount`: Maximum count of warmup iterations that should be performed, the default value is 50
 
-Usually, you shouldn't specify such characteristics like `LaunchCount`, `WarmupCount`, `TargetCount`, or `IterationTime` because BenchmarkDotNet has a smart algorithm to choose these values automatically based on received measurements. You can specify it for testing purposes or when you are damn sure that you know the right characteristics for your benchmark (when you set `TargetCount` = `20` you should understand why `20` is a good value for your case).
+Usually, you shouldn't specify such characteristics like `LaunchCount`, `WarmupCount`, `IterationCount`, or `IterationTime` because BenchmarkDotNet has a smart algorithm to choose these values automatically based on received measurements. You can specify it for testing purposes or when you are damn sure that you know the right characteristics for your benchmark (when you set `TargetCount` = `20` you should understand why `20` is a good value for your case).
 
 ### Accuracy
 If you want to change the accuracy level, you should use the following characteristics instead of manually adjusting values of `WarmupCount`, `TargetCount`, and so on.
