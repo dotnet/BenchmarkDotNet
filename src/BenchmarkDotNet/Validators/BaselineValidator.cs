@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -26,7 +27,7 @@ namespace BenchmarkDotNet.Validators
             {
                 var benchmarks = allBenchmarks.Where((benchmark, index) => benchmarkLogicalGroups[index] == logicalGroup).ToArray();
                 int methodBaselineCount = benchmarks.Select(b => b.Descriptor).Distinct().Count(it => it.Baseline);
-                int jobBaselineCount = benchmarks.Select(b => b.Job).Distinct().Count(it => it.Meta.Baseline);
+                int jobBaselineCount = benchmarks.Select(b => b.Job).Distinct(JobComparer.Instance).Count(it => it.Meta.Baseline);
                 string className = benchmarks.First().Descriptor.Type.Name;
 
                 if (methodBaselineCount > 1)
