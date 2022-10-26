@@ -696,12 +696,14 @@ namespace BenchmarkDotNet.Running
             if (benchmarkRunInfos.Any(benchmark => benchmark.Config.Options.IsSet(ConfigOptions.Resume)))
             {
                 var directoryInfo = new DirectoryInfo(rootArtifactsFolderPath);
-                var lastFiles = directoryInfo.GetFiles($"{currentLogFileName.Split('-')[0]}*");
-                if (lastFiles.Count() > 1)
+                var logFilesExceptCurrent = directoryInfo
+                    .GetFiles($"{currentLogFileName.Split('-')[0]}*")
+                    .Where(file => Path.GetFileNameWithoutExtension(file.Name) != currentLogFileName)
+                    .ToArray();
+
+                if (logFilesExceptCurrent.Length > 0)
                 {
-                    // The last is the current file and we need one before the last where we can get the last benchmarkId to skip in the current run until the benchmarkId that was found.
-                    var previousRunLogFile = lastFiles
-                        .Where(file => Path.GetFileNameWithoutExtension(file.Name) != currentLogFileName)
+                    var previousRunLogFile = logFilesExceptCurrent
                         .OrderByDescending(o => o.LastWriteTime)
                         .First();
 
