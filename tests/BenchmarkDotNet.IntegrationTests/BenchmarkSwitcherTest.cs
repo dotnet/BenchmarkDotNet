@@ -341,27 +341,10 @@ namespace BenchmarkDotNet.IntegrationTests
             var types = new[] { typeof(WithDryAttributeAndCategory) };
             var switcher = new BenchmarkSwitcher(types);
 
-            var firstResults = switcher.Run(new[] { "--filter", "*WithDryAttribute*" }, config);
-
-            var secondResults = switcher.Run(new[] { "--resume", "--filter", "*WithDryAttribute*" }, config);
-
-            foreach (var summary in secondResults)
-            {
-                Assert.False(summary.HasCriticalValidationErrors, "The \"Summary\" should have NOT \"HasCriticalValidationErrors\"");
-
-                Assert.True(summary.Reports.Any(), "The \"Summary\" should contain at least one \"BenchmarkReport\" in the \"Reports\" collection");
-
-                Assert.True(summary.Reports.All(r => r.BuildResult.IsBuildSuccess),
-                    "The following benchmarks have failed to build: " +
-                    string.Join(", ", summary.Reports.Where(r => !r.BuildResult.IsBuildSuccess).Select(r => r.BenchmarkCase.DisplayInfo)));
-
-                Assert.True(summary.Reports.All(r => r.ExecuteResults != null),
-                    "The following benchmarks don't have any execution results: " +
-                    string.Join(", ", summary.Reports.Where(r => r.ExecuteResults == null).Select(r => r.BenchmarkCase.DisplayInfo)));
-
-                Assert.True(summary.Reports.All(r => r.ExecuteResults.All(er => er.IsSuccess)),
-                    "All reports should have succeeded to execute");
-            }
+            // the first run should execute all benchmarks
+            Assert.Single(switcher.Run(new[] { "--filter", "*WithDryAttributeAndCategory*" }, config));
+            // resuming after succesfull run should run nothing
+            Assert.Empty(switcher.Run(new[] { "--resume", "--filter", "*WithDryAttributeAndCategory*" }, config));
         }
 
         private class UserInteractionMock : IUserInteraction

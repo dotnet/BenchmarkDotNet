@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Running
             var rootArtifactsFolderPath = GetRootArtifactsFolderPath(benchmarkRunInfos);
             var resultsFolderPath = GetResultsFolderPath(rootArtifactsFolderPath, benchmarkRunInfos);
             var logFilePath = Path.Combine(rootArtifactsFolderPath, title + ".log");
-            var parsedIdToResume = 0;
+            var idToResume = GetIdToResume(rootArtifactsFolderPath, title, benchmarkRunInfos);
 
             using (var streamLogger = new StreamLogger(GetLogFileStreamWriter(benchmarkRunInfos, logFilePath)))
             {
@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Running
                     return new[] { Summary.ValidationFailed(title, resultsFolderPath, logFilePath) };
 
                 int totalBenchmarkCount = supportedBenchmarks.Sum(benchmarkInfo => benchmarkInfo.BenchmarksCases.Length);
-                int benchmarksToRunCount = totalBenchmarkCount;
+                int benchmarksToRunCount = totalBenchmarkCount - (idToResume + 1); // ids are indexed from 0
                 compositeLogger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
                 compositeLogger.WriteLineHeader($"// ***** Found {totalBenchmarkCount} benchmark(s) in total *****");
                 var globalChronometer = Chronometer.Start();
@@ -84,35 +84,16 @@ namespace BenchmarkDotNet.Running
                     // used to estimate finish time, in contrary to globalChronometer it does not include build time
                     var runsChronometer = Chronometer.Start();
 
-                    if (supportedBenchmarks.Any(benchmark => benchmark.Config.Options.IsSet(ConfigOptions.Resume)))
-                    {
-                        var directoryInfo = new DirectoryInfo(rootArtifactsFolderPath);
-                        var lastFiles = directoryInfo.GetFiles($"{title.Split('-')[0]}*");
-                        if (lastFiles.Count() > 1)
-                        {
-                            var lastFilesSorted = lastFiles.OrderBy(o => o.LastWriteTime).ToArray();
-                            // The last is the current file and we need one before the last where we can get the last benchmarkId to skip in the current run until the benchmarkId that was found.
-                            var lastUpdatedFile = lastFilesSorted[lastFiles.Length - 2];
-                            var regex = new Regex("--benchmarkId (.*?) in", RegexOptions.Compiled);
-                            foreach (var line in File.ReadLines(lastUpdatedFile.FullName).Reverse())
-                            {
-                                var match = regex.Match(line);
-                                if (match.Success)
-                                {
-                                    parsedIdToResume = int.Parse(match.Groups[1].Value);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
                     foreach (var benchmarkRunInfo in supportedBenchmarks) // we run them in the old order now using the new build artifacts
                     {
-                        if (parsedIdToResume > 0)
+                        if (idToResume >= 0)
                         {
                             var benchmarkWithHighestIdForGivenType = benchmarkRunInfo.BenchmarksCases.Last();
-                            if (benchmarkToBuildResult[benchmarkWithHighestIdForGivenType].Id.Value < parsedIdToResume)
+                            if (benchmarkToBuildResult[benchmarkWithHighestIdForGivenType].Id.Value <= idToResume)
+                            {
+                                compositeLogger.WriteLineInfo($"Skipping {benchmarkRunInfo.BenchmarksCases.Length} benchmark(s) defined by {benchmarkRunInfo.Type.GetCorrectCSharpTypeName()}.");
                                 continue;
+                            }
                         }
 
                         var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup,
@@ -708,6 +689,35 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineError($"//    * {validationError.Message}");
                 logger.WriteLine();
             }
+        }
+
+        private static int GetIdToResume(string rootArtifactsFolderPath, string currentLogFileName, BenchmarkRunInfo[] benchmarkRunInfos)
+        {
+            if (benchmarkRunInfos.Any(benchmark => benchmark.Config.Options.IsSet(ConfigOptions.Resume)))
+            {
+                var directoryInfo = new DirectoryInfo(rootArtifactsFolderPath);
+                var lastFiles = directoryInfo.GetFiles($"{currentLogFileName.Split('-')[0]}*");
+                if (lastFiles.Count() > 1)
+                {
+                    // The last is the current file and we need one before the last where we can get the last benchmarkId to skip in the current run until the benchmarkId that was found.
+                    var previousRunLogFile = lastFiles
+                        .Where(file => Path.GetFileNameWithoutExtension(file.Name) != currentLogFileName)
+                        .OrderByDescending(o => o.LastWriteTime)
+                        .First();
+
+                    var regex = new Regex("--benchmarkId (.*?) in", RegexOptions.Compiled);
+                    foreach (var line in File.ReadLines(previousRunLogFile.FullName).Reverse())
+                    {
+                        var match = regex.Match(line);
+                        if (match.Success)
+                        {
+                            return int.Parse(match.Groups[1].Value);
+                        }
+                    }
+                }
+            }
+
+            return -1;
         }
     }
 }
