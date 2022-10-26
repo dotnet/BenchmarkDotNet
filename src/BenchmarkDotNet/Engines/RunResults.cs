@@ -73,7 +73,7 @@ namespace BenchmarkDotNet.Engines
             if (!ThreadingStats.Equals(ThreadingStats.Empty))
                 outWriter.WriteLine(ThreadingStats.ToOutputLine());
             if (ExceptionFrequency > 0)
-                outWriter.WriteLine(ExceptionsFrequencyStats.ToOutputLine(ExceptionFrequency));
+                outWriter.WriteLine(ExceptionsStats.ToOutputLine(ExceptionFrequency));
 
             outWriter.WriteLine();
         }

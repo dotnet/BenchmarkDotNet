@@ -3,11 +3,11 @@ using System.Runtime.ExceptionServices;
 
 namespace BenchmarkDotNet.Engines
 {
-    internal class ExceptionsFrequencyStats
+    internal class ExceptionsStats
     {
         internal const string ResultsLinePrefix = "// Exceptions: ";
 
-        public uint ExceptionsNumber { get; private set; }
+        internal ulong ExceptionsCount { get; private set; }
 
         public void StartListening()
         {
@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Engines
 
         private void OnFirstChanceException(object sender, FirstChanceExceptionEventArgs e)
         {
-            ExceptionsNumber++;
+            ExceptionsCount++;
         }
 
         public static string ToOutputLine(double exceptionCount) => $"{ResultsLinePrefix} {exceptionCount}";

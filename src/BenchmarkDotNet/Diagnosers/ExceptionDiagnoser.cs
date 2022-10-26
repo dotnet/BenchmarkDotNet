@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Diagnosers
             internal static readonly IMetricDescriptor Instance = new ExceptionsFrequencyMetricDescriptor();
 
             public string Id => "ExceptionFrequency";
-            public string DisplayName => Column.ExceptionFrequency;
+            public string DisplayName => Column.Exceptions;
             public string Legend => "the frequency of exceptions thrown during the operation";
             public string NumberFormat => "#0.0000";
             public UnitType UnitType => UnitType.Dimensionless;

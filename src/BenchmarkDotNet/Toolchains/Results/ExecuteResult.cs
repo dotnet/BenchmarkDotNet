@@ -131,9 +131,9 @@ namespace BenchmarkDotNet.Toolchains.Results
                 {
                     threadingStats = ThreadingStats.Parse(line);
                 }
-                else if (line.StartsWith(ExceptionsFrequencyStats.ResultsLinePrefix))
+                else if (line.StartsWith(ExceptionsStats.ResultsLinePrefix))
                 {
-                    exceptionFrequency = ExceptionsFrequencyStats.Parse(line);
+                    exceptionFrequency = ExceptionsStats.Parse(line);
                 }
             }
 

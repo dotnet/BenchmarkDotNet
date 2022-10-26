@@ -199,9 +199,9 @@ namespace BenchmarkDotNet.Engines
             IterationSetupAction(); // we run iteration setup first, so even if it allocates, it is not included in the results
 
             var initialThreadingStats = ThreadingStats.ReadInitial(); // this method might allocate
+            var exceptionsStats = new ExceptionsStats(); // allocates
+            exceptionsStats.StartListening(); // this method might allocate
             var initialGcStats = GcStats.ReadInitial();
-            var exceptionsStats = new ExceptionsFrequencyStats();
-            exceptionsStats.StartListening();
 
             WorkloadAction(data.InvokeCount / data.UnrollFactor);
 
@@ -215,7 +215,7 @@ namespace BenchmarkDotNet.Engines
             GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperations(totalOperationsCount);
             ThreadingStats threadingStats = (finalThreadingStats - initialThreadingStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
 
-            return (gcStats, threadingStats, exceptionsStats.ExceptionsNumber / (double)totalOperationsCount);
+            return (gcStats, threadingStats, exceptionsStats.ExceptionsCount / (double)totalOperationsCount);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
