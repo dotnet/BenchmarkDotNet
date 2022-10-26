@@ -19,12 +19,9 @@ namespace BenchmarkDotNet.Toolchains.Mono
         [PublicAPI]
         public static new IToolchain From(NetCoreAppSettings settings)
         {
-            var runtimeIdentifier = CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier();
             return new MonoToolchain(settings.Name,
                         new MonoGenerator(settings.TargetFrameworkMoniker, settings.CustomDotNetCliPath, settings.PackagesPath, settings.RuntimeFrameworkVersion),
-                        new MonoPublisher(
-                            settings.CustomDotNetCliPath,
-                            $"--self-contained -r {runtimeIdentifier} /p:UseMonoRuntime=true /p:RuntimeIdentifiers={runtimeIdentifier}"),
+                        new MonoPublisher(settings.CustomDotNetCliPath),
                         new DotNetCliExecutor(settings.CustomDotNetCliPath),
                         settings.CustomDotNetCliPath);
         }

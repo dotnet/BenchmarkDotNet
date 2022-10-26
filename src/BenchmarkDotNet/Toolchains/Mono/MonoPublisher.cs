@@ -9,11 +9,13 @@ namespace BenchmarkDotNet.Toolchains.Mono
 {
     public class MonoPublisher : IBuilder
     {
-        public MonoPublisher(string customDotNetCliPath = null, string extraArguments = null, IReadOnlyList<EnvironmentVariable> environmentVariables = null)
+        public MonoPublisher(string customDotNetCliPath)
         {
             CustomDotNetCliPath = customDotNetCliPath;
-            ExtraArguments = extraArguments;
-            EnvironmentVariables = environmentVariables;
+            var runtimeIdentifier = CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier();
+
+            // /p:RuntimeIdentifiers is set explicitly here because --self-contained requires it, see https://github.com/dotnet/sdk/issues/10566
+            ExtraArguments = $"--self-contained -r {runtimeIdentifier} /p:UseMonoRuntime=true /p:RuntimeIdentifiers={runtimeIdentifier}";
         }
 
         private string CustomDotNetCliPath { get; }
