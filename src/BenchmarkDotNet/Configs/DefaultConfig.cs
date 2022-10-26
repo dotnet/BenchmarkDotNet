@@ -106,5 +106,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
 
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
+
+        public AutomaticBaselineMode AutomaticBaselineMode { get; } = AutomaticBaselineMode.None;
     }
 }

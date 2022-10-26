@@ -53,6 +53,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public IOrderer Orderer { get; set; }
         [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
         [PublicAPI] public TimeSpan BuildTimeout { get; set; } = DefaultConfig.Instance.BuildTimeout;
+        [PublicAPI] public AutomaticBaselineMode AutomaticBaselineMode { get; private set; }
 
         public IReadOnlyList<Conclusion> ConfigAnalysisConclusion => emptyConclusion;
 
@@ -95,6 +96,12 @@ namespace BenchmarkDotNet.Configs
         public ManualConfig WithBuildTimeout(TimeSpan buildTimeout)
         {
             BuildTimeout = buildTimeout;
+            return this;
+        }
+
+        public ManualConfig WithAutomaticBaseline(AutomaticBaselineMode automaticBaselineMode)
+        {
+            AutomaticBaselineMode = automaticBaselineMode;
             return this;
         }
 
@@ -254,6 +261,7 @@ namespace BenchmarkDotNet.Configs
             columnHidingRules.AddRange(config.GetColumnHidingRules());
             Options |= config.Options;
             BuildTimeout = GetBuildTimeout(BuildTimeout, config.BuildTimeout);
+            AutomaticBaselineMode = config.AutomaticBaselineMode;
         }
 
         /// <summary>

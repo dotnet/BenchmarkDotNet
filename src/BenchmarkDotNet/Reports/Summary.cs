@@ -37,6 +37,7 @@ namespace BenchmarkDotNet.Reports
         private ImmutableDictionary<BenchmarkCase, BenchmarkReport> ReportMap { get; }
         private BaseliningStrategy BaseliningStrategy { get; }
         private bool? isMultipleRuntimes;
+        private readonly BenchmarkCase inferredBaselineBenchmarkCase;
 
         public Summary(
             string title,
@@ -62,11 +63,30 @@ namespace BenchmarkDotNet.Reports
             DisplayPrecisionManager = new DisplayPrecisionManager(this);
             Orderer = GetConfiguredOrdererOrDefaultOne(reports.Select(report => report.BenchmarkCase.Config));
             BenchmarksCases = Orderer.GetSummaryOrder(reports.Select(report => report.BenchmarkCase).ToImmutableArray(), this).ToImmutableArray(); // we sort it first
+            inferredBaselineBenchmarkCase = GetFastestBenchmarkCase(reports);
             Reports = BenchmarksCases.Select(b => ReportMap[b]).ToImmutableArray(); // we use sorted collection to re-create reports list
             BaseliningStrategy = BaseliningStrategy.Create(BenchmarksCases);
             Style = GetConfiguredSummaryStyleOrDefaultOne(BenchmarksCases).WithCultureInfo(cultureInfo);
             Table = GetTable(Style);
             AllRuntimes = BuildAllRuntimes(HostEnvironmentInfo, Reports);
+        }
+
+        private static BenchmarkCase GetFastestBenchmarkCase(ImmutableArray<BenchmarkReport> reports)
+        {
+            if (reports.Any() && reports.All(r => r.BenchmarkCase.Config.AutomaticBaselineMode == AutomaticBaselineMode.Fastest))
+            {
+                var fastestReport = reports.First();
+                foreach (var report in reports.Skip(1))
+                {
+                    if (report.ResultStatistics.Mean < fastestReport.ResultStatistics.Mean)
+                    {
+                        fastestReport = report;
+                    }
+                }
+                return fastestReport.BenchmarkCase;
+            }
+
+            return null;
         }
 
         [PublicAPI] public bool HasReport(BenchmarkCase benchmarkCase) => ReportMap.ContainsKey(benchmarkCase);
@@ -133,7 +153,11 @@ namespace BenchmarkDotNet.Reports
             => Orderer.GetLogicalGroupKey(BenchmarksCases, benchmarkCase);
 
         public bool IsBaseline(BenchmarkCase benchmarkCase)
-            => BaseliningStrategy.IsBaseline(benchmarkCase);
+        {
+            return inferredBaselineBenchmarkCase != null
+                ? inferredBaselineBenchmarkCase == benchmarkCase
+                : BaseliningStrategy.IsBaseline(benchmarkCase);
+        }
 
         [CanBeNull]
         public BenchmarkCase GetBaseline(string logicalGroupKey)

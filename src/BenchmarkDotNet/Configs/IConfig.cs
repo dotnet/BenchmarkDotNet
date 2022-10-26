@@ -57,5 +57,7 @@ namespace BenchmarkDotNet.Configs
         /// Collect any errors or warnings when composing the configuration
         /// </summary>
         IReadOnlyList<Conclusion> ConfigAnalysisConclusion { get; }
+
+        AutomaticBaselineMode AutomaticBaselineMode { get; }
     }
 }
