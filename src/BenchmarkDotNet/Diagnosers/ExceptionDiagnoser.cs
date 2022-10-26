@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             public string Id => "ExceptionFrequency";
             public string DisplayName => Column.Exceptions;
-            public string Legend => "the frequency of exceptions thrown during the operation";
+            public string Legend => "Exceptions thrown per single operation";
             public string NumberFormat => "#0.0000";
             public UnitType UnitType => UnitType.Dimensionless;
             public string Unit => "Count";
