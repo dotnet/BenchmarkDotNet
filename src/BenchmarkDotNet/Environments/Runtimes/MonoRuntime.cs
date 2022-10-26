@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Environments
 
         public string MonoBclPath { get; }
 
-        public bool IsDotNetBuiltIn { get; set; }
+        internal bool IsDotNetBuiltIn { get; }
 
         private MonoRuntime(string name) : base(RuntimeMoniker.Mono, "mono", name) { }
 
