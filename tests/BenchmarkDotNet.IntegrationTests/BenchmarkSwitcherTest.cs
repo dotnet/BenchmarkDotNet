@@ -332,6 +332,21 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Contains("static", logger.GetLog());
         }
 
+        [Fact]
+        public void WhenUserAddTheResumeAttributeAndRunTheBenchmarks()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+
+            var types = new[] { typeof(WithDryAttributeAndCategory) };
+            var switcher = new BenchmarkSwitcher(types);
+
+            // the first run should execute all benchmarks
+            Assert.Single(switcher.Run(new[] { "--filter", "*WithDryAttributeAndCategory*" }, config));
+            // resuming after succesfull run should run nothing
+            Assert.Empty(switcher.Run(new[] { "--resume", "--filter", "*WithDryAttributeAndCategory*" }, config));
+        }
+
         private class UserInteractionMock : IUserInteraction
         {
             private readonly IReadOnlyList<Type> returnValue;

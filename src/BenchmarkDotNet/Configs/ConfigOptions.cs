@@ -44,7 +44,11 @@ namespace BenchmarkDotNet.Configs
         /// <summary>
         /// Performs apples-to-apples comparison for provided benchmarks and jobs. Experimental, will change in the near future!
         /// </summary>
-        ApplesToApples = 1 << 8
+        ApplesToApples = 1 << 8,
+        /// <summary>
+        /// Continue the execution if the last run was stopped.
+        /// </summary>
+        Resume = 1 << 9
     }
 
     internal static class ConfigOptionsExtensions

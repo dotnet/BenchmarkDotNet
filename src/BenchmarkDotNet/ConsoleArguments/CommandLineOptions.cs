@@ -215,6 +215,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("noForcedGCs", Required = false, HelpText = "Specifying would not forcefully induce any GCs.")]
         public bool NoForcedGCs { get; set; }
 
+        [Option("resume", Required = false, Default = false, HelpText = "Continue the execution if the last run was stopped.")]
+        public bool Resume { get; set; }
+
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 
         [Usage(ApplicationAlias = "")]
