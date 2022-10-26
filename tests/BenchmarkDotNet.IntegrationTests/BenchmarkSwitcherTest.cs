@@ -345,8 +345,23 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var secondResults = switcher.Run(new[] { "--resume", "--filter", "*WithDryAttribute*" }, config);
 
-            Assert.Single(firstResults);
-            Assert.Single(secondResults);
+            foreach (var summary in secondResults)
+            {
+                Assert.False(summary.HasCriticalValidationErrors, "The \"Summary\" should have NOT \"HasCriticalValidationErrors\"");
+
+                Assert.True(summary.Reports.Any(), "The \"Summary\" should contain at least one \"BenchmarkReport\" in the \"Reports\" collection");
+
+                Assert.True(summary.Reports.All(r => r.BuildResult.IsBuildSuccess),
+                    "The following benchmarks have failed to build: " +
+                    string.Join(", ", summary.Reports.Where(r => !r.BuildResult.IsBuildSuccess).Select(r => r.BenchmarkCase.DisplayInfo)));
+
+                Assert.True(summary.Reports.All(r => r.ExecuteResults != null),
+                    "The following benchmarks don't have any execution results: " +
+                    string.Join(", ", summary.Reports.Where(r => r.ExecuteResults == null).Select(r => r.BenchmarkCase.DisplayInfo)));
+
+                Assert.True(summary.Reports.All(r => r.ExecuteResults.All(er => er.IsSuccess)),
+                    "All reports should have succeeded to execute");
+            }
         }
 
         private class UserInteractionMock : IUserInteraction
