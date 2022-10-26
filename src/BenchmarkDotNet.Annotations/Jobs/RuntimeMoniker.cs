@@ -143,6 +143,16 @@ namespace BenchmarkDotNet.Jobs
         /// <summary>
         /// Mono with the Ahead of Time LLVM Compiler backend and .net7.0
         /// </summary>
-        MonoAOTLLVMNet70
+        MonoAOTLLVMNet70,
+
+        /// <summary>
+        /// .NET 6 using MonoVM (not CLR which is the default)
+        /// </summary>
+        Mono60,
+
+        /// <summary>
+        /// .NET 7 using MonoVM (not CLR which is the default)
+        /// </summary>
+        Mono70,
     }
 }

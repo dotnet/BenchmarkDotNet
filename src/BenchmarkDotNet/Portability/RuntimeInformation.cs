@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Portability
         internal const string ReleaseConfigurationName = "RELEASE";
         internal const string Unknown = "?";
 
-        public static bool IsMono { get; } = Type.GetType("Mono.Runtime") != null; // it allocates a lot of memory, we need to check it once in order to keep Engine non-allocating!
+        public static bool IsMono { get; } = Type.GetType("Mono.RuntimeStructs") != null; // it allocates a lot of memory, we need to check it once in order to keep Engine non-allocating!
 
         public static bool IsFullFramework =>
 #if NET6_0_OR_GREATER
@@ -184,6 +184,10 @@ namespace BenchmarkDotNet.Portability
 
                     return "Mono " + version;
                 }
+                else
+                {
+                    return $"{GetNetCoreVersion()} using MonoVM";
+                }
             }
             else if (IsFullFramework)
             {
@@ -208,22 +212,7 @@ namespace BenchmarkDotNet.Portability
             }
             else if (IsNetCore)
             {
-                var coreclrAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
-                var corefxAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(Regex).GetTypeInfo().Assembly.Location);
-
-                if (CoreRuntime.TryGetVersion(out var version) && version >= new Version(5, 0))
-                {
-                    // after the merge of dotnet/corefx and dotnet/coreclr into dotnet/runtime the version should always be the same
-                    Debug.Assert(coreclrAssemblyInfo.FileVersion == corefxAssemblyInfo.FileVersion);
-
-                    return $".NET {version} ({coreclrAssemblyInfo.FileVersion})";
-                }
-                else
-                {
-                    string runtimeVersion = version != default ? version.ToString() : "?";
-
-                    return $".NET Core {runtimeVersion} (CoreCLR {coreclrAssemblyInfo.FileVersion}, CoreFX {corefxAssemblyInfo.FileVersion})";
-                }
+                return GetNetCoreVersion();
             }
             else if (IsNativeAOT)
             {
@@ -231,6 +220,26 @@ namespace BenchmarkDotNet.Portability
             }
 
             return Unknown;
+        }
+
+        private static string GetNetCoreVersion()
+        {
+            var coreclrAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
+            var corefxAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(Regex).GetTypeInfo().Assembly.Location);
+
+            if (CoreRuntime.TryGetVersion(out var version) && version >= new Version(5, 0))
+            {
+                // after the merge of dotnet/corefx and dotnet/coreclr into dotnet/runtime the version should always be the same
+                Debug.Assert(coreclrAssemblyInfo.FileVersion == corefxAssemblyInfo.FileVersion);
+
+                return $".NET {version} ({coreclrAssemblyInfo.FileVersion})";
+            }
+            else
+            {
+                string runtimeVersion = version != default ? version.ToString() : "?";
+
+                return $".NET Core {runtimeVersion} (CoreCLR {coreclrAssemblyInfo.FileVersion}, CoreFX {corefxAssemblyInfo.FileVersion})";
+            }
         }
 
         internal static Runtime GetCurrentRuntime()

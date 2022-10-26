@@ -29,6 +29,7 @@ using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
 using Perfolizer.Mathematics.SignificanceTesting;
 using Perfolizer.Mathematics.Thresholds;
+using BenchmarkDotNet.Toolchains.Mono;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -425,6 +426,12 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.MonoAOTLLVMNet70:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net7.0");
 
+                case RuntimeMoniker.Mono60:
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono60);
+
+                case RuntimeMoniker.Mono70:
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono70);
+
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
@@ -450,6 +457,19 @@ namespace BenchmarkDotNet.ConsoleArguments
             builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
 
             return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
+        }
+
+        private static Job MakeMonoJob(Job baseJob, CommandLineOptions options, MonoRuntime runtime)
+        {
+            return baseJob
+                .WithRuntime(runtime)
+                .WithToolchain(MonoToolchain.From(
+                    new NetCoreAppSettings(
+                        targetFrameworkMoniker: runtime.MsBuildMoniker,
+                        runtimeFrameworkVersion: null,
+                        name: runtime.Name,
+                        customDotNetCliPath: options.CliPath?.FullName,
+                        packagesPath: options.RestorePath?.FullName)));
         }
 
         private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker)

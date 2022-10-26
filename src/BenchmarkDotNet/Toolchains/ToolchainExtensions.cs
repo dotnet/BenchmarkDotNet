@@ -48,6 +48,8 @@ namespace BenchmarkDotNet.Toolchains
                         return InProcessNoEmitToolchain.Instance;
                     if (!string.IsNullOrEmpty(mono.AotArgs))
                         return MonoAotToolchain.Instance;
+                    if (mono.IsDotNetBuiltIn)
+                        return MonoToolchain.From(new NetCoreAppSettings(targetFrameworkMoniker: mono.MsBuildMoniker, runtimeFrameworkVersion: null, name: mono.Name));
 
                     return RoslynToolchain.Instance;
 
@@ -128,6 +130,12 @@ namespace BenchmarkDotNet.Toolchains
 
                 case RuntimeMoniker.NativeAot70:
                     return NativeAotToolchain.Net70;
+
+                case RuntimeMoniker.Mono60:
+                    return MonoToolchain.Mono60;
+
+                case RuntimeMoniker.Mono70:
+                    return MonoToolchain.Mono70;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "RuntimeMoniker not supported");
