@@ -132,16 +132,16 @@ namespace BenchmarkDotNet.Engines
 
             Host.AfterMainRun();
 
-            (GcStats workGcHasDone, ThreadingStats threadingStats) = includeExtraStats
+            (GcStats workGcHasDone, ThreadingStats threadingStats, double exceptionFrequency) = includeExtraStats
                 ? GetExtraStats(new IterationData(IterationMode.Workload, IterationStage.Actual, 0, invokeCount, UnrollFactor))
-                : (GcStats.Empty, ThreadingStats.Empty);
+                : (GcStats.Empty, ThreadingStats.Empty, 0);
 
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.BenchmarkStop(BenchmarkName);
 
             var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
 
-            return new RunResults(idle, main, outlierMode, workGcHasDone, threadingStats);
+            return new RunResults(idle, main, outlierMode, workGcHasDone, threadingStats, exceptionFrequency);
         }
 
         public Measurement RunIteration(IterationData data)
@@ -189,7 +189,7 @@ namespace BenchmarkDotNet.Engines
             return measurement;
         }
 
-        private (GcStats, ThreadingStats) GetExtraStats(IterationData data)
+        private (GcStats, ThreadingStats, double) GetExtraStats(IterationData data)
         {
             // we enable monitoring after main target run, for this single iteration which is executed at the end
             // so even if we enable AppDomain monitoring in separate process
@@ -199,19 +199,23 @@ namespace BenchmarkDotNet.Engines
             IterationSetupAction(); // we run iteration setup first, so even if it allocates, it is not included in the results
 
             var initialThreadingStats = ThreadingStats.ReadInitial(); // this method might allocate
+            var exceptionsStats = new ExceptionsStats(); // allocates
+            exceptionsStats.StartListening(); // this method might allocate
             var initialGcStats = GcStats.ReadInitial();
 
             WorkloadAction(data.InvokeCount / data.UnrollFactor);
 
+            exceptionsStats.Stop();
             var finalGcStats = GcStats.ReadFinal();
             var finalThreadingStats = ThreadingStats.ReadFinal();
 
             IterationCleanupAction(); // we run iteration cleanup after collecting GC stats
 
-            GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
+            var totalOperationsCount = data.InvokeCount * OperationsPerInvoke;
+            GcStats gcStats = (finalGcStats - initialGcStats).WithTotalOperations(totalOperationsCount);
             ThreadingStats threadingStats = (finalThreadingStats - initialThreadingStats).WithTotalOperations(data.InvokeCount * OperationsPerInvoke);
 
-            return (gcStats, threadingStats);
+            return (gcStats, threadingStats, exceptionsStats.ExceptionsCount / (double)totalOperationsCount);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]

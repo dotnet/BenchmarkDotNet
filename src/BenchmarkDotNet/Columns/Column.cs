@@ -55,6 +55,7 @@ namespace BenchmarkDotNet.Columns
         public const string CompletedWorkItems = "Completed Work Items";
         public const string LockContentions = "Lock Contentions";
         public const string CodeSize = "Code Size";
+        public const string Exceptions = "Exceptions";
 
         //Characteristics:
         public const string Id = "Id";

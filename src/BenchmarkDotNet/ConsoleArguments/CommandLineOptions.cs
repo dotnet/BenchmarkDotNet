@@ -37,6 +37,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('t', "threading", Required = false, Default = false, HelpText = "Prints threading statistics")]
         public bool UseThreadingDiagnoser { get; set; }
 
+        [Option("exceptions", Required = false, Default = false, HelpText = "Prints exception statistics")]
+        public bool UseExceptionDiagnoser { get; set; }
+
         [Option('d', "disasm", Required = false, Default = false, HelpText = "Gets disassembly of benchmarked code")]
         public bool UseDisassemblyDiagnoser
         {

@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, hugeSd && isBar ? 3 : 1),
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, 1)
             };
-            var executeResult = new ExecuteResult(measurements, default, default);
+            var executeResult = new ExecuteResult(measurements, default, default, 0);
             return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, new List<ExecuteResult> { executeResult }, metrics);
         }
 
