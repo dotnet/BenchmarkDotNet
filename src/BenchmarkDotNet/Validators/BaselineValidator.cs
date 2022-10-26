@@ -14,6 +14,17 @@ namespace BenchmarkDotNet.Validators
 
         public IEnumerable<ValidationError> Validate(ValidationParameters input)
         {
+            if (input.Config.AutomaticBaselineMode != Configs.AutomaticBaselineMode.None)
+            {
+                foreach (var benchmark in input.Benchmarks)
+                {
+                    if (benchmark.Descriptor.Baseline || benchmark.Job.Meta.Baseline)
+                    {
+                        yield return new ValidationError(TreatsWarningsAsErrors, "You cannot use both pre-configured and automatic baseline configuration", benchmark);
+                    }
+                }
+            }
+
             var allBenchmarks = input.Benchmarks.ToImmutableArray();
             var orderProvider = input.Config.Orderer;
 

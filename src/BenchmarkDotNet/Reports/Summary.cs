@@ -76,11 +76,14 @@ namespace BenchmarkDotNet.Reports
             if (reports.Any() && reports.All(r => r.BenchmarkCase.Config.AutomaticBaselineMode == AutomaticBaselineMode.Fastest))
             {
                 var fastestReport = reports.First();
-                foreach (var report in reports.Skip(1))
+                if (fastestReport.ResultStatistics != null)
                 {
-                    if (report.ResultStatistics.Mean < fastestReport.ResultStatistics.Mean)
+                    foreach (var report in reports.Skip(1).Where(r => r.ResultStatistics != null))
                     {
-                        fastestReport = report;
+                        if (report.ResultStatistics.Mean < fastestReport.ResultStatistics.Mean)
+                        {
+                            fastestReport = report;
+                        }
                     }
                 }
                 return fastestReport.BenchmarkCase;
