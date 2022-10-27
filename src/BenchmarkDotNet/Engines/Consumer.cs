@@ -30,8 +30,6 @@ namespace BenchmarkDotNet.Engines
         private double doubleHolder;
         private long longHolder;
         private ulong ulongHolder;
-        private string stringHolder;
-        private object objectHolder;
         private IntPtr ptrHolder;
         private UIntPtr uptrHolder;
 
@@ -97,16 +95,16 @@ namespace BenchmarkDotNet.Engines
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
-        public void Consume(string stringValue) => Volatile.Write(ref stringHolder, stringValue);
+        public void Consume(string stringValue) => DeadCodeEliminationHelper.KeepAliveWithoutBoxing(stringValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
-        public void Consume(object objectValue) => Volatile.Write(ref objectHolder, objectValue);
+        public void Consume(object objectValue) => DeadCodeEliminationHelper.KeepAliveWithoutBoxing(objectValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
         public void Consume<T>(T objectValue) where T : class // class constraint prevents from boxing structs
-            => Volatile.Write(ref objectHolder, objectValue);
+            => DeadCodeEliminationHelper.KeepAliveWithoutBoxing(objectValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe void Consume<T>(T* ptrValue) where T: unmanaged => Volatile.Write(ref ptrHolder, (IntPtr)ptrValue);
@@ -141,14 +139,11 @@ namespace BenchmarkDotNet.Engines
                 Volatile.Write(ref longHolder, (long)(object)value);
             else if (typeof(T) == typeof(ulong))
                 Volatile.Write(ref ulongHolder, (ulong)(object)value);
-            else if (default(T) == null)
-                objectHolder = (object) value;
+            else if (default(T) == null && !typeof(T).IsValueType)
+                DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
             else
-                ValueTypesConsumer(value); // non-primitive value types
+                DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(value); // non-primitive value types
         }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private void ValueTypesConsumer<T>(in T _) { }
 
         internal static bool IsConsumable(Type type)
             => SupportedTypes.Contains(type) || type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface;
