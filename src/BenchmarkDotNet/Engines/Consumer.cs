@@ -139,10 +139,8 @@ namespace BenchmarkDotNet.Engines
                 Volatile.Write(ref longHolder, (long)(object)value);
             else if (typeof(T) == typeof(ulong))
                 Volatile.Write(ref ulongHolder, (ulong)(object)value);
-            else if (default(T) == null && !typeof(T).IsValueType)
-                DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
             else
-                DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(value); // non-primitive value types
+                DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(value); // non-primitive and nullable value types
         }
 
         internal static bool IsConsumable(Type type)
