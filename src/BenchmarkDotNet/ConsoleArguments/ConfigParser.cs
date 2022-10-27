@@ -301,6 +301,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithMemoryRandomization();
             if (options.NoForcedGCs)
                 baseJob = baseJob.WithGcForce(false);
+            if (options.NoEvaluationOverhead)
+                baseJob = baseJob.WithEvaluateOverhead(false);
 
             if (options.EnvironmentVariables.Any())
             {

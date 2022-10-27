@@ -218,6 +218,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("noForcedGCs", Required = false, HelpText = "Specifying would not forcefully induce any GCs.")]
         public bool NoForcedGCs { get; set; }
 
+        [Option("noEvaluationOverhead", Required = false, HelpText = "Specifying would not run the evaluation overhead iterations.")]
+        public bool NoEvaluationOverhead { get; set; }
+
         [Option("resume", Required = false, Default = false, HelpText = "Continue the execution if the last run was stopped.")]
         public bool Resume { get; set; }
 
