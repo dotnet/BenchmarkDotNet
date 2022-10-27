@@ -661,7 +661,7 @@ namespace BenchmarkDotNet.Running
             {
                 Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining - {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish";
             }
-            taskbarProgress.SetProgress((ulong) executedBenchmarkCount, (ulong) totalBenchmarkCount);
+            taskbarProgress.SetProgress((float) executedBenchmarkCount / totalBenchmarkCount);
         }
 
         private static TimeSpan GetEstimatedFinishTime(in StartedClock runsChronometer, int benchmarksToRunCount, int executedBenchmarkCount)
