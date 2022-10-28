@@ -576,7 +576,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void UsersCanSpecifyWithoutOverheadEvalution()
         {
-            var parsedConfiguration = ConfigParser.Parse(new[] { "--noEvaluationOverhead" }, new OutputLogger(Output));
+            var parsedConfiguration = ConfigParser.Parse(new[] { "--noOverheadEvaluation" }, new OutputLogger(Output));
             Assert.True(parsedConfiguration.isSuccess);
 
             foreach (var job in parsedConfiguration.config.GetJobs())
