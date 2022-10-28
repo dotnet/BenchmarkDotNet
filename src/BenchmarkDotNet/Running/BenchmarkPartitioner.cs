@@ -81,7 +81,8 @@ namespace BenchmarkDotNet.Running
                 hashCode.Add(job.Environment.Gc);
                 hashCode.Add(job.Infrastructure.BuildConfiguration);
                 hashCode.Add(job.Environment.Gc);
-                hashCode.Add(job.Infrastructure.Arguments);
+                foreach (var arg in job.Infrastructure.Arguments ?? Array.Empty<Argument>())
+                    hashCode.Add(arg);
                 hashCode.Add(job.Infrastructure.NuGetReferences);
 
                 return hashCode.ToHashCode();
