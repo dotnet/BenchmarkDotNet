@@ -154,7 +154,7 @@ You can also add new jobs via attributes. Examples:
 [DryJob]
 [ClrJob, CoreJob, MonoJob]
 [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
-[SimpleJob(RunStrategy.ColdStart, launchCount: 1, warmupCount: 5, IterationCount: 5, id: "FastAndDirtyJob")]
+[SimpleJob(RunStrategy.ColdStart, launchCount: 1, warmupCount: 5, iterationCount: 5, id: "FastAndDirtyJob")]
 public class MyBenchmarkClass
 ```
 
