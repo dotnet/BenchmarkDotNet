@@ -21,7 +21,7 @@ A benchmark method should have a steady state.
 Of course, you can manually set all the characteristics. An example:
 
 ```cs
-[SimpleJob(launchCount: 3, warmupCount: 10, targetCount: 30)]
+[SimpleJob(launchCount: 3, warmupCount: 10, iterationCount: 30)]
 public class MyBenchmarkClass
 ```
 

@@ -5,7 +5,7 @@ using BenchmarkDotNet.Engines;
 namespace BenchmarkDotNet.Samples
 {
     [SimpleJob(RunStrategy.Monitoring, launchCount: 0,
-        warmupCount: 0, targetCount: 1)]
+        warmupCount: 0, iterationCount: 1)]
     public class IntroSetupCleanupTarget
     {
         [GlobalSetup(Target = nameof(BenchmarkA))]
