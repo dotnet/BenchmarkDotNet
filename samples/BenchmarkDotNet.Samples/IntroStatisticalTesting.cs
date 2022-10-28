@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Samples
     [StatisticalTestColumn(StatisticalTestKind.MannWhitney, ThresholdUnit.Microseconds, 1, true)]
     [StatisticalTestColumn(StatisticalTestKind.Welch, ThresholdUnit.Ratio, 0.03, true)]
     [StatisticalTestColumn(StatisticalTestKind.MannWhitney, ThresholdUnit.Ratio, 0.03, true)]
-    [SimpleJob(warmupCount: 0, targetCount: 5)]
+    [SimpleJob(warmupCount: 0, iterationCount: 5)]
     public class IntroStatisticalTesting
     {
         [Benchmark] public void Sleep50() => Thread.Sleep(50);

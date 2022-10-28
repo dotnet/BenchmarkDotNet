@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Engines
         private const double MaxOverheadRelativeError = 0.05;
         private const int DefaultWorkloadCount = 10;
 
-        private readonly int? targetCount;
+        private readonly int? iterationCount;
         private readonly double maxRelativeError;
         private readonly TimeInterval? maxAbsoluteError;
         private readonly OutlierMode outlierMode;
@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Engines
 
         public EngineActualStage(IEngine engine) : base(engine)
         {
-            targetCount = engine.TargetJob.ResolveValueAsNullable(RunMode.IterationCountCharacteristic);
+            iterationCount = engine.TargetJob.ResolveValueAsNullable(RunMode.IterationCountCharacteristic);
             maxRelativeError = engine.TargetJob.ResolveValue(AccuracyMode.MaxRelativeErrorCharacteristic, engine.Resolver);
             maxAbsoluteError = engine.TargetJob.ResolveValueAsNullable(AccuracyMode.MaxAbsoluteErrorCharacteristic);
             outlierMode = engine.TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, engine.Resolver);
@@ -38,9 +38,9 @@ namespace BenchmarkDotNet.Engines
             => Run(invokeCount, IterationMode.Workload, false, unrollFactor, forceSpecific);
 
         internal IReadOnlyList<Measurement> Run(long invokeCount, IterationMode iterationMode, bool runAuto, int unrollFactor, bool forceSpecific = false)
-            => (runAuto || targetCount == null) && !forceSpecific
+            => (runAuto || iterationCount == null) && !forceSpecific
                 ? RunAuto(invokeCount, iterationMode, unrollFactor)
-                : RunSpecific(invokeCount, iterationMode, targetCount ?? DefaultWorkloadCount, unrollFactor);
+                : RunSpecific(invokeCount, iterationMode, iterationCount ?? DefaultWorkloadCount, unrollFactor);
 
         private List<Measurement> RunAuto(long invokeCount, IterationMode iterationMode, int unrollFactor)
         {
