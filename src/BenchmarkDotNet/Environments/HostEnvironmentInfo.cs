@@ -98,7 +98,7 @@ namespace BenchmarkDotNet.Environments
 
             if (RuntimeInformation.IsNetCore && IsDotNetCliInstalled())
             {
-                // this wonderfull version number contains words like "preview" and ... 5 segments so it can not be parsed by Version.Parse. Example: "5.0.100-preview.8.20362.3"
+                // this wonderful version number contains words like "preview" and ... 5 segments so it can not be parsed by Version.Parse. Example: "5.0.100-preview.8.20362.3"
                 if (int.TryParse(new string(DotNetSdkVersion.Value.TrimStart().TakeWhile(char.IsDigit).ToArray()), out int major) && major >= 5)
                     yield return $".NET SDK={DotNetSdkVersion.Value}";
                 else

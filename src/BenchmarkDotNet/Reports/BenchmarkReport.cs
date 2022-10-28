@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Reports
             BuildResult = buildResult;
             ExecuteResults = executeResults ?? Array.Empty<ExecuteResult>();
             AllMeasurements = ExecuteResults.SelectMany((results, index) => results.Measurements).ToArray();
-            GcStats = ExecuteResults.Count > 0 ? executeResults[executeResults.Count -1].GcStats : default;
+            GcStats = ExecuteResults.Count > 0 ? ExecuteResults[ExecuteResults.Count - 1].GcStats : default;
             Metrics = metrics?.ToDictionary(metric => metric.Descriptor.Id)
                 ?? (IReadOnlyDictionary<string, Metric>)ImmutableDictionary<string, Metric>.Empty;
         }

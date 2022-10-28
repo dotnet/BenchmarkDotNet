@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -202,7 +203,7 @@ public class BuildContext : FrostingContext
 
 public static class DocumentationHelper
 {
-    public const string DocFxVersion = "2.59.3";
+    public const string DocFxVersion = "2.59.4";
 
     public static readonly string[] BdnAllVersions =
     {
@@ -428,12 +429,19 @@ public class DocFxChangelogDownloadTask : FrostingTask<BuildContext>
                 context.DocfxChangelogDownload(
                     DocumentationHelper.BdnAllVersions[i],
                     DocumentationHelper.BdnAllVersions[i - 1]);
+        } else if (context.Argument("LatestVersions", false))
+        {
+            for (int i = DocumentationHelper.BdnAllVersions.Length - 2; i < DocumentationHelper.BdnAllVersions.Length; i++)
+                context.DocfxChangelogDownload(
+                    DocumentationHelper.BdnAllVersions[i],
+                    DocumentationHelper.BdnAllVersions[i - 1]);
         }
 
-        context.DocfxChangelogDownload(
-            DocumentationHelper.BdnNextVersion,
-            DocumentationHelper.BdnAllVersions.Last(),
-            "HEAD");
+        if (!context.Argument("StableVersions", false))
+            context.DocfxChangelogDownload(
+                DocumentationHelper.BdnNextVersion,
+                DocumentationHelper.BdnAllVersions.Last(),
+                "HEAD");
     }
 }
 

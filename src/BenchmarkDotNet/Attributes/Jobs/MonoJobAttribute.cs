@@ -1,5 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Attributes
@@ -8,6 +9,10 @@ namespace BenchmarkDotNet.Attributes
     public class MonoJobAttribute : JobConfigBaseAttribute
     {
         public MonoJobAttribute(bool baseline = false) : base(Job.Default.WithRuntime(MonoRuntime.Default).WithBaseline(baseline))
+        {
+        }
+
+        public MonoJobAttribute(RuntimeMoniker runtimeMoniker, bool baseline = false) : base(Job.Default.WithRuntime(runtimeMoniker.GetRuntime()).WithBaseline(baseline))
         {
         }
 

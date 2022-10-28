@@ -16,33 +16,33 @@ namespace BenchmarkDotNet.Attributes
         public SimpleJobAttribute(
             int launchCount = DefaultValue,
             int warmupCount = DefaultValue,
-            int targetCount = DefaultValue,
+            int iterationCount = DefaultValue,
             int invocationCount = DefaultValue,
             string id = null,
             bool baseline = false
-        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, null, baseline)) { }
+        ) : base(CreateJob(id, launchCount, warmupCount, iterationCount, invocationCount, null, baseline)) { }
 
         [PublicAPI]
         public SimpleJobAttribute(
             RunStrategy runStrategy,
             int launchCount = DefaultValue,
             int warmupCount = DefaultValue,
-            int targetCount = DefaultValue,
+            int iterationCount = DefaultValue,
             int invocationCount = DefaultValue,
             string id = null,
             bool baseline = false
-        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, runStrategy, baseline)) { }
+        ) : base(CreateJob(id, launchCount, warmupCount, iterationCount, invocationCount, runStrategy, baseline)) { }
 
         [PublicAPI]
         public SimpleJobAttribute(
             RuntimeMoniker runtimeMoniker,
             int launchCount = DefaultValue,
             int warmupCount = DefaultValue,
-            int targetCount = DefaultValue,
+            int iterationCount = DefaultValue,
             int invocationCount = DefaultValue,
             string id = null,
             bool baseline = false
-        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, null, baseline, runtimeMoniker)) { }
+        ) : base(CreateJob(id, launchCount, warmupCount, iterationCount, invocationCount, null, baseline, runtimeMoniker)) { }
 
         [PublicAPI]
         public SimpleJobAttribute(
@@ -50,13 +50,13 @@ namespace BenchmarkDotNet.Attributes
             RuntimeMoniker runtimeMoniker,
             int launchCount = DefaultValue,
             int warmupCount = DefaultValue,
-            int targetCount = DefaultValue,
+            int iterationCount = DefaultValue,
             int invocationCount = DefaultValue,
             string id = null,
             bool baseline = false
-        ) : base(CreateJob(id, launchCount, warmupCount, targetCount, invocationCount, runStrategy, baseline, runtimeMoniker)) { }
+        ) : base(CreateJob(id, launchCount, warmupCount, iterationCount, invocationCount, runStrategy, baseline, runtimeMoniker)) { }
 
-        private static Job CreateJob(string id, int launchCount, int warmupCount, int targetCount, int invocationCount, RunStrategy? runStrategy,
+        private static Job CreateJob(string id, int launchCount, int warmupCount, int iterationCount, int invocationCount, RunStrategy? runStrategy,
             bool baseline, RuntimeMoniker runtimeMoniker = RuntimeMoniker.HostProcess)
         {
             var job = new Job(id);
@@ -74,9 +74,9 @@ namespace BenchmarkDotNet.Attributes
                 manualValuesCount++;
             }
 
-            if (targetCount != DefaultValue)
+            if (iterationCount != DefaultValue)
             {
-                job.Run.IterationCount = targetCount;
+                job.Run.IterationCount = iterationCount;
                 manualValuesCount++;
             }
             if (invocationCount != DefaultValue)

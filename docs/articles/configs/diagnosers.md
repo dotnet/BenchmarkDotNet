@@ -10,7 +10,7 @@ A **diagnoser** can attach to your benchmark and get some useful info.
 The current Diagnosers are:
 
 - GC and Memory Allocation (`MemoryDiagnoser`) which is cross platform, built-in and **is not enabled by default anymore**.
-  Please see Adam Sitnik's [blog post](http://adamsitnik.com/the-new-Memory-Diagnoser/) for all the details.
+  Please see Adam Sitnik's [blog post](https://adamsitnik.com/the-new-Memory-Diagnoser/) for all the details.
 - JIT Inlining Events (`InliningDiagnoser`).
   You can find this diagnoser in a separate package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`):
   [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/)
@@ -20,10 +20,10 @@ The current Diagnosers are:
 - Hardware Counter Diagnoser.
   You can find this diagnoser in a separate package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`):
   [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/).
-  Please see Adam Sitnik's [blog post](http://adamsitnik.com/Hardware-Counters-Diagnoser/) for all the details.
+  Please see Adam Sitnik's [blog post](https://adamsitnik.com/Hardware-Counters-Diagnoser/) for all the details.
 - Disassembly Diagnoser.
   It allows you to disassemble the benchmarked code to asm, IL and C#/F#.
-  Please see Adam Sitnik's [blog post](http://adamsitnik.com/Disassembly-Diagnoser/) for all the details.
+  Please see Adam Sitnik's [blog post](https://adamsitnik.com/Disassembly-Diagnoser/) for all the details.
 - ETW Profiler (`EtwProfiler`).
   It allows you to not only benchmark, but also profile the code. It's using TraceEvent, which internally uses ETW and exports all the information to a trace file. The trace file contains all of the stack traces captured by the profiler, PDBs to resolve symbols for both native and managed code and captured GC, JIT and CLR events. Please use one of the free tools: PerfView or Windows Performance Analyzer to analyze and visualize the data from trace file. You can find this diagnoser in a separate package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`): [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/)
   Please see Adam Sitnik's [blog post](https://adamsitnik.com/ETW-Profiler/) for all the details.
@@ -37,6 +37,7 @@ The current Diagnosers are:
   It is a cross-platform profiler that allows profile .NET code on every platform - Windows, Linux, macOS.
   Please see Wojciech Nagórski's [blog post](https://wojciechnagorski.com/2020/04/cross-platform-profiling-.net-code-with-benchmarkdotnet/) for all the details.
 - Threading Diagnoser (`ThreadingDiagnoser`) - .NET Core 3.0+ diagnoser that reports some Threading statistics.
+- Exception Diagnoser (`ExceptionDiagnoser`) - a diagnoser that reports the frequency of exceptions thrown during the operation.
 
 ## Usage
 
@@ -59,6 +60,7 @@ private class Config : ManualConfig
         Add(new InliningDiagnoser());
         Add(new EtwProfiler());
         Add(ThreadingDiagnoser.Default);
+        Add(ExceptionDiagnoser.Default);
     }
 }
 ```
@@ -72,6 +74,7 @@ You can also use one of the following attributes (apply it on a class that conta
 [ConcurrencyVisualizerProfiler]
 [NativeMemoryProfiler]
 [ThreadingDiagnoser]
+[ExceptionDiagnoser]
 ```
 
 In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on. The column Gen X means number of GC collections per 1000 operations for that generation.
@@ -80,7 +83,7 @@ In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on. The column Gen X means
 
 * In order to not affect main results we perform a separate run if any diagnoser is used. That's why it might take more time to execute benchmarks.
 * MemoryDiagnoser:
-	* Mono currently [does not](http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono) expose any api to get the number of allocated bytes. That's why our Mono users will get `?` in Allocated column.
+	* Mono currently [does not](https://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono) expose any api to get the number of allocated bytes. That's why our Mono users will get `?` in Allocated column.
 	* In order to get the number of allocated bytes in cross platform way we are using `GC.GetAllocatedBytesForCurrentThread` which recently got [exposed](https://github.com/dotnet/corefx/pull/12489) for netcoreapp1.1. That's why BenchmarkDotNet does not support netcoreapp1.0 from version 0.10.1.
 	* MemoryDiagnoser is `99.5%` accurate about allocated memory when using default settings or Job.ShortRun (or any longer job than it).
 * Threading Diagnoser:
@@ -123,3 +126,5 @@ In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on. The column Gen X means
 [!include[IntroNativeMemory](../samples/IntroNativeMemory.md)]
 
 [!include[IntroThreadingDiagnoser](../samples/IntroThreadingDiagnoser.md)]
+
+[!include[IntroExceptionDiagnoser](../samples/IntroExceptionDiagnoser.md)]

@@ -89,18 +89,23 @@ namespace BenchmarkDotNet.Running
             if (userInput.IsEmpty())
                 yield break;
 
+            var integerInput = userInput.Where(arg => IsInteger(arg)).ToArray();
+            var stringInput = userInput.Where(arg => !IsInteger(arg)).ToArray();
+
             for (int i = 0; i < allTypes.Count; i++)
             {
                 var type = allTypes[i];
 
-                if (userInput.Any(arg => type.GetDisplayName().ContainsWithIgnoreCase(arg))
-                    || userInput.Contains($"#{i}")
-                    || userInput.Contains(i.ToString())
-                    || userInput.Contains("*"))
+                if (stringInput.Any(arg => type.GetDisplayName().ContainsWithIgnoreCase(arg))
+                    || stringInput.Contains($"#{i}")
+                    || integerInput.Contains($"{i}")
+                    || stringInput.Contains("*"))
                 {
                     yield return type;
                 }
             }
+
+            static bool IsInteger(string str) => int.TryParse(str, out _);
         }
 
         private static void PrintAvailable(IReadOnlyList<Type> allTypes, ILogger logger)

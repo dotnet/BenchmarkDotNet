@@ -314,6 +314,6 @@ Let's build the best tool for benchmarking together!
 
 ## Code of Conduct
 
-This project has adopted the code of conduct defined by the [Contributor Covenant](http://contributor-covenant.org/)
+This project has adopted the code of conduct defined by the [Contributor Covenant](https://www.contributor-covenant.org/)
 to clarify expected behavior in our community.
 For more information, see the [.NET Foundation Code of Conduct](https://dotnetfoundation.org/code-of-conduct).

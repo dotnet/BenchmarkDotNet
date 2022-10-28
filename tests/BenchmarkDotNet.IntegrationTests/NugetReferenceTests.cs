@@ -1,22 +1,22 @@
-﻿using BenchmarkDotNet.Jobs;
+﻿using System;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Tests.XUnit;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.Roslyn;
+using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
-using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Attributes;
-using Newtonsoft.Json;
-using System;
-using BenchmarkDotNet.Toolchains.Roslyn;
-using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Loggers;
-using System.Collections.Immutable;
-using BenchmarkDotNet.Tests.XUnit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
     public class NuGetReferenceTests : BenchmarkTestExecutor
     {
-        public NuGetReferenceTests(ITestOutputHelper output) : base(output) { }
+        public NuGetReferenceTests(ITestOutputHelper output) : base(output)
+        {
+        }
 
         [FactNotLinux("For some reason this test is unstable on Ubuntu for both AzureDevOps and Travis CI")]
         public void UserCanSpecifyCustomNuGetPackageDependency()
@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests
             CanExecute<WithCallToNewtonsoft>(config);
         }
 
-        [Fact]
+        [FactClassicDotNetOnly("Roslyn toolchain does not support .NET Core")]
         public void RoslynToolchainDoesNotSupportNuGetPackageDependency()
         {
             var toolchain = RoslynToolchain.Instance;
@@ -37,19 +37,18 @@ namespace BenchmarkDotNet.IntegrationTests
             var unsupportedJob = Job.Dry.WithToolchain(toolchain).WithNuGet("Newtonsoft.Json", "11.0.2");
             var unsupportedJobConfig = CreateSimpleConfig(job: unsupportedJob);
             var unsupportedJobBenchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithCallToNewtonsoft), unsupportedJobConfig);
-            var unsupportedJobLogger = new CompositeLogger(unsupportedJobConfig.GetLoggers().ToImmutableHashSet());
+
             foreach (var benchmarkCase in unsupportedJobBenchmark.BenchmarksCases)
             {
-                Assert.False(toolchain.IsSupported(benchmarkCase, unsupportedJobLogger, BenchmarkRunnerClean.DefaultResolver));
+                Assert.NotEmpty(toolchain.Validate(benchmarkCase, BenchmarkRunnerClean.DefaultResolver));
             }
 
             var supportedJob = Job.Dry.WithToolchain(toolchain);
             var supportedConfig = CreateSimpleConfig(job: supportedJob);
             var supportedBenchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithCallToNewtonsoft), supportedConfig);
-            var supportedLogger = new CompositeLogger(supportedConfig.GetLoggers().ToImmutableHashSet());
             foreach (var benchmarkCase in supportedBenchmark.BenchmarksCases)
             {
-                Assert.True(toolchain.IsSupported(benchmarkCase, supportedLogger, BenchmarkRunnerClean.DefaultResolver));
+                Assert.Empty(toolchain.Validate(benchmarkCase, BenchmarkRunnerClean.DefaultResolver));
             }
         }
 

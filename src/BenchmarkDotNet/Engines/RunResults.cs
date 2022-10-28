@@ -23,17 +23,21 @@ namespace BenchmarkDotNet.Engines
 
         public ThreadingStats ThreadingStats { get; }
 
+        public double ExceptionFrequency { get; }
+
         public RunResults(IReadOnlyList<Measurement>? overhead,
                           IReadOnlyList<Measurement> workload,
                           OutlierMode outlierMode,
                           GcStats gcStats,
-                          ThreadingStats threadingStats)
+                          ThreadingStats threadingStats,
+                          double exceptionFrequency)
         {
             this.outlierMode = outlierMode;
             Overhead = overhead;
             Workload = workload;
             GCStats = gcStats;
             ThreadingStats = threadingStats;
+            ExceptionFrequency = exceptionFrequency;
         }
 
         public IEnumerable<Measurement> GetMeasurements()
@@ -68,6 +72,8 @@ namespace BenchmarkDotNet.Engines
                 outWriter.WriteLine(GCStats.ToOutputLine());
             if (!ThreadingStats.Equals(ThreadingStats.Empty))
                 outWriter.WriteLine(ThreadingStats.ToOutputLine());
+            if (ExceptionFrequency > 0)
+                outWriter.WriteLine(ExceptionsStats.ToOutputLine(ExceptionFrequency));
 
             outWriter.WriteLine();
         }

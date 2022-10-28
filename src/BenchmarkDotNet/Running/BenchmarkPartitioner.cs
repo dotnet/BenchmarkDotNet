@@ -41,6 +41,8 @@ namespace BenchmarkDotNet.Running
                     return false;
                 if (jobX.Environment.Platform != jobY.Environment.Platform) // platform is set in .csproj
                     return false;
+                if (jobX.Environment.LargeAddressAware != jobY.Environment.LargeAddressAware)
+                    return false;
                 if (AreDifferent(jobX.Infrastructure.BuildConfiguration, jobY.Infrastructure.BuildConfiguration)) // Debug vs Release
                     return false;
                 if (AreDifferent(jobX.Infrastructure.Arguments, jobY.Infrastructure.Arguments)) // arguments can be anything (Mono runtime settings or MsBuild parameters)
@@ -74,6 +76,7 @@ namespace BenchmarkDotNet.Running
                 hashCode ^= obj.Descriptor.Type.Assembly.Location.GetHashCode();
                 hashCode ^= (int)job.Environment.Jit;
                 hashCode ^= (int)job.Environment.Platform;
+                hashCode ^= job.Environment.LargeAddressAware.GetHashCode();
                 hashCode ^= job.Environment.Gc.GetHashCode();
 
                 if (job.Infrastructure.BuildConfiguration != null)

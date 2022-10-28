@@ -160,7 +160,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
         private IterationData[] CreateIterationData(List<double> startStopTimeStamps)
         {
-            // collection contains mixted .Start and .Stop intervals, if we sort it we know that n is Start and n + 1 is Stop
+            // collection contains mixed .Start and .Stop intervals, if we sort it we know that n is Start and n + 1 is Stop
             startStopTimeStamps.Sort();
 
             var iterations = new IterationData[startStopTimeStamps.Count / 2];

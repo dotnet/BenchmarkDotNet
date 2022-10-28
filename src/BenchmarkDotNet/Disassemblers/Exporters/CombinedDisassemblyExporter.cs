@@ -99,7 +99,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
 
                     foreach (var map in method.Maps)
                         foreach (var sourceCode in map.SourceCodes)
-                            logger.WriteLine(CodeFormatter.Format(sourceCode, formatter, config.PrintInstructionAddresses, disassemblyResult.PointerSize));
+                            logger.WriteLine(CodeFormatter.Format(sourceCode, formatter, config.PrintInstructionAddresses, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping));
 
                     logger.WriteLine();
                 }

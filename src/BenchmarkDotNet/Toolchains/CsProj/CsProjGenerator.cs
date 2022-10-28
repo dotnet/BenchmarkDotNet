@@ -154,19 +154,24 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             // important assumption! project's file name === output dll name
             string projectName = benchmarkTarget.GetTypeInfo().Assembly.GetName().Name;
 
-            // I was afraid of using .GetFiles with some smart search pattern due to the fact that the method was designed for Windows
-            // and now .NET is cross platform so who knows if the pattern would be supported for other OSes
             var possibleNames = new HashSet<string> { $"{projectName}.csproj", $"{projectName}.fsproj", $"{projectName}.vbproj" };
-            var projectFile = rootDirectory
-                .EnumerateFiles("*.*", SearchOption.AllDirectories)
-                .FirstOrDefault(file => possibleNames.Contains(file.Name));
+            var projectFiles = rootDirectory
+                .EnumerateFiles("*proj", SearchOption.AllDirectories)
+                .Where(file => possibleNames.Contains(file.Name))
+                .ToArray();
 
-            if (projectFile == default(FileInfo))
+            if (projectFiles.Length == 0)
             {
                 throw new NotSupportedException(
                     $"Unable to find {projectName} in {rootDirectory.FullName} and its subfolders. Most probably the name of output exe is different than the name of the .(c/f)sproj");
             }
-            return projectFile;
+            else if (projectFiles.Length > 1)
+            {
+                throw new NotSupportedException(
+                    $"Found more than one matching project file for {projectName} in {rootDirectory.FullName} and its subfolders: {string.Join(",", projectFiles.Select(pf => $"'{pf.FullName}'"))}. Benchmark project names needs to be unique.");
+            }
+
+            return projectFiles[0];
         }
 
         public override bool Equals(object obj) => obj is CsProjGenerator other && Equals(other);
