@@ -223,6 +223,17 @@ namespace BenchmarkDotNet.Engines
 
         public override bool Equals(object obj) => obj is GcStats other && Equals(other);
 
-        public override int GetHashCode() => HashCode.Combine(Gen0Collections, Gen1Collections, Gen2Collections, AllocatedBytes, TotalOperations);
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = Gen0Collections;
+                hashCode = (hashCode * 397) ^ Gen1Collections;
+                hashCode = (hashCode * 397) ^ Gen2Collections;
+                hashCode = (hashCode * 397) ^ AllocatedBytes.GetHashCode();
+                hashCode = (hashCode * 397) ^ TotalOperations.GetHashCode();
+                return hashCode;
+            }
+        }
     }
 }

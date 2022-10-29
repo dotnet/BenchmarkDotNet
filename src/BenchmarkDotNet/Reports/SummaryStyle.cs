@@ -80,16 +80,21 @@ namespace BenchmarkDotNet.Reports
 
         public override bool Equals(object obj) => obj is SummaryStyle summary && Equals(summary);
 
-        public override int GetHashCode() =>
-            HashCode.Combine(
-                PrintUnitsInHeader,
-                PrintUnitsInContent,
-                PrintZeroValuesInContent,
-                MaxParameterColumnWidth,
-                SizeUnit,
-                CodeSizeUnit,
-                TimeUnit,
-                RatioStyle);
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = PrintUnitsInHeader.GetHashCode();
+                hashCode = (hashCode * 397) ^ PrintUnitsInContent.GetHashCode();
+                hashCode = (hashCode * 397) ^ PrintZeroValuesInContent.GetHashCode();
+                hashCode = (hashCode * 397) ^ (SizeUnit != null ? SizeUnit.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (CodeSizeUnit != null ? CodeSizeUnit.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (TimeUnit != null ? TimeUnit.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ MaxParameterColumnWidth;
+                hashCode = (hashCode * 397) ^ RatioStyle.GetHashCode();
+                return hashCode;
+            }
+        }
 
         public static bool operator ==(SummaryStyle left, SummaryStyle right) => Equals(left, right);
 

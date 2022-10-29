@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Environments
 
         public bool Equals(ClrRuntime other) => other != null && base.Equals(other) && Version == other.Version;
 
-        public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Version);
+        public override int GetHashCode() => base.GetHashCode() ^ (Version?.GetHashCode() ?? 0);
 
         internal static ClrRuntime GetCurrentVersion()
         {

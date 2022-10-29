@@ -43,7 +43,10 @@ namespace BenchmarkDotNet.Jobs
                    PackageVersion == other.PackageVersion;
         }
 
-        public override int GetHashCode() => HashCode.Combine(PackageName, PackageVersion);
+        public override int GetHashCode()
+        {
+            return 557888800 + EqualityComparer<string>.Default.GetHashCode(PackageName) + EqualityComparer<string>.Default.GetHashCode(PackageVersion).GetHashCode();
+        }
 
         public override string ToString() => $"{PackageName}{(string.IsNullOrWhiteSpace(PackageVersion) ? string.Empty : $" {PackageVersion}")}";
 
