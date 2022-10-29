@@ -7,6 +7,7 @@ using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using JsonConvert = SimpleJson.SimpleJson;
 
@@ -57,7 +58,7 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
         }
 
         private BenchmarkSummaryStoreInfo? storeInfo = default;
-
+        private string? artifactsPath;
 
         internal JsonSnapshotStore(string filepath)
         {
@@ -75,8 +76,10 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
         /// </summary>
         public string Filename { get; }
 
+
         void ISnapshotStore.ExportBegin(ILogger logger)
         {
+            artifactsPath = default;
         }
 
         void ISnapshotStore.Export(Summary summary, ILogger logger)
@@ -117,13 +120,21 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
                 Title = summary.Title,
                 Benchmarks = benchmarks.ToArray(),
             };
-            //ResultsDirectoryPath = summary.ResultsDirectoryPath;
+            artifactsPath = summary.ResultsDirectoryPath;
         }
 
         void ISnapshotStore.ExportEnd(ILogger logger)
         {
-            System.Diagnostics.Debug.WriteLine(Environment.CurrentDirectory);
-            System.IO.File.WriteAllText(Filename, JsonConvert.SerializeObject(storeInfo));
+            var filePath = string.Empty;
+            try
+            {
+                filePath = Path.Combine(artifactsPath ?? string.Empty, Filename);
+                File.WriteAllText(filePath, JsonConvert.SerializeObject(storeInfo));
+            }
+            catch (Exception)
+            {
+                logger.WriteError($"{nameof(JsonSnapshotStore)} error in generating the file {filePath}");
+            }
         }
 
         ExecuteResult? ISnapshotStore.GetResult(ExecuteParameters executeParameters)
@@ -145,7 +156,8 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
         {
             if (storeInfo is null)
             {
-                if (System.IO.File.Exists(Filename))
+                var filepath = Path.Combine(benchmarkCase.Config.ArtifactsPath, Filename);
+                if (System.IO.File.Exists(filepath))
                 {
                     storeInfo = JsonConvert.DeserializeObject<BenchmarkSummaryStoreInfo>(System.IO.File.ReadAllText(Filename));
                 }
