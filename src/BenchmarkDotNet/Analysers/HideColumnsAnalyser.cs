@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Analysers
             var columnNames = string.Join(", ", hiddenColumns.Select(c => c.OriginalColumn.ColumnName));
 
             var message = $"Hidden columns: {columnNames}";
-            yield return Conclusion.CreateHint(Id, message);
+            yield return CreateHint(message);
         }
     }
 }
