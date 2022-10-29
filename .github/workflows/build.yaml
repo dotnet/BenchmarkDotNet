@@ -8,7 +8,7 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Run
       shell: cmd
       run: |
@@ -17,7 +17,7 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Clang
       uses: egor-tensin/setup-clang@v1
       with:
@@ -30,6 +30,6 @@ jobs:
   build-macos:
     runs-on: macOS-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Run
       run: ./build.sh
