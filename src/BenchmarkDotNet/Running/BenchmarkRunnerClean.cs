@@ -692,7 +692,7 @@ namespace BenchmarkDotNet.Running
                     logger.WriteLineInfo($"// Benchmark {validationError.BenchmarkCase.DisplayInfo}");
                 }
 
-                logger.WriteLineError($"//    * {validationError.Message}");
+                logger.WriteLineError(validationError.Message);
                 logger.WriteLine();
             }
         }
