@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Running
             {
                 var compositeLogger = CreateCompositeLogger(benchmarkRunInfos, streamLogger);
 
-                compositeLogger.WriteLineInfo("// Validating benchmarks:");
+                compositeLogger.WriteLineHeader("// ***** Validating benchmarks *****");
 
                 var (supportedBenchmarks, validationErrors) = GetSupportedBenchmarks(benchmarkRunInfos, resolver);
 
