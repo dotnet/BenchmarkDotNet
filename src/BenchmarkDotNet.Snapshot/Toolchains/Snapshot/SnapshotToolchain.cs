@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Toolchains.Snapshot
         /// <returns></returns>
         public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            if (_store.IsSupported(benchmarkCase, resolver))
+            if (!_store.IsSupported(benchmarkCase, resolver))
             {
                 yield return new ValidationError(false,
                     $"This benchmark '{benchmarkCase.DisplayInfo}' do not have a Snapshot, it will not be executed",
