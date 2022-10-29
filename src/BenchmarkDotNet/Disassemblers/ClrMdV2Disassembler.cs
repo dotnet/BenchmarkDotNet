@@ -327,7 +327,7 @@ namespace BenchmarkDotNet.Disassemblers
                 return x.FilePath == y.FilePath && x.LineNumber == y.LineNumber;
             }
 
-            public int GetHashCode(Sharp obj) => obj.FilePath.GetHashCode() ^ obj.LineNumber;
+            public int GetHashCode(Sharp obj) => HashCode.Combine(obj.FilePath, obj.LineNumber);
         }
     }
 }
