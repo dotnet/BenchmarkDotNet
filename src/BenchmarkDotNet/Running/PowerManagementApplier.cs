@@ -52,12 +52,12 @@ namespace BenchmarkDotNet.Running
                     {
                         powerPlanChanged = false;
                         var powerPlanFriendlyName = PowerManagementHelper.CurrentPlanFriendlyName;
-                        logger.WriteLineInfo($"Successfully reverted power plan (GUID: {userCurrentPowerPlan.Value} FriendlyName: {powerPlanFriendlyName})");
+                        logger.WriteLineInfo($"// Successfully reverted power plan (GUID: {userCurrentPowerPlan.Value} FriendlyName: {powerPlanFriendlyName})");
                     }
                 }
                 catch (Exception ex)
                 {
-                    logger.WriteLineError($"Cannot revert power plan (error message: {ex.Message})");
+                    logger.WriteLineError($"// Cannot revert power plan (error message: {ex.Message})");
                 }
             }
         }
@@ -76,14 +76,14 @@ namespace BenchmarkDotNet.Running
                 {
                     powerPlanChanged = true;
                     var powerPlanFriendlyName = PowerManagementHelper.CurrentPlanFriendlyName;
-                    logger.WriteLineInfo($"Setup power plan (GUID: {guid} FriendlyName: {powerPlanFriendlyName})");
+                    logger.WriteLineInfo($"// Setup power plan (GUID: {guid} FriendlyName: {powerPlanFriendlyName})");
                 }
                 else
-                    logger.WriteLineError($"Cannot setup power plan (GUID: {guid})");
+                    logger.WriteLineError($"// Cannot setup power plan (GUID: {guid})");
             }
             catch (Exception ex)
             {
-                logger.WriteLineError($"Cannot setup power plan (GUID: {guid}, error message: {ex.Message})");
+                logger.WriteLineError($"// Cannot setup power plan (GUID: {guid}, error message: {ex.Message})");
             }
         }
     }
