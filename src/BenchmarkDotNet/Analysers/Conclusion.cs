@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Analysers
         {
             return Mergeable
                 ? HashCode.Combine(AnalyserId, Kind, Message)
-                : HashCode.Combine(AnalyserId, Kind, Report?.ToString() ?? string.Empty);
+                : HashCode.Combine(AnalyserId, Kind, Report?.ToString());
         }
     }
 }

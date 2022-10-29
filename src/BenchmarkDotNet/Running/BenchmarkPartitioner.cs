@@ -69,9 +69,9 @@ namespace BenchmarkDotNet.Running
             {
                 var hashCode = new HashCode();
                 hashCode.Add(obj.GetToolchain());
-                hashCode.Add(obj.GetRuntime().GetType().MetadataToken);
+                hashCode.Add(obj.GetRuntime());
                 hashCode.Add(obj.Descriptor.Type.Assembly.Location);
-                hashCode.Add(obj.Descriptor.AdditionalLogic ?? string.Empty);
+                hashCode.Add(obj.Descriptor.AdditionalLogic);
                 hashCode.Add(obj.Descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any());
                 var job = obj.Job;
                 hashCode.Add(job.Environment.Jit);
