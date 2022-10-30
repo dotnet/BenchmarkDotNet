@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -13,6 +14,11 @@ namespace BenchmarkDotNet
         public void Add<T>(T value)
         {
             hashCode = Hash(hashCode, value);
+        }
+
+        public void Add<T>(T value, IEqualityComparer<T> comparer)
+        {
+            hashCode = Hash(hashCode, value, comparer);
         }
 
         public readonly int ToHashCode() => hashCode;
@@ -107,6 +113,15 @@ namespace BenchmarkDotNet
             unchecked
             {
                 return (hashCode * 397) ^ (value?.GetHashCode() ?? 0);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int Hash<T>(int hashCode, T value, IEqualityComparer<T> comparer)
+        {
+            unchecked
+            {
+                return (hashCode * 397) ^ (value is null ? 0 : (comparer?.GetHashCode(value) ?? value.GetHashCode()));
             }
         }
 
