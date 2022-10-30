@@ -5,6 +5,8 @@ using System.Runtime.CompilerServices;
 
 // Mimics System.HashCode, which is missing in NetStandard2.0.
 // Placed in root namespace to avoid ambiguous reference with System.HashCode
+
+// ReSharper disable once CheckNamespace
 namespace BenchmarkDotNet
 {
     internal struct HashCode
