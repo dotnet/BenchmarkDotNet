@@ -261,7 +261,10 @@ namespace BenchmarkDotNet.Configs
             columnHidingRules.AddRange(config.GetColumnHidingRules());
             Options |= config.Options;
             BuildTimeout = GetBuildTimeout(BuildTimeout, config.BuildTimeout);
-            AutomaticBaselineMode = config.AutomaticBaselineMode;
+            if (config.AutomaticBaselineMode != AutomaticBaselineMode.None)
+            {
+                AutomaticBaselineMode = config.AutomaticBaselineMode;
+            }
         }
 
         /// <summary>

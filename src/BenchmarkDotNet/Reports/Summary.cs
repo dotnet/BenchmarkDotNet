@@ -73,7 +73,8 @@ namespace BenchmarkDotNet.Reports
 
         private static BenchmarkCase GetFastestBenchmarkCase(ImmutableArray<BenchmarkReport> reports)
         {
-            if (reports.Any() && reports.All(r => r.BenchmarkCase.Config.AutomaticBaselineMode == AutomaticBaselineMode.Fastest))
+            var baselineReport = reports.Where(r => r.BenchmarkCase.Config.AutomaticBaselineMode != AutomaticBaselineMode.None).LastOrDefault();
+            if (baselineReport != null && baselineReport.BenchmarkCase.Config.AutomaticBaselineMode == AutomaticBaselineMode.Fastest)
             {
                 var fastestReport = reports.First();
                 if (fastestReport.ResultStatistics != null)
