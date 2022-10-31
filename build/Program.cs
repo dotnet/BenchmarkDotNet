@@ -48,6 +48,11 @@ public class BuildContext : FrostingContext
 
     public DirectoryPath ChangeLogDirectory { get; }
     public DirectoryPath ChangeLogGenDirectory { get; }
+    
+    public DirectoryPath RedirectRootDirectory { get; }
+    public DirectoryPath RedirectProjectDirectory { get; }
+    public DirectoryPath RedirectSourceDirectory { get; }
+    public DirectoryPath RedirectTargetDirectory { get; }
 
     public FilePath SolutionFile { get; }
     public FilePath UnitTestsProjectFile { get; }
@@ -81,6 +86,11 @@ public class BuildContext : FrostingContext
 
         ChangeLogDirectory = RootDirectory.Combine("docs").Combine("changelog");
         ChangeLogGenDirectory = RootDirectory.Combine("docs").Combine("_changelog");
+        
+        RedirectRootDirectory = RootDirectory.Combine("docs").Combine("_redirects");
+        RedirectProjectDirectory = RedirectRootDirectory.Combine("RedirectGenerator");
+        RedirectSourceDirectory = RedirectRootDirectory.Combine("redirects");
+        RedirectTargetDirectory = RootDirectory.Combine("docs").Combine("_site"); 
 
         SolutionFile = RootDirectory.CombineWithFilePath("BenchmarkDotNet.sln");
         UnitTestsProjectFile = RootDirectory.Combine("tests").Combine("BenchmarkDotNet.Tests")
@@ -133,7 +143,7 @@ public class BuildContext : FrostingContext
     public void DocfxChangelogDownload(string version, string versionPrevious, string lastCommit = "")
     {
         this.Information("DocfxChangelogDownload: " + version);
-        // Required environment variables: GITHIB_PRODUCT, GITHUB_TOKEN
+        // Required environment variables: GITHUB_PRODUCT, GITHUB_TOKEN
         var changeLogBuilderDirectory = ChangeLogGenDirectory.Combine("ChangeLogBuilder");
         var changeLogBuilderProjectFile = changeLogBuilderDirectory.CombineWithFilePath("ChangeLogBuilder.csproj");
         this.DotNetRun(changeLogBuilderProjectFile.FullPath,
@@ -198,6 +208,21 @@ public class BuildContext : FrostingContext
                 new ProcessSettings { Arguments = DocfxExeFile.FullPath + " " + docfxJson + " " + args });
         else
             this.StartProcess(DocfxExeFile.FullPath, new ProcessSettings { Arguments = docfxJson + " " + args });
+    }
+
+    public void GenerateRedirects()
+    {
+        var redirectProjectFile = RedirectProjectDirectory.CombineWithFilePath("RedirectGenerator.csproj");
+        this.Information(redirectProjectFile.FullPath);
+        this.DotNetBuild(redirectProjectFile.FullPath);
+        this.DotNetRun(redirectProjectFile.FullPath, new DotNetRunSettings
+        {
+            WorkingDirectory = RedirectProjectDirectory,
+        });
+
+        this.Information(RedirectTargetDirectory);
+        this.EnsureDirectoryExists(RedirectTargetDirectory);
+        this.CopyFiles(RedirectSourceDirectory + "/**/*", RedirectTargetDirectory, true);
     }
 }
 
@@ -462,6 +487,15 @@ public class DocfxChangelogGenerateTask : FrostingTask<BuildContext>
     }
 }
 
+[TaskName("DocFX_Generate_Redirects")]
+public class DocfxGenerateRedirectsTask : FrostingTask<BuildContext>
+{
+    public override void Run(BuildContext context)
+    {
+        context.GenerateRedirects();
+    }
+}
+
 // In order to work around xref issues in DocFx, BenchmarkDotNet and BenchmarkDotNet.Annotations must be build
 // before running the DocFX_Build target. However, including a dependency on BuildTask here may have unwanted
 // side effects (CleanTask).
@@ -474,6 +508,7 @@ public class DocfxChangelogBuildTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context)
     {
         context.RunDocfx(context.DocfxJsonFile);
+        context.GenerateRedirects();
     }
 }
 
@@ -484,6 +519,8 @@ public class DocfxChangelogServeTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
+        context.RunDocfx(context.DocfxJsonFile);
+        context.GenerateRedirects();
         context.RunDocfx(context.DocfxJsonFile, "--serve");
     }
 }
