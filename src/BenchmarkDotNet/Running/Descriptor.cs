@@ -51,13 +51,21 @@ namespace BenchmarkDotNet.Running
             IterationCleanupMethod = iterationCleanupMethod;
             OperationsPerInvoke = operationsPerInvoke;
             AdditionalLogic = additionalLogic ?? string.Empty;
-            WorkloadMethodDisplayInfo = description ?? workloadMethod?.Name ?? "Untitled";
+            WorkloadMethodDisplayInfo = FormatDescription(description) ?? workloadMethod?.Name ?? "Untitled";
             Baseline = baseline;
             Categories = categories ?? Array.Empty<string>();
             MethodIndex = methodIndex;
         }
 
         public override string ToString() => DisplayInfo;
+
+        private static string FormatDescription([CanBeNull] string description)
+        {
+            var specialSymbols = new[] { ' ', '\'', '[', ']' };
+            return description != null && specialSymbols.Any(description.Contains)
+                ? "'" + description + "'"
+                : description;
+        }
 
         public bool HasCategory(string category) => Categories.Any(c => c.EqualsWithIgnoreCase(category));
 
