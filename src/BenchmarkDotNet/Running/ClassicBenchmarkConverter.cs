@@ -114,7 +114,8 @@ namespace BenchmarkDotNet.Running
                     return BenchmarkCase.Create(
                         new Descriptor(target.Type, target.WorkloadMethod, target.GlobalSetupMethod, target.GlobalCleanupMethod,
                             target.IterationSetupMethod, target.IterationCleanupMethod,
-                            target.WorkloadMethodDisplayInfo, benchmarkContent, target.Baseline, target.Categories, target.OperationsPerInvoke),
+                            target.WorkloadMethodDisplayInfo, benchmarkContent, target.Baseline, target.Categories, target.OperationsPerInvoke,
+                            oldBehaviorForBenchmarkName: config?.SummaryStyle?.OldBehaviorForBenchmarkName ?? false),
                         b.Job,
                         b.Parameters,
                         b.Config);

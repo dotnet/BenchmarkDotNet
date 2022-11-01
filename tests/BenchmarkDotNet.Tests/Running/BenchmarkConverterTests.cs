@@ -4,6 +4,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Perfolizer.Mathematics.OutlierDetection;
 using Xunit;
@@ -277,6 +278,41 @@ namespace BenchmarkDotNet.Tests.Running
         {
             [IterationCleanup] private void X() { }
             [Benchmark] public void A() { }
+        }
+
+        [Fact]
+        public void BenchmarkNameWithSpecialCharactersIsNotEscapedByDefault()
+        {
+            var info = BenchmarkConverter.TypeToBenchmarks(typeof(BenchmarkNamesWithSpecialCharacters));
+
+            Assert.Equal("with space", info.BenchmarksCases[0].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("na\'me", info.BenchmarksCases[1].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("[name]", info.BenchmarksCases[2].Descriptor.WorkloadMethodDisplayInfo);
+        }
+
+        [Fact]
+        public void OldBenchmarkNameBehaviorCanBeEnabledWithSummaryStyle()
+        {
+            var config = DefaultConfig.Instance.WithSummaryStyle(
+                    SummaryStyle.Default.WithOldBehaviorForBenchmarkName(true));
+
+            var info = BenchmarkConverter.TypeToBenchmarks(typeof(BenchmarkNamesWithSpecialCharacters), config);
+
+            Assert.Equal("'with space'", info.BenchmarksCases[0].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("'na\'me'", info.BenchmarksCases[1].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("'[name]'", info.BenchmarksCases[2].Descriptor.WorkloadMethodDisplayInfo);
+        }
+
+        public sealed class BenchmarkNamesWithSpecialCharacters
+        {
+            [Benchmark(Description = "with space")]
+            public void A() { }
+
+            [Benchmark(Description = "na\'me")]
+            public void B() { }
+
+            [Benchmark(Description = "[name]")]
+            public void C() { }
         }
     }
 }
