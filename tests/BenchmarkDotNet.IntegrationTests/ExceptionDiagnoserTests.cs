@@ -8,6 +8,7 @@ using BenchmarkDotNet.Running;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -24,7 +25,8 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertStats(summary, new Dictionary<string, (string metricName, double expectedValue)>
             {
                 { nameof(ExceptionCount.DoNothing), ("ExceptionFrequency", 0.0) },
-                { nameof(ExceptionCount.ThrowOneException), ("ExceptionFrequency", 1.0) }
+                { nameof(ExceptionCount.ThrowOneException), ("ExceptionFrequency", 1.0) },
+                { nameof(ExceptionCount.ThrowFromMultipleThreads), ("ExceptionFrequency", 100.0) }
             });
         }
 
@@ -42,6 +44,22 @@ namespace BenchmarkDotNet.IntegrationTests
 
             [Benchmark]
             public void DoNothing() { }
+
+            [Benchmark]
+            public async Task ThrowFromMultipleThreads()
+            {
+                void ThrowMultipleExceptions()
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        ThrowOneException();
+                    }
+                }
+
+                var tasks = Enumerable.Range(1, 10).Select(
+                    i => Task.Run(ThrowMultipleExceptions));
+                await Task.WhenAll(tasks);
+            }
         }
 
         private IConfig CreateConfig()
