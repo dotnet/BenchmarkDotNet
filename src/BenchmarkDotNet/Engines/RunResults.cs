@@ -17,6 +17,18 @@ namespace BenchmarkDotNet.Engines
         [NotNull, PublicAPI]
         public IReadOnlyList<Measurement> EngineMeasurements { get; }
 
+        [CanBeNull, PublicAPI]
+        public IReadOnlyList<Measurement> Overhead
+            => EngineMeasurements
+                .Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual))
+                .ToArray();
+
+        [NotNull, PublicAPI]
+        public IReadOnlyList<Measurement> Workload
+            => EngineMeasurements
+                .Where(m => m.Is(IterationMode.Workload, IterationStage.Actual))
+                .ToArray();
+
         public GcStats GCStats { get; }
 
         public ThreadingStats ThreadingStats { get; }
@@ -38,12 +50,8 @@ namespace BenchmarkDotNet.Engines
 
         public IEnumerable<Measurement> GetWorkloadResultMeasurements()
         {
-            var overheadActualMeasurements = EngineMeasurements
-                .Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual))
-                .ToList();
-            var workloadActualMeasurements = EngineMeasurements
-                .Where(m => m.Is(IterationMode.Workload, IterationStage.Actual))
-                .ToList();
+            var overheadActualMeasurements = Overhead ?? Array.Empty<Measurement>();
+            var workloadActualMeasurements = Workload;
             if (workloadActualMeasurements.IsEmpty())
                 yield break;
 

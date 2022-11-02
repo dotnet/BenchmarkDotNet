@@ -11,11 +11,11 @@ namespace BenchmarkDotNet.Engines
     // TODO: use clockResolution
     internal class EnginePilotStage : EngineStage
     {
-        public class PilotStageResult
+        public readonly struct PilotStageResult
         {
             public long PerfectInvocationCount { get; }
             [NotNull]
-            public List<Measurement> Measurements { get; }
+            public IReadOnlyList<Measurement> Measurements { get; }
 
             public PilotStageResult(long perfectInvocationCount, [NotNull] List<Measurement> measurements)
             {
@@ -26,7 +26,7 @@ namespace BenchmarkDotNet.Engines
             public PilotStageResult(long perfectInvocationCount)
             {
                 PerfectInvocationCount = perfectInvocationCount;
-                Measurements = new List<Measurement>();
+                Measurements = Array.Empty<Measurement>();
             }
         }
 
