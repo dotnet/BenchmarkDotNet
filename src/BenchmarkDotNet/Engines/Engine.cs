@@ -41,6 +41,7 @@ namespace BenchmarkDotNet.Engines
         private bool EvaluateOverhead { get; }
         private bool MemoryRandomization { get; }
 
+        private readonly List<Measurement> jittingMeasurements = new (10);
         private readonly EnginePilotStage pilotStage;
         private readonly EngineWarmupStage warmupStage;
         private readonly EngineActualStage actualStage;
@@ -104,8 +105,10 @@ namespace BenchmarkDotNet.Engines
 
         public RunResults Run()
         {
+            var measurements = new List<Measurement>();
+            measurements.AddRange(jittingMeasurements);
+
             long invokeCount = TargetJob.ResolveValue(RunMode.InvocationCountCharacteristic, Resolver, 1);
-            IReadOnlyList<Measurement> idle = null;
 
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.BenchmarkStart(BenchmarkName);
@@ -114,21 +117,23 @@ namespace BenchmarkDotNet.Engines
             {
                 if (Strategy != RunStrategy.Monitoring)
                 {
-                    invokeCount = pilotStage.Run();
+                    var pilotStageResult = pilotStage.Run();
+                    invokeCount = pilotStageResult.PerfectInvocationCount;
+                    measurements.AddRange(pilotStageResult.Measurements);
 
                     if (EvaluateOverhead)
                     {
-                        warmupStage.RunOverhead(invokeCount, UnrollFactor);
-                        idle = actualStage.RunOverhead(invokeCount, UnrollFactor);
+                        measurements.AddRange(warmupStage.RunOverhead(invokeCount, UnrollFactor));
+                        measurements.AddRange(actualStage.RunOverhead(invokeCount, UnrollFactor));
                     }
                 }
 
-                warmupStage.RunWorkload(invokeCount, UnrollFactor, Strategy);
+                measurements.AddRange(warmupStage.RunWorkload(invokeCount, UnrollFactor, Strategy));
             }
 
             Host.BeforeMainRun();
 
-            var main = actualStage.RunWorkload(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring);
+            measurements.AddRange(actualStage.RunWorkload(invokeCount, UnrollFactor, forceSpecific: Strategy == RunStrategy.Monitoring));
 
             Host.AfterMainRun();
 
@@ -141,7 +146,7 @@ namespace BenchmarkDotNet.Engines
 
             var outlierMode = TargetJob.ResolveValue(AccuracyMode.OutlierModeCharacteristic, Resolver);
 
-            return new RunResults(idle, main, outlierMode, workGcHasDone, threadingStats, exceptionFrequency);
+            return new RunResults(measurements, outlierMode, workGcHasDone, threadingStats, exceptionFrequency);
         }
 
         public Measurement RunIteration(IterationData data)
@@ -183,6 +188,8 @@ namespace BenchmarkDotNet.Engines
             // Results
             var measurement = new Measurement(0, data.IterationMode, data.IterationStage, data.Index, totalOperations, clockSpan.GetNanoseconds());
             WriteLine(measurement.ToString());
+            if (measurement.IterationStage == IterationStage.Jitting)
+                jittingMeasurements.Add(measurement);
 
             Consume(stackMemory);
 

@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Toolchains.Results
         internal static ExecuteResult FromRunResults(RunResults runResults, int exitCode)
             => exitCode != 0
                 ? CreateFailed(exitCode)
-                : new ExecuteResult(runResults.GetMeasurements().ToList(), runResults.GCStats, runResults.ThreadingStats, runResults.ExceptionFrequency);
+                : new ExecuteResult(runResults.GetAllMeasurements().ToList(), runResults.GCStats, runResults.ThreadingStats, runResults.ExceptionFrequency);
 
         internal static ExecuteResult CreateFailed(int exitCode = -1)
             => new ExecuteResult(false, exitCode, default, Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), 0);
