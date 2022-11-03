@@ -41,7 +41,8 @@ namespace BenchmarkDotNet.Running
             bool baseline = false,
             string[] categories = null,
             int operationsPerInvoke = 1,
-            int methodIndex = 0)
+            int methodIndex = 0,
+            bool oldBehaviorForBenchmarkName = false)
         {
             Type = type;
             WorkloadMethod = workloadMethod;
@@ -51,7 +52,7 @@ namespace BenchmarkDotNet.Running
             IterationCleanupMethod = iterationCleanupMethod;
             OperationsPerInvoke = operationsPerInvoke;
             AdditionalLogic = additionalLogic ?? string.Empty;
-            WorkloadMethodDisplayInfo = FormatDescription(description) ?? workloadMethod?.Name ?? "Untitled";
+            WorkloadMethodDisplayInfo = FormatDescription(description, oldBehaviorForBenchmarkName) ?? workloadMethod?.Name ?? "Untitled";
             Baseline = baseline;
             Categories = categories ?? Array.Empty<string>();
             MethodIndex = methodIndex;
@@ -59,8 +60,11 @@ namespace BenchmarkDotNet.Running
 
         public override string ToString() => DisplayInfo;
 
-        private static string FormatDescription([CanBeNull] string description)
+        private static string FormatDescription([CanBeNull] string description, bool oldBehaviorForBenchmarkName)
         {
+            if (!oldBehaviorForBenchmarkName)
+                return description;
+
             var specialSymbols = new[] { ' ', '\'', '[', ']' };
             return description != null && specialSymbols.Any(description.Contains)
                 ? "'" + description + "'"

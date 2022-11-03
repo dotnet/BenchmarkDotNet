@@ -26,8 +26,11 @@ namespace BenchmarkDotNet.Reports
 
         public RatioStyle RatioStyle { get; }
 
+        public bool OldBehaviorForBenchmarkName { get; }
+
         public SummaryStyle([CanBeNull] CultureInfo cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true,
-            bool printZeroValuesInContent = false, int maxParameterColumnWidth = DefaultMaxParameterColumnWidth, RatioStyle ratioStyle = RatioStyle.Value)
+            bool printZeroValuesInContent = false, int maxParameterColumnWidth = DefaultMaxParameterColumnWidth, RatioStyle ratioStyle = RatioStyle.Value,
+            bool oldBehaviorForBenchmarkName = false)
         {
             if (maxParameterColumnWidth < DefaultMaxParameterColumnWidth)
                 throw new ArgumentOutOfRangeException(nameof(maxParameterColumnWidth), $"{DefaultMaxParameterColumnWidth} is the minimum.");
@@ -41,6 +44,7 @@ namespace BenchmarkDotNet.Reports
             MaxParameterColumnWidth = maxParameterColumnWidth;
             RatioStyle = ratioStyle;
             CodeSizeUnit = SizeUnit.B;
+            OldBehaviorForBenchmarkName = oldBehaviorForBenchmarkName;
         }
 
         public SummaryStyle WithTimeUnit(TimeUnit timeUnit)
@@ -61,6 +65,9 @@ namespace BenchmarkDotNet.Reports
         public SummaryStyle WithRatioStyle(RatioStyle ratioStyle)
             => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, ratioStyle);
 
+        public SummaryStyle WithOldBehaviorForBenchmarkName(bool oldBehaviorForBenchmarkName)
+            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, RatioStyle, oldBehaviorForBenchmarkName);
+
         public bool Equals(SummaryStyle other)
         {
             if (ReferenceEquals(null, other))
@@ -75,7 +82,8 @@ namespace BenchmarkDotNet.Reports
                    && Equals(CodeSizeUnit, other.CodeSizeUnit)
                    && Equals(TimeUnit, other.TimeUnit)
                    && MaxParameterColumnWidth == other.MaxParameterColumnWidth
-                   && RatioStyle == other.RatioStyle;
+                   && RatioStyle == other.RatioStyle
+                   && OldBehaviorForBenchmarkName == other.OldBehaviorForBenchmarkName;
         }
 
         public override bool Equals(object obj) => obj is SummaryStyle summary && Equals(summary);
@@ -92,6 +100,7 @@ namespace BenchmarkDotNet.Reports
                 hashCode = (hashCode * 397) ^ (TimeUnit != null ? TimeUnit.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ MaxParameterColumnWidth;
                 hashCode = (hashCode * 397) ^ RatioStyle.GetHashCode();
+                hashCode = (hashCode * 397) ^ OldBehaviorForBenchmarkName.GetHashCode();
                 return hashCode;
             }
         }

@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Running
             var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(allMethods, "IterationSetup");
             var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(allMethods, "IterationCleanup");
 
-            var targets = GetTargets(benchmarkMethods, type, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
+            var targets = GetTargets(benchmarkMethods, type, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods, configPerType.SummaryStyle.OldBehaviorForBenchmarkName).ToArray();
 
             var parameterDefinitions = GetParameterDefinitions(type);
             var parameterInstancesList = parameterDefinitions.Expand(configPerType.SummaryStyle);
@@ -115,7 +115,8 @@ namespace BenchmarkDotNet.Running
             Tuple<MethodInfo, TargetedAttribute>[] globalSetupMethods,
             Tuple<MethodInfo, TargetedAttribute>[] globalCleanupMethods,
             Tuple<MethodInfo, TargetedAttribute>[] iterationSetupMethods,
-            Tuple<MethodInfo, TargetedAttribute>[] iterationCleanupMethods)
+            Tuple<MethodInfo, TargetedAttribute>[] iterationCleanupMethods,
+            bool oldBehaviorForBenchmarkName)
         {
             return targetMethods
                 .Select(methodInfo => CreateDescriptor(type,
@@ -125,7 +126,8 @@ namespace BenchmarkDotNet.Running
                                                    GetTargetedMatchingMethod(methodInfo, iterationSetupMethods),
                                                    GetTargetedMatchingMethod(methodInfo, iterationCleanupMethods),
                                                    methodInfo.ResolveAttribute<BenchmarkAttribute>(),
-                                                   targetMethods));
+                                                   targetMethods,
+                                                   oldBehaviorForBenchmarkName));
         }
 
         private static MethodInfo GetTargetedMatchingMethod(MethodInfo benchmarkMethod, Tuple<MethodInfo, TargetedAttribute>[] methods)
@@ -152,7 +154,8 @@ namespace BenchmarkDotNet.Running
             MethodInfo iterationSetupMethod,
             MethodInfo iterationCleanupMethod,
             BenchmarkAttribute attr,
-            MethodInfo[] targetMethods)
+            MethodInfo[] targetMethods,
+            bool oldBehaviorForBenchmarkName)
         {
             var target = new Descriptor(
                 type,
@@ -165,7 +168,8 @@ namespace BenchmarkDotNet.Running
                 baseline: attr.Baseline,
                 categories: GetCategories(methodInfo),
                 operationsPerInvoke: attr.OperationsPerInvoke,
-                methodIndex: Array.IndexOf(targetMethods, methodInfo));
+                methodIndex: Array.IndexOf(targetMethods, methodInfo),
+                oldBehaviorForBenchmarkName: oldBehaviorForBenchmarkName);
             AssertMethodHasCorrectSignature("Benchmark", methodInfo);
             AssertMethodIsAccessible("Benchmark", methodInfo);
             AssertMethodIsNotGeneric("Benchmark", methodInfo);
