@@ -8,6 +8,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -213,7 +214,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.DoesNotContain("No benchmarks found", logger.GetLog());
 
                 // Operations + GlobalSetup + GlobalCleanup
-                var expectedCount = summary.Reports.SelectMany(r => r.AllMeasurements).Sum(m => m.Operations + 2);
+                long expectedCount = summary.Reports
+                    .SelectMany(r => r.AllMeasurements)
+                    .Where(m => m.IterationStage != IterationStage.Result)
+                    .Sum(m => m.Operations + 2);
                 Assert.Equal(expectedCount, BenchmarkAllCases.Counter);
             }
             finally
@@ -239,7 +243,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.DoesNotContain("No benchmarks found", logger.GetLog());
 
                 // Operations + GlobalSetup + GlobalCleanup
-                var expectedCount = summary.Reports.SelectMany(r => r.AllMeasurements).Sum(m => m.Operations + 2);
+                long expectedCount = summary.Reports
+                    .SelectMany(r => r.AllMeasurements)
+                    .Where(m => m.IterationStage != IterationStage.Result)
+                    .Sum(m => m.Operations + 2);
                 Assert.Equal(expectedCount, BenchmarkAllCases.Counter);
             }
             finally
