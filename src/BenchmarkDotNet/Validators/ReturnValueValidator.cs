@@ -83,18 +83,13 @@ namespace BenchmarkDotNet.Validators
                 if (obj.Count == 0)
                     return 0;
 
-                unchecked
+                var hashCode = new HashCode();
+                foreach (var instance in obj.Items.OrderBy(i => i.Name))
                 {
-                    int result = 0;
-
-                    foreach (var paramInstance in obj.Items.OrderBy(i => i.Name))
-                    {
-                        result = (result * 397) ^ paramInstance.Name.GetHashCode();
-                        result = (result * 397) ^ (paramInstance.Value?.GetHashCode() ?? 0);
-                    }
-
-                    return result;
+                    hashCode.Add(instance.Name);
+                    hashCode.Add(instance.Value);
                 }
+                return hashCode.ToHashCode();
             }
         }
 

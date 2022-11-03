@@ -41,6 +41,6 @@ namespace BenchmarkDotNet.Environments
             => base.Equals(other) && Name == other?.Name && CustomPath == other?.CustomPath && AotArgs == other?.AotArgs && MonoBclPath == other?.MonoBclPath;
 
         public override int GetHashCode()
-            => base.GetHashCode() ^ Name.GetHashCode() ^ (CustomPath?.GetHashCode() ?? 0) ^ (AotArgs?.GetHashCode() ?? 0) ^ (MonoBclPath?.GetHashCode() ?? 0);
+            => HashCode.Combine(base.GetHashCode(), Name, CustomPath, AotArgs, MonoBclPath);
     }
 }

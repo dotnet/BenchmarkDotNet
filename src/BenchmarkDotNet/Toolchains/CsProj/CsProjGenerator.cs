@@ -183,9 +183,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 && PackagesPath == other.PackagesPath;
 
         public override int GetHashCode()
-            => TargetFrameworkMoniker.GetHashCode()
-                ^ (RuntimeFrameworkVersion?.GetHashCode() ?? 0)
-                ^ (CliPath?.GetHashCode() ?? 0)
-                ^ (PackagesPath?.GetHashCode() ?? 0);
+            => HashCode.Combine(TargetFrameworkMoniker, RuntimeFrameworkVersion, CliPath, PackagesPath);
     }
 }
