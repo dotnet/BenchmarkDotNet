@@ -8,6 +8,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+using Perfolizer.Metrology;
 
 namespace BenchmarkDotNet.Diagnosers
 {
@@ -42,6 +43,26 @@ namespace BenchmarkDotNet.Diagnosers
             }
 
             yield return new Metric(AllocatedMemoryMetricDescriptor.Instance, diagnoserResults.GcStats.GetBytesAllocatedPerOperation(diagnoserResults.BenchmarkCase) ?? double.NaN);
+
+            if (Config.IncludeSurvived)
+            {
+                yield return new Metric(SurvivedMemoryMetricDescriptor.Instance, diagnoserResults.GcStats.SurvivedBytes ?? double.NaN);
+            }
+        }
+
+        private class SurvivedMemoryMetricDescriptor : IMetricDescriptor
+        {
+            internal static readonly IMetricDescriptor Instance = new SurvivedMemoryMetricDescriptor();
+
+            public string Id => "Survived Memory";
+            public string DisplayName => "Survived";
+            public string Legend => "Memory survived after the first operation (managed only, inclusive, 1KB = 1024B)";
+            public string NumberFormat => "N0";
+            public UnitType UnitType => UnitType.Size;
+            public string Unit => SizeUnit.B.Abbreviation;
+            public bool TheGreaterTheBetter => false;
+            public int PriorityInCategory { get; } = AllocatedMemoryMetricDescriptor.Instance.PriorityInCategory + 1;
+            public bool GetIsAvailable(Metric metric) => true;
         }
 
         private class GarbageCollectionsMetricDescriptor : IMetricDescriptor

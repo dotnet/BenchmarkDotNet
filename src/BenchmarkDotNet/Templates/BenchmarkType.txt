@@ -38,6 +38,7 @@
                 TargetJob = job,
                 OperationsPerInvoke = $OperationsPerInvoke$,
                 MeasureExtraStats = $MeasureExtraStats$,
+                MeasureSurvivedMemory = $MeasureSurvivedMemory$,
                 BenchmarkName = benchmarkName
             };
 

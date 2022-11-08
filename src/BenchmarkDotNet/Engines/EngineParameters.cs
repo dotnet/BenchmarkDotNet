@@ -27,6 +27,8 @@ namespace BenchmarkDotNet.Engines
         public Action IterationCleanupAction { get; set; }
         public bool MeasureExtraStats { get; set; }
 
+        public bool MeasureSurvivedMemory { get; set; }
+
         [PublicAPI] public string BenchmarkName { get;  set; }
 
         public bool NeedsJitting => TargetJob.ResolveValue(RunMode.RunStrategyCharacteristic, DefaultResolver).NeedsJitting();
