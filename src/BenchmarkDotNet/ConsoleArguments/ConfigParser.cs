@@ -394,6 +394,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net50:
                 case RuntimeMoniker.Net60:
                 case RuntimeMoniker.Net70:
+                case RuntimeMoniker.Net80:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
                         .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));

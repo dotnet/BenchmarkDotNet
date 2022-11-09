@@ -101,6 +101,11 @@ namespace BenchmarkDotNet.Jobs
         Net70,
 
         /// <summary>
+        /// .NET 8.0
+        /// </summary>
+        Net80,
+
+        /// <summary>
         /// NativeAOT compiled as net6.0
         /// </summary>
         NativeAot60,
