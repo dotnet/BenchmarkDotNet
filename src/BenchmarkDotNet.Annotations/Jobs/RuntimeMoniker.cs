@@ -164,5 +164,10 @@ namespace BenchmarkDotNet.Jobs
         /// .NET 7 using MonoVM (not CLR which is the default)
         /// </summary>
         Mono70,
+
+        /// <summary>
+        /// .NET 8 using MonoVM (not CLR which is the default)
+        /// </summary>
+        Mono80,
     }
 }

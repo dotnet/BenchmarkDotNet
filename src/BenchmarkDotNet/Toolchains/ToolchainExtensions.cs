@@ -143,6 +143,9 @@ namespace BenchmarkDotNet.Toolchains
                 case RuntimeMoniker.Mono70:
                     return MonoToolchain.Mono70;
 
+                case RuntimeMoniker.Mono80:
+                    return MonoToolchain.Mono80;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "RuntimeMoniker not supported");
             }

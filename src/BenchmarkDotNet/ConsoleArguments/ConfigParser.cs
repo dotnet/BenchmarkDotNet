@@ -438,6 +438,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Mono70:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono70);
 
+                case RuntimeMoniker.Mono80:
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono80);
+
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
