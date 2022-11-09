@@ -134,6 +134,9 @@ namespace BenchmarkDotNet.Toolchains
                 case RuntimeMoniker.NativeAot70:
                     return NativeAotToolchain.Net70;
 
+                case RuntimeMoniker.NativeAot80:
+                    return NativeAotToolchain.Net80;
+
                 case RuntimeMoniker.Mono60:
                     return MonoToolchain.Mono60;
 

@@ -116,6 +116,11 @@ namespace BenchmarkDotNet.Jobs
         NativeAot70,
 
         /// <summary>
+        /// NativeAOT compiled as net8.0
+        /// </summary>
+        NativeAot80,
+
+        /// <summary>
         /// WebAssembly with default .Net version
         /// </summary>
         Wasm,

@@ -400,7 +400,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
-            var config = ConfigParser.Parse(new[] { "--runtimes", "net462", "MONO", "netcoreapp3.0", "nativeaot6.0", "nativeAOT7.0"}, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "--runtimes", "net462", "MONO", "netcoreapp3.0", "nativeaot6.0", "nativeAOT7.0", "nativeAOT8.0" }, new OutputLogger(Output)).config;
 
             Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net462"));
@@ -408,6 +408,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp30));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net6.0" && nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot60));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net7.0" && nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot70));
+            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net8.0" && nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot80));
         }
 
         [Theory]
