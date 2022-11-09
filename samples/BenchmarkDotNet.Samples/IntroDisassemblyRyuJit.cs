@@ -3,7 +3,7 @@ using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DisassemblyDiagnoser(printSource: true)]
+    [DisassemblyDiagnoser(printSource: true, filters: null)]
     [RyuJitX64Job]
     public class IntroDisassemblyRyuJit
     {

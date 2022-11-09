@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DisassemblyDiagnoser(printInstructionAddresses: true, syntax: DisassemblySyntax.Masm)]
+    [DisassemblyDiagnoser(printInstructionAddresses: true, syntax: DisassemblySyntax.Masm, filters: null)]
     public class IntroDisassembly
     {
         private int[] field = Enumerable.Range(0, 100).ToArray();
