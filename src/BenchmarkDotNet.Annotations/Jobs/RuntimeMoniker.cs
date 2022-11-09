@@ -126,22 +126,22 @@ namespace BenchmarkDotNet.Jobs
         Wasm,
 
         /// <summary>
-        /// WebAssembly with .net5.0
+        /// WebAssembly with net5.0
         /// </summary>
         WasmNet50,
 
         /// <summary>
-        /// WebAssembly with .net6.0
+        /// WebAssembly with net6.0
         /// </summary>
         WasmNet60,
 
         /// <summary>
-        /// WebAssembly with .net7.0
+        /// WebAssembly with net7.0
         /// </summary>
         WasmNet70,
 
         /// <summary>
-        /// WebAssembly with .net8.0
+        /// WebAssembly with net8.0
         /// </summary>
         WasmNet80,
 
@@ -151,17 +151,17 @@ namespace BenchmarkDotNet.Jobs
         MonoAOTLLVM,
 
         /// <summary>
-        /// Mono with the Ahead of Time LLVM Compiler backend and .net6.0
+        /// Mono with the Ahead of Time LLVM Compiler backend and net6.0
         /// </summary>
         MonoAOTLLVMNet60,
 
         /// <summary>
-        /// Mono with the Ahead of Time LLVM Compiler backend and .net7.0
+        /// Mono with the Ahead of Time LLVM Compiler backend and net7.0
         /// </summary>
         MonoAOTLLVMNet70,
 
         /// <summary>
-        /// Mono with the Ahead of Time LLVM Compiler backend and .net8.0
+        /// Mono with the Ahead of Time LLVM Compiler backend and net8.0
         /// </summary>
         MonoAOTLLVMNet80,
 
