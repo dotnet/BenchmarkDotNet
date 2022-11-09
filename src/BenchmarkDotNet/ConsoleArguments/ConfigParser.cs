@@ -432,6 +432,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.MonoAOTLLVMNet70:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net7.0");
 
+                case RuntimeMoniker.MonoAOTLLVMNet80:
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net8.0");
+
                 case RuntimeMoniker.Mono60:
                     return MakeMonoJob(baseJob, options, MonoRuntime.Mono60);
 
