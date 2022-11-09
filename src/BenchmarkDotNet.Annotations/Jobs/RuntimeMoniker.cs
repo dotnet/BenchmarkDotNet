@@ -141,6 +141,11 @@ namespace BenchmarkDotNet.Jobs
         WasmNet70,
 
         /// <summary>
+        /// WebAssembly with .net8.0
+        /// </summary>
+        WasmNet80,
+
+        /// <summary>
         /// Mono with the Ahead of Time LLVM Compiler backend
         /// </summary>
         MonoAOTLLVM,

@@ -423,6 +423,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.WasmNet70:
                     return MakeWasmJob(baseJob, options, "net7.0", runtimeMoniker);
 
+                case RuntimeMoniker.WasmNet80:
+                    return MakeWasmJob(baseJob, options, "net8.0", runtimeMoniker);
+
                 case RuntimeMoniker.MonoAOTLLVM:
                     return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0");
 
