@@ -7,7 +7,7 @@
     <PackageId>BenchmarkDotNet.Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);NU1701;1701;CA1018;CA2007</NoWarn>
+    <NoWarn>$(NoWarn);NU1701;1701;CA1018;CA2007;CA1825</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json">
