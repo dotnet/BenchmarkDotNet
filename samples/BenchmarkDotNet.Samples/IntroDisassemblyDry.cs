@@ -3,7 +3,7 @@ using BenchmarkDotNet.Diagnosers;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DisassemblyDiagnoser(maxDepth: 3, filters: null)]
+    [DisassemblyDiagnoser(maxDepth: 3)]
     [DryJob]
     public class IntroDisassemblyDry
     {
