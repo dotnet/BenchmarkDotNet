@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
         ///
         /// </summary>
         public string Name { get; }
-            = nameof(JsonSnapshotStore);
+            = "Snapshot(Json)";
 
         /// <summary>
         ///
@@ -156,7 +156,7 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
         {
             if (storeInfo is null)
             {
-                var filepath = Path.Combine(benchmarkCase.Config.ArtifactsPath, Filename);
+                var filepath = Path.Combine(".", Filename);
                 if (System.IO.File.Exists(filepath))
                 {
                     storeInfo = JsonConvert.DeserializeObject<BenchmarkSummaryStoreInfo>(System.IO.File.ReadAllText(Filename));
