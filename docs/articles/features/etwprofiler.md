@@ -30,6 +30,11 @@ What we have today comes with following limitations:
 <DebugSymbols>true</DebugSymbols>
 ```
 
+> [!NOTE]
+> On certain machines [Intel TDT and Windows Defender](https://www.microsoft.com/en-us/security/blog/2021/04/26/defending-against-cryptojacking-with-microsoft-defender-for-endpoint-and-intel-tdt/) can cause CPU samples to be captured with no value.
+> You can correct this problem by disabling the feature using `powershell.exe Set-MpPreference -DisableTDTFeature $true`.
+> *WARNING:* Disabling security features will make your machine less secure; do so at your own risk.
+
 ## How to use it?
 
 You need to install `BenchmarkDotNet.Diagnostics.Windows` package.
