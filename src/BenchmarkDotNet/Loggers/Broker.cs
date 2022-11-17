@@ -55,7 +55,15 @@ namespace BenchmarkDotNet.Loggers
 
                     writer.WriteLine(Engine.Signals.Acknowledgment);
 
-                    if (signal == HostSignal.AfterAll)
+                    if (signal == HostSignal.BeforeAnythingElse)
+                    {
+                        // The client has connected, we no longer need to keep the local copy of client handle alive.
+                        // This allows server to detect that child process is done and hence avoid resource leak.
+                        // Full explanation: https://stackoverflow.com/a/39700027
+                        inputFromBenchmark.DisposeLocalCopyOfClientHandle();
+                        acknowledgments.DisposeLocalCopyOfClientHandle();
+                    }
+                    else if (signal == HostSignal.AfterAll)
                     {
                         // we have received the last signal so we can stop reading from the pipe
                         // if the process won't exit after this, its hung and needs to be killed
