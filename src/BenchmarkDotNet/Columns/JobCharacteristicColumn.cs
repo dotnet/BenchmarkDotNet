@@ -2,10 +2,10 @@
 using System.Linq;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains;
 
 namespace BenchmarkDotNet.Columns
 {
@@ -43,15 +43,20 @@ namespace BenchmarkDotNet.Columns
             switch (ColumnName)
             {
                 case Column.Job:
-                    return false;
+                    return summary.BenchmarksCases
+                        .Any(b => b.Job.HasValue(Job.IdCharacteristic) && !b.Job.GetValue(Job.ImplicitIdCharacteristic));
                 case Column.Toolchain:
-                    var groups = summary.BenchmarksCases.GroupBy(b => b.GetRuntime(), b => b.GetToolchain().Name).ToArray();
 
-                    bool isOneRuntime = groups.Length <= 1;
-                    if (isOneRuntime)
+                    var toolchainsByRuntime = summary.BenchmarksCases
+                        .GroupBy(b => b.GetRuntime().Name, b => b.Job.GetValue(InfrastructureMode.ToolchainCharacteristic))
+                        .ToArray();
+
+                    if (toolchainsByRuntime.Length <= 1)
                         return true;
 
-                    return groups.Any(toolchainNames => toolchainNames.Distinct().Count() > 1);
+                    return toolchainsByRuntime.Any(toolchains => toolchains.Where(toolchain => toolchain != null)
+                                                                           .DistinctBy(toolchain => toolchain.Name)
+                                                                           .Count() > 1);
                 default:
                     return true;
             }

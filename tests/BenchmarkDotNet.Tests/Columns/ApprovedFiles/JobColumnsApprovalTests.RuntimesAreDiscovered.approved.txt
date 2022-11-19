@@ -1,11 +1,10 @@
-﻿=== net7-net6 ===
-
+﻿
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
-  [Host] : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
-  net6   : extra output line
-  net7   : extra output line
+  [Host]     : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
+  Job-rndId0 : extra output line
+  Job-rndId1 : extra output line
 
 
  Method |  Runtime |     Mean | Error |

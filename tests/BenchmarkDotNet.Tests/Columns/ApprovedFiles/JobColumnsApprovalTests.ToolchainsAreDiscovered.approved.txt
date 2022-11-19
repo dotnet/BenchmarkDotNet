@@ -1,5 +1,4 @@
-﻿=== Default-InProcess ===
-
+﻿
 BenchmarkDotNet=v0.10.x-mock, OS=Microsoft Windows NT 10.0.x.mock, VM=Hyper-V
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
@@ -8,7 +7,7 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   InProcess  : extra output line
 
 
- Method |              Toolchain |     Mean | Error |
-------- |----------------------- |---------:|------:|
- Method |                Default | 1.000 ns |    NA |
- Method | InProcessEmitToolchain | 1.000 ns |    NA |
+ Method |     Toolchain |     Mean | Error |
+------- |-------------- |---------:|------:|
+ Method |       Default | 1.000 ns |    NA |
+ Method | InProcessEmit | 1.000 ns |    NA |

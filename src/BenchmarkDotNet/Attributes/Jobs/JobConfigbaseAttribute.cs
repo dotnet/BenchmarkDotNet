@@ -21,8 +21,8 @@ namespace BenchmarkDotNet.Attributes
         protected static Job GetJob(Job sourceJob, RuntimeMoniker runtimeMoniker, Jit? jit, Platform? platform)
         {
             var runtime = runtimeMoniker.GetRuntime();
-            var baseJob = sourceJob.WithRuntime(runtime).WithId($"{sourceJob.Id}-{runtime.Name}");
-            var id = baseJob.Id;
+            var baseJob = sourceJob.WithRuntime(runtime);
+            var id = $"{sourceJob.Id}-{runtime.Name}";
 
             if (jit.HasValue)
             {
@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Attributes
                 id += "-" + platform.Value;
             }
 
-            return baseJob.WithId(id).Freeze();
+            return baseJob.WithImplicitId(id).Freeze();
         }
     }
 }

@@ -14,22 +14,24 @@ namespace BenchmarkDotNet.Jobs
         [PublicAPI] public static readonly Characteristic<AccuracyMode> AccuracyCharacteristic = CreateCharacteristic<AccuracyMode>(nameof(Accuracy));
         [PublicAPI] public static readonly Characteristic<MetaMode> MetaCharacteristic = CreateCharacteristic<MetaMode>(nameof(Meta));
 
-        public static readonly Job LegacyJitX86 = new Job(nameof(LegacyJitX86), EnvironmentMode.LegacyJitX86).Freeze();
-        public static readonly Job LegacyJitX64 = new Job(nameof(LegacyJitX64), EnvironmentMode.LegacyJitX64).Freeze();
-        public static readonly Job RyuJitX64 = new Job(nameof(RyuJitX64), EnvironmentMode.RyuJitX64).Freeze();
-        public static readonly Job RyuJitX86 = new Job(nameof(RyuJitX86), EnvironmentMode.RyuJitX86).Freeze();
+        internal static readonly Characteristic<bool> ImplicitIdCharacteristic = CreateHiddenCharacteristic<bool>("ImplicitId");
+
+        public static readonly Job LegacyJitX86 = new Job(EnvironmentMode.LegacyJitX86).WithImplicitId(nameof(LegacyJitX86)).Freeze();
+        public static readonly Job LegacyJitX64 = new Job(EnvironmentMode.LegacyJitX64).WithImplicitId(nameof(LegacyJitX64)).Freeze();
+        public static readonly Job RyuJitX64 = new Job(EnvironmentMode.RyuJitX64).WithImplicitId(nameof(RyuJitX64)).Freeze();
+        public static readonly Job RyuJitX86 = new Job(EnvironmentMode.RyuJitX86).WithImplicitId(nameof(RyuJitX86)).Freeze();
 
         // Run
-        public static readonly Job Dry = new Job(nameof(Dry), RunMode.Dry).Freeze();
+        public static readonly Job Dry = new Job(RunMode.Dry).WithImplicitId(nameof(Dry)).Freeze();
 
-        public static readonly Job ShortRun = new Job(nameof(ShortRun), RunMode.Short).Freeze();
-        public static readonly Job MediumRun = new Job(nameof(MediumRun), RunMode.Medium).Freeze();
-        public static readonly Job LongRun = new Job(nameof(LongRun), RunMode.Long).Freeze();
-        public static readonly Job VeryLongRun = new Job(nameof(VeryLongRun), RunMode.VeryLong).Freeze();
+        public static readonly Job ShortRun = new Job(RunMode.Short).WithImplicitId(nameof(ShortRun)).Freeze();
+        public static readonly Job MediumRun = new Job(RunMode.Medium).WithImplicitId(nameof(MediumRun)).Freeze();
+        public static readonly Job LongRun = new Job(RunMode.Long).WithImplicitId(nameof(LongRun)).Freeze();
+        public static readonly Job VeryLongRun = new Job(RunMode.VeryLong).WithImplicitId(nameof(VeryLongRun)).Freeze();
 
         // Infrastructure
-        public static readonly Job InProcess = new Job(nameof(InProcess), InfrastructureMode.InProcess);
-        public static readonly Job InProcessDontLogOutput = new Job(nameof(InProcessDontLogOutput), InfrastructureMode.InProcessDontLogOutput);
+        public static readonly Job InProcess = new Job(InfrastructureMode.InProcess).WithImplicitId(nameof(InProcess));
+        public static readonly Job InProcessDontLogOutput = new Job(InfrastructureMode.InProcessDontLogOutput).WithImplicitId(nameof(InProcessDontLogOutput));
 
         public Job() : this((string)null) { }
 
@@ -40,6 +42,7 @@ namespace BenchmarkDotNet.Jobs
             InfrastructureCharacteristic[this] = new InfrastructureMode();
             AccuracyCharacteristic[this] = new AccuracyMode();
             MetaCharacteristic[this] = new MetaMode();
+            ImplicitIdCharacteristic[this] = false;
         }
 
         public Job(CharacteristicObject other) : this((string)null, other)

@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Attributes
             }
 
             if (id == null && manualValuesCount == 1 && runtimeMoniker != RuntimeMoniker.HostProcess)
-                job = job.WithId(runtimeMoniker.GetRuntime().Name);
+                job = job.WithImplicitId(runtimeMoniker.GetRuntime().Name);
 
             return job.Freeze();
         }

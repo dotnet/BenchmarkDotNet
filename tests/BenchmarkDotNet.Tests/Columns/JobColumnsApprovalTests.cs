@@ -7,7 +7,6 @@ using ApprovalTests;
 using ApprovalTests.Namers;
 using ApprovalTests.Reporters;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Engines;
@@ -18,7 +17,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
-using JetBrains.Annotations;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Columns
@@ -34,87 +32,122 @@ namespace BenchmarkDotNet.Tests.Columns
 
         public JobColumnsApprovalTests() => initCulture = Thread.CurrentThread.CurrentCulture;
 
-        [UsedImplicitly]
-        public static TheoryData<IConfig> GetConfigs()
-        {
-            var data = new TheoryData<IConfig>
-            {
-                DefaultConfig.Instance
-                    .AddJob(Job.InProcess),
-
-                DefaultConfig.Instance
-                    .AddJob(Job.Default)
-                    .AddJob(Job.InProcess),
-
-                DefaultConfig.Instance
-                    .AddJob(Job.Dry.WithRuntime(CoreRuntime.Core70).WithId("net7")),
-
-                DefaultConfig.Instance
-                    .AddJob(Job.Default.WithRuntime(CoreRuntime.Core70).WithId("net7"))
-                    .AddJob(Job.Default.WithRuntime(CoreRuntime.Core60).WithId("net6")),
-
-                DefaultConfig.Instance
-                    .AddJob(Job.Default.WithRuntime(CoreRuntime.Core70).WithId("net7"))
-                    .AddJob(Job.Default.WithRuntime(CoreRuntime.Core60).WithId("net6").WithToolchain(InProcessEmitToolchain.Instance))
-                    .AddJob(Job.Default.WithRuntime(CoreRuntime.Core60).WithId("net6")),
-            };
-
-            return data;
-        }
-
-        [Theory]
-        [MemberData(nameof(GetConfigs))]
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public void ColumnsDisplayTest(IConfig config)
-        {
-            var fileName = string.Join("-", config.GetJobs());
-
-            NamerFactory.AdditionalInformation = fileName;
-            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-
-            var logger = new AccumulationLogger();
-            logger.WriteLine("=== " + fileName + " ===");
-
-            var exporter = MarkdownExporter.Mock;
-            var summary = MockFactory.CreateSummary<BenchmarkClass>(config);
-            exporter.ExportToLog(summary, logger);
-
-            Approvals.Verify(logger.GetLog());
-        }
-
         public void Dispose() => Thread.CurrentThread.CurrentCulture = initCulture;
 
-        public class BenchmarkClass
+        [Fact]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public void ImplicitIdsAreDiscovered()
+        {
+            var config = DefaultConfig.Instance.AddJob(Job.Dry);
+
+            Verify<Benchmark>(config);
+        }
+
+        [Fact]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public void ExplicitIdsAreDiscovered()
+        {
+            var config = DefaultConfig.Instance.AddJob(Job.Dry.WithId("Dry"));
+
+            Verify<Benchmark>(config);
+        }
+
+        [DryJob(RuntimeMoniker.Net60)]
+        [SimpleJob(RuntimeMoniker.Net60)]
+        [SimpleJob(RunStrategy.ColdStart, RuntimeMoniker.Net60, 1, 1, 1)]
+        public class BenchmarkWithAttributeJobs
         {
             [Benchmark] public void Method() { }
         }
 
+        [Fact]
+        public void ToolchainIsDiscovered()
+        {
+            var config = DefaultConfig.Instance.AddJob(Job.InProcess);
+
+            Verify<Benchmark>(config);
+        }
+
+        [Fact]
+        public void ToolchainsAreDiscovered()
+        {
+            var config = DefaultConfig.Instance
+                .AddJob(Job.Default)
+                .AddJob(Job.InProcess);
+
+            Verify<Benchmark>(config);
+        }
+
+        [Fact]
+        public void RuntimeIsDiscovered()
+        {
+            var config = DefaultConfig.Instance
+                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core70));
+
+            Verify<Benchmark>(config);
+        }
+
+        [Fact]
+        public void RuntimesAreDiscovered()
+        {
+            var config = DefaultConfig.Instance
+                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core70))
+                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core60));
+
+            Verify<Benchmark>(config);
+        }
+
+        [Fact]
+        public void RuntimesWithToolchainsAreDiscovered()
+        {
+            var config = DefaultConfig.Instance
+                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core70).WithToolchain(InProcessEmitToolchain.Instance))
+                .AddJob(Job.Default.WithRuntime(CoreRuntime.Core60));
+
+            Verify<Benchmark>(config);
+        }
+
         [FactDotNetCoreOnly("In the .Net Framework cmd job uses CsProjClassicNetToolchain while fluent and attribute jobs use RoslynToolchain by default")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public void MultipleInputColumnsDisplayTest()
+        public void MultipleInputJobsAreDiscovered()
         {
             var cmdConfig = ConfigParser.Parse(
-                "--join --runtimes net481 net6.0 nativeaot6.0".Split(), NullLogger.Instance).config;
+                "--join --runtimes net481 net7.0 nativeaot7.0".Split(), NullLogger.Instance).config;
 
-            var fluentConfig = ManualConfig.CreateEmpty().AddColumnProvider(DefaultColumnProviders.Instance)
-                .AddJob(Job.Dry.WithRuntime(CoreRuntime.Core60))
+            var fluentConfig = DefaultConfig.Instance
+                .AddJob(Job.Dry.WithRuntime(CoreRuntime.Core70))
                 .AddJob(Job.Dry.WithRuntime(ClrRuntime.Net481))
-                .AddJob(Job.Dry.WithRuntime(NativeAotRuntime.Net60));
+                .AddJob(Job.Dry.WithRuntime(NativeAotRuntime.Net70));
 
             var config = ManualConfig.Union(cmdConfig, fluentConfig);
 
-            NamerFactory.AdditionalInformation = nameof(MultipleInputColumnsDisplayTest);
+            Verify<BenchmarkWithDryJobs>(config);
+        }
+
+        public class Benchmark
+        {
+            [Benchmark] public void Method() { }
+        }
+
+        [DryJob(RuntimeMoniker.Net60)]
+        [DryJob(RuntimeMoniker.Net481)]
+        [DryJob(RuntimeMoniker.NativeAot60)]
+        public class BenchmarkWithDryJobs
+        {
+            [Benchmark] public void Method() { }
+        }
+
+        private static void Verify<TBenchmark>(IConfig config)
+        {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
-            var logger = new AccumulationLogger();
-            logger.WriteLine("=== " + nameof(MultipleInputColumnsDisplayTest) + " ===");
-
             var exporter = MarkdownExporter.Mock;
-            var summary = MockFactory.CreateSummary<BenchmarkClass1>(config);
+            var summary = MockFactory.CreateSummary<TBenchmark>(config);
+
+            var logger = new AccumulationLogger();
             exporter.ExportToLog(summary, logger);
 
-            var log = logger.GetLog();
-            log = ReplaceRandomIDs(log);
+            var log = ReplaceRandomIDs(logger.GetLog());
             Approvals.Verify(log);
         }
 
@@ -135,14 +168,6 @@ namespace BenchmarkDotNet.Tests.Columns
             }
 
             return log;
-        }
-
-        [SimpleJob(RunStrategy.ColdStart, RuntimeMoniker.Net60)]
-        [SimpleJob(RunStrategy.ColdStart, RuntimeMoniker.Net481)]
-        [SimpleJob(RunStrategy.ColdStart, RuntimeMoniker.NativeAot60)]
-        public class BenchmarkClass1
-        {
-            [Benchmark] public void Method() { }
         }
     }
 }
