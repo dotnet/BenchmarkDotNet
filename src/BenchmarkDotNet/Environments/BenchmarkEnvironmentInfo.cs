@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Environments
             ? ""
             : Configuration;
 
-        [PublicAPI] protected string GetDebuggerFlag() => HasAttachedDebugger ? " [AttachedDebugger]" : "";
+        [PublicAPI] protected string GetDebuggerFlag() => HasAttachedDebugger ? "[AttachedDebugger]" : "";
         [PublicAPI] protected string GetGcServerFlag() => IsServerGC ? "Server" : "Workstation";
         [PublicAPI] protected string GetGcConcurrentFlag() => IsConcurrentGC ? "Concurrent" : "Non-concurrent";
 
