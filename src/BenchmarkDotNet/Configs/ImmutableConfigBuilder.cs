@@ -215,7 +215,7 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         private static IReadOnlyList<Job> GetRunnableJobs(IEnumerable<Job> jobs)
         {
-            var unique = jobs.Distinct().ToArray();
+            var unique = jobs.Distinct(JobComparer.Instance).ToArray();
             var result = new List<Job>();
 
             foreach (var standardJob in unique.Where(job => !job.Meta.IsMutator && !job.Meta.IsDefault))
