@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Tests.Engine
                 Accuracy = { MaxRelativeError = maxRelativeError }
             }.Freeze();
             var stage = CreateStage(job, data => data.InvokeCount * operationTime);
-            long invokeCount = stage.Run();
+            long invokeCount = stage.Run().PerfectInvocationCount;
             output.WriteLine($"InvokeCount = {invokeCount} (Min= {minInvokeCount}, Max = {MaxPossibleInvokeCount})");
             Assert.InRange(invokeCount, minInvokeCount, MaxPossibleInvokeCount);
         }
@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Tests.Engine
                 Run = { IterationTime = iterationTime }
             }.Freeze();
             var stage = CreateStage(job, data => data.InvokeCount * operationTime);
-            long invokeCount = stage.Run();
+            long invokeCount = stage.Run().PerfectInvocationCount;
             output.WriteLine($"InvokeCount = {invokeCount} (Min= {minInvokeCount}, Max = {maxInvokeCount})");
             Assert.InRange(invokeCount, minInvokeCount, maxInvokeCount);
         }

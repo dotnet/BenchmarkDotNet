@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.ExceptionServices;
+using System.Threading;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -7,7 +8,9 @@ namespace BenchmarkDotNet.Engines
     {
         internal const string ResultsLinePrefix = "// Exceptions: ";
 
-        internal ulong ExceptionsCount { get; private set; }
+        private long exceptionsCount;
+
+        internal long ExceptionsCount { get => exceptionsCount; }
 
         public void StartListening()
         {
@@ -21,7 +24,7 @@ namespace BenchmarkDotNet.Engines
 
         private void OnFirstChanceException(object sender, FirstChanceExceptionEventArgs e)
         {
-            ExceptionsCount++;
+            Interlocked.Increment(ref exceptionsCount);
         }
 
         public static string ToOutputLine(double exceptionCount) => $"{ResultsLinePrefix} {exceptionCount}";

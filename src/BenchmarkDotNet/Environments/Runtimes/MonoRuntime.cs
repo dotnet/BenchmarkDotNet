@@ -8,6 +8,7 @@ namespace BenchmarkDotNet.Environments
         public static readonly MonoRuntime Default = new MonoRuntime("Mono");
         public static readonly MonoRuntime Mono60 = new MonoRuntime("Mono with .NET 6.0", RuntimeMoniker.Mono60, "net6.0", isDotNetBuiltIn: true);
         public static readonly MonoRuntime Mono70 = new MonoRuntime("Mono with .NET 7.0", RuntimeMoniker.Mono70, "net7.0", isDotNetBuiltIn: true);
+        public static readonly MonoRuntime Mono80 = new MonoRuntime("Mono with .NET 8.0", RuntimeMoniker.Mono80, "net8.0", isDotNetBuiltIn: true);
 
         public string CustomPath { get; }
 
@@ -41,6 +42,6 @@ namespace BenchmarkDotNet.Environments
             => base.Equals(other) && Name == other?.Name && CustomPath == other?.CustomPath && AotArgs == other?.AotArgs && MonoBclPath == other?.MonoBclPath;
 
         public override int GetHashCode()
-            => base.GetHashCode() ^ Name.GetHashCode() ^ (CustomPath?.GetHashCode() ?? 0) ^ (AotArgs?.GetHashCode() ?? 0) ^ (MonoBclPath?.GetHashCode() ?? 0);
+            => HashCode.Combine(base.GetHashCode(), Name, CustomPath, AotArgs, MonoBclPath);
     }
 }

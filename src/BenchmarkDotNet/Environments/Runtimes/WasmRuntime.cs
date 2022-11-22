@@ -46,6 +46,6 @@ namespace BenchmarkDotNet.Environments
             => other != null && base.Equals(other) && other.JavaScriptEngine == JavaScriptEngine && other.JavaScriptEngineArguments == JavaScriptEngineArguments && other.Aot == Aot;
 
         public override int GetHashCode()
-            => base.GetHashCode() ^ (JavaScriptEngine?.GetHashCode() ?? 0) ^ (JavaScriptEngineArguments?.GetHashCode() ?? 0 ^ Aot.GetHashCode());
+            => HashCode.Combine(base.GetHashCode(), JavaScriptEngine, JavaScriptEngineArguments, Aot);
     }
 }

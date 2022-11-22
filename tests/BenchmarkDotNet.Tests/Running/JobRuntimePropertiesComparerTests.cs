@@ -95,29 +95,6 @@ namespace BenchmarkDotNet.Tests.Running
         }
 
         [Fact]
-        public void CustomNuGetJobsWithSamePackageVersionAreGroupedTogether()
-        {
-            var job1 = Job.Default.WithNuGet("AutoMapper", "7.0.1");
-            var job2 = Job.Default.WithNuGet("AutoMapper", "7.0.1");
-
-            var config = ManualConfig.Create(DefaultConfig.Instance)
-                .AddJob(job1)
-                .AddJob(job2);
-
-            var benchmarks1 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1), config);
-            var benchmarks2 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain2), config);
-
-            var grouped = benchmarks1.BenchmarksCases.Union(benchmarks2.BenchmarksCases)
-                .GroupBy(benchmark => benchmark, new BenchmarkPartitioner.BenchmarkRuntimePropertiesComparer())
-                .ToArray();
-
-            Assert.Single(grouped); // 7.0.1
-
-            foreach (var grouping in grouped)
-                Assert.Equal(2 * 3 * 2, grouping.Count()); // ((job1 + job2) * (M1 + M2 + M3) * (Plain1 + Plain2)
-        }
-
-        [Fact]
         public void CustomNuGetJobsAreGroupedByPackageVersion()
         {
             var config = ManualConfig.Create(DefaultConfig.Instance)

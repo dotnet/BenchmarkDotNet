@@ -1,3 +1,6 @@
+---
+title: Home
+---
 <h3 align="center">
 
   ![](logo/logo-wide.png)

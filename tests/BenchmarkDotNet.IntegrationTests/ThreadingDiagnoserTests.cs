@@ -14,6 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Portability;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -29,8 +31,10 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             yield return new object[] { Job.Default.GetToolchain() };
 
+            bool isOsxArm64 = RuntimeInformation.GetCurrentPlatform() == Platform.Arm64 && RuntimeInformation.IsMacOSX();
             if (!ContinuousIntegration.IsGitHubActionsOnWindows() // no native dependencies
-                && !ContinuousIntegration.IsAppVeyorOnWindows()) // too time consuming for AppVeyor (1h limit)
+                && !ContinuousIntegration.IsAppVeyorOnWindows() // too time consuming for AppVeyor (1h limit)
+                && !isOsxArm64) // Native compilation does not support targeting osx-arm64 yet. https://github.com/dotnet/corert/issues/4589
             {
                 yield return new object[]{ NativeAotToolchain.CreateBuilder()
                     .UseNuGet(

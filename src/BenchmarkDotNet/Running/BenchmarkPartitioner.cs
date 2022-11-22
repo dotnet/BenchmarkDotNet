@@ -67,30 +67,23 @@ namespace BenchmarkDotNet.Running
 
             public int GetHashCode(BenchmarkCase obj)
             {
+                var hashCode = new HashCode();
+                hashCode.Add(obj.GetToolchain());
+                hashCode.Add(obj.GetRuntime());
+                hashCode.Add(obj.Descriptor.Type.Assembly.Location);
+                hashCode.Add(obj.Descriptor.AdditionalLogic);
+                hashCode.Add(obj.Descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any());
                 var job = obj.Job;
-
-                int hashCode = obj.GetToolchain().GetHashCode();
-
-                hashCode ^=  GetRuntime(job).GetType().MetadataToken;
-
-                hashCode ^= obj.Descriptor.Type.Assembly.Location.GetHashCode();
-                hashCode ^= (int)job.Environment.Jit;
-                hashCode ^= (int)job.Environment.Platform;
-                hashCode ^= job.Environment.LargeAddressAware.GetHashCode();
-                hashCode ^= job.Environment.Gc.GetHashCode();
-
-                if (job.Infrastructure.BuildConfiguration != null)
-                    hashCode ^= job.Infrastructure.BuildConfiguration.GetHashCode();
-                if (job.Infrastructure.Arguments != null && job.Infrastructure.Arguments.Any())
-                    hashCode ^= job.Infrastructure.Arguments.GetHashCode();
-                if (job.Infrastructure.NuGetReferences != null)
-                    hashCode ^= job.Infrastructure.NuGetReferences.GetHashCode();
-                if (!string.IsNullOrEmpty(obj.Descriptor.AdditionalLogic))
-                    hashCode ^= obj.Descriptor.AdditionalLogic.GetHashCode();
-
-                hashCode ^= obj.Descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any().GetHashCode();
-
-                return hashCode;
+                hashCode.Add(job.Environment.Jit);
+                hashCode.Add(job.Environment.Platform);
+                hashCode.Add(job.Environment.LargeAddressAware);
+                hashCode.Add(job.Environment.Gc);
+                hashCode.Add(job.Infrastructure.BuildConfiguration);
+                foreach (var arg in job.Infrastructure.Arguments ?? Array.Empty<Argument>())
+                    hashCode.Add(arg);
+                foreach (var reference in job.Infrastructure.NuGetReferences ?? Array.Empty<NuGetReference>())
+                    hashCode.Add(reference);
+                return hashCode.ToHashCode();
             }
 
             private static Runtime GetRuntime(Job job)

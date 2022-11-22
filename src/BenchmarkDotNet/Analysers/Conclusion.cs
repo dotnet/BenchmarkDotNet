@@ -61,15 +61,9 @@ namespace BenchmarkDotNet.Analysers
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                int hashCode = AnalyserId.GetHashCode();
-                hashCode = (hashCode * 397) ^ (int) Kind;
-                hashCode = Mergeable
-                           ? (hashCode * 397) ^ Message.GetHashCode()
-                           : (hashCode * 397) ^ Report?.ToString().GetHashCode() ?? string.Empty.GetHashCode();
-                return hashCode;
-            }
+            return Mergeable
+                ? HashCode.Combine(AnalyserId, Kind, Message)
+                : HashCode.Combine(AnalyserId, Kind, Report?.ToString());
         }
     }
 }

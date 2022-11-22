@@ -72,8 +72,11 @@ namespace BenchmarkDotNet.IntegrationTests
                 Console.WriteLine(EngineRunMessage);
 
                 return new RunResults(
-                    new List<Measurement> { new Measurement(1, IterationMode.Overhead, IterationStage.Actual, 1, 1, 1) },
-                    new List<Measurement> { new Measurement(1, IterationMode.Workload, IterationStage.Actual, 1, 1, 1) },
+                    new List<Measurement>
+                    {
+                        new (1, IterationMode.Overhead, IterationStage.Actual, 1, 1, 1),
+                        new (1, IterationMode.Workload, IterationStage.Actual, 1, 1, 1)
+                    },
                     OutlierMode.DontRemove,
                     default,
                     default,

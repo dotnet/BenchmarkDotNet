@@ -2,12 +2,12 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.Tests</AssemblyTitle>
-    <TargetFrameworks>net462;net6.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net462</TargetFrameworks>
     <AssemblyName>BenchmarkDotNet.Tests</AssemblyName>
     <PackageId>BenchmarkDotNet.Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);NU1701;1701;CA1018;CA2007</NoWarn>
+    <NoWarn>$(NoWarn);NU1701;1701;CA1018;CA2007;CA1825</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json">

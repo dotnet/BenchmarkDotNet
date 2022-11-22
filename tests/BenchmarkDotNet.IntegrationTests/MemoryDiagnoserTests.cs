@@ -9,6 +9,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
@@ -69,6 +70,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             if (ContinuousIntegration.IsAppVeyorOnWindows()) // too time consuming for AppVeyor (1h limit)
                 return;
+            if (RuntimeInformation.GetCurrentPlatform() == Platform.Arm64 && RuntimeInformation.IsMacOSX())
+                return; // Native compilation does not support targeting osx-arm64 yet. https://github.com/dotnet/corert/issues/4589
 
             MemoryDiagnoserIsAccurate(
                 NativeAotToolchain.CreateBuilder()

@@ -166,7 +166,7 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetRuntimeVersion()
         {
-            if (IsMono)
+            if (IsMono && !IsWasm)
             {
                 var monoRuntimeType = Type.GetType("Mono.Runtime");
                 var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);

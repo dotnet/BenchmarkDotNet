@@ -9,13 +9,13 @@ namespace BenchmarkDotNet.Engines
 
         public EngineWarmupStage(IEngine engine) : base(engine) => this.engine = engine;
 
-        public void RunOverhead(long invokeCount, int unrollFactor)
+        public IReadOnlyList<Measurement> RunOverhead(long invokeCount, int unrollFactor)
             => Run(invokeCount, IterationMode.Overhead, unrollFactor, RunStrategy.Throughput);
 
-        public void RunWorkload(long invokeCount, int unrollFactor, RunStrategy runStrategy)
+        public IReadOnlyList<Measurement> RunWorkload(long invokeCount, int unrollFactor, RunStrategy runStrategy)
             => Run(invokeCount, IterationMode.Workload, unrollFactor, runStrategy);
 
-        internal List<Measurement> Run(long invokeCount, IterationMode iterationMode, int unrollFactor, RunStrategy runStrategy)
+        internal IReadOnlyList<Measurement> Run(long invokeCount, IterationMode iterationMode, int unrollFactor, RunStrategy runStrategy)
         {
             var criteria = DefaultStoppingCriteriaFactory.Instance.CreateWarmup(engine.TargetJob, engine.Resolver, iterationMode, runStrategy);
             return Run(criteria, invokeCount, iterationMode, IterationStage.Warmup, unrollFactor);

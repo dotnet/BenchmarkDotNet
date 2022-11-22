@@ -31,12 +31,6 @@ namespace BenchmarkDotNet.Jobs
             return Equals((EnvironmentVariable) obj);
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (Key.GetHashCode() * 397) ^ Value.GetHashCode();
-            }
-        }
+        public override int GetHashCode() => HashCode.Combine(Key, Value);
     }
 }
