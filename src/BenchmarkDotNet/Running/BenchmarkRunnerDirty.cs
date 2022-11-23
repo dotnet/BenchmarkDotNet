@@ -66,22 +66,18 @@ namespace BenchmarkDotNet.Running
                 return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(benchmarkRunInfos));
         }
 
-        /// <summary>
-        /// Supported only on Full .NET Framework. Not recommended.
-        /// </summary>
         [PublicAPI]
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will be removed soon as it is not supported in .NET Core")]
         public static Summary RunUrl(string url, IConfig config = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
                 return RunWithExceptionHandling(() => RunUrlWithDirtyAssemblyResolveHelper(url, config));
         }
 
-        /// <summary>
-        /// Supported only on Full .NET Framework. Not recommended.
-        /// </summary>
         [PublicAPI]
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will be removed soon as it is not supported in .NET Core")]
         public static Summary RunSource(string source, IConfig config = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
@@ -115,6 +111,7 @@ namespace BenchmarkDotNet.Running
         private static Summary[] RunWithDirtyAssemblyResolveHelper(BenchmarkRunInfo[] benchmarkRunInfos)
             => BenchmarkRunnerClean.Run(benchmarkRunInfos);
 
+#pragma warning disable CS0618 // Use of obsolete symbol
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Summary RunUrlWithDirtyAssemblyResolveHelper(string url, IConfig config = null)
             => RuntimeInformation.IsFullFramework
@@ -126,6 +123,7 @@ namespace BenchmarkDotNet.Running
             => RuntimeInformation.IsFullFramework
                 ? BenchmarkRunnerClean.Run(BenchmarkConverter.SourceToBenchmarks(source, config)).Single()
                 : throw new InvalidBenchmarkDeclarationException("Supported only on Full .NET Framework");
+#pragma warning restore CS0618 // Use of obsolete symbol
 
         private static Summary RunWithExceptionHandling(Func<Summary> run)
         {
