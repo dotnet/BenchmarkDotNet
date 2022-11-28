@@ -146,6 +146,8 @@ namespace BenchmarkDotNet.Disassemblers
                 .Append(' ')
                 .Append(config.Syntax.ToString())
                 .Append(' ')
+                .Append(parameters.BenchmarkCase.Job.Environment.GetRuntime().MsBuildMoniker)
+                .Append(' ')
                 .Append(string.Join(" ", config.Filters.Select(Escape)))
                 .ToString();
 

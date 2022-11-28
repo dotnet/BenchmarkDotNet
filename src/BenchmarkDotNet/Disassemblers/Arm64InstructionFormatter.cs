@@ -9,11 +9,11 @@ namespace BenchmarkDotNet.Disassemblers
     {
         // FormatterOptions is an Intel-specific concept that comes from the Iced library, but since our users can pass custom
         // Iced Formatter to DisassemblyDiagnoserConfig and it provides all the settings we need, we just reuse it here.
-        internal static string Format(Asm asm, FormatterOptions formatterOptions,
+        internal static string Format(Arm64Asm asm, FormatterOptions formatterOptions,
             bool printInstructionAddresses, uint pointerSize, IReadOnlyDictionary<ulong, string> symbols)
         {
             StringBuilder output = new ();
-            Arm64Instruction instruction = asm.Arm64Instruction;
+            Arm64Instruction instruction = asm.Instruction;
 
             if (printInstructionAddresses)
             {

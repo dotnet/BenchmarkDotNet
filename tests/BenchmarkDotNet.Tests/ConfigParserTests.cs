@@ -160,7 +160,7 @@ namespace BenchmarkDotNet.Tests
 
             CoreRunToolchain coreRunToolchain = (CoreRunToolchain)coreRunJob.GetToolchain();
             DotNetCliGenerator generator = (DotNetCliGenerator)coreRunToolchain.Generator;
-            Assert.Equal("net7.0", generator.TargetFrameworkMoniker);
+            Assert.Equal("net8.0", generator.TargetFrameworkMoniker);
         }
 
         [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]

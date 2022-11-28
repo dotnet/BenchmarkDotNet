@@ -232,11 +232,11 @@ namespace BenchmarkDotNet.Disassemblers
 
                     accumulator.Feed(instruction);
 
-                    yield return new Asm()
+                    yield return new Arm64Asm()
                     {
                         InstructionPointer = (ulong)instruction.Address,
                         InstructionLength = instruction.Bytes.Length,
-                        Arm64Instruction = instruction,
+                        Instruction = instruction,
                         ReferencedAddress = (address > ushort.MaxValue) ? address : null,
                         IsReferencedAddressIndirect = isIndirect
                     };

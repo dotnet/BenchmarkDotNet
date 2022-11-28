@@ -86,11 +86,11 @@ namespace BenchmarkDotNet.Disassemblers
                     }
                 }
 
-                yield return new Asm
+                yield return new IntelAsm
                 {
                     InstructionPointer = instruction.IP,
                     InstructionLength = instruction.Length,
-                    IntelInstruction = instruction,
+                    Instruction = instruction,
                     ReferencedAddress = (address > ushort.MaxValue) ? address : null,
                     IsReferencedAddressIndirect = isIndirect,
                 };
