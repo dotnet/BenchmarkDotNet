@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
+using System.Threading;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Loggers
@@ -16,6 +18,7 @@ namespace BenchmarkDotNet.Loggers
         private readonly IDiagnoser diagnoser;
         private readonly AnonymousPipeServerStream inputFromBenchmark, acknowledgments;
         private readonly DiagnoserActionParameters diagnoserActionParameters;
+        private readonly ManualResetEvent finished;
 
         public Broker(ILogger logger, Process process, IDiagnoser diagnoser,
             BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, AnonymousPipeServerStream inputFromBenchmark, AnonymousPipeServerStream acknowledgments)
@@ -26,9 +29,13 @@ namespace BenchmarkDotNet.Loggers
             this.inputFromBenchmark = inputFromBenchmark;
             this.acknowledgments = acknowledgments;
             diagnoserActionParameters = new DiagnoserActionParameters(process, benchmarkCase, benchmarkId);
+            finished = new ManualResetEvent(false);
 
             Results = new List<string>();
             PrefixedOutput = new List<string>();
+
+            process.EnableRaisingEvents = true;
+            process.Exited += OnProcessExited;
         }
 
         internal List<string> Results { get; }
@@ -37,17 +44,37 @@ namespace BenchmarkDotNet.Loggers
 
         internal void ProcessData()
         {
-            // Starting new processes on Windows is way more expensive when compared to Unix.
-            int milliseconds = RuntimeInformation.IsWindows() ? 500 : 250;
-            if (process.WaitForExit(milliseconds))
+            // When the process fails to start, there is no pipe to read from.
+            // If we try to read from such pipe, the read blocks and BDN hangs.
+            // We can't use async methods with cancellation tokens because Anonymous Pipes don't support async IO.
+
+            // Usually, this property is not set yet.
+            if (process.HasExited)
             {
-                // When the process fails to start, there is no pipe to read from.
-                // If we try to read from such pipe, the read blocks and BDN hangs.
-                // We can't use async methods with cancellation tokens because Anonymous Pipes don't support async IO.
-                // That is why we just wait a little for the process to fail.
                 return;
             }
 
+            Task.Run(ProcessDataBlocking);
+
+            finished.WaitOne();
+            finished.Dispose();
+        }
+
+        private void OnProcessExited(object sender, EventArgs e)
+        {
+            process.Exited -= OnProcessExited;
+
+            // Dispose all the pipes to let reading from pipe finish with EOF and avoid a reasource leak.
+            inputFromBenchmark.DisposeLocalCopyOfClientHandle();
+            inputFromBenchmark.Dispose();
+            acknowledgments.DisposeLocalCopyOfClientHandle();
+            acknowledgments.Dispose();
+
+            finished.Set();
+        }
+
+        private void ProcessDataBlocking()
+        {
             using StreamReader reader = new (inputFromBenchmark, AnonymousPipesHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
             using StreamWriter writer = new (acknowledgments, AnonymousPipesHost.UTF8NoBOM, bufferSize: 1);
             // Flush the data to the Stream after each write, otherwise the client will wait for input endlessly!
@@ -81,6 +108,8 @@ namespace BenchmarkDotNet.Loggers
                     {
                         // we have received the last signal so we can stop reading from the pipe
                         // if the process won't exit after this, its hung and needs to be killed
+                        process.Exited -= OnProcessExited;
+                        finished.Set();
                         return;
                     }
                 }
