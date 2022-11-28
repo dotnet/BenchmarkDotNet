@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
-        [FactDotNetCoreOnly("We don't want to test NativeAOT twice (for .NET Framework 4.6.2 and .NET 6.0)")]
+        [FactDotNetCoreOnly("We don't want to test NativeAOT twice (for .NET Framework 4.6.2 and .NET 7.0)")]
         public void MemoryDiagnoserSupportsNativeAOT()
         {
             if (ContinuousIntegration.IsAppVeyorOnWindows()) // too time consuming for AppVeyor (1h limit)
@@ -75,9 +75,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             MemoryDiagnoserIsAccurate(
                 NativeAotToolchain.CreateBuilder()
-                    .UseNuGet(
-                        "6.0.0-rc.1.21420.1", // we test against specific version to keep this test stable
-                        "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json")
+                    .UseNuGet("7.0.0", "https://api.nuget.org/v3/index.json")
                     .ToToolchain());
         }
 
@@ -216,9 +214,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocationQuantumIsNotAnIssueForNetCore21Plus(IToolchain toolchain)
         {
-            if (toolchain is NativeAotToolchain) // the fix has not yet been backported to NativeAOT
-                return;
-
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
             long arraySizeOverhead = IntPtr.Size; // array length
 
@@ -258,9 +253,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserIsAccurateForMultiThreadedBenchmarks(IToolchain toolchain)
         {
-            if (toolchain is NativeAotToolchain) // the API has not been yet ported to NativeAOT
-                return;
-
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
             long arraySizeOverhead = IntPtr.Size; // array length
             long memoryAllocatedPerArray = (MultiThreadedAllocation.Size + objectAllocationOverhead + arraySizeOverhead);

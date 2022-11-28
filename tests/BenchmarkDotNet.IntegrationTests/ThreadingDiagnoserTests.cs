@@ -37,9 +37,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 && !isOsxArm64) // Native compilation does not support targeting osx-arm64 yet. https://github.com/dotnet/corert/issues/4589
             {
                 yield return new object[]{ NativeAotToolchain.CreateBuilder()
-                    .UseNuGet(
-                        "6.0.0-rc.1.21420.1",
-                        "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json").ToToolchain() };
+                    .UseNuGet("7.0.0", "https://api.nuget.org/v3/index.json")
+                    .ToToolchain() };
             }
             // TODO: Support InProcessEmitToolchain.Instance
             // yield return new object[] { InProcessEmitToolchain.Instance };

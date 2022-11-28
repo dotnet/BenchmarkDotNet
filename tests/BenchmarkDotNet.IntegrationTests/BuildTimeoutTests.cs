@@ -27,12 +27,10 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty()
                 .WithBuildTimeout(timeout)
                 .AddJob(Job.Dry
-                    .WithRuntime(NativeAotRuntime.Net60)
+                    .WithRuntime(NativeAotRuntime.Net70)
                     .WithToolchain(NativeAotToolchain.CreateBuilder()
-                        .UseNuGet(
-                            "6.0.0-rc.1.21420.1", // we test against specific version to keep this test stable
-                            "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json") // using old feed that supports net6.0
-                        .TargetFrameworkMoniker("net6.0")
+                        .UseNuGet("7.0.0", "https://api.nuget.org/v3/index.json")
+                        .TargetFrameworkMoniker("net7.0")
                         .ToToolchain()));
 
             var summary = CanExecute<NativeAotBenchmark>(config, fullValidation: false);
