@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Pipes;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 
 namespace BenchmarkDotNet.Loggers
@@ -11,6 +12,7 @@ namespace BenchmarkDotNet.Loggers
     internal class Broker
     {
         private readonly ILogger logger;
+        private readonly Process process;
         private readonly IDiagnoser diagnoser;
         private readonly AnonymousPipeServerStream inputFromBenchmark, acknowledgments;
         private readonly DiagnoserActionParameters diagnoserActionParameters;
@@ -19,6 +21,7 @@ namespace BenchmarkDotNet.Loggers
             BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, AnonymousPipeServerStream inputFromBenchmark, AnonymousPipeServerStream acknowledgments)
         {
             this.logger = logger;
+            this.process = process;
             this.diagnoser = diagnoser;
             this.inputFromBenchmark = inputFromBenchmark;
             this.acknowledgments = acknowledgments;
@@ -34,6 +37,17 @@ namespace BenchmarkDotNet.Loggers
 
         internal void ProcessData()
         {
+            // Starting new processes on Windows is way more expensive when compared to Unix.
+            int milliseconds = RuntimeInformation.IsWindows() ? 500 : 250;
+            if (process.WaitForExit(milliseconds))
+            {
+                // When the process fails to start, there is no pipe to read from.
+                // If we try to read from such pipe, the read blocks and BDN hangs.
+                // We can't use async methods with cancellation tokens because Anonymous Pipes don't support async IO.
+                // That is why we just wait a little for the process to fail.
+                return;
+            }
+
             using StreamReader reader = new (inputFromBenchmark, AnonymousPipesHost.UTF8NoBOM, detectEncodingFromByteOrderMarks: false);
             using StreamWriter writer = new (acknowledgments, AnonymousPipesHost.UTF8NoBOM, bufferSize: 1);
             // Flush the data to the Stream after each write, otherwise the client will wait for input endlessly!
