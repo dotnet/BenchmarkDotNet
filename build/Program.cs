@@ -338,7 +338,7 @@ public class FastTestsTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context)
     {
         var targetFrameworks = context.IsRunningOnWindows()
-            ? new[] { "net461", "net6.0" }
+            ? new[] { "net462", "net6.0" }
             : new[] { "net6.0" };
 
         foreach (var targetFramework in targetFrameworks) 
@@ -346,9 +346,9 @@ public class FastTestsTask : FrostingTask<BuildContext>
     }
 }
 
-[TaskName("SlowTestsNet461")]
+[TaskName("SlowFullFrameworkTests")]
 [IsDependentOn(typeof(BuildTask))]
-public class SlowTestsNet461Task : FrostingTask<BuildContext>
+public class SlowFullFrameworkTestsTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context)
     {
@@ -357,7 +357,7 @@ public class SlowTestsNet461Task : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
-        context.RunTests(context.IntegrationTestsProjectFile, "IntegrationTests", "net461");
+        context.RunTests(context.IntegrationTestsProjectFile, "IntegrationTests", "net462");
     }
 }
 
@@ -378,7 +378,7 @@ public class SlowTestsNet5Task : FrostingTask<BuildContext>
 
 [TaskName("AllTests")]
 [IsDependentOn(typeof(FastTestsTask))]
-[IsDependentOn(typeof(SlowTestsNet461Task))]
+[IsDependentOn(typeof(SlowFullFrameworkTestsTask))]
 [IsDependentOn(typeof(SlowTestsNet5Task))]
 public class AllTestsTask : FrostingTask<BuildContext>
 {
