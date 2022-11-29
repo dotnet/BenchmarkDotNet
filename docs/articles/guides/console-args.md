@@ -23,11 +23,11 @@ The `--filter` or just `-f` allows you to filter the benchmarks by their full na
 
 Examples:
 
-1. Run all benchmarks from System.Memory namespace: `-f ’System.Memory*‘`
-2. Run all benchmarks: `-f ‘*’`
-3. Run all benchmarks from ClassA and ClassB `-f ’*ClassA*‘ ’*ClassB*‘`
+1. Run all benchmarks from System.Memory namespace: `-f 'System.Memory*'`
+2. Run all benchmarks: `-f '*'`
+3. Run all benchmarks from ClassA and ClassB `-f '*ClassA*' '*ClassB*'`
 
-**Note**: If you would like to **join** all the results into a **single summary**, you need to put `--join`. For example: `-f ’*ClassA*‘ ’*ClassB*‘ --join`
+**Note**: If you would like to **join** all the results into a **single summary**, you need to put `--join`. For example: `-f '*ClassA*' '*ClassB*' --join`
 
 ## List of benchmarks
 
