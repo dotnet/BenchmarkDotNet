@@ -123,11 +123,11 @@
 <p>The <code>--filter</code> or just <code>-f</code> allows you to filter the benchmarks by their full name (<code>namespace.typeName.methodName</code>) using glob patterns.</p>
 <p>Examples:</p>
 <ol>
-<li>Run all benchmarks from System.Memory namespace: <code>-f System.Memory*</code></li>
-<li>Run all benchmarks: <code>-f *</code></li>
-<li>Run all benchmarks from ClassA and ClassB <code>-f *ClassA* *ClassB*</code></li>
+<li>Run all benchmarks from System.Memory namespace: <code>-f 'System.Memory*'</code></li>
+<li>Run all benchmarks: <code>-f '*'</code></li>
+<li>Run all benchmarks from ClassA and ClassB <code>-f '*ClassA*' '*ClassB*'</code></li>
 </ol>
-<p><strong>Note</strong>: If you would like to <strong>join</strong> all the results into a <strong>single summary</strong>, you need to put <code>--join</code>. For example: <code>-f *ClassA* *ClassB* --join</code></p>
+<p><strong>Note</strong>: If you would like to <strong>join</strong> all the results into a <strong>single summary</strong>, you need to put <code>--join</code>. For example: <code>-f '*ClassA*' '*ClassB*' --join</code></p>
 <h2 id="list-of-benchmarks">List of benchmarks</h2>
 <p>The <code>--list</code> allows you to print all of the available benchmark names. Available options are:</p>
 <ul>
