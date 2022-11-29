@@ -33,7 +33,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
             bool isOsxArm64 = RuntimeInformation.GetCurrentPlatform() == Platform.Arm64 && RuntimeInformation.IsMacOSX();
             if (!ContinuousIntegration.IsGitHubActionsOnWindows() // no native dependencies
-                && !ContinuousIntegration.IsAppVeyorOnWindows() // too time consuming for AppVeyor (1h limit)
                 && !isOsxArm64) // Native compilation does not support targeting osx-arm64 yet. https://github.com/dotnet/corert/issues/4589
             {
                 yield return new object[]{ NativeAotToolchain.CreateBuilder()
