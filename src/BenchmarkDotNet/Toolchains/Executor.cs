@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
@@ -67,7 +68,17 @@ namespace BenchmarkDotNet.Toolchains
         {
             logger.WriteLineInfo($"// Execute: {process.StartInfo.FileName} {process.StartInfo.Arguments} in {process.StartInfo.WorkingDirectory}");
 
-            process.Start();
+            try
+            {
+                process.Start();
+            }
+            catch (Win32Exception ex)
+            {
+                logger.WriteLineError($"// Failed to start the benchmark process: {ex}");
+
+                return new ExecuteResult(true, null, null, Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), launchIndex);
+            }
+
             processOutputReader.BeginRead();
 
             process.EnsureHighPriority(logger);
