@@ -22,15 +22,22 @@ namespace BenchmarkDotNet.Disassemblers
         public int LineNumber { get; set; }
     }
 
-    public class Asm : SourceCode
+    public abstract class Asm : SourceCode
     {
         public int InstructionLength { get; set; }
         public ulong? ReferencedAddress { get; set; }
         public bool IsReferencedAddressIndirect { get; set; }
+    }
 
-        public Instruction? IntelInstruction { get; set; }
+    public class IntelAsm : Asm
+    {
+        public Instruction Instruction { get; set; }
+    }
+
+    public class Arm64Asm : Asm
+    {
 #if !CLRMDV1
-        public Gee.External.Capstone.Arm64.Arm64Instruction Arm64Instruction { get; set; }
+        public Gee.External.Capstone.Arm64.Arm64Instruction Instruction { get; set; }
 #endif
     }
 
@@ -44,7 +51,10 @@ namespace BenchmarkDotNet.Disassemblers
         [XmlArray("Instructions")]
         [XmlArrayItem(nameof(SourceCode), typeof(SourceCode))]
         [XmlArrayItem(nameof(Sharp), typeof(Sharp))]
-        [XmlArrayItem(nameof(Asm), typeof(Asm))]
+        [XmlArrayItem(nameof(IntelAsm), typeof(IntelAsm))]
+#if NET6_0_OR_GREATER // we can replace it with !CLRMDV1 when https://github.com/9ee1/Capstone.NET/issues/36 is solved
+        [XmlArrayItem(nameof(Arm64Asm), typeof(Arm64Asm))]
+#endif
         public SourceCode[] SourceCodes { get; set; }
     }
 
