@@ -21,6 +21,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 return;
             if (ContinuousIntegration.IsGitHubActionsOnWindows()) // no native dependencies installed
                 return;
+            if (RuntimeInformation.IsMacOSX())
+                return; // currently not supported
 
             var toolchain = NativeAotToolchain.CreateBuilder().UseNuGet().IlcInstructionSet(IsAvx2Supported() ? "avx2" : "").ToToolchain();
 

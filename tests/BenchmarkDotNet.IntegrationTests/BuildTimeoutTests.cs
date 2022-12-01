@@ -19,6 +19,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             if (!RuntimeInformation.Is64BitPlatform()) // NativeAOT does not support 32bit yet
                 return;
+            if (RuntimeInformation.IsMacOSX())
+                return; // currently not supported
 
             // we use NativeAOT on purpose because it takes a LOT of time to build it
             // so we can be sure that timeout = 1s should fail!

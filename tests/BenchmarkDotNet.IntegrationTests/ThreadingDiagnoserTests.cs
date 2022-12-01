@@ -31,9 +31,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             yield return new object[] { Job.Default.GetToolchain() };
 
-            bool isOsxArm64 = RuntimeInformation.GetCurrentPlatform() == Platform.Arm64 && RuntimeInformation.IsMacOSX();
             if (!ContinuousIntegration.IsGitHubActionsOnWindows() // no native dependencies
-                && !isOsxArm64) // Native compilation does not support targeting osx-arm64 yet. https://github.com/dotnet/corert/issues/4589
+                && !RuntimeInformation.IsMacOSX()) // currently not supported
             {
                 yield return new object[]{ NativeAotToolchain.CreateBuilder()
                     .UseNuGet("7.0.0", "https://api.nuget.org/v3/index.json")

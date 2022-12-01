@@ -67,8 +67,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactDotNetCoreOnly("We don't want to test NativeAOT twice (for .NET Framework 4.6.2 and .NET 7.0)")]
         public void MemoryDiagnoserSupportsNativeAOT()
         {
-            if (RuntimeInformation.GetCurrentPlatform() == Platform.Arm64 && RuntimeInformation.IsMacOSX())
-                return; // Native compilation does not support targeting osx-arm64 yet. https://github.com/dotnet/corert/issues/4589
+            if (RuntimeInformation.IsMacOSX())
+                return; // currently not supported
 
             MemoryDiagnoserIsAccurate(
                 NativeAotToolchain.CreateBuilder()
