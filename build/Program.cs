@@ -63,7 +63,8 @@ public class BuildContext : FrostingContext
     public DotNetCoreMSBuildSettings MsBuildSettings { get; }
 
     private IAppVeyorProvider AppVeyor => this.BuildSystem().AppVeyor;
-    public bool IsOnAppVeyorAndNotPr => AppVeyor.IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest;
+    public bool IsRunningOnAppVeyor => AppVeyor.IsRunningOnAppVeyor;
+    public bool IsOnAppVeyorAndNotPr => IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest;
     public bool IsOnAppVeyorAndBdnNightlyCiCd => IsOnAppVeyorAndNotPr && AppVeyor.Environment.Repository.Branch == "master" && this.IsRunningOnWindows();
     public bool IsLocalBuild => this.BuildSystem().IsLocalBuild;
     public bool IsCiBuild => !this.BuildSystem().IsLocalBuild;
@@ -338,8 +339,8 @@ public class FastTestsTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context)
     {
         var targetFrameworks = context.IsRunningOnWindows()
-            ? new[] { "net462", "net6.0" }
-            : new[] { "net6.0" };
+            ? new[] { "net462", "net7.0" }
+            : new[] { "net7.0" };
 
         foreach (var targetFramework in targetFrameworks) 
             context.RunTests(context.UnitTestsProjectFile, "UnitTests", targetFramework);
@@ -352,7 +353,7 @@ public class SlowFullFrameworkTestsTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context)
     {
-        return !context.SkipTests && !context.SkipSlowTests && context.IsRunningOnWindows();
+        return !context.SkipTests && !context.SkipSlowTests && context.IsRunningOnWindows() && !context.IsRunningOnAppVeyor;
     }
 
     public override void Run(BuildContext context)
@@ -361,9 +362,9 @@ public class SlowFullFrameworkTestsTask : FrostingTask<BuildContext>
     }
 }
 
-[TaskName("SlowTestsNet5")]
+[TaskName("SlowTestsNetCore")]
 [IsDependentOn(typeof(BuildTask))]
-public class SlowTestsNet5Task : FrostingTask<BuildContext>
+public class SlowTestsNetCoreTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context)
     {
@@ -372,14 +373,14 @@ public class SlowTestsNet5Task : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
-        context.RunTests(context.IntegrationTestsProjectFile, "IntegrationTests", "net6.0");
+        context.RunTests(context.IntegrationTestsProjectFile, "IntegrationTests", "net7.0");
     }
 }
 
 [TaskName("AllTests")]
 [IsDependentOn(typeof(FastTestsTask))]
 [IsDependentOn(typeof(SlowFullFrameworkTestsTask))]
-[IsDependentOn(typeof(SlowTestsNet5Task))]
+[IsDependentOn(typeof(SlowTestsNetCoreTask))]
 public class AllTestsTask : FrostingTask<BuildContext>
 {
 }
