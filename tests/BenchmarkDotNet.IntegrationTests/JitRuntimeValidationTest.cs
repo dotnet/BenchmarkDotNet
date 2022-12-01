@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData(Jit.RyuJit, Platform.X64, null)]
         public void CheckCore(Jit jit, Platform platform, string errorMessage)
         {
-            Verify(CoreRuntime.Core60, jit, platform, errorMessage);
+            Verify(CoreRuntime.Core70, jit, platform, errorMessage);
         }
 
         private void Verify(Runtime runtime, Jit jit, Platform platform, string errorMessage)

@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 new object[] { Jit.RyuJit, Platform.X64, ClrRuntime.Net462 }, // RyuJit for desktop .NET
 #endif
-                new object[] { Jit.RyuJit, Platform.X64, CoreRuntime.Core60 }, // .NET Core
+                new object[] { Jit.RyuJit, Platform.X64, CoreRuntime.Core70 }, // .NET Core
 
                 // we could add new object[] { Jit.Llvm, Platform.X64, new MonoRuntime() } here but our CI would need to have Mono installed..
             };
