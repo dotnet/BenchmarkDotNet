@@ -21,6 +21,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 return;
             if (ContinuousIntegration.IsGitHubActionsOnWindows()) // no native dependencies installed
                 return;
+            if (ContinuousIntegration.IsAppVeyorOnWindows())
+                return; // timeouts
             if (RuntimeInformation.IsMacOSX())
                 return; // currently not supported
 

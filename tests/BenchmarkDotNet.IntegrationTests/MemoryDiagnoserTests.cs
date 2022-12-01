@@ -69,6 +69,8 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             if (RuntimeInformation.IsMacOSX())
                 return; // currently not supported
+            if (ContinuousIntegration.IsAppVeyorOnWindows())
+                return; // timeouts
 
             MemoryDiagnoserIsAccurate(
                 NativeAotToolchain.CreateBuilder()
