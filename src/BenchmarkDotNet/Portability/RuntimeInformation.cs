@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -126,11 +126,19 @@ namespace BenchmarkDotNet.Portability
             Type.GetType("Java.Lang.Object, Mono.Android") != null;
 #endif
 
-        internal static bool IsiOS() => Type.GetType("Foundation.NSObject, Xamarin.iOS") != null;
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("ios")]
+#endif
+        internal static bool IsIOS() =>
+#if NET6_0_OR_GREATER
+            OperatingSystem.IsIOS();
+#else
+            Type.GetType("Foundation.NSObject, Xamarin.iOS") != null;
+#endif
 
         public static string GetOsVersion()
         {
-            if (IsMacOSX())
+            if (IsMacOS())
             {
                 string systemVersion = ExternalToolsHelper.MacSystemProfilerData.Value.GetValueOrDefault("System Version") ?? "";
                 string kernelVersion = ExternalToolsHelper.MacSystemProfilerData.Value.GetValueOrDefault("Kernel Version") ?? "";
@@ -184,7 +192,7 @@ namespace BenchmarkDotNet.Portability
                 return WmicCpuInfoProvider.WmicCpuInfo.Value;
             if (IsLinux())
                 return ProcCpuInfoProvider.ProcCpuInfo.Value;
-            if (IsMacOSX())
+            if (IsMacOS())
                 return SysctlCpuInfoProvider.SysctlCpuInfo.Value;
 
             return null;
