@@ -14,10 +14,9 @@ namespace BenchmarkDotNet.Engines
         public readonly struct PilotStageResult
         {
             public long PerfectInvocationCount { get; }
-            [NotNull]
             public IReadOnlyList<Measurement> Measurements { get; }
 
-            public PilotStageResult(long perfectInvocationCount, [NotNull] List<Measurement> measurements)
+            public PilotStageResult(long perfectInvocationCount, List<Measurement> measurements)
             {
                 PerfectInvocationCount = perfectInvocationCount;
                 Measurements = measurements;
