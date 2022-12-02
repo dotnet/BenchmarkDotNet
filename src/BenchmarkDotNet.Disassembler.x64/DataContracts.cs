@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Disassemblers
 
     public class Arm64Asm : Asm
     {
-#if !CLRMDV1
+#if !CLRMDV1 // don't include it in ClrMD V1 disassembler that supports only x86 and x64
         public Gee.External.Capstone.Arm64.Arm64Instruction Instruction { get; set; }
 #endif
     }
@@ -52,9 +52,6 @@ namespace BenchmarkDotNet.Disassemblers
         [XmlArrayItem(nameof(SourceCode), typeof(SourceCode))]
         [XmlArrayItem(nameof(Sharp), typeof(Sharp))]
         [XmlArrayItem(nameof(IntelAsm), typeof(IntelAsm))]
-#if NET6_0_OR_GREATER // we can replace it with !CLRMDV1 when https://github.com/9ee1/Capstone.NET/issues/36 is solved
-        [XmlArrayItem(nameof(Arm64Asm), typeof(Arm64Asm))]
-#endif
         public SourceCode[] SourceCodes { get; set; }
     }
 

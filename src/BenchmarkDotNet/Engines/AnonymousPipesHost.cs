@@ -51,8 +51,11 @@ namespace BenchmarkDotNet.Engines
 
             // read the response from Parent process, make the communication blocking
             string acknowledgment = inReader.ReadLine();
-            if (acknowledgment != Engine.Signals.Acknowledgment)
+            if (acknowledgment != Engine.Signals.Acknowledgment
+                && !(acknowledgment is null && hostSignal == HostSignal.AfterAll)) // an early EOF, but still valid
+            {
                 throw new NotSupportedException($"Unknown Acknowledgment: {acknowledgment}");
+            }
         }
 
         public void SendError(string message) => outWriter.WriteLine($"{ValidationErrorReporter.ConsoleErrorPrefix} {message}");

@@ -32,7 +32,8 @@ namespace BenchmarkDotNet.IntegrationTests
             yield return new object[] { Job.Default.GetToolchain() };
 
             if (!ContinuousIntegration.IsGitHubActionsOnWindows() // no native dependencies
-                && !RuntimeInformation.IsMacOSX()) // currently not supported
+                && !RuntimeInformation.IsMacOSX() // currently not supported
+                && !ContinuousIntegration.IsAppVeyorOnWindows()) // timeouts
             {
                 yield return new object[]{ NativeAotToolchain.CreateBuilder()
                     .UseNuGet("7.0.0", "https://api.nuget.org/v3/index.json")
