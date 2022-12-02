@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Portability.Cpu
 
         private static CpuInfo? Load()
         {
-            if (RuntimeInformation.IsMacOSX())
+            if (RuntimeInformation.IsMacOS())
             {
                 string content = ProcessHelper.RunAndReadOutput("sysctl", "-a");
                 return SysctlCpuInfoParser.ParseOutput(content);

@@ -107,9 +107,14 @@ namespace BenchmarkDotNet.Portability
 #endif
 
 #if NET6_0_OR_GREATER
-        [System.Runtime.Versioning.SupportedOSPlatformGuard("osx")]
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("macos")]
 #endif
-        internal static bool IsMacOSX() => IsOSPlatform(OSPlatform.OSX);
+        internal static bool IsMacOS() =>
+#if NET6_0_OR_GREATER
+            OperatingSystem.IsMacOS();
+#else
+            IsOSPlatform(OSPlatform.OSX);
+#endif
 
 #if NET6_0_OR_GREATER
         [System.Runtime.Versioning.SupportedOSPlatformGuard("android")]

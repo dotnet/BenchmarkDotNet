@@ -654,7 +654,7 @@ namespace BenchmarkDotNet.Running
 
         private static void UpdateTitle(int totalBenchmarkCount, int benchmarksToRunCount)
         {
-            if (!Console.IsOutputRedirected && (RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux() || RuntimeInformation.IsMacOSX()))
+            if (!Console.IsOutputRedirected && (RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux() || RuntimeInformation.IsMacOS()))
             {
                 Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining";
             }
@@ -669,7 +669,7 @@ namespace BenchmarkDotNet.Running
                 $" Estimated finish {estimatedEnd:yyyy-MM-dd H:mm} ({(int)fromNow.TotalHours}h {fromNow.Minutes}m from now) **";
             logger.WriteLineHeader(message);
 
-            if (!Console.IsOutputRedirected && (RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux() || RuntimeInformation.IsMacOSX()))
+            if (!Console.IsOutputRedirected && (RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux() || RuntimeInformation.IsMacOS()))
             {
                 Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining - {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish";
             }
