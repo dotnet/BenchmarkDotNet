@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 new object[] { Jit.RyuJit, Platform.X64, ClrRuntime.Net462 }, // RyuJit for desktop .NET
 #endif
-                new object[] { Jit.RyuJit, Platform.X64, CoreRuntime.Core60 }, // .NET Core
+                new object[] { Jit.RyuJit, Platform.X64, CoreRuntime.Core70 }, // .NET Core
 
                 // we could add new object[] { Jit.Llvm, Platform.X64, new MonoRuntime() } here but our CI would need to have Mono installed..
             };
@@ -143,7 +143,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var disassemblyResult = disassemblyDiagnoser.Results.Values.Single(result => result.Methods.Count(method => method.Name.Contains(nameof(WithInlineable.JustReturn))) == 1);
 
-            Assert.Contains(disassemblyResult.Methods, method => method.Maps.Any(map => map.SourceCodes.OfType<Asm>().All(asm => asm.IntelInstruction.ToString().Contains("ret"))));
+            Assert.Contains(disassemblyResult.Methods, method => method.Maps.Any(map => map.SourceCodes.OfType<IntelAsm>().All(asm => asm.Instruction.ToString().Contains("ret"))));
         }
 
         private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, IDiagnoser disassemblyDiagnoser, RunStrategy runStrategy)

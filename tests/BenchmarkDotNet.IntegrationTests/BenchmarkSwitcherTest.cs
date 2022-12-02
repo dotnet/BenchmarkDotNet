@@ -332,7 +332,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Contains("static", logger.GetLog());
         }
 
-        [Fact]
+        [FactDotNetCoreOnly("For some reason this test is flaky on Full Framework")]
         public void WhenUserAddTheResumeAttributeAndRunTheBenchmarks()
         {
             var logger = new OutputLogger(Output);

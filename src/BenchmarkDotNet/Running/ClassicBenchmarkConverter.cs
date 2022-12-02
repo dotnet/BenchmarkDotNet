@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 #if NET6_0_OR_GREATER
@@ -22,6 +23,8 @@ namespace BenchmarkDotNet.Running
         private static readonly HttpClient Client = new HttpClient();
 #endif
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will be removed soon as it is not supported in .NET Core")]
         public static BenchmarkRunInfo[] UrlToBenchmarks(string url, IConfig config = null)
         {
             if (!RuntimeInformation.IsFullFramework)
@@ -65,6 +68,8 @@ namespace BenchmarkDotNet.Running
             return SourceToBenchmarks(benchmarkContent, config);
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will be removed soon as it is not supported in .NET Core")]
         public static BenchmarkRunInfo[] SourceToBenchmarks(string source, IConfig config = null)
         {
             if (!RuntimeInformation.IsFullFramework)
