@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -46,7 +46,15 @@ namespace BenchmarkDotNet.Portability
                 && string.IsNullOrEmpty(typeof(object).Assembly.Location) // it's merged to a single .exe and .Location returns null
                 && !IsWasm; // Wasm also returns "" for assembly locations
 
-        public static bool IsWasm => IsOSPlatform(OSPlatform.Create("BROWSER"));
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("browser")]
+#endif
+        public static bool IsWasm =>
+#if NET6_0_OR_GREATER
+            OperatingSystem.IsBrowser();
+#else
+            IsOSPlatform(OSPlatform.Create("BROWSER"));
+#endif
 
 #if NETSTANDARD2_0
         public static bool IsAot { get; } = IsAotMethod(); // This allocates, so we only want to call it once statically.
@@ -91,14 +99,27 @@ namespace BenchmarkDotNet.Portability
 #if NET6_0_OR_GREATER
         [System.Runtime.Versioning.SupportedOSPlatformGuard("linux")]
 #endif
-        internal static bool IsLinux() => IsOSPlatform(OSPlatform.Linux);
+        internal static bool IsLinux() =>
+#if NET6_0_OR_GREATER
+            OperatingSystem.IsLinux();
+#else
+            IsOSPlatform(OSPlatform.Linux);
+#endif
 
 #if NET6_0_OR_GREATER
         [System.Runtime.Versioning.SupportedOSPlatformGuard("osx")]
 #endif
         internal static bool IsMacOSX() => IsOSPlatform(OSPlatform.OSX);
 
-        internal static bool IsAndroid() => Type.GetType("Java.Lang.Object, Mono.Android") != null;
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("android")]
+#endif
+        internal static bool IsAndroid() =>
+#if NET6_0_OR_GREATER
+            OperatingSystem.IsAndroid();
+#else
+            Type.GetType("Java.Lang.Object, Mono.Android") != null;
+#endif
 
         internal static bool IsiOS() => Type.GetType("Foundation.NSObject, Xamarin.iOS") != null;
 
