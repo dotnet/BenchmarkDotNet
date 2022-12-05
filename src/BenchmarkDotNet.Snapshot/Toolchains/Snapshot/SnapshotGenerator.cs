@@ -22,6 +22,6 @@ namespace BenchmarkDotNet.Toolchains.Snapshot
 
         /// <summary>returns a success</summary>
         public GenerateResult GenerateProject(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath)
-            => GenerateResult.Success(null, Array.Empty<string>());
+            => GenerateResult.Success(ArtifactsPaths.Empty, Array.Empty<string>());
     }
 }

@@ -125,15 +125,22 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
 
         void ISnapshotStore.ExportEnd(ILogger logger)
         {
-            var filePath = string.Empty;
-            try
+            if (storeInfo is not null)
             {
-                filePath = Path.Combine(artifactsPath ?? string.Empty, Filename);
-                File.WriteAllText(filePath, JsonConvert.SerializeObject(storeInfo));
+                var filePath = string.Empty;
+                try
+                {
+                    filePath = Path.Combine(artifactsPath ?? string.Empty, Filename);
+                    File.WriteAllText(filePath, JsonConvert.SerializeObject(storeInfo));
+                }
+                catch (Exception)
+                {
+                    logger.WriteError($"{nameof(JsonSnapshotStore)} error in generating the file {filePath}");
+                }
             }
-            catch (Exception)
+            else
             {
-                logger.WriteError($"{nameof(JsonSnapshotStore)} error in generating the file {filePath}");
+                logger.WriteError($"{nameof(JsonSnapshotStore)} error invali call sequence");
             }
         }
 
@@ -143,9 +150,15 @@ namespace BenchmarkDotNet.Toolchains.Snapshot.Stores
             if (storeInfo?.Benchmarks?.FirstOrDefault(b => b.Id == id) is BenchmarkStoreInfo benchmarkResult)
             {
                 var ai = benchmarkResult.ExecuteResults?.FirstOrDefault(e => e.LunchIndex == executeParameters.LaunchIndex);
-                if (ai is { })
+                if (ai is not null)
                 {
-                    return new ExecuteResult(ai.FoundExecutable, ai.ExitCode, default, ai.Results, ai.PrefixedLines, ai.StandardOutput, ai.LunchIndex);
+                    return new ExecuteResult(ai.FoundExecutable,
+                        ai.ExitCode,
+                        default,
+                        ai.Results ?? Array.Empty<string>(),
+                        ai.PrefixedLines ?? Array.Empty<string>(),
+                        ai.PrefixedLines ?? Array.Empty<string>(),
+                        ai.LunchIndex);
                 }
             }
             executeParameters.Logger.WriteError($"Cannot find Snapshot for BenchmarkCase {executeParameters.BenchmarkId}");
