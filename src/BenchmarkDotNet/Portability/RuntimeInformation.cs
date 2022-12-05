@@ -300,11 +300,13 @@ namespace BenchmarkDotNet.Portability
 
         public static Platform GetCurrentPlatform()
         {
-            // these are not part of .NET Standard 2.0, so we use a hack
-            // https://github.com/dotnet/runtime/blob/d81ad044fa6830f5f31f6b6e8224ebf66a3c298c/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/Architecture.cs#L12-L13
+            // these are not part of .NET Standard 2.0, so we use hardcoded values taken from
+            // https://github.com/dotnet/runtime/blob/1a37caf773a3b857ccff49a31be3333d4fdc491f/src/libraries/System.Private.CoreLib/src/System/Runtime/InteropServices/Architecture.cs#L9
             const Architecture Wasm = (Architecture)4;
             const Architecture S390x = (Architecture)5;
             const Architecture LoongArch64 = (Architecture)6;
+            const Architecture Armv6 = (Architecture)7;
+            const Architecture Ppc64le = (Architecture)8;
 
             switch (ProcessArchitecture)
             {
@@ -322,6 +324,10 @@ namespace BenchmarkDotNet.Portability
                     return Platform.S390x;
                 case LoongArch64:
                     return Platform.LoongArch64;
+                case Armv6:
+                    return Platform.Armv6;
+                case Ppc64le:
+                    return Platform.Ppc64le;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
