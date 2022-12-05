@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Disassemblers
 
         internal static class OutputParser
         {
-            internal static DisassemblyResult Parse([ItemCanBeNull] IReadOnlyList<string> input, string methodName, string commandLine)
+            internal static DisassemblyResult Parse(IReadOnlyList<string?> input, string methodName, string commandLine)
             {
                 var instructions = new List<MonoCode>();
 
@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Disassemblers
                 };
             }
 
-            private static DisassemblyResult CreateErrorResult([ItemCanBeNull] IReadOnlyList<string> input,
+            private static DisassemblyResult CreateErrorResult(IReadOnlyList<string?> input,
                 string methodName, string commandLine, string message)
             {
                 return new DisassemblyResult

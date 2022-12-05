@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactDotNetCoreOnly("We don't want to test NativeAOT twice (for .NET Framework 4.6.2 and .NET 7.0)")]
         public void MemoryDiagnoserSupportsNativeAOT()
         {
-            if (RuntimeInformation.IsMacOSX())
+            if (RuntimeInformation.IsMacOS())
                 return; // currently not supported
             if (ContinuousIntegration.IsAppVeyorOnWindows())
                 return; // timeouts

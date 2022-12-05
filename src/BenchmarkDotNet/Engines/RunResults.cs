@@ -14,16 +14,16 @@ namespace BenchmarkDotNet.Engines
     {
         private readonly OutlierMode outlierMode;
 
-        [NotNull, PublicAPI]
+        [PublicAPI]
         public IReadOnlyList<Measurement> EngineMeasurements { get; }
 
-        [CanBeNull, PublicAPI]
-        public IReadOnlyList<Measurement> Overhead
+        [PublicAPI]
+        public IReadOnlyList<Measurement>? Overhead
             => EngineMeasurements
                 .Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual))
                 .ToArray();
 
-        [NotNull, PublicAPI]
+        [PublicAPI]
         public IReadOnlyList<Measurement> Workload
             => EngineMeasurements
                 .Where(m => m.Is(IterationMode.Workload, IterationStage.Actual))
@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Engines
 
         public double ExceptionFrequency { get; }
 
-        public RunResults([NotNull] IReadOnlyList<Measurement> engineMeasurements,
+        public RunResults(IReadOnlyList<Measurement> engineMeasurements,
             OutlierMode outlierMode,
             GcStats gcStats,
             ThreadingStats threadingStats,

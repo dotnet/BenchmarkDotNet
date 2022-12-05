@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
         }
 
-        public string[] SuggestFor([NotNull] string userInput)
+        public string[] SuggestFor(string userInput)
         {
             if (userInput == null)
                 throw new ArgumentNullException(nameof(userInput));

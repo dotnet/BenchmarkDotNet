@@ -20,11 +20,9 @@ namespace BenchmarkDotNet.Reports
         [PublicAPI] public BuildResult BuildResult { get; }
         [PublicAPI] public IReadOnlyDictionary<string, Metric> Metrics { get; }
 
-        [NotNull]
         public IReadOnlyList<ExecuteResult> ExecuteResults { get; }
 
-        [CanBeNull]
-        public Statistics ResultStatistics => resultStatistics ?? (resultStatistics = GetResultRuns().Any()
+        public Statistics? ResultStatistics => resultStatistics ?? (resultStatistics = GetResultRuns().Any()
             ? new Statistics(GetResultRuns().Select(r => r.GetAverageTime().Nanoseconds))
             : null);
 

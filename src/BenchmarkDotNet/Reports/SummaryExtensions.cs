@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Reports
             return summary.BenchmarksCases.Where(b => summary.GetLogicalGroupKey(b) == logicalGroupKey);
         }
 
-        [NotNull, Pure]
-        public static CultureInfo GetCultureInfo([CanBeNull] this Summary summary) => summary?.Style?.CultureInfo ?? DefaultCultureInfo.Instance;
+        [Pure]
+        public static CultureInfo GetCultureInfo(this Summary? summary) => summary?.Style?.CultureInfo ?? DefaultCultureInfo.Instance;
     }
 }

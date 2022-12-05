@@ -46,8 +46,17 @@ namespace BenchmarkDotNet.Portability
                 && string.IsNullOrEmpty(typeof(object).Assembly.Location) // it's merged to a single .exe and .Location returns null
                 && !IsWasm; // Wasm also returns "" for assembly locations
 
-        public static bool IsWasm => IsOSPlatform(OSPlatform.Create("BROWSER"));
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("browser")]
+#endif
+        public static bool IsWasm =>
+#if NET6_0_OR_GREATER
+            OperatingSystem.IsBrowser();
+#else
+            IsOSPlatform(OSPlatform.Create("BROWSER"));
+#endif
 
+#if NETSTANDARD2_0
         public static bool IsAot { get; } = IsAotMethod(); // This allocates, so we only want to call it once statically.
 
         private static bool IsAotMethod()
@@ -65,6 +74,9 @@ namespace BenchmarkDotNet.Portability
 
             return false;
         }
+#else
+        public static bool IsAot => !System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
+#endif
 
         public static bool IsRunningInContainer => string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true");
 
@@ -87,20 +99,46 @@ namespace BenchmarkDotNet.Portability
 #if NET6_0_OR_GREATER
         [System.Runtime.Versioning.SupportedOSPlatformGuard("linux")]
 #endif
-        internal static bool IsLinux() => IsOSPlatform(OSPlatform.Linux);
+        internal static bool IsLinux() =>
+#if NET6_0_OR_GREATER
+            OperatingSystem.IsLinux();
+#else
+            IsOSPlatform(OSPlatform.Linux);
+#endif
 
 #if NET6_0_OR_GREATER
-        [System.Runtime.Versioning.SupportedOSPlatformGuard("osx")]
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("macos")]
 #endif
-        internal static bool IsMacOSX() => IsOSPlatform(OSPlatform.OSX);
+        internal static bool IsMacOS() =>
+#if NET6_0_OR_GREATER
+            OperatingSystem.IsMacOS();
+#else
+            IsOSPlatform(OSPlatform.OSX);
+#endif
 
-        internal static bool IsAndroid() => Type.GetType("Java.Lang.Object, Mono.Android") != null;
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("android")]
+#endif
+        internal static bool IsAndroid() =>
+#if NET6_0_OR_GREATER
+            OperatingSystem.IsAndroid();
+#else
+            Type.GetType("Java.Lang.Object, Mono.Android") != null;
+#endif
 
-        internal static bool IsiOS() => Type.GetType("Foundation.NSObject, Xamarin.iOS") != null;
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("ios")]
+#endif
+        internal static bool IsIOS() =>
+#if NET6_0_OR_GREATER
+            OperatingSystem.IsIOS();
+#else
+            Type.GetType("Foundation.NSObject, Xamarin.iOS") != null;
+#endif
 
         public static string GetOsVersion()
         {
-            if (IsMacOSX())
+            if (IsMacOS())
             {
                 string systemVersion = ExternalToolsHelper.MacSystemProfilerData.Value.GetValueOrDefault("System Version") ?? "";
                 string kernelVersion = ExternalToolsHelper.MacSystemProfilerData.Value.GetValueOrDefault("Kernel Version") ?? "";
@@ -123,7 +161,6 @@ namespace BenchmarkDotNet.Portability
         /// Returns null if the value is not available
         /// </summary>
         /// <returns></returns>
-        [CanBeNull]
         private static int? GetWindowsUbr()
         {
             if (IsWindows())
@@ -155,7 +192,7 @@ namespace BenchmarkDotNet.Portability
                 return WmicCpuInfoProvider.WmicCpuInfo.Value;
             if (IsLinux())
                 return ProcCpuInfoProvider.ProcCpuInfo.Value;
-            if (IsMacOSX())
+            if (IsMacOS())
                 return SysctlCpuInfoProvider.SysctlCpuInfo.Value;
 
             return null;

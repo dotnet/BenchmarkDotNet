@@ -53,9 +53,9 @@ namespace BenchmarkDotNet.Extensions
         }
 
         public static bool TrySetPriority(
-            [NotNull] this Process process,
+            this Process process,
             ProcessPriorityClass priority,
-            [NotNull] ILogger logger)
+            ILogger logger)
         {
             if (process == null)
                 throw new ArgumentNullException(nameof(process));
@@ -77,9 +77,9 @@ namespace BenchmarkDotNet.Extensions
         }
 
         public static bool TrySetAffinity(
-            [NotNull] this Process process,
+            this Process process,
             IntPtr processorAffinity,
-            [NotNull] ILogger logger)
+            ILogger logger)
         {
             if (process == null)
                 throw new ArgumentNullException(nameof(process));
@@ -103,7 +103,7 @@ namespace BenchmarkDotNet.Extensions
             return false;
         }
 
-        public static IntPtr? TryGetAffinity([NotNull] this Process process)
+        public static IntPtr? TryGetAffinity(this Process process)
         {
             if (process == null)
                 throw new ArgumentNullException(nameof(process));

@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Toolchains
                 case MonoRuntime mono:
                     if (RuntimeInformation.IsAndroid())
                         return InProcessEmitToolchain.Instance;
-                    if (RuntimeInformation.IsiOS())
+                    if (RuntimeInformation.IsIOS())
                         return InProcessNoEmitToolchain.Instance;
                     if (!string.IsNullOrEmpty(mono.AotArgs))
                         return MonoAotToolchain.Instance;

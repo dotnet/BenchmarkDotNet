@@ -103,7 +103,7 @@ namespace BenchmarkDotNet.Mathematics
             }
         }
 
-        [PublicAPI, NotNull]
+        [PublicAPI]
         public double[] GetActualOutliers(OutlierMode outlierMode)
         {
             switch (outlierMode)
@@ -152,7 +152,7 @@ namespace BenchmarkDotNet.Mathematics
         /// <summary>
         /// Mean for [X/Y].
         /// </summary>
-        public static double DivMean([CanBeNull] Statistics x, [CanBeNull] Statistics y)
+        public static double DivMean(Statistics? x, Statistics? y)
         {
             if (x == null || y == null)
                 return double.NaN;
@@ -162,8 +162,7 @@ namespace BenchmarkDotNet.Mathematics
             return MulMean(x, yInvert);
         }
 
-        [NotNull]
-        public static Statistics Divide([NotNull] Statistics x, [NotNull] Statistics y)
+        public static Statistics Divide(Statistics x, Statistics y)
         {
             if (x.N < 1)
                 throw new ArgumentOutOfRangeException(nameof(x), "Argument doesn't contain any values");

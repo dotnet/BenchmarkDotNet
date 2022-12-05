@@ -19,9 +19,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         /// Either <paramref name="targetMethod"/> or <paramref name="fallbackIdleSignature"/> should be not <c>null</c>.
         /// </summary>
         private static BenchmarkAction CreateCore(
-            [NotNull] object instance,
-            [CanBeNull] MethodInfo targetMethod,
-            [CanBeNull] MethodInfo fallbackIdleSignature,
+            object instance,
+            MethodInfo? targetMethod,
+            MethodInfo? fallbackIdleSignature,
             int unrollFactor)
         {
             PrepareInstanceAndResultType(instance, targetMethod, fallbackIdleSignature, out var resultInstance, out var resultType);

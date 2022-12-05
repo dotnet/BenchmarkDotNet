@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Tests.Reports
         [Theory]
         [MemberData(nameof(DataNames))]
         // First value is baseline, others are benchmark measurements
-        public void RatioPrecisionTestWithBaseline([NotNull] string testDataKey)
+        public void RatioPrecisionTestWithBaseline(string testDataKey)
         {
             var testData = Data[testDataKey];
             var summary = CreateSummary(testData.MeanValues, testData.RatioStyle, testData.Noise);

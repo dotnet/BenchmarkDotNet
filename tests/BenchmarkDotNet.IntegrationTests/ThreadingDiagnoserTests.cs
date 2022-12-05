@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.IntegrationTests
             yield return new object[] { Job.Default.GetToolchain() };
 
             if (!ContinuousIntegration.IsGitHubActionsOnWindows() // no native dependencies
-                && !RuntimeInformation.IsMacOSX() // currently not supported
+                && !RuntimeInformation.IsMacOS() // currently not supported
                 && !ContinuousIntegration.IsAppVeyorOnWindows()) // timeouts
             {
                 yield return new object[]{ NativeAotToolchain.CreateBuilder()

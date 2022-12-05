@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Analysers
         /// <param name="upperOutliers">All upper outliers</param>
         /// <param name="cultureInfo">CultureInfo</param>
         /// <returns>The message</returns>
-        [PublicAPI, NotNull, Pure]
+        [PublicAPI, Pure]
         public static string GetMessage(double[] actualOutliers, double[] allOutliers, double[] lowerOutliers, double[] upperOutliers, CultureInfo cultureInfo)
         {
             if (allOutliers.Length == 0)
@@ -80,8 +80,7 @@ namespace BenchmarkDotNet.Analysers
             return Format(actualOutliers.Length, "removed") + ", " + Format(allOutliers.Length, "detected") + rangeMessage;
         }
 
-        [CanBeNull]
-        private static string GetRangeMessage([NotNull] double[] values, CultureInfo cultureInfo)
+        private static string? GetRangeMessage(double[] values, CultureInfo cultureInfo)
         {
             string Format(double value) => TimeInterval.FromNanoseconds(value).ToString(cultureInfo, "N2");
 

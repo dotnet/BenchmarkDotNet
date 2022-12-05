@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Configs
         public string ArtifactsPath { get; }
         public CultureInfo CultureInfo { get; }
         public ConfigOptions Options { get; }
-        [NotNull] public IOrderer Orderer { get; }
+        public IOrderer Orderer { get; }
         public SummaryStyle SummaryStyle { get; }
         public TimeSpan BuildTimeout { get; }
 

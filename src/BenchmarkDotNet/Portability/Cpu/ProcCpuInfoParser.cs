@@ -9,8 +9,7 @@ namespace BenchmarkDotNet.Portability.Cpu
 {
     internal static class ProcCpuInfoParser
     {
-        [NotNull]
-        internal static CpuInfo ParseOutput([CanBeNull] string content)
+        internal static CpuInfo ParseOutput(string? content)
         {
             var logicalCores = SectionsHelper.ParseSections(content, ':');
             var processorModelNames = new HashSet<string>();

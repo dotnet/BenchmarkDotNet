@@ -128,20 +128,17 @@ namespace BenchmarkDotNet.Reports
 
         internal SummaryTable GetTable(SummaryStyle style) => new SummaryTable(this, style);
 
-        [CanBeNull]
-        public string GetLogicalGroupKey(BenchmarkCase benchmarkCase)
+        public string? GetLogicalGroupKey(BenchmarkCase benchmarkCase)
             => Orderer.GetLogicalGroupKey(BenchmarksCases, benchmarkCase);
 
         public bool IsBaseline(BenchmarkCase benchmarkCase)
             => BaseliningStrategy.IsBaseline(benchmarkCase);
 
-        [CanBeNull]
-        public BenchmarkCase GetBaseline(string logicalGroupKey)
+        public BenchmarkCase? GetBaseline(string logicalGroupKey)
             => BenchmarksCases
                 .Where(b => GetLogicalGroupKey(b) == logicalGroupKey)
                 .FirstOrDefault(IsBaseline);
 
-        [NotNull]
         public IEnumerable<BenchmarkCase> GetNonBaselines(string logicalGroupKey)
             => BenchmarksCases
                 .Where(b => GetLogicalGroupKey(b) == logicalGroupKey)
