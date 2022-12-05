@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var toolchain = RuntimeInformation.GetCurrentRuntime().GetToolchain(preferMsBuildToolchains: true);
 
-            var job = Job.Dry.WithToolchain(toolchain).WithNuGet("Newtonsoft.Json", "11.0.2");
+            var job = Job.Dry.WithToolchain(toolchain).WithNuGet("Newtonsoft.Json", "13.0.2");
             var config = CreateSimpleConfig(job: job);
 
             CanExecute<WithCallToNewtonsoft>(config);
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var toolchain = RoslynToolchain.Instance;
 
-            var unsupportedJob = Job.Dry.WithToolchain(toolchain).WithNuGet("Newtonsoft.Json", "11.0.2");
+            var unsupportedJob = Job.Dry.WithToolchain(toolchain).WithNuGet("Newtonsoft.Json", "13.0.2");
             var unsupportedJobConfig = CreateSimpleConfig(job: unsupportedJob);
             var unsupportedJobBenchmark = BenchmarkConverter.TypeToBenchmarks(typeof(WithCallToNewtonsoft), unsupportedJobConfig);
 
