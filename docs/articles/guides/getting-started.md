@@ -1,16 +1,14 @@
 # Getting started
-
 To get started with BenchmarkDotNet, please follow these steps. 
 
 ## Step 1. Create a project
 Create a new console application.
 
 ## Step 2. Installation
-
 Install BenchmarkDotNet via the NuGet package: [BenchmarkDotNet](https://www.nuget.org/packages/BenchmarkDotNet/)
 
-```
-PM> Install-Package BenchmarkDotNet
+```cmd
+> dotnet add package BenchmarkDotNet
 ```
 
 Read more about BenchmarkDotNet NuGet packages: @docs.nuget
@@ -58,39 +56,50 @@ namespace MyBenchmarks
 }
 ```
 
-The `BenchmarkRunner.Run<Md5VsSha256>()` call runs your benchmarks and print results to console output.
+The `BenchmarkRunner.Run<Md5VsSha256>()` call runs your benchmarks and prints results to the console.
 
-## Step 4. View results
+## Step 4. Run benchmarks
+Start your console application to run the benchmarks. The application must be built in the Release configuration.
+
+```cmd
+> dotnet run -c Release
+```
+
+## Step 5. View results
 View the results. Here is an example of output from the above benchmark:
 
 ```
-BenchmarkDotNet=v0.11.3, OS=Windows 10.0.17134.472 (1803/April2018Update/Redstone4)
-Intel Core i7-2630QM CPU 2.00GHz (Sandy Bridge), 1 CPU, 8 logical and 4 physical cores
-Frequency=1948699 Hz, Resolution=513.1629 ns, Timer=TSC
-.NET Core SDK=2.1.502
-  [Host]     : .NET Core 2.1.6 (CoreCLR 4.6.27019.06, CoreFX 4.6.27019.05), 64bit RyuJIT
-  DefaultJob : .NET Core 2.1.6 (CoreCLR 4.6.27019.06, CoreFX 4.6.27019.05), 64bit RyuJIT
+BenchmarkDotNet=v0.13.2, OS=Windows 10 (10.0.19045.2251)
+Intel Core i7-4770HQ CPU 2.20GHz (Haswell), 1 CPU, 8 logical and 4 physical cores
+.NET SDK=7.0.100
+  [Host]     : .NET 7.0.0 (7.0.22.51805), X64 RyuJIT AVX2
+  DefaultJob : .NET 7.0.0 (7.0.22.51805), X64 RyuJIT AVX2
 
 
-| Method |      Mean |     Error |    StdDev |
-|------- |----------:|----------:|----------:|
-| Sha256 | 100.90 us | 0.5070 us | 0.4494 us |
-|    Md5 |  37.66 us | 0.1290 us | 0.1207 us |
+| Method |     Mean |    Error |   StdDev |
+|------- |---------:|---------:|---------:|
+| Sha256 | 51.57 us | 0.311 us | 0.291 us |
+|    Md5 | 21.91 us | 0.138 us | 0.129 us |
 ```
 
+## Step 6. Analyze results
+BenchmarkDotNet will automatically create basic reports in the `.\BenchmarkDotNet.Artifacts\results` folder that can be shared and analyzed. 
 
-## Step 5. Analyze results
+To help analyze performance in further depth, you can configure your benchmark to collect and output more detailed information. Benchmark configuration can be conveniently changed by adding attributes to the class containing your benchmarks. For example:
 
-Analyze it. In your bin directory, you can find a lot of useful files with detailed information. For example:
+* [Diagnosers](../configs/diagnosers.md)
+  * GC allocations: `[MemoryDiagnoser]`
+  * Code size and disassembly: `[DisassemblyDiagnoser]`
+  * Threading statistics: `[ThreadingDiagnoser]`
+* [Exporters](../configs/exporters.md)
+  * CSV reports with raw data: `[CsvMeasurementsExporter]`
+  * JSON reports with raw data: `[JsonExporter]`
+  * Plots (if you have installed R): `[RPlotExporter]`
 
-* Csv reports with raw data: `Md5VsSha256-report.csv`, `Md5VsSha256-runs.csv`
-* Markdown reports:  `Md5VsSha256-report-default.md`, `Md5VsSha256-report-stackoverflow.md`, `Md5VsSha256-report-github.md`
-    * Plain report and log: `Md5VsSha256-report.txt`, `Md5VsSha256.log`
-    * Plots (if you have installed R): `Md5VsSha256-barplot.png`, `Md5VsSha256-boxplot.png`, and so on.
+For more information, see [Configs](../configs/configs.md).
 
 ## Next steps
-
-BenchmarkDotNet provides a lot of features which help to high-quality performance research.
-If you want to know more about BenchmarkDotNet features, checkout the [Overview](../overview.md) page.
-If you want have any questions, checkout the [FAQ](../faq.md) page.
-If you didn't find answer for your question on this page, [ask it on gitter](https://gitter.im/dotnet/BenchmarkDotNet) or [create an issue](https://github.com/dotnet/BenchmarkDotNet/issues).
+BenchmarkDotNet provides features which aid high-quality performance research.
+If you want to know more about BenchmarkDotNet features, check out the [Overview](../overview.md) page.
+If you have any questions, check out the [FAQ](../faq.md) page.
+If you didn't find an answer for your question on this page, [ask it on Gitter](https://gitter.im/dotnet/BenchmarkDotNet) or [create an issue on GitHub](https://github.com/dotnet/BenchmarkDotNet/issues).

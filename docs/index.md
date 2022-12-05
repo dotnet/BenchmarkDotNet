@@ -19,7 +19,7 @@ title: Home
 </h3>
 
 <h3 align="center">
-  <a href="#features">Features</a>
+  <a href="#Features">Features</a>
   <span> · </span>
   <a href="https://benchmarkdotnet.org/articles/guides/getting-started.html">Getting started</a>
   <span> · </span>
@@ -30,12 +30,12 @@ title: Home
 
 **BenchmarkDotNet** helps you to transform methods into benchmarks, track their performance, and share reproducible measurement experiments.
 It's no harder than writing unit tests!
-Under the hood, it performs a lot of [magic](#automation) that guarantees [reliable and precise](#reliability) results thanks to the [perfolizer](https://github.com/AndreyAkinshin/perfolizer) statistical engine.
+Under the hood, it performs a lot of [magic](#Automation) that guarantees [reliable and precise](#Reliability) results thanks to the [perfolizer](https://github.com/AndreyAkinshin/perfolizer) statistical engine.
 BenchmarkDotNet protects you from popular benchmarking mistakes and warns you if something is wrong with your benchmark design or obtained measurements.
-The results are presented in a [user-friendly](#friendliness) form that highlights all the important facts about your experiment.
+The results are presented in a [user-friendly](#Friendliness) form that highlights all the important facts about your experiment.
 The library is adopted by [13400+ projects](#who-uses-benchmarkdotnet) including .NET Runtime and supported by the [.NET Foundation](https://dotnetfoundation.org).
 
-It's [easy](#simplicity) to start writing benchmarks, check out an example
+It's [easy](#Simplicity) to start writing benchmarks, check out an example
   (copy-pastable version is [here](https://benchmarkdotnet.org/articles/guides/getting-started.html)):
 
 ```cs
@@ -79,7 +79,7 @@ Intel Core i7-7700K CPU 4.20GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cor
   [Host]       : .NET Framework 4.7.2 (4.7.3468.0), X64 RyuJIT
   Net472       : .NET Framework 4.7.2 (4.7.3468.0), X64 RyuJIT
   NetCoreApp30 : .NET Core 3.0.0 (CoreCLR 4.700.19.46205, CoreFX 4.700.19.46214), X64 RyuJIT
-  CoreRt30     : .NET CoreRT 1.0.28231.02 @Commit: 741d61493c560ba96e8151f9e56876d4d3828489, X64 AOT
+  NativeAot70  : .NET 7.0.0-preview.4.22172.7, X64 NativeAOT
   Mono         : Mono 6.4.0 (Visual Studio), X64
 
 
@@ -87,22 +87,22 @@ Intel Core i7-7700K CPU 4.20GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cor
 |------- |-------------- |------ |-----------:|----------:|----------:|------:|
 | Sha256 |    .NET 4.7.2 |  1000 |   7.735 us | 0.1913 us | 0.4034 us |  1.00 |
 | Sha256 | .NET Core 3.0 |  1000 |   3.989 us | 0.0796 us | 0.0745 us |  0.50 |
-| Sha256 |    CoreRt 3.0 |  1000 |   4.091 us | 0.0811 us | 0.1562 us |  0.53 |
+| Sha256 | NativeAOT 7.0 |  1000 |   4.091 us | 0.0811 us | 0.1562 us |  0.53 |
 | Sha256 |          Mono |  1000 |  13.117 us | 0.2485 us | 0.5019 us |  1.70 |
 |        |               |       |            |           |           |       |
 |    Md5 |    .NET 4.7.2 |  1000 |   2.872 us | 0.0552 us | 0.0737 us |  1.00 |
 |    Md5 | .NET Core 3.0 |  1000 |   1.848 us | 0.0348 us | 0.0326 us |  0.64 |
-|    Md5 |    CoreRt 3.0 |  1000 |   1.817 us | 0.0359 us | 0.0427 us |  0.63 |
+|    Md5 | NativeAOT 7.0 |  1000 |   1.817 us | 0.0359 us | 0.0427 us |  0.63 |
 |    Md5 |          Mono |  1000 |   3.574 us | 0.0678 us | 0.0753 us |  1.24 |
 |        |               |       |            |           |           |       |
 | Sha256 |    .NET 4.7.2 | 10000 |  74.509 us | 1.5787 us | 4.6052 us |  1.00 |
 | Sha256 | .NET Core 3.0 | 10000 |  36.049 us | 0.7151 us | 1.0025 us |  0.49 |
-| Sha256 |    CoreRt 3.0 | 10000 |  36.253 us | 0.7076 us | 0.7571 us |  0.49 |
+| Sha256 | NativeAOT 7.0 | 10000 |  36.253 us | 0.7076 us | 0.7571 us |  0.49 |
 | Sha256 |          Mono | 10000 | 116.350 us | 2.2555 us | 3.0110 us |  1.58 |
 |        |               |       |            |           |           |       |
 |    Md5 |    .NET 4.7.2 | 10000 |  17.308 us | 0.3361 us | 0.4250 us |  1.00 |
 |    Md5 | .NET Core 3.0 | 10000 |  15.726 us | 0.2064 us | 0.1930 us |  0.90 |
-|    Md5 |    CoreRt 3.0 | 10000 |  15.627 us | 0.2631 us | 0.2461 us |  0.89 |
+|    Md5 | NativeAOT 7.0 | 10000 |  15.627 us | 0.2631 us | 0.2461 us |  0.89 |
 |    Md5 |          Mono | 10000 |  30.205 us | 0.5868 us | 0.6522 us |  1.74 |
 
 ```
@@ -132,7 +132,7 @@ For example, if you want to [parameterize](https://benchmarkdotnet.org/articles/
   and run benchmarks for each case.
 If you want to compare benchmarks with each other,
   mark one of the benchmark as the [baseline](https://benchmarkdotnet.org/articles/features/baselines.html)
-  via `[Benchmark(baseline: true)]`: BenchmarkDotNet will compare it with all of the other benchmarks.
+  via `[Benchmark(Baseline = true)]`: BenchmarkDotNet will compare it with all of the other benchmarks.
 If you want to compare performance in different environments, use [jobs](https://benchmarkdotnet.org/articles/configs/jobs.html).
 For example, you can run all the benchmarks on .NET Core 3.0 and Mono via
   `[SimpleJob(RuntimeMoniker.NetCoreApp30)]` and `[SimpleJob(RuntimeMoniker.Mono)]`.
@@ -141,15 +141,15 @@ If you don't like attributes, you can call most of the APIs via the fluent style
 
 ```cs
 ManualConfig.CreateEmpty() // A configuration for our benchmarks
-    .With(Job.Default // Adding first job
-            .With(ClrRuntime.Net472) // .NET Framework 4.7.2
-            .With(Platform.X64) // Run as x64 application
-            .With(Jit.LegacyJit) // Use LegacyJIT instead of the default RyuJIT
-            .WithGcServer(true) // Use Server GC
-    ).With(Job.Default // Adding second job
-            .AsBaseline() // It will be marked as baseline
-            .WithEnvironmentVariable("Key", "Value") // Setting an environment variable
-            .WithWarmupCount(0) // Disable warm-up stage
+    .AddJob(Job.Default // Adding first job
+        .WithRuntime(ClrRuntime.Net472) // .NET Framework 4.7.2
+        .WithPlatform(Platform.X64) // Run as x64 application
+        .WithJit(Jit.LegacyJit) // Use LegacyJIT instead of the default RyuJIT
+        .WithGcServer(true) // Use Server GC
+    ).AddJob(Job.Default // Adding second job
+        .AsBaseline() // It will be marked as baseline
+        .WithEnvironmentVariable("Key", "Value") // Setting an environment variable
+        .WithWarmupCount(0) // Disable warm-up stage
     );
 ```
 
