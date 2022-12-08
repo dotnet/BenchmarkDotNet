@@ -83,6 +83,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, Runtime runtime)
         {
             if (RuntimeInformation.IsMacOS()) return; // currently not supported
+            if (RuntimeInformation.IsLinux()) return; // https://github.com/dotnet/BenchmarkDotNet/issues/2223
 
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
