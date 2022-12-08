@@ -4,9 +4,9 @@ using System.Reflection;
 
 namespace BenchmarkDotNet.Helpers
 {
-    internal static class ResourceHelper
+    public static class ResourceHelper
     {
-        internal static string LoadTemplate(string name) => LoadResource("BenchmarkDotNet.Templates." + name);
+        public static string LoadTemplate(string name) => LoadResource("BenchmarkDotNet.Templates." + name);
 
         internal static string LoadResource(string resourceName)
         {

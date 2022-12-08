@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace BenchmarkDotNet.Loggers
 {
-    internal class AsyncProcessOutputReader : IDisposable
+    public class AsyncProcessOutputReader : IDisposable
     {
         private readonly Process process;
         private readonly ILogger logger;
@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Loggers
 
         private long status;
 
-        internal AsyncProcessOutputReader(Process process, bool logOutput = false, ILogger logger = null, bool readStandardError = true)
+        public AsyncProcessOutputReader(Process process, bool logOutput = false, ILogger logger = null, bool readStandardError = true)
         {
             if (!process.StartInfo.RedirectStandardOutput)
                 throw new NotSupportedException("set RedirectStandardOutput to true first");
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Loggers
             errorFinishEvent.Dispose();
         }
 
-        internal void BeginRead()
+        public void BeginRead()
         {
             if (Interlocked.CompareExchange(ref status, (long)Status.Started, (long)Status.Created) != (long)Status.Created)
                 throw new InvalidOperationException("Reader can be started only once");
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Loggers
                 process.BeginErrorReadLine();
         }
 
-        internal void CancelRead()
+        public void CancelRead()
         {
             if (Interlocked.CompareExchange(ref status, (long)Status.Stopped, (long)Status.Started) != (long)Status.Started)
                 throw new InvalidOperationException("Only a started reader can be stopped");
@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Loggers
             Detach();
         }
 
-        internal void StopRead()
+        public void StopRead()
         {
             if (Interlocked.CompareExchange(ref status, (long)Status.Stopped, (long)Status.Started) != (long)Status.Started)
                 throw new InvalidOperationException("Only a started reader can be stopped");
@@ -87,7 +87,7 @@ namespace BenchmarkDotNet.Loggers
             Detach();
         }
 
-        internal ImmutableArray<string> GetOutputLines() => ReturnIfStopped(() => output.ToImmutableArray());
+        public ImmutableArray<string> GetOutputLines() => ReturnIfStopped(() => output.ToImmutableArray());
 
         internal ImmutableArray<string> GetErrorLines() => ReturnIfStopped(() => error.ToImmutableArray());
 

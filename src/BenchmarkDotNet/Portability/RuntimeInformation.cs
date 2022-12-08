@@ -19,7 +19,7 @@ using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironm
 
 namespace BenchmarkDotNet.Portability
 {
-    internal static class RuntimeInformation
+    public static class RuntimeInformation
     {
         internal const string DebugConfigurationName = "DEBUG";
         internal const string ReleaseConfigurationName = "RELEASE";
@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Portability
 #if NET6_0_OR_GREATER
         [System.Runtime.Versioning.SupportedOSPlatformGuard("windows")]
 #endif
-        internal static bool IsWindows() =>
+        public static bool IsWindows() =>
 #if NET6_0_OR_GREATER
             OperatingSystem.IsWindows(); // prefer linker-friendly OperatingSystem APIs
 #else

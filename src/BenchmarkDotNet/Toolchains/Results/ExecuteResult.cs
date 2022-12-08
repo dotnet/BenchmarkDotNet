@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Toolchains.Results
                 ? CreateFailed(exitCode)
                 : new ExecuteResult(runResults.GetAllMeasurements().ToList(), runResults.GCStats, runResults.ThreadingStats, runResults.ExceptionFrequency);
 
-        internal static ExecuteResult CreateFailed(int exitCode = -1)
+        public static ExecuteResult CreateFailed(int exitCode = -1)
             => new ExecuteResult(false, exitCode, default, Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), 0);
 
         public override string ToString() => "ExecuteResult: " + (FoundExecutable ? "Found executable" : "Executable not found");

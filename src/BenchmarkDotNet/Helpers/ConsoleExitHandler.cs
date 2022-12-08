@@ -5,12 +5,12 @@ using BenchmarkDotNet.Loggers;
 
 namespace BenchmarkDotNet.Helpers
 {
-    internal class ConsoleExitHandler : IDisposable
+    public class ConsoleExitHandler : IDisposable
     {
         private readonly Process process;
         private readonly ILogger logger;
 
-        internal ConsoleExitHandler(Process process, ILogger logger)
+        public ConsoleExitHandler(Process process, ILogger logger)
         {
             this.process = process;
             this.logger = logger;
@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Helpers
         // the user has closed the console window so we kill the entire process tree
         private void ProcessExitEventHandlerHandlerCallback(object sender, EventArgs e) => KillProcessTree();
 
-        internal void KillProcessTree()
+        public void KillProcessTree()
         {
             try
             {
