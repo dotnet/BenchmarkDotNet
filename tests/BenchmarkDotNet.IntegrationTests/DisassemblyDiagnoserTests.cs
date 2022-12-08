@@ -21,8 +21,6 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class DisassemblyDiagnoserTests : BenchmarkTestExecutor
     {
-        private const string WindowsOnly = "Disassembler supports only Windows";
-
         public DisassemblyDiagnoserTests(ITestOutputHelper output) : base(output) { }
 
         public static IEnumerable<object[]> GetAllJits()
@@ -80,11 +78,13 @@ namespace BenchmarkDotNet.IntegrationTests
             [MethodImpl(MethodImplOptions.NoInlining)] public void Benchmark(bool justAnOverload) { } // we need to test overloads (#562)
         }
 
-        [TheoryWindowsOnly(WindowsOnly)]
+        [Theory]
         [MemberData(nameof(GetAllJits))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, Runtime runtime)
         {
+            if (RuntimeInformation.IsMacOS()) return; // currently not supported
+
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
@@ -97,11 +97,13 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Recursive)}()");
         }
 
-        [TheoryWindowsOnly(WindowsOnly)]
+        [Theory]
         [MemberData(nameof(GetAllJits))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCallsUsingFilters(Jit jit, Platform platform, Runtime runtime)
         {
+            if (RuntimeInformation.IsMacOS()) return; // currently not supported
+
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 1, filters: new[] { "*WithCalls*" }));
 
@@ -120,11 +122,13 @@ namespace BenchmarkDotNet.IntegrationTests
             public T Create() => new T();
         }
 
-        [TheoryWindowsOnly(WindowsOnly)]
+        [Theory]
         [MemberData(nameof(GetAllJits))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleGenericTypes(Jit jit, Platform platform, Runtime runtime)
         {
+            if (RuntimeInformation.IsMacOS()) return; // currently not supported
+
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
@@ -140,11 +144,13 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public void JustReturn() { }
         }
 
-        [TheoryWindowsOnly(WindowsOnly)]
+        [Theory]
         [MemberData(nameof(GetAllJits))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleInlinableBenchmarks(Jit jit, Platform platform, Runtime runtime)
         {
+            if (RuntimeInformation.IsMacOS()) return; // currently not supported
+
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
