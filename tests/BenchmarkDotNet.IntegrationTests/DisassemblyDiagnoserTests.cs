@@ -13,7 +13,6 @@ using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
-using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -174,9 +173,10 @@ namespace BenchmarkDotNet.IntegrationTests
 
         private void AssertDisassembled(DisassemblyDiagnoser diagnoser, string methodSignature)
         {
-            Assert.True(diagnoser.Results.Single().Value
-                .Methods.Any(method => method.Name.EndsWith(methodSignature) && method.Maps.Any(map => map.SourceCodes.Any())),
-                $"{methodSignature} is missing");
+            DisassemblyResult result = diagnoser.Results.Single().Value;
+
+            Assert.Contains(methodSignature, result.Methods.Select(m => m.Name.Split('.').Last()).ToArray());
+            Assert.Contains(result.Methods.Single(m => m.Name.EndsWith(methodSignature)).Maps, map => map.SourceCodes.Any());
         }
     }
 }
