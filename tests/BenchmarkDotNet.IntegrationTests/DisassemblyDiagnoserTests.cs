@@ -11,6 +11,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
@@ -25,18 +26,26 @@ namespace BenchmarkDotNet.IntegrationTests
         public DisassemblyDiagnoserTests(ITestOutputHelper output) : base(output) { }
 
         public static IEnumerable<object[]> GetAllJits()
-            => new[]
+        {
+            if (RuntimeInformation.IsFullFramework)
             {
-#if NETFRAMEWORK
-                new object[] { Jit.LegacyJit, Platform.X86, ClrRuntime.Net462 }, // 32bit LegacyJit for desktop .NET
-                new object[] { Jit.LegacyJit, Platform.X64, ClrRuntime.Net462 }, // 64bit LegacyJit for desktop .NET
-
-                new object[] { Jit.RyuJit, Platform.X64, ClrRuntime.Net462 }, // RyuJit for desktop .NET
-#endif
-                new object[] { Jit.RyuJit, Platform.X64, CoreRuntime.Core70 }, // .NET Core
-
-                // we could add new object[] { Jit.Llvm, Platform.X64, new MonoRuntime() } here but our CI would need to have Mono installed..
-            };
+                yield return new object[] { Jit.LegacyJit, Platform.X86, ClrRuntime.Net462 }; // 32bit LegacyJit for desktop .NET
+                yield return new object[] { Jit.LegacyJit, Platform.X64, ClrRuntime.Net462 }; // 64bit LegacyJit for desktop .NET
+                yield return new object[] { Jit.RyuJit, Platform.X64, ClrRuntime.Net462 }; // RyuJit for desktop .NET
+            }
+            else if (RuntimeInformation.IsNetCore)
+            {
+                if (RuntimeInformation.GetCurrentPlatform() is Platform.X86 or Platform.X64)
+                {
+                    yield return new object[] { Jit.RyuJit, Platform.X64, CoreRuntime.Core70 }; // .NET Core x64
+                }
+                else if (RuntimeInformation.GetCurrentPlatform() is Platform.Arm64 && RuntimeInformation.IsLinux())
+                {
+                    yield return new object[] { Jit.RyuJit, Platform.Arm64, CoreRuntime.Core70 }; // .NET Core arm64
+                }
+            }
+            // we could add new object[] { Jit.Llvm, Platform.X64, new MonoRuntime() } here but our CI would need to have Mono installed..
+        }
 
         public class WithCalls
         {
@@ -143,7 +152,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var disassemblyResult = disassemblyDiagnoser.Results.Values.Single(result => result.Methods.Count(method => method.Name.Contains(nameof(WithInlineable.JustReturn))) == 1);
 
-            Assert.Contains(disassemblyResult.Methods, method => method.Maps.Any(map => map.SourceCodes.OfType<IntelAsm>().All(asm => asm.Instruction.ToString().Contains("ret"))));
+            Assert.Contains(disassemblyResult.Methods, method => method.Maps.Any(map => map.SourceCodes.OfType<Asm>().All(asm => asm.ToString().Contains("ret"))));
         }
 
         private IConfig CreateConfig(Jit jit, Platform platform, Runtime runtime, IDiagnoser disassemblyDiagnoser, RunStrategy runStrategy)
