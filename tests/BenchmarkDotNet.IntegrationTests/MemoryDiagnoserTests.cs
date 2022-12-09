@@ -23,6 +23,7 @@ using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Xunit;
 using Xunit.Abstractions;
+using BenchmarkDotNet.Toolchains.Mono;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -34,7 +35,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public static IEnumerable<object[]> GetToolchains()
         {
-            if (RuntimeInformation.IsMono) // https://github.com/mono/mono/issues/8397
+            if (RuntimeInformation.IsOldMono) // https://github.com/mono/mono/issues/8397
                 yield break;
 
             yield return new object[] { Job.Default.GetToolchain() };
@@ -76,6 +77,15 @@ namespace BenchmarkDotNet.IntegrationTests
                 NativeAotToolchain.CreateBuilder()
                     .UseNuGet("7.0.0", "https://api.nuget.org/v3/index.json")
                     .ToToolchain());
+        }
+
+        [FactDotNetCoreOnly("We don't want to test MonoVM twice (for .NET Framework 4.6.2 and .NET 7.0)")]
+        public void MemoryDiagnoserSupportsModernMono()
+        {
+            if (ContinuousIntegration.IsAppVeyorOnWindows())
+                return; // timeouts
+
+            MemoryDiagnoserIsAccurate(MonoToolchain.Mono70);
         }
 
         public class AllocatingGlobalSetupAndCleanup
