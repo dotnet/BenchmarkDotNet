@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Reports
                 ?? (IReadOnlyDictionary<string, Metric>)ImmutableDictionary<string, Metric>.Empty;
         }
 
-        public BenchmarkReport(BenchmarkCase benchmarkCase, GenerateResult generateResult, BuildResult buildResult)
+        internal BenchmarkReport(BenchmarkCase benchmarkCase, GenerateResult generateResult, BuildResult buildResult)
         {
             BenchmarkCase = benchmarkCase;
             GenerateResult = generateResult;
