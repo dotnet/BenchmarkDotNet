@@ -25,7 +25,14 @@ namespace BenchmarkDotNet.Portability
         internal const string ReleaseConfigurationName = "RELEASE";
         internal const string Unknown = "?";
 
+        /// <summary>
+        /// returns true for both the old (implementation of .NET Framework) and new Mono (.NET 6+ flavour)
+        /// </summary>
         public static bool IsMono { get; } = Type.GetType("Mono.RuntimeStructs") != null; // it allocates a lot of memory, we need to check it once in order to keep Engine non-allocating!
+
+        public static bool IsOldMono { get; } = Type.GetType("Mono.Runtime") != null;
+
+        public static bool IsNewMono { get; } = IsMono && !IsOldMono;
 
         public static bool IsFullFramework =>
 #if NET6_0_OR_GREATER
@@ -200,7 +207,24 @@ namespace BenchmarkDotNet.Portability
 
         internal static string GetRuntimeVersion()
         {
-            if (IsMono && !IsWasm)
+            if (IsWasm)
+            {
+                // code copied from https://github.com/dotnet/runtime/blob/2c573b59aaaf3fd17e2ecab95ad3769f195d2dbc/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/RuntimeInformation.cs#L20-L30
+                string versionString = typeof(object).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+
+                // Strip the git hash if there is one
+                if (versionString != null)
+                {
+                    int plusIndex = versionString.IndexOf('+');
+                    if (plusIndex != -1)
+                    {
+                        versionString = versionString.Substring(0, plusIndex);
+                    }
+                }
+
+                return $".NET Core (Mono) {versionString}";
+            }
+            else if (IsMono)
             {
                 var monoRuntimeType = Type.GetType("Mono.Runtime");
                 var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
@@ -221,7 +245,7 @@ namespace BenchmarkDotNet.Portability
 
                     return "Mono " + version;
                 }
-                else
+                else if (IsNewMono)
                 {
                     return $"{GetNetCoreVersion()} using MonoVM";
                 }
@@ -229,23 +253,6 @@ namespace BenchmarkDotNet.Portability
             else if (IsFullFramework)
             {
                 return FrameworkVersionHelper.GetFrameworkDescription();
-            }
-            else if (IsWasm)
-            {
-                // code copied from https://github.com/dotnet/runtime/blob/2c573b59aaaf3fd17e2ecab95ad3769f195d2dbc/src/libraries/System.Runtime.InteropServices.RuntimeInformation/src/System/Runtime/InteropServices/RuntimeInformation/RuntimeInformation.cs#L20-L30
-                string versionString = typeof(object).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-
-                // Strip the git hash if there is one
-                if (versionString != null)
-                {
-                    int plusIndex = versionString.IndexOf('+');
-                    if (plusIndex != -1)
-                    {
-                        versionString = versionString.Substring(0, plusIndex);
-                    }
-                }
-
-                return $".NET Core (Mono) {versionString}";
             }
             else if (IsNetCore)
             {
