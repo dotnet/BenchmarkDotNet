@@ -47,6 +47,16 @@ namespace BenchmarkDotNet.Reports
                 ?? (IReadOnlyDictionary<string, Metric>)ImmutableDictionary<string, Metric>.Empty;
         }
 
+        public BenchmarkReport(BenchmarkCase benchmarkCase, GenerateResult generateResult, BuildResult buildResult)
+        {
+            BenchmarkCase = benchmarkCase;
+            GenerateResult = generateResult;
+            BuildResult = buildResult;
+            ExecuteResults = Array.Empty<ExecuteResult>();
+            AllMeasurements = ImmutableList<Measurement>.Empty;
+            Metrics = ImmutableDictionary<string, Metric>.Empty;
+        }
+
         public override string ToString() => $"{BenchmarkCase.DisplayInfo}, {AllMeasurements.Count} runs";
 
         public IReadOnlyList<Measurement> GetResultRuns() => AllMeasurements.Where(r => r.Is(IterationMode.Workload, IterationStage.Result)).ToList();

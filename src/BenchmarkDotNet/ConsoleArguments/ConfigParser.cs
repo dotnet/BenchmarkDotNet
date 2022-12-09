@@ -242,6 +242,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             config.WithOption(ConfigOptions.JoinSummary, options.Join);
             config.WithOption(ConfigOptions.KeepBenchmarkFiles, options.KeepBenchmarkFiles);
+            config.WithOption(ConfigOptions.GenerateAndBuildOnly, options.GenerateAndBuildOnly);
             config.WithOption(ConfigOptions.DontOverwriteResults, options.DontOverwriteResults);
             config.WithOption(ConfigOptions.StopOnFirstError, options.StopOnFirstError);
             config.WithOption(ConfigOptions.DisableLogFile, options.DisableLogFile);

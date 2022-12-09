@@ -81,6 +81,11 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static IConfig KeepBenchmarkFiles(this IConfig config, bool value = true) => config.WithOption(ConfigOptions.KeepBenchmarkFiles, value);
 
         /// <summary>
+        /// determines if we skip executing after running generator and builder
+        /// </summary>
+        [PublicAPI] public static IConfig GenerateAndBuildOnly(this IConfig config, bool value = true) => config.WithOption(ConfigOptions.GenerateAndBuildOnly, value);
+
+        /// <summary>
         /// determines if the exported result files should not be overwritten (be default they are overwritten)
         /// </summary>
 
