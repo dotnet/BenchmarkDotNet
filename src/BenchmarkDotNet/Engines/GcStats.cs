@@ -132,7 +132,11 @@ namespace BenchmarkDotNet.Engines
 
         private static long GetAllocatedBytes()
         {
-            if (RuntimeInformation.IsMono) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
+            if (RuntimeInformation.IsOldMono) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
+                return 0;
+
+            // we have no tests for WASM and don't want to risk introducing a new bug (https://github.com/dotnet/BenchmarkDotNet/issues/2226)
+            if (RuntimeInformation.IsWasm)
                 return 0;
 
             // "This instance Int64 property returns the number of bytes that have been allocated by a specific
