@@ -267,7 +267,7 @@ namespace BenchmarkDotNet.Engines
 
         private static void EnableMonitoring()
         {
-            if (RuntimeInformation.IsMono) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono
+            if (RuntimeInformation.IsOldMono) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono
                 return;
 
             if (RuntimeInformation.IsFullFramework)

@@ -57,6 +57,11 @@ namespace BenchmarkDotNet.IntegrationTests
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
             long arraySizeOverhead = IntPtr.Size; // array length
 
+            if (toolchain is MonoToolchain)
+            {
+                objectAllocationOverhead += IntPtr.Size;
+            }
+
             AssertAllocations(toolchain, typeof(AccurateAllocations), new Dictionary<string, long>
             {
                 { nameof(AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
