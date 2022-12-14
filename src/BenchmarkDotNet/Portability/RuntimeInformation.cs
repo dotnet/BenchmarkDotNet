@@ -224,7 +224,7 @@ namespace BenchmarkDotNet.Portability
 
                 return $".NET Core (Mono) {versionString}";
             }
-            else if (IsMono)
+            else if (IsOldMono)
             {
                 var monoRuntimeType = Type.GetType("Mono.Runtime");
                 var monoDisplayName = monoRuntimeType?.GetMethod("GetDisplayName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
@@ -245,10 +245,10 @@ namespace BenchmarkDotNet.Portability
 
                     return "Mono " + version;
                 }
-                else if (IsNewMono)
-                {
-                    return $"{GetNetCoreVersion()} using MonoVM";
-                }
+            }
+            else if (IsNewMono)
+            {
+                return $"{GetNetCoreVersion()} using MonoVM";
             }
             else if (IsFullFramework)
             {
@@ -291,12 +291,14 @@ namespace BenchmarkDotNet.Portability
             //do not change the order of conditions because it may cause incorrect determination of runtime
             if (IsAot && IsMono)
                 return MonoAotLLVMRuntime.Default;
-            if (IsMono)
+            if (IsWasm)
+                return WasmRuntime.Default;
+            if (IsNewMono)
+                return MonoRuntime.GetCurrentVersion();
+            if (IsOldMono)
                 return MonoRuntime.Default;
             if (IsFullFramework)
                 return ClrRuntime.GetCurrentVersion();
-            if (IsWasm)
-                return WasmRuntime.Default;
             if (IsNetCore)
                 return CoreRuntime.GetCurrentVersion();
             if (IsNativeAOT)

@@ -43,5 +43,17 @@ namespace BenchmarkDotNet.Environments
 
         public override int GetHashCode()
             => HashCode.Combine(base.GetHashCode(), Name, CustomPath, AotArgs, MonoBclPath);
+
+        internal static Runtime GetCurrentVersion()
+        {
+            Version version = Environment.Version;
+            return version.Major switch
+            {
+                6 => Mono60,
+                7 => Mono70,
+                8 => Mono80,
+                _ => new MonoRuntime($"Mono with .NET {version.Major}.{version.Minor}", RuntimeMoniker.NotRecognized, $"net{version.Major}.{version.Minor}", isDotNetBuiltIn: true)
+            };
+        }
     }
 }
