@@ -5,10 +5,10 @@ namespace BenchmarkDotNet.Environments
 {
     public class MonoRuntime : Runtime, IEquatable<MonoRuntime>
     {
-        public static readonly MonoRuntime Default = new MonoRuntime("Mono");
-        public static readonly MonoRuntime Mono60 = new MonoRuntime("Mono with .NET 6.0", RuntimeMoniker.Mono60, "net6.0", isDotNetBuiltIn: true);
-        public static readonly MonoRuntime Mono70 = new MonoRuntime("Mono with .NET 7.0", RuntimeMoniker.Mono70, "net7.0", isDotNetBuiltIn: true);
-        public static readonly MonoRuntime Mono80 = new MonoRuntime("Mono with .NET 8.0", RuntimeMoniker.Mono80, "net8.0", isDotNetBuiltIn: true);
+        public static readonly MonoRuntime Default = new ("Mono");
+        public static readonly MonoRuntime Mono60 = new ("Mono with .NET 6.0", RuntimeMoniker.Mono60, "net6.0", isDotNetBuiltIn: true);
+        public static readonly MonoRuntime Mono70 = new ("Mono with .NET 7.0", RuntimeMoniker.Mono70, "net7.0", isDotNetBuiltIn: true);
+        public static readonly MonoRuntime Mono80 = new ("Mono with .NET 8.0", RuntimeMoniker.Mono80, "net8.0", isDotNetBuiltIn: true);
 
         public string CustomPath { get; }
 

@@ -31,9 +31,9 @@ namespace BenchmarkDotNet.Environments
         public bool IsPlatformSpecific => MsBuildMoniker.IndexOf('-') > 0;
 
         /// <summary>
-        /// use this method if you want to target .NET Core version not supported by current version of BenchmarkDotNet. Example: .NET Core 10
+        /// use this method if you want to target .NET version not supported by current version of BenchmarkDotNet. Example: .NET 10
         /// </summary>
-        /// <param name="msBuildMoniker">msbuild moniker, example: netcoreapp10.0</param>
+        /// <param name="msBuildMoniker">msbuild moniker, example: net10.0</param>
         /// <param name="displayName">display name used by BDN to print the results</param>
         /// <returns>new runtime information</returns>
         public static CoreRuntime CreateForNewVersion(string msBuildMoniker, string displayName)
