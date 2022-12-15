@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Portability;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Loggers
@@ -13,6 +14,8 @@ namespace BenchmarkDotNet.Loggers
         public static readonly ILogger Default = new ConsoleLogger();
         public static readonly ILogger Ascii = new ConsoleLogger(false);
         public static readonly ILogger Unicode = new ConsoleLogger(true);
+        private static readonly bool ConsoleSupportsColors
+            = !(RuntimeInformation.IsAndroid() || RuntimeInformation.IsIOS() || RuntimeInformation.IsWasm || RuntimeInformation.IsTvOS());
 
         private readonly bool unicodeSupport;
         private readonly Dictionary<LogKind, ConsoleColor> colorScheme;
@@ -40,6 +43,12 @@ namespace BenchmarkDotNet.Loggers
         {
             if (!unicodeSupport)
                 text = text.ToAscii();
+
+            if (!ConsoleSupportsColors)
+            {
+                write(text);
+                return;
+            }
 
             var colorBefore = Console.ForegroundColor;
 
