@@ -70,16 +70,7 @@ namespace BenchmarkDotNet.Configs
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
         public TimeSpan BuildTimeout => DefaultConfig.Instance.BuildTimeout;
 
-        public string ArtifactsPath
-        {
-            get
-            {
-                var root = RuntimeInformation.IsAndroid () ?
-                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) :
-                    Directory.GetCurrentDirectory();
-                return Path.Combine(root, "BenchmarkDotNet.Artifacts");
-            }
-        }
+        public string ArtifactsPath => null; // DefaultConfig.ArtifactsPath will be used if the user does not specify it in explicit way
 
         public CultureInfo CultureInfo => null;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => Array.Empty<BenchmarkLogicalGroupRule>();
