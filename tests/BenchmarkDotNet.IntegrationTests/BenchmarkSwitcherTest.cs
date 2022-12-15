@@ -289,6 +289,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void JobNotDefinedButStillBenchmarkIsExecuted()
         {
+            if (ContinuousIntegration.IsAppVeyorOnWindows())
+                return; // timeouts
+
             var types = new[] { typeof(JustBenchmark) };
             var switcher = new BenchmarkSwitcher(types);
             MockExporter mockExporter = new MockExporter();
