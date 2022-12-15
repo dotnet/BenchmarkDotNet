@@ -143,6 +143,16 @@ namespace BenchmarkDotNet.Portability
             Type.GetType("Foundation.NSObject, Xamarin.iOS") != null;
 #endif
 
+#if NET6_0_OR_GREATER
+        [System.Runtime.Versioning.SupportedOSPlatformGuard("tvos")]
+#endif
+        internal static bool IsTvOS() =>
+#if NET6_0_OR_GREATER
+            OperatingSystem.IsTvOS();
+#else
+            IsOSPlatform(OSPlatform.Create("TVOS"));
+#endif
+
         public static string GetOsVersion()
         {
             if (IsMacOS())
