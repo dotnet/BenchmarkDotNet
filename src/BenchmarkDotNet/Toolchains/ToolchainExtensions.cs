@@ -49,7 +49,25 @@ namespace BenchmarkDotNet.Toolchains
                     if (!string.IsNullOrEmpty(mono.AotArgs))
                         return MonoAotToolchain.Instance;
                     if (mono.IsDotNetBuiltIn)
-                        return MonoToolchain.From(new NetCoreAppSettings(targetFrameworkMoniker: mono.MsBuildMoniker, runtimeFrameworkVersion: null, name: mono.Name));
+                        if (RuntimeInformation.IsNewMono)
+                        {
+                            // It's a .NET SDK with Mono as default VM.
+                            // Publishing self-contained apps might not work like in https://github.com/dotnet/performance/issues/2787.
+                            // In such case, we are going to use default .NET toolchain that is just going to perform dotnet build,
+                            // which internally will result in creating Mono-based app.
+                            return mono.RuntimeMoniker switch
+                            {
+                                RuntimeMoniker.Mono60 => GetToolchain(RuntimeMoniker.Net60),
+                                RuntimeMoniker.Mono70 => GetToolchain(RuntimeMoniker.Net70),
+                                RuntimeMoniker.Mono80 => GetToolchain(RuntimeMoniker.Net80),
+                                _ => CsProjCoreToolchain.From(new NetCoreAppSettings(mono.MsBuildMoniker, null, mono.Name))
+                            };
+                        }
+                        else
+                        {
+                            return MonoToolchain.From(
+                                new NetCoreAppSettings(targetFrameworkMoniker: mono.MsBuildMoniker, runtimeFrameworkVersion: null, name: mono.Name));
+                        }
 
                     return RoslynToolchain.Instance;
 

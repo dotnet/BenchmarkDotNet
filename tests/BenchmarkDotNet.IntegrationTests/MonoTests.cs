@@ -3,6 +3,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.XUnit;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -27,6 +28,11 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (Type.GetType("Mono.RuntimeStructs") == null)
                 {
                     throw new Exception("This is not Mono runtime");
+                }
+
+                if (RuntimeInformation.GetCurrentRuntime() != MonoRuntime.Mono70)
+                {
+                    throw new Exception("Incorrect runtime detection");
                 }
             }
         }
