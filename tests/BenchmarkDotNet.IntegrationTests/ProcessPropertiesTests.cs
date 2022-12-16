@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 if (Process.GetCurrentProcess().ProcessorAffinity != Value)
                 {
-                    throw new InvalidOperationException("Did not set custom affinity");
+                    throw new InvalidOperationException($"Did not set custom affinity {Process.GetCurrentProcess().ProcessorAffinity} != {Value}");
                 }
             }
         }

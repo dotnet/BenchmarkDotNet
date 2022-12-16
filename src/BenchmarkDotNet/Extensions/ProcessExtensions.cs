@@ -45,7 +45,8 @@ namespace BenchmarkDotNet.Extensions
 
         private static IntPtr FixAffinity(IntPtr processorAffinity)
         {
-            int cpuMask = (1 << Environment.ProcessorCount) - 1;
+            // Max supported affinity without CPU groups is 64
+            long cpuMask = Environment.ProcessorCount >= 64 ? unchecked((long)0xFFFF_FFFF_FFFF_FFFF) : (1L << Environment.ProcessorCount) - 1;
 
             return RuntimeInformation.Is64BitPlatform()
                 ? new IntPtr(processorAffinity.ToInt64() & cpuMask)
