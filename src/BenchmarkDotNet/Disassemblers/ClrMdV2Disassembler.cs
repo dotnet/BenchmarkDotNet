@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Disassemblers
 {
@@ -309,6 +310,22 @@ namespace BenchmarkDotNet.Disassemblers
             if (!methodName.Any(c => c == '.')) // the method name does not contain namespace and type name
                 methodName = $"{method.Type.Name}.{method.Signature}";
             state.AddressToNameMapping.Add(address, methodName);
+        }
+
+        protected void FlushCachedDataIfNeeded(IDataReader dataTargetDataReader, ulong address, byte[] buffer)
+        {
+            if (!RuntimeInformation.IsWindows())
+            {
+                if (dataTargetDataReader.Read(address, buffer) <= 0)
+                {
+                    // We don't suspend the benchmark process for the time of disassembling,
+                    // as it would require sudo privileges.
+                    // Because of that, the Tiered JIT thread might still re-compile some methods
+                    // in the meantime when the host process it trying to disassemble the code.
+                    // In such case, Tiered JIT thread might create stubs which requires flushing of the cached data.
+                    dataTargetDataReader.FlushCachedData();
+                }
+            }
         }
 
         // GetMethodByInstructionPointer sometimes returns wrong methods.

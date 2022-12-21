@@ -51,6 +51,8 @@ namespace BenchmarkDotNet.Disassemblers
                             // is at an address one memory page higher than the code.
                             byte[] buffer = new byte[10];
 
+                            FlushCachedDataIfNeeded(state.Runtime.DataTarget.DataReader, address, buffer);
+
                             if (state.Runtime.DataTarget.DataReader.Read(address, buffer) == buffer.Length && buffer.SequenceEqual(callCountingStubTemplate))
                             {
                                 const ulong TargetMethodAddressSlotOffset = 8;
