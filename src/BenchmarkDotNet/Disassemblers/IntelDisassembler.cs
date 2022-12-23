@@ -4,7 +4,6 @@ using Microsoft.Diagnostics.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Disassemblers
 {
@@ -85,11 +84,7 @@ namespace BenchmarkDotNet.Disassemblers
 
                     if (address > ushort.MaxValue)
                     {
-                        // Translating an address to a method can cause AV and a process crash (https://github.com/dotnet/BenchmarkDotNet/issues/2070).
-                        // It was fixed in https://github.com/dotnet/runtime/pull/79846,
-                        // but was not backported to older runtimes yet (https://github.com/dotnet/runtime/pull/79862).
-                        // That is why we currently don't try to translate anything else than jumps and calls.
-                        if (state.RuntimeVersion.Major >= 8 || RuntimeInformation.IsWindows() || IsCallOrJump(instruction))
+                        if (!IsVulnerableToAvInDac || IsCallOrJump(instruction))
                         {
                             TryTranslateAddressToName(address, isPrestubMD, state, isIndirect, depth, currentMethod);
                         }

@@ -14,6 +14,11 @@ namespace BenchmarkDotNet.Disassemblers
     // This Disassembler uses ClrMd v2x. Please keep it in sync with ClrMdV1Disassembler (if possible).
     internal abstract class ClrMdV2Disassembler
     {
+        // Translating an address to a method can cause AV and a process crash (https://github.com/dotnet/BenchmarkDotNet/issues/2070).
+        // It was fixed in https://github.com/dotnet/runtime/pull/79846,
+        // and most likely will be backported to 7.0.2 very soon (https://github.com/dotnet/runtime/pull/79862).
+        protected static readonly bool IsVulnerableToAvInDac = !RuntimeInformation.IsWindows() && Environment.Version < new Version(7, 0, 2);
+
         internal DisassemblyResult AttachAndDisassemble(Settings settings)
         {
             using (var dataTarget = DataTarget.AttachToProcess(
@@ -271,7 +276,7 @@ namespace BenchmarkDotNet.Disassemblers
 
             if (method is null)
             {
-                if (isAddressPrecodeMD || this is not Arm64Disassembler)
+                if (isAddressPrecodeMD || !IsVulnerableToAvInDac)
                 {
                     var methodDescriptor = runtime.GetMethodByHandle(address);
                     if (!(methodDescriptor is null))
@@ -288,7 +293,7 @@ namespace BenchmarkDotNet.Disassemblers
                     }
                 }
 
-                if (this is not Arm64Disassembler)
+                if (!IsVulnerableToAvInDac)
                 {
                     var methodTableName = runtime.DacLibrary.SOSDacInterface.GetMethodTableName(address);
                     if (!string.IsNullOrEmpty(methodTableName))
