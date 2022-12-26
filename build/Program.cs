@@ -280,10 +280,11 @@ public static class DocumentationHelper
         "v0.12.1",
         "v0.13.0",
         "v0.13.1",
-        "v0.13.2"
+        "v0.13.2",
+        "v0.13.3"
     };
 
-    public const string BdnNextVersion = "v0.13.3";
+    public const string BdnNextVersion = "v0.13.4";
     public const string BdnFirstCommit = "6eda98ab1e83a0d185d09ff8b24c795711af8db1";
 }
 
@@ -445,29 +446,30 @@ public class DocFxChangelogDownloadTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        if (context.Argument("AllVersions", false))
-        {
+        // if (context.Argument("AllVersions", false))
+        // {
+        //     context.DocfxChangelogDownload(
+        //         DocumentationHelper.BdnAllVersions.First(),
+        //         DocumentationHelper.BdnFirstCommit);
+        //
+        //     for (int i = 1; i < DocumentationHelper.BdnAllVersions.Length; i++)
+        //         context.DocfxChangelogDownload(
+        //             DocumentationHelper.BdnAllVersions[i],
+        //             DocumentationHelper.BdnAllVersions[i - 1]);
+        // } else if (context.Argument("LatestVersions", false))
+        // {
+        // }
+        //
+        // if (!context.Argument("StableVersions", false))
+        //     context.DocfxChangelogDownload(
+        //         DocumentationHelper.BdnNextVersion,
+        //         DocumentationHelper.BdnAllVersions.Last(),
+        //         "HEAD");
+        
+        for (int i = DocumentationHelper.BdnAllVersions.Length - 3; i < DocumentationHelper.BdnAllVersions.Length; i++)
             context.DocfxChangelogDownload(
-                DocumentationHelper.BdnAllVersions.First(),
-                DocumentationHelper.BdnFirstCommit);
-
-            for (int i = 1; i < DocumentationHelper.BdnAllVersions.Length; i++)
-                context.DocfxChangelogDownload(
-                    DocumentationHelper.BdnAllVersions[i],
-                    DocumentationHelper.BdnAllVersions[i - 1]);
-        } else if (context.Argument("LatestVersions", false))
-        {
-            for (int i = DocumentationHelper.BdnAllVersions.Length - 2; i < DocumentationHelper.BdnAllVersions.Length; i++)
-                context.DocfxChangelogDownload(
-                    DocumentationHelper.BdnAllVersions[i],
-                    DocumentationHelper.BdnAllVersions[i - 1]);
-        }
-
-        if (!context.Argument("StableVersions", false))
-            context.DocfxChangelogDownload(
-                DocumentationHelper.BdnNextVersion,
-                DocumentationHelper.BdnAllVersions.Last(),
-                "HEAD");
+                DocumentationHelper.BdnAllVersions[i],
+                DocumentationHelper.BdnAllVersions[i - 1]);
     }
 }
 
