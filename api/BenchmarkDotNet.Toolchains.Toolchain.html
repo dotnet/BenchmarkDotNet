@@ -126,7 +126,7 @@
       <div class="level2"><a class="xref" href="BenchmarkDotNet.Toolchains.InProcess.Emit.InProcessEmitToolchain.html">InProcessEmitToolchain</a></div>
       <div class="level2"><a class="xref" href="BenchmarkDotNet.Toolchains.Mono.MonoAotToolchain.html">MonoAotToolchain</a></div>
       <div class="level2"><a class="xref" href="BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotLLVMToolChain.html">MonoAotLLVMToolChain</a></div>
-      <div class="level2"><a class="xref" href="BenchmarkDotNet.Toolchains.MonoWasm.WasmToolChain.html">WasmToolChain</a></div>
+      <div class="level2"><a class="xref" href="BenchmarkDotNet.Toolchains.MonoWasm.WasmToolchain.html">WasmToolchain</a></div>
       <div class="level2"><a class="xref" href="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.html">NativeAotToolchain</a></div>
       <div class="level2"><a class="xref" href="BenchmarkDotNet.Toolchains.Roslyn.RoslynToolchain.html">RoslynToolchain</a></div>
   </div>
@@ -315,58 +315,6 @@
   </h3>
   
   
-  <a id="BenchmarkDotNet_Toolchains_Toolchain_IsSupported_" data-uid="BenchmarkDotNet.Toolchains.Toolchain.IsSupported*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_Toolchain_IsSupported_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Characteristics_IResolver_" data-uid="BenchmarkDotNet.Toolchains.Toolchain.IsSupported(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Characteristics.IResolver)">IsSupported(BenchmarkCase, ILogger, IResolver)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></td>
-        <td><span class="parametername">benchmarkCase</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></td>
-        <td><span class="parametername">logger</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.IResolver.html">IResolver</a></td>
-        <td><span class="parametername">resolver</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
   <a id="BenchmarkDotNet_Toolchains_Toolchain_ToString_" data-uid="BenchmarkDotNet.Toolchains.Toolchain.ToString*"></a>
   <h4 id="BenchmarkDotNet_Toolchains_Toolchain_ToString" data-uid="BenchmarkDotNet.Toolchains.Toolchain.ToString">ToString()</h4>
   <div class="markdown level1 summary"></div>
@@ -392,6 +340,53 @@
   </table>
   <h5 class="overrides">Overrides</h5>
   <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring#system-object-tostring">Object.ToString()</a></div>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_Toolchain_Validate_" data-uid="BenchmarkDotNet.Toolchains.Toolchain.Validate*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_Toolchain_Validate_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Characteristics_IResolver_" data-uid="BenchmarkDotNet.Toolchains.Toolchain.Validate(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Characteristics.IResolver)">Validate(BenchmarkCase, IResolver)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;ValidationError&gt; Validate(BenchmarkCase benchmarkCase, IResolver resolver)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></td>
+        <td><span class="parametername">benchmarkCase</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Characteristics.IResolver.html">IResolver</a></td>
+        <td><span class="parametername">resolver</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a>

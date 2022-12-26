@@ -263,12 +263,12 @@ public class DisassemblyDiagnoserAttribute : Attribute, IConfigSource</code></pr
   
   
   <a id="BenchmarkDotNet_Attributes_DisassemblyDiagnoserAttribute__ctor_" data-uid="BenchmarkDotNet.Attributes.DisassemblyDiagnoserAttribute.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Attributes_DisassemblyDiagnoserAttribute__ctor_System_Int32_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_String___" data-uid="BenchmarkDotNet.Attributes.DisassemblyDiagnoserAttribute.#ctor(System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.String[])">DisassemblyDiagnoserAttribute(Int32, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String[])</h4>
+  <h4 id="BenchmarkDotNet_Attributes_DisassemblyDiagnoserAttribute__ctor_System_Int32_BenchmarkDotNet_Diagnosers_DisassemblySyntax_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_String___" data-uid="BenchmarkDotNet.Attributes.DisassemblyDiagnoserAttribute.#ctor(System.Int32,BenchmarkDotNet.Diagnosers.DisassemblySyntax,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.String[])">DisassemblyDiagnoserAttribute(Int32, DisassemblySyntax, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String[])</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DisassemblyDiagnoserAttribute(int maxDepth = 1, bool printSource = false, bool printInstructionAddresses = false, bool exportGithubMarkdown = true, bool exportHtml = false, bool exportCombinedDisassemblyReport = false, bool exportDiff = false, params string[] filters)</code></pre>
+    <pre><code class="lang-csharp hljs">public DisassemblyDiagnoserAttribute(int maxDepth = 1, DisassemblySyntax syntax = DisassemblySyntax.Masm, bool printSource = false, bool printInstructionAddresses = false, bool exportGithubMarkdown = true, bool exportHtml = false, bool exportCombinedDisassemblyReport = false, bool exportDiff = false, params string[] filters)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -284,6 +284,12 @@ public class DisassemblyDiagnoserAttribute : Attribute, IConfigSource</code></pr
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a></td>
         <td><span class="parametername">maxDepth</span></td>
         <td><p>Includes called methods to given level. 1 by default, indexed from 1. To print just the benchmark set it to 0.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Diagnosers.DisassemblySyntax.html">DisassemblySyntax</a></td>
+        <td><span class="parametername">syntax</span></td>
+        <td><p>The disassembly syntax. MASM is the default.</p>
 </td>
       </tr>
       <tr>

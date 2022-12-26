@@ -145,7 +145,7 @@
       <a class="xref" href="BenchmarkDotNet.Toolchains.Toolchain.html#BenchmarkDotNet_Toolchains_Toolchain_IsInProcess">Toolchain.IsInProcess</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Toolchains.Toolchain.html#BenchmarkDotNet_Toolchains_Toolchain_IsSupported_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Characteristics_IResolver_">Toolchain.IsSupported(BenchmarkCase, ILogger, IResolver)</a>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.Toolchain.html#BenchmarkDotNet_Toolchains_Toolchain_Validate_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Characteristics_IResolver_">Toolchain.Validate(BenchmarkCase, IResolver)</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.Toolchain.html#BenchmarkDotNet_Toolchains_Toolchain_ToString">Toolchain.ToString()</a>
@@ -187,12 +187,37 @@
   
   
   <h4 id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchain_Net70" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.Net70">Net70</h4>
-  <div class="markdown level1 summary"><p>compiled as net7.0, targets latest (7.0.0-*) NativeAOT build from the .NET 7 feed: <a href="https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json">https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json</a></p>
+  <div class="markdown level1 summary"><p>compiled as net7.0, targets latest NativeAOT build from the NuGet.org feed</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly IToolchain Net70</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchain_Net80" data-uid="BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.Net80">Net80</h4>
+  <div class="markdown level1 summary"><p>compiled as net8.0, targets latest NativeAOT build from the .NET 8 feed: <a href="https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet8/nuget/v3/index.json">https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet8/nuget/v3/index.json</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly IToolchain Net80</code></pre>
   </div>
   <h5 class="fieldValue">Field Value</h5>
   <table class="table table-bordered table-striped table-condensed">

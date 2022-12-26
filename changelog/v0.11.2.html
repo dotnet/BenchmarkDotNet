@@ -174,7 +174,7 @@ We are very grateful to all the contributors who spent their time to help us mak
 <hr>
 <h2 id="diagnosers">Diagnosers</h2>
 <h3 id="etwprofiler">EtwProfiler</h3>
-<p><code>EtwProfiler</code> allows to profile the benchmarked .NET code on Windows and exports the data to a trace file which can be opened with <a href="https://github.com/Microsoft/perfview">PerfView</a> or <a href="https://docs.microsoft.com/en-us/windows-hardware/test/wpt/windows-performance-analyzer">Windows Performance Analyzer</a>.</p>
+<p><code>EtwProfiler</code> allows to profile the benchmarked .NET code on Windows and exports the data to a trace file which can be opened with <a href="https://github.com/Microsoft/perfview">PerfView</a> or <a href="https://learn.microsoft.com/windows-hardware/test/wpt/windows-performance-analyzer">Windows Performance Analyzer</a>.</p>
 <p><code>EtwProfiler</code> uses <code>TraceEvent</code> library which internally uses Event Tracing for Windows (ETW) to capture stack traces and important .NET Runtime events.
 Before the process with benchmarked code is started, EtwProfiler starts User and Kernel ETW sessions. Every session writes data to it's own file and captures different data. User session listens for the .NET Runtime events (GC, JIT etc) while the Kernel session gets CPU stacks and Hardware Counter events. After this, the process with benchmarked code is started. During the benchmark execution all the data is captured and written to a trace file. Moreover, BenchmarkDotNet Engine emits it's own events to be able to differentiate jitting, warmup, pilot and actual workload when analyzing the trace file. When the benchmarking is over, both sessions are closed and the two trace files are merged into one.</p>
 <p><img src="https://adamsitnik.com/images/etwprofiler/flamegraph.png" alt=""></p>
@@ -234,7 +234,7 @@ public class IntroNuGet
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2e398c89561b3b1c89ec64b94f656ae20236efd1">2e398c</a> detect .NET Core 3.0 and use the appropriate target framework moniker, fixes ... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 </ul>
 <h3 id="deferred-execution-validator">Deferred Execution Validator</h3>
-<p>In LINQ, execution of a query is usually <a href="https://blogs.msdn.microsoft.com/charlie/2007/12/10/linq-and-deferred-execution/">deferred</a> until the moment when you actually request the data. If your benchmark just returns <code>IEnumerable</code> or <code>IQueryable</code> it's not measuring the execution of the query, just the creation.</p>
+<p>In LINQ, execution of a query is usually <a href="https://learn.microsoft.com/dotnet/standard/linq/deferred-execution-example">deferred</a> until the moment when you actually request the data. If your benchmark just returns <code>IEnumerable</code> or <code>IQueryable</code> it's not measuring the execution of the query, just the creation.</p>
 <p>This is why we decided to warn you about this issue whenever it happens:</p>
 <pre><code class="lang-log">Benchmark IntroDeferredExecution.Wrong returns a deferred execution result (IEnumerable&lt;Int32&gt;). You need to either change the method declaration to return a materialized result or consume it on your own. You can use .Consume() extension method to do that.
 </code></pre>

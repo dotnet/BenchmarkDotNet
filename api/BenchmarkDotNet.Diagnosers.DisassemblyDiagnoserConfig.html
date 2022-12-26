@@ -133,12 +133,12 @@
   
   
   <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig__ctor_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig__ctor_System_Int32_System_String___Iced_Intel_Formatter_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Boolean_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.#ctor(System.Int32,System.String[],Iced.Intel.Formatter,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">DisassemblyDiagnoserConfig(Int32, String[], Formatter, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean)</h4>
+  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig__ctor_System_Int32_BenchmarkDotNet_Diagnosers_DisassemblySyntax_System_String___Iced_Intel_FormatterOptions_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Boolean_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.#ctor(System.Int32,BenchmarkDotNet.Diagnosers.DisassemblySyntax,System.String[],Iced.Intel.FormatterOptions,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">DisassemblyDiagnoserConfig(Int32, DisassemblySyntax, String[], FormatterOptions, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DisassemblyDiagnoserConfig(int maxDepth = 1, string[] filters = null, Formatter formatter = null, bool printSource = false, bool printInstructionAddresses = false, bool exportGithubMarkdown = true, bool exportHtml = false, bool exportCombinedDisassemblyReport = false, bool exportDiff = false)</code></pre>
+    <pre><code class="lang-csharp hljs">public DisassemblyDiagnoserConfig(int maxDepth = 1, DisassemblySyntax syntax = DisassemblySyntax.Masm, string[] filters = null, FormatterOptions formatterOptions = null, bool printSource = false, bool printInstructionAddresses = false, bool exportGithubMarkdown = true, bool exportHtml = false, bool exportCombinedDisassemblyReport = false, bool exportDiff = false)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -157,15 +157,21 @@
 </td>
       </tr>
       <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Diagnosers.DisassemblySyntax.html">DisassemblySyntax</a></td>
+        <td><span class="parametername">syntax</span></td>
+        <td><p>The disassembly syntax. MASM is the default.</p>
+</td>
+      </tr>
+      <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a>[]</td>
         <td><span class="parametername">filters</span></td>
         <td><p>Glob patterns applied to full method signatures by the the disassembler.</p>
 </td>
       </tr>
       <tr>
-        <td><span class="xref">Iced.Intel.Formatter</span></td>
-        <td><span class="parametername">formatter</span></td>
-        <td><p>Assembly code formatter. If not provided, MasmFormatter with the recommended settings will be used.</p>
+        <td><span class="xref">Iced.Intel.FormatterOptions</span></td>
+        <td><span class="parametername">formatterOptions</span></td>
+        <td><p>Code formatter options. If not provided, the recommended settings will be used.</p>
 </td>
       </tr>
       <tr>
@@ -335,6 +341,31 @@
   </table>
   
   
+  <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_Formatting_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.Formatting*"></a>
+  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_Formatting" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.Formatting">Formatting</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FormatterOptions Formatting { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Iced.Intel.FormatterOptions</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_MaxDepth_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.MaxDepth*"></a>
   <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_MaxDepth" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.MaxDepth">MaxDepth</h4>
   <div class="markdown level1 summary"></div>
@@ -404,6 +435,31 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_Syntax_" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.Syntax*"></a>
+  <h4 id="BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig_Syntax" data-uid="BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.Syntax">Syntax</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DisassemblySyntax Syntax { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Diagnosers.DisassemblySyntax.html">DisassemblySyntax</a></td>
         <td></td>
       </tr>
     </tbody>

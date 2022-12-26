@@ -114,7 +114,7 @@
 <ul>
 <li><p><strong>Q</strong> Why can't I install BenchmarkDotNet in Visual Studio 2010/2012/2013?</p>
 <p><strong>A</strong> BenchmarkDotNet requires NuGet 3.x+ and can't be installed in old versions of Visual Studio which use NuGet 2.x.
-Consider to use Visual Studio 2015/2017 or <a href="http://jetbrains.com/rider/">Rider</a>.
+Consider to use Visual Studio 2015/2017 or <a href="https://www.jetbrains.com/rider/">Rider</a>.
 See also: <a href="https://github.com/dotnet/BenchmarkDotNet/issues/237">BenchmarkDotNet#237</a>, <a href="https://github.com/dotnet/roslyn/issues/12780">roslyn#12780</a>.</p>
 </li>
 <li><p><strong>Q</strong> Why can't I install BenchmarkDotNet in a new .NET Core Console App in Visual Studio 2017?</p>
@@ -140,7 +140,7 @@ Due to the fact that users usually run benchmarks in a develop environment and d
 <p><strong>A</strong> By default, BenchmarkDotNet automatically chooses a number of iterations which allows achieving the best precision.
 If you don't need such level of precision and just want to have a quick way to get approximated results, you can specify all parameters manually.
 For example, you can use the <code>SimpleJob</code> or <code>ShortRunJob</code> attributes:</p>
-<pre><code class="lang-cs">[SimpleJob(launchCount: 1, warmupCount: 3, targetCount: 5, invocationCount:100, id: &quot;QuickJob&quot;)]
+<pre><code class="lang-cs">[SimpleJob(launchCount: 1, warmupCount: 3, iterationCount: 5, invocationCount:100, id: &quot;QuickJob&quot;)]
 [ShortRunJob]
 </code></pre>
 </li>

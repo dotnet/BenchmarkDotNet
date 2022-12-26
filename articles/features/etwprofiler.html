@@ -111,7 +111,7 @@
             <article class="content wrap" id="_content" data-uid="docs.etwprofiler">
 <h1 id="etwprofiler">EtwProfiler</h1>
 
-<p><code>EtwProfiler</code> allows to profile the benchmarked .NET code on Windows and exports the data to a trace file which can be opened with <a href="https://github.com/Microsoft/perfview">PerfView</a> or <a href="https://docs.microsoft.com/en-us/windows-hardware/test/wpt/windows-performance-analyzer">Windows Performance Analyzer</a>.</p>
+<p><code>EtwProfiler</code> allows to profile the benchmarked .NET code on Windows and exports the data to a trace file which can be opened with <a href="https://github.com/Microsoft/perfview">PerfView</a> or <a href="https://learn.microsoft.com/windows-hardware/test/wpt/windows-performance-analyzer">Windows Performance Analyzer</a>.</p>
 <p><img src="https://adamsitnik.com/images/etwprofiler/flamegraph.png" alt=""></p>
 <h2 id="how-it-works">How it works</h2>
 <p><code>EtwProfiler</code> uses <code>TraceEvent</code> library which internally uses Event Tracing for Windows (ETW) to capture stack traces and important .NET Runtime events.</p>
@@ -127,6 +127,12 @@
 <pre><code class="lang-xml">&lt;DebugType&gt;pdbonly&lt;/DebugType&gt;
 &lt;DebugSymbols&gt;true&lt;/DebugSymbols&gt;
 </code></pre>
+<div class="NOTE">
+<h5>Note</h5>
+<p>On certain machines <a href="https://www.microsoft.com/en-us/security/blog/2021/04/26/defending-against-cryptojacking-with-microsoft-defender-for-endpoint-and-intel-tdt/">Intel TDT and Windows Defender</a> can cause CPU samples to be captured with no value.
+You can correct this problem by disabling the feature using <code>powershell.exe Set-MpPreference -DisableTDTFeature $true</code>.
+<em>WARNING:</em> Disabling security features will make your machine less secure; do so at your own risk.</p>
+</div>
 <h2 id="how-to-use-it">How to use it?</h2>
 <p>You need to install <code>BenchmarkDotNet.Diagnostics.Windows</code> package.</p>
 <p>It can be enabled in few ways, some of them:</p>

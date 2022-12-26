@@ -140,12 +140,12 @@
   
   
   <a id="BenchmarkDotNet_Engines_RunResults__ctor_" data-uid="BenchmarkDotNet.Engines.RunResults.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Engines_RunResults__ctor_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Reports_Measurement__System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Reports_Measurement__Perfolizer_Mathematics_OutlierDetection_OutlierMode_BenchmarkDotNet_Engines_GcStats_BenchmarkDotNet_Engines_ThreadingStats_" data-uid="BenchmarkDotNet.Engines.RunResults.#ctor(System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Reports.Measurement},System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Reports.Measurement},Perfolizer.Mathematics.OutlierDetection.OutlierMode,BenchmarkDotNet.Engines.GcStats,BenchmarkDotNet.Engines.ThreadingStats)">RunResults(IReadOnlyList&lt;Measurement&gt;, IReadOnlyList&lt;Measurement&gt;, OutlierMode, GcStats, ThreadingStats)</h4>
+  <h4 id="BenchmarkDotNet_Engines_RunResults__ctor_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Reports_Measurement__Perfolizer_Mathematics_OutlierDetection_OutlierMode_BenchmarkDotNet_Engines_GcStats_BenchmarkDotNet_Engines_ThreadingStats_System_Double_" data-uid="BenchmarkDotNet.Engines.RunResults.#ctor(System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Reports.Measurement},Perfolizer.Mathematics.OutlierDetection.OutlierMode,BenchmarkDotNet.Engines.GcStats,BenchmarkDotNet.Engines.ThreadingStats,System.Double)">RunResults(IReadOnlyList&lt;Measurement&gt;, OutlierMode, GcStats, ThreadingStats, Double)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public RunResults(IReadOnlyList&lt;Measurement&gt; overhead, IReadOnlyList&lt;Measurement&gt; workload, OutlierMode outlierMode, GcStats gcStats, ThreadingStats threadingStats)</code></pre>
+    <pre><code class="lang-csharp hljs">public RunResults(IReadOnlyList&lt;Measurement&gt; engineMeasurements, OutlierMode outlierMode, GcStats gcStats, ThreadingStats threadingStats, double exceptionFrequency)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -159,12 +159,7 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Reports.Measurement.html">Measurement</a>&gt;</td>
-        <td><span class="parametername">overhead</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Reports.Measurement.html">Measurement</a>&gt;</td>
-        <td><span class="parametername">workload</span></td>
+        <td><span class="parametername">engineMeasurements</span></td>
         <td></td>
       </tr>
       <tr>
@@ -182,10 +177,65 @@
         <td><span class="parametername">threadingStats</span></td>
         <td></td>
       </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">Double</a></td>
+        <td><span class="parametername">exceptionFrequency</span></td>
+        <td></td>
+      </tr>
     </tbody>
   </table>
   <h3 id="properties">Properties
   </h3>
+  
+  
+  <a id="BenchmarkDotNet_Engines_RunResults_EngineMeasurements_" data-uid="BenchmarkDotNet.Engines.RunResults.EngineMeasurements*"></a>
+  <h4 id="BenchmarkDotNet_Engines_RunResults_EngineMeasurements" data-uid="BenchmarkDotNet.Engines.RunResults.EngineMeasurements">EngineMeasurements</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly IReadOnlyList&lt;Measurement&gt; EngineMeasurements { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Reports.Measurement.html">Measurement</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Engines_RunResults_ExceptionFrequency_" data-uid="BenchmarkDotNet.Engines.RunResults.ExceptionFrequency*"></a>
+  <h4 id="BenchmarkDotNet_Engines_RunResults_ExceptionFrequency" data-uid="BenchmarkDotNet.Engines.RunResults.ExceptionFrequency">ExceptionFrequency</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly double ExceptionFrequency { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">Double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   
   
   <a id="BenchmarkDotNet_Engines_RunResults_GCStats_" data-uid="BenchmarkDotNet.Engines.RunResults.GCStats*"></a>
@@ -290,13 +340,38 @@
   </h3>
   
   
-  <a id="BenchmarkDotNet_Engines_RunResults_GetMeasurements_" data-uid="BenchmarkDotNet.Engines.RunResults.GetMeasurements*"></a>
-  <h4 id="BenchmarkDotNet_Engines_RunResults_GetMeasurements" data-uid="BenchmarkDotNet.Engines.RunResults.GetMeasurements">GetMeasurements()</h4>
+  <a id="BenchmarkDotNet_Engines_RunResults_GetAllMeasurements_" data-uid="BenchmarkDotNet.Engines.RunResults.GetAllMeasurements*"></a>
+  <h4 id="BenchmarkDotNet_Engines_RunResults_GetAllMeasurements" data-uid="BenchmarkDotNet.Engines.RunResults.GetAllMeasurements">GetAllMeasurements()</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IEnumerable&lt;Measurement&gt; GetMeasurements()</code></pre>
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;Measurement&gt; GetAllMeasurements()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Reports.Measurement.html">Measurement</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Engines_RunResults_GetWorkloadResultMeasurements_" data-uid="BenchmarkDotNet.Engines.RunResults.GetWorkloadResultMeasurements*"></a>
+  <h4 id="BenchmarkDotNet_Engines_RunResults_GetWorkloadResultMeasurements" data-uid="BenchmarkDotNet.Engines.RunResults.GetWorkloadResultMeasurements">GetWorkloadResultMeasurements()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;Measurement&gt; GetWorkloadResultMeasurements()</code></pre>
   </div>
   <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">

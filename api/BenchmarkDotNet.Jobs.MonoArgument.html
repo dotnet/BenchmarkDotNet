@@ -125,6 +125,10 @@ example: new MonoArgument(&quot;--gc=sgen&quot;)</p>
     <div class="level1"><a class="xref" href="BenchmarkDotNet.Jobs.Argument.html">Argument</a></div>
     <div class="level2"><span class="xref">MonoArgument</span></div>
   </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.Argument.html">Argument</a>&gt;</div>
+  </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -133,12 +137,21 @@ example: new MonoArgument(&quot;--gc=sgen&quot;)</p>
     <div>
       <a class="xref" href="BenchmarkDotNet.Jobs.Argument.html#BenchmarkDotNet_Jobs_Argument_ToString">Argument.ToString()</a>
     </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Jobs.Argument.html#BenchmarkDotNet_Jobs_Argument_Equals_BenchmarkDotNet_Jobs_Argument_">Argument.Equals(Argument)</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Jobs.Argument.html#BenchmarkDotNet_Jobs_Argument_Equals_System_Object_">Argument.Equals(Object)</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Jobs.Argument.html#BenchmarkDotNet_Jobs_Argument_GetHashCode">Argument.GetHashCode()</a>
+    </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Jobs.html">BenchmarkDotNet.Jobs</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Jobs_MonoArgument_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class MonoArgument : Argument</code></pre>
+    <pre><code class="lang-csharp hljs">public class MonoArgument : Argument, IEquatable&lt;Argument&gt;</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -169,6 +182,10 @@ example: new MonoArgument(&quot;--gc=sgen&quot;)</p>
       </tr>
     </tbody>
   </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iequatable-1">System.IEquatable&lt;T&gt;</a>
+  </div>
 </article>
           </div>
           

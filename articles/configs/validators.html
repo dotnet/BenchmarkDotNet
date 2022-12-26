@@ -116,7 +116,7 @@ If any of the validation errors is critical, then none of the benchmarks will ge
 <p>Available validators are:</p>
 <ul>
 <li><code>BaselineValidator.FailOnError</code> - it checks if more than 1 Benchmark per class has <code>Baseline = true</code> applied. This validator is mandatory.</li>
-<li><code>JitOptimizationsValidator.(Dont)FailOnError</code> - it checks whether any of the referenced assemblies is non-optimized. DontFailOnError version is enabled by default.</li>
+<li><code>JitOptimizationsValidator.(Dont)FailOnError</code> - it checks whether any of the referenced assemblies is non-optimized. <code>DontFailOnError</code> version is enabled by default.</li>
 <li><code>ExecutionValidator.(Dont)FailOnError</code> - it checks if it is possible to run your benchmarks by executing each of them once. Optional.</li>
 <li><code>ReturnValueValidator.(Dont)FailOnError</code> - it checks if non-void benchmarks return equal values. Optional.</li>
 </ul>

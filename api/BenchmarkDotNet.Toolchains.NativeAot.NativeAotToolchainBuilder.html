@@ -560,7 +560,7 @@ Based on <a href="https://github.com/dotnet/runtimelab/blob/d0a37893a67c125f9b0c
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public NativeAotToolchainBuilder UseNuGet(string microsoftDotNetILCompilerVersion = &quot;7.0.0-*&quot;, string nuGetFeedUrl = &quot;https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json&quot;)</code></pre>
+    <pre><code class="lang-csharp hljs">public NativeAotToolchainBuilder UseNuGet(string microsoftDotNetILCompilerVersion = &quot;&quot;, string nuGetFeedUrl = &quot;https://api.nuget.org/v3/index.json&quot;)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -575,13 +575,13 @@ Based on <a href="https://github.com/dotnet/runtimelab/blob/d0a37893a67c125f9b0c
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">microsoftDotNetILCompilerVersion</span></td>
-        <td><p>the version of Microsoft.DotNet.ILCompiler which should be used. The default is: &quot;7.0.0-*&quot;</p>
+        <td><p>the version of Microsoft.DotNet.ILCompiler which should be used. The default is empty which maps to latest version.</p>
 </td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
         <td><span class="parametername">nuGetFeedUrl</span></td>
-        <td><p>url to NuGet feed, The default is: &quot;https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json&quot;</p>
+        <td><p>url to NuGet feed, The default is: &quot;https://api.nuget.org/v3/index.json&quot;</p>
 </td>
       </tr>
     </tbody>

@@ -262,6 +262,32 @@ public FileInfo AOTCompilerPath { get; set; }</code></pre>
   </table>
   
   
+  <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_ApplesToApples_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.ApplesToApples*"></a>
+  <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_ApplesToApples" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.ApplesToApples">ApplesToApples</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Option(&quot;apples&quot;, Required = false, Default = false, HelpText = &quot;Runs apples-to-apples comparison for specified Jobs.&quot;)]
+public bool ApplesToApples { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_ArtifactsDirectory_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.ArtifactsDirectory*"></a>
   <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_ArtifactsDirectory" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.ArtifactsDirectory">ArtifactsDirectory</h4>
   <div class="markdown level1 summary"></div>
@@ -841,7 +867,7 @@ public DirectoryInfo IlcPackages { get; set; }</code></pre>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">[Option(&quot;invocationCount&quot;, Required = false, HelpText = &quot;Invocation count in a single iteration. By default calculated by the heuristic.&quot;)]
-public int? InvocationCount { get; set; }</code></pre>
+public long? InvocationCount { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -853,7 +879,7 @@ public int? InvocationCount { get; set; }</code></pre>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.nullable-1">Nullable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a>&gt;</td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.nullable-1">Nullable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">Int64</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -1224,6 +1250,58 @@ public FileInfo MonoPath { get; set; }</code></pre>
   </table>
   
   
+  <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_NoEvaluationOverhead_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.NoEvaluationOverhead*"></a>
+  <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_NoEvaluationOverhead" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.NoEvaluationOverhead">NoEvaluationOverhead</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Option(&quot;noOverheadEvaluation&quot;, Required = false, HelpText = &quot;Specifying would not run the evaluation overhead iterations.&quot;)]
+public bool NoEvaluationOverhead { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_NoForcedGCs_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.NoForcedGCs*"></a>
+  <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_NoForcedGCs" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.NoForcedGCs">NoForcedGCs</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Option(&quot;noForcedGCs&quot;, Required = false, HelpText = &quot;Specifying would not forcefully induce any GCs.&quot;)]
+public bool NoForcedGCs { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_Outliers_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.Outliers*"></a>
   <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_Outliers" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.Outliers">Outliers</h4>
   <div class="markdown level1 summary"></div>
@@ -1348,6 +1426,32 @@ public DirectoryInfo RestorePath { get; set; }</code></pre>
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.directoryinfo">DirectoryInfo</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_Resume_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.Resume*"></a>
+  <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_Resume" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.Resume">Resume</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Option(&quot;resume&quot;, Required = false, Default = false, HelpText = &quot;Continue the execution if the last run was stopped.&quot;)]
+public bool Resume { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -1570,6 +1674,32 @@ public int? UnrollFactor { get; set; }</code></pre>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">[Option('d', &quot;disasm&quot;, Required = false, Default = false, HelpText = &quot;Gets disassembly of benchmarked code&quot;)]
 public bool UseDisassemblyDiagnoser { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_UseExceptionDiagnoser_" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.UseExceptionDiagnoser*"></a>
+  <h4 id="BenchmarkDotNet_ConsoleArguments_CommandLineOptions_UseExceptionDiagnoser" data-uid="BenchmarkDotNet.ConsoleArguments.CommandLineOptions.UseExceptionDiagnoser">UseExceptionDiagnoser</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Option(&quot;exceptions&quot;, Required = false, Default = false, HelpText = &quot;Prints exception statistics&quot;)]
+public bool UseExceptionDiagnoser { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">

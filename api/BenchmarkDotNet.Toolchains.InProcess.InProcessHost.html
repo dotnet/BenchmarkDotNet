@@ -126,12 +126,13 @@
   <div class="implements">
     <h5>Implements</h5>
     <div><a class="xref" href="BenchmarkDotNet.Engines.IHost.html">IHost</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.InProcess.html">BenchmarkDotNet.Toolchains.InProcess</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Toolchains_InProcess_InProcessHost_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class InProcessHost : IHost</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class InProcessHost : IHost, IDisposable</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -260,6 +261,16 @@
   </table>
   <h3 id="methods">Methods
   </h3>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_InProcess_InProcessHost_Dispose_" data-uid="BenchmarkDotNet.Toolchains.InProcess.InProcessHost.Dispose*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_InProcess_InProcessHost_Dispose" data-uid="BenchmarkDotNet.Toolchains.InProcess.InProcessHost.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
   
   
   <a id="BenchmarkDotNet_Toolchains_InProcess_InProcessHost_ReportResults_" data-uid="BenchmarkDotNet.Toolchains.InProcess.InProcessHost.ReportResults*"></a>
@@ -417,6 +428,9 @@
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="BenchmarkDotNet.Engines.IHost.html">IHost</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">System.IDisposable</a>
   </div>
   <h3 id="extensionmethods">Extension Methods</h3>
   <div>

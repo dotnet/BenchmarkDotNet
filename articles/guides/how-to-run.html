@@ -122,8 +122,8 @@ var summary = BenchmarkRunner.Run(typeof(MyBenchmarkClass));
 <p>If you have more types and you want to choose which benchmark to run (either by using console line arguments or console input) you should use <code>BenchmarkSwitcher</code>:</p>
 <pre><code class="lang-cs">static void Main(string[] args) =&gt; BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
 </code></pre>
-<p>Also you can use the config command style to specify some config from command line (more @docs.console-args):</p>
-<pre><code class="lang-log">dotnet run -c Release -- --job short --runtimes net461 netcoreapp21--filter *BenchmarkClass1*
+<p>Also you can use the config command style to specify some config from command line (more <a class="xref" href="console-args.html">How to use console arguments</a>):</p>
+<pre><code class="lang-log">dotnet run -c Release -- --job short --runtimes net472 net7.0 --filter *BenchmarkClass1*
 </code></pre>
 <p>The most important thing about <code>BenchmarkSwitcher</code> is that you need to pass the <code>args</code> from <code>Main</code> to the <code>Run</code> method. If you don't, it won't parse the arguments.</p>
 <h2 id="url">Url</h2>

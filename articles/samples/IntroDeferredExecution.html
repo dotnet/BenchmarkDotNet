@@ -111,7 +111,7 @@
             <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Samples.IntroDeferredExecution">
 <h2 id="sample-introdeferredexecution">Sample: IntroDeferredExecution</h2>
 
-<p>In LINQ, execution of a query is usually <a href="https://blogs.msdn.microsoft.com/charlie/2007/12/10/linq-and-deferred-execution/">deferred</a> until the moment when you actually request the data. If your benchmark just returns <code>IEnumerable</code> or <code>IQueryable</code> it's not measuring the execution of the query, just the creation.</p>
+<p>In LINQ, execution of a query is usually <a href="https://learn.microsoft.com/dotnet/standard/linq/deferred-execution-example">deferred</a> until the moment when you actually request the data. If your benchmark just returns <code>IEnumerable</code> or <code>IQueryable</code> it's not measuring the execution of the query, just the creation.</p>
 <p>This is why we decided to warn you about this issue whenever it happens:</p>
 <pre><code class="lang-log">Benchmark IntroDeferredExecution.Wrong returns a deferred execution result (IEnumerable&lt;Int32&gt;). You need to either change the method declaration to return a materialized result or consume it on your own. You can use .Consume() extension method to do that.
 </code></pre>

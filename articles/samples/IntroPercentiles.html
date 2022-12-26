@@ -119,7 +119,7 @@ However, real-world scenarios often have so-called long tail distribution
 <p>The percentiles allow to include the tail of distribution into the comparison.
 However, it requires some preparations steps.
 At first, you should have enough runs to count percentiles from.
-The <code>TargetCount</code> in the config should be set to 10-20 runs at least.</p>
+The <code>IterationCount</code> in the config should be set to 10-20 runs at least.</p>
 <p>Second, the count of iterations for each run should not be very high, or the peak timings will be averaged.
 The <code>IterationTime = 25</code> works fine for most cases;
 for long-running benchmarks the <code>Mode = Mode.SingleRun</code> will be the best choice.
@@ -193,7 +193,7 @@ There're predefined <code>StatisticColumn.P0</code>..<code>StatisticColumn.P100<
 <p>Also, it's very easy to screw the results with incorrect setup. For example, the same code being run with</p>
 <pre><code class="lang-cs">new Job
 {
-	TargetCount = 5,
+	IterationCount = 5,
 	IterationTime = 500
 }
 </code></pre>
@@ -265,7 +265,7 @@ namespace BenchmarkDotNet.Samples
     // Using percentiles for adequate timings representation
     [Config(typeof(Config))]
     [SimpleJob(RunStrategy.ColdStart, launchCount: 4,
-        warmupCount: 3, targetCount: 20, id: &quot;MyJob&quot;)]
+        warmupCount: 3, iterationCount: 20, id: &quot;MyJob&quot;)]
     public class IntroPercentiles
     {
         // To share between runs.

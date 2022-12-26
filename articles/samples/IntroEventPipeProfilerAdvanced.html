@@ -112,7 +112,7 @@
 <h2 id="sample-eventpipeprofileradvanced">Sample: EventPipeProfilerAdvanced</h2>
 
 <p>The most advanced and powerful way to use <code>EventPipeProfiler</code> is a custom configuration. As you can see the below configuration adds <code>EventPipeProfiler</code> that constructor can take the profile and/or a list of providers.
-Both <code>EventPipeProfiler</code> and <code>dotnet trace</code> use the <code>Microsoft.Diagnostics.NETCore.Client</code> package internally. So before you start using the custom configuration of this profiler, it is worth reading the documentation <a href="https://github.com/dotnet/diagnostics/blob/master/documentation/dotnet-trace-instructions.md">here</a> and <a href="https://docs.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-trace#dotnet-trace-collect">here</a> where you can find more information about how to configure provider list.</p>
+Both <code>EventPipeProfiler</code> and <code>dotnet trace</code> use the <code>Microsoft.Diagnostics.NETCore.Client</code> package internally. So before you start using the custom configuration of this profiler, it is worth reading the documentation <a href="https://github.com/dotnet/diagnostics/blob/main/documentation/dotnet-trace-instructions.md">here</a> and <a href="https://learn.microsoft.com/dotnet/core/diagnostics/dotnet-trace#dotnet-trace-collect">here</a> where you can find more information about how to configure provider list.</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="EventPipeProfilerAdvanced.cs">using System.Buffers;
 using System.Diagnostics.Tracing;

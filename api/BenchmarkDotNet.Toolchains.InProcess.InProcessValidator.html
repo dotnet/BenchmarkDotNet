@@ -219,13 +219,13 @@ to proof that the config matches the environment.</p>
   </h3>
   
   
-  <a id="BenchmarkDotNet_Toolchains_InProcess_InProcessValidator_IsSupported_" data-uid="BenchmarkDotNet.Toolchains.InProcess.InProcessValidator.IsSupported*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_InProcess_InProcessValidator_IsSupported_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Loggers_ILogger_" data-uid="BenchmarkDotNet.Toolchains.InProcess.InProcessValidator.IsSupported(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Loggers.ILogger)">IsSupported(BenchmarkCase, ILogger)</h4>
+  <a id="BenchmarkDotNet_Toolchains_InProcess_InProcessValidator_Validate_" data-uid="BenchmarkDotNet.Toolchains.InProcess.InProcessValidator.Validate*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_InProcess_InProcessValidator_Validate_BenchmarkDotNet_Running_BenchmarkCase_" data-uid="BenchmarkDotNet.Toolchains.InProcess.InProcessValidator.Validate(BenchmarkDotNet.Running.BenchmarkCase)">Validate(BenchmarkCase)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public static IEnumerable&lt;ValidationError&gt; Validate(BenchmarkCase benchmarkCase)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -242,11 +242,6 @@ to proof that the config matches the environment.</p>
         <td><span class="parametername">benchmarkCase</span></td>
         <td></td>
       </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></td>
-        <td><span class="parametername">logger</span></td>
-        <td></td>
-      </tr>
     </tbody>
   </table>
   <h5 class="returns">Returns</h5>
@@ -259,7 +254,7 @@ to proof that the config matches the environment.</p>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>

@@ -123,7 +123,7 @@ namespace BenchmarkDotNet.Samples
     [StatisticalTestColumn(StatisticalTestKind.MannWhitney, ThresholdUnit.Microseconds, 1, true)]
     [StatisticalTestColumn(StatisticalTestKind.Welch, ThresholdUnit.Ratio, 0.03, true)]
     [StatisticalTestColumn(StatisticalTestKind.MannWhitney, ThresholdUnit.Ratio, 0.03, true)]
-    [SimpleJob(warmupCount: 0, targetCount: 5)]
+    [SimpleJob(warmupCount: 0, iterationCount: 5)]
     public class IntroStatisticalTesting
     {
         [Benchmark] public void Sleep50() =&gt; Thread.Sleep(50);
@@ -136,117 +136,32 @@ namespace BenchmarkDotNet.Samples
     }
 }
 </code></pre><h3 id="output">Output</h3>
-<table>
-<thead>
-<tr>
-<th>Method</th>
-<th style="text-align: right;">Mean</th>
-<th style="text-align: right;">Error</th>
-<th style="text-align: right;">StdDev</th>
-<th style="text-align: right;">Ratio</th>
-<th>Welch(1us)/p-values</th>
-<th>Welch(3%)/p-values</th>
-<th>MannWhitney(1us)/p-values</th>
-<th>MannWhitney(3%)/p-values</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Sleep50</td>
-<td style="text-align: right;">53.13 ms</td>
-<td style="text-align: right;">0.5901 ms</td>
-<td style="text-align: right;">0.1532 ms</td>
-<td style="text-align: right;">0.51</td>
-<td>Faster: 1.0000/0.0000</td>
-<td>Faster: 1.0000/0.0000</td>
-<td>Faster: 1.0000/0.0040</td>
-<td>Faster: 1.0000/0.0040</td>
-</tr>
-<tr>
-<td>Sleep97</td>
-<td style="text-align: right;">100.07 ms</td>
-<td style="text-align: right;">0.9093 ms</td>
-<td style="text-align: right;">0.2361 ms</td>
-<td style="text-align: right;">0.97</td>
-<td>Faster: 1.0000/0.0000</td>
-<td>Same: 1.0000/0.1290</td>
-<td>Faster: 1.0000/0.0040</td>
-<td>Same: 1.0000/0.1111</td>
-</tr>
-<tr>
-<td>Sleep99</td>
-<td style="text-align: right;">102.23 ms</td>
-<td style="text-align: right;">2.4462 ms</td>
-<td style="text-align: right;">0.6353 ms</td>
-<td style="text-align: right;">0.99</td>
-<td>Faster: 0.9928/0.0072</td>
-<td>Same: 1.0000/0.9994</td>
-<td>Faster: 0.9960/0.0079</td>
-<td>Same: 1.0000/1.0000</td>
-</tr>
-<tr>
-<td>Sleep100</td>
-<td style="text-align: right;">103.34 ms</td>
-<td style="text-align: right;">0.8180 ms</td>
-<td style="text-align: right;">0.2124 ms</td>
-<td style="text-align: right;">1.00</td>
-<td>Base: 0.5029/0.5029</td>
-<td>Base: 1.0000/1.0000</td>
-<td>Base: 0.7262/0.7262</td>
-<td>Base: 1.0000/1.0000</td>
-</tr>
-<tr>
-<td>Sleep101</td>
-<td style="text-align: right;">103.73 ms</td>
-<td style="text-align: right;">2.1591 ms</td>
-<td style="text-align: right;">0.5607 ms</td>
-<td style="text-align: right;">1.00</td>
-<td>Same: 0.1041/0.8969</td>
-<td>Same: 0.9999/1.0000</td>
-<td>Same: 0.1111/0.9246</td>
-<td>Same: 1.0000/1.0000</td>
-</tr>
-<tr>
-<td>Sleep103</td>
-<td style="text-align: right;">106.21 ms</td>
-<td style="text-align: right;">1.2511 ms</td>
-<td style="text-align: right;">0.3249 ms</td>
-<td style="text-align: right;">1.03</td>
-<td>Slower: 0.0000/1.0000</td>
-<td>Same: 0.9447/1.0000</td>
-<td>Slower: 0.0040/1.0000</td>
-<td>Same: 0.9246/1.0000</td>
-</tr>
-<tr>
-<td>Sleep150</td>
-<td style="text-align: right;">153.16 ms</td>
-<td style="text-align: right;">3.4929 ms</td>
-<td style="text-align: right;">0.9071 ms</td>
-<td style="text-align: right;">1.48</td>
-<td>Slower: 0.0000/1.0000</td>
-<td>Slower: 0.0000/1.0000</td>
-<td>Slower: 0.0040/1.0000</td>
-<td>Slower: 0.0040/1.0000</td>
-</tr>
-</tbody>
-</table>
-<p>// * Legends *
-Mean                      : Arithmetic mean of all measurements
-Error                     : Half of 99.9% confidence interval
-StdDev                    : Standard deviation of all measurements
-Ratio                     : Mean of the ratio distribution ([Current]/[Baseline])
-Welch(1us)/p-values       : Welch-based TOST equivalence test with 1 us threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
-Welch(3%)/p-values        : Welch-based TOST equivalence test with 3% threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
-MannWhitney(1us)/p-values : MannWhitney-based TOST equivalence test with 1 us threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
-MannWhitney(3%)/p-values  : MannWhitney-based TOST equivalence test with 3% threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
-1 ms                      : 1 Millisecond (0.001 sec)</p>
-<pre><code>
-### Links
+<pre><code class="lang-markdown">|   Method |      Mean |     Error |    StdDev | Ratio |   Welch(1us)/p-values |    Welch(3%)/p-values | MannWhitney(1us)/p-values | MannWhitney(3%)/p-values |
+|--------- |----------:|----------:|----------:|------:|---------------------- |---------------------- |-------------------------- |------------------------- |
+|  Sleep50 |  53.13 ms | 0.5901 ms | 0.1532 ms |  0.51 | Faster: 1.0000/0.0000 | Faster: 1.0000/0.0000 |     Faster: 1.0000/0.0040 |    Faster: 1.0000/0.0040 |
+|  Sleep97 | 100.07 ms | 0.9093 ms | 0.2361 ms |  0.97 | Faster: 1.0000/0.0000 |   Same: 1.0000/0.1290 |     Faster: 1.0000/0.0040 |      Same: 1.0000/0.1111 |
+|  Sleep99 | 102.23 ms | 2.4462 ms | 0.6353 ms |  0.99 | Faster: 0.9928/0.0072 |   Same: 1.0000/0.9994 |     Faster: 0.9960/0.0079 |      Same: 1.0000/1.0000 |
+| Sleep100 | 103.34 ms | 0.8180 ms | 0.2124 ms |  1.00 |   Base: 0.5029/0.5029 |   Base: 1.0000/1.0000 |       Base: 0.7262/0.7262 |      Base: 1.0000/1.0000 |
+| Sleep101 | 103.73 ms | 2.1591 ms | 0.5607 ms |  1.00 |   Same: 0.1041/0.8969 |   Same: 0.9999/1.0000 |       Same: 0.1111/0.9246 |      Same: 1.0000/1.0000 |
+| Sleep103 | 106.21 ms | 1.2511 ms | 0.3249 ms |  1.03 | Slower: 0.0000/1.0000 |   Same: 0.9447/1.0000 |     Slower: 0.0040/1.0000 |      Same: 0.9246/1.0000 |
+| Sleep150 | 153.16 ms | 3.4929 ms | 0.9071 ms |  1.48 | Slower: 0.0000/1.0000 | Slower: 0.0000/1.0000 |     Slower: 0.0040/1.0000 |    Slower: 0.0040/1.0000 |
 
-* The permanent link to this sample: @BenchmarkDotNet.Samples.IntroStatisticalTesting
-
----
+// * Legends *
+  Mean                      : Arithmetic mean of all measurements
+  Error                     : Half of 99.9% confidence interval
+  StdDev                    : Standard deviation of all measurements
+  Ratio                     : Mean of the ratio distribution ([Current]/[Baseline])
+  Welch(1us)/p-values       : Welch-based TOST equivalence test with 1 us threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
+  Welch(3%)/p-values        : Welch-based TOST equivalence test with 3% threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
+  MannWhitney(1us)/p-values : MannWhitney-based TOST equivalence test with 1 us threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
+  MannWhitney(3%)/p-values  : MannWhitney-based TOST equivalence test with 3% threshold. Format: 'Result: p-value(Slower)|p-value(Faster)'
+  1 ms                      : 1 Millisecond (0.001 sec)
 </code></pre>
+<h3 id="links">Links</h3>
+<ul>
+<li>The permanent link to this sample: <a class="xref" href="IntroStatisticalTesting.html">Sample: IntroStatisticalTesting</a></li>
+</ul>
+<hr>
 </article>
           </div>
           

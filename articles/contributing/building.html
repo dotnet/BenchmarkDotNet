@@ -121,7 +121,7 @@
 </ul>
 <p>Once all the necessary tools are in place, building is trivial. Simply open solution file <strong>BenchmarkDotNet.sln</strong> that lives at the base of the repository and run Build action.</p>
 <h2 id="cake-c-make">Cake (C# Make)</h2>
-<p><a href="http://cakebuild.net/">Cake (C# Make)</a> is a cross platform build automation system with a C# DSL to do things like compiling code, copy files/folders, running unit tests, compress files and build NuGet packages.</p>
+<p><a href="https://cakebuild.net/">Cake (C# Make)</a> is a cross platform build automation system with a C# DSL to do things like compiling code, copy files/folders, running unit tests, compress files and build NuGet packages.</p>
 <p>The build currently depends on the following prerequisites:</p>
 <ul>
 <li><p>Windows:</p>
@@ -133,43 +133,43 @@
 </li>
 <li><p>Linux:</p>
 <ul>
-<li>Install <a href="http://www.mono-project.com/download/#download-lin">Mono version 5 or higher</a></li>
-<li>Install <a href="http://fsharp.org/use/linux/">fsharp package</a></li>
+<li>Install <a href="https://www.mono-project.com/download/stable/#download-lin">Mono version 5 or higher</a></li>
+<li>Install <a href="https://fsharp.org/use/linux/">fsharp package</a></li>
 <li>Install packages required to .NET Core SDK
 <ul>
-<li>gettext</li>
-<li>libcurl4-openssl-dev</li>
-<li>libicu-dev</li>
-<li>libssl-dev</li>
-<li>libunwind8</li>
+<li><code>gettext</code></li>
+<li><code>libcurl4-openssl-dev</code></li>
+<li><code>libicu-dev</code></li>
+<li><code>libssl-dev</code></li>
+<li><code>libunwind8</code></li>
 </ul>
 </li>
 </ul>
 </li>
 <li><p>macOS</p>
 <ul>
-<li>Install <a href="http://www.mono-project.com/download/#download-mac">Mono version 5 or higher</a></li>
-<li>Install <a href="http://fsharp.org/use/mac/">fsharp package</a></li>
-<li>Install the latest version of <a href="https://www.microsoft.com/net/core#macos">OpenSSL</a>.</li>
+<li>Install <a href="https://www.mono-project.com/download/stable/#download-mac">Mono version 5 or higher</a></li>
+<li>Install <a href="https://fsharp.org/use/mac/">fsharp package</a></li>
+<li>Install the latest version of <a href="https://www.openssl.org/source/">OpenSSL</a>.</li>
 </ul>
 </li>
 </ul>
 <p>After you have installed these pre-requisites, you can build the BenchmarkDotNet by invoking the build script (<code>build.ps1</code> on Windows, or <code>build.sh</code> on Linux and macOS) at the base of the BenchmarkDotNet repository. By default the build process also run all the tests. There are quite a few tests, taking a significant amount of time that is not necessary if you just want to experiment with changes. You can skip the tests phase by adding the <code>skiptests</code> argument to the build script, e.g. <code>.\build.ps1 --SkipTests=True</code> or <code>./build.sh --skiptests=true</code>.</p>
 <p>Build has a number of options that you use. Some of the more important options are</p>
 <ul>
-<li><p><strong>skiptests</strong> - do not run the tests. This can shorten build times quite a bit. On Windows: <code>.\build.ps1 --SkipTests=True</code> or <code>./build.sh --skiptests=true</code> on Linux/macOS.</p>
+<li><p><strong><code>skiptests</code></strong> - do not run the tests. This can shorten build times quite a bit. On Windows: <code>.\build.ps1 --SkipTests=True</code> or <code>./build.sh --skiptests=true</code> on Linux/macOS.</p>
 </li>
-<li><p><strong>configuration</strong> - build the 'Release' or 'Debug' build type. Default value is 'Release'. On Windows: <code>.\build.ps1 -Configuration Debug</code> or <code>./build.sh --configuration debug</code> on Linux/macOS.</p>
+<li><p><strong><code>configuration</code></strong> - build the 'Release' or 'Debug' build type. Default value is 'Release'. On Windows: <code>.\build.ps1 -Configuration Debug</code> or <code>./build.sh --configuration debug</code> on Linux/macOS.</p>
 </li>
-<li><p><strong>target</strong> - with this parameter you can run a specific target from build pipeline. Default value is 'Default' target. On Windows: <code>.\build.ps1 -Target Default</code> or <code>./build.sh --target default</code> on Linux/macOS. Available targets:</p>
+<li><p><strong><code>target</code></strong> - with this parameter you can run a specific target from build pipeline. Default value is 'Default' target. On Windows: <code>.\build.ps1 -Target Default</code> or <code>./build.sh --target default</code> on Linux/macOS. Available targets:</p>
 <ul>
-<li><strong>Default</strong> - run all actions one by one.</li>
-<li><strong>Clean</strong> - clean all <code>obj</code>, <code>bin</code> and <code>artifacts</code> directories.</li>
-<li><strong>Restore</strong> - automatically execute <code>Clean</code> action and after that restore all NuGet dependencies.</li>
-<li><strong>Build</strong> - automatically execute <code>Restore</code> action, then run MSBuild for the solution file.</li>
-<li><strong>FastTests</strong> - automatically execute <code>Build</code> action, then run all tests from the BenchmarkDotNet.Tests project.</li>
-<li><strong>SlowTests</strong> - automatically execute <code>Build</code> action, then run all tests from the BenchmarkDotNet.IntegrationTests project.</li>
-<li><strong>Pack</strong> - automatically execute <code>Build</code> action and after that creates local NuGet packages.</li>
+<li><strong><code>Default</code></strong> - run all actions one by one.</li>
+<li><strong><code>Clean</code></strong> - clean all <code>obj</code>, <code>bin</code> and <code>artifacts</code> directories.</li>
+<li><strong><code>Restore</code></strong> - automatically execute <code>Clean</code> action and after that restore all NuGet dependencies.</li>
+<li><strong><code>Build</code></strong> - automatically execute <code>Restore</code> action, then run MSBuild for the solution file.</li>
+<li><strong><code>FastTests</code></strong> - automatically execute <code>Build</code> action, then run all tests from the BenchmarkDotNet.Tests project.</li>
+<li><strong><code>SlowTests</code></strong> - automatically execute <code>Build</code> action, then run all tests from the BenchmarkDotNet.IntegrationTests project.</li>
+<li><strong><code>Pack</code></strong> - automatically execute <code>Build</code> action and after that creates local NuGet packages.</li>
 </ul>
 </li>
 </ul>

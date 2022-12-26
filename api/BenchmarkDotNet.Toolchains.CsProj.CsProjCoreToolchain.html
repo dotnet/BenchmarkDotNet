@@ -122,6 +122,7 @@
     <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">Object</a></div>
     <div class="level1"><a class="xref" href="BenchmarkDotNet.Toolchains.Toolchain.html">Toolchain</a></div>
     <div class="level2"><span class="xref">CsProjCoreToolchain</span></div>
+      <div class="level3"><a class="xref" href="BenchmarkDotNet.Toolchains.Mono.MonoToolchain.html">MonoToolchain</a></div>
   </div>
   <div class="implements">
     <h5>Implements</h5>
@@ -349,6 +350,30 @@
       </tr>
     </tbody>
   </table>
+  
+  
+  <h4 id="BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_NetCoreApp80" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.NetCoreApp80">NetCoreApp80</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly IToolchain NetCoreApp80</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="methods">Methods
   </h3>
   
@@ -508,13 +533,13 @@
   <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode#system-object-gethashcode">Object.GetHashCode()</a></div>
   
   
-  <a id="BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_IsSupported_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.IsSupported*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_IsSupported_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Characteristics_IResolver_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.IsSupported(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Characteristics.IResolver)">IsSupported(BenchmarkCase, ILogger, IResolver)</h4>
+  <a id="BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_Validate_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Validate*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_Validate_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Characteristics_IResolver_" data-uid="BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Validate(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Characteristics.IResolver)">Validate(BenchmarkCase, IResolver)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver)</code></pre>
+    <pre><code class="lang-csharp hljs">public override IEnumerable&lt;ValidationError&gt; Validate(BenchmarkCase benchmarkCase, IResolver resolver)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -529,11 +554,6 @@
       <tr>
         <td><a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></td>
         <td><span class="parametername">benchmarkCase</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></td>
-        <td><span class="parametername">logger</span></td>
         <td></td>
       </tr>
       <tr>
@@ -553,13 +573,13 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="BenchmarkDotNet.Toolchains.Toolchain.html#BenchmarkDotNet_Toolchains_Toolchain_IsSupported_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Characteristics_IResolver_">Toolchain.IsSupported(BenchmarkCase, ILogger, IResolver)</a></div>
+  <div><a class="xref" href="BenchmarkDotNet.Toolchains.Toolchain.html#BenchmarkDotNet_Toolchains_Toolchain_Validate_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Characteristics_IResolver_">Toolchain.Validate(BenchmarkCase, IResolver)</a></div>
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="BenchmarkDotNet.Toolchains.IToolchain.html">IToolchain</a>

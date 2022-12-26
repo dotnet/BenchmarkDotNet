@@ -134,12 +134,12 @@
   
   
   <a id="BenchmarkDotNet_Toolchains_Results_GenerateResult__ctor_" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_Results_GenerateResult__ctor_BenchmarkDotNet_Toolchains_ArtifactsPaths_System_Boolean_System_Exception_System_Collections_Generic_IReadOnlyCollection_System_String__System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.#ctor(BenchmarkDotNet.Toolchains.ArtifactsPaths,System.Boolean,System.Exception,System.Collections.Generic.IReadOnlyCollection{System.String},System.Boolean)">GenerateResult(ArtifactsPaths, Boolean, Exception, IReadOnlyCollection&lt;String&gt;, Boolean)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_GenerateResult__ctor_BenchmarkDotNet_Toolchains_ArtifactsPaths_System_Boolean_System_Exception_System_Collections_Generic_IReadOnlyCollection_System_String__" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.#ctor(BenchmarkDotNet.Toolchains.ArtifactsPaths,System.Boolean,System.Exception,System.Collections.Generic.IReadOnlyCollection{System.String})">GenerateResult(ArtifactsPaths, Boolean, Exception, IReadOnlyCollection&lt;String&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public GenerateResult(ArtifactsPaths artifactsPaths, bool isGenerateSuccess, Exception generateException, IReadOnlyCollection&lt;string&gt; artifactsToCleanup, bool noAcknowledgments)</code></pre>
+    <pre><code class="lang-csharp hljs">public GenerateResult(ArtifactsPaths artifactsPaths, bool isGenerateSuccess, Exception generateException, IReadOnlyCollection&lt;string&gt; artifactsToCleanup)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -169,11 +169,6 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1">IReadOnlyCollection</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a>&gt;</td>
         <td><span class="parametername">artifactsToCleanup</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td><span class="parametername">noAcknowledgments</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -280,31 +275,6 @@
       </tr>
     </tbody>
   </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_Results_GenerateResult_NoAcknowledgments_" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.NoAcknowledgments*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_Results_GenerateResult_NoAcknowledgments" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.NoAcknowledgments">NoAcknowledgments</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool NoAcknowledgments { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
   <h3 id="methods">Methods
   </h3>
   
@@ -362,12 +332,12 @@
   
   
   <a id="BenchmarkDotNet_Toolchains_Results_GenerateResult_Success_" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.Success*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_Results_GenerateResult_Success_BenchmarkDotNet_Toolchains_ArtifactsPaths_System_Collections_Generic_IReadOnlyCollection_System_String__System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.Success(BenchmarkDotNet.Toolchains.ArtifactsPaths,System.Collections.Generic.IReadOnlyCollection{System.String},System.Boolean)">Success(ArtifactsPaths, IReadOnlyCollection&lt;String&gt;, Boolean)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_GenerateResult_Success_BenchmarkDotNet_Toolchains_ArtifactsPaths_System_Collections_Generic_IReadOnlyCollection_System_String__" data-uid="BenchmarkDotNet.Toolchains.Results.GenerateResult.Success(BenchmarkDotNet.Toolchains.ArtifactsPaths,System.Collections.Generic.IReadOnlyCollection{System.String})">Success(ArtifactsPaths, IReadOnlyCollection&lt;String&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static GenerateResult Success(ArtifactsPaths artifactsPaths, IReadOnlyCollection&lt;string&gt; artifactsToCleanup, bool noAcknowledgments)</code></pre>
+    <pre><code class="lang-csharp hljs">public static GenerateResult Success(ArtifactsPaths artifactsPaths, IReadOnlyCollection&lt;string&gt; artifactsToCleanup)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -387,11 +357,6 @@
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1">IReadOnlyCollection</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a>&gt;</td>
         <td><span class="parametername">artifactsToCleanup</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td><span class="parametername">noAcknowledgments</span></td>
         <td></td>
       </tr>
     </tbody>

@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class ConsoleHost
+    <title>Class MonoPublisher
    | BenchmarkDotNet </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class ConsoleHost
+    <meta name="title" content="Class MonoPublisher
    | BenchmarkDotNet ">
     <meta name="generator" content="docfx 2.59.4.0">
     
@@ -110,39 +110,39 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Engines.ConsoleHost">
+            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Toolchains.Mono.MonoPublisher">
   
   
-  <h1 id="BenchmarkDotNet_Engines_ConsoleHost" data-uid="BenchmarkDotNet.Engines.ConsoleHost" class="text-break">Class ConsoleHost
+  <h1 id="BenchmarkDotNet_Toolchains_Mono_MonoPublisher" data-uid="BenchmarkDotNet.Toolchains.Mono.MonoPublisher" class="text-break">Class MonoPublisher
   </h1>
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><span class="xref">ConsoleHost</span></div>
+    <div class="level1"><span class="xref">MonoPublisher</span></div>
   </div>
   <div class="implements">
     <h5>Implements</h5>
-    <div><a class="xref" href="BenchmarkDotNet.Engines.IHost.html">IHost</a></div>
+    <div><a class="xref" href="BenchmarkDotNet.Toolchains.IBuilder.html">IBuilder</a></div>
   </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Engines.html">BenchmarkDotNet.Engines</a></h6>
+  <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.Mono.html">BenchmarkDotNet.Toolchains.Mono</a></h6>
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
-  <h5 id="BenchmarkDotNet_Engines_ConsoleHost_syntax">Syntax</h5>
+  <h5 id="BenchmarkDotNet_Toolchains_Mono_MonoPublisher_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class ConsoleHost : IHost</code></pre>
+    <pre><code class="lang-csharp hljs">public class MonoPublisher : IBuilder</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
   
   
-  <a id="BenchmarkDotNet_Engines_ConsoleHost__ctor_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Engines_ConsoleHost__ctor_System_IO_TextWriter_System_IO_StreamReader_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.#ctor(System.IO.TextWriter,System.IO.StreamReader)">ConsoleHost(TextWriter, StreamReader)</h4>
+  <a id="BenchmarkDotNet_Toolchains_Mono_MonoPublisher__ctor_" data-uid="BenchmarkDotNet.Toolchains.Mono.MonoPublisher.#ctor*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_Mono_MonoPublisher__ctor_System_String_" data-uid="BenchmarkDotNet.Toolchains.Mono.MonoPublisher.#ctor(System.String)">MonoPublisher(String)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ConsoleHost(TextWriter outWriter, StreamReader inReader)</code></pre>
+    <pre><code class="lang-csharp hljs">public MonoPublisher(string customDotNetCliPath)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -155,13 +155,8 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textwriter">TextWriter</a></td>
-        <td><span class="parametername">outWriter</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.streamreader">StreamReader</a></td>
-        <td><span class="parametername">inReader</span></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
+        <td><span class="parametername">customDotNetCliPath</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -170,13 +165,13 @@
   </h3>
   
   
-  <a id="BenchmarkDotNet_Engines_ConsoleHost_ReportResults_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.ReportResults*"></a>
-  <h4 id="BenchmarkDotNet_Engines_ConsoleHost_ReportResults_BenchmarkDotNet_Engines_RunResults_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.ReportResults(BenchmarkDotNet.Engines.RunResults)">ReportResults(RunResults)</h4>
+  <a id="BenchmarkDotNet_Toolchains_Mono_MonoPublisher_Build_" data-uid="BenchmarkDotNet.Toolchains.Mono.MonoPublisher.Build*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_Mono_MonoPublisher_Build_BenchmarkDotNet_Toolchains_Results_GenerateResult_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Loggers_ILogger_" data-uid="BenchmarkDotNet.Toolchains.Mono.MonoPublisher.Build(BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Running.BuildPartition,BenchmarkDotNet.Loggers.ILogger)">Build(GenerateResult, BuildPartition, ILogger)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void ReportResults(RunResults runResults)</code></pre>
+    <pre><code class="lang-csharp hljs">public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -189,149 +184,40 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Engines.RunResults.html">RunResults</a></td>
-        <td><span class="parametername">runResults</span></td>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.Results.GenerateResult.html">GenerateResult</a></td>
+        <td><span class="parametername">generateResult</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Running.BuildPartition.html">BuildPartition</a></td>
+        <td><span class="parametername">buildPartition</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></td>
+        <td><span class="parametername">logger</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
-  
-  
-  <a id="BenchmarkDotNet_Engines_ConsoleHost_SendError_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.SendError*"></a>
-  <h4 id="BenchmarkDotNet_Engines_ConsoleHost_SendError_System_String_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.SendError(System.String)">SendError(String)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void SendError(string message)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
+  <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
         <th>Type</th>
-        <th>Name</th>
         <th>Description</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><span class="parametername">message</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Engines_ConsoleHost_SendSignal_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.SendSignal*"></a>
-  <h4 id="BenchmarkDotNet_Engines_ConsoleHost_SendSignal_BenchmarkDotNet_Engines_HostSignal_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.SendSignal(BenchmarkDotNet.Engines.HostSignal)">SendSignal(HostSignal)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void SendSignal(HostSignal hostSignal)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Engines.HostSignal.html">HostSignal</a></td>
-        <td><span class="parametername">hostSignal</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Engines_ConsoleHost_Write_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.Write*"></a>
-  <h4 id="BenchmarkDotNet_Engines_ConsoleHost_Write_System_String_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.Write(System.String)">Write(String)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Write(string message)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><span class="parametername">message</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Engines_ConsoleHost_WriteLine_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.WriteLine*"></a>
-  <h4 id="BenchmarkDotNet_Engines_ConsoleHost_WriteLine" data-uid="BenchmarkDotNet.Engines.ConsoleHost.WriteLine">WriteLine()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void WriteLine()</code></pre>
-  </div>
-  
-  
-  <a id="BenchmarkDotNet_Engines_ConsoleHost_WriteLine_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.WriteLine*"></a>
-  <h4 id="BenchmarkDotNet_Engines_ConsoleHost_WriteLine_System_String_" data-uid="BenchmarkDotNet.Engines.ConsoleHost.WriteLine(System.String)">WriteLine(String)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void WriteLine(string message)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><span class="parametername">message</span></td>
+        <td><a class="xref" href="BenchmarkDotNet.Toolchains.Results.BuildResult.html">BuildResult</a></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   <h3 id="implements">Implements</h3>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Engines.IHost.html">IHost</a>
-  </div>
-  <h3 id="extensionmethods">Extension Methods</h3>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html#BenchmarkDotNet_Engines_HostExtensions_WriteLine_BenchmarkDotNet_Engines_IHost_System_String_System_Object___">HostExtensions.WriteLine(IHost, String, Object[])</a>
-  </div>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html#BenchmarkDotNet_Engines_HostExtensions_BeforeAnythingElse_BenchmarkDotNet_Engines_IHost_">HostExtensions.BeforeAnythingElse(IHost)</a>
-  </div>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html#BenchmarkDotNet_Engines_HostExtensions_BeforeMainRun_BenchmarkDotNet_Engines_IHost_">HostExtensions.BeforeMainRun(IHost)</a>
-  </div>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html#BenchmarkDotNet_Engines_HostExtensions_AfterMainRun_BenchmarkDotNet_Engines_IHost_">HostExtensions.AfterMainRun(IHost)</a>
-  </div>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Engines.HostExtensions.html#BenchmarkDotNet_Engines_HostExtensions_AfterAll_BenchmarkDotNet_Engines_IHost_">HostExtensions.AfterAll(IHost)</a>
+      <a class="xref" href="BenchmarkDotNet.Toolchains.IBuilder.html">IBuilder</a>
   </div>
 </article>
           </div>

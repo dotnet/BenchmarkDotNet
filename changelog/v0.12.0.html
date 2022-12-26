@@ -332,8 +332,8 @@ Let's say:</p>
 If you try to run the benchmarks for a few .NET TFMs, they are all going to be executed using the latest .NET Framework from your machine.
 The only difference is that they are all going to have different features enabled depending on the target version they were compiled for.
 You can read more about this
-<a href="https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/version-compatibility">here</a> and
-<a href="https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/application-compatibility">here</a>.
+<a href="https://learn.microsoft.com/dotnet/framework/migration-guide/version-compatibility">here</a> and
+<a href="https://learn.microsoft.com/dotnet/framework/migration-guide/application-compatibility">here</a>.
 This is <strong>.NET Framework behavior which can not be controlled by BenchmarkDotNet or any other tool</strong>.</p>
 <p><strong>Note:</strong> Console arguments support works only if you pass the <code>args</code> to <code>BenchmarkSwitcher</code>:</p>
 <pre><code class="lang-cs">class Program
@@ -386,7 +386,7 @@ By using the console line argument, you don't need to edit the source code anyti
 Moreover, if you share the source code of the benchmark, other people can run it even if they don't have the exact same framework version installed.</p>
 <h2 id="official-templates-for-benchmarkdotnet-based-projects">Official templates for BenchmarkDotNet-based projects</h2>
 <p>Since v0.12.0, BenchmarkDotNet provides project templates to setup your benchmarks easily.
-The template exists for each major .NET language (<a href="https://docs.microsoft.com/en-us/dotnet/csharp/">C#</a>, <a href="https://docs.microsoft.com/en-us/dotnet/fsharp/">F#</a> and <a href="https://docs.microsoft.com/en-us/dotnet/visual-basic/">VB</a>) with equivalent features and structure.
+The template exists for each major .NET language (<a href="https://learn.microsoft.com/dotnet/csharp/">C#</a>, <a href="https://learn.microsoft.com/dotnet/fsharp/">F#</a> and <a href="https://learn.microsoft.com/dotnet/visual-basic/">VB</a>) with equivalent features and structure.
 The templates require the <a href="https://www.microsoft.com/net/download">.NET Core SDK</a>. Once installed, run the following command to install the templates:</p>
 <pre><code class="lang-log">dotnet new -i BenchmarkDotNet.Templates
 </code></pre>
@@ -426,7 +426,7 @@ To create a benchmark project with a configuration class, use the option <code>-
 </code></pre>
 <p>The version of the template NuGet package is synced with the <a href="https://www.nuget.org/packages/BenchmarkDotNet/">BenchmarkDotNet</a> package.
 For instance, the template version <code>0.12.0</code> is referencing <a href="https://www.nuget.org/packages/BenchmarkDotNet/0.12.0">BenchmarkDotnet 0.12.0</a> - there is no floating version behavior.
-For more info about the <code>dotnet new</code> CLI, please read <a href="https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet">the documentation</a>.</p>
+For more info about the <code>dotnet new</code> CLI, please read <a href="https://learn.microsoft.com/dotnet/core/tools/dotnet">the documentation</a>.</p>
 <h2 id="new-nativememoryprofiler">New NativeMemoryProfiler</h2>
 <p><code>NativeMemoryProfiler</code> measure the native memory traffic and adds the extra columns <code>Allocated native memory</code> and <code>Native memory leak</code> to the summary table.
 Internally, it uses <code>EtwProfiler</code> to profile the code using ETW.</p>

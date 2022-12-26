@@ -121,7 +121,7 @@ It's automatically choosing the amount of operation in main iterations based on 
 The amount of iterations will also be chosen automatically based on accuracy job settings.
 A benchmark method should have a steady state.</p>
 <p>Of course, you can manually set all the characteristics. An example:</p>
-<pre><code class="lang-cs">[SimpleJob(launchCount: 3, warmupCount: 10, targetCount: 30)]
+<pre><code class="lang-cs">[SimpleJob(launchCount: 3, warmupCount: 10, iterationCount: 30)]
 public class MyBenchmarkClass
 </code></pre>
 <hr>
@@ -139,7 +139,7 @@ using BenchmarkDotNet.Engines;
 
 namespace BenchmarkDotNet.Samples
 {
-    [SimpleJob(RunStrategy.ColdStart, targetCount: 5)]
+    [SimpleJob(RunStrategy.ColdStart, iterationCount: 5)]
     [MinColumn, MaxColumn, MeanColumn, MedianColumn]
     public class IntroColdStart
     {
@@ -185,7 +185,7 @@ Also you can use <code>[IterationSetup]</code> and <code>[IterationCleanup]</cod
 It's a perfect mode for benchmarks which doesn't have a steady state and the performance distribution is tricky:
 <code>Monitoring</code> will help you to collect a set of measurements and get statistics.</p>
 <h3 id="usage">Usage</h3>
-<pre><code class="lang-cs">[SimpleJob(RunStrategy.Monitoring, launchCount: 10, warmupCount: 0, targetCount: 100)]
+<pre><code class="lang-cs">[SimpleJob(RunStrategy.Monitoring, launchCount: 10, warmupCount: 0, iterationCount: 100)]
 public class MyBenchmarkClass
 </code></pre>
 <h3 id="source-code">Source code</h3>
@@ -196,7 +196,7 @@ using BenchmarkDotNet.Engines;
 
 namespace BenchmarkDotNet.Samples
 {
-    [SimpleJob(RunStrategy.Monitoring, targetCount: 10, id: &quot;MonitoringJob&quot;)]
+    [SimpleJob(RunStrategy.Monitoring, iterationCount: 10, id: &quot;MonitoringJob&quot;)]
     [MinColumn, Q1Column, Q3Column, MaxColumn]
     public class IntroMonitoring
     {

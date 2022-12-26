@@ -1403,7 +1403,7 @@ otherwise this is the # of logical CPUs you affinitized your process to.</p>
   
   
   <a id="BenchmarkDotNet_Jobs_JobExtensions_WithInvocationCount_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithInvocationCount*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithInvocationCount_BenchmarkDotNet_Jobs_Job_System_Int32_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithInvocationCount(BenchmarkDotNet.Jobs.Job,System.Int32)">WithInvocationCount(Job, Int32)</h4>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithInvocationCount_BenchmarkDotNet_Jobs_Job_System_Int64_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithInvocationCount(BenchmarkDotNet.Jobs.Job,System.Int64)">WithInvocationCount(Job, Int64)</h4>
   <div class="markdown level1 summary"><p>Invocation count in a single iteration.
 If specified, <a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_IterationTime">IterationTime</a> will be ignored.
 If specified, it must be a multiple of <a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_UnrollFactor">UnrollFactor</a>.</p>
@@ -1411,7 +1411,7 @@ If specified, it must be a multiple of <a class="xref" href="BenchmarkDotNet.Job
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Job WithInvocationCount(this Job job, int count)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Job WithInvocationCount(this Job job, long count)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -1429,7 +1429,7 @@ If specified, it must be a multiple of <a class="xref" href="BenchmarkDotNet.Job
         <td></td>
       </tr>
       <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">Int64</a></td>
         <td><span class="parametername">count</span></td>
         <td></td>
       </tr>
@@ -1577,6 +1577,54 @@ The default value is 500 milliseconds.</p>
       <tr>
         <td><a class="xref" href="BenchmarkDotNet.Environments.Jit.html">Jit</a></td>
         <td><span class="parametername">jit</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Jobs_JobExtensions_WithLargeAddressAware_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithLargeAddressAware*"></a>
+  <h4 id="BenchmarkDotNet_Jobs_JobExtensions_WithLargeAddressAware_BenchmarkDotNet_Jobs_Job_System_Boolean_" data-uid="BenchmarkDotNet.Jobs.JobExtensions.WithLargeAddressAware(BenchmarkDotNet.Jobs.Job,System.Boolean)">WithLargeAddressAware(Job, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Specifies that benchmark can handle addresses larger than 2 gigabytes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Job WithLargeAddressAware(this Job job, bool value = true)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a></td>
+        <td><span class="parametername">job</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><span class="parametername">value</span></td>
         <td></td>
       </tr>
     </tbody>

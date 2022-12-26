@@ -115,7 +115,7 @@
 <p>The current Diagnosers are:</p>
 <ul>
 <li>GC and Memory Allocation (<code>MemoryDiagnoser</code>) which is cross platform, built-in and <strong>is not enabled by default anymore</strong>.
-Please see Adam Sitnik's <a href="http://adamsitnik.com/the-new-Memory-Diagnoser/">blog post</a> for all the details.</li>
+Please see Adam Sitnik's <a href="https://adamsitnik.com/the-new-Memory-Diagnoser/">blog post</a> for all the details.</li>
 <li>JIT Inlining Events (<code>InliningDiagnoser</code>).
 You can find this diagnoser in a separate package with diagnosers for Windows (<code>BenchmarkDotNet.Diagnostics.Windows</code>):
 <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet"></a></li>
@@ -125,10 +125,10 @@ You can find this diagnoser as well as the (<code>InliningDiagnoser</code>) in a
 <li>Hardware Counter Diagnoser.
 You can find this diagnoser in a separate package with diagnosers for Windows (<code>BenchmarkDotNet.Diagnostics.Windows</code>):
 <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet"></a>.
-Please see Adam Sitnik's <a href="http://adamsitnik.com/Hardware-Counters-Diagnoser/">blog post</a> for all the details.</li>
+Please see Adam Sitnik's <a href="https://adamsitnik.com/Hardware-Counters-Diagnoser/">blog post</a> for all the details.</li>
 <li>Disassembly Diagnoser.
 It allows you to disassemble the benchmarked code to asm, IL and C#/F#.
-Please see Adam Sitnik's <a href="http://adamsitnik.com/Disassembly-Diagnoser/">blog post</a> for all the details.</li>
+Please see Adam Sitnik's <a href="https://adamsitnik.com/Disassembly-Diagnoser/">blog post</a> for all the details.</li>
 <li>ETW Profiler (<code>EtwProfiler</code>).
 It allows you to not only benchmark, but also profile the code. It's using TraceEvent, which internally uses ETW and exports all the information to a trace file. The trace file contains all of the stack traces captured by the profiler, PDBs to resolve symbols for both native and managed code and captured GC, JIT and CLR events. Please use one of the free tools: PerfView or Windows Performance Analyzer to analyze and visualize the data from trace file. You can find this diagnoser in a separate package with diagnosers for Windows (<code>BenchmarkDotNet.Diagnostics.Windows</code>): <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet"></a>
 Please see Adam Sitnik's <a href="https://adamsitnik.com/ETW-Profiler/">blog post</a> for all the details.</li>
@@ -142,6 +142,7 @@ Please see Wojciech Nagórski's <a href="https://wojciechnagorski.com/2019/08/an
 It is a cross-platform profiler that allows profile .NET code on every platform - Windows, Linux, macOS.
 Please see Wojciech Nagórski's <a href="https://wojciechnagorski.com/2020/04/cross-platform-profiling-.net-code-with-benchmarkdotnet/">blog post</a> for all the details.</li>
 <li>Threading Diagnoser (<code>ThreadingDiagnoser</code>) - .NET Core 3.0+ diagnoser that reports some Threading statistics.</li>
+<li>Exception Diagnoser (<code>ExceptionDiagnoser</code>) - a diagnoser that reports the frequency of exceptions thrown during the operation.</li>
 </ul>
 <h2 id="usage">Usage</h2>
 <p>Below is a sample output from the <code>GC and Memory Allocation</code> diagnoser, note the extra columns on the right-hand side (&quot;Gen 0&quot;, &quot;Gen 1&quot;, &quot;Gen 2&quot; and &quot;Allocated&quot;):</p>
@@ -158,6 +159,7 @@ Please see Wojciech Nagórski's <a href="https://wojciechnagorski.com/2020/04/cr
         Add(new InliningDiagnoser());
         Add(new EtwProfiler());
         Add(ThreadingDiagnoser.Default);
+        Add(ExceptionDiagnoser.Default);
     }
 }
 </code></pre>
@@ -169,6 +171,7 @@ Please see Wojciech Nagórski's <a href="https://wojciechnagorski.com/2020/04/cr
 [ConcurrencyVisualizerProfiler]
 [NativeMemoryProfiler]
 [ThreadingDiagnoser]
+[ExceptionDiagnoser]
 </code></pre>
 <p>In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on. The column Gen X means number of GC collections per 1000 operations for that generation.</p>
 <h2 id="restrictions">Restrictions</h2>
@@ -176,7 +179,7 @@ Please see Wojciech Nagórski's <a href="https://wojciechnagorski.com/2020/04/cr
 <li>In order to not affect main results we perform a separate run if any diagnoser is used. That's why it might take more time to execute benchmarks.</li>
 <li>MemoryDiagnoser:
 <ul>
-<li>Mono currently <a href="http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono">does not</a> expose any api to get the number of allocated bytes. That's why our Mono users will get <code>?</code> in Allocated column.</li>
+<li>Mono currently <a href="https://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-in-mono">does not</a> expose any api to get the number of allocated bytes. That's why our Mono users will get <code>?</code> in Allocated column.</li>
 <li>In order to get the number of allocated bytes in cross platform way we are using <code>GC.GetAllocatedBytesForCurrentThread</code> which recently got <a href="https://github.com/dotnet/corefx/pull/12489">exposed</a> for netcoreapp1.1. That's why BenchmarkDotNet does not support netcoreapp1.0 from version 0.10.1.</li>
 <li>MemoryDiagnoser is <code>99.5%</code> accurate about allocated memory when using default settings or Job.ShortRun (or any longer job than it).</li>
 </ul>
@@ -372,11 +375,12 @@ namespace BenchmarkDotNet.Samples
 <h2 id="sample-introdisassembly">Sample: IntroDisassembly</h2>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroDisassembly.cs">using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Diagnosers;
 using System.Linq;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DisassemblyDiagnoser]
+    [DisassemblyDiagnoser(printInstructionAddresses: true, syntax: DisassemblySyntax.Masm)]
     public class IntroDisassembly
     {
         private int[] field = Enumerable.Range(0, 100).ToArray();
@@ -555,7 +559,7 @@ namespace BenchmarkDotNet.Samples
     }
 }
 </code></pre><h3 id="output">Output</h3>
-<p>The disassembly result can be obtained <a href="http://adamsitnik.com/files/disasm/Jit_Devirtualization-disassembly-report.html">here</a>.
+<p>The disassembly result can be obtained <a href="https://adamsitnik.com/files/disasm/Jit_Devirtualization-disassembly-report.html">here</a>.
 The file was too big to embed it in this doc page.</p>
 <h3 id="links">Links</h3>
 <ul>
@@ -846,6 +850,61 @@ namespace BenchmarkDotNet.Samples
 <ul>
 <li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
 <li>The permanent link to this sample: <a class="xref" href="../samples/IntroThreadingDiagnoser.html">Sample: IntroThreadingDiagnoser</a></li>
+</ul>
+<hr>
+<h2 id="sample-introexceptiondiagnoser">Sample: IntroExceptionDiagnoser</h2>
+<p>The <code>ExceptionDiagnoser</code> uses <a href="https://learn.microsoft.com/en-us/dotnet/api/system.appdomain.firstchanceexception">AppDomain.FirstChanceException</a> API to report:</p>
+<ul>
+<li>Exception frequency: The number of exceptions thrown during the operations divided by the number of operations.</li>
+</ul>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroExceptionDiagnoser.cs">using BenchmarkDotNet.Attributes;
+using System;
+
+namespace BenchmarkDotNet.Samples
+{
+    [ExceptionDiagnoser]
+    public class IntroExceptionDiagnoser
+    {
+        [Benchmark]
+        public void ThrowExceptionRandomly()
+        {
+            try
+            {
+                if (new Random().Next(0, 5) &gt; 1)
+                {
+                    throw new Exception();
+                }
+            }
+            catch { }
+        }
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">Error</th>
+<th style="text-align: right;">StdDev</th>
+<th style="text-align: right;">Exception frequency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ThrowExceptionRandomly</td>
+<td style="text-align: right;">4.936 us</td>
+<td style="text-align: right;">0.1542 us</td>
+<td style="text-align: right;">0.4499 us</td>
+<td style="text-align: right;">0.1381</td>
+</tr>
+</tbody>
+</table>
+<h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroExceptionDiagnoser.html">Sample: IntroExceptionDiagnoser</a></li>
 </ul>
 <hr>
 </article>

@@ -114,7 +114,7 @@
 <h2 id="use-the-release-build-without-an-attached-debugger">Use the Release build without an attached debugger</h2>
 <p>Never use the Debug build for benchmarking. <em>Never</em>. The debug version of the target method can run 10–100 times slower.
 The release mode means that you should have <code>&lt;Optimize&gt;true&lt;/Optimize&gt;</code> in your csproj file
-or use <a href="https://msdn.microsoft.com/en-us/library/t0hfscdc.aspx">/optimize</a> for <code>csc</code>. Also your never
+or use <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/compiler-options/">/optimize</a> for <code>csc</code>. Also your never
 should use an attached debugger (e.g. Visual Studio or WinDbg) during the benchmarking. The best way is
 build our benchmark in the Release mode and run it from the command line.</p>
 <h2 id="try-different-environments">Try different environments</h2>

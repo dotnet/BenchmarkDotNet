@@ -111,7 +111,7 @@
             <article class="content wrap" id="_content" data-uid="docs.event-pipe-profiler">
 <h1 id="eventpipeprofiler">EventPipeProfiler</h1>
 
-<p><code>EventPipeProfiler</code> is a cross-platform profiler that allows profile .NET code on every platform - Windows, Linux, macOS. Collected data are exported to trace files (<code>.speedscope.json</code> and <code>.nettrace</code>) which can be analyzed using <a href="https://www.speedscope.app/">SpeedScope</a>, <a href="https://github.com/Microsoft/perfview">PerfView</a>, and <a href="https://docs.microsoft.com/en-us/visualstudio/profiling/profiling-feature-tour">Visual Studio Profiler</a>. This new profiler is available from the 0.12.1 version.</p>
+<p><code>EventPipeProfiler</code> is a cross-platform profiler that allows profile .NET code on every platform - Windows, Linux, macOS. Collected data are exported to trace files (<code>.speedscope.json</code> and <code>.nettrace</code>) which can be analyzed using <a href="https://www.speedscope.app/">SpeedScope</a>, <a href="https://github.com/Microsoft/perfview">PerfView</a>, and <a href="https://learn.microsoft.com/visualstudio/profiling/profiling-feature-tour">Visual Studio Profiler</a>. This new profiler is available from the 0.12.1 version.</p>
 <p><img src="https://wojciechnagorski.com/images/EventPipeProfiler/SpeedScopeAdvance.png" alt=""></p>
 <h1 id="configuration">Configuration</h1>
 <p><code>EventPipeProfiler</code> can be enabled in three ways:</p>
@@ -151,7 +151,7 @@ C:\Work\BenchmarkDotNet\samples\BenchmarkDotNet.Samples\BenchmarkDotNet.Artifact
 </code></pre>
 <h2 id="sample-eventpipeprofileradvanced">Sample: EventPipeProfilerAdvanced</h2>
 <p>The most advanced and powerful way to use <code>EventPipeProfiler</code> is a custom configuration. As you can see the below configuration adds <code>EventPipeProfiler</code> that constructor can take the profile and/or a list of providers.
-Both <code>EventPipeProfiler</code> and <code>dotnet trace</code> use the <code>Microsoft.Diagnostics.NETCore.Client</code> package internally. So before you start using the custom configuration of this profiler, it is worth reading the documentation <a href="https://github.com/dotnet/diagnostics/blob/master/documentation/dotnet-trace-instructions.md">here</a> and <a href="https://docs.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-trace#dotnet-trace-collect">here</a> where you can find more information about how to configure provider list.</p>
+Both <code>EventPipeProfiler</code> and <code>dotnet trace</code> use the <code>Microsoft.Diagnostics.NETCore.Client</code> package internally. So before you start using the custom configuration of this profiler, it is worth reading the documentation <a href="https://github.com/dotnet/diagnostics/blob/main/documentation/dotnet-trace-instructions.md">here</a> and <a href="https://learn.microsoft.com/dotnet/core/diagnostics/dotnet-trace#dotnet-trace-collect">here</a> where you can find more information about how to configure provider list.</p>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="EventPipeProfilerAdvanced.cs">using System.Buffers;
 using System.Diagnostics.Tracing;

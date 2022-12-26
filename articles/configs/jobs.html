@@ -144,11 +144,17 @@
 <li><code>AllowVeryLargeObjects</code>:  On 64-bit platforms, enables arrays that are greater than 2 gigabytes (GB) in total size</li>
 </ul>
 </li>
+<li><code>LargeAddressAware</code>: Specifies that benchmark can handle addresses larger than 2 gigabytes. See also: <a class="xref" href="../samples/IntroLargeAddressAware.html">Sample: IntroLargeAddressAware</a> and <a href="https://learn.microsoft.com/cpp/build/reference/largeaddressaware-handle-large-addresses"><code>LARGEADDRESSAWARE</code></a>
+<ul>
+<li><code>false</code>: Benchmark uses the defaults (64-bit: enabled; 32-bit: disabled).</li>
+<li><code>true</code>: Explicitly specify that benchmark can handle addresses larger than 2 gigabytes.</li>
+</ul>
+</li>
 <li><code>EnvironmentVariables</code>: customized environment variables for target benchmark. See also: <a class="xref" href="../samples/IntroEnvVars.html">Sample: IntroEnvVars</a></li>
 </ul>
 <p>BenchmarkDotNet will use host process environment characteristics for non specified values.</p>
 <h3 id="run">Run</h3>
-<p>In this category, you can specifiy how to benchmark each method.</p>
+<p>In this category, you can specify how to benchmark each method.</p>
 <ul>
 <li><code>RunStrategy</code>:
 <ul>
@@ -168,16 +174,16 @@
 <li><code>MinWarmupIterationCount</code>: Minimum count of warmup iterations that should be performed, the default value is 6</li>
 <li><code>MaxWarmupIterationCount</code>: Maximum count of warmup iterations that should be performed, the default value is 50</li>
 </ul>
-<p>Usually, you shouldn't specify such characteristics like <code>LaunchCount</code>, <code>WarmupCount</code>, <code>TargetCount</code>, or <code>IterationTime</code> because BenchmarkDotNet has a smart algorithm to choose these values automatically based on received measurements. You can specify it for testing purposes or when you are damn sure that you know the right characteristics for your benchmark (when you set <code>TargetCount</code> = <code>20</code> you should understand why <code>20</code> is a good value for your case).</p>
+<p>Usually, you shouldn't specify such characteristics like <code>LaunchCount</code>, <code>WarmupCount</code>, <code>IterationCount</code>, or <code>IterationTime</code> because BenchmarkDotNet has a smart algorithm to choose these values automatically based on received measurements. You can specify it for testing purposes or when you are damn sure that you know the right characteristics for your benchmark (when you set <code>IterationCount</code> = <code>20</code> you should understand why <code>20</code> is a good value for your case).</p>
 <h3 id="accuracy">Accuracy</h3>
-<p>If you want to change the accuracy level, you should use the following characteristics instead of manually adjusting values of <code>WarmupCount</code>, <code>TargetCount</code>, and so on.</p>
+<p>If you want to change the accuracy level, you should use the following characteristics instead of manually adjusting values of <code>WarmupCount</code>, <code>IterationCount</code>, and so on.</p>
 <ul>
 <li><code>MaxRelativeError</code>, <code>MaxAbsoluteError</code>: Maximum acceptable error for a benchmark (by default, BenchmarkDotNet continue iterations until the actual error is less than the specified error). <em>In these two characteristics</em>, the error means half of 99.9% confidence interval. <code>MaxAbsoluteError</code> is an absolute <code>TimeInterval</code>; doesn't have a default value. <code>MaxRelativeError</code> defines max acceptable (<code>(&lt;half of CI 99.9%&gt;) / Mean</code>).</li>
 <li><code>MinIterationTime</code>: Minimum time of a single iteration. Unlike <code>Run.IterationTime</code>, this characteristic specifies only the lower limit. In case of need, BenchmarkDotNet can increase this value.</li>
 <li><code>MinInvokeCount</code>:  Minimum about of target method invocation. Default value if <code>4</code> but you can decrease this value for cases when single invocations takes a lot of time.</li>
-<li><code>EvaluateOverhead</code>: if you benchmark method takes nanoseconds, BenchmarkDotNet overhead can significantly affect measurements. If this characterics is enable, the overhead will be evaluated and subtracted from the result measurements. Default value is <code>true</code>.</li>
+<li><code>EvaluateOverhead</code>: if your benchmark method takes nanoseconds, BenchmarkDotNet overhead can significantly affect measurements. If this characteristic is enabled, the overhead will be evaluated and subtracted from the result measurements. Default value is <code>true</code>.</li>
 <li><code>WithOutlierMode</code>: sometimes you could have outliers in your measurements. Usually these are unexpected outliers which arose because of other processes activities. By default (<code>OutlierMode.RemoveUpper</code>), all upper outliers (which is larger than Q3) will be removed from the result measurements. However, some of benchmarks have <em>expected</em> outliers. In these situation, you expect that some of invocation can produce outliers measurements (e.g. in case of network activities, cache operations, and so on). If you want to see result statistics with these outliers, you should use <code>OutlierMode.DontRemove</code>. If you can also choose <code>OutlierMode.RemoveLower</code> (outliers which are smaller than Q1 will be removed) or <code>OutlierMode.RemoveAll</code> (all outliers will be removed). See also: @BenchmarkDotNet.Mathematics.OutlierMode</li>
-<li><code>AnalyzeLaunchVariance</code>: this characteristic makes sense only if <code>Run.LaunchCount</code> is default. If this mode is enabled and, BenchmarkDotNet will try to perform several launches and detect if there is a veriance between launches. If this mode is disable, only one launch will be performed.</li>
+<li><code>AnalyzeLaunchVariance</code>: this characteristic makes sense only if <code>Run.LaunchCount</code> is default. If this mode is enabled and, BenchmarkDotNet will try to perform several launches and detect if there is a variance between launches. If this mode is disable, only one launch will be performed.</li>
 </ul>
 <h3 id="infrastructure">Infrastructure</h3>
 <p>Usually, you shouldn't specify any characteristics from this section, it can be used for advanced cases only.</p>
@@ -237,7 +243,7 @@ public class MyBenchmarks
 <pre><code class="lang-cs">[DryJob]
 [ClrJob, CoreJob, MonoJob]
 [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
-[SimpleJob(RunStrategy.ColdStart, launchCount: 1, warmupCount: 5, targetCount: 5, id: &quot;FastAndDirtyJob&quot;)]
+[SimpleJob(RunStrategy.ColdStart, launchCount: 1, warmupCount: 5, iterationCount: 5, id: &quot;FastAndDirtyJob&quot;)]
 public class MyBenchmarkClass
 </code></pre>
 <p>Note that each of the attributes identifies a separate job, the sample above will result in 8 different jobs, not a single merged job.</p>

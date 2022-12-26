@@ -152,11 +152,12 @@ If you don't have it, you will get a warning like follows:</p>
 <h2 id="sample-introdisassembly">Sample: IntroDisassembly</h2>
 <h3 id="source-code">Source code</h3>
 <pre><code class="lang-csharp" name="IntroDisassembly.cs">using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Diagnosers;
 using System.Linq;
 
 namespace BenchmarkDotNet.Samples
 {
-    [DisassemblyDiagnoser]
+    [DisassemblyDiagnoser(printInstructionAddresses: true, syntax: DisassemblySyntax.Masm)]
     public class IntroDisassembly
     {
         private int[] field = Enumerable.Range(0, 100).ToArray();
@@ -380,7 +381,7 @@ namespace BenchmarkDotNet.Samples
     }
 }
 </code></pre><h3 id="output">Output</h3>
-<p>The disassembly result can be obtained <a href="http://adamsitnik.com/files/disasm/Jit_Devirtualization-disassembly-report.html">here</a>.
+<p>The disassembly result can be obtained <a href="https://adamsitnik.com/files/disasm/Jit_Devirtualization-disassembly-report.html">here</a>.
 The file was too big to embed it in this doc page.</p>
 <h3 id="links">Links</h3>
 <ul>

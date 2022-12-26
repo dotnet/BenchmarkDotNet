@@ -133,12 +133,12 @@
   
   
   <a id="BenchmarkDotNet_Toolchains_Results_ExecuteResult__ctor_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_Results_ExecuteResult__ctor_System_Boolean_System_Nullable_System_Int32__System_Nullable_System_Int32__System_Collections_Generic_IReadOnlyList_System_String__System_Collections_Generic_IReadOnlyList_System_String__System_Int32_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.#ctor(System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Collections.Generic.IReadOnlyList{System.String},System.Collections.Generic.IReadOnlyList{System.String},System.Int32)">ExecuteResult(Boolean, Nullable&lt;Int32&gt;, Nullable&lt;Int32&gt;, IReadOnlyList&lt;String&gt;, IReadOnlyList&lt;String&gt;, Int32)</h4>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_ExecuteResult__ctor_System_Boolean_System_Nullable_System_Int32__System_Nullable_System_Int32__System_Collections_Generic_IReadOnlyList_System_String__System_Collections_Generic_IReadOnlyList_System_String__System_Collections_Generic_IReadOnlyList_System_String__System_Int32_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.#ctor(System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Collections.Generic.IReadOnlyList{System.String},System.Collections.Generic.IReadOnlyList{System.String},System.Collections.Generic.IReadOnlyList{System.String},System.Int32)">ExecuteResult(Boolean, Nullable&lt;Int32&gt;, Nullable&lt;Int32&gt;, IReadOnlyList&lt;String&gt;, IReadOnlyList&lt;String&gt;, IReadOnlyList&lt;String&gt;, Int32)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ExecuteResult(bool foundExecutable, int? exitCode, int? processId, IReadOnlyList&lt;string&gt; data, IReadOnlyList&lt;string&gt; linesWithExtraOutput, int launchIndex)</code></pre>
+    <pre><code class="lang-csharp hljs">public ExecuteResult(bool foundExecutable, int? exitCode, int? processId, IReadOnlyList&lt;string&gt; results, IReadOnlyList&lt;string&gt; prefixedLines, IReadOnlyList&lt;string&gt; standardOutput, int launchIndex)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -167,12 +167,17 @@
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a>&gt;</td>
-        <td><span class="parametername">data</span></td>
+        <td><span class="parametername">results</span></td>
         <td></td>
       </tr>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a>&gt;</td>
-        <td><span class="parametername">linesWithExtraOutput</span></td>
+        <td><span class="parametername">prefixedLines</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a>&gt;</td>
+        <td><span class="parametername">standardOutput</span></td>
         <td></td>
       </tr>
       <tr>
@@ -230,31 +235,6 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.nullable-1">Nullable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_ExtraOutput_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.ExtraOutput*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_ExtraOutput" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.ExtraOutput">ExtraOutput</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;string&gt; ExtraOutput { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -336,6 +316,32 @@
   </table>
   
   
+  <a id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_PrefixedLines_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.PrefixedLines*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_PrefixedLines" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.PrefixedLines">PrefixedLines</h4>
+  <div class="markdown level1 summary"><p>Lines reported by the Benchmark process that are starting with &quot;//&quot;</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;string&gt; PrefixedLines { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_ProcessId_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.ProcessId*"></a>
   <h4 id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_ProcessId" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.ProcessId">ProcessId</h4>
   <div class="markdown level1 summary"></div>
@@ -355,6 +361,58 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.nullable-1">Nullable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_Results_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.Results*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_Results" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.Results">Results</h4>
+  <div class="markdown level1 summary"><p>Lines reported by the Benchmark process that are not starting with &quot;//&quot;</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;string&gt; Results { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_StandardOutput_" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.StandardOutput*"></a>
+  <h4 id="BenchmarkDotNet_Toolchains_Results_ExecuteResult_StandardOutput" data-uid="BenchmarkDotNet.Toolchains.Results.ExecuteResult.StandardOutput">StandardOutput</h4>
+  <div class="markdown level1 summary"><p>All lines printed to standard output by the Benchmark process</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;string&gt; StandardOutput { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>

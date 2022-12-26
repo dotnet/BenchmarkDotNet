@@ -122,6 +122,8 @@
     <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">Object</a></div>
     <div class="level1"><a class="xref" href="BenchmarkDotNet.Disassemblers.SourceCode.html">SourceCode</a></div>
     <div class="level2"><span class="xref">Asm</span></div>
+      <div class="level3"><a class="xref" href="BenchmarkDotNet.Disassemblers.Arm64Asm.html">Arm64Asm</a></div>
+      <div class="level3"><a class="xref" href="BenchmarkDotNet.Disassemblers.IntelAsm.html">IntelAsm</a></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -133,19 +135,19 @@
   <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
   <h5 id="BenchmarkDotNet_Disassemblers_Asm_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class Asm : SourceCode</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract class Asm : SourceCode</code></pre>
   </div>
   <h3 id="properties">Properties
   </h3>
   
   
-  <a id="BenchmarkDotNet_Disassemblers_Asm_Instruction_" data-uid="BenchmarkDotNet.Disassemblers.Asm.Instruction*"></a>
-  <h4 id="BenchmarkDotNet_Disassemblers_Asm_Instruction" data-uid="BenchmarkDotNet.Disassemblers.Asm.Instruction">Instruction</h4>
+  <a id="BenchmarkDotNet_Disassemblers_Asm_InstructionLength_" data-uid="BenchmarkDotNet.Disassemblers.Asm.InstructionLength*"></a>
+  <h4 id="BenchmarkDotNet_Disassemblers_Asm_InstructionLength" data-uid="BenchmarkDotNet.Disassemblers.Asm.InstructionLength">InstructionLength</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Instruction Instruction { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int InstructionLength { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -157,7 +159,57 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">Iced.Intel.Instruction</span></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Disassemblers_Asm_IsReferencedAddressIndirect_" data-uid="BenchmarkDotNet.Disassemblers.Asm.IsReferencedAddressIndirect*"></a>
+  <h4 id="BenchmarkDotNet_Disassemblers_Asm_IsReferencedAddressIndirect" data-uid="BenchmarkDotNet.Disassemblers.Asm.IsReferencedAddressIndirect">IsReferencedAddressIndirect</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsReferencedAddressIndirect { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="BenchmarkDotNet_Disassemblers_Asm_ReferencedAddress_" data-uid="BenchmarkDotNet.Disassemblers.Asm.ReferencedAddress*"></a>
+  <h4 id="BenchmarkDotNet_Disassemblers_Asm_ReferencedAddress" data-uid="BenchmarkDotNet.Disassemblers.Asm.ReferencedAddress">ReferencedAddress</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ulong? ReferencedAddress { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.nullable-1">Nullable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.uint64">UInt64</a>&gt;</td>
         <td></td>
       </tr>
     </tbody>

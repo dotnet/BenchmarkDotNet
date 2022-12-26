@@ -154,7 +154,7 @@ namespace BenchmarkDotNet.Samples
             NetCoreAppSettings netCoreAppSettings = new NetCoreAppSettings(
                 targetFrameworkMoniker: &quot;net5.0&quot;, runtimeFrameworkVersion: null, name: &quot;Wasm&quot;,
                 customDotNetCliPath: cliPath);
-            IToolchain toolChain = WasmToolChain.From(netCoreAppSettings);
+            IToolchain toolChain = WasmToolchain.From(netCoreAppSettings);
 
             BenchmarkRunner.Run&lt;IntroCustomMonoFluentConfig&gt;(DefaultConfig.Instance
                 .AddJob(Job.ShortRun.WithRuntime(runtime).WithToolchain(toolChain)));

@@ -123,11 +123,11 @@
 <p>The <code>--filter</code> or just <code>-f</code> allows you to filter the benchmarks by their full name (<code>namespace.typeName.methodName</code>) using glob patterns.</p>
 <p>Examples:</p>
 <ol>
-<li>Run all benchmarks from System.Memory namespace: <code>-f 'System.Memory*'</code></li>
-<li>Run all benchmarks: <code>-f '*'</code></li>
-<li>Run all benchmarks from ClassA and ClassB <code>-f '*ClassA*' '*ClassB*'</code></li>
+<li>Run all benchmarks from System.Memory namespace: <code>-f System.Memory*</code></li>
+<li>Run all benchmarks: <code>-f *</code></li>
+<li>Run all benchmarks from ClassA and ClassB <code>-f *ClassA* *ClassB*</code></li>
 </ol>
-<p><strong>Note</strong>: If you would like to <strong>join</strong> all the results into a <strong>single summary</strong>, you need to put <code>--join</code>. For example: <code>-f '*ClassA*' '*ClassB*' --join</code></p>
+<p><strong>Note</strong>: If you would like to <strong>join</strong> all the results into a <strong>single summary</strong>, you need to put <code>--join</code>. For example: <code>-f *ClassA* *ClassB* --join</code></p>
 <h2 id="list-of-benchmarks">List of benchmarks</h2>
 <p>The <code>--list</code> allows you to print all of the available benchmark names. Available options are:</p>
 <ul>
@@ -273,7 +273,7 @@ static IConfig GetGlobalConfig()
 <li><code>-e</code>, <code>--exporters</code> GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML.</li>
 <li><code>-i</code>, <code>--inProcess</code> (default: false) run benchmarks in the same process, without spawning child process per benchmark.</li>
 <li><code>-a</code>, <code>--artifacts</code> valid path to an accessible directory where output artifacts will be stored.</li>
-<li><code>--outliers</code> (default: RemoveUpper) DontRemove/RemoveUpper/RemoveLower/RemoveAll.</li>
+<li><code>--outliers</code> (default: RemoveUpper) <code>DontRemove</code>/<code>RemoveUpper</code>/<code>RemoveLower</code>/<code>RemoveAll</code>.</li>
 <li><code>--affinity</code> affinity mask to set for the benchmark process.</li>
 <li><code>--allStats</code> (default: false) Displays all statistics (min, max &amp; more).</li>
 <li><code>--allCategories</code> categories to run. If few are provided, only the benchmarks which belong to all of them are going to be executed.</li>
@@ -289,7 +289,7 @@ static IConfig GetGlobalConfig()
 <li><code>--version</code> display version information.</li>
 <li><code>--keepFiles</code> (default: false) determines if all auto-generated files should be kept or removed after running the benchmarks.</li>
 <li><code>--noOverwrite</code> (default: false) determines if the exported result files should not be overwritten.</li>
-<li><code>--disableLogFile</code> disables the logfile.</li>
+<li><code>--disableLogFile</code> disables the log file.</li>
 <li><code>--maxWidth</code> max parameter column width, the default is 20.</li>
 <li><code>--envVars</code> colon separated environment variables (key:value).</li>
 <li><code>--strategy</code> the RunStrategy that should be used. Throughput/ColdStart/Monitoring.</li>
