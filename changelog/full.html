@@ -223,7 +223,7 @@ As part of this hackathon we have received following PRs:</li>
 <h2 id="milestone-details">Milestone details</h2>
 <p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.13.3">v0.13.3</a> scope,
 29 issues were resolved and 72 pull requests were merged.
-This release includes 85 commits by 22 contributors.</p>
+This release includes 87 commits by 22 contributors.</p>
 <h2 id="resolved-issues-29">Resolved issues (29)</h2>
 <ul>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/989">#989</a> [Suggestion] add API for detecting benchmark run failures. (assignee: <a href="https://github.com/emanuel-v-r">@emanuel-v-r</a>)</li>
@@ -331,7 +331,7 @@ This release includes 85 commits by 22 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2234">#2234</a> Disassembler realiability fixes (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2235">#2235</a> tests can't assume x64 hardware (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 </ul>
-<h2 id="commits-85">Commits (85)</h2>
+<h2 id="commits-87">Commits (87)</h2>
 <ul>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/33b288ff2918d31c461f0de64908f99e24a4b45e">33b288</a> Use latest AzDO macOS pool (#2085) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/83750baceb71cb0c81a01145a5872b63bc7db858">83750b</a> Postrelease v0.13.2 update (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
@@ -418,6 +418,8 @@ This release includes 85 commits by 22 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/82f03f4d4222dfcf4e19e1f32a47867342a680d1">82f03f</a> Add support for .NET SDK that uses Mono instead CLR as a default VM (#2230) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/96844853b8c15eeed65ef8349aa9dbe47fb05248">968448</a> Disassembler realiability fixes (#2234) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a098bc1761c9157dbca5bd10ef6d08840620136e">a098bc</a> tests can't assume x64 hardware (#2235) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/2665ac7c38f3edecbd7f593f25941eb613cbd779">2665ac</a> Prepare v0.13.3 changelog (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0714f5f4a97bc74ff0ac5860525527c8e8825205">0714f5</a> Set library version: 0.13.3 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 </ul>
 <h2 id="contributors-22">Contributors (22)</h2>
 <ul>
@@ -446,7 +448,7 @@ This release includes 85 commits by 22 contributors.</p>
 </ul>
 <p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
-<p><em>Date: TBA</em></p>
+<p><em>Date: December 26, 2022</em></p>
 <p><em>Milestone: <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av0.13.3">v0.13.3</a></em>
 (<a href="https://github.com/dotnet/BenchmarkDotNet/compare/v0.13.2...v0.13.3">List of commits</a>)</p>
 <p><em>NuGet Packages:</em></p>
@@ -773,21 +775,23 @@ public class AllocationColumnSample
 </ul>
 <h2 id="milestone-details">Milestone details</h2>
 <p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.13.2">v0.13.2</a> scope,
-44 issues were resolved and 124 pull requests were merged.
+50 issues were resolved and 124 pull requests were merged.
 This release includes 147 commits by 34 contributors.</p>
-<h2 id="resolved-issues-44">Resolved issues (44)</h2>
+<h2 id="resolved-issues-50">Resolved issues (50)</h2>
 <ul>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/299">#299</a> Add API to remove columns for baseline comparison (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/384">#384</a> Print Vector<byte>.Count as part of machine info (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</byte></li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/722">#722</a> Add scaled column for Allocated Memory</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/837">#837</a> Problems with default UnrollFactor in V0.11.0 (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1177">#1177</a> Public types missing from reference assemblies don't work with ParamsSource</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1506">#1506</a> BenchmarkDotNet does not force to High Performance Mode during running (assignee: <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1603">#1603</a> Don't display Job and Toolchain column when running benchmarks for multiple runtimes</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1669">#1669</a> --buildTimeout does not seem to work (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1680">#1680</a> Cannot override RD.xml for NativeAOT</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1700">#1700</a> [Bug] Not unique exporter for exporter type</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1711">#1711</a> Add support for IBM Z architecture (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1727">#1727</a> Unhelpful rounding in MemoryDiagnoser</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1753">#1753</a> &quot;call: command not found&quot; in .sh build script (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1755">#1755</a> EventPipeProfiler: File names are very verbose</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1756">#1756</a> EventPipeProfile: speedscope.app cannot parse result file (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1774">#1774</a> Ability to compare --corerun with --runtimes (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1775">#1775</a> Please add an easy way to remove columns</li>
@@ -798,6 +802,7 @@ This release includes 147 commits by 34 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1809">#1809</a> Exception when using ParamsSource with (null) objects</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1812">#1812</a> Invalid codegen for Enumerable.Empty returned from ParamsSource</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1819">#1819</a> How to change exporter output path?</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1836">#1836</a> [Bug] <code>System.InvalidOperationException: There is an error in XML document (0, 0).</code></li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1857">#1857</a> Github actions ubuntu-latest &quot;Unable to load shared library 'advapi32.dll' or one of its dependencies&quot; when profiling dotnet 5</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1864">#1864</a> Is there a way to join summaries as if the benchmarks were run separately? (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1871">#1871</a> Detect ReSharper's Dynamic Program Analysis (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
@@ -809,7 +814,10 @@ This release includes 147 commits by 34 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1934">#1934</a> Ensure WorkloadActionUnroll and similar are optimized if possible</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1937">#1937</a> PR builds should not be published to BDN nightly feed (assignee: <a href="https://github.com/mawosoft">@mawosoft</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1943">#1943</a> GitHub Actions Windows CI leg failing due to lack of native tools (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1948">#1948</a> questions to help with future PRs</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1957">#1957</a> Broken pipe (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1977">#1977</a> More Data for JSON and XML Export</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1989">#1989</a> Way to summarize all the params results (assignee: <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1992">#1992</a> API Docs on website empty (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2000">#2000</a> DisassemblyDiagnoser broken on Linux (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2009">#2009</a> Cleanup the dependencies (assignee: <a href="https://github.com/martincostello">@martincostello</a>)</li>
@@ -1166,15 +1174,15 @@ This release includes 147 commits by 34 contributors.</p>
 </ul>
 <h2 id="milestone-details">Milestone details</h2>
 <p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.13.1">v0.13.1</a> scope,
-3 issues were resolved and 22 pull requests were merged.
-This release includes 36 commits by 10 contributors.</p>
+3 issues were resolved and 23 pull requests were merged.
+This release includes 36 commits by 9 contributors.</p>
 <h2 id="resolved-issues-3">Resolved issues (3)</h2>
 <ul>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1703">#1703</a> Unable to run benchmark when <code>ParamsSource</code> refers to string with surrogate pairs</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1713">#1713</a> System.NotSupportedException: Unknown Acknowledgment: ﻿Acknowledgment when running in a github action (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1714">#1714</a> AwaitingTasksShouldNotInterfereAllocationResults is flaky (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 </ul>
-<h2 id="merged-pull-requests-22">Merged pull requests (22)</h2>
+<h2 id="merged-pull-requests-23">Merged pull requests (23)</h2>
 <ul>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1705">#1705</a> do not split surrogates in <code>ParameterInstance.ToDisplayText()</code> (by <a href="https://github.com/novak-as">@novak-as</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1710">#1710</a> Fix typo (by <a href="https://github.com/martincostello">@martincostello</a>)</li>
@@ -1184,6 +1192,7 @@ This release includes 36 commits by 10 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1725">#1725</a> Add ValidateExecutableReferencesMatchSelfContained (by <a href="https://github.com/kant2002">@kant2002</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1729">#1729</a> Naricc/validate executable references match self contained (by <a href="https://github.com/naricc">@naricc</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1735">#1735</a> Use Utf8 not just for writing to standard output, but also for reading from standard input (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1739">#1739</a> Add support for returning unmanaged types from benchmarks (by <a href="https://github.com/kant2002">@kant2002</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1742">#1742</a> Fix WasmAssembliesToBundle item is empty error (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1743">#1743</a> Add linker description for wasm AOT (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/1744">#1744</a> Make mono/wasm run on Windows (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
@@ -1226,7 +1235,7 @@ This release includes 36 commits by 10 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c3fb7b9724a62048d27ef5bcaec616117d68b934">c3fb7b</a> Add support for returning unmanaged types from benchmarks (#1739) (by <a href="https://github.com/kant2002">@kant2002</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6f453baafa4ef800e0377ebc463ffa82b2f76368">6f453b</a> [wasm] Allow unsafe code (#1752) (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c2cee254b3a9aec3a6b73bc7fd21b7f2f70ca2ec">c2cee2</a> Fix the CI (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/19cbef28cba94cd4a7da6266b839d4d3fe2f14db">19cbef</a> Fix typo in docs (#1748) (by <a href="https://github.com/Jlobblet">@Jlobblet</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/19cbef28cba94cd4a7da6266b839d4d3fe2f14db">19cbef</a> Fix typo in docs (#1748) (by John Blundell)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1a94d4dfa65f975f49d1bc92ced5c7a45bb994d4">1a94d4</a> [wasm] Add WasmMainJSPath in interpreter projects (#1757) (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/37ec19f6dba9ccee6a8f776aa3020ca189944f0c">37ec19</a> Get rid of warning (#1760) (by <a href="https://github.com/radekdoulik">@radekdoulik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4bd433d85fff4fb6ba8c4f8df3e685ad669e2519">4bd433</a> use benchmark process runtime, not host process runtime when deciding whether... (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
@@ -1238,14 +1247,13 @@ This release includes 36 commits by 10 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/708be495530a968ed767a20f4623f54231d1ab9b">708be4</a> Prepare v0.13.1 changelog (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a936815f2a58d9b728cfc5fe620bba17481c180c">a93681</a> Set library version: 0.13.1 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 </ul>
-<h2 id="contributors-10">Contributors (10)</h2>
+<h2 id="contributors-9">Contributors (9)</h2>
 <ul>
 <li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 <li>Andrii Kurdiumov (<a href="https://github.com/kant2002">@kant2002</a>)</li>
-<li>Chris Granade (<a href="https://github.com/cgranade">@cgranade</a>)</li>
-<li>Evgeny Grebenyuk (<a href="https://github.com/eugene-g">@eugene-g</a>)</li>
-<li>John Blundell (<a href="https://github.com/Jlobblet">@Jlobblet</a>)</li>
+<li>Cassandra Granade (<a href="https://github.com/cgranade">@cgranade</a>)</li>
+<li>Evgenii Grebeniuk (<a href="https://github.com/eugene-g">@eugene-g</a>)</li>
 <li>Martin Costello (<a href="https://github.com/martincostello">@martincostello</a>)</li>
 <li>Nathan Ricci (<a href="https://github.com/naricc">@naricc</a>)</li>
 <li>Oleksandr Novak (<a href="https://github.com/novak-as">@novak-as</a>)</li>

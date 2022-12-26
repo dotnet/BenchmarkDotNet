@@ -427,21 +427,23 @@ public class AllocationColumnSample
 </ul>
 <h2 id="milestone-details">Milestone details</h2>
 <p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.13.2">v0.13.2</a> scope,
-44 issues were resolved and 124 pull requests were merged.
+50 issues were resolved and 124 pull requests were merged.
 This release includes 147 commits by 34 contributors.</p>
-<h2 id="resolved-issues-44">Resolved issues (44)</h2>
+<h2 id="resolved-issues-50">Resolved issues (50)</h2>
 <ul>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/299">#299</a> Add API to remove columns for baseline comparison (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/384">#384</a> Print Vector<byte>.Count as part of machine info (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</byte></li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/722">#722</a> Add scaled column for Allocated Memory</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/837">#837</a> Problems with default UnrollFactor in V0.11.0 (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1177">#1177</a> Public types missing from reference assemblies don't work with ParamsSource</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1506">#1506</a> BenchmarkDotNet does not force to High Performance Mode during running (assignee: <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1603">#1603</a> Don't display Job and Toolchain column when running benchmarks for multiple runtimes</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1669">#1669</a> --buildTimeout does not seem to work (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1680">#1680</a> Cannot override RD.xml for NativeAOT</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1700">#1700</a> [Bug] Not unique exporter for exporter type</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1711">#1711</a> Add support for IBM Z architecture (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1727">#1727</a> Unhelpful rounding in MemoryDiagnoser</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1753">#1753</a> &quot;call: command not found&quot; in .sh build script (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1755">#1755</a> EventPipeProfiler: File names are very verbose</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1756">#1756</a> EventPipeProfile: speedscope.app cannot parse result file (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1774">#1774</a> Ability to compare --corerun with --runtimes (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1775">#1775</a> Please add an easy way to remove columns</li>
@@ -452,6 +454,7 @@ This release includes 147 commits by 34 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1809">#1809</a> Exception when using ParamsSource with (null) objects</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1812">#1812</a> Invalid codegen for Enumerable.Empty returned from ParamsSource</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1819">#1819</a> How to change exporter output path?</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1836">#1836</a> [Bug] <code>System.InvalidOperationException: There is an error in XML document (0, 0).</code></li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1857">#1857</a> Github actions ubuntu-latest &quot;Unable to load shared library 'advapi32.dll' or one of its dependencies&quot; when profiling dotnet 5</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1864">#1864</a> Is there a way to join summaries as if the benchmarks were run separately? (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1871">#1871</a> Detect ReSharper's Dynamic Program Analysis (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
@@ -463,7 +466,10 @@ This release includes 147 commits by 34 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1934">#1934</a> Ensure WorkloadActionUnroll and similar are optimized if possible</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1937">#1937</a> PR builds should not be published to BDN nightly feed (assignee: <a href="https://github.com/mawosoft">@mawosoft</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1943">#1943</a> GitHub Actions Windows CI leg failing due to lack of native tools (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1948">#1948</a> questions to help with future PRs</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1957">#1957</a> Broken pipe (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1977">#1977</a> More Data for JSON and XML Export</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1989">#1989</a> Way to summarize all the params results (assignee: <a href="https://github.com/YegorStepanov">@YegorStepanov</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1992">#1992</a> API Docs on website empty (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2000">#2000</a> DisassemblyDiagnoser broken on Linux (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2009">#2009</a> Cleanup the dependencies (assignee: <a href="https://github.com/martincostello">@martincostello</a>)</li>

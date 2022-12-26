@@ -7831,7 +7831,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/full.html",
-          "hash": "8CbittpON/Fwc7JTa5iqb3rgg05RlrWp/jAvRdTTUIU="
+          "hash": "eXPJeZEDRWBHPbFYHuEi/RNXDjv1SxpbwEu3t4ZBrIs="
         }
       },
       "is_incremental": false,
@@ -8158,7 +8158,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.13.1.html",
-          "hash": "qppMoX0Yr2smxgt/L+lrXpx90wvKvmPbIAF/9dgPG0c="
+          "hash": "NpbeULkNdxZGVKhyoXhU8pL302xOIXYLW4VwE5B1bJs="
         }
       },
       "is_incremental": false,
@@ -8173,7 +8173,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.13.2.html",
-          "hash": "U2riE4L8C7ryib96mjx7zWFKwCoYSmLI5gj9aPGpHjA="
+          "hash": "4yg4hZxnqTL2iesOsG5joRe2wDTENqYTzzNrTQ+kU6M="
         }
       },
       "is_incremental": false,
@@ -8185,7 +8185,19 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.13.3.html",
-          "hash": "PR65Dn0xQFMOE87tRk50HhpBQ05yE8to2FcjHO/Iz+Q="
+          "hash": "ApDFwpUjPeykz4otHTFPWFeehYKlhp7w+4HvDIXI/E4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "changelog/v0.13.4.md",
+      "output": {
+        ".html": {
+          "relative_path": "changelog/v0.13.4.html",
+          "hash": "zZHwFbchZKXbocrr/x3nySlEujQo8DRMLp+AqQhp8aw="
         }
       },
       "is_incremental": false,
@@ -8651,7 +8663,7 @@
         "ConceptualDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 158,
+          "total_file_count": 159,
           "skipped_file_count": 0
         },
         "ManagedReferenceDocumentProcessor": {
