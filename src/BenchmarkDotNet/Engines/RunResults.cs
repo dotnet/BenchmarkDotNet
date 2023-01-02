@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
@@ -13,35 +14,51 @@ namespace BenchmarkDotNet.Engines
     {
         private readonly OutlierMode outlierMode;
 
-        [CanBeNull, PublicAPI]
-        public IReadOnlyList<Measurement> Overhead { get; }
+        [PublicAPI]
+        public IReadOnlyList<Measurement> EngineMeasurements { get; }
 
-        [NotNull, PublicAPI]
-        public IReadOnlyList<Measurement> Workload { get; }
+        [PublicAPI]
+        public IReadOnlyList<Measurement>? Overhead
+            => EngineMeasurements
+                .Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual))
+                .ToArray();
+
+        [PublicAPI]
+        public IReadOnlyList<Measurement> Workload
+            => EngineMeasurements
+                .Where(m => m.Is(IterationMode.Workload, IterationStage.Actual))
+                .ToArray();
 
         public GcStats GCStats { get; }
 
         public ThreadingStats ThreadingStats { get; }
 
-        public RunResults([CanBeNull] IReadOnlyList<Measurement> overhead,
-                          [NotNull] IReadOnlyList<Measurement> workload,
-                          OutlierMode outlierMode,
-                          GcStats gcStats,
-                          ThreadingStats threadingStats)
+        public double ExceptionFrequency { get; }
+
+        public RunResults(IReadOnlyList<Measurement> engineMeasurements,
+            OutlierMode outlierMode,
+            GcStats gcStats,
+            ThreadingStats threadingStats,
+            double exceptionFrequency)
         {
             this.outlierMode = outlierMode;
-            Overhead = overhead;
-            Workload = workload;
+            EngineMeasurements = engineMeasurements;
             GCStats = gcStats;
             ThreadingStats = threadingStats;
+            ExceptionFrequency = exceptionFrequency;
         }
 
-        public IEnumerable<Measurement> GetMeasurements()
+        public IEnumerable<Measurement> GetWorkloadResultMeasurements()
         {
-            double overhead = Overhead == null ? 0.0 : new Statistics(Overhead.Select(m => m.Nanoseconds)).Median;
-            var mainStats = new Statistics(Workload.Select(m => m.Nanoseconds));
+            var overheadActualMeasurements = Overhead ?? Array.Empty<Measurement>();
+            var workloadActualMeasurements = Workload;
+            if (workloadActualMeasurements.IsEmpty())
+                yield break;
+
+            double overhead = overheadActualMeasurements.IsEmpty() ? 0.0 : new Statistics(overheadActualMeasurements.Select(m => m.Nanoseconds)).Median;
+            var mainStats = new Statistics(workloadActualMeasurements.Select(m => m.Nanoseconds));
             int resultIndex = 0;
-            foreach (var measurement in Workload)
+            foreach (var measurement in workloadActualMeasurements)
             {
                 if (mainStats.IsActualOutlier(measurement.Nanoseconds, outlierMode))
                     continue;
@@ -59,15 +76,25 @@ namespace BenchmarkDotNet.Engines
             }
         }
 
+        public IEnumerable<Measurement> GetAllMeasurements()
+        {
+            foreach (var measurement in EngineMeasurements)
+                yield return measurement;
+            foreach (var measurement in GetWorkloadResultMeasurements())
+                yield return measurement;
+        }
+
         public void Print(TextWriter outWriter)
         {
-            foreach (var measurement in GetMeasurements())
+            foreach (var measurement in GetWorkloadResultMeasurements())
                 outWriter.WriteLine(measurement.ToString());
 
             if (!GCStats.Equals(GcStats.Empty))
                 outWriter.WriteLine(GCStats.ToOutputLine());
             if (!ThreadingStats.Equals(ThreadingStats.Empty))
                 outWriter.WriteLine(ThreadingStats.ToOutputLine());
+            if (ExceptionFrequency > 0)
+                outWriter.WriteLine(ExceptionsStats.ToOutputLine(ExceptionFrequency));
 
             outWriter.WriteLine();
         }

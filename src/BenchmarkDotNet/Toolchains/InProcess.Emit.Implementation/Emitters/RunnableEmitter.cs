@@ -285,7 +285,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         public readonly MethodInfo getElapsedMethod;
         public readonly MethodInfo startClockMethod;
 
-        private RunnableEmitter([NotNull] BuildPartition buildPartition, [NotNull] ModuleBuilder moduleBuilder)
+        private RunnableEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder)
         {
             if (buildPartition == null)
                 throw new ArgumentNullException(nameof(buildPartition));
@@ -298,7 +298,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             startClockMethod = typeof(ClockExtensions).GetMethod(nameof(ClockExtensions.Start), BindingFlagsPublicStatic);
         }
 
-        [NotNull]
         private Descriptor Descriptor => benchmark.BenchmarkCase.Descriptor;
 
         // ReSharper disable once UnusedMethodReturnValue.Local

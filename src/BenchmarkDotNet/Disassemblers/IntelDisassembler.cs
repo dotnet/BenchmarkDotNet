@@ -51,6 +51,8 @@ namespace BenchmarkDotNet.Disassemblers
                             // is at an address one memory page higher than the code.
                             byte[] buffer = new byte[10];
 
+                            FlushCachedDataIfNeeded(state.Runtime.DataTarget.DataReader, address, buffer);
+
                             if (state.Runtime.DataTarget.DataReader.Read(address, buffer) == buffer.Length && buffer.SequenceEqual(callCountingStubTemplate))
                             {
                                 const ulong TargetMethodAddressSlotOffset = 8;
@@ -82,20 +84,34 @@ namespace BenchmarkDotNet.Disassemblers
 
                     if (address > ushort.MaxValue)
                     {
-                        TryTranslateAddressToName(address, isPrestubMD, state, isIndirect, depth, currentMethod);
+                        if (!IsVulnerableToAvInDac || IsCallOrJump(instruction))
+                        {
+                            TryTranslateAddressToName(address, isPrestubMD, state, isIndirect, depth, currentMethod);
+                        }
                     }
                 }
 
-                yield return new Asm
+                yield return new IntelAsm
                 {
                     InstructionPointer = instruction.IP,
                     InstructionLength = instruction.Length,
-                    IntelInstruction = instruction,
+                    Instruction = instruction,
                     ReferencedAddress = (address > ushort.MaxValue) ? address : null,
                     IsReferencedAddressIndirect = isIndirect,
                 };
             }
         }
+
+        private static bool IsCallOrJump(Instruction instruction)
+            => instruction.FlowControl switch
+            {
+                FlowControl.Call => true,
+                FlowControl.IndirectCall => true,
+                FlowControl.ConditionalBranch => true,
+                FlowControl.IndirectBranch => true,
+                FlowControl.UnconditionalBranch => true,
+                _ => false
+            };
 
         private static bool TryGetReferencedAddress(Instruction instruction, uint pointerSize, out ulong referencedAddress)
         {

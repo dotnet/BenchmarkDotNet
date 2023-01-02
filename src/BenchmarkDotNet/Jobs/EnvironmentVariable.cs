@@ -5,16 +5,14 @@ namespace BenchmarkDotNet.Jobs
 {
     public class EnvironmentVariable : IEquatable<EnvironmentVariable>
     {
-        public EnvironmentVariable([NotNull] string key, [NotNull] string value)
+        public EnvironmentVariable(string key, string value)
         {
             Key = key ?? throw new ArgumentNullException(nameof(key));
-            Value = value ?? throw new ArgumentNullException(nameof(Value));
+            Value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
-        [NotNull]
         public string Key { get; }
 
-        [NotNull]
         public string Value { get; }
 
         // CharacteristicPresenters call ToString(), this is why we need this override
@@ -33,12 +31,6 @@ namespace BenchmarkDotNet.Jobs
             return Equals((EnvironmentVariable) obj);
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (Key.GetHashCode() * 397) ^ Value.GetHashCode();
-            }
-        }
+        public override int GetHashCode() => HashCode.Combine(Key, Value);
     }
 }

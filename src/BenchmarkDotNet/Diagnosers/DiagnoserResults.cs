@@ -15,6 +15,7 @@ namespace BenchmarkDotNet.Diagnosers
             GcStats = executeResult.GcStats;
             ThreadingStats = executeResult.ThreadingStats;
             BuildResult = buildResult;
+            ExceptionFrequency = executeResult.ExceptionFrequency;
         }
 
         public BenchmarkCase BenchmarkCase { get; }
@@ -24,6 +25,8 @@ namespace BenchmarkDotNet.Diagnosers
         public GcStats GcStats { get; }
 
         public ThreadingStats ThreadingStats { get; }
+
+        public double ExceptionFrequency { get; }
 
         public BuildResult BuildResult { get; }
     }

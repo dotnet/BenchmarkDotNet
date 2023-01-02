@@ -11,16 +11,17 @@ namespace BenchmarkDotNet.Environments
 {
     public class CoreRuntime : Runtime
     {
-        public static readonly CoreRuntime Core20 = new CoreRuntime(RuntimeMoniker.NetCoreApp20, "netcoreapp2.0", ".NET Core 2.0");
-        public static readonly CoreRuntime Core21 = new CoreRuntime(RuntimeMoniker.NetCoreApp21, "netcoreapp2.1", ".NET Core 2.1");
-        public static readonly CoreRuntime Core22 = new CoreRuntime(RuntimeMoniker.NetCoreApp22, "netcoreapp2.2", ".NET Core 2.2");
-        public static readonly CoreRuntime Core30 = new CoreRuntime(RuntimeMoniker.NetCoreApp30, "netcoreapp3.0", ".NET Core 3.0");
-        public static readonly CoreRuntime Core31 = new CoreRuntime(RuntimeMoniker.NetCoreApp31, "netcoreapp3.1", ".NET Core 3.1");
-        public static readonly CoreRuntime Core50 = new CoreRuntime(RuntimeMoniker.Net50, "net5.0", ".NET 5.0");
-        public static readonly CoreRuntime Core60 = new CoreRuntime(RuntimeMoniker.Net60, "net6.0", ".NET 6.0");
-        public static readonly CoreRuntime Core70 = new CoreRuntime(RuntimeMoniker.Net70, "net7.0", ".NET 7.0");
+        public static readonly CoreRuntime Core20 = new (RuntimeMoniker.NetCoreApp20, "netcoreapp2.0", ".NET Core 2.0");
+        public static readonly CoreRuntime Core21 = new (RuntimeMoniker.NetCoreApp21, "netcoreapp2.1", ".NET Core 2.1");
+        public static readonly CoreRuntime Core22 = new (RuntimeMoniker.NetCoreApp22, "netcoreapp2.2", ".NET Core 2.2");
+        public static readonly CoreRuntime Core30 = new (RuntimeMoniker.NetCoreApp30, "netcoreapp3.0", ".NET Core 3.0");
+        public static readonly CoreRuntime Core31 = new (RuntimeMoniker.NetCoreApp31, "netcoreapp3.1", ".NET Core 3.1");
+        public static readonly CoreRuntime Core50 = new (RuntimeMoniker.Net50, "net5.0", ".NET 5.0");
+        public static readonly CoreRuntime Core60 = new (RuntimeMoniker.Net60, "net6.0", ".NET 6.0");
+        public static readonly CoreRuntime Core70 = new (RuntimeMoniker.Net70, "net7.0", ".NET 7.0");
+        public static readonly CoreRuntime Core80 = new (RuntimeMoniker.Net80, "net8.0", ".NET 8.0");
 
-        public static CoreRuntime Latest => Core70; // when dotnet/runtime branches for 8.0, this will need to get updated
+        public static CoreRuntime Latest => Core80; // when dotnet/runtime branches for 9.0, this will need to get updated
 
         private CoreRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)
             : base(runtimeMoniker, msBuildMoniker, displayName)
@@ -30,9 +31,9 @@ namespace BenchmarkDotNet.Environments
         public bool IsPlatformSpecific => MsBuildMoniker.IndexOf('-') > 0;
 
         /// <summary>
-        /// use this method if you want to target .NET Core version not supported by current version of BenchmarkDotNet. Example: .NET Core 10
+        /// use this method if you want to target .NET version not supported by current version of BenchmarkDotNet. Example: .NET 10
         /// </summary>
-        /// <param name="msBuildMoniker">msbuild moniker, example: netcoreapp10.0</param>
+        /// <param name="msBuildMoniker">msbuild moniker, example: net10.0</param>
         /// <param name="displayName">display name used by BDN to print the results</param>
         /// <returns>new runtime information</returns>
         public static CoreRuntime CreateForNewVersion(string msBuildMoniker, string displayName)

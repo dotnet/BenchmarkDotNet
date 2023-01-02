@@ -59,16 +59,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 throw new InvalidOperationException("Bug: (OverheadResultType == null");
         }
 
-        [NotNull]
+        public Type OriginMethodReturnType { get; }
         public Type WorkloadMethodReturnType { get; }
-        [NotNull]
         public Type OverheadMethodReturnType { get; }
 
         public bool IsVoid { get; }
         public bool IsByRef { get; }
         public bool IsConsumable { get; }
-        [CanBeNull]
-        public FieldInfo WorkloadConsumableField { get; }
+        public FieldInfo? WorkloadConsumableField { get; }
 
         public bool IsAwaitable { get; }
     }

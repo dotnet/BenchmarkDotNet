@@ -41,6 +41,6 @@ namespace BenchmarkDotNet.Environments
 
         public override bool Equals(object obj) => obj is Runtime other && Equals(other);
 
-        public override int GetHashCode() => Name.GetHashCode() ^ (int)RuntimeMoniker ^ MsBuildMoniker.GetHashCode();
+        public override int GetHashCode() => HashCode.Combine(Name, MsBuildMoniker, RuntimeMoniker);
     }
 }

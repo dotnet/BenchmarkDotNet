@@ -4,9 +4,9 @@ using BenchmarkDotNet.Characteristics;
 
 namespace BenchmarkDotNet.Jobs
 {
-    internal class JobComparer : IComparer<Job>
+    internal class JobComparer : IComparer<Job>, IEqualityComparer<Job>
     {
-        public static readonly IComparer<Job> Instance = new JobComparer();
+        public static readonly JobComparer Instance = new JobComparer();
 
         public int Compare(Job x, Job y)
         {
@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Jobs
             if (y == null)
                 return 1;
 
-            if (x.GetType()!=y.GetType())
+            if (x.GetType() != y.GetType())
                 throw new InvalidOperationException($"The type of xJob ({x.GetType()}) != type of yJob ({y.GetType()})");
 
             var presenter = CharacteristicPresenter.DefaultPresenter;
@@ -48,5 +48,9 @@ namespace BenchmarkDotNet.Jobs
 
             return 0;
         }
+
+        public bool Equals(Job x, Job y) => Compare(x, y) == 0;
+
+        public int GetHashCode(Job obj) => obj.Id.GetHashCode();
     }
 }

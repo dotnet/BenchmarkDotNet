@@ -44,10 +44,30 @@ namespace BenchmarkDotNet.Toolchains
                 case MonoRuntime mono:
                     if (RuntimeInformation.IsAndroid())
                         return InProcessEmitToolchain.Instance;
-                    if (RuntimeInformation.IsiOS())
+                    if (RuntimeInformation.IsIOS())
                         return InProcessNoEmitToolchain.Instance;
                     if (!string.IsNullOrEmpty(mono.AotArgs))
                         return MonoAotToolchain.Instance;
+                    if (mono.IsDotNetBuiltIn)
+                        if (RuntimeInformation.IsNewMono)
+                        {
+                            // It's a .NET SDK with Mono as default VM.
+                            // Publishing self-contained apps might not work like in https://github.com/dotnet/performance/issues/2787.
+                            // In such case, we are going to use default .NET toolchain that is just going to perform dotnet build,
+                            // which internally will result in creating Mono-based app.
+                            return mono.RuntimeMoniker switch
+                            {
+                                RuntimeMoniker.Mono60 => GetToolchain(RuntimeMoniker.Net60),
+                                RuntimeMoniker.Mono70 => GetToolchain(RuntimeMoniker.Net70),
+                                RuntimeMoniker.Mono80 => GetToolchain(RuntimeMoniker.Net80),
+                                _ => CsProjCoreToolchain.From(new NetCoreAppSettings(mono.MsBuildMoniker, null, mono.Name))
+                            };
+                        }
+                        else
+                        {
+                            return MonoToolchain.From(
+                                new NetCoreAppSettings(targetFrameworkMoniker: mono.MsBuildMoniker, runtimeFrameworkVersion: null, name: mono.Name));
+                        }
 
                     return RoslynToolchain.Instance;
 
@@ -123,11 +143,26 @@ namespace BenchmarkDotNet.Toolchains
                 case RuntimeMoniker.Net70:
                     return CsProjCoreToolchain.NetCoreApp70;
 
+                case RuntimeMoniker.Net80:
+                    return CsProjCoreToolchain.NetCoreApp80;
+
                 case RuntimeMoniker.NativeAot60:
                     return NativeAotToolchain.Net60;
 
                 case RuntimeMoniker.NativeAot70:
                     return NativeAotToolchain.Net70;
+
+                case RuntimeMoniker.NativeAot80:
+                    return NativeAotToolchain.Net80;
+
+                case RuntimeMoniker.Mono60:
+                    return MonoToolchain.Mono60;
+
+                case RuntimeMoniker.Mono70:
+                    return MonoToolchain.Mono70;
+
+                case RuntimeMoniker.Mono80:
+                    return MonoToolchain.Mono80;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, "RuntimeMoniker not supported");

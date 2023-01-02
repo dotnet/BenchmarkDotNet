@@ -22,8 +22,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteError("No benchmarks to choose from. Make sure you provided public non-sealed non-static types with public [Benchmark] methods.");
         }
 
-        [NotNull]
-        public IReadOnlyList<Type> AskUser([NotNull] IReadOnlyList<Type> allTypes, ILogger logger)
+        public IReadOnlyList<Type> AskUser(IReadOnlyList<Type> allTypes, ILogger logger)
         {
             var selectedTypes = new List<Type>();
             string benchmarkCaptionExample = allTypes.First().GetDisplayName();
@@ -53,7 +52,7 @@ namespace BenchmarkDotNet.Running
             return selectedTypes;
         }
 
-        public void PrintWrongFilterInfo(IReadOnlyList<Type> allTypes, ILogger logger, [NotNull] string[] userFilters)
+        public void PrintWrongFilterInfo(IReadOnlyList<Type> allTypes, ILogger logger, string[] userFilters)
         {
             var correctionSuggester = new CorrectionsSuggester(allTypes);
 
@@ -109,7 +108,7 @@ namespace BenchmarkDotNet.Running
             static bool IsInteger(string str) => int.TryParse(str, out _);
         }
 
-        private static void PrintAvailable([NotNull] IReadOnlyList<Type> allTypes, ILogger logger)
+        private static void PrintAvailable(IReadOnlyList<Type> allTypes, ILogger logger)
         {
             logger.WriteLineHelp($"Available Benchmark{(allTypes.Count > 1 ? "s" : "")}:");
 

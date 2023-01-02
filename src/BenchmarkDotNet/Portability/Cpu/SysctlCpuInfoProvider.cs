@@ -12,10 +12,9 @@ namespace BenchmarkDotNet.Portability.Cpu
     {
         internal static readonly Lazy<CpuInfo> SysctlCpuInfo = new Lazy<CpuInfo>(Load);
 
-        [CanBeNull]
-        private static CpuInfo Load()
+        private static CpuInfo? Load()
         {
-            if (RuntimeInformation.IsMacOSX())
+            if (RuntimeInformation.IsMacOS())
             {
                 string content = ProcessHelper.RunAndReadOutput("sysctl", "-a");
                 return SysctlCpuInfoParser.ParseOutput(content);

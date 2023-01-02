@@ -13,8 +13,7 @@ namespace BenchmarkDotNet.Helpers
         /// Run external process and return the console output.
         /// In the case of any exception, null will be returned.
         /// </summary>
-        [CanBeNull]
-        internal static string RunAndReadOutput(string fileName, string arguments = "", ILogger logger = null)
+        internal static string? RunAndReadOutput(string fileName, string arguments = "", ILogger logger = null)
         {
             var processStartInfo = new ProcessStartInfo
             {

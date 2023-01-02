@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Tests.Engine
         [AssertionMethod]
         private static void CheckResults(int expectedResultCount, List<Measurement> measurements, OutlierMode outlierMode)
         {
-            Assert.Equal(expectedResultCount, new RunResults(null, measurements, outlierMode, default, default).GetMeasurements().Count());
+            Assert.Equal(expectedResultCount, new RunResults(measurements, outlierMode, default, default, 0).GetWorkloadResultMeasurements().Count());
         }
 
         private static void Add(List<Measurement> measurements, int time)

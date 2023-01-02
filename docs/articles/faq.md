@@ -45,7 +45,7 @@ If you don't need such level of precision and just want to have a quick way to g
 For example, you can use the `SimpleJob` or `ShortRunJob` attributes:
 
     ```cs
-    [SimpleJob(launchCount: 1, warmupCount: 3, targetCount: 5, invocationCount:100, id: "QuickJob")]
+    [SimpleJob(launchCount: 1, warmupCount: 3, iterationCount: 5, invocationCount:100, id: "QuickJob")]
     [ShortRunJob]
     ```
 

@@ -61,11 +61,11 @@ In this category, you can specify how to benchmark each method.
 * `MinWarmupIterationCount`: Minimum count of warmup iterations that should be performed, the default value is 6
 * `MaxWarmupIterationCount`: Maximum count of warmup iterations that should be performed, the default value is 50
 
-Usually, you shouldn't specify such characteristics like `LaunchCount`, `WarmupCount`, `TargetCount`, or `IterationTime` because BenchmarkDotNet has a smart algorithm to choose these values automatically based on received measurements. You can specify it for testing purposes or when you are damn sure that you know the right characteristics for your benchmark (when you set `TargetCount` = `20` you should understand why `20` is a good value for your case).
+Usually, you shouldn't specify such characteristics like `LaunchCount`, `WarmupCount`, `IterationCount`, or `IterationTime` because BenchmarkDotNet has a smart algorithm to choose these values automatically based on received measurements. You can specify it for testing purposes or when you are damn sure that you know the right characteristics for your benchmark (when you set `IterationCount` = `20` you should understand why `20` is a good value for your case).
 
 ### Accuracy
 
-If you want to change the accuracy level, you should use the following characteristics instead of manually adjusting values of `WarmupCount`, `TargetCount`, and so on.
+If you want to change the accuracy level, you should use the following characteristics instead of manually adjusting values of `WarmupCount`, `IterationCount`, and so on.
 
 * `MaxRelativeError`, `MaxAbsoluteError`: Maximum acceptable error for a benchmark (by default, BenchmarkDotNet continue iterations until the actual error is less than the specified error). *In these two characteristics*, the error means half of 99.9% confidence interval. `MaxAbsoluteError` is an absolute `TimeInterval`; doesn't have a default value. `MaxRelativeError` defines max acceptable (`(<half of CI 99.9%>) / Mean`).
 * `MinIterationTime`: Minimum time of a single iteration. Unlike `Run.IterationTime`, this characteristic specifies only the lower limit. In case of need, BenchmarkDotNet can increase this value.
@@ -154,7 +154,7 @@ You can also add new jobs via attributes. Examples:
 [DryJob]
 [ClrJob, CoreJob, MonoJob]
 [LegacyJitX86Job, LegacyJitX64Job, RyuJitX64Job]
-[SimpleJob(RunStrategy.ColdStart, launchCount: 1, warmupCount: 5, targetCount: 5, id: "FastAndDirtyJob")]
+[SimpleJob(RunStrategy.ColdStart, launchCount: 1, warmupCount: 5, iterationCount: 5, id: "FastAndDirtyJob")]
 public class MyBenchmarkClass
 ```
 

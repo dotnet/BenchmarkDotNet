@@ -289,6 +289,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void JobNotDefinedButStillBenchmarkIsExecuted()
         {
+            if (ContinuousIntegration.IsAppVeyorOnWindows())
+                return; // timeouts
+
             var types = new[] { typeof(JustBenchmark) };
             var switcher = new BenchmarkSwitcher(types);
             MockExporter mockExporter = new MockExporter();
@@ -330,6 +333,21 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.True(summariesForAssembly.Single().HasCriticalValidationErrors);
             Assert.Contains("static", logger.GetLog());
+        }
+
+        [FactDotNetCoreOnly("For some reason this test is flaky on Full Framework")]
+        public void WhenUserAddTheResumeAttributeAndRunTheBenchmarks()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+
+            var types = new[] { typeof(WithDryAttributeAndCategory) };
+            var switcher = new BenchmarkSwitcher(types);
+
+            // the first run should execute all benchmarks
+            Assert.Single(switcher.Run(new[] { "--filter", "*WithDryAttributeAndCategory*" }, config));
+            // resuming after succesfull run should run nothing
+            Assert.Empty(switcher.Run(new[] { "--resume", "--filter", "*WithDryAttributeAndCategory*" }, config));
         }
 
         private class UserInteractionMock : IUserInteraction

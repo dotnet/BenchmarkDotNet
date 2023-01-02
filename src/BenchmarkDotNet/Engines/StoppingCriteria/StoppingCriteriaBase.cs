@@ -25,12 +25,10 @@ namespace BenchmarkDotNet.Engines
 
         public abstract StoppingResult Evaluate(IReadOnlyList<Measurement> measurements);
 
-        [NotNull]
         protected abstract string GetTitle();
 
         protected abstract int GetMaxIterationCount();
 
-        [NotNull]
         protected abstract IEnumerable<string> GetWarnings();
     }
 }

@@ -20,6 +20,19 @@ namespace BenchmarkDotNet.Tests.Configs
     public class ImmutableConfigTests
     {
         [Fact]
+        public void DuplicateJobsAreExcluded()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+
+            mutable.AddJob(new Job());
+            mutable.AddJob(new Job());
+
+            var final = ImmutableConfigBuilder.Create(mutable);
+
+            Assert.Single(final.GetJobs());
+        }
+
+        [Fact]
         public void DuplicateColumnProvidersAreExcluded()
         {
             var mutable = ManualConfig.CreateEmpty();

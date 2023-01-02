@@ -21,12 +21,11 @@ namespace BenchmarkDotNet.Reports
         public SizeUnit SizeUnit { get; }
         internal SizeUnit CodeSizeUnit { get; }
         public TimeUnit TimeUnit { get; }
-        [NotNull]
         public CultureInfo CultureInfo { get; }
 
         public RatioStyle RatioStyle { get; }
 
-        public SummaryStyle([CanBeNull] CultureInfo cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true,
+        public SummaryStyle(CultureInfo? cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true,
             bool printZeroValuesInContent = false, int maxParameterColumnWidth = DefaultMaxParameterColumnWidth, RatioStyle ratioStyle = RatioStyle.Value)
         {
             if (maxParameterColumnWidth < DefaultMaxParameterColumnWidth)
@@ -80,21 +79,16 @@ namespace BenchmarkDotNet.Reports
 
         public override bool Equals(object obj) => obj is SummaryStyle summary && Equals(summary);
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hashCode = PrintUnitsInHeader.GetHashCode();
-                hashCode = (hashCode * 397) ^ PrintUnitsInContent.GetHashCode();
-                hashCode = (hashCode * 397) ^ PrintZeroValuesInContent.GetHashCode();
-                hashCode = (hashCode * 397) ^ (SizeUnit != null ? SizeUnit.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (CodeSizeUnit != null ? CodeSizeUnit.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (TimeUnit != null ? TimeUnit.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ MaxParameterColumnWidth;
-                hashCode = (hashCode * 397) ^ RatioStyle.GetHashCode();
-                return hashCode;
-            }
-        }
+        public override int GetHashCode() =>
+            HashCode.Combine(
+                PrintUnitsInHeader,
+                PrintUnitsInContent,
+                PrintZeroValuesInContent,
+                SizeUnit,
+                CodeSizeUnit,
+                TimeUnit,
+                MaxParameterColumnWidth,
+                RatioStyle);
 
         public static bool operator ==(SummaryStyle left, SummaryStyle right) => Equals(left, right);
 

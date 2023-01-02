@@ -171,11 +171,11 @@ namespace BenchmarkDotNet.Disassemblers
 
                 TryTranslateAddressToName(instruction, state, depth, currentMethod, out ulong referencedAddress);
 
-                yield return new Asm
+                yield return new IntelAsm
                 {
                     InstructionPointer = instruction.IP,
                     InstructionLength = instruction.Length,
-                    IntelInstruction = instruction,
+                    Instruction = instruction,
                     ReferencedAddress = (referencedAddress > ushort.MaxValue) ? referencedAddress : null,
                 };
             }

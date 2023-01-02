@@ -66,16 +66,7 @@ namespace BenchmarkDotNet.Columns
             return Equals((SizeUnit) obj);
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hashCode = (Name != null ? Name.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (Description != null ? Description.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ ByteAmount.GetHashCode();
-                return hashCode;
-            }
-        }
+        public override int GetHashCode() => HashCode.Combine(Name, Description, ByteAmount);
 
         public static bool operator ==(SizeUnit left, SizeUnit right) => Equals(left, right);
 

@@ -86,15 +86,6 @@ namespace BenchmarkDotNet.Engines
 
         public override bool Equals(object obj) => obj is ThreadingStats other && Equals(other);
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hashCode = CompletedWorkItemCount.GetHashCode();
-                hashCode = (hashCode * 397) ^ LockContentionCount.GetHashCode();
-                hashCode = (hashCode * 397) ^ TotalOperations.GetHashCode();
-                return hashCode;
-            }
-        }
+        public override int GetHashCode() => HashCode.Combine(CompletedWorkItemCount, LockContentionCount, TotalOperations);
     }
 }

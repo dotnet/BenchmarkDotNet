@@ -5,7 +5,7 @@ using BenchmarkDotNet.Engines;
 
 namespace BenchmarkDotNet.Samples
 {
-    [SimpleJob(RunStrategy.ColdStart, targetCount: 5)]
+    [SimpleJob(RunStrategy.ColdStart, iterationCount: 5)]
     [MinColumn, MaxColumn, MeanColumn, MedianColumn]
     public class IntroColdStart
     {

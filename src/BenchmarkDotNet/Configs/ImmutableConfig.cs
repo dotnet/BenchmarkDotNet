@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Configs
         public string ArtifactsPath { get; }
         public CultureInfo CultureInfo { get; }
         public ConfigOptions Options { get; }
-        [NotNull] public IOrderer Orderer { get; }
+        public IOrderer Orderer { get; }
         public SummaryStyle SummaryStyle { get; }
         public TimeSpan BuildTimeout { get; }
 
@@ -106,9 +106,11 @@ namespace BenchmarkDotNet.Configs
 
         public bool HasThreadingDiagnoser() => diagnosers.Contains(ThreadingDiagnoser.Default);
 
+        public bool HasExceptionDiagnoser() => diagnosers.Contains(ExceptionDiagnoser.Default);
+
         internal bool HasPerfCollectProfiler() => diagnosers.OfType<PerfCollectProfiler>().Any();
 
-        public bool HasExtraStatsDiagnoser() => HasMemoryDiagnoser() || HasThreadingDiagnoser();
+        public bool HasExtraStatsDiagnoser() => HasMemoryDiagnoser() || HasThreadingDiagnoser() || HasExceptionDiagnoser();
 
         public IDiagnoser GetCompositeDiagnoser(BenchmarkCase benchmarkCase, RunMode runMode)
         {

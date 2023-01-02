@@ -29,6 +29,7 @@ using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
 using Perfolizer.Mathematics.SignificanceTesting;
 using Perfolizer.Mathematics.Thresholds;
+using BenchmarkDotNet.Toolchains.Mono;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -213,6 +214,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 config.AddDiagnoser(MemoryDiagnoser.Default);
             if (options.UseThreadingDiagnoser)
                 config.AddDiagnoser(ThreadingDiagnoser.Default);
+            if (options.UseExceptionDiagnoser)
+                config.AddDiagnoser(ExceptionDiagnoser.Default);
             if (options.UseDisassemblyDiagnoser)
                 config.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(
                     maxDepth: options.DisassemblerRecursiveDepth,
@@ -245,6 +248,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.WithOption(ConfigOptions.LogBuildOutput, options.LogBuildOutput);
             config.WithOption(ConfigOptions.GenerateMSBuildBinLog, options.GenerateMSBuildBinLog);
             config.WithOption(ConfigOptions.ApplesToApples, options.ApplesToApples);
+            config.WithOption(ConfigOptions.Resume, options.Resume);
 
             if (options.MaxParameterColumnWidth.HasValue)
                 config.WithSummaryStyle(SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParameterColumnWidth.Value));
@@ -297,6 +301,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithMemoryRandomization();
             if (options.NoForcedGCs)
                 baseJob = baseJob.WithGcForce(false);
+            if (options.NoEvaluationOverhead)
+                baseJob = baseJob.WithEvaluateOverhead(false);
 
             if (options.EnvironmentVariables.Any())
             {
@@ -388,6 +394,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net50:
                 case RuntimeMoniker.Net60:
                 case RuntimeMoniker.Net70:
+                case RuntimeMoniker.Net80:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
                         .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
@@ -401,6 +408,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.NativeAot70:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json");
 
+                case RuntimeMoniker.NativeAot80:
+                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet8/nuget/v3/index.json");
+
                 case RuntimeMoniker.Wasm:
                     return MakeWasmJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0", runtimeMoniker);
 
@@ -413,6 +423,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.WasmNet70:
                     return MakeWasmJob(baseJob, options, "net7.0", runtimeMoniker);
 
+                case RuntimeMoniker.WasmNet80:
+                    return MakeWasmJob(baseJob, options, "net8.0", runtimeMoniker);
+
                 case RuntimeMoniker.MonoAOTLLVM:
                     return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0");
 
@@ -421,6 +434,18 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                 case RuntimeMoniker.MonoAOTLLVMNet70:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net7.0");
+
+                case RuntimeMoniker.MonoAOTLLVMNet80:
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net8.0");
+
+                case RuntimeMoniker.Mono60:
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono60);
+
+                case RuntimeMoniker.Mono70:
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono70);
+
+                case RuntimeMoniker.Mono80:
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono80);
 
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
@@ -447,6 +472,19 @@ namespace BenchmarkDotNet.ConsoleArguments
             builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
 
             return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
+        }
+
+        private static Job MakeMonoJob(Job baseJob, CommandLineOptions options, MonoRuntime runtime)
+        {
+            return baseJob
+                .WithRuntime(runtime)
+                .WithToolchain(MonoToolchain.From(
+                    new NetCoreAppSettings(
+                        targetFrameworkMoniker: runtime.MsBuildMoniker,
+                        runtimeFrameworkVersion: null,
+                        name: runtime.Name,
+                        customDotNetCliPath: options.CliPath?.FullName,
+                        packagesPath: options.RestorePath?.FullName)));
         }
 
         private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker)

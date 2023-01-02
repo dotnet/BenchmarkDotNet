@@ -4,7 +4,8 @@
     <AssemblyTitle>BenchmarkDotNet</AssemblyTitle>
     <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <NoWarn>$(NoWarn);1701;1702;1705;1591;3005;NU1702;CS3001;CS3003;CS8002</NoWarn>
+    <Nullable>annotations</Nullable>
+    <NoWarn>$(NoWarn);1701;1702;1705;1591;3005;NU1702;CS3001;CS3003</NoWarn>
     <AssemblyName>BenchmarkDotNet</AssemblyName>
     <PackageId>BenchmarkDotNet</PackageId>
     <RootNamespace>BenchmarkDotNet</RootNamespace>
@@ -17,23 +18,25 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.4.3" />
-    <PackageReference Include="Gee.External.Capstone" Version="2.2.0" />
+    <PackageReference Include="Gee.External.Capstone" Version="2.3.0" />
     <PackageReference Include="Iced" Version="1.17.0" />
     <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="2.2.332302" />
     <PackageReference Include="Perfolizer" Version="0.2.1" />
     <PackageReference Include="System.Management" Version="6.0.0" />
-    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
-    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.0.0" />
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.0.2" PrivateAssets="contentfiles;analyzers" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETStandard' ">
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
   </ItemGroup>
-  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(OS)' == 'Windows_NT' AND '$(UseMonoRuntime)' != 'true' ">
     <ProjectReference Include="..\BenchmarkDotNet.Disassembler.x64\BenchmarkDotNet.Disassembler.x64.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
@@ -48,7 +51,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETStandard' ">
     <Compile Include="..\BenchmarkDotNet.Annotations\Attributes\DynamicallyAccessedMembersAttribute.cs" Link="Properties\DynamicallyAccessedMembersAttribute.cs" />
     <Compile Include="..\BenchmarkDotNet.Annotations\Attributes\DynamicallyAccessedMemberTypes.cs" Link="Properties\DynamicallyAccessedMemberTypes.cs" />
   </ItemGroup>

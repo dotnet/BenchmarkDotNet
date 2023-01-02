@@ -206,6 +206,8 @@ namespace BenchmarkDotNet.Disassemblers
                             // is at an address one memory page higher than the code.
                             byte[] buffer = new byte[12];
 
+                            FlushCachedDataIfNeeded(state.Runtime.DataTarget.DataReader, address, buffer);
+
                             if (state.Runtime.DataTarget.DataReader.Read(address, buffer) == buffer.Length)
                             {
                                 if (buffer.SequenceEqual(callCountingStubTemplate))
@@ -232,11 +234,11 @@ namespace BenchmarkDotNet.Disassemblers
 
                     accumulator.Feed(instruction);
 
-                    yield return new Asm()
+                    yield return new Arm64Asm()
                     {
                         InstructionPointer = (ulong)instruction.Address,
                         InstructionLength = instruction.Bytes.Length,
-                        Arm64Instruction = instruction,
+                        Instruction = instruction,
                         ReferencedAddress = (address > ushort.MaxValue) ? address : null,
                         IsReferencedAddressIndirect = isIndirect
                     };

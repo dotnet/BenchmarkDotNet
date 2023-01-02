@@ -114,7 +114,7 @@ namespace BenchmarkDotNet.Running
 
             if (effectiveConfig.Options.HasFlag(ConfigOptions.ApplesToApples))
             {
-                return ApplesToApples(effectiveConfig, benchmarksToFilter, logger, options);
+                return ApplesToApples(ImmutableConfigBuilder.Create(effectiveConfig), benchmarksToFilter, logger, options);
             }
 
             var filteredBenchmarks = TypeFilter.Filter(effectiveConfig, benchmarksToFilter);
@@ -140,7 +140,7 @@ namespace BenchmarkDotNet.Running
             printer.Print(testNames, nonNullLogger);
         }
 
-        private IEnumerable<Summary> ApplesToApples(ManualConfig effectiveConfig, IReadOnlyList<Type> benchmarksToFilter, ILogger logger, CommandLineOptions options)
+        private IEnumerable<Summary> ApplesToApples(ImmutableConfig effectiveConfig, IReadOnlyList<Type> benchmarksToFilter, ILogger logger, CommandLineOptions options)
         {
             var jobs = effectiveConfig.GetJobs().ToArray();
             if (jobs.Length <= 1)

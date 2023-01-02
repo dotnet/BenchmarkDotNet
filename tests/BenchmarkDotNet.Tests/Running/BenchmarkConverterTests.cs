@@ -215,7 +215,7 @@ namespace BenchmarkDotNet.Tests.Running
 
         public class BAC
         {
-            // BAC is not sorted in either desceding or ascending way
+            // BAC is not sorted in either descending or ascending way
             [Benchmark] public void B() { }
             [Benchmark] public void A() { }
             [Benchmark] public void C() { }

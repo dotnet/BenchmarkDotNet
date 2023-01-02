@@ -101,6 +101,11 @@ namespace BenchmarkDotNet.Jobs
         Net70,
 
         /// <summary>
+        /// .NET 8.0
+        /// </summary>
+        Net80,
+
+        /// <summary>
         /// NativeAOT compiled as net6.0
         /// </summary>
         NativeAot60,
@@ -111,24 +116,34 @@ namespace BenchmarkDotNet.Jobs
         NativeAot70,
 
         /// <summary>
+        /// NativeAOT compiled as net8.0
+        /// </summary>
+        NativeAot80,
+
+        /// <summary>
         /// WebAssembly with default .Net version
         /// </summary>
         Wasm,
 
         /// <summary>
-        /// WebAssembly with .net5.0
+        /// WebAssembly with net5.0
         /// </summary>
         WasmNet50,
 
         /// <summary>
-        /// WebAssembly with .net6.0
+        /// WebAssembly with net6.0
         /// </summary>
         WasmNet60,
 
         /// <summary>
-        /// WebAssembly with .net7.0
+        /// WebAssembly with net7.0
         /// </summary>
         WasmNet70,
+
+        /// <summary>
+        /// WebAssembly with net8.0
+        /// </summary>
+        WasmNet80,
 
         /// <summary>
         /// Mono with the Ahead of Time LLVM Compiler backend
@@ -136,13 +151,33 @@ namespace BenchmarkDotNet.Jobs
         MonoAOTLLVM,
 
         /// <summary>
-        /// Mono with the Ahead of Time LLVM Compiler backend and .net6.0
+        /// Mono with the Ahead of Time LLVM Compiler backend and net6.0
         /// </summary>
         MonoAOTLLVMNet60,
 
         /// <summary>
-        /// Mono with the Ahead of Time LLVM Compiler backend and .net7.0
+        /// Mono with the Ahead of Time LLVM Compiler backend and net7.0
         /// </summary>
-        MonoAOTLLVMNet70
+        MonoAOTLLVMNet70,
+
+        /// <summary>
+        /// Mono with the Ahead of Time LLVM Compiler backend and net8.0
+        /// </summary>
+        MonoAOTLLVMNet80,
+
+        /// <summary>
+        /// .NET 6 using MonoVM (not CLR which is the default)
+        /// </summary>
+        Mono60,
+
+        /// <summary>
+        /// .NET 7 using MonoVM (not CLR which is the default)
+        /// </summary>
+        Mono70,
+
+        /// <summary>
+        /// .NET 8 using MonoVM (not CLR which is the default)
+        /// </summary>
+        Mono80,
     }
 }

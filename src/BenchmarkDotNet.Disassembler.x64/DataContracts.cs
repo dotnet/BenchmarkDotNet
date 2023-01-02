@@ -22,15 +22,26 @@ namespace BenchmarkDotNet.Disassemblers
         public int LineNumber { get; set; }
     }
 
-    public class Asm : SourceCode
+    public abstract class Asm : SourceCode
     {
         public int InstructionLength { get; set; }
         public ulong? ReferencedAddress { get; set; }
         public bool IsReferencedAddressIndirect { get; set; }
+    }
 
-        public Instruction? IntelInstruction { get; set; }
-#if !CLRMDV1
-        public Gee.External.Capstone.Arm64.Arm64Instruction Arm64Instruction { get; set; }
+    public class IntelAsm : Asm
+    {
+        public Instruction Instruction { get; set; }
+
+        public override string ToString() => Instruction.ToString();
+    }
+
+    public class Arm64Asm : Asm
+    {
+#if !CLRMDV1 // don't include it in ClrMD V1 disassembler that supports only x86 and x64
+        public Gee.External.Capstone.Arm64.Arm64Instruction Instruction { get; set; }
+
+        public override string ToString() => Instruction.ToString();
 #endif
     }
 
@@ -44,7 +55,7 @@ namespace BenchmarkDotNet.Disassemblers
         [XmlArray("Instructions")]
         [XmlArrayItem(nameof(SourceCode), typeof(SourceCode))]
         [XmlArrayItem(nameof(Sharp), typeof(Sharp))]
-        [XmlArrayItem(nameof(Asm), typeof(Asm))]
+        [XmlArrayItem(nameof(IntelAsm), typeof(IntelAsm))]
         public SourceCode[] SourceCodes { get; set; }
     }
 

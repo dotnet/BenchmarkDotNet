@@ -86,7 +86,7 @@ namespace BenchmarkDotNet.Mathematics
             return builder.ToString();
         }
 
-        public string ToString([CanBeNull] CultureInfo cultureInfo, string format = "0.##")
+        public string ToString(CultureInfo? cultureInfo, string format = "0.##")
         {
             return ToString(x => x.ToString(format, cultureInfo));
         }

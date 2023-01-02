@@ -13,7 +13,7 @@ However, real-world scenarios often have so-called long tail distribution
 The percentiles allow to include the tail of distribution into the comparison.
 However, it requires some preparations steps.
 At first, you should have enough runs to count percentiles from.
-The `TargetCount` in the config should be set to 10-20 runs at least.  
+The `IterationCount` in the config should be set to 10-20 runs at least.  
 
 Second, the count of iterations for each run should not be very high, or the peak timings will be averaged.
 The `IterationTime = 25` works fine for most cases;
@@ -47,7 +47,7 @@ Also, it's very easy to screw the results with incorrect setup. For example, the
 ```cs
 new Job
 {
-	TargetCount = 5,
+	IterationCount = 5,
 	IterationTime = 500
 }
 ```

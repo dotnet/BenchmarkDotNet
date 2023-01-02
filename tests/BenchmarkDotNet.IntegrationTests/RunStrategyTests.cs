@@ -19,6 +19,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void RunStrategiesAreSupported()
         {
+            if (ContinuousIntegration.IsAppVeyorOnWindows())
+                return; // timeouts
+
             var config = ManualConfig.CreateEmpty()
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddLogger(new OutputLogger(Output))

@@ -25,8 +25,8 @@ namespace BenchmarkDotNet.IntegrationTests
             var summary = BenchmarkRunner
                 .Run<NeedsMoreThan2GB>(
                     ManualConfig.CreateEmpty()
-                        .AddJob(Job.Dry.WithRuntime(CoreRuntime.Core60).WithPlatform(Platform.X64).WithId("Core"))
-                        .AddJob(Job.Dry.WithRuntime(ClrRuntime.Net462).WithPlatform(Platform.X86).WithLargeAddressAware().WithId("Framework"))
+                        .AddJob(Job.Dry.WithRuntime(CoreRuntime.Core70).WithPlatform(Platform.X64).WithId("Core"))
+                        .AddJob(Job.Dry.WithRuntime(ClrRuntime.Net462).WithPlatform(Platform.X86).WithGcServer(false).WithLargeAddressAware().WithId("Framework"))
                         .AddColumnProvider(DefaultColumnProviders.Instance)
                         .AddLogger(new OutputLogger(output)));
 
@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Any());
 
             Assert.Contains(".NET Framework", summary.AllRuntimes);
-            Assert.Contains(".NET 6.0", summary.AllRuntimes);
+            Assert.Contains(".NET 7.0", summary.AllRuntimes);
         }
     }
 

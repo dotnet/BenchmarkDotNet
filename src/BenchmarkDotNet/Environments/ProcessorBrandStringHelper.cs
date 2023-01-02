@@ -5,9 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability.Cpu;
-using JetBrains.Annotations;
 using Perfolizer.Horology;
-using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
 
 namespace BenchmarkDotNet.Environments
 {
@@ -19,7 +17,6 @@ namespace BenchmarkDotNet.Environments
         /// <param name="cpuInfo">The CPU information</param>
         /// <param name="includeMaxFrequency">Whether to include determined max frequency information</param>
         /// <returns>Prettified version</returns>
-        [NotNull]
         public static string Prettify(CpuInfo cpuInfo, bool includeMaxFrequency = false)
         {
             if (cpuInfo == null || string.IsNullOrEmpty(cpuInfo.ProcessorName))
@@ -68,8 +65,7 @@ namespace BenchmarkDotNet.Environments
         /// Parse a processor name and tries to return a microarchitecture name.
         /// Works only for well-known microarchitectures.
         /// </summary>
-        [CanBeNull]
-        private static string ParseMicroarchitecture([NotNull] string processorName)
+        private static string? ParseMicroarchitecture(string processorName)
         {
             if (processorName.StartsWith("Intel Core"))
             {
@@ -121,9 +117,8 @@ namespace BenchmarkDotNet.Environments
         });
 
         // see http://www.intel.com/content/www/us/en/processors/processor-numbers.html
-        [CanBeNull]
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
-        internal static string ParseIntelCoreMicroarchitecture([NotNull] string modelNumber)
+        internal static string? ParseIntelCoreMicroarchitecture(string modelNumber)
         {
             if (KnownMicroarchitectures.Value.ContainsKey(modelNumber))
                 return KnownMicroarchitectures.Value[modelNumber];

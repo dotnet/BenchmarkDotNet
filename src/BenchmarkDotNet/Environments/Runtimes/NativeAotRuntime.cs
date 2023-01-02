@@ -14,6 +14,10 @@ namespace BenchmarkDotNet.Environments
         /// NativeAOT compiled as net7.0
         /// </summary>
         public static readonly NativeAotRuntime Net70 = new NativeAotRuntime(RuntimeMoniker.NativeAot70, "net7.0", "NativeAOT 7.0");
+        /// <summary>
+        /// NativeAOT compiled as net8.0
+        /// </summary>
+        public static readonly NativeAotRuntime Net80 = new NativeAotRuntime(RuntimeMoniker.NativeAot80, "net8.0", "NativeAOT 8.0");
 
         public override bool IsAOT => true;
 

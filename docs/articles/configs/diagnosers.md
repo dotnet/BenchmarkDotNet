@@ -37,6 +37,7 @@ The current Diagnosers are:
   It is a cross-platform profiler that allows profile .NET code on every platform - Windows, Linux, macOS.
   Please see Wojciech Nagórski's [blog post](https://wojciechnagorski.com/2020/04/cross-platform-profiling-.net-code-with-benchmarkdotnet/) for all the details.
 - Threading Diagnoser (`ThreadingDiagnoser`) - .NET Core 3.0+ diagnoser that reports some Threading statistics.
+- Exception Diagnoser (`ExceptionDiagnoser`) - a diagnoser that reports the frequency of exceptions thrown during the operation.
 
 ## Usage
 
@@ -59,6 +60,7 @@ private class Config : ManualConfig
         Add(new InliningDiagnoser());
         Add(new EtwProfiler());
         Add(ThreadingDiagnoser.Default);
+        Add(ExceptionDiagnoser.Default);
     }
 }
 ```
@@ -72,6 +74,7 @@ You can also use one of the following attributes (apply it on a class that conta
 [ConcurrencyVisualizerProfiler]
 [NativeMemoryProfiler]
 [ThreadingDiagnoser]
+[ExceptionDiagnoser]
 ```
 
 In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on. The column Gen X means number of GC collections per 1000 operations for that generation.
@@ -123,3 +126,5 @@ In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on. The column Gen X means
 [!include[IntroNativeMemory](../samples/IntroNativeMemory.md)]
 
 [!include[IntroThreadingDiagnoser](../samples/IntroThreadingDiagnoser.md)]
+
+[!include[IntroExceptionDiagnoser](../samples/IntroExceptionDiagnoser.md)]

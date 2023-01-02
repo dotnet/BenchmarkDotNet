@@ -3,12 +3,28 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Jobs
 {
-    public abstract class Argument
+    public abstract class Argument: IEquatable<Argument>
     {
-        [PublicAPI] public string TextRepresentation { get; protected set; }
+        [PublicAPI] public string TextRepresentation { get; }
+
+        protected Argument(string value)
+        {
+            TextRepresentation = value;
+        }
 
         // CharacteristicPresenters call ToString(), this is why we need this override
         public override string ToString() => TextRepresentation;
+
+        public bool Equals(Argument other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return TextRepresentation == other.TextRepresentation;
+        }
+
+        public override bool Equals(object obj) => Equals(obj as Argument);
+
+        public override int GetHashCode() => HashCode.Combine(TextRepresentation);
     }
 
     /// <summary>
@@ -17,12 +33,10 @@ namespace BenchmarkDotNet.Jobs
     /// </summary>
     public class MonoArgument : Argument
     {
-        public MonoArgument(string value)
+        public MonoArgument(string value) : base(value)
         {
             if (value == "--llvm" || value == "--nollvm")
                 throw new NotSupportedException("Please use job.Env.Jit to specify Jit in explicit way");
-
-            TextRepresentation = value;
         }
     }
 
@@ -33,6 +47,6 @@ namespace BenchmarkDotNet.Jobs
     [PublicAPI]
     public class MsBuildArgument : Argument
     {
-        public MsBuildArgument(string value) => TextRepresentation = value;
+        public MsBuildArgument(string value) : base(value) { }
     }
 }

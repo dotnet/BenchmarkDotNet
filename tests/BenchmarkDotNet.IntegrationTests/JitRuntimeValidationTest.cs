@@ -1,11 +1,12 @@
-﻿using System.Linq;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
+using System.Collections.Generic;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -39,13 +40,18 @@ namespace BenchmarkDotNet.IntegrationTests
 //          Verify(Runtime.Mono, jit, platform, errorMessage);
 //      }
 
+        public static IEnumerable<object[]> CheckCore_Arguments()
+        {
+            yield return new object[] { Jit.LegacyJit, Platform.X86, ToolchainSupportsOnlyRyuJit };
+            yield return new object[] { Jit.LegacyJit, Platform.X64, ToolchainSupportsOnlyRyuJit };
+            yield return new object[] { Jit.RyuJit, RuntimeInformation.GetCurrentPlatform(), null };
+        }
+
         [Theory]
-        [InlineData(Jit.LegacyJit, Platform.X86, ToolchainSupportsOnlyRyuJit)]
-        [InlineData(Jit.LegacyJit, Platform.X64, ToolchainSupportsOnlyRyuJit)]
-        [InlineData(Jit.RyuJit, Platform.X64, null)]
+        [MemberData(nameof(CheckCore_Arguments))]
         public void CheckCore(Jit jit, Platform platform, string errorMessage)
         {
-            Verify(CoreRuntime.Core60, jit, platform, errorMessage);
+            Verify(CoreRuntime.Core70, jit, platform, errorMessage);
         }
 
         private void Verify(Runtime runtime, Jit jit, Platform platform, string errorMessage)
