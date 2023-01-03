@@ -18,28 +18,37 @@ namespace BenchmarkDotNet.Running
 
         private string oldConsoleTitle;
 
-        /// <summary>
-        /// Constructs a ConsoleTitler
-        /// </summary>
-        /// <param name="fallbackTitle">What to restore Console.Title to upon disposal (for platforms with write-only Console.Title)</param>
-        public ConsoleTitler(string fallbackTitle)
+        public ConsoleTitler(string initialTitle)
         {
-            // Return without enabling if Console output is redirected, or if we're not on a platform that supports Console retitling.
-            if (Console.IsOutputRedirected || !PlatformSupportsTitleWrite())
+            // Return without enabling if Console output is redirected.
+            if (Console.IsOutputRedirected)
             {
                 return;
             }
 
             try
             {
-                oldConsoleTitle = PlatformSupportsTitleRead() ? Console.Title : fallbackTitle;
-                IsEnabled = true;
+                oldConsoleTitle = PlatformSupportsTitleRead() ? Console.Title : "";
             }
             catch (IOException)
             {
                 // We're unable to read Console.Title on a platform that supports it. This can happen when no console
                 // window is available due to the application being Windows Forms, WPF, Windows Service or a daemon.
-                // Because we won't be able to write Console.Title either, return without enabling the titler.
+                oldConsoleTitle = "";
+            }
+
+            try
+            {
+                // Enable ConsoleTitler if and only if we can successfully set the Console.Title property.
+                Console.Title = initialTitle;
+                IsEnabled = true;
+            }
+            catch (IOException)
+            {
+            }
+            catch (PlatformNotSupportedException)
+            {
+                // As of .NET 7, platforms other than Windows, Linux and MacOS do not support Console retitling.
             }
         }
 
@@ -47,11 +56,6 @@ namespace BenchmarkDotNet.Running
         [System.Runtime.Versioning.SupportedOSPlatformGuard("windows")]
 #endif
         private static bool PlatformSupportsTitleRead() => RuntimeInformation.IsWindows();
-
-        private static bool PlatformSupportsTitleWrite() =>
-            RuntimeInformation.IsWindows() ||
-            RuntimeInformation.IsLinux() ||
-            RuntimeInformation.IsMacOS();
 
         /// <summary>
         /// Updates Console.Title if enabled.
@@ -64,20 +68,9 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        /// <summary>
-        /// Updates Console.Title if enabled, using a Func to avoid potential string-building cost.
-        /// </summary>
-        public void UpdateTitle(Func<string> title)
-        {
-            if (IsEnabled)
-            {
-                Console.Title = title();
-            }
-        }
-
         public void Dispose()
         {
-            if (IsEnabled && oldConsoleTitle != null)
+            if (IsEnabled)
             {
                 Console.Title = oldConsoleTitle;
                 IsEnabled = false;

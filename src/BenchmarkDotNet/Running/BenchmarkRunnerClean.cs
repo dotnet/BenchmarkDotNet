@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -167,14 +167,12 @@ namespace BenchmarkDotNet.Running
             var cultureInfo = config.CultureInfo ?? DefaultCultureInfo.Instance;
             var reports = new List<BenchmarkReport>();
             string title = GetTitle(new[] { benchmarkRunInfo });
-            using var consoleTitler = new ConsoleTitler("");
+            using var consoleTitler = new ConsoleTitler($"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining");
 
             logger.WriteLineInfo($"// Found {benchmarks.Length} benchmarks:");
             foreach (var benchmark in benchmarks)
                 logger.WriteLineInfo($"//   {benchmark.DisplayInfo}");
             logger.WriteLine();
-
-            UpdateTitle(totalBenchmarkCount, benchmarksToRunCount, consoleTitler);
 
             using (var powerManagementApplier = new PowerManagementApplier(logger))
             {
@@ -646,11 +644,6 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static void UpdateTitle(int totalBenchmarkCount, int benchmarksToRunCount, ConsoleTitler consoleTitler)
-        {
-            consoleTitler.UpdateTitle(() => $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining");
-        }
-
         private static void LogProgress(ILogger logger, in StartedClock runsChronometer, int totalBenchmarkCount, int benchmarksToRunCount, ConsoleTitler consoleTitler, TaskbarProgress taskbarProgress)
         {
             int executedBenchmarkCount = totalBenchmarkCount - benchmarksToRunCount;
@@ -660,7 +653,7 @@ namespace BenchmarkDotNet.Running
                 $" Estimated finish {estimatedEnd:yyyy-MM-dd H:mm} ({(int)fromNow.TotalHours}h {fromNow.Minutes}m from now) **";
             logger.WriteLineHeader(message);
 
-            consoleTitler.UpdateTitle (() => $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining - {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish");
+            consoleTitler.UpdateTitle ($"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining - {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish");
 
             taskbarProgress.SetProgress((float) executedBenchmarkCount / totalBenchmarkCount);
         }
