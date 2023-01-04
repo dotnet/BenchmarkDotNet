@@ -68,7 +68,7 @@
     "globalMetadata" :
     {
       "_appTitle" : "BenchmarkDotNet",
-      "_appFooter" : "Copyright &copy; 2013–2021 .NET Foundation and contributors",
+      "_appFooter" : "Copyright &copy; 2013–2023 .NET Foundation and contributors",
       "_appLogoPath" : "logo/icon.svg",
       "_appFaviconPath": "logo/icon-32.png",
       "_enableSearch": false
