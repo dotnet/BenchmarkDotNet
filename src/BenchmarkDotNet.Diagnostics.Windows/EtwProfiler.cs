@@ -69,6 +69,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 Stop(parameters);
         }
 
+        public IEnumerable<IMetricDescriptor> GetForceShowColumns() => Enumerable.Empty<IMetricDescriptor>();
+
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
             if (!benchmarkToEtlFile.TryGetValue(results.BenchmarkCase, out var traceFilePath))

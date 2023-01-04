@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -18,10 +17,7 @@ namespace BenchmarkDotNet.Diagnosers
     {
         public static readonly ThreadingDiagnoser Default = new ThreadingDiagnoser();
 
-        private ThreadingDiagnoser() {
-            DefaultColumnProviders.MetricsColumnProvider.RegisterForcedColumn(this, CompletedWorkItemCountMetricDescriptor.Instance);
-            DefaultColumnProviders.MetricsColumnProvider.RegisterForcedColumn(this, LockContentionCountMetricDescriptor.Instance);
-        }
+        private ThreadingDiagnoser() { }
 
         public IEnumerable<string> Ids => new[] { nameof(ThreadingDiagnoser) };
 
@@ -37,8 +33,8 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {
-            yield return new Metric(CompletedWorkItemCountMetricDescriptor.Instance, results.ThreadingStats.CompletedWorkItemCount / (double)results.ThreadingStats.TotalOperations);
-            yield return new Metric(LockContentionCountMetricDescriptor.Instance, results.ThreadingStats.LockContentionCount / (double)results.ThreadingStats.TotalOperations);
+            yield return new Metric(CompletedWorkItemCountMetricDescriptor.Instance, results.ThreadingStats.CompletedWorkItemCount / (double) results.ThreadingStats.TotalOperations);
+            yield return new Metric(LockContentionCountMetricDescriptor.Instance, results.ThreadingStats.LockContentionCount / (double) results.ThreadingStats.TotalOperations);
         }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
@@ -54,6 +50,12 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
+        public IEnumerable<IMetricDescriptor> GetForceShowColumns()
+        {
+            yield return CompletedWorkItemCountMetricDescriptor.Instance;
+            yield return LockContentionCountMetricDescriptor.Instance;
+        }
+
         private class CompletedWorkItemCountMetricDescriptor : IMetricDescriptor
         {
             internal static readonly IMetricDescriptor Instance = new CompletedWorkItemCountMetricDescriptor();
@@ -66,6 +68,7 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory => 0;
+            public bool GetIsAvailable(Metric metric) => true;
         }
 
         private class LockContentionCountMetricDescriptor : IMetricDescriptor
@@ -80,6 +83,7 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory => 0;
+            public bool GetIsAvailable(Metric metric) => true;
         }
     }
 }

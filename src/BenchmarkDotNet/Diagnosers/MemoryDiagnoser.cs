@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
@@ -18,11 +17,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public static readonly MemoryDiagnoser Default = new MemoryDiagnoser(new MemoryDiagnoserConfig(displayGenColumns: true));
 
-        public MemoryDiagnoser(MemoryDiagnoserConfig config)
-        {
-            Config = config;
-            DefaultColumnProviders.MetricsColumnProvider.RegisterForcedColumn(this, AllocatedMemoryMetricDescriptor.Instance);
-        }
+        public MemoryDiagnoser(MemoryDiagnoserConfig config) => Config = config;
 
         public MemoryDiagnoserConfig Config { get; }
 
@@ -33,6 +28,11 @@ namespace BenchmarkDotNet.Diagnosers
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
         public void DisplayResults(ILogger logger) { }
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Array.Empty<ValidationError>();
+
+        public IEnumerable<IMetricDescriptor> GetForceShowColumns()
+        {
+            yield return AllocatedMemoryMetricDescriptor.Instance;
+        }
 
         // the action takes places in other process, and the values are gathered by Engine
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
@@ -65,8 +65,6 @@ namespace BenchmarkDotNet.Diagnosers
                 DisplayName = columnName;
                 Legend = $"GC Generation {generationId} collects per 1000 operations";
                 PriorityInCategory = generationId;
-
-                MetricColumn.RegisterColumnRequiresPositive(this);
             }
 
             public string Id { get; }
@@ -77,6 +75,7 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory { get; }
+            public bool GetIsAvailable(Metric metric) => metric.Value > 0;
         }
     }
 }

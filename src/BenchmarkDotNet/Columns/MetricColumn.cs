@@ -12,17 +12,6 @@ namespace BenchmarkDotNet.Columns
     {
         internal const string UnknownRepresentation = "?";
 
-        // This is used so we won't break the public IMetricDescriptor interface.
-        private static readonly HashSet<Type> s_metricsRequiringPositive = new ();
-
-        internal static void RegisterColumnRequiresPositive(IMetricDescriptor metricDescriptor)
-        {
-            lock (s_metricsRequiringPositive)
-            {
-                s_metricsRequiringPositive.Add(metricDescriptor.GetType());
-            }
-        }
-
         private readonly IMetricDescriptor descriptor;
         private readonly bool force;
 
@@ -48,7 +37,7 @@ namespace BenchmarkDotNet.Columns
         public bool IsAvailable(Summary summary) => force
             || summary.Reports.Any(report =>
                 report.Metrics.TryGetValue(descriptor.Id, out var metric)
-                && (!s_metricsRequiringPositive.Contains(metric.Descriptor.GetType()) || metric.Value > 0));
+                && metric.Descriptor.GetIsAvailable(metric));
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => GetValue(summary, benchmarkCase, SummaryStyle.Default);
 

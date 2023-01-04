@@ -94,26 +94,9 @@ namespace BenchmarkDotNet.Columns
 
         internal class MetricsColumnProvider : IColumnProvider
         {
-            // This is used so we don't have to break the public IDiagnoser interface.
-            private static readonly Dictionary<Type, HashSet<IMetricDescriptor>> s_forceAddColumns = new ();
-
-            internal static void RegisterForcedColumn(IDiagnoser diagnoser, IMetricDescriptor metricDescriptor)
-            {
-                var type = diagnoser.GetType();
-                lock (s_forceAddColumns)
-                {
-                    if (!s_forceAddColumns.TryGetValue(type, out var set))
-                    {
-                        set = new HashSet<IMetricDescriptor>();
-                        s_forceAddColumns.Add(type, set);
-                    }
-                    set.Add(metricDescriptor);
-                }
-            }
-
             public IEnumerable<IColumn> GetColumns(Summary summary)
             {
-                var forcedTypes = new HashSet<Type>();
+                var forcedColumnIds = new HashSet<string>();
 
                 return summary
                     .Reports
@@ -125,18 +108,17 @@ namespace BenchmarkDotNet.Columns
                             report.BenchmarkCase.Config.diagnosers
                             .SelectMany(diagnoser =>
                             {
-                                if (!s_forceAddColumns.TryGetValue(diagnoser.GetType(), out var descriptors))
-                                    return Array.Empty<IMetricDescriptor>();
-                                foreach (var desc in descriptors)
+                                var forcedColumns = diagnoser.GetForceShowColumns();
+                                foreach (var desc in forcedColumns)
                                 {
-                                    forcedTypes.Add(desc.GetType());
+                                    forcedColumnIds.Add(desc.Id);
                                 }
-                                return (IEnumerable<IMetricDescriptor>) descriptors;
+                                return forcedColumns;
                             })
                         )
                     )
                     .Distinct(MetricDescriptorEqualityComparer.Instance)
-                    .Select(descriptor => new MetricColumn(descriptor, forcedTypes.Contains(descriptor.GetType())));
+                    .Select(descriptor => new MetricColumn(descriptor, forcedColumnIds.Contains(descriptor.Id)));
             }
         }
     }

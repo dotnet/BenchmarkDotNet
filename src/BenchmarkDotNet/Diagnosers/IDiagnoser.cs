@@ -27,6 +27,8 @@ namespace BenchmarkDotNet.Diagnosers
         void DisplayResults(ILogger logger);
 
         IEnumerable<ValidationError> Validate(ValidationParameters validationParameters);
+
+        IEnumerable<IMetricDescriptor> GetForceShowColumns();
     }
 
     public interface IConfigurableDiagnoser<in TConfig> : IDiagnoser

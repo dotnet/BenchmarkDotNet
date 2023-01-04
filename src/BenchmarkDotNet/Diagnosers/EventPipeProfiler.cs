@@ -118,6 +118,8 @@ namespace BenchmarkDotNet.Diagnosers
             return Array.Empty<Metric>();
         }
 
+        public IEnumerable<IMetricDescriptor> GetForceShowColumns() => Enumerable.Empty<IMetricDescriptor>();
+
         public void DisplayResults(ILogger resultLogger)
         {
             if (!benchmarkToTraceFile.Any())

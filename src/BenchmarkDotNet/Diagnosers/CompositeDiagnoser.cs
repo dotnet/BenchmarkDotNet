@@ -52,5 +52,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => diagnosers.SelectMany(diagnoser => diagnoser.Validate(validationParameters));
+
+        public IEnumerable<IMetricDescriptor> GetForceShowColumns() => Enumerable.Empty<IMetricDescriptor>();
     }
 }
