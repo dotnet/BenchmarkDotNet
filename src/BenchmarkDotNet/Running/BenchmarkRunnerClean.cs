@@ -17,7 +17,6 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Parameters;
@@ -168,14 +167,12 @@ namespace BenchmarkDotNet.Running
             var cultureInfo = config.CultureInfo ?? DefaultCultureInfo.Instance;
             var reports = new List<BenchmarkReport>();
             string title = GetTitle(new[] { benchmarkRunInfo });
-            var consoleTitle = RuntimeInformation.IsWindows() ? Console.Title : string.Empty;
+            using var consoleTitler = new ConsoleTitler($"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining");
 
             logger.WriteLineInfo($"// Found {benchmarks.Length} benchmarks:");
             foreach (var benchmark in benchmarks)
                 logger.WriteLineInfo($"//   {benchmark.DisplayInfo}");
             logger.WriteLine();
-
-            UpdateTitle(totalBenchmarkCount, benchmarksToRunCount);
 
             using (var powerManagementApplier = new PowerManagementApplier(logger))
             {
@@ -241,13 +238,8 @@ namespace BenchmarkDotNet.Running
 
                     benchmarksToRunCount -= stop ? benchmarks.Length - i : 1;
 
-                    LogProgress(logger, in runsChronometer, totalBenchmarkCount, benchmarksToRunCount, taskbarProgress);
+                    LogProgress(logger, in runsChronometer, totalBenchmarkCount, benchmarksToRunCount, consoleTitler, taskbarProgress);
                 }
-            }
-
-            if (RuntimeInformation.IsWindows())
-            {
-                Console.Title = consoleTitle;
             }
 
             var runEnd = runsChronometer.GetElapsed();
@@ -652,15 +644,7 @@ namespace BenchmarkDotNet.Running
             }
         }
 
-        private static void UpdateTitle(int totalBenchmarkCount, int benchmarksToRunCount)
-        {
-            if (!Console.IsOutputRedirected && (RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux() || RuntimeInformation.IsMacOS()))
-            {
-                Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining";
-            }
-        }
-
-        private static void LogProgress(ILogger logger, in StartedClock runsChronometer, int totalBenchmarkCount, int benchmarksToRunCount, TaskbarProgress taskbarProgress)
+        private static void LogProgress(ILogger logger, in StartedClock runsChronometer, int totalBenchmarkCount, int benchmarksToRunCount, ConsoleTitler consoleTitler, TaskbarProgress taskbarProgress)
         {
             int executedBenchmarkCount = totalBenchmarkCount - benchmarksToRunCount;
             TimeSpan fromNow = GetEstimatedFinishTime(runsChronometer, benchmarksToRunCount, executedBenchmarkCount);
@@ -669,10 +653,8 @@ namespace BenchmarkDotNet.Running
                 $" Estimated finish {estimatedEnd:yyyy-MM-dd H:mm} ({(int)fromNow.TotalHours}h {fromNow.Minutes}m from now) **";
             logger.WriteLineHeader(message);
 
-            if (!Console.IsOutputRedirected && (RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux() || RuntimeInformation.IsMacOS()))
-            {
-                Console.Title = $"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining - {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish";
-            }
+            consoleTitler.UpdateTitle ($"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining - {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish");
+
             taskbarProgress.SetProgress((float) executedBenchmarkCount / totalBenchmarkCount);
         }
 
