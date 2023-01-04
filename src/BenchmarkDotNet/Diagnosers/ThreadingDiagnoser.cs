@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -17,7 +18,10 @@ namespace BenchmarkDotNet.Diagnosers
     {
         public static readonly ThreadingDiagnoser Default = new ThreadingDiagnoser();
 
-        private ThreadingDiagnoser() { }
+        private ThreadingDiagnoser() {
+            DefaultColumnProviders.MetricsColumnProvider.RegisterForcedColumn(this, CompletedWorkItemCountMetricDescriptor.Instance);
+            DefaultColumnProviders.MetricsColumnProvider.RegisterForcedColumn(this, LockContentionCountMetricDescriptor.Instance);
+        }
 
         public IEnumerable<string> Ids => new[] { nameof(ThreadingDiagnoser) };
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
@@ -91,17 +92,49 @@ namespace BenchmarkDotNet.Columns
                 .Select(definition => new ParamColumn(definition.Name, definition.PriorityInCategory));
         }
 
-        private class MetricsColumnProvider : IColumnProvider
+        internal class MetricsColumnProvider : IColumnProvider
         {
-            public IEnumerable<IColumn> GetColumns(Summary summary) => summary
-                .Reports
-                .SelectMany(report =>
-                    report.Metrics.Values
-                    .Select(metric => metric.Descriptor)
-                    // Force add AllocatedMemoryMetricDescriptor if the memory diagnoser is attached, in case no measurements were able to be made, so we still show the column.
-                    .Concat(report.BenchmarkCase.Config.HasMemoryDiagnoser() ? new[] { Diagnosers.AllocatedMemoryMetricDescriptor.Instance } : Array.Empty<IMetricDescriptor>()))
-                .Distinct(MetricDescriptorEqualityComparer.Instance)
-                .Select(descriptor => new MetricColumn(descriptor));
+            // This is used so we don't have to break the public IDiagnoser interface.
+            private static readonly Dictionary<Type, HashSet<IMetricDescriptor>> s_forceAddColumns = new ();
+
+            internal static void RegisterForcedColumn(IDiagnoser diagnoser, IMetricDescriptor metricDescriptor)
+            {
+                var type = diagnoser.GetType();
+                if (!s_forceAddColumns.TryGetValue(type, out var set))
+                {
+                    set = new HashSet<IMetricDescriptor>();
+                    s_forceAddColumns.Add(type, set);
+                }
+                set.Add(metricDescriptor);
+            }
+
+            public IEnumerable<IColumn> GetColumns(Summary summary)
+            {
+                var forcedTypes = new HashSet<Type>();
+
+                return summary
+                    .Reports
+                    .SelectMany(report =>
+                        report.Metrics.Values
+                        .Select(metric => metric.Descriptor)
+                        // Force add columns in case no measurements were able to be made.
+                        .Concat(
+                            report.BenchmarkCase.Config.diagnosers
+                            .SelectMany(diagnoser =>
+                            {
+                                if (!s_forceAddColumns.TryGetValue(diagnoser.GetType(), out var descriptors))
+                                    return Array.Empty<IMetricDescriptor>();
+                                foreach (var desc in descriptors)
+                                {
+                                    forcedTypes.Add(desc.GetType());
+                                }
+                                return (IEnumerable<IMetricDescriptor>) descriptors;
+                            })
+                        )
+                    )
+                    .Distinct(MetricDescriptorEqualityComparer.Instance)
+                    .Select(descriptor => new MetricColumn(descriptor, forcedTypes.Contains(descriptor.GetType())));
+            }
         }
     }
 }

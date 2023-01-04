@@ -37,6 +37,8 @@ namespace BenchmarkDotNet.Diagnosers
 
             results = new Dictionary<BenchmarkCase, DisassemblyResult>();
             Exporters = GetExporters(results, config);
+
+            DefaultColumnProviders.MetricsColumnProvider.RegisterForcedColumn(this, NativeCodeSizeMetricDescriptor.Instance);
         }
 
         public DisassemblyDiagnoserConfig Config { get; }

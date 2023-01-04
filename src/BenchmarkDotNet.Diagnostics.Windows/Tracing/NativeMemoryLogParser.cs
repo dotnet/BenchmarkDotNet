@@ -262,8 +262,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
             return new[]
             {
-                new Metric(new AllocatedNativeMemoryDescriptor(), memoryAllocatedPerOperation),
-                new Metric(new NativeMemoryLeakDescriptor(), memoryLeakPerOperation)
+                new Metric(AllocatedNativeMemoryDescriptor.Instance, memoryAllocatedPerOperation),
+                new Metric(NativeMemoryLeakDescriptor.Instance, memoryLeakPerOperation)
             };
         }
 

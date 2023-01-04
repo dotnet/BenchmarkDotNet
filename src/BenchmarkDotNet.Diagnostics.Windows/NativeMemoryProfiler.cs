@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Diagnostics.Windows.Tracing;
 using BenchmarkDotNet.Engines;
@@ -26,7 +27,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         public string ShortName => "NativeMemory";
 
         [PublicAPI] // parameterless ctor required by DiagnosersLoader to support creating this profiler via console line args
-        public NativeMemoryProfiler() => etwProfiler = new EtwProfiler(CreateDefaultConfig());
+        public NativeMemoryProfiler()
+        {
+            etwProfiler = new EtwProfiler(CreateDefaultConfig());
+            DefaultColumnProviders.MetricsColumnProvider.RegisterForcedColumn(this, AllocatedNativeMemoryDescriptor.Instance);
+        }
 
         public IEnumerable<string> Ids => new[] { nameof(NativeMemoryProfiler) };
 

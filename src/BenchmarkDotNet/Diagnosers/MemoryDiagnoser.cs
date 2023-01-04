@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
@@ -17,7 +18,11 @@ namespace BenchmarkDotNet.Diagnosers
 
         public static readonly MemoryDiagnoser Default = new MemoryDiagnoser(new MemoryDiagnoserConfig(displayGenColumns: true));
 
-        public MemoryDiagnoser(MemoryDiagnoserConfig config) => Config = config;
+        public MemoryDiagnoser(MemoryDiagnoserConfig config)
+        {
+            Config = config;
+            DefaultColumnProviders.MetricsColumnProvider.RegisterForcedColumn(this, AllocatedMemoryMetricDescriptor.Instance);
+        }
 
         public MemoryDiagnoserConfig Config { get; }
 
@@ -48,7 +53,7 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        internal class GarbageCollectionsMetricDescriptor : IMetricDescriptor
+        private class GarbageCollectionsMetricDescriptor : IMetricDescriptor
         {
             internal static readonly IMetricDescriptor Gen0 = new GarbageCollectionsMetricDescriptor(0, Column.Gen0);
             internal static readonly IMetricDescriptor Gen1 = new GarbageCollectionsMetricDescriptor(1, Column.Gen1);
@@ -60,6 +65,8 @@ namespace BenchmarkDotNet.Diagnosers
                 DisplayName = columnName;
                 Legend = $"GC Generation {generationId} collects per 1000 operations";
                 PriorityInCategory = generationId;
+
+                MetricColumn.RegisterColumnRequiresPositive(this);
             }
 
             public string Id { get; }

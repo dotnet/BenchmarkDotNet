@@ -16,7 +16,10 @@ namespace BenchmarkDotNet.Diagnosers
     {
         public static readonly ExceptionDiagnoser Default = new ExceptionDiagnoser();
 
-        private ExceptionDiagnoser() { }
+        private ExceptionDiagnoser()
+        {
+            DefaultColumnProviders.MetricsColumnProvider.RegisterForcedColumn(this, ExceptionsFrequencyMetricDescriptor.Instance);
+        }
 
         public IEnumerable<string> Ids => new[] { nameof(ExceptionDiagnoser) };
 

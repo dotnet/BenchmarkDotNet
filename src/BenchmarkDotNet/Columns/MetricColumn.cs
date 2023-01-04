@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Perfolizer.Common;
@@ -8,9 +10,24 @@ namespace BenchmarkDotNet.Columns
 {
     public class MetricColumn : IColumn
     {
-        private readonly IMetricDescriptor descriptor;
+        // This is used so we won't break the public IMetricDescriptor interface.
+        private static readonly HashSet<Type> s_metricsRequiringPositive = new ();
 
-        public MetricColumn(IMetricDescriptor metricDescriptor) => descriptor = metricDescriptor;
+        internal static void RegisterColumnRequiresPositive(IMetricDescriptor metricDescriptor)
+        {
+            s_metricsRequiringPositive.Add(metricDescriptor.GetType());
+        }
+
+        private readonly IMetricDescriptor descriptor;
+        private readonly bool force;
+
+        public MetricColumn(IMetricDescriptor metricDescriptor) : this(metricDescriptor, false) { }
+
+        public MetricColumn(IMetricDescriptor metricDescriptor, bool forceShow)
+        {
+            descriptor = metricDescriptor;
+            force = forceShow;
+        }
 
         public string Id => descriptor.Id;
         public string ColumnName => descriptor.DisplayName;
@@ -23,20 +40,10 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
 
-        public bool IsAvailable(Summary summary) => descriptor is Diagnosers.AllocatedMemoryMetricDescriptor || summary.Reports.Any(IsAvailable);
-
-        private bool IsAvailable(BenchmarkReport report)
-        {
-            if (!report.Metrics.TryGetValue(descriptor.Id, out var metric))
-            {
-                return false;
-            }
-            if (metric.Descriptor is Diagnosers.MemoryDiagnoser.GarbageCollectionsMetricDescriptor)
-            {
-                return metric.Value > 0;
-            }
-            return true;
-        }
+        public bool IsAvailable(Summary summary) => force
+            || summary.Reports.Any(report =>
+                report.Metrics.TryGetValue(descriptor.Id, out var metric)
+                && (!s_metricsRequiringPositive.Contains(metric.Descriptor.GetType()) || metric.Value > 0));
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => GetValue(summary, benchmarkCase, SummaryStyle.Default);
 

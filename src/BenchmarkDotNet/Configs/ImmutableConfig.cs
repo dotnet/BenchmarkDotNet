@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Configs
         private readonly ImmutableArray<IColumnProvider> columnProviders;
         private readonly ImmutableArray<IExporter> exporters;
         private readonly ImmutableHashSet<ILogger> loggers;
-        private readonly ImmutableHashSet<IDiagnoser> diagnosers;
+        internal readonly ImmutableHashSet<IDiagnoser> diagnosers;
         private readonly ImmutableHashSet<IAnalyser> analysers;
         private readonly ImmutableHashSet<IValidator> validators;
         private readonly ImmutableHashSet<Job> jobs;
