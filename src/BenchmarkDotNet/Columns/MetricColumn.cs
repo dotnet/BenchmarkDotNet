@@ -17,7 +17,10 @@ namespace BenchmarkDotNet.Columns
 
         internal static void RegisterColumnRequiresPositive(IMetricDescriptor metricDescriptor)
         {
-            s_metricsRequiringPositive.Add(metricDescriptor.GetType());
+            lock (s_metricsRequiringPositive)
+            {
+                s_metricsRequiringPositive.Add(metricDescriptor.GetType());
+            }
         }
 
         private readonly IMetricDescriptor descriptor;

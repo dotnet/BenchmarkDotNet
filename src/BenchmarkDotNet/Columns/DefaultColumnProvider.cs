@@ -100,12 +100,15 @@ namespace BenchmarkDotNet.Columns
             internal static void RegisterForcedColumn(IDiagnoser diagnoser, IMetricDescriptor metricDescriptor)
             {
                 var type = diagnoser.GetType();
-                if (!s_forceAddColumns.TryGetValue(type, out var set))
+                lock (s_forceAddColumns)
                 {
-                    set = new HashSet<IMetricDescriptor>();
-                    s_forceAddColumns.Add(type, set);
+                    if (!s_forceAddColumns.TryGetValue(type, out var set))
+                    {
+                        set = new HashSet<IMetricDescriptor>();
+                        s_forceAddColumns.Add(type, set);
+                    }
+                    set.Add(metricDescriptor);
                 }
-                set.Add(metricDescriptor);
             }
 
             public IEnumerable<IColumn> GetColumns(Summary summary)
