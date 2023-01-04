@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.Tests.Reports
             var actual = table.Columns.First(c => c.Header == "metric1").Content;
 
             // assert
-            Assert.Equal(new[] { "-", "?" }, actual);
+            Assert.Equal(new[] { "-", MetricColumn.UnknownRepresentation }, actual);
         }
     }
 }

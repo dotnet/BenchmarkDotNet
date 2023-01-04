@@ -10,6 +10,8 @@ namespace BenchmarkDotNet.Columns
 {
     public class MetricColumn : IColumn
     {
+        internal const string UnknownRepresentation = "?";
+
         // This is used so we won't break the public IMetricDescriptor interface.
         private static readonly HashSet<Type> s_metricsRequiringPositive = new ();
 
@@ -50,7 +52,7 @@ namespace BenchmarkDotNet.Columns
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style)
         {
             if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase].Metrics.TryGetValue(descriptor.Id, out Metric metric))
-                return "?";
+                return UnknownRepresentation;
             if (metric.Value == 0.0 && !style.PrintZeroValuesInContent)
                 return "-";
 

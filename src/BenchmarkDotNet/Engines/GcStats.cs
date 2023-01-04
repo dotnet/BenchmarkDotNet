@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -189,7 +190,7 @@ namespace BenchmarkDotNet.Engines
         }
 
         public string ToOutputLine()
-            => $"{ResultsLinePrefix} {Gen0Collections} {Gen1Collections} {Gen2Collections} {AllocatedBytes?.ToString() ?? "?"} {TotalOperations}";
+            => $"{ResultsLinePrefix} {Gen0Collections} {Gen1Collections} {Gen2Collections} {AllocatedBytes?.ToString() ?? MetricColumn.UnknownRepresentation} {TotalOperations}";
 
         public static GcStats Parse(string line)
         {
@@ -211,7 +212,7 @@ namespace BenchmarkDotNet.Engines
 
         private static bool TryParse(string s, out long? result)
         {
-            if (s == "?")
+            if (s == MetricColumn.UnknownRepresentation)
             {
                 result = null;
                 return true;
