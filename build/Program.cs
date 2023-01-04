@@ -446,26 +446,26 @@ public class DocFxChangelogDownloadTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        // if (context.Argument("AllVersions", false))
-        // {
-        //     context.DocfxChangelogDownload(
-        //         DocumentationHelper.BdnAllVersions.First(),
-        //         DocumentationHelper.BdnFirstCommit);
-        //
-        //     for (int i = 1; i < DocumentationHelper.BdnAllVersions.Length; i++)
-        //         context.DocfxChangelogDownload(
-        //             DocumentationHelper.BdnAllVersions[i],
-        //             DocumentationHelper.BdnAllVersions[i - 1]);
-        // } else if (context.Argument("LatestVersions", false))
-        // {
-        // }
-        //
-        // if (!context.Argument("StableVersions", false))
-        //     context.DocfxChangelogDownload(
-        //         DocumentationHelper.BdnNextVersion,
-        //         DocumentationHelper.BdnAllVersions.Last(),
-        //         "HEAD");
-        
+        if (context.Argument("AllVersions", false))
+        {
+            context.DocfxChangelogDownload(
+                DocumentationHelper.BdnAllVersions.First(),
+                DocumentationHelper.BdnFirstCommit);
+
+            for (int i = 1; i < DocumentationHelper.BdnAllVersions.Length; i++)
+                context.DocfxChangelogDownload(
+                    DocumentationHelper.BdnAllVersions[i],
+                    DocumentationHelper.BdnAllVersions[i - 1]);
+        } else if (context.Argument("LatestVersions", false))
+        {
+        }
+
+        if (!context.Argument("StableVersions", false))
+            context.DocfxChangelogDownload(
+                DocumentationHelper.BdnNextVersion,
+                DocumentationHelper.BdnAllVersions.Last(),
+                "HEAD");
+
         for (int i = DocumentationHelper.BdnAllVersions.Length - 3; i < DocumentationHelper.BdnAllVersions.Length; i++)
             context.DocfxChangelogDownload(
                 DocumentationHelper.BdnAllVersions[i],
