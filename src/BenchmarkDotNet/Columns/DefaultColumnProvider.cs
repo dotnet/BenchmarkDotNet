@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
@@ -92,34 +91,13 @@ namespace BenchmarkDotNet.Columns
                 .Select(definition => new ParamColumn(definition.Name, definition.PriorityInCategory));
         }
 
-        internal class MetricsColumnProvider : IColumnProvider
+        private class MetricsColumnProvider : IColumnProvider
         {
-            public IEnumerable<IColumn> GetColumns(Summary summary)
-            {
-                var forcedColumnIds = new HashSet<string>();
-
-                return summary
-                    .Reports
-                    .SelectMany(report =>
-                        report.Metrics.Values
-                        .Select(metric => metric.Descriptor)
-                        // Force add columns in case no measurements were able to be made.
-                        .Concat(
-                            report.BenchmarkCase.Config.diagnosers
-                            .SelectMany(diagnoser =>
-                            {
-                                var forcedColumns = diagnoser.GetForceShowColumns();
-                                foreach (var desc in forcedColumns)
-                                {
-                                    forcedColumnIds.Add(desc.Id);
-                                }
-                                return forcedColumns;
-                            })
-                        )
-                    )
-                    .Distinct(MetricDescriptorEqualityComparer.Instance)
-                    .Select(descriptor => new MetricColumn(descriptor, forcedColumnIds.Contains(descriptor.Id)));
-            }
+            public IEnumerable<IColumn> GetColumns(Summary summary) => summary
+                .Reports
+                .SelectMany(report => report.Metrics.Values.Select(metric => metric.Descriptor))
+                .Distinct(MetricDescriptorEqualityComparer.Instance)
+                .Select(descriptor => new MetricColumn(descriptor));
         }
     }
 }

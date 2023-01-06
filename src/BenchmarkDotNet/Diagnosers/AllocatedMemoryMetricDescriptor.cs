@@ -16,6 +16,5 @@ namespace BenchmarkDotNet.Diagnosers
         public string Unit => SizeUnit.B.Name;
         public bool TheGreaterTheBetter => false;
         public int PriorityInCategory => GC.MaxGeneration + 1;
-        public bool GetIsAvailable(Metric metric) => true;
     }
 }

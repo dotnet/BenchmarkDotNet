@@ -37,11 +37,6 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Enumerable.Empty<ValidationError>();
 
-        public IEnumerable<IMetricDescriptor> GetForceShowColumns()
-        {
-            yield return ExceptionsFrequencyMetricDescriptor.Instance;
-        }
-
         private class ExceptionsFrequencyMetricDescriptor : IMetricDescriptor
         {
             internal static readonly IMetricDescriptor Instance = new ExceptionsFrequencyMetricDescriptor();
@@ -54,7 +49,6 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory => 0;
-            public bool GetIsAvailable(Metric metric) => true;
         }
     }
 }

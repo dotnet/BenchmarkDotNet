@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Perfolizer.Common;
@@ -13,15 +11,8 @@ namespace BenchmarkDotNet.Columns
         internal const string UnknownRepresentation = "?";
 
         private readonly IMetricDescriptor descriptor;
-        private readonly bool force;
 
-        public MetricColumn(IMetricDescriptor metricDescriptor) : this(metricDescriptor, false) { }
-
-        public MetricColumn(IMetricDescriptor metricDescriptor, bool forceShow)
-        {
-            descriptor = metricDescriptor;
-            force = forceShow;
-        }
+        public MetricColumn(IMetricDescriptor metricDescriptor) => descriptor = metricDescriptor;
 
         public string Id => descriptor.Id;
         public string ColumnName => descriptor.DisplayName;
@@ -34,16 +25,15 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
 
-        public bool IsAvailable(Summary summary) => force
-            || summary.Reports.Any(report =>
+        public bool IsAvailable(Summary summary) => summary.Reports.Any(report =>
                 report.Metrics.TryGetValue(descriptor.Id, out var metric)
-                && metric.Descriptor.GetIsAvailable(metric));
+                && metric.IsAvailable);
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => GetValue(summary, benchmarkCase, SummaryStyle.Default);
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style)
         {
-            if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase].Metrics.TryGetValue(descriptor.Id, out Metric metric))
+            if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase].Metrics.TryGetValue(descriptor.Id, out Metric metric) || !metric.HasValue)
                 return UnknownRepresentation;
             if (metric.Value == 0.0 && !style.PrintZeroValuesInContent)
                 return "-";

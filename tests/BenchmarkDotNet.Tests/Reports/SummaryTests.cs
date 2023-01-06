@@ -92,7 +92,6 @@ namespace BenchmarkDotNet.Tests.Reports
             public string Unit { get; } = nameof(Unit);
             public bool TheGreaterTheBetter { get; }
             public int PriorityInCategory => 0;
-            public bool GetIsAvailable(Metric metric) => true;
         }
     }
 }

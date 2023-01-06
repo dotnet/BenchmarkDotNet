@@ -60,11 +60,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => etwProfiler.Validate(validationParameters);
 
-        public IEnumerable<IMetricDescriptor> GetForceShowColumns()
-        {
-            yield return AllocatedNativeMemoryDescriptor.Instance;
-        }
-
         private static EtwProfilerConfig CreateDefaultConfig()
         {
             // We add VirtualAlloc because we want to catch low level VirtualAlloc and VirtualFree calls.

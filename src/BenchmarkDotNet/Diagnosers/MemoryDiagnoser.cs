@@ -29,11 +29,6 @@ namespace BenchmarkDotNet.Diagnosers
         public void DisplayResults(ILogger logger) { }
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => Array.Empty<ValidationError>();
 
-        public IEnumerable<IMetricDescriptor> GetForceShowColumns()
-        {
-            yield return AllocatedMemoryMetricDescriptor.Instance;
-        }
-
         // the action takes places in other process, and the values are gathered by Engine
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
 
@@ -41,16 +36,17 @@ namespace BenchmarkDotNet.Diagnosers
         {
             if (Config.DisplayGenColumns)
             {
-                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen0, diagnoserResults.GcStats.Gen0Collections / (double) diagnoserResults.GcStats.TotalOperations * 1000);
-                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen1, diagnoserResults.GcStats.Gen1Collections / (double) diagnoserResults.GcStats.TotalOperations * 1000);
-                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen2, diagnoserResults.GcStats.Gen2Collections / (double) diagnoserResults.GcStats.TotalOperations * 1000);
+                yield return GetCollectionsMetric(GarbageCollectionsMetricDescriptor.Gen0, diagnoserResults.GcStats.Gen0Collections);
+                yield return GetCollectionsMetric(GarbageCollectionsMetricDescriptor.Gen1, diagnoserResults.GcStats.Gen1Collections);
+                yield return GetCollectionsMetric(GarbageCollectionsMetricDescriptor.Gen2, diagnoserResults.GcStats.Gen2Collections);
+
+                Metric GetCollectionsMetric(IMetricDescriptor descriptor, int collections)
+                {
+                    return new Metric(descriptor, collections / (double) diagnoserResults.GcStats.TotalOperations * 1000, collections > 0);
+                }
             }
 
-            var allocatedBytes = diagnoserResults.GcStats.GetBytesAllocatedPerOperation(diagnoserResults.BenchmarkCase);
-            if (allocatedBytes != null)
-            {
-                yield return new Metric(AllocatedMemoryMetricDescriptor.Instance, allocatedBytes.Value);
-            }
+            yield return new Metric(AllocatedMemoryMetricDescriptor.Instance, diagnoserResults.GcStats.GetBytesAllocatedPerOperation(diagnoserResults.BenchmarkCase), true);
         }
 
         private class GarbageCollectionsMetricDescriptor : IMetricDescriptor
@@ -75,7 +71,6 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory { get; }
-            public bool GetIsAvailable(Metric metric) => metric.Value > 0;
         }
     }
 }

@@ -10,10 +10,18 @@ namespace BenchmarkDotNet.Reports
 
         public IMetricDescriptor Descriptor { get; }
 
-        public Metric(IMetricDescriptor descriptor, double value)
+        internal bool HasValue { get; }
+
+        internal bool IsAvailable { get; }
+
+        public Metric(IMetricDescriptor descriptor, double value) : this(descriptor, value, true) { }
+
+        internal Metric(IMetricDescriptor descriptor, double? value, bool isAvailable)
         {
             Descriptor = descriptor;
-            Value = value;
+            Value = value ?? double.NaN;
+            HasValue = value.HasValue;
+            IsAvailable = isAvailable;
         }
     }
 
@@ -34,8 +42,6 @@ namespace BenchmarkDotNet.Reports
         [PublicAPI] bool TheGreaterTheBetter { get; }
 
         [PublicAPI] int PriorityInCategory { get; }
-
-        [PublicAPI] bool GetIsAvailable(Metric metric);
     }
 
     public class MetricDescriptorEqualityComparer : EqualityComparer<IMetricDescriptor>

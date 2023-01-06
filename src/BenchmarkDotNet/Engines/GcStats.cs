@@ -47,10 +47,8 @@ namespace BenchmarkDotNet.Engines
             bool excludeAllocationQuantumSideEffects = benchmarkCase.GetRuntime().RuntimeMoniker <= RuntimeMoniker.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
 
             long? allocatedBytes = GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects);
-            return !allocatedBytes.HasValue
-                ? null
-                : allocatedBytes == 0
-                ? 0
+            return allocatedBytes == null ? null
+                : allocatedBytes == 0 ? 0
                 : (long) Math.Round( // let's round it to reduce the side effects of Allocation quantum
                     (double) allocatedBytes.Value / TotalOperations,
                     MidpointRounding.ToEven);
@@ -104,7 +102,7 @@ namespace BenchmarkDotNet.Engines
         /// <returns></returns>
         public long? GetTotalAllocatedBytes(bool excludeAllocationQuantumSideEffects)
         {
-            if (!AllocatedBytes.HasValue)
+            if (AllocatedBytes == null)
                 return null;
 
             if (!excludeAllocationQuantumSideEffects)

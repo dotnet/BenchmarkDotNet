@@ -130,11 +130,6 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
-        public IEnumerable<IMetricDescriptor> GetForceShowColumns()
-        {
-            yield return NativeCodeSizeMetricDescriptor.Instance;
-        }
-
         private static bool ShouldUseMonoDisassembler(BenchmarkCase benchmarkCase)
             => benchmarkCase.Job.Environment.Runtime is MonoRuntime || RuntimeInformation.IsMono;
 
@@ -195,7 +190,6 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => SizeUnit.B.Name;
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory => 0;
-            public bool GetIsAvailable(Metric metric) => true;
         }
     }
 }

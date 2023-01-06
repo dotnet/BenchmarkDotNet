@@ -77,8 +77,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) => etwProfiler.Validate(validationParameters);
 
-        public IEnumerable<IMetricDescriptor> GetForceShowColumns() => Enumerable.Empty<IMetricDescriptor>();
-
         private static EtwProfilerConfig CreateDefaultConfig()
         {
             var kernelKeywords = KernelTraceEventParser.Keywords.ImageLoad | KernelTraceEventParser.Keywords.Profile; // same as for EtwProfiler

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -30,8 +29,6 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => new[] { new ValidationError(false, GetErrorMessage()) };
-
-        public IEnumerable<IMetricDescriptor> GetForceShowColumns() => Enumerable.Empty<IMetricDescriptor>();
 
         private string GetErrorMessage() => $@"Unable to resolve {unresolved.Name} diagnoser using dynamic assembly loading. 
             {(RuntimeInformation.IsFullFramework || RuntimeInformation.IsWindows()

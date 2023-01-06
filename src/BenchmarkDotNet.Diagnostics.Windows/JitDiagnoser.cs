@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Loggers;
@@ -39,8 +38,6 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 yield return new ValidationError(true, $"{GetType().Name} is supported only on Windows");
             }
         }
-
-        public IEnumerable<IMetricDescriptor> GetForceShowColumns() => Enumerable.Empty<IMetricDescriptor>();
 
         public void DisplayResults(ILogger outputLogger)
         {
