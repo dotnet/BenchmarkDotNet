@@ -126,17 +126,6 @@ var summary = BenchmarkRunner.Run(typeof(MyBenchmarkClass));
 <pre><code class="lang-log">dotnet run -c Release -- --job short --runtimes net472 net7.0 --filter *BenchmarkClass1*
 </code></pre>
 <p>The most important thing about <code>BenchmarkSwitcher</code> is that you need to pass the <code>args</code> from <code>Main</code> to the <code>Run</code> method. If you don't, it won't parse the arguments.</p>
-<h2 id="url">Url</h2>
-<p>You can also run a benchmark directly from the internet:</p>
-<pre><code class="lang-cs">string url = &quot;&lt;E.g. direct link to raw content of a gist&gt;&quot;;
-var summary = BenchmarkRunner.RunUrl(url);
-</code></pre>
-<p><strong>Note:</strong> it works only for Full .NET Framework. It's not recommended to use this approach.</p>
-<h2 id="source">Source</h2>
-<pre><code class="lang-cs">string benchmarkSource = &quot;public class MyBenchmarkClass { ...&quot;;
-var summary = BenchmarkRunner.RunSource(benchmarkSource);
-</code></pre>
-<p><strong>Note:</strong> it works only for Full .NET Framework. It's not recommended to use this approach.</p>
 </article>
           </div>
           

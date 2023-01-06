@@ -116,7 +116,7 @@
 <p>Create a new console application.</p>
 <h2 id="step-2-installation">Step 2. Installation</h2>
 <p>Install BenchmarkDotNet via the NuGet package: <a href="https://www.nuget.org/packages/BenchmarkDotNet/">BenchmarkDotNet</a></p>
-<pre><code>PM&gt; Install-Package BenchmarkDotNet
+<pre><code class="lang-cmd">&gt; dotnet add package BenchmarkDotNet
 </code></pre>
 <p>Read more about BenchmarkDotNet NuGet packages: <a class="xref" href="nuget.html">Installing NuGet packages</a></p>
 <h2 id="step-3-design-a-benchmark">Step 3. Design a benchmark</h2>
@@ -159,38 +159,50 @@ namespace MyBenchmarks
     }
 }
 </code></pre>
-<p>The <code>BenchmarkRunner.Run&lt;Md5VsSha256&gt;()</code> call runs your benchmarks and print results to console output.</p>
-<h2 id="step-4-view-results">Step 4. View results</h2>
-<p>View the results. Here is an example of output from the above benchmark:</p>
-<pre><code>BenchmarkDotNet=v0.11.3, OS=Windows 10.0.17134.472 (1803/April2018Update/Redstone4)
-Intel Core i7-2630QM CPU 2.00GHz (Sandy Bridge), 1 CPU, 8 logical and 4 physical cores
-Frequency=1948699 Hz, Resolution=513.1629 ns, Timer=TSC
-.NET Core SDK=2.1.502
-  [Host]     : .NET Core 2.1.6 (CoreCLR 4.6.27019.06, CoreFX 4.6.27019.05), 64bit RyuJIT
-  DefaultJob : .NET Core 2.1.6 (CoreCLR 4.6.27019.06, CoreFX 4.6.27019.05), 64bit RyuJIT
-
-
-| Method |      Mean |     Error |    StdDev |
-|------- |----------:|----------:|----------:|
-| Sha256 | 100.90 us | 0.5070 us | 0.4494 us |
-|    Md5 |  37.66 us | 0.1290 us | 0.1207 us |
+<p>The <code>BenchmarkRunner.Run&lt;Md5VsSha256&gt;()</code> call runs your benchmarks and prints results to the console.</p>
+<h2 id="step-4-run-benchmarks">Step 4. Run benchmarks</h2>
+<p>Start your console application to run the benchmarks. The application must be built in the Release configuration.</p>
+<pre><code class="lang-cmd">&gt; dotnet run -c Release
 </code></pre>
-<h2 id="step-5-analyze-results">Step 5. Analyze results</h2>
-<p>Analyze it. In your bin directory, you can find a lot of useful files with detailed information. For example:</p>
+<h2 id="step-5-view-results">Step 5. View results</h2>
+<p>View the results. Here is an example of output from the above benchmark:</p>
+<pre><code>BenchmarkDotNet=v0.13.2, OS=Windows 10 (10.0.19045.2251)
+Intel Core i7-4770HQ CPU 2.20GHz (Haswell), 1 CPU, 8 logical and 4 physical cores
+.NET SDK=7.0.100
+  [Host]     : .NET 7.0.0 (7.0.22.51805), X64 RyuJIT AVX2
+  DefaultJob : .NET 7.0.0 (7.0.22.51805), X64 RyuJIT AVX2
+
+
+| Method |     Mean |    Error |   StdDev |
+|------- |---------:|---------:|---------:|
+| Sha256 | 51.57 us | 0.311 us | 0.291 us |
+|    Md5 | 21.91 us | 0.138 us | 0.129 us |
+</code></pre>
+<h2 id="step-6-analyze-results">Step 6. Analyze results</h2>
+<p>BenchmarkDotNet will automatically create basic reports in the <code>.\BenchmarkDotNet.Artifacts\results</code> folder that can be shared and analyzed.</p>
+<p>To help analyze performance in further depth, you can configure your benchmark to collect and output more detailed information. Benchmark configuration can be conveniently changed by adding attributes to the class containing your benchmarks. For example:</p>
 <ul>
-<li>Csv reports with raw data: <code>Md5VsSha256-report.csv</code>, <code>Md5VsSha256-runs.csv</code></li>
-<li>Markdown reports:  <code>Md5VsSha256-report-default.md</code>, <code>Md5VsSha256-report-stackoverflow.md</code>, <code>Md5VsSha256-report-github.md</code>
+<li><a href="../configs/diagnosers.html">Diagnosers</a>
 <ul>
-<li>Plain report and log: <code>Md5VsSha256-report.txt</code>, <code>Md5VsSha256.log</code></li>
-<li>Plots (if you have installed R): <code>Md5VsSha256-barplot.png</code>, <code>Md5VsSha256-boxplot.png</code>, and so on.</li>
+<li>GC allocations: <code>[MemoryDiagnoser]</code></li>
+<li>Code size and disassembly: <code>[DisassemblyDiagnoser]</code></li>
+<li>Threading statistics: <code>[ThreadingDiagnoser]</code></li>
+</ul>
+</li>
+<li><a href="../configs/exporters.html">Exporters</a>
+<ul>
+<li>CSV reports with raw data: <code>[CsvMeasurementsExporter]</code></li>
+<li>JSON reports with raw data: <code>[JsonExporter]</code></li>
+<li>Plots (if you have installed R): <code>[RPlotExporter]</code></li>
 </ul>
 </li>
 </ul>
+<p>For more information, see <a href="../configs/configs.html">Configs</a>.</p>
 <h2 id="next-steps">Next steps</h2>
-<p>BenchmarkDotNet provides a lot of features which help to high-quality performance research.
-If you want to know more about BenchmarkDotNet features, checkout the <a href="../overview.html">Overview</a> page.
-If you want have any questions, checkout the <a href="../faq.html">FAQ</a> page.
-If you didn't find answer for your question on this page, <a href="https://gitter.im/dotnet/BenchmarkDotNet">ask it on gitter</a> or <a href="https://github.com/dotnet/BenchmarkDotNet/issues">create an issue</a>.</p>
+<p>BenchmarkDotNet provides features which aid high-quality performance research.
+If you want to know more about BenchmarkDotNet features, check out the <a href="../overview.html">Overview</a> page.
+If you have any questions, check out the <a href="../faq.html">FAQ</a> page.
+If you didn't find an answer for your question on this page, <a href="https://gitter.im/dotnet/BenchmarkDotNet">ask it on Gitter</a> or <a href="https://github.com/dotnet/BenchmarkDotNet/issues">create an issue on GitHub</a>.</p>
 </article>
           </div>
           

@@ -115,7 +115,7 @@
 <a href="https://github.com/dotnet/BenchmarkDotNet"><img src="https://img.shields.io/badge/source%20code-GitHub-informational" alt="GitHub"></a></p>
 </h3>
 <h3 align="center">
-  <a href="#features">Features</a>
+  <a href="#Features">Features</a>
   <span> · </span>
   <a href="https://benchmarkdotnet.org/articles/guides/getting-started.html">Getting started</a>
   <span> · </span>
@@ -125,11 +125,11 @@
 </h3>
 <p><strong>BenchmarkDotNet</strong> helps you to transform methods into benchmarks, track their performance, and share reproducible measurement experiments.
 It's no harder than writing unit tests!
-Under the hood, it performs a lot of <a href="#automation">magic</a> that guarantees <a href="#reliability">reliable and precise</a> results thanks to the <a href="https://github.com/AndreyAkinshin/perfolizer">perfolizer</a> statistical engine.
+Under the hood, it performs a lot of <a href="#Automation">magic</a> that guarantees <a href="#Reliability">reliable and precise</a> results thanks to the <a href="https://github.com/AndreyAkinshin/perfolizer">perfolizer</a> statistical engine.
 BenchmarkDotNet protects you from popular benchmarking mistakes and warns you if something is wrong with your benchmark design or obtained measurements.
-The results are presented in a <a href="#friendliness">user-friendly</a> form that highlights all the important facts about your experiment.
+The results are presented in a <a href="#Friendliness">user-friendly</a> form that highlights all the important facts about your experiment.
 The library is adopted by <a href="#who-uses-benchmarkdotnet">13400+ projects</a> including .NET Runtime and supported by the <a href="https://dotnetfoundation.org">.NET Foundation</a>.</p>
-<p>It's <a href="#simplicity">easy</a> to start writing benchmarks, check out an example
+<p>It's <a href="#Simplicity">easy</a> to start writing benchmarks, check out an example
 (copy-pastable version is <a href="https://benchmarkdotnet.org/articles/guides/getting-started.html">here</a>):</p>
 <pre><code class="lang-cs">[SimpleJob(RuntimeMoniker.Net472, baseline: true)]
 [SimpleJob(RuntimeMoniker.NetCoreApp30)]
@@ -168,7 +168,7 @@ Intel Core i7-7700K CPU 4.20GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cor
   [Host]       : .NET Framework 4.7.2 (4.7.3468.0), X64 RyuJIT
   Net472       : .NET Framework 4.7.2 (4.7.3468.0), X64 RyuJIT
   NetCoreApp30 : .NET Core 3.0.0 (CoreCLR 4.700.19.46205, CoreFX 4.700.19.46214), X64 RyuJIT
-  CoreRt30     : .NET CoreRT 1.0.28231.02 @Commit: 741d61493c560ba96e8151f9e56876d4d3828489, X64 AOT
+  NativeAot70  : .NET 7.0.0-preview.4.22172.7, X64 NativeAOT
   Mono         : Mono 6.4.0 (Visual Studio), X64
 
 
@@ -176,22 +176,22 @@ Intel Core i7-7700K CPU 4.20GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cor
 |------- |-------------- |------ |-----------:|----------:|----------:|------:|
 | Sha256 |    .NET 4.7.2 |  1000 |   7.735 us | 0.1913 us | 0.4034 us |  1.00 |
 | Sha256 | .NET Core 3.0 |  1000 |   3.989 us | 0.0796 us | 0.0745 us |  0.50 |
-| Sha256 |    CoreRt 3.0 |  1000 |   4.091 us | 0.0811 us | 0.1562 us |  0.53 |
+| Sha256 | NativeAOT 7.0 |  1000 |   4.091 us | 0.0811 us | 0.1562 us |  0.53 |
 | Sha256 |          Mono |  1000 |  13.117 us | 0.2485 us | 0.5019 us |  1.70 |
 |        |               |       |            |           |           |       |
 |    Md5 |    .NET 4.7.2 |  1000 |   2.872 us | 0.0552 us | 0.0737 us |  1.00 |
 |    Md5 | .NET Core 3.0 |  1000 |   1.848 us | 0.0348 us | 0.0326 us |  0.64 |
-|    Md5 |    CoreRt 3.0 |  1000 |   1.817 us | 0.0359 us | 0.0427 us |  0.63 |
+|    Md5 | NativeAOT 7.0 |  1000 |   1.817 us | 0.0359 us | 0.0427 us |  0.63 |
 |    Md5 |          Mono |  1000 |   3.574 us | 0.0678 us | 0.0753 us |  1.24 |
 |        |               |       |            |           |           |       |
 | Sha256 |    .NET 4.7.2 | 10000 |  74.509 us | 1.5787 us | 4.6052 us |  1.00 |
 | Sha256 | .NET Core 3.0 | 10000 |  36.049 us | 0.7151 us | 1.0025 us |  0.49 |
-| Sha256 |    CoreRt 3.0 | 10000 |  36.253 us | 0.7076 us | 0.7571 us |  0.49 |
+| Sha256 | NativeAOT 7.0 | 10000 |  36.253 us | 0.7076 us | 0.7571 us |  0.49 |
 | Sha256 |          Mono | 10000 | 116.350 us | 2.2555 us | 3.0110 us |  1.58 |
 |        |               |       |            |           |           |       |
 |    Md5 |    .NET 4.7.2 | 10000 |  17.308 us | 0.3361 us | 0.4250 us |  1.00 |
 |    Md5 | .NET Core 3.0 | 10000 |  15.726 us | 0.2064 us | 0.1930 us |  0.90 |
-|    Md5 |    CoreRt 3.0 | 10000 |  15.627 us | 0.2631 us | 0.2461 us |  0.89 |
+|    Md5 | NativeAOT 7.0 | 10000 |  15.627 us | 0.2631 us | 0.2461 us |  0.89 |
 |    Md5 |          Mono | 10000 |  30.205 us | 0.5868 us | 0.6522 us |  1.74 |
 
 </code></pre>
@@ -213,21 +213,21 @@ mark a field or a property with <code>[Params(1, 2, 3)]</code>: BenchmarkDotNet 
 and run benchmarks for each case.
 If you want to compare benchmarks with each other,
 mark one of the benchmark as the <a href="https://benchmarkdotnet.org/articles/features/baselines.html">baseline</a>
-via <code>[Benchmark(baseline: true)]</code>: BenchmarkDotNet will compare it with all of the other benchmarks.
+via <code>[Benchmark(Baseline = true)]</code>: BenchmarkDotNet will compare it with all of the other benchmarks.
 If you want to compare performance in different environments, use <a href="https://benchmarkdotnet.org/articles/configs/jobs.html">jobs</a>.
 For example, you can run all the benchmarks on .NET Core 3.0 and Mono via
 <code>[SimpleJob(RuntimeMoniker.NetCoreApp30)]</code> and <code>[SimpleJob(RuntimeMoniker.Mono)]</code>.</p>
 <p>If you don't like attributes, you can call most of the APIs via the fluent style and write code like this:</p>
 <pre><code class="lang-cs">ManualConfig.CreateEmpty() // A configuration for our benchmarks
-    .With(Job.Default // Adding first job
-            .With(ClrRuntime.Net472) // .NET Framework 4.7.2
-            .With(Platform.X64) // Run as x64 application
-            .With(Jit.LegacyJit) // Use LegacyJIT instead of the default RyuJIT
-            .WithGcServer(true) // Use Server GC
-    ).With(Job.Default // Adding second job
-            .AsBaseline() // It will be marked as baseline
-            .WithEnvironmentVariable(&quot;Key&quot;, &quot;Value&quot;) // Setting an environment variable
-            .WithWarmupCount(0) // Disable warm-up stage
+    .AddJob(Job.Default // Adding first job
+        .WithRuntime(ClrRuntime.Net472) // .NET Framework 4.7.2
+        .WithPlatform(Platform.X64) // Run as x64 application
+        .WithJit(Jit.LegacyJit) // Use LegacyJIT instead of the default RyuJIT
+        .WithGcServer(true) // Use Server GC
+    ).AddJob(Job.Default // Adding second job
+        .AsBaseline() // It will be marked as baseline
+        .WithEnvironmentVariable(&quot;Key&quot;, &quot;Value&quot;) // Setting an environment variable
+        .WithWarmupCount(0) // Disable warm-up stage
     );
 </code></pre>
 <p>If you prefer command-line experience, you can configure your benchmarks via
