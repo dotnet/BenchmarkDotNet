@@ -73,6 +73,7 @@ namespace BenchmarkDotNet.Diagnosers
                 return new[]
                 {
                     CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.InliningDiagnoser"),
+                    CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.JitStatsDiagnoser"),
                     CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.EtwProfiler"),
                     CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.ConcurrencyVisualizerProfiler"),
                     CreateDiagnoser(diagnosticsAssembly, "BenchmarkDotNet.Diagnostics.Windows.NativeMemoryProfiler")
