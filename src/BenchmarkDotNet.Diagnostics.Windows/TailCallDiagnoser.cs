@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     /// See <see href="https://blogs.msdn.microsoft.com/clrcodegeneration/2009/05/11/jit-etw-tracing-in-net-framework-4/">MSDN blog post about JIT tracing events</see>
     /// and <see href="https://georgeplotnikov.github.io/articles/tale-tail-call-dotnet">detailed blog post by George Plotnikov</see> for more info
     /// </summary>
-    public class TailCallDiagnoser : JitDiagnoser
+    public class TailCallDiagnoser : JitDiagnoser<object>
     {
         private static readonly string LogSeparator = new string('-', 20);
 

@@ -6,7 +6,7 @@ using Microsoft.Diagnostics.Tracing.Session;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
-    public class InliningDiagnoser : JitDiagnoser
+    public class InliningDiagnoser : JitDiagnoser<object>
     {
         private static readonly string LogSeparator = new string('-', 20);
 
