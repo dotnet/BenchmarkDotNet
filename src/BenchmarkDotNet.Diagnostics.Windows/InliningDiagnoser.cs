@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using Microsoft.Diagnostics.Tracing.Session;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
-    public class InliningDiagnoser : JitDiagnoser
+    public class InliningDiagnoser : JitDiagnoser<object>, IProfiler
     {
         private static readonly string LogSeparator = new string('-', 20);
 
@@ -42,6 +43,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         }
 
         public override IEnumerable<string> Ids => new[] { nameof(InliningDiagnoser) };
+
+        public string ShortName => "inlining";
 
         protected override void AttachToEvents(TraceEventSession session, BenchmarkCase benchmarkCase)
         {
