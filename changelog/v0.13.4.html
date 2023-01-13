@@ -111,6 +111,94 @@
             <article class="content wrap" id="_content" data-uid="changelog.v0.13.4">
 <h1 id="benchmarkdotnet-v0134">BenchmarkDotNet v0.13.4</h1>
 
+<h2 id="highlights">Highlights</h2>
+<ul>
+<li>Fixed LINQPad support
+<a href="https://github.com/dotnet/BenchmarkDotNet/issues/2237">#2237</a>
+<a href="https://github.com/dotnet/BenchmarkDotNet/pull/2238">#2238</a></li>
+<li>New <code>JitStatsDiagnoser</code>
+<a href="https://github.com/dotnet/BenchmarkDotNet/pull/2243">#2243</a></li>
+<li>Minor documentation improvements
+<a href="https://github.com/dotnet/BenchmarkDotNet/pull/2206">#2206</a>
+<a href="https://github.com/dotnet/BenchmarkDotNet/pull/2218">#2218</a></li>
+</ul>
+<h2 id="jitstatsdiagnoser">JitStatsDiagnoser</h2>
+<p>This new diagnoser introduced in (<a href="https://github.com/dotnet/BenchmarkDotNet/pull/2243">#2243</a>) allows getting advanced JIT statistics.</p>
+<p>Sample usage:</p>
+<pre><code class="lang-cmd">dotnet run -c Release -f net7.0 --filter *IntroBasic.Sleep --profiler jit
+</code></pre>
+<p>Result:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">Error</th>
+<th style="text-align: right;">StdDev</th>
+<th style="text-align: right;">Methods JITted</th>
+<th style="text-align: right;">Methods Tiered</th>
+<th style="text-align: right;">JIT allocated memory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sleep</td>
+<td style="text-align: right;">15.53 ms</td>
+<td style="text-align: right;">0.034 ms</td>
+<td style="text-align: right;">0.032 ms</td>
+<td style="text-align: right;">1,102</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">221,736 B</td>
+</tr>
+</tbody>
+</table>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.13.4">v0.13.4</a> scope,
+1 issues were resolved and 4 pull requests were merged.
+This release includes 9 commits by 5 contributors.</p>
+<h2 id="resolved-issues-1">Resolved issues (1)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2237">#2237</a> Version 0.13.3 breaks LINQPad (and any non-Console application)</li>
+</ul>
+<h2 id="merged-pull-requests-4">Merged pull requests (4)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2206">#2206</a> Add single quote when use pattern with filters (by <a href="https://github.com/erlangxk">@erlangxk</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2218">#2218</a> Improve getting started guide (by <a href="https://github.com/reflectronic">@reflectronic</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2238">#2238</a> Fix IOException when Console window unavailable (#2237) (by <a href="https://github.com/albahari">@albahari</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2243">#2243</a> JitStatsDiagnoser (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+</ul>
+<h2 id="commits-9">Commits (9)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/dc7734d3eba06880428c0e16d287c9ca837a9d40">dc7734</a> Postrelease v0.13.3 update (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e04e2d7d0cc4fefb954f8a8bd90b8f82100802f9">e04e2d</a> Fix IOException when Console window unavailable (#2237) (#2238) (by <a href="https://github.com/albahari">@albahari</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7694d0e79b7446373f893ff532b801a519f1b700">7694d0</a> Update copyright year (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/5e8a318d2243701d0141d74a6c89307149486156">5e8a31</a> Revert comments in DocFxChangelogDownloadTask (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ea0eb2fe403cab9c1daa0e5aa6e42ab038100418">ea0eb2</a> Add single quote when use pattern with filters (#2206) (by <a href="https://github.com/erlangxk">@erlangxk</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0cf185020583a5c5c987d064d09426edc4399a5b">0cf185</a> Improve getting started guide (#2218) (by <a href="https://github.com/reflectronic">@reflectronic</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/12bf220e11fddc8e65b066eb1f300b63bfde7e9b">12bf22</a> JitStatsDiagnoser (#2243) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/858a86f112ce251188b39291abe4633209a98fed">858a86</a> Prepare v0.13.4 changelog (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0dbc1fa40bbb5e9bc436f2c0db9c52244a5116f3">0dbc1f</a> Set library version: 0.13.4 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-5">Contributors (5)</h2>
+<ul>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>albahari (<a href="https://github.com/albahari">@albahari</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>erlangxk (<a href="https://github.com/erlangxk">@erlangxk</a>)</li>
+<li>John Tur (<a href="https://github.com/reflectronic">@reflectronic</a>)</li>
+</ul>
+<p>Thank you very much!</p>
+<h2 id="additional-details">Additional details</h2>
+<p><em>Date: January 13, 2023</em></p>
+<p><em>Milestone: <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av0.13.4">v0.13.4</a></em>
+(<a href="https://github.com/dotnet/BenchmarkDotNet/compare/v0.13.3...v0.13.4">List of commits</a>)</p>
+<p><em>NuGet Packages:</em></p>
+<ul>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.13.4">https://www.nuget.org/packages/BenchmarkDotNet/0.13.4</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.13.4">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.13.4</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.13.4">https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.13.4</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.13.4">https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.13.4</a></li>
+</ul>
 </article>
           </div>
           
