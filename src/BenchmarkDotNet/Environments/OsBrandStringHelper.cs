@@ -102,7 +102,9 @@ namespace BenchmarkDotNet.Environments
             { "10.0.19042", "10 20H2 [20H2, October 2020 Update]" },
             { "10.0.19043", "10 21H1 [21H1, May 2021 Update]" },
             { "10.0.19044", "10 21H2 [21H2, November 2021 Update]" },
-            { "10.0.22000", "11 21H2 [21H2]" },
+            { "10.0.19045", "10 22H2 [22H2, 2022 Update]" },
+            { "10.0.22000", "11 21H2 [21H2, Sun Valley]" },
+            { "10.0.22621", "11 22H2 [22H2, Sun Valley 2]" },
         };
 
         private class Windows1XVersion
@@ -155,9 +157,10 @@ namespace BenchmarkDotNet.Environments
                 new Windows1XVersion("20H2", "20H2", "October 2020 Update", 19042),
                 new Windows1XVersion("21H1", "21H1", "May 2021 Update", 19043),
                 new Windows1XVersion("21H2", "21H2", "November 2021 Update", 19044),
-                new Windows1XVersion("21H2", "21H2", "November 2021 Update", 19044),
+                new Windows1XVersion("22H2", "22H2", "2022 Update", 19045),
                 // Windows 11
-                new Windows1XVersion("21H2", "21H2", null, 22000),
+                new Windows1XVersion("21H2", "Sun Valley", null, 22000),
+                new Windows1XVersion("22H2", "Sun Valley 2", "2022 Update", 22621),
             };
 
             public static Windows1XVersion? Resolve(string osVersionString)

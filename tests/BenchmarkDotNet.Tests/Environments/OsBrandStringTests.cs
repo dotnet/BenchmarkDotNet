@@ -47,8 +47,10 @@ namespace BenchmarkDotNet.Tests.Environments
         [InlineData("10.0.19043", 964, "Windows 10 (10.0.19043.964/21H1/May2021Update)")]
         [InlineData("10.0.19044", 1147, "Windows 10 (10.0.19044.1147/21H2/November2021Update)")]
         [InlineData("10.0.19099", 1729, "Windows 10 (10.0.19099.1729)")]
-        [InlineData("10.0.22000", 348, "Windows 11 (10.0.22000.348/21H2)")]
+        [InlineData("10.0.19045", 0, "Windows 10 (10.0.19045.0/22H2/2022Update)")]
+        [InlineData("10.0.22000", 348, "Windows 11 (10.0.22000.348/21H2/SunValley)")]
         [InlineData("10.0.22518", 1012, "Windows 11 (10.0.22518.1012)")]
+        [InlineData("10.0.22621", 0, "Windows 11 (10.0.22621.0/22H2/2022Update/SunValley2)")]
         public void WindowsWithUbrIsPrettified(string originalVersion, int ubr, string prettifiedName)
             => Check(OsBrandStringHelper.Prettify("Windows", originalVersion, ubr), prettifiedName);
 
