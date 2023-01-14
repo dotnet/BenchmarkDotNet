@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,13 +8,12 @@ using Cake.Common.Diagnostics;
 using Cake.Common.IO;
 using Cake.Common.Net;
 using Cake.Common.Tools.DotNet;
+using Cake.Common.Tools.DotNet.Build;
 using Cake.Common.Tools.DotNet.MSBuild;
+using Cake.Common.Tools.DotNet.Pack;
 using Cake.Common.Tools.DotNet.Restore;
 using Cake.Common.Tools.DotNet.Run;
-using Cake.Common.Tools.DotNetCore.Build;
-using Cake.Common.Tools.DotNetCore.MSBuild;
-using Cake.Common.Tools.DotNetCore.Pack;
-using Cake.Common.Tools.DotNetCore.Test;
+using Cake.Common.Tools.DotNet.Test;
 using Cake.Core;
 using Cake.Core.IO;
 using Cake.FileHelpers;
@@ -59,8 +57,8 @@ public class BuildContext : FrostingContext
     public FilePath IntegrationTestsProjectFile { get; }
     public FilePath TemplatesTestsProjectFile { get; }
     public FilePathCollection AllPackableSrcProjects { get; }
-
-    public DotNetCoreMSBuildSettings MsBuildSettings { get; }
+    
+    public DotNetMSBuildSettings MsBuildSettings { get; }
 
     private IAppVeyorProvider AppVeyor => this.BuildSystem().AppVeyor;
     public bool IsRunningOnAppVeyor => AppVeyor.IsRunningOnAppVeyor;
@@ -103,7 +101,7 @@ public class BuildContext : FrostingContext
         AllPackableSrcProjects = new FilePathCollection(context.GetFiles(RootDirectory.FullPath + "/src/**/*.csproj")
             .Where(p => !p.FullPath.Contains("Disassembler")));
 
-        MsBuildSettings = new DotNetCoreMSBuildSettings
+        MsBuildSettings = new DotNetMSBuildSettings
         {
             MaxCpuCount = 1
         };
@@ -118,9 +116,9 @@ public class BuildContext : FrostingContext
         }
     }
 
-    private DotNetCoreTestSettings GetTestSettingsParameters(FilePath logFile, string tfm)
+    private DotNetTestSettings GetTestSettingsParameters(FilePath logFile, string tfm)
     {
-        var settings = new DotNetCoreTestSettings
+        var settings = new DotNetTestSettings
         {
             Configuration = BuildConfiguration,
             Framework = tfm,
@@ -318,7 +316,7 @@ public class BuildTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        context.DotNetBuild(context.SolutionFile.FullPath, new DotNetCoreBuildSettings
+        context.DotNetBuild(context.SolutionFile.FullPath, new DotNetBuildSettings
         {
             Configuration = context.BuildConfiguration,
             NoRestore = true,
@@ -398,14 +396,14 @@ public class PackTask : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
-        var settingsSrc = new DotNetCorePackSettings
+        var settingsSrc = new DotNetPackSettings
         {
             Configuration = context.BuildConfiguration,
             OutputDirectory = context.ArtifactsDirectory.FullPath,
             ArgumentCustomization = args => args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg"),
             MSBuildSettings = context.MsBuildSettings
         };
-        var settingsTemplate = new DotNetCorePackSettings
+        var settingsTemplate = new DotNetPackSettings
         {
             Configuration = context.BuildConfiguration,
             OutputDirectory = context.ArtifactsDirectory.FullPath,
