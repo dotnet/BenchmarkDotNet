@@ -48,11 +48,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 }
             };
 
-            session.Source.Clr.TieredCompilationBackgroundJitStart += tieredData =>
+            session.Source.Clr.TieredCompilationBackgroundJitStop += tieredData =>
             {
                 if (StatsPerProcess.TryGetValue(tieredData.ProcessID, out JitStats jitStats))
                 {
-                    Interlocked.Increment(ref jitStats.MethodsTiered);
+                    Interlocked.Add(ref jitStats.MethodsTiered, tieredData.JittedMethodCount);
                 }
             };
         }
