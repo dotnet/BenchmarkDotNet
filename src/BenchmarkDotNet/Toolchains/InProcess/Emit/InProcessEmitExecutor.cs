@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
         /// <summary> Default timeout for in-process benchmarks. </summary>
         public static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(5);
 
-        /// <summary>Initializes a new instance of the <see cref="InProcessExecutor" /> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="InProcessEmitExecutor" /> class.</summary>
         /// <param name="timeout">Timeout for the run.</param>
         /// <param name="logOutput"><c>true</c> if the output should be logged.</param>
         public InProcessEmitExecutor(TimeSpan timeout, bool logOutput)
