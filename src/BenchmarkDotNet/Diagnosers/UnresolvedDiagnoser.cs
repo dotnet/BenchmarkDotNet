@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Diagnosers
 
         public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.None;
 
-        public IEnumerable<string> Ids => Array.Empty<string>();
+        public IEnumerable<string> Ids => new string[] { nameof(UnresolvedDiagnoser) };
         public IEnumerable<IExporter> Exporters => Array.Empty<IExporter>();
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) { }
