@@ -4,7 +4,7 @@ uid: BenchmarkDotNet.Samples.IntroJitStatsDiagnoser
 
 ## Sample: IntroJitStatsDiagnoser
 
-This diagnoser shows various stats from the JIT compiler: 
+This diagnoser shows various stats from the JIT compiler that were collected during entire benchmark run (warmup phase and BenchmarkDotNet-generated boilerplate code are included):
 * Amount of JITted methods.
 * Amount of [tiered methods](https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-core-3-0#tiered-compilation).
 * How much memory JIT allocated during the benchmark.
