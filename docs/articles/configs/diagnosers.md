@@ -11,6 +11,9 @@ The current Diagnosers are:
 
 - GC and Memory Allocation (`MemoryDiagnoser`) which is cross platform, built-in and **is not enabled by default anymore**.
   Please see Adam Sitnik's [blog post](https://adamsitnik.com/the-new-Memory-Diagnoser/) for all the details.
+- JIT Stats Diagnoser.
+  You can find this diagnoser in a separate package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`):
+  [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/)
 - JIT Inlining Events (`InliningDiagnoser`).
   You can find this diagnoser in a separate package with diagnosers for Windows (`BenchmarkDotNet.Diagnostics.Windows`):
   [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/)
@@ -122,6 +125,8 @@ In BenchmarkDotNet, 1kB = 1024B, 1MB = 1024kB, and so on. The column Gen X means
 [!include[IntroDisassemblyDry](../samples/IntroDisassemblyDry.md)]
 
 [!include[IntroTailcall](../samples/IntroTailcall.md)]
+
+[!include[IntroJitStatsDiagnoser](../samples/IntroJitStatsDiagnoser.md)]
 
 [!include[IntroNativeMemory](../samples/IntroNativeMemory.md)]
 
