@@ -115,62 +115,36 @@ namespace BenchmarkDotNet.Helpers
             _ = await task.ConfigureAwait(false);
         }
 
-        internal static MethodInfo GetGetResultMethod(Type taskType)
+        internal static MethodInfo GetGetResultMethod(Type taskType) => GetMethod(taskType, nameof(AwaitHelper.GetResult));
+
+        internal static MethodInfo GetToValueTaskMethod(Type taskType) => GetMethod(taskType, nameof(AwaitHelper.ToValueTaskVoid));
+
+        private static MethodInfo GetMethod(Type taskType, string methodName)
         {
             if (!taskType.IsGenericType)
             {
-                return typeof(AwaitHelper).GetMethod(nameof(AwaitHelper.GetResult), BindingFlags.Public | BindingFlags.Static, null, new Type[1] { taskType }, null);
+                return typeof(AwaitHelper).GetMethod(methodName, BindingFlags.Public | BindingFlags.Static, null, new Type[1] { taskType }, null);
             }
 
             Type compareType = taskType.GetGenericTypeDefinition() == typeof(ValueTask<>) ? typeof(ValueTask<>)
-                : typeof(Task).IsAssignableFrom(taskType.GetGenericTypeDefinition()) ? typeof(Task<>)
+                : typeof(Task).IsAssignableFrom(taskType) ? typeof(Task<>)
                 : null;
-            if (compareType == null)
-            {
-                return null;
-            }
-            return typeof(AwaitHelper).GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .First(m =>
-                {
-                    if (m.Name != nameof(AwaitHelper.GetResult)) return false;
-                    Type paramType = m.GetParameters().First().ParameterType;
-                    // We have to compare the types indirectly, == check doesn't work.
-                    return paramType.Assembly == compareType.Assembly && paramType.Namespace == compareType.Namespace && paramType.Name == compareType.Name;
-                })
-                .MakeGenericMethod(new[] { GetTaskResultType(taskType) });
-        }
-
-        internal static MethodInfo GetToValueTaskMethod(Type taskType)
-        {
-            if (!taskType.IsGenericType)
-            {
-                return typeof(AwaitHelper).GetMethod(nameof(AwaitHelper.ToValueTaskVoid), BindingFlags.Public | BindingFlags.Static, null, new Type[1] { taskType }, null);
-            }
-
-            Type compareType = taskType.GetGenericTypeDefinition() == typeof(ValueTask<>) ? typeof(ValueTask<>)
-                : typeof(Task).IsAssignableFrom(taskType.GetGenericTypeDefinition()) ? typeof(Task<>)
-                : null;
-            if (compareType == null)
-            {
-                return null;
-            }
             return compareType == null
                 ? null
                 : typeof(AwaitHelper).GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .First(m =>
-                {
-                    if (m.Name != nameof(AwaitHelper.ToValueTaskVoid)) return false;
-                    Type paramType = m.GetParameters().First().ParameterType;
-                    // We have to compare the types indirectly, == check doesn't work.
-                    return paramType.Assembly == compareType.Assembly && paramType.Namespace == compareType.Namespace && paramType.Name == compareType.Name;
-                })
-                .MakeGenericMethod(new[] { GetTaskResultType(taskType) });
+                    .First(m =>
+                    {
+                        if (m.Name != methodName) return false;
+                        Type paramType = m.GetParameters().First().ParameterType;
+                        // We have to compare the types indirectly, == check doesn't work.
+                        return paramType.Assembly == compareType.Assembly && paramType.Namespace == compareType.Namespace && paramType.Name == compareType.Name;
+                    })
+                    .MakeGenericMethod(new[]
+                    {
+                        taskType
+                        .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance).ReturnType
+                        .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance).ReturnType
+                    });
         }
-
-        private static Type GetTaskResultType(Type taskType) => taskType
-            .GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance)
-            .ReturnType
-            .GetMethod(nameof(TaskAwaiter.GetResult), BindingFlags.Public | BindingFlags.Instance)
-            .ReturnType;
     }
 }
