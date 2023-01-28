@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
 namespace BenchmarkDotNet.Validators
 {
@@ -20,22 +18,21 @@ namespace BenchmarkDotNet.Validators
         private ReturnValueValidator(bool failOnError)
             : base(failOnError) { }
 
-        protected override void ExecuteBenchmarks(object benchmarkTypeInstance, IEnumerable<BenchmarkCase> benchmarks, List<ValidationError> errors)
+        protected override void ExecuteBenchmarks(IEnumerable<BenchmarkExecutor> executors, List<ValidationError> errors)
         {
-            foreach (var parameterGroup in benchmarks.GroupBy(i => i.Parameters, ParameterInstancesEqualityComparer.Instance))
+            foreach (var parameterGroup in executors.GroupBy(i => i.BenchmarkCase.Parameters, ParameterInstancesEqualityComparer.Instance))
             {
                 var results = new List<(BenchmarkCase benchmark, object returnValue)>();
                 bool hasErrorsInGroup = false;
 
-                foreach (var benchmark in parameterGroup.DistinctBy(i => i.Descriptor.WorkloadMethod))
+                foreach (var executor in parameterGroup.DistinctBy(e => e.BenchmarkCase.Descriptor.WorkloadMethod))
                 {
                     try
                     {
-                        InProcessNoEmitRunner.FillMembers(benchmarkTypeInstance, benchmark);
-                        var result = benchmark.Descriptor.WorkloadMethod.Invoke(benchmarkTypeInstance, null);
+                        var result = executor.Invoke();
 
-                        if (benchmark.Descriptor.WorkloadMethod.ReturnType != typeof(void))
-                            results.Add((benchmark, result));
+                        if (executor.BenchmarkCase.Descriptor.WorkloadMethod.ReturnType != typeof(void))
+                            results.Add((executor.BenchmarkCase, result));
                     }
                     catch (Exception ex)
                     {
@@ -43,8 +40,8 @@ namespace BenchmarkDotNet.Validators
 
                         errors.Add(new ValidationError(
                             TreatsWarningsAsErrors,
-                            $"Failed to execute benchmark '{benchmark.DisplayInfo}', exception was: '{GetDisplayExceptionMessage(ex)}'",
-                            benchmark));
+                            $"Failed to execute benchmark '{executor.BenchmarkCase.DisplayInfo}', exception was: '{GetDisplayExceptionMessage(ex)}'",
+                            executor.BenchmarkCase));
                     }
                 }
 
@@ -75,7 +72,11 @@ namespace BenchmarkDotNet.Validators
                 if (x.Count != y.Count)
                     return false;
 
-                return x.Items.OrderBy(i => i.Name).Zip(y.Items.OrderBy(i => i.Name), (a, b) => a.Name == b.Name && Equals(a.Value, b.Value)).All(i => i);
+                return x.Items
+                    .Where(i => !i.IsArgument)
+                    .OrderBy(i => i.Name)
+                    .Zip(y.Items.OrderBy(i => i.Name), (a, b) => a.Name == b.Name && Equals(a.Value, b.Value))
+                    .All(i => i);
             }
 
             public int GetHashCode(ParameterInstances obj)
@@ -84,7 +85,7 @@ namespace BenchmarkDotNet.Validators
                     return 0;
 
                 var hashCode = new HashCode();
-                foreach (var instance in obj.Items.OrderBy(i => i.Name))
+                foreach (var instance in obj.Items.Where(i => !i.IsArgument).OrderBy(i => i.Name))
                 {
                     hashCode.Add(instance.Name);
                     hashCode.Add(instance.Value);
@@ -137,7 +138,7 @@ namespace BenchmarkDotNet.Validators
 
                 return false;
 
-                Array ToStructuralEquatable(object obj)
+                static Array ToStructuralEquatable(object obj)
                 {
                     switch (obj)
                     {
