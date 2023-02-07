@@ -7,6 +7,7 @@
     using BenchmarkDotNet.Reports;
     using BenchmarkDotNet.Running;
     using BenchmarkDotNet.Validators;
+    using Microsoft.Diagnostics.Tracing.Parsers.MicrosoftWindowsTCPIP;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -17,7 +18,8 @@
         private int _sessionId;
         private string _collectorPath;
         private string _outputFile;
-        private bool _isStarted;
+        private State _state;
+        private int _currentProcessId;
 
         public enum VSDiagnosticsTool {
             CpuUsageBase,
@@ -34,11 +36,21 @@
             PerfInstrumentation,
         }
 
+        private enum State
+        {
+            New,
+            RunningAttachedToPid,
+            Paused,
+            Stopped,
+        }
+
         public VSDiagnosticsProfiler(VSDiagnosticsTool config = VSDiagnosticsTool.CpuUsageBase, string pathToVSDiagnostics = null, string outputFile = null) {
             _config = config;
             _sessionId = new Random().Next() % 255;
             _collectorPath = LocateCollectorPath(pathToVSDiagnostics);
             _outputFile = outputFile ?? $"benchmark_{_sessionId}.diagsession";
+            _state = State.New;
+            _currentProcessId = 0;
         }
 
         public IEnumerable<string> Ids => new[] { nameof(VSDiagnosticsProfiler) };
@@ -50,15 +62,34 @@
         public IEnumerable<IAnalyser> Analysers => Array.Empty<IAnalyser>();
 
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters) {
-            if (signal == HostSignal.BeforeAnythingElse) {
-                StartOrResume(parameters);
-                Pause(parameters);
-            }
-            else if (signal == HostSignal.BeforeActualRun) {
-                StartOrResume(parameters);
+            if (signal == HostSignal.BeforeActualRun) {
+                switch (_state) {
+                    case State.New:
+                        var currentPid = parameters.Process?.Id ?? 0;
+                        var configFile = $"AgentConfigs\\{_config}.json";
+                        RunVSDiagnosticsCommand($"start {_sessionId} /attach:{currentPid} /loadConfig:{configFile}");
+                        _currentProcessId = currentPid;
+                        _state = State.RunningAttachedToPid;
+                        break;
+                    case State.RunningAttachedToPid:
+                        break;
+                    case State.Paused:
+                        currentPid = parameters.Process?.Id ?? 0;
+                        if (_currentProcessId != currentPid) {
+                            RunVSDiagnosticsCommand($"update {_sessionId} /attach:{currentPid} /detach:{_currentProcessId}");
+                        }
+
+                        _currentProcessId = currentPid;
+                        RunVSDiagnosticsCommand($"resume {_sessionId}");
+                        _state = State.RunningAttachedToPid;
+                        break;
+                    case State.Stopped:
+                        break;
+                }
             }
             else if (signal == HostSignal.AfterActualRun) {
-                Pause(parameters);
+                RunVSDiagnosticsCommand($"pause {_sessionId}");
+                _state = State.Paused;
             }
         }
 
@@ -69,16 +100,14 @@
         }
 
         public void DisplayResults(ILogger logger) {
-            Stop();
-            logger.WriteLineInfo($"Exported diagsession file(s).");
+            RunVSDiagnosticsCommand($"stop {_sessionId} /output:{_outputFile}");
+            _state = State.Stopped;
+
+            logger.WriteLineInfo($"Exported diagsession file: {_outputFile}.");
         }
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) {
             return Array.Empty<ValidationError>();
-        }
-
-        private void Stop() {
-            RunVSDiagnosticsCommand($"stop {_sessionId} /output:{_outputFile}");
         }
 
         private bool RunVSDiagnosticsCommand(string arguments) {
@@ -97,25 +126,6 @@
             bool success = process.Start();
             process.WaitForExit();
             return success;
-        }
-
-        private void Pause(DiagnoserActionParameters parameters) {
-            RunVSDiagnosticsCommand($"pause {_sessionId}");
-        }
-
-        private void StartOrResume(DiagnoserActionParameters parameters) {
-            var pidToAttach = parameters.Process.Id;
-            var configFile = $"AgentConfigs\\{_config}.json";
-
-            string arguments;
-            if (_isStarted) {
-                arguments = $"resume {_sessionId}";
-            } else {
-                arguments = $"start {_sessionId} /attach:{pidToAttach} /loadConfig:{configFile}";
-            }
-
-            RunVSDiagnosticsCommand(arguments);
-            _isStarted = true;
         }
 
         private string LocateCollectorPath(string collectorPath = null) {
