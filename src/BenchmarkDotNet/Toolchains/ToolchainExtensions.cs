@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Toolchains
                     if (RuntimeInformation.IsNetCore || preferMsBuildToolchains)
                         return clrRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
                             ? GetToolchain(clrRuntime.RuntimeMoniker)
-                            : CsProjClassicNetToolchain.From(clrRuntime.MsBuildMoniker);
+                            : CsProjClassicNetToolchain.From(clrRuntime.MsBuildMoniker, clrRuntime.Name);
 
                     return RoslynToolchain.Instance;
 

@@ -36,7 +36,6 @@ namespace BenchmarkDotNet.Reports
 
         private ImmutableDictionary<BenchmarkCase, BenchmarkReport> ReportMap { get; }
         private BaseliningStrategy BaseliningStrategy { get; }
-        private bool? isMultipleRuntimes;
 
         public Summary(
             string title,
@@ -79,9 +78,6 @@ namespace BenchmarkDotNet.Reports
         public bool HasCriticalValidationErrors => ValidationErrors.Any(validationError => validationError.IsCritical);
 
         public int GetNumberOfExecutedBenchmarks() => Reports.Count(report => report.ExecuteResults.Any(result => result.FoundExecutable));
-
-        public bool IsMultipleRuntimes
-            => isMultipleRuntimes ??= BenchmarksCases.Length > 1 ? BenchmarksCases.Select(benchmark => benchmark.GetRuntime()).Distinct().Count() > 1 : false;
 
         internal static Summary ValidationFailed(string title, string resultsDirectoryPath, string logFilePath, ImmutableArray<ValidationError>? validationErrors = null)
             => new Summary(title, ImmutableArray<BenchmarkReport>.Empty, HostEnvironmentInfo.GetCurrent(), resultsDirectoryPath, logFilePath, TimeSpan.Zero, DefaultCultureInfo.Instance, validationErrors ?? ImmutableArray<ValidationError>.Empty, ImmutableArray<IColumnHidingRule>.Empty);

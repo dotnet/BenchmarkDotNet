@@ -31,8 +31,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         {
         }
 
-        public static IToolchain From(string targetFrameworkMoniker, string packagesPath = null)
-            => new CsProjClassicNetToolchain(targetFrameworkMoniker, targetFrameworkMoniker, packagesPath);
+        public static IToolchain From(string targetFrameworkMoniker, string name, string packagesPath = null)
+            => new CsProjClassicNetToolchain(targetFrameworkMoniker, name, packagesPath);
 
         public override IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver)
         {

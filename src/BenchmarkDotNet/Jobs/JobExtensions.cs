@@ -21,7 +21,10 @@ namespace BenchmarkDotNet.Jobs
         public static Job With(this Job job, Platform platform) => job.WithPlatform(platform);
         public static Job WithPlatform(this Job job, Platform platform) => job.WithCore(j => j.Environment.Platform = platform);
 
-        public static Job WithId(this Job job, string id) => new Job(id, job);
+        public static Job WithId(this Job job, string id) => new Job(id, job).WithImplicitId(false);
+
+        internal static Job WithImplicitId(this Job job, string id) => new Job(id, job).WithImplicitId(true);
+        private static Job WithImplicitId(this Job job, bool isImplicit) => job.WithCore(j => Job.ImplicitIdCharacteristic[j] = isImplicit);
 
         // Env
         [EditorBrowsable(EditorBrowsableState.Never)]

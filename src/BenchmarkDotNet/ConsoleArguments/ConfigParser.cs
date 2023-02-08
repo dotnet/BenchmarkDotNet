@@ -107,7 +107,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             foreach (string runtime in options.Runtimes)
             {
-                if (!TryParse(runtime, out RuntimeMoniker runtimeMoniker))
+                if (!TryParse(runtime, out RuntimeMoniker runtimeMoniker, out _))
                 {
                     logger.WriteLineError($"The provided runtime \"{runtime}\" is invalid. Available options are: {string.Join(", ", Enum.GetNames(typeof(RuntimeMoniker)).Select(name => name.ToLower()))}.");
                     return false;
@@ -365,7 +365,7 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static Job CreateJobForGivenRuntime(Job baseJob, string runtimeId, CommandLineOptions options)
         {
-            if (!TryParse(runtimeId, out RuntimeMoniker runtimeMoniker))
+            if (!TryParse(runtimeId, out RuntimeMoniker runtimeMoniker, out string platformSpecificPostfix))
             {
                 throw new InvalidOperationException("Impossible, already validated by the Validate method");
             }
@@ -379,10 +379,10 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net472:
                 case RuntimeMoniker.Net48:
                 case RuntimeMoniker.Net481:
+                    var clrRuntime = runtimeMoniker.GetRuntime();
                     return baseJob
-                        .WithRuntime(runtimeMoniker.GetRuntime())
-                        .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName));
-
+                        .WithRuntime(clrRuntime)
+                        .WithToolchain(CsProjClassicNetToolchain.From(clrRuntime.MsBuildMoniker, clrRuntime.Name, options.RestorePath?.FullName));
                 case RuntimeMoniker.NetCoreApp20:
                 case RuntimeMoniker.NetCoreApp21:
                 case RuntimeMoniker.NetCoreApp22:
@@ -395,9 +395,10 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net60:
                 case RuntimeMoniker.Net70:
                 case RuntimeMoniker.Net80:
+                    var coreRuntime = runtimeMoniker.GetRuntime();
                     return baseJob
-                        .WithRuntime(runtimeMoniker.GetRuntime())
-                        .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
+                        .WithRuntime(coreRuntime)
+                        .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(coreRuntime.MsBuildMoniker + platformSpecificPostfix, null, coreRuntime.Name + platformSpecificPostfix, options.CliPath?.FullName, options.RestorePath?.FullName)));
 
                 case RuntimeMoniker.Mono:
                     return baseJob.WithRuntime(new MonoRuntime("Mono", options.MonoPath?.FullName));
@@ -613,13 +614,20 @@ namespace BenchmarkDotNet.ConsoleArguments
             return coreRunPath.FullName.Substring(lastCommonDirectorySeparatorIndex);
         }
 
-        private static bool TryParse(string runtime, out RuntimeMoniker runtimeMoniker)
+        private static bool TryParse(string runtime, out RuntimeMoniker runtimeMoniker, out string platformSpecificPostfix)
         {
             int index = runtime.IndexOf('-');
 
-            return index < 0
-                ? Enum.TryParse<RuntimeMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker)
-                : Enum.TryParse<RuntimeMoniker>(runtime.Substring(0, index).Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker);
+            if (index < 0)
+            {
+                platformSpecificPostfix = "";
+                return Enum.TryParse<RuntimeMoniker>(runtime.Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker);
+            }
+            else
+            {
+                platformSpecificPostfix = runtime.Substring(index).ToLower();
+                return Enum.TryParse<RuntimeMoniker>(runtime.Substring(0, index).Replace(".", string.Empty), ignoreCase: true, out runtimeMoniker);
+            }
         }
     }
 }

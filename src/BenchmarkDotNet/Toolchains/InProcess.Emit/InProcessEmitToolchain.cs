@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
         /// <param name="logOutput"><c>true</c> if the output should be logged.</param>
         public InProcessEmitToolchain(TimeSpan timeout, bool logOutput) :
             base(
-                nameof(InProcessEmitToolchain),
+                "InProcessEmit",
                 new InProcessEmitGenerator(),
                 new InProcessEmitBuilder(),
                 new InProcessEmitExecutor(timeout, logOutput))

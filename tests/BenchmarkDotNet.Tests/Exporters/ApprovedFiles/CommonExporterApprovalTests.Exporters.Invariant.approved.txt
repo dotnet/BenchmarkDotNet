@@ -8,8 +8,7 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
   LongRun : extra output line
 
-Job=LongRun  IterationCount=100  LaunchCount=3  
-WarmupCount=15  
+IterationCount=100  LaunchCount=3  WarmupCount=15  
 ....
 [options="header"]
 |===
@@ -41,8 +40,7 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
   LongRun : extra output line
 </code></pre>
-<pre><code>Job=LongRun  IterationCount=100  LaunchCount=3  
-WarmupCount=15  
+<pre><code>IterationCount=100  LaunchCount=3  WarmupCount=15  
 </code></pre>
 
 <table>
@@ -407,8 +405,7 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
   LongRun : extra output line
 
-Job=LongRun  IterationCount=100  LaunchCount=3  
-WarmupCount=15  
+IterationCount=100  LaunchCount=3  WarmupCount=15  
 
  Method |     Mean | Error |   StdDev |      P67 |
 ------- |---------:|------:|---------:|---------:|
@@ -425,8 +422,7 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
   LongRun : extra output line
 
-Job=LongRun  IterationCount=100  LaunchCount=3  
-WarmupCount=15  
+IterationCount=100  LaunchCount=3  WarmupCount=15  
 
 {noformat}
 ||Method ||    Mean ||Error ||  StdDev ||     P67 ||
@@ -442,8 +438,7 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
   LongRun : extra output line
 
-Job=LongRun  IterationCount=100  LaunchCount=3  
-WarmupCount=15  
+IterationCount=100  LaunchCount=3  WarmupCount=15  
 
 | Method |     Mean | Error |   StdDev |      P67 |
 |------- |---------:|------:|---------:|---------:|
@@ -460,8 +455,7 @@ Frequency=2531248 Hz, Resolution=395.0620 ns, Timer=TSC
   [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
   LongRun : extra output line
 
-Job=LongRun  IterationCount=100  LaunchCount=3  
-WarmupCount=15  
+IterationCount=100  LaunchCount=3  WarmupCount=15  
 
 ```
 | Method |     Mean | Error |   StdDev |      P67 |
@@ -478,8 +472,7 @@ MarkdownExporter-stackoverflow
       [Host]  : Clr 4.0.x.mock, 64mock RyuJIT-v4.6.x.mock CONFIGURATION
       LongRun : extra output line
 
-    Job=LongRun  IterationCount=100  LaunchCount=3  
-    WarmupCount=15  
+    IterationCount=100  LaunchCount=3  WarmupCount=15  
 
      Method |     Mean | Error |   StdDev |      P67 |
     ------- |---------:|------:|---------:|---------:|
