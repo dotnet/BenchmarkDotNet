@@ -69,6 +69,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public UnitType UnitType => UnitType.Dimensionless;
             public string Unit => "Count";
             public int PriorityInCategory => 0;
+            public bool GetIsAvailable(Metric metric) => true;
         }
 
         private sealed class MethodsTieredDescriptor : IMetricDescriptor
@@ -83,6 +84,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public UnitType UnitType => UnitType.Dimensionless;
             public string Unit => "Count";
             public int PriorityInCategory => 0;
+            public bool GetIsAvailable(Metric metric) => true;
         }
 
         private sealed class JitAllocatedMemoryDescriptor : IMetricDescriptor
@@ -97,6 +99,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             public UnitType UnitType => UnitType.Size;
             public string Unit => SizeUnit.B.Name;
             public int PriorityInCategory => 0;
+            public bool GetIsAvailable(Metric metric) => true;
         }
     }
 

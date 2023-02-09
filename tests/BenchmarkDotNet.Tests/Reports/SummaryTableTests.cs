@@ -110,11 +110,27 @@ namespace BenchmarkDotNet.Tests.Reports
         }
 
         [Fact] // Issue #1783
-        public void MissingValueInMetricColumnIsQuestionMark()
+        public void NaNValueInMetricColumnIsQuestionMark()
         {
             // arrange
             var config = ManualConfig.Create(DefaultConfig.Instance);
-            var metrics = new[] { new Metric(new FakeMetricDescriptor("metric1", "some legend", "0.0"), 0.0) };
+            var metrics = new[] { new Metric(new FakeMetricDescriptor("metric1", "some legend", "0.0"), double.NaN) };
+            var style = config.SummaryStyle.WithZeroMetricValuesInContent();
+
+            // act
+            var summary = MockFactory.CreateSummary(config, hugeSd: false, metrics);
+            var table = new SummaryTable(summary, style);
+            var actual = table.Columns.First(c => c.Header == "metric1").Content;
+
+            // assert
+            Assert.True(actual.All(value => value == MetricColumn.UnknownRepresentation));
+        }
+
+        [Fact] // Issue #1783
+        public void MissingValueInMetricColumnIsNA()
+        {
+            // arrange
+            var config = ManualConfig.Create(DefaultConfig.Instance);
             bool firstMetricsUsed = false;
 
             // act
@@ -123,7 +139,7 @@ namespace BenchmarkDotNet.Tests.Reports
                 if (!firstMetricsUsed)
                 {
                     firstMetricsUsed = true;
-                    return metrics;
+                    return new[] { new Metric(new FakeMetricDescriptor("metric1", "some legend", "0.0"), 0.0) };
                 }
                 return System.Array.Empty<Metric>();
             });
@@ -131,7 +147,7 @@ namespace BenchmarkDotNet.Tests.Reports
             var actual = table.Columns.First(c => c.Header == "metric1").Content;
 
             // assert
-            Assert.Equal(new[] { "-", MetricColumn.UnknownRepresentation }, actual);
+            Assert.Equal(new[] { "-", "NA" }, actual);
         }
     }
 }

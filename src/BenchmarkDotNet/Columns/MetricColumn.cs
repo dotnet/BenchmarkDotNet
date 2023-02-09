@@ -27,13 +27,15 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsAvailable(Summary summary) => summary.Reports.Any(report =>
                 report.Metrics.TryGetValue(descriptor.Id, out var metric)
-                && metric.IsAvailable);
+                && metric.Descriptor.GetIsAvailable(metric));
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => GetValue(summary, benchmarkCase, SummaryStyle.Default);
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style)
         {
-            if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase].Metrics.TryGetValue(descriptor.Id, out Metric metric) || !metric.HasValue)
+            if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase].Metrics.TryGetValue(descriptor.Id, out Metric metric))
+                return "NA";
+            if (double.IsNaN(metric.Value))
                 return UnknownRepresentation;
             if (metric.Value == 0.0 && !style.PrintZeroValuesInContent)
                 return "-";

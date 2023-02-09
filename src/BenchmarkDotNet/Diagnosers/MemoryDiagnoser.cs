@@ -36,17 +36,12 @@ namespace BenchmarkDotNet.Diagnosers
         {
             if (Config.DisplayGenColumns)
             {
-                yield return GetCollectionsMetric(GarbageCollectionsMetricDescriptor.Gen0, diagnoserResults.GcStats.Gen0Collections);
-                yield return GetCollectionsMetric(GarbageCollectionsMetricDescriptor.Gen1, diagnoserResults.GcStats.Gen1Collections);
-                yield return GetCollectionsMetric(GarbageCollectionsMetricDescriptor.Gen2, diagnoserResults.GcStats.Gen2Collections);
-
-                Metric GetCollectionsMetric(IMetricDescriptor descriptor, int collections)
-                {
-                    return new Metric(descriptor, collections / (double) diagnoserResults.GcStats.TotalOperations * 1000, collections > 0);
-                }
+                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen0, diagnoserResults.GcStats.Gen0Collections / (double) diagnoserResults.GcStats.TotalOperations * 1000);
+                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen1, diagnoserResults.GcStats.Gen1Collections / (double) diagnoserResults.GcStats.TotalOperations * 1000);
+                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen2, diagnoserResults.GcStats.Gen2Collections / (double) diagnoserResults.GcStats.TotalOperations * 1000);
             }
 
-            yield return new Metric(AllocatedMemoryMetricDescriptor.Instance, diagnoserResults.GcStats.GetBytesAllocatedPerOperation(diagnoserResults.BenchmarkCase), true);
+            yield return new Metric(AllocatedMemoryMetricDescriptor.Instance, diagnoserResults.GcStats.GetBytesAllocatedPerOperation(diagnoserResults.BenchmarkCase) ?? double.NaN);
         }
 
         private class GarbageCollectionsMetricDescriptor : IMetricDescriptor
@@ -71,6 +66,7 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory { get; }
+            public bool GetIsAvailable(Metric metric) => metric.Value > 0;
         }
     }
 }
