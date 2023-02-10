@@ -4,7 +4,9 @@ uid: docs.how-to-run
 
 # How to run your benchmarks
 
-There are several ways to run your benchmarks. What is important is that **BenchmarkDotNet works only with Console Apps**. It does not support any other kind of application like ASP.NET, Azure WebJobs, etc.
+There are several ways to run your benchmarks. What is important is that **BenchmarkDotNet works only with Console Apps and in Tests**. It does not support any other kind of application like ASP.NET, Azure WebJobs, etc.
+You can author tests with BenchMarks and control their running with the Test Explorer. To see results, scroll to the bottom of the Results pane and choose Open test log.
+You can add the [Ignore] attribute to Test methods as desired.
 
 ## Types
 
