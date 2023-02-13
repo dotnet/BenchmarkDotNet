@@ -18,6 +18,7 @@ namespace BenchmarkDotNet.Engines
                                 .Where(field => !field.IsStatic) // exclude this HashSet itself
                                 .Select(field => field.FieldType));
 
+#pragma warning disable IDE0052 // Remove unread private members
         private volatile byte byteHolder;
         private volatile sbyte sbyteHolder;
         private volatile short shortHolder;
@@ -30,10 +31,10 @@ namespace BenchmarkDotNet.Engines
         private double doubleHolder;
         private long longHolder;
         private ulong ulongHolder;
-        private string stringHolder;
-        private object objectHolder;
-        private IntPtr ptrHolder;
-        private UIntPtr uptrHolder;
+        private volatile object objectHolder;
+        private volatile IntPtr ptrHolder;
+        private volatile UIntPtr uptrHolder;
+#pragma warning restore IDE0052 // Remove unread private members
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
@@ -84,11 +85,11 @@ namespace BenchmarkDotNet.Engines
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
-        public void Consume(IntPtr intPtrValue) => Volatile.Write(ref ptrHolder, intPtrValue);
+        public void Consume(IntPtr intPtrValue) => ptrHolder = intPtrValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
-        public void Consume(UIntPtr uintPtrValue) => Volatile.Write(ref uptrHolder, uintPtrValue);
+        public void Consume(UIntPtr uintPtrValue) => uptrHolder = uintPtrValue;
 
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -97,22 +98,28 @@ namespace BenchmarkDotNet.Engines
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
-        public void Consume(string stringValue) => Volatile.Write(ref stringHolder, stringValue);
+        public void Consume(string stringValue) => Consume((object) stringValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
-        public void Consume(object objectValue) => Volatile.Write(ref objectHolder, objectValue);
+        public void Consume(object objectValue)
+        {
+            // Write to volatile field to prevent dead code elimination and out-of-order execution.
+            objectHolder = objectValue;
+            // Overwrite field to null so we aren't holding onto references to affect GC behavior. (#1942)
+            objectHolder = null;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
         public void Consume<T>(T objectValue) where T : class // class constraint prevents from boxing structs
-            => Volatile.Write(ref objectHolder, objectValue);
+             => Consume((object) objectValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void Consume<T>(T* ptrValue) where T: unmanaged => Volatile.Write(ref ptrHolder, (IntPtr)ptrValue);
+        public unsafe void Consume<T>(T* ptrValue) where T : unmanaged => ptrHolder = (IntPtr) ptrValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void Consume(void* ptrValue) => Volatile.Write(ref ptrHolder, (IntPtr)ptrValue);
+        public unsafe void Consume(void* ptrValue) => ptrHolder = (IntPtr) ptrValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Consume<T>(in T value)
@@ -141,14 +148,11 @@ namespace BenchmarkDotNet.Engines
                 Volatile.Write(ref longHolder, (long)(object)value);
             else if (typeof(T) == typeof(ulong))
                 Volatile.Write(ref ulongHolder, (ulong)(object)value);
-            else if (default(T) == null)
-                objectHolder = (object) value;
+            else if (default(T) == null && !typeof(T).IsValueType)
+                Consume((object) value);
             else
-                ValueTypesConsumer(value); // non-primitive value types
+                DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(value); // non-primitive and nullable value types
         }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private void ValueTypesConsumer<T>(in T _) { }
 
         internal static bool IsConsumable(Type type)
             => SupportedTypes.Contains(type) || type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface;
