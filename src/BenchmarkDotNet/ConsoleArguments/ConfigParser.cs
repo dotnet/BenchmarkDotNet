@@ -250,6 +250,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.WithOption(ConfigOptions.ApplesToApples, options.ApplesToApples);
             config.WithOption(ConfigOptions.Resume, options.Resume);
 
+            if (config.Options.IsSet(ConfigOptions.GenerateMSBuildBinLog))
+                config.Options |= ConfigOptions.KeepBenchmarkFiles;
+
             if (options.MaxParameterColumnWidth.HasValue)
                 config.WithSummaryStyle(SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParameterColumnWidth.Value));
 
