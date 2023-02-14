@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Parameters;
@@ -12,14 +14,13 @@ namespace BenchmarkDotNet.Tests.Mocks.Toolchain
 {
     public class MockToolchain : IToolchain
     {
-        private readonly IMockMeasurer measurer;
-
-        public MockToolchain(IMockMeasurer measurer) => this.measurer = measurer;
+        public MockToolchain(Func<BenchmarkCase, List<Measurement>> measurer)
+            => Executor = new MockExecutor(measurer);
 
         public string Name => nameof(MockToolchain);
         public IGenerator Generator => new MockGenerator();
         public IBuilder Builder => new MockBuilder();
-        public IExecutor Executor => new MockExecutor(measurer);
+        public IExecutor Executor { get; private set; }
         public bool IsInProcess => false;
         public IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver) => ImmutableArray<ValidationError>.Empty;
 
@@ -38,11 +39,11 @@ namespace BenchmarkDotNet.Tests.Mocks.Toolchain
 
         private class MockExecutor : IExecutor
         {
-            private readonly IMockMeasurer mockMeasurer;
+            private readonly Func<BenchmarkCase, List<Measurement>> measurer;
 
-            public MockExecutor(IMockMeasurer mockMeasurer) => this.mockMeasurer = mockMeasurer;
+            public MockExecutor(Func<BenchmarkCase, List<Measurement>> measurer) => this.measurer = measurer;
 
-            public ExecuteResult Execute(ExecuteParameters executeParameters) => new (mockMeasurer.Measure(executeParameters.BenchmarkCase));
+            public ExecuteResult Execute(ExecuteParameters executeParameters) => new (measurer(executeParameters.BenchmarkCase));
         }
     }
 }
