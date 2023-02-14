@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Xml.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.Mocks;
@@ -21,13 +22,12 @@ namespace BenchmarkDotNet.Tests.Columns
         [Fact]
         public void RatioColumnTest01()
         {
-            var measurer = MockMeasurer.Create(name => name switch
+            var summary = MockRunner.Run<BenchmarkClass>(output, name => name switch
             {
                 "Foo" => new double[] { 2, 2, 2 },
                 "Bar" => new double[] { 4, 4, 4 },
                 _ => throw new InvalidOperationException()
             });
-            var summary = MockRunner.Run<BenchmarkClass>(output, measurer);
 
             var ratioColumn = summary.GetColumns().FirstOrDefault(column => column.ColumnName == "Ratio");
             Assert.NotNull(ratioColumn);
