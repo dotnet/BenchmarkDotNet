@@ -280,10 +280,11 @@ public static class DocumentationHelper
         "v0.13.1",
         "v0.13.2",
         "v0.13.3",
-        "v0.13.4"
+        "v0.13.4",
+        "v0.13.5"
     };
 
-    public const string BdnNextVersion = "v0.13.5";
+    public const string BdnNextVersion = "v0.13.6";
     public const string BdnFirstCommit = "6eda98ab1e83a0d185d09ff8b24c795711af8db1";
 }
 
