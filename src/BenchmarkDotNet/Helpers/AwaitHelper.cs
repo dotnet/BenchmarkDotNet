@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Helpers
@@ -10,54 +11,55 @@ namespace BenchmarkDotNet.Helpers
     {
         private class ValueTaskWaiter
         {
-            // We use thread static field so that multiple threads can use individual lock object and callback.
+            // We use thread static field so that each thread uses its own individual callback and reset event.
             [ThreadStatic]
             private static ValueTaskWaiter ts_current;
             internal static ValueTaskWaiter Current => ts_current ??= new ValueTaskWaiter();
 
+            // We cache the callback to prevent allocations for memory diagnoser.
             private readonly Action awaiterCallback;
-            private bool awaiterCompleted;
+            private readonly ManualResetEventSlim resetEvent;
 
             private ValueTaskWaiter()
             {
-                awaiterCallback = AwaiterCallback;
-            }
-
-            private void AwaiterCallback()
-            {
-                lock (this)
-                {
-                    awaiterCompleted = true;
-                    System.Threading.Monitor.Pulse(this);
-                }
+                resetEvent = new ();
+                awaiterCallback = resetEvent.Set;
             }
 
             // Hook up a callback instead of converting to Task to prevent extra allocations on each benchmark run.
             internal void Wait(ConfiguredValueTaskAwaitable.ConfiguredValueTaskAwaiter awaiter)
             {
-                lock (this)
+                resetEvent.Reset();
+                awaiter.UnsafeOnCompleted(awaiterCallback);
+
+                // The fastest way to wait for completion is to spin a bit before waiting on the event. This is the same logic that Task.GetAwaiter().GetResult() uses.
+                var spinner = new SpinWait();
+                while (!resetEvent.IsSet)
                 {
-                    awaiterCompleted = false;
-                    awaiter.UnsafeOnCompleted(awaiterCallback);
-                    // Check if the callback executed synchronously before blocking.
-                    if (!awaiterCompleted)
+                    if (spinner.NextSpinWillYield)
                     {
-                        System.Threading.Monitor.Wait(this);
+                        resetEvent.Wait();
+                        return;
                     }
+                    spinner.SpinOnce();
                 }
             }
 
             internal void Wait<T>(ConfiguredValueTaskAwaitable<T>.ConfiguredValueTaskAwaiter awaiter)
             {
-                lock (this)
+                resetEvent.Reset();
+                awaiter.UnsafeOnCompleted(awaiterCallback);
+
+                // The fastest way to wait for completion is to spin a bit before waiting on the event. This is the same logic that Task.GetAwaiter().GetResult() uses.
+                var spinner = new SpinWait();
+                while (!resetEvent.IsSet)
                 {
-                    awaiterCompleted = false;
-                    awaiter.UnsafeOnCompleted(awaiterCallback);
-                    // Check if the callback executed synchronously before blocking.
-                    if (!awaiterCompleted)
+                    if (spinner.NextSpinWillYield)
                     {
-                        System.Threading.Monitor.Wait(this);
+                        resetEvent.Wait();
+                        return;
                     }
+                    spinner.SpinOnce();
                 }
             }
         }
