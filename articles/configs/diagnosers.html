@@ -116,6 +116,9 @@
 <ul>
 <li>GC and Memory Allocation (<code>MemoryDiagnoser</code>) which is cross platform, built-in and <strong>is not enabled by default anymore</strong>.
 Please see Adam Sitnik's <a href="https://adamsitnik.com/the-new-Memory-Diagnoser/">blog post</a> for all the details.</li>
+<li>JIT Stats Diagnoser.
+You can find this diagnoser in a separate package with diagnosers for Windows (<code>BenchmarkDotNet.Diagnostics.Windows</code>):
+<a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet"></a></li>
 <li>JIT Inlining Events (<code>InliningDiagnoser</code>).
 You can find this diagnoser in a separate package with diagnosers for Windows (<code>BenchmarkDotNet.Diagnostics.Windows</code>):
 <a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet"></a></li>
@@ -655,6 +658,61 @@ Tail call type: RecursiveLoop
 <ul>
 <li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
 <li>The permanent link to this sample: <a class="xref" href="../samples/IntroTailcall.html">Sample: IntroTailcall</a></li>
+</ul>
+<hr>
+<h2 id="sample-introjitstatsdiagnoser">Sample: IntroJitStatsDiagnoser</h2>
+<p>This diagnoser shows various stats from the JIT compiler that were collected during entire benchmark run (warmup phase and BenchmarkDotNet-generated boilerplate code are included):</p>
+<ul>
+<li>Amount of JITted methods.</li>
+<li>Amount of <a href="https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-core-3-0#tiered-compilation">tiered methods</a>.</li>
+<li>How much memory JIT allocated during the benchmark.</li>
+</ul>
+<h3 id="restrictions">Restrictions</h3>
+<ul>
+<li>Windows only</li>
+</ul>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroJitStatsDiagnoser.cs">using System.Threading;
+using BenchmarkDotNet.Attributes;
+
+namespace BenchmarkDotNet.Samples
+{
+    [Diagnostics.Windows.Configs.JitStatsDiagnoser]
+    public class IntroJitStatsDiagnoser
+    {
+        [Benchmark]
+        public void Sleep() =&gt; Thread.Sleep(10);
+    }
+}
+</code></pre><h3 id="output">Output</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">Error</th>
+<th style="text-align: right;">StdDev</th>
+<th style="text-align: right;">Methods JITted</th>
+<th style="text-align: right;">Methods Tiered</th>
+<th style="text-align: right;">JIT allocated memory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sleep</td>
+<td style="text-align: right;">15.50 ms</td>
+<td style="text-align: right;">0.052 ms</td>
+<td style="text-align: right;">0.048 ms</td>
+<td style="text-align: right;">1,102</td>
+<td style="text-align: right;">214</td>
+<td style="text-align: right;">221,736 B</td>
+</tr>
+</tbody>
+</table>
+<h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="diagnosers.html">Diagnosers</a></li>
+<li>The permanent link to this sample: <a class="xref" href="../samples/IntroJitStatsDiagnoser.html">Sample: IntroJitStatsDiagnoser</a></li>
 </ul>
 <hr>
 <h2 id="sample-intronativememory">Sample: IntroNativeMemory</h2>

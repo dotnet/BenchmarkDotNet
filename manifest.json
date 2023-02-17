@@ -5592,42 +5592,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.BenchmarkAction.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.BenchmarkAction.html",
-          "hash": "4/8pp2WLLkgdERqCifhOBCeHipUxAWWNql+xdshT3CE="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.BenchmarkActionCodegen.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.BenchmarkActionCodegen.html",
-          "hash": "lO30hvSrPgqpqB4F3vmiczXTmMDjHmEWhGb3y783a/M="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.BenchmarkActionFactory.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.BenchmarkActionFactory.html",
-          "hash": "6GTlANyO+isUOKF6OLJz6+8UNe+r8buZNdOYAwUsWVY="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.ConsumableTypeInfo.yml",
       "output": {
         ".html": {
@@ -5728,7 +5692,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.InProcessEmitExecutor.html",
-          "hash": "HTW7Wt4ZyenMs+fFZtPvLjPn1eqwCrycIMUC2oIVOTY="
+          "hash": "hdMEmto2FyTPUOm8L1pxokPXzK6BTffxEQ5uKZ/6BOE="
         }
       },
       "is_incremental": false,
@@ -5752,7 +5716,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.Emit.InProcessEmitToolchain.html",
-          "hash": "vujZ7eho/Ucg6S5UKs0sBT+YAum9dyEdBc6EnM2KUhA="
+          "hash": "Vh5AwLDTu+nwh14NYPJouXAakldC1wVjPxtO2mP1Uig="
         }
       },
       "is_incremental": false,
@@ -5772,42 +5736,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessBuilder.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessBuilder.html",
-          "hash": "DralAoD5xY7vgWscK9CWRakp80YCOIS/XPXl3RJGA8Q="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessExecutor.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessExecutor.html",
-          "hash": "Plleip0/hP7pgayytR/KLzTi7ZjJ/ZlKQMthxgU28fc="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessGenerator.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessGenerator.html",
-          "hash": "krwppkCzWpDw3D3vUjucTXT+Fi7ckdkD3oFPtKicnJY="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessHost.yml",
       "output": {
         ".html": {
@@ -5820,23 +5748,11 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessToolchain.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessToolchain.html",
-          "hash": "PRAFa1Ma8pqtrFu40Tn6xf2dIvqCgUAIKRlRNaeP3rk="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessValidator.yml",
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.InProcessValidator.html",
-          "hash": "nN06PpGKVIsYOm+d58VeOEwsnhka18eN97usjdt55CM="
+          "hash": "kO2R5Doim0VZbxNFWlI9Uqj5i47zBfCNFR3k7il8Yrs="
         }
       },
       "is_incremental": false,
@@ -5932,7 +5848,7 @@
       "output": {
         ".html": {
           "relative_path": "api/BenchmarkDotNet.Toolchains.InProcess.html",
-          "hash": "+7S771u9E2KSUkHzTwF0aD2gLy9Ku92qU2GURsJxBNU="
+          "hash": "m0l5iTM8vJk8AG46d9VfhVmaJD7qHg6hTy1rAJpGLU4="
         }
       },
       "is_incremental": false,
@@ -6544,7 +6460,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "rOKnbJnbZ2VzclVCFMe/+6rAjxccHdXsdl0qTK3c8mc="
+          "hash": "95hr9QwQ4Dh39nZ8O9h1akpDOlBkK5ikRzaiYsUgviQ="
         }
       },
       "is_incremental": false,
@@ -6604,7 +6520,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/configs/diagnosers.html",
-          "hash": "jRLsoR12/H4upp/NZImXIdqmrz/IhoIgFKfV/ifocDU="
+          "hash": "oaAgvt2EFlfwtulOrHABHrh2ynYgUOIjP/FwYWNSEi0="
         }
       },
       "is_incremental": false,
@@ -7416,6 +7332,18 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "articles/samples/IntroJitStatsDiagnoser.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/samples/IntroJitStatsDiagnoser.html",
+          "hash": "D2PXOdASbXEbFShHhkrtdAnR8JmAt62Kzp5wJtzCVNQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "articles/samples/IntroJobBaseline.md",
       "output": {
         ".html": {
@@ -7816,7 +7744,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/toc.html",
-          "hash": "ErIwlBJK2D7/Eq9KmDowWSliEHEZ3Y9EX8lNequdtwM="
+          "hash": "a1RZYgLQ/kpcnmeS28SrZ/EtKbZ7pHnxVxVgl4yIIQA="
         }
       },
       "is_incremental": false,
@@ -7831,7 +7759,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/full.html",
-          "hash": "TTvRwuGOOBCczb298uTjhvYHzbQMyPyxZxAbrArqV8Q="
+          "hash": "wnZHlfjowLyfCttkWd3ldqsFrAsyjY0QjVJo4cCniYc="
         }
       },
       "is_incremental": false,
@@ -7843,7 +7771,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/index.html",
-          "hash": "s2FnWmiU7J1PgTamKiC1p3fHn+G45VaE4ECI5ZML/4k="
+          "hash": "5kUbACJ1zpwL6ttXY2dWeCMM90JzShInkovWs9TFeUc="
         }
       },
       "is_incremental": false,
@@ -7855,7 +7783,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/toc.html",
-          "hash": "t+DdYBccOzUAX/hMlxjM3AyU9I3SLmsa/m5SZAl6D68="
+          "hash": "LOyXtabfjuibXxJBILi5z/Pk5dqFUmirkGLmN0X3HDg="
         }
       },
       "is_incremental": false,
@@ -8209,7 +8137,7 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.13.5.html",
-          "hash": "cPC7/M/UOdiiSVkBKpXlM9nfigYJuaKvEp6bPB5uguI="
+          "hash": "kLjKGyInmDxzf/Uf9irhstIBF/Z/BW9zpo7ak0fY9DM="
         }
       },
       "is_incremental": false,
@@ -8532,7 +8460,7 @@
       "output": {
         ".html": {
           "relative_path": "index.html",
-          "hash": "PlD6kjUDVN5soqj+KTFyowoGu408qiYL4/bEcYy3LHw="
+          "hash": "QRJMYbq4v0dVF26vWmAQxCIZaKlA7Yki9MvHYF3ODhU="
         }
       },
       "is_incremental": false,
@@ -8675,13 +8603,13 @@
         "ConceptualDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 160,
+          "total_file_count": 161,
           "skipped_file_count": 0
         },
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 541,
+          "total_file_count": 534,
           "skipped_file_count": 0
         },
         "ResourceDocumentProcessor": {
