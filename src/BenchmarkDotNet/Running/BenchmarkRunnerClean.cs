@@ -17,6 +17,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Parameters;
@@ -41,8 +42,11 @@ namespace BenchmarkDotNet.Running
             var resolver = DefaultResolver;
             var artifactsToCleanup = new List<string>();
 
-            var title = GetTitle(benchmarkRunInfos);
             var rootArtifactsFolderPath = GetRootArtifactsFolderPath(benchmarkRunInfos);
+            var maxTitleLength = RuntimeInformation.IsWindows()
+                ? 254 - rootArtifactsFolderPath.Length
+                : int.MaxValue;
+            var title = GetTitle(benchmarkRunInfos, maxTitleLength);
             var resultsFolderPath = GetResultsFolderPath(rootArtifactsFolderPath, benchmarkRunInfos);
             var logFilePath = Path.Combine(rootArtifactsFolderPath, title + ".log");
             var idToResume = GetIdToResume(rootArtifactsFolderPath, title, benchmarkRunInfos);
@@ -573,7 +577,7 @@ namespace BenchmarkDotNet.Running
             return customPath != default ? customPath.CreateIfNotExists() : defaultPath;
         }
 
-        private static string GetTitle(BenchmarkRunInfo[] benchmarkRunInfos)
+        private static string GetTitle(BenchmarkRunInfo[] benchmarkRunInfos, int desiredMaxLength = int.MaxValue)
         {
             // few types might have the same name: A.Name and B.Name will both report "Name"
             // in that case, we can not use the type name as file name because they would be getting overwritten #529
@@ -582,8 +586,22 @@ namespace BenchmarkDotNet.Running
             var fileNamePrefix = (uniqueTargetTypes.Length == 1)
                 ? FolderNameHelper.ToFolderName(uniqueTargetTypes[0])
                 : "BenchmarkRun";
+            string dateTimeSuffix = DateTime.Now.ToString(DateTimeFormat);
 
-            return $"{fileNamePrefix}-{DateTime.Now.ToString(DateTimeFormat)}";
+            int maxFileNamePrefixLength = desiredMaxLength - dateTimeSuffix.Length - 1;
+            if (maxFileNamePrefixLength <= 2)
+                return dateTimeSuffix;
+
+            if (fileNamePrefix.Length > maxFileNamePrefixLength)
+            {
+                int length1 = maxFileNamePrefixLength / 2;
+                int length2 = maxFileNamePrefixLength - length1 - 1;
+                fileNamePrefix = fileNamePrefix.Substring(0, length1) +
+                                 "-" +
+                                 fileNamePrefix.Substring(fileNamePrefix.Length - length2, length2);
+            }
+
+            return $"{fileNamePrefix}-{dateTimeSuffix}";
         }
 
         private static string GetResultsFolderPath(string rootArtifactsFolderPath, BenchmarkRunInfo[] benchmarkRunInfos)
