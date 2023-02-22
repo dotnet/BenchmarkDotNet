@@ -139,15 +139,20 @@ namespace BenchmarkDotNet.Extensions
 
         internal static bool ContainsRunnableBenchmarks(this Type type)
         {
+            return GetRunnableBenchmarks(type).Any();
+        }
+
+        internal static MethodInfo[] GetRunnableBenchmarks(this Type type)
+        {
             var typeInfo = type.GetTypeInfo();
 
             if (typeInfo.IsAbstract
                 || typeInfo.IsSealed
                 || typeInfo.IsNotPublic
                 || typeInfo.IsGenericType && !IsRunnableGenericType(typeInfo))
-                return false;
+                return Array.Empty<MethodInfo>();
 
-            return typeInfo.GetBenchmarks().Any();
+            return typeInfo.GetBenchmarks();
         }
 
         private static MethodInfo[] GetBenchmarks(this TypeInfo typeInfo)
