@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Running
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will be removed soon as it is not supported in .NET Core")]
-        public static BenchmarkRunInfo[] UrlToBenchmarks(string url, IConfig config = null)
+        public static BenchmarkRunInfo[] UrlToBenchmarks(string url, IConfig? config = null)
         {
             if (!RuntimeInformation.IsFullFramework)
                 throw new NotSupportedException("Supported only on Full .NET Framework.");
@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Running
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method will be removed soon as it is not supported in .NET Core")]
-        public static BenchmarkRunInfo[] SourceToBenchmarks(string source, IConfig config = null)
+        public static BenchmarkRunInfo[] SourceToBenchmarks(string source, IConfig? config = null)
         {
             if (!RuntimeInformation.IsFullFramework)
                 throw new NotSupportedException("Supported only on Full .NET Framework.");

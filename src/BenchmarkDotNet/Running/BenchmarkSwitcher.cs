@@ -53,15 +53,15 @@ namespace BenchmarkDotNet.Running
         /// <summary>
         /// Run all available benchmarks.
         /// </summary>
-        [PublicAPI] public IEnumerable<Summary> RunAll(IConfig config = null) => Run(new[] { "--filter", "*" }, config);
+        [PublicAPI] public IEnumerable<Summary> RunAll(IConfig? config = null) => Run(new[] { "--filter", "*" }, config);
 
         /// <summary>
         /// Run all available benchmarks and join them to a single summary
         /// </summary>
-        [PublicAPI] public Summary RunAllJoined(IConfig config = null) => Run(new[] { "--filter", "*", "--join" }, config).Single();
+        [PublicAPI] public Summary RunAllJoined(IConfig? config = null) => Run(new[] { "--filter", "*", "--join" }, config).Single();
 
         [PublicAPI]
-        public IEnumerable<Summary> Run(string[] args = null, IConfig config = null)
+        public IEnumerable<Summary> Run(string[]? args = null, IConfig? config = null)
         {
             // VS generates bad assembly binding redirects for ValueTuple for Full .NET Framework
             // we need to keep the logic that uses it in a separate method and create DirtyAssemblyResolveHelper first
@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Running
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[] args, IConfig config, bool askUserForInput)
+        internal IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[]? args, IConfig? config, bool askUserForInput)
         {
             var notNullArgs = args ?? Array.Empty<string>();
             var notNullConfig = config ?? DefaultConfig.Instance;
