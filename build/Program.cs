@@ -1,6 +1,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using Build;
 using Cake.Common;
 using Cake.Common.Build;
 using Cake.Common.Build.AppVeyor;
@@ -144,13 +145,7 @@ public class BuildContext : FrostingContext
         this.Information("DocfxChangelogDownload: " + version);
         // Required environment variables: GITHUB_PRODUCT, GITHUB_TOKEN
         var changeLogBuilderDirectory = ChangeLogGenDirectory.Combine("ChangeLogBuilder");
-        var changeLogBuilderProjectFile = changeLogBuilderDirectory.CombineWithFilePath("ChangeLogBuilder.csproj");
-        this.DotNetRun(changeLogBuilderProjectFile.FullPath,
-            new ProcessArgumentBuilder().Append(version).Append(versionPrevious).Append(lastCommit),
-            new DotNetRunSettings()
-            {
-                WorkingDirectory = changeLogBuilderDirectory
-            });
+        ChangeLogBuilder.Run(changeLogBuilderDirectory, version, versionPrevious, lastCommit).Wait();
 
         var src = changeLogBuilderDirectory.CombineWithFilePath(version + ".md");
         var dest = ChangeLogGenDirectory.Combine("details").CombineWithFilePath(version + ".md");
@@ -456,20 +451,19 @@ public class DocFxChangelogDownloadTask : FrostingTask<BuildContext>
                 context.DocfxChangelogDownload(
                     DocumentationHelper.BdnAllVersions[i],
                     DocumentationHelper.BdnAllVersions[i - 1]);
-        } else if (context.Argument("LatestVersions", false))
+        }
+        else if (context.Argument("LatestVersions", false))
         {
+            for (int i = DocumentationHelper.BdnAllVersions.Length - 3; i < DocumentationHelper.BdnAllVersions.Length; i++)
+                context.DocfxChangelogDownload(
+                    DocumentationHelper.BdnAllVersions[i],
+                    DocumentationHelper.BdnAllVersions[i - 1]);
         }
 
-        if (!context.Argument("StableVersions", false))
-            context.DocfxChangelogDownload(
-                DocumentationHelper.BdnNextVersion,
-                DocumentationHelper.BdnAllVersions.Last(),
-                "HEAD");
-
-        for (int i = DocumentationHelper.BdnAllVersions.Length - 3; i < DocumentationHelper.BdnAllVersions.Length; i++)
-            context.DocfxChangelogDownload(
-                DocumentationHelper.BdnAllVersions[i],
-                DocumentationHelper.BdnAllVersions[i - 1]);
+        context.DocfxChangelogDownload(
+            DocumentationHelper.BdnNextVersion,
+            DocumentationHelper.BdnAllVersions.Last(),
+            "HEAD");
     }
 }
 
