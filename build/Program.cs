@@ -7,7 +7,6 @@ using Cake.Common.Build;
 using Cake.Common.Build.AppVeyor;
 using Cake.Common.Diagnostics;
 using Cake.Common.IO;
-using Cake.Common.Net;
 using Cake.Common.Tools.DotNet;
 using Cake.Common.Tools.DotNet.Build;
 using Cake.Common.Tools.DotNet.MSBuild;
@@ -40,8 +39,6 @@ public class BuildContext : FrostingContext
     public DirectoryPath ArtifactsDirectory { get; }
     public DirectoryPath ToolsDirectory { get; }
     public DirectoryPath DocsDirectory { get; }
-    public DirectoryPath DocfxDirectory { get; }
-    public FilePath DocfxExeFile { get; }
     public FilePath DocfxJsonFile { get; }
     public DirectoryPath TestOutputDirectory { get; }
 
@@ -79,8 +76,6 @@ public class BuildContext : FrostingContext
         ArtifactsDirectory = RootDirectory.Combine("artifacts");
         ToolsDirectory = RootDirectory.Combine("tools");
         DocsDirectory = RootDirectory.Combine("docs");
-        DocfxDirectory = ToolsDirectory.Combine("docfx");
-        DocfxExeFile = DocfxDirectory.CombineWithFilePath("docfx.exe");
         DocfxJsonFile = DocsDirectory.CombineWithFilePath("docfx.json");
         TestOutputDirectory = RootDirectory.Combine("TestResults");
 
@@ -194,14 +189,14 @@ public class BuildContext : FrostingContext
         this.FileWriteText(release, content.ToString());
     }
 
-    public void RunDocfx(FilePath docfxJson, string args = "")
+    public void RunDocfx(FilePath docfxJson)
     {
-        this.Information($"Running docfx for '{docfxJson}' with args '{args}'");
-        if (!this.IsRunningOnWindows())
-            this.StartProcess("mono",
-                new ProcessSettings { Arguments = DocfxExeFile.FullPath + " " + docfxJson + " " + args });
-        else
-            this.StartProcess(DocfxExeFile.FullPath, new ProcessSettings { Arguments = docfxJson + " " + args });
+        this.Information($"Running docfx for '{docfxJson}'");
+        
+        var currentDirectory = Directory.GetCurrentDirectory();
+        Directory.SetCurrentDirectory(docfxJson.GetDirectory().FullPath);
+        Microsoft.DocAsCode.Docset.Build(docfxJson.FullPath).Wait();
+        Directory.SetCurrentDirectory(currentDirectory);
     }
 
     public void GenerateRedirects()
@@ -222,8 +217,6 @@ public class BuildContext : FrostingContext
 
 public static class DocumentationHelper
 {
-    public const string DocFxVersion = "2.59.4";
-
     public static readonly string[] BdnAllVersions =
     {
         "v0.7.0",
@@ -419,24 +412,8 @@ public class DefaultTask : FrostingTask
 {
 }
 
-[TaskName("DocFX_Install")]
-public class DocfxInstallTask : FrostingTask<BuildContext>
-{
-    public override void Run(BuildContext context)
-    {
-        if (!context.FileExists(context.DocfxExeFile.FullPath))
-        {
-            var url =
-                $"https://github.com/dotnet/docfx/releases/download/v{DocumentationHelper.DocFxVersion}/docfx.zip";
-            var docfxZip = context.ToolsDirectory.CombineWithFilePath("docfx.zip");
-            context.DownloadFile(url, docfxZip);
-            context.Unzip(docfxZip, context.DocfxDirectory);
-        }
-    }
-}
 
 [TaskName("DocFX_Changelog_Download")]
-[IsDependentOn(typeof(DocfxInstallTask))]
 public class DocFxChangelogDownloadTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
@@ -468,7 +445,6 @@ public class DocFxChangelogDownloadTask : FrostingTask<BuildContext>
 }
 
 [TaskName("DocFX_Changelog_Generate")]
-[IsDependentOn(typeof(DocfxInstallTask))]
 public class DocfxChangelogGenerateTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
@@ -498,26 +474,12 @@ public class DocfxGenerateRedirectsTask : FrostingTask<BuildContext>
 // side effects (CleanTask).
 // TODO: Define dependencies when a CI workflow scenario for using the "DocFX_Build" target exists.
 [TaskName("DocFX_Build")]
-[IsDependentOn(typeof(DocfxInstallTask))]
 [IsDependentOn(typeof(DocfxChangelogGenerateTask))]
-public class DocfxChangelogBuildTask : FrostingTask<BuildContext>
+public class DocfxBuildTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
         context.RunDocfx(context.DocfxJsonFile);
         context.GenerateRedirects();
-    }
-}
-
-[TaskName("DocFX_Serve")]
-[IsDependentOn(typeof(DocfxInstallTask))]
-[IsDependentOn(typeof(DocfxChangelogGenerateTask))]
-public class DocfxChangelogServeTask : FrostingTask<BuildContext>
-{
-    public override void Run(BuildContext context)
-    {
-        context.RunDocfx(context.DocfxJsonFile);
-        context.GenerateRedirects();
-        context.RunDocfx(context.DocfxJsonFile, "--serve");
     }
 }

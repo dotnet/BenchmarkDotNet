@@ -7,6 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Cake.Frosting" Version="3.0.0" />
     <PackageReference Include="Cake.FileHelpers" Version="6.0.0" />
+    <PackageReference Include="Microsoft.DocAsCode.App" Version="2.62.1" />
     <PackageReference Include="Ben.Demystifier" Version="0.1.1" />
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
     <PackageReference Include="Octokit" Version="0.29.0" />
