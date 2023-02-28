@@ -123,10 +123,7 @@ namespace BenchmarkDotNet.Loggers
 
                     if (logOutput)
                     {
-                        lock (this) // #2125
-                        {
-                            logger.WriteLine(e.Data);
-                        }
+                        logger.WriteLine(e.Data);
                     }
                 }
             }
@@ -144,10 +141,7 @@ namespace BenchmarkDotNet.Loggers
 
                     if (logOutput)
                     {
-                        lock (this) // #2125
-                        {
-                            logger.WriteLineError(e.Data);
-                        }
+                        logger.WriteLineError(e.Data);
                     }
                 }
             }
