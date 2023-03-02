@@ -68,6 +68,7 @@ namespace BenchmarkDotNet.Configs
             yield return GenericBenchmarksValidator.DontFailOnError;
             yield return DeferredExecutionValidator.FailOnError;
             yield return ParamsAllValuesValidator.FailOnError;
+            yield return ParamsValidator.FailOnError;
         }
 
         public IOrderer Orderer => null;
