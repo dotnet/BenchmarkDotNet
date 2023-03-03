@@ -48,6 +48,14 @@ namespace BenchmarkDotNet.Tests.Validators
         [Fact] public void NonStaticReadonly1Test() => Check<NonStaticReadonly1>(nameof(NonStaticReadonly1.Input), "readonly", P);
         [Fact] public void NonStaticReadonly2Test() => Check<NonStaticReadonly2>(nameof(NonStaticReadonly2.Input), "readonly", Pa);
         [Fact] public void NonStaticReadonly3Test() => Check<NonStaticReadonly3>(nameof(NonStaticReadonly3.Input), "readonly", Ps);
+        [Fact] public void FieldMultiple1Test() => Check<FieldMultiple1>(nameof(FieldMultiple1.Input), "single attribute", P, Pa);
+        [Fact] public void FieldMultiple2Test() => Check<FieldMultiple2>(nameof(FieldMultiple2.Input), "single attribute", P, Ps);
+        [Fact] public void FieldMultiple3Test() => Check<FieldMultiple3>(nameof(FieldMultiple3.Input), "single attribute", Pa, Ps);
+        [Fact] public void FieldMultiple4Test() => Check<FieldMultiple4>(nameof(FieldMultiple4.Input), "single attribute", P, Pa, Ps);
+        [Fact] public void PropMultiple1Test() => Check<PropMultiple1>(nameof(PropMultiple1.Input), "single attribute", P, Pa);
+        [Fact] public void PropMultiple2Test() => Check<PropMultiple2>(nameof(PropMultiple2.Input), "single attribute", P, Ps);
+        [Fact] public void PropMultiple3Test() => Check<PropMultiple3>(nameof(PropMultiple3.Input), "single attribute", Pa, Ps);
+        [Fact] public void PropMultiple4Test() => Check<PropMultiple4>(nameof(PropMultiple4.Input), "single attribute", P, Pa, Ps);
 
         public class Base
         {
@@ -109,6 +117,64 @@ namespace BenchmarkDotNet.Tests.Validators
         {
             [ParamsSource(nameof(Source))]
             public readonly bool Input = false;
+        }
+
+        public class FieldMultiple1 : Base
+        {
+            [Params(false, true)]
+            [ParamsAllValues]
+            public bool Input = false;
+        }
+
+        public class FieldMultiple2 : Base
+        {
+            [Params(false, true)]
+            [ParamsSource(nameof(Source))]
+            public bool Input = false;
+        }
+
+        public class FieldMultiple3 : Base
+        {
+            [ParamsAllValues]
+            [ParamsSource(nameof(Source))]
+            public bool Input = false;
+        }
+
+        public class FieldMultiple4 : Base
+        {
+            [Params(false, true)]
+            [ParamsAllValues]
+            [ParamsSource(nameof(Source))]
+            public bool Input = false;
+        }
+
+        public class PropMultiple1 : Base
+        {
+            [Params(false, true)]
+            [ParamsAllValues]
+            public bool Input { get; set; }
+        }
+
+        public class PropMultiple2 : Base
+        {
+            [Params(false, true)]
+            [ParamsSource(nameof(Source))]
+            public bool Input { get; set; }
+        }
+
+        public class PropMultiple3 : Base
+        {
+            [ParamsAllValues]
+            [ParamsSource(nameof(Source))]
+            public bool Input { get; set; }
+        }
+
+        public class PropMultiple4 : Base
+        {
+            [Params(false, true)]
+            [ParamsAllValues]
+            [ParamsSource(nameof(Source))]
+            public bool Input { get; set; }
         }
     }
 }
