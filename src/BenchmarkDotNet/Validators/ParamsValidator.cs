@@ -36,6 +36,10 @@ namespace BenchmarkDotNet.Validators
                 string name = $"{type.Name}.{memberInfo.Name}";
                 string? attributeString = string.Join(", ", attributes.Select(attribute => $"[{attribute.GetType().Name.Replace(nameof(Attribute), "")}]"));
 
+                if (attributes.Count > 1)
+                    yield return new ValidationError(TreatsWarningsAsErrors,
+                        $"Unable to use {name} with {attributeString} at the same time. Please, use a single attribute.");
+
                 if (memberInfo is FieldInfo fieldInfo && (fieldInfo.IsLiteral || fieldInfo.IsInitOnly))
                 {
                     string modifier = fieldInfo.IsInitOnly ? "readonly" : "constant";
