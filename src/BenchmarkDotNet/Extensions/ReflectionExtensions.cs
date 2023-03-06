@@ -19,6 +19,20 @@ namespace BenchmarkDotNet.Extensions
 
         internal static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
 
+        public static bool IsInitOnly(this PropertyInfo propertyInfo)
+        {
+            var setMethodReturnParameter = propertyInfo.SetMethod?.ReturnParameter;
+            if (setMethodReturnParameter == null)
+                return false;
+
+            var isExternalInitType = typeof(System.Runtime.CompilerServices.Unsafe).Assembly
+                .GetType("System.Runtime.CompilerServices.IsExternalInit");
+            if (isExternalInitType == null)
+                return false;
+
+            return setMethodReturnParameter.GetRequiredCustomModifiers().Contains(isExternalInitType);
+        }
+
         /// <summary>
         /// returns type name which can be used in generated C# code
         /// </summary>
