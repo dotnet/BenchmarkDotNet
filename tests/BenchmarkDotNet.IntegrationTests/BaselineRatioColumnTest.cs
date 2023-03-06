@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             public string Description => "For Testing Only!";
 
-            public string Name => "TestBenchmarkExporter";
+            public string Id => "TestBenchmarkExporter";
 
             public void ExportToLog(Summary summary, BenchmarkDotNet.Loggers.ILogger logger) => ExportCalled = true;
 

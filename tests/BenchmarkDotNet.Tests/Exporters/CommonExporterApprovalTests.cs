@@ -66,7 +66,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         private static void PrintTitle(AccumulationLogger logger, IExporter exporter)
         {
             logger.WriteLine("############################################");
-            logger.WriteLine($"{exporter.Name}");
+            logger.WriteLine($"{exporter.Id}");
             logger.WriteLine("############################################");
         }
 

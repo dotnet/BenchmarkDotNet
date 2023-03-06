@@ -7,6 +7,8 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.Csv;
+using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
@@ -362,7 +364,7 @@ namespace BenchmarkDotNet.Tests.Configs
             var leftAddedToTheRight = ManualConfig.Create(right);
             leftAddedToTheRight.Add(left);
 
-            return new[]{ rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig() };
+            return new[] { rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig() };
         }
 
         public class TestExporter : IExporter, IExporterDependencies
@@ -376,7 +378,7 @@ namespace BenchmarkDotNet.Tests.Configs
 
             public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger) => Enumerable.Empty<string>();
 
-            public string Name => nameof(TestExporter);
+            public string Id => nameof(TestExporter);
             public void ExportToLog(Summary summary, ILogger logger) { }
         }
 
@@ -386,40 +388,54 @@ namespace BenchmarkDotNet.Tests.Configs
 
             public IEnumerable<string> ExportToFiles(Summary summary, ILogger consoleLogger) => Enumerable.Empty<string>();
 
-            public string Name => nameof(TestExporterDependency);
+            public string Id => nameof(TestExporterDependency);
             public void ExportToLog(Summary summary, ILogger logger) { }
         }
 
         [Fact]
-        public void GenerateWarningWhenExporterDependencyAlreadyExistInConfig()
+        public void TheFirstCsvExporterHasPrecedence()
         {
-            System.Globalization.CultureInfo currentCulture = default;
-            System.Globalization.CultureInfo currentUICulture = default;
-            {
-                var ct = System.Threading.Thread.CurrentThread;
-                currentCulture = ct.CurrentCulture;
-                currentUICulture = ct.CurrentUICulture;
-                ct.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-                ct.CurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;
-            }
-            try
-            {
-                var mutable = ManualConfig.CreateEmpty();
-                mutable.AddExporter(new BenchmarkDotNet.Exporters.Csv.CsvMeasurementsExporter(BenchmarkDotNet.Exporters.Csv.CsvSeparator.Comma));
-                mutable.AddExporter(RPlotExporter.Default);
+            var config = ManualConfig.CreateEmpty();
+            config.AddExporter(CsvMeasurementsExporter.Default);
+            config.AddExporter(new CsvMeasurementsExporter(CsvSeparator.Comma));
 
-                var final = ImmutableConfigBuilder.Create(mutable);
+            var immutableConfig = config.CreateImmutableConfig();
+            var exporters = immutableConfig.GetExporters().Cast<CsvMeasurementsExporter>().Where(e => e != null).ToArray();
 
-                Assert.Equal(1, final.ConfigAnalysisConclusion.Count);
-            }
-            finally
-            {
-                var ct = System.Threading.Thread.CurrentThread;
-                ct.CurrentCulture = currentCulture;
-                ct.CurrentUICulture = currentUICulture;
+            Assert.Single(exporters);
+            Assert.True(exporters.First() == CsvMeasurementsExporter.Default);
+        }
 
-            }
+        [Fact]
+        public void DifferentMarkdownExportersAreNotRemoved()
+        {
+            var config = ManualConfig.CreateEmpty();
+            config.AddExporter(MarkdownExporter.Default);
+            config.AddExporter(MarkdownExporter.GitHub);
 
+            var immutableConfig = config.CreateImmutableConfig();
+            var exporters = immutableConfig.GetExporters().Cast<MarkdownExporter>().Where(e => e != null).ToArray();
+
+            Assert.Equal(2, exporters.Length);
+            Assert.True(exporters[0] == MarkdownExporter.Default);
+            Assert.True(exporters[1] == MarkdownExporter.GitHub);
+        }
+
+        [Fact]
+        public void DifferentXmlExportersAreNotRemoved()
+        {
+            var config = ManualConfig.CreateEmpty();
+            config.AddExporter(XmlExporter.Default);
+            config.AddExporter(XmlExporter.Full);
+            config.AddExporter(XmlExporter.FullCompressed);
+
+            var immutableConfig = config.CreateImmutableConfig();
+            var exporters = immutableConfig.GetExporters().Cast<XmlExporter>().Where(e => e != null).ToArray();
+
+            Assert.Equal(3, exporters.Length);
+            Assert.True(exporters[0] == XmlExporter.Default);
+            Assert.True(exporters[1] == XmlExporter.Full);
+            Assert.True(exporters[2] == XmlExporter.FullCompressed);
         }
     }
 }
