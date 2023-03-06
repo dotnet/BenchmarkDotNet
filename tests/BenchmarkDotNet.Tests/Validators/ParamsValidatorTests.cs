@@ -176,5 +176,31 @@ namespace BenchmarkDotNet.Tests.Validators
             [ParamsSource(nameof(Source))]
             public bool Input { get; set; }
         }
+
+#if NET5_0_OR_GREATER
+
+        [Fact] public void InitOnly1Test() => Check<InitOnly1>(nameof(InitOnly1.Input), "init-only", P);
+        [Fact] public void InitOnly2Test() => Check<InitOnly2>(nameof(InitOnly2.Input), "init-only", Pa);
+        [Fact] public void InitOnly3Test() => Check<InitOnly3>(nameof(InitOnly3.Input), "init-only", Ps);
+
+        public class InitOnly1 : Base
+        {
+            [Params(false, true)]
+            public bool Input { get; init; }
+        }
+
+        public class InitOnly2 : Base
+        {
+            [ParamsAllValues]
+            public bool Input { get; init; }
+        }
+
+        public class InitOnly3 : Base
+        {
+            [ParamsSource(nameof(Source))]
+            public bool Input { get; init; }
+        }
+
+#endif
     }
 }

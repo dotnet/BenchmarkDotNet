@@ -46,6 +46,12 @@ namespace BenchmarkDotNet.Validators
                     yield return new ValidationError(TreatsWarningsAsErrors,
                         $"Unable to use {name} with {attributeString} because it's a {modifier} field. Please, remove the {modifier} modifier.");
                 }
+
+                if (memberInfo is PropertyInfo propertyInfo && propertyInfo.IsInitOnly())
+                {
+                    yield return new ValidationError(TreatsWarningsAsErrors,
+                        $"Unable to use {name} with {attributeString} because it's init-only. Please, provide a public setter.");
+                }
             }
         }
     }
