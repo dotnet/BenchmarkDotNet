@@ -3,33 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Extensions
 {
     internal static class ReflectionExtensions
     {
-        [PublicAPI]
-        internal static T ResolveAttribute<T>(this Type type) where T : Attribute =>
+        internal static T? ResolveAttribute<T>(this Type? type) where T : Attribute =>
             type?.GetTypeInfo().GetCustomAttributes(typeof(T), false).OfType<T>().FirstOrDefault();
 
-        [PublicAPI]
-        internal static T ResolveAttribute<T>(this MethodInfo methodInfo) where T : Attribute =>
-            methodInfo?.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
+        internal static T? ResolveAttribute<T>(this MemberInfo? memberInfo) where T : Attribute =>
+            memberInfo?.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
 
-        [PublicAPI]
-        internal static T ResolveAttribute<T>(this PropertyInfo propertyInfo) where T : Attribute =>
-            propertyInfo?.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
-
-        [PublicAPI]
-        internal static T ResolveAttribute<T>(this FieldInfo fieldInfo) where T : Attribute =>
-            fieldInfo?.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
-
-        [PublicAPI]
-        internal static bool HasAttribute<T>(this MethodInfo methodInfo) where T : Attribute =>
-            methodInfo.ResolveAttribute<T>() != null;
+        internal static bool HasAttribute<T>(this MemberInfo? memberInfo) where T : Attribute =>
+            memberInfo.ResolveAttribute<T>() != null;
 
         internal static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
+
+        public static bool IsInitOnly(this PropertyInfo propertyInfo)
+        {
+            var setMethodReturnParameter = propertyInfo.SetMethod?.ReturnParameter;
+            if (setMethodReturnParameter == null)
+                return false;
+
+            var isExternalInitType = typeof(System.Runtime.CompilerServices.Unsafe).Assembly
+                .GetType("System.Runtime.CompilerServices.IsExternalInit");
+            if (isExternalInitType == null)
+                return false;
+
+            return setMethodReturnParameter.GetRequiredCustomModifiers().Contains(isExternalInitType);
+        }
 
         /// <summary>
         /// returns type name which can be used in generated C# code
@@ -183,13 +185,13 @@ namespace BenchmarkDotNet.Extensions
             return joined;
         }
 
-        internal static bool IsStackOnlyWithImplicitCast(this Type argumentType, object argumentInstance)
+        internal static bool IsStackOnlyWithImplicitCast(this Type argumentType, object? argumentInstance)
         {
             if (argumentInstance == null)
                 return false;
 
             // IsByRefLikeAttribute is not exposed for older runtimes, so we need to check it in an ugly way ;)
-            bool isByRefLike = argumentType.GetCustomAttributes().Any(attribute => attribute.ToString().Contains("IsByRefLike"));
+            bool isByRefLike = argumentType.GetCustomAttributes().Any(attribute => attribute.ToString()?.Contains("IsByRefLike") ?? false);
             if (!isByRefLike)
                 return false;
 

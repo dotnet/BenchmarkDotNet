@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Running
     {
         private const BindingFlags AllMethodsFlags =  BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-        public static BenchmarkRunInfo TypeToBenchmarks(Type type, IConfig config = null)
+        public static BenchmarkRunInfo TypeToBenchmarks(Type type, IConfig? config = null)
         {
             if (type.IsGenericTypeDefinition)
                 throw new InvalidBenchmarkDeclarationException($"{type.Name} is generic type definition, use BenchmarkSwitcher for it"); // for "open generic types" should be used BenchmarkSwitcher
@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Running
             return MethodsToBenchmarksWithFullConfig(type, benchmarkMethods, config);
         }
 
-        public static BenchmarkRunInfo MethodsToBenchmarks(Type containingType, MethodInfo[] benchmarkMethods, IConfig config = null)
+        public static BenchmarkRunInfo MethodsToBenchmarks(Type containingType, MethodInfo[] benchmarkMethods, IConfig? config = null)
             => MethodsToBenchmarksWithFullConfig(containingType, GetOrderedBenchmarkMethods(benchmarkMethods), config);
 
         private static MethodInfo[] GetOrderedBenchmarkMethods(MethodInfo[] methods)
@@ -41,7 +41,7 @@ namespace BenchmarkDotNet.Running
                 .Select(pair => pair.method)
                 .ToArray();
 
-        private static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type type, MethodInfo[] benchmarkMethods, IConfig config)
+        private static BenchmarkRunInfo MethodsToBenchmarksWithFullConfig(Type type, MethodInfo[] benchmarkMethods, IConfig? config)
         {
             var allMethods = type.GetMethods(AllMethodsFlags); // benchmarkMethods can be filtered, without Setups, look #564
             var configPerType = GetFullTypeConfig(type, config);
@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Running
             return new BenchmarkRunInfo(orderedBenchmarks, type, configPerType);
         }
 
-        private static ImmutableConfig GetFullTypeConfig(Type type, IConfig config)
+        private static ImmutableConfig GetFullTypeConfig(Type type, IConfig? config)
         {
             config = config ?? DefaultConfig.Instance;
 
