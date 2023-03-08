@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Configs
             var uniqueLoggers = source.GetLoggers().ToImmutableHashSet();
             var configAnalyse = new List<Conclusion>();
 
-            var uniqueHardwareCounters = source.GetHardwareCounters().ToImmutableHashSet();
+            var uniqueHardwareCounters = source.GetHardwareCounters().Where(counter => counter != HardwareCounter.NotSet).ToImmutableHashSet();
             var uniqueDiagnosers = GetDiagnosers(source.GetDiagnosers(), uniqueHardwareCounters);
             var uniqueExporters = GetExporters(source.GetExporters(), uniqueDiagnosers, configAnalyse);
             var uniqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);

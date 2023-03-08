@@ -71,6 +71,20 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Equal(HardwareCounter.CacheMisses, final.GetHardwareCounters().Single());
         }
 
+        [Fact]
+        public void NoSetHardwareCounterIsExcluded()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+
+            mutable.AddHardwareCounters(HardwareCounter.NotSet);
+            mutable.AddHardwareCounters(HardwareCounter.CacheMisses);
+
+            var final = ImmutableConfigBuilder.Create(mutable);
+
+            Assert.Single(final.GetHardwareCounters());
+            Assert.Equal(HardwareCounter.CacheMisses, final.GetHardwareCounters().Single());
+        }
+
         [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because NativeAOT compiler goes crazy when some dependency has reference to TraceEvent...")]
         public void WhenUserDefinesHardwareCountersWeChooseTheRightDiagnoser()
         {
