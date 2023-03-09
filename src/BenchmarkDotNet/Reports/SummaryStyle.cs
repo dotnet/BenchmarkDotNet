@@ -60,6 +60,12 @@ namespace BenchmarkDotNet.Reports
         public SummaryStyle WithRatioStyle(RatioStyle ratioStyle)
             => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth, ratioStyle);
 
+        public SummaryStyle WithUnitsInHeader(bool printUnitsInHeader)
+            => new SummaryStyle(CultureInfo, printUnitsInHeader, SizeUnit, TimeUnit, PrintUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth);
+
+        public SummaryStyle WithUnitsInContent(bool printUnitsInContent)
+            => new SummaryStyle(CultureInfo, PrintUnitsInHeader, SizeUnit, TimeUnit, printUnitsInContent, PrintZeroValuesInContent, MaxParameterColumnWidth);
+
         public bool Equals(SummaryStyle other)
         {
             if (ReferenceEquals(null, other))
