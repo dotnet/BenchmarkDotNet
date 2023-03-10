@@ -149,7 +149,9 @@ namespace BenchmarkDotNet.Toolchains
                     start.WorkingDirectory = artifactsPaths.BinariesDirectoryPath;
                     break;
                 default:
-                    throw new NotSupportedException("Runtime = " + runtime);
+                    start.FileName = exePath;
+                    start.Arguments = args;
+                    break;
             }
             return start;
         }
