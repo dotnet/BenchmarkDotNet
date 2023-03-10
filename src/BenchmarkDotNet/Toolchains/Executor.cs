@@ -148,10 +148,12 @@ namespace BenchmarkDotNet.Toolchains
                     start.Arguments = args;
                     start.WorkingDirectory = artifactsPaths.BinariesDirectoryPath;
                     break;
-                default:
+                case CustomRuntime _:
                     start.FileName = exePath;
                     start.Arguments = args;
                     break;
+                default:
+                    throw new NotSupportedException("Runtime = " + runtime);
             }
             return start;
         }
