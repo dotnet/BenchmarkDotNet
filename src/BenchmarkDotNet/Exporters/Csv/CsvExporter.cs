@@ -6,26 +6,24 @@ namespace BenchmarkDotNet.Exporters.Csv
 {
     public class CsvExporter : ExporterBase
     {
-        private readonly SummaryStyle style;
         private readonly CsvSeparator separator;
+        private readonly SummaryStyle? style;
         protected override string FileExtension => "csv";
 
-        public static readonly IExporter Default = new CsvExporter(CsvSeparator.CurrentCulture, SummaryStyle.Default.WithZeroMetricValuesInContent());
+        public static readonly IExporter Default = new CsvExporter(CsvSeparator.CurrentCulture);
 
-        public CsvExporter(CsvSeparator separator) : this (separator, SummaryStyle.Default.WithZeroMetricValuesInContent())
+        [PublicAPI]
+        public CsvExporter(CsvSeparator separator, SummaryStyle? style = null)
         {
-        }
-
-        [PublicAPI] public CsvExporter(CsvSeparator separator, SummaryStyle style)
-        {
-            this.style = style;
             this.separator = separator;
+            this.style = style;
         }
 
         public override void ExportToLog(Summary summary, ILogger logger)
         {
             string realSeparator = separator.ToRealSeparator();
-            foreach (var line in summary.GetTable(style.WithCultureInfo(summary.GetCultureInfo())).FullContentWithHeader)
+            var exportStyle = (style ?? summary.Style).WithZeroMetricValuesInContent();
+            foreach (var line in summary.GetTable(exportStyle).FullContentWithHeader)
             {
                 for (int i = 0; i < line.Length;)
                 {
