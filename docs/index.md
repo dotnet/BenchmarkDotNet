@@ -15,6 +15,7 @@ title: Home
   [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet?color=yellow)](https://gitter.im/dotnet/BenchmarkDotNet)
   [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
   [![GitHub](https://img.shields.io/badge/source%20code-GitHub-informational)](https://github.com/dotnet/BenchmarkDotNet)
+  [![Twitter](https://img.shields.io/twitter/follow/BenchmarkDotNet?style=social)](https://twitter.com/BenchmarkDotNet)
 
 </h3>
 

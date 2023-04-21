@@ -11,6 +11,7 @@
   [![Stars](https://img.shields.io/github/stars/dotnet/BenchmarkDotNet?color=brightgreen)](https://github.com/dotnet/BenchmarkDotNet/stargazers)
   [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet?color=yellow)](https://gitter.im/dotnet/BenchmarkDotNet)
   [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
+  [![Twitter](https://img.shields.io/twitter/follow/BenchmarkDotNet?style=social)](https://twitter.com/BenchmarkDotNet)
 
 </h3>
 
