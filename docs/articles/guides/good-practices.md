@@ -4,9 +4,7 @@
 
 Never use the Debug build for benchmarking. *Never*. The debug version of the target method can run 10–100 times slower. 
 The release mode means that you should have `<Optimize>true</Optimize>` in your csproj file 
-or use [/optimize](https://learn.microsoft.com/dotnet/csharp/language-reference/compiler-options/) for `csc`. Also your never 
-should use an attached debugger (e.g. Visual Studio or WinDbg) during the benchmarking. The best way is 
-build our benchmark in the Release mode and run it from the command line.
+or use [/optimize](https://learn.microsoft.com/dotnet/csharp/language-reference/compiler-options/) for `csc`. Also you should never use an attached debugger (e.g. Visual Studio or WinDbg) during the benchmarking. The best way is to build your benchmark in the Release mode and run it from the command line.
 
 ## Try different environments
 
