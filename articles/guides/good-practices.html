@@ -114,9 +114,7 @@
 <h2 id="use-the-release-build-without-an-attached-debugger">Use the Release build without an attached debugger</h2>
 <p>Never use the Debug build for benchmarking. <em>Never</em>. The debug version of the target method can run 10–100 times slower.
 The release mode means that you should have <code>&lt;Optimize&gt;true&lt;/Optimize&gt;</code> in your csproj file
-or use <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/compiler-options/">/optimize</a> for <code>csc</code>. Also your never
-should use an attached debugger (e.g. Visual Studio or WinDbg) during the benchmarking. The best way is
-build our benchmark in the Release mode and run it from the command line.</p>
+or use <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/compiler-options/">/optimize</a> for <code>csc</code>. Also you should never use an attached debugger (e.g. Visual Studio or WinDbg) during the benchmarking. The best way is to build your benchmark in the Release mode and run it from the command line.</p>
 <h2 id="try-different-environments">Try different environments</h2>
 <p>Please, don't extrapolate your results. Or do it very carefully.
 I remind you again: the results in different environments may vary significantly. If a <code>Foo1</code> method is faster than
@@ -138,7 +136,7 @@ about methods performance for CLR 2 or .NET Framework 4.6 or LegacyJIT-x64 or x8
 </code></pre>
 <h2 id="power-settings-and-other-applications">Power settings and other applications</h2>
 <ul>
-<li>Turn off all of the applications except the benchmark process and the standard OS processes. If you run benchmark and work in the Visual Studio at the same time, it can negatively affect to benchmark results.</li>
+<li>Turn off all of the applications except the benchmark process and the standard OS processes. If you run benchmark and work in the Visual Studio at the same time, it can negatively affect the benchmark results.</li>
 <li>If you use laptop for benchmarking, keep it plugged in and use the maximum performance mode.</li>
 </ul>
 </article>
