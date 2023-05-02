@@ -36,6 +36,6 @@ double Foo()
 
 ## Power settings and other applications
 
-* Turn off all of the applications except the benchmark process and the standard OS processes. If you run benchmark and work in the Visual Studio at the same time, it can negatively affect to benchmark results.
+* Turn off all of the applications except the benchmark process and the standard OS processes. If you run benchmark and work in the Visual Studio at the same time, it can negatively affect the benchmark results.
 * If you use laptop for benchmarking, keep it plugged in and use the maximum performance mode.
 
