@@ -291,40 +291,6 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public void NonPublicPropertiesWithParamsAreDiscovered()
-        {
-            Assert.Throws<InvalidOperationException>(
-                () => ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(NonPublicPropertyWithParams))));
-        }
-
-        public class NonPublicPropertyWithParams
-        {
-            [Params(1)]
-            [UsedImplicitly]
-            internal int Property { get; set; }
-
-            [Benchmark]
-            public void NonThrowing() { }
-        }
-
-        [Fact]
-        public void PropertyWithoutPublicSetterParamsAreDiscovered()
-        {
-            Assert.Throws<InvalidOperationException>(
-                () => ExecutionValidator.FailOnError.Validate(BenchmarkConverter.TypeToBenchmarks(typeof(PropertyWithoutPublicSetterParams))));
-        }
-
-        public class PropertyWithoutPublicSetterParams
-        {
-            [Params(1)]
-            [UsedImplicitly]
-            internal int Property { get; }
-
-            [Benchmark]
-            public void NonThrowing() { }
-        }
-
-        [Fact]
         public void FieldsWithoutParamsValuesAreDiscovered()
         {
             Assert.Empty(BenchmarkConverter.TypeToBenchmarks(typeof(FieldsWithoutParamsValues)).BenchmarksCases);

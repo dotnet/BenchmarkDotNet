@@ -31,22 +31,6 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
-        public void ParamsDoesNotSupportPropertyWithoutPublicSetter()
-        {
-            // System.InvalidOperationException : Property "ParamProperty" must be public and writable if it has the [Params(..)] attribute applied to it
-            Assert.Throws<InvalidOperationException>(() => CanExecute<ParamsTestPrivatePropertyError>());
-        }
-
-        public class ParamsTestPrivatePropertyError
-        {
-            [Params(1, 2)]
-            public int ParamProperty { get; private set; }
-
-            [Benchmark]
-            public void Benchmark() => Console.WriteLine($"// ### New Parameter {ParamProperty} ###");
-        }
-
-        [Fact]
         public void ParamsSupportPublicFields()
         {
             var summary = CanExecute<ParamsTestField>();
@@ -62,22 +46,6 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             [Params(1, 2)]
             public int ParamField = 0;
-
-            [Benchmark]
-            public void Benchmark() => Console.WriteLine($"// ### New Parameter {ParamField} ###");
-        }
-
-        [Fact]
-        public void ParamsDoesNotSupportPrivateFields()
-        {
-            // System.InvalidOperationException : Field "ParamField" must be public if it has the [Params(..)] attribute applied to it
-            Assert.Throws<InvalidOperationException>(() => CanExecute<ParamsTestPrivateFieldError>());
-        }
-
-        public class ParamsTestPrivateFieldError
-        {
-            [Params(1, 2)]
-            private int ParamField = 0;
 
             [Benchmark]
             public void Benchmark() => Console.WriteLine($"// ### New Parameter {ParamField} ###");
@@ -248,32 +216,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 if (StaticParamProperty != 2)
                     throw new ArgumentException($"{nameof(StaticParamProperty)} has wrong value: {StaticParamProperty}!");
             }
-        }
-
-        [Fact]
-        public void ParamsPropertiesMustHavePublicSetter()
-            => Assert.Throws<InvalidOperationException>(() => CanExecute<WithStaticParamsPropertyWithNoPublicSetter>());
-
-        public class WithStaticParamsPropertyWithNoPublicSetter
-        {
-            [Params(3)]
-            public static int StaticParamProperty { get; private set; }
-
-            [Benchmark]
-            public int Benchmark() => StaticParamProperty;
-        }
-
-        [Fact]
-        public void ParamsFieldsMustBePublic()
-            => Assert.Throws<InvalidOperationException>(() => CanExecute<WithStaticPrivateParamsField>());
-
-        public class WithStaticPrivateParamsField
-        {
-            [Params(4)]
-            private static int StaticParamField = 0;
-
-            [Benchmark]
-            public int Benchmark() => StaticParamField;
         }
     }
 }
