@@ -24,7 +24,14 @@ namespace BenchmarkDotNet.Parameters
             if (x == null) return -1;
             for (int i = 0; i < Math.Min(x.Count, y.Count); i++)
             {
-                int compareTo = PrimitiveComparer.CompareTo(x[i]?.Value, y[i]?.Value);
+                int compareTo;
+                if (x[i]?.Value != null && x[i]?.Value is IComparable comparable && x[i]?.Value.GetType() == y[i]?.Value?.GetType())
+                {
+                    compareTo = comparable.CompareTo(y[i]?.Value);
+                    if (compareTo != 0)
+                        return compareTo;
+                }
+                compareTo = PrimitiveComparer.CompareTo(x[i]?.Value, y[i]?.Value);
                 if (compareTo != 0)
                     return compareTo;
             }
