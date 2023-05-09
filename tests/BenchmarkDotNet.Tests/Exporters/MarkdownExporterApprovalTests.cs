@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -225,8 +226,8 @@ namespace BenchmarkDotNet.Tests.Exporters
             [SimpleJob(id: "Job1", baseline: true), SimpleJob(id: "Job2")]
             public class MethodJobBaseline_MethodsJobs
             {
-                [Benchmark(Baseline = true)] public void Foo() {}
-                [Benchmark] public void Bar() {}
+                [Benchmark(Baseline = true)] public void Foo() { }
+                [Benchmark] public void Bar() { }
             }
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
@@ -235,8 +236,8 @@ namespace BenchmarkDotNet.Tests.Exporters
             {
                 [Params(2, 10), UsedImplicitly] public int Param;
 
-                [Benchmark(Baseline = true)] public void Foo() {}
-                [Benchmark] public void Bar() {}
+                [Benchmark(Baseline = true)] public void Foo() { }
+                [Benchmark] public void Bar() { }
             }
 
             /* Invalid */
@@ -244,16 +245,16 @@ namespace BenchmarkDotNet.Tests.Exporters
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             public class Invalid_TwoMethodBaselines
             {
-                [Benchmark(Baseline = true)] public void Foo() {}
-                [Benchmark(Baseline = true)] public void Bar() {}
+                [Benchmark(Baseline = true)] public void Foo() { }
+                [Benchmark(Baseline = true)] public void Bar() { }
             }
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1", baseline: true), SimpleJob(id: "Job2", baseline: true)]
             public class Invalid_TwoJobBaselines
             {
-                [Benchmark] public void Foo() {}
-                [Benchmark] public void Bar() {}
+                [Benchmark] public void Foo() { }
+                [Benchmark] public void Bar() { }
             }
 
             /* Escape Params */
@@ -262,9 +263,40 @@ namespace BenchmarkDotNet.Tests.Exporters
             {
                 [Params("\t", "\n"), UsedImplicitly] public string StringParam;
 
-                [Arguments('\t')] [Arguments('\n')]
-                [Benchmark] public void Foo(char charArg) {}
-                [Benchmark] public void Bar() {}
+                [Arguments('\t'), Arguments('\n')]
+                [Benchmark] public void Foo(char charArg) { }
+                [Benchmark] public void Bar() { }
+            }
+
+            /* Param Arrays */
+
+            [BaselineColumn]
+            [LogicalGroupColumn]
+            public class ParamArray
+            {
+                [Params(new byte[] { 0 }, new byte[] { 1 }, new byte[] { 0 })]
+                public byte[] Param;
+
+                [Benchmark(Baseline = true)] public void Foo() { }
+                [Benchmark] public void Bar() { }
+            }
+
+            [BaselineColumn]
+            [LogicalGroupColumn]
+            public class ParamArrayOfArrays
+            {
+                [ParamsSource(nameof(GetValues))]
+                public int[][] Param;
+
+                public IEnumerable<int[][]> GetValues()
+                {
+                    yield return new int[][] { new[] { 0 }, new[] { 0 }, };
+                    yield return new int[][] { new[] { 0 }, new[] { 1 }, };
+                    yield return new int[][] { new[] { 0 }, new[] { 0 }, };
+                }
+
+                [Benchmark(Baseline = true)] public void Foo() { }
+                [Benchmark] public void Bar() { }
             }
         }
     }
