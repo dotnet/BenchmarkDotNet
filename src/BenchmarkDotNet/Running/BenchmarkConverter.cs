@@ -248,11 +248,11 @@ namespace BenchmarkDotNet.Running
         private static string[] GetCategories(MethodInfo method)
         {
             var attributes = new List<BenchmarkCategoryAttribute>();
-            attributes.AddRange(method.GetCustomAttributes(typeof(BenchmarkCategoryAttribute), false).OfType<BenchmarkCategoryAttribute>());
-            var type = method.DeclaringType;
+            attributes.AddRange(method.GetCustomAttributes(typeof(BenchmarkCategoryAttribute), true).OfType<BenchmarkCategoryAttribute>());
+            var type = method.ReflectedType;
             if (type != null)
             {
-                attributes.AddRange(type.GetTypeInfo().GetCustomAttributes(typeof(BenchmarkCategoryAttribute), false).OfType<BenchmarkCategoryAttribute>());
+                attributes.AddRange(type.GetTypeInfo().GetCustomAttributes(typeof(BenchmarkCategoryAttribute), true).OfType<BenchmarkCategoryAttribute>());
                 attributes.AddRange(type.GetTypeInfo().Assembly.GetCustomAttributes().OfType<BenchmarkCategoryAttribute>());
             }
             if (attributes.Count == 0)
