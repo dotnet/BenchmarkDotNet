@@ -7,6 +7,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Configs
@@ -69,6 +70,7 @@ namespace BenchmarkDotNet.Configs
                 source.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath,
                 source.CultureInfo,
                 source.Orderer ?? DefaultOrderer.Instance,
+                source.CategoryDiscoverer ?? DefaultCategoryDiscoverer.Instance,
                 source.SummaryStyle ?? SummaryStyle.Default,
                 source.Options,
                 source.BuildTimeout,

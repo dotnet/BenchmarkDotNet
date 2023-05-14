@@ -51,7 +51,8 @@ namespace BenchmarkDotNet.Running
             var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(allMethods, "IterationSetup");
             var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(allMethods, "IterationCleanup");
 
-            var targets = GetTargets(benchmarkMethods, type, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods).ToArray();
+            var targets = GetTargets(benchmarkMethods, type, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods,
+                configPerType).ToArray();
 
             var parameterDefinitions = GetParameterDefinitions(type);
             var parameterInstancesList = parameterDefinitions.Expand(configPerType.SummaryStyle);
@@ -115,7 +116,8 @@ namespace BenchmarkDotNet.Running
             Tuple<MethodInfo, TargetedAttribute>[] globalSetupMethods,
             Tuple<MethodInfo, TargetedAttribute>[] globalCleanupMethods,
             Tuple<MethodInfo, TargetedAttribute>[] iterationSetupMethods,
-            Tuple<MethodInfo, TargetedAttribute>[] iterationCleanupMethods)
+            Tuple<MethodInfo, TargetedAttribute>[] iterationCleanupMethods,
+            IConfig config)
         {
             return targetMethods
                 .Select(methodInfo => CreateDescriptor(type,
@@ -125,7 +127,8 @@ namespace BenchmarkDotNet.Running
                                                    GetTargetedMatchingMethod(methodInfo, iterationSetupMethods),
                                                    GetTargetedMatchingMethod(methodInfo, iterationCleanupMethods),
                                                    methodInfo.ResolveAttribute<BenchmarkAttribute>(),
-                                                   targetMethods));
+                                                   targetMethods,
+                                                   config));
         }
 
         private static MethodInfo GetTargetedMatchingMethod(MethodInfo benchmarkMethod, Tuple<MethodInfo, TargetedAttribute>[] methods)
@@ -152,8 +155,10 @@ namespace BenchmarkDotNet.Running
             MethodInfo iterationSetupMethod,
             MethodInfo iterationCleanupMethod,
             BenchmarkAttribute attr,
-            MethodInfo[] targetMethods)
+            MethodInfo[] targetMethods,
+            IConfig config)
         {
+            var categoryDiscoverer = config.CategoryDiscoverer ?? DefaultCategoryDiscoverer.Instance;
             var target = new Descriptor(
                 type,
                 methodInfo,
@@ -163,7 +168,7 @@ namespace BenchmarkDotNet.Running
                 iterationCleanupMethod,
                 attr.Description,
                 baseline: attr.Baseline,
-                categories: GetCategories(methodInfo),
+                categories: categoryDiscoverer.GetCategories(methodInfo),
                 operationsPerInvoke: attr.OperationsPerInvoke,
                 methodIndex: Array.IndexOf(targetMethods, methodInfo));
             AssertMethodHasCorrectSignature("Benchmark", methodInfo);
@@ -243,21 +248,6 @@ namespace BenchmarkDotNet.Running
             var valuesInfo = GetValidValuesForParamsSource(target, argumentsSourceAttribute.Name);
             for (int sourceIndex = 0; sourceIndex < valuesInfo.values.Length; sourceIndex++)
                 yield return SmartParamBuilder.CreateForArguments(benchmark, parameterDefinitions, valuesInfo, sourceIndex, summaryStyle);
-        }
-
-        private static string[] GetCategories(MethodInfo method)
-        {
-            var attributes = new List<BenchmarkCategoryAttribute>();
-            attributes.AddRange(method.GetCustomAttributes(typeof(BenchmarkCategoryAttribute), true).OfType<BenchmarkCategoryAttribute>());
-            var type = method.ReflectedType;
-            if (type != null)
-            {
-                attributes.AddRange(type.GetTypeInfo().GetCustomAttributes(typeof(BenchmarkCategoryAttribute), true).OfType<BenchmarkCategoryAttribute>());
-                attributes.AddRange(type.GetTypeInfo().Assembly.GetCustomAttributes().OfType<BenchmarkCategoryAttribute>());
-            }
-            if (attributes.Count == 0)
-                return Array.Empty<string>();
-            return attributes.SelectMany(attr => attr.Categories).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
         }
 
         private static ImmutableArray<BenchmarkCase> GetFilteredBenchmarks(IEnumerable<BenchmarkCase> benchmarks, IEnumerable<IFilter> filters)

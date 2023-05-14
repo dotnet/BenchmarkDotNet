@@ -13,6 +13,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
@@ -51,6 +52,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public string ArtifactsPath { get; set; }
         [PublicAPI] public CultureInfo CultureInfo { get; set; }
         [PublicAPI] public IOrderer Orderer { get; set; }
+        [PublicAPI] public ICategoryDiscoverer CategoryDiscoverer { get; set; }
         [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
         [PublicAPI] public TimeSpan BuildTimeout { get; set; } = DefaultConfig.Instance.BuildTimeout;
 
@@ -89,6 +91,12 @@ namespace BenchmarkDotNet.Configs
         public ManualConfig WithOrderer(IOrderer orderer)
         {
             Orderer = orderer;
+            return this;
+        }
+
+        public ManualConfig WithCategoryDiscoverer(ICategoryDiscoverer categoryDiscoverer)
+        {
+            CategoryDiscoverer = categoryDiscoverer;
             return this;
         }
 
@@ -247,6 +255,7 @@ namespace BenchmarkDotNet.Configs
             hardwareCounters.AddRange(config.GetHardwareCounters());
             filters.AddRange(config.GetFilters());
             Orderer = config.Orderer ?? Orderer;
+            CategoryDiscoverer = config.CategoryDiscoverer ?? CategoryDiscoverer;
             ArtifactsPath = config.ArtifactsPath ?? ArtifactsPath;
             CultureInfo = config.CultureInfo ?? CultureInfo;
             SummaryStyle = config.SummaryStyle ?? SummaryStyle;
