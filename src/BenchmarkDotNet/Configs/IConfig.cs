@@ -10,6 +10,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
@@ -30,6 +31,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IColumnHidingRule> GetColumnHidingRules();
 
         IOrderer? Orderer { get; }
+        ICategoryDiscoverer? CategoryDiscoverer { get; }
 
         SummaryStyle SummaryStyle { get; }
 

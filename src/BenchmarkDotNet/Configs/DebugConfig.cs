@@ -12,6 +12,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Validators;
 
@@ -66,6 +67,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
 
         public IOrderer Orderer => DefaultOrderer.Instance;
+        public ICategoryDiscoverer? CategoryDiscoverer => DefaultCategoryDiscoverer.Instance;
         public SummaryStyle SummaryStyle => SummaryStyle.Default;
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
         public TimeSpan BuildTimeout => DefaultConfig.Instance.BuildTimeout;
