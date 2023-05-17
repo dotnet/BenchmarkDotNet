@@ -12,6 +12,13 @@ namespace BenchmarkDotNet.Engines
 {
     public class Consumer
     {
+        private static readonly HashSet<Type> SupportedTypes
+            = new HashSet<Type>(
+                typeof(Consumer).GetTypeInfo()
+                                .DeclaredFields
+                                .Where(field => !field.IsStatic) // exclude this HashSet itself
+                                .Select(field => field.FieldType));
+
 #pragma warning disable IDE0052 // Remove unread private members
         private volatile byte byteHolder;
         private volatile sbyte sbyteHolder;
@@ -123,7 +130,8 @@ namespace BenchmarkDotNet.Engines
             // This also works for empty structs, because the runtime enforces a minimum size of 1 byte.
             => byteHolder = Unsafe.As<T, byte>(ref Unsafe.AsRef(in value));
 
-        internal static bool IsConsumable(Type type) => !type.IsByRefLike();
+        internal static bool IsConsumable(Type type)
+            => SupportedTypes.Contains(type) || type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface || !type.IsByRefLike();
 
         internal static bool HasConsumableField(Type type, out FieldInfo consumableField)
         {

@@ -80,7 +80,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         public override void EmitOverheadImplementation(ILGenerator ilBuilder, Type returnType)
         {
-            if (returnType.IsByRefLike())
+            bool isByRefLike = returnType.IsByRefLike();
+            if (isByRefLike || (Consumer.IsConsumable(returnType) && !isByRefLike))
             {
                 /*
                     // return default;

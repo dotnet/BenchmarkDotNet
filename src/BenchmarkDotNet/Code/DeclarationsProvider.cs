@@ -90,7 +90,8 @@ namespace BenchmarkDotNet.Code
             get
             {
                 var type = WorkloadMethodReturnType;
-                if (type.IsByRefLike())
+                bool isByRefLike = type.IsByRefLike();
+                if (isByRefLike || (Consumer.IsConsumable(type) && !isByRefLike))
                 {
                     return $"return default({type.GetCorrectCSharpTypeName()});";
                 }
