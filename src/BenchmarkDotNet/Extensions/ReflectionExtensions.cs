@@ -185,9 +185,7 @@ namespace BenchmarkDotNet.Extensions
             if (argumentInstance == null)
                 return false;
 
-            // IsByRefLikeAttribute is not exposed for older runtimes, so we need to check it in an ugly way ;)
-            bool isByRefLike = argumentType.GetCustomAttributes().Any(attribute => attribute.ToString()?.Contains("IsByRefLike") ?? false);
-            if (!isByRefLike)
+            if (!argumentType.IsByRefLike())
                 return false;
 
             var instanceType = argumentInstance.GetType();
@@ -209,5 +207,9 @@ namespace BenchmarkDotNet.Extensions
                     && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it
 
         internal static bool IsLinqPad(this Assembly assembly) => assembly.FullName.IndexOf("LINQPAD", StringComparison.OrdinalIgnoreCase) >= 0;
+
+        internal static bool IsByRefLike(this Type type)
+            // Type.IsByRefLike is not available in netstandard2.0.
+            => type.IsValueType && type.CustomAttributes.Any(attr => attr.AttributeType.FullName == "System.Runtime.CompilerServices.IsByRefLikeAttribute");
     }
 }
