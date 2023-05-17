@@ -94,10 +94,7 @@ namespace BenchmarkDotNet.Code
                 {
                     return $"return default({type.GetCorrectCSharpTypeName()});";
                 }
-                return $"""
-                    System.Runtime.CompilerServices.Unsafe.SkipInit(out {type.GetCorrectCSharpTypeName()} value);
-                    return value;
-                    """;
+                return $"System.Runtime.CompilerServices.Unsafe.SkipInit(out {type.GetCorrectCSharpTypeName()} value);\nreturn value;";
             }
         }
 
