@@ -44,9 +44,6 @@ namespace BenchmarkDotNet.Code
 
         public virtual string ConsumeField => null;
 
-        protected abstract Type OverheadMethodReturnType { get; }
-
-        public string OverheadMethodReturnTypeName => OverheadMethodReturnType.GetCorrectCSharpTypeName();
 
         public abstract string OverheadImplementation { get; }
 
@@ -76,8 +73,6 @@ namespace BenchmarkDotNet.Code
 
         public override string ReturnsDefinition => "RETURNS_VOID";
 
-        protected override Type OverheadMethodReturnType => typeof(void);
-
         public override string OverheadImplementation => string.Empty;
     }
 
@@ -90,26 +85,19 @@ namespace BenchmarkDotNet.Code
                 ? $".{field.Name}"
                 : null;
 
-        protected override Type OverheadMethodReturnType
-            => Consumer.IsConsumable(WorkloadMethodReturnType)
-                ? WorkloadMethodReturnType
-                : (Consumer.HasConsumableField(WorkloadMethodReturnType, out var field)
-                    ? field.FieldType
-                    : typeof(int)); // we return this simple type because creating bigger ValueType could take longer than benchmarked method itself
-
         public override string OverheadImplementation
         {
             get
             {
-                string value;
-                var type = OverheadMethodReturnType;
-                if (type.GetTypeInfo().IsPrimitive)
-                    value = $"default({type.GetCorrectCSharpTypeName()})";
-                else if (type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface)
-                    value = "null";
-                else
-                    value = SourceCodeHelper.ToSourceCode(Activator.CreateInstance(type)) + ";";
-                return $"return {value};";
+                var type = WorkloadMethodReturnType;
+                if (type.IsByRefLike())
+                {
+                    return $"return default({type.GetCorrectCSharpTypeName()});";
+                }
+                return $"""
+                    System.Runtime.CompilerServices.Unsafe.SkipInit(out {type.GetCorrectCSharpTypeName()} value);
+                    return value;
+                    """;
             }
         }
 
@@ -123,13 +111,11 @@ namespace BenchmarkDotNet.Code
     {
         public ByRefDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
 
-        protected override Type OverheadMethodReturnType => typeof(IntPtr);
-
         public override string WorkloadMethodReturnTypeName => base.WorkloadMethodReturnTypeName.Replace("&", string.Empty);
 
         public override string ConsumeField => null;
 
-        public override string OverheadImplementation => $"return default(System.{nameof(IntPtr)});";
+        public override string OverheadImplementation => $"return ref overheadDefaultValueHolder;";
 
         public override string ReturnsDefinition => "RETURNS_BYREF";
 
@@ -139,8 +125,6 @@ namespace BenchmarkDotNet.Code
     internal class ByReadOnlyRefDeclarationsProvider : ByRefDeclarationsProvider
     {
         public ByReadOnlyRefDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
-
-        public override string ReturnsDefinition => "RETURNS_BYREF_READONLY";
 
         public override string WorkloadMethodReturnTypeModifiers => "ref readonly";
     }

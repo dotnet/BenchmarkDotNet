@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 {
-    public enum CustomEnumNonConsumable
+    public enum EmptyEnum
     {
     }
 
@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
     }
 
 
-    public struct CustomStructNonConsumable
+    public struct EmptyStruct
     {
     }
 

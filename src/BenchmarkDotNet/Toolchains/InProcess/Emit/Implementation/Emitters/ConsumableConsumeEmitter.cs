@@ -2,53 +2,18 @@
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     internal class ConsumableConsumeEmitter : ConsumeEmitter
     {
-        private static MethodInfo GetConsumeMethod(Type consumableType)
-        {
-            var consumeMethod = typeof(Consumer).GetMethod(nameof(Consumer.Consume), new[] { consumableType });
-
-            // Use generic method for ref types
-            if (consumeMethod == null || consumeMethod.GetParameterTypes().FirstOrDefault() == typeof(object))
-            {
-                if (consumableType.IsClass || consumableType.IsInterface)
-                {
-                    consumeMethod = typeof(Consumer)
-                        .GetMethods()
-                        .Single(m =>
-                        {
-                            Type argType = m.GetParameterTypes().FirstOrDefault();
-
-                            return m.Name == nameof(Consumer.Consume) && m.IsGenericMethodDefinition
-                                && !argType.IsByRef // we are not interested in "Consume<T>(in T value)"
-                                && argType.IsPointer == consumableType.IsPointer; // use "Consume<T>(T objectValue) where T : class" or "Consume<T>(T* ptrValue) where T: unmanaged"
-                        });
-
-                    consumeMethod = consumableType.IsPointer
-                        ? consumeMethod.MakeGenericMethod(consumableType.GetElementType()) // consumableType is T*, we need T for Consume<T>(T* ptrValue)
-                        : consumeMethod.MakeGenericMethod(consumableType);
-                }
-                else
-                {
-                    consumeMethod = null;
-                }
-            }
-
-            if (consumeMethod == null)
-            {
-                throw new InvalidOperationException($"Cannot consume result of {consumableType}.");
-            }
-
-            return consumeMethod;
-        }
-
         private FieldBuilder consumerField;
         private LocalBuilder disassemblyDiagnoserLocal;
+        private LocalBuilder resultLocal;
 
         public ConsumableConsumeEmitter(ConsumableTypeInfo consumableTypeInfo) : base(consumableTypeInfo)
         {
@@ -70,6 +35,32 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             ilBuilder.EmitReturnDefault(ConsumableInfo.WorkloadMethodReturnType, disassemblyDiagnoserLocal);
         }
 
+        protected override void DeclareLoopLocalsOverride(ILGenerator ilBuilder)
+        {
+            /*
+                .locals init (
+                    [4] native int,
+                )
+             */
+            var consumeField = ConsumableInfo.WorkloadConsumableField;
+            if (consumeField == null)
+            {
+                GetConsumeMethod(ConsumableInfo.WorkloadMethodReturnType, out bool passByRef);
+                if (passByRef)
+                {
+                    resultLocal = ilBuilder.DeclareLocal(ConsumableInfo.WorkloadMethodReturnType);
+                }
+            }
+            else
+            {
+                GetConsumeMethod(consumeField.FieldType, out bool passByRef);
+                if (passByRef)
+                {
+                    resultLocal = ilBuilder.DeclareLocal(consumeField.FieldType);
+                }
+            }
+        }
+
         protected override void OnEmitCtorBodyOverride(ConstructorBuilder constructorBuilder, ILGenerator ilBuilder)
         {
             var ctor = typeof(Consumer).GetConstructor(Array.Empty<Type>());
@@ -85,6 +76,47 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             ilBuilder.Emit(OpCodes.Ldarg_0);
             ilBuilder.Emit(OpCodes.Newobj, ctor);
             ilBuilder.Emit(OpCodes.Stfld, consumerField);
+        }
+
+        public override void EmitOverheadImplementation(ILGenerator ilBuilder, Type returnType)
+        {
+            if (returnType.IsByRefLike())
+            {
+                /*
+                    // return default;
+                    IL_0000: ldc.i4.0
+                    IL_0001: ret
+                 */
+                // optional local if default(T) uses .initobj
+                var optionalLocalForInitobj = ilBuilder.DeclareOptionalLocalForReturnDefault(returnType);
+                ilBuilder.EmitReturnDefault(returnType, optionalLocalForInitobj);
+                return;
+            }
+
+            /*
+                // System.Runtime.CompilerServices.Unsafe.SkipInit(out BenchmarkDotNet.Samples.CustomWithConsumable value);
+                // return value;
+                .locals init (
+                    [0] valuetype BenchmarkDotNet.Samples.CustomWithConsumable
+                )
+
+                IL_0000: ldloca.s 0
+                IL_0002: call void Unsafe::SkipInit<valuetype BenchmarkDotNet.Samples.CustomWithConsumable>(!!0&)
+                IL_0007: ldloc.0
+                IL_0008: ret
+             */
+            var local = ilBuilder.DeclareLocal(returnType);
+            ilBuilder.EmitLdloca(local);
+            ilBuilder.Emit(OpCodes.Call, GetGenericSkipInitMethod(returnType));
+            ilBuilder.EmitLdloc(local);
+            ilBuilder.Emit(OpCodes.Ret);
+        }
+
+        private static MethodInfo GetGenericSkipInitMethod(Type skipInitType)
+        {
+            return typeof(Unsafe).GetMethods(BindingFlags.Static | BindingFlags.Public)
+                .Single(m => m.Name == nameof(Unsafe.SkipInit) && m.IsGenericMethodDefinition && m.ReturnType == typeof(void) && m.GetParameters().Single().IsOut)
+                .MakeGenericMethod(skipInitType);
         }
 
         protected override void EmitActionBeforeCallOverride(ILGenerator ilBuilder)
@@ -107,29 +139,80 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 // ... .Consume( ... .ConsumableField);
                 IL_001e: callvirt instance void [BenchmarkDotNet]BenchmarkDotNet.Engines.Consumer::Consume(int32)
                 // -or- .Consume( ... );
-                IL_001e: ldfld int32 BenchmarkDotNet.Samples.CustomWithConsumable::ConsumableField
-                IL_0023: callvirt instance void [BenchmarkDotNet]BenchmarkDotNet.Engines.Consumer::Consume(int32)
+                IL_0018: valuetype [System.Runtime]System.Decimal int32 BenchmarkDotNet.Samples.CustomWithConsumable::ConsumableField
+                IL_001d: stloc.1
+                IL_001e: ldloca.s 1
+                IL_0020: callvirt instance void [BenchmarkDotNet]BenchmarkDotNet.Engines.Consumer::Consume<valuetype [System.Runtime]System.Decimal>(!!0&)
              */
-            if (ActionKind == RunnableActionKind.Overhead)
+            var consumeField = ConsumableInfo.WorkloadConsumableField;
+            if (consumeField == null)
             {
-                var overheadConsumeMethod = GetConsumeMethod(ConsumableInfo.OverheadMethodReturnType);
-                ilBuilder.Emit(OpCodes.Callvirt, overheadConsumeMethod);
+                var consumeMethod = GetConsumeMethod(ConsumableInfo.WorkloadMethodReturnType, out bool passByRef);
+                if (passByRef)
+                {
+                    ilBuilder.EmitStloc(resultLocal);
+                    ilBuilder.EmitLdloca(resultLocal);
+                }
+                ilBuilder.Emit(OpCodes.Callvirt, consumeMethod);
             }
             else
             {
-                var consumeField = ConsumableInfo.WorkloadConsumableField;
-                if (consumeField == null)
+                var consumeMethod = GetConsumeMethod(consumeField.FieldType, out bool passByRef);
+                if (passByRef)
                 {
-                    var consumeMethod = GetConsumeMethod(ConsumableInfo.WorkloadMethodReturnType);
-                    ilBuilder.Emit(OpCodes.Callvirt, consumeMethod);
+                    ilBuilder.EmitStloc(resultLocal);
+                    ilBuilder.EmitLdloca(resultLocal);
+                    ilBuilder.Emit(OpCodes.Ldflda, consumeField);
                 }
                 else
                 {
-                    var consumeMethod = GetConsumeMethod(consumeField.FieldType);
                     ilBuilder.Emit(OpCodes.Ldfld, consumeField);
-                    ilBuilder.Emit(OpCodes.Callvirt, consumeMethod);
+                }
+                ilBuilder.Emit(OpCodes.Callvirt, consumeMethod);
+            }
+        }
+
+        protected static MethodInfo GetGenericConsumeMethod(Type consumableType, Func<ParameterInfo, bool> comparator)
+        {
+            return typeof(Consumer).GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .Single(m => m.Name == nameof(Consumer.Consume) && m.IsGenericMethodDefinition && comparator(m.GetParameters().Single()))
+                .MakeGenericMethod(consumableType);
+        }
+
+        private static MethodInfo GetConsumeMethod(Type consumableType, out bool passByRef)
+        {
+            passByRef = false;
+            var consumeMethod = typeof(Consumer).GetMethod(nameof(Consumer.Consume), new[] { consumableType });
+
+            if (consumeMethod == null
+                // Use generic method for ref types, except base System.Object.
+                || (consumeMethod.GetParameterTypes().FirstOrDefault() == typeof(object) && consumableType != typeof(object)))
+            {
+                // Consume<T>(T* ptrValue)
+                if (consumableType.IsPointer)
+                {
+                    consumeMethod = GetGenericConsumeMethod(consumableType.GetElementType(), param => param.ParameterType.IsPointer);
+                }
+                // Consume<T>(T value) where T : class
+                else if (consumableType.IsClass || consumableType.IsInterface)
+                {
+                    consumeMethod = GetGenericConsumeMethod(consumableType, param => !param.IsIn && !param.ParameterType.IsPointer);
+                }
+                // Everything else, covers non-primitve structs, nullable values, and byref returns.
+                // Consume<T>(in T value)
+                else
+                {
+                    passByRef = true;
+                    consumeMethod = GetGenericConsumeMethod(consumableType, param => param.IsIn);
                 }
             }
+
+            if (consumeMethod == null)
+            {
+                throw new InvalidOperationException($"Cannot consume result of {consumableType}.");
+            }
+
+            return consumeMethod;
         }
     }
 }

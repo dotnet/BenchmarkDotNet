@@ -37,12 +37,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             return value;
         }
 
-        public static bool IsRefLikeType(Type t)
-        {
-            return t.IsValueType
-                && t.GetCustomAttributes().Any(a => a.GetType().FullName == IsByRefLikeAttributeTypeName);
-        }
-
         public static MethodInfo GetImplicitConversionOpFromTo(Type from, Type to)
         {
             return GetImplicitConversionOpCore(to, from, to)

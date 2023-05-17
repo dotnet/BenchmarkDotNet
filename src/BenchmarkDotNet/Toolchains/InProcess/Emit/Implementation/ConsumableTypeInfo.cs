@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Engines;
-using JetBrains.Annotations;
 using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -48,32 +47,21 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             if (WorkloadMethodReturnType == typeof(void))
             {
                 IsVoid = true;
-                OverheadMethodReturnType = WorkloadMethodReturnType;
             }
             else if (WorkloadMethodReturnType.IsByRef)
             {
                 IsByRef = true;
-                OverheadMethodReturnType = typeof(IntPtr);
             }
             else if (Consumer.IsConsumable(WorkloadMethodReturnType)
                 || Consumer.HasConsumableField(WorkloadMethodReturnType, out consumableField))
             {
                 IsConsumable = true;
                 WorkloadConsumableField = consumableField;
-                OverheadMethodReturnType = consumableField?.FieldType ?? WorkloadMethodReturnType;
             }
-            else
-            {
-                OverheadMethodReturnType = typeof(int); // we return this simple type because creating bigger ValueType could take longer than benchmarked method itself
-            }
-
-            if (OverheadMethodReturnType == null)
-                throw new InvalidOperationException("Bug: (OverheadResultType == null");
         }
 
         public Type OriginMethodReturnType { get; }
         public Type WorkloadMethodReturnType { get; }
-        public Type OverheadMethodReturnType { get; }
 
         public MethodInfo? GetAwaiterMethod { get; }
         public MethodInfo? GetResultMethod { get; }

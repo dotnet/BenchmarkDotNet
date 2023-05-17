@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         }
 
         [Benchmark, Arguments(123.0, 4, "5", null)]
-        public CustomStructNonConsumable ReturnManyArgsCase(ref double i, int j, string k, object l)
+        public EmptyStruct ReturnManyArgsCase(ref double i, int j, string k, object l)
         {
             Thread.Sleep(100);
             return default;

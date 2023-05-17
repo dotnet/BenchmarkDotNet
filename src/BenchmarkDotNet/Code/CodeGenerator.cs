@@ -48,7 +48,6 @@ namespace BenchmarkDotNet.Code
                     .Replace("$WorkloadMethodDelegate$", provider.WorkloadMethodDelegate(passArguments))
                     .Replace("$WorkloadMethodReturnType$", provider.WorkloadMethodReturnTypeName)
                     .Replace("$WorkloadMethodReturnTypeModifiers$", provider.WorkloadMethodReturnTypeModifiers)
-                    .Replace("$OverheadMethodReturnTypeName$", provider.OverheadMethodReturnTypeName)
                     .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)
                     .Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName)
                     .Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName)

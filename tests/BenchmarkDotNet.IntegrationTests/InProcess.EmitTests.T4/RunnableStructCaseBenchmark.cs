@@ -209,15 +209,15 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         [Benchmark, Arguments(null, "19", 0.19)]
         public TimeSpan? StructCase19(TimeSpan? x, ref string y, double? z) => default;
 
-        // ---- Begin StructCase(CustomEnumNonConsumable) ----
+        // ---- Begin StructCase(EmptyEnum) ----
 
-        private CustomEnumNonConsumable _refResultHolder20;
+        private EmptyEnum _refResultHolder20;
 
         [Benchmark]
-        public ref CustomEnumNonConsumable RefReturnStructCase20() => ref _refResultHolder20;
+        public ref EmptyEnum RefReturnStructCase20() => ref _refResultHolder20;
 
         [Benchmark, Arguments(20, "20", 0.20)]
-        public CustomEnumNonConsumable StructCase20(int x, ref string y, double? z) => default;
+        public EmptyEnum StructCase20(int x, ref string y, double? z) => default;
 
         // ---- Begin StructCase(CustomEnumConsumable) ----
 
@@ -229,15 +229,10 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         [Benchmark, Arguments(21, "21", 0.21)]
         public CustomEnumConsumable StructCase21(int x, ref string y, double? z) => default;
 
-        // ---- Begin StructCase(CustomStructNonConsumable) ----
-
-        private CustomStructNonConsumable _refResultHolder22;
-
-        [Benchmark]
-        public ref CustomStructNonConsumable RefReturnStructCase22() => ref _refResultHolder22;
+        // ---- Begin StructCase(EmptyStruct) ----
 
         [Benchmark, Arguments(22, "22", 0.22)]
-        public CustomStructNonConsumable StructCase22(int x, ref string y, double? z) => default;
+        public EmptyStruct StructCase22(int x, ref string y, double? z) => default;
 
         // ---- Begin StructCase(CustomStructConsumable) ----
 

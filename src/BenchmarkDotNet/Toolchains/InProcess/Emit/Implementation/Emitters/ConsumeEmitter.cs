@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Reflection.Emit;
+using BenchmarkDotNet.Helpers.Reflection.Emit;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
@@ -130,6 +131,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         {
         }
 
+        public virtual void EmitOverheadImplementation(ILGenerator ilBuilder, Type returnType)
+        {
+            /*
+                // return default;
+                IL_0000: ldc.i4.0
+                IL_0001: ret
+             */
+            // optional local if default(T) uses .initobj
+            var optionalLocalForInitobj = ilBuilder.DeclareOptionalLocalForReturnDefault(returnType);
+            ilBuilder.EmitReturnDefault(returnType, optionalLocalForInitobj);
+        }
+
         public void BeginEmitAction(
             MethodBuilder actionMethodBuilder,
             ILGenerator ilBuilder,
@@ -177,6 +190,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         }
 
         protected virtual void DeclareActionLocalsOverride(ILGenerator ilBuilder)
+        {
+        }
+
+        public void DeclareLoopLocals(ILGenerator ilBuilder)
+        {
+
+            AssertHasBuilder(ilBuilder);
+
+            DeclareLoopLocalsOverride(ilBuilder);
+        }
+
+        protected virtual void DeclareLoopLocalsOverride(ILGenerator ilBuilder)
         {
         }
 

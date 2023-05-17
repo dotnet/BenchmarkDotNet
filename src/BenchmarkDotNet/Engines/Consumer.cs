@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using BenchmarkDotNet.Extensions;
 using JetBrains.Annotations;
 
 // ReSharper disable NotAccessedField.Local
@@ -11,13 +12,6 @@ namespace BenchmarkDotNet.Engines
 {
     public class Consumer
     {
-        private static readonly HashSet<Type> SupportedTypes
-            = new HashSet<Type>(
-                typeof(Consumer).GetTypeInfo()
-                                .DeclaredFields
-                                .Where(field => !field.IsStatic) // exclude this HashSet itself
-                                .Select(field => field.FieldType));
-
 #pragma warning disable IDE0052 // Remove unread private members
         private volatile byte byteHolder;
         private volatile sbyte sbyteHolder;
@@ -123,39 +117,13 @@ namespace BenchmarkDotNet.Engines
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Consume<T>(in T value)
-        {
-            if (typeof(T) == typeof(byte))
-                byteHolder = (byte)(object)value;
-            else if (typeof(T) == typeof(sbyte))
-                sbyteHolder = (sbyte)(object)value;
-            else if (typeof(T) == typeof(short))
-                shortHolder = (short)(object)value;
-            else if (typeof(T) == typeof(ushort))
-                ushortHolder = (ushort)(object)value;
-            else if (typeof(T) == typeof(int))
-                intHolder = (int)(object)value;
-            else if (typeof(T) == typeof(uint))
-                uintHolder = (uint)(object)value;
-            else if (typeof(T) == typeof(bool))
-                boolHolder = (bool)(object)value;
-            else if (typeof(T) == typeof(char))
-                charHolder = (char)(object)value;
-            else if (typeof(T) == typeof(float))
-                floatHolder = (float)(object)value;
-            else if (typeof(T) == typeof(double))
-                Volatile.Write(ref doubleHolder, (double)(object)value);
-            else if (typeof(T) == typeof(long))
-                Volatile.Write(ref longHolder, (long)(object)value);
-            else if (typeof(T) == typeof(ulong))
-                Volatile.Write(ref ulongHolder, (ulong)(object)value);
-            else if (default(T) == null && !typeof(T).IsValueType)
-                Consume((object) value);
-            else
-                DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(value); // non-primitive and nullable value types
-        }
+            // Read the value as a byte and write it to a volatile field.
+            // This prevents copying large structs, and prevents dead code elimination and out-of-order execution.
+            // (reading as a type larger than byte could possibly read past the memory bounds, causing the application to crash)
+            // This also works for empty structs, because the runtime enforces a minimum size of 1 byte.
+            => byteHolder = Unsafe.As<T, byte>(ref Unsafe.AsRef(in value));
 
-        internal static bool IsConsumable(Type type)
-            => SupportedTypes.Contains(type) || type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface;
+        internal static bool IsConsumable(Type type) => !type.IsByRefLike();
 
         internal static bool HasConsumableField(Type type, out FieldInfo consumableField)
         {
