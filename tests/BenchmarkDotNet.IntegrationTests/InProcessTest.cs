@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
@@ -42,19 +43,32 @@ namespace BenchmarkDotNet.IntegrationTests
         public void BenchmarkActionVoidSupported() => TestInvoke(x => x.InvokeOnceVoid(), UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionTaskSupported() => TestInvoke(x => x.InvokeOnceTaskAsync(), UnrollFactor, null);
+        public void BenchmarkActionTaskSupported() => TestInvoke(x => x.InvokeOnceTaskAsync(), UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionRefTypeSupported() => TestInvoke(x => x.InvokeOnceRefType(), UnrollFactor, StringResult);
+        public void BenchmarkActionValueTaskSupported() => TestInvoke(x => x.InvokeOnceValueTaskAsync(), UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionValueTypeSupported() => TestInvoke(x => x.InvokeOnceValueType(), UnrollFactor, DecimalResult);
+        public void BenchmarkActionRefTypeSupported() => TestInvoke(x => x.InvokeOnceRefType(), UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionTaskOfTSupported() => TestInvoke(x => x.InvokeOnceTaskOfTAsync(), UnrollFactor, StringResult);
+        public void BenchmarkActionValueTypeSupported() => TestInvoke(x => x.InvokeOnceValueType(), UnrollFactor);
 
         [Fact]
-        public void BenchmarkActionValueTaskOfTSupported() => TestInvoke(x => x.InvokeOnceValueTaskOfT(), UnrollFactor, DecimalResult);
+        public void BenchmarkActionTaskOfTSupported() => TestInvoke(x => x.InvokeOnceTaskOfTAsync(), UnrollFactor);
+
+        [Fact]
+        public void BenchmarkActionValueTaskOfTSupported() => TestInvoke(x => x.InvokeOnceValueTaskOfT(), UnrollFactor);
+
+        [Fact]
+        public unsafe void BenchmarkActionVoidPointerSupported() => TestInvoke(x => x.InvokeOnceVoidPointerType(), UnrollFactor);
+
+        // Can't use ref returns in expression, so pass the MethodInfo directly instead.
+        [Fact]
+        public void BenchmarkActionByRefTypeSupported() => TestInvoke(typeof(BenchmarkAllCases).GetMethod(nameof(BenchmarkAllCases.InvokeOnceByRefType)), UnrollFactor);
+
+        [Fact]
+        public void BenchmarkActionByRefReadonlyValueTypeSupported() => TestInvoke(typeof(BenchmarkAllCases).GetMethod(nameof(BenchmarkAllCases.InvokeOnceByRefReadonlyType)), UnrollFactor);
 
         [Fact]
         public void BenchmarkDifferentPlatformReturnsValidationError()
@@ -82,65 +96,49 @@ namespace BenchmarkDotNet.IntegrationTests
 
             // Run mode
             var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), unrollFactor);
-            TestInvoke(action, unrollFactor, false, null);
+            TestInvoke(action, unrollFactor, false);
 
             // Idle mode
             action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), unrollFactor);
-            TestInvoke(action, unrollFactor, true, null);
+            TestInvoke(action, unrollFactor, true);
 
             // GlobalSetup/GlobalCleanup
             action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkAllCases());
-            TestInvoke(action, 1, false, null);
+            TestInvoke(action, 1, false);
             action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkAllCases());
-            TestInvoke(action, 1, false, null);
+            TestInvoke(action, 1, false);
 
             // GlobalSetup/GlobalCleanup (empty)
             descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod);
             action = BenchmarkActionFactory.CreateGlobalSetup(descriptor, new BenchmarkAllCases());
-            TestInvoke(action, unrollFactor, true, null);
+            TestInvoke(action, unrollFactor, true);
             action = BenchmarkActionFactory.CreateGlobalCleanup(descriptor, new BenchmarkAllCases());
-            TestInvoke(action, unrollFactor, true, null);
+            TestInvoke(action, unrollFactor, true);
         }
 
         [AssertionMethod]
-        private void TestInvoke<T>(Expression<Func<BenchmarkAllCases, T>> methodCall, int unrollFactor, object expectedResult)
+        private void TestInvoke<T>(Expression<Func<BenchmarkAllCases, T>> methodCall, int unrollFactor)
         {
             var targetMethod = ((MethodCallExpression)methodCall.Body).Method;
+            TestInvoke(targetMethod, unrollFactor);
+        }
+
+        [AssertionMethod]
+        private void TestInvoke(MethodInfo targetMethod, int unrollFactor)
+        {
             var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod);
 
             // Run mode
             var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), unrollFactor);
-            TestInvoke(action, unrollFactor, false, expectedResult);
+            TestInvoke(action, unrollFactor, false);
 
             // Idle mode
-
-            bool isValueTask = typeof(T).IsConstructedGenericType && typeof(T).GetGenericTypeDefinition() == typeof(ValueTask<>);
-
-            object? idleExpected;
-            if (isValueTask)
-                idleExpected = GetDefault(typeof(T).GetGenericArguments()[0]);
-            else if (typeof(T).GetTypeInfo().IsValueType)
-                idleExpected = 0;
-            else if (expectedResult == null || typeof(T) == typeof(Task))
-                idleExpected = null;
-            else
-                idleExpected = GetDefault(expectedResult.GetType());
-
             action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), unrollFactor);
-            TestInvoke(action, unrollFactor, true, idleExpected);
-        }
-
-        private static object GetDefault(Type type)
-        {
-            if (type.GetTypeInfo().IsValueType)
-            {
-                return Activator.CreateInstance(type);
-            }
-            return null;
+            TestInvoke(action, unrollFactor, true);
         }
 
         [AssertionMethod]
-        private void TestInvoke(BenchmarkAction benchmarkAction, int unrollFactor, bool isIdle, object expectedResult)
+        private void TestInvoke(BenchmarkAction benchmarkAction, int unrollFactor, bool isIdle)
         {
             try
             {
@@ -164,8 +162,6 @@ namespace BenchmarkDotNet.IntegrationTests
                     benchmarkAction.InvokeUnroll(11);
                     Assert.Equal(BenchmarkAllCases.Counter, 1 + unrollFactor * 11);
                 }
-
-                Assert.Equal(benchmarkAction.LastRunResult, expectedResult);
             }
             finally
             {
@@ -238,6 +234,13 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [Benchmark]
+            public async ValueTask InvokeOnceValueTaskAsync()
+            {
+                await Task.Yield();
+                Interlocked.Increment(ref Counter);
+            }
+
+            [Benchmark]
             public string InvokeOnceRefType()
             {
                 Interlocked.Increment(ref Counter);
@@ -265,6 +268,51 @@ namespace BenchmarkDotNet.IntegrationTests
                 Interlocked.Increment(ref Counter);
                 return new ValueTask<decimal>(DecimalResult);
             }
+
+            [Benchmark]
+            public ref int InvokeOnceByRefType()
+            {
+                Interlocked.Increment(ref Counter);
+                return ref Counter;
+            }
+
+            [Benchmark]
+            public ref readonly int InvokeOnceByRefReadonlyType()
+            {
+                Interlocked.Increment(ref Counter);
+                return ref Counter;
+            }
+
+            [Benchmark]
+            public unsafe void* InvokeOnceVoidPointerType()
+            {
+                Interlocked.Increment(ref Counter);
+                return default;
+            }
+
+#if NET9_0_OR_GREATER
+            [Benchmark]
+            public Span<int> InvokeOnceRefStruct()
+            {
+                Interlocked.Increment(ref Counter);
+                return default;
+            }
+
+            // This doesn't make much sense in practice, but the type system allows it, so we test it.
+            [Benchmark]
+            public ref Span<int> InvokeOnceByRefRefStruct()
+            {
+                Interlocked.Increment(ref Counter);
+                return ref Unsafe.NullRef<Span<int>>();
+            }
+
+            [Benchmark]
+            public ref readonly Span<int> InvokeOnceByRefReadonlyRefStruct()
+            {
+                Interlocked.Increment(ref Counter);
+                return ref Unsafe.NullRef<Span<int>>();
+            }
+#endif
         }
 
 

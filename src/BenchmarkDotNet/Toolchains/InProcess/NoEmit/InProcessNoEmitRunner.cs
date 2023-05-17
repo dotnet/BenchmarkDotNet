@@ -8,6 +8,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Parameters;
+using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
@@ -126,6 +127,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     host.WriteLine("// {0}", infoLine);
                 host.WriteLine("// Job: {0}", job.DisplayInfo);
                 host.WriteLine();
+
+                var errors = BenchmarkProcessValidator.Validate(job, instance);
+                if (ValidationErrorReporter.ReportIfAny(errors, host))
+                    return;
 
                 var compositeInProcessDiagnoserHandler = new Diagnosers.CompositeInProcessDiagnoserHandler(
                     parameters.CompositeInProcessDiagnoser.InProcessDiagnosers
