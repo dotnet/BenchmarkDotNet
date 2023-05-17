@@ -43,6 +43,27 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             return ref refValueHolder;
         }
 
+        [Benchmark]
+        public unsafe int* ReturnsIntPointer()
+        {
+            Thread.Sleep(100);
+            return default;
+        }
+
+        [Benchmark]
+        public unsafe void* ReturnsVoidPointer()
+        {
+            Thread.Sleep(100);
+            return default;
+        }
+
+        [Benchmark]
+        public unsafe EmptyStruct* ReturnsStructPointer()
+        {
+            Thread.Sleep(100);
+            return default;
+        }
+
         [Benchmark, Arguments(12)]
         public Task<int> TaskSample(long arg)
         {

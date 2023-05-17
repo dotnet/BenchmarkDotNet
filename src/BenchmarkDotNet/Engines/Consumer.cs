@@ -131,6 +131,7 @@ namespace BenchmarkDotNet.Engines
             => byteHolder = Unsafe.As<T, byte>(ref Unsafe.AsRef(in value));
 
         internal static bool IsConsumable(Type type)
+            // IsClass returns true for pointers.
             => SupportedTypes.Contains(type) || type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface || !type.IsByRefLike();
 
         internal static bool HasConsumableField(Type type, out FieldInfo consumableField)
