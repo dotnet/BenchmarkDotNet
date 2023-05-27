@@ -80,8 +80,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         public override void EmitOverheadImplementation(ILGenerator ilBuilder, Type returnType)
         {
-            bool isByRefLike = returnType.IsByRefLike();
-            if (isByRefLike || (Consumer.IsConsumable(returnType) && !isByRefLike))
+            // ByRefLike types and pointers use default, everything else uses Unsafe.SkipInit.
+            if (returnType.IsByRefLike() || returnType.IsPointer)
             {
                 /*
                     // return default;

@@ -90,8 +90,8 @@ namespace BenchmarkDotNet.Code
             get
             {
                 var type = WorkloadMethodReturnType;
-                bool isByRefLike = type.IsByRefLike();
-                if (isByRefLike || (Consumer.IsConsumable(type) && !isByRefLike))
+                // ByRefLike types and pointers use default, everything else uses Unsafe.SkipInit.
+                if (type.IsByRefLike() || type.IsPointer)
                 {
                     return $"return default({type.GetCorrectCSharpTypeName()});";
                 }

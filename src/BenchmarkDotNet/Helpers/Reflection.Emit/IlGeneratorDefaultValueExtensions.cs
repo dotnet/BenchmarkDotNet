@@ -19,6 +19,9 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
             {
                 case Type t when t == typeof(void):
                     break;
+                case Type t when t.IsPointer: // Type.IsClass returns true for pointers, so we have to check for pointer type first.
+                    EmitInitObj(ilBuilder, resultType, local);
+                    break;
                 case Type t when t.IsClass || t.IsInterface:
                     ilBuilder.Emit(OpCodes.Ldnull);
                     ilBuilder.EmitStloc(local);
