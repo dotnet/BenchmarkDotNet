@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -56,7 +57,8 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                     new[]
                     {
                         benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
-                        typeof(BenchmarkCase).Assembly // BenchmarkDotNet
+                        typeof(BenchmarkCase).Assembly, // BenchmarkDotNet
+                        typeof(Unsafe).Assembly // Unsafe
                     })
                 .Distinct();
     }
