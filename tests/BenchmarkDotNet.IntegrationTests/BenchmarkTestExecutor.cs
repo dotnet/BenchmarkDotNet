@@ -58,6 +58,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
             if (!config.GetLoggers().OfType<OutputLogger>().Any())
                 config = config.AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default);
+            if (!config.GetLoggers().OfType<ConsoleLogger>().Any())
+                config = config.AddLogger(ConsoleLogger.Default);
 
             if (!config.GetColumnProviders().Any())
                 config = config.AddColumnProvider(DefaultColumnProviders.Instance);

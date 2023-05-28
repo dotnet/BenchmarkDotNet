@@ -17,12 +17,17 @@ namespace BenchmarkDotNet.Helpers
 
         internal static string GetTraceFilePath(DiagnoserActionParameters details, DateTime creationTime, string fileExtension)
         {
-            string nameNoLimit = GetFilePathNoLimits(details, creationTime, fileExtension);
+            return GetFilePath(details, null, creationTime, fileExtension, "userheap.etl".Length);
+        }
 
-            // long paths can be enabled on Windows but it does not mean that ETW is going to work fine..
+        internal static string GetFilePath(DiagnoserActionParameters details, string? subfolder, DateTime? creationTime, string fileExtension, int reserve)
+        {
+            string nameNoLimit = GetFilePathNoLimits(details, subfolder, creationTime, fileExtension);
+
+            // long paths can be enabled on Windows but it does not mean that everything is going to work fine..
             // so we always use 260 as limit on Windows
             int limit =  RuntimeInformation.IsWindows()
-                ? WindowsOldPathLimit - "userheap.etl".Length // the session files get merged, they need to have same name (without extension)
+                ? WindowsOldPathLimit - reserve
                 : CommonSenseLimit;
 
             if (nameNoLimit.Length <= limit)
@@ -30,17 +35,17 @@ namespace BenchmarkDotNet.Helpers
                 return nameNoLimit;
             }
 
-            return GetLimitedFilePath(details, creationTime, fileExtension, limit);
+            return GetLimitedFilePath(details, subfolder, creationTime, fileExtension, limit);
         }
 
-        private static string GetFilePathNoLimits(DiagnoserActionParameters details, DateTime creationTime, string fileExtension)
+        private static string GetFilePathNoLimits(DiagnoserActionParameters details, string? subfolder, DateTime? creationTime, string fileExtension)
         {
             string fileName = $@"{FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type)}.{FullNameProvider.GetMethodName(details.BenchmarkCase)}";
 
-            return GetFilePath(fileName, details, creationTime, fileExtension);
+            return GetFilePath(fileName, details, subfolder, creationTime, fileExtension);
         }
 
-        private static string GetLimitedFilePath(DiagnoserActionParameters details, DateTime creationTime, string fileExtension, int limit)
+        private static string GetLimitedFilePath(DiagnoserActionParameters details, string? subfolder, DateTime? creationTime, string fileExtension, int limit)
         {
             string shortTypeName = FolderNameHelper.ToFolderName(details.BenchmarkCase.Descriptor.Type, includeNamespace: false);
             string methodName = details.BenchmarkCase.Descriptor.WorkloadMethod.Name;
@@ -50,7 +55,7 @@ namespace BenchmarkDotNet.Helpers
 
             string fileName = $@"{shortTypeName}.{methodName}{parameters}";
 
-            string finalResult = GetFilePath(fileName, details, creationTime, fileExtension);
+            string finalResult = GetFilePath(fileName, details, subfolder, creationTime, fileExtension);
 
             if (finalResult.Length > limit)
             {
@@ -61,20 +66,23 @@ namespace BenchmarkDotNet.Helpers
             return finalResult;
         }
 
-        private static string GetFilePath(string fileName, DiagnoserActionParameters details, DateTime creationTime, string fileExtension)
+        private static string GetFilePath(string fileName, DiagnoserActionParameters details, string? subfolder, DateTime? creationTime, string fileExtension)
         {
             // if we run for more than one toolchain, the output file name should contain the name too so we can differ net462 vs netcoreapp2.1 etc
             if (details.Config.GetJobs().Select(job => ToolchainExtensions.GetToolchain(job)).Distinct().Count() > 1)
                 fileName += $"-{details.BenchmarkCase.Job.Environment.Runtime?.Name ?? details.BenchmarkCase.GetToolchain()?.Name ?? details.BenchmarkCase.Job.Id}";
 
-            fileName += $"-{creationTime.ToString(BenchmarkRunnerClean.DateTimeFormat)}";
+            if (creationTime.HasValue)
+                fileName += $"-{creationTime.Value.ToString(BenchmarkRunnerClean.DateTimeFormat)}";
 
             fileName = FolderNameHelper.ToFolderName(fileName);
 
             if (!string.IsNullOrEmpty(fileExtension))
                 fileName = $"{fileName}.{fileExtension}";
 
-            return Path.Combine(details.Config.ArtifactsPath, fileName);
+            return subfolder != null
+                ? Path.Combine(details.Config.ArtifactsPath, subfolder, fileName)
+                : Path.Combine(details.Config.ArtifactsPath, fileName);
         }
     }
 }
