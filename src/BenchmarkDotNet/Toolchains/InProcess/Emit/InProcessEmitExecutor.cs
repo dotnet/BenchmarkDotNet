@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -20,6 +21,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
     public class InProcessEmitExecutor : IExecutor
     {
         private static readonly TimeSpan UnderDebuggerTimeout = TimeSpan.FromDays(1);
+        private static readonly TimeSpan UnderProfilerTimeout = TimeSpan.FromDays(1);
 
         /// <summary> Default timeout for in-process benchmarks. </summary>
         public static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(5);
@@ -64,9 +66,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
 
             runThread.IsBackground = true;
 
-            var timeout = HostEnvironmentInfo.GetCurrent().HasAttachedDebugger
-                ? UnderDebuggerTimeout
-                : ExecutionTimeout;
+            var timeout = GetTimeout(executeParameters);
 
             runThread.Start();
 
@@ -76,6 +76,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
                     "Prefer to use out-of-process toolchains for long-running benchmarks.");
 
             return ExecuteResult.FromRunResults(host.RunResults, exitCode);
+        }
+
+        private TimeSpan GetTimeout(ExecuteParameters executeParameters)
+        {
+            if (HostEnvironmentInfo.GetCurrent().HasAttachedDebugger)
+                return UnderDebuggerTimeout;
+            if (executeParameters.Diagnoser is IProfiler)
+                return UnderProfilerTimeout;
+            return ExecutionTimeout;
         }
 
         private int ExecuteCore(IHost host, ExecuteParameters parameters)
