@@ -57,7 +57,6 @@ namespace BenchmarkDotNet.Loggers
             Task.Run(ProcessDataBlocking);
 
             finished.WaitOne();
-            finished.Dispose();
         }
 
         private void OnProcessExited(object sender, EventArgs e)
