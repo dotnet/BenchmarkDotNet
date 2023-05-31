@@ -120,7 +120,7 @@ public class BuildContext : FrostingContext
             Framework = tfm,
             NoBuild = true,
             NoRestore = true,
-            Loggers = new[] { "trx", $"trx;LogFileName={logFile.FullPath}" }
+            Loggers = new[] { "trx", $"trx;LogFileName={logFile.FullPath}", "console;verbosity=detailed" }
         };
         // force the tool to not look for the .dll in platform-specific directory
         settings.EnvironmentVariables["Platform"] = "";
@@ -380,7 +380,8 @@ public class PackTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context)
     {
-        return context.IsOnAppVeyorAndBdnNightlyCiCd;
+        //return context.IsOnAppVeyorAndBdnNightlyCiCd;
+        return true;
     }
 
     public override void Run(BuildContext context)
