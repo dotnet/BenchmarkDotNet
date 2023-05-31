@@ -11,6 +11,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using Xunit;
@@ -19,7 +20,7 @@ namespace BenchmarkDotNet.Tests.Attributes
 {
     // In case of failed approval tests, use the following reporter:
     // [UseReporter(typeof(KDiffReporter))]
-    [UseReporter(typeof(XUnit2Reporter))]
+    [UseReporter(typeof(PatchedXUnit2Reporter))]
     [UseApprovalSubdirectory("ApprovedFiles")]
     [Collection("ApprovalTests")]
     public class ParamsAllValuesApprovalTests : IDisposable
