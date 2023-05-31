@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Portability;
 using Xunit;
 using Xunit.Abstractions;
@@ -49,6 +49,19 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = CreateConfig(toolchain);
 
             var summary = BenchmarkRunner.Run<CompletedWorkItemCount>(config);
+            try
+            {
+                summary.CheckPlatformLinkerIssues();
+            }
+            catch (MisconfiguredEnvironmentException e)
+            {
+                if (ContinuousIntegration.IsLocalRun())
+                {
+                    output.WriteLine(e.SkipMessage);
+                    return;
+                }
+                throw;
+            }
 
             AssertStats(summary, new Dictionary<string, (string metricName, double expectedValue)>
             {
@@ -77,6 +90,19 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = CreateConfig(toolchain);
 
             var summary = BenchmarkRunner.Run<LockContentionCount>(config);
+            try
+            {
+                summary.CheckPlatformLinkerIssues();
+            }
+            catch (MisconfiguredEnvironmentException e)
+            {
+                if (ContinuousIntegration.IsLocalRun())
+                {
+                    output.WriteLine(e.SkipMessage);
+                    return;
+                }
+                throw;
+            }
 
             AssertStats(summary, new Dictionary<string, (string metricName, double expectedValue)>
             {
