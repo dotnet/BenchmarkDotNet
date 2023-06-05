@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
@@ -75,6 +76,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             (bool isSuccess, IConfig config, CommandLineOptions options) result = default;
 
+            args = ExpandResponseFile(args).ToArray();
             using (var parser = CreateParser(logger))
             {
                 parser
@@ -84,6 +86,100 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
 
             return result;
+        }
+
+        private static IEnumerable<string> ExpandResponseFile(string[] args)
+        {
+            foreach (var arg in args)
+            {
+                if (arg.StartsWith("@"))
+                {
+                    var fileName = arg.Substring(1);
+                    if (File.Exists(fileName))
+                    {
+                        var lines = File.ReadAllLines(fileName);
+                        foreach (var line in lines)
+                        {
+                            foreach (var token in ConsumeTokens(line))
+                                yield return token;
+                        }
+                    }
+                }
+                else
+                {
+                    if (arg.Contains(' '))
+                    {
+                        // Workaround for CommandLine library issue with parsing these kind of args.
+                        yield return " " + arg;
+                    }
+                    else
+                    {
+                        yield return arg;
+                    }
+                }
+            }
+        }
+
+        private static IEnumerable<string> ConsumeTokens(string line)
+        {
+            bool insideQuotes = false;
+            var token = new StringBuilder();
+            for (int i = 0; i < line.Length; i++)
+            {
+                char currentChar = line[i];
+                if (currentChar == ' ' && !insideQuotes)
+                {
+                    if (token.Length > 0)
+                    {
+                        yield return GetToken();
+                        token = new StringBuilder();
+                    }
+
+                    continue;
+                }
+
+                if (currentChar == '"')
+                {
+                    insideQuotes = !insideQuotes;
+                    continue;
+                }
+
+                if (currentChar == '\\' && insideQuotes)
+                {
+                    if (line[i + 1] == '"')
+                    {
+                        insideQuotes = false;
+                        i++;
+                        continue;
+                    }
+
+                    if (line[i + 1] == '\\')
+                    {
+                        token.Append('\\');
+                        i++;
+                        continue;
+                    }
+                }
+
+                token.Append(currentChar);
+            }
+
+            if (token.Length > 0)
+            {
+                yield return GetToken();
+            }
+
+            string GetToken()
+            {
+                var result = token.ToString();
+                if (result.Contains(' '))
+                {
+                    // Workaround for CommandLine library issue with parsing these kind of args.
+                    return " " + result;
+                }
+
+                return result;
+            }
         }
 
         private static Parser CreateParser(ILogger logger)
