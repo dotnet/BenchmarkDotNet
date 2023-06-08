@@ -86,18 +86,7 @@ namespace BenchmarkDotNet.Code
                 : null;
 
         public override string OverheadImplementation
-        {
-            get
-            {
-                var type = WorkloadMethodReturnType;
-                // ByRefLike types and pointers use default, everything else uses Unsafe.SkipInit.
-                if (type.IsByRefLike() || type.IsPointer)
-                {
-                    return $"return default({type.GetCorrectCSharpTypeName()});";
-                }
-                return $"System.Runtime.CompilerServices.Unsafe.SkipInit(out {type.GetCorrectCSharpTypeName()} value);\nreturn value;";
-            }
-        }
+            => $"return default({WorkloadMethodReturnType.GetCorrectCSharpTypeName()});";
 
         public override string ReturnsDefinition
             => Consumer.IsConsumable(WorkloadMethodReturnType) || Consumer.HasConsumableField(WorkloadMethodReturnType, out _)

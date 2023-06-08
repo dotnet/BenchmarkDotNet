@@ -78,48 +78,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             ilBuilder.Emit(OpCodes.Stfld, consumerField);
         }
 
-        public override void EmitOverheadImplementation(ILGenerator ilBuilder, Type returnType)
-        {
-            // ByRefLike types and pointers use default, everything else uses Unsafe.SkipInit.
-            if (returnType.IsByRefLike() || returnType.IsPointer)
-            {
-                /*
-                    // return default;
-                    IL_0000: ldc.i4.0
-                    IL_0001: ret
-                 */
-                // optional local if default(T) uses .initobj
-                var optionalLocalForInitobj = ilBuilder.DeclareOptionalLocalForReturnDefault(returnType);
-                ilBuilder.EmitReturnDefault(returnType, optionalLocalForInitobj);
-                return;
-            }
-
-            /*
-                // System.Runtime.CompilerServices.Unsafe.SkipInit(out BenchmarkDotNet.Samples.CustomWithConsumable value);
-                // return value;
-                .locals init (
-                    [0] valuetype BenchmarkDotNet.Samples.CustomWithConsumable
-                )
-
-                IL_0000: ldloca.s 0
-                IL_0002: call void Unsafe::SkipInit<valuetype BenchmarkDotNet.Samples.CustomWithConsumable>(!!0&)
-                IL_0007: ldloc.0
-                IL_0008: ret
-             */
-            var local = ilBuilder.DeclareLocal(returnType);
-            ilBuilder.EmitLdloca(local);
-            ilBuilder.Emit(OpCodes.Call, GetGenericSkipInitMethod(returnType));
-            ilBuilder.EmitLdloc(local);
-            ilBuilder.Emit(OpCodes.Ret);
-        }
-
-        private static MethodInfo GetGenericSkipInitMethod(Type skipInitType)
-        {
-            return typeof(Unsafe).GetMethods(BindingFlags.Static | BindingFlags.Public)
-                .Single(m => m.Name == nameof(Unsafe.SkipInit) && m.IsGenericMethodDefinition && m.ReturnType == typeof(void) && m.GetParameters().Single().IsOut)
-                .MakeGenericMethod(skipInitType);
-        }
-
         protected override void EmitActionBeforeCallOverride(ILGenerator ilBuilder)
         {
             /*
