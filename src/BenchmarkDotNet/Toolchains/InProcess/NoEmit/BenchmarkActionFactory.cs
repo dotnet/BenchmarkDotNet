@@ -114,7 +114,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 if (isUsingAsyncKeyword)
                     throw new NotSupportedException("Async void is not supported by design.");
             }
-            else if (resultType.IsByRefLike() || resultType?.GetElementType()?.IsByRefLike() == true)
+            else if (resultType.IsByRefLike() || resultType.GetElementType()?.IsByRefLike() == true)
             {
                 throw new NotSupportedException("InProcessNoEmitToolchain does not support consuming ByRefLike return types.");
             }

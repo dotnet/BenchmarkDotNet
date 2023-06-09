@@ -184,17 +184,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 InvokeMultiple = InvokeMultipleHardcoded;
             }
 
-            private static T OverheadStatic()
-            {
-                Unsafe.SkipInit(out T value);
-                return value;
-            }
+            private static T OverheadStatic() => default;
 
-            private T OverheadInstance()
-            {
-                Unsafe.SkipInit(out T value);
-                return value;
-            }
+            private T OverheadInstance() => default;
 
             private void InvokeSingleHardcoded() => consumer.Consume(callback());
 
@@ -274,11 +266,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 InvokeMultiple = InvokeMultipleHardcoded;
             }
 
-            private T Overhead()
-            {
-                Unsafe.SkipInit(out T value);
-                return value;
-            }
+            private T Overhead() => default;
 
             // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
             private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
@@ -362,11 +350,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 InvokeMultiple = InvokeMultipleHardcoded;
             }
 
-            private T Overhead()
-            {
-                Unsafe.SkipInit(out T value);
-                return value;
-            }
+            private T Overhead() => default;
 
             // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
             private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
