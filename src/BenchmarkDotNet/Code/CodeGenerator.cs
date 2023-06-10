@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Code
             {
                 var benchmark = buildInfo.BenchmarkCase;
 
-                var provider = GetDeclarationsProvider(benchmark.Descriptor);
+                var provider = GetDeclarationsProvider(benchmark);
 
                 string passArguments = GetPassArguments(benchmark);
 
@@ -53,6 +53,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName)
                     .Replace("$IterationCleanupMethodName$", provider.IterationCleanupMethodName)
                     .Replace("$OverheadImplementation$", provider.OverheadImplementation)
+                    .Replace("$OverheadDefaultValueHolderField$", provider.OverheadDefaultValueHolderDeclaration)
                     .Replace("$ConsumeField$", provider.ConsumeField)
                     .Replace("$JobSetDefinition$", GetJobsSetDefinition(benchmark))
                     .Replace("$ParamsContent$", GetParamsContent(benchmark))
@@ -147,19 +148,19 @@ namespace BenchmarkDotNet.Code
                 Replace("; ", ";\n                ");
         }
 
-        private static DeclarationsProvider GetDeclarationsProvider(Descriptor descriptor)
+        private static DeclarationsProvider GetDeclarationsProvider(BenchmarkCase benchmark)
         {
-            var method = descriptor.WorkloadMethod;
+            var method = benchmark.Descriptor.WorkloadMethod;
 
             if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask))
             {
-                return new TaskDeclarationsProvider(descriptor);
+                return new TaskDeclarationsProvider(benchmark);
             }
             if (method.ReturnType.GetTypeInfo().IsGenericType
                 && (method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
                     || method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)))
             {
-                return new GenericTaskDeclarationsProvider(descriptor);
+                return new GenericTaskDeclarationsProvider(benchmark);
             }
 
             if (method.ReturnType == typeof(void))
@@ -170,19 +171,19 @@ namespace BenchmarkDotNet.Code
                     throw new NotSupportedException("async void is not supported by design");
                 }
 
-                return new VoidDeclarationsProvider(descriptor);
+                return new VoidDeclarationsProvider(benchmark);
             }
 
             if (method.ReturnType.IsByRef)
             {
                 // System.Runtime.CompilerServices.IsReadOnlyAttribute is part of .NET Standard 2.1, we can't use it here..
                 if (method.ReturnParameter.GetCustomAttributes().Any(attribute => attribute.GetType().Name == "IsReadOnlyAttribute"))
-                    return new ByReadOnlyRefDeclarationsProvider(descriptor);
+                    return new ByReadOnlyRefDeclarationsProvider(benchmark);
                 else
-                    return new ByRefDeclarationsProvider(descriptor);
+                    return new ByRefDeclarationsProvider(benchmark);
             }
 
-            return new NonVoidDeclarationsProvider(descriptor);
+            return new NonVoidDeclarationsProvider(benchmark);
         }
 
         // internal for tests

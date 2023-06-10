@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Helpers.Reflection.Emit;
+﻿using BenchmarkDotNet.Engines;
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -8,14 +8,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     internal class ByRefConsumeEmitter : ConsumableConsumeEmitter
     {
-        private FieldBuilder overheadDefaultValueHolderField;
-
         public ByRefConsumeEmitter(ConsumableTypeInfo consumableTypeInfo) : base(consumableTypeInfo) { }
 
         protected override void OnDefineFieldsOverride(TypeBuilder runnableBuilder)
         {
-            base.OnDefineFieldsOverride(runnableBuilder);
-
             var nonRefType = ConsumableInfo.WorkloadMethodReturnType.GetElementType();
             if (nonRefType == null)
                 throw new InvalidOperationException($"Bug: type {ConsumableInfo.WorkloadMethodReturnType} is non-ref type.");
@@ -23,6 +19,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             overheadDefaultValueHolderField = runnableBuilder.DefineField(
                 OverheadDefaultValueHolderFieldName,
                 nonRefType, FieldAttributes.Private);
+
+            consumerField = runnableBuilder.DefineField(ConsumerFieldName, typeof(Consumer), FieldAttributes.Private);
         }
 
         protected override void EmitDisassemblyDiagnoserReturnDefaultOverride(ILGenerator ilBuilder)

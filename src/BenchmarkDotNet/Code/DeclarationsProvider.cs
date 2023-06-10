@@ -14,9 +14,10 @@ namespace BenchmarkDotNet.Code
         // "GlobalSetup" or "GlobalCleanup" methods are optional, so default to an empty delegate, so there is always something that can be invoked
         private const string EmptyAction = "() => { }";
 
-        protected readonly Descriptor Descriptor;
+        protected readonly BenchmarkCase Benchmark;
+        protected Descriptor Descriptor => Benchmark.Descriptor;
 
-        internal DeclarationsProvider(Descriptor descriptor) => Descriptor = descriptor;
+        internal DeclarationsProvider(BenchmarkCase benchmark) => Benchmark = benchmark;
 
         public string OperationsPerInvoke => Descriptor.OperationsPerInvoke.ToString();
 
@@ -47,6 +48,8 @@ namespace BenchmarkDotNet.Code
 
         public abstract string OverheadImplementation { get; }
 
+        public virtual string OverheadDefaultValueHolderDeclaration => null;
+
         private string GetMethodName(MethodInfo method)
         {
             if (method == null)
@@ -69,7 +72,7 @@ namespace BenchmarkDotNet.Code
 
     internal class VoidDeclarationsProvider : DeclarationsProvider
     {
-        public VoidDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
+        public VoidDeclarationsProvider(BenchmarkCase benchmark) : base(benchmark) { }
 
         public override string ReturnsDefinition => "RETURNS_VOID";
 
@@ -78,7 +81,12 @@ namespace BenchmarkDotNet.Code
 
     internal class NonVoidDeclarationsProvider : DeclarationsProvider
     {
-        public NonVoidDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
+        private readonly bool overheadReturnsDefault;
+
+        public NonVoidDeclarationsProvider(BenchmarkCase benchmark) : base(benchmark)
+        {
+            overheadReturnsDefault = WorkloadMethodReturnType.IsByRefLike() || WorkloadMethodReturnType.IsDefaultFasterThanField(Benchmark.GetRuntime().RuntimeMoniker == Jobs.RuntimeMoniker.Mono);
+        }
 
         public override string ConsumeField
             => !Consumer.IsConsumable(WorkloadMethodReturnType) && Consumer.HasConsumableField(WorkloadMethodReturnType, out var field)
@@ -86,7 +94,22 @@ namespace BenchmarkDotNet.Code
                 : null;
 
         public override string OverheadImplementation
-            => $"return default({WorkloadMethodReturnType.GetCorrectCSharpTypeName()});";
+            => overheadReturnsDefault
+                ? $"return default({WorkloadMethodReturnType.GetCorrectCSharpTypeName()});"
+                : "return overheadDefaultValueHolder;";
+
+        public override string OverheadDefaultValueHolderDeclaration
+        {
+            get
+            {
+                if (overheadReturnsDefault)
+                {
+                    return null;
+                }
+                string typeName = WorkloadMethodReturnType.GetCorrectCSharpTypeName();
+                return $"private {typeName} overheadDefaultValueHolder = default({typeName});";
+            }
+        }
 
         public override string ReturnsDefinition
             => Consumer.IsConsumable(WorkloadMethodReturnType) || Consumer.HasConsumableField(WorkloadMethodReturnType, out _)
@@ -96,13 +119,22 @@ namespace BenchmarkDotNet.Code
 
     internal class ByRefDeclarationsProvider : NonVoidDeclarationsProvider
     {
-        public ByRefDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
+        public ByRefDeclarationsProvider(BenchmarkCase benchmark) : base(benchmark) { }
 
         public override string WorkloadMethodReturnTypeName => base.WorkloadMethodReturnTypeName.Replace("&", string.Empty);
 
         public override string ConsumeField => null;
 
         public override string OverheadImplementation => $"return ref overheadDefaultValueHolder;";
+
+        public override string OverheadDefaultValueHolderDeclaration
+        {
+            get
+            {
+                string typeName = WorkloadMethodReturnType.GetCorrectCSharpTypeName();
+                return $"private {typeName} overheadDefaultValueHolder = default({typeName});";
+            }
+        }
 
         public override string ReturnsDefinition => "RETURNS_BYREF";
 
@@ -111,14 +143,14 @@ namespace BenchmarkDotNet.Code
 
     internal class ByReadOnlyRefDeclarationsProvider : ByRefDeclarationsProvider
     {
-        public ByReadOnlyRefDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
+        public ByReadOnlyRefDeclarationsProvider(BenchmarkCase benchmark) : base(benchmark) { }
 
         public override string WorkloadMethodReturnTypeModifiers => "ref readonly";
     }
 
     internal class TaskDeclarationsProvider : VoidDeclarationsProvider
     {
-        public TaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
+        public TaskDeclarationsProvider(BenchmarkCase benchmark) : base(benchmark) { }
 
         // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way,
         // and will eventually throw actual exception, not aggregated one
@@ -135,7 +167,7 @@ namespace BenchmarkDotNet.Code
     /// </summary>
     internal class GenericTaskDeclarationsProvider : NonVoidDeclarationsProvider
     {
-        public GenericTaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
+        public GenericTaskDeclarationsProvider(BenchmarkCase benchmark) : base(benchmark) { }
 
         protected override Type WorkloadMethodReturnType => Descriptor.WorkloadMethod.ReturnType.GetTypeInfo().GetGenericArguments().Single();
 

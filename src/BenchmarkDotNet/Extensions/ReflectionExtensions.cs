@@ -211,5 +211,43 @@ namespace BenchmarkDotNet.Extensions
         internal static bool IsByRefLike(this Type type)
             // Type.IsByRefLike is not available in netstandard2.0.
             => type.IsValueType && type.CustomAttributes.Any(attr => attr.AttributeType.FullName == "System.Runtime.CompilerServices.IsByRefLikeAttribute");
+
+        // Struct size of 64 bytes was observed to be the point at which `default` may be slower in classic Mono, from benchmarks.
+        // Between 64 and 128 bytes, both methods may be about the same speed, depending on the complexity of the struct.
+        // For all types > 128 bytes, reading from a field is faster than `default`.
+        private const int MonoDefaultCutoffSize = 64;
+
+        // We use the fastest possible method to return a value of the workload return type in order to prevent the overhead method from taking longer than the workload method.
+        // Classic Mono runs `default` slower than reading a field for very large structs. `default` is faster for all types in all other runtimes.
+        internal static bool IsDefaultFasterThanField(this Type type, bool isClassicMono)
+            => !isClassicMono || type.SizeOfDefault() <= MonoDefaultCutoffSize;
+
+        private static int SizeOfDefault(this Type type) => type switch
+        {
+            _ when type == typeof(byte) || type == typeof(sbyte)
+                => 1,
+
+            _ when type == typeof(short) || type == typeof(ushort) || type == typeof(char)
+                => 2,
+
+            _ when type == typeof(int) || type == typeof(uint)
+                => 4,
+
+            _ when type == typeof(long) || type == typeof(ulong)
+                => 8,
+
+            _ when type.IsPointer || type.IsClass || type.IsInterface || type == typeof(IntPtr) || type == typeof(UIntPtr)
+                => IntPtr.Size,
+
+            _ when type.IsEnum
+                => Enum.GetUnderlyingType(type).SizeOfDefault(),
+
+            // Note: the runtime pads structs for alignment purposes, and it enforces a minimum of 1 byte, even for empty structs,
+            // but we don't need to worry about either of those cases for the purpose this serves (calculating whether to use `default` or read a field in Mono for the overhead method).
+            _ when type.IsValueType
+                => type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Aggregate(0, (count, field) => field.FieldType.SizeOfDefault() + count),
+
+            _ => throw new Exception("Unknown type size: " + type.FullName)
+        };
     }
 }

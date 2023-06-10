@@ -2,25 +2,35 @@
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
+using BenchmarkDotNet.Portability;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
     internal class ConsumableConsumeEmitter : ConsumeEmitter
     {
-        private FieldBuilder consumerField;
+        protected FieldBuilder overheadDefaultValueHolderField;
+        protected FieldBuilder consumerField;
         private LocalBuilder disassemblyDiagnoserLocal;
         private LocalBuilder resultLocal;
+        private readonly bool overheadReturnsDefault;
 
         public ConsumableConsumeEmitter(ConsumableTypeInfo consumableTypeInfo) : base(consumableTypeInfo)
         {
+            overheadReturnsDefault = consumableTypeInfo.WorkloadMethodReturnType.IsByRefLike() || consumableTypeInfo.WorkloadMethodReturnType.IsDefaultFasterThanField(RuntimeInformation.IsOldMono);
         }
 
         protected override void OnDefineFieldsOverride(TypeBuilder runnableBuilder)
         {
+            if (!overheadReturnsDefault)
+            {
+                overheadDefaultValueHolderField = runnableBuilder.DefineField(
+                    RunnableConstants.OverheadDefaultValueHolderFieldName,
+                    ConsumableInfo.WorkloadMethodReturnType, FieldAttributes.Private);
+            }
+
             consumerField = runnableBuilder.DefineField(RunnableConstants.ConsumerFieldName, typeof(Consumer), FieldAttributes.Private);
         }
 
@@ -76,6 +86,32 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             ilBuilder.Emit(OpCodes.Ldarg_0);
             ilBuilder.Emit(OpCodes.Newobj, ctor);
             ilBuilder.Emit(OpCodes.Stfld, consumerField);
+        }
+
+        public override void EmitOverheadImplementation(ILGenerator ilBuilder, Type returnType)
+        {
+            if (overheadReturnsDefault)
+            {
+                /*
+                    // return default;
+                    IL_0000: ldc.i4.0
+                    IL_0001: ret
+                 */
+                // optional local if default(T) uses .initobj
+                var optionalLocalForInitobj = ilBuilder.DeclareOptionalLocalForReturnDefault(returnType);
+                ilBuilder.EmitReturnDefault(returnType, optionalLocalForInitobj);
+                return;
+            }
+
+            /*
+                // return overheadDefaultValueHolder;
+                IL_0000: ldarg.0
+                IL_0001: ldfld int32 C::'field'
+                IL_0006: ret
+             */
+            ilBuilder.Emit(OpCodes.Ldarg_0);
+            ilBuilder.Emit(OpCodes.Ldfld, overheadDefaultValueHolderField);
+            ilBuilder.Emit(OpCodes.Ret);
         }
 
         protected override void EmitActionBeforeCallOverride(ILGenerator ilBuilder)
