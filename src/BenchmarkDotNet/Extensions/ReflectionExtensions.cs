@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Extensions
@@ -242,12 +243,50 @@ namespace BenchmarkDotNet.Extensions
             _ when type.IsEnum
                 => Enum.GetUnderlyingType(type).SizeOfDefault(),
 
-            // Note: the runtime pads structs for alignment purposes, and it enforces a minimum of 1 byte, even for empty structs,
-            // but we don't need to worry about either of those cases for the purpose this serves (calculating whether to use `default` or read a field in Mono for the overhead method).
             _ when type.IsValueType
-                => type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Aggregate(0, (count, field) => field.FieldType.SizeOfDefault() + count),
+                => type.SizeOfDefaultStruct(),
 
             _ => throw new Exception("Unknown type size: " + type.FullName)
         };
+
+        private static int SizeOfDefaultStruct(this Type structType)
+        {
+            // Find the offset of the highest field, so we only have to calculate the size of it + its offset.
+            int fieldOffset = int.MinValue;
+            FieldInfo maxField = null;
+            bool containsReference = false;
+            foreach (var field in structType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            {
+                var fieldType = field.FieldType;
+                containsReference |= fieldType.IsPointer || fieldType.IsClass || fieldType.IsInterface;
+                int offset = field.GetFieldOffset();
+                if (offset > fieldOffset)
+                {
+                    fieldOffset = offset;
+                    maxField = field;
+                }
+            }
+            if (maxField == null)
+            {
+                // Runtime enforces minimum struct size as 1 byte.
+                return 1;
+            }
+            // Runtime pads struct for alignment purposes if it contains a reference.
+            int structSize = maxField.FieldType.SizeOfDefault() + fieldOffset;
+            return containsReference
+                ? GetPaddedStructSize(structSize)
+                : structSize;
+        }
+
+        // Code obtained from https://stackoverflow.com/a/56512720
+        private static int GetFieldOffset(this FieldInfo fi) => Marshal.ReadInt32(fi.FieldHandle.Value + (4 + IntPtr.Size)) & 0xFFFFFF;
+
+        private static int GetPaddedStructSize(int fieldsSize)
+        {
+            Math.DivRem(fieldsSize, IntPtr.Size, out int padding);
+            return padding == 0
+                ? fieldsSize
+                : fieldsSize - padding + IntPtr.Size;
+        }
     }
 }
