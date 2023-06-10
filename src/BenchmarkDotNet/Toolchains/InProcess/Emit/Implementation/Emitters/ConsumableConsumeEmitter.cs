@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         public ConsumableConsumeEmitter(ConsumableTypeInfo consumableTypeInfo) : base(consumableTypeInfo)
         {
-            overheadReturnsDefault = consumableTypeInfo.WorkloadMethodReturnType.IsByRefLike() || consumableTypeInfo.WorkloadMethodReturnType.IsDefaultFasterThanField(RuntimeInformation.IsOldMono);
+            overheadReturnsDefault = consumableTypeInfo.WorkloadMethodReturnType.IsDefaultFasterThanField(RuntimeInformation.IsOldMono);
         }
 
         protected override void OnDefineFieldsOverride(TypeBuilder runnableBuilder)

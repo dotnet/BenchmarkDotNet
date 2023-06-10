@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Code
 
         public NonVoidDeclarationsProvider(BenchmarkCase benchmark) : base(benchmark)
         {
-            overheadReturnsDefault = WorkloadMethodReturnType.IsByRefLike() || WorkloadMethodReturnType.IsDefaultFasterThanField(Benchmark.GetRuntime().RuntimeMoniker == Jobs.RuntimeMoniker.Mono);
+            overheadReturnsDefault = WorkloadMethodReturnType.IsDefaultFasterThanField(Benchmark.GetRuntime().RuntimeMoniker == Jobs.RuntimeMoniker.Mono);
         }
 
         public override string ConsumeField

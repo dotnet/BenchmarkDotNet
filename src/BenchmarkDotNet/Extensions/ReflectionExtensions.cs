@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
 
@@ -219,74 +220,25 @@ namespace BenchmarkDotNet.Extensions
         private const int MonoDefaultCutoffSize = 64;
 
         // We use the fastest possible method to return a value of the workload return type in order to prevent the overhead method from taking longer than the workload method.
-        // Classic Mono runs `default` slower than reading a field for very large structs. `default` is faster for all types in all other runtimes.
         internal static bool IsDefaultFasterThanField(this Type type, bool isClassicMono)
-            => !isClassicMono || type.SizeOfDefault() <= MonoDefaultCutoffSize;
+                // Classic Mono runs `default` slower than reading a field for very large structs. `default` is faster for all types in all other runtimes.
+            => !isClassicMono
+                // ByRefLike and pointer cannot be used as generic arguments, so check for them before getting the size.
+                || type.IsByRefLike() || type.IsPointer
+                // We don't need to check the size for primitives and reference types.
+                || type.IsPrimitive || type.IsEnum || !type.IsValueType
+                || SizeOf(type) <= MonoDefaultCutoffSize;
 
-        private static int SizeOfDefault(this Type type) => type switch
+        private static int SizeOf(Type type)
         {
-            _ when type == typeof(byte) || type == typeof(sbyte)
-                => 1,
-
-            _ when type == typeof(short) || type == typeof(ushort) || type == typeof(char)
-                => 2,
-
-            _ when type == typeof(int) || type == typeof(uint)
-                => 4,
-
-            _ when type == typeof(long) || type == typeof(ulong)
-                => 8,
-
-            _ when type.IsPointer || type.IsClass || type.IsInterface || type == typeof(IntPtr) || type == typeof(UIntPtr)
-                => IntPtr.Size,
-
-            _ when type.IsEnum
-                => Enum.GetUnderlyingType(type).SizeOfDefault(),
-
-            _ when type.IsValueType
-                => type.SizeOfDefaultStruct(),
-
-            _ => throw new Exception("Unknown type size: " + type.FullName)
-        };
-
-        private static int SizeOfDefaultStruct(this Type structType)
-        {
-            // Find the offset of the highest field, so we only have to calculate the size of it + its offset.
-            int fieldOffset = int.MinValue;
-            FieldInfo maxField = null;
-            bool containsReference = false;
-            foreach (var field in structType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-            {
-                var fieldType = field.FieldType;
-                containsReference |= fieldType.IsPointer || fieldType.IsClass || fieldType.IsInterface;
-                int offset = field.GetFieldOffset();
-                if (offset > fieldOffset)
-                {
-                    fieldOffset = offset;
-                    maxField = field;
-                }
-            }
-            if (maxField == null)
-            {
-                // Runtime enforces minimum struct size as 1 byte.
-                return 1;
-            }
-            // Runtime pads struct for alignment purposes if it contains a reference.
-            int structSize = maxField.FieldType.SizeOfDefault() + fieldOffset;
-            return containsReference
-                ? GetPaddedStructSize(structSize)
-                : structSize;
+            return (int) GetGenericSizeOfMethod(type).Invoke(null, null);
         }
 
-        // Code obtained from https://stackoverflow.com/a/56512720
-        private static int GetFieldOffset(this FieldInfo fi) => Marshal.ReadInt32(fi.FieldHandle.Value + (4 + IntPtr.Size)) & 0xFFFFFF;
-
-        private static int GetPaddedStructSize(int fieldsSize)
+        private static MethodInfo GetGenericSizeOfMethod(Type type)
         {
-            Math.DivRem(fieldsSize, IntPtr.Size, out int padding);
-            return padding == 0
-                ? fieldsSize
-                : fieldsSize - padding + IntPtr.Size;
+            return typeof(Unsafe).GetMethods(BindingFlags.Static | BindingFlags.Public)
+                .Single(m => m.Name == nameof(Unsafe.SizeOf) && m.IsGenericMethodDefinition && m.ReturnType == typeof(int) && m.GetParameters().Length == 0)
+                .MakeGenericMethod(type);
         }
     }
 }
