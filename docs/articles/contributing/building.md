@@ -4,7 +4,7 @@ There are two recommended options to build BenchmarkDotNet from source:
 
 ## Visual Studio
 
-- [Visual Studio](https://www.visualstudio.com/downloads/) (Community, Professional, Enterprise) with .NET 4.6.1 SDK and F# support.
+- [Visual Studio](https://www.visualstudio.com/downloads/) (Community, Professional, Enterprise) with .NET 4.6.2 SDK and F# support.
 
 - [.NET 5 SDK](https://dotnet.microsoft.com/download).
 
