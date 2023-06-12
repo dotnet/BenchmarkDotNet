@@ -4,12 +4,8 @@
       "src": [
         {
           "files": [
-            "src/BenchmarkDotNet/*.csproj",
-            "src/BenchmarkDotNet.Annotations/*.csproj"
-          ],
-          "exclude": [
-            "**/obj/**",
-            "**/bin/**"
+            "src/BenchmarkDotNet/bin/Release/netstandard2.0/BenchmarkDotNet.dll",
+            "src/BenchmarkDotNet/bin/Release/netstandard2.0/BenchmarkDotNet.Annotations.dll"
           ],
           "src": ".."
         }
