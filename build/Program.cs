@@ -198,44 +198,9 @@ public class BuildContext : FrostingContext
         
         var currentDirectory = Directory.GetCurrentDirectory();
         Directory.SetCurrentDirectory(docfxJson.GetDirectory().FullPath);
-        DocfxGenerateMetadata(docfxJson.FullPath);
+        Microsoft.DocAsCode.Dotnet.DotnetApiCatalog.GenerateManagedReferenceYamlFiles(docfxJson.FullPath).Wait();
         Microsoft.DocAsCode.Docset.Build(docfxJson.FullPath).Wait();
         Directory.SetCurrentDirectory(currentDirectory);
-    }
-
-    private void DocfxGenerateMetadata(string configPath)
-    {
-        Microsoft.DocAsCode.Common.Logger.RegisterListener(new Microsoft.DocAsCode.Common.ConsoleLogListener());
-        try
-        {
-            string directoryName = System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(configPath));
-            Newtonsoft.Json.Linq.JToken jtoken;
-            if (!Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText(configPath)).TryGetValue("metadata", out jtoken))
-                return;
-
-            var dotnetApiCatalogType = typeof(Microsoft.DocAsCode.Dotnet.DotnetApiOptions).Assembly.GetTypes()
-                .First(t => t.Name == "DotnetApiCatalog");
-            var dotnetApiCatalogExecMethod = dotnetApiCatalogType.GetMethod("Exec", BindingFlags.Static | BindingFlags.NonPublic);
-            var metadataJsonConfigType = typeof(Microsoft.DocAsCode.Dotnet.DotnetApiOptions).Assembly.GetTypes()
-                .First(t => t.Name == "MetadataJsonConfig");
-
-            var config = jtoken.ToObject(metadataJsonConfigType, Microsoft.DocAsCode.Common.JsonUtility.DefaultSerializer.Value);
-
-            var execTask = (Task)dotnetApiCatalogExecMethod.Invoke(null, new[]
-            {
-                config,
-                new Microsoft.DocAsCode.Dotnet.DotnetApiOptions(),
-                directoryName,
-                null
-            });
-            execTask.Wait();
-        }
-        finally
-        {
-            Microsoft.DocAsCode.Common.Logger.Flush();
-            Microsoft.DocAsCode.Common.Logger.PrintSummary();
-            Microsoft.DocAsCode.Common.Logger.UnregisterAllListeners();
-        }
     }
 
     public void GenerateRedirects()
