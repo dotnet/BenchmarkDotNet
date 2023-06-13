@@ -50,12 +50,12 @@
     "fileMetadataFiles": [],
     "template": [
       "default",
+      "modern",
       "template"
     ],
     "xrefService": [
       "https://xref.docs.microsoft.com/query?uid={uid}"
     ],
-    "postProcessors": ["ExtractSearchIndex"],
     "markdownEngineName": "markdig",
     "noLangKeyword": false,
     "keepFileLink": false,
@@ -67,7 +67,8 @@
       "_appFooter" : "Copyright &copy; 2013–2023 .NET Foundation and contributors",
       "_appLogoPath" : "logo/icon.svg",
       "_appFaviconPath": "logo/icon-32.png",
-      "_enableSearch": false
+      "_enableSearch": true,
+      "_disableContribution": true
     },
     "sitemap":
     {

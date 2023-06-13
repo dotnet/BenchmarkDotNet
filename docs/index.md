@@ -1,13 +1,13 @@
 ---
 title: Home
 ---
-<h3 align="center">
+<div align="center">
 
   ![](logo/logo-wide.png)
 
-</h3>
+</div>
 
-<h3 align="center">
+<div align="center">
 
   [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/)
   [![Downloads](https://img.shields.io/nuget/dt/benchmarkdotnet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/)
@@ -17,9 +17,9 @@ title: Home
   [![GitHub](https://img.shields.io/badge/source%20code-GitHub-informational)](https://github.com/dotnet/BenchmarkDotNet)
   [![Twitter](https://img.shields.io/twitter/follow/BenchmarkDotNet?style=social)](https://twitter.com/BenchmarkDotNet)
 
-</h3>
+</div>
 
-<h3 align="center">
+<div align="center" style="font-size: 150%;margin-bottom: 20px">
   <a href="#features">Features</a>
   <span> · </span>
   <a href="https://benchmarkdotnet.org/articles/guides/getting-started.html">Getting started</a>
@@ -27,7 +27,7 @@ title: Home
   <a href="https://benchmarkdotnet.org/articles/overview.html">Documentation</a>
   <span> · </span>
   <a href="#learn-more-about-benchmarking">Learn more about benchmarking</a>
-</h3>
+</div>
 
 **BenchmarkDotNet** helps you to transform methods into benchmarks, track their performance, and share reproducible measurement experiments.
 It's no harder than writing unit tests!
