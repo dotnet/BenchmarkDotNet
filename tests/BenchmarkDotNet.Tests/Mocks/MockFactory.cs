@@ -32,6 +32,21 @@ namespace BenchmarkDotNet.Tests.Mocks
                 ImmutableArray<IColumnHidingRule>.Empty);
         }
 
+        public static Summary CreateSummary(IConfig config, params Type[] benchmarkTypes)
+        {
+            var runInfos = benchmarkTypes.Select(type => BenchmarkConverter.TypeToBenchmarks(type, config));
+            return new Summary(
+                "MockSummary",
+                runInfos.SelectMany(i => i.BenchmarksCases.Select((benchmark, index) => CreateReport(benchmark, 5, (index + 1) * 100))).ToImmutableArray(),
+                new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
+                string.Empty,
+                string.Empty,
+                TimeSpan.FromMinutes(1),
+                TestCultureInfo.Instance,
+                ImmutableArray<ValidationError>.Empty,
+                ImmutableArray<IColumnHidingRule>.Empty);
+        }
+
         public static Summary CreateSummary(IConfig config) => new Summary(
                 "MockSummary",
                 CreateReports(config),

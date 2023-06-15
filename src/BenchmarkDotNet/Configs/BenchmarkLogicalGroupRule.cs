@@ -2,6 +2,6 @@
 {
     public enum BenchmarkLogicalGroupRule
     {
-        ByMethod, ByJob, ByParams, ByCategory
+        ByMethod, ByJob, ByParams, ByCategory, ByType
     }
 }

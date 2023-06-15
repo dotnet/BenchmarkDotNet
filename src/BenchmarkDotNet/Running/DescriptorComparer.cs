@@ -5,14 +5,14 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
 {
-    internal class DescriptorComparer : IComparer<Descriptor>
+    internal class MethodComparer : IComparer<Descriptor>
     {
-        [PublicAPI] public static readonly IComparer<Descriptor> Alphabetical = new DescriptorComparer(MethodOrderPolicy.Alphabetical);
-        [PublicAPI] public static readonly IComparer<Descriptor> Declared = new DescriptorComparer(MethodOrderPolicy.Declared);
+        [PublicAPI] public static readonly IComparer<Descriptor> Alphabetical = new MethodComparer(MethodOrderPolicy.Alphabetical);
+        [PublicAPI] public static readonly IComparer<Descriptor> Declared = new MethodComparer(MethodOrderPolicy.Declared);
 
         private readonly MethodOrderPolicy methodOrderPolicy;
 
-        public DescriptorComparer(MethodOrderPolicy methodOrderPolicy)
+        public MethodComparer(MethodOrderPolicy methodOrderPolicy)
         {
             this.methodOrderPolicy = methodOrderPolicy;
         }
@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Running
             switch (methodOrderPolicy)
             {
                 case MethodOrderPolicy.Alphabetical:
-                    return string.CompareOrdinal(x.DisplayInfo, y.DisplayInfo);
+                    return string.CompareOrdinal(x.WorkloadMethodDisplayInfo, y.WorkloadMethodDisplayInfo);
                 case MethodOrderPolicy.Declared:
                     return x.MethodIndex - y.MethodIndex;
                 default:

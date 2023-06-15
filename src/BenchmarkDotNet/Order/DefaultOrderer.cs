@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
@@ -20,7 +21,8 @@ namespace BenchmarkDotNet.Order
         private readonly IComparer<string[]> categoryComparer = CategoryComparer.Instance;
         private readonly IComparer<ParameterInstances> paramsComparer = ParameterComparer.Instance;
         private readonly IComparer<Job> jobComparer = JobComparer.Instance;
-        private readonly IComparer<Descriptor> targetComparer;
+        private readonly IComparer<Descriptor> typeComparer = TypeComparer.Instance;
+        private readonly IComparer<Descriptor> methodComparer;
 
         public SummaryOrderPolicy SummaryOrderPolicy { get; }
         public MethodOrderPolicy MethodOrderPolicy { get; }
@@ -31,7 +33,7 @@ namespace BenchmarkDotNet.Order
         {
             SummaryOrderPolicy = summaryOrderPolicy;
             MethodOrderPolicy = methodOrderPolicy;
-            targetComparer = new DescriptorComparer(methodOrderPolicy);
+            methodComparer = new MethodComparer(methodOrderPolicy);
         }
 
         [PublicAPI]
@@ -39,7 +41,7 @@ namespace BenchmarkDotNet.Order
             ImmutableArray<BenchmarkCase> benchmarkCases,
             IEnumerable<BenchmarkLogicalGroupRule> order = null)
         {
-            var benchmarkComparer = new BenchmarkComparer(categoryComparer, paramsComparer, jobComparer, targetComparer, order);
+            var benchmarkComparer = new BenchmarkComparer(categoryComparer, paramsComparer, jobComparer, typeComparer, methodComparer, order);
             var list = benchmarkCases.ToList();
             list.Sort(benchmarkComparer);
             return list;
@@ -87,8 +89,15 @@ namespace BenchmarkDotNet.Order
         {
             var explicitRules = benchmarkCase.Config.GetLogicalGroupRules().ToList();
             var implicitRules = new List<BenchmarkLogicalGroupRule>();
+
+            bool hasMultipleTypes = allBenchmarksCases.DistinctBy(b => b.Descriptor.Type).Count() > 1;
             bool hasJobBaselines = allBenchmarksCases.Any(b => b.Job.Meta.Baseline);
             bool hasDescriptorBaselines = allBenchmarksCases.Any(b => b.Descriptor.Baseline);
+
+            if (hasMultipleTypes && !hasJobBaselines && !hasDescriptorBaselines)
+            {
+                implicitRules.Add(BenchmarkLogicalGroupRule.ByType);
+            }
             if (hasJobBaselines)
             {
                 implicitRules.Add(BenchmarkLogicalGroupRule.ByParams);
@@ -114,8 +123,11 @@ namespace BenchmarkDotNet.Order
             {
                 switch (rule)
                 {
+                    case BenchmarkLogicalGroupRule.ByType:
+                        keys.Add(benchmarkCase.Descriptor.TypeInfo);
+                        break;
                     case BenchmarkLogicalGroupRule.ByMethod:
-                        keys.Add(benchmarkCase.Descriptor.DisplayInfo);
+                        keys.Add(benchmarkCase.Descriptor.WorkloadMethodDisplayInfo);
                         break;
                     case BenchmarkLogicalGroupRule.ByJob:
                         keys.Add(benchmarkCase.Job.DisplayInfo);
@@ -139,7 +151,7 @@ namespace BenchmarkDotNet.Order
             IEnumerable<IGrouping<string, BenchmarkCase>> logicalGroups,
             IEnumerable<BenchmarkLogicalGroupRule> order = null)
         {
-            var benchmarkComparer = new BenchmarkComparer(categoryComparer, paramsComparer, jobComparer, targetComparer, order);
+            var benchmarkComparer = new BenchmarkComparer(categoryComparer, paramsComparer, jobComparer, typeComparer, methodComparer, order);
             var logicalGroupComparer = new LogicalGroupComparer(benchmarkComparer);
             var list = logicalGroups.ToList();
             list.Sort(logicalGroupComparer);
@@ -152,6 +164,7 @@ namespace BenchmarkDotNet.Order
         {
             private static readonly BenchmarkLogicalGroupRule[] DefaultOrder =
             {
+                BenchmarkLogicalGroupRule.ByType,
                 BenchmarkLogicalGroupRule.ByCategory,
                 BenchmarkLogicalGroupRule.ByParams,
                 BenchmarkLogicalGroupRule.ByJob,
@@ -161,18 +174,21 @@ namespace BenchmarkDotNet.Order
             private readonly IComparer<string[]> categoryComparer;
             private readonly IComparer<ParameterInstances> paramsComparer;
             private readonly IComparer<Job> jobComparer;
-            private readonly IComparer<Descriptor> targetComparer;
+            private readonly IComparer<Descriptor> typeComparer;
+            private readonly IComparer<Descriptor> methodComparer;
             private readonly List<BenchmarkLogicalGroupRule> order;
 
             public BenchmarkComparer(
                 IComparer<string[]> categoryComparer,
                 IComparer<ParameterInstances> paramsComparer,
                 IComparer<Job> jobComparer,
-                IComparer<Descriptor> targetComparer,
+                IComparer<Descriptor> typeComparer,
+                IComparer<Descriptor> methodComparer,
                 IEnumerable<BenchmarkLogicalGroupRule> order)
             {
                 this.categoryComparer = categoryComparer;
-                this.targetComparer = targetComparer;
+                this.typeComparer = typeComparer;
+                this.methodComparer = methodComparer;
                 this.jobComparer = jobComparer;
                 this.paramsComparer = paramsComparer;
 
@@ -192,7 +208,8 @@ namespace BenchmarkDotNet.Order
                 {
                     int compare = rule switch
                     {
-                        BenchmarkLogicalGroupRule.ByMethod => targetComparer?.Compare(x.Descriptor, y.Descriptor) ?? 0,
+                        BenchmarkLogicalGroupRule.ByType => typeComparer?.Compare(x.Descriptor, y.Descriptor) ?? 0,
+                        BenchmarkLogicalGroupRule.ByMethod => methodComparer?.Compare(x.Descriptor, y.Descriptor) ?? 0,
                         BenchmarkLogicalGroupRule.ByJob => jobComparer?.Compare(x.Job, y.Job) ?? 0,
                         BenchmarkLogicalGroupRule.ByParams => paramsComparer?.Compare(x.Parameters, y.Parameters) ?? 0,
                         BenchmarkLogicalGroupRule.ByCategory => categoryComparer?.Compare(x.Descriptor.Categories, y.Descriptor.Categories) ?? 0,
