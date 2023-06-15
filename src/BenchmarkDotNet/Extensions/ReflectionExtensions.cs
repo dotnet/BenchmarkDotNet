@@ -102,6 +102,10 @@ namespace BenchmarkDotNet.Extensions
         /// </summary>
         private static string GetDisplayName(this TypeInfo typeInfo)
         {
+            var customAttr = typeInfo.GetCustomAttribute<BenchmarkNameAttribute>();
+            if (customAttr != null)
+                return customAttr.Name;
+
             if (!typeInfo.IsGenericType)
                 return typeInfo.Name;
 
