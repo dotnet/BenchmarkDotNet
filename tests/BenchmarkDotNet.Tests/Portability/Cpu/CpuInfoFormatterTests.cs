@@ -1,22 +1,18 @@
-﻿using System.Runtime.CompilerServices;
-using System.Text;
-using ApprovalTests;
-using ApprovalTests.Namers;
-using ApprovalTests.Reporters;
+﻿using System.Text;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Portability.Cpu;
-using BenchmarkDotNet.Tests.XUnit;
+using VerifyTests;
+using VerifyXunit;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Portability.Cpu
 {
     [Collection("ApprovalTests")]
-    [UseReporter(typeof(PatchedXUnit2Reporter))]
-    [UseApprovalSubdirectory("ApprovedFiles")]
+    [UsesVerify]
     public class CpuInfoFormatterTests
     {
         [Fact]
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public void FormatTest()
+        public Task FormatTest()
         {
             var captions = new StringBuilder();
             foreach (var processorName in new[] { null, "", "Intel" })
@@ -28,7 +24,9 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
                 captions.AppendLine(CpuInfoFormatter.Format(mockCpuInfo));
             }
 
-            Approvals.Verify(captions.ToString());
+            var settings = new VerifySettings();
+            settings.UseDirectory("ApprovedFiles");
+            return Verifier.Verify(captions.ToString(), settings);
         }
     }
 }

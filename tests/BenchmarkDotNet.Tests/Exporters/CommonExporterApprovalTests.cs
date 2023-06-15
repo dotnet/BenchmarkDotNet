@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using ApprovalTests;
-using ApprovalTests.Namers;
-using ApprovalTests.Reporters;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
@@ -13,17 +11,15 @@ using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
-using BenchmarkDotNet.Tests.XUnit;
 using JetBrains.Annotations;
+using VerifyTests;
+using VerifyXunit;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Exporters
 {
-    // In case of failed approval tests, use the following reporter:
-    // [UseReporter(typeof(KDiffReporter))]
     [Collection("ApprovalTests")]
-    [UseReporter(typeof(PatchedXUnit2Reporter))]
-    [UseApprovalSubdirectory("ApprovedFiles")]
+    [UsesVerify]
     public class CommonExporterApprovalTests : IDisposable
     {
         private readonly CultureInfo initCulture;
@@ -44,12 +40,10 @@ namespace BenchmarkDotNet.Tests.Exporters
         public static TheoryData<string> CultureInfoNames => TheoryDataHelper.Create(CultureInfos.Keys);
 
         [Theory]
-        [MethodImpl(MethodImplOptions.NoInlining)] // required by the Approval test framework, do NOT remove
         [MemberData(nameof(CultureInfoNames))]
-        public void Exporters(string cultureInfoName)
+        public Task Exporters(string cultureInfoName)
         {
             var cultureInfo = CultureInfos[cultureInfoName];
-            NamerFactory.AdditionalInformation = $"{GetName(cultureInfo)}";
             Thread.CurrentThread.CurrentCulture = cultureInfo;
 
             var logger = new AccumulationLogger();
@@ -61,7 +55,10 @@ namespace BenchmarkDotNet.Tests.Exporters
                 exporter.ExportToLog(MockFactory.CreateSummary(config.WithCultureInfo(cultureInfo)), logger);
             }
 
-            Approvals.Verify(logger.GetLog());
+            var settings = new VerifySettings();
+            settings.UseDirectory("ApprovedFiles");
+            settings.UseTextForParameters(GetName(cultureInfo));
+            return Verifier.Verify(logger.GetLog(), settings);
         }
 
         private static void PrintTitle(AccumulationLogger logger, IExporter exporter)
