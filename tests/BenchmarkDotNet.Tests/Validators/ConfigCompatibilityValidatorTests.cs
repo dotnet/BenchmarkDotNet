@@ -6,8 +6,8 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Validators;
-using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Portability;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -22,6 +22,12 @@ namespace BenchmarkDotNet.Tests.Validators
         [Fact]
         public void RunningBenchmarksWithIncompatibleConfigsMustFailWithCriticalError()
         {
+            if (!KnownIssue.Issue2299.IsFixed && RuntimeInformation.IsMono && RuntimeInformation.IsLinux())
+            {
+                Output.WriteLine(KnownIssue.Issue2299.IgnoreMessage);
+                return;
+            }
+
             var logger = new OutputLogger(Output);
             var config = ManualConfig.CreateEmpty().AddLogger(logger);
             var summary =
