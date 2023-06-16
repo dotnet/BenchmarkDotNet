@@ -47,8 +47,10 @@ namespace BenchmarkDotNet.Tests.Environments
         [InlineData("10.0.19043", 964, "Windows 10 (10.0.19043.964/21H1/May2021Update)")]
         [InlineData("10.0.19044", 1147, "Windows 10 (10.0.19044.1147/21H2/November2021Update)")]
         [InlineData("10.0.19099", 1729, "Windows 10 (10.0.19099.1729)")]
-        [InlineData("10.0.22000", 348, "Windows 11 (10.0.22000.348/21H2)")]
+        [InlineData("10.0.19045", 0, "Windows 10 (10.0.19045.0/22H2/2022Update)")]
+        [InlineData("10.0.22000", 348, "Windows 11 (10.0.22000.348/21H2/SunValley)")]
         [InlineData("10.0.22518", 1012, "Windows 11 (10.0.22518.1012)")]
+        [InlineData("10.0.22621", 0, "Windows 11 (10.0.22621.0/22H2/2022Update/SunValley2)")]
         public void WindowsWithUbrIsPrettified(string originalVersion, int ubr, string prettifiedName)
             => Check(OsBrandStringHelper.Prettify("Windows", originalVersion, ubr), prettifiedName);
 
@@ -59,6 +61,7 @@ namespace BenchmarkDotNet.Tests.Environments
         [InlineData("macOS 11.1 (20C69)", "Darwin 20.2.0", "macOS Big Sur 11.1 (20C69) [Darwin 20.2.0]")]
         [InlineData("macOS 11.3.1 (20E241)", "Darwin 20.4.0", "macOS Big Sur 11.3.1 (20E241) [Darwin 20.4.0]")]
         [InlineData("macOS 12.1 (21C52)", "Darwin 21.2.0", "macOS Monterey 12.1 (21C52) [Darwin 21.2.0]")]
+        [InlineData("macOS 13.0.1 (22A400)", "Darwin 22.1.0", "macOS Ventura 13.0.1 (22A400) [Darwin 22.1.0]")]
         public void MacOSXIsPrettified(string systemVersion, string kernelVersion, string prettifiedName)
             => Check(OsBrandStringHelper.PrettifyMacOSX(systemVersion, kernelVersion), prettifiedName);
     }

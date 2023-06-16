@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var actualLogLines = GetActualLogLines(summary);
             foreach (string line in actualLogLines)
                 Output.WriteLine(line);
-            Assert.Equal(expectedLogLines, actualLogLines);
+            SmartAssert.Equal(expectedLogLines, actualLogLines);
         }
 
         public class AllSetupAndCleanupAttributeBenchmarks

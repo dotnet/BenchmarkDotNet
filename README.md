@@ -11,11 +11,12 @@
   [![Stars](https://img.shields.io/github/stars/dotnet/BenchmarkDotNet?color=brightgreen)](https://github.com/dotnet/BenchmarkDotNet/stargazers)
   [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet?color=yellow)](https://gitter.im/dotnet/BenchmarkDotNet)
   [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
+  [![Twitter](https://img.shields.io/twitter/follow/BenchmarkDotNet?style=social)](https://twitter.com/BenchmarkDotNet)
 
 </h3>
 
 <h3 align="center">
-  <a href="#Features">Features</a>
+  <a href="#features">Features</a>
   <span> · </span>
   <a href="https://benchmarkdotnet.org/articles/guides/getting-started.html">Getting started</a>
   <span> · </span>
@@ -26,12 +27,12 @@
 
 **BenchmarkDotNet** helps you to transform methods into benchmarks, track their performance, and share reproducible measurement experiments.
 It's no harder than writing unit tests!
-Under the hood, it performs a lot of [magic](#Automation) that guarantees [reliable and precise](#Reliability) results thanks to the [perfolizer](https://github.com/AndreyAkinshin/perfolizer) statistical engine.
+Under the hood, it performs a lot of [magic](#automation) that guarantees [reliable and precise](#reliability) results thanks to the [perfolizer](https://github.com/AndreyAkinshin/perfolizer) statistical engine.
 BenchmarkDotNet protects you from popular benchmarking mistakes and warns you if something is wrong with your benchmark design or obtained measurements.
-The results are presented in a [user-friendly](#Friendliness) form that highlights all the important facts about your experiment.
-The library is adopted by [13400+ projects](#who-uses-benchmarkdotnet) including .NET Runtime and supported by the [.NET Foundation](https://dotnetfoundation.org).
+The results are presented in a [user-friendly](#friendliness) form that highlights all the important facts about your experiment.
+The library is adopted by [14300+ projects](#who-uses-benchmarkdotnet) including .NET Runtime and supported by the [.NET Foundation](https://dotnetfoundation.org).
 
-It's [easy](#Simplicity) to start writing benchmarks, check out an example
+It's [easy](#simplicity) to start writing benchmarks, check out an example
   (copy-pastable version is [here](https://benchmarkdotnet.org/articles/guides/getting-started.html)):
 
 ```cs
@@ -231,7 +232,7 @@ If you don't customize the summary view,
 ## Who uses BenchmarkDotNet?
 
 Everyone!
-BenchmarkDotNet is already adopted by more than [13400+](https://github.com/dotnet/BenchmarkDotNet/network/dependents?package_id=UGFja2FnZS0xNTY3MzExMzE%3D) projects including
+BenchmarkDotNet is already adopted by more than [14300+](https://github.com/dotnet/BenchmarkDotNet/network/dependents?package_id=UGFja2FnZS0xNTY3MzExMzE%3D) projects including
   [dotnet/performance](https://github.com/dotnet/performance) (reference benchmarks for all .NET Runtimes),
   [dotnet/runtime](https://github.com/dotnet/runtime/issues?utf8=%E2%9C%93&q=BenchmarkDotNet) (.NET runtime and libraries),
   [Roslyn](https://github.com/dotnet/roslyn/search?q=BenchmarkDotNet&type=Issues&utf8=✓) (C# and Visual Basic compiler),
@@ -266,9 +267,9 @@ BenchmarkDotNet is already adopted by more than [13400+](https://github.com/dotn
   [TensorFlow.NET](https://github.com/SciSharp/TensorFlow.NET/tree/master/src/TensorFlowNet.Benchmarks),
   [Apache Thrift](https://github.com/apache/thrift/tree/master/lib/netstd/Benchmarks/Thrift.Benchmarks).  
 On GitHub, you can find
-  10700+ [issues](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=created&type=Issues&utf8=✓),
-  4700+ [commits](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=committer-date&type=Commits&utf8=✓), and
-  1,500,000+ [files](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=indexed&type=Code&utf8=✓)
+  12600+ [issues](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=created&type=Issues&utf8=✓),
+  5200+ [commits](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=committer-date&type=Commits&utf8=✓), and
+  1,600,000+ [files](https://github.com/search?o=desc&q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&s=indexed&type=Code&utf8=✓)
   that involve BenchmarkDotNet.
 
 ## Learn more about benchmarking

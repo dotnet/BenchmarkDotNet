@@ -11,7 +11,7 @@ using Microsoft.Diagnostics.Tracing.Parsers;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
-    public abstract class JitDiagnoser : EtwDiagnoser<object>, IDiagnoser
+    public abstract class JitDiagnoser<TStats> : EtwDiagnoser<TStats>, IDiagnoser where TStats : new()
     {
         protected override ulong EventType => (ulong)ClrTraceEventParser.Keywords.JitTracing;
 

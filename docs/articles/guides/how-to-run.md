@@ -32,24 +32,3 @@ dotnet run -c Release -- --job short --runtimes net472 net7.0 --filter *Benchmar
 ```
 
 The most important thing about `BenchmarkSwitcher` is that you need to pass the `args` from `Main` to the `Run` method. If you don't, it won't parse the arguments.
-
-
-## Url
-
-You can also run a benchmark directly from the internet:
-
-```cs
-string url = "<E.g. direct link to raw content of a gist>";
-var summary = BenchmarkRunner.RunUrl(url);
-```
-
-**Note:** it works only for Full .NET Framework. It's not recommended to use this approach.
-
-## Source
-
-```cs
-string benchmarkSource = "public class MyBenchmarkClass { ...";
-var summary = BenchmarkRunner.RunSource(benchmarkSource);
-```
-
-**Note:** it works only for Full .NET Framework. It's not recommended to use this approach.

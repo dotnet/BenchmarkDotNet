@@ -290,6 +290,19 @@ namespace BenchmarkDotNet.IntegrationTests
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
 
             var summary = BenchmarkRunner.Run(benchmarks);
+            try
+            {
+                summary.CheckPlatformLinkerIssues();
+            }
+            catch (MisconfiguredEnvironmentException e)
+            {
+                if (ContinuousIntegration.IsLocalRun())
+                {
+                    output.WriteLine(e.SkipMessage);
+                    return;
+                }
+                throw;
+            }
 
             foreach (var benchmarkAllocationsValidator in benchmarksAllocationsValidators)
             {

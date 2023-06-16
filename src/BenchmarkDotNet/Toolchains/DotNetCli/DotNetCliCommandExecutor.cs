@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 stopwatch.Stop();
                 outputReader.StopRead();
 
-                parameters.Logger.WriteLineInfo($"// command took {stopwatch.Elapsed.TotalSeconds:0.##}s and exited with {process.ExitCode}");
+                parameters.Logger.WriteLineInfo($"// command took {stopwatch.Elapsed.TotalSeconds.ToInvariantString("0.##")} sec and exited with {process.ExitCode}");
 
                 return process.ExitCode <= 0
                     ? DotNetCliCommandResult.Success(stopwatch.Elapsed, outputReader.GetOutputText())

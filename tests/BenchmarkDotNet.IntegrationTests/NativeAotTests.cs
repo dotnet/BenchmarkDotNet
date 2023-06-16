@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.XUnit;
@@ -34,7 +35,17 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithToolchain(toolchain)
                     .WithEnvironmentVariable(NativeAotBenchmark.EnvVarKey, IsAvx2Supported().ToString().ToLower()));
 
-            CanExecute<NativeAotBenchmark>(config);
+            try
+            {
+                CanExecute<NativeAotBenchmark>(config);
+            }
+            catch (MisconfiguredEnvironmentException e)
+            {
+                if (ContinuousIntegration.IsLocalRun())
+                    Output.WriteLine(e.SkipMessage);
+                else
+                    throw;
+            }
         }
 
         private bool IsAvx2Supported()

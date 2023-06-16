@@ -4,12 +4,13 @@ using ApprovalTests;
 using ApprovalTests.Namers;
 using ApprovalTests.Reporters;
 using BenchmarkDotNet.Portability.Cpu;
+using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Portability.Cpu
 {
     [Collection("ApprovalTests")]
-    [UseReporter(typeof(XUnit2Reporter))]
+    [UseReporter(typeof(PatchedXUnit2Reporter))]
     [UseApprovalSubdirectory("ApprovedFiles")]
     public class CpuInfoFormatterTests
     {

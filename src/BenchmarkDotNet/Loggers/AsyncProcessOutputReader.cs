@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Loggers
         private readonly ILogger logger;
         private readonly bool logOutput, readStandardError;
 
-        private static readonly TimeSpan FinishEventTimeout = TimeSpan.FromMilliseconds(500);
+        private static readonly TimeSpan FinishEventTimeout = TimeSpan.FromSeconds(1);
         private readonly AutoResetEvent outputFinishEvent, errorFinishEvent;
         private readonly ConcurrentQueue<string> output, error;
 
@@ -123,10 +123,7 @@ namespace BenchmarkDotNet.Loggers
 
                     if (logOutput)
                     {
-                        lock (this) // #2125
-                        {
-                            logger.WriteLine(e.Data);
-                        }
+                        logger.WriteLine(e.Data);
                     }
                 }
             }
@@ -144,10 +141,7 @@ namespace BenchmarkDotNet.Loggers
 
                     if (logOutput)
                     {
-                        lock (this) // #2125
-                        {
-                            logger.WriteLineError(e.Data);
-                        }
+                        logger.WriteLineError(e.Data);
                     }
                 }
             }

@@ -12,8 +12,12 @@
   href: IntroCategories.md
 - name: IntroCategoryBaseline
   href: IntroCategoryBaseline.md
+- name: IntroCategoryDiscoverer
+  href: IntroCategoryDiscoverer.md
 - name: IntroColdStart
   href: IntroColdStart.md
+- name: IntroComparableComplexParam
+  href: IntroComparableComplexParam.md
 - name: IntroConfigSource
   href: IntroConfigSource.md
 - name: IntroConfigUnion
@@ -32,6 +36,8 @@
   href: IntroDisassemblyDry.md
 - name: IntroDisassemblyRyuJit
   href: IntroDisassemblyRyuJit.md
+- name: IntroDotTraceDiagnoser
+  href: IntroDotTraceDiagnoser.md
 - name: IntroEnvVars
   href: IntroEnvVars.md
 - name: IntroEventPipeProfiler
@@ -60,6 +66,8 @@
   href: IntroInProcess.md
 - name: IntroInProcessWrongEnv
   href: IntroInProcessWrongEnv.md
+- name: IntroJitStatsDiagnoser
+  href: IntroJitStatsDiagnoser.md
 - name: IntroJobBaseline
   href: IntroJobBaseline.md
 - name: IntroJoin

@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.Samples</AssemblyTitle>
-    <TargetFrameworks>net462;net7.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;net462</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.Samples</AssemblyName>
     <OutputType>Exe</OutputType>
@@ -21,6 +21,7 @@
     <PackageReference Include="System.Drawing.Common" Version="4.7.2" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotTrace\BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
   </ItemGroup>

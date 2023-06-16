@@ -4,12 +4,8 @@
       "src": [
         {
           "files": [
-            "src/BenchmarkDotNet/*.csproj",
-            "src/BenchmarkDotNet.Annotations/*.csproj"
-          ],
-          "exclude": [
-            "**/obj/**",
-            "**/bin/**"
+            "src/BenchmarkDotNet/bin/Release/netstandard2.0/BenchmarkDotNet.dll",
+            "src/BenchmarkDotNet/bin/Release/netstandard2.0/BenchmarkDotNet.Annotations.dll"
           ],
           "src": ".."
         }
@@ -54,12 +50,12 @@
     "fileMetadataFiles": [],
     "template": [
       "default",
+      "modern",
       "template"
     ],
     "xrefService": [
       "https://xref.docs.microsoft.com/query?uid={uid}"
     ],
-    "postProcessors": ["ExtractSearchIndex"],
     "markdownEngineName": "markdig",
     "noLangKeyword": false,
     "keepFileLink": false,
@@ -68,10 +64,11 @@
     "globalMetadata" :
     {
       "_appTitle" : "BenchmarkDotNet",
-      "_appFooter" : "Copyright &copy; 2013–2021 .NET Foundation and contributors",
+      "_appFooter" : "Copyright &copy; 2013–2023 .NET Foundation and contributors",
       "_appLogoPath" : "logo/icon.svg",
       "_appFaviconPath": "logo/icon-32.png",
-      "_enableSearch": false
+      "_enableSearch": true,
+      "_disableContribution": true
     },
     "sitemap":
     {

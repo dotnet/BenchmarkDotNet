@@ -14,7 +14,7 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Toolchains.InProcess
 {
     /// <summary>
-    ///     Validator to be used together with <see cref="InProcessToolchain" />
+    ///     Validator to be used together with <see cref="InProcessNoEmitToolchain" /> or <see cref="InProcessEmitToolchain"/>
     ///     to proof that the config matches the environment.
     /// </summary>
     /// <seealso cref="IValidator" />
@@ -81,9 +81,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         private static string ValidateToolchain(Job job, Characteristic characteristic) =>
             job.Infrastructure.Toolchain is InProcessEmitToolchain
             || job.Infrastructure.Toolchain is InProcessNoEmitToolchain
-#pragma warning disable 618
-            || job.Infrastructure.Toolchain is InProcessToolchain
-#pragma warning restore 618
                 ? null
                 : $"should be instance of {nameof(InProcessEmitToolchain)} or {nameof(InProcessNoEmitToolchain)}.";
 
@@ -156,8 +153,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     $"Target {target} has {nameof(target.AdditionalLogic)} filled. AdditionalLogic is not supported by in-process toolchain.");
             }
 
-            foreach (var benchmarkWithArguments in validationParameters.Benchmarks.Where(benchmark => benchmark.HasArguments))
-                yield return new ValidationError(true, "Arguments are not supported by the InProcessToolchain yet, see #687 for more details", benchmarkWithArguments);
+            foreach (var benchmarkWithArguments in validationParameters.Benchmarks.Where(benchmark => benchmark.HasArguments && benchmark.GetToolchain() is InProcessNoEmitToolchain))
+                yield return new ValidationError(true, "Arguments are not supported by the InProcessNoEmitToolchain, see #687 for more details", benchmarkWithArguments);
 
             foreach (var validationError in validationParameters.Config.GetJobs().SelectMany(job => ValidateJob(job, TreatsWarningsAsErrors)))
                 yield return validationError;

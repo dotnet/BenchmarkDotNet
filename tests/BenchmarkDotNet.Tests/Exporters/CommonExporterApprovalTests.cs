@@ -13,6 +13,7 @@ using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
+using BenchmarkDotNet.Tests.XUnit;
 using JetBrains.Annotations;
 using Xunit;
 
@@ -21,7 +22,7 @@ namespace BenchmarkDotNet.Tests.Exporters
     // In case of failed approval tests, use the following reporter:
     // [UseReporter(typeof(KDiffReporter))]
     [Collection("ApprovalTests")]
-    [UseReporter(typeof(XUnit2Reporter))]
+    [UseReporter(typeof(PatchedXUnit2Reporter))]
     [UseApprovalSubdirectory("ApprovedFiles")]
     public class CommonExporterApprovalTests : IDisposable
     {
@@ -60,7 +61,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                 exporter.ExportToLog(MockFactory.CreateSummary(config.WithCultureInfo(cultureInfo)), logger);
             }
 
-            Approvals.Verify(logger.GetLog(), x => x.Replace("\r", string.Empty));
+            Approvals.Verify(logger.GetLog());
         }
 
         private static void PrintTitle(AccumulationLogger logger, IExporter exporter)

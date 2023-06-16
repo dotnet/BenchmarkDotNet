@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Running;
 using Microsoft.Diagnostics.Tracing.Session;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Diagnosers;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
@@ -9,7 +10,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
     /// See <see href="https://blogs.msdn.microsoft.com/clrcodegeneration/2009/05/11/jit-etw-tracing-in-net-framework-4/">MSDN blog post about JIT tracing events</see>
     /// and <see href="https://georgeplotnikov.github.io/articles/tale-tail-call-dotnet">detailed blog post by George Plotnikov</see> for more info
     /// </summary>
-    public class TailCallDiagnoser : JitDiagnoser
+    public class TailCallDiagnoser : JitDiagnoser<object>, IProfiler
     {
         private static readonly string LogSeparator = new string('-', 20);
 
@@ -31,6 +32,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         }
 
         public override IEnumerable<string> Ids => new[] { nameof(TailCallDiagnoser) };
+
+        public string ShortName => "tail";
 
         protected override void AttachToEvents(TraceEventSession traceEventSession, BenchmarkCase benchmarkCase)
         {
