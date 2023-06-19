@@ -13,25 +13,26 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using Perfolizer;
 using Perfolizer.Horology;
+using Perfolizer.Mathematics.Common;
+using Perfolizer.Mathematics.SignificanceTesting;
+using Perfolizer.Mathematics.SignificanceTesting.MannWhitney;
 using Perfolizer.Metrology;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 {
-    public class ExpectedBenchmarkResultsTests : BenchmarkTestExecutor
+    public class ExpectedBenchmarkResultsTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
         // NativeAot takes a long time to build, so not including it in these tests.
         // We also don't test InProcessNoEmitToolchain because it is known to be less accurate than code-gen toolchains.
 
         private static readonly TimeInterval FallbackCpuResolutionValue = TimeInterval.FromNanoseconds(0.2d);
 
-        public ExpectedBenchmarkResultsTests(ITestOutputHelper output) : base(output) { }
-
         private static IEnumerable<Type> EmptyBenchmarkTypes() =>
-            new[]
-            {
+            [
                 typeof(EmptyVoid),
                 typeof(EmptyByte),
                 typeof(EmptySByte),
@@ -46,7 +47,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 typeof(EmptyUIntPtr),
                 typeof(EmptyVoidPointer),
                 typeof(EmptyClass)
-            };
+            ];
 
         public static IEnumerable<object[]> InProcessData()
         {
@@ -60,8 +61,8 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         {
             foreach (var type in EmptyBenchmarkTypes())
             {
-                yield return new object[] { type, RuntimeMoniker.Net70 };
-                yield return new object[] { type, RuntimeMoniker.Mono70 };
+                yield return new object[] { type, RuntimeMoniker.Net80 };
+                yield return new object[] { type, RuntimeMoniker.Mono80 };
             }
         }
 
@@ -76,17 +77,19 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 
         [Theory]
         [MemberData(nameof(InProcessData))]
-        public void EmptyBenchmarksReportZeroTimeAndAllocated_InProcess(Type benchmarkType)
+        public void EmptyBenchmarkReportsZeroTimeAndAllocated_InProcess(Type benchmarkType)
         {
             AssertZeroResults(benchmarkType, ManualConfig.CreateEmpty()
                 .AddJob(Job.Default
                     .WithToolchain(InProcessEmitToolchain.Instance)
-                ));
+                // IL Emit has incorrect overhead measurement. https://github.com/dotnet/runtime/issues/89685
+                // We multiply the threshold to account for it.
+                ), multiplyThresholdBy: RuntimeInformation.IsNetCore ? 3 : 1);
         }
 
         [TheoryEnvSpecific("To not repeat tests in both Full .NET Framework and Core", EnvRequirement.DotNetCoreOnly)]
         [MemberData(nameof(CoreData))]
-        public void EmptyBenchmarksReportZeroTimeAndAllocated_Core(Type benchmarkType, RuntimeMoniker runtimeMoniker)
+        public void EmptyBenchmarkReportsZeroTimeAndAllocated_Core(Type benchmarkType, RuntimeMoniker runtimeMoniker)
         {
             AssertZeroResults(benchmarkType, ManualConfig.CreateEmpty()
                 .AddJob(Job.Default
@@ -96,7 +99,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 
         [TheoryEnvSpecific("Can only run Full .NET Framework and Mono tests from Framework host", EnvRequirement.FullFrameworkOnly)]
         [MemberData(nameof(FrameworkData))]
-        public void EmptyBenchmarksReportZeroTimeAndAllocated_Framework(Type benchmarkType, RuntimeMoniker runtimeMoniker)
+        public void EmptyBenchmarkReportsZeroTimeAndAllocated_Framework(Type benchmarkType, RuntimeMoniker runtimeMoniker)
         {
             AssertZeroResults(benchmarkType, ManualConfig.CreateEmpty()
                 .AddJob(Job.Default
@@ -104,7 +107,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 ));
         }
 
-        private void AssertZeroResults(Type benchmarkType, IConfig config)
+        private void AssertZeroResults(Type benchmarkType, IConfig config, int multiplyThresholdBy = 1)
         {
             var summary = CanExecute(benchmarkType, config
                 .WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Nanosecond))
@@ -112,7 +115,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
             );
 
             var cpuResolution = CpuDetector.Cpu?.MaxFrequency()?.ToResolution() ?? FallbackCpuResolutionValue;
-            var threshold = new NumberValue(cpuResolution.Nanoseconds).ToThreshold();
+            var threshold = new NumberValue(cpuResolution.Nanoseconds * multiplyThresholdBy).ToThreshold();
 
             foreach (var report in summary.Reports)
             {
@@ -126,87 +129,137 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
             }
         }
 
-        [Fact]
-        public void DifferentSizedStructsBenchmarksReportsNonZeroTimeAndZeroAllocated_InProcess()
+        private static IEnumerable<Type> NonEmptyBenchmarkTypes() =>
+            [
+                typeof(DifferentSizedStructs),
+                typeof(ActualWork)
+            ];
+
+        public static IEnumerable<object[]> NonEmptyInProcessData()
         {
-            AssertDifferentSizedStructsResults(ManualConfig.CreateEmpty()
+            foreach (var type in NonEmptyBenchmarkTypes())
+            {
+                yield return new object[] { type };
+            }
+        }
+
+        public static IEnumerable<object[]> NonEmptyCoreData()
+        {
+            foreach (var type in NonEmptyBenchmarkTypes())
+            {
+                yield return new object[] { type, RuntimeMoniker.Net80 };
+                yield return new object[] { type, RuntimeMoniker.Mono80 };
+            }
+        }
+
+        public static IEnumerable<object[]> NonEmptyFrameworkData()
+        {
+            foreach (var type in NonEmptyBenchmarkTypes())
+            {
+                yield return new object[] { type, RuntimeMoniker.Net462 };
+                yield return new object[] { type, RuntimeMoniker.Mono };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(NonEmptyInProcessData))]
+        public void NonEmptyBenchmarkReportsNonZeroTimeAndZeroAllocated_InProcess(Type benchmarkType)
+        {
+            AssertNonZeroResults(benchmarkType, ManualConfig.CreateEmpty()
                 .AddJob(Job.Default
                     .WithToolchain(InProcessEmitToolchain.Instance)
-                ));
+                // InProcess overhead measurements are incorrect, so we adjust the results to account for it. https://github.com/dotnet/runtime/issues/89685
+                ), subtractOverheadByClocks: RuntimeInformation.IsNetCore ? 3 : 1);
         }
 
         [TheoryEnvSpecific("To not repeat tests in both Full .NET Framework and Core", EnvRequirement.DotNetCoreOnly)]
-        [InlineData(RuntimeMoniker.Net70)]
-        [InlineData(RuntimeMoniker.Mono70)]
-        public void DifferentSizedStructsBenchmarksReportsNonZeroTimeAndZeroAllocated_Core(RuntimeMoniker runtimeMoniker)
+        [MemberData(nameof(NonEmptyCoreData))]
+        public void NonEmptyBenchmarkReportsNonZeroTimeAndZeroAllocated_Core(Type benchmarkType, RuntimeMoniker runtimeMoniker)
         {
-            AssertDifferentSizedStructsResults(ManualConfig.CreateEmpty()
+            AssertNonZeroResults(benchmarkType, ManualConfig.CreateEmpty()
                 .AddJob(Job.Default
                     .WithRuntime(runtimeMoniker.GetRuntime())
                 ));
         }
 
-        [TheoryEnvSpecific("Can only run Full .NET Framework and Mono tests from Framework host", EnvRequirement.FullFrameworkOnly)]
-        [InlineData(RuntimeMoniker.Net462)]
-        [InlineData(RuntimeMoniker.Mono)]
-        public void DifferentSizedStructsBenchmarksReportsNonZeroTimeAndZeroAllocated_Framework(RuntimeMoniker runtimeMoniker)
+        [TheoryEnvSpecific("Can only run Mono tests from Framework host", EnvRequirement.FullFrameworkOnly)]
+        [MemberData(nameof(NonEmptyFrameworkData))]
+        public void NonEmptyBenchmarkReportsNonZeroTimeAndZeroAllocated_Framework(Type benchmarkType, RuntimeMoniker runtimeMoniker)
         {
-            AssertDifferentSizedStructsResults(ManualConfig.CreateEmpty()
+            AssertNonZeroResults(benchmarkType, ManualConfig.CreateEmpty()
                 .AddJob(Job.Default
                     .WithRuntime(runtimeMoniker.GetRuntime())
                 ));
         }
 
-        private void AssertDifferentSizedStructsResults(IConfig config)
+        private void AssertNonZeroResults(Type benchmarkType, IConfig config, int subtractOverheadByClocks = 0)
         {
-            var summary = CanExecute<DifferentSizedStructs>(config
+            var summary = CanExecute(benchmarkType, config
                 .WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Nanosecond))
                 .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)))
             );
 
             var cpuResolution = CpuDetector.Cpu?.MaxFrequency()?.ToResolution() ?? FallbackCpuResolutionValue;
-            var threshold = (cpuResolution / 2).ToThreshold();
+            // Modern cpus can execute multiple instructions per clock cycle,
+            // resulting in measurements greater than 0 but less than 1 clock cycle.
+            // (example: Intel Core i9-9880H CPU 2.30GHz reports 0.2852 ns for `_field++;`)
+            var threshold = new NumberValue(cpuResolution.Nanoseconds / 4).ToThreshold();
+            // InProcess overhead measurements are incorrect, so we adjust the results to account for it. https://github.com/dotnet/runtime/issues/89685
+            var overheadSubtraction = cpuResolution.Nanoseconds * subtractOverheadByClocks;
 
             foreach (var report in summary.Reports)
             {
                 var workloadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).GetStatistics().Sample;
-                var overheadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual)).GetStatistics().Sample;
+                var overheadMeasurements = new Sample(report.AllMeasurements
+                    .Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual))
+                    .GetStatistics().OriginalValues
+                    .Select(x => x - overheadSubtraction).ToArray());
 
-                bool isZero = ZeroMeasurementHelper.AreIndistinguishable(workloadMeasurements, overheadMeasurements, threshold);
-                Assert.False(isZero, $"Actual time was 0.");
+                var comparisonResult = new SimpleEquivalenceTest(MannWhitneyTest.Instance).Perform(workloadMeasurements, overheadMeasurements, threshold, SignificanceLevel.P1E5);
+                Assert.True(comparisonResult == ComparisonResult.Greater, "Workload measurements are not greater than overhead.");
 
                 Assert.True((report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase) ?? 0L) == 0L, "Memory allocations measured above 0.");
             }
         }
     }
+}
 
-    public struct Struct16
-    {
-        public long l1, l2;
-    }
+// Types outside of namespace so it's easier to read in the test explorer.
+#pragma warning disable CA1050 // Declare types in namespaces
+public struct Struct16
+{
+    public long l1, l2;
+}
 
-    public struct Struct32
-    {
-        public long l1, l2, l3, l4;
-    }
+public struct Struct32
+{
+    public long l1, l2, l3, l4;
+}
 
-    public struct Struct64
-    {
-        public long l1, l2, l3, l4, l5, l6, l7, l8;
-    }
+public struct Struct64
+{
+    public long l1, l2, l3, l4, l5, l6, l7, l8;
+}
 
-    public struct Struct128
-    {
-        public long l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14, l15, l16;
-    }
+public struct Struct128
+{
+    public long l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14, l15, l16;
+}
 
-    public class DifferentSizedStructs
-    {
-        [Benchmark] public Struct16 Struct16() => default;
-        [Benchmark] public Struct32 Struct32() => default;
-        [Benchmark] public Struct64 Struct64() => default;
-        [Benchmark] public Struct128 Struct128() => default;
-    }
+public class DifferentSizedStructs
+{
+    [Benchmark] public Struct16 Struct16() => default;
+    [Benchmark] public Struct32 Struct32() => default;
+    [Benchmark] public Struct64 Struct64() => default;
+    [Benchmark] public Struct128 Struct128() => default;
+}
+
+public class ActualWork
+{
+    public int _field;
+
+    [Benchmark]
+    public void IncrementField() => _field++;
 }
 
 public class EmptyVoid
