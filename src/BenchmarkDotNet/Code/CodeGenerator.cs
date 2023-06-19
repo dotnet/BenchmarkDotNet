@@ -45,7 +45,6 @@ namespace BenchmarkDotNet.Code
                     .Replace("$ID$", buildInfo.Id.ToString())
                     .Replace("$OperationsPerInvoke$", provider.OperationsPerInvoke)
                     .Replace("$WorkloadTypeName$", provider.WorkloadTypeName)
-                    .Replace("$WorkloadMethodDelegate$", provider.WorkloadMethodDelegate(passArguments))
                     .Replace("$WorkloadMethodReturnType$", provider.WorkloadMethodReturnTypeName)
                     .Replace("$WorkloadMethodReturnTypeModifiers$", provider.WorkloadMethodReturnTypeModifiers)
                     .Replace("$OverheadMethodReturnTypeName$", provider.OverheadMethodReturnTypeName)
