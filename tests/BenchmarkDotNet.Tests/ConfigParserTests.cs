@@ -586,5 +586,31 @@ namespace BenchmarkDotNet.Tests
                 Assert.False(job.Accuracy.EvaluateOverhead);
             }
         }
+
+        [Theory]
+        [InlineData("--filter abc", "--filter *")]
+        [InlineData("-f abc", "--filter *")]
+        [InlineData("-f *", "--filter *")]
+        [InlineData("--runtime net7.0 --join", "--filter * --runtime net7.0 --join")]
+        [InlineData("--join abc", "--filter * --join")]
+        public void CheckUpdateValidArgs(string strArgs, string expected)
+        {
+            var args = strArgs.Split();
+            _ = ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = new[] { "*" });
+
+            Assert.Equal(expected.Split(), updatedArgs);
+        }
+
+        [Theory]
+        [InlineData("--filter abc -f abc")]
+        [InlineData("--runtimes net")]
+        public void CheckUpdateInvalidArgs(string strArgs)
+        {
+            var args = strArgs.Split();
+            bool isSuccess = ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = new[] { "*" });
+
+            Assert.Null(updatedArgs);
+            Assert.False(isSuccess);
+        }
     }
 }
