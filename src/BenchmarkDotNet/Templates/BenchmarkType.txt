@@ -96,325 +96,15 @@
             @DummyUnroll@
         }
 
-        private $OverheadMethodReturnTypeName$ __Overhead($ArgumentsDefinition$) // __ is to avoid possible name conflict
+        private void __Overhead($ArgumentsDefinition$) // __ is to avoid possible name conflict
         {
-            $OverheadImplementation$
         }
-
-#if RETURNS_CONSUMABLE_$ID$
-
-        // Prevent inlining the method invoke.
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
-        private $OverheadMethodReturnTypeName$ __OverheadWrapper($ArgumentsDefinition$)
-        {
-            return __Overhead($PassArguments$);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
-        private $WorkloadMethodReturnType$ __WorkloadWrapper($ArgumentsDefinition$)
-        {
-            return $WorkloadMethodCall$;
-        }
-
-        private BenchmarkDotNet.Engines.Consumer consumer = new BenchmarkDotNet.Engines.Consumer();
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void OverheadActionUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                consumer.Consume(__OverheadWrapper($PassArguments$));@Unroll@
-            }
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void OverheadActionNoUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                consumer.Consume(__OverheadWrapper($PassArguments$));
-            }
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void WorkloadActionUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            for (System.Int64  i = 0; i < invokeCount; i++)
-            {
-                consumer.Consume(__WorkloadWrapper($PassArguments$)$ConsumeField$);@Unroll@
-            }
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void WorkloadActionNoUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                consumer.Consume(__WorkloadWrapper($PassArguments$)$ConsumeField$);
-            }
-        }
-        
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
-        {
-            if (NotEleven == 11)
-            {
-                $LoadArguments$
-                return $WorkloadMethodCall$;
-            }
-            
-            return default($WorkloadMethodReturnType$);
-        }
-
-#elif RETURNS_NON_CONSUMABLE_STRUCT_$ID$
-
-        // Prevent inlining the method invoke.
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
-        private $OverheadMethodReturnTypeName$ __OverheadWrapper($ArgumentsDefinition$)
-        {
-            return __Overhead($PassArguments$);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
-        private $WorkloadMethodReturnType$ __WorkloadWrapper($ArgumentsDefinition$)
-        {
-            return $WorkloadMethodCall$;
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void OverheadActionUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            $OverheadMethodReturnTypeName$ result = default($OverheadMethodReturnTypeName$);
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                result = __OverheadWrapper($PassArguments$);@Unroll@
-            }
-            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void OverheadActionNoUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            $OverheadMethodReturnTypeName$ result = default($OverheadMethodReturnTypeName$);
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                result = __OverheadWrapper($PassArguments$);
-            }
-            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void WorkloadActionUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            $WorkloadMethodReturnType$ result = default($WorkloadMethodReturnType$);
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                result = __WorkloadWrapper($PassArguments$);@Unroll@
-            }
-            NonGenericKeepAliveWithoutBoxing(result);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void WorkloadActionNoUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            $WorkloadMethodReturnType$ result = default($WorkloadMethodReturnType$);
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                result = __WorkloadWrapper($PassArguments$);
-            }
-            NonGenericKeepAliveWithoutBoxing(result);
-        }
-
-        // we must not simply use DeadCodeEliminationHelper.KeepAliveWithoutBoxing<T> because it's generic method
-        // and stack-only types like Span<T> can not be generic type arguments http://adamsitnik.com/Span/#span-must-not-be-a-generic-type-argument
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        private void NonGenericKeepAliveWithoutBoxing($WorkloadMethodReturnType$ _) { }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
-        {
-            if (NotEleven == 11)
-            {
-                $LoadArguments$
-                return $WorkloadMethodCall$;
-            }
-            
-            return default($WorkloadMethodReturnType$);
-        }
-
-#elif RETURNS_BYREF_$ID$
-
-        // Prevent inlining the method invoke.
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
-        private $OverheadMethodReturnTypeName$ __OverheadWrapper($ArgumentsDefinition$)
-        {
-            return __Overhead($PassArguments$);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
-        private ref $WorkloadMethodReturnType$ __WorkloadWrapper($ArgumentsDefinition$)
-        {
-            return ref $WorkloadMethodCall$;
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void OverheadActionUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            $OverheadMethodReturnTypeName$ value = default($OverheadMethodReturnTypeName$);
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                value = __OverheadWrapper($PassArguments$);@Unroll@
-            }
-            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void OverheadActionNoUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            $OverheadMethodReturnTypeName$ value = default($OverheadMethodReturnTypeName$);
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                value = __OverheadWrapper($PassArguments$);
-            }
-            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
-        }
-
-        private $WorkloadMethodReturnType$ workloadDefaultValueHolder = default($WorkloadMethodReturnType$);
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void WorkloadActionUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            ref $WorkloadMethodReturnType$ alias = ref workloadDefaultValueHolder;
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                alias = __WorkloadWrapper($PassArguments$);@Unroll@
-            }
-            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void WorkloadActionNoUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            ref $WorkloadMethodReturnType$ alias = ref workloadDefaultValueHolder;
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                alias = __WorkloadWrapper($PassArguments$);
-            }
-            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public ref $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
-        {
-            if (NotEleven == 11)
-            {
-                $LoadArguments$
-                return ref $WorkloadMethodCall$;
-            }
-            
-            return ref workloadDefaultValueHolder;
-        }
-#elif RETURNS_BYREF_READONLY_$ID$
-
-        // Prevent inlining the method invoke.
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
-        private $OverheadMethodReturnTypeName$ __OverheadWrapper($ArgumentsDefinition$)
-        {
-            return __Overhead($PassArguments$);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
-        private ref readonly $WorkloadMethodReturnType$ __WorkloadWrapper($ArgumentsDefinition$)
-        {
-            return ref $WorkloadMethodCall$;
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void OverheadActionUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            $OverheadMethodReturnTypeName$ value = default($OverheadMethodReturnTypeName$);
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                value = __OverheadWrapper($PassArguments$);@Unroll@
-            }
-            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void OverheadActionNoUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            $OverheadMethodReturnTypeName$ value = default($OverheadMethodReturnTypeName$);
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                value = __OverheadWrapper($PassArguments$);
-            }
-            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
-        }
-
-        private $WorkloadMethodReturnType$ workloadDefaultValueHolder = default($WorkloadMethodReturnType$);
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void WorkloadActionUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            ref $WorkloadMethodReturnType$ alias = ref workloadDefaultValueHolder;
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                alias = __WorkloadWrapper($PassArguments$);@Unroll@
-            }
-            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(alias);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
-        private void WorkloadActionNoUnroll(System.Int64 invokeCount)
-        {
-            $LoadArguments$
-            ref $WorkloadMethodReturnType$ alias = ref workloadDefaultValueHolder;
-            for (System.Int64 i = 0; i < invokeCount; i++)
-            {
-                alias = __WorkloadWrapper($PassArguments$);
-            }
-            BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(alias);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public ref readonly $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
-        {
-            if (NotEleven == 11)
-            {
-                $LoadArguments$
-                return ref $WorkloadMethodCall$;
-            }
-            
-            return ref workloadDefaultValueHolder;
-        }
-#elif RETURNS_VOID_$ID$
 
         // Prevent inlining the method invoke.
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
         private void __OverheadWrapper($ArgumentsDefinition$)
         {
             __Overhead($PassArguments$);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
-        private void __WorkloadWrapper($ArgumentsDefinition$)
-        {
-            $WorkloadMethodCall$;
         }
 
         [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
@@ -455,6 +145,59 @@
             {
                 __WorkloadWrapper($PassArguments$);
             }
+        }
+
+#if RETURNS_NON_VOID_$ID$
+
+        // Prevent inlining the method invoke.
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
+        private $WorkloadMethodReturnType$ __WorkloadWrapper($ArgumentsDefinition$)
+        {
+            return $WorkloadMethodCall$;
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
+        {
+            if (NotEleven == 11)
+            {
+                $LoadArguments$
+                return $WorkloadMethodCall$;
+            }
+            
+            return default($WorkloadMethodReturnType$);
+        }
+
+#elif RETURNS_BYREF_$ID$
+
+        // Prevent inlining the method invoke.
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
+        private $WorkloadMethodReturnTypeModifiers$ $WorkloadMethodReturnType$ __WorkloadWrapper($ArgumentsDefinition$)
+        {
+            return ref $WorkloadMethodCall$;
+        }
+
+        private $WorkloadMethodReturnType$ __disassemblerDefaultValueHolder = default($WorkloadMethodReturnType$);
+        
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public $WorkloadMethodReturnTypeModifiers$ $WorkloadMethodReturnType$ $DisassemblerEntryMethodName$()
+        {
+            if (NotEleven == 11)
+            {
+                $LoadArguments$
+                return ref $WorkloadMethodCall$;
+            }
+            
+            return ref __disassemblerDefaultValueHolder;
+        }
+
+#elif RETURNS_VOID_$ID$
+
+        // Prevent inlining the method invoke.
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining | System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
+        private void __WorkloadWrapper($ArgumentsDefinition$)
+        {
+            $WorkloadMethodCall$;
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
