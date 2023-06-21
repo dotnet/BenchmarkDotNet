@@ -37,5 +37,14 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
 
             return methodBuilder;
         }
+
+        public static MethodBuilder SetAggressiveOptimizationImplementationFlag(this MethodBuilder methodBuilder)
+        {
+            // AggressiveOptimization is not available in netstandard2.0, so just use the value casted to enum.
+            methodBuilder.SetImplementationFlags(
+                methodBuilder.GetMethodImplementationFlags() | (MethodImplAttributes) 512);
+
+            return methodBuilder;
+        }
     }
 }

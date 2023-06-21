@@ -129,21 +129,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 var engineParameters = new EngineParameters
                 {
                     Host = host,
-                    WorkloadActionNoUnroll = invocationCount =>
-                    {
-                        for (int i = 0; i < invocationCount; i++)
-                            workloadAction.InvokeSingle();
-                    },
-                    WorkloadActionUnroll = workloadAction.InvokeMultiple,
+                    WorkloadActionNoUnroll = workloadAction.InvokeNoUnroll,
+                    WorkloadActionUnroll = workloadAction.InvokeUnroll,
                     Dummy1Action = dummy1.InvokeSingle,
                     Dummy2Action = dummy2.InvokeSingle,
                     Dummy3Action = dummy3.InvokeSingle,
-                    OverheadActionNoUnroll = invocationCount =>
-                    {
-                        for (int i = 0; i < invocationCount; i++)
-                            overheadAction.InvokeSingle();
-                    },
-                    OverheadActionUnroll = overheadAction.InvokeMultiple,
+                    OverheadActionNoUnroll = overheadAction.InvokeNoUnroll,
+                    OverheadActionUnroll = overheadAction.InvokeUnroll,
                     GlobalSetupAction = globalSetupAction.InvokeSingle,
                     GlobalCleanupAction = globalCleanupAction.InvokeSingle,
                     IterationSetupAction = iterationSetupAction.InvokeSingle,

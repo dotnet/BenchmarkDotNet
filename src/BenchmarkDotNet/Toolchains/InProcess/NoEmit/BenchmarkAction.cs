@@ -14,7 +14,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
         /// <summary>Gets or sets invoke multiple times callback.</summary>
         /// <value>Invoke multiple times callback.</value>
-        public Action<long> InvokeMultiple { get; protected set; }
+        public Action<long> InvokeUnroll { get; protected set; }
+        public Action<long> InvokeNoUnroll{ get; protected set; }
 
         /// <summary>Gets the last run result.</summary>
         /// <value>The last run result.</value>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
@@ -14,6 +15,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
     /// <summary>Helper class that creates <see cref="BenchmarkAction"/> instances. </summary>
     public static partial class BenchmarkActionFactory
     {
+        // Not available in netstandard2.0, so just use the value casted to enum.
+        public const MethodImplOptions AggressiveOptimization = (MethodImplOptions) 512;
+
         internal class BenchmarkActionVoid : BenchmarkActionBase
         {
             private readonly Action callback;
@@ -25,16 +29,25 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 InvokeSingle = callback;
 
                 unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
+                InvokeUnroll = WorkloadActionUnroll;
+                InvokeNoUnroll = WorkloadActionNoUnroll;
             }
 
             private static void OverheadStatic() { }
             private void OverheadInstance() { }
 
-            private void InvokeMultipleHardcoded(long repeatCount)
+            [MethodImpl(AggressiveOptimization)]
+            private void WorkloadActionUnroll(long repeatCount)
             {
                 for (long i = 0; i < repeatCount; i++)
                     unrolledCallback();
+            }
+
+            [MethodImpl(AggressiveOptimization)]
+            private void WorkloadActionNoUnroll(long repeatCount)
+            {
+                for (long i = 0; i < repeatCount; i++)
+                    callback();
             }
         }
 
@@ -50,7 +63,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 InvokeSingle = InvokeSingleHardcoded;
 
                 unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
+                InvokeUnroll = WorkloadActionUnroll;
+                InvokeNoUnroll = WorkloadActionNoUnroll;
             }
 
             private static T OverheadStatic() => default;
@@ -58,10 +72,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
             private void InvokeSingleHardcoded() => result = callback();
 
-            private void InvokeMultipleHardcoded(long repeatCount)
+            [MethodImpl(AggressiveOptimization)]
+            private void WorkloadActionUnroll(long repeatCount)
             {
                 for (long i = 0; i < repeatCount; i++)
                     result = unrolledCallback();
+            }
+
+            [MethodImpl(AggressiveOptimization)]
+            private void WorkloadActionNoUnroll(long repeatCount)
+            {
+                for (long i = 0; i < repeatCount; i++)
+                    result = callback();
             }
 
             public override object LastRunResult => result;
@@ -89,7 +111,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 InvokeSingle = callback;
 
                 unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
+                InvokeUnroll = WorkloadActionUnroll;
+                InvokeNoUnroll = WorkloadActionNoUnroll;
 
             }
 
@@ -99,10 +122,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             // must be kept in sync with TaskDeclarationsProvider.TargetMethodDelegate
             private void ExecuteBlocking() => startTaskCallback.Invoke().GetAwaiter().GetResult();
 
-            private void InvokeMultipleHardcoded(long repeatCount)
+            [MethodImpl(AggressiveOptimization)]
+            private void WorkloadActionUnroll(long repeatCount)
             {
                 for (long i = 0; i < repeatCount; i++)
                     unrolledCallback();
+            }
+
+            [MethodImpl(AggressiveOptimization)]
+            private void WorkloadActionNoUnroll(long repeatCount)
+            {
+                for (long i = 0; i < repeatCount; i++)
+                    callback();
             }
         }
 
@@ -129,7 +160,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 InvokeSingle = InvokeSingleHardcoded;
 
                 unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
+                InvokeUnroll = WorkloadActionUnroll;
+                InvokeNoUnroll = WorkloadActionNoUnroll;
             }
 
             private T Overhead() => default;
@@ -139,10 +171,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
             private void InvokeSingleHardcoded() => result = callback();
 
-            private void InvokeMultipleHardcoded(long repeatCount)
+            [MethodImpl(AggressiveOptimization)]
+            private void WorkloadActionUnroll(long repeatCount)
             {
                 for (long i = 0; i < repeatCount; i++)
                     result = unrolledCallback();
+            }
+
+            [MethodImpl(AggressiveOptimization)]
+            private void WorkloadActionNoUnroll(long repeatCount)
+            {
+                for (long i = 0; i < repeatCount; i++)
+                    result = callback();
             }
 
             public override object LastRunResult => result;
@@ -172,7 +212,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
 
                 unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
+                InvokeUnroll = WorkloadActionUnroll;
+                InvokeNoUnroll = WorkloadActionNoUnroll;
             }
 
             private T Overhead() => default;
@@ -182,10 +223,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
             private void InvokeSingleHardcoded() => result = callback();
 
-            private void InvokeMultipleHardcoded(long repeatCount)
+            [MethodImpl(AggressiveOptimization)]
+            private void WorkloadActionUnroll(long repeatCount)
             {
                 for (long i = 0; i < repeatCount; i++)
                     result = unrolledCallback();
+            }
+
+            [MethodImpl(AggressiveOptimization)]
+            private void WorkloadActionNoUnroll(long repeatCount)
+            {
+                for (long i = 0; i < repeatCount; i++)
+                    result = callback();
             }
 
             public override object LastRunResult => result;
