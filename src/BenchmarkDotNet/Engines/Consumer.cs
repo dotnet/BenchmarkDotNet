@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using JetBrains.Annotations;
@@ -11,13 +8,6 @@ namespace BenchmarkDotNet.Engines
 {
     public class Consumer
     {
-        private static readonly HashSet<Type> SupportedTypes
-            = new HashSet<Type>(
-                typeof(Consumer).GetTypeInfo()
-                                .DeclaredFields
-                                .Where(field => !field.IsStatic) // exclude this HashSet itself
-                                .Select(field => field.FieldType));
-
 #pragma warning disable IDE0052 // Remove unread private members
         private volatile byte byteHolder;
         private volatile sbyte sbyteHolder;
@@ -152,29 +142,6 @@ namespace BenchmarkDotNet.Engines
                 Consume((object) value);
             else
                 DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(value); // non-primitive and nullable value types
-        }
-
-        internal static bool IsConsumable(Type type)
-            => SupportedTypes.Contains(type) || type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface;
-
-        internal static bool HasConsumableField(Type type, out FieldInfo? consumableField)
-        {
-            var typeInfo = type.GetTypeInfo();
-
-            if (typeInfo.IsEnum)
-            {
-                // Enums are tricky bastards which report "value__" field, which is public for reflection, but inaccessible via C#
-                consumableField = null;
-                return false;
-            }
-
-            var publicInstanceFields = typeInfo.DeclaredFields
-                                               .Where(field => field.IsPublic && !field.IsStatic)
-                                               .ToArray();
-
-            consumableField = publicInstanceFields.FirstOrDefault(field => IsConsumable(field.FieldType));
-
-            return consumableField != null;
         }
     }
 }
