@@ -86,7 +86,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             return result;
         }
 
-        internal static bool TryUpdateArgs(string[]? args, out string[]? updatedArgs, Action<CommandLineOptions> updater)
+        internal static bool TryUpdateArgs(string[] args, out string[]? updatedArgs, Action<CommandLineOptions> updater)
         {
             (bool isSuccess, CommandLineOptions options) result = default;
 

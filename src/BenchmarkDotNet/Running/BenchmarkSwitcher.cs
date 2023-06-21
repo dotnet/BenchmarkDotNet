@@ -55,6 +55,7 @@ namespace BenchmarkDotNet.Running
         /// </summary>
         [PublicAPI] public IEnumerable<Summary> RunAll(IConfig? config = null, string[]? args = null)
         {
+            args ??= Array.Empty<string>();
             if (ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = new[] { "*" }))
                 args = updatedArgs;
 
@@ -66,6 +67,7 @@ namespace BenchmarkDotNet.Running
         /// </summary>
         [PublicAPI] public Summary RunAllJoined(IConfig? config = null, string[]? args = null)
         {
+            args ??= Array.Empty<string>();
             if (ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => (options.Join, options.Filters) = (true, new[] { "*" })))
                 args = updatedArgs;
 
