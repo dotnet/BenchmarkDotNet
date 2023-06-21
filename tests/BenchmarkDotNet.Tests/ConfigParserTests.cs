@@ -591,7 +591,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("--filter abc", "--filter *")]
         [InlineData("-f abc", "--filter *")]
         [InlineData("-f *", "--filter *")]
-        [InlineData("--runtime net7.0 --join", "--filter * --runtime net7.0 --join")]
+        [InlineData("--runtimes net7.0 --join", "--filter * --join --runtimes net7.0")]
         [InlineData("--join abc", "--filter * --join")]
         public void CheckUpdateValidArgs(string strArgs, string expected)
         {
