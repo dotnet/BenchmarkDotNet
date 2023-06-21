@@ -16,9 +16,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 return new VoidConsumeEmitter(consumableTypeInfo);
             if (consumableTypeInfo.IsByRef)
                 return new ByRefConsumeEmitter(consumableTypeInfo);
-            if (consumableTypeInfo.IsConsumable)
-                return new ConsumableConsumeEmitter(consumableTypeInfo);
-            return new NonConsumableConsumeEmitter(consumableTypeInfo);
+            return new NonVoidConsumeEmitter(consumableTypeInfo);
         }
 
         protected ConsumeEmitter(ConsumableTypeInfo consumableTypeInfo)
@@ -86,28 +84,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         {
         }
 
-        public void OnEmitMembers(TypeBuilder runnableBuilder)
-        {
-            AssertNoBuilder();
-
-            OnEmitMembersOverride(runnableBuilder);
-        }
-
-        protected virtual void OnEmitMembersOverride(TypeBuilder runnableBuilder)
-        {
-        }
-
-        public void OnEmitCtorBody(ConstructorBuilder constructorBuilder, ILGenerator ilBuilder)
-        {
-            AssertNoBuilder();
-
-            OnEmitCtorBodyOverride(constructorBuilder, ilBuilder);
-        }
-
-        protected virtual void OnEmitCtorBodyOverride(ConstructorBuilder constructorBuilder, ILGenerator ilBuilder)
-        {
-        }
-
         public void DeclareDisassemblyDiagnoserLocals(ILGenerator ilBuilder)
         {
             AssertNoBuilder();
@@ -145,72 +121,16 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             ActionMethodBuilder = actionMethodBuilder;
             ActionInvokeMethod = actionInvokeMethod;
             ActionKind = actionKind;
-
-            BeginEmitActionOverride(IlBuilder);
-        }
-
-        protected virtual void BeginEmitActionOverride(ILGenerator ilBuilder)
-        {
         }
 
         public void CompleteEmitAction(ILGenerator ilBuilder)
         {
             AssertHasBuilder(ilBuilder);
 
-            CompleteEmitActionOverride(ilBuilder);
-
             IlBuilder = null;
             ActionMethodBuilder = null;
             ActionInvokeMethod = null;
             ActionKind = null;
-        }
-
-        protected virtual void CompleteEmitActionOverride(ILGenerator ilBuilder)
-        {
-        }
-
-        public void DeclareActionLocals(ILGenerator ilBuilder)
-        {
-            AssertHasBuilder(ilBuilder);
-
-            DeclareActionLocalsOverride(ilBuilder);
-        }
-
-        protected virtual void DeclareActionLocalsOverride(ILGenerator ilBuilder)
-        {
-        }
-
-        public void EmitActionBeforeLoop(ILGenerator ilBuilder)
-        {
-            AssertHasBuilder(ilBuilder);
-
-            EmitActionBeforeLoopOverride(ilBuilder);
-        }
-
-        protected virtual void EmitActionBeforeLoopOverride(ILGenerator ilBuilder)
-        {
-        }
-
-        public void EmitActionAfterLoop(ILGenerator ilBuilder)
-        {
-            AssertHasBuilder(ilBuilder);
-
-            EmitActionAfterLoopOverride(ilBuilder);
-        }
-
-        protected virtual void EmitActionAfterLoopOverride(ILGenerator ilBuilder)
-        {
-        }
-
-        public void EmitActionBeforeCall(ILGenerator ilBuilder)
-        {
-            AssertHasBuilder(ilBuilder);
-
-            EmitActionBeforeCallOverride(ilBuilder);
-        }
-
-        protected virtual void EmitActionBeforeCallOverride(ILGenerator ilBuilder)
-        {
         }
 
         public void EmitActionAfterCall(ILGenerator ilBuilder)
