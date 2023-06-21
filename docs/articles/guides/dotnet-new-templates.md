@@ -5,7 +5,7 @@ name: BenchmarkDotNet templates
 
 # BenchmarkDotNet templates
 
-BenchmarkDotNet provides project templates to setup your benchmarks easily 
+BenchmarkDotNet provides project templates to setup your benchmarks easily.  
 The template exists for each major .NET language ([C#](https://learn.microsoft.com/dotnet/csharp/), [F#](https://learn.microsoft.com/dotnet/fsharp/) and [VB](https://learn.microsoft.com/dotnet/visual-basic/)) with equivalent features and structure.
 
 ## How to install the templates
@@ -43,7 +43,7 @@ dotnet new benchmark -lang VB
 
 The template projects has five additional options - all of them are optional.
 
-By default a class library project targeting netstandard2.0 is created.
+By default a class library project targeting `netstandard2.0` is created.
 You can specify `-f` or `--frameworks` to change targeting to one or more frameworks:
 
 ```log
