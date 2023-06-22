@@ -7,7 +7,7 @@ using Xunit;
 
 namespace BenchmarkDotNet.Tests.Portability.Cpu
 {
-    [Collection("ApprovalTests")]
+    [Collection("VerifyTests")]
     [UsesVerify]
     public class CpuInfoFormatterTests
     {
@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
             }
 
             var settings = new VerifySettings();
-            settings.UseDirectory("ApprovedFiles");
+            settings.UseDirectory("VerifiedFiles");
             return Verifier.Verify(captions.ToString(), settings);
         }
     }

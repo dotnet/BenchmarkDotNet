@@ -16,13 +16,13 @@ using Xunit;
 
 namespace BenchmarkDotNet.Tests.Attributes
 {
-    [Collection("ApprovalTests")]
+    [Collection("VerifyTests")]
     [UsesVerify]
-    public class ParamsAllValuesApprovalTests : IDisposable
+    public class ParamsAllValuesVerifyTests : IDisposable
     {
         private readonly CultureInfo initCulture;
 
-        public ParamsAllValuesApprovalTests() => initCulture = Thread.CurrentThread.CurrentCulture;
+        public ParamsAllValuesVerifyTests() => initCulture = Thread.CurrentThread.CurrentCulture;
 
         [UsedImplicitly]
         public static TheoryData<Type> GetBenchmarkTypes()
@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Tests.Attributes
                 logger.WriteLineError("* " + error.Message);
 
             var settings = new VerifySettings();
-            settings.UseDirectory("ApprovedFiles");
+            settings.UseDirectory("VerifiedFiles");
             settings.UseTextForParameters(benchmarkType.Name);
             return Verifier.Verify(logger.GetLog(), settings);
         }

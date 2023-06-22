@@ -18,13 +18,13 @@ using Xunit;
 
 namespace BenchmarkDotNet.Tests.Exporters
 {
-    [Collection("ApprovalTests")]
+    [Collection("VerifyTests")]
     [UsesVerify]
-    public class CommonExporterApprovalTests : IDisposable
+    public class CommonExporterVerifyTests : IDisposable
     {
         private readonly CultureInfo initCulture;
 
-        public CommonExporterApprovalTests()
+        public CommonExporterVerifyTests()
         {
             initCulture = Thread.CurrentThread.CurrentCulture;
         }
@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             }
 
             var settings = new VerifySettings();
-            settings.UseDirectory("ApprovedFiles");
+            settings.UseDirectory("VerifiedFiles");
             settings.UseTextForParameters(GetName(cultureInfo));
             return Verifier.Verify(logger.GetLog(), settings);
         }

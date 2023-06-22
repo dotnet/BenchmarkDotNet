@@ -17,13 +17,13 @@ using Xunit;
 
 namespace BenchmarkDotNet.Tests.Exporters
 {
-    [Collection("ApprovalTests")]
+    [Collection("VerifyTests")]
     [UsesVerify]
-    public class MarkdownExporterApprovalTests : IDisposable
+    public class MarkdownExporterVerifyTests : IDisposable
     {
         private readonly CultureInfo initCulture;
 
-        public MarkdownExporterApprovalTests() => initCulture = Thread.CurrentThread.CurrentCulture;
+        public MarkdownExporterVerifyTests() => initCulture = Thread.CurrentThread.CurrentCulture;
 
         [UsedImplicitly]
         public static TheoryData<Type> GetGroupBenchmarkTypes()
@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                 logger.WriteLineError("* " + error.Message);
 
             var settings = new VerifySettings();
-            settings.UseDirectory("ApprovedFiles");
+            settings.UseDirectory("VerifiedFiles");
             settings.UseTextForParameters(benchmarkType.Name);
             return Verifier.Verify(logger.GetLog(), settings);
         }
