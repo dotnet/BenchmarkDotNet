@@ -42,16 +42,4 @@
   <ItemGroup>
     <EmbeddedResource Include="Portability\Cpu\TestFiles\*.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <None Remove="Exporters\ApprovedFiles\MarkdownExporterApprovalTests.GroupExporterTest_Escape_ParamsAndArguments.verified.txt" />
-    <None Remove="Exporters\ApprovedFiles\CommonExporterApprovalTests.Exporters_ru-RU.verified.txt" />
-    <None Remove="Exporters\ApprovedFiles\CommonExporterApprovalTests.Exporters_en-US.verified.txt" />
-    <None Remove="Exporters\ApprovedFiles\CommonExporterApprovalTests.Exporters_Invariant.verified.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Exporters\ApprovedFiles\MarkdownExporterApprovalTests.GroupExporterTest_Escape_ParamsAndArguments.verified.txt" />
-    <None Remove="Exporters\ApprovedFiles\CommonExporterApprovalTests.Exporters_ru-RU.verified.txt" />
-    <None Remove="Exporters\ApprovedFiles\CommonExporterApprovalTests.Exporters_en-US.verified.txt" />
-    <None Remove="Exporters\ApprovedFiles\CommonExporterApprovalTests.Exporters_Invariant.verified.txt" />
-  </ItemGroup>
 </Project>
