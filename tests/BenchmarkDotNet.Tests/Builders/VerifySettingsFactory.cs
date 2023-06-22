@@ -8,6 +8,7 @@ namespace BenchmarkDotNet.Tests.Builders
         {
             var result = new VerifySettings();
             result.UseDirectory("VerifiedFiles");
+            result.DisableDiff();
             return result;
         }
     }
