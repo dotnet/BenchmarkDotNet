@@ -9,9 +9,9 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
-using VerifyTests;
 using VerifyXunit;
 using Xunit;
 
@@ -54,8 +54,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             foreach (var error in errors)
                 logger.WriteLineError("* " + error.Message);
 
-            var settings = new VerifySettings();
-            settings.UseDirectory("VerifiedFiles");
+            var settings = VerifySettingsFactory.Create();
             settings.UseTextForParameters(benchmarkType.Name);
             return Verifier.Verify(logger.GetLog(), settings);
         }

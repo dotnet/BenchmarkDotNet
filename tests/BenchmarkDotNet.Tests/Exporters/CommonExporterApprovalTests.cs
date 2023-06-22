@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Columns;
@@ -10,9 +9,9 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Tests.Mocks;
 using JetBrains.Annotations;
-using VerifyTests;
 using VerifyXunit;
 using Xunit;
 
@@ -55,8 +54,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                 exporter.ExportToLog(MockFactory.CreateSummary(config.WithCultureInfo(cultureInfo)), logger);
             }
 
-            var settings = new VerifySettings();
-            settings.UseDirectory("VerifiedFiles");
+            var settings = VerifySettingsFactory.Create();
             settings.UseTextForParameters(GetName(cultureInfo));
             return Verifier.Verify(logger.GetLog(), settings);
         }

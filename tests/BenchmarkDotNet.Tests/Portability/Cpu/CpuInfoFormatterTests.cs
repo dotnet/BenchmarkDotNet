@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Portability.Cpu;
-using VerifyTests;
+using BenchmarkDotNet.Tests.Builders;
 using VerifyXunit;
 using Xunit;
 
@@ -24,8 +24,7 @@ namespace BenchmarkDotNet.Tests.Portability.Cpu
                 captions.AppendLine(CpuInfoFormatter.Format(mockCpuInfo));
             }
 
-            var settings = new VerifySettings();
-            settings.UseDirectory("VerifiedFiles");
+            var settings = VerifySettingsFactory.Create();
             return Verifier.Verify(captions.ToString(), settings);
         }
     }
