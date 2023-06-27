@@ -20,7 +20,12 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
         {
             Aot = aot;
             CustomRuntimePack = customRuntimePack;
-            MainJS = (targetFrameworkMoniker == "net5.0" || targetFrameworkMoniker == "net6.0") ? "main.js" : "test-main.js";
+            MainJS = targetFrameworkMoniker switch
+            {
+                "net5.0" or "net6.0" => "main.js",
+                "net7.0" => "test-main.js",
+                _ => "test-main.mjs"
+            };
         }
 
         protected override void GenerateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
