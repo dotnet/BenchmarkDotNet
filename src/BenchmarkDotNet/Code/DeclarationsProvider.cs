@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Engines;
@@ -44,7 +45,7 @@ namespace BenchmarkDotNet.Code
 
         public string OverheadMethodReturnTypeName => OverheadMethodReturnType.GetCorrectCSharpTypeName();
 
-        public virtual string AwaiterTypeName => string.Empty;
+        public virtual string AsyncBenchmarkRunnerTypeName => null;
 
         public virtual void OverrideUnrollFactor(BenchmarkCase benchmarkCase) { }
 
@@ -146,17 +147,28 @@ namespace BenchmarkDotNet.Code
         public override string WorkloadMethodReturnTypeModifiers => "ref readonly";
     }
 
-    internal class TaskDeclarationsProvider : DeclarationsProvider
+    internal class AsyncDeclarationsProvider : DeclarationsProvider
     {
-        public TaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
+        private readonly Type asyncConsumerType;
+        public AsyncDeclarationsProvider(Descriptor descriptor, Type asyncConsumerType) : base(descriptor) => this.asyncConsumerType = asyncConsumerType;
 
         public override string ReturnsDefinition => "RETURNS_AWAITABLE";
-
-        public override string AwaiterTypeName => WorkloadMethodReturnType.GetMethod(nameof(Task.GetAwaiter), BindingFlags.Public | BindingFlags.Instance).ReturnType.GetCorrectCSharpTypeName();
 
         public override string OverheadImplementation => $"return default({OverheadMethodReturnType.GetCorrectCSharpTypeName()});";
 
         protected override Type OverheadMethodReturnType => WorkloadMethodReturnType;
+
+        public override string AsyncBenchmarkRunnerTypeName
+        {
+            get
+            {
+                string consumerTypeName = asyncConsumerType.GetCorrectCSharpTypeName();
+                string awaiterTypeName = asyncConsumerType.GetInterfaces()
+                    .First(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IAsyncConsumer<,>))
+                    .GetGenericArguments()[1].GetCorrectCSharpTypeName();
+                return $"BenchmarkDotNet.Engines.AsyncBenchmarkRunner<BenchmarkFunc, {consumerTypeName}, {WorkloadMethodReturnTypeName}, {awaiterTypeName}>";
+            }
+        }
 
         public override void OverrideUnrollFactor(BenchmarkCase benchmarkCase) => benchmarkCase.ForceUnrollFactorForAsync();
     }

@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Filters;
@@ -109,5 +111,14 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
 
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
+
+        public IReadOnlyDictionary<Type, Type> GetAsyncConsumerTypes() => new Dictionary<Type, Type>()
+        {
+            // Default consumers for Task and ValueTask.
+            [typeof(Task)] = typeof(TaskConsumer),
+            [typeof(Task<>)] = typeof(TaskConsumer<>),
+            [typeof(ValueTask)] = typeof(ValueTaskConsumer),
+            [typeof(ValueTask<>)] = typeof(ValueTaskConsumer<>),
+        };
     }
 }

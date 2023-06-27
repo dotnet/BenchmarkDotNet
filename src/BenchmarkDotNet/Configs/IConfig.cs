@@ -29,6 +29,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IFilter> GetFilters();
         IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
         IEnumerable<IColumnHidingRule> GetColumnHidingRules();
+        IReadOnlyDictionary<Type, Type> GetAsyncConsumerTypes();
 
         IOrderer? Orderer { get; }
         ICategoryDiscoverer? CategoryDiscoverer { get; }

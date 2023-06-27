@@ -1,5 +1,5 @@
     // the type name must be in sync with WindowsDisassembler.BuildArguments
-    public unsafe partial class Runnable_$ID$ : global::$WorkloadTypeName$
+    public unsafe class Runnable_$ID$ : global::$WorkloadTypeName$
     {
         public static void Run(BenchmarkDotNet.Engines.IHost host, System.String benchmarkName)
         {
@@ -64,7 +64,6 @@
             overheadDelegate = __Overhead;
             workloadDelegate = $WorkloadMethodDelegate$;
             $InitializeArgumentFields$
-            __SetContinuation();
         }
 
         private System.Func<System.Threading.Tasks.ValueTask> globalSetupAction;
@@ -110,17 +109,24 @@
             $OverheadImplementation$
         }
 
-        partial void __SetContinuation();
-
 #if RETURNS_AWAITABLE_$ID$
 
-        private readonly BenchmarkDotNet.Helpers.AutoResetValueTaskSource<Perfolizer.Horology.ClockSpan> valueTaskSource = new BenchmarkDotNet.Helpers.AutoResetValueTaskSource<Perfolizer.Horology.ClockSpan>();
-        private System.Int64 repeatsRemaining;
-        private System.Action continuation;
-        private Perfolizer.Horology.StartedClock startedClock;
-        private $AwaiterTypeName$ currentAwaiter;
+        private struct BenchmarkFunc : IBenchmarkFunc<$WorkloadMethodReturnType$>
+        {
+            $WorkloadMethodReturnType$ InvokeWorkload()
+            {
+                $LoadArguments$
+                return workloadDelegate($PassArguments$); 
+            }
 
-        partial void __SetContinuation() => continuation = __Continuation;
+            $WorkloadMethodReturnType$ InvokeOverhead()
+            {
+                $LoadArguments$
+                return overheadDelegate($PassArguments$);
+            }
+        }
+        
+        private readonly $AsyncBenchmarkRunnerType$ __asyncBenchmarkRunner = new $AsyncBenchmarkRunnerType$();
 
 #if NETCOREAPP3_0_OR_GREATER
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
@@ -128,7 +134,7 @@
         // Awaits are not unrolled.
         private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> OverheadActionUnroll(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)
         {
-            return OverheadActionImpl(invokeCount, clock);
+            return __asyncBenchmarkRunner.InvokeOverhead(invokeCount, clock);
         }
 
 #if NETCOREAPP3_0_OR_GREATER
@@ -136,31 +142,7 @@
 #endif
         private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> OverheadActionNoUnroll(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)
         {
-            return OverheadActionImpl(invokeCount, clock);
-        }
-
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
-        private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> OverheadActionImpl(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)
-        {
-            repeatsRemaining = invokeCount;
-            $OverheadMethodReturnTypeName$ value = default($OverheadMethodReturnTypeName$);
-            startedClock = Perfolizer.Horology.ClockExtensions.Start(clock);
-            try
-            {
-                $LoadArguments$
-                while (--repeatsRemaining >= 0)
-                {
-                    value = overheadDelegate($PassArguments$);
-                }
-            }
-            catch (System.Exception)
-            {
-                BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
-                throw;
-            }
-            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(startedClock.GetElapsed());
+            return __asyncBenchmarkRunner.InvokeOverhead(invokeCount, clock);
         }
 
 #if NETCOREAPP3_0_OR_GREATER
@@ -168,7 +150,7 @@
 #endif
         private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> WorkloadActionUnroll(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)
         {
-            return WorkloadActionImpl(invokeCount, clock);
+            return __asyncBenchmarkRunner.InvokeWorkload(invokeCount, clock);
         }
 
 #if NETCOREAPP3_0_OR_GREATER
@@ -176,72 +158,7 @@
 #endif
         private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> WorkloadActionNoUnroll(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)
         {
-            return WorkloadActionImpl(invokeCount, clock);
-        }
-
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
-        private System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan> WorkloadActionImpl(System.Int64 invokeCount, Perfolizer.Horology.IClock clock)
-        {
-            repeatsRemaining = invokeCount;
-            startedClock = Perfolizer.Horology.ClockExtensions.Start(clock);
-            __RunTask();
-            return new System.Threading.Tasks.ValueTask<Perfolizer.Horology.ClockSpan>(valueTaskSource, valueTaskSource.Version);
-        }
-
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
-        private void __RunTask()
-        {
-            try
-            {
-                $LoadArguments$
-                while (--repeatsRemaining >= 0)
-                {
-                    currentAwaiter = workloadDelegate($PassArguments$).GetAwaiter();
-                    if (!currentAwaiter.IsCompleted)
-                    {
-                        currentAwaiter.UnsafeOnCompleted(continuation);
-                        return;
-                    }
-                    currentAwaiter.GetResult();
-                }
-            }
-            catch (System.Exception e)
-            {
-                __SetException(e);
-                return;
-            }
-            var clockspan = startedClock.GetElapsed();
-            currentAwaiter = default($AwaiterTypeName$);
-            startedClock = default(Perfolizer.Horology.StartedClock);
-            valueTaskSource.SetResult(clockspan);
-        }
-
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
-        private void __Continuation()
-        {
-            try
-            {
-                currentAwaiter.GetResult();
-            }
-            catch (System.Exception e)
-            {
-                __SetException(e);
-                return;
-            }
-            __RunTask();
-        }
-
-        private void __SetException(System.Exception e)
-        {
-            currentAwaiter = default($AwaiterTypeName$);
-            startedClock = default(Perfolizer.Horology.StartedClock);
-            valueTaskSource.SetException(e);
+            return __asyncBenchmarkRunner.InvokeWorkload(invokeCount, clock);
         }
         
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization | System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]

@@ -67,6 +67,9 @@ namespace BenchmarkDotNet.Engines
         void INotifyCompletion.OnCompleted(Action continuation)
             => this.continuation = continuation;
 
+#if NETCOREAPP3_0_OR_GREATER
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         private void MoveNext(ref StateMachine stateMachine)
         {
             try
@@ -123,6 +126,7 @@ namespace BenchmarkDotNet.Engines
             valueTaskSource.SetResult(clockspan);
         }
 
+        // TODO: make sure Dispose is called.
         public void Dispose()
         {
             benchmarkFunc = default;
@@ -133,6 +137,9 @@ namespace BenchmarkDotNet.Engines
             action();
         }
 
+#if NETCOREAPP3_0_OR_GREATER
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         public ValueTask<ClockSpan> InvokeOverhead(long repeatCount, IClock clock)
         {
             repeatsRemaining = repeatCount;

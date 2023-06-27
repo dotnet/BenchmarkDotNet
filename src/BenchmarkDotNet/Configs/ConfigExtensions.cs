@@ -3,10 +3,12 @@ using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
@@ -114,6 +116,10 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static ManualConfig HideColumns(this IConfig config, params string[] columnNames) => config.With(c => c.HideColumns(columnNames));
         [PublicAPI] public static ManualConfig HideColumns(this IConfig config, params IColumn[] columns) => config.With(c => c.HideColumns(columns));
         [PublicAPI] public static ManualConfig HideColumns(this IConfig config, params IColumnHidingRule[] rules) => config.With(c => c.HideColumns(rules));
+        [PublicAPI] public static ManualConfig AddAsyncConsumer<TAwaitable, TAwaiter, TAsyncConsumer>(this IConfig config)
+            where TAwaiter : ICriticalNotifyCompletion
+            where TAsyncConsumer : struct, IAsyncConsumer<TAwaitable, TAwaiter>
+            => config.With(c => c.AddAsyncConsumer<TAwaitable, TAwaiter, TAsyncConsumer>());
 
         public static ImmutableConfig CreateImmutableConfig(this IConfig config) => ImmutableConfigBuilder.Create(config);
 
@@ -131,6 +137,29 @@ namespace BenchmarkDotNet.Configs
             var manualConfig = ManualConfig.Create(config);
             addAction(manualConfig);
             return manualConfig;
+        }
+
+        internal static bool GetIsAwaitable(this IConfig config, Type type, out Type asyncConsumerType)
+        {
+            var consumerTypes = config.GetAsyncConsumerTypes();
+            if (consumerTypes.TryGetValue(type, out asyncConsumerType))
+            {
+                return true;
+            }
+            if (type.IsGenericType)
+            {
+                var genericType = type.GetGenericArguments()[0];
+                foreach (var kvp in consumerTypes)
+                {
+                    if (kvp.Key.IsGenericType && kvp.Key.MakeGenericType(genericType) == type)
+                    {
+                        // TODO: handle partially closed types.
+                        asyncConsumerType = kvp.Value.MakeGenericType(genericType);
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

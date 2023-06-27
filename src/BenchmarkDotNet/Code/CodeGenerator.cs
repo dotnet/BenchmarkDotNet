@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -33,7 +34,7 @@ namespace BenchmarkDotNet.Code
             {
                 var benchmark = buildInfo.BenchmarkCase;
 
-                var provider = GetDeclarationsProvider(benchmark.Descriptor);
+                var provider = GetDeclarationsProvider(benchmark.Descriptor, benchmark.Config);
 
                 provider.OverrideUnrollFactor(benchmark);
 
@@ -51,7 +52,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$WorkloadMethodReturnType$", provider.WorkloadMethodReturnTypeName)
                     .Replace("$WorkloadMethodReturnTypeModifiers$", provider.WorkloadMethodReturnTypeModifiers)
                     .Replace("$OverheadMethodReturnTypeName$", provider.OverheadMethodReturnTypeName)
-                    .Replace("$AwaiterTypeName$", provider.AwaiterTypeName)
+                    .Replace("$AsyncBenchmarkRunnerType$", provider.AsyncBenchmarkRunnerTypeName)
                     .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)
                     .Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName)
                     .Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName)
@@ -151,16 +152,13 @@ namespace BenchmarkDotNet.Code
                 Replace("; ", ";\n                ");
         }
 
-        private static DeclarationsProvider GetDeclarationsProvider(Descriptor descriptor)
+        private static DeclarationsProvider GetDeclarationsProvider(Descriptor descriptor, IConfig config)
         {
             var method = descriptor.WorkloadMethod;
 
-            if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask)
-                || method.ReturnType.GetTypeInfo().IsGenericType
-                    && (method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
-                    || method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)))
+            if (config.GetIsAwaitable(method.ReturnType, out var asyncConsumerType))
             {
-                return new TaskDeclarationsProvider(descriptor);
+                return new AsyncDeclarationsProvider(descriptor, asyncConsumerType);
             }
 
             if (method.ReturnType == typeof(void))
