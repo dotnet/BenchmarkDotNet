@@ -2,33 +2,28 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
-using ApprovalTests;
-using ApprovalTests.Namers;
-using ApprovalTests.Reporters;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Tests.XUnit;
+using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
+using VerifyXunit;
 using Xunit;
 
 namespace BenchmarkDotNet.Tests.Exporters
 {
-    // In case of failed approval tests, use the following reporter:
-    // [UseReporter(typeof(KDiffReporter))]
-    [UseReporter(typeof(PatchedXUnit2Reporter))]
-    [UseApprovalSubdirectory("ApprovedFiles")]
-    [Collection("ApprovalTests")]
-    public class MarkdownExporterApprovalTests : IDisposable
+    [Collection("VerifyTests")]
+    [UsesVerify]
+    public class MarkdownExporterVerifyTests : IDisposable
     {
         private readonly CultureInfo initCulture;
 
-        public MarkdownExporterApprovalTests() => initCulture = Thread.CurrentThread.CurrentCulture;
+        public MarkdownExporterVerifyTests() => initCulture = Thread.CurrentThread.CurrentCulture;
 
         [UsedImplicitly]
         public static TheoryData<Type> GetGroupBenchmarkTypes()
@@ -41,10 +36,8 @@ namespace BenchmarkDotNet.Tests.Exporters
 
         [Theory]
         [MemberData(nameof(GetGroupBenchmarkTypes))]
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public void GroupExporterTest(Type benchmarkType)
+        public Task GroupExporterTest(Type benchmarkType)
         {
-            NamerFactory.AdditionalInformation = benchmarkType.Name;
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
             var logger = new AccumulationLogger();
@@ -61,7 +54,9 @@ namespace BenchmarkDotNet.Tests.Exporters
             foreach (var error in errors)
                 logger.WriteLineError("* " + error.Message);
 
-            Approvals.Verify(logger.GetLog());
+            var settings = VerifySettingsFactory.Create();
+            settings.UseTextForParameters(benchmarkType.Name);
+            return Verifier.Verify(logger.GetLog(), settings);
         }
 
         public void Dispose() => Thread.CurrentThread.CurrentCulture = initCulture;
