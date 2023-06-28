@@ -121,9 +121,9 @@ namespace BenchmarkDotNet.Configs
         public ManualConfig AddAsyncConsumer(Type awaitableType, Type asyncConsumerType)
         {
             // Validate types
-            if (!asyncConsumerType.IsValueType)
+            if (asyncConsumerType.IsNotPublic || (!asyncConsumerType.IsValueType && asyncConsumerType.GetConstructor(Array.Empty<Type>()) == null))
             {
-                throw new ArgumentException($"asyncConsumerType [{asyncConsumerType}] must be a struct.");
+                throw new ArgumentException($"asyncConsumerType [{asyncConsumerType}] is not a public struct, or a public class with a public, parameterless constructor.");
             }
             bool consumerIsOpenGeneric = asyncConsumerType.IsGenericTypeDefinition;
             bool awaitableisOpenGeneric = awaitableType.IsGenericTypeDefinition;
@@ -134,12 +134,12 @@ namespace BenchmarkDotNet.Configs
             int consumerOpenGenericCount = asyncConsumerType.GetGenericArguments().Count(t => t.IsGenericParameter);
             if (consumerOpenGenericCount > 1)
             {
-                throw new ArgumentException($"asyncConsumerType [{asyncConsumerType}] has more than 1 open generic argument. Only 0 or 1 open generic arguments is supported.");
+                throw new ArgumentException($"asyncConsumerType [{asyncConsumerType}] has more than 1 open generic argument. Only 0 or 1 open generic arguments are supported.");
             }
             int awaitableOpenGenericCount = awaitableType.GetGenericArguments().Count(t => t.IsGenericParameter);
             if (awaitableOpenGenericCount > 1)
             {
-                throw new ArgumentException($"awaitableType [{awaitableType}] has more than 1 open generic argument. Only 0 or 1 open generic arguments is supported.");
+                throw new ArgumentException($"awaitableType [{awaitableType}] has more than 1 open generic argument. Only 0 or 1 open generic arguments are supported.");
             }
             if (consumerOpenGenericCount != awaitableOpenGenericCount)
             {

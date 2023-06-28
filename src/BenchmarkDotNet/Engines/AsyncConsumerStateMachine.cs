@@ -7,58 +7,21 @@ using System.Threading.Tasks;
 namespace BenchmarkDotNet.Engines
 {
     // Using an interface instead of delegates allows the JIT to inline the call when it's used as a generic struct.
-    public interface IBenchmarkFunc<TResult>
+    public interface IFunc<TResult>
     {
-        TResult InvokeWorkload();
-        TResult InvokeOverhead();
+        TResult Invoke();
     }
 
-    public class AsyncBenchmarkRunner<TBenchmarkFunc, TAsyncConsumer, TAwaitable, TAwaiter> : ICriticalNotifyCompletion, IDisposable
-        where TBenchmarkFunc : struct, IBenchmarkFunc<TAwaitable>
-        // Struct constraint allows us to create the default value and forces the JIT to generate specialized code that can be inlined.
-        where TAsyncConsumer : struct, IAsyncConsumer<TAwaitable, TAwaiter>
-        where TAwaiter : ICriticalNotifyCompletion
+    internal sealed class AsyncStateMachineAdvancer : ICriticalNotifyCompletion
     {
-        // Using struct rather than class forces the JIT to generate specialized code that can be inlined.
-        // Also C# compiler uses struct state machines in Release mode, so we want to do the same.
-        private struct StateMachine : IAsyncStateMachine
-        {
-            internal AsyncBenchmarkRunner<TBenchmarkFunc, TAsyncConsumer, TAwaitable, TAwaiter> owner;
-            internal TAsyncConsumer asyncConsumer;
-
-            public void MoveNext() => owner.MoveNext(ref this);
-
-            void IAsyncStateMachine.SetStateMachine(IAsyncStateMachine stateMachine) => asyncConsumer.SetStateMachine(stateMachine);
-        }
-
-        private readonly AutoResetValueTaskSource<ClockSpan> valueTaskSource = new ();
-        private TBenchmarkFunc benchmarkFunc;
-        private int state = -1;
-        private long repeatsRemaining;
-        private StartedClock startedClock;
-        private TAwaiter currentAwaiter;
+        // The continuation callback moves the state machine forward through the builder in the TAsyncConsumer.
         private Action continuation;
 
-        public AsyncBenchmarkRunner(TBenchmarkFunc benchmarkFunc)
+        internal void Advance()
         {
-            this.benchmarkFunc = benchmarkFunc;
-            // Initialize the state machine and consumer before the actual workload starts.
-            StateMachine stateMachine = default;
-            stateMachine.asyncConsumer = new TAsyncConsumer();
-            stateMachine.asyncConsumer.CreateAsyncMethodBuilder();
-            stateMachine.owner = this;
-            stateMachine.asyncConsumer.Start(ref stateMachine);
-        }
-
-        public ValueTask<ClockSpan> InvokeWorkload(long repeatCount, IClock clock)
-        {
-            repeatsRemaining = repeatCount;
             Action action = continuation;
             continuation = null;
-            startedClock = clock.Start();
-            // The continuation callback moves the state machine forward through the builder in the TAsyncConsumer.
             action();
-            return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
         }
 
         void ICriticalNotifyCompletion.UnsafeOnCompleted(Action continuation)
@@ -66,110 +29,242 @@ namespace BenchmarkDotNet.Engines
 
         void INotifyCompletion.OnCompleted(Action continuation)
             => this.continuation = continuation;
+    }
 
-#if NETCOREAPP3_0_OR_GREATER
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-#endif
-        private void MoveNext(ref StateMachine stateMachine)
+    public sealed class AsyncBenchmarkRunner<TWorkloadFunc, TOverheadFunc, TAsyncConsumer, TAwaitable, TAwaiter> : IDisposable
+        where TWorkloadFunc : struct, IFunc<TAwaitable>
+        where TOverheadFunc : struct, IFunc<TAwaitable>
+        where TAsyncConsumer : IAsyncConsumer<TAwaitable, TAwaiter>, new()
+        where TAwaiter : ICriticalNotifyCompletion
+    {
+        private readonly AutoResetValueTaskSource<ClockSpan> valueTaskSource = new ();
+        private readonly TWorkloadFunc workloadFunc;
+        private readonly TOverheadFunc overheadFunc;
+        private long repeatsRemaining;
+        private IClock clock;
+        private AsyncStateMachineAdvancer workloadAsyncStateMachineAdvancer;
+        private AsyncStateMachineAdvancer overheadAsyncStateMachineAdvancer;
+        private bool isDisposed;
+
+        public AsyncBenchmarkRunner(TWorkloadFunc workloadFunc, TOverheadFunc overheadFunc)
         {
-            try
-            {
-                if (state < 0)
-                {
-                    if (state == -1)
-                    {
-                        // This is called when we call asyncConsumer.Start, so we just hook up the continuation
-                        // to the owner so the state machine can be moved forward when the benchmark starts.
-                        state = 0;
-                        var _this = this;
-                        stateMachine.asyncConsumer.AwaitOnCompleted(ref _this, ref stateMachine);
-                        return;
-                    }
-                    // This has been disposed, we complete the consumer.
-                    stateMachine.asyncConsumer.SetResult();
-                    return;
-                }
+            this.workloadFunc = workloadFunc;
+            this.overheadFunc = overheadFunc;
+        }
 
-                if (state == 1)
-                {
-                    state = 0;
-                    stateMachine.asyncConsumer.GetResult(ref currentAwaiter);
-                }
-
-                while (--repeatsRemaining >= 0)
-                {
-                    var awaitable = benchmarkFunc.InvokeWorkload();
-                    currentAwaiter = stateMachine.asyncConsumer.GetAwaiter(ref awaitable);
-                    if (!stateMachine.asyncConsumer.GetIsCompleted(ref currentAwaiter))
-                    {
-                        state = 1;
-                        stateMachine.asyncConsumer.AwaitOnCompleted(ref currentAwaiter, ref stateMachine);
-                        return;
-                    }
-                    stateMachine.asyncConsumer.GetResult(ref currentAwaiter);
-                }
-            }
-            catch (Exception e)
+        private void MaybeInitializeWorkload()
+        {
+            if (workloadAsyncStateMachineAdvancer != null)
             {
-                currentAwaiter = default;
-                startedClock = default;
-                valueTaskSource.SetException(e);
                 return;
             }
-            var clockspan = startedClock.GetElapsed();
-            currentAwaiter = default;
-            startedClock = default;
+
+            // Initialize the state machine and consumer before the workload starts.
+            workloadAsyncStateMachineAdvancer = new ();
+            StateMachine<TWorkloadFunc, TAsyncConsumer> stateMachine = default;
+            stateMachine.consumer = new ();
+            stateMachine.consumer.CreateAsyncMethodBuilder();
+            stateMachine.owner = this;
+            stateMachine.stateMachineAdvancer = workloadAsyncStateMachineAdvancer;
+            stateMachine.func = workloadFunc;
+            stateMachine.state = -1;
+            stateMachine.consumer.Start(ref stateMachine);
+        }
+
+        public ValueTask<ClockSpan> InvokeWorkload(long repeatCount, IClock clock)
+        {
+            MaybeInitializeWorkload();
+            repeatsRemaining = repeatCount;
+            // The clock is started inside the state machine.
+            this.clock = clock;
+            workloadAsyncStateMachineAdvancer.Advance();
+            this.clock = default;
+            return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
+        }
+
+        private void MaybeInitializeOverhead()
+        {
+            if (overheadAsyncStateMachineAdvancer != null)
             {
-                // We hook up the continuation to the owner so the state machine can be moved forward when the next benchmark iteration starts.
-                stateMachine.asyncConsumer.AwaitOnCompleted(ref stateMachine.owner, ref stateMachine);
+                return;
             }
-            valueTaskSource.SetResult(clockspan);
+
+            // Initialize the state machine and consumer before the overhead starts.
+            overheadAsyncStateMachineAdvancer = new ();
+            StateMachine<TOverheadFunc, OverheadConsumer> stateMachine = default;
+            stateMachine.consumer = new () { asyncConsumer = new () };
+            stateMachine.consumer.CreateAsyncMethodBuilder();
+            stateMachine.owner = this;
+            stateMachine.stateMachineAdvancer = overheadAsyncStateMachineAdvancer;
+            stateMachine.func = overheadFunc;
+            stateMachine.state = -1;
+            stateMachine.consumer.Start(ref stateMachine);
+        }
+
+        public ValueTask<ClockSpan> InvokeOverhead(long repeatCount, IClock clock)
+        {
+            MaybeInitializeOverhead();
+            repeatsRemaining = repeatCount;
+            // The clock is started inside the state machine.
+            this.clock = clock;
+            overheadAsyncStateMachineAdvancer.Advance();
+            this.clock = default;
+            return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
         }
 
         // TODO: make sure Dispose is called.
         public void Dispose()
         {
-            benchmarkFunc = default;
-            Action action = continuation;
-            continuation = null;
-            // Set the state and invoke the callback for the state machine to advance to complete the consumer.
-            state = -2;
-            action();
+            // Set the isDisposed flag and advance the state machines to complete the consumers.
+            isDisposed = true;
+            workloadAsyncStateMachineAdvancer?.Advance();
+            overheadAsyncStateMachineAdvancer?.Advance();
         }
 
-#if NETCOREAPP3_0_OR_GREATER
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-#endif
-        public ValueTask<ClockSpan> InvokeOverhead(long repeatCount, IClock clock)
+        // C# compiler creates struct state machines in Release mode, so we do the same.
+        private struct StateMachine<TFunc, TConsumer> : IAsyncStateMachine
+            where TFunc : struct, IFunc<TAwaitable>
+            where TConsumer : IAsyncConsumer<TAwaitable, TAwaiter>, new()
         {
-            repeatsRemaining = repeatCount;
-            TAwaitable value = default;
-            startedClock = clock.Start();
-            try
+            internal AsyncBenchmarkRunner<TWorkloadFunc, TOverheadFunc, TAsyncConsumer, TAwaitable, TAwaiter> owner;
+            internal AsyncStateMachineAdvancer stateMachineAdvancer;
+            internal TConsumer consumer;
+            internal TFunc func;
+            internal int state;
+            private StartedClock startedClock;
+            private TAwaiter currentAwaiter;
+
+#if NETCOREAPP3_0_OR_GREATER
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
+            public void MoveNext()
             {
-                while (--repeatsRemaining >= 0)
+                try
                 {
-                    value = benchmarkFunc.InvokeOverhead();
+                    if (state < 0)
+                    {
+                        if (state == -1)
+                        {
+                            // This is called when we call asyncConsumer.Start, so we just hook up the continuation
+                            // to the advancer so the state machine can be moved forward when the benchmark starts.
+                            state = -2;
+                            consumer.AwaitOnCompleted(ref stateMachineAdvancer, ref this);
+                            return;
+                        }
+
+                        if (owner.isDisposed)
+                        {
+                            // The owner has been disposed, we complete the consumer.
+                            consumer.SetResult();
+                            return;
+                        }
+
+                        // The benchmark has been started, start the clock.
+                        state = 0;
+                        startedClock = owner.clock.Start();
+                        goto StartLoop;
+                    }
+
+                    if (state == 1)
+                    {
+                        state = 0;
+                        GetResult();
+                    }
+
+                StartLoop:
+                    while (--owner.repeatsRemaining >= 0)
+                    {
+                        var awaitable = func.Invoke();
+                        GetAwaiter(ref awaitable);
+                        if (!GetIsCompleted())
+                        {
+                            state = 1;
+                            consumer.AwaitOnCompleted(ref currentAwaiter, ref this);
+                            return;
+                        }
+                        GetResult();
+                    }
                 }
-            }
-            catch (Exception e)
-            {
+                catch (Exception e)
+                {
+                    currentAwaiter = default;
+                    startedClock = default;
+                    owner.valueTaskSource.SetException(e);
+                    return;
+                }
+                var clockspan = startedClock.GetElapsed();
                 currentAwaiter = default;
                 startedClock = default;
-                valueTaskSource.SetException(e);
-                DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
-                throw;
+                state = -2;
+                {
+                    // We hook up the continuation to the advancer so the state machine can be moved forward when the next benchmark iteration starts.
+                    consumer.AwaitOnCompleted(ref stateMachineAdvancer, ref this);
+                }
+                owner.valueTaskSource.SetResult(clockspan);
             }
-            var clockspan = startedClock.GetElapsed();
-            currentAwaiter = default;
-            startedClock = default;
-            return new ValueTask<ClockSpan>(clockspan);
+
+            // Make sure the methods are called without inlining.
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            private void GetAwaiter(ref TAwaitable awaitable) => currentAwaiter = consumer.GetAwaiter(ref awaitable);
+
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            private bool GetIsCompleted() => consumer.GetIsCompleted(ref currentAwaiter);
+
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            private void GetResult() => consumer.GetResult(ref currentAwaiter);
+
+            void IAsyncStateMachine.SetStateMachine(IAsyncStateMachine stateMachine) => consumer.SetStateMachine(stateMachine);
+        }
+
+        private struct OverheadConsumer : IAsyncConsumer<TAwaitable, TAwaiter>
+        {
+            internal TAsyncConsumer asyncConsumer;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void CreateAsyncMethodBuilder()
+                => asyncConsumer.CreateAsyncMethodBuilder();
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
+                => asyncConsumer.Start(ref stateMachine);
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void AwaitOnCompleted<TAnyAwaiter, TStateMachine>(ref TAnyAwaiter awaiter, ref TStateMachine stateMachine)
+                where TAnyAwaiter : ICriticalNotifyCompletion
+                where TStateMachine : IAsyncStateMachine
+                => asyncConsumer.AwaitOnCompleted(ref awaiter, ref stateMachine);
+
+            public void SetResult()
+                => asyncConsumer.SetResult();
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void SetStateMachine(IAsyncStateMachine stateMachine)
+                => asyncConsumer.SetStateMachine(stateMachine);
+
+            public TAwaiter GetAwaiter(ref TAwaitable awaitable)
+                => default;
+
+            public bool GetIsCompleted(ref TAwaiter awaiter)
+                => true;
+
+            public void GetResult(ref TAwaiter awaiter) { }
         }
 
         public ValueTask InvokeSingle()
         {
             var asyncConsumer = new TAsyncConsumer();
-            var awaitable = benchmarkFunc.InvokeWorkload();
+            var awaitable = workloadFunc.Invoke();
+
+            if (null == default(TAwaitable) && awaitable is Task task)
+            {
+                return new ValueTask(task);
+            }
+
+            if (typeof(TAwaitable) == typeof(ValueTask))
+            {
+                return (ValueTask) (object) awaitable;
+            }
+
             var awaiter = asyncConsumer.GetAwaiter(ref awaitable);
             if (asyncConsumer.GetIsCompleted(ref awaiter))
             {
@@ -183,21 +278,59 @@ namespace BenchmarkDotNet.Engines
                 }
                 return new ValueTask();
             }
-            var taskCompletionSource = new TaskCompletionSource<bool>();
-            awaiter.UnsafeOnCompleted(() =>
+
+            ToValueTaskVoidStateMachine stateMachine = default;
+            stateMachine.builder = AsyncValueTaskMethodBuilder.Create();
+            stateMachine.consumer = asyncConsumer;
+            stateMachine.awaiter = awaiter;
+            stateMachine.builder.Start(ref stateMachine);
+            return stateMachine.builder.Task;
+
+            //var taskCompletionSource = new TaskCompletionSource<bool>();
+            //awaiter.UnsafeOnCompleted(() =>
+            //{
+            //    try
+            //    {
+            //        asyncConsumer.GetResult(ref awaiter);
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        taskCompletionSource.SetException(e);
+            //        return;
+            //    }
+            //    taskCompletionSource.SetResult(true);
+            //});
+            //return new ValueTask(taskCompletionSource.Task);
+        }
+
+        private struct ToValueTaskVoidStateMachine : IAsyncStateMachine
+        {
+            internal AsyncValueTaskMethodBuilder builder;
+            internal TAsyncConsumer consumer;
+            internal TAwaiter awaiter;
+            private bool isStarted;
+
+            public void MoveNext()
             {
+                if (!isStarted)
+                {
+                    isStarted = true;
+                    builder.AwaitUnsafeOnCompleted(ref awaiter, ref this);
+                    return;
+                }
+
                 try
                 {
-                    asyncConsumer.GetResult(ref awaiter);
+                    consumer.GetResult(ref awaiter);
+                    builder.SetResult();
                 }
                 catch (Exception e)
                 {
-                    taskCompletionSource.SetException(e);
-                    return;
+                    builder.SetException(e);
                 }
-                taskCompletionSource.SetResult(true);
-            });
-            return new ValueTask(taskCompletionSource.Task);
+            }
+
+            void IAsyncStateMachine.SetStateMachine(IAsyncStateMachine stateMachine) => builder.SetStateMachine(stateMachine);
         }
     }
 }

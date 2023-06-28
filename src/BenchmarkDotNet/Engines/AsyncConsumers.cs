@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Engines
 {
+    // TODO: handle return types from GetResult.
+
     public interface IAwaitableConverter<TAwaitable, TAwaiter>
         where TAwaiter : ICriticalNotifyCompletion
     {
@@ -32,24 +34,24 @@ namespace BenchmarkDotNet.Engines
     // Using struct rather than class forces the JIT to generate specialized code that can be inlined.
     public struct TaskConsumer : IAsyncConsumer<Task, ConfiguredTaskAwaitable.ConfiguredTaskAwaiter>
     {
-        private AsyncTaskMethodBuilder _builder;
+        private AsyncTaskMethodBuilder builder;
 
         public void CreateAsyncMethodBuilder()
-            => _builder = AsyncTaskMethodBuilder.Create();
+            => builder = AsyncTaskMethodBuilder.Create();
 
         public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
-            => _builder.Start(ref stateMachine);
+            => builder.Start(ref stateMachine);
 
         public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
             where TAwaiter : ICriticalNotifyCompletion
             where TStateMachine : IAsyncStateMachine
-            => _builder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
+            => builder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
 
         public void SetResult()
-            => _builder.SetResult();
+            => builder.SetResult();
 
         public void SetStateMachine(IAsyncStateMachine stateMachine)
-            => _builder.SetStateMachine(stateMachine);
+            => builder.SetStateMachine(stateMachine);
 
         public ConfiguredTaskAwaitable.ConfiguredTaskAwaiter GetAwaiter(ref Task awaitable)
             => awaitable.ConfigureAwait(false).GetAwaiter();
@@ -63,24 +65,24 @@ namespace BenchmarkDotNet.Engines
 
     public struct TaskConsumer<T> : IAsyncConsumer<Task<T>, ConfiguredTaskAwaitable<T>.ConfiguredTaskAwaiter>
     {
-        private AsyncTaskMethodBuilder _builder;
+        private AsyncTaskMethodBuilder builder;
 
         public void CreateAsyncMethodBuilder()
-            => _builder = AsyncTaskMethodBuilder.Create();
+            => builder = AsyncTaskMethodBuilder.Create();
 
         public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
-            => _builder.Start(ref stateMachine);
+            => builder.Start(ref stateMachine);
 
         public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
             where TAwaiter : ICriticalNotifyCompletion
             where TStateMachine : IAsyncStateMachine
-            => _builder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
+            => builder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
 
         public void SetResult()
-            => _builder.SetResult();
+            => builder.SetResult();
 
         public void SetStateMachine(IAsyncStateMachine stateMachine)
-            => _builder.SetStateMachine(stateMachine);
+            => builder.SetStateMachine(stateMachine);
 
         public ConfiguredTaskAwaitable<T>.ConfiguredTaskAwaiter GetAwaiter(ref Task<T> awaitable)
             => awaitable.ConfigureAwait(false).GetAwaiter();
@@ -94,24 +96,24 @@ namespace BenchmarkDotNet.Engines
 
     public struct ValueTaskConsumer : IAsyncConsumer<ValueTask, ConfiguredValueTaskAwaitable.ConfiguredValueTaskAwaiter>
     {
-        private AsyncValueTaskMethodBuilder _builder;
+        private AsyncValueTaskMethodBuilder builder;
 
         public void CreateAsyncMethodBuilder()
-            => _builder = AsyncValueTaskMethodBuilder.Create();
+            => builder = AsyncValueTaskMethodBuilder.Create();
 
         public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
-            => _builder.Start(ref stateMachine);
+            => builder.Start(ref stateMachine);
 
         public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
             where TAwaiter : ICriticalNotifyCompletion
             where TStateMachine : IAsyncStateMachine
-            => _builder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
+            => builder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
 
         public void SetResult()
-            => _builder.SetResult();
+            => builder.SetResult();
 
         public void SetStateMachine(IAsyncStateMachine stateMachine)
-            => _builder.SetStateMachine(stateMachine);
+            => builder.SetStateMachine(stateMachine);
 
         public ConfiguredValueTaskAwaitable.ConfiguredValueTaskAwaiter GetAwaiter(ref ValueTask awaitable)
             => awaitable.ConfigureAwait(false).GetAwaiter();
@@ -125,24 +127,24 @@ namespace BenchmarkDotNet.Engines
 
     public struct ValueTaskConsumer<T> : IAsyncConsumer<ValueTask<T>, ConfiguredValueTaskAwaitable<T>.ConfiguredValueTaskAwaiter>
     {
-        private AsyncValueTaskMethodBuilder _builder;
+        private AsyncValueTaskMethodBuilder builder;
 
         public void CreateAsyncMethodBuilder()
-            => _builder = AsyncValueTaskMethodBuilder.Create();
+            => builder = AsyncValueTaskMethodBuilder.Create();
 
         public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
-            => _builder.Start(ref stateMachine);
+            => builder.Start(ref stateMachine);
 
         public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
             where TAwaiter : ICriticalNotifyCompletion
             where TStateMachine : IAsyncStateMachine
-            => _builder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
+            => builder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
 
         public void SetResult()
-            => _builder.SetResult();
+            => builder.SetResult();
 
         public void SetStateMachine(IAsyncStateMachine stateMachine)
-            => _builder.SetStateMachine(stateMachine);
+            => builder.SetStateMachine(stateMachine);
 
         public ConfiguredValueTaskAwaitable<T>.ConfiguredValueTaskAwaiter GetAwaiter(ref ValueTask<T> awaitable)
             => awaitable.ConfigureAwait(false).GetAwaiter();

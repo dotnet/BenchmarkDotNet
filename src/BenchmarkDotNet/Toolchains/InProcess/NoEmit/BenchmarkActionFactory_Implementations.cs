@@ -120,17 +120,16 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             where TAwaiter : ICriticalNotifyCompletion
         {
             // IBenchmarkFunc implemented via struct instead of on the class so that it can be inlined.
-            private readonly struct AsyncBenchmarkFunc : IBenchmarkFunc<TAwaitable>
+            private readonly struct AsyncBenchmarkFunc : IFunc<TAwaitable>
             {
                 private readonly Func<TAwaitable> callback;
 
                 internal AsyncBenchmarkFunc(Func<TAwaitable> callback) => this.callback = callback;
-                public TAwaitable InvokeWorkload() => callback();
-                public TAwaitable InvokeOverhead() => callback();
+                public TAwaitable Invoke() => callback();
             }
 
             private readonly Func<TAwaitable> callback;
-            private readonly AsyncBenchmarkRunner<AsyncBenchmarkFunc, TAsyncConsumer, TAwaitable, TAwaiter> asyncBenchmarkRunner;
+            private readonly AsyncBenchmarkRunner<AsyncBenchmarkFunc, AsyncBenchmarkFunc, TAsyncConsumer, TAwaitable, TAwaiter> asyncBenchmarkRunner;
 
             public BenchmarkActionAsync(object instance, MethodInfo method, int unrollFactor)
             {
@@ -147,7 +146,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                     InvokeSingle = InvokeSingleHardcodedOverhead;
                     InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcodedOverhead;
                 }
-                asyncBenchmarkRunner = new (new AsyncBenchmarkFunc(callback));
+                asyncBenchmarkRunner = new (new AsyncBenchmarkFunc(callback), new AsyncBenchmarkFunc(callback));
             }
 
             private TAwaitable Overhead() => default;
