@@ -116,55 +116,101 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         }
 
         internal class BenchmarkActionAsync<TAsyncConsumer, TAwaitable, TAwaiter> : BenchmarkActionBase
-            where TAsyncConsumer : struct, IAsyncConsumer<TAwaitable, TAwaiter>
+            where TAsyncConsumer : struct, IAsyncVoidConsumer<TAwaitable, TAwaiter>
             where TAwaiter : ICriticalNotifyCompletion
         {
-            // IBenchmarkFunc implemented via struct instead of on the class so that it can be inlined.
-            private readonly struct AsyncBenchmarkFunc : IFunc<TAwaitable>
+            private readonly struct WorkloadFunc : IFunc<TAwaitable>
             {
                 private readonly Func<TAwaitable> callback;
 
-                internal AsyncBenchmarkFunc(Func<TAwaitable> callback) => this.callback = callback;
+                internal WorkloadFunc(Func<TAwaitable> callback) => this.callback = callback;
                 public TAwaitable Invoke() => callback();
             }
 
-            private readonly Func<TAwaitable> callback;
-            private readonly AsyncBenchmarkRunner<AsyncBenchmarkFunc, AsyncBenchmarkFunc, TAsyncConsumer, TAwaitable, TAwaiter> asyncBenchmarkRunner;
+            private readonly struct OverheadFunc : IFunc<EmptyAwaiter>
+            {
+                private readonly Func<EmptyAwaiter> callback;
+
+                internal OverheadFunc(Func<EmptyAwaiter> callback) => this.callback = callback;
+                public EmptyAwaiter Invoke() => callback();
+            }
+
+            private readonly AsyncBenchmarkRunner asyncBenchmarkRunner;
 
             public BenchmarkActionAsync(object instance, MethodInfo method, int unrollFactor)
             {
                 bool isIdle = method == null;
                 if (!isIdle)
                 {
-                    callback = CreateWorkload<Func<TAwaitable>>(instance, method);
+                    var callback = CreateWorkload<Func<TAwaitable>>(instance, method);
+                    asyncBenchmarkRunner = new AsyncWorkloadRunner<WorkloadFunc, TAsyncConsumer, TAwaitable, TAwaiter>(new WorkloadFunc(callback));
                     InvokeSingle = InvokeSingleHardcoded;
                     InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcoded;
                 }
                 else
                 {
-                    callback = Overhead;
-                    InvokeSingle = InvokeSingleHardcodedOverhead;
-                    InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcodedOverhead;
+                    asyncBenchmarkRunner = new AsyncOverheadRunner<OverheadFunc, TAsyncConsumer, TAwaitable, TAwaiter>(new OverheadFunc(Overhead));
+                    InvokeSingle = InvokeSingleHardcoded;
+                    InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcoded;
                 }
-                asyncBenchmarkRunner = new (new AsyncBenchmarkFunc(callback), new AsyncBenchmarkFunc(callback));
             }
 
-            private TAwaitable Overhead() => default;
-
-            private ValueTask InvokeSingleHardcodedOverhead()
-            {
-                callback();
-                return new ValueTask();
-            }
-
-            private ValueTask<ClockSpan> InvokeNoUnrollHardcodedOverhead(long repeatCount, IClock clock)
-                => asyncBenchmarkRunner.InvokeOverhead(repeatCount, clock);
+            private EmptyAwaiter Overhead() => default;
 
             protected virtual ValueTask InvokeSingleHardcoded()
                 => asyncBenchmarkRunner.InvokeSingle();
 
             private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
-                => asyncBenchmarkRunner.InvokeWorkload(repeatCount, clock);
+                => asyncBenchmarkRunner.Invoke(repeatCount, clock);
+        }
+
+        internal class BenchmarkActionAsync<TAsyncConsumer, TAwaitable, TAwaiter, TResult> : BenchmarkActionBase
+            where TAsyncConsumer : struct, IAsyncResultConsumer<TAwaitable, TAwaiter, TResult>
+            where TAwaiter : ICriticalNotifyCompletion
+        {
+            private readonly struct WorkloadFunc : IFunc<TAwaitable>
+            {
+                private readonly Func<TAwaitable> callback;
+
+                internal WorkloadFunc(Func<TAwaitable> callback) => this.callback = callback;
+                public TAwaitable Invoke() => callback();
+            }
+
+            private readonly struct OverheadFunc : IFunc<EmptyAwaiter>
+            {
+                private readonly Func<EmptyAwaiter> callback;
+
+                internal OverheadFunc(Func<EmptyAwaiter> callback) => this.callback = callback;
+                public EmptyAwaiter Invoke() => callback();
+            }
+
+            private readonly AsyncBenchmarkRunner asyncBenchmarkRunner;
+
+            public BenchmarkActionAsync(object instance, MethodInfo method, int unrollFactor)
+            {
+                bool isIdle = method == null;
+                if (!isIdle)
+                {
+                    var callback = CreateWorkload<Func<TAwaitable>>(instance, method);
+                    asyncBenchmarkRunner = new AsyncWorkloadRunner<WorkloadFunc, TAsyncConsumer, TAwaitable, TAwaiter, TResult>(new WorkloadFunc(callback));
+                    InvokeSingle = InvokeSingleHardcoded;
+                    InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcoded;
+                }
+                else
+                {
+                    asyncBenchmarkRunner = new AsyncOverheadRunner<OverheadFunc, TAsyncConsumer, TAwaitable, TAwaiter, TResult>(new OverheadFunc(Overhead));
+                    InvokeSingle = InvokeSingleHardcoded;
+                    InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcoded;
+                }
+            }
+
+            private EmptyAwaiter Overhead() => default;
+
+            protected virtual ValueTask InvokeSingleHardcoded()
+                => asyncBenchmarkRunner.InvokeSingle();
+
+            private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
+                => asyncBenchmarkRunner.Invoke(repeatCount, clock);
         }
 
         internal class BenchmarkActionTask : BenchmarkActionAsync<TaskConsumer, Task, ConfiguredTaskAwaitable.ConfiguredTaskAwaiter>
@@ -174,7 +220,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             }
         }
 
-        internal class BenchmarkActionTask<T> : BenchmarkActionAsync<TaskConsumer<T>, Task<T>, ConfiguredTaskAwaitable<T>.ConfiguredTaskAwaiter>
+        internal class BenchmarkActionTask<T> : BenchmarkActionAsync<TaskConsumer<T>, Task<T>, ConfiguredTaskAwaitable<T>.ConfiguredTaskAwaiter, T>
         {
             public BenchmarkActionTask(object instance, MethodInfo method, int unrollFactor) : base(instance, method, unrollFactor)
             {
@@ -188,7 +234,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             }
         }
 
-        internal class BenchmarkActionValueTask<T> : BenchmarkActionAsync<ValueTaskConsumer<T>, ValueTask<T>, ConfiguredValueTaskAwaitable<T>.ConfiguredValueTaskAwaiter>
+        internal class BenchmarkActionValueTask<T> : BenchmarkActionAsync<ValueTaskConsumer<T>, ValueTask<T>, ConfiguredValueTaskAwaitable<T>.ConfiguredValueTaskAwaiter, T>
         {
             public BenchmarkActionValueTask(object instance, MethodInfo method, int unrollFactor) : base(instance, method, unrollFactor)
             {

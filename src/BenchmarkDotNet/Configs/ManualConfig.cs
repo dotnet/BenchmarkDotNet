@@ -118,13 +118,16 @@ namespace BenchmarkDotNet.Configs
             return this;
         }
 
+        // TODO: only pass in asyncConsumerType, get awaitableType from IAsyncConsumer<TAwaitable, TAwaiter>
         public ManualConfig AddAsyncConsumer(Type awaitableType, Type asyncConsumerType)
         {
             // Validate types
-            if (asyncConsumerType.IsNotPublic || (!asyncConsumerType.IsValueType && asyncConsumerType.GetConstructor(Array.Empty<Type>()) == null))
+            bool isPublic = asyncConsumerType.IsPublic || asyncConsumerType.IsNestedPublic;
+            if (!isPublic || (!asyncConsumerType.IsValueType && asyncConsumerType.GetConstructor(Array.Empty<Type>()) == null))
             {
                 throw new ArgumentException($"asyncConsumerType [{asyncConsumerType}] is not a public struct, or a public class with a public, parameterless constructor.");
             }
+            // TODO: handle multiple generics, verify that the open generics are contained in TAwaitable. https://stackoverflow.com/questions/65725729/why-is-checking-equality-of-open-generic-types-inconsistent
             bool consumerIsOpenGeneric = asyncConsumerType.IsGenericTypeDefinition;
             bool awaitableisOpenGeneric = awaitableType.IsGenericTypeDefinition;
             if (consumerIsOpenGeneric != awaitableisOpenGeneric)
@@ -150,8 +153,9 @@ namespace BenchmarkDotNet.Configs
             // TODO: handle partially closed types.
             var closedAwaitableType = awaitableisOpenGeneric ? awaitableType.MakeGenericType(typeof(int)) : awaitableType;
             var closedConsumerType = consumerIsOpenGeneric ? asyncConsumerType.MakeGenericType(typeof(int)) : asyncConsumerType;
-            var iAsyncConsumerType = closedConsumerType.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IAsyncConsumer<,>))
-                ?? throw new ArgumentException($"asyncConsumerType [{asyncConsumerType}] does not implement IAsyncConsumer<TAwaitable, TAwaiter>.");
+            var iAsyncConsumerType = closedConsumerType.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IAsyncVoidConsumer<,>))
+                ?? closedConsumerType.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IAsyncResultConsumer<,,>))
+                ?? throw new ArgumentException($"asyncConsumerType [{asyncConsumerType}] does not implement IAsyncVoidConsumer<TAwaitable, TAwaiter> or IAsyncResultConsumer<TAwaitable, TAwaiter, TResult>.");
             if (iAsyncConsumerType.GetGenericArguments()[0] != closedAwaitableType)
             {
                 throw new ArgumentException($"asyncConsumerType [{asyncConsumerType}] does not implement IAsyncConsumer<TAwaitable, TAwaiter> with the expected TAwaitable type [{awaitableType}].");

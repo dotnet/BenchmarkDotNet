@@ -116,10 +116,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static ManualConfig HideColumns(this IConfig config, params string[] columnNames) => config.With(c => c.HideColumns(columnNames));
         [PublicAPI] public static ManualConfig HideColumns(this IConfig config, params IColumn[] columns) => config.With(c => c.HideColumns(columns));
         [PublicAPI] public static ManualConfig HideColumns(this IConfig config, params IColumnHidingRule[] rules) => config.With(c => c.HideColumns(rules));
-        [PublicAPI] public static ManualConfig AddAsyncConsumer<TAwaitable, TAwaiter, TAsyncConsumer>(this IConfig config)
-            where TAwaiter : ICriticalNotifyCompletion
-            where TAsyncConsumer : struct, IAsyncConsumer<TAwaitable, TAwaiter>
-            => config.With(c => c.AddAsyncConsumer<TAwaitable, TAwaiter, TAsyncConsumer>());
+        [PublicAPI] public static ManualConfig AddAsyncConsumer(this IConfig config, Type awaitableType, Type asyncConsumerType) => config.With(c => c.AddAsyncConsumer(awaitableType, asyncConsumerType));
 
         public static ImmutableConfig CreateImmutableConfig(this IConfig config) => ImmutableConfigBuilder.Create(config);
 

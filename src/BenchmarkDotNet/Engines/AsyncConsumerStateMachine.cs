@@ -31,104 +31,83 @@ namespace BenchmarkDotNet.Engines
             => this.continuation = continuation;
     }
 
-    public sealed class AsyncBenchmarkRunner<TWorkloadFunc, TOverheadFunc, TAsyncConsumer, TAwaitable, TAwaiter> : IDisposable
-        where TWorkloadFunc : struct, IFunc<TAwaitable>
-        where TOverheadFunc : struct, IFunc<TAwaitable>
-        where TAsyncConsumer : IAsyncConsumer<TAwaitable, TAwaiter>, new()
+    public struct EmptyAwaiter : ICriticalNotifyCompletion
+    {
+        void ICriticalNotifyCompletion.UnsafeOnCompleted(Action continuation)
+            => throw new NotImplementedException();
+
+        void INotifyCompletion.OnCompleted(Action continuation)
+            => throw new NotImplementedException();
+    }
+
+    public abstract class AsyncBenchmarkRunner : IDisposable
+    {
+        public abstract ValueTask<ClockSpan> Invoke(long repeatCount, IClock clock);
+        public abstract ValueTask InvokeSingle();
+        public abstract void Dispose();
+    }
+
+    public abstract class AsyncBenchmarkRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter> : AsyncBenchmarkRunner
+        where TFunc : struct, IFunc<TAwaitable>
+        where TAsyncConsumer : IAsyncVoidConsumer<TAwaitable, TAwaiter>, new()
         where TAwaiter : ICriticalNotifyCompletion
     {
         private readonly AutoResetValueTaskSource<ClockSpan> valueTaskSource = new ();
-        private readonly TWorkloadFunc workloadFunc;
-        private readonly TOverheadFunc overheadFunc;
+        private readonly TFunc func;
         private long repeatsRemaining;
         private IClock clock;
-        private AsyncStateMachineAdvancer workloadAsyncStateMachineAdvancer;
-        private AsyncStateMachineAdvancer overheadAsyncStateMachineAdvancer;
+        private AsyncStateMachineAdvancer asyncStateMachineAdvancer;
         private bool isDisposed;
 
-        public AsyncBenchmarkRunner(TWorkloadFunc workloadFunc, TOverheadFunc overheadFunc)
+        public AsyncBenchmarkRunner(TFunc func)
         {
-            this.workloadFunc = workloadFunc;
-            this.overheadFunc = overheadFunc;
+            this.func = func;
         }
 
-        private void MaybeInitializeWorkload()
+        private void MaybeInitializeStateMachine()
         {
-            if (workloadAsyncStateMachineAdvancer != null)
+            if (asyncStateMachineAdvancer != null)
             {
                 return;
             }
 
             // Initialize the state machine and consumer before the workload starts.
-            workloadAsyncStateMachineAdvancer = new ();
-            StateMachine<TWorkloadFunc, TAsyncConsumer> stateMachine = default;
+            asyncStateMachineAdvancer = new ();
+            StateMachine stateMachine = default;
             stateMachine.consumer = new ();
             stateMachine.consumer.CreateAsyncMethodBuilder();
             stateMachine.owner = this;
-            stateMachine.stateMachineAdvancer = workloadAsyncStateMachineAdvancer;
-            stateMachine.func = workloadFunc;
+            stateMachine.stateMachineAdvancer = asyncStateMachineAdvancer;
+            stateMachine.func = func;
             stateMachine.state = -1;
             stateMachine.consumer.Start(ref stateMachine);
         }
 
-        public ValueTask<ClockSpan> InvokeWorkload(long repeatCount, IClock clock)
+        public override ValueTask<ClockSpan> Invoke(long repeatCount, IClock clock)
         {
-            MaybeInitializeWorkload();
+            MaybeInitializeStateMachine();
             repeatsRemaining = repeatCount;
             // The clock is started inside the state machine.
             this.clock = clock;
-            workloadAsyncStateMachineAdvancer.Advance();
-            this.clock = default;
-            return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
-        }
-
-        private void MaybeInitializeOverhead()
-        {
-            if (overheadAsyncStateMachineAdvancer != null)
-            {
-                return;
-            }
-
-            // Initialize the state machine and consumer before the overhead starts.
-            overheadAsyncStateMachineAdvancer = new ();
-            StateMachine<TOverheadFunc, OverheadConsumer> stateMachine = default;
-            stateMachine.consumer = new () { asyncConsumer = new () };
-            stateMachine.consumer.CreateAsyncMethodBuilder();
-            stateMachine.owner = this;
-            stateMachine.stateMachineAdvancer = overheadAsyncStateMachineAdvancer;
-            stateMachine.func = overheadFunc;
-            stateMachine.state = -1;
-            stateMachine.consumer.Start(ref stateMachine);
-        }
-
-        public ValueTask<ClockSpan> InvokeOverhead(long repeatCount, IClock clock)
-        {
-            MaybeInitializeOverhead();
-            repeatsRemaining = repeatCount;
-            // The clock is started inside the state machine.
-            this.clock = clock;
-            overheadAsyncStateMachineAdvancer.Advance();
+            asyncStateMachineAdvancer.Advance();
             this.clock = default;
             return new ValueTask<ClockSpan>(valueTaskSource, valueTaskSource.Version);
         }
 
         // TODO: make sure Dispose is called.
-        public void Dispose()
+        public override void Dispose()
         {
-            // Set the isDisposed flag and advance the state machines to complete the consumers.
+            // Set the isDisposed flag and advance the state machine to complete the consumer.
             isDisposed = true;
-            workloadAsyncStateMachineAdvancer?.Advance();
-            overheadAsyncStateMachineAdvancer?.Advance();
+            asyncStateMachineAdvancer?.Advance();
         }
 
         // C# compiler creates struct state machines in Release mode, so we do the same.
-        private struct StateMachine<TFunc, TConsumer> : IAsyncStateMachine
-            where TFunc : struct, IFunc<TAwaitable>
-            where TConsumer : IAsyncConsumer<TAwaitable, TAwaiter>, new()
+        private struct StateMachine : IAsyncStateMachine
         {
-            internal AsyncBenchmarkRunner<TWorkloadFunc, TOverheadFunc, TAsyncConsumer, TAwaitable, TAwaiter> owner;
+            internal AsyncBenchmarkRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter> owner;
             internal AsyncStateMachineAdvancer stateMachineAdvancer;
-            internal TConsumer consumer;
+            internal TAsyncConsumer consumer;
             internal TFunc func;
             internal int state;
             private StartedClock startedClock;
@@ -168,21 +147,23 @@ namespace BenchmarkDotNet.Engines
                     if (state == 1)
                     {
                         state = 0;
-                        GetResult();
+                        consumer.GetResult(ref currentAwaiter);
+                        currentAwaiter = default;
                     }
 
                 StartLoop:
                     while (--owner.repeatsRemaining >= 0)
                     {
                         var awaitable = func.Invoke();
-                        GetAwaiter(ref awaitable);
-                        if (!GetIsCompleted())
+                        var awaiter = consumer.GetAwaiter(ref awaitable);
+                        if (!consumer.GetIsCompleted(ref awaiter))
                         {
                             state = 1;
+                            currentAwaiter = awaiter;
                             consumer.AwaitOnCompleted(ref currentAwaiter, ref this);
                             return;
                         }
-                        GetResult();
+                        consumer.GetResult(ref awaiter);
                     }
                 }
                 catch (Exception e)
@@ -203,57 +184,13 @@ namespace BenchmarkDotNet.Engines
                 owner.valueTaskSource.SetResult(clockspan);
             }
 
-            // Make sure the methods are called without inlining.
-            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-            private void GetAwaiter(ref TAwaitable awaitable) => currentAwaiter = consumer.GetAwaiter(ref awaitable);
-
-            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-            private bool GetIsCompleted() => consumer.GetIsCompleted(ref currentAwaiter);
-
-            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-            private void GetResult() => consumer.GetResult(ref currentAwaiter);
-
             void IAsyncStateMachine.SetStateMachine(IAsyncStateMachine stateMachine) => consumer.SetStateMachine(stateMachine);
         }
 
-        private struct OverheadConsumer : IAsyncConsumer<TAwaitable, TAwaiter>
-        {
-            internal TAsyncConsumer asyncConsumer;
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void CreateAsyncMethodBuilder()
-                => asyncConsumer.CreateAsyncMethodBuilder();
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
-                => asyncConsumer.Start(ref stateMachine);
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void AwaitOnCompleted<TAnyAwaiter, TStateMachine>(ref TAnyAwaiter awaiter, ref TStateMachine stateMachine)
-                where TAnyAwaiter : ICriticalNotifyCompletion
-                where TStateMachine : IAsyncStateMachine
-                => asyncConsumer.AwaitOnCompleted(ref awaiter, ref stateMachine);
-
-            public void SetResult()
-                => asyncConsumer.SetResult();
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void SetStateMachine(IAsyncStateMachine stateMachine)
-                => asyncConsumer.SetStateMachine(stateMachine);
-
-            public TAwaiter GetAwaiter(ref TAwaitable awaitable)
-                => default;
-
-            public bool GetIsCompleted(ref TAwaiter awaiter)
-                => true;
-
-            public void GetResult(ref TAwaiter awaiter) { }
-        }
-
-        public ValueTask InvokeSingle()
+        public override ValueTask InvokeSingle()
         {
             var asyncConsumer = new TAsyncConsumer();
-            var awaitable = workloadFunc.Invoke();
+            var awaitable = func.Invoke();
 
             if (null == default(TAwaitable) && awaitable is Task task)
             {
@@ -286,6 +223,7 @@ namespace BenchmarkDotNet.Engines
             stateMachine.builder.Start(ref stateMachine);
             return stateMachine.builder.Task;
 
+            // TODO: remove the commented code after the statemachine is verified working.
             //var taskCompletionSource = new TaskCompletionSource<bool>();
             //awaiter.UnsafeOnCompleted(() =>
             //{
@@ -331,6 +269,206 @@ namespace BenchmarkDotNet.Engines
             }
 
             void IAsyncStateMachine.SetStateMachine(IAsyncStateMachine stateMachine) => builder.SetStateMachine(stateMachine);
+        }
+    }
+
+    public sealed class AsyncWorkloadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter> : AsyncBenchmarkRunner<TFunc, AsyncWorkloadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter>.AsyncConsumer, TAwaitable, TAwaiter>
+        where TFunc : struct, IFunc<TAwaitable>
+        where TAsyncConsumer : IAsyncVoidConsumer<TAwaitable, TAwaiter>, new()
+        where TAwaiter : ICriticalNotifyCompletion
+    {
+        public AsyncWorkloadRunner(TFunc func) : base(func) { }
+
+        public struct AsyncConsumer : IAsyncVoidConsumer<TAwaitable, TAwaiter>
+        {
+            internal TAsyncConsumer asyncConsumer;
+
+            public void CreateAsyncMethodBuilder()
+            {
+                asyncConsumer = new ();
+                asyncConsumer.CreateAsyncMethodBuilder();
+            }
+
+            public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
+                => asyncConsumer.Start(ref stateMachine);
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void AwaitOnCompleted<TAnyAwaiter, TStateMachine>(ref TAnyAwaiter awaiter, ref TStateMachine stateMachine)
+                where TAnyAwaiter : ICriticalNotifyCompletion
+                where TStateMachine : IAsyncStateMachine
+                => asyncConsumer.AwaitOnCompleted(ref awaiter, ref stateMachine);
+
+            public void SetResult()
+                => asyncConsumer.SetResult();
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void SetStateMachine(IAsyncStateMachine stateMachine)
+                => asyncConsumer.SetStateMachine(stateMachine);
+
+            // Make sure the methods are called without inlining.
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            public TAwaiter GetAwaiter(ref TAwaitable awaitable)
+                => asyncConsumer.GetAwaiter(ref awaitable);
+
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            public bool GetIsCompleted(ref TAwaiter awaiter)
+                => asyncConsumer.GetIsCompleted(ref awaiter);
+
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            public void GetResult(ref TAwaiter awaiter)
+                => asyncConsumer.GetResult(ref awaiter);
+        }
+    }
+
+    public sealed class AsyncOverheadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter> : AsyncBenchmarkRunner<TFunc, AsyncOverheadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter>.AsyncConsumer, EmptyAwaiter, EmptyAwaiter>
+        where TFunc : struct, IFunc<EmptyAwaiter>
+        where TAsyncConsumer : IAsyncVoidConsumer<TAwaitable, TAwaiter>, new()
+        where TAwaiter : ICriticalNotifyCompletion
+    {
+        public AsyncOverheadRunner(TFunc func) : base(func) { }
+
+        public struct AsyncConsumer : IAsyncVoidConsumer<EmptyAwaiter, EmptyAwaiter>
+        {
+            internal TAsyncConsumer asyncConsumer;
+
+            public void CreateAsyncMethodBuilder()
+            {
+                asyncConsumer = new ();
+                asyncConsumer.CreateAsyncMethodBuilder();
+            }
+
+            public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
+                => asyncConsumer.Start(ref stateMachine);
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void AwaitOnCompleted<TAnyAwaiter, TStateMachine>(ref TAnyAwaiter awaiter, ref TStateMachine stateMachine)
+                where TAnyAwaiter : ICriticalNotifyCompletion
+                where TStateMachine : IAsyncStateMachine
+                => asyncConsumer.AwaitOnCompleted(ref awaiter, ref stateMachine);
+
+            public void SetResult()
+                => asyncConsumer.SetResult();
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void SetStateMachine(IAsyncStateMachine stateMachine)
+                => asyncConsumer.SetStateMachine(stateMachine);
+
+            // Make sure the methods are called without inlining.
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            public EmptyAwaiter GetAwaiter(ref EmptyAwaiter awaitable)
+                => default;
+
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            public bool GetIsCompleted(ref EmptyAwaiter awaiter)
+                => true;
+
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            public void GetResult(ref EmptyAwaiter awaiter) { }
+        }
+    }
+
+    public sealed class AsyncWorkloadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter, TResult> : AsyncBenchmarkRunner<TFunc, AsyncWorkloadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter, TResult>.AsyncConsumer, TAwaitable, TAwaiter>
+        where TFunc : struct, IFunc<TAwaitable>
+        where TAsyncConsumer : IAsyncResultConsumer<TAwaitable, TAwaiter, TResult>, new()
+        where TAwaiter : ICriticalNotifyCompletion
+    {
+        public AsyncWorkloadRunner(TFunc func) : base(func) { }
+
+        public struct AsyncConsumer : IAsyncVoidConsumer<TAwaitable, TAwaiter>
+        {
+            internal TAsyncConsumer asyncConsumer;
+
+            public void CreateAsyncMethodBuilder()
+            {
+                asyncConsumer = new ();
+                asyncConsumer.CreateAsyncMethodBuilder();
+            }
+
+            public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
+                => asyncConsumer.Start(ref stateMachine);
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void AwaitOnCompleted<TAnyAwaiter, TStateMachine>(ref TAnyAwaiter awaiter, ref TStateMachine stateMachine)
+                where TAnyAwaiter : ICriticalNotifyCompletion
+                where TStateMachine : IAsyncStateMachine
+                => asyncConsumer.AwaitOnCompleted(ref awaiter, ref stateMachine);
+
+            public void SetResult()
+                => asyncConsumer.SetResult();
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void SetStateMachine(IAsyncStateMachine stateMachine)
+                => asyncConsumer.SetStateMachine(stateMachine);
+
+            // Make sure the methods are called without inlining.
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            public TAwaiter GetAwaiter(ref TAwaitable awaitable)
+                => asyncConsumer.GetAwaiter(ref awaitable);
+
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            public bool GetIsCompleted(ref TAwaiter awaiter)
+                => asyncConsumer.GetIsCompleted(ref awaiter);
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void GetResult(ref TAwaiter awaiter)
+                => GetResultNoInlining(ref awaiter);
+
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            private TResult GetResultNoInlining(ref TAwaiter awaiter)
+                => asyncConsumer.GetResult(ref awaiter);
+        }
+    }
+
+    public sealed class AsyncOverheadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter, TResult> : AsyncBenchmarkRunner<TFunc, AsyncOverheadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter, TResult>.AsyncConsumer, EmptyAwaiter, EmptyAwaiter>
+        where TFunc : struct, IFunc<EmptyAwaiter>
+        where TAsyncConsumer : IAsyncResultConsumer<TAwaitable, TAwaiter, TResult>, new()
+        where TAwaiter : ICriticalNotifyCompletion
+    {
+        public AsyncOverheadRunner(TFunc func) : base(func) { }
+
+        public struct AsyncConsumer : IAsyncVoidConsumer<EmptyAwaiter, EmptyAwaiter>
+        {
+            internal TAsyncConsumer asyncConsumer;
+
+            public void CreateAsyncMethodBuilder()
+            {
+                asyncConsumer = new ();
+                asyncConsumer.CreateAsyncMethodBuilder();
+            }
+
+            public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
+                => asyncConsumer.Start(ref stateMachine);
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void AwaitOnCompleted<TAnyAwaiter, TStateMachine>(ref TAnyAwaiter awaiter, ref TStateMachine stateMachine)
+                where TAnyAwaiter : ICriticalNotifyCompletion
+                where TStateMachine : IAsyncStateMachine
+                => asyncConsumer.AwaitOnCompleted(ref awaiter, ref stateMachine);
+
+            public void SetResult()
+                => asyncConsumer.SetResult();
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void SetStateMachine(IAsyncStateMachine stateMachine)
+                => asyncConsumer.SetStateMachine(stateMachine);
+
+            // Make sure the methods are called without inlining.
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            public EmptyAwaiter GetAwaiter(ref EmptyAwaiter awaitable)
+                => default;
+
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            public bool GetIsCompleted(ref EmptyAwaiter awaiter)
+                => true;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void GetResult(ref EmptyAwaiter awaiter)
+            {
+                GetResultNoInlining(ref awaiter);
+            }
+
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            private void GetResultNoInlining(ref EmptyAwaiter awaiter) { }
         }
     }
 }

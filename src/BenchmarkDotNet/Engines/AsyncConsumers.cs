@@ -3,14 +3,23 @@ using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Engines
 {
-    // TODO: handle return types from GetResult.
-
     public interface IAwaitableConverter<TAwaitable, TAwaiter>
         where TAwaiter : ICriticalNotifyCompletion
     {
         public TAwaiter GetAwaiter(ref TAwaitable awaitable);
         public bool GetIsCompleted(ref TAwaiter awaiter);
+    }
+
+    public interface IAwaitableVoidConverter<TAwaitable, TAwaiter> : IAwaitableConverter<TAwaitable, TAwaiter>
+        where TAwaiter : ICriticalNotifyCompletion
+    {
         public void GetResult(ref TAwaiter awaiter);
+    }
+
+    public interface IAwaitableResultConverter<TAwaitable, TAwaiter, TResult> : IAwaitableConverter<TAwaitable, TAwaiter>
+        where TAwaiter : ICriticalNotifyCompletion
+    {
+        public TResult GetResult(ref TAwaiter awaiter);
     }
 
     public interface IAsyncMethodBuilder
@@ -25,19 +34,27 @@ namespace BenchmarkDotNet.Engines
         public void SetResult();
     }
 
-    public interface IAsyncConsumer<TAwaitable, TAwaiter> : IAwaitableConverter<TAwaitable, TAwaiter>, IAsyncMethodBuilder
+    public interface IAsyncVoidConsumer<TAwaitable, TAwaiter> : IAwaitableVoidConverter<TAwaitable, TAwaiter>, IAsyncMethodBuilder
         where TAwaiter : ICriticalNotifyCompletion
     {
     }
 
-    // We use ConfigureAwait(false) to prevent dead-locks with InProcess toolchains (it could be ran on a thread with a SynchronizationContext).
-    // Using struct rather than class forces the JIT to generate specialized code that can be inlined.
-    public struct TaskConsumer : IAsyncConsumer<Task, ConfiguredTaskAwaitable.ConfiguredTaskAwaiter>
+    public interface IAsyncResultConsumer<TAwaitable, TAwaiter, TResult> : IAwaitableResultConverter<TAwaitable, TAwaiter, TResult>, IAsyncMethodBuilder
+        where TAwaiter : ICriticalNotifyCompletion
     {
-        private AsyncTaskMethodBuilder builder;
+    }
+
+    // We use a type that users cannot access to prevent the async method builder from being jitted with the user's type, in case the benchmark is ran with ColdStart.
+    internal struct UnusedStruct { }
+
+    // We use ConfigureAwait(false) to prevent dead-locks with InProcess toolchains (it could be ran on a thread with a SynchronizationContext).
+    // Using struct rather than class forces the JIT to generate specialized code that can be inlined, and avoids an extra allocation.
+    public struct TaskConsumer : IAsyncVoidConsumer<Task, ConfiguredTaskAwaitable.ConfiguredTaskAwaiter>
+    {
+        private AsyncTaskMethodBuilder<UnusedStruct> builder;
 
         public void CreateAsyncMethodBuilder()
-            => builder = AsyncTaskMethodBuilder.Create();
+            => builder = AsyncTaskMethodBuilder<UnusedStruct>.Create();
 
         public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
             => builder.Start(ref stateMachine);
@@ -48,7 +65,7 @@ namespace BenchmarkDotNet.Engines
             => builder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
 
         public void SetResult()
-            => builder.SetResult();
+            => builder.SetResult(default);
 
         public void SetStateMachine(IAsyncStateMachine stateMachine)
             => builder.SetStateMachine(stateMachine);
@@ -63,12 +80,12 @@ namespace BenchmarkDotNet.Engines
             => awaiter.GetResult();
     }
 
-    public struct TaskConsumer<T> : IAsyncConsumer<Task<T>, ConfiguredTaskAwaitable<T>.ConfiguredTaskAwaiter>
+    public struct TaskConsumer<T> : IAsyncResultConsumer<Task<T>, ConfiguredTaskAwaitable<T>.ConfiguredTaskAwaiter, T>
     {
-        private AsyncTaskMethodBuilder builder;
+        private AsyncTaskMethodBuilder<UnusedStruct> builder;
 
         public void CreateAsyncMethodBuilder()
-            => builder = AsyncTaskMethodBuilder.Create();
+            => builder = AsyncTaskMethodBuilder<UnusedStruct>.Create();
 
         public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
             => builder.Start(ref stateMachine);
@@ -79,7 +96,7 @@ namespace BenchmarkDotNet.Engines
             => builder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
 
         public void SetResult()
-            => builder.SetResult();
+            => builder.SetResult(default);
 
         public void SetStateMachine(IAsyncStateMachine stateMachine)
             => builder.SetStateMachine(stateMachine);
@@ -90,16 +107,16 @@ namespace BenchmarkDotNet.Engines
         public bool GetIsCompleted(ref ConfiguredTaskAwaitable<T>.ConfiguredTaskAwaiter awaiter)
             => awaiter.IsCompleted;
 
-        public void GetResult(ref ConfiguredTaskAwaitable<T>.ConfiguredTaskAwaiter awaiter)
+        public T GetResult(ref ConfiguredTaskAwaitable<T>.ConfiguredTaskAwaiter awaiter)
             => awaiter.GetResult();
     }
 
-    public struct ValueTaskConsumer : IAsyncConsumer<ValueTask, ConfiguredValueTaskAwaitable.ConfiguredValueTaskAwaiter>
+    public struct ValueTaskConsumer : IAsyncVoidConsumer<ValueTask, ConfiguredValueTaskAwaitable.ConfiguredValueTaskAwaiter>
     {
-        private AsyncValueTaskMethodBuilder builder;
+        private AsyncValueTaskMethodBuilder<UnusedStruct> builder;
 
         public void CreateAsyncMethodBuilder()
-            => builder = AsyncValueTaskMethodBuilder.Create();
+            => builder = AsyncValueTaskMethodBuilder<UnusedStruct>.Create();
 
         public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
             => builder.Start(ref stateMachine);
@@ -110,7 +127,7 @@ namespace BenchmarkDotNet.Engines
             => builder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
 
         public void SetResult()
-            => builder.SetResult();
+            => builder.SetResult(default);
 
         public void SetStateMachine(IAsyncStateMachine stateMachine)
             => builder.SetStateMachine(stateMachine);
@@ -125,12 +142,12 @@ namespace BenchmarkDotNet.Engines
             => awaiter.GetResult();
     }
 
-    public struct ValueTaskConsumer<T> : IAsyncConsumer<ValueTask<T>, ConfiguredValueTaskAwaitable<T>.ConfiguredValueTaskAwaiter>
+    public struct ValueTaskConsumer<T> : IAsyncResultConsumer<ValueTask<T>, ConfiguredValueTaskAwaitable<T>.ConfiguredValueTaskAwaiter, T>
     {
-        private AsyncValueTaskMethodBuilder builder;
+        private AsyncValueTaskMethodBuilder<UnusedStruct> builder;
 
         public void CreateAsyncMethodBuilder()
-            => builder = AsyncValueTaskMethodBuilder.Create();
+            => builder = AsyncValueTaskMethodBuilder<UnusedStruct>.Create();
 
         public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
             => builder.Start(ref stateMachine);
@@ -141,7 +158,7 @@ namespace BenchmarkDotNet.Engines
             => builder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
 
         public void SetResult()
-            => builder.SetResult();
+            => builder.SetResult(default);
 
         public void SetStateMachine(IAsyncStateMachine stateMachine)
             => builder.SetStateMachine(stateMachine);
@@ -152,7 +169,7 @@ namespace BenchmarkDotNet.Engines
         public bool GetIsCompleted(ref ConfiguredValueTaskAwaitable<T>.ConfiguredValueTaskAwaiter awaiter)
             => awaiter.IsCompleted;
 
-        public void GetResult(ref ConfiguredValueTaskAwaitable<T>.ConfiguredValueTaskAwaiter awaiter)
+        public T GetResult(ref ConfiguredValueTaskAwaitable<T>.ConfiguredValueTaskAwaiter awaiter)
             => awaiter.GetResult();
     }
 }
