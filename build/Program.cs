@@ -384,8 +384,7 @@ public class PackTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context)
     {
-        //return context.IsOnAppVeyorAndBdnNightlyCiCd;
-        return true;
+        return context.IsOnAppVeyorAndBdnNightlyCiCd || context.IsLocalBuild;
     }
 
     public override void Run(BuildContext context)
