@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
 
             using (var file = new StreamReader(File.OpenRead(projectFile.FullName)))
             {
-                var (customProperties, sdkName) = GetSettingsThatNeedsToBeCopied(file, projectFile);
+                var (customProperties, sdkName, packageReferences) = GetSettingsThatNeedsToBeCopied(file, projectFile);
 
                 string content = new StringBuilder(ResourceHelper.LoadTemplate("WasmCsProj.txt"))
                     .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
@@ -60,6 +60,7 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
                     .Replace("$SDKNAME$", sdkName)
                     .Replace("$WASMDATADIR$", runtime.WasmDataDir)
                     .Replace("$TARGET$", CustomRuntimePack != null ? "PublishWithCustomRuntimePack" : "Publish")
+                    .Replace("$PACKAGEREFERENCES$", packageReferences)
                 .ToString();
 
                 File.WriteAllText(artifactsPaths.ProjectFilePath, content);

@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             using (var file = new StreamReader(File.OpenRead(projectFile.FullName)))
             {
-                var (customProperties, sdkName) = GetSettingsThatNeedsToBeCopied(file, projectFile);
+                var (customProperties, sdkName, packageReferences) = GetSettingsThatNeedsToBeCopied(file, projectFile);
 
                 var content = new StringBuilder(ResourceHelper.LoadTemplate("CsProj.txt"))
                     .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
@@ -71,6 +71,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                     .Replace("$COPIEDSETTINGS$", customProperties)
                     .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
                     .Replace("$SDKNAME$", sdkName)
+                    .Replace("$PACKAGEREFERENCES$", packageReferences)
                     .ToString();
 
                 File.WriteAllText(artifactsPaths.ProjectFilePath, content);
@@ -97,12 +98,13 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         // the host project or one of the .props file that it imports might contain some custom settings that needs to be copied, sth like
         // <NetCoreAppImplicitPackageVersion>2.0.0-beta-001607-00</NetCoreAppImplicitPackageVersion>
         // <RuntimeFrameworkVersion>2.0.0-beta-001607-00</RuntimeFrameworkVersion>
-        internal (string customProperties, string sdkName) GetSettingsThatNeedsToBeCopied(TextReader streamReader, FileInfo projectFile)
+        internal (string customProperties, string sdkName, string packageReferences) GetSettingsThatNeedsToBeCopied(TextReader streamReader, FileInfo projectFile)
         {
             if (!string.IsNullOrEmpty(RuntimeFrameworkVersion)) // some power users knows what to configure, just do it and copy nothing more
-                return ($"<RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>", DefaultSdkName);
+                return ($"<RuntimeFrameworkVersion>{RuntimeFrameworkVersion}</RuntimeFrameworkVersion>", DefaultSdkName, string.Empty);
 
             var customProperties = new StringBuilder();
+            var packageReferences = new StringBuilder();
             var sdkName = DefaultSdkName;
 
             string line;
@@ -133,9 +135,23 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 if (trimmedLine.StartsWith("<Project Sdk=\"")
                     || (TargetFrameworkMoniker.StartsWith("netcoreapp", StringComparison.InvariantCultureIgnoreCase) &&  trimmedLine.StartsWith("<Import Sdk=\"")))
                     sdkName = trimmedLine.Split('"')[1]; // its sth like Sdk="name"
+
+                if (trimmedLine.StartsWith("<PackageReference Include=\""))
+                {
+                    AppendPackageReference(trimmedLine, packageReferences, streamReader);
+                }
             }
 
-            return (customProperties.ToString(), sdkName);
+            return (customProperties.ToString(), sdkName, packageReferences.ToString());
+        }
+
+        private static void AppendPackageReference(string line, StringBuilder stringBuilder, TextReader streamReader)
+        {
+            do
+            {
+                stringBuilder.AppendLine(line);
+            }
+            while (!line.EndsWith("\" />") && !line.EndsWith("</PackageReference>") && (line = streamReader.ReadLine()) != null);
         }
 
         /// <summary>

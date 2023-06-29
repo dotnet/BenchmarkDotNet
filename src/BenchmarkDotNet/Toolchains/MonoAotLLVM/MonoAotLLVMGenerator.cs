@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
 
             using (var file = new StreamReader(File.OpenRead(projectFile.FullName)))
             {
-                var (customProperties, sdkName) = GetSettingsThatNeedsToBeCopied(file, projectFile);
+                var (customProperties, sdkName, packageReferences) = GetSettingsThatNeedsToBeCopied(file, projectFile);
 
                 string content = new StringBuilder(ResourceHelper.LoadTemplate("MonoAOTLLVMCsProj.txt"))
                     .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
@@ -47,6 +47,7 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
                     .Replace("$COMPILERBINARYPATH$", AotCompilerPath)
                     .Replace("$RUNTIMEIDENTIFIER$",  CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier())
                     .Replace("$USELLVM$", useLLVM)
+                    .Replace("$PACKAGEREFERENCES$", packageReferences)
                     .ToString();
 
                 File.WriteAllText(artifactsPaths.ProjectFilePath, content);
