@@ -52,7 +52,6 @@ namespace BenchmarkDotNet.Code
                     .Replace("$WorkloadMethodReturnType$", provider.WorkloadMethodReturnTypeName)
                     .Replace("$WorkloadMethodReturnTypeModifiers$", provider.WorkloadMethodReturnTypeModifiers)
                     .Replace("$OverheadMethodReturnTypeName$", provider.OverheadMethodReturnTypeName)
-                    .Replace("$AsyncBenchmarkRunnerFieldDeclarations$", provider.GetAsyncBenchmarkRunnerFieldDeclarations(buildInfo.Id))
                     .Replace("$InitializeAsyncBenchmarkRunnerFields$", provider.GetInitializeAsyncBenchmarkRunnerFields(buildInfo.Id))
                     .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)
                     .Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName)
@@ -64,8 +63,10 @@ namespace BenchmarkDotNet.Code
                     .Replace("$ParamsContent$", GetParamsContent(benchmark))
                     .Replace("$ArgumentsDefinition$", GetArgumentsDefinition(benchmark))
                     .Replace("$DeclareArgumentFields$", GetDeclareArgumentFields(benchmark))
-                    .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark)).Replace("$LoadArguments$", GetLoadArguments(benchmark))
+                    .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark))
+                    .Replace("$LoadArguments$", GetLoadArguments(benchmark))
                     .Replace("$PassArguments$", passArguments)
+                    .Replace("$PassArgumentsDirect$", GetPassArgumentsDirect(benchmark))
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
                     .Replace("$MeasureExtraStats$", buildInfo.Config.HasExtraStatsDiagnoser() ? "true" : "false")
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
@@ -157,11 +158,6 @@ namespace BenchmarkDotNet.Code
         {
             var method = descriptor.WorkloadMethod;
 
-            if (config.GetIsAwaitable(method.ReturnType, out var asyncConsumerType))
-            {
-                return new AsyncDeclarationsProvider(descriptor, asyncConsumerType);
-            }
-
             if (method.ReturnType == typeof(void))
             {
                 bool isUsingAsyncKeyword = method.HasAttribute<AsyncStateMachineAttribute>();
@@ -180,6 +176,11 @@ namespace BenchmarkDotNet.Code
                     return new ByReadOnlyRefDeclarationsProvider(descriptor);
                 else
                     return new ByRefDeclarationsProvider(descriptor);
+            }
+
+            if (config.GetIsAwaitable(method.ReturnType, out var asyncConsumerType))
+            {
+                return new AwaitableDeclarationsProvider(descriptor, asyncConsumerType);
             }
 
             return new NonVoidDeclarationsProvider(descriptor);
@@ -222,6 +223,12 @@ namespace BenchmarkDotNet.Code
                 ", ",
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
                     .Select((parameter, index) => $"{GetParameterModifier(parameter)} arg{index}"));
+
+        private static string GetPassArgumentsDirect(BenchmarkCase benchmarkCase)
+            => string.Join(
+                ", ",
+                benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
+                    .Select((parameter, index) => $"{GetParameterModifier(parameter)} __argField{index}"));
 
         private static string GetExtraAttributes(Descriptor descriptor)
             => descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any() ? "[System.STAThreadAttribute]" : string.Empty;

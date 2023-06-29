@@ -110,12 +110,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 // DONTTOUCH: these should be allocated together
                 var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type);
-                var workloadAction = BenchmarkActionFactory.CreateWorkload(target, instance, unrollFactor);
-                var overheadAction = BenchmarkActionFactory.CreateOverhead(target, instance, unrollFactor);
-                var globalSetupAction = BenchmarkActionFactory.CreateGlobalSetup(target, instance);
-                var globalCleanupAction = BenchmarkActionFactory.CreateGlobalCleanup(target, instance);
-                var iterationSetupAction = BenchmarkActionFactory.CreateIterationSetup(target, instance);
-                var iterationCleanupAction = BenchmarkActionFactory.CreateIterationCleanup(target, instance);
+                var workloadAction = BenchmarkActionFactory.CreateWorkload(target, instance, unrollFactor, benchmarkCase.Config);
+                var overheadAction = BenchmarkActionFactory.CreateOverhead(target, instance, unrollFactor, benchmarkCase.Config);
+                var globalSetupAction = BenchmarkActionFactory.CreateGlobalSetup(target, instance, benchmarkCase.Config);
+                var globalCleanupAction = BenchmarkActionFactory.CreateGlobalCleanup(target, instance, benchmarkCase.Config);
+                var iterationSetupAction = BenchmarkActionFactory.CreateIterationSetup(target, instance, benchmarkCase.Config);
+                var iterationCleanupAction = BenchmarkActionFactory.CreateIterationCleanup(target, instance, benchmarkCase.Config);
                 var dummy1 = BenchmarkActionFactory.CreateDummy();
                 var dummy2 = BenchmarkActionFactory.CreateDummy();
                 var dummy3 = BenchmarkActionFactory.CreateDummy();

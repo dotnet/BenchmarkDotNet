@@ -272,7 +272,8 @@ namespace BenchmarkDotNet.Engines
         }
     }
 
-    public sealed class AsyncWorkloadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter> : AsyncBenchmarkRunner<TFunc, AsyncWorkloadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter>.AsyncConsumer, TAwaitable, TAwaiter>
+    public sealed class AsyncWorkloadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter>
+        : AsyncBenchmarkRunner<TFunc, AsyncWorkloadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter>.AsyncConsumer, TAwaitable, TAwaiter>
         where TFunc : struct, IFunc<TAwaitable>
         where TAsyncConsumer : IAsyncVoidConsumer<TAwaitable, TAwaiter>, new()
         where TAwaiter : ICriticalNotifyCompletion
@@ -320,14 +321,17 @@ namespace BenchmarkDotNet.Engines
         }
     }
 
-    public sealed class AsyncOverheadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter> : AsyncBenchmarkRunner<TFunc, AsyncOverheadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter>.AsyncConsumer, EmptyAwaiter, EmptyAwaiter>
-        where TFunc : struct, IFunc<EmptyAwaiter>
+    // TODO: pass overhead types explicitly (TAwaitableOverhead, TAwaiterOverhead), only use EmptyAwaiter for non-primitive struct types.
+    public sealed class AsyncOverheadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter, TAwaitableOverhead, TAwaiterOverhead>
+        : AsyncBenchmarkRunner<TFunc, AsyncOverheadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter, TAwaitableOverhead, TAwaiterOverhead>.AsyncConsumer, TAwaitableOverhead, TAwaiterOverhead>
+        where TFunc : struct, IFunc<TAwaitableOverhead>
         where TAsyncConsumer : IAsyncVoidConsumer<TAwaitable, TAwaiter>, new()
         where TAwaiter : ICriticalNotifyCompletion
+        where TAwaiterOverhead : ICriticalNotifyCompletion
     {
         public AsyncOverheadRunner(TFunc func) : base(func) { }
 
-        public struct AsyncConsumer : IAsyncVoidConsumer<EmptyAwaiter, EmptyAwaiter>
+        public struct AsyncConsumer : IAsyncVoidConsumer<TAwaitableOverhead, TAwaiterOverhead>
         {
             internal TAsyncConsumer asyncConsumer;
 
@@ -355,19 +359,20 @@ namespace BenchmarkDotNet.Engines
 
             // Make sure the methods are called without inlining.
             [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-            public EmptyAwaiter GetAwaiter(ref EmptyAwaiter awaitable)
+            public TAwaiterOverhead GetAwaiter(ref TAwaitableOverhead awaitable)
                 => default;
 
             [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-            public bool GetIsCompleted(ref EmptyAwaiter awaiter)
+            public bool GetIsCompleted(ref TAwaiterOverhead awaiter)
                 => true;
 
             [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-            public void GetResult(ref EmptyAwaiter awaiter) { }
+            public void GetResult(ref TAwaiterOverhead awaiter) { }
         }
     }
 
-    public sealed class AsyncWorkloadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter, TResult> : AsyncBenchmarkRunner<TFunc, AsyncWorkloadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter, TResult>.AsyncConsumer, TAwaitable, TAwaiter>
+    public sealed class AsyncWorkloadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter, TResult>
+        : AsyncBenchmarkRunner<TFunc, AsyncWorkloadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter, TResult>.AsyncConsumer, TAwaitable, TAwaiter>
         where TFunc : struct, IFunc<TAwaitable>
         where TAsyncConsumer : IAsyncResultConsumer<TAwaitable, TAwaiter, TResult>, new()
         where TAwaiter : ICriticalNotifyCompletion
@@ -419,14 +424,16 @@ namespace BenchmarkDotNet.Engines
         }
     }
 
-    public sealed class AsyncOverheadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter, TResult> : AsyncBenchmarkRunner<TFunc, AsyncOverheadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter, TResult>.AsyncConsumer, EmptyAwaiter, EmptyAwaiter>
-        where TFunc : struct, IFunc<EmptyAwaiter>
+    public sealed class AsyncOverheadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter, TAwaitableOverhead, TAwaiterOverhead, TResult>
+        : AsyncBenchmarkRunner<TFunc, AsyncOverheadRunner<TFunc, TAsyncConsumer, TAwaitable, TAwaiter, TAwaitableOverhead, TAwaiterOverhead, TResult>.AsyncConsumer, TAwaitableOverhead, TAwaiterOverhead>
+        where TFunc : struct, IFunc<TAwaitableOverhead>
         where TAsyncConsumer : IAsyncResultConsumer<TAwaitable, TAwaiter, TResult>, new()
         where TAwaiter : ICriticalNotifyCompletion
+        where TAwaiterOverhead : ICriticalNotifyCompletion
     {
         public AsyncOverheadRunner(TFunc func) : base(func) { }
 
-        public struct AsyncConsumer : IAsyncVoidConsumer<EmptyAwaiter, EmptyAwaiter>
+        public struct AsyncConsumer : IAsyncVoidConsumer<TAwaitableOverhead, TAwaiterOverhead>
         {
             internal TAsyncConsumer asyncConsumer;
 
@@ -454,21 +461,21 @@ namespace BenchmarkDotNet.Engines
 
             // Make sure the methods are called without inlining.
             [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-            public EmptyAwaiter GetAwaiter(ref EmptyAwaiter awaitable)
+            public TAwaiterOverhead GetAwaiter(ref TAwaitableOverhead awaitable)
                 => default;
 
             [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-            public bool GetIsCompleted(ref EmptyAwaiter awaiter)
+            public bool GetIsCompleted(ref TAwaiterOverhead awaiter)
                 => true;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void GetResult(ref EmptyAwaiter awaiter)
+            public void GetResult(ref TAwaiterOverhead awaiter)
             {
                 GetResultNoInlining(ref awaiter);
             }
 
             [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-            private void GetResultNoInlining(ref EmptyAwaiter awaiter) { }
+            private void GetResultNoInlining(ref TAwaiterOverhead awaiter) { }
         }
     }
 }

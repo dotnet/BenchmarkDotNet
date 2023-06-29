@@ -144,22 +144,19 @@
             }
         }
         
-        $AsyncBenchmarkRunnerFieldDeclarations$
+        private readonly BenchmarkDotNet.Engines.AsyncBenchmarkRunner __asyncWorkloadRunner;
+        private readonly BenchmarkDotNet.Engines.AsyncBenchmarkRunner __asyncOverheadRunner;
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private $WorkloadMethodReturnType$ __InvokeWorkload()
         {
-// TODO: pass arguments directly.
-            $LoadArguments$
-            return workloadDelegate($PassArguments$); 
+            return workloadDelegate($PassArgumentsDirect$); 
         }
         
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private $OverheadMethodReturnTypeName$ __InvokeOverhead()
         {
-// TODO: pass arguments directly.
-            $LoadArguments$
-            return overheadDelegate($PassArguments$);
+            return overheadDelegate($PassArgumentsDirect$);
         }
 
         // Awaits are not unrolled.

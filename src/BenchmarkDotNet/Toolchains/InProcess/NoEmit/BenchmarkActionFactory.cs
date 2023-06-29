@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 
@@ -22,36 +24,17 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             object instance,
             MethodInfo? targetMethod,
             MethodInfo? fallbackIdleSignature,
-            int unrollFactor)
+            int unrollFactor,
+            IConfig config)
         {
             PrepareInstanceAndResultType(instance, targetMethod, fallbackIdleSignature, out var resultInstance, out var resultType);
 
             if (resultType == typeof(void))
                 return new BenchmarkActionVoid(resultInstance, targetMethod, unrollFactor);
 
-            if (resultType == typeof(Task))
-                return new BenchmarkActionTask(resultInstance, targetMethod, unrollFactor);
-
-            if (resultType == typeof(ValueTask))
-                return new BenchmarkActionValueTask(resultInstance, targetMethod, unrollFactor);
-
-            if (resultType.GetTypeInfo().IsGenericType)
+            if (config.GetIsAwaitable(resultType, out var asyncConsumerType))
             {
-                var genericType = resultType.GetGenericTypeDefinition();
-                var argType = resultType.GenericTypeArguments[0];
-                if (typeof(Task<>) == genericType)
-                    return Create(
-                        typeof(BenchmarkActionTask<>).MakeGenericType(argType),
-                        resultInstance,
-                        targetMethod,
-                        unrollFactor);
-
-                if (typeof(ValueTask<>).IsAssignableFrom(genericType))
-                    return Create(
-                        typeof(BenchmarkActionValueTask<>).MakeGenericType(argType),
-                        resultInstance,
-                        targetMethod,
-                        unrollFactor);
+                return CreateBenchmarkActionAwaitable(asyncConsumerType, resultType, resultInstance, targetMethod, unrollFactor);
             }
 
             if (targetMethod == null && resultType.GetTypeInfo().IsValueType)
@@ -62,6 +45,33 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 typeof(BenchmarkAction<>).MakeGenericType(resultType),
                 resultInstance,
                 targetMethod,
+                unrollFactor);
+        }
+
+        private static BenchmarkActionBase CreateBenchmarkActionAwaitable(Type asyncConsumerType, Type awaitableType, object instance, MethodInfo method, int unrollFactor)
+        {
+            var asyncConsumerInterfaceType = asyncConsumerType.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IAsyncVoidConsumer<,>));
+            bool isVoidConsumer = asyncConsumerInterfaceType?.GetGenericArguments()[0] == awaitableType;
+            if (!isVoidConsumer)
+            {
+                asyncConsumerInterfaceType = asyncConsumerType.GetInterfaces().First(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IAsyncResultConsumer<,,>));
+            }
+
+            Type[] genericArguments = asyncConsumerInterfaceType.GetGenericArguments();
+            Type awaiterType = genericArguments[1];
+
+            if (isVoidConsumer)
+            {
+                return (BenchmarkActionBase) Activator.CreateInstance(
+                    typeof(BenchmarkActionAwaitable<,,>).MakeGenericType(asyncConsumerType, awaitableType, awaiterType),
+                    instance,
+                    method,
+                    unrollFactor);
+            }
+            return (BenchmarkActionBase) Activator.CreateInstance(
+                typeof(BenchmarkActionAwaitable<,,,>).MakeGenericType(asyncConsumerType, awaitableType, awaiterType, genericArguments[2]),
+                instance,
+                method,
                 unrollFactor);
         }
 
@@ -103,13 +113,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
         internal static int GetUnrollFactor(BenchmarkCase benchmarkCase)
         {
-            // Only support (Value)Task for async benchmarks.
-            var methodReturnType = benchmarkCase.Descriptor.WorkloadMethod.ReturnType;
-            bool isAwaitable = methodReturnType == typeof(Task) || methodReturnType == typeof(ValueTask)
-                || (methodReturnType.GetTypeInfo().IsGenericType
-                    && (methodReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
-                    || methodReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)));
-            if (isAwaitable)
+            if (benchmarkCase.Config.GetIsAwaitable(benchmarkCase.Descriptor.WorkloadMethod.ReturnType, out _))
             {
                 benchmarkCase.ForceUnrollFactorForAsync();
             }
@@ -120,49 +124,55 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         /// <param name="descriptor">Descriptor info.</param>
         /// <param name="instance">Instance of target.</param>
         /// <param name="unrollFactor">Unroll factor.</param>
+        /// <param name="config">Config.</param>
         /// <returns>Run benchmark action.</returns>
-        public static BenchmarkAction CreateWorkload(Descriptor descriptor, object instance, int unrollFactor) =>
-            CreateCore(instance, descriptor.WorkloadMethod, null, unrollFactor);
+        public static BenchmarkAction CreateWorkload(Descriptor descriptor, object instance, int unrollFactor, IConfig config) =>
+            CreateCore(instance, descriptor.WorkloadMethod, null, unrollFactor, config);
 
         /// <summary>Creates idle benchmark action.</summary>
         /// <param name="descriptor">Descriptor info.</param>
         /// <param name="instance">Instance of target.</param>
         /// <param name="unrollFactor">Unroll factor.</param>
+        /// <param name="config">Config.</param>
         /// <returns>Idle benchmark action.</returns>
-        public static BenchmarkAction CreateOverhead(Descriptor descriptor, object instance, int unrollFactor) =>
-            CreateCore(instance, null, descriptor.WorkloadMethod, unrollFactor);
+        public static BenchmarkAction CreateOverhead(Descriptor descriptor, object instance, int unrollFactor, IConfig config) =>
+            CreateCore(instance, null, descriptor.WorkloadMethod, unrollFactor, config);
 
         /// <summary>Creates global setup benchmark action.</summary>
         /// <param name="descriptor">Descriptor info.</param>
         /// <param name="instance">Instance of target.</param>
+        /// <param name="config">Config.</param>
         /// <returns>Setup benchmark action.</returns>
-        public static BenchmarkAction CreateGlobalSetup(Descriptor descriptor, object instance) =>
-            CreateCore(instance, descriptor.GlobalSetupMethod, FallbackSignature, 1);
+        public static BenchmarkAction CreateGlobalSetup(Descriptor descriptor, object instance, IConfig config) =>
+            CreateCore(instance, descriptor.GlobalSetupMethod, FallbackSignature, 1, config);
 
         /// <summary>Creates global cleanup benchmark action.</summary>
         /// <param name="descriptor">Descriptor info.</param>
         /// <param name="instance">Instance of target.</param>
+        /// <param name="config">Config.</param>
         /// <returns>Cleanup benchmark action.</returns>
-        public static BenchmarkAction CreateGlobalCleanup(Descriptor descriptor, object instance) =>
-            CreateCore(instance, descriptor.GlobalCleanupMethod, FallbackSignature, 1);
+        public static BenchmarkAction CreateGlobalCleanup(Descriptor descriptor, object instance, IConfig config) =>
+            CreateCore(instance, descriptor.GlobalCleanupMethod, FallbackSignature, 1, config);
 
         /// <summary>Creates global setup benchmark action.</summary>
         /// <param name="descriptor">Descriptor info.</param>
         /// <param name="instance">Instance of target.</param>
+        /// <param name="config">Config.</param>
         /// <returns>Setup benchmark action.</returns>
-        public static BenchmarkAction CreateIterationSetup(Descriptor descriptor, object instance) =>
-            CreateCore(instance, descriptor.IterationSetupMethod, FallbackSignature, 1);
+        public static BenchmarkAction CreateIterationSetup(Descriptor descriptor, object instance, IConfig config) =>
+            CreateCore(instance, descriptor.IterationSetupMethod, FallbackSignature, 1, config);
 
         /// <summary>Creates global cleanup benchmark action.</summary>
         /// <param name="descriptor">Descriptor info.</param>
         /// <param name="instance">Instance of target.</param>
+        /// <param name="config">Config.</param>
         /// <returns>Cleanup benchmark action.</returns>
-        public static BenchmarkAction CreateIterationCleanup(Descriptor descriptor, object instance) =>
-            CreateCore(instance, descriptor.IterationCleanupMethod, FallbackSignature, 1);
+        public static BenchmarkAction CreateIterationCleanup(Descriptor descriptor, object instance, IConfig config) =>
+            CreateCore(instance, descriptor.IterationCleanupMethod, FallbackSignature, 1, config);
 
         /// <summary>Creates a dummy benchmark action.</summary>
         /// <returns>Dummy benchmark action.</returns>
         public static BenchmarkAction CreateDummy() =>
-            CreateCore(new DummyInstance(), DummyMethod, null, 1);
+            CreateCore(new DummyInstance(), DummyMethod, null, 1, DefaultConfig.Instance);
     }
 }
