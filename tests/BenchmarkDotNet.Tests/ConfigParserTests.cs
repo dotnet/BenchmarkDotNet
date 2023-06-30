@@ -587,6 +587,38 @@ namespace BenchmarkDotNet.Tests
             }
         }
 
+        [Fact]
+        public void UserCanSpecifyWasmArgs()
+        {
+            var parsedConfiguration = ConfigParser.Parse(new[] { "--runtimes", "wasm", "--wasmArgs", "--expose_wasm --module" }, new OutputLogger(Output));
+            Assert.True(parsedConfiguration.isSuccess);
+            var jobs = parsedConfiguration.config.GetJobs();
+            foreach (var job in parsedConfiguration.config.GetJobs())
+            {
+                var wasmRuntime = Assert.IsType<WasmRuntime>(job.Environment.Runtime);
+                Assert.Equal(" --expose_wasm --module", wasmRuntime.JavaScriptEngineArguments);
+            }
+        }
+
+        [Fact]
+        public void UserCanSpecifyWasmArgsViaResponseFile()
+        {
+            var tempResponseFile = Path.GetRandomFileName();
+            File.WriteAllLines(tempResponseFile, new[]
+            {
+                "--runtimes wasm",
+                "--wasmArgs \"--expose_wasm --module\""
+            });
+            var parsedConfiguration = ConfigParser.Parse(new[] { $"@{tempResponseFile}" }, new OutputLogger(Output));
+            Assert.True(parsedConfiguration.isSuccess);
+            var jobs = parsedConfiguration.config.GetJobs();
+            foreach (var job in parsedConfiguration.config.GetJobs())
+            {
+                var wasmRuntime = Assert.IsType<WasmRuntime>(job.Environment.Runtime);
+                Assert.Equal(" --expose_wasm --module", wasmRuntime.JavaScriptEngineArguments);
+            }
+        }
+
         [Theory]
         [InlineData("--filter abc", "--filter *")]
         [InlineData("-f abc", "--filter *")]
