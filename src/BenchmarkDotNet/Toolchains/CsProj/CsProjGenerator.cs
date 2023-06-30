@@ -150,9 +150,13 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             do
             {
                 stringBuilder.AppendLine(line);
+                line = RemoveAllWhiteSpace(line);
             }
-            while (!line.EndsWith("\" />") && !line.EndsWith("</PackageReference>") && (line = streamReader.ReadLine()) != null);
+            while (!line.EndsWith("/>") && !line.EndsWith("</PackageReference>") && (line = streamReader.ReadLine()) != null);
         }
+
+        private static string RemoveAllWhiteSpace(string value)
+            => new string(value.Where(c => !char.IsWhiteSpace(c)).ToArray());
 
         /// <summary>
         /// returns a path to the project file which defines the benchmarks
