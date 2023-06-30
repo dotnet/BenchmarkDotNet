@@ -1,6 +1,9 @@
+using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using Build;
 using Cake.Common;
 using Cake.Common.Build;
@@ -195,6 +198,7 @@ public class BuildContext : FrostingContext
         
         var currentDirectory = Directory.GetCurrentDirectory();
         Directory.SetCurrentDirectory(docfxJson.GetDirectory().FullPath);
+        Microsoft.DocAsCode.Dotnet.DotnetApiCatalog.GenerateManagedReferenceYamlFiles(docfxJson.FullPath).Wait();
         Microsoft.DocAsCode.Docset.Build(docfxJson.FullPath).Wait();
         Directory.SetCurrentDirectory(currentDirectory);
     }
@@ -380,8 +384,7 @@ public class PackTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context)
     {
-        //return context.IsOnAppVeyorAndBdnNightlyCiCd;
-        return true;
+        return context.IsOnAppVeyorAndBdnNightlyCiCd || context.IsLocalBuild;
     }
 
     public override void Run(BuildContext context)

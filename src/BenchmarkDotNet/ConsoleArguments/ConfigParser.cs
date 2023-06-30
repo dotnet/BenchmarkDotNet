@@ -182,6 +182,31 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
         }
 
+        internal static bool TryUpdateArgs(string[] args, out string[]? updatedArgs, Action<CommandLineOptions> updater)
+        {
+            (bool isSuccess, CommandLineOptions options) result = default;
+
+            ILogger logger = NullLogger.Instance;
+            using (var parser = CreateParser(logger))
+            {
+                parser
+                    .ParseArguments<CommandLineOptions>(args)
+                    .WithParsed(options => result = Validate(options, logger) ? (true, options) : (false, default))
+                    .WithNotParsed(errors => result = (false,  default));
+
+                if (!result.isSuccess)
+                {
+                    updatedArgs = null;
+                    return false;
+                }
+
+                updater(result.options);
+
+                updatedArgs = parser.FormatCommandLine(result.options, settings => settings.SkipDefault = true).Split();
+                return true;
+            }
+        }
+
         private static Parser CreateParser(ILogger logger)
             => new Parser(settings =>
             {
