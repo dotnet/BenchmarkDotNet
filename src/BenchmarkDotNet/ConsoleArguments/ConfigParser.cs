@@ -76,7 +76,13 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             (bool isSuccess, IConfig config, CommandLineOptions options) result = default;
 
-            args = ExpandResponseFile(args).ToArray();
+            var (expandSuccess, expandedArgs) = ExpandResponseFile(args, logger);
+            if (!expandSuccess)
+            {
+                return (false, default, default);
+            }
+
+            args = expandedArgs;
             using (var parser = CreateParser(logger))
             {
                 parser
@@ -88,21 +94,34 @@ namespace BenchmarkDotNet.ConsoleArguments
             return result;
         }
 
-        private static IEnumerable<string> ExpandResponseFile(string[] args)
+        private static (bool Success, string[] ExpandedTokens) ExpandResponseFile(string[] args, ILogger logger)
         {
+            List<string> result = new ();
             foreach (var arg in args)
             {
                 if (arg.StartsWith("@"))
                 {
                     var fileName = arg.Substring(1);
-                    if (File.Exists(fileName))
+                    try
                     {
-                        var lines = File.ReadAllLines(fileName);
-                        foreach (var line in lines)
+                        if (File.Exists(fileName))
                         {
-                            foreach (var token in ConsumeTokens(line))
-                                yield return token;
+                            var lines = File.ReadAllLines(fileName);
+                            foreach (var line in lines)
+                            {
+                                result.AddRange(ConsumeTokens(line));
+                            }
                         }
+                        else
+                        {
+                            logger.WriteLineError($"Response file {fileName} does not exists.");
+                            return (false, Array.Empty<string>());
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.WriteLineError($"Failed to parse RSP file: {fileName}, {ex.Message}");
+                        return (false, Array.Empty<string>());
                     }
                 }
                 else
@@ -110,14 +129,16 @@ namespace BenchmarkDotNet.ConsoleArguments
                     if (arg.Contains(' '))
                     {
                         // Workaround for CommandLine library issue with parsing these kind of args.
-                        yield return " " + arg;
+                        result.Add(" " + arg);
                     }
                     else
                     {
-                        yield return arg;
+                        result.Add(arg);
                     }
                 }
             }
+
+            return (true, result.ToArray());
         }
 
         private static IEnumerable<string> ConsumeTokens(string line)
