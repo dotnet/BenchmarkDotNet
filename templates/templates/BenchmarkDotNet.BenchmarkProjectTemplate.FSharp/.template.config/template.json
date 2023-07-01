@@ -138,7 +138,7 @@
       "type": "parameter",
       "datatype": "bool",
       "description": "If specified, the project is set up as console app.",
-      "defaultValue": "false"
+      "defaultValue": "true"
     },
     "version": {
       "type": "parameter",
