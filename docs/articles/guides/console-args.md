@@ -186,6 +186,21 @@ Now, the default settings are: `WarmupCount=1` but you might still overwrite it 
 dotnet run -c Release -- --warmupCount 2
 ```
 
+## Response files support
+
+Benchmark.NET supports parsing parameters via response files. for example you can create file `run.rsp` with following content
+```
+--warmupCount 1
+--minIterationCount 9
+--maxIterationCount 12
+```
+
+and run it using `dotnet run -c Release -- @run.rsp`. It would be equivalent to running following command line
+
+```log
+dotnet run -c Release -- --warmupCount 1 --minIterationCount 9 --maxIterationCount 12
+```
+
 ## Statistical Test
 
 To perform a Mann–Whitney U Test and display the results in a dedicated column you need to provide the Threshold:
