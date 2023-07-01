@@ -11,6 +11,7 @@ using BenchmarkDotNet.Toolchains.CsProj;
 using JetBrains.Annotations;
 using Xunit;
 using BenchmarkDotNet.Extensions;
+using System.Xml;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -57,13 +58,17 @@ namespace BenchmarkDotNet.Tests
         {
             var sut = new CsProjGenerator(targetFrameworkMoniker, null, null, null, isNetCore);
 
-            using (var reader = new StringReader(csProjContent))
-            {
-                var (customProperties, sdkName, packageReferences) = sut.GetSettingsThatNeedsToBeCopied(reader, TestAssemblyFileInfo);
+            var xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(csProjContent);
+            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
 
-                Assert.Equal(expectedSdkValue, sdkName);
-                Assert.Empty(customProperties);
-            }
+            Assert.Equal(expectedSdkValue, sdkName);
+            Assert.Empty(customProperties);
+        }
+
+        private static void AssertCustomProperties(string expected, string actual)
+        {
+            Assert.Equal(expected.Replace(Environment.NewLine, "\n").Replace("\n", Environment.NewLine), actual);
         }
 
         [Fact]
@@ -79,13 +84,14 @@ namespace BenchmarkDotNet.Tests
 ";
             var sut = new CsProjGenerator("netcoreapp3.0", null, null, null, true);
 
-            using (var reader = new StringReader(withUseWpfTrue))
-            {
-                var (customProperties, sdkName, packageReferences) = sut.GetSettingsThatNeedsToBeCopied(reader, TestAssemblyFileInfo);
+            var xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(withUseWpfTrue);
+            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
 
-                Assert.Equal("<UseWpf>true</UseWpf>" + Environment.NewLine, customProperties);
-                Assert.Equal("Microsoft.NET.Sdk", sdkName);
-            }
+            AssertCustomProperties(@"<PropertyGroup>
+  <UseWpf>true</UseWpf>
+</PropertyGroup>", customProperties);
+            Assert.Equal("Microsoft.NET.Sdk", sdkName);
         }
 
         [Fact]
@@ -104,13 +110,14 @@ namespace BenchmarkDotNet.Tests
 ";
             var sut = new CsProjGenerator("netcoreapp3.0", null, null, null, true);
 
-            using (var reader = new StringReader(WithPackageReference))
-            {
-                var (customProperties, sdkName, packageReferences) = sut.GetSettingsThatNeedsToBeCopied(reader, TestAssemblyFileInfo);
+            var xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(WithPackageReference);
+            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
 
-                Assert.Equal("<PackageReference Include=\"xunit\" Version=\"2.4.2\" />" + Environment.NewLine, packageReferences);
-                Assert.Equal("Microsoft.NET.Sdk", sdkName);
-            }
+            AssertCustomProperties(@"<ItemGroup>
+  <PackageReference Include=""xunit"" Version=""2.4.2"" />
+</ItemGroup>", customProperties);
+            Assert.Equal("Microsoft.NET.Sdk", sdkName);
         }
 
         [Fact]
@@ -132,16 +139,17 @@ namespace BenchmarkDotNet.Tests
 ";
             var sut = new CsProjGenerator("netcoreapp3.0", null, null, null, true);
 
-            using (var reader = new StringReader(WithPackageReference))
-            {
-                var (customProperties, sdkName, packageReferences) = sut.GetSettingsThatNeedsToBeCopied(reader, TestAssemblyFileInfo);
+            var xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(WithPackageReference);
+            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
 
-                Assert.Equal(@"<PackageReference Include=""xunit.runner.visualstudio"" Version=""2.4.5"">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>".Replace(Environment.NewLine, "\n").Replace("\n", Environment.NewLine) + Environment.NewLine, packageReferences);
-                Assert.Equal("Microsoft.NET.Sdk", sdkName);
-            }
+            AssertCustomProperties(@"<ItemGroup>
+  <PackageReference Include=""xunit.runner.visualstudio"" Version=""2.4.5"">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+  </PackageReference>
+</ItemGroup>", customProperties);
+            Assert.Equal("Microsoft.NET.Sdk", sdkName);
         }
 
         [Fact]
@@ -164,13 +172,14 @@ namespace BenchmarkDotNet.Tests
 
             var sut = new CsProjGenerator("netcoreapp3.0", null, null, null, true);
 
-            using (var reader = new StringReader(importingAbsolutePath))
-            {
-                var (customProperties, sdkName, packageReferences) = sut.GetSettingsThatNeedsToBeCopied(reader, TestAssemblyFileInfo);
+            var xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(importingAbsolutePath);
+            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
 
-                Assert.Equal("<LangVersion>9.9</LangVersion>" + Environment.NewLine, customProperties);
-                Assert.Equal("Microsoft.NET.Sdk", sdkName);
-            }
+            AssertCustomProperties(@"<PropertyGroup>
+  <LangVersion>9.9</LangVersion>
+</PropertyGroup>", customProperties);
+            Assert.Equal("Microsoft.NET.Sdk", sdkName);
 
             File.Delete(propsFilePath);
         }
@@ -195,13 +204,14 @@ namespace BenchmarkDotNet.Tests
 
             var sut = new CsProjGenerator("netcoreapp3.0", null, null, null, true);
 
-            using (var reader = new StringReader(importingRelativePath))
-            {
-                var (customProperties, sdkName, packageReferences) = sut.GetSettingsThatNeedsToBeCopied(reader, TestAssemblyFileInfo);
+            var xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(importingRelativePath);
+            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
 
-                Assert.Equal("<LangVersion>9.9</LangVersion>" + Environment.NewLine, customProperties);
-                Assert.Equal("Microsoft.NET.Sdk", sdkName);
-            }
+            AssertCustomProperties(@"<PropertyGroup>
+  <LangVersion>9.9</LangVersion>
+</PropertyGroup>", customProperties);
+            Assert.Equal("Microsoft.NET.Sdk", sdkName);
 
             File.Delete(propsFilePath);
         }

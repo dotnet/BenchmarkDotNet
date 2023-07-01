@@ -21,9 +21,6 @@
     <Deterministic>true</Deterministic>
     <!-- needed for custom build configurations (only "Release" builds are optimized by default) -->
     <Optimize Condition=" '$(Configuration)' != 'Debug' ">true</Optimize>
-    <!-- Begin copied settings from benchmarks project -->
-    $COPIEDSETTINGS$
-    <!-- End copied settings -->
     <!-- we set LangVersion after any copied settings which might contain LangVersion copied from the benchmarks project -->
     <LangVersion Condition="'$(LangVersion)' == '' Or ($([System.Char]::IsDigit('$(LangVersion)', 0)) And '$(LangVersion)' &lt; '7.3')">latest</LangVersion>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
@@ -39,10 +36,10 @@
   <ItemGroup>
     <ProjectReference Include="$CSPROJPATH$" />
   </ItemGroup>
-  
-  <ItemGroup>
-    $PACKAGEREFERENCES$
-  </ItemGroup>
+
+  <!-- Begin copied settings from benchmarks project -->
+  $COPIEDSETTINGS$
+  <!-- End copied settings -->
 
   $RUNTIMESETTINGS$
 

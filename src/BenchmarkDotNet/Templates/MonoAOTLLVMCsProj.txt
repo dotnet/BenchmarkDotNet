@@ -24,10 +24,10 @@
   <ItemGroup>
     <ProjectReference Include="$CSPROJPATH$" />
   </ItemGroup>
-  
-  <ItemGroup>
-    $PACKAGEREFERENCES$
-  </ItemGroup>
+
+  <!-- Begin copied settings from benchmarks project -->
+  $COPIEDSETTINGS$
+  <!-- End copied settings -->
 
   <!-- Redirect 'dotnet publish' to in-tree runtime pack -->
   <Target Name="TrickRuntimePackLocation" AfterTargets="ProcessFrameworkReferences">
