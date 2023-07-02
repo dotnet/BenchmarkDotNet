@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
@@ -37,14 +35,7 @@ namespace BenchmarkDotNet.Configs
         private readonly List<IFilter> filters = new List<IFilter>();
         private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = new List<BenchmarkLogicalGroupRule>();
         private readonly List<IColumnHidingRule> columnHidingRules = new List<IColumnHidingRule>();
-        private readonly Dictionary<Type, Type> asyncConsumerTypes = new Dictionary<Type, Type>()
-        {
-            // Default consumers for Task and ValueTask.
-            [typeof(Task)] = typeof(TaskConsumer),
-            [typeof(Task<>)] = typeof(TaskConsumer<>),
-            [typeof(ValueTask)] = typeof(ValueTaskConsumer),
-            [typeof(ValueTask<>)] = typeof(ValueTaskConsumer<>),
-        };
+        private readonly HashSet<AsyncAdapterDefinition> awaitableAdapters = new HashSet<AsyncAdapterDefinition>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
@@ -57,7 +48,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => columnHidingRules;
-        public IReadOnlyDictionary<Type, Type> GetAsyncConsumerTypes() => asyncConsumerTypes;
+        public IEnumerable<AsyncAdapterDefinition> GetAsyncAdapterDefinitions() => awaitableAdapters;
 
         [PublicAPI] public ConfigOptions Options { get; set; }
         [PublicAPI] public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
@@ -118,50 +109,20 @@ namespace BenchmarkDotNet.Configs
             return this;
         }
 
-        // TODO: only pass in asyncConsumerType, get awaitableType from IAsyncConsumer<TAwaitable, TAwaiter>
-        public ManualConfig AddAsyncConsumer(Type awaitableType, Type asyncConsumerType)
+        /// <summary>
+        /// Adds an adapter to make a type awaitable. This type must implement <see cref="IAwaitableAdapter{TAwaitable, TAwaiter}"/> or <see cref="IAwaitableAdapter{TAwaitable, TAwaiter, TResult}"/>.
+        /// <para/>Optionally provide an async method builder adapter that will be used to consume the awaitable type. This type must implement <see cref="IAsyncMethodBuilderAdapter"/>.
+        /// If not provided, <paramref name="awaitableAdapterType"/> will be used if it implements <see cref="IAsyncMethodBuilderAdapter"/>, otherwise <see cref="AsyncTaskMethodBuilderAdapter"/> will be used.
+        /// </summary>
+        /// <remarks>
+        /// If an adapter already exists for the corresponding awaitable type, it will be overridden.
+        /// </remarks>
+        /// <param name="awaitableAdapterType">The awaitable type adapter.</param>
+        /// <param name="asyncMethodBuilderAdapterType">The async method builder adapter.</param>
+        /// <exception cref="ArgumentException"></exception>
+        public ManualConfig AddAsyncAdapter(Type awaitableAdapterType, Type asyncMethodBuilderAdapterType = null)
         {
-            // Validate types
-            bool isPublic = asyncConsumerType.IsPublic || asyncConsumerType.IsNestedPublic;
-            if (!isPublic || (!asyncConsumerType.IsValueType && asyncConsumerType.GetConstructor(Array.Empty<Type>()) == null))
-            {
-                throw new ArgumentException($"asyncConsumerType [{asyncConsumerType}] is not a public struct, or a public class with a public, parameterless constructor.");
-            }
-            // TODO: handle multiple generics, verify that the open generics are contained in TAwaitable. https://stackoverflow.com/questions/65725729/why-is-checking-equality-of-open-generic-types-inconsistent
-            bool consumerIsOpenGeneric = asyncConsumerType.IsGenericTypeDefinition;
-            bool awaitableisOpenGeneric = awaitableType.IsGenericTypeDefinition;
-            if (consumerIsOpenGeneric != awaitableisOpenGeneric)
-            {
-                throw new ArgumentException($"asyncConsumerType [{asyncConsumerType}] or awaitableType [{awaitableType}] is an open generic type, while the other is not. Both types must be open or both must be closed.");
-            }
-            int consumerOpenGenericCount = asyncConsumerType.GetGenericArguments().Count(t => t.IsGenericParameter);
-            if (consumerOpenGenericCount > 1)
-            {
-                throw new ArgumentException($"asyncConsumerType [{asyncConsumerType}] has more than 1 open generic argument. Only 0 or 1 open generic arguments are supported.");
-            }
-            int awaitableOpenGenericCount = awaitableType.GetGenericArguments().Count(t => t.IsGenericParameter);
-            if (awaitableOpenGenericCount > 1)
-            {
-                throw new ArgumentException($"awaitableType [{awaitableType}] has more than 1 open generic argument. Only 0 or 1 open generic arguments are supported.");
-            }
-            if (consumerOpenGenericCount != awaitableOpenGenericCount)
-            {
-                throw new ArgumentException($"awaitableType [{awaitableType}] does not have the same open generic argument count as awaitableType [{awaitableType}].");
-            }
-
-            // If the types are open, make closed types for comparison.
-            // TODO: handle partially closed types.
-            var closedAwaitableType = awaitableisOpenGeneric ? awaitableType.MakeGenericType(typeof(int)) : awaitableType;
-            var closedConsumerType = consumerIsOpenGeneric ? asyncConsumerType.MakeGenericType(typeof(int)) : asyncConsumerType;
-            var iAsyncConsumerType = closedConsumerType.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IAsyncVoidConsumer<,>))
-                ?? closedConsumerType.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IAsyncResultConsumer<,,>))
-                ?? throw new ArgumentException($"asyncConsumerType [{asyncConsumerType}] does not implement IAsyncVoidConsumer<TAwaitable, TAwaiter> or IAsyncResultConsumer<TAwaitable, TAwaiter, TResult>.");
-            if (iAsyncConsumerType.GetGenericArguments()[0] != closedAwaitableType)
-            {
-                throw new ArgumentException($"asyncConsumerType [{asyncConsumerType}] does not implement IAsyncConsumer<TAwaitable, TAwaiter> with the expected TAwaitable type [{awaitableType}].");
-            }
-
-            asyncConsumerTypes[awaitableType] = asyncConsumerType;
+            awaitableAdapters.Add(new AsyncAdapterDefinition(awaitableAdapterType, asyncMethodBuilderAdapterType));
             return this;
         }
 
@@ -320,10 +281,7 @@ namespace BenchmarkDotNet.Configs
             SummaryStyle = config.SummaryStyle ?? SummaryStyle;
             logicalGroupRules.AddRange(config.GetLogicalGroupRules());
             columnHidingRules.AddRange(config.GetColumnHidingRules());
-            foreach (var kvp in config.GetAsyncConsumerTypes())
-            {
-                asyncConsumerTypes[kvp.Key] = kvp.Value;
-            }
+            awaitableAdapters.AddRange(config.GetAsyncAdapterDefinitions());
             Options |= config.Options;
             BuildTimeout = GetBuildTimeout(BuildTimeout, config.BuildTimeout);
         }

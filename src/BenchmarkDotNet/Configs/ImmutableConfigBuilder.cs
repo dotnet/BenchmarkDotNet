@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Configs
             var uniqueFilters = source.GetFilters().ToImmutableHashSet();
             var uniqueRules = source.GetLogicalGroupRules().ToImmutableArray();
             var uniqueHidingRules = source.GetColumnHidingRules().ToImmutableArray();
-            var uniqueAsyncConsumerTypes = source.GetAsyncConsumerTypes().ToImmutableDictionary();
+            var uniqueAsyncConsumerTypes = source.GetAsyncAdapterDefinitions().ToImmutableHashSet();
 
             var uniqueRunnableJobs = GetRunnableJobs(source.GetJobs()).ToImmutableHashSet();
 

@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Configs
         private readonly ImmutableHashSet<IFilter> filters;
         private readonly ImmutableArray<BenchmarkLogicalGroupRule> rules;
         private readonly ImmutableArray<IColumnHidingRule> columnHidingRules;
-        private readonly ImmutableDictionary<Type, Type> asyncConsumerTypes;
+        private readonly ImmutableHashSet<AsyncAdapterDefinition> awaitableAdapters;
 
         internal ImmutableConfig(
             ImmutableArray<IColumnProvider> uniqueColumnProviders,
@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.Configs
             ImmutableHashSet<IFilter> uniqueFilters,
             ImmutableArray<BenchmarkLogicalGroupRule> uniqueRules,
             ImmutableArray<IColumnHidingRule> uniqueColumnHidingRules,
-            ImmutableDictionary<Type, Type> uniqueAsyncConsumerTypes,
+            ImmutableHashSet<AsyncAdapterDefinition> uniqueAsyncConsumerTypes,
             ImmutableHashSet<Job> uniqueRunnableJobs,
             ConfigUnionRule unionRule,
             string artifactsPath,
@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Configs
             filters = uniqueFilters;
             rules = uniqueRules;
             columnHidingRules = uniqueColumnHidingRules;
-            asyncConsumerTypes = uniqueAsyncConsumerTypes;
+            awaitableAdapters = uniqueAsyncConsumerTypes;
             jobs = uniqueRunnableJobs;
             UnionRule = unionRule;
             ArtifactsPath = artifactsPath;
@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => rules;
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => columnHidingRules;
-        public IReadOnlyDictionary<Type, Type> GetAsyncConsumerTypes() => asyncConsumerTypes;
+        public IEnumerable<AsyncAdapterDefinition> GetAsyncAdapterDefinitions() => awaitableAdapters;
 
         public ILogger GetCompositeLogger() => new CompositeLogger(loggers);
         public IExporter GetCompositeExporter() => new CompositeExporter(exporters);

@@ -178,9 +178,9 @@ namespace BenchmarkDotNet.Code
                     return new ByRefDeclarationsProvider(descriptor);
             }
 
-            if (config.GetIsAwaitable(method.ReturnType, out var asyncConsumerType))
+            if (config.GetIsAwaitable(method.ReturnType, out var adapter))
             {
-                return new AwaitableDeclarationsProvider(descriptor, asyncConsumerType);
+                return new AwaitableDeclarationsProvider(descriptor, adapter);
             }
 
             return new NonVoidDeclarationsProvider(descriptor);

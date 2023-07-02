@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
-
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
@@ -32,10 +27,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             if (resultType == typeof(void))
                 return new BenchmarkActionVoid(resultInstance, targetMethod, unrollFactor);
 
-            if (config.GetIsAwaitable(resultType, out var asyncConsumerType))
-            {
-                return CreateBenchmarkActionAwaitable(asyncConsumerType, resultType, resultInstance, targetMethod, unrollFactor);
-            }
+            if (config.GetIsAwaitable(resultType, out var adapter))
+                return CreateBenchmarkActionAwaitable(adapter, resultInstance, targetMethod, unrollFactor);
 
             if (targetMethod == null && resultType.GetTypeInfo().IsValueType)
                 // for Idle: we return int because creating bigger ValueType could take longer than benchmarked method itself.
@@ -48,28 +41,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 unrollFactor);
         }
 
-        private static BenchmarkActionBase CreateBenchmarkActionAwaitable(Type asyncConsumerType, Type awaitableType, object instance, MethodInfo method, int unrollFactor)
+        private static BenchmarkActionBase CreateBenchmarkActionAwaitable(ConcreteAsyncAdapter adapter, object instance, MethodInfo method, int unrollFactor)
         {
-            var asyncConsumerInterfaceType = asyncConsumerType.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IAsyncVoidConsumer<,>));
-            bool isVoidConsumer = asyncConsumerInterfaceType?.GetGenericArguments()[0] == awaitableType;
-            if (!isVoidConsumer)
-            {
-                asyncConsumerInterfaceType = asyncConsumerType.GetInterfaces().First(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IAsyncResultConsumer<,,>));
-            }
-
-            Type[] genericArguments = asyncConsumerInterfaceType.GetGenericArguments();
-            Type awaiterType = genericArguments[1];
-
-            if (isVoidConsumer)
+            if (adapter.resultType == null)
             {
                 return (BenchmarkActionBase) Activator.CreateInstance(
-                    typeof(BenchmarkActionAwaitable<,,>).MakeGenericType(asyncConsumerType, awaitableType, awaiterType),
+                    typeof(BenchmarkActionAwaitable<,,,>).MakeGenericType(adapter.asyncMethodBuilderAdapterType, adapter.awaitableAdapterType, adapter.awaitableType, adapter.awaiterType),
                     instance,
                     method,
                     unrollFactor);
             }
             return (BenchmarkActionBase) Activator.CreateInstance(
-                typeof(BenchmarkActionAwaitable<,,,>).MakeGenericType(asyncConsumerType, awaitableType, awaiterType, genericArguments[2]),
+                typeof(BenchmarkActionAwaitable<,,,,>).MakeGenericType(adapter.asyncMethodBuilderAdapterType, adapter.awaitableAdapterType, adapter.awaitableType, adapter.awaiterType, adapter.resultType),
                 instance,
                 method,
                 unrollFactor);

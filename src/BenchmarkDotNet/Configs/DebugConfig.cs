@@ -67,14 +67,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
-        public IReadOnlyDictionary<Type, Type> GetAsyncConsumerTypes() => new Dictionary<Type, Type>()
-        {
-            // Default consumers for Task and ValueTask.
-            [typeof(Task)] = typeof(TaskConsumer),
-            [typeof(Task<>)] = typeof(TaskConsumer<>),
-            [typeof(ValueTask)] = typeof(ValueTaskConsumer),
-            [typeof(ValueTask<>)] = typeof(ValueTaskConsumer<>),
-        };
+        public IEnumerable<AsyncAdapterDefinition> GetAsyncAdapterDefinitions() => Array.Empty<AsyncAdapterDefinition>();
 
         public IOrderer Orderer => DefaultOrderer.Instance;
         public ICategoryDiscoverer? CategoryDiscoverer => DefaultCategoryDiscoverer.Instance;

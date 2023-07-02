@@ -12,7 +12,6 @@ using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -29,7 +28,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IFilter> GetFilters();
         IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
         IEnumerable<IColumnHidingRule> GetColumnHidingRules();
-        IReadOnlyDictionary<Type, Type> GetAsyncConsumerTypes();
+        IEnumerable<AsyncAdapterDefinition> GetAsyncAdapterDefinitions();
 
         IOrderer? Orderer { get; }
         ICategoryDiscoverer? CategoryDiscoverer { get; }

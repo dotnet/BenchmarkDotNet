@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -149,8 +150,9 @@ namespace BenchmarkDotNet.Code
 
     internal class AwaitableDeclarationsProvider : DeclarationsProvider
     {
-        private readonly Type asyncConsumerType;
-        public AwaitableDeclarationsProvider(Descriptor descriptor, Type asyncConsumerType) : base(descriptor) => this.asyncConsumerType = asyncConsumerType;
+        private readonly ConcreteAsyncAdapter adapter;
+
+        public AwaitableDeclarationsProvider(Descriptor descriptor, ConcreteAsyncAdapter adapter) : base(descriptor) => this.adapter = adapter;
 
         public override string ReturnsDefinition => "RETURNS_AWAITABLE";
 
@@ -164,27 +166,19 @@ namespace BenchmarkDotNet.Code
 
         public override string GetInitializeAsyncBenchmarkRunnerFields(BenchmarkId id)
         {
-            string consumerTypeName = asyncConsumerType.GetCorrectCSharpTypeName();
+            string awaitableAdapterTypeName = adapter.awaitableAdapterType.GetCorrectCSharpTypeName();
+            string asyncMethodBuilderAdapterTypeName = adapter.asyncMethodBuilderAdapterType.GetCorrectCSharpTypeName();
 
-            var asyncConsumerInterfaceType = asyncConsumerType.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IAsyncVoidConsumer<,>));
-            bool isVoidConsumer = asyncConsumerInterfaceType?.GetGenericArguments()[0] == WorkloadMethodReturnType;
-            if (!isVoidConsumer)
-            {
-                asyncConsumerInterfaceType = asyncConsumerType.GetInterfaces().First(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IAsyncResultConsumer<,,>));
-            }
-
-            Type[] genericArguments = asyncConsumerInterfaceType.GetGenericArguments();
-            Type awaiterType = genericArguments[1];
-            string awaiterTypeName = awaiterType.GetCorrectCSharpTypeName();
-            string overheadAwaiterTypeName = awaiterType.IsValueType
+            string awaiterTypeName = adapter.awaiterType.GetCorrectCSharpTypeName();
+            string overheadAwaiterTypeName = adapter.awaiterType.IsValueType
                 ? typeof(EmptyAwaiter).GetCorrectCSharpTypeName() // we use this simple type so we don't include the cost of a large struct in the overhead
                 : awaiterTypeName;
-            string appendResultType = isVoidConsumer ? string.Empty : $", {genericArguments[2].GetCorrectCSharpTypeName()}";
+            string appendResultType = adapter.resultType == null ? string.Empty : $", {adapter.resultType.GetCorrectCSharpTypeName()}";
 
             string runnableName = GetRunnableName(id);
 
-            var workloadRunnerTypeName = $"BenchmarkDotNet.Engines.AsyncWorkloadRunner<{runnableName}.WorkloadFunc, {consumerTypeName}, {WorkloadMethodReturnTypeName}, {awaiterTypeName}{appendResultType}>";
-            var overheadRunnerTypeName = $"BenchmarkDotNet.Engines.AsyncOverheadRunner<{runnableName}.OverheadFunc, {consumerTypeName}, {WorkloadMethodReturnTypeName}, {awaiterTypeName}, {OverheadMethodReturnTypeName}, {overheadAwaiterTypeName}{appendResultType}>";
+            var workloadRunnerTypeName = $"BenchmarkDotNet.Engines.AsyncWorkloadRunner<{runnableName}.WorkloadFunc, {asyncMethodBuilderAdapterTypeName}, {awaitableAdapterTypeName}, {WorkloadMethodReturnTypeName}, {awaiterTypeName}{appendResultType}>";
+            var overheadRunnerTypeName = $"BenchmarkDotNet.Engines.AsyncOverheadRunner<{runnableName}.OverheadFunc, {asyncMethodBuilderAdapterTypeName}, {OverheadMethodReturnTypeName}, {overheadAwaiterTypeName}{appendResultType}>";
 
             return $"__asyncWorkloadRunner = new {workloadRunnerTypeName}(new {runnableName}.WorkloadFunc(this));" + Environment.NewLine
      + $"            __asyncOverheadRunner = new {overheadRunnerTypeName}(new {runnableName}.OverheadFunc(this));";

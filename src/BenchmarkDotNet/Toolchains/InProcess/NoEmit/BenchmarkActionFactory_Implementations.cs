@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Engines;
+﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Engines;
 using Perfolizer.Horology;
 using System;
 using System.Reflection;
@@ -110,8 +111,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             public TAwaitable Invoke() => callback();
         }
 
-        internal class BenchmarkActionAwaitable<TAsyncConsumer, TAwaitable, TAwaiter> : BenchmarkActionBase
-            where TAsyncConsumer : struct, IAsyncVoidConsumer<TAwaitable, TAwaiter>
+        internal class BenchmarkActionAwaitable<TAsyncMethodBuilderAdapter, TAwaitableAdapter, TAwaitable, TAwaiter> : BenchmarkActionBase
+            where TAsyncMethodBuilderAdapter : IAsyncMethodBuilderAdapter, new()
+            where TAwaitableAdapter : IAwaitableAdapter<TAwaitable, TAwaiter>, new()
             where TAwaiter : ICriticalNotifyCompletion
         {
             private readonly AsyncBenchmarkRunner asyncBenchmarkRunner;
@@ -122,11 +124,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 if (!isIdle)
                 {
                     var callback = CreateWorkload<Func<TAwaitable>>(instance, method);
-                    asyncBenchmarkRunner = new AsyncWorkloadRunner<AwaitableFunc<TAwaitable>, TAsyncConsumer, TAwaitable, TAwaiter>(new AwaitableFunc<TAwaitable>(callback));
+                    asyncBenchmarkRunner = new AsyncWorkloadRunner<AwaitableFunc<TAwaitable>, TAsyncMethodBuilderAdapter, TAwaitableAdapter, TAwaitable, TAwaiter>(new (callback));
                 }
                 else
                 {
-                    asyncBenchmarkRunner = new AsyncOverheadRunner<AwaitableFunc<TAwaitable>, TAsyncConsumer, TAwaitable, TAwaiter, TAwaitable, TAwaiter>(new AwaitableFunc<TAwaitable>(Overhead));
+                    asyncBenchmarkRunner = new AsyncOverheadRunner<AwaitableFunc<TAwaitable>, TAsyncMethodBuilderAdapter, TAwaitable, TAwaiter>(new (Overhead));
                 }
                 InvokeSingle = InvokeSingleHardcoded;
                 InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcoded;
@@ -141,8 +143,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 => asyncBenchmarkRunner.Invoke(repeatCount, clock);
         }
 
-        internal class BenchmarkActionAwaitable<TAsyncConsumer, TAwaitable, TAwaiter, TResult> : BenchmarkActionBase
-            where TAsyncConsumer : struct, IAsyncResultConsumer<TAwaitable, TAwaiter, TResult>
+        internal class BenchmarkActionAwaitable<TAsyncMethodBuilderAdapter, TAwaitableAdapter, TAwaitable, TAwaiter, TResult> : BenchmarkActionBase
+            where TAsyncMethodBuilderAdapter : IAsyncMethodBuilderAdapter, new()
+            where TAwaitableAdapter : IAwaitableAdapter<TAwaitable, TAwaiter, TResult>, new()
             where TAwaiter : ICriticalNotifyCompletion
         {
             private readonly AsyncBenchmarkRunner asyncBenchmarkRunner;
@@ -153,11 +156,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 if (!isIdle)
                 {
                     var callback = CreateWorkload<Func<TAwaitable>>(instance, method);
-                    asyncBenchmarkRunner = new AsyncWorkloadRunner<AwaitableFunc<TAwaitable>, TAsyncConsumer, TAwaitable, TAwaiter, TResult>(new AwaitableFunc<TAwaitable>(callback));
+                    asyncBenchmarkRunner = new AsyncWorkloadRunner<AwaitableFunc<TAwaitable>, TAsyncMethodBuilderAdapter, TAwaitableAdapter, TAwaitable, TAwaiter, TResult>(new (callback));
                 }
                 else
                 {
-                    asyncBenchmarkRunner = new AsyncOverheadRunner<AwaitableFunc<TAwaitable>, TAsyncConsumer, TAwaitable, TAwaiter, TAwaitable, TAwaiter, TResult>(new AwaitableFunc<TAwaitable>(Overhead));
+                    asyncBenchmarkRunner = new AsyncOverheadRunner<AwaitableFunc<TAwaitable>, TAsyncMethodBuilderAdapter, TAwaitable, TAwaiter, TResult>(new (Overhead));
                 }
                 InvokeSingle = InvokeSingleHardcoded;
                 InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcoded;
