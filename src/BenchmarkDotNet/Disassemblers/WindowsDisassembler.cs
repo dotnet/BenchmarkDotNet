@@ -86,18 +86,15 @@ namespace BenchmarkDotNet.Disassemblers
             var dir = new FileInfo(assemblyWithDisassemblersInResources.Location).Directory ?? throw new DirectoryNotFoundException();
             string disassemblerPath = Path.Combine(
                 dir.FullName,
-                FolderNameHelper.ToFolderName(BenchmarkDotNetInfo.Instance.FullVersion), // possible update
+                FolderNameHelper.ToFolderName(BenchmarkDotNetInfo.FullVersion), // possible update
                 exeName); // separate process per architecture!!
 
             Path.GetDirectoryName(disassemblerPath).CreateIfNotExists();
 
-            // for development we always want to copy the file to not omit any dev changes
-            if (!BenchmarkDotNetInfo.Instance.IsDevelop)
-            {
-                if (File.Exists(disassemblerPath))
-                    return disassemblerPath;
-            }
-
+#if !PRERELEASE_DEVELOP // for development we always want to copy the file to not omit any dev changes (Properties.BenchmarkDotNetInfo.FullVersion in file name is not enough)
+            if (File.Exists(disassemblerPath))
+                return disassemblerPath;
+#endif
             // the disassembler has not been yet retrieved from the resources
             CopyFromResources(
                 assemblyWithDisassemblersInResources,

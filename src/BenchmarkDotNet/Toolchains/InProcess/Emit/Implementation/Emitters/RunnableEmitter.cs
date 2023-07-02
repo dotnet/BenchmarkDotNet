@@ -12,7 +12,6 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
@@ -79,13 +78,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         private static bool ShouldSaveToDisk(IConfig config)
         {
-            if (!BenchmarkDotNetInfo.Instance.IsRelease)
-            {
-                // we never want to do that in our official NuGet.org package, it's a hack
-                return config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles) && Portability.RuntimeInformation.IsFullFramework;
-            }
-
+#if PRERELEASE_DEVELOP || PRERELEASE_NIGHTLY // we never want to do that in our official NuGet.org package, it's a hack
+            return config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles) && Portability.RuntimeInformation.IsFullFramework;
+#else
             return false;
+#endif
         }
 
         private static string GetRunnableTypeName(BenchmarkBuildInfo benchmark)

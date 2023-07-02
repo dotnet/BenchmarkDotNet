@@ -33,7 +33,6 @@ public class BuildContext : FrostingContext
     public string BuildConfiguration { get; set; }
     public bool SkipTests { get; set; }
     public bool SkipSlowTests { get; set; }
-    public string TargetVersion { get; set; }
 
     public DirectoryPath RootDirectory { get; }
     public DirectoryPath ArtifactsDirectory { get; }
@@ -46,6 +45,8 @@ public class BuildContext : FrostingContext
     public DirectoryPath ChangeLogGenDirectory { get; }
     
     public DirectoryPath RedirectRootDirectory { get; }
+    public DirectoryPath RedirectProjectDirectory { get; }
+    public DirectoryPath RedirectSourceDirectory { get; }
     public DirectoryPath RedirectTargetDirectory { get; }
 
     public FilePath SolutionFile { get; }
@@ -69,7 +70,6 @@ public class BuildContext : FrostingContext
         BuildConfiguration = context.Argument("Configuration", "Release");
         SkipTests = context.Argument("SkipTests", false);
         SkipSlowTests = context.Argument("SkipSlowTests", false);
-        TargetVersion = context.Argument("Version", "");
 
         RootDirectory = new DirectoryPath(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName);
         ArtifactsDirectory = RootDirectory.Combine("artifacts");
@@ -82,6 +82,8 @@ public class BuildContext : FrostingContext
         ChangeLogGenDirectory = RootDirectory.Combine("docs").Combine("_changelog");
         
         RedirectRootDirectory = RootDirectory.Combine("docs").Combine("_redirects");
+        RedirectProjectDirectory = RedirectRootDirectory.Combine("RedirectGenerator");
+        RedirectSourceDirectory = RedirectRootDirectory.Combine("redirects");
         RedirectTargetDirectory = RootDirectory.Combine("docs").Combine("_site"); 
 
         SolutionFile = RootDirectory.CombineWithFilePath("BenchmarkDotNet.sln");
@@ -94,16 +96,11 @@ public class BuildContext : FrostingContext
         AllPackableSrcProjects = new FilePathCollection(context.GetFiles(RootDirectory.FullPath + "/src/**/*.csproj")
             .Where(p => !p.FullPath.Contains("Disassembler")));
 
-        MsBuildSettings = new DotNetMSBuildSettings();
-        if (IsCiBuild)
+        MsBuildSettings = new DotNetMSBuildSettings
         {
-            MsBuildSettings.MaxCpuCount = 1;
-            MsBuildSettings.WithProperty("UseSharedCompilation", "false");
-            MsBuildSettings.WithProperty("CI_BUILD", "true");
-        }
-
-        if (!string.IsNullOrEmpty(TargetVersion))
-            MsBuildSettings.WithProperty("Version", TargetVersion);
+            MaxCpuCount = 1
+        };
+        MsBuildSettings.WithProperty("UseSharedCompilation", "false");
 
         // NativeAOT build requires VS C++ tools to be added to $path via vcvars64.bat
         // but once we do that, dotnet restore fails with:
@@ -413,19 +410,17 @@ public class PackTask : FrostingTask<BuildContext>
             Configuration = context.BuildConfiguration,
             OutputDirectory = context.ArtifactsDirectory.FullPath,
             ArgumentCustomization = args => args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg"),
-            MSBuildSettings = context.MsBuildSettings,
-            NoBuild = true
+            MSBuildSettings = context.MsBuildSettings
         };
-
-        foreach (var project in context.AllPackableSrcProjects)
-            context.DotNetPack(project.FullPath, settingsSrc);
-        
         var settingsTemplate = new DotNetPackSettings
         {
             Configuration = context.BuildConfiguration,
             OutputDirectory = context.ArtifactsDirectory.FullPath,
             MSBuildSettings = context.MsBuildSettings
         };
+
+        foreach (var project in context.AllPackableSrcProjects)
+            context.DotNetPack(project.FullPath, settingsSrc);
         context.DotNetPack(context.TemplatesTestsProjectFile.FullPath, settingsTemplate);
     }
 }

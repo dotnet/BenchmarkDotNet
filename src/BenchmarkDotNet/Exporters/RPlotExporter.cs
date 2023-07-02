@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Exporters
             string logFullPath = Path.Combine(summary.ResultsDirectoryPath, logFileName);
             string script = ResourceHelper.
                 LoadTemplate(scriptFileName).
-                Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.Instance.BrandTitle).
+                Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.FullTitle).
                 Replace("$CsvSeparator$", CsvMeasurementsExporter.Default.Separator);
             lock (BuildScriptLock)
                 File.WriteAllText(scriptFullPath, script);
