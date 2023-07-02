@@ -44,7 +44,7 @@ public class BuildContext : FrostingContext
 
     public DirectoryPath ChangeLogDirectory { get; }
     public DirectoryPath ChangeLogGenDirectory { get; }
-    
+
     public DirectoryPath RedirectRootDirectory { get; }
     public DirectoryPath RedirectTargetDirectory { get; }
 
@@ -53,13 +53,17 @@ public class BuildContext : FrostingContext
     public FilePath IntegrationTestsProjectFile { get; }
     public FilePath TemplatesTestsProjectFile { get; }
     public FilePathCollection AllPackableSrcProjects { get; }
-    
+
     public DotNetMSBuildSettings MsBuildSettings { get; }
 
     private IAppVeyorProvider AppVeyor => this.BuildSystem().AppVeyor;
     public bool IsRunningOnAppVeyor => AppVeyor.IsRunningOnAppVeyor;
     public bool IsOnAppVeyorAndNotPr => IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest;
-    public bool IsOnAppVeyorAndBdnNightlyCiCd => IsOnAppVeyorAndNotPr && AppVeyor.Environment.Repository.Branch == "master" && this.IsRunningOnWindows();
+
+    public bool IsOnAppVeyorAndBdnNightlyCiCd => IsOnAppVeyorAndNotPr &&
+                                                 AppVeyor.Environment.Repository.Branch == "master" &&
+                                                 this.IsRunningOnWindows();
+
     public bool IsLocalBuild => this.BuildSystem().IsLocalBuild;
     public bool IsCiBuild => !this.BuildSystem().IsLocalBuild;
 
@@ -80,9 +84,9 @@ public class BuildContext : FrostingContext
 
         ChangeLogDirectory = RootDirectory.Combine("docs").Combine("changelog");
         ChangeLogGenDirectory = RootDirectory.Combine("docs").Combine("_changelog");
-        
+
         RedirectRootDirectory = RootDirectory.Combine("docs").Combine("_redirects");
-        RedirectTargetDirectory = RootDirectory.Combine("docs").Combine("_site"); 
+        RedirectTargetDirectory = RootDirectory.Combine("docs").Combine("_site");
 
         SolutionFile = RootDirectory.CombineWithFilePath("BenchmarkDotNet.sln");
         UnitTestsProjectFile = RootDirectory.Combine("tests").Combine("BenchmarkDotNet.Tests")
@@ -189,7 +193,7 @@ public class BuildContext : FrostingContext
     public void RunDocfx(FilePath docfxJson)
     {
         this.Information($"Running docfx for '{docfxJson}'");
-        
+
         var currentDirectory = Directory.GetCurrentDirectory();
         Directory.SetCurrentDirectory(docfxJson.GetDirectory().FullPath);
         Microsoft.DocAsCode.Dotnet.DotnetApiCatalog.GenerateManagedReferenceYamlFiles(docfxJson.FullPath).Wait();
@@ -350,7 +354,7 @@ public class FastTestsTask : FrostingTask<BuildContext>
             ? new[] { "net462", "net7.0" }
             : new[] { "net7.0" };
 
-        foreach (var targetFramework in targetFrameworks) 
+        foreach (var targetFramework in targetFrameworks)
             context.RunTests(context.UnitTestsProjectFile, "UnitTests", targetFramework);
     }
 }
@@ -361,7 +365,8 @@ public class SlowFullFrameworkTestsTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context)
     {
-        return !context.SkipTests && !context.SkipSlowTests && context.IsRunningOnWindows() && !context.IsRunningOnAppVeyor;
+        return !context.SkipTests && !context.SkipSlowTests && context.IsRunningOnWindows() &&
+               !context.IsRunningOnAppVeyor;
     }
 
     public override void Run(BuildContext context)
@@ -416,7 +421,7 @@ public class PackTask : FrostingTask<BuildContext>
 
         foreach (var project in context.AllPackableSrcProjects)
             context.DotNetPack(project.FullPath, settingsSrc);
-        
+
         var settingsTemplate = new DotNetPackSettings
         {
             Configuration = context.BuildConfiguration,
@@ -445,7 +450,7 @@ public class DocFxChangelogDownloadTask : FrostingTask<BuildContext>
             context.DocfxChangelogDownload(
                 DocumentationHelper.BdnAllVersions.First(),
                 DocumentationHelper.BdnFirstCommit);
-        
+
             for (int i = 1; i < DocumentationHelper.BdnAllVersions.Length; i++)
                 context.DocfxChangelogDownload(
                     DocumentationHelper.BdnAllVersions[i],
@@ -453,7 +458,9 @@ public class DocFxChangelogDownloadTask : FrostingTask<BuildContext>
         }
         else if (context.Argument("LatestVersions", false))
         {
-            for (int i = DocumentationHelper.BdnAllVersions.Length - 3; i < DocumentationHelper.BdnAllVersions.Length; i++)
+            for (int i = DocumentationHelper.BdnAllVersions.Length - 3;
+                 i < DocumentationHelper.BdnAllVersions.Length;
+                 i++)
                 context.DocfxChangelogDownload(
                     DocumentationHelper.BdnAllVersions[i],
                     DocumentationHelper.BdnAllVersions[i - 1]);
@@ -475,10 +482,42 @@ public class DocfxChangelogGenerateTask : FrostingTask<BuildContext>
             context.DocfxChangelogGenerate(version);
         context.DocfxChangelogGenerate(DocumentationHelper.BdnNextVersion);
 
-        context.CopyFile(context.ChangeLogGenDirectory.CombineWithFilePath("index.md"),
-            context.ChangeLogDirectory.CombineWithFilePath("index.md"));
-        context.CopyFile(context.ChangeLogGenDirectory.CombineWithFilePath("full.md"),
-            context.ChangeLogDirectory.CombineWithFilePath("full.md"));
+        context.Information("DocfxChangelogGenerate: index.md");
+        var indexContent = new StringBuilder();
+        indexContent.AppendLine("---");
+        indexContent.AppendLine("uid: changelog");
+        indexContent.AppendLine("---");
+        indexContent.AppendLine("");
+        indexContent.AppendLine("# ChangeLog");
+        indexContent.AppendLine("");
+        foreach (var version in DocumentationHelper.BdnAllVersions.Reverse())
+            indexContent.AppendLine($"* @changelog.{version}");
+        indexContent.AppendLine("* @changelog.full");
+        context.FileWriteText(context.ChangeLogDirectory.CombineWithFilePath("index.md"), indexContent.ToString());
+
+        context.Information("DocfxChangelogGenerate: full.md");
+        var fullContent = new StringBuilder();
+        fullContent.AppendLine("---");
+        fullContent.AppendLine("uid: changelog");
+        fullContent.AppendLine("---");
+        fullContent.AppendLine("");
+        fullContent.AppendLine("# Full ChangeLog");
+        fullContent.AppendLine("");
+        foreach (var version in DocumentationHelper.BdnAllVersions.Reverse())
+            indexContent.AppendLine($"[!include[{version}]({version}.md)]");
+        context.FileWriteText(context.ChangeLogDirectory.CombineWithFilePath("full.md"), fullContent.ToString());
+
+        context.Information("DocfxChangelogGenerate: toc.yml");
+        var tocContent = new StringBuilder();
+        foreach (var version in DocumentationHelper.BdnAllVersions.Reverse())
+        {
+            tocContent.AppendLine($"- name: {version}");
+            tocContent.AppendLine($"  href: {version}.md");
+        }
+
+        tocContent.AppendLine("- name: Full ChangeLog");
+        tocContent.AppendLine("  href: full.md");
+        context.FileWriteText(context.ChangeLogDirectory.CombineWithFilePath("toc.yml"), tocContent.ToString());
     }
 }
 
