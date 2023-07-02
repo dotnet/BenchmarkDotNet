@@ -498,7 +498,7 @@ public class DocfxChangelogGenerateTask : FrostingTask<BuildContext>
         context.Information("DocfxChangelogGenerate: full.md");
         var fullContent = new StringBuilder();
         fullContent.AppendLine("---");
-        fullContent.AppendLine("uid: changelog");
+        fullContent.AppendLine("uid: changelog.full");
         fullContent.AppendLine("---");
         fullContent.AppendLine("");
         fullContent.AppendLine("# Full ChangeLog");
