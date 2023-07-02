@@ -1,9 +1,6 @@
-using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using Build;
 using Cake.Common;
 using Cake.Common.Build;
@@ -15,7 +12,6 @@ using Cake.Common.Tools.DotNet.Build;
 using Cake.Common.Tools.DotNet.MSBuild;
 using Cake.Common.Tools.DotNet.Pack;
 using Cake.Common.Tools.DotNet.Restore;
-using Cake.Common.Tools.DotNet.Run;
 using Cake.Common.Tools.DotNet.Test;
 using Cake.Core;
 using Cake.Core.IO;
@@ -205,17 +201,37 @@ public class BuildContext : FrostingContext
 
     public void GenerateRedirects()
     {
-        var redirectProjectFile = RedirectProjectDirectory.CombineWithFilePath("RedirectGenerator.csproj");
-        this.Information(redirectProjectFile.FullPath);
-        this.DotNetBuild(redirectProjectFile.FullPath);
-        this.DotNetRun(redirectProjectFile.FullPath, new DotNetRunSettings
+        var redirectFile = RedirectRootDirectory.CombineWithFilePath("_redirects");
+        if (!this.FileExists(redirectFile))
         {
-            WorkingDirectory = RedirectProjectDirectory,
-        });
+            this.Error($"Redirect file '{redirectFile}' does not exist");
+            return;
+        }
 
-        this.Information(RedirectTargetDirectory);
         this.EnsureDirectoryExists(RedirectTargetDirectory);
-        this.CopyFiles(RedirectSourceDirectory + "/**/*", RedirectTargetDirectory, true);
+
+        var redirects = this.FileReadLines(redirectFile)
+            .Select(line => line.Split(' '))
+            .Select(parts => (source: parts[0], target: parts[1]))
+            .ToList();
+
+        foreach (var (source, target) in redirects)
+        {
+            var fileName = source.StartsWith("/") || source.StartsWith("\\") ? source[1..] : source;
+            var fullFileName = RedirectTargetDirectory.CombineWithFilePath(fileName);
+            var content =
+                $"<!doctype html>" +
+                $"<html lang=en-us>" +
+                $"<head>" +
+                $"<title>{target}</title>" +
+                $"<link rel=canonical href='{target}'>" +
+                $"<meta name=robots content=\"noindex\">" +
+                $"<meta charset=utf-8><meta http-equiv=refresh content=\"0; url={target}\">" +
+                $"</head>" +
+                $"</html>";
+            this.EnsureDirectoryExists(fullFileName.GetDirectory());
+            this.FileWriteText(fullFileName, content);
+        }
     }
 }
 
