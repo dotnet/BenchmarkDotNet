@@ -504,7 +504,7 @@ public class DocfxChangelogGenerateTask : FrostingTask<BuildContext>
         fullContent.AppendLine("# Full ChangeLog");
         fullContent.AppendLine("");
         foreach (var version in DocumentationHelper.BdnAllVersions.Reverse())
-            indexContent.AppendLine($"[!include[{version}]({version}.md)]");
+            fullContent.AppendLine($"[!include[{version}]({version}.md)]");
         context.FileWriteText(context.ChangeLogDirectory.CombineWithFilePath("full.md"), fullContent.ToString());
 
         context.Information("DocfxChangelogGenerate: toc.yml");
