@@ -1,39 +1,53 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Properties
 {
-    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public static class BenchmarkDotNetInfo
+    public class BenchmarkDotNetInfo
     {
-#if PRERELEASE_NIGHTLY
-        public const string PrereleaseLabel = "-nightly";
-#elif PRERELEASE_DEVELOP
-        public const string PrereleaseLabel = "-develop";
-#else
-        public const string PrereleaseLabel = "";
-#endif
-
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-        [SuppressMessage("ReSharper", "RedundantLogicalConditionalExpressionOperand")]
-        private static readonly Lazy<string> FullVersionLazy = new Lazy<string>(() =>
+        private static readonly Lazy<BenchmarkDotNetInfo> LazyInstance = new (() =>
         {
-            string version = typeof(BenchmarkDotNetInfo).GetTypeInfo().Assembly.GetName().Version.ToString();
-#pragma warning disable 162
-            if (version.EndsWith(".0") && PrereleaseLabel == "")
-                version = version.Substring(0, version.Length - 2);
-            if (version.EndsWith(".0") && PrereleaseLabel == "-develop")
-                version = version.Substring(0, version.Length - 1) + DateTime.Now.ToString("yyyyMMdd");
-#pragma warning restore 162
-            return version + PrereleaseLabel;
+            var assembly = typeof(BenchmarkDotNetInfo).GetTypeInfo().Assembly;
+            var assemblyVersion = assembly.GetName().Version;
+            string informationVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion ?? "";
+            return new BenchmarkDotNetInfo(assemblyVersion, informationVersion);
         });
 
-        private static readonly Lazy<string> FullTitleLazy = new Lazy<string>(() => "BenchmarkDotNet v" + FullVersionLazy.Value);
+        public static BenchmarkDotNetInfo Instance { get; } = LazyInstance.Value;
 
-        public static string FullVersion => FullVersionLazy.Value;
+        public Version AssemblyVersion { get; }
+        public string FullVersion { get; }
 
-        public static string FullTitle => FullTitleLazy.Value;
+        public bool IsDevelop { get; }
+        public bool IsNightly { get; }
+        public bool IsRelease { get; }
+
+        public string BrandTitle { get; }
+        public string BrandVersion { get; }
+
+        public BenchmarkDotNetInfo(Version assemblyVersion, string fullVersion)
+        {
+            AssemblyVersion = assemblyVersion;
+            FullVersion = fullVersion;
+
+            string versionPrefix = AssemblyVersion.Revision > 0
+                ? AssemblyVersion.ToString()
+                : AssemblyVersion.ToString(3);
+            if (!FullVersion.StartsWith(versionPrefix))
+                throw new ArgumentException($"Inconsistent versions: '{assemblyVersion}' and '{fullVersion}'");
+            string versionSuffix = FullVersion.Substring(versionPrefix.Length).TrimStart('-');
+
+            IsDevelop = versionSuffix.StartsWith("develop");
+            IsNightly = AssemblyVersion.Revision > 0;
+            IsRelease = versionSuffix.IsEmpty() && AssemblyVersion.Revision <= 0;
+
+            string brandVersionSuffix = IsDevelop
+                ? "-" + DateTime.Now.ToString("yyyyMMdd")
+                : "";
+            BrandVersion = FullVersion + brandVersionSuffix;
+            BrandTitle = "BenchmarkDotNet v" + BrandVersion;
+        }
 
         internal const string PublicKey =
             "00240000048000009400000006020000002400005253413100040000010001002970bbdfca4d12" +
