@@ -141,13 +141,8 @@ public class BuildContext : FrostingContext
     {
         this.Information("DocfxChangelogDownload: " + version);
         // Required environment variables: GITHUB_PRODUCT, GITHUB_TOKEN
-        var changeLogBuilderDirectory = ChangeLogGenDirectory.Combine("ChangeLogBuilder");
-        ChangeLogBuilder.Run(changeLogBuilderDirectory, version, versionPrevious, lastCommit).Wait();
-
-        var src = changeLogBuilderDirectory.CombineWithFilePath(version + ".md");
-        var dest = ChangeLogGenDirectory.Combine("details").CombineWithFilePath(version + ".md");
-        this.CopyFile(src, dest);
-        this.Information($"Changelog for {version}: {dest}");
+        var path = ChangeLogGenDirectory.Combine("details");
+        ChangeLogBuilder.Run(path, version, versionPrevious, lastCommit).Wait();
     }
 
     public void DocfxChangelogGenerate(string version)
@@ -450,7 +445,7 @@ public class DocFxChangelogDownloadTask : FrostingTask<BuildContext>
             context.DocfxChangelogDownload(
                 DocumentationHelper.BdnAllVersions.First(),
                 DocumentationHelper.BdnFirstCommit);
-
+        
             for (int i = 1; i < DocumentationHelper.BdnAllVersions.Length; i++)
                 context.DocfxChangelogDownload(
                     DocumentationHelper.BdnAllVersions[i],
