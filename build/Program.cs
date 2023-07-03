@@ -54,7 +54,9 @@ public class BuildContext : FrostingContext
     public FilePath TemplatesTestsProjectFile { get; }
     public FilePathCollection AllPackableSrcProjects { get; }
 
-    public DotNetMSBuildSettings MsBuildSettings { get; }
+    public DotNetMSBuildSettings MsBuildSettingsRestore { get; }
+    public DotNetMSBuildSettings MsBuildSettingsBuild { get; }
+    public DotNetMSBuildSettings MsBuildSettingsPack { get; }
 
     private IAppVeyorProvider AppVeyor => this.BuildSystem().AppVeyor;
     public bool IsRunningOnAppVeyor => AppVeyor.IsRunningOnAppVeyor;
@@ -98,23 +100,31 @@ public class BuildContext : FrostingContext
         AllPackableSrcProjects = new FilePathCollection(context.GetFiles(RootDirectory.FullPath + "/src/**/*.csproj")
             .Where(p => !p.FullPath.Contains("Disassembler")));
 
-        MsBuildSettings = new DotNetMSBuildSettings();
+        MsBuildSettingsRestore = new DotNetMSBuildSettings();
+        MsBuildSettingsBuild = new DotNetMSBuildSettings();
+        MsBuildSettingsPack = new DotNetMSBuildSettings();
+        
         if (IsCiBuild)
         {
-            MsBuildSettings.MaxCpuCount = 1;
-            MsBuildSettings.WithProperty("UseSharedCompilation", "false");
             System.Environment.SetEnvironmentVariable("BDN_CI_BUILD", "true");
+            
+            MsBuildSettingsBuild.MaxCpuCount = 1;
+            MsBuildSettingsBuild.WithProperty("UseSharedCompilation", "false");
         }
 
         if (!string.IsNullOrEmpty(TargetVersion))
-            MsBuildSettings.WithProperty("Version", TargetVersion);
+        {
+            MsBuildSettingsRestore.WithProperty("Version", TargetVersion);
+            MsBuildSettingsBuild.WithProperty("Version", TargetVersion);
+            MsBuildSettingsPack.WithProperty("Version", TargetVersion);
+        }
 
         // NativeAOT build requires VS C++ tools to be added to $path via vcvars64.bat
         // but once we do that, dotnet restore fails with:
         // "Please specify a valid solution configuration using the Configuration and Platform properties"
         if (context.IsRunningOnWindows())
         {
-            MsBuildSettings.WithProperty("Platform", "Any CPU");
+            MsBuildSettingsRestore.WithProperty("Platform", "Any CPU");
         }
     }
 
@@ -316,7 +326,7 @@ public class RestoreTask : FrostingTask<BuildContext>
         context.DotNetRestore(context.SolutionFile.FullPath,
             new DotNetRestoreSettings
             {
-                MSBuildSettings = context.MsBuildSettings
+                MSBuildSettings = context.MsBuildSettingsRestore
             });
     }
 }
@@ -333,7 +343,7 @@ public class BuildTask : FrostingTask<BuildContext>
             Configuration = context.BuildConfiguration,
             NoRestore = true,
             DiagnosticOutput = true,
-            MSBuildSettings = context.MsBuildSettings,
+            MSBuildSettings = context.MsBuildSettingsBuild,
             Verbosity = DotNetVerbosity.Minimal
         });
     }
@@ -414,7 +424,7 @@ public class PackTask : FrostingTask<BuildContext>
             Configuration = context.BuildConfiguration,
             OutputDirectory = context.ArtifactsDirectory.FullPath,
             ArgumentCustomization = args => args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg"),
-            MSBuildSettings = context.MsBuildSettings,
+            MSBuildSettings = context.MsBuildSettingsPack,
             NoBuild = true,
             NoRestore = true
         };
@@ -426,7 +436,7 @@ public class PackTask : FrostingTask<BuildContext>
         {
             Configuration = context.BuildConfiguration,
             OutputDirectory = context.ArtifactsDirectory.FullPath,
-            MSBuildSettings = context.MsBuildSettings
+            MSBuildSettings = context.MsBuildSettingsPack
         };
         context.DotNetPack(context.TemplatesTestsProjectFile.FullPath, settingsTemplate);
     }
