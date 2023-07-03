@@ -162,7 +162,7 @@ public class BuildContext : FrostingContext
         var path = ChangeLogGenDirectory.Combine("details");
         if (this.DirectoryExists(path) && forceClean)
             this.DeleteDirectory(path, new DeleteDirectorySettings() { Force = true, Recursive = true });
-        
+
         if (!this.DirectoryExists(path))
         {
             var settings = new GitCloneSettings { Checkout = true, BranchName = "docs-changelog-details" };
@@ -475,7 +475,7 @@ public class DocFxChangelogDownloadTask : FrostingTask<BuildContext>
     {
         var count = context.Argument("VersionCount", -1);
         var total = DocumentationHelper.BdnAllVersions.Length;
-        
+
         if (count == 0)
         {
             context.DocfxChangelogDownload(
@@ -569,6 +569,14 @@ public class DocfxBuildTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
+        context.Information("DocfxBuild: Generate index.md");
+        var content = new StringBuilder();
+        content.AppendLine("---");
+        content.AppendLine("title: Home");
+        content.AppendLine("---");
+        content.Append(context.FileReadText(context.RootDirectory.CombineWithFilePath("README.md")));
+        context.FileWriteText(context.DocsDirectory.CombineWithFilePath("index.md"), content.ToString());
+
         context.RunDocfx(context.DocfxJsonFile);
         context.GenerateRedirects();
     }
@@ -636,8 +644,7 @@ public class UpdateStatsTask : FrostingTask<BuildContext>
         };
         var files = new[]
         {
-            context.RootDirectory.CombineWithFilePath("README.md"),
-            context.DocsDirectory.CombineWithFilePath("index.md")
+            context.RootDirectory.CombineWithFilePath("README.md")
         };
         foreach (var file in files)
         {
@@ -648,7 +655,7 @@ public class UpdateStatsTask : FrostingTask<BuildContext>
                     lines[i] = updater.Apply(lines[i]);
             }
 
-            context.FileWriteLines(file, lines);   
+            context.FileWriteLines(file, lines);
         }
     }
 }
