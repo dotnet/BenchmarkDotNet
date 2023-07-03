@@ -1,7 +1,10 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Build;
 using Cake.Common;
 using Cake.Common.Build;
@@ -568,5 +571,84 @@ public class DocfxBuildTask : FrostingTask<BuildContext>
     {
         context.RunDocfx(context.DocfxJsonFile);
         context.GenerateRedirects();
+    }
+}
+
+[TaskName("UpdateStats")]
+public class UpdateStatsTask : FrostingTask<BuildContext>
+{
+    public class Updater
+    {
+        public string Prefix { get; }
+        public Regex Regex { get; }
+        public int Value { get; }
+
+        public Updater(string prefix, string regex, int value)
+        {
+            Prefix = prefix;
+            Regex = new Regex(regex);
+            Value = value;
+        }
+
+        public string Apply(string line)
+        {
+            if (!line.StartsWith(Prefix))
+                return line;
+
+            var match = Regex.Match(line);
+            if (!match.Success)
+                return line;
+
+            // Groups[1] refers to the first group (\d+)
+            var numberString = match.Groups[1].Value;
+            var number = int.Parse(numberString);
+            return line.Replace(number.ToString(), Value.ToString());
+        }
+    }
+
+    private static async Task<int> GetDependentProjectsNumber()
+    {
+        using var httpClient = new HttpClient();
+        const string url = "https://github.com/dotnet/BenchmarkDotNet/network/dependents";
+        var response = await httpClient.GetAsync(new Uri(url));
+        var dependentsPage = await response.Content.ReadAsStringAsync();
+        var match = new Regex(@"([0-9\,]+)[\n\r\s]+Repositories").Match(dependentsPage);
+        var number = int.Parse(match.Groups[1].Value.Replace(",", ""));
+        number = number / 100 * 100;
+        return number;
+    }
+
+    public override void Run(BuildContext context)
+    {
+        var dependentProjectsNumber = GetDependentProjectsNumber().Result;
+        var updaters = new Updater[]
+        {
+            new(
+                "The library is adopted by",
+                @"\[(\d+)\+ GitHub projects\]",
+                dependentProjectsNumber
+            ),
+            new(
+                "BenchmarkDotNet is already adopted by more than ",
+                @"\[(\d+)\+\]",
+                dependentProjectsNumber
+            ),
+        };
+        var files = new[]
+        {
+            context.RootDirectory.CombineWithFilePath("README.md"),
+            context.DocsDirectory.CombineWithFilePath("index.md")
+        };
+        foreach (var file in files)
+        {
+            var lines = context.FileReadLines(file);
+            for (var i = 0; i < lines.Length; i++)
+            {
+                foreach (var updater in updaters)
+                    lines[i] = updater.Apply(lines[i]);
+            }
+
+            context.FileWriteLines(file, lines);   
+        }
     }
 }
