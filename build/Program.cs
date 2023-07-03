@@ -17,6 +17,7 @@ using Cake.Core;
 using Cake.Core.IO;
 using Cake.FileHelpers;
 using Cake.Frosting;
+using Cake.Git;
 
 public static class Program
 {
@@ -103,11 +104,11 @@ public class BuildContext : FrostingContext
         MsBuildSettingsRestore = new DotNetMSBuildSettings();
         MsBuildSettingsBuild = new DotNetMSBuildSettings();
         MsBuildSettingsPack = new DotNetMSBuildSettings();
-        
+
         if (IsCiBuild)
         {
             System.Environment.SetEnvironmentVariable("BDN_CI_BUILD", "true");
-            
+
             MsBuildSettingsBuild.MaxCpuCount = 1;
             MsBuildSettingsBuild.WithProperty("UseSharedCompilation", "false");
         }
@@ -152,8 +153,22 @@ public class BuildContext : FrostingContext
         this.DotNetTest(projectFile.FullPath, settings);
     }
 
+    public void EnsureChangelogDetailsExist(bool forceClean = false)
+    {
+        var path = ChangeLogGenDirectory.Combine("details");
+        if (this.DirectoryExists(path) && forceClean)
+            this.DeleteDirectory(path, new DeleteDirectorySettings() { Force = true, Recursive = true });
+        
+        if (!this.DirectoryExists(path))
+        {
+            var settings = new GitCloneSettings { Checkout = true, BranchName = "docs-changelog-details" };
+            this.GitClone("https://github.com/dotnet/BenchmarkDotNet.git", path, settings);
+        }
+    }
+
     public void DocfxChangelogDownload(string version, string versionPrevious, string lastCommit = "")
     {
+        EnsureChangelogDetailsExist(true);
         this.Information("DocfxChangelogDownload: " + version);
         // Required environment variables: GITHUB_PRODUCT, GITHUB_TOKEN
         var path = ChangeLogGenDirectory.Combine("details");
@@ -162,6 +177,7 @@ public class BuildContext : FrostingContext
 
     public void DocfxChangelogGenerate(string version)
     {
+        EnsureChangelogDetailsExist();
         this.Information("DocfxChangelogGenerate: " + version);
         var header = ChangeLogGenDirectory.Combine("header").CombineWithFilePath(version + ".md");
         var footer = ChangeLogGenDirectory.Combine("footer").CombineWithFilePath(version + ".md");
