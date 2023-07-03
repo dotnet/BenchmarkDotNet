@@ -22,7 +22,7 @@ jobs:
       run: ./build.bat --target Build
 
     - name: Download changelog
-      run: ./build.bat --target DocFX_Changelog_Download --LatestVersions 1
+      run: ./build.bat --target DocFX_Changelog_Download --VersionCount 1
       env:
         GITHUB_PRODUCT: ChangelogBuilder
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
