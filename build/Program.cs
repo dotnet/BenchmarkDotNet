@@ -425,9 +425,7 @@ public class PackTask : FrostingTask<BuildContext>
             Configuration = context.BuildConfiguration,
             OutputDirectory = context.ArtifactsDirectory.FullPath,
             ArgumentCustomization = args => args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg"),
-            MSBuildSettings = context.MsBuildSettingsPack,
-            NoBuild = true,
-            NoRestore = true
+            MSBuildSettings = context.MsBuildSettingsPack
         };
 
         foreach (var project in context.AllPackableSrcProjects)
@@ -436,8 +434,7 @@ public class PackTask : FrostingTask<BuildContext>
         var settingsTemplate = new DotNetPackSettings
         {
             Configuration = context.BuildConfiguration,
-            OutputDirectory = context.ArtifactsDirectory.FullPath,
-            MSBuildSettings = context.MsBuildSettingsPack
+            OutputDirectory = context.ArtifactsDirectory.FullPath
         };
         context.DotNetPack(context.TemplatesTestsProjectFile.FullPath, settingsTemplate);
     }

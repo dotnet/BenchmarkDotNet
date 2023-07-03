@@ -41,7 +41,7 @@
     <VersionPrefix Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' ">$(VersionPrefix).$(APPVEYOR_BUILD_NUMBER)</VersionPrefix>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(VersionSuffix)' == '' ">
+  <PropertyGroup Condition=" '$(VersionSuffix)' == '' AND '$(APPVEYOR_BUILD_NUMBER)' == '' ">
     <VersionSuffix>develop</VersionSuffix>
     <VersionSuffix Condition=" '$(APPVEYOR_BUILD_NUMBER)' == '' AND '$(BDN_CI_BUILD)' != '' ">ci</VersionSuffix>
   </PropertyGroup>
