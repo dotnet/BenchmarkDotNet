@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -469,22 +470,23 @@ public class DocFxChangelogDownloadTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        if (context.Argument("AllVersions", false))
+        var count = context.Argument("VersionCount", -1);
+        var total = DocumentationHelper.BdnAllVersions.Length;
+        
+        if (count == 0)
         {
             context.DocfxChangelogDownload(
                 DocumentationHelper.BdnAllVersions.First(),
                 DocumentationHelper.BdnFirstCommit);
 
-            for (int i = 1; i < DocumentationHelper.BdnAllVersions.Length; i++)
+            for (int i = 1; i < total; i++)
                 context.DocfxChangelogDownload(
                     DocumentationHelper.BdnAllVersions[i],
                     DocumentationHelper.BdnAllVersions[i - 1]);
         }
-        else if (context.Argument("LatestVersions", false))
+        else if (count > 0)
         {
-            for (int i = DocumentationHelper.BdnAllVersions.Length - 3;
-                 i < DocumentationHelper.BdnAllVersions.Length;
-                 i++)
+            for (int i = Math.Max(total - count, 1); i < total; i++)
                 context.DocfxChangelogDownload(
                     DocumentationHelper.BdnAllVersions[i],
                     DocumentationHelper.BdnAllVersions[i - 1]);
