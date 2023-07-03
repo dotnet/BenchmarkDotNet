@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text;
+using System.Xml;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
@@ -30,27 +31,26 @@ namespace BenchmarkDotNet.Toolchains.MonoAotLLVM
 
             string useLLVM = AotCompilerMode == MonoAotCompilerMode.llvm ? "true" : "false";
 
-            using (var file = new StreamReader(File.OpenRead(projectFile.FullName)))
-            {
-                var (customProperties, sdkName) = GetSettingsThatNeedsToBeCopied(file, projectFile);
+            var xmlDoc = new XmlDocument();
+            xmlDoc.Load(projectFile.FullName);
+            var (customProperties, sdkName) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
 
-                string content = new StringBuilder(ResourceHelper.LoadTemplate("MonoAOTLLVMCsProj.txt"))
-                    .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
-                    .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
-                    .Replace("$CSPROJPATH$", projectFile.FullName)
-                    .Replace("$TFM$", TargetFrameworkMoniker)
-                    .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
-                    .Replace("$COPIEDSETTINGS$", customProperties)
-                    .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
-                    .Replace("$SDKNAME$", sdkName)
-                    .Replace("$RUNTIMEPACK$", CustomRuntimePack ?? "")
-                    .Replace("$COMPILERBINARYPATH$", AotCompilerPath)
-                    .Replace("$RUNTIMEIDENTIFIER$",  CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier())
-                    .Replace("$USELLVM$", useLLVM)
-                    .ToString();
+            string content = new StringBuilder(ResourceHelper.LoadTemplate("MonoAOTLLVMCsProj.txt"))
+                .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
+                .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
+                .Replace("$CSPROJPATH$", projectFile.FullName)
+                .Replace("$TFM$", TargetFrameworkMoniker)
+                .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
+                .Replace("$COPIEDSETTINGS$", customProperties)
+                .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
+                .Replace("$SDKNAME$", sdkName)
+                .Replace("$RUNTIMEPACK$", CustomRuntimePack ?? "")
+                .Replace("$COMPILERBINARYPATH$", AotCompilerPath)
+                .Replace("$RUNTIMEIDENTIFIER$", CustomDotNetCliToolchainBuilder.GetPortableRuntimeIdentifier())
+                .Replace("$USELLVM$", useLLVM)
+                .ToString();
 
-                File.WriteAllText(artifactsPaths.ProjectFilePath, content);
-            }
+            File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
 
         protected override string GetExecutablePath(string binariesDirectoryPath, string programName)
