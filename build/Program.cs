@@ -125,6 +125,7 @@ public class BuildContext : FrostingContext
         if (context.IsRunningOnWindows())
         {
             MsBuildSettingsRestore.WithProperty("Platform", "Any CPU");
+            MsBuildSettingsBuild.WithProperty("Platform", "Any CPU");
         }
     }
 
