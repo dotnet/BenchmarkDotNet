@@ -7,6 +7,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Portability.Cpu;
+using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
@@ -51,6 +52,7 @@ namespace BenchmarkDotNet.Environments
         public virtual IEnumerable<string> ToFormattedString()
         {
             yield return "Benchmark Process Environment Information:";
+            yield return $"{BenchmarkDotNetInfo.Instance.BrandTitle}";
             yield return $"{RuntimeInfoPrefix}{GetRuntimeInfo()}";
             yield return $"{GcInfoPrefix}{GetGcConcurrentFlag()} {GetGcServerFlag()}";
             yield return $"{HardwareIntrinsicsPrefix}{HardwareIntrinsics.GetFullInfo(RuntimeInformation.GetCurrentPlatform())} {HardwareIntrinsics.GetVectorSize()}";

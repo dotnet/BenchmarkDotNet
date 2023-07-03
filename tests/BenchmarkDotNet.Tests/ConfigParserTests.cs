@@ -586,5 +586,63 @@ namespace BenchmarkDotNet.Tests
                 Assert.False(job.Accuracy.EvaluateOverhead);
             }
         }
+
+        [Fact]
+        public void UserCanSpecifyWasmArgs()
+        {
+            var parsedConfiguration = ConfigParser.Parse(new[] { "--runtimes", "wasm", "--wasmArgs", "--expose_wasm --module" }, new OutputLogger(Output));
+            Assert.True(parsedConfiguration.isSuccess);
+            var jobs = parsedConfiguration.config.GetJobs();
+            foreach (var job in parsedConfiguration.config.GetJobs())
+            {
+                var wasmRuntime = Assert.IsType<WasmRuntime>(job.Environment.Runtime);
+                Assert.Equal(" --expose_wasm --module", wasmRuntime.JavaScriptEngineArguments);
+            }
+        }
+
+        [Fact]
+        public void UserCanSpecifyWasmArgsViaResponseFile()
+        {
+            var tempResponseFile = Path.GetRandomFileName();
+            File.WriteAllLines(tempResponseFile, new[]
+            {
+                "--runtimes wasm",
+                "--wasmArgs \"--expose_wasm --module\""
+            });
+            var parsedConfiguration = ConfigParser.Parse(new[] { $"@{tempResponseFile}" }, new OutputLogger(Output));
+            Assert.True(parsedConfiguration.isSuccess);
+            var jobs = parsedConfiguration.config.GetJobs();
+            foreach (var job in parsedConfiguration.config.GetJobs())
+            {
+                var wasmRuntime = Assert.IsType<WasmRuntime>(job.Environment.Runtime);
+                Assert.Equal(" --expose_wasm --module", wasmRuntime.JavaScriptEngineArguments);
+            }
+        }
+
+        [Theory]
+        [InlineData("--filter abc", "--filter *")]
+        [InlineData("-f abc", "--filter *")]
+        [InlineData("-f *", "--filter *")]
+        [InlineData("--runtimes net7.0 --join", "--filter * --join --runtimes net7.0")]
+        [InlineData("--join abc", "--filter * --join")]
+        public void CheckUpdateValidArgs(string strArgs, string expected)
+        {
+            var args = strArgs.Split();
+            _ = ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = new[] { "*" });
+
+            Assert.Equal(expected.Split(), updatedArgs);
+        }
+
+        [Theory]
+        [InlineData("--filter abc -f abc")]
+        [InlineData("--runtimes net")]
+        public void CheckUpdateInvalidArgs(string strArgs)
+        {
+            var args = strArgs.Split();
+            bool isSuccess = ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = new[] { "*" });
+
+            Assert.Null(updatedArgs);
+            Assert.False(isSuccess);
+        }
     }
 }

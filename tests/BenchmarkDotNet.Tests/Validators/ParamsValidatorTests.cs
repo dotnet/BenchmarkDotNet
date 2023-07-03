@@ -6,11 +6,13 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using Xunit;
 using Xunit.Abstractions;
+#pragma warning disable CS0414
 
 namespace BenchmarkDotNet.Tests.Validators
 {
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
     public class ParamsValidatorTests
     {
         private readonly ITestOutputHelper output;
@@ -56,6 +58,18 @@ namespace BenchmarkDotNet.Tests.Validators
         [Fact] public void PropMultiple2Test() => Check<PropMultiple2>(nameof(PropMultiple2.Input), "single attribute", P, Ps);
         [Fact] public void PropMultiple3Test() => Check<PropMultiple3>(nameof(PropMultiple3.Input), "single attribute", Pa, Ps);
         [Fact] public void PropMultiple4Test() => Check<PropMultiple4>(nameof(PropMultiple4.Input), "single attribute", P, Pa, Ps);
+        [Fact] public void PrivateSetter1Test() => Check<PrivateSetter1>(nameof(PrivateSetter1.Input), "setter is not public", P);
+        [Fact] public void PrivateSetter2Test() => Check<PrivateSetter2>(nameof(PrivateSetter2.Input), "setter is not public", Pa);
+        [Fact] public void PrivateSetter3Test() => Check<PrivateSetter3>(nameof(PrivateSetter3.Input), "setter is not public", Ps);
+        [Fact] public void NoSetter1Test() => Check<NoSetter1>(nameof(NoSetter1.Input), "no setter", P);
+        [Fact] public void NoSetter2Test() => Check<NoSetter2>(nameof(NoSetter2.Input), "no setter", Pa);
+        [Fact] public void NoSetter3Test() => Check<NoSetter3>(nameof(NoSetter3.Input), "no setter", Ps);
+        [Fact] public void InternalField1Test() => Check<InternalField1>(nameof(InternalField1.Input), "it's not public", P);
+        [Fact] public void InternalField2Test() => Check<InternalField2>(nameof(InternalField2.Input), "it's not public", Pa);
+        [Fact] public void InternalField3Test() => Check<InternalField3>(nameof(InternalField3.Input), "it's not public", Ps);
+        [Fact] public void InternalProp1Test() => Check<InternalProp1>(nameof(InternalProp1.Input), "setter is not public", P);
+        [Fact] public void InternalProp2Test() => Check<InternalProp2>(nameof(InternalProp2.Input), "setter is not public", Pa);
+        [Fact] public void InternalProp3Test() => Check<InternalProp3>(nameof(InternalProp3.Input), "setter is not public", Ps);
 
         public class Base
         {
@@ -117,6 +131,78 @@ namespace BenchmarkDotNet.Tests.Validators
         {
             [ParamsSource(nameof(Source))]
             public readonly bool Input = false;
+        }
+
+        public class PrivateSetter1 : Base
+        {
+            [Params(false, true)]
+            public bool Input { get; private set; }
+        }
+
+        public class PrivateSetter2 : Base
+        {
+            [ParamsAllValues]
+            public bool Input { get; private set; }
+        }
+
+        public class PrivateSetter3 : Base
+        {
+            [ParamsSource(nameof(Source))]
+            public bool Input { get; private set; }
+        }
+
+        public class NoSetter1 : Base
+        {
+            [Params(false, true)]
+            public bool Input { get; } = false;
+        }
+
+        public class NoSetter2 : Base
+        {
+            [ParamsAllValues]
+            public bool Input { get; } = false;
+        }
+
+        public class NoSetter3 : Base
+        {
+            [ParamsSource(nameof(Source))]
+            public bool Input { get; } = false;
+        }
+
+        public class InternalField1 : Base
+        {
+            [Params(false, true)]
+            internal bool Input = false;
+        }
+
+        public class InternalField2 : Base
+        {
+            [ParamsAllValues]
+            internal bool Input = false;
+        }
+
+        public class InternalField3 : Base
+        {
+            [ParamsSource(nameof(Source))]
+            internal bool Input = false;
+        }
+
+        public class InternalProp1 : Base
+        {
+            [Params(false, true)]
+            internal bool Input { get; set; }
+        }
+
+        public class InternalProp2 : Base
+        {
+            [ParamsAllValues]
+            internal bool Input { get; set; }
+        }
+
+        public class InternalProp3 : Base
+        {
+            [ParamsSource(nameof(Source))]
+            internal bool Input { get; set; }
         }
 
         public class FieldMultiple1 : Base

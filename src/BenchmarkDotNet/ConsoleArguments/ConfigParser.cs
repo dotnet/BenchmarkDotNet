@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
@@ -75,6 +76,13 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             (bool isSuccess, IConfig config, CommandLineOptions options) result = default;
 
+            var (expandSuccess, expandedArgs) = ExpandResponseFile(args, logger);
+            if (!expandSuccess)
+            {
+                return (false, default, default);
+            }
+
+            args = expandedArgs;
             using (var parser = CreateParser(logger))
             {
                 parser
@@ -84,6 +92,140 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
 
             return result;
+        }
+
+        private static (bool Success, string[] ExpandedTokens) ExpandResponseFile(string[] args, ILogger logger)
+        {
+            List<string> result = new ();
+            foreach (var arg in args)
+            {
+                if (arg.StartsWith("@"))
+                {
+                    var fileName = arg.Substring(1);
+                    try
+                    {
+                        if (File.Exists(fileName))
+                        {
+                            var lines = File.ReadAllLines(fileName);
+                            foreach (var line in lines)
+                            {
+                                result.AddRange(ConsumeTokens(line));
+                            }
+                        }
+                        else
+                        {
+                            logger.WriteLineError($"Response file {fileName} does not exists.");
+                            return (false, Array.Empty<string>());
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.WriteLineError($"Failed to parse RSP file: {fileName}, {ex.Message}");
+                        return (false, Array.Empty<string>());
+                    }
+                }
+                else
+                {
+                    if (arg.Contains(' '))
+                    {
+                        // Workaround for CommandLine library issue with parsing these kind of args.
+                        result.Add(" " + arg);
+                    }
+                    else
+                    {
+                        result.Add(arg);
+                    }
+                }
+            }
+
+            return (true, result.ToArray());
+        }
+
+        private static IEnumerable<string> ConsumeTokens(string line)
+        {
+            bool insideQuotes = false;
+            var token = new StringBuilder();
+            for (int i = 0; i < line.Length; i++)
+            {
+                char currentChar = line[i];
+                if (currentChar == ' ' && !insideQuotes)
+                {
+                    if (token.Length > 0)
+                    {
+                        yield return GetToken();
+                        token = new StringBuilder();
+                    }
+
+                    continue;
+                }
+
+                if (currentChar == '"')
+                {
+                    insideQuotes = !insideQuotes;
+                    continue;
+                }
+
+                if (currentChar == '\\' && insideQuotes)
+                {
+                    if (line[i + 1] == '"')
+                    {
+                        insideQuotes = false;
+                        i++;
+                        continue;
+                    }
+
+                    if (line[i + 1] == '\\')
+                    {
+                        token.Append('\\');
+                        i++;
+                        continue;
+                    }
+                }
+
+                token.Append(currentChar);
+            }
+
+            if (token.Length > 0)
+            {
+                yield return GetToken();
+            }
+
+            string GetToken()
+            {
+                var result = token.ToString();
+                if (result.Contains(' '))
+                {
+                    // Workaround for CommandLine library issue with parsing these kind of args.
+                    return " " + result;
+                }
+
+                return result;
+            }
+        }
+
+        internal static bool TryUpdateArgs(string[] args, out string[]? updatedArgs, Action<CommandLineOptions> updater)
+        {
+            (bool isSuccess, CommandLineOptions options) result = default;
+
+            ILogger logger = NullLogger.Instance;
+            using (var parser = CreateParser(logger))
+            {
+                parser
+                    .ParseArguments<CommandLineOptions>(args)
+                    .WithParsed(options => result = Validate(options, logger) ? (true, options) : (false, default))
+                    .WithNotParsed(errors => result = (false,  default));
+
+                if (!result.isSuccess)
+                {
+                    updatedArgs = null;
+                    return false;
+                }
+
+                updater(result.options);
+
+                updatedArgs = parser.FormatCommandLine(result.options, settings => settings.SkipDefault = true).Split();
+                return true;
+            }
         }
 
         private static Parser CreateParser(ILogger logger)

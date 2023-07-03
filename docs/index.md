@@ -1,41 +1,42 @@
 ---
 title: Home
 ---
-<h3 align="center">
+<div align="center">
 
   ![](logo/logo-wide.png)
 
-</h3>
+</div>
 
-<h3 align="center">
+<div align="center">
 
   [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/)
   [![Downloads](https://img.shields.io/nuget/dt/benchmarkdotnet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/)
   [![Stars](https://img.shields.io/github/stars/dotnet/BenchmarkDotNet?color=brightgreen)](https://github.com/dotnet/BenchmarkDotNet/stargazers)
   [![Gitter](https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet?color=yellow)](https://gitter.im/dotnet/BenchmarkDotNet)
-  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
+  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dotnet/BenchmarkDotNet/blob/master/LICENSE.md)
   [![GitHub](https://img.shields.io/badge/source%20code-GitHub-informational)](https://github.com/dotnet/BenchmarkDotNet)
+  [![Twitter](https://img.shields.io/twitter/follow/BenchmarkDotNet?style=social)](https://twitter.com/BenchmarkDotNet)
 
-</h3>
+</div>
 
-<h3 align="center">
-  <a href="#Features">Features</a>
+<div align="center" style="font-size: 150%;margin-bottom: 20px">
+  <a href="#features">Features</a>
   <span> · </span>
   <a href="https://benchmarkdotnet.org/articles/guides/getting-started.html">Getting started</a>
   <span> · </span>
   <a href="https://benchmarkdotnet.org/articles/overview.html">Documentation</a>
   <span> · </span>
   <a href="#learn-more-about-benchmarking">Learn more about benchmarking</a>
-</h3>
+</div>
 
 **BenchmarkDotNet** helps you to transform methods into benchmarks, track their performance, and share reproducible measurement experiments.
 It's no harder than writing unit tests!
-Under the hood, it performs a lot of [magic](#Automation) that guarantees [reliable and precise](#Reliability) results thanks to the [perfolizer](https://github.com/AndreyAkinshin/perfolizer) statistical engine.
+Under the hood, it performs a lot of [magic](#automation) that guarantees [reliable and precise](#reliability) results thanks to the [perfolizer](https://github.com/AndreyAkinshin/perfolizer) statistical engine.
 BenchmarkDotNet protects you from popular benchmarking mistakes and warns you if something is wrong with your benchmark design or obtained measurements.
-The results are presented in a [user-friendly](#Friendliness) form that highlights all the important facts about your experiment.
+The results are presented in a [user-friendly](#friendliness) form that highlights all the important facts about your experiment.
 The library is adopted by [14300+ projects](#who-uses-benchmarkdotnet) including .NET Runtime and supported by the [.NET Foundation](https://dotnetfoundation.org).
 
-It's [easy](#Simplicity) to start writing benchmarks, check out an example
+It's [easy](#simplicity) to start writing benchmarks, check out an example
   (copy-pastable version is [here](https://benchmarkdotnet.org/articles/guides/getting-started.html)):
 
 ```cs

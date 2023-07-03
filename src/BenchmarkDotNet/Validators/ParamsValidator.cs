@@ -20,7 +20,9 @@ namespace BenchmarkDotNet.Validators
 
         private IEnumerable<ValidationError> Validate(Type type)
         {
-            foreach (var memberInfo in type.GetMembers(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy))
+            const BindingFlags reflectionFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance |
+                                                 BindingFlags.FlattenHierarchy;
+            foreach (var memberInfo in type.GetMembers(reflectionFlags))
             {
                 var attributes = new Attribute[]
                     {
@@ -40,17 +42,33 @@ namespace BenchmarkDotNet.Validators
                     yield return new ValidationError(TreatsWarningsAsErrors,
                         $"Unable to use {name} with {attributeString} at the same time. Please, use a single attribute.");
 
-                if (memberInfo is FieldInfo fieldInfo && (fieldInfo.IsLiteral || fieldInfo.IsInitOnly))
+                if (memberInfo is FieldInfo fieldInfo)
                 {
-                    string modifier = fieldInfo.IsInitOnly ? "readonly" : "constant";
-                    yield return new ValidationError(TreatsWarningsAsErrors,
-                        $"Unable to use {name} with {attributeString} because it's a {modifier} field. Please, remove the {modifier} modifier.");
+                    if (fieldInfo.IsLiteral || fieldInfo.IsInitOnly)
+                    {
+                        string modifier = fieldInfo.IsInitOnly ? "readonly" : "constant";
+                        yield return new ValidationError(TreatsWarningsAsErrors,
+                            $"Unable to use {name} with {attributeString} because it's a {modifier} field. Please, remove the {modifier} modifier.");
+                    }
+
+                    if (!fieldInfo.IsPublic)
+                        yield return new ValidationError(TreatsWarningsAsErrors,
+                            $"Unable to use {name} with {attributeString} because it's not public. Please, make it public.");
                 }
 
-                if (memberInfo is PropertyInfo propertyInfo && propertyInfo.IsInitOnly())
+                if (memberInfo is PropertyInfo propertyInfo)
                 {
-                    yield return new ValidationError(TreatsWarningsAsErrors,
-                        $"Unable to use {name} with {attributeString} because it's init-only. Please, provide a public setter.");
+                    if (propertyInfo.IsInitOnly())
+                        yield return new ValidationError(TreatsWarningsAsErrors,
+                            $"Unable to use {name} with {attributeString} because it's init-only. Please, provide a public setter.");
+
+                    if (propertyInfo.SetMethod == null)
+                        yield return new ValidationError(TreatsWarningsAsErrors,
+                            $"Unable to use {name} with {attributeString} because it has no setter. Please, provide a public setter.");
+
+                    if (propertyInfo.SetMethod != null && !propertyInfo.SetMethod.IsPublic)
+                        yield return new ValidationError(TreatsWarningsAsErrors,
+                            $"Unable to use {name} with {attributeString} because its setter is not public. Please, make the setter public.");
                 }
             }
         }

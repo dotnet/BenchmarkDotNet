@@ -19,7 +19,17 @@ namespace BenchmarkDotNet.Validators
         {
             foreach (var group in validationParameters.Benchmarks.GroupBy(benchmark => benchmark.Descriptor.Type.GetTypeInfo().Assembly))
             {
-                foreach (var referencedAssemblyName in group.Key.GetReferencedAssemblies())
+                // GetReferencedAssemblies() is not supported in NativeAOT currently.
+                AssemblyName[] referencedAssemblies;
+                try
+                {
+                    referencedAssemblies = group.Key.GetReferencedAssemblies();
+                }
+                catch (NotSupportedException)
+                {
+                    referencedAssemblies = Array.Empty<AssemblyName>();
+                }
+                foreach (var referencedAssemblyName in referencedAssemblies)
                 {
                     var referencedAssembly = Assembly.Load(referencedAssemblyName);
 

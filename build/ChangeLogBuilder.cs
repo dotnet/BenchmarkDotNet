@@ -97,6 +97,9 @@ public class ChangeLogBuilder
 
     public class MarkdownBuilder
     {
+        private static IReadOnlyList<Milestone> AllMilestones = null;
+        private static readonly Dictionary<string, string> AuthorNames = new();
+        
         private readonly Config config;
         private readonly StringBuilder builder;
 
@@ -114,11 +117,13 @@ public class ChangeLogBuilder
         private async Task<string> Build()
         {
             var (repoOwner, repoName, milestone, previousMilestone, lastCommit) = config;
+            if (string.IsNullOrEmpty(lastCommit))
+                lastCommit = milestone;
 
             var client = new GitHubClient(new ProductHeaderValue(config.ProductHeader));
             var tokenAuth = new Credentials(config.Token);
             client.Credentials = tokenAuth;
-
+            
             if (milestone == "_")
             {
                 var allContributors = await client.Repository.GetAllContributors(repoOwner, repoName);
@@ -136,46 +141,62 @@ public class ChangeLogBuilder
                 return builder.ToString();
             }
 
-            var issueRequest = new RepositoryIssueRequest
+            if (AllMilestones == null)
             {
-                State = ItemStateFilter.Closed
-            };
-            var pullRequestRequest = new PullRequestRequest
-            {
-                State = ItemStateFilter.Closed
-            };
+                var milestoneRequest = new MilestoneRequest
+                {
+                    State = ItemStateFilter.All
+                };
+                AllMilestones = await client.Issue.Milestone.GetAllForRepository(repoOwner, repoName, milestoneRequest);
+            }
 
-            var issues = (await client.Issue.GetAllForRepository(repoOwner, repoName, issueRequest))
-                .Where(issue => issue.Milestone != null && issue.Milestone.Title == milestone)
+            IReadOnlyList<Issue> allIssues = Array.Empty<Issue>();
+            var targetMilestone = AllMilestones.FirstOrDefault(m => m.Title == milestone);
+            if (targetMilestone != null)
+            {
+                var issueRequest = new RepositoryIssueRequest
+                {
+                    State = ItemStateFilter.Closed,
+                    Milestone = targetMilestone.Number.ToString()
+                };
+
+                allIssues = await client.Issue.GetAllForRepository(repoOwner, repoName, issueRequest);
+            }
+
+            var issues = allIssues
                 .Where(issue => issue.PullRequest == null)
                 .OrderBy(issue => issue.Number)
                 .ToList();
-
-            var pullRequests =
-                (await client.PullRequest.GetAllForRepository(repoOwner, repoName, pullRequestRequest))
-                .Where(issue => issue.Milestone != null && issue.Milestone.Title == milestone)
+            var pullRequests = allIssues
+                .Where(issue => issue.PullRequest != null)
                 .OrderBy(issue => issue.Number)
                 .ToList();
-
+            
             var compare = await client.Repository.Commit.Compare(repoOwner, repoName, previousMilestone, lastCommit);
             var commits = compare.Commits;
-
-            var authorNames = new Dictionary<string, string>();
+            
+            
             foreach (var contributor in commits.Select(commit => commit.Author))
-                if (contributor != null && !authorNames.ContainsKey(contributor.Login))
+                if (contributor != null && !AuthorNames.ContainsKey(contributor.Login))
                 {
                     var user = await client.User.Get(contributor.Login);
                     var name = user?.Name;
-                    authorNames[contributor.Login] = string.IsNullOrWhiteSpace(name) ? contributor.Login : name;
+                    AuthorNames[contributor.Login] = string.IsNullOrWhiteSpace(name) ? contributor.Login : name;
                 }
 
+            string PresentContributor(GitHubCommit commit)
+            {
+                if (commit.Author != null)
+                    return $"{AuthorNames[commit.Author.Login]} ({commit.Author.ToLink()})".Trim();
+                return commit.Commit.Author.Name;
+            }
+            
             var contributors = compare.Commits
-                .Select(commit => commit.Author)
-                .Where(author => author != null)
-                .Distinct(AuthorEqualityComparer.Default)
-                .OrderBy(author => authorNames[author.Login])
+                .Select(PresentContributor)
+                .OrderBy(it => it)
+                .Distinct()
                 .ToImmutableList();
-
+            
             var milestoneHtmlUlr = $"https://github.com/{repoOwner}/{repoName}/issues?q=milestone:{milestone}";
 
             builder.AppendLine("## Milestone details");
@@ -192,9 +213,7 @@ public class ChangeLogBuilder
                 $"[#{pr.Number}]({pr.HtmlUrl}) {pr.Title.Trim()}{pr.User.ToStr("by")}");
             AppendList("Commits", commits, commit =>
                 $"{commit.ToLink()} {commit.Commit.ToCommitMessage()}{commit.ToByStr()}");
-            AppendList("Contributors", contributors, contributor =>
-                    $"{authorNames[contributor.Login]} ({contributor.ToLink()})".Trim(),
-                "Thank you very much!");
+            AppendList("Contributors", contributors, it => it, "Thank you very much!");
 
             return builder.ToString();
         }

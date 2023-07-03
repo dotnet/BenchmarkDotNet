@@ -71,6 +71,7 @@ namespace BenchmarkDotNet.Environments
                 case Version v when v.Major == 5 && v.Minor == 0: return GetPlatformSpecific(Core50);
                 case Version v when v.Major == 6 && v.Minor == 0: return GetPlatformSpecific(Core60);
                 case Version v when v.Major == 7 && v.Minor == 0: return GetPlatformSpecific(Core70);
+                case Version v when v.Major == 8 && v.Minor == 0: return GetPlatformSpecific(Core80);
                 default:
                     return CreateForNewVersion($"net{version.Major}.{version.Minor}", $".NET {version.Major}.{version.Minor}");
             }

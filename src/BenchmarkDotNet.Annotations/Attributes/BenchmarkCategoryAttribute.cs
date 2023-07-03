@@ -3,7 +3,7 @@ using System;
 
 namespace BenchmarkDotNet.Attributes
 {
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Assembly)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = true)]
     public class BenchmarkCategoryAttribute : Attribute
     {
         public string[] Categories { get; }

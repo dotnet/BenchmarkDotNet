@@ -13,6 +13,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Configs
@@ -72,6 +73,7 @@ namespace BenchmarkDotNet.Configs
         }
 
         public IOrderer Orderer => null;
+        public ICategoryDiscoverer? CategoryDiscoverer => null;
 
         public ConfigUnionRule UnionRule => ConfigUnionRule.Union;
 

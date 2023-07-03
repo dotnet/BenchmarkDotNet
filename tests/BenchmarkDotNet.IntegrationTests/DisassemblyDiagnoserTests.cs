@@ -41,6 +41,15 @@ namespace BenchmarkDotNet.IntegrationTests
                     yield return new object[] { Jit.RyuJit, Platform.Arm64, CoreRuntime.Core70 }; // .NET Core arm64
                 }
             }
+            if (RuntimeInformation.IsMacOS())
+            {
+                // This scope of tests is not supported on macOS
+                // However, when the MemberData method provides no data, xUnit throws an "No data found" InvalidOperationException
+                // In order to fix the problem, we should provide at least one input data set
+                // All the tests check the OS on the first line and stop the test if it's macOS
+                yield return new object[] { Jit.Default, Platform.AnyCpu, CoreRuntime.Latest };
+            }
+
             // we could add new object[] { Jit.Llvm, Platform.X64, new MonoRuntime() } here but our CI would need to have Mono installed..
         }
 

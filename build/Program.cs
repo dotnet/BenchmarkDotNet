@@ -12,7 +12,6 @@ using Cake.Common.Tools.DotNet.Build;
 using Cake.Common.Tools.DotNet.MSBuild;
 using Cake.Common.Tools.DotNet.Pack;
 using Cake.Common.Tools.DotNet.Restore;
-using Cake.Common.Tools.DotNet.Run;
 using Cake.Common.Tools.DotNet.Test;
 using Cake.Core;
 using Cake.Core.IO;
@@ -34,6 +33,7 @@ public class BuildContext : FrostingContext
     public string BuildConfiguration { get; set; }
     public bool SkipTests { get; set; }
     public bool SkipSlowTests { get; set; }
+    public string TargetVersion { get; set; }
 
     public DirectoryPath RootDirectory { get; }
     public DirectoryPath ArtifactsDirectory { get; }
@@ -44,10 +44,8 @@ public class BuildContext : FrostingContext
 
     public DirectoryPath ChangeLogDirectory { get; }
     public DirectoryPath ChangeLogGenDirectory { get; }
-    
+
     public DirectoryPath RedirectRootDirectory { get; }
-    public DirectoryPath RedirectProjectDirectory { get; }
-    public DirectoryPath RedirectSourceDirectory { get; }
     public DirectoryPath RedirectTargetDirectory { get; }
 
     public FilePath SolutionFile { get; }
@@ -55,13 +53,19 @@ public class BuildContext : FrostingContext
     public FilePath IntegrationTestsProjectFile { get; }
     public FilePath TemplatesTestsProjectFile { get; }
     public FilePathCollection AllPackableSrcProjects { get; }
-    
-    public DotNetMSBuildSettings MsBuildSettings { get; }
+
+    public DotNetMSBuildSettings MsBuildSettingsRestore { get; }
+    public DotNetMSBuildSettings MsBuildSettingsBuild { get; }
+    public DotNetMSBuildSettings MsBuildSettingsPack { get; }
 
     private IAppVeyorProvider AppVeyor => this.BuildSystem().AppVeyor;
     public bool IsRunningOnAppVeyor => AppVeyor.IsRunningOnAppVeyor;
     public bool IsOnAppVeyorAndNotPr => IsRunningOnAppVeyor && !AppVeyor.Environment.PullRequest.IsPullRequest;
-    public bool IsOnAppVeyorAndBdnNightlyCiCd => IsOnAppVeyorAndNotPr && AppVeyor.Environment.Repository.Branch == "master" && this.IsRunningOnWindows();
+
+    public bool IsOnAppVeyorAndBdnNightlyCiCd => IsOnAppVeyorAndNotPr &&
+                                                 AppVeyor.Environment.Repository.Branch == "master" &&
+                                                 this.IsRunningOnWindows();
+
     public bool IsLocalBuild => this.BuildSystem().IsLocalBuild;
     public bool IsCiBuild => !this.BuildSystem().IsLocalBuild;
 
@@ -71,6 +75,7 @@ public class BuildContext : FrostingContext
         BuildConfiguration = context.Argument("Configuration", "Release");
         SkipTests = context.Argument("SkipTests", false);
         SkipSlowTests = context.Argument("SkipSlowTests", false);
+        TargetVersion = context.Argument("Version", "");
 
         RootDirectory = new DirectoryPath(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName);
         ArtifactsDirectory = RootDirectory.Combine("artifacts");
@@ -81,11 +86,9 @@ public class BuildContext : FrostingContext
 
         ChangeLogDirectory = RootDirectory.Combine("docs").Combine("changelog");
         ChangeLogGenDirectory = RootDirectory.Combine("docs").Combine("_changelog");
-        
+
         RedirectRootDirectory = RootDirectory.Combine("docs").Combine("_redirects");
-        RedirectProjectDirectory = RedirectRootDirectory.Combine("RedirectGenerator");
-        RedirectSourceDirectory = RedirectRootDirectory.Combine("redirects");
-        RedirectTargetDirectory = RootDirectory.Combine("docs").Combine("_site"); 
+        RedirectTargetDirectory = RootDirectory.Combine("docs").Combine("_site");
 
         SolutionFile = RootDirectory.CombineWithFilePath("BenchmarkDotNet.sln");
         UnitTestsProjectFile = RootDirectory.Combine("tests").Combine("BenchmarkDotNet.Tests")
@@ -97,18 +100,32 @@ public class BuildContext : FrostingContext
         AllPackableSrcProjects = new FilePathCollection(context.GetFiles(RootDirectory.FullPath + "/src/**/*.csproj")
             .Where(p => !p.FullPath.Contains("Disassembler")));
 
-        MsBuildSettings = new DotNetMSBuildSettings
+        MsBuildSettingsRestore = new DotNetMSBuildSettings();
+        MsBuildSettingsBuild = new DotNetMSBuildSettings();
+        MsBuildSettingsPack = new DotNetMSBuildSettings();
+        
+        if (IsCiBuild)
         {
-            MaxCpuCount = 1
-        };
-        MsBuildSettings.WithProperty("UseSharedCompilation", "false");
+            System.Environment.SetEnvironmentVariable("BDN_CI_BUILD", "true");
+            
+            MsBuildSettingsBuild.MaxCpuCount = 1;
+            MsBuildSettingsBuild.WithProperty("UseSharedCompilation", "false");
+        }
+
+        if (!string.IsNullOrEmpty(TargetVersion))
+        {
+            MsBuildSettingsRestore.WithProperty("Version", TargetVersion);
+            MsBuildSettingsBuild.WithProperty("Version", TargetVersion);
+            MsBuildSettingsPack.WithProperty("Version", TargetVersion);
+        }
 
         // NativeAOT build requires VS C++ tools to be added to $path via vcvars64.bat
         // but once we do that, dotnet restore fails with:
         // "Please specify a valid solution configuration using the Configuration and Platform properties"
         if (context.IsRunningOnWindows())
         {
-            MsBuildSettings.WithProperty("Platform", "Any CPU");
+            MsBuildSettingsRestore.WithProperty("Platform", "Any CPU");
+            MsBuildSettingsBuild.WithProperty("Platform", "Any CPU");
         }
     }
 
@@ -120,7 +137,7 @@ public class BuildContext : FrostingContext
             Framework = tfm,
             NoBuild = true,
             NoRestore = true,
-            Loggers = new[] { "trx", $"trx;LogFileName={logFile.FullPath}" }
+            Loggers = new[] { "trx", $"trx;LogFileName={logFile.FullPath}", "console;verbosity=detailed" }
         };
         // force the tool to not look for the .dll in platform-specific directory
         settings.EnvironmentVariables["Platform"] = "";
@@ -139,13 +156,8 @@ public class BuildContext : FrostingContext
     {
         this.Information("DocfxChangelogDownload: " + version);
         // Required environment variables: GITHUB_PRODUCT, GITHUB_TOKEN
-        var changeLogBuilderDirectory = ChangeLogGenDirectory.Combine("ChangeLogBuilder");
-        ChangeLogBuilder.Run(changeLogBuilderDirectory, version, versionPrevious, lastCommit).Wait();
-
-        var src = changeLogBuilderDirectory.CombineWithFilePath(version + ".md");
-        var dest = ChangeLogGenDirectory.Combine("details").CombineWithFilePath(version + ".md");
-        this.CopyFile(src, dest);
-        this.Information($"Changelog for {version}: {dest}");
+        var path = ChangeLogGenDirectory.Combine("details");
+        ChangeLogBuilder.Run(path, version, versionPrevious, lastCommit).Wait();
     }
 
     public void DocfxChangelogGenerate(string version)
@@ -192,26 +204,47 @@ public class BuildContext : FrostingContext
     public void RunDocfx(FilePath docfxJson)
     {
         this.Information($"Running docfx for '{docfxJson}'");
-        
+
         var currentDirectory = Directory.GetCurrentDirectory();
         Directory.SetCurrentDirectory(docfxJson.GetDirectory().FullPath);
+        Microsoft.DocAsCode.Dotnet.DotnetApiCatalog.GenerateManagedReferenceYamlFiles(docfxJson.FullPath).Wait();
         Microsoft.DocAsCode.Docset.Build(docfxJson.FullPath).Wait();
         Directory.SetCurrentDirectory(currentDirectory);
     }
 
     public void GenerateRedirects()
     {
-        var redirectProjectFile = RedirectProjectDirectory.CombineWithFilePath("RedirectGenerator.csproj");
-        this.Information(redirectProjectFile.FullPath);
-        this.DotNetBuild(redirectProjectFile.FullPath);
-        this.DotNetRun(redirectProjectFile.FullPath, new DotNetRunSettings
+        var redirectFile = RedirectRootDirectory.CombineWithFilePath("_redirects");
+        if (!this.FileExists(redirectFile))
         {
-            WorkingDirectory = RedirectProjectDirectory,
-        });
+            this.Error($"Redirect file '{redirectFile}' does not exist");
+            return;
+        }
 
-        this.Information(RedirectTargetDirectory);
         this.EnsureDirectoryExists(RedirectTargetDirectory);
-        this.CopyFiles(RedirectSourceDirectory + "/**/*", RedirectTargetDirectory, true);
+
+        var redirects = this.FileReadLines(redirectFile)
+            .Select(line => line.Split(' '))
+            .Select(parts => (source: parts[0], target: parts[1]))
+            .ToList();
+
+        foreach (var (source, target) in redirects)
+        {
+            var fileName = source.StartsWith("/") || source.StartsWith("\\") ? source[1..] : source;
+            var fullFileName = RedirectTargetDirectory.CombineWithFilePath(fileName);
+            var content =
+                $"<!doctype html>" +
+                $"<html lang=en-us>" +
+                $"<head>" +
+                $"<title>{target}</title>" +
+                $"<link rel=canonical href='{target}'>" +
+                $"<meta name=robots content=\"noindex\">" +
+                $"<meta charset=utf-8><meta http-equiv=refresh content=\"0; url={target}\">" +
+                $"</head>" +
+                $"</html>";
+            this.EnsureDirectoryExists(fullFileName.GetDirectory());
+            this.FileWriteText(fullFileName, content);
+        }
     }
 }
 
@@ -294,7 +327,7 @@ public class RestoreTask : FrostingTask<BuildContext>
         context.DotNetRestore(context.SolutionFile.FullPath,
             new DotNetRestoreSettings
             {
-                MSBuildSettings = context.MsBuildSettings
+                MSBuildSettings = context.MsBuildSettingsRestore
             });
     }
 }
@@ -305,12 +338,13 @@ public class BuildTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
+        context.Information("BuildSystemProvider: " + context.BuildSystem().Provider);
         context.DotNetBuild(context.SolutionFile.FullPath, new DotNetBuildSettings
         {
             Configuration = context.BuildConfiguration,
             NoRestore = true,
             DiagnosticOutput = true,
-            MSBuildSettings = context.MsBuildSettings,
+            MSBuildSettings = context.MsBuildSettingsBuild,
             Verbosity = DotNetVerbosity.Minimal
         });
     }
@@ -331,7 +365,7 @@ public class FastTestsTask : FrostingTask<BuildContext>
             ? new[] { "net462", "net7.0" }
             : new[] { "net7.0" };
 
-        foreach (var targetFramework in targetFrameworks) 
+        foreach (var targetFramework in targetFrameworks)
             context.RunTests(context.UnitTestsProjectFile, "UnitTests", targetFramework);
     }
 }
@@ -342,7 +376,8 @@ public class SlowFullFrameworkTestsTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context)
     {
-        return !context.SkipTests && !context.SkipSlowTests && context.IsRunningOnWindows() && !context.IsRunningOnAppVeyor;
+        return !context.SkipTests && !context.SkipSlowTests && context.IsRunningOnWindows() &&
+               !context.IsRunningOnAppVeyor;
     }
 
     public override void Run(BuildContext context)
@@ -380,7 +415,7 @@ public class PackTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context)
     {
-        return context.IsOnAppVeyorAndBdnNightlyCiCd;
+        return context.IsOnAppVeyorAndBdnNightlyCiCd || context.IsLocalBuild;
     }
 
     public override void Run(BuildContext context)
@@ -390,17 +425,20 @@ public class PackTask : FrostingTask<BuildContext>
             Configuration = context.BuildConfiguration,
             OutputDirectory = context.ArtifactsDirectory.FullPath,
             ArgumentCustomization = args => args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg"),
-            MSBuildSettings = context.MsBuildSettings
-        };
-        var settingsTemplate = new DotNetPackSettings
-        {
-            Configuration = context.BuildConfiguration,
-            OutputDirectory = context.ArtifactsDirectory.FullPath,
-            MSBuildSettings = context.MsBuildSettings
+            MSBuildSettings = context.MsBuildSettingsPack,
+            NoBuild = true,
+            NoRestore = true
         };
 
         foreach (var project in context.AllPackableSrcProjects)
             context.DotNetPack(project.FullPath, settingsSrc);
+
+        var settingsTemplate = new DotNetPackSettings
+        {
+            Configuration = context.BuildConfiguration,
+            OutputDirectory = context.ArtifactsDirectory.FullPath,
+            MSBuildSettings = context.MsBuildSettingsPack
+        };
         context.DotNetPack(context.TemplatesTestsProjectFile.FullPath, settingsTemplate);
     }
 }
@@ -431,7 +469,9 @@ public class DocFxChangelogDownloadTask : FrostingTask<BuildContext>
         }
         else if (context.Argument("LatestVersions", false))
         {
-            for (int i = DocumentationHelper.BdnAllVersions.Length - 3; i < DocumentationHelper.BdnAllVersions.Length; i++)
+            for (int i = DocumentationHelper.BdnAllVersions.Length - 3;
+                 i < DocumentationHelper.BdnAllVersions.Length;
+                 i++)
                 context.DocfxChangelogDownload(
                     DocumentationHelper.BdnAllVersions[i],
                     DocumentationHelper.BdnAllVersions[i - 1]);
@@ -453,10 +493,42 @@ public class DocfxChangelogGenerateTask : FrostingTask<BuildContext>
             context.DocfxChangelogGenerate(version);
         context.DocfxChangelogGenerate(DocumentationHelper.BdnNextVersion);
 
-        context.CopyFile(context.ChangeLogGenDirectory.CombineWithFilePath("index.md"),
-            context.ChangeLogDirectory.CombineWithFilePath("index.md"));
-        context.CopyFile(context.ChangeLogGenDirectory.CombineWithFilePath("full.md"),
-            context.ChangeLogDirectory.CombineWithFilePath("full.md"));
+        context.Information("DocfxChangelogGenerate: index.md");
+        var indexContent = new StringBuilder();
+        indexContent.AppendLine("---");
+        indexContent.AppendLine("uid: changelog");
+        indexContent.AppendLine("---");
+        indexContent.AppendLine("");
+        indexContent.AppendLine("# ChangeLog");
+        indexContent.AppendLine("");
+        foreach (var version in DocumentationHelper.BdnAllVersions.Reverse())
+            indexContent.AppendLine($"* @changelog.{version}");
+        indexContent.AppendLine("* @changelog.full");
+        context.FileWriteText(context.ChangeLogDirectory.CombineWithFilePath("index.md"), indexContent.ToString());
+
+        context.Information("DocfxChangelogGenerate: full.md");
+        var fullContent = new StringBuilder();
+        fullContent.AppendLine("---");
+        fullContent.AppendLine("uid: changelog.full");
+        fullContent.AppendLine("---");
+        fullContent.AppendLine("");
+        fullContent.AppendLine("# Full ChangeLog");
+        fullContent.AppendLine("");
+        foreach (var version in DocumentationHelper.BdnAllVersions.Reverse())
+            fullContent.AppendLine($"[!include[{version}]({version}.md)]");
+        context.FileWriteText(context.ChangeLogDirectory.CombineWithFilePath("full.md"), fullContent.ToString());
+
+        context.Information("DocfxChangelogGenerate: toc.yml");
+        var tocContent = new StringBuilder();
+        foreach (var version in DocumentationHelper.BdnAllVersions.Reverse())
+        {
+            tocContent.AppendLine($"- name: {version}");
+            tocContent.AppendLine($"  href: {version}.md");
+        }
+
+        tocContent.AppendLine("- name: Full ChangeLog");
+        tocContent.AppendLine("  href: full.md");
+        context.FileWriteText(context.ChangeLogDirectory.CombineWithFilePath("toc.yml"), tocContent.ToString());
     }
 }
 

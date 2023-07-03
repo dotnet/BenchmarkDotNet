@@ -145,7 +145,8 @@ namespace BenchmarkDotNet.Running
                     }
 
                     compositeLogger.WriteLineHeader("// * Artifacts cleanup *");
-                    Cleanup(new HashSet<string>(artifactsToCleanup.Distinct()));
+                    Cleanup(compositeLogger, new HashSet<string>(artifactsToCleanup.Distinct()));
+                    compositeLogger.WriteLineInfo("Artifacts cleanup is finished");
                     compositeLogger.Flush();
                 }
             }
@@ -639,10 +640,11 @@ namespace BenchmarkDotNet.Running
             return new CompositeLogger(loggers.Values.ToImmutableHashSet());
         }
 
-        private static void Cleanup(HashSet<string> artifactsToCleanup)
+        private static void Cleanup(ILogger logger, HashSet<string> artifactsToCleanup)
         {
             foreach (string path in artifactsToCleanup)
             {
+                logger.WriteLineInfo($"Trying to delete '{path}'");
                 try
                 {
                     if (Directory.Exists(path))
@@ -653,9 +655,11 @@ namespace BenchmarkDotNet.Running
                     {
                         File.Delete(path);
                     }
+                    logger.WriteLineInfo($"Successfully deleted '{path}'");
                 }
-                catch
+                catch (Exception e)
                 {
+                    logger.WriteLineInfo($"Failed to delete '{path}' because of the following exception: {e}");
                     // sth is locking our auto-generated files
                     // there is very little we can do about it
                 }

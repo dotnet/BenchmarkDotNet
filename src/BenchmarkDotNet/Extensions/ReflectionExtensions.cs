@@ -53,31 +53,43 @@ namespace BenchmarkDotNet.Extensions
             if (!string.IsNullOrEmpty(type.Namespace) && includeNamespace)
                 prefix += type.Namespace + ".";
 
-            string nestedTypes = "";
-            Type child = type, parent = type.DeclaringType;
-            while (child.IsNested && parent != null)
-            {
-                nestedTypes = parent.Name + "." + nestedTypes;
-
-                child = parent;
-                parent = parent.DeclaringType;
-            }
-            prefix += nestedTypes;
-
-
             if (type.GetTypeInfo().IsGenericParameter)
                 return type.Name;
-            if (type.GetTypeInfo().IsGenericType)
-            {
-                string mainName = type.Name.Substring(0, type.Name.IndexOf('`'));
-                string args = string.Join(", ", type.GetGenericArguments().Select(T => GetCorrectCSharpTypeName(T, includeGenericArgumentsNamespace, includeGenericArgumentsNamespace)).ToArray());
-                return $"{prefix}{mainName}<{args}>";
-            }
 
             if (type.IsArray)
                 return GetCorrectCSharpTypeName(type.GetElementType()) + "[" + new string(',', type.GetArrayRank() - 1) + "]";
 
-            return prefix + type.Name.Replace("&", string.Empty);
+            return prefix + string.Join(".", GetNestedTypeNames(type, includeGenericArgumentsNamespace).Reverse());
+        }
+
+        // from most nested to least
+        private static IEnumerable<string> GetNestedTypeNames(Type type, bool includeGenericArgumentsNamespace)
+        {
+            var allTypeParameters = new Stack<Type>(type.GetGenericArguments());
+
+            Type currentType = type;
+            while (currentType != null)
+            {
+                string name = currentType.Name.Replace("&", string.Empty);
+
+                if (name.Contains('`'))
+                {
+                    var parts = name.Split('`');
+                    var mainName = parts[0];
+                    var parameterCount = int.Parse(parts[1]);
+
+                    var typeParameters = Enumerable
+                        .Range(0, parameterCount)
+                        .Select(_ => allTypeParameters.Pop())
+                        .Reverse();
+
+                    var args = string.Join(", ", typeParameters.Select(T => GetCorrectCSharpTypeName(T, includeGenericArgumentsNamespace, includeGenericArgumentsNamespace)));
+                    name = $"{mainName}<{args}>";
+                }
+
+                yield return name;
+                currentType = currentType.DeclaringType;
+            }
         }
 
         /// <summary>
@@ -158,31 +170,26 @@ namespace BenchmarkDotNet.Extensions
                 .Where(method => method.GetCustomAttributes(true).OfType<BenchmarkAttribute>().Any())
                 .ToArray();
 
-        internal static (string Name, TAttribute Attribute, bool IsPrivate, bool IsStatic, Type ParameterType)[] GetTypeMembersWithGivenAttribute<TAttribute>(this Type type, BindingFlags reflectionFlags)
-            where TAttribute : Attribute
+        internal static (string Name, TAttribute Attribute, bool IsStatic, Type ParameterType)[]
+            GetTypeMembersWithGivenAttribute<TAttribute>(this Type type, BindingFlags reflectionFlags) where TAttribute : Attribute
         {
-            var allFields = type.GetFields(reflectionFlags)
-                                .Select(f => (
-                                    Name: f.Name,
-                                    Attribute: f.ResolveAttribute<TAttribute>(),
-                                    IsPrivate: f.IsPrivate,
-                                    IsStatic: f.IsStatic,
-                                    ParameterType: f.FieldType));
+            var allFields = type
+                .GetFields(reflectionFlags)
+                .Select(f => (
+                    Name: f.Name,
+                    Attribute: f.ResolveAttribute<TAttribute>(),
+                    IsStatic: f.IsStatic,
+                    ParameterType: f.FieldType));
 
-            var allProperties = type.GetProperties(reflectionFlags)
-                                    .Select(p => (
-                                        Name: p.Name,
-                                        Attribute: p.ResolveAttribute<TAttribute>(),
-                                        IsPrivate: p.GetSetMethod() == null,
-                                        IsStatic: p.GetSetMethod() != null && p.GetSetMethod().IsStatic,
-                                        PropertyType: p.PropertyType));
+            var allProperties = type
+                .GetProperties(reflectionFlags)
+                .Select(p => (
+                    Name: p.Name,
+                    Attribute: p.ResolveAttribute<TAttribute>(),
+                    IsStatic: p.GetSetMethod() != null && p.GetSetMethod().IsStatic,
+                    PropertyType: p.PropertyType));
 
-            var joined = allFields.Concat(allProperties).Where(member => member.Attribute != null).ToArray();
-
-            foreach (var member in joined.Where(m => m.IsPrivate))
-                throw new InvalidOperationException($"Member \"{member.Name}\" must be public if it has the [{typeof(TAttribute).Name}] attribute applied to it");
-
-            return joined;
+            return allFields.Concat(allProperties).Where(member => member.Attribute != null).ToArray();
         }
 
         internal static bool IsStackOnlyWithImplicitCast(this Type argumentType, object? argumentInstance)

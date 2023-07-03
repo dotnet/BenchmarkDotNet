@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Environments
 
         protected HostEnvironmentInfo()
         {
-            BenchmarkDotNetVersion = BenchmarkDotNetInfo.FullVersion;
+            BenchmarkDotNetVersion = BenchmarkDotNetInfo.Instance.BrandVersion;
             OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
             CpuInfo = new Lazy<CpuInfo>(RuntimeInformation.GetCpuInfo);
             ChronometerFrequency = Chronometer.Frequency;

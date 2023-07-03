@@ -1,6 +1,4 @@
 ﻿using System.Linq;
-using System.Threading;
-using ApprovalUtilities.Utilities;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Running;
