@@ -234,7 +234,8 @@ namespace BenchmarkDotNet.Environments
                 new MacOSXVersion(19, "Catalina"),
                 new MacOSXVersion(20, "Big Sur"),
                 new MacOSXVersion(21, "Monterey"),
-                new MacOSXVersion(22, "Ventura")
+                new MacOSXVersion(22, "Ventura"),
+                new MacOSXVersion(23, "Sonoma"),
             };
 
             public static string? ResolveCodeName(string kernelVersion)
