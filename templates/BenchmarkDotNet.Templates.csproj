@@ -32,10 +32,5 @@
             OutputFilename="templates/BenchmarkDotNet.BenchmarkProjectTemplate.CSharp/.template.config/template.json"
             MatchExpression='("defaultValue": )"([\d+\.?]+)"'
             ReplacementText='${1}"$(VersionPrefix)"' />
-    <PropertyGroup>
-      <InputFile>templates/BenchmarkDotNet.BenchmarkProjectTemplate.CSharp/.template.config/template.json</InputFile>
-      <OutputFile>templates/BenchmarkDotNet.BenchmarkProjectTemplate.CSharp/.template.config/template.json</OutputFile>
-      <VersionRegex>"defaultValue" : ([\d+\.?]+)</VersionRegex>
-    </PropertyGroup>
   </Target>
 </Project>
