@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Management;
 using System.Numerics;
@@ -163,6 +164,13 @@ namespace BenchmarkDotNet.Portability
                     return OsBrandStringHelper.PrettifyMacOSX(systemVersion, kernelVersion);
             }
 
+            if (IsLinux())
+            {
+                string? version = GetLinuxOsVersion();
+                if (version != null && version.Trim() != "")
+                    return version;
+            }
+
             string operatingSystem = RuntimeEnvironment.OperatingSystem;
             string operatingSystemVersion = RuntimeEnvironment.OperatingSystemVersion;
 
@@ -170,6 +178,20 @@ namespace BenchmarkDotNet.Portability
                 operatingSystem,
                 operatingSystemVersion,
                 GetWindowsUbr());
+        }
+
+        private static string? GetLinuxOsVersion()
+        {
+            if (!IsLinux())
+                return null;
+            try
+            {
+                return LinuxOsReleaseHelper.GetNameByOsRelease(File.ReadAllLines("/etc/os-release"));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         // TODO: Introduce a common util API for registry calls, use it also in BenchmarkDotNet.Toolchains.CsProj.GetCurrentVersionBasedOnWindowsRegistry
