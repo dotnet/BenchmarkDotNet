@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -15,9 +16,16 @@ namespace BenchmarkDotNet.Extensions
         internal static bool IsTrue(this bool? valueOrNothing) => valueOrNothing.HasValue && valueOrNothing.Value;
 
         private static DebuggableAttribute? GetDebuggableAttribute(Assembly? assembly)
-            => assembly?.GetCustomAttributes()
-                .OfType<DebuggableAttribute>()
-                .SingleOrDefault();
+        {
+            try
+            {
+                return assembly?.GetCustomAttributes().OfType<DebuggableAttribute>().SingleOrDefault();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
 
         private static bool? IsJitOptimizerDisabled(this DebuggableAttribute? attribute) => attribute?.IsJITOptimizerDisabled;
 
