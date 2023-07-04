@@ -644,7 +644,6 @@ namespace BenchmarkDotNet.Running
         {
             foreach (string path in artifactsToCleanup)
             {
-                logger.WriteLineInfo($"Trying to delete '{path}'");
                 try
                 {
                     if (Directory.Exists(path))
@@ -655,11 +654,9 @@ namespace BenchmarkDotNet.Running
                     {
                         File.Delete(path);
                     }
-                    logger.WriteLineInfo($"Successfully deleted '{path}'");
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    logger.WriteLineInfo($"Failed to delete '{path}' because of the following exception: {e}");
                     // sth is locking our auto-generated files
                     // there is very little we can do about it
                 }
