@@ -1,4 +1,4 @@
-# Run only from the folder where the batch file is located!
+# Run only from the folder where the shell script is located!
 
 dotnet build BenchmarkDotNet.Templates.csproj -c Release
 dotnet pack BenchmarkDotNet.Templates.csproj -c Release
