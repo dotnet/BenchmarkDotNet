@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Columns
             bool isBaseline = summary.IsBaseline(benchmarkCase);
 
             if (ResultsAreInvalid(summary, benchmarkCase, baseline))
-                return "?";
+                return MetricColumn.UnknownRepresentation;
 
             var baselineStat = summary[baseline].ResultStatistics;
             var baselineMetrics = summary[baseline].Metrics;

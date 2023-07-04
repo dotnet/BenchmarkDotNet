@@ -296,7 +296,7 @@ namespace BenchmarkDotNet.Portability
                 }
                 else
                 {
-                    string runtimeVersion = version != default ? version.ToString() : "?";
+                    string runtimeVersion = version != default ? version.ToString() : Unknown;
 
                     return $".NET Core {runtimeVersion} (CoreCLR {coreclrAssemblyInfo.FileVersion}, CoreFX {corefxAssemblyInfo.FileVersion})";
                 }

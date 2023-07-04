@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -17,9 +18,10 @@ namespace BenchmarkDotNet.Engines
         private static readonly Func<long> GetAllocatedBytesForCurrentThreadDelegate = CreateGetAllocatedBytesForCurrentThreadDelegate();
         private static readonly Func<bool, long> GetTotalAllocatedBytesDelegate = CreateGetTotalAllocatedBytesDelegate();
 #endif
-        public static readonly GcStats Empty = new GcStats(0, 0, 0, 0, 0);
 
-        private GcStats(int gen0Collections, int gen1Collections, int gen2Collections, long allocatedBytes, long totalOperations)
+        public static readonly GcStats Empty = default;
+
+        private GcStats(int gen0Collections, int gen1Collections, int gen2Collections, long? allocatedBytes, long totalOperations)
         {
             Gen0Collections = gen0Collections;
             Gen1Collections = gen1Collections;
@@ -36,18 +38,19 @@ namespace BenchmarkDotNet.Engines
         /// <summary>
         /// Total per all runs
         /// </summary>
-        private long AllocatedBytes { get; }
+        private long? AllocatedBytes { get; }
 
         public long TotalOperations { get; }
 
-        public long GetBytesAllocatedPerOperation(BenchmarkCase benchmarkCase)
+        public long? GetBytesAllocatedPerOperation(BenchmarkCase benchmarkCase)
         {
             bool excludeAllocationQuantumSideEffects = benchmarkCase.GetRuntime().RuntimeMoniker <= RuntimeMoniker.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
 
-            return GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects) == 0
-                ? 0
+            long? allocatedBytes = GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects);
+            return allocatedBytes == null ? null
+                : allocatedBytes == 0 ? 0
                 : (long) Math.Round( // let's round it to reduce the side effects of Allocation quantum
-                    (double) GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects) / TotalOperations,
+                    (double) allocatedBytes.Value / TotalOperations,
                     MidpointRounding.ToEven);
         }
 
@@ -67,8 +70,13 @@ namespace BenchmarkDotNet.Engines
                 Math.Max(0, left.Gen0Collections - right.Gen0Collections),
                 Math.Max(0, left.Gen1Collections - right.Gen1Collections),
                 Math.Max(0, left.Gen2Collections - right.Gen2Collections),
-                Math.Max(0, left.AllocatedBytes - right.AllocatedBytes),
+                ClampToPositive(left.AllocatedBytes - right.AllocatedBytes),
                 Math.Max(0, left.TotalOperations - right.TotalOperations));
+        }
+
+        private static long? ClampToPositive(long? num)
+        {
+            return num.HasValue ? Math.Max(0, num.Value) : null;
         }
 
         public GcStats WithTotalOperations(long totalOperationsCount)
@@ -92,8 +100,11 @@ namespace BenchmarkDotNet.Engines
         /// <param name="excludeAllocationQuantumSideEffects">Allocation quantum can affecting some of our nano-benchmarks in non-deterministic way.
         /// when this parameter is set to true and the number of all allocated bytes is less or equal AQ, we ignore AQ and put 0 to the results</param>
         /// <returns></returns>
-        public long GetTotalAllocatedBytes(bool excludeAllocationQuantumSideEffects)
+        public long? GetTotalAllocatedBytes(bool excludeAllocationQuantumSideEffects)
         {
+            if (AllocatedBytes == null)
+                return null;
+
             if (!excludeAllocationQuantumSideEffects)
                 return AllocatedBytes;
 
@@ -103,7 +114,7 @@ namespace BenchmarkDotNet.Engines
         public static GcStats ReadInitial()
         {
             // this will force GC.Collect, so we want to do this before collecting collections counts
-            long allocatedBytes = GetAllocatedBytes();
+            long? allocatedBytes = GetAllocatedBytes();
 
             return new GcStats(
                 GC.CollectionCount(0),
@@ -130,14 +141,14 @@ namespace BenchmarkDotNet.Engines
         public static GcStats FromForced(int forcedFullGarbageCollections)
             => new GcStats(forcedFullGarbageCollections, forcedFullGarbageCollections, forcedFullGarbageCollections, 0, 0);
 
-        private static long GetAllocatedBytes()
+        private static long? GetAllocatedBytes()
         {
             if (RuntimeInformation.IsOldMono) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
-                return 0;
+                return null;
 
             // we have no tests for WASM and don't want to risk introducing a new bug (https://github.com/dotnet/BenchmarkDotNet/issues/2226)
             if (RuntimeInformation.IsWasm)
-                return 0;
+                return null;
 
             // "This instance Int64 property returns the number of bytes that have been allocated by a specific
             // AppDomain. The number is accurate as of the last garbage collection." - CLR via C#
@@ -177,7 +188,7 @@ namespace BenchmarkDotNet.Engines
         }
 
         public string ToOutputLine()
-            => $"{ResultsLinePrefix} {Gen0Collections} {Gen1Collections} {Gen2Collections} {AllocatedBytes} {TotalOperations}";
+            => $"{ResultsLinePrefix} {Gen0Collections} {Gen1Collections} {Gen2Collections} {AllocatedBytes?.ToString() ?? MetricColumn.UnknownRepresentation} {TotalOperations}";
 
         public static GcStats Parse(string line)
         {
@@ -188,13 +199,29 @@ namespace BenchmarkDotNet.Engines
             if (!int.TryParse(measurementSplit[0], out int gen0)
                 || !int.TryParse(measurementSplit[1], out int gen1)
                 || !int.TryParse(measurementSplit[2], out int gen2)
-                || !long.TryParse(measurementSplit[3], out long allocatedBytes)
+                || !TryParse(measurementSplit[3], out long? allocatedBytes)
                 || !long.TryParse(measurementSplit[4], out long totalOperationsCount))
             {
                 throw new NotSupportedException("Invalid string");
             }
 
             return new GcStats(gen0, gen1, gen2, allocatedBytes, totalOperationsCount);
+        }
+
+        private static bool TryParse(string s, out long? result)
+        {
+            if (s == MetricColumn.UnknownRepresentation)
+            {
+                result = null;
+                return true;
+            }
+            if (long.TryParse(s, out long r))
+            {
+                result = r;
+                return true;
+            }
+            result = null;
+            return false;
         }
 
         public override string ToString() => ToOutputLine();

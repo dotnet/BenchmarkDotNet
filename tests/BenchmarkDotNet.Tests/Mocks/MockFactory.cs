@@ -57,6 +57,17 @@ namespace BenchmarkDotNet.Tests.Mocks
                 ImmutableArray<ValidationError>.Empty,
                 ImmutableArray<IColumnHidingRule>.Empty);
 
+        public static Summary CreateSummary<TBenchmark>(IConfig config, bool hugeSd, Func<BenchmarkCase, Metric[]> metricsBuilder) => new Summary(
+                "MockSummary",
+                CreateBenchmarks<TBenchmark>(config).Select(b => CreateReport(b, hugeSd, metricsBuilder(b))).ToImmutableArray(),
+                new HostEnvironmentInfoBuilder().Build(),
+                string.Empty,
+                string.Empty,
+                TimeSpan.FromMinutes(1),
+                TestCultureInfo.Instance,
+                ImmutableArray<ValidationError>.Empty,
+                ImmutableArray<IColumnHidingRule>.Empty);
+
         private static ImmutableArray<BenchmarkReport> CreateReports(IConfig config)
             => CreateBenchmarks<MockBenchmarkClass>(config).Select(CreateSimpleReport).ToImmutableArray();
 

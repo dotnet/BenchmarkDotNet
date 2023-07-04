@@ -68,6 +68,7 @@ namespace BenchmarkDotNet.Tests.Columns
             public string Unit { get; }
             public bool TheGreaterTheBetter { get; }
             public int PriorityInCategory => 0;
+            public bool GetIsAvailable(Metric metric) => true;
         }
     }
 }
