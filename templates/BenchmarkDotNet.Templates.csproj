@@ -31,7 +31,7 @@
             InputFilename="templates/BenchmarkDotNet.BenchmarkProjectTemplate.CSharp/.template.config/template.json"
             OutputFilename="templates/BenchmarkDotNet.BenchmarkProjectTemplate.CSharp/.template.config/template.json"
             MatchExpression='("defaultValue": )"([\d+\.?]+)"'
-            ReplacementText='${1}"$(Major).$(Minor).$(Revision)"' />
+            ReplacementText='${1}"$(VersionPrefix)"' />
     <PropertyGroup>
       <InputFile>templates/BenchmarkDotNet.BenchmarkProjectTemplate.CSharp/.template.config/template.json</InputFile>
       <OutputFile>templates/BenchmarkDotNet.BenchmarkProjectTemplate.CSharp/.template.config/template.json</OutputFile>
