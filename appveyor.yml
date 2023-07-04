@@ -10,6 +10,7 @@ branches:
   # blacklist
   except:
     - gh-pages
+    - docs-changelog-details
 
 pull_requests:
   do_not_increment_build_number: true

@@ -1,0 +1,35 @@
+name: docs-changelog-generate
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: master
+
+    - name: Download changelog
+      run: ./build.sh --target DocFX_Changelog_Download --VersionCount 1
+      env:
+        GITHUB_PRODUCT: ChangelogBuilder
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Push changelog
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: docs-changelog-details
+        FOLDER: docs/_changelog/details
+        GIT_CONFIG_NAME: Andrey Akinshin
+        GIT_CONFIG_EMAIL: andrey.akinshin@gmail.com
+        CLEAN: true

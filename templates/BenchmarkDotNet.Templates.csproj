@@ -24,4 +24,25 @@
     <Compile Remove="**\*" />
     <None Remove="*.bat;.sh" />
   </ItemGroup>
+
+  <Target Name="Fix BenchmarkDotNetVersion"
+          BeforeTargets="Build">
+    <ReplaceFileText
+            InputFilename="templates/BenchmarkDotNet.BenchmarkProjectTemplate.CSharp/.template.config/template.json"
+            OutputFilename="templates/BenchmarkDotNet.BenchmarkProjectTemplate.CSharp/.template.config/template.json"
+            MatchExpression='("defaultValue": )"([\d+\.?]+)"'
+            ReplacementText='${1}"$(VersionPrefix)"' />
+
+    <ReplaceFileText
+            InputFilename="templates/BenchmarkDotNet.BenchmarkProjectTemplate.FSharp/.template.config/template.json"
+            OutputFilename="templates/BenchmarkDotNet.BenchmarkProjectTemplate.FSharp/.template.config/template.json"
+            MatchExpression='("defaultValue": )"([\d+\.?]+)"'
+            ReplacementText='${1}"$(VersionPrefix)"' />
+
+    <ReplaceFileText
+            InputFilename="templates/BenchmarkDotNet.BenchmarkProjectTemplate.VB/.template.config/template.json"
+            OutputFilename="templates/BenchmarkDotNet.BenchmarkProjectTemplate.VB/.template.config/template.json"
+            MatchExpression='("defaultValue": )"([\d+\.?]+)"'
+            ReplacementText='${1}"$(VersionPrefix)"' />
+  </Target>
 </Project>

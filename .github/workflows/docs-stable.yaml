@@ -21,12 +21,11 @@ jobs:
     - name: Build BenchmarkDotNet
       run: ./build.bat --target Build
 
-    # Temporary disabled because of the API limit
-    # - name: Download changelog
-    #   run: ./build.bat --target DocFX_Changelog_Download --LatestVersions true --StableVersions true
-    #   env:
-    #     GITHUB_PRODUCT: ChangelogBuilder
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Download changelog
+      run: ./build.bat --target DocFX_Changelog_Download --VersionCount 1
+      env:
+        GITHUB_PRODUCT: ChangelogBuilder
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build documentation
       run: ./build.bat --target DocFX_Build

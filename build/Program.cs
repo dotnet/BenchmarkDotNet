@@ -1,6 +1,10 @@
+using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Build;
 using Cake.Common;
 using Cake.Common.Build;
@@ -17,6 +21,7 @@ using Cake.Core;
 using Cake.Core.IO;
 using Cake.FileHelpers;
 using Cake.Frosting;
+using Cake.Git;
 
 public static class Program
 {
@@ -103,11 +108,11 @@ public class BuildContext : FrostingContext
         MsBuildSettingsRestore = new DotNetMSBuildSettings();
         MsBuildSettingsBuild = new DotNetMSBuildSettings();
         MsBuildSettingsPack = new DotNetMSBuildSettings();
-        
+
         if (IsCiBuild)
         {
             System.Environment.SetEnvironmentVariable("BDN_CI_BUILD", "true");
-            
+
             MsBuildSettingsBuild.MaxCpuCount = 1;
             MsBuildSettingsBuild.WithProperty("UseSharedCompilation", "false");
         }
@@ -152,8 +157,22 @@ public class BuildContext : FrostingContext
         this.DotNetTest(projectFile.FullPath, settings);
     }
 
+    public void EnsureChangelogDetailsExist(bool forceClean = false)
+    {
+        var path = ChangeLogGenDirectory.Combine("details");
+        if (this.DirectoryExists(path) && forceClean)
+            this.DeleteDirectory(path, new DeleteDirectorySettings() { Force = true, Recursive = true });
+
+        if (!this.DirectoryExists(path))
+        {
+            var settings = new GitCloneSettings { Checkout = true, BranchName = "docs-changelog-details" };
+            this.GitClone("https://github.com/dotnet/BenchmarkDotNet.git", path, settings);
+        }
+    }
+
     public void DocfxChangelogDownload(string version, string versionPrevious, string lastCommit = "")
     {
+        EnsureChangelogDetailsExist(true);
         this.Information("DocfxChangelogDownload: " + version);
         // Required environment variables: GITHUB_PRODUCT, GITHUB_TOKEN
         var path = ChangeLogGenDirectory.Combine("details");
@@ -162,6 +181,7 @@ public class BuildContext : FrostingContext
 
     public void DocfxChangelogGenerate(string version)
     {
+        EnsureChangelogDetailsExist();
         this.Information("DocfxChangelogGenerate: " + version);
         var header = ChangeLogGenDirectory.Combine("header").CombineWithFilePath(version + ".md");
         var footer = ChangeLogGenDirectory.Combine("footer").CombineWithFilePath(version + ".md");
@@ -425,9 +445,7 @@ public class PackTask : FrostingTask<BuildContext>
             Configuration = context.BuildConfiguration,
             OutputDirectory = context.ArtifactsDirectory.FullPath,
             ArgumentCustomization = args => args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg"),
-            MSBuildSettings = context.MsBuildSettingsPack,
-            NoBuild = true,
-            NoRestore = true
+            MSBuildSettings = context.MsBuildSettingsPack
         };
 
         foreach (var project in context.AllPackableSrcProjects)
@@ -436,8 +454,7 @@ public class PackTask : FrostingTask<BuildContext>
         var settingsTemplate = new DotNetPackSettings
         {
             Configuration = context.BuildConfiguration,
-            OutputDirectory = context.ArtifactsDirectory.FullPath,
-            MSBuildSettings = context.MsBuildSettingsPack
+            OutputDirectory = context.ArtifactsDirectory.FullPath
         };
         context.DotNetPack(context.TemplatesTestsProjectFile.FullPath, settingsTemplate);
     }
@@ -456,22 +473,23 @@ public class DocFxChangelogDownloadTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        if (context.Argument("AllVersions", false))
+        var count = context.Argument("VersionCount", -1);
+        var total = DocumentationHelper.BdnAllVersions.Length;
+
+        if (count == 0)
         {
             context.DocfxChangelogDownload(
                 DocumentationHelper.BdnAllVersions.First(),
                 DocumentationHelper.BdnFirstCommit);
 
-            for (int i = 1; i < DocumentationHelper.BdnAllVersions.Length; i++)
+            for (int i = 1; i < total; i++)
                 context.DocfxChangelogDownload(
                     DocumentationHelper.BdnAllVersions[i],
                     DocumentationHelper.BdnAllVersions[i - 1]);
         }
-        else if (context.Argument("LatestVersions", false))
+        else if (count > 0)
         {
-            for (int i = DocumentationHelper.BdnAllVersions.Length - 3;
-                 i < DocumentationHelper.BdnAllVersions.Length;
-                 i++)
+            for (int i = Math.Max(total - count, 1); i < total; i++)
                 context.DocfxChangelogDownload(
                     DocumentationHelper.BdnAllVersions[i],
                     DocumentationHelper.BdnAllVersions[i - 1]);
@@ -551,7 +569,93 @@ public class DocfxBuildTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
+        context.Information("DocfxBuild: Generate index.md");
+        var content = new StringBuilder();
+        content.AppendLine("---");
+        content.AppendLine("title: Home");
+        content.AppendLine("---");
+        content.Append(context.FileReadText(context.RootDirectory.CombineWithFilePath("README.md")));
+        context.FileWriteText(context.DocsDirectory.CombineWithFilePath("index.md"), content.ToString());
+
         context.RunDocfx(context.DocfxJsonFile);
         context.GenerateRedirects();
+    }
+}
+
+[TaskName("UpdateStats")]
+public class UpdateStatsTask : FrostingTask<BuildContext>
+{
+    public class Updater
+    {
+        public string Prefix { get; }
+        public Regex Regex { get; }
+        public int Value { get; }
+
+        public Updater(string prefix, string regex, int value)
+        {
+            Prefix = prefix;
+            Regex = new Regex(regex);
+            Value = value;
+        }
+
+        public string Apply(string line)
+        {
+            if (!line.StartsWith(Prefix))
+                return line;
+
+            var match = Regex.Match(line);
+            if (!match.Success)
+                return line;
+
+            // Groups[1] refers to the first group (\d+)
+            var numberString = match.Groups[1].Value;
+            var number = int.Parse(numberString);
+            return line.Replace(number.ToString(), Value.ToString());
+        }
+    }
+
+    private static async Task<int> GetDependentProjectsNumber()
+    {
+        using var httpClient = new HttpClient();
+        const string url = "https://github.com/dotnet/BenchmarkDotNet/network/dependents";
+        var response = await httpClient.GetAsync(new Uri(url));
+        var dependentsPage = await response.Content.ReadAsStringAsync();
+        var match = new Regex(@"([0-9\,]+)[\n\r\s]+Repositories").Match(dependentsPage);
+        var number = int.Parse(match.Groups[1].Value.Replace(",", ""));
+        number = number / 100 * 100;
+        return number;
+    }
+
+    public override void Run(BuildContext context)
+    {
+        var dependentProjectsNumber = GetDependentProjectsNumber().Result;
+        var updaters = new Updater[]
+        {
+            new(
+                "The library is adopted by",
+                @"\[(\d+)\+ GitHub projects\]",
+                dependentProjectsNumber
+            ),
+            new(
+                "BenchmarkDotNet is already adopted by more than ",
+                @"\[(\d+)\+\]",
+                dependentProjectsNumber
+            ),
+        };
+        var files = new[]
+        {
+            context.RootDirectory.CombineWithFilePath("README.md")
+        };
+        foreach (var file in files)
+        {
+            var lines = context.FileReadLines(file);
+            for (var i = 0; i < lines.Length; i++)
+            {
+                foreach (var updater in updaters)
+                    lines[i] = updater.Apply(lines[i]);
+            }
+
+            context.FileWriteLines(file, lines);
+        }
     }
 }
