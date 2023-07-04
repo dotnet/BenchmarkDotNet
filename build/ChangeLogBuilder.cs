@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -245,7 +244,7 @@ public class ChangeLogBuilder
         }
         catch (Exception e)
         {
-            await Console.Error.WriteLineAsync(e.Demystify().ToString());
+            await Console.Error.WriteLineAsync(e.ToString());
         }
     }
 }
