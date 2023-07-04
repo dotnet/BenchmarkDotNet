@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Exporters
         {
             Dialect = nameof(GitHub),
             UseCodeBlocks = true,
-            CodeBlockStart = "``` ini",
+            CodeBlockStart = "```",
             StartOfGroupHighlightStrategy = MarkdownHighlightStrategy.Bold,
             ColumnsStartWithSeparator = true,
             EscapeHtml = true
