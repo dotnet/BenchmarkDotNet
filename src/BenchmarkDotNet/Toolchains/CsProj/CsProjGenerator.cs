@@ -162,28 +162,20 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 sdkName = DefaultSdkName;
             }
 
-            XmlDocument itemGroupsettings = null;
-            XmlDocument propertyGroupSettings = null;
+            List<XmlDocument> groupsettings = new List<XmlDocument>();
 
-            GetSettingsThatNeedToBeCopied(projectElement, ref itemGroupsettings, ref propertyGroupSettings, projectFile);
+            GetSettingsThatNeedToBeCopied(projectElement, groupsettings, projectFile);
 
-            List<string> customSettings = new List<string>(2);
-            if (itemGroupsettings != null)
-            {
-                customSettings.Add(GetIndentedXmlString(itemGroupsettings));
-            }
-            if (propertyGroupSettings != null)
-            {
-                customSettings.Add(GetIndentedXmlString(propertyGroupSettings));
-            }
-
-            return (string.Join(Environment.NewLine + Environment.NewLine, customSettings), sdkName);
+            return (
+                string.Join(Environment.NewLine + Environment.NewLine, groupsettings.Select(GetIndentedXmlString)),
+                sdkName
+            );
         }
 
-        private static void GetSettingsThatNeedToBeCopied(XmlElement projectElement, ref XmlDocument itemGroupsettings, ref XmlDocument propertyGroupSettings, FileInfo projectFile)
+        private static void GetSettingsThatNeedToBeCopied(XmlElement projectElement, List<XmlDocument> groupsettings, FileInfo projectFile)
         {
-            CopyProperties(projectElement, ref itemGroupsettings, "ItemGroup");
-            CopyProperties(projectElement, ref propertyGroupSettings, "PropertyGroup");
+            CopyProperties(projectElement, groupsettings, "ItemGroup");
+            CopyProperties(projectElement, groupsettings, "PropertyGroup");
 
             foreach (XmlElement importElement in projectElement.GetElementsByTagName("Import"))
             {
@@ -196,16 +188,17 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 {
                     var importXmlDoc = new XmlDocument();
                     importXmlDoc.Load(absolutePath);
-                    GetSettingsThatNeedToBeCopied(importXmlDoc.DocumentElement, ref itemGroupsettings, ref propertyGroupSettings, projectFile);
+                    GetSettingsThatNeedToBeCopied(importXmlDoc.DocumentElement, groupsettings, projectFile);
                 }
             }
         }
 
-        private static void CopyProperties(XmlElement projectElement, ref XmlDocument copyToDocument, string groupName)
+        private static void CopyProperties(XmlElement projectElement, List<XmlDocument> groupsettings, string groupName)
         {
-            XmlElement itemGroupElement = copyToDocument?.DocumentElement;
             foreach (XmlElement groupElement in projectElement.GetElementsByTagName(groupName))
             {
+                XmlDocument copyToDocument = null;
+                XmlNode itemGroupElement = null;
                 foreach (var node in groupElement.ChildNodes)
                 {
                     if (node is XmlElement setting && SettingsWeWantToCopy.Contains(setting.Name))
@@ -213,8 +206,10 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                         if (copyToDocument is null)
                         {
                             copyToDocument = new XmlDocument();
-                            itemGroupElement = copyToDocument.CreateElement(groupName);
+                            // Copy the group with attributes, not including children, to preserve conditions.
+                            itemGroupElement = copyToDocument.ImportNode(groupElement, false);
                             copyToDocument.AppendChild(itemGroupElement);
+                            groupsettings.Add(copyToDocument);
                         }
                         XmlNode copiedNode = copyToDocument.ImportNode(setting, true);
                         itemGroupElement.AppendChild(copiedNode);

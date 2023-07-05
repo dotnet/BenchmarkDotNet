@@ -217,6 +217,41 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
+        public void SettingsFromGroupWithConditionAreCopiedWithCondition()
+        {
+            const string WithPackageReference = @"
+<Project Sdk=""Microsoft.NET.Sdk"">
+  <PropertyGroup>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup Condition="" '$(TargetFrameworkIdentifier)' == '.NETFramework' "">
+    <PackageReference Include=""xunit"" Version=""2.4.2"" />
+    <Reference Include=""System.Runtime"" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include=""System.Runtime.CompilerServices.Unsafe"" Version=""6.0.0"" />
+  </ItemGroup>
+</Project>
+";
+            var sut = new CsProjGenerator("netcoreapp3.0", null, null, null, true);
+
+            var xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(WithPackageReference);
+            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
+
+            AssertCustomProperties(@"<ItemGroup Condition="" '$(TargetFrameworkIdentifier)' == '.NETFramework' "">
+  <PackageReference Include=""xunit"" Version=""2.4.2"" />
+</ItemGroup>
+
+<ItemGroup>
+  <PackageReference Include=""System.Runtime.CompilerServices.Unsafe"" Version=""6.0.0"" />
+</ItemGroup>", customProperties);
+            Assert.Equal("Microsoft.NET.Sdk", sdkName);
+        }
+
+        [Fact]
         public void TheDefaultFilePathShouldBeUsedWhenAnAssemblyLocationIsEmpty()
         {
             const string programName = "testProgram";
