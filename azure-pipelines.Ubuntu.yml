@@ -13,7 +13,7 @@ jobs:
   parameters:
     name: Ubuntu
     vmImage: 'ubuntu-20.04'
-    scriptFileName: ./build.sh
+    scriptFileName: ./build.cmd CI
     initialization:
       - bash: |
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -

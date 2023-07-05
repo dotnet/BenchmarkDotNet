@@ -19,7 +19,7 @@ jobs:
         ref: master
 
     - name: Download changelog
-      run: ./build.sh --target DocFX_Changelog_Download --VersionCount 1
+      run: ./build.cmd DocsUpdate /p:Depth=1
       env:
         GITHUB_PRODUCT: ChangelogBuilder
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

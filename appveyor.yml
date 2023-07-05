@@ -37,7 +37,7 @@ before_build:
 #---------------------------------#
 
 build_script:
-- ps: .\build.ps1
+- ps: .\build.cmd CI
 
 test: off
 deploy: off

@@ -1,16 +1,8 @@
 #!/usr/bin/env pwsh
+
 $DotNetInstallerUri = 'https://dot.net/v1/dotnet-install.ps1';
-$DotNetUnixInstallerUri = 'https://dot.net/v1/dotnet-install.sh'
-$PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent
-$BuildPath = Join-Path $PSScriptRoot "build"
-
-# Make sure tools folder exists
-$ToolPath = Join-Path $PSScriptRoot "tools"
-if (!(Test-Path $ToolPath)) {
-    Write-Verbose "Creating tools directory..."
-    New-Item -Path $ToolPath -Type Directory -Force | out-null
-}
-
+$BuildPath = Split-Path $MyInvocation.MyCommand.Path -Parent
+$PSScriptRoot = Split-Path $PSScriptRoot -Parent
 
 if ($PSVersionTable.PSEdition -ne 'Core') {
     # Attempt to set highest encryption available for SecurityProtocol.
@@ -36,7 +28,6 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 $env:DOTNET_CLI_TELEMETRY_OPTOUT=1
 $env:DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX=2
 
-
 Function Remove-PathVariable([string]$VariableToRemove)
 {
     $SplitChar = ';'
@@ -60,20 +51,10 @@ Function Remove-PathVariable([string]$VariableToRemove)
 }
 
 $InstallPath = Join-Path $PSScriptRoot ".dotnet"
-$GlobalJsonPath = Join-Path $BuildPath "global.json"
+$SdkPath = Join-Path $BuildPath "sdk"
+$GlobalJsonPath = Join-Path $SdkPath "global.json"
 if (!(Test-Path $InstallPath)) {
     New-Item -Path $InstallPath -ItemType Directory -Force | Out-Null;
-}
-
-if ($IsMacOS -or $IsLinux) {
-    $ScriptPath = Join-Path $InstallPath 'dotnet-install.sh'
-    (New-Object System.Net.WebClient).DownloadFile($DotNetUnixInstallerUri, $ScriptPath);
-    & bash $ScriptPath --jsonfile "$GlobalJsonPath" --install-dir "$InstallPath" --no-path
-
-    Remove-PathVariable "$InstallPath"
-    $env:PATH = "$($InstallPath):$env:PATH"
-}
-else {
     $ScriptPath = Join-Path $InstallPath 'dotnet-install.ps1'
     (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, $ScriptPath);
     & $ScriptPath -JSonFile $GlobalJsonPath -InstallDir $InstallPath;
@@ -81,11 +62,12 @@ else {
     Remove-PathVariable "$InstallPath"
     $env:PATH = "$InstallPath;$env:PATH"
 }
+
 $env:DOTNET_ROOT=$InstallPath
 
 ###########################################################################
 # RUN BUILD SCRIPT
 ###########################################################################
-& dotnet run --project build/Build.csproj -- $args
+& dotnet run --configuration Release --project build/BenchmarkDotNet.Build/BenchmarkDotNet.Build.csproj -- $args
 
 exit $LASTEXITCODE;

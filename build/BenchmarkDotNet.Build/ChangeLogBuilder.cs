@@ -5,76 +5,26 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Build.Helpers;
+using BenchmarkDotNet.Build.Meta;
 using Cake.Core.IO;
-using JetBrains.Annotations;
 using Octokit;
 
-namespace Build;
+namespace BenchmarkDotNet.Build;
 
-public static class OctokitExtensions
+public static class ChangeLogBuilder
 {
-    public static string ToStr(this User user, string prefix) => user != null
-        ? $" ({prefix} [@{user.Login}]({user.HtmlUrl}))"
-        : "";
-
-    private static string ToStr(this Author user, string prefix) => user != null
-        ? $" ({prefix} {user.ToLink()})"
-        : "";
-
-    private static string ToStr(this Committer user, string prefix) => user != null
-        ? $" ({prefix} {user.Name})"
-        : "";
-
-    public static string ToLink(this Author user) => $"[@{user.Login}]({user.HtmlUrl})";
-
-    public static string ToLinkWithName(this Author user, string name) => $"[@{user.Login} ({name})]({user.HtmlUrl})";
-
-    public static string ToCommitMessage(this Commit commit)
+    private class Config
     {
-        var message = commit.Message.Trim().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-            .FirstOrDefault() ?? "";
-        return message.Length > 80 ? message.Substring(0, 77) + "..." : message;
-    }
+        public string CurrentMilestone { get; }
+        public string PreviousMilestone { get; }
+        public string LastCommit { get; }
 
-    public static string ToLink(this GitHubCommit commit) => $"[{commit.Sha.Substring(0, 6)}]({commit.HtmlUrl})";
-
-    public static string ToByStr(this GitHubCommit commit)
-    {
-        if (commit.Author != null)
-            return commit.Author.ToStr("by");
-        return commit.Commit.Author != null ? commit.Commit.Author.ToStr("by") : "";
-    }
-}
-
-public class ChangeLogBuilder
-{
-    public class Config
-    {
-        [PublicAPI] public string ProductHeader => Environment.GetEnvironmentVariable("GITHUB_PRODUCT");
-        [PublicAPI] public string Token => Environment.GetEnvironmentVariable("GITHUB_TOKEN");
-
-        [PublicAPI] public string RepoOwner => "dotnet";
-        [PublicAPI] public string RepoName => "BenchmarkDotNet";
-        [PublicAPI] public string CurrentMilestone { get; }
-
-        [PublicAPI] public string PreviousMilestone { get; }
-        [PublicAPI] public string LastCommit { get; }
-
-        public void Deconstruct(out string repoOwner, out string repoName, out string currentMilestone,
-            out string previousMilestone, out string lastCommit)
+        public void Deconstruct(out string currentMilestone, out string previousMilestone, out string lastCommit)
         {
-            repoOwner = RepoOwner;
-            repoName = RepoName;
             currentMilestone = CurrentMilestone;
             previousMilestone = PreviousMilestone;
             lastCommit = LastCommit;
-        }
-
-        public Config(string[] args)
-        {
-            CurrentMilestone = args[0];
-            PreviousMilestone = args[1];
-            LastCommit = args.Length <= 2 ? CurrentMilestone : args[2];
         }
 
         public Config(string currentMilestone, string previousMilestone, string lastCommit)
@@ -85,20 +35,11 @@ public class ChangeLogBuilder
         }
     }
 
-    public class AuthorEqualityComparer : IEqualityComparer<Author>
+    private class MarkdownBuilder
     {
-        public static readonly IEqualityComparer<Author> Default = new AuthorEqualityComparer();
-
-        public bool Equals(Author x, Author y) => x.Login == y.Login;
-
-        public int GetHashCode(Author author) => author.Login.GetHashCode();
-    }
-
-    public class MarkdownBuilder
-    {
-        private static IReadOnlyList<Milestone> AllMilestones = null;
+        private static IReadOnlyList<Milestone>? allMilestones;
         private static readonly Dictionary<string, string> AuthorNames = new();
-        
+
         private readonly Config config;
         private readonly StringBuilder builder;
 
@@ -115,17 +56,17 @@ public class ChangeLogBuilder
 
         private async Task<string> Build()
         {
-            var (repoOwner, repoName, milestone, previousMilestone, lastCommit) = config;
+            var (milestone, previousMilestone, lastCommit) = config;
             if (string.IsNullOrEmpty(lastCommit))
                 lastCommit = milestone;
 
-            var client = new GitHubClient(new ProductHeaderValue(config.ProductHeader));
-            var tokenAuth = new Credentials(config.Token);
+            var client = new GitHubClient(new ProductHeaderValue(Repo.ProductHeader));
+            var tokenAuth = new Credentials(Repo.Token);
             client.Credentials = tokenAuth;
-            
+
             if (milestone == "_")
             {
-                var allContributors = await client.Repository.GetAllContributors(repoOwner, repoName);
+                var allContributors = await client.Repository.GetAllContributors(Repo.Owner, Repo.Name);
                 builder.AppendLine("# All contributors");
                 builder.AppendLine();
                 foreach (var contributor in allContributors)
@@ -140,17 +81,17 @@ public class ChangeLogBuilder
                 return builder.ToString();
             }
 
-            if (AllMilestones == null)
+            if (allMilestones == null)
             {
                 var milestoneRequest = new MilestoneRequest
                 {
                     State = ItemStateFilter.All
                 };
-                AllMilestones = await client.Issue.Milestone.GetAllForRepository(repoOwner, repoName, milestoneRequest);
+                allMilestones = await client.Issue.Milestone.GetAllForRepository(Repo.Owner, Repo.Name, milestoneRequest);
             }
 
             IReadOnlyList<Issue> allIssues = Array.Empty<Issue>();
-            var targetMilestone = AllMilestones.FirstOrDefault(m => m.Title == milestone);
+            var targetMilestone = allMilestones.FirstOrDefault(m => m.Title == milestone);
             if (targetMilestone != null)
             {
                 var issueRequest = new RepositoryIssueRequest
@@ -159,7 +100,7 @@ public class ChangeLogBuilder
                     Milestone = targetMilestone.Number.ToString()
                 };
 
-                allIssues = await client.Issue.GetAllForRepository(repoOwner, repoName, issueRequest);
+                allIssues = await client.Issue.GetAllForRepository(Repo.Owner, Repo.Name, issueRequest);
             }
 
             var issues = allIssues
@@ -170,11 +111,11 @@ public class ChangeLogBuilder
                 .Where(issue => issue.PullRequest != null)
                 .OrderBy(issue => issue.Number)
                 .ToList();
-            
-            var compare = await client.Repository.Commit.Compare(repoOwner, repoName, previousMilestone, lastCommit);
+
+            var compare = await client.Repository.Commit.Compare(Repo.Owner, Repo.Name, previousMilestone, lastCommit);
             var commits = compare.Commits;
-            
-            
+
+
             foreach (var contributor in commits.Select(commit => commit.Author))
                 if (contributor != null && !AuthorNames.ContainsKey(contributor.Login))
                 {
@@ -189,14 +130,14 @@ public class ChangeLogBuilder
                     return $"{AuthorNames[commit.Author.Login]} ({commit.Author.ToLink()})".Trim();
                 return commit.Commit.Author.Name;
             }
-            
+
             var contributors = compare.Commits
                 .Select(PresentContributor)
                 .OrderBy(it => it)
                 .Distinct()
                 .ToImmutableList();
-            
-            var milestoneHtmlUlr = $"https://github.com/{repoOwner}/{repoName}/issues?q=milestone:{milestone}";
+
+            var milestoneHtmlUlr = $"https://github.com/{Repo.Owner}/{Repo.Name}/issues?q=milestone:{milestone}";
 
             builder.AppendLine("## Milestone details");
             builder.AppendLine();
@@ -218,7 +159,7 @@ public class ChangeLogBuilder
         }
 
         private void AppendList<T>(string title, IReadOnlyList<T> items, Func<T, string> format,
-            string conclusion = null)
+            string? conclusion = null)
         {
             builder.AppendLine($"## {title} ({items.Count})");
             builder.AppendLine();
@@ -233,8 +174,9 @@ public class ChangeLogBuilder
             builder.AppendLine();
         }
     }
-    
-    public static async Task Run(DirectoryPath path, string currentMilestone, string previousMilestone, string lastCommit)
+
+    public static async Task Run(DirectoryPath path, string currentMilestone, string previousMilestone,
+        string lastCommit)
     {
         try
         {

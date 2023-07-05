@@ -13,4 +13,4 @@ jobs:
   parameters:
     name: macOS
     vmImage: 'macOS-latest'
-    scriptFileName: ./build.sh
+    scriptFileName: ./build.cmd CI
