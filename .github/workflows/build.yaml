@@ -109,7 +109,7 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
       - name: Report tests results
-        uses: dorny/test-reporter@v1
+        uses: AndreyAkinshin/test-reporter@0e2c48ebec2007001dd77dd4bcbcd450b96d5a38
         if: always()
         with:
           name: test-results
