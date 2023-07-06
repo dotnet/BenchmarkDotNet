@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -73,9 +74,21 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (!restoreResult.IsSuccess)
                 return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
 
-            var buildResult = BuildNoRestore();
-            if (!buildResult.IsSuccess && RetryFailedBuildWithNoDeps) // if we fail to do the full build, we try with --no-dependencies
+            // On our CI (Windows+.NET 7), Integration tests take to much time because each benchmark run rebuilds the BenchmarkDotNet itself.
+            // To reduce the total duration of the CI workflows, we build all the projects without dependencies
+            bool forceNoDependencies = XUnitHelper.IsIntegrationTest.Value &&
+                                       RuntimeInformation.IsWindows() &&
+                                       RuntimeInformation.IsNetCore;
+
+            DotNetCliCommandResult buildResult;
+            if (forceNoDependencies)
                 buildResult = BuildNoRestoreNoDependencies();
+            else
+            {
+                buildResult = BuildNoRestore();
+                if (!buildResult.IsSuccess && RetryFailedBuildWithNoDeps) // if we fail to do the full build, we try with --no-dependencies
+                    buildResult = BuildNoRestoreNoDependencies();
+            }
 
             return buildResult.ToBuildResult(GenerateResult);
         }
