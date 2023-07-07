@@ -154,9 +154,13 @@ public class CommandLineParser
         Write(ScriptName + " ");
         WriteTask("pack ");
         WriteOption("/p:");
-        WriteArg("Version");
+        WriteArg("VersionPrefix");
         WriteOption("=");
-        WriteArg("0.1.1729-preview");
+        WriteArg("0.1.1729");
+        WriteOption(" /p:");
+        WriteArg("VersionSuffix");
+        WriteOption("=");
+        WriteArg("preview");
         WriteLine();
 
         WritePrefix();

@@ -40,7 +40,7 @@
     <VersionPrefix>0.13.5</VersionPrefix>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(VersionSuffix)' == '' ">
+  <PropertyGroup Condition=" '$(VersionStable)' == '' AND '$(VersionSuffix)' == '' ">
     <VersionSuffix>develop</VersionSuffix>
     <VersionSuffix Condition=" '$(BDN_CI_BUILD)' != '' ">ci</VersionSuffix>
   </PropertyGroup>
