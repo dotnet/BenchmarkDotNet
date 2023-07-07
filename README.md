@@ -282,15 +282,6 @@ You will avoid common pitfalls, control the accuracy of your measurements, and i
   </a>
 </div>
 
-## Build status
-
-| Build server | Platform | Build status |
-|--------------|----------|--------------|
-| Azure Pipelines | Windows | [![Azure Windows](https://dev.azure.com/dotnet/BenchmarkDotNet/_apis/build/status/BenchmarkDotNet%20-%20Windows)](https://dev.azure.com/dotnet/BenchmarkDotNet/_build/latest?definitionId=55) |
-| Azure Pipelines | Ubuntu  | [![Azure Ubuntu](https://dev.azure.com/dotnet/BenchmarkDotNet/_apis/build/status/BenchmarkDotNet%20-%20Ubuntu)](https://dev.azure.com/dotnet/BenchmarkDotNet/_build/latest?definitionId=56) |
-| Azure Pipelines | macOS | [![Azure macOS](https://dev.azure.com/dotnet/BenchmarkDotNet/_apis/build/status/BenchmarkDotNet%20-%20macOS)](https://dev.azure.com/dotnet/BenchmarkDotNet/_build/latest?definitionId=57) |
-| GitHub Actions | * | [![GitHub Actions](https://github.com/dotnet/BenchmarkDotNet/actions/workflows/build.yaml/badge.svg)](https://github.com/dotnet/BenchmarkDotNet/actions/workflows/build.yaml) |
-
 ## Contributions are welcome!
 
 BenchmarkDotNet is already a stable full-featured library that allows performing performance investigation on a professional level.
