@@ -1,5 +1,5 @@
 name: report-test-results
-run-name: Report test results for '${{ github.event.workflow_run.head_branch }}' / ${{ github.event.workflow_run.display_title }}
+run-name: Report test results for '${{ github.event.workflow_run.head_branch }}' / ${{ github.event.workflow_run.head_commit.message }}
 
 on:
   workflow_run:
