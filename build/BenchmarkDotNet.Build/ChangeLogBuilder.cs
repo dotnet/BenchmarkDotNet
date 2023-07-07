@@ -58,7 +58,7 @@ public static class ChangeLogBuilder
         {
             var (currentVersion, previousVersion, lastCommit) = config;
             if (string.IsNullOrEmpty(lastCommit))
-                lastCommit = currentVersion;
+                lastCommit = $"v{currentVersion}";
 
             var client = new GitHubClient(new ProductHeaderValue(GitHubCredentials.ProductHeader));
             var tokenAuth = new Credentials(GitHubCredentials.Token);
@@ -182,7 +182,7 @@ public static class ChangeLogBuilder
         {
             var config = new Config(currentVersion, previousVersion, lastCommit);
             var releaseNotes = await MarkdownBuilder.Build(config);
-            await File.WriteAllTextAsync(path.Combine(config.CurrentVersion + ".md").FullPath, releaseNotes);
+            await File.WriteAllTextAsync(path.Combine($"v{config.CurrentVersion}.md").FullPath, releaseNotes);
         }
         catch (Exception e)
         {
