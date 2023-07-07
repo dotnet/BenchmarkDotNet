@@ -2,7 +2,7 @@ name: report-test-results
 
 on:
   workflow_run:
-    workflows: [ 'main' ]
+    workflows: [ 'test' ]
     types:
       - completed
 
