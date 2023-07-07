@@ -6,5 +6,8 @@ public static class Repo
     public const string Name = "BenchmarkDotNet";
     public const string HttpsUrlBase = $"https://github.com/{Owner}/{Name}";
     public const string HttpsGitUrl =  $"{HttpsUrlBase}.git";
+    
     public const string ChangelogDetailsBranch = "docs-changelog-details";
+    public const string DocsStableBranch = "docs-stable";
+    public const string MasterBranch = "master";
 }

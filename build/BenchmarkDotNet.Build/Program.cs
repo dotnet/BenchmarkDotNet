@@ -119,6 +119,17 @@ public class DocsBuildTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context) => context.DocumentationRunner.Build();
 }
 
+[TaskName("Release")]
+[TaskDescription("Release new version")]
+[IsDependentOn(typeof(BuildTask))]
+[IsDependentOn(typeof(PackTask))]
+[IsDependentOn(typeof(DocsUpdateTask))]
+[IsDependentOn(typeof(DocsBuildTask))]
+public class ReleaseTask : FrostingTask<BuildContext>
+{
+    public override void Run(BuildContext context) => context.ReleaseRunner.Run();
+}
+
 [TaskName("FastTests")]
 [TaskDescription("OBSOLETE: use 'UnitTests'")]
 [IsDependentOn(typeof(UnitTestsTask))]

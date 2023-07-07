@@ -6,6 +6,7 @@ using Cake.Common.Tools.DotNet.Build;
 using Cake.Common.Tools.DotNet.Pack;
 using Cake.Common.Tools.DotNet.Restore;
 using Cake.Core;
+using Cake.Core.IO;
 
 namespace BenchmarkDotNet.Build.Runners;
 
@@ -37,6 +38,18 @@ public class BuildRunner
             MSBuildSettings = context.MsBuildSettingsBuild,
             Configuration = context.BuildConfiguration,
             Verbosity = context.BuildVerbosity
+        });
+    }
+
+    public void BuildProjectSilent(FilePath projectFile)
+    {
+        context.DotNetBuild(projectFile.FullPath, new DotNetBuildSettings
+        {
+            NoRestore = false,
+            DiagnosticOutput = false,
+            MSBuildSettings = context.MsBuildSettingsBuild,
+            Configuration = context.BuildConfiguration,
+            Verbosity = DotNetVerbosity.Quiet
         });
     }
 

@@ -15,8 +15,8 @@ public class DocumentationRunner
 {
     private readonly BuildContext context;
 
-    private readonly DirectoryPath changelogDirectory;
-    private readonly DirectoryPath changelogSrcDirectory;
+    public DirectoryPath ChangelogDirectory { get; }
+    public DirectoryPath ChangelogSrcDirectory { get; }
     private readonly DirectoryPath changelogDetailsDirectory;
     private readonly DirectoryPath docsGeneratedDirectory;
 
@@ -34,19 +34,19 @@ public class DocumentationRunner
         this.context = context;
 
         var docsDirectory = context.RootDirectory.Combine("docs");
-        changelogDirectory = docsDirectory.Combine("changelog");
-        changelogSrcDirectory = docsDirectory.Combine("_changelog");
-        changelogDetailsDirectory = changelogSrcDirectory.Combine("details");
+        ChangelogDirectory = docsDirectory.Combine("changelog");
+        ChangelogSrcDirectory = docsDirectory.Combine("_changelog");
+        changelogDetailsDirectory = ChangelogSrcDirectory.Combine("details");
         docsGeneratedDirectory = docsDirectory.Combine("_site");
 
         redirectFile = docsDirectory.Combine("_redirects").CombineWithFilePath("_redirects");
         docfxJsonFile = docsDirectory.CombineWithFilePath("docfx.json");
         readmeFile = context.RootDirectory.CombineWithFilePath("README.md");
         rootIndexFile = docsDirectory.CombineWithFilePath("index.md");
-        changelogIndexFile = changelogDirectory.CombineWithFilePath("index.md");
-        changelogFullFile = changelogDirectory.CombineWithFilePath("full.md");
-        changelogTocFile = changelogDirectory.CombineWithFilePath("toc.yml");
-        lastFooterFile = changelogSrcDirectory.Combine("footer")
+        changelogIndexFile = ChangelogDirectory.CombineWithFilePath("index.md");
+        changelogFullFile = ChangelogDirectory.CombineWithFilePath("full.md");
+        changelogTocFile = ChangelogDirectory.CombineWithFilePath("toc.yml");
+        lastFooterFile = ChangelogSrcDirectory.Combine("footer")
             .CombineWithFilePath("v" + context.VersionHistory.CurrentVersion + ".md");
     }
 
@@ -132,6 +132,10 @@ public class DocumentationRunner
     private void GenerateChangelogToc()
     {
         var content = new StringBuilder();
+
+        content.AppendLine($"- name: {context.VersionHistory.CurrentVersion}");
+        content.AppendLine($"  href: {context.VersionHistory.CurrentVersion}.md");
+        
         foreach (var version in context.VersionHistory.StableVersions.Reverse())
         {
             content.AppendLine($"- name: {version}");
@@ -153,6 +157,8 @@ public class DocumentationRunner
         content.AppendLine("");
         content.AppendLine("# Full ChangeLog");
         content.AppendLine("");
+        content.AppendLine(
+            $"[!include[{context.VersionHistory.CurrentVersion}]({context.VersionHistory.CurrentVersion}.md)]");
         foreach (var version in context.VersionHistory.StableVersions.Reverse())
             content.AppendLine($"[!include[{version}]({version}.md)]");
 
@@ -168,6 +174,7 @@ public class DocumentationRunner
         content.AppendLine("");
         content.AppendLine("# ChangeLog");
         content.AppendLine("");
+        content.AppendLine($"* @changelog.{context.VersionHistory.CurrentVersion}");
         foreach (var version in context.VersionHistory.StableVersions.Reverse())
             content.AppendLine($"* @changelog.{version}");
         content.AppendLine("* @changelog.full");
@@ -178,10 +185,10 @@ public class DocumentationRunner
     private void DocfxChangelogGenerate(string version)
     {
         EnsureChangelogDetailsExist();
-        var header = changelogSrcDirectory.Combine("header").CombineWithFilePath(version + ".md");
-        var footer = changelogSrcDirectory.Combine("footer").CombineWithFilePath(version + ".md");
-        var details = changelogSrcDirectory.Combine("details").CombineWithFilePath(version + ".md");
-        var release = changelogDirectory.CombineWithFilePath(version + ".md");
+        var header = ChangelogSrcDirectory.Combine("header").CombineWithFilePath(version + ".md");
+        var footer = ChangelogSrcDirectory.Combine("footer").CombineWithFilePath(version + ".md");
+        var details = ChangelogSrcDirectory.Combine("details").CombineWithFilePath(version + ".md");
+        var release = ChangelogDirectory.CombineWithFilePath(version + ".md");
 
         var content = new StringBuilder();
         content.AppendLine("---");
@@ -224,7 +231,7 @@ public class DocumentationRunner
                 new DeleteDirectorySettings { Force = true, Recursive = true });
 
         if (!context.DirectoryExists(changelogDetailsDirectory))
-            context.Clone(changelogDetailsDirectory, Repo.HttpsGitUrl, Repo.ChangelogDetailsBranch);
+            context.GitRunner.Clone(changelogDetailsDirectory, Repo.HttpsGitUrl, Repo.ChangelogDetailsBranch);
     }
 
     private void DocfxChangelogDownload(string version, string versionPrevious, string lastCommit = "")
@@ -273,7 +280,7 @@ public class DocumentationRunner
         var version = context.VersionHistory.CurrentVersion;
         var previousVersion = context.VersionHistory.StableVersions.Last();
         var date = context.VersionStable
-            ? DateTime.Now.ToString("MMMM dd, yyyy", CultureInfo.InvariantCulture) 
+            ? DateTime.Now.ToString("MMMM dd, yyyy", CultureInfo.InvariantCulture)
             : "TBA";
 
         var content = new StringBuilder();

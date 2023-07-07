@@ -26,6 +26,8 @@ public class BuildContext : FrostingContext
     public DotNetVerbosity BuildVerbosity { get; set; } = DotNetVerbosity.Minimal;
     public int Depth { get; set; }
     public bool VersionStable { get; }
+    public string NextVersion { get; }
+    public bool PushMode { get; }
 
     public DirectoryPath RootDirectory { get; }
     public DirectoryPath BuildDirectory { get; }
@@ -34,6 +36,8 @@ public class BuildContext : FrostingContext
     public FilePath SolutionFile { get; }
     public FilePath TemplatesTestsProjectFile { get; }
     public FilePathCollection AllPackableSrcProjects { get; }
+    public FilePath VersionsFile { get; }
+    public FilePath CommonPropsFile { get; }
 
     public DotNetMSBuildSettings MsBuildSettingsRestore { get; }
     public DotNetMSBuildSettings MsBuildSettingsBuild { get; }
@@ -45,9 +49,11 @@ public class BuildContext : FrostingContext
 
     public VersionHistory VersionHistory { get; }
 
+    public GitRunner GitRunner { get; }
     public UnitTestRunner UnitTestRunner { get; }
     public DocumentationRunner DocumentationRunner { get; }
     public BuildRunner BuildRunner { get; }
+    public ReleaseRunner ReleaseRunner { get; }
 
     public BuildContext(ICakeContext context)
         : base(context)
@@ -64,6 +70,9 @@ public class BuildContext : FrostingContext
         AllPackableSrcProjects = new FilePathCollection(context.GetFiles(RootDirectory.FullPath + "/src/**/*.csproj")
             .Where(p => !p.FullPath.Contains("Disassembler")));
 
+        VersionsFile = BuildDirectory.CombineWithFilePath("versions.txt");
+        CommonPropsFile = BuildDirectory.CombineWithFilePath("common.props");
+
         MsBuildSettingsRestore = new DotNetMSBuildSettings();
         MsBuildSettingsBuild = new DotNetMSBuildSettings();
         MsBuildSettingsPack = new DotNetMSBuildSettings();
@@ -78,6 +87,8 @@ public class BuildContext : FrostingContext
 
         Depth = -1;
         VersionStable = false;
+        NextVersion = "";
+        PushMode = false;
         if (context.Arguments.HasArgument("msbuild"))
         {
             var msBuildParameters = context.Arguments.GetArguments().First(it => it.Key == "msbuild").Value;
@@ -107,6 +118,12 @@ public class BuildContext : FrostingContext
 
                     if (name.Equals("VersionStable", StringComparison.OrdinalIgnoreCase) && value != "")
                         VersionStable = true;
+                    
+                    if (name.Equals("NextVersion", StringComparison.OrdinalIgnoreCase) && value != "")
+                        NextVersion = value;
+                    
+                    if (name.Equals("PushMode", StringComparison.OrdinalIgnoreCase) && value != "")
+                        PushMode = true;
                 }
             }
         }
@@ -129,11 +146,13 @@ public class BuildContext : FrostingContext
         nuGetPackageNames.Sort();
         NuGetPackageNames = nuGetPackageNames;
 
-        VersionHistory = new VersionHistory(this, BuildDirectory.CombineWithFilePath("versions.txt"));
+        VersionHistory = new VersionHistory(this, VersionsFile);
 
+        GitRunner = new GitRunner(this);
         UnitTestRunner = new UnitTestRunner(this);
         DocumentationRunner = new DocumentationRunner(this);
         BuildRunner = new BuildRunner(this);
+        ReleaseRunner = new ReleaseRunner(this);
     }
 
     public void GenerateFile(FilePath filePath, StringBuilder content)
@@ -160,32 +179,4 @@ public class BuildContext : FrostingContext
         }
     }
 
-    public void Clone(DirectoryPath path, string repoUrl, string branchName)
-    {
-        this.Information($"[GitClone]");
-        this.Information($"  Repo: {repoUrl}");
-        this.Information($"  Branch: {branchName}");
-        this.Information($"  Path: {path}");
-        var settings = new GitCloneSettings { Checkout = true, BranchName = branchName };
-        try
-        {
-            this.GitClone(repoUrl, path, settings);
-            this.Information("  Success");
-        }
-        catch (Exception e)
-        {
-            this.Error($"  Failed to clone via API (Exception: {e.GetType().Name})'");
-            try
-            {
-                var gitArgs = $"clone -b {branchName} {repoUrl} {path}";
-                this.Information($"  Trying to clone manually using 'git {gitArgs}'");
-                this.StartProcess("git", gitArgs);
-                this.Information("  Success");
-            }
-            catch (Exception e2)
-            {
-                throw new Exception($"Failed to clone {repoUrl} to {path} (branch: '{branchName})'", e2);
-            }
-        }
-    }
 }
