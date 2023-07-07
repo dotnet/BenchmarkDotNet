@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,7 @@ public class DocumentationRunner
     private readonly FilePath changelogIndexFile;
     private readonly FilePath changelogFullFile;
     private readonly FilePath changelogTocFile;
+    private readonly FilePath lastFooterFile;
 
     public DocumentationRunner(BuildContext context)
     {
@@ -34,8 +36,8 @@ public class DocumentationRunner
         var docsDirectory = context.RootDirectory.Combine("docs");
         changelogDirectory = docsDirectory.Combine("changelog");
         changelogSrcDirectory = docsDirectory.Combine("_changelog");
-        docsGeneratedDirectory = docsDirectory.Combine("_site");
         changelogDetailsDirectory = changelogSrcDirectory.Combine("details");
+        docsGeneratedDirectory = docsDirectory.Combine("_site");
 
         redirectFile = docsDirectory.Combine("_redirects").CombineWithFilePath("_redirects");
         docfxJsonFile = docsDirectory.CombineWithFilePath("docfx.json");
@@ -44,13 +46,16 @@ public class DocumentationRunner
         changelogIndexFile = changelogDirectory.CombineWithFilePath("index.md");
         changelogFullFile = changelogDirectory.CombineWithFilePath("full.md");
         changelogTocFile = changelogDirectory.CombineWithFilePath("toc.yml");
+        lastFooterFile = changelogSrcDirectory.Combine("footer")
+            .CombineWithFilePath("v" + context.VersionHistory.CurrentVersion + ".md");
     }
 
     public void Update()
     {
-        EnsureChangelogDetailsExist();
-
         ReadmeUpdater.Run(context);
+        UpdateLastFooter();
+
+        EnsureChangelogDetailsExist();
 
         if (string.IsNullOrEmpty(GitHubCredentials.Token))
             throw new Exception($"Environment variable '{GitHubCredentials.TokenVariableName}' is not specified!");
@@ -79,17 +84,16 @@ public class DocumentationRunner
         }
 
         DocfxChangelogDownload(
-            history.NextVersion,
+            history.CurrentVersion,
             history.StableVersions.Last(),
             "HEAD");
     }
-
 
     public void Prepare()
     {
         foreach (var version in context.VersionHistory.StableVersions)
             DocfxChangelogGenerate(version);
-        DocfxChangelogGenerate(context.VersionHistory.NextVersion);
+        DocfxChangelogGenerate(context.VersionHistory.CurrentVersion);
 
         GenerateIndexMd();
         GenerateChangelogIndex();
@@ -262,5 +266,28 @@ public class DocumentationRunner
             context.EnsureDirectoryExists(fullFilePath.GetDirectory());
             context.GenerateFile(fullFilePath, content);
         }
+    }
+
+    private void UpdateLastFooter()
+    {
+        var version = context.VersionHistory.CurrentVersion;
+        var previousVersion = context.VersionHistory.StableVersions.Last();
+        var date = context.VersionStable
+            ? DateTime.Now.ToString("MMMM dd, yyyy", CultureInfo.InvariantCulture) 
+            : "TBA";
+
+        var content = new StringBuilder();
+        content.AppendLine($"_Date: {date}_");
+        content.AppendLine("");
+        content.AppendLine(
+            $"_Milestone: [v{version}](https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av{version})_");
+        content.AppendLine(
+            $"([List of commits](https://github.com/dotnet/BenchmarkDotNet/compare/v{previousVersion}...v{version}))");
+        content.AppendLine("");
+        content.AppendLine("_NuGet Packages:_");
+        foreach (var packageName in context.NuGetPackageNames)
+            content.AppendLine($"* https://www.nuget.org/packages/{packageName}/{version}");
+
+        context.GenerateFile(lastFooterFile, content);
     }
 }

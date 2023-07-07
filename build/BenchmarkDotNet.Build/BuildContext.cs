@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,7 @@ public class BuildContext : FrostingContext
     public string BuildConfiguration { get; set; } = "Release";
     public DotNetVerbosity BuildVerbosity { get; set; } = DotNetVerbosity.Minimal;
     public int Depth { get; set; }
+    public bool VersionStable { get; }
 
     public DirectoryPath RootDirectory { get; }
     public DirectoryPath BuildDirectory { get; }
@@ -38,6 +40,8 @@ public class BuildContext : FrostingContext
     public DotNetMSBuildSettings MsBuildSettingsPack { get; }
 
     private bool IsCiBuild => !this.BuildSystem().IsLocalBuild;
+
+    public IReadOnlyCollection<string> NuGetPackageNames { get; }
 
     public VersionHistory VersionHistory { get; }
 
@@ -73,6 +77,7 @@ public class BuildContext : FrostingContext
         }
 
         Depth = -1;
+        VersionStable = false;
         if (context.Arguments.HasArgument("msbuild"))
         {
             var msBuildParameters = context.Arguments.GetArguments().First(it => it.Key == "msbuild").Value;
@@ -99,6 +104,9 @@ public class BuildContext : FrostingContext
 
                     if (name.Equals("depth", StringComparison.OrdinalIgnoreCase))
                         Depth = int.Parse(value);
+
+                    if (name.Equals("VersionStable", StringComparison.OrdinalIgnoreCase) && value != "")
+                        VersionStable = true;
                 }
             }
         }
@@ -111,6 +119,15 @@ public class BuildContext : FrostingContext
             MsBuildSettingsRestore.WithProperty("Platform", "Any CPU");
             MsBuildSettingsBuild.WithProperty("Platform", "Any CPU");
         }
+
+        var nuGetPackageNames = new List<string>();
+        nuGetPackageNames.AddRange(this
+            .GetSubDirectories(RootDirectory.Combine("src"))
+            .Select(directoryPath => directoryPath.GetDirectoryName())
+            .Where(name => !name.Contains("Disassembler", StringComparison.OrdinalIgnoreCase)));
+        nuGetPackageNames.Add("BenchmarkDotNet.Templates");
+        nuGetPackageNames.Sort();
+        NuGetPackageNames = nuGetPackageNames;
 
         VersionHistory = new VersionHistory(this, BuildDirectory.CombineWithFilePath("versions.txt"));
 
