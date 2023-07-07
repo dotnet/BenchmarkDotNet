@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Build.Meta;
 using Cake.Common;
 using Cake.Frosting;
 
@@ -84,9 +85,20 @@ public class CiTask : FrostingTask<BuildContext>
 
 [TaskName("DocsUpdate")]
 [TaskDescription("Update generated documentation files")]
-public class DocsUpdateTask : FrostingTask<BuildContext>
+public class DocsUpdateTask : FrostingTask<BuildContext>, IHelpProvider
 {
     public override void Run(BuildContext context) => context.DocumentationRunner.Update();
+
+    public HelpInfo GetHelp()
+    {
+        return new HelpInfo
+        {
+            Description = new[]
+            {
+                $"Requires environment variable '{GitHubCredentials.TokenVariableName}'"
+            }
+        };
+    }
 }
 
 [TaskName("DocsPrepare")]
