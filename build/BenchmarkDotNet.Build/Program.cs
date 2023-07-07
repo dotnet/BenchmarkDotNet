@@ -43,8 +43,7 @@ public class UnitTestsTask : FrostingTask<BuildContext>
 [IsDependentOn(typeof(BuildTask))]
 public class InTestsFullTask : FrostingTask<BuildContext>
 {
-    public override bool ShouldRun(BuildContext context) =>
-        context.IsRunningOnWindows() && !context.IsRunningOnAppVeyor;
+    public override bool ShouldRun(BuildContext context) => context.IsRunningOnWindows();
 
     public override void Run(BuildContext context) => context.UnitTestRunner.RunInTests("net462");
 }

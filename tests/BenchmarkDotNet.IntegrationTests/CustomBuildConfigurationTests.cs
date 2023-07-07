@@ -18,9 +18,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void UserCanSpecifyCustomBuildConfiguration()
         {
-            if (ContinuousIntegration.IsAppVeyorOnWindows())
-                return; // timeouts
-
             var jobWithCustomConfiguration = Job.Dry.WithCustomBuildConfiguration("CUSTOM");
 
             var config = CreateSimpleConfig(job: jobWithCustomConfiguration);

@@ -38,12 +38,11 @@
 
   <PropertyGroup Condition=" '$(VersionPrefix)' == '' ">
     <VersionPrefix>0.13.5</VersionPrefix>
-    <VersionPrefix Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' ">$(VersionPrefix).$(APPVEYOR_BUILD_NUMBER)</VersionPrefix>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(VersionSuffix)' == '' AND '$(APPVEYOR_BUILD_NUMBER)' == '' ">
+  <PropertyGroup Condition=" '$(VersionSuffix)' == '' ">
     <VersionSuffix>develop</VersionSuffix>
-    <VersionSuffix Condition=" '$(APPVEYOR_BUILD_NUMBER)' == '' AND '$(BDN_CI_BUILD)' != '' ">ci</VersionSuffix>
+    <VersionSuffix Condition=" '$(BDN_CI_BUILD)' != '' ">ci</VersionSuffix>
   </PropertyGroup>
 
   <PropertyGroup>
