@@ -1,4 +1,5 @@
 name: publish-nightly
+run-name: Publish nightly nupkg / ${{ github.event.head_commit.message }}
 
 on:
   push:
@@ -14,6 +15,11 @@ jobs:
         run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
       - name: Pack
         run: ./build.cmd pack /p:VersionSuffix=nightly.$DATE.$GITHUB_RUN_NUMBER
+      - name: Upload nupkg to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: nupkgs
+          path: "**/*.nupkg"
       - name: Publish nupkg
         env:
           MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}

@@ -1,4 +1,5 @@
 name: run-tests
+run-name: Run tests / ${{ github.event.head_commit.message }}
 
 on:
   pull_request:
@@ -95,7 +96,7 @@ jobs:
           name: test-macos-trx
           path: "**/*.trx"
   
-  docs-spellcheck:
+  spellcheck-docs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

@@ -1,4 +1,5 @@
 name: report-test-results
+run-name: Report test results for '${{ github.event.workflow_run.head_branch }}' / ${{ github.event.workflow_run.display_title }}
 
 on:
   workflow_run:
@@ -11,12 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
-      - name: Print info about the target workflow_run
-        run : |
-          echo "workflow_run: ${{ github.event.workflow_run }}"
-          echo "head_sha: ${{ github.event.workflow_run.head_sha }}"
-          echo "workflow_id: ${{ github.event.workflow_run.workflow_id }}"
-          echo "head_branch: ${{ github.event.workflow_run.head_branch }}"
       - name: Download Artifacts
         uses: dawidd6/action-download-artifact@v2
         with:
