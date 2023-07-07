@@ -9,7 +9,7 @@ on:
 permissions: write-all
 
 jobs:
-  build:
+  generate:
     runs-on: windows-latest
     steps:
 

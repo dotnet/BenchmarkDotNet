@@ -2,7 +2,7 @@ name: report-test-results
 
 on:
   workflow_run:
-    workflows: [ 'test' ]
+    workflows: [ 'run-tests' ]
     types:
       - completed
 
@@ -20,7 +20,7 @@ jobs:
       - name: Report tests results
         uses: AndreyAkinshin/test-reporter@0e2c48ebec2007001dd77dd4bcbcd450b96d5a38
         with:
-          name: test-results
+          name: report
           path: "**/*.trx"
           reporter: dotnet-trx
           fail-on-error: true
