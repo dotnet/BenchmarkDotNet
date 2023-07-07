@@ -9,11 +9,7 @@ on:
 jobs:
   report:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-      issues: write
-      pull-requests: write
+    permissions: write-all
     steps:
       - name: Download Artifacts
         uses: dawidd6/action-download-artifact@v2
