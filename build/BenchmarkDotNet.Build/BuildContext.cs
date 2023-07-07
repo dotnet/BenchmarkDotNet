@@ -29,14 +29,6 @@ public class BuildContext : FrostingContext
     public DirectoryPath RootDirectory { get; }
     public DirectoryPath BuildDirectory { get; }
     public DirectoryPath ArtifactsDirectory { get; }
-    public DirectoryPath DocsDirectory { get; }
-    public FilePath DocfxJsonFile { get; }
-
-    public DirectoryPath ChangeLogDirectory { get; }
-    public DirectoryPath ChangeLogGenDirectory { get; }
-
-    public DirectoryPath RedirectRootDirectory { get; }
-    public DirectoryPath RedirectTargetDirectory { get; }
 
     public FilePath SolutionFile { get; }
     public FilePath TemplatesTestsProjectFile { get; }
@@ -56,9 +48,9 @@ public class BuildContext : FrostingContext
 
     public bool IsLocalBuild => this.BuildSystem().IsLocalBuild;
     public bool IsCiBuild => !this.BuildSystem().IsLocalBuild;
-    
+
     public VersionHistory VersionHistory { get; }
-    
+
     public UnitTestRunner UnitTestRunner { get; }
     public DocumentationRunner DocumentationRunner { get; }
     public BuildRunner BuildRunner { get; }
@@ -69,17 +61,10 @@ public class BuildContext : FrostingContext
         RootDirectory = new DirectoryPath(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent?.Parent?.FullName);
         BuildDirectory = RootDirectory.Combine("build");
         ArtifactsDirectory = RootDirectory.Combine("artifacts");
-        DocsDirectory = RootDirectory.Combine("docs");
-        DocfxJsonFile = DocsDirectory.CombineWithFilePath("docfx.json");
-        
-        ChangeLogDirectory = RootDirectory.Combine("docs").Combine("changelog");
-        ChangeLogGenDirectory = RootDirectory.Combine("docs").Combine("_changelog");
 
-        RedirectRootDirectory = RootDirectory.Combine("docs").Combine("_redirects");
-        RedirectTargetDirectory = RootDirectory.Combine("docs").Combine("_site");
 
         SolutionFile = RootDirectory.CombineWithFilePath("BenchmarkDotNet.sln");
-        
+
         TemplatesTestsProjectFile = RootDirectory.Combine("templates")
             .CombineWithFilePath("BenchmarkDotNet.Templates.csproj");
         AllPackableSrcProjects = new FilePathCollection(context.GetFiles(RootDirectory.FullPath + "/src/**/*.csproj")
@@ -127,7 +112,7 @@ public class BuildContext : FrostingContext
                 }
             }
         }
-        
+
         // NativeAOT build requires VS C++ tools to be added to $path via vcvars64.bat
         // but once we do that, dotnet restore fails with:
         // "Please specify a valid solution configuration using the Configuration and Platform properties"
@@ -143,92 +128,57 @@ public class BuildContext : FrostingContext
         DocumentationRunner = new DocumentationRunner(this);
         BuildRunner = new BuildRunner(this);
     }
-    
-    public void EnsureChangelogDetailsExist(bool forceClean = false)
-    {
-        var path = ChangeLogGenDirectory.Combine("details");
-        if (this.DirectoryExists(path) && forceClean)
-            this.DeleteDirectory(path, new DeleteDirectorySettings() { Force = true, Recursive = true });
 
-        if (!this.DirectoryExists(path))
+    public void GenerateFile(FilePath filePath, StringBuilder content)
+    {
+        GenerateFile(filePath, content.ToString());
+    }
+
+    public void GenerateFile(FilePath filePath, string content)
+    {
+        var relativePath = RootDirectory.GetRelativePath(filePath);
+        if (this.FileExists(filePath))
         {
-            var repo = Repo.HttpsGitUrl;
-            var branchName = Repo.ChangelogDetailsBranch;
-            var settings = new GitCloneSettings { Checkout = true, BranchName = branchName };
-            this.Information($"Trying to clone {repo} to {path} (branch: '{branchName})");
+            var oldContent = this.FileReadText(filePath);
+            if (content == oldContent)
+                return;
+
+            this.FileWriteText(filePath, content);
+            this.Information("[Updated] " + relativePath);
+        }
+        else
+        {
+            this.FileWriteText(filePath, content);
+            this.Information("[Generated] " + relativePath);
+        }
+    }
+
+    public void Clone(DirectoryPath path, string repoUrl, string branchName)
+    {
+        this.Information($"[GitClone]");
+        this.Information($"  Repo: {repoUrl}");
+        this.Information($"  Branch: {branchName}");
+        this.Information($"  Path: {path}");
+        var settings = new GitCloneSettings { Checkout = true, BranchName = branchName };
+        try
+        {
+            this.GitClone(repoUrl, path, settings);
+            this.Information("  Success");
+        }
+        catch (Exception e)
+        {
+            this.Error($"  Failed to clone via API (Exception: {e.GetType().Name})'");
             try
             {
-                this.GitClone(repo, path, settings);
+                var gitArgs = $"clone -b {branchName} {repoUrl} {path}";
+                this.Information($"  Trying to clone manually using 'git {gitArgs}'");
+                this.StartProcess("git", gitArgs);
+                this.Information("  Success");
             }
-            catch (Exception e)
+            catch (Exception e2)
             {
-                this.Error($"Failed to clone {repo} to {path} (branch: '{branchName}), Exception: {e.GetType().Name}'");
-                try
-                {
-                    var gitArgs = $"clone -b {branchName} {repo} {path}";
-                    this.Information($"Trying to clone manually: 'git {gitArgs}'");
-                    this.StartProcess("git", gitArgs);
-                }
-                catch (Exception e2)
-                {
-                    throw new Exception($"Failed to clone {repo} to {path} (branch: '{branchName})'", e2);
-                }
+                throw new Exception($"Failed to clone {repoUrl} to {path} (branch: '{branchName})'", e2);
             }
-
-            this.Information("Clone is successfully finished");
-            this.Information("");
         }
     }
-
-    public void DocfxChangelogDownload(string version, string versionPrevious, string lastCommit = "")
-    {
-        EnsureChangelogDetailsExist();
-        this.Information("DocfxChangelogDownload: " + version);
-        var path = ChangeLogGenDirectory.Combine("details");
-        ChangeLogBuilder.Run(path, version, versionPrevious, lastCommit).Wait();
-    }
-
-    public void DocfxChangelogGenerate(string version)
-    {
-        EnsureChangelogDetailsExist();
-        this.Information("DocfxChangelogGenerate: " + version);
-        var header = ChangeLogGenDirectory.Combine("header").CombineWithFilePath(version + ".md");
-        var footer = ChangeLogGenDirectory.Combine("footer").CombineWithFilePath(version + ".md");
-        var details = ChangeLogGenDirectory.Combine("details").CombineWithFilePath(version + ".md");
-        var release = ChangeLogDirectory.CombineWithFilePath(version + ".md");
-
-        var content = new StringBuilder();
-        content.AppendLine("---");
-        content.AppendLine("uid: changelog." + version);
-        content.AppendLine("---");
-        content.AppendLine("");
-        content.AppendLine("# BenchmarkDotNet " + version);
-        content.AppendLine("");
-        content.AppendLine("");
-
-        if (this.FileExists(header))
-        {
-            content.AppendLine(this.FileReadText(header));
-            content.AppendLine("");
-            content.AppendLine("");
-        }
-
-        if (this.FileExists(details))
-        {
-            content.AppendLine(this.FileReadText(details));
-            content.AppendLine("");
-            content.AppendLine("");
-        }
-
-        if (this.FileExists(footer))
-        {
-            content.AppendLine("## Additional details");
-            content.AppendLine("");
-            content.AppendLine(this.FileReadText(footer));
-        }
-
-        this.FileWriteText(release, content.ToString());
-    }
-
-
 }

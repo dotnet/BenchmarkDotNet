@@ -16,21 +16,21 @@ public static class ChangeLogBuilder
 {
     private class Config
     {
-        public string CurrentMilestone { get; }
-        public string PreviousMilestone { get; }
+        public string CurrentVersion { get; }
+        public string PreviousVersion { get; }
         public string LastCommit { get; }
 
         public void Deconstruct(out string currentMilestone, out string previousMilestone, out string lastCommit)
         {
-            currentMilestone = CurrentMilestone;
-            previousMilestone = PreviousMilestone;
+            currentMilestone = CurrentVersion;
+            previousMilestone = PreviousVersion;
             lastCommit = LastCommit;
         }
 
-        public Config(string currentMilestone, string previousMilestone, string lastCommit)
+        public Config(string currentVersion, string previousVersion, string lastCommit)
         {
-            CurrentMilestone = currentMilestone;
-            PreviousMilestone = previousMilestone;
+            CurrentVersion = currentVersion;
+            PreviousVersion = previousVersion;
             LastCommit = lastCommit;
         }
     }
@@ -56,15 +56,15 @@ public static class ChangeLogBuilder
 
         private async Task<string> Build()
         {
-            var (milestone, previousMilestone, lastCommit) = config;
+            var (currentVersion, previousVersion, lastCommit) = config;
             if (string.IsNullOrEmpty(lastCommit))
-                lastCommit = milestone;
+                lastCommit = currentVersion;
 
-            var client = new GitHubClient(new ProductHeaderValue(Repo.ProductHeader));
-            var tokenAuth = new Credentials(Repo.Token);
+            var client = new GitHubClient(new ProductHeaderValue(GitHubCredentials.ProductHeader));
+            var tokenAuth = new Credentials(GitHubCredentials.Token);
             client.Credentials = tokenAuth;
 
-            if (milestone == "_")
+            if (currentVersion == "_")
             {
                 var allContributors = await client.Repository.GetAllContributors(Repo.Owner, Repo.Name);
                 builder.AppendLine("# All contributors");
@@ -87,11 +87,12 @@ public static class ChangeLogBuilder
                 {
                     State = ItemStateFilter.All
                 };
-                allMilestones = await client.Issue.Milestone.GetAllForRepository(Repo.Owner, Repo.Name, milestoneRequest);
+                allMilestones =
+                    await client.Issue.Milestone.GetAllForRepository(Repo.Owner, Repo.Name, milestoneRequest);
             }
 
             IReadOnlyList<Issue> allIssues = Array.Empty<Issue>();
-            var targetMilestone = allMilestones.FirstOrDefault(m => m.Title == milestone);
+            var targetMilestone = allMilestones.FirstOrDefault(m => m.Title == $"v{currentVersion}");
             if (targetMilestone != null)
             {
                 var issueRequest = new RepositoryIssueRequest
@@ -112,9 +113,9 @@ public static class ChangeLogBuilder
                 .OrderBy(issue => issue.Number)
                 .ToList();
 
-            var compare = await client.Repository.Commit.Compare(Repo.Owner, Repo.Name, previousMilestone, lastCommit);
+            var compare =
+                await client.Repository.Commit.Compare(Repo.Owner, Repo.Name, $"v{previousVersion}", lastCommit);
             var commits = compare.Commits;
-
 
             foreach (var contributor in commits.Select(commit => commit.Author))
                 if (contributor != null && !AuthorNames.ContainsKey(contributor.Login))
@@ -137,11 +138,11 @@ public static class ChangeLogBuilder
                 .Distinct()
                 .ToImmutableList();
 
-            var milestoneHtmlUlr = $"https://github.com/{Repo.Owner}/{Repo.Name}/issues?q=milestone:{milestone}";
+            var milestoneHtmlUlr = $"https://github.com/{Repo.Owner}/{Repo.Name}/issues?q=milestone:{currentVersion}";
 
             builder.AppendLine("## Milestone details");
             builder.AppendLine();
-            builder.AppendLine($"In the [{milestone}]({milestoneHtmlUlr}) scope, ");
+            builder.AppendLine($"In the [{currentVersion}]({milestoneHtmlUlr}) scope, ");
             builder.Append(issues.Count + " issues were resolved and ");
             builder.AppendLine(pullRequests.Count + " pull requests were merged.");
             builder.AppendLine($"This release includes {commits.Count} commits by {contributors.Count} contributors.");
@@ -175,14 +176,13 @@ public static class ChangeLogBuilder
         }
     }
 
-    public static async Task Run(DirectoryPath path, string currentMilestone, string previousMilestone,
-        string lastCommit)
+    public static async Task Run(DirectoryPath path, string currentVersion, string previousVersion, string lastCommit)
     {
         try
         {
-            var config = new Config(currentMilestone, previousMilestone, lastCommit);
+            var config = new Config(currentVersion, previousVersion, lastCommit);
             var releaseNotes = await MarkdownBuilder.Build(config);
-            await File.WriteAllTextAsync(path.Combine(config.CurrentMilestone + ".md").FullPath, releaseNotes);
+            await File.WriteAllTextAsync(path.Combine(config.CurrentVersion + ".md").FullPath, releaseNotes);
         }
         catch (Exception e)
         {
