@@ -1,4 +1,4 @@
-name: docs-changelog-generate
+name: generate-changelog
 
 on:
   push:

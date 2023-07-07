@@ -1,4 +1,4 @@
-name: docs-stable
+name: generate-gh-pages
 
 on:
   push:

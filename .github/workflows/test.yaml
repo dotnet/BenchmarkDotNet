@@ -1,14 +1,12 @@
-name: build
+name: test
 
 on:
   pull_request:
   push:
 
-permissions: write-all
-
 jobs:
 
-  build-windows-core:
+  test-windows-core:
     runs-on: windows-latest
     steps:
       - name: Disable Windows Defender
@@ -26,13 +24,13 @@ jobs:
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           ./build.cmd InTestsCore -e
       - name: Upload test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: build-windows-core-trx
+          name: test-windows-core-trx
           path: "**/*.trx"
 
-  build-windows-full:
+  test-windows-full:
     runs-on: windows-latest
     steps:
       - name: Disable Windows Defender
@@ -50,13 +48,13 @@ jobs:
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           ./build.cmd InTestsFull -e
       - name: Upload test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: build-windows-full-trx
+          name: test-windows-full-trx
           path: "**/*.trx"
 
-  build-linux:
+  test-linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -74,13 +72,13 @@ jobs:
       - name: Run task 'InTestsCore'
         run: ./build.cmd InTestsCore -e
       - name: Upload test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: build-linux-trx
+          name: test-linux-trx
           path: "**/*.trx"
 
-  build-macos:
+  test-macos:
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v3
@@ -91,28 +89,21 @@ jobs:
       - name: Run task 'InTestsCore'
         run: ./build.cmd InTestsCore -e
       - name: Upload test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: build-macos-trx
+          name: test-macos-trx
           path: "**/*.trx"
   
-  report:
-    concurrency: ci-${{ github.ref }}
-    needs: [build-windows-full, build-windows-core, build-linux, build-macos]
+  docs-spellcheck:
     runs-on: ubuntu-latest
-    if: always()
     steps:
       - uses: actions/checkout@v3
-      - name: Download Artifacts
-        uses: actions/download-artifact@v3
-      - name: Display structure of downloaded files
-        run: ls -R
-      - name: Report tests results
-        uses: AndreyAkinshin/test-reporter@0e2c48ebec2007001dd77dd4bcbcd450b96d5a38
-        if: always()
+      - uses: actions/setup-node@v1
+        name: Setup node
         with:
-          name: test-results
-          path: "**/*.trx"
-          reporter: dotnet-trx
-          fail-on-error: true
+          node-version: "16"
+      - run: npm install -g cspell
+        name: Install cSpell
+      - run: cspell --config ./cSpell.json "docs/**/*.md" --no-progress
+        name: Run cSpell
