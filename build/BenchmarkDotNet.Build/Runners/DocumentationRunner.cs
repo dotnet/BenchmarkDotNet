@@ -87,39 +87,43 @@ public class DocumentationRunner
         if (string.IsNullOrEmpty(Repo.Token))
             throw new Exception($"Environment variable '{Repo.TokenVar}' is not specified!");
 
-        var count = context.Depth;
-        var total = DocumentationHelper.BdnAllVersions.Length;
+        var history = context.VersionHistory; 
 
-        if (count == 0)
+        var depth = context.Depth;
+        var stableVersionCount = history.StableVersions.Length;
+
+        if (depth == 0)
         {
             context.DocfxChangelogDownload(
-                DocumentationHelper.BdnAllVersions.First(),
-                DocumentationHelper.BdnFirstCommit);
+                history.StableVersions.First(),
+                history.FirstCommit);
 
-            for (int i = 1; i < total; i++)
+            for (int i = 1; i < stableVersionCount; i++)
                 context.DocfxChangelogDownload(
-                    DocumentationHelper.BdnAllVersions[i],
-                    DocumentationHelper.BdnAllVersions[i - 1]);
+                    history.StableVersions[i],
+                    history.StableVersions[i - 1]);
         }
-        else if (count > 0)
+        else if (depth > 0)
         {
-            for (int i = Math.Max(total - count, 1); i < total; i++)
+            for (int i = Math.Max(stableVersionCount - depth, 1); i < stableVersionCount; i++)
                 context.DocfxChangelogDownload(
-                    DocumentationHelper.BdnAllVersions[i],
-                    DocumentationHelper.BdnAllVersions[i - 1]);
+                    history.StableVersions[i],
+                    history.StableVersions[i - 1]);
         }
 
         context.DocfxChangelogDownload(
-            DocumentationHelper.BdnNextVersion,
-            DocumentationHelper.BdnAllVersions.Last(),
+            history.NextVersion,
+            history.StableVersions.Last(),
             "HEAD");
     }
 
     public void Prepare()
     {
-        foreach (var version in DocumentationHelper.BdnAllVersions)
+        var history = context.VersionHistory;
+        
+        foreach (var version in history.StableVersions)
             context.DocfxChangelogGenerate(version);
-        context.DocfxChangelogGenerate(DocumentationHelper.BdnNextVersion);
+        context.DocfxChangelogGenerate(history.NextVersion);
 
         context.Information("DocfxChangelogGenerate: index.md");
         var indexContent = new StringBuilder();
@@ -129,7 +133,7 @@ public class DocumentationRunner
         indexContent.AppendLine("");
         indexContent.AppendLine("# ChangeLog");
         indexContent.AppendLine("");
-        foreach (var version in DocumentationHelper.BdnAllVersions.Reverse())
+        foreach (var version in history.StableVersions.Reverse())
             indexContent.AppendLine($"* @changelog.{version}");
         indexContent.AppendLine("* @changelog.full");
         context.FileWriteText(context.ChangeLogDirectory.CombineWithFilePath("index.md"), indexContent.ToString());
@@ -142,13 +146,13 @@ public class DocumentationRunner
         fullContent.AppendLine("");
         fullContent.AppendLine("# Full ChangeLog");
         fullContent.AppendLine("");
-        foreach (var version in DocumentationHelper.BdnAllVersions.Reverse())
+        foreach (var version in history.StableVersions.Reverse())
             fullContent.AppendLine($"[!include[{version}]({version}.md)]");
         context.FileWriteText(context.ChangeLogDirectory.CombineWithFilePath("full.md"), fullContent.ToString());
 
         context.Information("DocfxChangelogGenerate: toc.yml");
         var tocContent = new StringBuilder();
-        foreach (var version in DocumentationHelper.BdnAllVersions.Reverse())
+        foreach (var version in history.StableVersions.Reverse())
         {
             tocContent.AppendLine($"- name: {version}");
             tocContent.AppendLine($"  href: {version}.md");

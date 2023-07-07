@@ -27,6 +27,7 @@ public class BuildContext : FrostingContext
     public int Depth { get; set; }
 
     public DirectoryPath RootDirectory { get; }
+    public DirectoryPath BuildDirectory { get; }
     public DirectoryPath ArtifactsDirectory { get; }
     public DirectoryPath DocsDirectory { get; }
     public FilePath DocfxJsonFile { get; }
@@ -56,6 +57,8 @@ public class BuildContext : FrostingContext
     public bool IsLocalBuild => this.BuildSystem().IsLocalBuild;
     public bool IsCiBuild => !this.BuildSystem().IsLocalBuild;
     
+    public VersionHistory VersionHistory { get; }
+    
     public UnitTestRunner UnitTestRunner { get; }
     public DocumentationRunner DocumentationRunner { get; }
     public BuildRunner BuildRunner { get; }
@@ -64,6 +67,7 @@ public class BuildContext : FrostingContext
         : base(context)
     {
         RootDirectory = new DirectoryPath(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent?.Parent?.FullName);
+        BuildDirectory = RootDirectory.Combine("build");
         ArtifactsDirectory = RootDirectory.Combine("artifacts");
         DocsDirectory = RootDirectory.Combine("docs");
         DocfxJsonFile = DocsDirectory.CombineWithFilePath("docfx.json");
@@ -132,6 +136,8 @@ public class BuildContext : FrostingContext
             MsBuildSettingsRestore.WithProperty("Platform", "Any CPU");
             MsBuildSettingsBuild.WithProperty("Platform", "Any CPU");
         }
+
+        VersionHistory = new VersionHistory(this, BuildDirectory.CombineWithFilePath("versions.txt"));
 
         UnitTestRunner = new UnitTestRunner(this);
         DocumentationRunner = new DocumentationRunner(this);
