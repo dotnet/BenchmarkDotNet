@@ -1,76 +1,11 @@
 # Team
 
-This project is supported by the [.NET Foundation](https://dotnetfoundation.org).
-
 Maintainers:
   [Andrey Akinshin](https://github.com/AndreyAkinshin) (Project Lead),
-  [Adam Sitnik](https://github.com/adamsitnik).
+  [Adam Sitnik](https://github.com/adamsitnik),
+  [Yegor Stepanov](https://github.com/YegorStepanov),
+  [Tim Cassell](https://github.com/timcassell).
 
-Contributors:
+[All contributors on GitHub (200+)](https://github.com/dotnet/BenchmarkDotNet/graphs/contributors)
 
-* [@mattwarren (Matt Warren)](https://github.com/mattwarren)
-* [@alinasmirnova (Alina Smirnova)](https://github.com/alinasmirnova)
-* [@ig-sinicyn](https://github.com/ig-sinicyn)
-* [@Ky7m (Igor Fesenko)](https://github.com/Ky7m)
-* [@epeshk (Evgeny Peshkov)](https://github.com/epeshk)
-* [@redknightlois (Federico Andres Lois)](https://github.com/redknightlois)
-* [@Teknikaali (Anssi Kettunen)](https://github.com/Teknikaali)
-* [@morgan-kn (Irina Ananyeva)](https://github.com/morgan-kn)
-* [@gigi81 (Luigi Grilli)](https://github.com/gigi81)
-* [@lukasz-pyrzyk (Łukasz Pyrzyk)](https://github.com/lukasz-pyrzyk)
-* [@Rizzen (Mark)](https://github.com/Rizzen)
-* [@FransBouma (Frans Bouma)](https://github.com/FransBouma)
-* [@AmadeusW (Amadeusz Wieczorek)](https://github.com/AmadeusW)
-* [@lahma (Marko Lahma)](https://github.com/lahma)
-* [@ppanyukov (Philip Panyukov)](https://github.com/ppanyukov)
-* [@roji (Shay Rojansky)](https://github.com/roji)
-* [@mtschneiders (Mateus Artur Schneiders)](https://github.com/mtschneiders)
-* [@mfilippov (Mikhail Filippov)](https://github.com/mfilippov)
-* [@svick (Petr Onderka)](https://github.com/svick)
-* [@alexandrnikitin (Alexandr Nikitin)](https://github.com/alexandrnikitin)
-* [@Chrisgozd (Christopher Gozdziewski)](https://github.com/Chrisgozd)
-* [@dmitry-ra (Dmitry Razumikhin)](https://github.com/dmitry-ra)
-* [@ENikS (Eugene Sadovoi)](https://github.com/ENikS)
-* [@GeorgePlotnikov (George Plotnikov)](https://github.com/GeorgePlotnikov)
-* [@ltrzesniewski (Lucas Trzesniewski)](https://github.com/ltrzesniewski)
-* [@cdmihai (Mihai Codoban)](https://github.com/cdmihai)
-* [@shoelzer (Steve Hoelzer)](https://github.com/shoelzer)
-* [@krk (Kerem)](https://github.com/krk)
-* [@ipjohnson (Ian Johnson)](https://github.com/ipjohnson)
-* [@stevedesmond-ca (Steve Desmond)](https://github.com/stevedesmond-ca)
-* [@aarondandy (Aaron Dandy)](https://github.com/aarondandy)
-* [@AlekseiKudelia](https://github.com/AlekseiKudelia)
-* [@aidmsu (Andrey Dorokhov)](https://github.com/aidmsu)
-* [@arthrp (Arthur)](https://github.com/arthrp)
-* [@benjamin-hodgson (Benjamin Hodgson)](https://github.com/benjamin-hodgson)
-* [@jawn (Bernard Vander Beken)](https://github.com/jawn)
-* [@dfederm (David Federman)](https://github.com/dfederm)
-* [@davkean (David Kean)](https://github.com/davkean)
-* [@DenisIstomin (Denis Istomin)](https://github.com/DenisIstomin)
-* [@mijay (Dmitry Kononchuk)](https://github.com/mijay)
-* [@eerhardt (Eric Erhardt)](https://github.com/eerhardt)
-* [@onionhammer (Erik O'Leary)](https://github.com/onionhammer)
-* [@ForNeVeR (Friedrich von Never)](https://github.com/ForNeVeR)
-* [@IanKemp (Ian Kemp)](https://github.com/IanKemp)
-* [@cloudRoutine (Jared Hester)](https://github.com/cloudRoutine)
-* [@cincuranet (Jiri Cincura ↹)](https://github.com/cincuranet)
-* [@JohanLarsson (Johan Larsson)](https://github.com/JohanLarsson)
-* [@Matthew-Bonner (Matthew Bonner)](https://github.com/Matthew-Bonner)
-* [@mmayr-at (Michael Mayr)](https://github.com/mmayr-at)
-* [@MishaHusiuk (MishaHusiuk)](https://github.com/MishaHusiuk)
-* [@NN--- (NN)](https://github.com/NN---)
-* [@paulness (Paul Ness)](https://github.com/paulness)
-* [@pentp (Pent Ploompuu)](https://github.com/pentp)
-* [@RichLinnell (Rich Linnell)](https://github.com/RichLinnell)
-* [@rolshevsky (Rostislav Olshevsky)](https://github.com/rolshevsky)
-* [@russcam (Russ Cam)](https://github.com/russcam)
-* [@goldshtn (Sasha Goldshtein)](https://github.com/goldshtn)
-* [@ScottHutchinson (Scott Hutchinson)](https://github.com/ScottHutchinson)
-* [@smitpatel (Smit Patel)](https://github.com/smitpatel)
-* [@afmorris (Tony Morris)](https://github.com/afmorris)
-* [@Tornhoof](https://github.com/Tornhoof)
-* [@vkkoshelev](https://github.com/vkkoshelev)
-* [@factormystic](https://github.com/factormystic)
-* [@nietras](https://github.com/nietras)
-
-[All contributors on GitHub](https://github.com/dotnet/BenchmarkDotNet/graphs/contributors)
+BenchmarkDotNet is a part of the [.NET Foundation](https://dotnetfoundation.org).
