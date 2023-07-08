@@ -133,13 +133,13 @@ public class DocumentationRunner
     {
         var content = new StringBuilder();
 
-        content.AppendLine($"- name: {context.VersionHistory.CurrentVersion}");
-        content.AppendLine($"  href: {context.VersionHistory.CurrentVersion}.md");
+        content.AppendLine($"- name: v{context.VersionHistory.CurrentVersion}");
+        content.AppendLine($"  href: v{context.VersionHistory.CurrentVersion}.md");
         
         foreach (var version in context.VersionHistory.StableVersions.Reverse())
         {
-            content.AppendLine($"- name: {version}");
-            content.AppendLine($"  href: {version}.md");
+            content.AppendLine($"- name: v{version}");
+            content.AppendLine($"  href: v{version}.md");
         }
 
         content.AppendLine("- name: Full ChangeLog");
@@ -158,9 +158,9 @@ public class DocumentationRunner
         content.AppendLine("# Full ChangeLog");
         content.AppendLine("");
         content.AppendLine(
-            $"[!include[{context.VersionHistory.CurrentVersion}]({context.VersionHistory.CurrentVersion}.md)]");
+            $"[!include[v{context.VersionHistory.CurrentVersion}](v{context.VersionHistory.CurrentVersion}.md)]");
         foreach (var version in context.VersionHistory.StableVersions.Reverse())
-            content.AppendLine($"[!include[{version}]({version}.md)]");
+            content.AppendLine($"[!include[v{version}](v{version}.md)]");
 
         context.GenerateFile(changelogFullFile, content);
     }
@@ -174,9 +174,9 @@ public class DocumentationRunner
         content.AppendLine("");
         content.AppendLine("# ChangeLog");
         content.AppendLine("");
-        content.AppendLine($"* @changelog.{context.VersionHistory.CurrentVersion}");
+        content.AppendLine($"* @changelog.v{context.VersionHistory.CurrentVersion}");
         foreach (var version in context.VersionHistory.StableVersions.Reverse())
-            content.AppendLine($"* @changelog.{version}");
+            content.AppendLine($"* @changelog.v{version}");
         content.AppendLine("* @changelog.full");
 
         context.GenerateFile(changelogIndexFile, content);
@@ -185,17 +185,18 @@ public class DocumentationRunner
     private void DocfxChangelogGenerate(string version)
     {
         EnsureChangelogDetailsExist();
-        var header = ChangelogSrcDirectory.Combine("header").CombineWithFilePath(version + ".md");
-        var footer = ChangelogSrcDirectory.Combine("footer").CombineWithFilePath(version + ".md");
-        var details = ChangelogSrcDirectory.Combine("details").CombineWithFilePath(version + ".md");
-        var release = ChangelogDirectory.CombineWithFilePath(version + ".md");
+        var md = $"v{version}.md";
+        var header = ChangelogSrcDirectory.Combine("header").CombineWithFilePath(md);
+        var footer = ChangelogSrcDirectory.Combine("footer").CombineWithFilePath(md);
+        var details = ChangelogSrcDirectory.Combine("details").CombineWithFilePath(md);
+        var release = ChangelogDirectory.CombineWithFilePath(md);
 
         var content = new StringBuilder();
         content.AppendLine("---");
-        content.AppendLine("uid: changelog." + version);
+        content.AppendLine("uid: changelog.v" + version);
         content.AppendLine("---");
         content.AppendLine("");
-        content.AppendLine("# BenchmarkDotNet " + version);
+        content.AppendLine("# BenchmarkDotNet v" + version);
         content.AppendLine("");
         content.AppendLine("");
 

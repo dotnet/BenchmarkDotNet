@@ -6,3 +6,7 @@
 #breadcrumb {
   display: none;
 }
+
+.affix {
+  display: none !important;
+}

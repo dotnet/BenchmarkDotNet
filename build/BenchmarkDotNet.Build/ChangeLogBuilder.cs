@@ -136,11 +136,11 @@ public static class ChangeLogBuilder
                 .Distinct()
                 .ToImmutableList();
 
-            var milestoneHtmlUlr = $"https://github.com/{Repo.Owner}/{Repo.Name}/issues?q=milestone:{currentVersion}";
+            var milestoneHtmlUlr = $"https://github.com/{Repo.Owner}/{Repo.Name}/issues?q=milestone:v{currentVersion}";
 
             builder.AppendLine("## Milestone details");
             builder.AppendLine();
-            builder.AppendLine($"In the [{currentVersion}]({milestoneHtmlUlr}) scope, ");
+            builder.AppendLine($"In the [v{currentVersion}]({milestoneHtmlUlr}) scope, ");
             builder.Append(issues.Count + " issues were resolved and ");
             builder.AppendLine(pullRequests.Count + " pull requests were merged.");
             builder.AppendLine($"This release includes {commits.Count} commits by {contributors.Count} contributors.");
