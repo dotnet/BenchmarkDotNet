@@ -8,11 +8,9 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
-using Perfolizer.Horology;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -22,8 +20,6 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
     {
         // NativeAot takes a long time to build, so not including it in these tests.
         // We also don't test InProcessNoEmitToolchain because it is known to be less accurate than code-gen toolchains.
-
-        private static readonly TimeInterval FallbackCpuResolutionValue = TimeInterval.FromNanoseconds(0.2d);
 
         public ExpectedBenchmarkResultsTests(ITestOutputHelper output) : base(output) { }
 
@@ -109,9 +105,6 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)))
             );
 
-            var cpuResolution = RuntimeInformation.GetCpuInfo().MaxFrequency?.ToResolution() ?? FallbackCpuResolutionValue;
-            var cpuGhz = cpuResolution.ToFrequency().ToGHz();
-
             foreach (var report in summary.Reports)
             {
                 var workloadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).GetStatistics().WithoutOutliers();
@@ -120,11 +113,8 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 bool isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workloadMeasurements, overheadMeasurements);
                 Assert.True(isZero, $"Actual time was not 0.");
 
-                var workloadTime = workloadMeasurements.Average();
-                var overheadTime = overheadMeasurements.Average();
-
-                // Allow for 1 cpu cycle variance
-                Assert.True(overheadTime * cpuGhz < workloadTime * cpuGhz + 1, "Overhead took more time than workload.");
+                isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(overheadMeasurements, workloadMeasurements);
+                Assert.True(isZero, "Overhead took more time than workload.");
 
                 Assert.True((report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase) ?? 0L) == 0L, "Memory allocations measured above 0.");
             }
@@ -168,9 +158,6 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)))
             );
 
-            var cpuResolution = RuntimeInformation.GetCpuInfo().MaxFrequency?.ToResolution() ?? FallbackCpuResolutionValue;
-            var cpuGhz = cpuResolution.ToFrequency().ToGHz();
-
             foreach (var report in summary.Reports)
             {
                 var workloadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).GetStatistics().WithoutOutliers();
@@ -179,11 +166,8 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 bool isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workloadMeasurements, overheadMeasurements);
                 Assert.False(isZero, $"Actual time was 0.");
 
-                var workloadTime = workloadMeasurements.Average();
-                var overheadTime = overheadMeasurements.Average();
-
-                // Allow for 1 cpu cycle variance
-                Assert.True(overheadTime * cpuGhz < workloadTime * cpuGhz + 1, "Overhead took more time than workload.");
+                isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(overheadMeasurements, workloadMeasurements);
+                Assert.True(isZero, "Overhead took more time than workload.");
 
                 Assert.True((report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase) ?? 0L) == 0L, "Memory allocations measured above 0.");
             }
