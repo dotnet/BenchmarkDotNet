@@ -5,6 +5,7 @@ using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -113,20 +114,14 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 
             foreach (var report in summary.Reports)
             {
-                var workloadTimes = report.AllMeasurements
-                    .Where(m => m.IsOverhead() && m.IterationStage == Engines.IterationStage.Actual)
-                    .Select(m => m.GetAverageTime().Nanoseconds)
-                    .ToArray();
-                var overheadTimes = report.AllMeasurements
-                    .Where(m => m.IsOverhead() && m.IterationStage == Engines.IterationStage.Actual)
-                    .Select(m => m.GetAverageTime().Nanoseconds)
-                    .ToArray();
+                var workloadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).GetStatistics().WithoutOutliers();
+                var overheadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual)).GetStatistics().WithoutOutliers();
 
-                bool isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workloadTimes, overheadTimes);
+                bool isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workloadMeasurements, overheadMeasurements);
                 Assert.True(isZero, $"Actual time was not 0.");
 
-                var workloadTime = workloadTimes.Average();
-                var overheadTime = overheadTimes.Average();
+                var workloadTime = workloadMeasurements.Average();
+                var overheadTime = overheadMeasurements.Average();
 
                 // Allow for 1 cpu cycle variance
                 Assert.True(overheadTime * cpuGhz < workloadTime * cpuGhz + 1, "Overhead took more time than workload.");
@@ -178,20 +173,14 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 
             foreach (var report in summary.Reports)
             {
-                var workloadTimes = report.AllMeasurements
-                    .Where(m => m.IsOverhead() && m.IterationStage == Engines.IterationStage.Actual)
-                    .Select(m => m.GetAverageTime().Nanoseconds)
-                    .ToArray();
-                var overheadTimes = report.AllMeasurements
-                    .Where(m => m.IsOverhead() && m.IterationStage == Engines.IterationStage.Actual)
-                    .Select(m => m.GetAverageTime().Nanoseconds)
-                    .ToArray();
+                var workloadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).GetStatistics().WithoutOutliers();
+                var overheadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual)).GetStatistics().WithoutOutliers();
 
-                bool isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workloadTimes, overheadTimes);
+                bool isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workloadMeasurements, overheadMeasurements);
                 Assert.False(isZero, $"Actual time was 0.");
 
-                var workloadTime = workloadTimes.Average();
-                var overheadTime = overheadTimes.Average();
+                var workloadTime = workloadMeasurements.Average();
+                var overheadTime = overheadMeasurements.Average();
 
                 // Allow for 1 cpu cycle variance
                 Assert.True(overheadTime * cpuGhz < workloadTime * cpuGhz + 1, "Overhead took more time than workload.");
