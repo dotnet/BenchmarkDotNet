@@ -9,6 +9,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    if: ${{ github.repository == 'dotnet/BenchmarkDotNet' }}
     steps:
       - uses: actions/checkout@v3
       - name: Set date
