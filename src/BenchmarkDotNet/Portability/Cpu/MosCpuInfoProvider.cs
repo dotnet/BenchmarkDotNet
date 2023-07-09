@@ -50,8 +50,8 @@ namespace BenchmarkDotNet.Portability.Cpu
                 physicalCoreCount > 0 ? (int?) physicalCoreCount : null,
                 logicalCoreCount > 0 ? (int?) logicalCoreCount : null,
                 nominalClockSpeed > 0 && logicalCoreCount > 0 ? Frequency.FromMHz(nominalClockSpeed) : (Frequency?)null,
-                maxClockSpeed > 0 && logicalCoreCount > 0 ? Frequency.FromMHz(maxClockSpeed) : 0,
-                minClockSpeed > 0 && logicalCoreCount > 0 ? Frequency.FromMHz(minClockSpeed) : (Frequency?)null);
+                minClockSpeed > 0 && logicalCoreCount > 0 ? Frequency.FromMHz(minClockSpeed) : (Frequency?)null,
+                maxClockSpeed > 0 && logicalCoreCount > 0 ? Frequency.FromMHz(maxClockSpeed) : 0);
         }
     }
 }
