@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
@@ -10,6 +11,7 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using Perfolizer.Horology;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -19,6 +21,8 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
     {
         // NativeAot takes a long time to build, so not including it in these tests.
         // We also don't test InProcessNoEmitToolchain because it is known to be less accurate than code-gen toolchains.
+
+        private static readonly TimeInterval FallbackCpuResolutionValue = TimeInterval.FromNanoseconds(0.2d);
 
         public ExpectedBenchmarkResultsTests(ITestOutputHelper output) : base(output) { }
 
@@ -104,21 +108,25 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)))
             );
 
-            var cpuGhz = RuntimeInformation.GetCpuInfo().MaxFrequency.Value.ToGHz();
+            var cpuResolution = RuntimeInformation.GetCpuInfo().MaxFrequency?.ToResolution() ?? FallbackCpuResolutionValue;
+            var cpuGhz = cpuResolution.ToFrequency().ToGHz();
 
             foreach (var report in summary.Reports)
             {
-                Assert.True(cpuGhz * report.ResultStatistics.Mean < 1, $"Actual time was greater than 1 clock cycle.");
-
-                var overheadTime = report.AllMeasurements
+                var workloadTimes = report.AllMeasurements
                     .Where(m => m.IsOverhead() && m.IterationStage == Engines.IterationStage.Actual)
                     .Select(m => m.GetAverageTime().Nanoseconds)
-                    .Average();
-
-                var workloadTime = report.AllMeasurements
-                    .Where(m => m.IsWorkload() && m.IterationStage == Engines.IterationStage.Actual)
+                    .ToArray();
+                var overheadTimes = report.AllMeasurements
+                    .Where(m => m.IsOverhead() && m.IterationStage == Engines.IterationStage.Actual)
                     .Select(m => m.GetAverageTime().Nanoseconds)
-                    .Average();
+                    .ToArray();
+
+                bool isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workloadTimes, overheadTimes);
+                Assert.True(isZero, $"Actual time was not 0.");
+
+                var workloadTime = workloadTimes.Average();
+                var overheadTime = overheadTimes.Average();
 
                 // Allow for 1 cpu cycle variance
                 Assert.True(overheadTime * cpuGhz < workloadTime * cpuGhz + 1, "Overhead took more time than workload.");
@@ -165,21 +173,25 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)))
             );
 
-            var cpuGhz = RuntimeInformation.GetCpuInfo().MaxFrequency.Value.ToGHz();
+            var cpuResolution = RuntimeInformation.GetCpuInfo().MaxFrequency?.ToResolution() ?? FallbackCpuResolutionValue;
+            var cpuGhz = cpuResolution.ToFrequency().ToGHz();
 
             foreach (var report in summary.Reports)
             {
-                Assert.True(cpuGhz * report.ResultStatistics.Mean >= 1, $"Actual time was less than 1 clock cycle.");
-
-                var overheadTime = report.AllMeasurements
+                var workloadTimes = report.AllMeasurements
                     .Where(m => m.IsOverhead() && m.IterationStage == Engines.IterationStage.Actual)
                     .Select(m => m.GetAverageTime().Nanoseconds)
-                    .Average();
-
-                var workloadTime = report.AllMeasurements
-                    .Where(m => m.IsWorkload() && m.IterationStage == Engines.IterationStage.Actual)
+                    .ToArray();
+                var overheadTimes = report.AllMeasurements
+                    .Where(m => m.IsOverhead() && m.IterationStage == Engines.IterationStage.Actual)
                     .Select(m => m.GetAverageTime().Nanoseconds)
-                    .Average();
+                    .ToArray();
+
+                bool isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workloadTimes, overheadTimes);
+                Assert.False(isZero, $"Actual time was 0.");
+
+                var workloadTime = workloadTimes.Average();
+                var overheadTime = overheadTimes.Average();
 
                 // Allow for 1 cpu cycle variance
                 Assert.True(overheadTime * cpuGhz < workloadTime * cpuGhz + 1, "Overhead took more time than workload.");
