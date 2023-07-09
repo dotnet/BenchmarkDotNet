@@ -136,9 +136,9 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         }
 
         [Fact]
-        public void LargeStructBenchmarksReportsNonZeroTimeAndZeroAllocated_InProcess()
+        public void DifferentSizedStructsBenchmarksReportsNonZeroTimeAndZeroAllocated_InProcess()
         {
-            AssertLargeStructResults(ManualConfig.CreateEmpty()
+            AssertDifferentSizedStructsResults(ManualConfig.CreateEmpty()
                 .AddJob(Job.Default
                     .WithToolchain(InProcessEmitToolchain.Instance)
                 ));
@@ -147,9 +147,9 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         [TheoryNetCoreOnly("To not repeat tests in both full Framework and Core")]
         [InlineData(RuntimeMoniker.Net70)]
         [InlineData(RuntimeMoniker.Mono70)]
-        public void LargeStructBenchmarksReportsNonZeroTimeAndZeroAllocated_Core(RuntimeMoniker runtimeMoniker)
+        public void DifferentSizedStructsBenchmarksReportsNonZeroTimeAndZeroAllocated_Core(RuntimeMoniker runtimeMoniker)
         {
-            AssertLargeStructResults(ManualConfig.CreateEmpty()
+            AssertDifferentSizedStructsResults(ManualConfig.CreateEmpty()
                 .AddJob(Job.Default
                     .WithRuntime(runtimeMoniker.GetRuntime())
                 ));
@@ -158,17 +158,17 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         [TheoryFullFrameworkOnly("Can only run full Framework and Mono tests from Framework host")]
         [InlineData(RuntimeMoniker.Net462)]
         [InlineData(RuntimeMoniker.Mono)]
-        public void LargeStructBenchmarksReportsNonZeroTimeAndZeroAllocated_Framework(RuntimeMoniker runtimeMoniker)
+        public void DifferentSizedStructsBenchmarksReportsNonZeroTimeAndZeroAllocated_Framework(RuntimeMoniker runtimeMoniker)
         {
-            AssertLargeStructResults(ManualConfig.CreateEmpty()
+            AssertDifferentSizedStructsResults(ManualConfig.CreateEmpty()
                 .AddJob(Job.Default
                     .WithRuntime(runtimeMoniker.GetRuntime())
                 ));
         }
 
-        private void AssertLargeStructResults(IConfig config)
+        private void AssertDifferentSizedStructsResults(IConfig config)
         {
-            var summary = CanExecute<LargeStruct>(config
+            var summary = CanExecute<DifferentSizedStructs>(config
                 .WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(Perfolizer.Horology.TimeUnit.Nanosecond))
                 .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)))
             );
@@ -201,18 +201,36 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         }
     }
 
-    public class LargeStruct
+    public struct Struct16
     {
-        public struct Struct
-        {
-            // 128 bits
-            public long l1, l2, l3, l4,
-                        l5, l6, l7, l8,
-                        l9, l10, l11, l12,
-                        l13, l14, l15, l16;
-        }
+        public long l1, l2;
+    }
 
-        [Benchmark] public Struct Benchmark() => default;
+    public struct Struct32
+    {
+        public long l1, l2, l3, l4;
+    }
+
+    public struct Struct64
+    {
+        public long l1, l2, l3, l4,
+                    l5, l6, l7, l8;
+    }
+
+    public struct Struct128
+    {
+        public long l1, l2, l3, l4,
+                    l5, l6, l7, l8,
+                    l9, l10, l11, l12,
+                    l13, l14, l15, l16;
+    }
+
+    public class DifferentSizedStructs
+    {
+        [Benchmark] public Struct16 Struct16() => default;
+        [Benchmark] public Struct32 Struct32() => default;
+        [Benchmark] public Struct64 Struct64() => default;
+        [Benchmark] public Struct128 Struct128() => default;
     }
 }
 
