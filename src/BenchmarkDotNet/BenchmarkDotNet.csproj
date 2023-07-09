@@ -24,6 +24,7 @@
     <PackageReference Include="Perfolizer" Version="0.2.1" />
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.0.2" PrivateAssets="contentfiles;analyzers" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
+    <!-- Do not update these packages, or else netcoreapp3.0 and older will no longer work -->
     <PackageReference Include="System.Management" Version="5.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" />
   </ItemGroup>
