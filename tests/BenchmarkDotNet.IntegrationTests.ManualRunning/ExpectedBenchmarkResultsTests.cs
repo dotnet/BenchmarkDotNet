@@ -248,17 +248,17 @@ public class RealTimeBenchmarks
     }
 }
 
-public class EmptyVoid : RealTimeBenchmarks { [Benchmark] public void Benchmark() { } }
-public class EmptyByte : RealTimeBenchmarks { [Benchmark] public byte Benchmark() => default; }
-public class EmptySByte : RealTimeBenchmarks { [Benchmark] public sbyte Benchmark() => default; }
-public class EmptyShort : RealTimeBenchmarks { [Benchmark] public short Benchmark() => default; }
-public class EmptyUShort : RealTimeBenchmarks { [Benchmark] public ushort Benchmark() => default; }
-public class EmptyChar : RealTimeBenchmarks { [Benchmark] public char Benchmark() => default; }
-public class EmptyInt32 : RealTimeBenchmarks { [Benchmark] public int Benchmark() => default; }
-public class EmptyUInt32 : RealTimeBenchmarks { [Benchmark] public uint Benchmark() => default; }
-public class EmptyInt64 : RealTimeBenchmarks { [Benchmark] public long Benchmark() => default; }
-public class EmptyUInt64 : RealTimeBenchmarks { [Benchmark] public ulong Benchmark() => default; }
-public class EmptyIntPtr : RealTimeBenchmarks { [Benchmark] public IntPtr Benchmark() => default; }
-public class EmptyUIntPtr : RealTimeBenchmarks { [Benchmark] public UIntPtr Benchmark() => default; }
-public class EmptyVoidPointer : RealTimeBenchmarks { [Benchmark] public unsafe void* Benchmark() => default; }
+public class EmptyVoid : RealTimeBenchmarks { [Benchmark] public void Void() { } }
+public class EmptyByte : RealTimeBenchmarks { [Benchmark] public byte Byte() => default; }
+public class EmptySByte : RealTimeBenchmarks { [Benchmark] public sbyte SByte() => default; }
+public class EmptyShort : RealTimeBenchmarks { [Benchmark] public short Short() => default; }
+public class EmptyUShort : RealTimeBenchmarks { [Benchmark] public ushort UShort() => default; }
+public class EmptyChar : RealTimeBenchmarks { [Benchmark] public char Char() => default; }
+public class EmptyInt32 : RealTimeBenchmarks { [Benchmark] public int Int32() => default; }
+public class EmptyUInt32 : RealTimeBenchmarks { [Benchmark] public uint UInt32() => default; }
+public class EmptyInt64 : RealTimeBenchmarks { [Benchmark] public long Int64() => default; }
+public class EmptyUInt64 : RealTimeBenchmarks { [Benchmark] public ulong UInt64() => default; }
+public class EmptyIntPtr : RealTimeBenchmarks { [Benchmark] public IntPtr IntPtr() => default; }
+public class EmptyUIntPtr : RealTimeBenchmarks { [Benchmark] public UIntPtr UIntPtr() => default; }
+public class EmptyVoidPointer : RealTimeBenchmarks { [Benchmark] public unsafe void* VoidPointer() => default; }
 public class EmptyClass : RealTimeBenchmarks { [Benchmark] public object Class() => default; }
