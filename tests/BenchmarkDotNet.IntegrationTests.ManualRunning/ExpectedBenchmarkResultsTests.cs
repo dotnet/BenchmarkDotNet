@@ -9,9 +9,12 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
+using Perfolizer.Horology;
+using Perfolizer.Mathematics.Thresholds;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -21,6 +24,8 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
     {
         // NativeAot takes a long time to build, so not including it in these tests.
         // We also don't test InProcessNoEmitToolchain because it is known to be less accurate than code-gen toolchains.
+
+        private static readonly TimeInterval FallbackCpuResolutionValue = TimeInterval.FromNanoseconds(0.2d);
 
         public ExpectedBenchmarkResultsTests(ITestOutputHelper output) : base(output) { }
 
@@ -102,19 +107,22 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         private void AssertZeroResults(Type benchmarkType, IConfig config)
         {
             var summary = CanExecute(benchmarkType, config
-                .WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(Perfolizer.Horology.TimeUnit.Nanosecond))
+                .WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Nanosecond))
                 .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)))
             );
+
+            var cpuResolution = RuntimeInformation.GetCpuInfo().MaxFrequency?.ToResolution() ?? FallbackCpuResolutionValue;
+            var threshold = Threshold.Create(ThresholdUnit.Nanoseconds, cpuResolution.Nanoseconds);
 
             foreach (var report in summary.Reports)
             {
                 var workloadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).GetStatistics().WithoutOutliers();
                 var overheadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual)).GetStatistics().WithoutOutliers();
 
-                bool isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workloadMeasurements, overheadMeasurements);
+                bool isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workloadMeasurements, overheadMeasurements, threshold);
                 Assert.True(isZero, $"Actual time was not 0.");
 
-                isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(overheadMeasurements, workloadMeasurements);
+                isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(overheadMeasurements, workloadMeasurements, threshold);
                 Assert.True(isZero, "Overhead took more time than workload.");
 
                 Assert.True((report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase) ?? 0L) == 0L, "Memory allocations measured above 0.");
@@ -155,19 +163,22 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         private void AssertDifferentSizedStructsResults(IConfig config)
         {
             var summary = CanExecute<DifferentSizedStructs>(config
-                .WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(Perfolizer.Horology.TimeUnit.Nanosecond))
+                .WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Nanosecond))
                 .AddDiagnoser(new MemoryDiagnoser(new MemoryDiagnoserConfig(false)))
             );
+
+            var cpuResolution = RuntimeInformation.GetCpuInfo().MaxFrequency?.ToResolution() ?? FallbackCpuResolutionValue;
+            var threshold = Threshold.Create(ThresholdUnit.Nanoseconds, cpuResolution.Nanoseconds);
 
             foreach (var report in summary.Reports)
             {
                 var workloadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).GetStatistics().WithoutOutliers();
                 var overheadMeasurements = report.AllMeasurements.Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual)).GetStatistics().WithoutOutliers();
 
-                bool isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workloadMeasurements, overheadMeasurements);
+                bool isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(workloadMeasurements, overheadMeasurements, threshold);
                 Assert.False(isZero, $"Actual time was 0.");
 
-                isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(overheadMeasurements, workloadMeasurements);
+                isZero = ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(overheadMeasurements, workloadMeasurements, threshold);
                 Assert.True(isZero, "Overhead took more time than workload.");
 
                 Assert.True((report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase) ?? 0L) == 0L, "Memory allocations measured above 0.");
