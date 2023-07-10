@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Attributes;
@@ -198,7 +199,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                     l13, l14, l15, l16;
     }
 
-    public class DifferentSizedStructs
+    public class DifferentSizedStructs : RealTimeBenchmarks
     {
         [Benchmark] public Struct16 Struct16() => default;
         [Benchmark] public Struct32 Struct32() => default;
@@ -207,17 +208,46 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
     }
 }
 
-public class EmptyVoid { [Benchmark] public void Benchmark() { } }
-public class EmptyByte { [Benchmark] public byte Benchmark() => default; }
-public class EmptySByte { [Benchmark] public sbyte Benchmark() => default; }
-public class EmptyShort { [Benchmark] public short Benchmark() => default; }
-public class EmptyUShort { [Benchmark] public ushort Benchmark() => default; }
-public class EmptyChar { [Benchmark] public char Benchmark() => default; }
-public class EmptyInt32 { [Benchmark] public int Benchmark() => default; }
-public class EmptyUInt32 { [Benchmark] public uint Benchmark() => default; }
-public class EmptyInt64 { [Benchmark] public long Benchmark() => default; }
-public class EmptyUInt64 { [Benchmark] public ulong Benchmark() => default; }
-public class EmptyIntPtr { [Benchmark] public IntPtr Benchmark() => default; }
-public class EmptyUIntPtr { [Benchmark] public UIntPtr Benchmark() => default; }
-public class EmptyVoidPointer { [Benchmark] public unsafe void* Benchmark() => default; }
-public class EmptyClass { [Benchmark] public object Class() => default; }
+public class RealTimeBenchmarks
+{
+    private Process process;
+    private ProcessPriorityClass oldPriority;
+
+    [GlobalSetup]
+    public void Setup()
+    {
+        process = Process.GetCurrentProcess();
+        try
+        {
+            oldPriority = process.PriorityClass;
+            // Requires admin mode. Makes the OS never give up CPU time for this process, so we can get more accurate timings.
+            process.PriorityClass = ProcessPriorityClass.RealTime;
+        }
+        catch (PlatformNotSupportedException) { }
+    }
+
+    [GlobalCleanup]
+    public void Cleanup()
+    {
+        try
+        {
+            process.PriorityClass = oldPriority;
+        }
+        catch (PlatformNotSupportedException) { }
+    }
+}
+
+public class EmptyVoid : RealTimeBenchmarks { [Benchmark] public void Benchmark() { } }
+public class EmptyByte : RealTimeBenchmarks { [Benchmark] public byte Benchmark() => default; }
+public class EmptySByte : RealTimeBenchmarks { [Benchmark] public sbyte Benchmark() => default; }
+public class EmptyShort : RealTimeBenchmarks { [Benchmark] public short Benchmark() => default; }
+public class EmptyUShort : RealTimeBenchmarks { [Benchmark] public ushort Benchmark() => default; }
+public class EmptyChar : RealTimeBenchmarks { [Benchmark] public char Benchmark() => default; }
+public class EmptyInt32 : RealTimeBenchmarks { [Benchmark] public int Benchmark() => default; }
+public class EmptyUInt32 : RealTimeBenchmarks { [Benchmark] public uint Benchmark() => default; }
+public class EmptyInt64 : RealTimeBenchmarks { [Benchmark] public long Benchmark() => default; }
+public class EmptyUInt64 : RealTimeBenchmarks { [Benchmark] public ulong Benchmark() => default; }
+public class EmptyIntPtr : RealTimeBenchmarks { [Benchmark] public IntPtr Benchmark() => default; }
+public class EmptyUIntPtr : RealTimeBenchmarks { [Benchmark] public UIntPtr Benchmark() => default; }
+public class EmptyVoidPointer : RealTimeBenchmarks { [Benchmark] public unsafe void* Benchmark() => default; }
+public class EmptyClass : RealTimeBenchmarks { [Benchmark] public object Class() => default; }
