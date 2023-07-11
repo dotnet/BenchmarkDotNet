@@ -34,8 +34,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             "CopyLocalLockFileAssemblies",
             "PreserveCompilationContext",
             "UserSecretsId",
-            "EnablePreviewFeatures",
-            "PackageReference"
+            "EnablePreviewFeatures"
         }.ToImmutableArray();
 
         public string RuntimeFrameworkVersion { get; }
