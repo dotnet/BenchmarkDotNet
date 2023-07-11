@@ -1,0 +1,216 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class CustomRuntime
+ | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class CustomRuntime
+ | BenchmarkDotNet ">
+      
+      <link rel="icon" href="../logo/icon-32.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
+  </head>
+
+  <script type="module">
+    import options from './../public/main.js'
+    import { init } from './../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="BenchmarkDotNet.Environments.CustomRuntime">
+
+
+
+  <h1 id="BenchmarkDotNet_Environments_CustomRuntime" data-uid="BenchmarkDotNet.Environments.CustomRuntime" class="text-break">
+    Class CustomRuntime
+  
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="BenchmarkDotNet.html">BenchmarkDotNet</a>.<a class="xref" href="BenchmarkDotNet.Environments.html">Environments</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>BenchmarkDotNet.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract class CustomRuntime : Runtime, IEquatable&lt;Runtime&gt;</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a></div>
+      <div><span class="xref">CustomRuntime</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a>&gt;</div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist derived">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.Runtime.html#BenchmarkDotNet_Environments_Runtime_ToString">Runtime.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.Runtime.html#BenchmarkDotNet_Environments_Runtime_Equals_BenchmarkDotNet_Environments_Runtime_">Runtime.Equals(Runtime)</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.Runtime.html#BenchmarkDotNet_Environments_Runtime_Equals_System_Object_">Runtime.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.Runtime.html#BenchmarkDotNet_Environments_Runtime_GetHashCode">Runtime.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.Runtime.html#BenchmarkDotNet_Environments_Runtime_Name">Runtime.Name</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.Runtime.html#BenchmarkDotNet_Environments_Runtime_RuntimeMoniker">Runtime.RuntimeMoniker</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.Runtime.html#BenchmarkDotNet_Environments_Runtime_MsBuildMoniker">Runtime.MsBuildMoniker</a>
+    </div>
+    <div>
+      <a class="xref" href="BenchmarkDotNet.Environments.Runtime.html#BenchmarkDotNet_Environments_Runtime_IsAOT">Runtime.IsAOT</a>
+    </div>
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="BenchmarkDotNet_Environments_CustomRuntime__ctor_" data-uid="BenchmarkDotNet.Environments.CustomRuntime.#ctor*"></a>
+
+  <h3 id="BenchmarkDotNet_Environments_CustomRuntime__ctor_BenchmarkDotNet_Jobs_RuntimeMoniker_System_String_System_String_" data-uid="BenchmarkDotNet.Environments.CustomRuntime.#ctor(BenchmarkDotNet.Jobs.RuntimeMoniker,System.String,System.String)">
+  CustomRuntime(RuntimeMoniker, string, string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected CustomRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>runtimeMoniker</code> <a class="xref" href="BenchmarkDotNet.Jobs.RuntimeMoniker.html">RuntimeMoniker</a></dt>
+    <dd></dd>
+    <dt><code>msBuildMoniker</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>displayName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2023 .NET Foundation and contributors
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

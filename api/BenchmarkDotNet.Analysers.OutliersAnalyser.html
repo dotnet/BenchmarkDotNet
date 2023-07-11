@@ -1,134 +1,126 @@
 ﻿<!DOCTYPE html>
-<!--[if IE]><![endif]-->
 <html>
-  
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class OutliersAnalyser
-   | BenchmarkDotNet </title>
-    <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class OutliersAnalyser
-   | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.59.4.0">
-    
-    <link rel="shortcut icon" href="../logo/icon-32.png">
-    <link rel="stylesheet" href="../styles/docfx.vendor.css">
-    <link rel="stylesheet" href="../styles/docfx.css">
-    <link rel="stylesheet" href="../styles/main.css">
-    <meta property="docfx:navrel" content="../toc.html">
-    <meta property="docfx:tocrel" content="toc.html">
-    
-    
-    
-  
-    <!-- Google Analytics -->
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  
-      ga('create', 'UA-41419012-6', 'auto');
-      ga('send', 'pageview');
-  
-    </script>
-    <!-- /Google Analytics -->
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function (d, w, c) {
-            (w[c] = w[c] || []).push(function() {
-                try {
-                    w.yaCounter40812449 = new Ya.Metrika({
-                        id:40812449,
-                        clickmap:true,
-                        trackLinks:true,
-                        accurateTrackBounce:true
-                    });
-                } catch(e) { }
-            });
-  
-            var n = d.getElementsByTagName("script")[0],
-                s = d.createElement("script"),
-                f = function () { n.parentNode.insertBefore(s, n); };
-            s.type = "text/javascript";
-            s.async = true;
-            s.src = "https://mc.yandex.ru/metrika/watch.js";
-  
-            if (w.opera == "[object Opera]") {
-                d.addEventListener("DOMContentLoaded", f, false);
-            } else { f(); }
-        })(document, window, "yandex_metrika_callbacks");
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-    <!-- at the end of the HEAD -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
-    <link rel="stylesheet" href="../styles/search.css">
+      <title>Class OutliersAnalyser
+ | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class OutliersAnalyser
+ | BenchmarkDotNet ">
+      
+      <link rel="icon" href="../logo/icon-32.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
   </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
-    <div id="wrapper">
-      <header>
-        
-        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              
-              <a class="navbar-brand" href="../index.html">
-                <img id="logo" class="svg" src="../logo/icon.svg" alt="">
-              </a>
+
+  <script type="module">
+    import options from './../public/main.js'
+    import { init } from './../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
             </div>
-            <div class="collapse navbar-collapse" id="navbar">
-              <div class="navbar-right navbar-form">
-                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
-              </div>
-            </div>
-          </div>
-        </nav>
-        
-        <div class="subnav navbar navbar-default">
-          <div class="container hide-when-search" id="breadcrumb">
-            <ul class="breadcrumb">
-              <li></li>
-            </ul>
           </div>
         </div>
-      </header>
-      <div role="main" class="container body-content hide-when-search">
-        
-        <div class="sidenav hide-when-search">
-          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
-          <div class="sidetoggle collapse" id="sidetoggle">
-            <div id="sidetoc"></div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
           </div>
         </div>
-        <div class="article row grid-right">
-          <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser">
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser">
+
+
+
+  <h1 id="BenchmarkDotNet_Analysers_OutliersAnalyser" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser" class="text-break">
+    Class OutliersAnalyser
   
-  
-  <h1 id="BenchmarkDotNet_Analysers_OutliersAnalyser" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser" class="text-break">Class OutliersAnalyser
   </h1>
-  <div class="markdown level0 summary"></div>
-  <div class="markdown level0 conceptual"></div>
-  <div class="inheritance">
-    <h5>Inheritance</h5>
-    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><a class="xref" href="BenchmarkDotNet.Analysers.AnalyserBase.html">AnalyserBase</a></div>
-    <div class="level2"><span class="xref">OutliersAnalyser</span></div>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="BenchmarkDotNet.html">BenchmarkDotNet</a>.<a class="xref" href="BenchmarkDotNet.Analysers.html">Analysers</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>BenchmarkDotNet.dll</dd></dl>
   </div>
-  <div class="implements">
-    <h5>Implements</h5>
-    <div><a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a></div>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class OutliersAnalyser : AnalyserBase, IAnalyser</code></pre>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><a class="xref" href="BenchmarkDotNet.Analysers.AnalyserBase.html">AnalyserBase</a></div>
+      <div><span class="xref">OutliersAnalyser</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a></div>
+    </dd>
+  </dl>
+
+
+  <dl class="typelist derived">
+    <dt>Inherited Members</dt>
+    <dd>
     <div>
       <a class="xref" href="BenchmarkDotNet.Analysers.AnalyserBase.html#BenchmarkDotNet_Analysers_AnalyserBase_Analyse_BenchmarkDotNet_Reports_Summary_">AnalyserBase.Analyse(Summary)</a>
     </div>
@@ -136,243 +128,203 @@
       <a class="xref" href="BenchmarkDotNet.Analysers.AnalyserBase.html#BenchmarkDotNet_Analysers_AnalyserBase_AnalyseSummary_BenchmarkDotNet_Reports_Summary_">AnalyserBase.AnalyseSummary(Summary)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Analysers.AnalyserBase.html#BenchmarkDotNet_Analysers_AnalyserBase_CreateHint_System_String_BenchmarkDotNet_Reports_BenchmarkReport_System_Boolean_">AnalyserBase.CreateHint(String, BenchmarkReport, Boolean)</a>
+      <a class="xref" href="BenchmarkDotNet.Analysers.AnalyserBase.html#BenchmarkDotNet_Analysers_AnalyserBase_CreateHint_System_String_BenchmarkDotNet_Reports_BenchmarkReport_System_Boolean_">AnalyserBase.CreateHint(string, BenchmarkReport, bool)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Analysers.AnalyserBase.html#BenchmarkDotNet_Analysers_AnalyserBase_CreateWarning_System_String_BenchmarkDotNet_Reports_BenchmarkReport_System_Boolean_">AnalyserBase.CreateWarning(String, BenchmarkReport, Boolean)</a>
+      <a class="xref" href="BenchmarkDotNet.Analysers.AnalyserBase.html#BenchmarkDotNet_Analysers_AnalyserBase_CreateWarning_System_String_BenchmarkDotNet_Reports_BenchmarkReport_System_Boolean_">AnalyserBase.CreateWarning(string, BenchmarkReport, bool)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Analysers.AnalyserBase.html#BenchmarkDotNet_Analysers_AnalyserBase_CreateError_System_String_BenchmarkDotNet_Reports_BenchmarkReport_System_Boolean_">AnalyserBase.CreateError(String, BenchmarkReport, Boolean)</a>
+      <a class="xref" href="BenchmarkDotNet.Analysers.AnalyserBase.html#BenchmarkDotNet_Analysers_AnalyserBase_CreateError_System_String_BenchmarkDotNet_Reports_BenchmarkReport_System_Boolean_">AnalyserBase.CreateError(string, BenchmarkReport, bool)</a>
     </div>
-  </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Analysers.html">BenchmarkDotNet.Analysers</a></h6>
-  <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
-  <h5 id="BenchmarkDotNet_Analysers_OutliersAnalyser_syntax">Syntax</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class OutliersAnalyser : AnalyserBase, IAnalyser</code></pre>
-  </div>
-  <h3 id="fields">Fields
+  </dd></dl>
+
+
+
+
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="BenchmarkDotNet_Analysers_OutliersAnalyser_Default" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser.Default">
+  Default
+  
   </h3>
-  
-  
-  <h4 id="BenchmarkDotNet_Analysers_OutliersAnalyser_Default" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser.Default">Default</h4>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly IAnalyser Default</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="properties">Properties
-  </h3>
-  
-  
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
   <a id="BenchmarkDotNet_Analysers_OutliersAnalyser_Id_" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser.Id*"></a>
-  <h4 id="BenchmarkDotNet_Analysers_OutliersAnalyser_Id" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser.Id">Id</h4>
+
+  <h3 id="BenchmarkDotNet_Analysers_OutliersAnalyser_Id" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser.Id">
+  Id
+  
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public override string Id { get; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="BenchmarkDotNet.Analysers.AnalyserBase.html#BenchmarkDotNet_Analysers_AnalyserBase_Id">AnalyserBase.Id</a></div>
-  <h3 id="methods">Methods
-  </h3>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
   <a id="BenchmarkDotNet_Analysers_OutliersAnalyser_AnalyseReport_" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser.AnalyseReport*"></a>
-  <h4 id="BenchmarkDotNet_Analysers_OutliersAnalyser_AnalyseReport_BenchmarkDotNet_Reports_BenchmarkReport_BenchmarkDotNet_Reports_Summary_" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser.AnalyseReport(BenchmarkDotNet.Reports.BenchmarkReport,BenchmarkDotNet.Reports.Summary)">AnalyseReport(BenchmarkReport, Summary)</h4>
+
+  <h3 id="BenchmarkDotNet_Analysers_OutliersAnalyser_AnalyseReport_BenchmarkDotNet_Reports_BenchmarkReport_BenchmarkDotNet_Reports_Summary_" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser.AnalyseReport(BenchmarkDotNet.Reports.BenchmarkReport,BenchmarkDotNet.Reports.Summary)">
+  AnalyseReport(BenchmarkReport, Summary)
+  
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">protected override IEnumerable&lt;Conclusion&gt; AnalyseReport(BenchmarkReport report, Summary summary)</code></pre>
   </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Reports.BenchmarkReport.html">BenchmarkReport</a></td>
-        <td><span class="parametername">report</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Reports.Summary.html">Summary</a></td>
-        <td><span class="parametername">summary</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.Conclusion.html">Conclusion</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="BenchmarkDotNet.Analysers.AnalyserBase.html#BenchmarkDotNet_Analysers_AnalyserBase_AnalyseReport_BenchmarkDotNet_Reports_BenchmarkReport_BenchmarkDotNet_Reports_Summary_">AnalyserBase.AnalyseReport(BenchmarkReport, Summary)</a></div>
-  
-  
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>report</code> <a class="xref" href="BenchmarkDotNet.Reports.BenchmarkReport.html">BenchmarkReport</a></dt>
+    <dd></dd>
+    <dt><code>summary</code> <a class="xref" href="BenchmarkDotNet.Reports.Summary.html">Summary</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.Conclusion.html">Conclusion</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Analysers_OutliersAnalyser_GetMessage_" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser.GetMessage*"></a>
-  <h4 id="BenchmarkDotNet_Analysers_OutliersAnalyser_GetMessage_System_Double___System_Double___System_Double___System_Double___System_Globalization_CultureInfo_" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser.GetMessage(System.Double[],System.Double[],System.Double[],System.Double[],System.Globalization.CultureInfo)">GetMessage(Double[], Double[], Double[], Double[], CultureInfo)</h4>
+
+  <h3 id="BenchmarkDotNet_Analysers_OutliersAnalyser_GetMessage_System_Double___System_Double___System_Double___System_Double___System_Globalization_CultureInfo_" data-uid="BenchmarkDotNet.Analysers.OutliersAnalyser.GetMessage(System.Double[],System.Double[],System.Double[],System.Double[],System.Globalization.CultureInfo)">
+  GetMessage(double[], double[], double[], double[], CultureInfo)
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>Returns a nice message which can be displayed in the summary.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static string GetMessage(double[] actualOutliers, double[] allOutliers, double[] lowerOutliers, double[] upperOutliers, CultureInfo cultureInfo)</code></pre>
   </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">Double</a>[]</td>
-        <td><span class="parametername">actualOutliers</span></td>
-        <td><p>Actual outliers which were removed from the statistics</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">Double</a>[]</td>
-        <td><span class="parametername">allOutliers</span></td>
-        <td><p>All outliers which present in the distribution (lower and upper)</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">Double</a>[]</td>
-        <td><span class="parametername">lowerOutliers</span></td>
-        <td><p>All lower outliers</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">Double</a>[]</td>
-        <td><span class="parametername">upperOutliers</span></td>
-        <td><p>All upper outliers</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo">CultureInfo</a></td>
-        <td><span class="parametername">cultureInfo</span></td>
-        <td><p>CultureInfo</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><p>The message</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="implements">Implements</h3>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a>
-  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>actualOutliers</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>[]</dt>
+    <dd><p>Actual outliers which were removed from the statistics</p>
+</dd>
+    <dt><code>allOutliers</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>[]</dt>
+    <dd><p>All outliers which present in the distribution (lower and upper)</p>
+</dd>
+    <dt><code>lowerOutliers</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>[]</dt>
+    <dd><p>All lower outliers</p>
+</dd>
+    <dt><code>upperOutliers</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>[]</dt>
+    <dd><p>All upper outliers</p>
+</dd>
+    <dt><code>cultureInfo</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo">CultureInfo</a></dt>
+    <dd><p>CultureInfo</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The message</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
 </article>
-          </div>
-          
-          <div class="hidden-sm col-md-2" role="complementary">
-            <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
-              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-                <h5>In This Article</h5>
-                <div></div>
-              </nav>
-            </div>
-          </div>
+
+
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2023 .NET Foundation and contributors
         </div>
       </div>
-      
-      <footer>
-        <div class="grad-bottom"></div>
-        <div class="footer">
-          <div class="container">
-            <span class="pull-right">
-              <a href="#top">Back to top</a>
-            </span>
-            Copyright &copy; 2013–2023 .NET Foundation and contributors
-            
-          </div>
-        </div>
-      </footer>
-    </div>
-    
-    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
-    <script type="text/javascript" src="../styles/docfx.js"></script>
-    <script type="text/javascript" src="../styles/main.js"></script>
-    <!-- at the end of the BODY -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-    <script type="text/javascript">
-        docsearch({
-            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
-            indexName: 'benchmarkdotnet',
-            inputSelector: '#search-query',
-            debug: false // Set debug to true if you want to inspect the dropdown
-        });
-    </script>  </body>
+    </footer>
+  </body>
 </html>

@@ -1,114 +1,81 @@
 ﻿<!DOCTYPE html>
-<!--[if IE]><![endif]-->
 <html>
-  
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>BenchmarkDotNet v0.10.4 | BenchmarkDotNet </title>
-    <meta name="viewport" content="width=device-width">
-    <meta name="title" content="BenchmarkDotNet v0.10.4 | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.59.4.0">
-    
-    <link rel="shortcut icon" href="../logo/icon-32.png">
-    <link rel="stylesheet" href="../styles/docfx.vendor.css">
-    <link rel="stylesheet" href="../styles/docfx.css">
-    <link rel="stylesheet" href="../styles/main.css">
-    <meta property="docfx:navrel" content="../toc.html">
-    <meta property="docfx:tocrel" content="toc.html">
-    
-    
-    
-  
-    <!-- Google Analytics -->
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  
-      ga('create', 'UA-41419012-6', 'auto');
-      ga('send', 'pageview');
-  
-    </script>
-    <!-- /Google Analytics -->
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function (d, w, c) {
-            (w[c] = w[c] || []).push(function() {
-                try {
-                    w.yaCounter40812449 = new Ya.Metrika({
-                        id:40812449,
-                        clickmap:true,
-                        trackLinks:true,
-                        accurateTrackBounce:true
-                    });
-                } catch(e) { }
-            });
-  
-            var n = d.getElementsByTagName("script")[0],
-                s = d.createElement("script"),
-                f = function () { n.parentNode.insertBefore(s, n); };
-            s.type = "text/javascript";
-            s.async = true;
-            s.src = "https://mc.yandex.ru/metrika/watch.js";
-  
-            if (w.opera == "[object Opera]") {
-                d.addEventListener("DOMContentLoaded", f, false);
-            } else { f(); }
-        })(document, window, "yandex_metrika_callbacks");
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-    <!-- at the end of the HEAD -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
-    <link rel="stylesheet" href="../styles/search.css">
+      <title>BenchmarkDotNet v0.10.4 | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="BenchmarkDotNet v0.10.4 | BenchmarkDotNet ">
+      
+      <link rel="icon" href="../logo/icon-32.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.10.4.md/#L1">
   </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
-    <div id="wrapper">
-      <header>
-        
-        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              
-              <a class="navbar-brand" href="../index.html">
-                <img id="logo" class="svg" src="../logo/icon.svg" alt="">
-              </a>
+
+  <script type="module">
+    import options from './../public/main.js'
+    import { init } from './../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
             </div>
-            <div class="collapse navbar-collapse" id="navbar">
-              <div class="navbar-right navbar-form">
-                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
-              </div>
-            </div>
-          </div>
-        </nav>
-        
-        <div class="subnav navbar navbar-default">
-          <div class="container hide-when-search" id="breadcrumb">
-            <ul class="breadcrumb">
-              <li></li>
-            </ul>
           </div>
         </div>
-      </header>
-      <div role="main" class="container body-content hide-when-search">
-        
-        <div class="sidenav hide-when-search">
-          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
-          <div class="sidetoggle collapse" id="sidetoggle">
-            <div id="sidetoc"></div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
           </div>
         </div>
-        <div class="article row grid-right">
-          <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="changelog.v0.10.4">
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="changelog.v0.10.4">
 <h1 id="benchmarkdotnet-v0104">BenchmarkDotNet v0.10.4</h1>
 
 <ul>
@@ -139,7 +106,7 @@
 <h2 id="milestone-details">Milestone details</h2>
 <p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.10.4">v0.10.4</a> scope,
 23 issues were resolved and 14 pull requests were merged.
-This release includes 103 commits by 8 contributors.</p>
+This release includes 103 commits by 9 contributors.</p>
 <h2 id="resolved-issues-23">Resolved issues (23)</h2>
 <ul>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/118">#118</a> Raw data in CSV reports (assignee: <a href="https://github.com/AmadeusW">@AmadeusW</a>)</li>
@@ -172,13 +139,13 @@ This release includes 103 commits by 8 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/379">#379</a> Feature: in-process benchmarks (by <a href="https://github.com/ig-sinicyn">@ig-sinicyn</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/392">#392</a> Add an optional config to BenchmarkSwitcher. (by <a href="https://github.com/ILMTitan">@ILMTitan</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/396">#396</a> Allow users to pick, show and hide measurement units in the reports and exports. (by <a href="https://github.com/AmadeusW">@AmadeusW</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/400">#400</a> fix spelling error: misspredict =&gt; mispredict (by <a href="https://github.com/stevedesmond-ca">@stevedesmond-ca</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/400">#400</a> fix spelling error: misspredict =&gt; mispredict (by <a href="https://github.com/SteveDesmond-ca">@SteveDesmond-ca</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/405">#405</a> Make RoslynToolchain types public (by <a href="https://github.com/cdmihai">@cdmihai</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/407">#407</a> Propagate benchmark to hooks (by <a href="https://github.com/cdmihai">@cdmihai</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/408">#408</a> Small fixes before approval tests (by <a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/409">#409</a> CSVHelper.Escape() method should check for actual separator value (by <a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/416">#416</a> Exports file to temporary location if target is locked (by <a href="https://github.com/AmadeusW">@AmadeusW</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/421">#421</a> MarkdownExporter right-justifies numeric columns (by <a href="https://github.com/stevedesmond-ca">@stevedesmond-ca</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/421">#421</a> MarkdownExporter right-justifies numeric columns (by <a href="https://github.com/SteveDesmond-ca">@SteveDesmond-ca</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/423">#423</a> Updated Microsoft.Net.Test.Sdk (by <a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/430">#430</a> Fix unix OS detection. (by <a href="https://github.com/mfilippov">@mfilippov</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/432">#432</a> Fix macOS detection (by <a href="https://github.com/mfilippov">@mfilippov</a>)</li>
@@ -211,7 +178,7 @@ This release includes 103 commits by 8 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/faba771f36ccc272c49bd7194df3a94e98bcd156">faba77</a> Update README.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6dce74bc6c38aeca6e36f91f20d2604dfda965ec">6dce74</a> Update logo in README.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7a750f78efac73bbfc75a394c6aff6def573cdfa">7a750f</a> Another fix in README.md (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1caa0dc83a195c9d04941d18af5692da5903d4d5">1caa0d</a> fix spelling error: misspredict =&gt; mispredict (by <a href="https://github.com/stevedesmond-ca">@stevedesmond-ca</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/1caa0dc83a195c9d04941d18af5692da5903d4d5">1caa0d</a> fix spelling error: misspredict =&gt; mispredict (by <a href="https://github.com/SteveDesmond-ca">@SteveDesmond-ca</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/742912b477678dd0e2dad295bd3d1b5ae10c4cc6">742912</a> use Array.Empty and Task.Completed (after upgrading to .NET 4.6) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/0dafac43cb2553f075592128a54fa1cdbd0cf8ba">0dafac</a> there is no need to set up <runtimeidentifier> with latest VS, fixes #393 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</runtimeidentifier></li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f5d88e2a66eb4ac436b1737212c726be47ab7613">f5d88e</a> Catch exceptions in BenchmarkDotNet.Running.BenchmarkRunnerCore.Run (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
@@ -256,7 +223,7 @@ This release includes 103 commits by 8 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e7ad369f2d905f4058190abc0bf5bac880cec6fe">e7ad36</a> don't log false alarms, fixes #419 (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/80308113a4c1668ebb2bb16c10b6e16cd35def1e">803081</a> Allow users to pick, show and hide measurement units in the reports and expor... (by <a href="https://github.com/AmadeusW">@AmadeusW</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fa312804267eb3b9b26e2efe64c1d44c608fba12">fa3128</a> Exports file to temporary location if target is locked (#416) (by <a href="https://github.com/AmadeusW">@AmadeusW</a>)</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c923ba82fbd5ce8976252e2dacb460fedb0cbee4">c923ba</a> MarkdownExporter right-justifies numeric columns (#421) (by <a href="https://github.com/stevedesmond-ca">@stevedesmond-ca</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c923ba82fbd5ce8976252e2dacb460fedb0cbee4">c923ba</a> MarkdownExporter right-justifies numeric columns (#421) (by <a href="https://github.com/SteveDesmond-ca">@SteveDesmond-ca</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/aa290d92b45e3f3eacab82a742d462d2208bae6d">aa290d</a> Add column legends (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8d8db56a5ee9004fdd3ecc2faab28e10b67cb22f">8d8db5</a> Handle case when there are no columns with legends (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/dc201c7bee40b564358ff818a9ce4f24e60649dc">dc201c</a> Add empty line before legends (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
@@ -289,16 +256,17 @@ This release includes 103 commits by 8 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7f3d061df634e1701e7be1a846d68353c3a0fd88">7f3d06</a> Always use PlatformAbstractions in RuntimeInformation.GetOsVersion() (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/46d34f6d1d0cf37c7db8e3d9c50350153e5f080f">46d34f</a> Set library version: 0.10.4 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 </ul>
-<h2 id="contributors-8">Contributors (8)</h2>
+<h2 id="contributors-9">Contributors (9)</h2>
 <ul>
 <li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
 <li>Alina Smirnova (<a href="https://github.com/alinasmirnova">@alinasmirnova</a>)</li>
 <li>Amadeusz Wieczorek (<a href="https://github.com/AmadeusW">@AmadeusW</a>)</li>
 <li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 <li>ig-sinicyn (<a href="https://github.com/ig-sinicyn">@ig-sinicyn</a>)</li>
+<li>ILMTitan</li>
 <li>Mihai Codoban (<a href="https://github.com/cdmihai">@cdmihai</a>)</li>
 <li>Mikhail Filippov (<a href="https://github.com/mfilippov">@mfilippov</a>)</li>
-<li>Steve Desmond (<a href="https://github.com/stevedesmond-ca">@stevedesmond-ca</a>)</li>
+<li>Steve Desmond (<a href="https://github.com/SteveDesmond-ca">@SteveDesmond-ca</a>)</li>
 </ul>
 <p>Thank you very much!</p>
 <h2 id="additional-details">Additional details</h2>
@@ -312,51 +280,25 @@ This release includes 103 commits by 8 contributors.</p>
 <li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.10.4">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.10.4</a></li>
 </ul>
 </article>
-          </div>
-          
-          <div class="hidden-sm col-md-2" role="complementary">
-            <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                  <li>
-                    <a href="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/changelog/v0.10.4.md/#L1" class="contribution-link">Improve this Doc</a>
-                  </li>
-                </ul>
-              </div>
-              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-                <h5>In This Article</h5>
-                <div></div>
-              </nav>
-            </div>
-          </div>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2023 .NET Foundation and contributors
         </div>
       </div>
-      
-      <footer>
-        <div class="grad-bottom"></div>
-        <div class="footer">
-          <div class="container">
-            <span class="pull-right">
-              <a href="#top">Back to top</a>
-            </span>
-            Copyright &copy; 2013–2023 .NET Foundation and contributors
-            
-          </div>
-        </div>
-      </footer>
-    </div>
-    
-    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
-    <script type="text/javascript" src="../styles/docfx.js"></script>
-    <script type="text/javascript" src="../styles/main.js"></script>
-    <!-- at the end of the BODY -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-    <script type="text/javascript">
-        docsearch({
-            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
-            indexName: 'benchmarkdotnet',
-            inputSelector: '#search-query',
-            debug: false // Set debug to true if you want to inspect the dropdown
-        });
-    </script>  </body>
+    </footer>
+  </body>
 </html>

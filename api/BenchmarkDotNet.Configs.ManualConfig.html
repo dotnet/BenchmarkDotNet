@@ -1,1797 +1,1855 @@
 ﻿<!DOCTYPE html>
-<!--[if IE]><![endif]-->
 <html>
-  
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class ManualConfig
-   | BenchmarkDotNet </title>
-    <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class ManualConfig
-   | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.59.4.0">
-    
-    <link rel="shortcut icon" href="../logo/icon-32.png">
-    <link rel="stylesheet" href="../styles/docfx.vendor.css">
-    <link rel="stylesheet" href="../styles/docfx.css">
-    <link rel="stylesheet" href="../styles/main.css">
-    <meta property="docfx:navrel" content="../toc.html">
-    <meta property="docfx:tocrel" content="toc.html">
-    
-    
-    
-  
-    <!-- Google Analytics -->
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  
-      ga('create', 'UA-41419012-6', 'auto');
-      ga('send', 'pageview');
-  
-    </script>
-    <!-- /Google Analytics -->
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function (d, w, c) {
-            (w[c] = w[c] || []).push(function() {
-                try {
-                    w.yaCounter40812449 = new Ya.Metrika({
-                        id:40812449,
-                        clickmap:true,
-                        trackLinks:true,
-                        accurateTrackBounce:true
-                    });
-                } catch(e) { }
-            });
-  
-            var n = d.getElementsByTagName("script")[0],
-                s = d.createElement("script"),
-                f = function () { n.parentNode.insertBefore(s, n); };
-            s.type = "text/javascript";
-            s.async = true;
-            s.src = "https://mc.yandex.ru/metrika/watch.js";
-  
-            if (w.opera == "[object Opera]") {
-                d.addEventListener("DOMContentLoaded", f, false);
-            } else { f(); }
-        })(document, window, "yandex_metrika_callbacks");
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-    <!-- at the end of the HEAD -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
-    <link rel="stylesheet" href="../styles/search.css">
+      <title>Class ManualConfig
+ | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class ManualConfig
+ | BenchmarkDotNet ">
+      
+      <link rel="icon" href="../logo/icon-32.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
   </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
-    <div id="wrapper">
-      <header>
-        
-        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              
-              <a class="navbar-brand" href="../index.html">
-                <img id="logo" class="svg" src="../logo/icon.svg" alt="">
-              </a>
+
+  <script type="module">
+    import options from './../public/main.js'
+    import { init } from './../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
             </div>
-            <div class="collapse navbar-collapse" id="navbar">
-              <div class="navbar-right navbar-form">
-                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
-              </div>
-            </div>
-          </div>
-        </nav>
-        
-        <div class="subnav navbar navbar-default">
-          <div class="container hide-when-search" id="breadcrumb">
-            <ul class="breadcrumb">
-              <li></li>
-            </ul>
           </div>
         </div>
-      </header>
-      <div role="main" class="container body-content hide-when-search">
-        
-        <div class="sidenav hide-when-search">
-          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
-          <div class="sidetoggle collapse" id="sidetoggle">
-            <div id="sidetoc"></div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
           </div>
         </div>
-        <div class="article row grid-right">
-          <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Configs.ManualConfig">
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="BenchmarkDotNet.Configs.ManualConfig">
+
+
+
+  <h1 id="BenchmarkDotNet_Configs_ManualConfig" data-uid="BenchmarkDotNet.Configs.ManualConfig" class="text-break">
+    Class ManualConfig
   
-  
-  <h1 id="BenchmarkDotNet_Configs_ManualConfig" data-uid="BenchmarkDotNet.Configs.ManualConfig" class="text-break">Class ManualConfig
   </h1>
-  <div class="markdown level0 summary"></div>
-  <div class="markdown level0 conceptual"></div>
-  <div class="inheritance">
-    <h5>Inheritance</h5>
-    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><span class="xref">ManualConfig</span></div>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="BenchmarkDotNet.html">BenchmarkDotNet</a>.<a class="xref" href="BenchmarkDotNet.Configs.html">Configs</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>BenchmarkDotNet.dll</dd></dl>
   </div>
-  <div class="implements">
-    <h5>Implements</h5>
-    <div><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></div>
-  </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Configs.html">BenchmarkDotNet.Configs</a></h6>
-  <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
-  <h5 id="BenchmarkDotNet_Configs_ManualConfig_syntax">Syntax</h5>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class ManualConfig : IConfig</code></pre>
   </div>
-  <h3 id="properties">Properties
-  </h3>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_ArtifactsPath_" data-uid="BenchmarkDotNet.Configs.ManualConfig.ArtifactsPath*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_ArtifactsPath" data-uid="BenchmarkDotNet.Configs.ManualConfig.ArtifactsPath">ArtifactsPath</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string ArtifactsPath { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_BuildTimeout_" data-uid="BenchmarkDotNet.Configs.ManualConfig.BuildTimeout*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_BuildTimeout" data-uid="BenchmarkDotNet.Configs.ManualConfig.BuildTimeout">BuildTimeout</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TimeSpan BuildTimeout { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_ConfigAnalysisConclusion_" data-uid="BenchmarkDotNet.Configs.ManualConfig.ConfigAnalysisConclusion*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_ConfigAnalysisConclusion" data-uid="BenchmarkDotNet.Configs.ManualConfig.ConfigAnalysisConclusion">ConfigAnalysisConclusion</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;Conclusion&gt; ConfigAnalysisConclusion { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.Conclusion.html">Conclusion</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_CultureInfo_" data-uid="BenchmarkDotNet.Configs.ManualConfig.CultureInfo*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_CultureInfo" data-uid="BenchmarkDotNet.Configs.ManualConfig.CultureInfo">CultureInfo</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public CultureInfo CultureInfo { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo">CultureInfo</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_Options_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Options*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_Options" data-uid="BenchmarkDotNet.Configs.ManualConfig.Options">Options</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ConfigOptions Options { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ConfigOptions.html">ConfigOptions</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_Orderer_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Orderer*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_Orderer" data-uid="BenchmarkDotNet.Configs.ManualConfig.Orderer">Orderer</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IOrderer Orderer { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Order.IOrderer.html">IOrderer</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_SummaryStyle_" data-uid="BenchmarkDotNet.Configs.ManualConfig.SummaryStyle*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_SummaryStyle" data-uid="BenchmarkDotNet.Configs.ManualConfig.SummaryStyle">SummaryStyle</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public SummaryStyle SummaryStyle { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_UnionRule_" data-uid="BenchmarkDotNet.Configs.ManualConfig.UnionRule*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_UnionRule" data-uid="BenchmarkDotNet.Configs.ManualConfig.UnionRule">UnionRule</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ConfigUnionRule UnionRule { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ConfigUnionRule.html">ConfigUnionRule</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="methods">Methods
-  </h3>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_Add_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Add*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_Add_BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Add(BenchmarkDotNet.Configs.IConfig)">Add(IConfig)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Add(IConfig config)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
-        <td><span class="parametername">config</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_AddAnalyser_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddAnalyser*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_AddAnalyser_BenchmarkDotNet_Analysers_IAnalyser___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddAnalyser(BenchmarkDotNet.Analysers.IAnalyser[])">AddAnalyser(IAnalyser[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig AddAnalyser(params IAnalyser[] newAnalysers)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a>[]</td>
-        <td><span class="parametername">newAnalysers</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_AddColumn_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddColumn*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_AddColumn_BenchmarkDotNet_Columns_IColumn___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddColumn(BenchmarkDotNet.Columns.IColumn[])">AddColumn(IColumn[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig AddColumn(params IColumn[] newColumns)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Columns.IColumn.html">IColumn</a>[]</td>
-        <td><span class="parametername">newColumns</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_AddColumnProvider_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddColumnProvider*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_AddColumnProvider_BenchmarkDotNet_Columns_IColumnProvider___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddColumnProvider(BenchmarkDotNet.Columns.IColumnProvider[])">AddColumnProvider(IColumnProvider[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig AddColumnProvider(params IColumnProvider[] newColumnProviders)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Columns.IColumnProvider.html">IColumnProvider</a>[]</td>
-        <td><span class="parametername">newColumnProviders</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_AddDiagnoser_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddDiagnoser*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_AddDiagnoser_BenchmarkDotNet_Diagnosers_IDiagnoser___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddDiagnoser(BenchmarkDotNet.Diagnosers.IDiagnoser[])">AddDiagnoser(IDiagnoser[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig AddDiagnoser(params IDiagnoser[] newDiagnosers)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Diagnosers.IDiagnoser.html">IDiagnoser</a>[]</td>
-        <td><span class="parametername">newDiagnosers</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_AddExporter_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddExporter*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_AddExporter_BenchmarkDotNet_Exporters_IExporter___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddExporter(BenchmarkDotNet.Exporters.IExporter[])">AddExporter(IExporter[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig AddExporter(params IExporter[] newExporters)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Exporters.IExporter.html">IExporter</a>[]</td>
-        <td><span class="parametername">newExporters</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_AddFilter_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddFilter*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_AddFilter_BenchmarkDotNet_Filters_IFilter___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddFilter(BenchmarkDotNet.Filters.IFilter[])">AddFilter(IFilter[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig AddFilter(params IFilter[] newFilters)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Filters.IFilter.html">IFilter</a>[]</td>
-        <td><span class="parametername">newFilters</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_AddHardwareCounters_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddHardwareCounters*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_AddHardwareCounters_BenchmarkDotNet_Diagnosers_HardwareCounter___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddHardwareCounters(BenchmarkDotNet.Diagnosers.HardwareCounter[])">AddHardwareCounters(HardwareCounter[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig AddHardwareCounters(params HardwareCounter[] newHardwareCounters)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Diagnosers.HardwareCounter.html">HardwareCounter</a>[]</td>
-        <td><span class="parametername">newHardwareCounters</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_AddJob_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddJob*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_AddJob_BenchmarkDotNet_Jobs_Job___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddJob(BenchmarkDotNet.Jobs.Job[])">AddJob(Job[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig AddJob(params Job[] newJobs)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a>[]</td>
-        <td><span class="parametername">newJobs</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_AddLogger_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddLogger*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_AddLogger_BenchmarkDotNet_Loggers_ILogger___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddLogger(BenchmarkDotNet.Loggers.ILogger[])">AddLogger(ILogger[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig AddLogger(params ILogger[] newLoggers)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a>[]</td>
-        <td><span class="parametername">newLoggers</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_AddLogicalGroupRules_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddLogicalGroupRules*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_AddLogicalGroupRules_BenchmarkDotNet_Configs_BenchmarkLogicalGroupRule___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddLogicalGroupRules(BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule[])">AddLogicalGroupRules(BenchmarkLogicalGroupRule[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig AddLogicalGroupRules(params BenchmarkLogicalGroupRule[] rules)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule.html">BenchmarkLogicalGroupRule</a>[]</td>
-        <td><span class="parametername">rules</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_AddValidator_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddValidator*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_AddValidator_BenchmarkDotNet_Validators_IValidator___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddValidator(BenchmarkDotNet.Validators.IValidator[])">AddValidator(IValidator[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig AddValidator(params IValidator[] newValidators)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Validators.IValidator.html">IValidator</a>[]</td>
-        <td><span class="parametername">newValidators</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_Create_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Create*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_Create_BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Create(BenchmarkDotNet.Configs.IConfig)">Create(IConfig)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static ManualConfig Create(IConfig config)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
-        <td><span class="parametername">config</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_CreateEmpty_" data-uid="BenchmarkDotNet.Configs.ManualConfig.CreateEmpty*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_CreateEmpty" data-uid="BenchmarkDotNet.Configs.ManualConfig.CreateEmpty">CreateEmpty()</h4>
-  <div class="markdown level1 summary"><p>Creates a completely EMPTY config with no predefined settings.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static ManualConfig CreateEmpty()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 id="BenchmarkDotNet_Configs_ManualConfig_CreateEmpty_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>You should most probably use the <a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html#BenchmarkDotNet_Configs_ManualConfig_CreateMinimumViable">CreateMinimumViable()</a> method instead.</p>
-</div>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_CreateMinimumViable_" data-uid="BenchmarkDotNet.Configs.ManualConfig.CreateMinimumViable*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_CreateMinimumViable" data-uid="BenchmarkDotNet.Configs.ManualConfig.CreateMinimumViable">CreateMinimumViable()</h4>
-  <div class="markdown level1 summary"><p>Creates a minimum viable config with predefined columns provider and console logger.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static ManualConfig CreateMinimumViable()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_GetAnalysers_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetAnalysers*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_GetAnalysers" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetAnalysers">GetAnalysers()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IAnalyser&gt; GetAnalysers()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_GetColumnHidingRules_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetColumnHidingRules*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_GetColumnHidingRules" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetColumnHidingRules">GetColumnHidingRules()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IColumnHidingRule&gt; GetColumnHidingRules()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Columns.IColumnHidingRule.html">IColumnHidingRule</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_GetColumnProviders_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetColumnProviders*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_GetColumnProviders" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetColumnProviders">GetColumnProviders()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IColumnProvider&gt; GetColumnProviders()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Columns.IColumnProvider.html">IColumnProvider</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_GetDiagnosers_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetDiagnosers*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_GetDiagnosers" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetDiagnosers">GetDiagnosers()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IDiagnoser&gt; GetDiagnosers()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Diagnosers.IDiagnoser.html">IDiagnoser</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_GetExporters_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetExporters*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_GetExporters" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetExporters">GetExporters()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IExporter&gt; GetExporters()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Exporters.IExporter.html">IExporter</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_GetFilters_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetFilters*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_GetFilters" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetFilters">GetFilters()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IFilter&gt; GetFilters()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Filters.IFilter.html">IFilter</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_GetHardwareCounters_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetHardwareCounters*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_GetHardwareCounters" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetHardwareCounters">GetHardwareCounters()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IEnumerable&lt;HardwareCounter&gt; GetHardwareCounters()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Diagnosers.HardwareCounter.html">HardwareCounter</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_GetJobs_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetJobs*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_GetJobs" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetJobs">GetJobs()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IEnumerable&lt;Job&gt; GetJobs()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_GetLoggers_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetLoggers*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_GetLoggers" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetLoggers">GetLoggers()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IEnumerable&lt;ILogger&gt; GetLoggers()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_GetLogicalGroupRules_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetLogicalGroupRules*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_GetLogicalGroupRules" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetLogicalGroupRules">GetLogicalGroupRules()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IEnumerable&lt;BenchmarkLogicalGroupRule&gt; GetLogicalGroupRules()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule.html">BenchmarkLogicalGroupRule</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_GetValidators_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetValidators*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_GetValidators" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetValidators">GetValidators()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IValidator&gt; GetValidators()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Validators.IValidator.html">IValidator</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_HideColumns_" data-uid="BenchmarkDotNet.Configs.ManualConfig.HideColumns*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_HideColumns_BenchmarkDotNet_Columns_IColumn___" data-uid="BenchmarkDotNet.Configs.ManualConfig.HideColumns(BenchmarkDotNet.Columns.IColumn[])">HideColumns(IColumn[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig HideColumns(params IColumn[] columns)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Columns.IColumn.html">IColumn</a>[]</td>
-        <td><span class="parametername">columns</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_HideColumns_" data-uid="BenchmarkDotNet.Configs.ManualConfig.HideColumns*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_HideColumns_BenchmarkDotNet_Columns_IColumnHidingRule___" data-uid="BenchmarkDotNet.Configs.ManualConfig.HideColumns(BenchmarkDotNet.Columns.IColumnHidingRule[])">HideColumns(IColumnHidingRule[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig HideColumns(params IColumnHidingRule[] rules)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Columns.IColumnHidingRule.html">IColumnHidingRule</a>[]</td>
-        <td><span class="parametername">rules</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_HideColumns_" data-uid="BenchmarkDotNet.Configs.ManualConfig.HideColumns*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_HideColumns_System_String___" data-uid="BenchmarkDotNet.Configs.ManualConfig.HideColumns(System.String[])">HideColumns(String[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig HideColumns(params string[] columnNames)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a>[]</td>
-        <td><span class="parametername">columnNames</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_Union_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Union*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_Union_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Union(BenchmarkDotNet.Configs.IConfig,BenchmarkDotNet.Configs.IConfig)">Union(IConfig, IConfig)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static ManualConfig Union(IConfig globalConfig, IConfig localConfig)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
-        <td><span class="parametername">globalConfig</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></td>
-        <td><span class="parametername">localConfig</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_WithArtifactsPath_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithArtifactsPath*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_WithArtifactsPath_System_String_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithArtifactsPath(System.String)">WithArtifactsPath(String)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig WithArtifactsPath(string artifactsPath)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><span class="parametername">artifactsPath</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_WithBuildTimeout_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithBuildTimeout*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_WithBuildTimeout_System_TimeSpan_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithBuildTimeout(System.TimeSpan)">WithBuildTimeout(TimeSpan)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig WithBuildTimeout(TimeSpan buildTimeout)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
-        <td><span class="parametername">buildTimeout</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_WithOption_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithOption*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_WithOption_BenchmarkDotNet_Configs_ConfigOptions_System_Boolean_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithOption(BenchmarkDotNet.Configs.ConfigOptions,System.Boolean)">WithOption(ConfigOptions, Boolean)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig WithOption(ConfigOptions option, bool value)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ConfigOptions.html">ConfigOptions</a></td>
-        <td><span class="parametername">option</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td><span class="parametername">value</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_WithOptions_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithOptions*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_WithOptions_BenchmarkDotNet_Configs_ConfigOptions_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithOptions(BenchmarkDotNet.Configs.ConfigOptions)">WithOptions(ConfigOptions)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig WithOptions(ConfigOptions options)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ConfigOptions.html">ConfigOptions</a></td>
-        <td><span class="parametername">options</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_WithOrderer_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithOrderer*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_WithOrderer_BenchmarkDotNet_Order_IOrderer_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithOrderer(BenchmarkDotNet.Order.IOrderer)">WithOrderer(IOrderer)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig WithOrderer(IOrderer orderer)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Order.IOrderer.html">IOrderer</a></td>
-        <td><span class="parametername">orderer</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_WithSummaryStyle_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithSummaryStyle*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_WithSummaryStyle_BenchmarkDotNet_Reports_SummaryStyle_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithSummaryStyle(BenchmarkDotNet.Reports.SummaryStyle)">WithSummaryStyle(SummaryStyle)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig WithSummaryStyle(SummaryStyle summaryStyle)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></td>
-        <td><span class="parametername">summaryStyle</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Configs_ManualConfig_WithUnionRule_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithUnionRule*"></a>
-  <h4 id="BenchmarkDotNet_Configs_ManualConfig_WithUnionRule_BenchmarkDotNet_Configs_ConfigUnionRule_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithUnionRule(BenchmarkDotNet.Configs.ConfigUnionRule)">WithUnionRule(ConfigUnionRule)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ManualConfig WithUnionRule(ConfigUnionRule unionRule)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ConfigUnionRule.html">ConfigUnionRule</a></td>
-        <td><span class="parametername">unionRule</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="implements">Implements</h3>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">ManualConfig</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist extensionMethods">
+    <dt>Extension Methods</dt>
+    <dd>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a>
-  </div>
-  <h3 id="extensionmethods">Extension Methods</h3>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddColumn_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Columns_IColumn___">ConfigExtensions.AddColumn(IConfig, IColumn[])</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddAnalyser_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Analysers_IAnalyser___">ConfigExtensions.AddAnalyser(IConfig, params IAnalyser[])</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddColumnProvider_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Columns_IColumnProvider___">ConfigExtensions.AddColumnProvider(IConfig, IColumnProvider[])</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddColumn_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Columns_IColumn___">ConfigExtensions.AddColumn(IConfig, params IColumn[])</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddLogger_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Loggers_ILogger___">ConfigExtensions.AddLogger(IConfig, ILogger[])</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddColumnProvider_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Columns_IColumnProvider___">ConfigExtensions.AddColumnProvider(IConfig, params IColumnProvider[])</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddExporter_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Exporters_IExporter___">ConfigExtensions.AddExporter(IConfig, IExporter[])</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddDiagnoser_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Diagnosers_IDiagnoser___">ConfigExtensions.AddDiagnoser(IConfig, params IDiagnoser[])</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddDiagnoser_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Diagnosers_IDiagnoser___">ConfigExtensions.AddDiagnoser(IConfig, IDiagnoser[])</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddExporter_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Exporters_IExporter___">ConfigExtensions.AddExporter(IConfig, params IExporter[])</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddAnalyser_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Analysers_IAnalyser___">ConfigExtensions.AddAnalyser(IConfig, IAnalyser[])</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddFilter_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Filters_IFilter___">ConfigExtensions.AddFilter(IConfig, params IFilter[])</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddValidator_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Validators_IValidator___">ConfigExtensions.AddValidator(IConfig, IValidator[])</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddHardwareCounters_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Diagnosers_HardwareCounter___">ConfigExtensions.AddHardwareCounters(IConfig, params HardwareCounter[])</a>
   </div>
   <div>
       <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddJob_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Jobs_Job_">ConfigExtensions.AddJob(IConfig, Job)</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_WithOrderer_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Order_IOrderer_">ConfigExtensions.WithOrderer(IConfig, IOrderer)</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddLogger_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Loggers_ILogger___">ConfigExtensions.AddLogger(IConfig, params ILogger[])</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddHardwareCounters_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Diagnosers_HardwareCounter___">ConfigExtensions.AddHardwareCounters(IConfig, HardwareCounter[])</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddLogicalGroupRules_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Configs_BenchmarkLogicalGroupRule___">ConfigExtensions.AddLogicalGroupRules(IConfig, params BenchmarkLogicalGroupRule[])</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddFilter_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Filters_IFilter___">ConfigExtensions.AddFilter(IConfig, IFilter[])</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddValidator_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Validators_IValidator___">ConfigExtensions.AddValidator(IConfig, params IValidator[])</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_WithSummaryStyle_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Reports_SummaryStyle_">ConfigExtensions.WithSummaryStyle(IConfig, SummaryStyle)</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_CreateImmutableConfig_BenchmarkDotNet_Configs_IConfig_">ConfigExtensions.CreateImmutableConfig(IConfig)</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_WithArtifactsPath_BenchmarkDotNet_Configs_IConfig_System_String_">ConfigExtensions.WithArtifactsPath(IConfig, String)</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_DontOverwriteResults_BenchmarkDotNet_Configs_IConfig_System_Boolean_">ConfigExtensions.DontOverwriteResults(IConfig, bool)</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_WithUnionRule_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Configs_ConfigUnionRule_">ConfigExtensions.WithUnionRule(IConfig, ConfigUnionRule)</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_HideColumns_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Columns_IColumn___">ConfigExtensions.HideColumns(IConfig, params IColumn[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_HideColumns_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Columns_IColumnHidingRule___">ConfigExtensions.HideColumns(IConfig, params IColumnHidingRule[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_HideColumns_BenchmarkDotNet_Configs_IConfig_System_String___">ConfigExtensions.HideColumns(IConfig, params string[])</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_KeepBenchmarkFiles_BenchmarkDotNet_Configs_IConfig_System_Boolean_">ConfigExtensions.KeepBenchmarkFiles(IConfig, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_StopOnFirstError_BenchmarkDotNet_Configs_IConfig_System_Boolean_">ConfigExtensions.StopOnFirstError(IConfig, bool)</a>
+  </div>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_WithArtifactsPath_BenchmarkDotNet_Configs_IConfig_System_String_">ConfigExtensions.WithArtifactsPath(IConfig, string)</a>
   </div>
   <div>
       <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_WithCultureInfo_BenchmarkDotNet_Configs_IConfig_System_Globalization_CultureInfo_">ConfigExtensions.WithCultureInfo(IConfig, CultureInfo)</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_KeepBenchmarkFiles_BenchmarkDotNet_Configs_IConfig_System_Boolean_">ConfigExtensions.KeepBenchmarkFiles(IConfig, Boolean)</a>
-  </div>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_DontOverwriteResults_BenchmarkDotNet_Configs_IConfig_System_Boolean_">ConfigExtensions.DontOverwriteResults(IConfig, Boolean)</a>
-  </div>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_StopOnFirstError_BenchmarkDotNet_Configs_IConfig_System_Boolean_">ConfigExtensions.StopOnFirstError(IConfig, Boolean)</a>
-  </div>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_WithOption_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Configs_ConfigOptions_System_Boolean_">ConfigExtensions.WithOption(IConfig, ConfigOptions, Boolean)</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_WithOption_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Configs_ConfigOptions_System_Boolean_">ConfigExtensions.WithOption(IConfig, ConfigOptions, bool)</a>
   </div>
   <div>
       <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_WithOptions_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Configs_ConfigOptions_">ConfigExtensions.WithOptions(IConfig, ConfigOptions)</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddLogicalGroupRules_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Configs_BenchmarkLogicalGroupRule___">ConfigExtensions.AddLogicalGroupRules(IConfig, BenchmarkLogicalGroupRule[])</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_WithOrderer_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Order_IOrderer_">ConfigExtensions.WithOrderer(IConfig, IOrderer)</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_HideColumns_BenchmarkDotNet_Configs_IConfig_System_String___">ConfigExtensions.HideColumns(IConfig, String[])</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_WithSummaryStyle_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Reports_SummaryStyle_">ConfigExtensions.WithSummaryStyle(IConfig, SummaryStyle)</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_HideColumns_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Columns_IColumn___">ConfigExtensions.HideColumns(IConfig, IColumn[])</a>
+      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_WithUnionRule_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Configs_ConfigUnionRule_">ConfigExtensions.WithUnionRule(IConfig, ConfigUnionRule)</a>
   </div>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_HideColumns_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Columns_IColumnHidingRule___">ConfigExtensions.HideColumns(IConfig, IColumnHidingRule[])</a>
+  </dd></dl>
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig__ctor_" data-uid="BenchmarkDotNet.Configs.ManualConfig.#ctor*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig__ctor" data-uid="BenchmarkDotNet.Configs.ManualConfig.#ctor">
+  ManualConfig()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig()</code></pre>
   </div>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_CreateImmutableConfig_BenchmarkDotNet_Configs_IConfig_">ConfigExtensions.CreateImmutableConfig(IConfig)</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_ArtifactsPath_" data-uid="BenchmarkDotNet.Configs.ManualConfig.ArtifactsPath*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_ArtifactsPath" data-uid="BenchmarkDotNet.Configs.ManualConfig.ArtifactsPath">
+  ArtifactsPath
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>the default value is &quot;./BenchmarkDotNet.Artifacts&quot;</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string ArtifactsPath { get; set; }</code></pre>
   </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_BuildTimeout_" data-uid="BenchmarkDotNet.Configs.ManualConfig.BuildTimeout*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_BuildTimeout" data-uid="BenchmarkDotNet.Configs.ManualConfig.BuildTimeout">
+  BuildTimeout
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>the auto-generated project build timeout</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeSpan BuildTimeout { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_CategoryDiscoverer_" data-uid="BenchmarkDotNet.Configs.ManualConfig.CategoryDiscoverer*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_CategoryDiscoverer" data-uid="BenchmarkDotNet.Configs.ManualConfig.CategoryDiscoverer">
+  CategoryDiscoverer
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ICategoryDiscoverer CategoryDiscoverer { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Running.ICategoryDiscoverer.html">ICategoryDiscoverer</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_ConfigAnalysisConclusion_" data-uid="BenchmarkDotNet.Configs.ManualConfig.ConfigAnalysisConclusion*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_ConfigAnalysisConclusion" data-uid="BenchmarkDotNet.Configs.ManualConfig.ConfigAnalysisConclusion">
+  ConfigAnalysisConclusion
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Collect any errors or warnings when composing the configuration</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;Conclusion&gt; ConfigAnalysisConclusion { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.Conclusion.html">Conclusion</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_CultureInfo_" data-uid="BenchmarkDotNet.Configs.ManualConfig.CultureInfo*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_CultureInfo" data-uid="BenchmarkDotNet.Configs.ManualConfig.CultureInfo">
+  CultureInfo
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CultureInfo CultureInfo { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo">CultureInfo</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_Options_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Options*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_Options" data-uid="BenchmarkDotNet.Configs.ManualConfig.Options">
+  Options
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>a set of custom flags that can enable/disable various settings</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ConfigOptions Options { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ConfigOptions.html">ConfigOptions</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_Orderer_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Orderer*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_Orderer" data-uid="BenchmarkDotNet.Configs.ManualConfig.Orderer">
+  Orderer
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IOrderer Orderer { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Order.IOrderer.html">IOrderer</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_SummaryStyle_" data-uid="BenchmarkDotNet.Configs.ManualConfig.SummaryStyle*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_SummaryStyle" data-uid="BenchmarkDotNet.Configs.ManualConfig.SummaryStyle">
+  SummaryStyle
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SummaryStyle SummaryStyle { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_UnionRule_" data-uid="BenchmarkDotNet.Configs.ManualConfig.UnionRule*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_UnionRule" data-uid="BenchmarkDotNet.Configs.ManualConfig.UnionRule">
+  UnionRule
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ConfigUnionRule UnionRule { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ConfigUnionRule.html">ConfigUnionRule</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_Add_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Add*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_Add_BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Add(BenchmarkDotNet.Configs.IConfig)">
+  Add(IConfig)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Add(IConfig config)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>config</code> <a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_AddAnalyser_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddAnalyser*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_AddAnalyser_BenchmarkDotNet_Analysers_IAnalyser___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddAnalyser(BenchmarkDotNet.Analysers.IAnalyser[])">
+  AddAnalyser(params IAnalyser[])
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig AddAnalyser(params IAnalyser[] newAnalysers)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>newAnalysers</code> <a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_AddColumn_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddColumn*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_AddColumn_BenchmarkDotNet_Columns_IColumn___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddColumn(BenchmarkDotNet.Columns.IColumn[])">
+  AddColumn(params IColumn[])
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig AddColumn(params IColumn[] newColumns)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>newColumns</code> <a class="xref" href="BenchmarkDotNet.Columns.IColumn.html">IColumn</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_AddColumnProvider_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddColumnProvider*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_AddColumnProvider_BenchmarkDotNet_Columns_IColumnProvider___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddColumnProvider(BenchmarkDotNet.Columns.IColumnProvider[])">
+  AddColumnProvider(params IColumnProvider[])
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig AddColumnProvider(params IColumnProvider[] newColumnProviders)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>newColumnProviders</code> <a class="xref" href="BenchmarkDotNet.Columns.IColumnProvider.html">IColumnProvider</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_AddDiagnoser_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddDiagnoser*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_AddDiagnoser_BenchmarkDotNet_Diagnosers_IDiagnoser___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddDiagnoser(BenchmarkDotNet.Diagnosers.IDiagnoser[])">
+  AddDiagnoser(params IDiagnoser[])
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig AddDiagnoser(params IDiagnoser[] newDiagnosers)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>newDiagnosers</code> <a class="xref" href="BenchmarkDotNet.Diagnosers.IDiagnoser.html">IDiagnoser</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_AddExporter_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddExporter*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_AddExporter_BenchmarkDotNet_Exporters_IExporter___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddExporter(BenchmarkDotNet.Exporters.IExporter[])">
+  AddExporter(params IExporter[])
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig AddExporter(params IExporter[] newExporters)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>newExporters</code> <a class="xref" href="BenchmarkDotNet.Exporters.IExporter.html">IExporter</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_AddFilter_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddFilter*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_AddFilter_BenchmarkDotNet_Filters_IFilter___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddFilter(BenchmarkDotNet.Filters.IFilter[])">
+  AddFilter(params IFilter[])
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig AddFilter(params IFilter[] newFilters)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>newFilters</code> <a class="xref" href="BenchmarkDotNet.Filters.IFilter.html">IFilter</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_AddHardwareCounters_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddHardwareCounters*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_AddHardwareCounters_BenchmarkDotNet_Diagnosers_HardwareCounter___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddHardwareCounters(BenchmarkDotNet.Diagnosers.HardwareCounter[])">
+  AddHardwareCounters(params HardwareCounter[])
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig AddHardwareCounters(params HardwareCounter[] newHardwareCounters)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>newHardwareCounters</code> <a class="xref" href="BenchmarkDotNet.Diagnosers.HardwareCounter.html">HardwareCounter</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_AddJob_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddJob*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_AddJob_BenchmarkDotNet_Jobs_Job___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddJob(BenchmarkDotNet.Jobs.Job[])">
+  AddJob(params Job[])
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig AddJob(params Job[] newJobs)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>newJobs</code> <a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_AddLogger_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddLogger*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_AddLogger_BenchmarkDotNet_Loggers_ILogger___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddLogger(BenchmarkDotNet.Loggers.ILogger[])">
+  AddLogger(params ILogger[])
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig AddLogger(params ILogger[] newLoggers)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>newLoggers</code> <a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_AddLogicalGroupRules_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddLogicalGroupRules*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_AddLogicalGroupRules_BenchmarkDotNet_Configs_BenchmarkLogicalGroupRule___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddLogicalGroupRules(BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule[])">
+  AddLogicalGroupRules(params BenchmarkLogicalGroupRule[])
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig AddLogicalGroupRules(params BenchmarkLogicalGroupRule[] rules)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rules</code> <a class="xref" href="BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule.html">BenchmarkLogicalGroupRule</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_AddValidator_" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddValidator*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_AddValidator_BenchmarkDotNet_Validators_IValidator___" data-uid="BenchmarkDotNet.Configs.ManualConfig.AddValidator(BenchmarkDotNet.Validators.IValidator[])">
+  AddValidator(params IValidator[])
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig AddValidator(params IValidator[] newValidators)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>newValidators</code> <a class="xref" href="BenchmarkDotNet.Validators.IValidator.html">IValidator</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_Create_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Create*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_Create_BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Create(BenchmarkDotNet.Configs.IConfig)">
+  Create(IConfig)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ManualConfig Create(IConfig config)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>config</code> <a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_CreateEmpty_" data-uid="BenchmarkDotNet.Configs.ManualConfig.CreateEmpty*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_CreateEmpty" data-uid="BenchmarkDotNet.Configs.ManualConfig.CreateEmpty">
+  CreateEmpty()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a completely EMPTY config with no predefined settings.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ManualConfig CreateEmpty()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section" id="BenchmarkDotNet_Configs_ManualConfig_CreateEmpty_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>You should most probably use the <a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html#BenchmarkDotNet_Configs_ManualConfig_CreateMinimumViable">CreateMinimumViable()</a> method instead.</p>
+</div>
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_CreateMinimumViable_" data-uid="BenchmarkDotNet.Configs.ManualConfig.CreateMinimumViable*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_CreateMinimumViable" data-uid="BenchmarkDotNet.Configs.ManualConfig.CreateMinimumViable">
+  CreateMinimumViable()
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Creates a minimum viable config with predefined columns provider and console logger.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ManualConfig CreateMinimumViable()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_GetAnalysers_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetAnalysers*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_GetAnalysers" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetAnalysers">
+  GetAnalysers()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IAnalyser&gt; GetAnalysers()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Analysers.IAnalyser.html">IAnalyser</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_GetColumnHidingRules_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetColumnHidingRules*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_GetColumnHidingRules" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetColumnHidingRules">
+  GetColumnHidingRules()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IColumnHidingRule&gt; GetColumnHidingRules()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Columns.IColumnHidingRule.html">IColumnHidingRule</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_GetColumnProviders_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetColumnProviders*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_GetColumnProviders" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetColumnProviders">
+  GetColumnProviders()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IColumnProvider&gt; GetColumnProviders()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Columns.IColumnProvider.html">IColumnProvider</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_GetDiagnosers_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetDiagnosers*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_GetDiagnosers" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetDiagnosers">
+  GetDiagnosers()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IDiagnoser&gt; GetDiagnosers()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Diagnosers.IDiagnoser.html">IDiagnoser</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_GetExporters_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetExporters*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_GetExporters" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetExporters">
+  GetExporters()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IExporter&gt; GetExporters()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Exporters.IExporter.html">IExporter</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_GetFilters_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetFilters*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_GetFilters" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetFilters">
+  GetFilters()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IFilter&gt; GetFilters()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Filters.IFilter.html">IFilter</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_GetHardwareCounters_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetHardwareCounters*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_GetHardwareCounters" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetHardwareCounters">
+  GetHardwareCounters()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;HardwareCounter&gt; GetHardwareCounters()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Diagnosers.HardwareCounter.html">HardwareCounter</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_GetJobs_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetJobs*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_GetJobs" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetJobs">
+  GetJobs()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;Job&gt; GetJobs()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.Job.html">Job</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_GetLoggers_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetLoggers*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_GetLoggers" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetLoggers">
+  GetLoggers()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;ILogger&gt; GetLoggers()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_GetLogicalGroupRules_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetLogicalGroupRules*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_GetLogicalGroupRules" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetLogicalGroupRules">
+  GetLogicalGroupRules()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;BenchmarkLogicalGroupRule&gt; GetLogicalGroupRules()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule.html">BenchmarkLogicalGroupRule</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_GetValidators_" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetValidators*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_GetValidators" data-uid="BenchmarkDotNet.Configs.ManualConfig.GetValidators">
+  GetValidators()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;IValidator&gt; GetValidators()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Validators.IValidator.html">IValidator</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_HideColumns_" data-uid="BenchmarkDotNet.Configs.ManualConfig.HideColumns*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_HideColumns_BenchmarkDotNet_Columns_IColumnHidingRule___" data-uid="BenchmarkDotNet.Configs.ManualConfig.HideColumns(BenchmarkDotNet.Columns.IColumnHidingRule[])">
+  HideColumns(params IColumnHidingRule[])
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig HideColumns(params IColumnHidingRule[] rules)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>rules</code> <a class="xref" href="BenchmarkDotNet.Columns.IColumnHidingRule.html">IColumnHidingRule</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_HideColumns_" data-uid="BenchmarkDotNet.Configs.ManualConfig.HideColumns*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_HideColumns_BenchmarkDotNet_Columns_IColumn___" data-uid="BenchmarkDotNet.Configs.ManualConfig.HideColumns(BenchmarkDotNet.Columns.IColumn[])">
+  HideColumns(params IColumn[])
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig HideColumns(params IColumn[] columns)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>columns</code> <a class="xref" href="BenchmarkDotNet.Columns.IColumn.html">IColumn</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_HideColumns_" data-uid="BenchmarkDotNet.Configs.ManualConfig.HideColumns*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_HideColumns_System_String___" data-uid="BenchmarkDotNet.Configs.ManualConfig.HideColumns(System.String[])">
+  HideColumns(params string[])
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig HideColumns(params string[] columnNames)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>columnNames</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_Union_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Union*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_Union_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Configs_IConfig_" data-uid="BenchmarkDotNet.Configs.ManualConfig.Union(BenchmarkDotNet.Configs.IConfig,BenchmarkDotNet.Configs.IConfig)">
+  Union(IConfig, IConfig)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ManualConfig Union(IConfig globalConfig, IConfig localConfig)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>globalConfig</code> <a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></dt>
+    <dd></dd>
+    <dt><code>localConfig</code> <a class="xref" href="BenchmarkDotNet.Configs.IConfig.html">IConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_WithArtifactsPath_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithArtifactsPath*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_WithArtifactsPath_System_String_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithArtifactsPath(System.String)">
+  WithArtifactsPath(string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig WithArtifactsPath(string artifactsPath)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>artifactsPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_WithBuildTimeout_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithBuildTimeout*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_WithBuildTimeout_System_TimeSpan_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithBuildTimeout(System.TimeSpan)">
+  WithBuildTimeout(TimeSpan)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig WithBuildTimeout(TimeSpan buildTimeout)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>buildTimeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_WithCategoryDiscoverer_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithCategoryDiscoverer*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_WithCategoryDiscoverer_BenchmarkDotNet_Running_ICategoryDiscoverer_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithCategoryDiscoverer(BenchmarkDotNet.Running.ICategoryDiscoverer)">
+  WithCategoryDiscoverer(ICategoryDiscoverer)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig WithCategoryDiscoverer(ICategoryDiscoverer categoryDiscoverer)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>categoryDiscoverer</code> <a class="xref" href="BenchmarkDotNet.Running.ICategoryDiscoverer.html">ICategoryDiscoverer</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_WithOption_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithOption*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_WithOption_BenchmarkDotNet_Configs_ConfigOptions_System_Boolean_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithOption(BenchmarkDotNet.Configs.ConfigOptions,System.Boolean)">
+  WithOption(ConfigOptions, bool)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig WithOption(ConfigOptions option, bool value)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>option</code> <a class="xref" href="BenchmarkDotNet.Configs.ConfigOptions.html">ConfigOptions</a></dt>
+    <dd></dd>
+    <dt><code>value</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_WithOptions_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithOptions*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_WithOptions_BenchmarkDotNet_Configs_ConfigOptions_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithOptions(BenchmarkDotNet.Configs.ConfigOptions)">
+  WithOptions(ConfigOptions)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig WithOptions(ConfigOptions options)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>options</code> <a class="xref" href="BenchmarkDotNet.Configs.ConfigOptions.html">ConfigOptions</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_WithOrderer_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithOrderer*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_WithOrderer_BenchmarkDotNet_Order_IOrderer_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithOrderer(BenchmarkDotNet.Order.IOrderer)">
+  WithOrderer(IOrderer)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig WithOrderer(IOrderer orderer)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>orderer</code> <a class="xref" href="BenchmarkDotNet.Order.IOrderer.html">IOrderer</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_WithSummaryStyle_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithSummaryStyle*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_WithSummaryStyle_BenchmarkDotNet_Reports_SummaryStyle_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithSummaryStyle(BenchmarkDotNet.Reports.SummaryStyle)">
+  WithSummaryStyle(SummaryStyle)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig WithSummaryStyle(SummaryStyle summaryStyle)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>summaryStyle</code> <a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Configs_ManualConfig_WithUnionRule_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithUnionRule*"></a>
+
+  <h3 id="BenchmarkDotNet_Configs_ManualConfig_WithUnionRule_BenchmarkDotNet_Configs_ConfigUnionRule_" data-uid="BenchmarkDotNet.Configs.ManualConfig.WithUnionRule(BenchmarkDotNet.Configs.ConfigUnionRule)">
+  WithUnionRule(ConfigUnionRule)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ManualConfig WithUnionRule(ConfigUnionRule unionRule)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>unionRule</code> <a class="xref" href="BenchmarkDotNet.Configs.ConfigUnionRule.html">ConfigUnionRule</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Configs.ManualConfig.html">ManualConfig</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
 </article>
-          </div>
-          
-          <div class="hidden-sm col-md-2" role="complementary">
-            <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
-              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-                <h5>In This Article</h5>
-                <div></div>
-              </nav>
-            </div>
-          </div>
+
+
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2023 .NET Foundation and contributors
         </div>
       </div>
-      
-      <footer>
-        <div class="grad-bottom"></div>
-        <div class="footer">
-          <div class="container">
-            <span class="pull-right">
-              <a href="#top">Back to top</a>
-            </span>
-            Copyright &copy; 2013–2023 .NET Foundation and contributors
-            
-          </div>
-        </div>
-      </footer>
-    </div>
-    
-    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
-    <script type="text/javascript" src="../styles/docfx.js"></script>
-    <script type="text/javascript" src="../styles/main.js"></script>
-    <!-- at the end of the BODY -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-    <script type="text/javascript">
-        docsearch({
-            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
-            indexName: 'benchmarkdotnet',
-            inputSelector: '#search-query',
-            debug: false // Set debug to true if you want to inspect the dropdown
-        });
-    </script>  </body>
+    </footer>
+  </body>
 </html>

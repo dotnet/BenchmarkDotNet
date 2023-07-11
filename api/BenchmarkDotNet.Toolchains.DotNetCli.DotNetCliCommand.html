@@ -1,783 +1,831 @@
 ﻿<!DOCTYPE html>
-<!--[if IE]><![endif]-->
 <html>
-  
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class DotNetCliCommand
-   | BenchmarkDotNet </title>
-    <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class DotNetCliCommand
-   | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.59.4.0">
-    
-    <link rel="shortcut icon" href="../logo/icon-32.png">
-    <link rel="stylesheet" href="../styles/docfx.vendor.css">
-    <link rel="stylesheet" href="../styles/docfx.css">
-    <link rel="stylesheet" href="../styles/main.css">
-    <meta property="docfx:navrel" content="../toc.html">
-    <meta property="docfx:tocrel" content="toc.html">
-    
-    
-    
-  
-    <!-- Google Analytics -->
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  
-      ga('create', 'UA-41419012-6', 'auto');
-      ga('send', 'pageview');
-  
-    </script>
-    <!-- /Google Analytics -->
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function (d, w, c) {
-            (w[c] = w[c] || []).push(function() {
-                try {
-                    w.yaCounter40812449 = new Ya.Metrika({
-                        id:40812449,
-                        clickmap:true,
-                        trackLinks:true,
-                        accurateTrackBounce:true
-                    });
-                } catch(e) { }
-            });
-  
-            var n = d.getElementsByTagName("script")[0],
-                s = d.createElement("script"),
-                f = function () { n.parentNode.insertBefore(s, n); };
-            s.type = "text/javascript";
-            s.async = true;
-            s.src = "https://mc.yandex.ru/metrika/watch.js";
-  
-            if (w.opera == "[object Opera]") {
-                d.addEventListener("DOMContentLoaded", f, false);
-            } else { f(); }
-        })(document, window, "yandex_metrika_callbacks");
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-    <!-- at the end of the HEAD -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
-    <link rel="stylesheet" href="../styles/search.css">
+      <title>Class DotNetCliCommand
+ | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class DotNetCliCommand
+ | BenchmarkDotNet ">
+      
+      <link rel="icon" href="../logo/icon-32.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
   </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
-    <div id="wrapper">
-      <header>
-        
-        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              
-              <a class="navbar-brand" href="../index.html">
-                <img id="logo" class="svg" src="../logo/icon.svg" alt="">
-              </a>
+
+  <script type="module">
+    import options from './../public/main.js'
+    import { init } from './../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
             </div>
-            <div class="collapse navbar-collapse" id="navbar">
-              <div class="navbar-right navbar-form">
-                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
-              </div>
-            </div>
-          </div>
-        </nav>
-        
-        <div class="subnav navbar navbar-default">
-          <div class="container hide-when-search" id="breadcrumb">
-            <ul class="breadcrumb">
-              <li></li>
-            </ul>
           </div>
         </div>
-      </header>
-      <div role="main" class="container body-content hide-when-search">
-        
-        <div class="sidenav hide-when-search">
-          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
-          <div class="sidetoggle collapse" id="sidetoggle">
-            <div id="sidetoc"></div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
           </div>
-        </div>
-        <div class="article row grid-right">
-          <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand">
-  
-  
-  <h1 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand" class="text-break">Class DotNetCliCommand
-  </h1>
-  <div class="markdown level0 summary"></div>
-  <div class="markdown level0 conceptual"></div>
-  <div class="inheritance">
-    <h5>Inheritance</h5>
-    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><span class="xref">DotNetCliCommand</span></div>
-  </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.html">BenchmarkDotNet.Toolchains.DotNetCli</a></h6>
-  <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
-  <h5 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_syntax">Syntax</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class DotNetCliCommand</code></pre>
-  </div>
-  <h3 id="constructors">Constructors
-  </h3>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand__ctor_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand__ctor_System_String_System_String_BenchmarkDotNet_Toolchains_Results_GenerateResult_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Running_BuildPartition_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Jobs_EnvironmentVariable__System_TimeSpan_System_Boolean_System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.#ctor(System.String,System.String,BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Running.BuildPartition,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable},System.TimeSpan,System.Boolean,System.Boolean)">DotNetCliCommand(String, String, GenerateResult, ILogger, BuildPartition, IReadOnlyList&lt;EnvironmentVariable&gt;, TimeSpan, Boolean, Boolean)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger, BuildPartition buildPartition, IReadOnlyList&lt;EnvironmentVariable&gt; environmentVariables, TimeSpan timeout, bool logOutput = false, bool retryFailedBuildWithNoDeps = true)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><span class="parametername">cliPath</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><span class="parametername">arguments</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Toolchains.Results.GenerateResult.html">GenerateResult</a></td>
-        <td><span class="parametername">generateResult</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></td>
-        <td><span class="parametername">logger</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Running.BuildPartition.html">BuildPartition</a></td>
-        <td><span class="parametername">buildPartition</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>&gt;</td>
-        <td><span class="parametername">environmentVariables</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
-        <td><span class="parametername">timeout</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td><span class="parametername">logOutput</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td><span class="parametername">retryFailedBuildWithNoDeps</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="properties">Properties
-  </h3>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Arguments_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Arguments*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Arguments" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Arguments">Arguments</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string Arguments { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildPartition_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildPartition*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildPartition" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildPartition">BuildPartition</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public BuildPartition BuildPartition { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Running.BuildPartition.html">BuildPartition</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_CliPath_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.CliPath*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_CliPath" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.CliPath">CliPath</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string CliPath { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_EnvironmentVariables_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.EnvironmentVariables*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_EnvironmentVariables" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.EnvironmentVariables">EnvironmentVariables</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;EnvironmentVariable&gt; EnvironmentVariables { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_GenerateResult_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.GenerateResult*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_GenerateResult" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.GenerateResult">GenerateResult</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public GenerateResult GenerateResult { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Toolchains.Results.GenerateResult.html">GenerateResult</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Logger_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Logger*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Logger" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Logger">Logger</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ILogger Logger { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_LogOutput_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.LogOutput*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_LogOutput" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.LogOutput">LogOutput</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool LogOutput { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RetryFailedBuildWithNoDeps_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RetryFailedBuildWithNoDeps*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RetryFailedBuildWithNoDeps" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RetryFailedBuildWithNoDeps">RetryFailedBuildWithNoDeps</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool RetryFailedBuildWithNoDeps { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Timeout_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Timeout*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Timeout" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Timeout">Timeout</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TimeSpan Timeout { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="methods">Methods
-  </h3>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_AddPackages_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.AddPackages*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_AddPackages" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.AddPackages">AddPackages()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult AddPackages()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html">DotNetCliCommandResult</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Build_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Build*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Build" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Build">Build()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult Build()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html">DotNetCliCommandResult</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildNoRestore_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestore*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildNoRestore" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestore">BuildNoRestore()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult BuildNoRestore()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html">DotNetCliCommandResult</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildNoRestoreNoDependencies_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestoreNoDependencies*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildNoRestoreNoDependencies" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestoreNoDependencies">BuildNoRestoreNoDependencies()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult BuildNoRestoreNoDependencies()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html">DotNetCliCommandResult</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Publish_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Publish*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Publish" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Publish">Publish()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult Publish()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html">DotNetCliCommandResult</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_PublishNoBuildAndNoRestore_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoBuildAndNoRestore*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_PublishNoBuildAndNoRestore" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoBuildAndNoRestore">PublishNoBuildAndNoRestore()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult PublishNoBuildAndNoRestore()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html">DotNetCliCommandResult</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Restore_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Restore*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Restore" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Restore">Restore()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult Restore()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html">DotNetCliCommandResult</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RestoreThenBuild_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RestoreThenBuild*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RestoreThenBuild" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RestoreThenBuild">RestoreThenBuild()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public BuildResult RestoreThenBuild()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Toolchains.Results.BuildResult.html">BuildResult</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RestoreThenBuildThenPublish_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RestoreThenBuildThenPublish*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RestoreThenBuildThenPublish" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RestoreThenBuildThenPublish">RestoreThenBuildThenPublish()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public BuildResult RestoreThenBuildThenPublish()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Toolchains.Results.BuildResult.html">BuildResult</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_WithArguments_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.WithArguments*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_WithArguments_System_String_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.WithArguments(System.String)">WithArguments(String)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DotNetCliCommand WithArguments(string arguments)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><span class="parametername">arguments</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html">DotNetCliCommand</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_WithCliPath_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.WithCliPath*"></a>
-  <h4 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_WithCliPath_System_String_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.WithCliPath(System.String)">WithCliPath(String)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DotNetCliCommand WithCliPath(string cliPath)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><span class="parametername">cliPath</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html">DotNetCliCommand</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-</article>
-          </div>
-          
-          <div class="hidden-sm col-md-2" role="complementary">
-            <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
-              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-                <h5>In This Article</h5>
-                <div></div>
-              </nav>
-            </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
           </div>
         </div>
       </div>
-      
-      <footer>
-        <div class="grad-bottom"></div>
-        <div class="footer">
-          <div class="container">
-            <span class="pull-right">
-              <a href="#top">Back to top</a>
-            </span>
-            Copyright &copy; 2013–2023 .NET Foundation and contributors
-            
-          </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
         </div>
-      </footer>
-    </div>
-    
-    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
-    <script type="text/javascript" src="../styles/docfx.js"></script>
-    <script type="text/javascript" src="../styles/main.js"></script>
-    <!-- at the end of the BODY -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-    <script type="text/javascript">
-        docsearch({
-            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
-            indexName: 'benchmarkdotnet',
-            inputSelector: '#search-query',
-            debug: false // Set debug to true if you want to inspect the dropdown
-        });
-    </script>  </body>
+
+        <article data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand">
+
+
+
+  <h1 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand" class="text-break">
+    Class DotNetCliCommand
+  
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="BenchmarkDotNet.html">BenchmarkDotNet</a>.<a class="xref" href="BenchmarkDotNet.Toolchains.html">Toolchains</a>.<a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.html">DotNetCli</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>BenchmarkDotNet.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class DotNetCliCommand</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">DotNetCliCommand</span></div>
+    </dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand__ctor_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.#ctor*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand__ctor_System_String_System_String_BenchmarkDotNet_Toolchains_Results_GenerateResult_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Running_BuildPartition_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Jobs_EnvironmentVariable__System_TimeSpan_System_Boolean_System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.#ctor(System.String,System.String,BenchmarkDotNet.Toolchains.Results.GenerateResult,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Running.BuildPartition,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable},System.TimeSpan,System.Boolean,System.Boolean)">
+  DotNetCliCommand(string, string, GenerateResult, ILogger, BuildPartition, IReadOnlyList&lt;EnvironmentVariable&gt;, TimeSpan, bool, bool)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DotNetCliCommand(string cliPath, string arguments, GenerateResult generateResult, ILogger logger, BuildPartition buildPartition, IReadOnlyList&lt;EnvironmentVariable&gt; environmentVariables, TimeSpan timeout, bool logOutput = false, bool retryFailedBuildWithNoDeps = true)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>cliPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>arguments</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>generateResult</code> <a class="xref" href="BenchmarkDotNet.Toolchains.Results.GenerateResult.html">GenerateResult</a></dt>
+    <dd></dd>
+    <dt><code>logger</code> <a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></dt>
+    <dd></dd>
+    <dt><code>buildPartition</code> <a class="xref" href="BenchmarkDotNet.Running.BuildPartition.html">BuildPartition</a></dt>
+    <dd></dd>
+    <dt><code>environmentVariables</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>timeout</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></dt>
+    <dd></dd>
+    <dt><code>logOutput</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+    <dt><code>retryFailedBuildWithNoDeps</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Arguments_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Arguments*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Arguments" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Arguments">
+  Arguments
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Arguments { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildPartition_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildPartition*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildPartition" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildPartition">
+  BuildPartition
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BuildPartition BuildPartition { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Running.BuildPartition.html">BuildPartition</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_CliPath_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.CliPath*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_CliPath" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.CliPath">
+  CliPath
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string CliPath { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_EnvironmentVariables_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.EnvironmentVariables*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_EnvironmentVariables" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.EnvironmentVariables">
+  EnvironmentVariables
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;EnvironmentVariable&gt; EnvironmentVariables { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_GenerateResult_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.GenerateResult*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_GenerateResult" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.GenerateResult">
+  GenerateResult
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public GenerateResult GenerateResult { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Toolchains.Results.GenerateResult.html">GenerateResult</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_LogOutput_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.LogOutput*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_LogOutput" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.LogOutput">
+  LogOutput
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool LogOutput { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Logger_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Logger*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Logger" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Logger">
+  Logger
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ILogger Logger { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html">ILogger</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RetryFailedBuildWithNoDeps_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RetryFailedBuildWithNoDeps*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RetryFailedBuildWithNoDeps" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RetryFailedBuildWithNoDeps">
+  RetryFailedBuildWithNoDeps
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool RetryFailedBuildWithNoDeps { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Timeout_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Timeout*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Timeout" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Timeout">
+  Timeout
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeSpan Timeout { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_AddPackages_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.AddPackages*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_AddPackages" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.AddPackages">
+  AddPackages()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult AddPackages()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html">DotNetCliCommandResult</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Build_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Build*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Build" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Build">
+  Build()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult Build()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html">DotNetCliCommandResult</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildNoRestore_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestore*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildNoRestore" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestore">
+  BuildNoRestore()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult BuildNoRestore()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html">DotNetCliCommandResult</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildNoRestoreNoDependencies_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestoreNoDependencies*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_BuildNoRestoreNoDependencies" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.BuildNoRestoreNoDependencies">
+  BuildNoRestoreNoDependencies()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult BuildNoRestoreNoDependencies()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html">DotNetCliCommandResult</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Publish_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Publish*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Publish" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Publish">
+  Publish()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult Publish()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html">DotNetCliCommandResult</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_PublishNoBuildAndNoRestore_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoBuildAndNoRestore*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_PublishNoBuildAndNoRestore" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.PublishNoBuildAndNoRestore">
+  PublishNoBuildAndNoRestore()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult PublishNoBuildAndNoRestore()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html">DotNetCliCommandResult</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Restore_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Restore*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_Restore" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.Restore">
+  Restore()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DotNetCliCommandResult Restore()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommandResult.html">DotNetCliCommandResult</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RestoreThenBuild_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RestoreThenBuild*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RestoreThenBuild" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RestoreThenBuild">
+  RestoreThenBuild()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BuildResult RestoreThenBuild()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Toolchains.Results.BuildResult.html">BuildResult</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RestoreThenBuildThenPublish_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RestoreThenBuildThenPublish*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_RestoreThenBuildThenPublish" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.RestoreThenBuildThenPublish">
+  RestoreThenBuildThenPublish()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BuildResult RestoreThenBuildThenPublish()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Toolchains.Results.BuildResult.html">BuildResult</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_WithArguments_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.WithArguments*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_WithArguments_System_String_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.WithArguments(System.String)">
+  WithArguments(string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DotNetCliCommand WithArguments(string arguments)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>arguments</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html">DotNetCliCommand</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_WithCliPath_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.WithCliPath*"></a>
+
+  <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliCommand_WithCliPath_System_String_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.WithCliPath(System.String)">
+  WithCliPath(string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DotNetCliCommand WithCliPath(string cliPath)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>cliPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliCommand.html">DotNetCliCommand</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2023 .NET Foundation and contributors
+        </div>
+      </div>
+    </footer>
+  </body>
 </html>

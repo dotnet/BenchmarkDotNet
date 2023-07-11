@@ -1,132 +1,122 @@
 ﻿<!DOCTYPE html>
-<!--[if IE]><![endif]-->
 <html>
-  
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class EnvironmentMode
-   | BenchmarkDotNet </title>
-    <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class EnvironmentMode
-   | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.59.4.0">
-    
-    <link rel="shortcut icon" href="../logo/icon-32.png">
-    <link rel="stylesheet" href="../styles/docfx.vendor.css">
-    <link rel="stylesheet" href="../styles/docfx.css">
-    <link rel="stylesheet" href="../styles/main.css">
-    <meta property="docfx:navrel" content="../toc.html">
-    <meta property="docfx:tocrel" content="toc.html">
-    
-    
-    
-  
-    <!-- Google Analytics -->
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  
-      ga('create', 'UA-41419012-6', 'auto');
-      ga('send', 'pageview');
-  
-    </script>
-    <!-- /Google Analytics -->
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function (d, w, c) {
-            (w[c] = w[c] || []).push(function() {
-                try {
-                    w.yaCounter40812449 = new Ya.Metrika({
-                        id:40812449,
-                        clickmap:true,
-                        trackLinks:true,
-                        accurateTrackBounce:true
-                    });
-                } catch(e) { }
-            });
-  
-            var n = d.getElementsByTagName("script")[0],
-                s = d.createElement("script"),
-                f = function () { n.parentNode.insertBefore(s, n); };
-            s.type = "text/javascript";
-            s.async = true;
-            s.src = "https://mc.yandex.ru/metrika/watch.js";
-  
-            if (w.opera == "[object Opera]") {
-                d.addEventListener("DOMContentLoaded", f, false);
-            } else { f(); }
-        })(document, window, "yandex_metrika_callbacks");
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-    <!-- at the end of the HEAD -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
-    <link rel="stylesheet" href="../styles/search.css">
+      <title>Class EnvironmentMode
+ | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class EnvironmentMode
+ | BenchmarkDotNet ">
+      
+      <link rel="icon" href="../logo/icon-32.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
   </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
-    <div id="wrapper">
-      <header>
-        
-        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              
-              <a class="navbar-brand" href="../index.html">
-                <img id="logo" class="svg" src="../logo/icon.svg" alt="">
-              </a>
+
+  <script type="module">
+    import options from './../public/main.js'
+    import { init } from './../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
             </div>
-            <div class="collapse navbar-collapse" id="navbar">
-              <div class="navbar-right navbar-form">
-                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
-              </div>
-            </div>
-          </div>
-        </nav>
-        
-        <div class="subnav navbar navbar-default">
-          <div class="container hide-when-search" id="breadcrumb">
-            <ul class="breadcrumb">
-              <li></li>
-            </ul>
           </div>
         </div>
-      </header>
-      <div role="main" class="container body-content hide-when-search">
-        
-        <div class="sidenav hide-when-search">
-          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
-          <div class="sidetoggle collapse" id="sidetoggle">
-            <div id="sidetoc"></div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
           </div>
         </div>
-        <div class="article row grid-right">
-          <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode">
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="BenchmarkDotNet.Jobs.EnvironmentMode">
+
+
+
+  <h1 id="BenchmarkDotNet_Jobs_EnvironmentMode" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode" class="text-break">
+    Class EnvironmentMode
   
-  
-  <h1 id="BenchmarkDotNet_Jobs_EnvironmentMode" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode" class="text-break">Class EnvironmentMode
   </h1>
-  <div class="markdown level0 summary"></div>
-  <div class="markdown level0 conceptual"></div>
-  <div class="inheritance">
-    <h5>Inheritance</h5>
-    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html">CharacteristicObject</a></div>
-    <div class="level2"><a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html">CharacteristicObject</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html">EnvironmentMode</a>&gt;</div>
-    <div class="level3"><a class="xref" href="BenchmarkDotNet.Jobs.JobMode-1.html">JobMode</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html">EnvironmentMode</a>&gt;</div>
-    <div class="level4"><span class="xref">EnvironmentMode</span></div>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="BenchmarkDotNet.html">BenchmarkDotNet</a>.<a class="xref" href="BenchmarkDotNet.Jobs.html">Jobs</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>BenchmarkDotNet.dll</dd></dl>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class EnvironmentMode : JobMode&lt;EnvironmentMode&gt;</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html">CharacteristicObject</a></div>
+      <div><a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html">CharacteristicObject</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html">EnvironmentMode</a>&gt;</div>
+      <div><a class="xref" href="BenchmarkDotNet.Jobs.JobMode-1.html">JobMode</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html">EnvironmentMode</a>&gt;</div>
+      <div><span class="xref">EnvironmentMode</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist derived">
+    <dt>Inherited Members</dt>
+    <dd>
     <div>
       <a class="xref" href="BenchmarkDotNet.Jobs.JobMode-1.html#BenchmarkDotNet_Jobs_JobMode_1_Default">JobMode&lt;EnvironmentMode&gt;.Default</a>
     </div>
@@ -137,13 +127,13 @@
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_Apply_BenchmarkDotNet_Characteristics_CharacteristicObject_">CharacteristicObject&lt;EnvironmentMode&gt;.Apply(CharacteristicObject)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_Apply_BenchmarkDotNet_Characteristics_CharacteristicObject___">CharacteristicObject&lt;EnvironmentMode&gt;.Apply(CharacteristicObject[])</a>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_Apply_BenchmarkDotNet_Characteristics_CharacteristicObject___">CharacteristicObject&lt;EnvironmentMode&gt;.Apply(params CharacteristicObject[])</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_ApplyAndFreeze_BenchmarkDotNet_Characteristics_CharacteristicObject_">CharacteristicObject&lt;EnvironmentMode&gt;.ApplyAndFreeze(CharacteristicObject)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_ApplyAndFreeze_BenchmarkDotNet_Characteristics_CharacteristicObject___">CharacteristicObject&lt;EnvironmentMode&gt;.ApplyAndFreeze(CharacteristicObject[])</a>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_ApplyAndFreeze_BenchmarkDotNet_Characteristics_CharacteristicObject___">CharacteristicObject&lt;EnvironmentMode&gt;.ApplyAndFreeze(params CharacteristicObject[])</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_Freeze">CharacteristicObject&lt;EnvironmentMode&gt;.Freeze()</a>
@@ -152,31 +142,7 @@
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_UnfreezeCopy">CharacteristicObject&lt;EnvironmentMode&gt;.UnfreezeCopy()</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_CreateCharacteristic__1_System_String_">CharacteristicObject&lt;EnvironmentMode&gt;.CreateCharacteristic&lt;TC&gt;(String)</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_CreateHiddenCharacteristic__1_System_String_">CharacteristicObject&lt;EnvironmentMode&gt;.CreateHiddenCharacteristic&lt;TC&gt;(String)</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_CreateIgnoreOnApplyCharacteristic__1_System_String_">CharacteristicObject&lt;EnvironmentMode&gt;.CreateIgnoreOnApplyCharacteristic&lt;TC&gt;(String)</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveId_BenchmarkDotNet_Characteristics_CharacteristicObject_System_String_">CharacteristicObject.ResolveId(CharacteristicObject, String)</a>
-    </div>
-    <div>
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_IdCharacteristic">CharacteristicObject.IdCharacteristic</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_OwnerOrSelf">CharacteristicObject.OwnerOrSelf</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_Frozen">CharacteristicObject.Frozen</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_IsPropertyBag">CharacteristicObject.IsPropertyBag</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_HasChanges">CharacteristicObject.HasChanges</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_GetCharacteristicsWithValues">CharacteristicObject.GetCharacteristicsWithValues()</a>
@@ -194,730 +160,861 @@
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveValue_BenchmarkDotNet_Characteristics_Characteristic_BenchmarkDotNet_Characteristics_IResolver_">CharacteristicObject.ResolveValue(Characteristic, IResolver)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveValue_BenchmarkDotNet_Characteristics_Characteristic_BenchmarkDotNet_Characteristics_IResolver_System_Object_">CharacteristicObject.ResolveValue(Characteristic, IResolver, Object)</a>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveValue_BenchmarkDotNet_Characteristics_Characteristic_BenchmarkDotNet_Characteristics_IResolver_System_Object_">CharacteristicObject.ResolveValue(Characteristic, IResolver, object)</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveValue__1_BenchmarkDotNet_Characteristics_Characteristic___0____0_">CharacteristicObject.ResolveValue&lt;T&gt;(Characteristic&lt;T&gt;, T)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveValue_BenchmarkDotNet_Characteristics_Characteristic_System_Object_">CharacteristicObject.ResolveValue(Characteristic, Object)</a>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveValue_BenchmarkDotNet_Characteristics_Characteristic_System_Object_">CharacteristicObject.ResolveValue(Characteristic, object)</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveValueAsNullable__1_BenchmarkDotNet_Characteristics_Characteristic___0__">CharacteristicObject.ResolveValueAsNullable&lt;T&gt;(Characteristic&lt;T&gt;)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ApplyCore_BenchmarkDotNet_Characteristics_CharacteristicObject_">CharacteristicObject.ApplyCore(CharacteristicObject)</a>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ToString">CharacteristicObject.ToString()</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_FreezeCore">CharacteristicObject.FreezeCore()</a>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_Frozen">CharacteristicObject.Frozen</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_UnfreezeCopyCore">CharacteristicObject.UnfreezeCopyCore()</a>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_HasChanges">CharacteristicObject.HasChanges</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_Id">CharacteristicObject.Id</a>
     </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ToString">CharacteristicObject.ToString()</a>
-    </div>
+  </dd></dl>
+
+  <dl class="typelist extensionMethods">
+    <dt>Extension Methods</dt>
+    <dd>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicHelper.html#BenchmarkDotNet_Characteristics_CharacteristicHelper_GetAllCharacteristics_BenchmarkDotNet_Characteristics_CharacteristicObject_">CharacteristicHelper.GetAllCharacteristics(CharacteristicObject)</a>
   </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Jobs.html">BenchmarkDotNet.Jobs</a></h6>
-  <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
-  <h5 id="BenchmarkDotNet_Jobs_EnvironmentMode_syntax">Syntax</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class EnvironmentMode : JobMode&lt;EnvironmentMode&gt;</code></pre>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicHelper.html#BenchmarkDotNet_Characteristics_CharacteristicHelper_GetThisTypeCharacteristics_BenchmarkDotNet_Characteristics_CharacteristicObject_">CharacteristicHelper.GetThisTypeCharacteristics(CharacteristicObject)</a>
   </div>
-  <h3 id="constructors">Constructors
-  </h3>
-  
-  
+  </dd></dl>
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
   <a id="BenchmarkDotNet_Jobs_EnvironmentMode__ctor_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode__ctor" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.#ctor">EnvironmentMode()</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode__ctor" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.#ctor">
+  EnvironmentMode()
+  
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public EnvironmentMode()</code></pre>
   </div>
-  
-  
+
+
+
+
+
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_EnvironmentMode__ctor_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode__ctor_BenchmarkDotNet_Environments_Runtime_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.#ctor(BenchmarkDotNet.Environments.Runtime)">EnvironmentMode(Runtime)</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode__ctor_BenchmarkDotNet_Environments_Runtime_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.#ctor(BenchmarkDotNet.Environments.Runtime)">
+  EnvironmentMode(Runtime)
+  
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public EnvironmentMode(Runtime runtime)</code></pre>
   </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a></td>
-        <td><span class="parametername">runtime</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>runtime</code> <a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_EnvironmentMode__ctor_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode__ctor_System_String_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.#ctor(System.String)">EnvironmentMode(String)</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode__ctor_System_String_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.#ctor(System.String)">
+  EnvironmentMode(string)
+  
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public EnvironmentMode(string id)</code></pre>
   </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><span class="parametername">id</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>id</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_EnvironmentMode__ctor_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode__ctor_System_String_BenchmarkDotNet_Environments_Jit_BenchmarkDotNet_Environments_Platform_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.#ctor(System.String,BenchmarkDotNet.Environments.Jit,BenchmarkDotNet.Environments.Platform)">EnvironmentMode(String, Jit, Platform)</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode__ctor_System_String_BenchmarkDotNet_Environments_Jit_BenchmarkDotNet_Environments_Platform_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.#ctor(System.String,BenchmarkDotNet.Environments.Jit,BenchmarkDotNet.Environments.Platform)">
+  EnvironmentMode(string, Jit, Platform)
+  
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public EnvironmentMode(string id, Jit jit, Platform platform)</code></pre>
   </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><span class="parametername">id</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Environments.Jit.html">Jit</a></td>
-        <td><span class="parametername">jit</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Environments.Platform.html">Platform</a></td>
-        <td><span class="parametername">platform</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="fields">Fields
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>id</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>jit</code> <a class="xref" href="BenchmarkDotNet.Environments.Jit.html">Jit</a></dt>
+    <dd></dd>
+    <dt><code>platform</code> <a class="xref" href="BenchmarkDotNet.Environments.Platform.html">Platform</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_AffinityCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.AffinityCharacteristic">
+  AffinityCharacteristic
+  
   </h3>
-  
-  
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_AffinityCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.AffinityCharacteristic">AffinityCharacteristic</h4>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;IntPtr&gt; AffinityCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">IntPtr</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">IntPtr</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_EnvironmentVariablesCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.EnvironmentVariablesCharacteristic">
+  EnvironmentVariablesCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_EnvironmentVariablesCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.EnvironmentVariablesCharacteristic">EnvironmentVariablesCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;IReadOnlyList&lt;EnvironmentVariable&gt;&gt; EnvironmentVariablesCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>&gt;&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_GcCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.GcCharacteristic">
+  GcCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_GcCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.GcCharacteristic">GcCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;GcMode&gt; GcCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.GcMode.html">GcMode</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.GcMode.html">GcMode</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_JitCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.JitCharacteristic">
+  JitCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_JitCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.JitCharacteristic">JitCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;Jit&gt; JitCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="BenchmarkDotNet.Environments.Jit.html">Jit</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="BenchmarkDotNet.Environments.Jit.html">Jit</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_LargeAddressAwareCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.LargeAddressAwareCharacteristic">
+  LargeAddressAwareCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_LargeAddressAwareCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.LargeAddressAwareCharacteristic">LargeAddressAwareCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;bool&gt; LargeAddressAwareCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_LegacyJitX64" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.LegacyJitX64">
+  LegacyJitX64
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_LegacyJitX64" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.LegacyJitX64">LegacyJitX64</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly EnvironmentMode LegacyJitX64</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html">EnvironmentMode</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html">EnvironmentMode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_LegacyJitX86" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.LegacyJitX86">
+  LegacyJitX86
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_LegacyJitX86" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.LegacyJitX86">LegacyJitX86</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly EnvironmentMode LegacyJitX86</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html">EnvironmentMode</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html">EnvironmentMode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_PlatformCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.PlatformCharacteristic">
+  PlatformCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_PlatformCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.PlatformCharacteristic">PlatformCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;Platform&gt; PlatformCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="BenchmarkDotNet.Environments.Platform.html">Platform</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="BenchmarkDotNet.Environments.Platform.html">Platform</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_PowerPlanModeCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.PowerPlanModeCharacteristic">
+  PowerPlanModeCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_PowerPlanModeCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.PowerPlanModeCharacteristic">PowerPlanModeCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;Guid?&gt; PowerPlanModeCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.nullable-1">Nullable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.guid">Guid</a>&gt;&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.guid">Guid</a>?&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_RuntimeCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.RuntimeCharacteristic">
+  RuntimeCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_RuntimeCharacteristic" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.RuntimeCharacteristic">RuntimeCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;Runtime&gt; RuntimeCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_RyuJitX64" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.RyuJitX64">
+  RyuJitX64
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_RyuJitX64" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.RyuJitX64">RyuJitX64</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly EnvironmentMode RyuJitX64</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html">EnvironmentMode</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html">EnvironmentMode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_RyuJitX86" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.RyuJitX86">
+  RyuJitX86
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_RyuJitX86" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.RyuJitX86">RyuJitX86</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly EnvironmentMode RyuJitX86</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html">EnvironmentMode</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="properties">Properties
-  </h3>
-  
-  
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html">EnvironmentMode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
   <a id="BenchmarkDotNet_Jobs_EnvironmentMode_Affinity_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.Affinity*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_Affinity" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.Affinity">Affinity</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_Affinity" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.Affinity">
+  Affinity
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>ProcessorAffinity for the benchmark process.
 See also: <a href="https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx">https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx</a></p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public IntPtr Affinity { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">IntPtr</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.intptr">IntPtr</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_EnvironmentMode_EnvironmentVariables_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.EnvironmentVariables*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_EnvironmentVariables" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.EnvironmentVariables">EnvironmentVariables</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_EnvironmentVariables" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.EnvironmentVariables">
+  EnvironmentVariables
+  
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;EnvironmentVariable&gt; EnvironmentVariables { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_EnvironmentMode_Gc_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.Gc*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_Gc" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.Gc">Gc</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_Gc" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.Gc">
+  Gc
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>GcMode</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public GcMode Gc { get; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.GcMode.html">GcMode</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Jobs.GcMode.html">GcMode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_EnvironmentMode_Jit_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.Jit*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_Jit" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.Jit">Jit</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_Jit" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.Jit">
+  Jit
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>JIT (Just-In-Time compiler)</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public Jit Jit { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Environments.Jit.html">Jit</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Environments.Jit.html">Jit</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_EnvironmentMode_LargeAddressAware_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.LargeAddressAware*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_LargeAddressAware" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.LargeAddressAware">LargeAddressAware</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_LargeAddressAware" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.LargeAddressAware">
+  LargeAddressAware
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>Specifies that benchmark can handle addresses larger than 2 gigabytes.
 <returns>false: Benchmark uses the default (64-bit: enabled; 32-bit:disabled). This is the default.</returns>
 <returns>true: Explicitly specify that benchmark can handle addresses larger than 2 gigabytes.</returns></p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public bool LargeAddressAware { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_EnvironmentMode_Platform_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.Platform*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_Platform" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.Platform">Platform</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_Platform" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.Platform">
+  Platform
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>Platform (x86 or x64)</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public Platform Platform { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Environments.Platform.html">Platform</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Environments.Platform.html">Platform</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_EnvironmentMode_PowerPlanMode_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.PowerPlanMode*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_PowerPlanMode" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.PowerPlanMode">PowerPlanMode</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_PowerPlanMode" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.PowerPlanMode">
+  PowerPlanMode
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>Power Plan Mode</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public Guid? PowerPlanMode { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.nullable-1">Nullable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.guid">Guid</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 id="BenchmarkDotNet_Jobs_EnvironmentMode_PowerPlanMode_remarks">Remarks</h5>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.guid">Guid</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="BenchmarkDotNet_Jobs_EnvironmentMode_PowerPlanMode_remarks">Remarks</h4>
   <div class="markdown level1 remarks"><p>Supported only on Windows.</p>
 </div>
-  
-  
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_EnvironmentMode_Runtime_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.Runtime*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_Runtime" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.Runtime">Runtime</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_Runtime" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.Runtime">
+  Runtime
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>Runtime</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public Runtime Runtime { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="methods">Methods
-  </h3>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Environments.Runtime.html">Runtime</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
   <a id="BenchmarkDotNet_Jobs_EnvironmentMode_SetEnvironmentVariable_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.SetEnvironmentVariable*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_EnvironmentMode_SetEnvironmentVariable_BenchmarkDotNet_Jobs_EnvironmentVariable_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.SetEnvironmentVariable(BenchmarkDotNet.Jobs.EnvironmentVariable)">SetEnvironmentVariable(EnvironmentVariable)</h4>
-  <div class="markdown level1 summary"><p>Adds the specified <code data-dev-comment-type="paramref" class="paramref">variable</code> to <a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html#BenchmarkDotNet_Jobs_EnvironmentMode_EnvironmentVariables">EnvironmentVariables</a>.
+
+  <h3 id="BenchmarkDotNet_Jobs_EnvironmentMode_SetEnvironmentVariable_BenchmarkDotNet_Jobs_EnvironmentVariable_" data-uid="BenchmarkDotNet.Jobs.EnvironmentMode.SetEnvironmentVariable(BenchmarkDotNet.Jobs.EnvironmentVariable)">
+  SetEnvironmentVariable(EnvironmentVariable)
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds the specified <code class="paramref">variable</code> to <a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html#BenchmarkDotNet_Jobs_EnvironmentMode_EnvironmentVariables">EnvironmentVariables</a>.
 If <a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html#BenchmarkDotNet_Jobs_EnvironmentMode_EnvironmentVariables">EnvironmentVariables</a> already contains a variable with the same key,
 it will be overriden.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public void SetEnvironmentVariable(EnvironmentVariable variable)</code></pre>
   </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a></td>
-        <td><span class="parametername">variable</span></td>
-        <td><p>The new environment variable which should be added to <a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html#BenchmarkDotNet_Jobs_EnvironmentMode_EnvironmentVariables">EnvironmentVariables</a></p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="extensionmethods">Extension Methods</h3>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicHelper.html#BenchmarkDotNet_Characteristics_CharacteristicHelper_GetThisTypeCharacteristics_BenchmarkDotNet_Characteristics_CharacteristicObject_">CharacteristicHelper.GetThisTypeCharacteristics(CharacteristicObject)</a>
-  </div>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicHelper.html#BenchmarkDotNet_Characteristics_CharacteristicHelper_GetAllCharacteristics_BenchmarkDotNet_Characteristics_CharacteristicObject_">CharacteristicHelper.GetAllCharacteristics(CharacteristicObject)</a>
-  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>variable</code> <a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentVariable.html">EnvironmentVariable</a></dt>
+    <dd><p>The new environment variable which should be added to <a class="xref" href="BenchmarkDotNet.Jobs.EnvironmentMode.html#BenchmarkDotNet_Jobs_EnvironmentMode_EnvironmentVariables">EnvironmentVariables</a></p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
 </article>
-          </div>
-          
-          <div class="hidden-sm col-md-2" role="complementary">
-            <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
-              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-                <h5>In This Article</h5>
-                <div></div>
-              </nav>
-            </div>
-          </div>
+
+
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2023 .NET Foundation and contributors
         </div>
       </div>
-      
-      <footer>
-        <div class="grad-bottom"></div>
-        <div class="footer">
-          <div class="container">
-            <span class="pull-right">
-              <a href="#top">Back to top</a>
-            </span>
-            Copyright &copy; 2013–2023 .NET Foundation and contributors
-            
-          </div>
-        </div>
-      </footer>
-    </div>
-    
-    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
-    <script type="text/javascript" src="../styles/docfx.js"></script>
-    <script type="text/javascript" src="../styles/main.js"></script>
-    <!-- at the end of the BODY -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-    <script type="text/javascript">
-        docsearch({
-            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
-            indexName: 'benchmarkdotnet',
-            inputSelector: '#search-query',
-            debug: false // Set debug to true if you want to inspect the dropdown
-        });
-    </script>  </body>
+    </footer>
+  </body>
 </html>

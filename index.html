@@ -1,135 +1,109 @@
 ﻿<!DOCTYPE html>
-<!--[if IE]><![endif]-->
 <html>
-  
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Home | BenchmarkDotNet </title>
-    <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Home | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.59.4.0">
-    
-    <link rel="shortcut icon" href="logo/icon-32.png">
-    <link rel="stylesheet" href="styles/docfx.vendor.css">
-    <link rel="stylesheet" href="styles/docfx.css">
-    <link rel="stylesheet" href="styles/main.css">
-    <meta property="docfx:navrel" content="toc.html">
-    <meta property="docfx:tocrel" content="toc.html">
-    
-    
-    
-  
-    <!-- Google Analytics -->
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  
-      ga('create', 'UA-41419012-6', 'auto');
-      ga('send', 'pageview');
-  
-    </script>
-    <!-- /Google Analytics -->
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function (d, w, c) {
-            (w[c] = w[c] || []).push(function() {
-                try {
-                    w.yaCounter40812449 = new Ya.Metrika({
-                        id:40812449,
-                        clickmap:true,
-                        trackLinks:true,
-                        accurateTrackBounce:true
-                    });
-                } catch(e) { }
-            });
-  
-            var n = d.getElementsByTagName("script")[0],
-                s = d.createElement("script"),
-                f = function () { n.parentNode.insertBefore(s, n); };
-            s.type = "text/javascript";
-            s.async = true;
-            s.src = "https://mc.yandex.ru/metrika/watch.js";
-  
-            if (w.opera == "[object Opera]") {
-                d.addEventListener("DOMContentLoaded", f, false);
-            } else { f(); }
-        })(document, window, "yandex_metrika_callbacks");
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-    <!-- at the end of the HEAD -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
-    <link rel="stylesheet" href="styles/search.css">
+      <title>Home | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Home | BenchmarkDotNet ">
+      
+      <link rel="icon" href="logo/icon-32.png">
+      <link rel="stylesheet" href="public/docfx.min.css">
+      <link rel="stylesheet" href="public/main.css">
+      <meta name="docfx:navrel" content="toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/index.md/#L1">
   </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
-    <div id="wrapper">
-      <header>
-        
-        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              
-              <a class="navbar-brand" href="index.html">
-                <img id="logo" class="svg" src="logo/icon.svg" alt="">
-              </a>
+
+  <script type="module">
+    import options from './public/main.js'
+    import { init } from './public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="index.html">
+            <img id="logo" class="svg" src="logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
             </div>
-            <div class="collapse navbar-collapse" id="navbar">
-              <div class="navbar-right navbar-form">
-                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
-              </div>
-            </div>
-          </div>
-        </nav>
-        
-        <div class="subnav navbar navbar-default">
-          <div class="container hide-when-search" id="breadcrumb">
-            <ul class="breadcrumb">
-              <li></li>
-            </ul>
           </div>
         </div>
-      </header>
-      <div role="main" class="container body-content hide-when-search">
-        <div class="article row grid">
-          <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="">
-<h3 align="center">
-<p><img src="logo/logo-wide.png" alt=""></p>
-</h3>
+      </nav>
+    </header>
 
-<h3 align="center">
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+
+<div align="center">
+<p><img src="https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/ec962b0bd6854c991d7a3ebd77037579165acb36/docs/logo/logo-wide.png" alt=""></p>
+</div>
+<div align="center">
 <p><a href="https://www.nuget.org/packages/BenchmarkDotNet/"><img src="https://img.shields.io/nuget/v/BenchmarkDotNet.svg" alt="NuGet"></a>
+<a href="https://www.myget.org/feed/Packages/benchmarkdotnet"><img src="https://img.shields.io/myget/benchmarkdotnet/vpre/benchmarkdotnet?label=myget" alt="MyGet"></a>
 <a href="https://www.nuget.org/packages/BenchmarkDotNet/"><img src="https://img.shields.io/nuget/dt/benchmarkdotnet.svg" alt="Downloads"></a>
 <a href="https://github.com/dotnet/BenchmarkDotNet/stargazers"><img src="https://img.shields.io/github/stars/dotnet/BenchmarkDotNet?color=brightgreen" alt="Stars"></a>
-<a href="https://gitter.im/dotnet/BenchmarkDotNet"><img src="https://img.shields.io/gitter/room/dotnet/BenchmarkDotNet?color=yellow" alt="Gitter"></a>
-<a href="LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
-<a href="https://github.com/dotnet/BenchmarkDotNet"><img src="https://img.shields.io/badge/source%20code-GitHub-informational" alt="GitHub"></a></p>
-</h3>
-<h3 align="center">
-  <a href="#Features">Features</a>
+<img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
+<a href="https://twitter.com/BenchmarkDotNet"><img src="https://img.shields.io/twitter/follow/BenchmarkDotNet?style=social&amp;label=Twitter" alt="Twitter"></a></p>
+</div>
+<div align="center" style="font-size: 130%; margin-bottom: 20px">
+  <a href="#features">Features</a>
   <span> · </span>
   <a href="https://benchmarkdotnet.org/articles/guides/getting-started.html">Getting started</a>
   <span> · </span>
   <a href="https://benchmarkdotnet.org/articles/overview.html">Documentation</a>
   <span> · </span>
   <a href="#learn-more-about-benchmarking">Learn more about benchmarking</a>
-</h3>
+</div>
 <p><strong>BenchmarkDotNet</strong> helps you to transform methods into benchmarks, track their performance, and share reproducible measurement experiments.
 It's no harder than writing unit tests!
-Under the hood, it performs a lot of <a href="#Automation">magic</a> that guarantees <a href="#Reliability">reliable and precise</a> results thanks to the <a href="https://github.com/AndreyAkinshin/perfolizer">perfolizer</a> statistical engine.
+Under the hood, it performs a lot of <a href="#automation">magic</a> that guarantees <a href="#reliability">reliable and precise</a> results thanks to the <a href="https://github.com/AndreyAkinshin/perfolizer">perfolizer</a> statistical engine.
 BenchmarkDotNet protects you from popular benchmarking mistakes and warns you if something is wrong with your benchmark design or obtained measurements.
-The results are presented in a <a href="#Friendliness">user-friendly</a> form that highlights all the important facts about your experiment.
-The library is adopted by <a href="#who-uses-benchmarkdotnet">14300+ projects</a> including .NET Runtime and supported by the <a href="https://dotnetfoundation.org">.NET Foundation</a>.</p>
-<p>It's <a href="#Simplicity">easy</a> to start writing benchmarks, check out an example
+The results are presented in a <a href="#friendliness">user-friendly</a> form that highlights all the important facts about your experiment.
+The library is adopted by <a href="#who-uses-benchmarkdotnet">16600+ GitHub projects</a> including .NET Runtime.</p>
+<p>It's <a href="#simplicity">easy</a> to start writing benchmarks, check out the following example
 (copy-pastable version is <a href="https://benchmarkdotnet.org/articles/guides/getting-started.html">here</a>):</p>
 <pre><code class="lang-cs">[SimpleJob(RuntimeMoniker.Net472, baseline: true)]
 [SimpleJob(RuntimeMoniker.NetCoreApp30)]
@@ -196,7 +170,7 @@ Intel Core i7-7700K CPU 4.20GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cor
 
 </code></pre>
 <p>The measured data can be exported to different formats (md, html, csv, xml, json, etc.) including plots:</p>
-<p><img src="images/v0.12.0/rplot.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/ec962b0bd6854c991d7a3ebd77037579165acb36/docs/images/v0.12.0/rplot.png" alt=""></p>
 <p><em>Supported runtimes:</em> .NET 5+, .NET Framework 4.6.1+, .NET Core 2.0+, Mono, NativeAOT<br>
 <em>Supported languages:</em> C#, F#, Visual Basic<br>
 <em>Supported OS:</em> Windows, Linux, macOS<br>
@@ -212,7 +186,7 @@ You can design very complicated performance experiments in the declarative style
 mark a field or a property with <code>[Params(1, 2, 3)]</code>: BenchmarkDotNet will enumerate all of the specified values
 and run benchmarks for each case.
 If you want to compare benchmarks with each other,
-mark one of the benchmark as the <a href="https://benchmarkdotnet.org/articles/features/baselines.html">baseline</a>
+mark one of the benchmarks as the <a href="https://benchmarkdotnet.org/articles/features/baselines.html">baseline</a>
 via <code>[Benchmark(Baseline = true)]</code>: BenchmarkDotNet will compare it with all of the other benchmarks.
 If you want to compare performance in different environments, use <a href="https://benchmarkdotnet.org/articles/configs/jobs.html">jobs</a>.
 For example, you can run all the benchmarks on .NET Core 3.0 and Mono via
@@ -235,12 +209,12 @@ the <a href="https://benchmarkdotnet.org/articles/guides/console-args.html">cons
 in any console application (other types of applications are not supported).</p>
 <h3 id="automation">Automation</h3>
 <p>Reliable benchmarks always include a lot of boilerplate code.</p>
-<p>Let's think about what should you do in a typical case.
+<p>Let's think about what you should do in a typical case.
 First, you should perform a pilot experiment and determine the best number of method invocations.
 Next, you should execute several warm-up iterations and ensure that your benchmark achieved a steady state.
 After that, you should execute the main iterations and calculate some basic statistics.
-If you calculate some values in your benchmark, you should use it somehow to prevent the dead code elimination.
-If you use loops, you should care about an effect of the loop unrolling on your results
+If you calculate some values in your benchmark, you should use it somehow to prevent dead code elimination.
+If you use loops, you should care about the effect of the loop unrolling on your results
 (which may depend on the processor architecture).
 Once you get results, you should check for some special properties of the obtained performance distribution
 like multimodality or extremely high outliers.
@@ -250,7 +224,7 @@ If you want to test several environments, you should perform the measurements in
 Note that it's a shortened version of the full checklist that you should follow during benchmarking:
 there are a lot of additional hidden pitfalls that should be handled appropriately.
 Fortunately, you shouldn't worry about it because
-BenchmarkDotNet <a href="https://benchmarkdotnet.org/articles/guides/how-it-works.html">will do</a> this boring and time-consuming stuff for you.</p>
+BenchmarkDotNet <a href="https://benchmarkdotnet.org/articles/guides/how-it-works.html">will perform</a> this boring and time-consuming stuff for you.</p>
 <p>Moreover, the library can help you with some advanced tasks that you may want to perform during the investigation.
 For example,
 BenchmarkDotNet can measure the <a href="https://benchmarkdotnet.org/articles/configs/diagnosers.html#usage">managed</a> and
@@ -264,10 +238,10 @@ BenchmarkDotNet tries to choose the best benchmarking parameters and
 achieve a good trade-off between the measurement prevision and the total duration of all benchmark runs.
 So, you shouldn't use any magic numbers (like &quot;We should perform 100 iterations here&quot;),
 the library will do it for you based on the values of statistical metrics.</p>
-<p>BenchmarkDotNet also prevents benchmarking of non-optimized assemblies that was built using DEBUG mode because
+<p>BenchmarkDotNet also prevents benchmarking of non-optimized assemblies that were built using DEBUG mode because
 the corresponding results will be unreliable.
-It will print a warning you if you have an attached debugger,
-if you use hypervisor (HyperV, VMware, VirtualBox),
+The library will print a warning if you have an attached debugger,
+if you use a hypervisor (HyperV, VMware, VirtualBox),
 or if you have any other problems with the current environment.</p>
 <p>During 6+ years of development, we faced dozens of different problems that may spoil your measurements.
 Inside BenchmarkDotNet, there are a lot of heuristics, checks, hacks, and tricks that help you to
@@ -289,13 +263,13 @@ For example, it will warn you in case of multimodal distribution or high outlier
 In this case, you can scroll the results up and check out ASCII-style histograms for each distribution
 or generate beautiful png plots using <code>[RPlotExporter]</code>.</p>
 <p>BenchmarkDotNet doesn't overload you with data; it shows only the essential information depending on your results:
-it allows you to keep summary small for primitive cases and extend it only for the complicated cases.
+it allows you to keep the summary small for primitive cases and extend it only for complicated cases.
 Of course, you can request any additional statistics and visualizations manually.
 If you don't customize the summary view,
 the default presentation will be as much user-friendly as possible. :)</p>
 <h2 id="who-uses-benchmarkdotnet">Who uses BenchmarkDotNet?</h2>
 <p>Everyone!
-BenchmarkDotNet is already adopted by more than <a href="https://github.com/dotnet/BenchmarkDotNet/network/dependents?package_id=UGFja2FnZS0xNTY3MzExMzE%3D">14300+</a> projects including
+BenchmarkDotNet is already adopted by more than <a href="https://github.com/dotnet/BenchmarkDotNet/network/dependents?package_id=UGFja2FnZS0xNTY3MzExMzE%3D">16600+</a> projects including
 <a href="https://github.com/dotnet/performance">dotnet/performance</a> (reference benchmarks for all .NET Runtimes),
 <a href="https://github.com/dotnet/runtime/issues?utf8=%E2%9C%93&amp;q=BenchmarkDotNet">dotnet/runtime</a> (.NET runtime and libraries),
 <a href="https://github.com/dotnet/roslyn/search?q=BenchmarkDotNet&amp;type=Issues&amp;utf8=%E2%9C%93">Roslyn</a> (C# and Visual Basic compiler),
@@ -328,15 +302,10 @@ BenchmarkDotNet is already adopted by more than <a href="https://github.com/dotn
 <a href="https://github.com/restsharp/RestSharp/tree/dev/benchmarks/RestSharp.Benchmarks">RestSharp</a>,
 <a href="https://github.com/jbogard/MediatR/tree/master/test/MediatR.Benchmarks">MediatR</a>,
 <a href="https://github.com/SciSharp/TensorFlow.NET/tree/master/src/TensorFlowNet.Benchmarks">TensorFlow.NET</a>,
-<a href="https://github.com/apache/thrift/tree/master/lib/netstd/Benchmarks/Thrift.Benchmarks">Apache Thrift</a>.<br>
-On GitHub, you can find
-12600+ <a href="https://github.com/search?o=desc&amp;q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&amp;s=created&amp;type=Issues&amp;utf8=%E2%9C%93">issues</a>,
-5200+ <a href="https://github.com/search?o=desc&amp;q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&amp;s=committer-date&amp;type=Commits&amp;utf8=%E2%9C%93">commits</a>, and
-1,600,000+ <a href="https://github.com/search?o=desc&amp;q=BenchmarkDotNet+-repo:dotnet%2FBenchmarkDotNet&amp;s=indexed&amp;type=Code&amp;utf8=%E2%9C%93">files</a>
-that involve BenchmarkDotNet.</p>
+<a href="https://github.com/apache/thrift/tree/master/lib/netstd/Benchmarks/Thrift.Benchmarks">Apache Thrift</a>.</p>
 <h2 id="learn-more-about-benchmarking">Learn more about benchmarking</h2>
 <p>BenchmarkDotNet is not a silver bullet that magically makes all of your benchmarks correct and analyzes the measurements for you.
-Even if you use this library, you still should know how to design the benchmark experiments and how to make correct conclusions based on the raw data.
+Even if you use this library, you still should know how to design benchmark experiments and how to make correct conclusions based on the raw data.
 If you want to know more about benchmarking methodology and good practices,
 it's recommended to read a book by Andrey Akinshin (the BenchmarkDotNet project lead): <a href="https://aakinshin.net/prodotnetbenchmarking/">&quot;Pro .NET Benchmarking&quot;</a>.
 Use this in-depth guide to correctly design benchmarks, measure key performance metrics of .NET applications, and analyze results.
@@ -347,43 +316,6 @@ You will avoid common pitfalls, control the accuracy of your measurements, and i
     <img src="https://aakinshin.net/img/misc/prodotnetbenchmarking-cover.png" width="400">
   </a>
 </div>
-<h2 id="build-status">Build status</h2>
-<table>
-<thead>
-<tr>
-<th>Build server</th>
-<th>Platform</th>
-<th>Build status</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Azure Pipelines</td>
-<td>Windows</td>
-<td><a href="https://dev.azure.com/dotnet/BenchmarkDotNet/_build/latest?definitionId=55"><img src="https://dev.azure.com/dotnet/BenchmarkDotNet/_apis/build/status/BenchmarkDotNet%20-%20Windows" alt="Azure Pipelines Windows"></a></td>
-</tr>
-<tr>
-<td>Azure Pipelines</td>
-<td>Ubuntu</td>
-<td><a href="https://dev.azure.com/dotnet/BenchmarkDotNet/_build/latest?definitionId=56"><img src="https://dev.azure.com/dotnet/BenchmarkDotNet/_apis/build/status/BenchmarkDotNet%20-%20Ubuntu" alt="Azure Pipelines Ubuntu"></a></td>
-</tr>
-<tr>
-<td>Azure Pipelines</td>
-<td>macOS</td>
-<td><a href="https://dev.azure.com/dotnet/BenchmarkDotNet/_build/latest?definitionId=57"><img src="https://dev.azure.com/dotnet/BenchmarkDotNet/_apis/build/status/BenchmarkDotNet%20-%20macOS" alt="Azure Pipelines macOS"></a></td>
-</tr>
-<tr>
-<td>AppVeyor</td>
-<td>Windows</td>
-<td><a href="https://ci.appveyor.com/project/dotnetfoundation/benchmarkdotnet/branch/master"><img src="https://img.shields.io/appveyor/ci/dotnetfoundation/benchmarkdotnet/master.svg" alt="AppVeyor/Windows"></a></td>
-</tr>
-<tr>
-<td>GitHub Actions</td>
-<td>*</td>
-<td><a href="https://github.com/dotnet/BenchmarkDotNet/actions/workflows/build.yaml"><img src="https://github.com/dotnet/BenchmarkDotNet/actions/workflows/build.yaml/badge.svg" alt="build"></a></td>
-</tr>
-</tbody>
-</table>
 <h2 id="contributions-are-welcome">Contributions are welcome!</h2>
 <p>BenchmarkDotNet is already a stable full-featured library that allows performing performance investigation on a professional level.
 And it continues to evolve!
@@ -400,51 +332,25 @@ Let's build the best tool for benchmarking together!</p>
 to clarify expected behavior in our community.
 For more information, see the <a href="https://dotnetfoundation.org/code-of-conduct">.NET Foundation Code of Conduct</a>.</p>
 </article>
-          </div>
-          
-          <div class="hidden-sm col-md-2" role="complementary">
-            <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                  <li>
-                    <a href="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/index.md/#L1" class="contribution-link">Improve this Doc</a>
-                  </li>
-                </ul>
-              </div>
-              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-                <h5>In This Article</h5>
-                <div></div>
-              </nav>
-            </div>
-          </div>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2023 .NET Foundation and contributors
         </div>
       </div>
-      
-      <footer>
-        <div class="grad-bottom"></div>
-        <div class="footer">
-          <div class="container">
-            <span class="pull-right">
-              <a href="#top">Back to top</a>
-            </span>
-            Copyright &copy; 2013–2023 .NET Foundation and contributors
-            
-          </div>
-        </div>
-      </footer>
-    </div>
-    
-    <script type="text/javascript" src="styles/docfx.vendor.js"></script>
-    <script type="text/javascript" src="styles/docfx.js"></script>
-    <script type="text/javascript" src="styles/main.js"></script>
-    <!-- at the end of the BODY -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-    <script type="text/javascript">
-        docsearch({
-            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
-            indexName: 'benchmarkdotnet',
-            inputSelector: '#search-query',
-            debug: false // Set debug to true if you want to inspect the dropdown
-        });
-    </script>  </body>
+    </footer>
+  </body>
 </html>

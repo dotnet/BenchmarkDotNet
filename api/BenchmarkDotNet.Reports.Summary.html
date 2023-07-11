@@ -1,885 +1,120 @@
 ﻿<!DOCTYPE html>
-<!--[if IE]><![endif]-->
 <html>
-  
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class Summary
-   | BenchmarkDotNet </title>
-    <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class Summary
-   | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.59.4.0">
-    
-    <link rel="shortcut icon" href="../logo/icon-32.png">
-    <link rel="stylesheet" href="../styles/docfx.vendor.css">
-    <link rel="stylesheet" href="../styles/docfx.css">
-    <link rel="stylesheet" href="../styles/main.css">
-    <meta property="docfx:navrel" content="../toc.html">
-    <meta property="docfx:tocrel" content="toc.html">
-    
-    
-    
-  
-    <!-- Google Analytics -->
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  
-      ga('create', 'UA-41419012-6', 'auto');
-      ga('send', 'pageview');
-  
-    </script>
-    <!-- /Google Analytics -->
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function (d, w, c) {
-            (w[c] = w[c] || []).push(function() {
-                try {
-                    w.yaCounter40812449 = new Ya.Metrika({
-                        id:40812449,
-                        clickmap:true,
-                        trackLinks:true,
-                        accurateTrackBounce:true
-                    });
-                } catch(e) { }
-            });
-  
-            var n = d.getElementsByTagName("script")[0],
-                s = d.createElement("script"),
-                f = function () { n.parentNode.insertBefore(s, n); };
-            s.type = "text/javascript";
-            s.async = true;
-            s.src = "https://mc.yandex.ru/metrika/watch.js";
-  
-            if (w.opera == "[object Opera]") {
-                d.addEventListener("DOMContentLoaded", f, false);
-            } else { f(); }
-        })(document, window, "yandex_metrika_callbacks");
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-    <!-- at the end of the HEAD -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
-    <link rel="stylesheet" href="../styles/search.css">
+      <title>Class Summary
+ | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class Summary
+ | BenchmarkDotNet ">
+      
+      <link rel="icon" href="../logo/icon-32.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
   </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
-    <div id="wrapper">
-      <header>
-        
-        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              
-              <a class="navbar-brand" href="../index.html">
-                <img id="logo" class="svg" src="../logo/icon.svg" alt="">
-              </a>
+
+  <script type="module">
+    import options from './../public/main.js'
+    import { init } from './../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
             </div>
-            <div class="collapse navbar-collapse" id="navbar">
-              <div class="navbar-right navbar-form">
-                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
-              </div>
-            </div>
-          </div>
-        </nav>
-        
-        <div class="subnav navbar navbar-default">
-          <div class="container hide-when-search" id="breadcrumb">
-            <ul class="breadcrumb">
-              <li></li>
-            </ul>
           </div>
         </div>
-      </header>
-      <div role="main" class="container body-content hide-when-search">
-        
-        <div class="sidenav hide-when-search">
-          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
-          <div class="sidetoggle collapse" id="sidetoggle">
-            <div id="sidetoc"></div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
           </div>
         </div>
-        <div class="article row grid-right">
-          <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Reports.Summary">
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="BenchmarkDotNet.Reports.Summary">
+
+
+
+  <h1 id="BenchmarkDotNet_Reports_Summary" data-uid="BenchmarkDotNet.Reports.Summary" class="text-break">
+    Class Summary
   
-  
-  <h1 id="BenchmarkDotNet_Reports_Summary" data-uid="BenchmarkDotNet.Reports.Summary" class="text-break">Class Summary
   </h1>
-  <div class="markdown level0 summary"></div>
-  <div class="markdown level0 conceptual"></div>
-  <div class="inheritance">
-    <h5>Inheritance</h5>
-    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><span class="xref">Summary</span></div>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="BenchmarkDotNet.html">BenchmarkDotNet</a>.<a class="xref" href="BenchmarkDotNet.Reports.html">Reports</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>BenchmarkDotNet.dll</dd></dl>
   </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Reports.html">BenchmarkDotNet.Reports</a></h6>
-  <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
-  <h5 id="BenchmarkDotNet_Reports_Summary_syntax">Syntax</h5>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public class Summary</code></pre>
   </div>
-  <h3 id="constructors">Constructors
-  </h3>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary__ctor_" data-uid="BenchmarkDotNet.Reports.Summary.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary__ctor_System_String_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Reports_BenchmarkReport__BenchmarkDotNet_Environments_HostEnvironmentInfo_System_String_System_String_System_TimeSpan_System_Globalization_CultureInfo_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Validators_ValidationError__System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Columns_IColumnHidingRule__" data-uid="BenchmarkDotNet.Reports.Summary.#ctor(System.String,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Reports.BenchmarkReport},BenchmarkDotNet.Environments.HostEnvironmentInfo,System.String,System.String,System.TimeSpan,System.Globalization.CultureInfo,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Validators.ValidationError},System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Columns.IColumnHidingRule})">Summary(String, ImmutableArray&lt;BenchmarkReport&gt;, HostEnvironmentInfo, String, String, TimeSpan, CultureInfo, ImmutableArray&lt;ValidationError&gt;, ImmutableArray&lt;IColumnHidingRule&gt;)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Summary(string title, ImmutableArray&lt;BenchmarkReport&gt; reports, HostEnvironmentInfo hostEnvironmentInfo, string resultsDirectoryPath, string logFilePath, TimeSpan totalTime, CultureInfo cultureInfo, ImmutableArray&lt;ValidationError&gt; validationErrors, ImmutableArray&lt;IColumnHidingRule&gt; columnHidingRules)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><span class="parametername">title</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Reports.BenchmarkReport.html">BenchmarkReport</a>&gt;</td>
-        <td><span class="parametername">reports</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Environments.HostEnvironmentInfo.html">HostEnvironmentInfo</a></td>
-        <td><span class="parametername">hostEnvironmentInfo</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><span class="parametername">resultsDirectoryPath</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><span class="parametername">logFilePath</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
-        <td><span class="parametername">totalTime</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo">CultureInfo</a></td>
-        <td><span class="parametername">cultureInfo</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</td>
-        <td><span class="parametername">validationErrors</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Columns.IColumnHidingRule.html">IColumnHidingRule</a>&gt;</td>
-        <td><span class="parametername">columnHidingRules</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="properties">Properties
-  </h3>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_AllRuntimes_" data-uid="BenchmarkDotNet.Reports.Summary.AllRuntimes*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_AllRuntimes" data-uid="BenchmarkDotNet.Reports.Summary.AllRuntimes">AllRuntimes</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string AllRuntimes { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_BenchmarksCases_" data-uid="BenchmarkDotNet.Reports.Summary.BenchmarksCases*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_BenchmarksCases" data-uid="BenchmarkDotNet.Reports.Summary.BenchmarksCases">BenchmarksCases</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ImmutableArray&lt;BenchmarkCase&gt; BenchmarksCases { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_ColumnHidingRules_" data-uid="BenchmarkDotNet.Reports.Summary.ColumnHidingRules*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_ColumnHidingRules" data-uid="BenchmarkDotNet.Reports.Summary.ColumnHidingRules">ColumnHidingRules</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ImmutableArray&lt;IColumnHidingRule&gt; ColumnHidingRules { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Columns.IColumnHidingRule.html">IColumnHidingRule</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_HasCriticalValidationErrors_" data-uid="BenchmarkDotNet.Reports.Summary.HasCriticalValidationErrors*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_HasCriticalValidationErrors" data-uid="BenchmarkDotNet.Reports.Summary.HasCriticalValidationErrors">HasCriticalValidationErrors</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool HasCriticalValidationErrors { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_HostEnvironmentInfo_" data-uid="BenchmarkDotNet.Reports.Summary.HostEnvironmentInfo*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_HostEnvironmentInfo" data-uid="BenchmarkDotNet.Reports.Summary.HostEnvironmentInfo">HostEnvironmentInfo</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public HostEnvironmentInfo HostEnvironmentInfo { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Environments.HostEnvironmentInfo.html">HostEnvironmentInfo</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_IsMultipleRuntimes_" data-uid="BenchmarkDotNet.Reports.Summary.IsMultipleRuntimes*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_IsMultipleRuntimes" data-uid="BenchmarkDotNet.Reports.Summary.IsMultipleRuntimes">IsMultipleRuntimes</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool IsMultipleRuntimes { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_Item_" data-uid="BenchmarkDotNet.Reports.Summary.Item*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_Item_BenchmarkDotNet_Running_BenchmarkCase_" data-uid="BenchmarkDotNet.Reports.Summary.Item(BenchmarkDotNet.Running.BenchmarkCase)">Item[BenchmarkCase]</h4>
-  <div class="markdown level1 summary"><p>Returns a report for the given benchmark or null if there is no a corresponded report.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public BenchmarkReport this[BenchmarkCase benchmarkCase] { get; }</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></td>
-        <td><span class="parametername">benchmarkCase</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Reports.BenchmarkReport.html">BenchmarkReport</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_LogFilePath_" data-uid="BenchmarkDotNet.Reports.Summary.LogFilePath*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_LogFilePath" data-uid="BenchmarkDotNet.Reports.Summary.LogFilePath">LogFilePath</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string LogFilePath { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_Orderer_" data-uid="BenchmarkDotNet.Reports.Summary.Orderer*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_Orderer" data-uid="BenchmarkDotNet.Reports.Summary.Orderer">Orderer</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IOrderer Orderer { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Order.IOrderer.html">IOrderer</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_Reports_" data-uid="BenchmarkDotNet.Reports.Summary.Reports*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_Reports" data-uid="BenchmarkDotNet.Reports.Summary.Reports">Reports</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ImmutableArray&lt;BenchmarkReport&gt; Reports { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Reports.BenchmarkReport.html">BenchmarkReport</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_ResultsDirectoryPath_" data-uid="BenchmarkDotNet.Reports.Summary.ResultsDirectoryPath*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_ResultsDirectoryPath" data-uid="BenchmarkDotNet.Reports.Summary.ResultsDirectoryPath">ResultsDirectoryPath</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string ResultsDirectoryPath { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_Style_" data-uid="BenchmarkDotNet.Reports.Summary.Style*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_Style" data-uid="BenchmarkDotNet.Reports.Summary.Style">Style</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public SummaryStyle Style { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_Table_" data-uid="BenchmarkDotNet.Reports.Summary.Table*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_Table" data-uid="BenchmarkDotNet.Reports.Summary.Table">Table</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public SummaryTable Table { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Reports.SummaryTable.html">SummaryTable</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_Title_" data-uid="BenchmarkDotNet.Reports.Summary.Title*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_Title" data-uid="BenchmarkDotNet.Reports.Summary.Title">Title</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string Title { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_TotalTime_" data-uid="BenchmarkDotNet.Reports.Summary.TotalTime*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_TotalTime" data-uid="BenchmarkDotNet.Reports.Summary.TotalTime">TotalTime</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TimeSpan TotalTime { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_ValidationErrors_" data-uid="BenchmarkDotNet.Reports.Summary.ValidationErrors*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_ValidationErrors" data-uid="BenchmarkDotNet.Reports.Summary.ValidationErrors">ValidationErrors</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ImmutableArray&lt;ValidationError&gt; ValidationErrors { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="methods">Methods
-  </h3>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_GetBaseline_" data-uid="BenchmarkDotNet.Reports.Summary.GetBaseline*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_GetBaseline_System_String_" data-uid="BenchmarkDotNet.Reports.Summary.GetBaseline(System.String)">GetBaseline(String)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public BenchmarkCase GetBaseline(string logicalGroupKey)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><span class="parametername">logicalGroupKey</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_GetLogicalGroupKey_" data-uid="BenchmarkDotNet.Reports.Summary.GetLogicalGroupKey*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_GetLogicalGroupKey_BenchmarkDotNet_Running_BenchmarkCase_" data-uid="BenchmarkDotNet.Reports.Summary.GetLogicalGroupKey(BenchmarkDotNet.Running.BenchmarkCase)">GetLogicalGroupKey(BenchmarkCase)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string GetLogicalGroupKey(BenchmarkCase benchmarkCase)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></td>
-        <td><span class="parametername">benchmarkCase</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_GetNonBaselines_" data-uid="BenchmarkDotNet.Reports.Summary.GetNonBaselines*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_GetNonBaselines_System_String_" data-uid="BenchmarkDotNet.Reports.Summary.GetNonBaselines(System.String)">GetNonBaselines(String)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IEnumerable&lt;BenchmarkCase&gt; GetNonBaselines(string logicalGroupKey)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td><span class="parametername">logicalGroupKey</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_GetNumberOfExecutedBenchmarks_" data-uid="BenchmarkDotNet.Reports.Summary.GetNumberOfExecutedBenchmarks*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_GetNumberOfExecutedBenchmarks" data-uid="BenchmarkDotNet.Reports.Summary.GetNumberOfExecutedBenchmarks">GetNumberOfExecutedBenchmarks()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int GetNumberOfExecutedBenchmarks()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_HasBaselines_" data-uid="BenchmarkDotNet.Reports.Summary.HasBaselines*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_HasBaselines" data-uid="BenchmarkDotNet.Reports.Summary.HasBaselines">HasBaselines()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool HasBaselines()</code></pre>
-  </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_HasReport_" data-uid="BenchmarkDotNet.Reports.Summary.HasReport*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_HasReport_BenchmarkDotNet_Running_BenchmarkCase_" data-uid="BenchmarkDotNet.Reports.Summary.HasReport(BenchmarkDotNet.Running.BenchmarkCase)">HasReport(BenchmarkCase)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool HasReport(BenchmarkCase benchmarkCase)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></td>
-        <td><span class="parametername">benchmarkCase</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="BenchmarkDotNet_Reports_Summary_IsBaseline_" data-uid="BenchmarkDotNet.Reports.Summary.IsBaseline*"></a>
-  <h4 id="BenchmarkDotNet_Reports_Summary_IsBaseline_BenchmarkDotNet_Running_BenchmarkCase_" data-uid="BenchmarkDotNet.Reports.Summary.IsBaseline(BenchmarkDotNet.Running.BenchmarkCase)">IsBaseline(BenchmarkCase)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool IsBaseline(BenchmarkCase benchmarkCase)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></td>
-        <td><span class="parametername">benchmarkCase</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="extensionmethods">Extension Methods</h3>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">Summary</span></div>
+    </dd>
+  </dl>
+
+
+
+
+  <dl class="typelist extensionMethods">
+    <dt>Extension Methods</dt>
+    <dd>
   <div>
       <a class="xref" href="BenchmarkDotNet.Extensions.ReportExtensions.html#BenchmarkDotNet_Extensions_ReportExtensions_GetReportFor__1_BenchmarkDotNet_Reports_Summary_System_Linq_Expressions_Expression_System_Action___0___">ReportExtensions.GetReportFor&lt;T&gt;(Summary, Expression&lt;Action&lt;T&gt;&gt;)</a>
   </div>
@@ -890,54 +125,840 @@
       <a class="xref" href="BenchmarkDotNet.Reports.SummaryExtensions.html#BenchmarkDotNet_Reports_SummaryExtensions_GetColumns_BenchmarkDotNet_Reports_Summary_">SummaryExtensions.GetColumns(Summary)</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Reports.SummaryExtensions.html#BenchmarkDotNet_Reports_SummaryExtensions_GetLogicalGroupForBenchmark_BenchmarkDotNet_Reports_Summary_BenchmarkDotNet_Running_BenchmarkCase_">SummaryExtensions.GetLogicalGroupForBenchmark(Summary, BenchmarkCase)</a>
+      <a class="xref" href="BenchmarkDotNet.Reports.SummaryExtensions.html#BenchmarkDotNet_Reports_SummaryExtensions_GetCultureInfo_BenchmarkDotNet_Reports_Summary_">SummaryExtensions.GetCultureInfo(Summary?)</a>
   </div>
   <div>
-      <a class="xref" href="BenchmarkDotNet.Reports.SummaryExtensions.html#BenchmarkDotNet_Reports_SummaryExtensions_GetCultureInfo_BenchmarkDotNet_Reports_Summary_">SummaryExtensions.GetCultureInfo(Summary)</a>
+      <a class="xref" href="BenchmarkDotNet.Reports.SummaryExtensions.html#BenchmarkDotNet_Reports_SummaryExtensions_GetLogicalGroupForBenchmark_BenchmarkDotNet_Reports_Summary_BenchmarkDotNet_Running_BenchmarkCase_">SummaryExtensions.GetLogicalGroupForBenchmark(Summary, BenchmarkCase)</a>
   </div>
+  </dd></dl>
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="BenchmarkDotNet_Reports_Summary__ctor_" data-uid="BenchmarkDotNet.Reports.Summary.#ctor*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary__ctor_System_String_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Reports_BenchmarkReport__BenchmarkDotNet_Environments_HostEnvironmentInfo_System_String_System_String_System_TimeSpan_System_Globalization_CultureInfo_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Validators_ValidationError__System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Columns_IColumnHidingRule__" data-uid="BenchmarkDotNet.Reports.Summary.#ctor(System.String,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Reports.BenchmarkReport},BenchmarkDotNet.Environments.HostEnvironmentInfo,System.String,System.String,System.TimeSpan,System.Globalization.CultureInfo,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Validators.ValidationError},System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Columns.IColumnHidingRule})">
+  Summary(string, ImmutableArray&lt;BenchmarkReport&gt;, HostEnvironmentInfo, string, string, TimeSpan, CultureInfo, ImmutableArray&lt;ValidationError&gt;, ImmutableArray&lt;IColumnHidingRule&gt;)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Summary(string title, ImmutableArray&lt;BenchmarkReport&gt; reports, HostEnvironmentInfo hostEnvironmentInfo, string resultsDirectoryPath, string logFilePath, TimeSpan totalTime, CultureInfo cultureInfo, ImmutableArray&lt;ValidationError&gt; validationErrors, ImmutableArray&lt;IColumnHidingRule&gt; columnHidingRules)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>title</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>reports</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Reports.BenchmarkReport.html">BenchmarkReport</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>hostEnvironmentInfo</code> <a class="xref" href="BenchmarkDotNet.Environments.HostEnvironmentInfo.html">HostEnvironmentInfo</a></dt>
+    <dd></dd>
+    <dt><code>resultsDirectoryPath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>logFilePath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+    <dt><code>totalTime</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></dt>
+    <dd></dd>
+    <dt><code>cultureInfo</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo">CultureInfo</a></dt>
+    <dd></dd>
+    <dt><code>validationErrors</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>columnHidingRules</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Columns.IColumnHidingRule.html">IColumnHidingRule</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_AllRuntimes_" data-uid="BenchmarkDotNet.Reports.Summary.AllRuntimes*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_AllRuntimes" data-uid="BenchmarkDotNet.Reports.Summary.AllRuntimes">
+  AllRuntimes
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string AllRuntimes { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_BenchmarksCases_" data-uid="BenchmarkDotNet.Reports.Summary.BenchmarksCases*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_BenchmarksCases" data-uid="BenchmarkDotNet.Reports.Summary.BenchmarksCases">
+  BenchmarksCases
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ImmutableArray&lt;BenchmarkCase&gt; BenchmarksCases { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_ColumnHidingRules_" data-uid="BenchmarkDotNet.Reports.Summary.ColumnHidingRules*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_ColumnHidingRules" data-uid="BenchmarkDotNet.Reports.Summary.ColumnHidingRules">
+  ColumnHidingRules
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ImmutableArray&lt;IColumnHidingRule&gt; ColumnHidingRules { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Columns.IColumnHidingRule.html">IColumnHidingRule</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_HasCriticalValidationErrors_" data-uid="BenchmarkDotNet.Reports.Summary.HasCriticalValidationErrors*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_HasCriticalValidationErrors" data-uid="BenchmarkDotNet.Reports.Summary.HasCriticalValidationErrors">
+  HasCriticalValidationErrors
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool HasCriticalValidationErrors { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_HostEnvironmentInfo_" data-uid="BenchmarkDotNet.Reports.Summary.HostEnvironmentInfo*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_HostEnvironmentInfo" data-uid="BenchmarkDotNet.Reports.Summary.HostEnvironmentInfo">
+  HostEnvironmentInfo
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public HostEnvironmentInfo HostEnvironmentInfo { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Environments.HostEnvironmentInfo.html">HostEnvironmentInfo</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_IsMultipleRuntimes_" data-uid="BenchmarkDotNet.Reports.Summary.IsMultipleRuntimes*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_IsMultipleRuntimes" data-uid="BenchmarkDotNet.Reports.Summary.IsMultipleRuntimes">
+  IsMultipleRuntimes
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsMultipleRuntimes { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_Item_" data-uid="BenchmarkDotNet.Reports.Summary.Item*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_Item_BenchmarkDotNet_Running_BenchmarkCase_" data-uid="BenchmarkDotNet.Reports.Summary.Item(BenchmarkDotNet.Running.BenchmarkCase)">
+  this[BenchmarkCase]
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>Returns a report for the given benchmark or null if there is no a corresponded report.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BenchmarkReport this[BenchmarkCase benchmarkCase] { get; }</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>benchmarkCase</code> <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Reports.BenchmarkReport.html">BenchmarkReport</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_LogFilePath_" data-uid="BenchmarkDotNet.Reports.Summary.LogFilePath*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_LogFilePath" data-uid="BenchmarkDotNet.Reports.Summary.LogFilePath">
+  LogFilePath
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string LogFilePath { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_Orderer_" data-uid="BenchmarkDotNet.Reports.Summary.Orderer*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_Orderer" data-uid="BenchmarkDotNet.Reports.Summary.Orderer">
+  Orderer
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IOrderer Orderer { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Order.IOrderer.html">IOrderer</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_Reports_" data-uid="BenchmarkDotNet.Reports.Summary.Reports*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_Reports" data-uid="BenchmarkDotNet.Reports.Summary.Reports">
+  Reports
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ImmutableArray&lt;BenchmarkReport&gt; Reports { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Reports.BenchmarkReport.html">BenchmarkReport</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_ResultsDirectoryPath_" data-uid="BenchmarkDotNet.Reports.Summary.ResultsDirectoryPath*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_ResultsDirectoryPath" data-uid="BenchmarkDotNet.Reports.Summary.ResultsDirectoryPath">
+  ResultsDirectoryPath
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string ResultsDirectoryPath { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_Style_" data-uid="BenchmarkDotNet.Reports.Summary.Style*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_Style" data-uid="BenchmarkDotNet.Reports.Summary.Style">
+  Style
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SummaryStyle Style { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_Table_" data-uid="BenchmarkDotNet.Reports.Summary.Table*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_Table" data-uid="BenchmarkDotNet.Reports.Summary.Table">
+  Table
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SummaryTable Table { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Reports.SummaryTable.html">SummaryTable</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_Title_" data-uid="BenchmarkDotNet.Reports.Summary.Title*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_Title" data-uid="BenchmarkDotNet.Reports.Summary.Title">
+  Title
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Title { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_TotalTime_" data-uid="BenchmarkDotNet.Reports.Summary.TotalTime*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_TotalTime" data-uid="BenchmarkDotNet.Reports.Summary.TotalTime">
+  TotalTime
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeSpan TotalTime { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_ValidationErrors_" data-uid="BenchmarkDotNet.Reports.Summary.ValidationErrors*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_ValidationErrors" data-uid="BenchmarkDotNet.Reports.Summary.ValidationErrors">
+  ValidationErrors
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ImmutableArray&lt;ValidationError&gt; ValidationErrors { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_GetBaseline_" data-uid="BenchmarkDotNet.Reports.Summary.GetBaseline*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_GetBaseline_System_String_" data-uid="BenchmarkDotNet.Reports.Summary.GetBaseline(System.String)">
+  GetBaseline(string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BenchmarkCase? GetBaseline(string logicalGroupKey)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>logicalGroupKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_GetLogicalGroupKey_" data-uid="BenchmarkDotNet.Reports.Summary.GetLogicalGroupKey*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_GetLogicalGroupKey_BenchmarkDotNet_Running_BenchmarkCase_" data-uid="BenchmarkDotNet.Reports.Summary.GetLogicalGroupKey(BenchmarkDotNet.Running.BenchmarkCase)">
+  GetLogicalGroupKey(BenchmarkCase)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string? GetLogicalGroupKey(BenchmarkCase benchmarkCase)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>benchmarkCase</code> <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_GetNonBaselines_" data-uid="BenchmarkDotNet.Reports.Summary.GetNonBaselines*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_GetNonBaselines_System_String_" data-uid="BenchmarkDotNet.Reports.Summary.GetNonBaselines(System.String)">
+  GetNonBaselines(string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;BenchmarkCase&gt; GetNonBaselines(string logicalGroupKey)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>logicalGroupKey</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_GetNumberOfExecutedBenchmarks_" data-uid="BenchmarkDotNet.Reports.Summary.GetNumberOfExecutedBenchmarks*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_GetNumberOfExecutedBenchmarks" data-uid="BenchmarkDotNet.Reports.Summary.GetNumberOfExecutedBenchmarks">
+  GetNumberOfExecutedBenchmarks()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int GetNumberOfExecutedBenchmarks()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_HasBaselines_" data-uid="BenchmarkDotNet.Reports.Summary.HasBaselines*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_HasBaselines" data-uid="BenchmarkDotNet.Reports.Summary.HasBaselines">
+  HasBaselines()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool HasBaselines()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_HasReport_" data-uid="BenchmarkDotNet.Reports.Summary.HasReport*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_HasReport_BenchmarkDotNet_Running_BenchmarkCase_" data-uid="BenchmarkDotNet.Reports.Summary.HasReport(BenchmarkDotNet.Running.BenchmarkCase)">
+  HasReport(BenchmarkCase)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool HasReport(BenchmarkCase benchmarkCase)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>benchmarkCase</code> <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_Summary_IsBaseline_" data-uid="BenchmarkDotNet.Reports.Summary.IsBaseline*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_Summary_IsBaseline_BenchmarkDotNet_Running_BenchmarkCase_" data-uid="BenchmarkDotNet.Reports.Summary.IsBaseline(BenchmarkDotNet.Running.BenchmarkCase)">
+  IsBaseline(BenchmarkCase)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsBaseline(BenchmarkCase benchmarkCase)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>benchmarkCase</code> <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></dt>
+    <dd></dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
 </article>
-          </div>
-          
-          <div class="hidden-sm col-md-2" role="complementary">
-            <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
-              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-                <h5>In This Article</h5>
-                <div></div>
-              </nav>
-            </div>
-          </div>
+
+
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2023 .NET Foundation and contributors
         </div>
       </div>
-      
-      <footer>
-        <div class="grad-bottom"></div>
-        <div class="footer">
-          <div class="container">
-            <span class="pull-right">
-              <a href="#top">Back to top</a>
-            </span>
-            Copyright &copy; 2013–2023 .NET Foundation and contributors
-            
-          </div>
-        </div>
-      </footer>
-    </div>
-    
-    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
-    <script type="text/javascript" src="../styles/docfx.js"></script>
-    <script type="text/javascript" src="../styles/main.js"></script>
-    <!-- at the end of the BODY -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-    <script type="text/javascript">
-        docsearch({
-            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
-            indexName: 'benchmarkdotnet',
-            inputSelector: '#search-query',
-            debug: false // Set debug to true if you want to inspect the dropdown
-        });
-    </script>  </body>
+    </footer>
+  </body>
 </html>

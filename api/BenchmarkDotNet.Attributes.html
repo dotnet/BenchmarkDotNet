@@ -1,479 +1,681 @@
 ﻿<!DOCTYPE html>
-<!--[if IE]><![endif]-->
 <html>
-  
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Namespace BenchmarkDotNet.Attributes
-   | BenchmarkDotNet </title>
-    <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Namespace BenchmarkDotNet.Attributes
-   | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.59.4.0">
-    
-    <link rel="shortcut icon" href="../logo/icon-32.png">
-    <link rel="stylesheet" href="../styles/docfx.vendor.css">
-    <link rel="stylesheet" href="../styles/docfx.css">
-    <link rel="stylesheet" href="../styles/main.css">
-    <meta property="docfx:navrel" content="../toc.html">
-    <meta property="docfx:tocrel" content="toc.html">
-    
-    
-    
-  
-    <!-- Google Analytics -->
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  
-      ga('create', 'UA-41419012-6', 'auto');
-      ga('send', 'pageview');
-  
-    </script>
-    <!-- /Google Analytics -->
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function (d, w, c) {
-            (w[c] = w[c] || []).push(function() {
-                try {
-                    w.yaCounter40812449 = new Ya.Metrika({
-                        id:40812449,
-                        clickmap:true,
-                        trackLinks:true,
-                        accurateTrackBounce:true
-                    });
-                } catch(e) { }
-            });
-  
-            var n = d.getElementsByTagName("script")[0],
-                s = d.createElement("script"),
-                f = function () { n.parentNode.insertBefore(s, n); };
-            s.type = "text/javascript";
-            s.async = true;
-            s.src = "https://mc.yandex.ru/metrika/watch.js";
-  
-            if (w.opera == "[object Opera]") {
-                d.addEventListener("DOMContentLoaded", f, false);
-            } else { f(); }
-        })(document, window, "yandex_metrika_callbacks");
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-    <!-- at the end of the HEAD -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
-    <link rel="stylesheet" href="../styles/search.css">
+      <title>Namespace BenchmarkDotNet.Attributes
+ | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Namespace BenchmarkDotNet.Attributes
+ | BenchmarkDotNet ">
+      
+      <link rel="icon" href="../logo/icon-32.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
   </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
-    <div id="wrapper">
-      <header>
-        
-        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              
-              <a class="navbar-brand" href="../index.html">
-                <img id="logo" class="svg" src="../logo/icon.svg" alt="">
-              </a>
+
+  <script type="module">
+    import options from './../public/main.js'
+    import { init } from './../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
             </div>
-            <div class="collapse navbar-collapse" id="navbar">
-              <div class="navbar-right navbar-form">
-                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
-              </div>
-            </div>
-          </div>
-        </nav>
-        
-        <div class="subnav navbar navbar-default">
-          <div class="container hide-when-search" id="breadcrumb">
-            <ul class="breadcrumb">
-              <li></li>
-            </ul>
           </div>
         </div>
-      </header>
-      <div role="main" class="container body-content hide-when-search">
-        
-        <div class="sidenav hide-when-search">
-          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
-          <div class="sidetoggle collapse" id="sidetoggle">
-            <div id="sidetoc"></div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
           </div>
-        </div>
-        <div class="article row grid-right">
-          <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Attributes">
-  
-  <h1 id="BenchmarkDotNet_Attributes" data-uid="BenchmarkDotNet.Attributes" class="text-break">Namespace BenchmarkDotNet.Attributes
-  </h1>
-  <div class="markdown level0 summary"></div>
-  <div class="markdown level0 conceptual"></div>
-  <div class="markdown level0 remarks"></div>
-    <h3 id="classes">Classes
-  </h3>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.AllCategoriesFilterAttribute.html">AllCategoriesFilterAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.AllStatisticsColumnAttribute.html">AllStatisticsColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.AnyCategoriesFilterAttribute.html">AnyCategoriesFilterAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ArgumentsAttribute.html">ArgumentsAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html">ArgumentsSourceAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ArtifactsPathAttribute.html">ArtifactsPathAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.AsciiDocExporterAttribute.html">AsciiDocExporterAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.BaselineColumnAttribute.html">BaselineColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.BenchmarkAttribute.html">BenchmarkAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.BenchmarkCategoryAttribute.html">BenchmarkCategoryAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.CategoriesColumnAttribute.html">CategoriesColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ClrJobAttribute.html">ClrJobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ColumnConfigBaseAttribute.html">ColumnConfigBaseAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ConfidenceIntervalErrorColumnAttribute.html">ConfidenceIntervalErrorColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ConfigAttribute.html">ConfigAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.CoreJobAttribute.html">CoreJobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.CsvExporterAttribute.html">CsvExporterAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.CsvMeasurementsExporterAttribute.html">CsvMeasurementsExporterAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.DisassemblyDiagnoserAttribute.html">DisassemblyDiagnoserAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.DryClrJobAttribute.html">DryClrJobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.DryCoreJobAttribute.html">DryCoreJobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.DryJobAttribute.html">DryJobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.DryMonoJobAttribute.html">DryMonoJobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.EncodingAttribute.html">EncodingAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.EncodingAttribute.ASCII.html">EncodingAttribute.ASCII</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.EncodingAttribute.Unicode.html">EncodingAttribute.Unicode</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.EvaluateOverheadAttribute.html">EvaluateOverheadAttribute</a></h4>
-      <section><p>Specifies if the overhead should be evaluated (Idle runs) and it's average value subtracted from every result.
-True by default, very important for nano-benchmarks.</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.EventPipeProfilerAttribute.html">EventPipeProfilerAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ExceptionDiagnoserAttribute.html">ExceptionDiagnoserAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ExecutionValidatorAttribute.html">ExecutionValidatorAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ExporterConfigBaseAttribute.html">ExporterConfigBaseAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.FilterConfigBaseAttribute.html">FilterConfigBaseAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.GcConcurrentAttribute.html">GcConcurrentAttribute</a></h4>
-      <section><p>Specifies whether the common language runtime runs garbage collection on a separate thread.
-<returns>false: Does not run garbage collection concurrently.</returns>
-<returns>true: Runs garbage collection concurrently. This is the default.</returns></p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.GcForceAttribute.html">GcForceAttribute</a></h4>
-      <section><p>Specifies whether the BenchmarkDotNet's benchmark runner forces full garbage collection after each benchmark invocation
-<returns>false: Does not force garbage collection.</returns>
-<returns>true: Forces full garbage collection after each benchmark invocation. This is the default.</returns></p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.GcServerAttribute.html">GcServerAttribute</a></h4>
-      <section><p>Specifies whether the common language runtime runs server garbage collection.
-<returns>false: Does not run server garbage collection. This is the default.</returns>
-<returns>true: Runs server garbage collection.</returns></p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.GenericTypeArgumentsAttribute.html">GenericTypeArgumentsAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.GlobalCleanupAttribute.html">GlobalCleanupAttribute</a></h4>
-      <section><p>Marks method to be executed after all benchmark iterations.
-<remarks>It's going to be executed only once, after all benchmark runs.</remarks></p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.GlobalSetupAttribute.html">GlobalSetupAttribute</a></h4>
-      <section><p>Marks method to be executed before all benchmark iterations.
-<remarks>It's going to be executed only once, just before warm up.</remarks></p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.GroupBenchmarksByAttribute.html">GroupBenchmarksByAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.HardwareCountersAttribute.html">HardwareCountersAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.HideColumnsAttribute.html">HideColumnsAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.HtmlExporterAttribute.html">HtmlExporterAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.InnerIterationCountAttribute.html">InnerIterationCountAttribute</a></h4>
-      <section><p>Invocation count in a single iteration.
-Does exactly the same as InvocationCountAttribute, added to make porting from xunit-performance to BenchmarkDotNet easier</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.InProcessAttribute.html">InProcessAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.InvocationCountAttribute.html">InvocationCountAttribute</a></h4>
-      <section><p>Invocation count in a single iteration.
-If specified, <a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_IterationTime">IterationTime</a> will be ignored.
-If specified, it must be a multiple of <a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_UnrollFactor">UnrollFactor</a>.</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.IterationCleanupAttribute.html">IterationCleanupAttribute</a></h4>
-      <section><p>Marks method to be executed after each benchmark iteration. This should NOT be used for microbenchmarks - please see the docs.</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.IterationCountAttribute.html">IterationCountAttribute</a></h4>
-      <section><p>How many target iterations should be performed
-If specified, <a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_MinIterationCount">MinIterationCount</a> will be ignored.
-If specified, <a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_MaxIterationCount">MaxIterationCount</a> will be ignored.</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.IterationsColumnAttribute.html">IterationsColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.IterationSetupAttribute.html">IterationSetupAttribute</a></h4>
-      <section><p>Marks method to be executed before each benchmark iteration. This should NOT be used for microbenchmarks - please see the docs.</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.IterationTimeAttribute.html">IterationTimeAttribute</a></h4>
-      <section><p>Desired time of execution of an iteration. Used by Pilot stage to estimate the number of invocations per iteration.
-The default value is 500 milliseconds.</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.JobConfigBaseAttribute.html">JobConfigBaseAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.JobMutatorConfigBaseAttribute.html">JobMutatorConfigBaseAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.JsonExporterAttribute.html">JsonExporterAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.JsonExporterAttribute.BriefAttribute.html">JsonExporterAttribute.BriefAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.JsonExporterAttribute.BriefCompressed.html">JsonExporterAttribute.BriefCompressed</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.JsonExporterAttribute.Full.html">JsonExporterAttribute.Full</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.JsonExporterAttribute.FullCompressed.html">JsonExporterAttribute.FullCompressed</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.KeepBenchmarkFilesAttribute.html">KeepBenchmarkFilesAttribute</a></h4>
-      <section><p>determines if all auto-generated files should be kept or removed after running the benchmarks</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.KurtosisColumnAttribute.html">KurtosisColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.LegacyJitX64JobAttribute.html">LegacyJitX64JobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.LegacyJitX86JobAttribute.html">LegacyJitX86JobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.LogicalGroupColumnAttribute.html">LogicalGroupColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.LongRunJobAttribute.html">LongRunJobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MarkdownExporterAttribute.html">MarkdownExporterAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MarkdownExporterAttribute.Atlassian.html">MarkdownExporterAttribute.Atlassian</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MarkdownExporterAttribute.Default.html">MarkdownExporterAttribute.Default</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MarkdownExporterAttribute.GitHub.html">MarkdownExporterAttribute.GitHub</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MarkdownExporterAttribute.StackOverflow.html">MarkdownExporterAttribute.StackOverflow</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MaxAbsoluteErrorAttribute.html">MaxAbsoluteErrorAttribute</a></h4>
-      <section><p>Maximum acceptable error for a benchmark (by default, BenchmarkDotNet continue iterations until the actual error is less than the specified error).
-Doesn't have a default value.
-<remarks>If <a class="xref" href="BenchmarkDotNet.Jobs.AccuracyMode.html#BenchmarkDotNet_Jobs_AccuracyMode_MaxRelativeError">MaxRelativeError</a> is also provided, the smallest value is used as stop criteria.</remarks></p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MaxColumnAttribute.html">MaxColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MaxIterationCountAttribute.html">MaxIterationCountAttribute</a></h4>
-      <section><p>Maximum count of target iterations that should be performed
-The default value is 100
-<remarks>If you set this value to below 15, then <a class="xref" href="BenchmarkDotNet.Analysers.MultimodalDistributionAnalyzer.html">MultimodalDistributionAnalyzer</a>  is not going to work</remarks></p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MaxRelativeErrorAttribute.html">MaxRelativeErrorAttribute</a></h4>
-      <section><p>Maximum acceptable error for a benchmark (by default, BenchmarkDotNet continue iterations until the actual error is less than the specified error).
-The default value is 0.02.
-<remarks>If <a class="xref" href="BenchmarkDotNet.Jobs.AccuracyMode.html#BenchmarkDotNet_Jobs_AccuracyMode_MaxAbsoluteError">MaxAbsoluteError</a> is also provided, the smallest value is used as stop criteria.</remarks></p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MaxWarmupCountAttribute.html">MaxWarmupCountAttribute</a></h4>
-      <section><p>Maximum count of warmup iterations that should be performed
-The default value is 50</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MeanColumnAttribute.html">MeanColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MedianColumnAttribute.html">MedianColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MediumRunJobAttribute.html">MediumRunJobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MemoryDiagnoserAttribute.html">MemoryDiagnoserAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MemoryRandomizationAttribute.html">MemoryRandomizationAttribute</a></h4>
-      <section><p>specifies whether Engine should allocate some random-sized memory between iterations
-<remarks>it makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration</remarks></p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MinColumnAttribute.html">MinColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MinInvokeCountAttribute.html">MinInvokeCountAttribute</a></h4>
-      <section><p>Minimum count of benchmark invocations per iteration.
-The default value is 4.</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MinIterationCountAttribute.html">MinIterationCountAttribute</a></h4>
-      <section><p>Minimum count of target iterations that should be performed.
-The default value is 15.
-<remarks>If you set this value to below 15, then <a class="xref" href="BenchmarkDotNet.Analysers.MultimodalDistributionAnalyzer.html">MultimodalDistributionAnalyzer</a> is not going to work.</remarks></p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MinIterationTimeAttribute.html">MinIterationTimeAttribute</a></h4>
-      <section><p>Minimum time of a single iteration. Unlike Run.IterationTime, this characteristic specifies only the lower limit. In case of need, BenchmarkDotNet can increase this value.
-The default value is 500 milliseconds.</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MinWarmupCountAttribute.html">MinWarmupCountAttribute</a></h4>
-      <section><p>Minimum count of warmup iterations that should be performed
-The default value is 6</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MonoJobAttribute.html">MonoJobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.MValueColumnAttribute.html">MValueColumnAttribute</a></h4>
-      <section><p>Prints mvalue.
-See <a href="http://www.brendangregg.com/FrequencyTrails/modes.html">http://www.brendangregg.com/FrequencyTrails/modes.html</a></p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.NamespaceColumnAttribute.html">NamespaceColumnAttribute</a></h4>
-      <section><p>Add a column with the target method namespace.</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.html">OperatingSystemsArchitectureFilterAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.html">OperatingSystemsFilterAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.OrdererAttribute.html">OrdererAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.OutliersAttribute.html">OutliersAttribute</a></h4>
-      <section><p>Specifies which outliers should be removed from the distribution</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ParamsAllValuesAttribute.html">ParamsAllValuesAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ParamsAttribute.html">ParamsAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ParamsSourceAttribute.html">ParamsSourceAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.PerfCollectProfilerAttribute.html">PerfCollectProfilerAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.PlainExporterAttribute.html">PlainExporterAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.PriorityAttribute.html">PriorityAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ProcessCountAttribute.html">ProcessCountAttribute</a></h4>
-      <section><p>How many times we should launch process with target benchmark.</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.Q1ColumnAttribute.html">Q1ColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.Q3ColumnAttribute.html">Q3ColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.RankColumnAttribute.html">RankColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ReturnValueValidatorAttribute.html">ReturnValueValidatorAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.RPlotExporterAttribute.html">RPlotExporterAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.RunOncePerIterationAttribute.html">RunOncePerIterationAttribute</a></h4>
-      <section><p>Run the benchmark exactly once per iteration.</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.RyuJitX64JobAttribute.html">RyuJitX64JobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.RyuJitX86JobAttribute.html">RyuJitX86JobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ShortRunJobAttribute.html">ShortRunJobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.SimpleJobAttribute.html">SimpleJobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.SkewnessColumnAttribute.html">SkewnessColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.html">StatisticalTestColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.StdDevColumnAttribute.html">StdDevColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.StdErrorColumnAttribute.html">StdErrorColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.StopOnFirstErrorAttribute.html">StopOnFirstErrorAttribute</a></h4>
-      <section><p>determines if running should be stop after first error</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.TargetedAttribute.html">TargetedAttribute</a></h4>
-      <section><p>Base class for attributes that are targeted at one or more method(s)</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ThreadingDiagnoserAttribute.html">ThreadingDiagnoserAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.UnicodeConsoleLoggerAttribute.html">UnicodeConsoleLoggerAttribute</a></h4>
-      <section><p>Enable unicode support in console logger</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.ValidatorConfigBaseAttribute.html">ValidatorConfigBaseAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.VeryLongRunJobAttribute.html">VeryLongRunJobAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.WarmupCountAttribute.html">WarmupCountAttribute</a></h4>
-      <section><p>How many warmup iterations should be performed.</p>
-</section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.html">WelchTTestPValueColumnAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.XmlExporterAttribute.html">XmlExporterAttribute</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.XmlExporterAttribute.Brief.html">XmlExporterAttribute.Brief</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.XmlExporterAttribute.BriefCompressed.html">XmlExporterAttribute.BriefCompressed</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.XmlExporterAttribute.Full.html">XmlExporterAttribute.Full</a></h4>
-      <section></section>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.XmlExporterAttribute.FullCompressed.html">XmlExporterAttribute.FullCompressed</a></h4>
-      <section></section>
-    <h3 id="enums">Enums
-  </h3>
-      <h4><a class="xref" href="BenchmarkDotNet.Attributes.OS.html">OS</a></h4>
-      <section></section>
-</article>
-          </div>
-          
-          <div class="hidden-sm col-md-2" role="complementary">
-            <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
-              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-                <h5>In This Article</h5>
-                <div></div>
-              </nav>
-            </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
           </div>
         </div>
       </div>
-      
-      <footer>
-        <div class="grad-bottom"></div>
-        <div class="footer">
-          <div class="container">
-            <span class="pull-right">
-              <a href="#top">Back to top</a>
-            </span>
-            Copyright &copy; 2013–2023 .NET Foundation and contributors
-            
-          </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
         </div>
-      </footer>
-    </div>
-    
-    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
-    <script type="text/javascript" src="../styles/docfx.js"></script>
-    <script type="text/javascript" src="../styles/main.js"></script>
-    <!-- at the end of the BODY -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-    <script type="text/javascript">
-        docsearch({
-            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
-            indexName: 'benchmarkdotnet',
-            inputSelector: '#search-query',
-            debug: false // Set debug to true if you want to inspect the dropdown
-        });
-    </script>  </body>
+
+        <article data-uid="BenchmarkDotNet.Attributes">
+
+  <h1 id="BenchmarkDotNet_Attributes" data-uid="BenchmarkDotNet.Attributes" class="text-break">Namespace BenchmarkDotNet.Attributes
+</h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="markdown level0 remarks"></div>
+
+    <h3 id="classes">
+Classes
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.AllCategoriesFilterAttribute.html">AllCategoriesFilterAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.AllStatisticsColumnAttribute.html">AllStatisticsColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.AnyCategoriesFilterAttribute.html">AnyCategoriesFilterAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ArgumentsAttribute.html">ArgumentsAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ArgumentsSourceAttribute.html">ArgumentsSourceAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ArtifactsPathAttribute.html">ArtifactsPathAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.AsciiDocExporterAttribute.html">AsciiDocExporterAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.BaselineColumnAttribute.html">BaselineColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.BenchmarkAttribute.html">BenchmarkAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.BenchmarkCategoryAttribute.html">BenchmarkCategoryAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.CategoriesColumnAttribute.html">CategoriesColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.CategoryDiscovererAttribute.html">CategoryDiscovererAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ClrJobAttribute.html">ClrJobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ColumnConfigBaseAttribute.html">ColumnConfigBaseAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ConfidenceIntervalErrorColumnAttribute.html">ConfidenceIntervalErrorColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ConfigAttribute.html">ConfigAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.CoreJobAttribute.html">CoreJobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.CsvExporterAttribute.html">CsvExporterAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.CsvMeasurementsExporterAttribute.html">CsvMeasurementsExporterAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.DisassemblyDiagnoserAttribute.html">DisassemblyDiagnoserAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.DryClrJobAttribute.html">DryClrJobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.DryCoreJobAttribute.html">DryCoreJobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.DryJobAttribute.html">DryJobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.DryMonoJobAttribute.html">DryMonoJobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.EncodingAttribute.html">EncodingAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.EncodingAttribute.ASCII.html">EncodingAttribute.ASCII</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.EncodingAttribute.Unicode.html">EncodingAttribute.Unicode</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.EvaluateOverheadAttribute.html">EvaluateOverheadAttribute</a></dt>
+      <dd><p>Specifies if the overhead should be evaluated (Idle runs) and it's average value subtracted from every result.
+True by default, very important for nano-benchmarks.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.EventPipeProfilerAttribute.html">EventPipeProfilerAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ExceptionDiagnoserAttribute.html">ExceptionDiagnoserAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ExecutionValidatorAttribute.html">ExecutionValidatorAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ExporterConfigBaseAttribute.html">ExporterConfigBaseAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.FilterConfigBaseAttribute.html">FilterConfigBaseAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.GcConcurrentAttribute.html">GcConcurrentAttribute</a></dt>
+      <dd><p>Specifies whether the common language runtime runs garbage collection on a separate thread.
+<returns>false: Does not run garbage collection concurrently.</returns>
+<returns>true: Runs garbage collection concurrently. This is the default.</returns></p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.GcForceAttribute.html">GcForceAttribute</a></dt>
+      <dd><p>Specifies whether the BenchmarkDotNet's benchmark runner forces full garbage collection after each benchmark invocation
+<returns>false: Does not force garbage collection.</returns>
+<returns>true: Forces full garbage collection after each benchmark invocation. This is the default.</returns></p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.GcServerAttribute.html">GcServerAttribute</a></dt>
+      <dd><p>Specifies whether the common language runtime runs server garbage collection.
+<returns>false: Does not run server garbage collection. This is the default.</returns>
+<returns>true: Runs server garbage collection.</returns></p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.GenericTypeArgumentsAttribute.html">GenericTypeArgumentsAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.GlobalCleanupAttribute.html">GlobalCleanupAttribute</a></dt>
+      <dd><p>Marks method to be executed after all benchmark iterations.
+<remarks>It's going to be executed only once, after all benchmark runs.</remarks></p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.GlobalSetupAttribute.html">GlobalSetupAttribute</a></dt>
+      <dd><p>Marks method to be executed before all benchmark iterations.
+<remarks>It's going to be executed only once, just before warm up.</remarks></p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.GroupBenchmarksByAttribute.html">GroupBenchmarksByAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.HardwareCountersAttribute.html">HardwareCountersAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.HideColumnsAttribute.html">HideColumnsAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.HtmlExporterAttribute.html">HtmlExporterAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.InProcessAttribute.html">InProcessAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.InnerIterationCountAttribute.html">InnerIterationCountAttribute</a></dt>
+      <dd><p>Invocation count in a single iteration.
+Does exactly the same as InvocationCountAttribute, added to make porting from xunit-performance to BenchmarkDotNet easier</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.InvocationCountAttribute.html">InvocationCountAttribute</a></dt>
+      <dd><p>Invocation count in a single iteration.
+If specified, <a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_IterationTime">IterationTime</a> will be ignored.
+If specified, it must be a multiple of <a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_UnrollFactor">UnrollFactor</a>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.IterationCleanupAttribute.html">IterationCleanupAttribute</a></dt>
+      <dd><p>Marks method to be executed after each benchmark iteration. This should NOT be used for microbenchmarks - please see the docs.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.IterationCountAttribute.html">IterationCountAttribute</a></dt>
+      <dd><p>How many target iterations should be performed
+If specified, <a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_MinIterationCount">MinIterationCount</a> will be ignored.
+If specified, <a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_MaxIterationCount">MaxIterationCount</a> will be ignored.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.IterationSetupAttribute.html">IterationSetupAttribute</a></dt>
+      <dd><p>Marks method to be executed before each benchmark iteration. This should NOT be used for microbenchmarks - please see the docs.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.IterationTimeAttribute.html">IterationTimeAttribute</a></dt>
+      <dd><p>Desired time of execution of an iteration. Used by Pilot stage to estimate the number of invocations per iteration.
+The default value is 500 milliseconds.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.IterationsColumnAttribute.html">IterationsColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.JobConfigBaseAttribute.html">JobConfigBaseAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.JobMutatorConfigBaseAttribute.html">JobMutatorConfigBaseAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.JsonExporterAttribute.html">JsonExporterAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.JsonExporterAttribute.BriefAttribute.html">JsonExporterAttribute.BriefAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.JsonExporterAttribute.BriefCompressed.html">JsonExporterAttribute.BriefCompressed</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.JsonExporterAttribute.Full.html">JsonExporterAttribute.Full</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.JsonExporterAttribute.FullCompressed.html">JsonExporterAttribute.FullCompressed</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.KeepBenchmarkFilesAttribute.html">KeepBenchmarkFilesAttribute</a></dt>
+      <dd><p>determines if all auto-generated files should be kept or removed after running the benchmarks</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.KurtosisColumnAttribute.html">KurtosisColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.LegacyJitX64JobAttribute.html">LegacyJitX64JobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.LegacyJitX86JobAttribute.html">LegacyJitX86JobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.LogicalGroupColumnAttribute.html">LogicalGroupColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.LongRunJobAttribute.html">LongRunJobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MValueColumnAttribute.html">MValueColumnAttribute</a></dt>
+      <dd><p>Prints mvalue.
+See <a href="http://www.brendangregg.com/FrequencyTrails/modes.html">http://www.brendangregg.com/FrequencyTrails/modes.html</a></p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MarkdownExporterAttribute.html">MarkdownExporterAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MarkdownExporterAttribute.Atlassian.html">MarkdownExporterAttribute.Atlassian</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MarkdownExporterAttribute.Default.html">MarkdownExporterAttribute.Default</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MarkdownExporterAttribute.GitHub.html">MarkdownExporterAttribute.GitHub</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MarkdownExporterAttribute.StackOverflow.html">MarkdownExporterAttribute.StackOverflow</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MaxAbsoluteErrorAttribute.html">MaxAbsoluteErrorAttribute</a></dt>
+      <dd><p>Maximum acceptable error for a benchmark (by default, BenchmarkDotNet continue iterations until the actual error is less than the specified error).
+Doesn't have a default value.
+<remarks>If <a class="xref" href="BenchmarkDotNet.Jobs.AccuracyMode.html#BenchmarkDotNet_Jobs_AccuracyMode_MaxRelativeError">MaxRelativeError</a> is also provided, the smallest value is used as stop criteria.</remarks></p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MaxColumnAttribute.html">MaxColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MaxIterationCountAttribute.html">MaxIterationCountAttribute</a></dt>
+      <dd><p>Maximum count of target iterations that should be performed
+The default value is 100
+<remarks>If you set this value to below 15, then <a class="xref" href="BenchmarkDotNet.Analysers.MultimodalDistributionAnalyzer.html">MultimodalDistributionAnalyzer</a>  is not going to work</remarks></p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MaxRelativeErrorAttribute.html">MaxRelativeErrorAttribute</a></dt>
+      <dd><p>Maximum acceptable error for a benchmark (by default, BenchmarkDotNet continue iterations until the actual error is less than the specified error).
+The default value is 0.02.
+<remarks>If <a class="xref" href="BenchmarkDotNet.Jobs.AccuracyMode.html#BenchmarkDotNet_Jobs_AccuracyMode_MaxAbsoluteError">MaxAbsoluteError</a> is also provided, the smallest value is used as stop criteria.</remarks></p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MaxWarmupCountAttribute.html">MaxWarmupCountAttribute</a></dt>
+      <dd><p>Maximum count of warmup iterations that should be performed
+The default value is 50</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MeanColumnAttribute.html">MeanColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MedianColumnAttribute.html">MedianColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MediumRunJobAttribute.html">MediumRunJobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MemoryDiagnoserAttribute.html">MemoryDiagnoserAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MemoryRandomizationAttribute.html">MemoryRandomizationAttribute</a></dt>
+      <dd><p>specifies whether Engine should allocate some random-sized memory between iterations
+<remarks>it makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration</remarks></p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MinColumnAttribute.html">MinColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MinInvokeCountAttribute.html">MinInvokeCountAttribute</a></dt>
+      <dd><p>Minimum count of benchmark invocations per iteration.
+The default value is 4.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MinIterationCountAttribute.html">MinIterationCountAttribute</a></dt>
+      <dd><p>Minimum count of target iterations that should be performed.
+The default value is 15.
+<remarks>If you set this value to below 15, then <a class="xref" href="BenchmarkDotNet.Analysers.MultimodalDistributionAnalyzer.html">MultimodalDistributionAnalyzer</a> is not going to work.</remarks></p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MinIterationTimeAttribute.html">MinIterationTimeAttribute</a></dt>
+      <dd><p>Minimum time of a single iteration. Unlike Run.IterationTime, this characteristic specifies only the lower limit. In case of need, BenchmarkDotNet can increase this value.
+The default value is 500 milliseconds.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MinWarmupCountAttribute.html">MinWarmupCountAttribute</a></dt>
+      <dd><p>Minimum count of warmup iterations that should be performed
+The default value is 6</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.MonoJobAttribute.html">MonoJobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.NamespaceColumnAttribute.html">NamespaceColumnAttribute</a></dt>
+      <dd><p>Add a column with the target method namespace.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.OperatingSystemsArchitectureFilterAttribute.html">OperatingSystemsArchitectureFilterAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.OperatingSystemsFilterAttribute.html">OperatingSystemsFilterAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.OrdererAttribute.html">OrdererAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.OutliersAttribute.html">OutliersAttribute</a></dt>
+      <dd><p>Specifies which outliers should be removed from the distribution</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ParamsAllValuesAttribute.html">ParamsAllValuesAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ParamsAttribute.html">ParamsAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ParamsSourceAttribute.html">ParamsSourceAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.PerfCollectProfilerAttribute.html">PerfCollectProfilerAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.PlainExporterAttribute.html">PlainExporterAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.PriorityAttribute.html">PriorityAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ProcessCountAttribute.html">ProcessCountAttribute</a></dt>
+      <dd><p>How many times we should launch process with target benchmark.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.Q1ColumnAttribute.html">Q1ColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.Q3ColumnAttribute.html">Q3ColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.RPlotExporterAttribute.html">RPlotExporterAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.RankColumnAttribute.html">RankColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ReturnValueValidatorAttribute.html">ReturnValueValidatorAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.RunOncePerIterationAttribute.html">RunOncePerIterationAttribute</a></dt>
+      <dd><p>Run the benchmark exactly once per iteration.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.RyuJitX64JobAttribute.html">RyuJitX64JobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.RyuJitX86JobAttribute.html">RyuJitX86JobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ShortRunJobAttribute.html">ShortRunJobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.SimpleJobAttribute.html">SimpleJobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.SkewnessColumnAttribute.html">SkewnessColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.StatisticalTestColumnAttribute.html">StatisticalTestColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.StdDevColumnAttribute.html">StdDevColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.StdErrorColumnAttribute.html">StdErrorColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.StopOnFirstErrorAttribute.html">StopOnFirstErrorAttribute</a></dt>
+      <dd><p>determines if running should be stop after first error</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.TargetedAttribute.html">TargetedAttribute</a></dt>
+      <dd><p>Base class for attributes that are targeted at one or more method(s)</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ThreadingDiagnoserAttribute.html">ThreadingDiagnoserAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.UnicodeConsoleLoggerAttribute.html">UnicodeConsoleLoggerAttribute</a></dt>
+      <dd><p>Enable unicode support in console logger</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.ValidatorConfigBaseAttribute.html">ValidatorConfigBaseAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.VeryLongRunJobAttribute.html">VeryLongRunJobAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.WarmupCountAttribute.html">WarmupCountAttribute</a></dt>
+      <dd><p>How many warmup iterations should be performed.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.WelchTTestPValueColumnAttribute.html">WelchTTestPValueColumnAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.XmlExporterAttribute.html">XmlExporterAttribute</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.XmlExporterAttribute.Brief.html">XmlExporterAttribute.Brief</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.XmlExporterAttribute.BriefCompressed.html">XmlExporterAttribute.BriefCompressed</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.XmlExporterAttribute.Full.html">XmlExporterAttribute.Full</a></dt>
+      <dd></dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.XmlExporterAttribute.FullCompressed.html">XmlExporterAttribute.FullCompressed</a></dt>
+      <dd></dd>
+    </dl>
+    <h3 id="enums">
+Enums
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="BenchmarkDotNet.Attributes.OS.html">OS</a></dt>
+      <dd></dd>
+    </dl>
+
+
+</article>
+
+
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2023 .NET Foundation and contributors
+        </div>
+      </div>
+    </footer>
+  </body>
 </html>

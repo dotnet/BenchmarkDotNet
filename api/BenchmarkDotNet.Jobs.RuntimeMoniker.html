@@ -1,358 +1,244 @@
 ﻿<!DOCTYPE html>
-<!--[if IE]><![endif]-->
 <html>
-  
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Enum RuntimeMoniker
-   | BenchmarkDotNet </title>
-    <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Enum RuntimeMoniker
-   | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.59.4.0">
-    
-    <link rel="shortcut icon" href="../logo/icon-32.png">
-    <link rel="stylesheet" href="../styles/docfx.vendor.css">
-    <link rel="stylesheet" href="../styles/docfx.css">
-    <link rel="stylesheet" href="../styles/main.css">
-    <meta property="docfx:navrel" content="../toc.html">
-    <meta property="docfx:tocrel" content="toc.html">
-    
-    
-    
-  
-    <!-- Google Analytics -->
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  
-      ga('create', 'UA-41419012-6', 'auto');
-      ga('send', 'pageview');
-  
-    </script>
-    <!-- /Google Analytics -->
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function (d, w, c) {
-            (w[c] = w[c] || []).push(function() {
-                try {
-                    w.yaCounter40812449 = new Ya.Metrika({
-                        id:40812449,
-                        clickmap:true,
-                        trackLinks:true,
-                        accurateTrackBounce:true
-                    });
-                } catch(e) { }
-            });
-  
-            var n = d.getElementsByTagName("script")[0],
-                s = d.createElement("script"),
-                f = function () { n.parentNode.insertBefore(s, n); };
-            s.type = "text/javascript";
-            s.async = true;
-            s.src = "https://mc.yandex.ru/metrika/watch.js";
-  
-            if (w.opera == "[object Opera]") {
-                d.addEventListener("DOMContentLoaded", f, false);
-            } else { f(); }
-        })(document, window, "yandex_metrika_callbacks");
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-    <!-- at the end of the HEAD -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
-    <link rel="stylesheet" href="../styles/search.css">
+      <title>Enum RuntimeMoniker
+ | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Enum RuntimeMoniker
+ | BenchmarkDotNet ">
+      
+      <link rel="icon" href="../logo/icon-32.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
   </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
-    <div id="wrapper">
-      <header>
-        
-        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              
-              <a class="navbar-brand" href="../index.html">
-                <img id="logo" class="svg" src="../logo/icon.svg" alt="">
-              </a>
+
+  <script type="module">
+    import options from './../public/main.js'
+    import { init } from './../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
             </div>
-            <div class="collapse navbar-collapse" id="navbar">
-              <div class="navbar-right navbar-form">
-                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
-              </div>
-            </div>
-          </div>
-        </nav>
-        
-        <div class="subnav navbar navbar-default">
-          <div class="container hide-when-search" id="breadcrumb">
-            <ul class="breadcrumb">
-              <li></li>
-            </ul>
           </div>
         </div>
-      </header>
-      <div role="main" class="container body-content hide-when-search">
-        
-        <div class="sidenav hide-when-search">
-          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
-          <div class="sidetoggle collapse" id="sidetoggle">
-            <div id="sidetoc"></div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
           </div>
-        </div>
-        <div class="article row grid-right">
-          <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Jobs.RuntimeMoniker">
-  
-  
-  <h1 id="BenchmarkDotNet_Jobs_RuntimeMoniker" data-uid="BenchmarkDotNet.Jobs.RuntimeMoniker" class="text-break">Enum RuntimeMoniker
-  </h1>
-  <div class="markdown level0 summary"></div>
-  <div class="markdown level0 conceptual"></div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Jobs.html">BenchmarkDotNet.Jobs</a></h6>
-  <h6><strong>Assembly</strong>: BenchmarkDotNet.Annotations.dll</h6>
-  <h5 id="BenchmarkDotNet_Jobs_RuntimeMoniker_syntax">Syntax</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public enum RuntimeMoniker</code></pre>
-  </div>
-  <h3 id="fields">Fields
-  </h3>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    <thead>
-    <tbody>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_HostProcess">HostProcess</td>
-        <td><p>the same Runtime as the host Process (default setting)</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono">Mono</td>
-        <td><p>Mono</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono60">Mono60</td>
-        <td><p>.NET 6 using MonoVM (not CLR which is the default)</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono70">Mono70</td>
-        <td><p>.NET 7 using MonoVM (not CLR which is the default)</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono80">Mono80</td>
-        <td><p>.NET 8 using MonoVM (not CLR which is the default)</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVM">MonoAOTLLVM</td>
-        <td><p>Mono with the Ahead of Time LLVM Compiler backend</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVMNet60">MonoAOTLLVMNet60</td>
-        <td><p>Mono with the Ahead of Time LLVM Compiler backend and net6.0</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVMNet70">MonoAOTLLVMNet70</td>
-        <td><p>Mono with the Ahead of Time LLVM Compiler backend and net7.0</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVMNet80">MonoAOTLLVMNet80</td>
-        <td><p>Mono with the Ahead of Time LLVM Compiler backend and net8.0</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_NativeAot60">NativeAot60</td>
-        <td><p>NativeAOT compiled as net6.0</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_NativeAot70">NativeAot70</td>
-        <td><p>NativeAOT compiled as net7.0</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_NativeAot80">NativeAot80</td>
-        <td><p>NativeAOT compiled as net8.0</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net461">Net461</td>
-        <td><p>.NET 4.6.1</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net462">Net462</td>
-        <td><p>.NET 4.6.2</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net47">Net47</td>
-        <td><p>.NET 4.7</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net471">Net471</td>
-        <td><p>.NET 4.7.1</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net472">Net472</td>
-        <td><p>.NET 4.7.2</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net48">Net48</td>
-        <td><p>.NET 4.8</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net481">Net481</td>
-        <td><p>.NET 4.8.1</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net50">Net50</td>
-        <td><p>.NET 5.0</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net60">Net60</td>
-        <td><p>.NET 6.0</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net70">Net70</td>
-        <td><p>.NET 7.0</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net80">Net80</td>
-        <td><p>.NET 8.0</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_NetCoreApp20">NetCoreApp20</td>
-        <td><p>.NET Core 2.0</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_NetCoreApp21">NetCoreApp21</td>
-        <td><p>.NET Core 2.1</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_NetCoreApp22">NetCoreApp22</td>
-        <td><p>.NET Core 2.2</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_NetCoreApp30">NetCoreApp30</td>
-        <td><p>.NET Core 3.0</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_NetCoreApp31">NetCoreApp31</td>
-        <td><p>.NET Core 3.1</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_NetCoreApp50">NetCoreApp50</td>
-        <td><p>.NET Core 5.0 aka &quot;.NET 5&quot;</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_NotRecognized">NotRecognized</td>
-        <td><p>not recognized, possibly a new version of .NET Core</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_Wasm">Wasm</td>
-        <td><p>WebAssembly with default .Net version</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet50">WasmNet50</td>
-        <td><p>WebAssembly with net5.0</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet60">WasmNet60</td>
-        <td><p>WebAssembly with net6.0</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet70">WasmNet70</td>
-        <td><p>WebAssembly with net7.0</p>
-</td>
-      </tr>
-      <tr>
-        <td id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet80">WasmNet80</td>
-        <td><p>WebAssembly with net8.0</p>
-</td>
-      </tr>
-    </tbody>
-  </thead></thead></table>
-</article>
-          </div>
-          
-          <div class="hidden-sm col-md-2" role="complementary">
-            <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
-              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-                <h5>In This Article</h5>
-                <div></div>
-              </nav>
-            </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
           </div>
         </div>
       </div>
-      
-      <footer>
-        <div class="grad-bottom"></div>
-        <div class="footer">
-          <div class="container">
-            <span class="pull-right">
-              <a href="#top">Back to top</a>
-            </span>
-            Copyright &copy; 2013–2023 .NET Foundation and contributors
-            
-          </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
         </div>
-      </footer>
-    </div>
-    
-    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
-    <script type="text/javascript" src="../styles/docfx.js"></script>
-    <script type="text/javascript" src="../styles/main.js"></script>
-    <!-- at the end of the BODY -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-    <script type="text/javascript">
-        docsearch({
-            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
-            indexName: 'benchmarkdotnet',
-            inputSelector: '#search-query',
-            debug: false // Set debug to true if you want to inspect the dropdown
-        });
-    </script>  </body>
+
+        <article data-uid="BenchmarkDotNet.Jobs.RuntimeMoniker">
+
+
+
+
+  <h1 id="BenchmarkDotNet_Jobs_RuntimeMoniker" data-uid="BenchmarkDotNet.Jobs.RuntimeMoniker" class="text-break">
+    Enum RuntimeMoniker
+  
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="BenchmarkDotNet.html">BenchmarkDotNet</a>.<a class="xref" href="BenchmarkDotNet.Jobs.html">Jobs</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>BenchmarkDotNet.Annotations.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public enum RuntimeMoniker</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+  <h2 id="fields">Fields
+</h2>
+  <dl class="parameters">
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_HostProcess"><code>HostProcess = 0</code></dt>
+    <dd><p>the same Runtime as the host Process (default setting)</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono"><code>Mono = 2</code></dt>
+    <dd><p>Mono</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono60"><code>Mono60 = 32</code></dt>
+    <dd><p>.NET 6 using MonoVM (not CLR which is the default)</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono70"><code>Mono70 = 33</code></dt>
+    <dd><p>.NET 7 using MonoVM (not CLR which is the default)</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono80"><code>Mono80 = 34</code></dt>
+    <dd><p>.NET 8 using MonoVM (not CLR which is the default)</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVM"><code>MonoAOTLLVM = 28</code></dt>
+    <dd><p>Mono with the Ahead of Time LLVM Compiler backend</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVMNet60"><code>MonoAOTLLVMNet60 = 29</code></dt>
+    <dd><p>Mono with the Ahead of Time LLVM Compiler backend and net6.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVMNet70"><code>MonoAOTLLVMNet70 = 30</code></dt>
+    <dd><p>Mono with the Ahead of Time LLVM Compiler backend and net7.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVMNet80"><code>MonoAOTLLVMNet80 = 31</code></dt>
+    <dd><p>Mono with the Ahead of Time LLVM Compiler backend and net8.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NativeAot60"><code>NativeAot60 = 20</code></dt>
+    <dd><p>NativeAOT compiled as net6.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NativeAot70"><code>NativeAot70 = 21</code></dt>
+    <dd><p>NativeAOT compiled as net7.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NativeAot80"><code>NativeAot80 = 22</code></dt>
+    <dd><p>NativeAOT compiled as net8.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net461"><code>Net461 = 3</code></dt>
+    <dd><p>.NET 4.6.1</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net462"><code>Net462 = 4</code></dt>
+    <dd><p>.NET 4.6.2</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net47"><code>Net47 = 5</code></dt>
+    <dd><p>.NET 4.7</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net471"><code>Net471 = 6</code></dt>
+    <dd><p>.NET 4.7.1</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net472"><code>Net472 = 7</code></dt>
+    <dd><p>.NET 4.7.2</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net48"><code>Net48 = 8</code></dt>
+    <dd><p>.NET 4.8</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net481"><code>Net481 = 9</code></dt>
+    <dd><p>.NET 4.8.1</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net50"><code>Net50 = 16</code></dt>
+    <dd><p>.NET 5.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net60"><code>Net60 = 17</code></dt>
+    <dd><p>.NET 6.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net70"><code>Net70 = 18</code></dt>
+    <dd><p>.NET 7.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net80"><code>Net80 = 19</code></dt>
+    <dd><p>.NET 8.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NetCoreApp20"><code>NetCoreApp20 = 10</code></dt>
+    <dd><p>.NET Core 2.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NetCoreApp21"><code>NetCoreApp21 = 11</code></dt>
+    <dd><p>.NET Core 2.1</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NetCoreApp22"><code>NetCoreApp22 = 12</code></dt>
+    <dd><p>.NET Core 2.2</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NetCoreApp30"><code>NetCoreApp30 = 13</code></dt>
+    <dd><p>.NET Core 3.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NetCoreApp31"><code>NetCoreApp31 = 14</code></dt>
+    <dd><p>.NET Core 3.1</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NetCoreApp50"><code>[Obsolete(&quot;Please switch to the &#39;RuntimeMoniker.Net50&#39;&quot;)]
+NetCoreApp50 = 15</code></dt>
+    <dd><p>.NET Core 5.0 aka &quot;.NET 5&quot;</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NotRecognized"><code>NotRecognized = 1</code></dt>
+    <dd><p>not recognized, possibly a new version of .NET Core</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Wasm"><code>Wasm = 23</code></dt>
+    <dd><p>WebAssembly with default .Net version</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet50"><code>WasmNet50 = 24</code></dt>
+    <dd><p>WebAssembly with net5.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet60"><code>WasmNet60 = 25</code></dt>
+    <dd><p>WebAssembly with net6.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet70"><code>WasmNet70 = 26</code></dt>
+    <dd><p>WebAssembly with net7.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet80"><code>WasmNet80 = 27</code></dt>
+    <dd><p>WebAssembly with net8.0</p>
+</dd>
+  </dl>
+
+
+
+</article>
+
+
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2023 .NET Foundation and contributors
+        </div>
+      </div>
+    </footer>
+  </body>
 </html>

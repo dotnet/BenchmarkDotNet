@@ -1,132 +1,122 @@
 ﻿<!DOCTYPE html>
-<!--[if IE]><![endif]-->
 <html>
-  
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class RunMode
-   | BenchmarkDotNet </title>
-    <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class RunMode
-   | BenchmarkDotNet ">
-    <meta name="generator" content="docfx 2.59.4.0">
-    
-    <link rel="shortcut icon" href="../logo/icon-32.png">
-    <link rel="stylesheet" href="../styles/docfx.vendor.css">
-    <link rel="stylesheet" href="../styles/docfx.css">
-    <link rel="stylesheet" href="../styles/main.css">
-    <meta property="docfx:navrel" content="../toc.html">
-    <meta property="docfx:tocrel" content="toc.html">
-    
-    
-    
-  
-    <!-- Google Analytics -->
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  
-      ga('create', 'UA-41419012-6', 'auto');
-      ga('send', 'pageview');
-  
-    </script>
-    <!-- /Google Analytics -->
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function (d, w, c) {
-            (w[c] = w[c] || []).push(function() {
-                try {
-                    w.yaCounter40812449 = new Ya.Metrika({
-                        id:40812449,
-                        clickmap:true,
-                        trackLinks:true,
-                        accurateTrackBounce:true
-                    });
-                } catch(e) { }
-            });
-  
-            var n = d.getElementsByTagName("script")[0],
-                s = d.createElement("script"),
-                f = function () { n.parentNode.insertBefore(s, n); };
-            s.type = "text/javascript";
-            s.async = true;
-            s.src = "https://mc.yandex.ru/metrika/watch.js";
-  
-            if (w.opera == "[object Opera]") {
-                d.addEventListener("DOMContentLoaded", f, false);
-            } else { f(); }
-        })(document, window, "yandex_metrika_callbacks");
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/40812449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-    <!-- at the end of the HEAD -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css">
-    <link rel="stylesheet" href="../styles/search.css">
+      <title>Class RunMode
+ | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class RunMode
+ | BenchmarkDotNet ">
+      
+      <link rel="icon" href="../logo/icon-32.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
   </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
-    <div id="wrapper">
-      <header>
-        
-        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              
-              <a class="navbar-brand" href="../index.html">
-                <img id="logo" class="svg" src="../logo/icon.svg" alt="">
-              </a>
+
+  <script type="module">
+    import options from './../public/main.js'
+    import { init } from './../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
             </div>
-            <div class="collapse navbar-collapse" id="navbar">
-              <div class="navbar-right navbar-form">
-                <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off" autofocus="">
-              </div>
-            </div>
-          </div>
-        </nav>
-        
-        <div class="subnav navbar navbar-default">
-          <div class="container hide-when-search" id="breadcrumb">
-            <ul class="breadcrumb">
-              <li></li>
-            </ul>
           </div>
         </div>
-      </header>
-      <div role="main" class="container body-content hide-when-search">
-        
-        <div class="sidenav hide-when-search">
-          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
-          <div class="sidetoggle collapse" id="sidetoggle">
-            <div id="sidetoc"></div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
           </div>
         </div>
-        <div class="article row grid-right">
-          <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="BenchmarkDotNet.Jobs.RunMode">
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="BenchmarkDotNet.Jobs.RunMode">
+
+
+
+  <h1 id="BenchmarkDotNet_Jobs_RunMode" data-uid="BenchmarkDotNet.Jobs.RunMode" class="text-break">
+    Class RunMode
   
-  
-  <h1 id="BenchmarkDotNet_Jobs_RunMode" data-uid="BenchmarkDotNet.Jobs.RunMode" class="text-break">Class RunMode
   </h1>
-  <div class="markdown level0 summary"></div>
-  <div class="markdown level0 conceptual"></div>
-  <div class="inheritance">
-    <h5>Inheritance</h5>
-    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html">CharacteristicObject</a></div>
-    <div class="level2"><a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html">CharacteristicObject</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html">RunMode</a>&gt;</div>
-    <div class="level3"><a class="xref" href="BenchmarkDotNet.Jobs.JobMode-1.html">JobMode</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html">RunMode</a>&gt;</div>
-    <div class="level4"><span class="xref">RunMode</span></div>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="BenchmarkDotNet.html">BenchmarkDotNet</a>.<a class="xref" href="BenchmarkDotNet.Jobs.html">Jobs</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>BenchmarkDotNet.dll</dd></dl>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class RunMode : JobMode&lt;RunMode&gt;</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html">CharacteristicObject</a></div>
+      <div><a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html">CharacteristicObject</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html">RunMode</a>&gt;</div>
+      <div><a class="xref" href="BenchmarkDotNet.Jobs.JobMode-1.html">JobMode</a>&lt;<a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html">RunMode</a>&gt;</div>
+      <div><span class="xref">RunMode</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist derived">
+    <dt>Inherited Members</dt>
+    <dd>
     <div>
       <a class="xref" href="BenchmarkDotNet.Jobs.JobMode-1.html#BenchmarkDotNet_Jobs_JobMode_1_Default">JobMode&lt;RunMode&gt;.Default</a>
     </div>
@@ -137,13 +127,13 @@
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_Apply_BenchmarkDotNet_Characteristics_CharacteristicObject_">CharacteristicObject&lt;RunMode&gt;.Apply(CharacteristicObject)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_Apply_BenchmarkDotNet_Characteristics_CharacteristicObject___">CharacteristicObject&lt;RunMode&gt;.Apply(CharacteristicObject[])</a>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_Apply_BenchmarkDotNet_Characteristics_CharacteristicObject___">CharacteristicObject&lt;RunMode&gt;.Apply(params CharacteristicObject[])</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_ApplyAndFreeze_BenchmarkDotNet_Characteristics_CharacteristicObject_">CharacteristicObject&lt;RunMode&gt;.ApplyAndFreeze(CharacteristicObject)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_ApplyAndFreeze_BenchmarkDotNet_Characteristics_CharacteristicObject___">CharacteristicObject&lt;RunMode&gt;.ApplyAndFreeze(CharacteristicObject[])</a>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_ApplyAndFreeze_BenchmarkDotNet_Characteristics_CharacteristicObject___">CharacteristicObject&lt;RunMode&gt;.ApplyAndFreeze(params CharacteristicObject[])</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_Freeze">CharacteristicObject&lt;RunMode&gt;.Freeze()</a>
@@ -152,31 +142,7 @@
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_UnfreezeCopy">CharacteristicObject&lt;RunMode&gt;.UnfreezeCopy()</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_CreateCharacteristic__1_System_String_">CharacteristicObject&lt;RunMode&gt;.CreateCharacteristic&lt;TC&gt;(String)</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_CreateHiddenCharacteristic__1_System_String_">CharacteristicObject&lt;RunMode&gt;.CreateHiddenCharacteristic&lt;TC&gt;(String)</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1_CreateIgnoreOnApplyCharacteristic__1_System_String_">CharacteristicObject&lt;RunMode&gt;.CreateIgnoreOnApplyCharacteristic&lt;TC&gt;(String)</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveId_BenchmarkDotNet_Characteristics_CharacteristicObject_System_String_">CharacteristicObject.ResolveId(CharacteristicObject, String)</a>
-    </div>
-    <div>
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_IdCharacteristic">CharacteristicObject.IdCharacteristic</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_OwnerOrSelf">CharacteristicObject.OwnerOrSelf</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_Frozen">CharacteristicObject.Frozen</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_IsPropertyBag">CharacteristicObject.IsPropertyBag</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_HasChanges">CharacteristicObject.HasChanges</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_GetCharacteristicsWithValues">CharacteristicObject.GetCharacteristicsWithValues()</a>
@@ -194,840 +160,1013 @@
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveValue_BenchmarkDotNet_Characteristics_Characteristic_BenchmarkDotNet_Characteristics_IResolver_">CharacteristicObject.ResolveValue(Characteristic, IResolver)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveValue_BenchmarkDotNet_Characteristics_Characteristic_BenchmarkDotNet_Characteristics_IResolver_System_Object_">CharacteristicObject.ResolveValue(Characteristic, IResolver, Object)</a>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveValue_BenchmarkDotNet_Characteristics_Characteristic_BenchmarkDotNet_Characteristics_IResolver_System_Object_">CharacteristicObject.ResolveValue(Characteristic, IResolver, object)</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveValue__1_BenchmarkDotNet_Characteristics_Characteristic___0____0_">CharacteristicObject.ResolveValue&lt;T&gt;(Characteristic&lt;T&gt;, T)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveValue_BenchmarkDotNet_Characteristics_Characteristic_System_Object_">CharacteristicObject.ResolveValue(Characteristic, Object)</a>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveValue_BenchmarkDotNet_Characteristics_Characteristic_System_Object_">CharacteristicObject.ResolveValue(Characteristic, object)</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ResolveValueAsNullable__1_BenchmarkDotNet_Characteristics_Characteristic___0__">CharacteristicObject.ResolveValueAsNullable&lt;T&gt;(Characteristic&lt;T&gt;)</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ApplyCore_BenchmarkDotNet_Characteristics_CharacteristicObject_">CharacteristicObject.ApplyCore(CharacteristicObject)</a>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ToString">CharacteristicObject.ToString()</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_FreezeCore">CharacteristicObject.FreezeCore()</a>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_Frozen">CharacteristicObject.Frozen</a>
     </div>
     <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_UnfreezeCopyCore">CharacteristicObject.UnfreezeCopyCore()</a>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_HasChanges">CharacteristicObject.HasChanges</a>
     </div>
     <div>
       <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_Id">CharacteristicObject.Id</a>
     </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject_ToString">CharacteristicObject.ToString()</a>
-    </div>
+  </dd></dl>
+
+  <dl class="typelist extensionMethods">
+    <dt>Extension Methods</dt>
+    <dd>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicHelper.html#BenchmarkDotNet_Characteristics_CharacteristicHelper_GetAllCharacteristics_BenchmarkDotNet_Characteristics_CharacteristicObject_">CharacteristicHelper.GetAllCharacteristics(CharacteristicObject)</a>
   </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="BenchmarkDotNet.Jobs.html">BenchmarkDotNet.Jobs</a></h6>
-  <h6><strong>Assembly</strong>: BenchmarkDotNet.dll</h6>
-  <h5 id="BenchmarkDotNet_Jobs_RunMode_syntax">Syntax</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class RunMode : JobMode&lt;RunMode&gt;</code></pre>
+  <div>
+      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicHelper.html#BenchmarkDotNet_Characteristics_CharacteristicHelper_GetThisTypeCharacteristics_BenchmarkDotNet_Characteristics_CharacteristicObject_">CharacteristicHelper.GetThisTypeCharacteristics(CharacteristicObject)</a>
   </div>
-  <h3 id="constructors">Constructors
-  </h3>
-  
-  
+  </dd></dl>
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
   <a id="BenchmarkDotNet_Jobs_RunMode__ctor_" data-uid="BenchmarkDotNet.Jobs.RunMode.#ctor*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_RunMode__ctor" data-uid="BenchmarkDotNet.Jobs.RunMode.#ctor">RunMode()</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode__ctor" data-uid="BenchmarkDotNet.Jobs.RunMode.#ctor">
+  RunMode()
+  
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public RunMode()</code></pre>
   </div>
-  <h3 id="fields">Fields
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_Dry" data-uid="BenchmarkDotNet.Jobs.RunMode.Dry">
+  Dry
+  
   </h3>
-  
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_Dry" data-uid="BenchmarkDotNet.Jobs.RunMode.Dry">Dry</h4>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly RunMode Dry</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html">RunMode</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html">RunMode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_InvocationCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.InvocationCountCharacteristic">
+  InvocationCountCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_InvocationCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.InvocationCountCharacteristic">InvocationCountCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;long&gt; InvocationCountCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">Int64</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_IterationCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.IterationCountCharacteristic">
+  IterationCountCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_IterationCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.IterationCountCharacteristic">IterationCountCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;int&gt; IterationCountCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_IterationTimeCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.IterationTimeCharacteristic">
+  IterationTimeCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_IterationTimeCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.IterationTimeCharacteristic">IterationTimeCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;TimeInterval&gt; IterationTimeCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<span class="xref">Perfolizer.Horology.TimeInterval</span>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<span class="xref">TimeInterval</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_LaunchCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.LaunchCountCharacteristic">
+  LaunchCountCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_LaunchCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.LaunchCountCharacteristic">LaunchCountCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;int&gt; LaunchCountCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_Long" data-uid="BenchmarkDotNet.Jobs.RunMode.Long">
+  Long
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_Long" data-uid="BenchmarkDotNet.Jobs.RunMode.Long">Long</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly RunMode Long</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html">RunMode</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html">RunMode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_MaxIterationCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.MaxIterationCountCharacteristic">
+  MaxIterationCountCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_MaxIterationCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.MaxIterationCountCharacteristic">MaxIterationCountCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;int&gt; MaxIterationCountCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_MaxWarmupIterationCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.MaxWarmupIterationCountCharacteristic">
+  MaxWarmupIterationCountCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_MaxWarmupIterationCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.MaxWarmupIterationCountCharacteristic">MaxWarmupIterationCountCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;int&gt; MaxWarmupIterationCountCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_Medium" data-uid="BenchmarkDotNet.Jobs.RunMode.Medium">
+  Medium
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_Medium" data-uid="BenchmarkDotNet.Jobs.RunMode.Medium">Medium</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly RunMode Medium</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html">RunMode</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html">RunMode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_MemoryRandomizationCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.MemoryRandomizationCharacteristic">
+  MemoryRandomizationCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_MemoryRandomizationCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.MemoryRandomizationCharacteristic">MemoryRandomizationCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;bool&gt; MemoryRandomizationCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_MinIterationCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.MinIterationCountCharacteristic">
+  MinIterationCountCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_MinIterationCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.MinIterationCountCharacteristic">MinIterationCountCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;int&gt; MinIterationCountCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_MinWarmupIterationCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.MinWarmupIterationCountCharacteristic">
+  MinWarmupIterationCountCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_MinWarmupIterationCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.MinWarmupIterationCountCharacteristic">MinWarmupIterationCountCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;int&gt; MinWarmupIterationCountCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_RunStrategyCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.RunStrategyCharacteristic">
+  RunStrategyCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_RunStrategyCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.RunStrategyCharacteristic">RunStrategyCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;RunStrategy&gt; RunStrategyCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="BenchmarkDotNet.Engines.RunStrategy.html">RunStrategy</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="BenchmarkDotNet.Engines.RunStrategy.html">RunStrategy</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_Short" data-uid="BenchmarkDotNet.Jobs.RunMode.Short">
+  Short
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_Short" data-uid="BenchmarkDotNet.Jobs.RunMode.Short">Short</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly RunMode Short</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html">RunMode</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html">RunMode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_UnrollFactorCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.UnrollFactorCharacteristic">
+  UnrollFactorCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_UnrollFactorCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.UnrollFactorCharacteristic">UnrollFactorCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;int&gt; UnrollFactorCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_VeryLong" data-uid="BenchmarkDotNet.Jobs.RunMode.VeryLong">
+  VeryLong
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_VeryLong" data-uid="BenchmarkDotNet.Jobs.RunMode.VeryLong">VeryLong</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly RunMode VeryLong</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html">RunMode</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html">RunMode</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_WarmupCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.WarmupCountCharacteristic">
+  WarmupCountCharacteristic
   
-  
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_WarmupCountCharacteristic" data-uid="BenchmarkDotNet.Jobs.RunMode.WarmupCountCharacteristic">WarmupCountCharacteristic</h4>
+  </h3>
+
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public static readonly Characteristic&lt;int&gt; WarmupCountCharacteristic</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="properties">Properties
-  </h3>
-  
-  
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Characteristics.Characteristic-1.html">Characteristic</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
   <a id="BenchmarkDotNet_Jobs_RunMode_InvocationCount_" data-uid="BenchmarkDotNet.Jobs.RunMode.InvocationCount*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_InvocationCount" data-uid="BenchmarkDotNet.Jobs.RunMode.InvocationCount">InvocationCount</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_InvocationCount" data-uid="BenchmarkDotNet.Jobs.RunMode.InvocationCount">
+  InvocationCount
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>Invocation count in a single iteration.
 If specified, <a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_IterationTime">IterationTime</a> will be ignored.
 If specified, it must be a multiple of <a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_UnrollFactor">UnrollFactor</a>.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public long InvocationCount { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">Int64</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_RunMode_IterationCount_" data-uid="BenchmarkDotNet.Jobs.RunMode.IterationCount*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_IterationCount" data-uid="BenchmarkDotNet.Jobs.RunMode.IterationCount">IterationCount</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_IterationCount" data-uid="BenchmarkDotNet.Jobs.RunMode.IterationCount">
+  IterationCount
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>How many target iterations should be performed
 If specified, <a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_MinIterationCount">MinIterationCount</a> will be ignored.
 If specified, <a class="xref" href="BenchmarkDotNet.Jobs.RunMode.html#BenchmarkDotNet_Jobs_RunMode_MaxIterationCount">MaxIterationCount</a> will be ignored.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public int IterationCount { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_RunMode_IterationTime_" data-uid="BenchmarkDotNet.Jobs.RunMode.IterationTime*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_IterationTime" data-uid="BenchmarkDotNet.Jobs.RunMode.IterationTime">IterationTime</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_IterationTime" data-uid="BenchmarkDotNet.Jobs.RunMode.IterationTime">
+  IterationTime
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>Desired time of execution of an iteration. Used by Pilot stage to estimate the number of invocations per iteration.
 The default value is 500 milliseconds.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public TimeInterval IterationTime { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">Perfolizer.Horology.TimeInterval</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><span class="xref">TimeInterval</span></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_RunMode_LaunchCount_" data-uid="BenchmarkDotNet.Jobs.RunMode.LaunchCount*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_LaunchCount" data-uid="BenchmarkDotNet.Jobs.RunMode.LaunchCount">LaunchCount</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_LaunchCount" data-uid="BenchmarkDotNet.Jobs.RunMode.LaunchCount">
+  LaunchCount
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>How many times we should launch process with target benchmark.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public int LaunchCount { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_RunMode_MaxIterationCount_" data-uid="BenchmarkDotNet.Jobs.RunMode.MaxIterationCount*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_MaxIterationCount" data-uid="BenchmarkDotNet.Jobs.RunMode.MaxIterationCount">MaxIterationCount</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_MaxIterationCount" data-uid="BenchmarkDotNet.Jobs.RunMode.MaxIterationCount">
+  MaxIterationCount
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>Maximum count of target iterations that should be performed
 The default value is 100
 <remarks>If you set this value to below 15, then <a class="xref" href="BenchmarkDotNet.Analysers.MultimodalDistributionAnalyzer.html">MultimodalDistributionAnalyzer</a>  is not going to work</remarks></p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public int MaxIterationCount { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_RunMode_MaxWarmupIterationCount_" data-uid="BenchmarkDotNet.Jobs.RunMode.MaxWarmupIterationCount*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_MaxWarmupIterationCount" data-uid="BenchmarkDotNet.Jobs.RunMode.MaxWarmupIterationCount">MaxWarmupIterationCount</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_MaxWarmupIterationCount" data-uid="BenchmarkDotNet.Jobs.RunMode.MaxWarmupIterationCount">
+  MaxWarmupIterationCount
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>Maximum count of warmup iterations that should be performed
 The default value is 50</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public int MaxWarmupIterationCount { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_RunMode_MemoryRandomization_" data-uid="BenchmarkDotNet.Jobs.RunMode.MemoryRandomization*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_MemoryRandomization" data-uid="BenchmarkDotNet.Jobs.RunMode.MemoryRandomization">MemoryRandomization</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_MemoryRandomization" data-uid="BenchmarkDotNet.Jobs.RunMode.MemoryRandomization">
+  MemoryRandomization
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>specifies whether Engine should allocate some random-sized memory between iterations
 <remarks>it makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration</remarks></p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public bool MemoryRandomization { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_RunMode_MinIterationCount_" data-uid="BenchmarkDotNet.Jobs.RunMode.MinIterationCount*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_MinIterationCount" data-uid="BenchmarkDotNet.Jobs.RunMode.MinIterationCount">MinIterationCount</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_MinIterationCount" data-uid="BenchmarkDotNet.Jobs.RunMode.MinIterationCount">
+  MinIterationCount
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>Minimum count of target iterations that should be performed
 The default value is 15
 <remarks>If you set this value to below 15, then <a class="xref" href="BenchmarkDotNet.Analysers.MultimodalDistributionAnalyzer.html">MultimodalDistributionAnalyzer</a> is not going to work</remarks></p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public int MinIterationCount { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_RunMode_MinWarmupIterationCount_" data-uid="BenchmarkDotNet.Jobs.RunMode.MinWarmupIterationCount*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_MinWarmupIterationCount" data-uid="BenchmarkDotNet.Jobs.RunMode.MinWarmupIterationCount">MinWarmupIterationCount</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_MinWarmupIterationCount" data-uid="BenchmarkDotNet.Jobs.RunMode.MinWarmupIterationCount">
+  MinWarmupIterationCount
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>Minimum count of warmup iterations that should be performed
 The default value is 6</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public int MinWarmupIterationCount { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_RunMode_RunStrategy_" data-uid="BenchmarkDotNet.Jobs.RunMode.RunStrategy*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_RunStrategy" data-uid="BenchmarkDotNet.Jobs.RunMode.RunStrategy">RunStrategy</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_RunStrategy" data-uid="BenchmarkDotNet.Jobs.RunMode.RunStrategy">
+  RunStrategy
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>Available values: Throughput and ColdStart.
 Throughput: default strategy which allows to get good precision level.
 ColdStart: should be used only for measuring cold start of the application or testing purpose.
 Monitoring: no overhead evaluating, with several target iterations. Perfect for macrobenchmarks without a steady state with high variance.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public RunStrategy RunStrategy { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="BenchmarkDotNet.Engines.RunStrategy.html">RunStrategy</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Engines.RunStrategy.html">RunStrategy</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_RunMode_UnrollFactor_" data-uid="BenchmarkDotNet.Jobs.RunMode.UnrollFactor*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_UnrollFactor" data-uid="BenchmarkDotNet.Jobs.RunMode.UnrollFactor">UnrollFactor</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_UnrollFactor" data-uid="BenchmarkDotNet.Jobs.RunMode.UnrollFactor">
+  UnrollFactor
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>How many times the benchmark method will be invoked per one iteration of a generated loop.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public int UnrollFactor { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
   <a id="BenchmarkDotNet_Jobs_RunMode_WarmupCount_" data-uid="BenchmarkDotNet.Jobs.RunMode.WarmupCount*"></a>
-  <h4 id="BenchmarkDotNet_Jobs_RunMode_WarmupCount" data-uid="BenchmarkDotNet.Jobs.RunMode.WarmupCount">WarmupCount</h4>
+
+  <h3 id="BenchmarkDotNet_Jobs_RunMode_WarmupCount" data-uid="BenchmarkDotNet.Jobs.RunMode.WarmupCount">
+  WarmupCount
+  
+  </h3>
+
   <div class="markdown level1 summary"><p>How many warmup iterations should be performed.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
+
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public int WarmupCount { get; set; }</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="extensionmethods">Extension Methods</h3>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicHelper.html#BenchmarkDotNet_Characteristics_CharacteristicHelper_GetThisTypeCharacteristics_BenchmarkDotNet_Characteristics_CharacteristicObject_">CharacteristicHelper.GetThisTypeCharacteristics(CharacteristicObject)</a>
-  </div>
-  <div>
-      <a class="xref" href="BenchmarkDotNet.Characteristics.CharacteristicHelper.html#BenchmarkDotNet_Characteristics_CharacteristicHelper_GetAllCharacteristics_BenchmarkDotNet_Characteristics_CharacteristicObject_">CharacteristicHelper.GetAllCharacteristics(CharacteristicObject)</a>
-  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
 </article>
-          </div>
-          
-          <div class="hidden-sm col-md-2" role="complementary">
-            <div class="sideaffix">
-              <div class="contribution">
-                <ul class="nav">
-                </ul>
-              </div>
-              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-                <h5>In This Article</h5>
-                <div></div>
-              </nav>
-            </div>
-          </div>
+
+
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2023 .NET Foundation and contributors
         </div>
       </div>
-      
-      <footer>
-        <div class="grad-bottom"></div>
-        <div class="footer">
-          <div class="container">
-            <span class="pull-right">
-              <a href="#top">Back to top</a>
-            </span>
-            Copyright &copy; 2013–2023 .NET Foundation and contributors
-            
-          </div>
-        </div>
-      </footer>
-    </div>
-    
-    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
-    <script type="text/javascript" src="../styles/docfx.js"></script>
-    <script type="text/javascript" src="../styles/main.js"></script>
-    <!-- at the end of the BODY -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-    <script type="text/javascript">
-        docsearch({
-            apiKey: 'c56d6c558557cfa1fd103a049363cf8b',
-            indexName: 'benchmarkdotnet',
-            inputSelector: '#search-query',
-            debug: false // Set debug to true if you want to inspect the dropdown
-        });
-    </script>  </body>
+    </footer>
+  </body>
 </html>

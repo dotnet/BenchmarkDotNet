@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Sample: IntroComparableComplexParam | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Sample: IntroComparableComplexParam | BenchmarkDotNet ">
+      
+      <link rel="icon" href="../../logo/icon-32.png">
+      <link rel="stylesheet" href="../../public/docfx.min.css">
+      <link rel="stylesheet" href="../../public/main.css">
+      <meta name="docfx:navrel" content="../../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/dotnet/BenchmarkDotNet/blob/docs-stable/docs/articles/samples/IntroComparableComplexParam.md/#L1">
+  </head>
+
+  <script type="module">
+    import options from './../../public/main.js'
+    import { init } from './../../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../../index.html">
+            <img id="logo" class="svg" src="../../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="BenchmarkDotNet.Samples.IntroComparableComplexParam">
+<h2 id="sample-introcomparablecomplexparam">Sample: IntroComparableComplexParam</h2>
+
+<p>You can implement <code>IComparable</code> (the non generic version) on your complex parameter class if you want custom ordering behavior for your parameter.</p>
+<p>One use case for this is having a parameter class that overrides <code>ToString()</code>, but also providing a custom ordering behavior that isn't the alphabetical order of the result of <code>ToString()</code>.</p>
+<h3 id="source-code">Source code</h3>
+<pre><code class="lang-csharp" name="IntroComparableComplexParam.cs">using System;
+using System.Collections.Generic;
+using BenchmarkDotNet.Attributes;
+
+namespace BenchmarkDotNet.Samples
+{
+    public class IntroComparableComplexParam
+    {
+        [ParamsSource(nameof(ValuesForA))]
+        public ComplexParam A { get; set; }
+
+        public IEnumerable&lt;ComplexParam&gt; ValuesForA =&gt; new[] { new ComplexParam(1, &quot;First&quot;), new ComplexParam(2, &quot;Second&quot;) };
+
+        [Benchmark]
+        public object Benchmark() =&gt; A;
+
+        // Only non generic IComparable is required to provide custom order behavior, but implementing IComparable&lt;&gt; too is customary.
+        public class ComplexParam : IComparable&lt;ComplexParam&gt;, IComparable
+        {
+            public ComplexParam(int value, string name)
+            {
+                Value = value;
+                Name = name;
+            }
+
+            public int Value { get; set; }
+
+            public string Name { get; set; }
+
+            public override string ToString() =&gt; Name;
+
+            public int CompareTo(ComplexParam other) =&gt; other == null ? 1 : Value.CompareTo(other.Value);
+
+            public int CompareTo(object obj) =&gt; obj is ComplexParam other ? CompareTo(other) : throw new ArgumentException();
+        }
+    }
+}
+</code></pre><h3 id="links">Links</h3>
+<ul>
+<li><a class="xref" href="../features/parameterization.html">Parameterization</a></li>
+<li>The permanent link to this sample: <a class="xref" href="IntroComparableComplexParam.html">Sample: IntroComparableComplexParam</a></li>
+</ul>
+<hr>
+</article>
+
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2023 .NET Foundation and contributors
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
