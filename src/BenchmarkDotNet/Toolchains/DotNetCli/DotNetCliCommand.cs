@@ -90,6 +90,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                     buildResult = BuildNoRestoreNoDependencies();
             }
 
+            if (!buildResult.IsSuccess)
+                return BuildResult.Failure(GenerateResult, buildResult.AllInformation);
+
             return buildResult.ToBuildResult(GenerateResult);
         }
 
