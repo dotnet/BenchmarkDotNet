@@ -39,7 +39,7 @@ jobs:
 
   deploy:
     concurrency: ci-${{ github.ref }}
-    needs: [build]
+    needs: [generate]
     runs-on: ubuntu-latest
     steps:
 
