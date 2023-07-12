@@ -34,4 +34,21 @@ public static class KnownOptions
         Description = "Prints help information",
         Aliases = new[] { "-h" }
     };
+
+    public static readonly BoolOption Stable = new("--stable")
+    {
+        Description = "Removes VersionSuffix in MSBuild settings",
+        Aliases = new[] { "-s" }
+    };
+
+    public static readonly StringOption NextVersion = new("--next-version")
+    {
+        Description = "Specifies next version number",
+        Aliases = new[] { "-n" }
+    };
+    
+    public static readonly BoolOption Push = new("--push")
+    {
+        Description = "When specified, the task actually perform push to GitHub and nuget.org"
+    };
 }

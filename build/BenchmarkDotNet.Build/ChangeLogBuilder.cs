@@ -60,7 +60,7 @@ public static class ChangeLogBuilder
             if (string.IsNullOrEmpty(lastCommit))
                 lastCommit = $"v{currentVersion}";
 
-            var client = GitHubCredentials.CreateClient();
+            var client = Utils.CreateGitHubClient();
 
             if (currentVersion == "_")
             {

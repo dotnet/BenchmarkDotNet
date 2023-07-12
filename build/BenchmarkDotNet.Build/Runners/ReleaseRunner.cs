@@ -3,7 +3,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Build.Helpers;
 using BenchmarkDotNet.Build.Meta;
+using BenchmarkDotNet.Build.Options;
 using Cake.Common.Diagnostics;
 using Cake.Common.IO;
 using Cake.Common.Tools.DotNet;
@@ -24,48 +26,46 @@ public class ReleaseRunner
 
     public void Run()
     {
-        var nextVersion = context.NextVersion;
+        KnownOptions.Stable.AssertTrue(context);
+
+        EnvVar.GitHubToken.AssertHasValue();
+        if (KnownOptions.Push.Resolve(context))
+            EnvVar.NuGetToken.AssertHasValue();
+        else
+            EnvVar.NuGetToken.SetEmpty();
+
+        var nextVersion = KnownOptions.NextVersion.AssertHasValue(context);
         var currentVersion = context.VersionHistory.CurrentVersion;
-        var isStable = context.VersionStable;
         var tag = "v" + currentVersion;
 
-        if (string.IsNullOrEmpty(nextVersion))
-            throw new Exception("NextVersion is not specified");
-        if (!isStable)
-            throw new Exception("VersionStable is not specified");
-        if (string.IsNullOrEmpty(GitHubCredentials.Token))
-            throw new Exception($"Environment variable '{GitHubCredentials.TokenVariableName}' is not specified!");
-        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NUGET_TOKEN")))
-            throw new Exception($"Environment variable 'NUGET_TOKEN' is not specified!");
-
         context.GitRunner.Tag(tag);
-        context.GitRunner.BranchMove(Repo.DocsStableBranch, "HEAD");
-        
+
         // Upgrade current version and commit changes
-        UpdateVersionsTxt();
-        UpdateCommonProps();
+        UpdateVersionsTxt(nextVersion);
+        UpdateCommonProps(nextVersion);
         context.Information($"Building {context.TemplatesTestsProjectFile}");
         context.BuildRunner.BuildProjectSilent(context.TemplatesTestsProjectFile);
         context.GitRunner.Commit($"Set next BenchmarkDotNet version: {nextVersion}");
-        
-        UpdateMilestones().Wait();
-        
+
+        UpdateMilestones(nextVersion).Wait();
+
+        context.GitRunner.BranchMove(Repo.DocsStableBranch, "HEAD");
         context.GitRunner.Push(Repo.MasterBranch);
         context.GitRunner.Push(Repo.DocsStableBranch, true);
         context.GitRunner.Push(tag);
 
         PushNupkg();
 
-        PublishGitHubRelease().Wait();
+        PublishGitHubRelease();
     }
 
-    private void UpdateVersionsTxt()
+    private void UpdateVersionsTxt(string versionToAppend)
     {
         var content = context.FileReadText(context.VersionsFile).Trim();
-        context.GenerateFile(context.VersionsFile, $"{content}\n{context.NextVersion}");
+        context.GenerateFile(context.VersionsFile, $"{content}\n{versionToAppend}");
     }
 
-    private void UpdateCommonProps()
+    private void UpdateCommonProps(string newCurrentVersion)
     {
         var regex = new Regex(@"<VersionPrefix>([\d\.]+)</VersionPrefix>");
 
@@ -75,43 +75,34 @@ public class ReleaseRunner
             throw new Exception($"Failed to find VersionPrefix definition in {context.CommonPropsFile}");
 
         var oldVersion = match.Groups[1].Value;
-        context.GenerateFile(context.CommonPropsFile, content.Replace(oldVersion, context.NextVersion));
+        context.GenerateFile(context.CommonPropsFile, content.Replace(oldVersion, newCurrentVersion));
     }
 
-    private async Task UpdateMilestones()
+    private async Task UpdateMilestones(string nextVersion)
     {
         var currentVersion = context.VersionHistory.CurrentVersion;
-        var nextVersion = context.NextVersion;
 
-        var client = GitHubCredentials.CreateClient();
+        var client = Utils.CreateGitHubClient();
         var allMilestones = await client.Issue.Milestone.GetAllForRepository(Repo.Owner, Repo.Name);
         var currentMilestone = allMilestones.First(milestone => milestone.Title == $"v{currentVersion}");
 
         context.Information($"[GitHub] Close milestone v{currentVersion}");
-        if (context.PushMode)
+        context.RunOnlyInPushMode(() =>
         {
-            await client.Issue.Milestone.Update(Repo.Owner, Repo.Name, currentMilestone.Number,
-                new MilestoneUpdate { State = ItemState.Closed, DueOn = DateTimeOffset.Now });
-        }
-        else
-        {
-            context.Information("  Skip because PushMode is disabled");
-        }
+            var milestoneUpdate = new MilestoneUpdate { State = ItemState.Closed, DueOn = DateTimeOffset.Now };
+            client.Issue.Milestone.Update(Repo.Owner, Repo.Name, currentMilestone.Number, milestoneUpdate).Wait();
+        });
 
         context.Information($"[GitHub] Create milestone v{nextVersion}");
-        if (context.PushMode)
+        context.RunOnlyInPushMode(() =>
         {
-            await client.Issue.Milestone.Create(Repo.Owner, Repo.Name, new NewMilestone($"v{nextVersion}"));
-        }
-        else
-        {
-            context.Information("  Skip because PushMode is disabled");
-        }
+            client.Issue.Milestone.Create(Repo.Owner, Repo.Name, new NewMilestone($"v{nextVersion}")).Wait();
+        });
     }
 
     private void PushNupkg()
     {
-        var nuGetToken = Environment.GetEnvironmentVariable("NUGET_TOKEN");
+        var nuGetToken = EnvVar.NuGetToken.GetValue();
 
         var files = context
             .GetFiles(context.ArtifactsDirectory.CombineWithFilePath("*").FullPath)
@@ -126,14 +117,11 @@ public class ReleaseRunner
         foreach (var file in files)
         {
             context.Information($"Push: {file}");
-            if (context.PushMode)
-                context.DotNetNuGetPush(file, settings);
-            else
-                context.Information("  Skip because PushMode is disabled");
+            context.RunOnlyInPushMode(() => context.DotNetNuGetPush(file, settings));
         }
     }
 
-    private async Task PublishGitHubRelease()
+    private void PublishGitHubRelease()
     {
         var version = context.VersionHistory.CurrentVersion;
         var tag = $"v{version}";
@@ -145,23 +133,19 @@ public class ReleaseRunner
                     PreprocessMarkdown(context.FileReadText(notesFile));
 
         context.Information($"[GitHub] Creating release '{version}'");
-        var client = GitHubCredentials.CreateClient();
-        if (context.PushMode)
+        var client = Utils.CreateGitHubClient();
+        context.RunOnlyInPushMode(() =>
         {
-            await client.Repository.Release.Create(Repo.Owner, Repo.Name, new NewRelease(tag)
+            client.Repository.Release.Create(Repo.Owner, Repo.Name, new NewRelease(tag)
             {
                 Name = version,
                 Draft = false,
                 Prerelease = false,
                 GenerateReleaseNotes = false,
                 Body = notes
-            });
+            }).Wait();
             context.Information("  Success");
-        }
-        else
-        {
-            context.Information("  Skip because PushMode is disabled");
-        }
+        });
     }
 
     private static string PreprocessMarkdown(string content)

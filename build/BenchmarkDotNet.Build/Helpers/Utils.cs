@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using BenchmarkDotNet.Build.Options;
+using Cake.Common.Diagnostics;
 using Cake.Common.Tools.DotNet;
+using Octokit;
 
 namespace BenchmarkDotNet.Build.Helpers;
 
@@ -34,5 +37,15 @@ public static class Utils
             { "diagnostic", DotNetVerbosity.Diagnostic }
         };
         return lookup.TryGetValue(verbosity, out var value) ? value : null;
+    }
+
+    public static GitHubClient CreateGitHubClient()
+    {
+        EnvVar.GitHubToken.AssertHasValue();
+
+        var client = new GitHubClient(new ProductHeaderValue("BenchmarkDotNet"));
+        var tokenAuth = new Credentials(EnvVar.GitHubToken.GetValue());
+        client.Credentials = tokenAuth;
+        return client;
     }
 }

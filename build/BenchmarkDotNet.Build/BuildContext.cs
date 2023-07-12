@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Build.Helpers;
 using BenchmarkDotNet.Build.Meta;
+using BenchmarkDotNet.Build.Options;
 using BenchmarkDotNet.Build.Runners;
 using Cake.Common;
 using Cake.Common.Build;
@@ -23,9 +24,6 @@ public class BuildContext : FrostingContext
 {
     public string BuildConfiguration { get; set; } = "Release";
     public DotNetVerbosity BuildVerbosity { get; set; } = DotNetVerbosity.Minimal;
-    public bool VersionStable { get; }
-    public string NextVersion { get; }
-    public bool PushMode { get; }
 
     public DirectoryPath RootDirectory { get; }
     public DirectoryPath BuildDirectory { get; }
@@ -83,9 +81,7 @@ public class BuildContext : FrostingContext
             MsBuildSettingsBuild.WithProperty("UseSharedCompilation", "false");
         }
 
-        VersionStable = false;
-        NextVersion = "";
-        PushMode = false;
+
         if (context.Arguments.HasArgument("msbuild"))
         {
             var msBuildParameters = context.Arguments.GetArguments().First(it => it.Key == "msbuild").Value;
@@ -109,17 +105,17 @@ public class BuildContext : FrostingContext
                         if (parsedVerbosity != null)
                             BuildVerbosity = parsedVerbosity.Value;
                     }
-
-                    if (name.Equals("VersionStable", StringComparison.OrdinalIgnoreCase) && value != "")
-                        VersionStable = true;
-                    
-                    if (name.Equals("NextVersion", StringComparison.OrdinalIgnoreCase) && value != "")
-                        NextVersion = value;
-                    
-                    if (name.Equals("PushMode", StringComparison.OrdinalIgnoreCase) && value != "")
-                        PushMode = true;
                 }
             }
+        }
+
+        if (KnownOptions.Stable.Resolve(this))
+        {
+            const string name = "NoVersionSuffix";
+            const string value = "true";
+            MsBuildSettingsRestore.WithProperty(name, value);
+            MsBuildSettingsBuild.WithProperty(name, value);
+            MsBuildSettingsPack.WithProperty(name, value);
         }
 
         // NativeAOT build requires VS C++ tools to be added to $path via vcvars64.bat
@@ -177,4 +173,13 @@ public class BuildContext : FrostingContext
         }
     }
 
+    public void RunOnlyInPushMode(Action action)
+    {
+        if (KnownOptions.Push.Resolve(this))
+        {
+            action();
+        }
+        else
+            this.Information("  Skip because PushMode is disabled");
+    }
 }

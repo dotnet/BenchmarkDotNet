@@ -1,4 +1,3 @@
-using BenchmarkDotNet.Build.Meta;
 using BenchmarkDotNet.Build.Options;
 using Cake.Common;
 using Cake.Frosting;
@@ -129,7 +128,8 @@ public class PackTask : FrostingTask<BuildContext>, IHelpProvider
             {
                 new Example(Name)
                     .WithMsBuildArgument("VersionPrefix", "0.1.1729")
-                    .WithMsBuildArgument("VersionSuffix", "preview")
+                    .WithMsBuildArgument("VersionSuffix", "preview"),
+                new Example(Name).WithArgument(KnownOptions.Stable)
             }
         };
     }
@@ -147,7 +147,7 @@ public class DocsUpdateTask : FrostingTask<BuildContext>, IHelpProvider
         return new HelpInfo
         {
             Options = new IOption[] { KnownOptions.DocsPreview, KnownOptions.DocsDepth },
-            EnvironmentVariables = new[] { GitHubCredentials.TokenVariableName },
+            EnvironmentVariables = new[] { EnvVar.GitHubToken },
             Examples = new[]
             {
                 new Example(Name)
@@ -210,10 +210,14 @@ public class ReleaseTask : FrostingTask<BuildContext>, IHelpProvider
 
     public HelpInfo GetHelp() => new()
     {
-        EnvironmentVariables = new[]
+        Options = new IOption[] { KnownOptions.NextVersion, KnownOptions.Push },
+        EnvironmentVariables = new[] { EnvVar.GitHubToken, EnvVar.NuGetToken },
+        Examples = new[]
         {
-            GitHubCredentials.TokenVariableName,
-            "NUGET_TOKEN"
+            new Example(Name)
+                .WithArgument(KnownOptions.Stable)
+                .WithArgument(KnownOptions.NextVersion, "v0.1.1729")
+                .WithArgument(KnownOptions.Push)
         }
     };
 }

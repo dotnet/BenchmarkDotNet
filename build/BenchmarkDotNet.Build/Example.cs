@@ -15,19 +15,19 @@ public class Example
         TaskName = taskName;
     }
 
-    public Example WithArgument(string name, string? value = null)
-    {
-        arguments.Add(new Argument(name, value, false));
-        return this;
-    }
-
     public Example WithMsBuildArgument(string name, string value)
     {
         arguments.Add(new Argument(name, value, true));
         return this;
     }
 
-    public Example WithArgument(IOption option, string? value = null)
+    public Example WithArgument(BoolOption option)
+    {
+        arguments.Add(new Argument(option.CommandLineName, null, false));
+        return this;
+    }
+
+    public Example WithArgument(StringOption option, string value)
     {
         arguments.Add(new Argument(option.CommandLineName, value, false));
         return this;

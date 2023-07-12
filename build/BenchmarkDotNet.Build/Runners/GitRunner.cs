@@ -63,13 +63,11 @@ public class GitRunner
         context.Information("[GitPush]");
         context.Information($"  Target: {target}");
         context.Information($"  Force: {force}");
-        if (context.PushMode)
+        context.RunOnlyInPushMode(() =>
         {
             var forceFlag = force ? " --force" : "";
             RunCommand($"push origin {target}{forceFlag}");
-        }
-        else
-            context.Information("  Skip because PushMode is disabled");
+        });
     }
 
     private void RunCommand(string commandLineArgs) => RunCommand(null, commandLineArgs);

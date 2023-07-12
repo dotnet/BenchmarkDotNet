@@ -17,4 +17,11 @@ public class BoolOption : Option<bool>
             return true;
         return !value.Equals(false.ToString(), StringComparison.OrdinalIgnoreCase);
     }
+
+    public void AssertTrue(BuildContext context)
+    {
+        var value = Resolve(context);
+        if (!value)
+            throw new Exception($"{CommandLineName} is not specified");
+    }
 }

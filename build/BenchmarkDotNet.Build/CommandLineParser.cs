@@ -86,7 +86,7 @@ public class CommandLineParser
 
     private readonly IOption[] baseOptions =
     {
-        KnownOptions.Verbosity, KnownOptions.Exclusive, KnownOptions.Help
+        KnownOptions.Verbosity, KnownOptions.Exclusive, KnownOptions.Help, KnownOptions.Stable
     };
 
     private void PrintHelp()
@@ -108,7 +108,7 @@ public class CommandLineParser
 
         WriteLine();
 
-        PrintExamples(GetTasks().SelectMany(task => task.HelpInfo.Examples));
+        PrintExamples(GetTasks().SelectMany(task => task.HelpInfo.Examples).ToList());
 
         PrintOptions(baseOptions);
 
@@ -169,10 +169,10 @@ public class CommandLineParser
         if (helpInfo.EnvironmentVariables.Any())
         {
             WriteHeader("Environment variables:");
-            foreach (var variable in helpInfo.EnvironmentVariables)
+            foreach (var envVar in helpInfo.EnvironmentVariables)
             {
                 WritePrefix();
-                WriteOption(variable);
+                WriteOption(envVar.Name);
                 WriteLine();
             }
         }
@@ -237,8 +237,10 @@ public class CommandLineParser
         WriteLine();
     }
 
-    private void PrintExamples(IEnumerable<Example> examples)
+    private void PrintExamples(IReadOnlyList<Example> examples)
     {
+        if (!examples.Any())
+            return;
         WriteHeader("Examples:");
 
         foreach (var example in examples)

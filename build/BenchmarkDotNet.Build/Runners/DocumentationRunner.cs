@@ -57,13 +57,12 @@ public class DocumentationRunner
 
     public void Update()
     {
+        EnvVar.GitHubToken.AssertHasValue();
+
         ReadmeUpdater.Run(context);
         UpdateLastFooter();
 
         EnsureChangelogDetailsExist();
-
-        if (string.IsNullOrEmpty(GitHubCredentials.Token))
-            throw new Exception($"Environment variable '{GitHubCredentials.TokenVariableName}' is not specified!");
 
         var history = context.VersionHistory;
         var stableVersionCount = history.StableVersions.Length;
@@ -294,7 +293,7 @@ public class DocumentationRunner
     {
         var version = context.VersionHistory.CurrentVersion;
         var previousVersion = context.VersionHistory.StableVersions.Last();
-        var date = context.VersionStable
+        var date = KnownOptions.Stable.Resolve(context)
             ? DateTime.Now.ToString("MMMM dd, yyyy", CultureInfo.InvariantCulture)
             : "TBA";
 
