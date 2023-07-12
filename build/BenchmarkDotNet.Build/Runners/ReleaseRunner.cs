@@ -119,7 +119,8 @@ public class ReleaseRunner
         var settings = new DotNetNuGetPushSettings
         {
             ApiKey = nuGetToken,
-            SymbolApiKey = nuGetToken
+            SymbolApiKey = nuGetToken,
+            Source = "https://api.nuget.org/v3/index.json"
         };
 
         foreach (var file in files)
