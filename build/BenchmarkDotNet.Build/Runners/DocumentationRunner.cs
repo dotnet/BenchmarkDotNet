@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Build.Meta;
+using BenchmarkDotNet.Build.Options;
 using Cake.Common.Diagnostics;
 using Cake.Common.IO;
 using Cake.Core.IO;
@@ -14,6 +15,8 @@ namespace BenchmarkDotNet.Build.Runners;
 public class DocumentationRunner
 {
     private readonly BuildContext context;
+    private readonly bool preview;
+    private readonly string depth;
 
     public DirectoryPath ChangelogDirectory { get; }
     public DirectoryPath ChangelogSrcDirectory { get; }
@@ -32,6 +35,8 @@ public class DocumentationRunner
     public DocumentationRunner(BuildContext context)
     {
         this.context = context;
+        preview = KnownOptions.DocsPreview.Resolve(context);
+        depth = KnownOptions.DocsDepth.Resolve(context);
 
         var docsDirectory = context.RootDirectory.Combine("docs");
         ChangelogDirectory = docsDirectory.Combine("changelog");
@@ -61,39 +66,43 @@ public class DocumentationRunner
             throw new Exception($"Environment variable '{GitHubCredentials.TokenVariableName}' is not specified!");
 
         var history = context.VersionHistory;
-        var depth = context.Depth;
         var stableVersionCount = history.StableVersions.Length;
 
-        if (depth == 0)
+        if (depth.Equals("all", StringComparison.OrdinalIgnoreCase))
         {
             DocfxChangelogDownload(
                 history.StableVersions.First(),
                 history.FirstCommit);
 
-            for (int i = 1; i < stableVersionCount; i++)
+            for (var i = 1; i < stableVersionCount; i++)
                 DocfxChangelogDownload(
                     history.StableVersions[i],
                     history.StableVersions[i - 1]);
         }
-        else if (depth > 0)
+        else if (depth != "")
         {
-            for (int i = Math.Max(stableVersionCount - depth, 1); i < stableVersionCount; i++)
+            if (!int.TryParse(depth, CultureInfo.InvariantCulture, out var depthValue))
+                throw new InvalidDataException($"Failed to parse the depth value: '{depth}'");
+
+            for (var i = Math.Max(stableVersionCount - depthValue, 1); i < stableVersionCount; i++)
                 DocfxChangelogDownload(
                     history.StableVersions[i],
                     history.StableVersions[i - 1]);
         }
 
-        DocfxChangelogDownload(
-            history.CurrentVersion,
-            history.StableVersions.Last(),
-            "HEAD");
+        if (preview)
+            DocfxChangelogDownload(
+                history.CurrentVersion,
+                history.StableVersions.Last(),
+                "HEAD");
     }
 
     public void Prepare()
     {
         foreach (var version in context.VersionHistory.StableVersions)
             DocfxChangelogGenerate(version);
-        DocfxChangelogGenerate(context.VersionHistory.CurrentVersion);
+        if (preview)
+            DocfxChangelogGenerate(context.VersionHistory.CurrentVersion);
 
         GenerateIndexMd();
         GenerateChangelogIndex();
@@ -133,9 +142,12 @@ public class DocumentationRunner
     {
         var content = new StringBuilder();
 
-        content.AppendLine($"- name: v{context.VersionHistory.CurrentVersion}");
-        content.AppendLine($"  href: v{context.VersionHistory.CurrentVersion}.md");
-        
+        if (preview)
+        {
+            content.AppendLine($"- name: v{context.VersionHistory.CurrentVersion}");
+            content.AppendLine($"  href: v{context.VersionHistory.CurrentVersion}.md");
+        }
+
         foreach (var version in context.VersionHistory.StableVersions.Reverse())
         {
             content.AppendLine($"- name: v{version}");
@@ -157,8 +169,9 @@ public class DocumentationRunner
         content.AppendLine("");
         content.AppendLine("# Full ChangeLog");
         content.AppendLine("");
-        content.AppendLine(
-            $"[!include[v{context.VersionHistory.CurrentVersion}](v{context.VersionHistory.CurrentVersion}.md)]");
+        if (preview)
+            content.AppendLine(
+                $"[!include[v{context.VersionHistory.CurrentVersion}](v{context.VersionHistory.CurrentVersion}.md)]");
         foreach (var version in context.VersionHistory.StableVersions.Reverse())
             content.AppendLine($"[!include[v{version}](v{version}.md)]");
 
@@ -174,7 +187,8 @@ public class DocumentationRunner
         content.AppendLine("");
         content.AppendLine("# ChangeLog");
         content.AppendLine("");
-        content.AppendLine($"* @changelog.v{context.VersionHistory.CurrentVersion}");
+        if (preview)
+            content.AppendLine($"* @changelog.v{context.VersionHistory.CurrentVersion}");
         foreach (var version in context.VersionHistory.StableVersions.Reverse())
             content.AppendLine($"* @changelog.v{version}");
         content.AppendLine("* @changelog.full");
@@ -238,8 +252,8 @@ public class DocumentationRunner
     private void DocfxChangelogDownload(string version, string versionPrevious, string lastCommit = "")
     {
         EnsureChangelogDetailsExist();
-        context.Information("DocfxChangelogDownload: " + version);
-        ChangeLogBuilder.Run(changelogDetailsDirectory, version, versionPrevious, lastCommit).Wait();
+        context.Information($"Downloading changelog details for v{version}");
+        ChangeLogBuilder.Run(context, changelogDetailsDirectory, version, versionPrevious, lastCommit);
     }
 
     private void GenerateRedirects()

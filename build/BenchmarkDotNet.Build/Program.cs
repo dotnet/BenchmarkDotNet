@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Build.Meta;
+using BenchmarkDotNet.Build.Options;
 using Cake.Common;
 using Cake.Frosting;
 
@@ -92,19 +93,25 @@ public class DocsUpdateTask : FrostingTask<BuildContext>, IHelpProvider
     {
         return new HelpInfo
         {
-            Description = new[]
-            {
-                $"Requires environment variable '{GitHubCredentials.TokenVariableName}'"
-            }
+            Options = new IOption[] { KnownOptions.DocsPreview, KnownOptions.DocsDepth },
+            EnvironmentVariables = new[] { GitHubCredentials.TokenVariableName }
         };
     }
 }
 
 [TaskName("DocsPrepare")]
 [TaskDescription("Prepare auxiliary documentation files")]
-public class DocsPrepareTask : FrostingTask<BuildContext>
+public class DocsPrepareTask : FrostingTask<BuildContext>, IHelpProvider
 {
     public override void Run(BuildContext context) => context.DocumentationRunner.Prepare();
+
+    public HelpInfo GetHelp()
+    {
+        return new HelpInfo
+        {
+            Options = new IOption[] { KnownOptions.DocsPreview }
+        };
+    }
 }
 
 // In order to work around xref issues in DocFx, BenchmarkDotNet and BenchmarkDotNet.Annotations must be build
@@ -114,9 +121,14 @@ public class DocsPrepareTask : FrostingTask<BuildContext>
 [TaskName("DocsBuild")]
 [TaskDescription("Build final documentation")]
 [IsDependentOn(typeof(DocsPrepareTask))]
-public class DocsBuildTask : FrostingTask<BuildContext>
+public class DocsBuildTask : FrostingTask<BuildContext>, IHelpProvider
 {
     public override void Run(BuildContext context) => context.DocumentationRunner.Build();
+
+    public HelpInfo GetHelp() => new()
+    {
+        Options = new IOption[] { KnownOptions.DocsPreview }
+    };
 }
 
 [TaskName("Release")]

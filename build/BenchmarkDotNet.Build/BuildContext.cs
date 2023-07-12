@@ -16,7 +16,6 @@ using Cake.Core;
 using Cake.Core.IO;
 using Cake.FileHelpers;
 using Cake.Frosting;
-using Cake.Git;
 
 namespace BenchmarkDotNet.Build;
 
@@ -24,7 +23,6 @@ public class BuildContext : FrostingContext
 {
     public string BuildConfiguration { get; set; } = "Release";
     public DotNetVerbosity BuildVerbosity { get; set; } = DotNetVerbosity.Minimal;
-    public int Depth { get; set; }
     public bool VersionStable { get; }
     public string NextVersion { get; }
     public bool PushMode { get; }
@@ -85,7 +83,6 @@ public class BuildContext : FrostingContext
             MsBuildSettingsBuild.WithProperty("UseSharedCompilation", "false");
         }
 
-        Depth = -1;
         VersionStable = false;
         NextVersion = "";
         PushMode = false;
@@ -112,9 +109,6 @@ public class BuildContext : FrostingContext
                         if (parsedVerbosity != null)
                             BuildVerbosity = parsedVerbosity.Value;
                     }
-
-                    if (name.Equals("depth", StringComparison.OrdinalIgnoreCase))
-                        Depth = int.Parse(value);
 
                     if (name.Equals("VersionStable", StringComparison.OrdinalIgnoreCase) && value != "")
                         VersionStable = true;
@@ -160,14 +154,18 @@ public class BuildContext : FrostingContext
         GenerateFile(filePath, content.ToString());
     }
 
-    public void GenerateFile(FilePath filePath, string content)
+    public void GenerateFile(FilePath filePath, string content, bool reportNoChanges = false)
     {
         var relativePath = RootDirectory.GetRelativePath(filePath);
         if (this.FileExists(filePath))
         {
             var oldContent = this.FileReadText(filePath);
             if (content == oldContent)
+            {
+                if (reportNoChanges)
+                    this.Information("[NoChanges] " + relativePath);
                 return;
+            }
 
             this.FileWriteText(filePath, content);
             this.Information("[Updated] " + relativePath);

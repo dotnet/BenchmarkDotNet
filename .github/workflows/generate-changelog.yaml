@@ -20,9 +20,8 @@ jobs:
         ref: master
 
     - name: Download changelog
-      run: ./build.cmd DocsUpdate /p:Depth=1
+      run: ./build.cmd DocsUpdate --depth 1 --preview
       env:
-        GITHUB_PRODUCT: ChangelogBuilder
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Push changelog

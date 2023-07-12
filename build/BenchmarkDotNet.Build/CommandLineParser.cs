@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using BenchmarkDotNet.Build.Options;
 using Cake.Frosting;
 
 namespace BenchmarkDotNet.Build;
@@ -9,6 +11,9 @@ namespace BenchmarkDotNet.Build;
 public class CommandLineParser
 {
     private const string ScriptName = "build.cmd";
+
+    private static readonly string CallScriptName =
+        (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) ? ScriptName : "./" + ScriptName;
 
     public static readonly CommandLineParser Instance = new();
 
@@ -53,63 +58,32 @@ public class CommandLineParser
         {
             var arg = argsToProcess.Dequeue();
 
-            var matched = false;
-            foreach (var option in options)
-            {
-                if (Is(arg, option.ShortName, option.FullName))
-                {
-                    matched = true;
-                    cakeArgs.Add(option.CakeOption);
-                    if (option.Arg != "")
-                    {
-                        if (!argsToProcess.Any())
-                        {
-                            PrintError(option.FullName + " is not specified");
-                            return null;
-                        }
-
-                        cakeArgs.Add(argsToProcess.Dequeue());
-                    }
-                }
-            }
-
             if (arg.StartsWith("/p:"))
             {
-                matched = true;
                 cakeArgs.Add("--msbuild");
                 cakeArgs.Add(arg[3..]);
+                continue;
             }
 
-            if (!matched)
+            if (arg.StartsWith('-'))
             {
-                PrintError("Unknown option: " + arg);
-                return null;
+                cakeArgs.Add(arg);
+                if (argsToProcess.Any() && !argsToProcess.Peek().StartsWith('-'))
+                    cakeArgs.Add(argsToProcess.Dequeue());
+                continue;
             }
+
+            PrintError("Unknown option: " + arg);
+            return null;
         }
 
         return cakeArgs.ToArray();
     }
 
 
-    private record Option(string ShortName, string FullName, string Arg, string Description, string CakeOption);
-
-    private readonly Option[] options =
+    private readonly IOption[] baseOptions =
     {
-        new("-v",
-            "--verbosity",
-            "<LEVEL>",
-            "Specifies the amount of information to be displayed\n(Quiet, Minimal, Normal, Verbose, Diagnostic)",
-            "--verbosity"),
-        new("-e",
-            "--exclusive",
-            "",
-            "Executes the target task without any dependencies",
-            "--exclusive"),
-        new("-h",
-            "--help",
-            "",
-            "Prints help information for the target task",
-            "")
+        KnownOptions.Verbosity, KnownOptions.Exclusive, KnownOptions.Help
     };
 
     private void PrintHelp()
@@ -127,7 +101,7 @@ public class CommandLineParser
         WriteHeader("Usage:");
 
         WritePrefix();
-        Write(ScriptName + " ");
+        Write(CallScriptName + " ");
         WriteTask("<TASK> ");
         WriteOption("[OPTIONS]");
         WriteLine();
@@ -137,12 +111,12 @@ public class CommandLineParser
         WriteHeader("Examples:");
 
         WritePrefix();
-        Write(ScriptName + " ");
+        Write(CallScriptName + " ");
         WriteTask("restore");
         WriteLine();
 
         WritePrefix();
-        Write(ScriptName + " ");
+        Write(CallScriptName + " ");
         WriteTask("build ");
         WriteOption("/p:");
         WriteArg("Configuration");
@@ -151,7 +125,7 @@ public class CommandLineParser
         WriteLine();
 
         WritePrefix();
-        Write(ScriptName + " ");
+        Write(CallScriptName + " ");
         WriteTask("pack ");
         WriteOption("/p:");
         WriteArg("VersionPrefix");
@@ -164,26 +138,28 @@ public class CommandLineParser
         WriteLine();
 
         WritePrefix();
-        Write(ScriptName + " ");
+        Write(CallScriptName + " ");
         WriteTask("unittests ");
         WriteOption("--exclusive --verbosity ");
         WriteArg("Diagnostic");
         WriteLine();
 
         WritePrefix();
-        Write(ScriptName + " ");
+        Write(CallScriptName + " ");
         WriteTask("docs-update ");
-        WriteOption("/p:");
-        WriteArg("Depth");
-        WriteOption("=");
+        WriteOption("--depth ");
         WriteArg("3");
         WriteLine();
 
+        WritePrefix();
+        Write(CallScriptName + " ");
+        WriteTask("docs-build ");
+        WriteOption("--preview ");
         WriteLine();
 
-        PrintCommonOptions();
-
         WriteLine();
+
+        PrintOptions(baseOptions);
 
         WriteHeader("Tasks:");
         var taskWidth = GetTaskNames().Max(name => name.Length) + 3;
@@ -207,29 +183,47 @@ public class CommandLineParser
         }
     }
 
-    private void PrintCommonOptions()
+    private void PrintOptions(IOption[] options)
     {
+        const string valuePlaceholder = "<VALUE>";
+
         WriteLine("Options:", ConsoleColor.DarkCyan);
 
-        var shortNameWidth = options.Max(it => it.ShortName.Length);
-        var targetWidth = options.Max(it => it.FullName.Length + it.Arg.Length);
-
-        foreach (var (shortName, fullName, arg, description, _) in options)
+        int GetWidth(IOption option)
         {
+            int width = option.CommandLineName.Length;
+            foreach (var alias in option.Aliases)
+                width += 1 + alias.Length;
+            if (option is StringOption)
+                width += 1 + valuePlaceholder.Length;
+            return width;
+        }
+
+        const int descriptionGap = 3;
+        var maxWidth = options.Max(GetWidth) + descriptionGap;
+
+        foreach (var option in options)
+        {
+            var allNames = option.Aliases.Append(option.CommandLineName).OrderBy(name => name.Length);
+            var joinName = string.Join(',', allNames);
+
             WritePrefix();
-            WriteOption(shortName.PadRight(shortNameWidth));
-            WriteOption(shortName != "" ? "," : " ");
-            WriteOption(fullName);
-            Write(" ");
-            WriteArg(arg);
-            Write(new string(' ', targetWidth - fullName.Length - arg.Length + 3));
-            var descriptionLines = description.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            WriteOption(joinName);
+            if (option is StringOption)
+            {
+                Write(" ");
+                WriteArg(valuePlaceholder);
+            }
+
+            Write(new string(' ',
+                maxWidth - joinName.Length - (option is StringOption ? valuePlaceholder.Length + 1 : 0)));
+            var descriptionLines = option.Description.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
             Write(descriptionLines.FirstOrDefault() ?? "");
             for (int i = 1; i < descriptionLines.Length; i++)
             {
                 WriteLine();
                 WritePrefix();
-                Write(new string(' ', shortNameWidth + 2 + targetWidth + 3));
+                Write(new string(' ', maxWidth));
                 Write(descriptionLines[i]);
             }
 
@@ -240,9 +234,11 @@ public class CommandLineParser
         WriteOption("/p:");
         WriteArg("<KEY>");
         WriteOption("=");
-        WriteArg("<VALUE>");
-        Write(new string(' ', targetWidth + shortNameWidth - 11));
+        WriteArg(valuePlaceholder);
+        Write(new string(' ', maxWidth - "/p:<KEY>=".Length - valuePlaceholder.Length));
         Write("Passes custom properties to MSBuild");
+        WriteLine();
+
         WriteLine();
     }
 
@@ -267,18 +263,19 @@ public class CommandLineParser
             WriteLine(taskDescription);
         }
 
-        foreach (var line in helpInfo.Description)
-        {
-            WritePrefix();
-            WriteLine(line);
-        }
+        if (string.IsNullOrWhiteSpace(helpInfo.Description))
+            foreach (var line in helpInfo.Description.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+            {
+                WritePrefix();
+                WriteLine(line.Trim());
+            }
 
         WriteLine();
 
         WriteHeader("Usage:");
 
         WritePrefix();
-        Write(ScriptName + " ");
+        Write(CallScriptName + " ");
         WriteTask(taskName + " ");
         WriteOption("[OPTIONS]");
         WriteLine();
@@ -309,7 +306,19 @@ public class CommandLineParser
 
         WriteLine();
 
-        PrintCommonOptions();
+        PrintOptions(helpInfo.Options.Concat(baseOptions).ToArray());
+
+        if (helpInfo.EnvironmentVariables.Any())
+        {
+            WriteHeader("Environment variables:");
+            foreach (var variable in helpInfo.EnvironmentVariables)
+            {
+                WritePrefix();
+                WriteOption(variable);
+            }
+
+            WriteLine();
+        }
     }
 
     private static HashSet<string> GetTaskNames()

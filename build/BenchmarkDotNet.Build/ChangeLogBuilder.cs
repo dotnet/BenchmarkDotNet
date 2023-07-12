@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Build.Helpers;
 using BenchmarkDotNet.Build.Meta;
+using Cake.Common.Diagnostics;
 using Cake.Core.IO;
 using Octokit;
 
@@ -174,17 +174,18 @@ public static class ChangeLogBuilder
         }
     }
 
-    public static async Task Run(DirectoryPath path, string currentVersion, string previousVersion, string lastCommit)
+    public static void Run(BuildContext context, DirectoryPath path,
+        string currentVersion, string previousVersion, string lastCommit)
     {
         try
         {
             var config = new Config(currentVersion, previousVersion, lastCommit);
-            var releaseNotes = await MarkdownBuilder.Build(config);
-            await File.WriteAllTextAsync(path.Combine($"v{config.CurrentVersion}.md").FullPath, releaseNotes);
+            var releaseNotes = MarkdownBuilder.Build(config).Result;
+            context.GenerateFile(path.Combine($"v{config.CurrentVersion}.md").FullPath, releaseNotes, true);
         }
         catch (Exception e)
         {
-            await Console.Error.WriteLineAsync(e.ToString());
+            context.Error(e.ToString());
         }
     }
 }
