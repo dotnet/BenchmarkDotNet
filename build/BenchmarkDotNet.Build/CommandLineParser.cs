@@ -34,14 +34,17 @@ public class CommandLineParser
         if (Is(taskName, "-t", "--target") && argsToProcess.Any())
             taskName = argsToProcess.Dequeue();
 
-        taskName = taskName.Replace("-", "");
-
         var taskNames = GetTaskNames();
-        if (!taskNames.Contains(taskName))
+        var matchedTaskName = taskNames
+            .FirstOrDefault(name => string.Equals(name.Replace("-", ""), taskName.Replace("-", ""),
+                StringComparison.OrdinalIgnoreCase));
+        if (matchedTaskName == null)
         {
             PrintError($"'{taskName}' is not a task");
             return null;
         }
+
+        taskName = matchedTaskName;
 
         if (argsToProcess.Count == 1 && Is(argsToProcess.Peek(), "-h", "--help"))
         {
@@ -93,9 +96,6 @@ public class CommandLineParser
         WritePrefix();
         WriteLine("BenchmarkDotNet build script");
 
-        WritePrefix();
-        WriteLine("Task names are case-insensitive, dashes are ignored");
-
         WriteLine();
 
         WriteHeader("Usage:");
@@ -139,7 +139,7 @@ public class CommandLineParser
 
         WritePrefix();
         Write(CallScriptName + " ");
-        WriteTask("unittests ");
+        WriteTask("unit-tests ");
         WriteOption("--exclusive --verbosity ");
         WriteArg("Diagnostic");
         WriteLine();
@@ -288,21 +288,6 @@ public class CommandLineParser
         Write(ScriptName + " ");
         WriteTask(taskName);
         WriteLine();
-
-        if (taskName.StartsWith("docs", StringComparison.OrdinalIgnoreCase))
-        {
-            WritePrefix();
-            Write(ScriptName + " ");
-            WriteTask("docs-" + taskName[4..].ToLowerInvariant());
-            WriteLine();
-        }
-        else
-        {
-            WritePrefix();
-            Write(ScriptName + " ");
-            WriteTask(taskName.ToLowerInvariant());
-            WriteLine();
-        }
 
         WriteLine();
 

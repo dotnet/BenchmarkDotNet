@@ -16,14 +16,14 @@ public static class Program
     }
 }
 
-[TaskName("Restore")]
+[TaskName("restore")]
 [TaskDescription("Restore NuGet packages")]
 public class RestoreTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context) => context.BuildRunner.Restore();
 }
 
-[TaskName("Build")]
+[TaskName("build")]
 [TaskDescription("Build BenchmarkDotNet.sln solution")]
 [IsDependentOn(typeof(RestoreTask))]
 public class BuildTask : FrostingTask<BuildContext>
@@ -31,7 +31,7 @@ public class BuildTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context) => context.BuildRunner.Build();
 }
 
-[TaskName("UnitTests")]
+[TaskName("unit-tests")]
 [TaskDescription("Run unit tests (fast)")]
 [IsDependentOn(typeof(BuildTask))]
 public class UnitTestsTask : FrostingTask<BuildContext>
@@ -39,7 +39,7 @@ public class UnitTestsTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context) => context.UnitTestRunner.RunUnitTests();
 }
 
-[TaskName("InTestsFull")]
+[TaskName("in-tests-full")]
 [TaskDescription("Run integration tests using .NET Framework 4.6.2+ (slow)")]
 [IsDependentOn(typeof(BuildTask))]
 public class InTestsFullTask : FrostingTask<BuildContext>
@@ -49,7 +49,7 @@ public class InTestsFullTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context) => context.UnitTestRunner.RunInTests("net462");
 }
 
-[TaskName("InTestsCore")]
+[TaskName("in-tests-core")]
 [TaskDescription("Run integration tests using .NET 7 (slow)")]
 [IsDependentOn(typeof(BuildTask))]
 public class InTestsCoreTask : FrostingTask<BuildContext>
@@ -57,7 +57,7 @@ public class InTestsCoreTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context) => context.UnitTestRunner.RunInTests("net7.0");
 }
 
-[TaskName("AllTests")]
+[TaskName("all-tests")]
 [TaskDescription("Run all unit and integration tests (slow)")]
 [IsDependentOn(typeof(UnitTestsTask))]
 [IsDependentOn(typeof(InTestsFullTask))]
@@ -66,7 +66,7 @@ public class AllTestsTask : FrostingTask<BuildContext>
 {
 }
 
-[TaskName("Pack")]
+[TaskName("pack")]
 [TaskDescription("Pack Nupkg packages")]
 [IsDependentOn(typeof(BuildTask))]
 public class PackTask : FrostingTask<BuildContext>
@@ -74,16 +74,7 @@ public class PackTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context) => context.BuildRunner.Pack();
 }
 
-[TaskName("CI")]
-[TaskDescription("Perform all CI-related tasks: Restore, Build, AllTests, Pack")]
-[IsDependentOn(typeof(BuildTask))]
-[IsDependentOn(typeof(AllTestsTask))]
-[IsDependentOn(typeof(PackTask))]
-public class CiTask : FrostingTask<BuildContext>
-{
-}
-
-[TaskName("DocsUpdate")]
+[TaskName("docs-update")]
 [TaskDescription("Update generated documentation files")]
 public class DocsUpdateTask : FrostingTask<BuildContext>, IHelpProvider
 {
@@ -99,7 +90,7 @@ public class DocsUpdateTask : FrostingTask<BuildContext>, IHelpProvider
     }
 }
 
-[TaskName("DocsPrepare")]
+[TaskName("docs-prepare")]
 [TaskDescription("Prepare auxiliary documentation files")]
 public class DocsPrepareTask : FrostingTask<BuildContext>, IHelpProvider
 {
@@ -114,11 +105,7 @@ public class DocsPrepareTask : FrostingTask<BuildContext>, IHelpProvider
     }
 }
 
-// In order to work around xref issues in DocFx, BenchmarkDotNet and BenchmarkDotNet.Annotations must be build
-// before running the DocFX_Build target. However, including a dependency on BuildTask here may have unwanted
-// side effects (CleanTask).
-// TODO: Define dependencies when a CI workflow scenario for using the "DocFX_Build" target exists.
-[TaskName("DocsBuild")]
+[TaskName("docs-build")]
 [TaskDescription("Build final documentation")]
 [IsDependentOn(typeof(DocsPrepareTask))]
 public class DocsBuildTask : FrostingTask<BuildContext>, IHelpProvider
@@ -127,11 +114,12 @@ public class DocsBuildTask : FrostingTask<BuildContext>, IHelpProvider
 
     public HelpInfo GetHelp() => new()
     {
+        Description = "The 'build' task should be run manually to build api docs",
         Options = new IOption[] { KnownOptions.DocsPreview }
     };
 }
 
-[TaskName("Release")]
+[TaskName("release")]
 [TaskDescription("Release new version")]
 [IsDependentOn(typeof(BuildTask))]
 [IsDependentOn(typeof(PackTask))]
@@ -140,53 +128,4 @@ public class DocsBuildTask : FrostingTask<BuildContext>, IHelpProvider
 public class ReleaseTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context) => context.ReleaseRunner.Run();
-}
-
-[TaskName("FastTests")]
-[TaskDescription("OBSOLETE: use 'UnitTests'")]
-[IsDependentOn(typeof(UnitTestsTask))]
-public class FastTestsTask : FrostingTask<BuildContext>
-{
-}
-
-[TaskName("SlowFullFrameworkTests")]
-[TaskDescription("OBSOLETE: use 'InTestsFull'")]
-[IsDependentOn(typeof(InTestsFullTask))]
-public class SlowFullFrameworkTestsTask : FrostingTask<BuildContext>
-{
-}
-
-[TaskName("SlowTestsNetCore")]
-[TaskDescription("OBSOLETE: use 'InTestsCore'")]
-[IsDependentOn(typeof(InTestsCoreTask))]
-public class SlowTestsNetCoreTask : FrostingTask<BuildContext>
-{
-}
-
-[TaskName("DocFX_Changelog_Download")]
-[TaskDescription("OBSOLETE: use 'DocsUpdate'")]
-[IsDependentOn(typeof(DocsUpdateTask))]
-public class DocFxChangelogDownloadTask : FrostingTask<BuildContext>
-{
-}
-
-[TaskName("DocFX_Changelog_Generate")]
-[TaskDescription("OBSOLETE: use 'DocsPrepare'")]
-[IsDependentOn(typeof(DocsPrepareTask))]
-public class DocfxChangelogGenerateTask : FrostingTask<BuildContext>
-{
-}
-
-[TaskName("DocFX_Generate_Redirects")]
-[TaskDescription("OBSOLETE: use 'DocsBuild'")]
-[IsDependentOn(typeof(DocsBuildTask))]
-public class DocfxGenerateRedirectsTask : FrostingTask<BuildContext>
-{
-}
-
-[TaskName("DocFX_Build")]
-[TaskDescription("OBSOLETE: use 'DocsBuild'")]
-[IsDependentOn(typeof(DocsBuildTask))]
-public class DocfxBuildTask : FrostingTask<BuildContext>
-{
 }

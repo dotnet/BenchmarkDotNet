@@ -49,10 +49,10 @@ It will be transformed to:
 
 ## Building documentation locally
 
-You can build documentation locally with the help of the `DocsBuild` build task:
+You can build documentation locally with the help of the `docs-build` build task:
 
 ```
-build.cmd DocsBuild
+build.cmd docs-build
 ```
 
 ## See also

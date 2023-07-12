@@ -20,7 +20,7 @@ jobs:
         ref: master
 
     - name: Download changelog
-      run: ./build.cmd DocsUpdate --depth 1 --preview
+      run: ./build.cmd docs-update --depth 1 --preview
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

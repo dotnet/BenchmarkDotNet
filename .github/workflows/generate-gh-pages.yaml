@@ -20,15 +20,15 @@ jobs:
         ref: docs-stable
 
     - name: Build BenchmarkDotNet
-      run: ./build.cmd Build
+      run: ./build.cmd build
 
     - name: Download changelog
-      run: ./build.cmd DocsUpdate --depth 1 --preview
+      run: ./build.cmd docs-update --depth 1 --preview
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build documentation
-      run: ./build.cmd DocsBuild
+      run: ./build.cmd docs-build
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v1

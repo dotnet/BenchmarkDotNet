@@ -18,16 +18,16 @@ jobs:
         run: Set-MpPreference -DisableRealtimeMonitoring $true
         shell: powershell
       - uses: actions/checkout@v3
-      - name: Run task 'Build'
+      - name: Run task 'build'
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          ./build.cmd Build
-      - name: Run task 'InTestsCore'
+          ./build.cmd build
+      - name: Run task 'in-tests-core'
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          ./build.cmd InTestsCore -e
+          ./build.cmd in-tests-core -e
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
@@ -42,16 +42,16 @@ jobs:
         run: Set-MpPreference -DisableRealtimeMonitoring $true
         shell: powershell
       - uses: actions/checkout@v3
-      - name: Run task 'Build'
+      - name: Run task 'build'
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          ./build.cmd Build
-      - name: Run task 'InTestsFull'
+          ./build.cmd build
+      - name: Run task 'in-tests-full'
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          ./build.cmd InTestsFull -e
+          ./build.cmd in-tests-full -e
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
@@ -70,12 +70,12 @@ jobs:
           platform: x64
       - name: Set up zlib-static
         run: sudo apt-get install -y libkrb5-dev
-      - name: Run task 'Build'
-        run: ./build.cmd Build
-      - name: Run task 'UnitTests'
-        run: ./build.cmd UnitTests -e
-      - name: Run task 'InTestsCore'
-        run: ./build.cmd InTestsCore -e
+      - name: Run task 'build'
+        run: ./build.cmd build
+      - name: Run task 'unit-tests'
+        run: ./build.cmd unit-tests -e
+      - name: Run task 'in-tests-core'
+        run: ./build.cmd in-tests-core -e
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
@@ -87,12 +87,12 @@ jobs:
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v3
-      - name: Run task 'Build'
-        run: ./build.cmd Build
-      - name: Run task 'UnitTests'
-        run: ./build.cmd UnitTests -e
-      - name: Run task 'InTestsCore'
-        run: ./build.cmd InTestsCore -e
+      - name: Run task 'build'
+        run: ./build.cmd build
+      - name: Run task 'unit-tests'
+        run: ./build.cmd unit-tests -e
+      - name: Run task 'in-tests-core'
+        run: ./build.cmd in-tests-core -e
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
