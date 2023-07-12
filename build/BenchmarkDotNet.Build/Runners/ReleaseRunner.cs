@@ -67,15 +67,11 @@ public class ReleaseRunner
 
     private void UpdateCommonProps(string newCurrentVersion)
     {
-        var regex = new Regex(@"<VersionPrefix>([\d\.]+)</VersionPrefix>");
-
-        var content = context.FileReadText(context.CommonPropsFile);
-        var match = regex.Match(content);
-        if (!match.Success)
-            throw new Exception($"Failed to find VersionPrefix definition in {context.CommonPropsFile}");
-
-        var oldVersion = match.Groups[1].Value;
-        context.GenerateFile(context.CommonPropsFile, content.Replace(oldVersion, newCurrentVersion));
+        var content = Utils.ApplyRegex(
+            context.FileReadText(context.CommonPropsFile),
+            @"<VersionPrefix>([\d\.]+)</VersionPrefix>",
+            newCurrentVersion);
+        context.GenerateFile(context.CommonPropsFile, content);
     }
 
     private async Task UpdateMilestones(string nextVersion)

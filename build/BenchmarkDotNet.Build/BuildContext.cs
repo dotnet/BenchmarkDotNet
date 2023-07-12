@@ -34,6 +34,7 @@ public class BuildContext : FrostingContext
     public FilePathCollection AllPackableSrcProjects { get; }
     public FilePath VersionsFile { get; }
     public FilePath CommonPropsFile { get; }
+    public FilePath ReadmeFile { get; }
 
     public DotNetMSBuildSettings MsBuildSettingsRestore { get; }
     public DotNetMSBuildSettings MsBuildSettingsBuild { get; }
@@ -68,6 +69,7 @@ public class BuildContext : FrostingContext
 
         VersionsFile = BuildDirectory.CombineWithFilePath("versions.txt");
         CommonPropsFile = BuildDirectory.CombineWithFilePath("common.props");
+        ReadmeFile = RootDirectory.CombineWithFilePath("README.md");
 
         MsBuildSettingsRestore = new DotNetMSBuildSettings();
         MsBuildSettingsBuild = new DotNetMSBuildSettings();

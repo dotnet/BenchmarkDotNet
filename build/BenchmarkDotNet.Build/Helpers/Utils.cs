@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using BenchmarkDotNet.Build.Options;
-using Cake.Common.Diagnostics;
+using System.Text.RegularExpressions;
 using Cake.Common.Tools.DotNet;
 using Octokit;
 
@@ -47,5 +46,16 @@ public static class Utils
         var tokenAuth = new Credentials(EnvVar.GitHubToken.GetValue());
         client.Credentials = tokenAuth;
         return client;
+    }
+
+    public static string ApplyRegex(string content, string pattern, string newValue)
+    {
+        var regex = new Regex(pattern);
+        var match = regex.Match(content);
+        if (!match.Success)
+            throw new Exception("Failed to apply regex");
+
+        var oldValue = match.Groups[1].Value;
+        return content.Replace(oldValue, newValue);
     }
 }

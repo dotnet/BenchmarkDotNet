@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using BenchmarkDotNet.Build.Helpers;
 using BenchmarkDotNet.Build.Meta;
 using BenchmarkDotNet.Build.Options;
 using Cake.Common.Diagnostics;
@@ -59,7 +60,7 @@ public class DocumentationRunner
     {
         EnvVar.GitHubToken.AssertHasValue();
 
-        ReadmeUpdater.Run(context);
+        UpdateReadme();
         UpdateLastFooter();
 
         EnsureChangelogDetailsExist();
@@ -94,6 +95,17 @@ public class DocumentationRunner
                 history.CurrentVersion,
                 history.StableVersions.Last(),
                 "HEAD");
+    }
+
+    private void UpdateReadme()
+    {
+        var content = Utils.ApplyRegex(
+            context.FileReadText(context.ReadmeFile),
+            @"\[(\d+)\+ GitHub projects\]",
+            Repo.GetDependentProjectsNumber().Result.ToString()
+        );
+
+        context.GenerateFile(context.ReadmeFile, content, true);
     }
 
     public void Prepare()

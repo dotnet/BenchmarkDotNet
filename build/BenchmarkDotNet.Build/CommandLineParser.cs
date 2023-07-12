@@ -143,11 +143,11 @@ public class CommandLineParser
             ? $"Task '{taskName}': {taskDescription}"
             : $"Task '{taskName}'");
 
-        if (string.IsNullOrWhiteSpace(helpInfo.Description))
+        if (!string.IsNullOrWhiteSpace(helpInfo.Description))
             foreach (var line in helpInfo.Description.Split('\n', StringSplitOptions.RemoveEmptyEntries))
             {
                 WritePrefix();
-                WriteLine(line.Trim());
+                WriteLine(line.TrimEnd());
             }
 
         WriteLine();

@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Build.Meta;
 using BenchmarkDotNet.Build.Options;
 using Cake.Common;
 using Cake.Frosting;
@@ -146,6 +147,11 @@ public class DocsUpdateTask : FrostingTask<BuildContext>, IHelpProvider
     {
         return new HelpInfo
         {
+            Description = $"This task updates the following files:\n" +
+                          $"* README.md (the number of dependent projects number)\n" +
+                          $"* Last changelog footer (if {KnownOptions.Stable.CommandLineName} is specified)\n" +
+                          $"* All changelog details in docs/_changelog\n" +
+                          $"  (This dir is a cloned version of this repo from branch {Repo.ChangelogDetailsBranch})",
             Options = new IOption[] { KnownOptions.DocsPreview, KnownOptions.DocsDepth },
             EnvironmentVariables = new[] { EnvVar.GitHubToken },
             Examples = new[]

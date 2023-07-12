@@ -30,7 +30,11 @@ It's no harder than writing unit tests!
 Under the hood, it performs a lot of [magic](#automation) that guarantees [reliable and precise](#reliability) results thanks to the [perfolizer](https://github.com/AndreyAkinshin/perfolizer) statistical engine.
 BenchmarkDotNet protects you from popular benchmarking mistakes and warns you if something is wrong with your benchmark design or obtained measurements.
 The results are presented in a [user-friendly](#friendliness) form that highlights all the important facts about your experiment.
-The library is adopted by [16600+ GitHub projects](#who-uses-benchmarkdotnet) including .NET Runtime.
+BenchmarkDotNet is already adopted by [16600+ GitHub projects](https://github.com/dotnet/BenchmarkDotNet/network/dependents) including
+  [.NET Runtime](https://github.com/dotnet/runtime),
+  [.NET Compiler](https://github.com/dotnet/roslyn),
+  [.NET Performance](https://github.com/dotnet/performance),
+  and many others.
 
 It's [easy](#simplicity) to start writing benchmarks, check out the following example
   (copy-pastable version is [here](https://benchmarkdotnet.org/articles/guides/getting-started.html)):
@@ -228,44 +232,6 @@ BenchmarkDotNet doesn't overload you with data; it shows only the essential info
 Of course, you can request any additional statistics and visualizations manually.
 If you don't customize the summary view,
   the default presentation will be as much user-friendly as possible. :)
-
-## Who uses BenchmarkDotNet?
-
-Everyone!
-BenchmarkDotNet is already adopted by more than [16600+](https://github.com/dotnet/BenchmarkDotNet/network/dependents?package_id=UGFja2FnZS0xNTY3MzExMzE%3D) projects including
-  [dotnet/performance](https://github.com/dotnet/performance) (reference benchmarks for all .NET Runtimes),
-  [dotnet/runtime](https://github.com/dotnet/runtime/issues?utf8=%E2%9C%93&q=BenchmarkDotNet) (.NET runtime and libraries),
-  [Roslyn](https://github.com/dotnet/roslyn/search?q=BenchmarkDotNet&type=Issues&utf8=✓) (C# and Visual Basic compiler),
-  [Mono](https://github.com/mono/mono/tree/master/sdks/wasm/bench-runner),
-  [ASP.NET Core](https://github.com/aspnet/AspNetCore/tree/master/src/Servers/IIS/IIS/benchmarks),
-  [ML.NET](https://github.com/dotnet/machinelearning/tree/main/test/Microsoft.ML.PerformanceTests),
-  [Entity Framework Core](https://github.com/dotnet/efcore/tree/master/benchmark),
-  [PowerShell](https://github.com/PowerShell/PowerShell/tree/master/test/perf/benchmarks)
-  [SignalR](https://github.com/aspnet/SignalR/tree/master/benchmarks/Microsoft.AspNetCore.SignalR.Microbenchmarks),
-  [F#](https://github.com/fsharp/fsharp/blob/master/tests/scripts/array-perf/array-perf.fs),
-  [Orleans](https://github.com/dotnet/orleans/tree/master/test/Benchmarks),
-  [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json/tree/master/Src/Newtonsoft.Json.Tests/Benchmarks),
-  [Elasticsearch.Net](https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/bool-queries.html#_perfomance_considerations),
-  [Dapper](https://github.com/DapperLib/Dapper/tree/main/benchmarks/Dapper.Tests.Performance),
-  [Expecto](https://github.com/haf/expecto/tree/master/Expecto.BenchmarkDotNet),
-  [ImageSharp](https://github.com/SixLabors/ImageSharp/tree/master/tests/ImageSharp.Benchmarks),
-  [RavenDB](https://github.com/ravendb/ravendb/tree/v4.0/bench),
-  [NodaTime](https://github.com/nodatime/nodatime/tree/master/src/NodaTime.Benchmarks),
-  [Jint](https://github.com/sebastienros/jint/tree/dev/Jint.Benchmark),
-  [NServiceBus](https://github.com/Particular/NServiceBus/issues?utf8=✓&q=+BenchmarkDotNet+),
-  [Serilog](https://github.com/serilog/serilog/tree/dev/test/Serilog.PerformanceTests),
-  [Autofac](https://github.com/autofac/Autofac/tree/develop/bench/Autofac.Benchmarks),
-  [Npgsql](https://github.com/npgsql/npgsql/tree/main/test/Npgsql.Benchmarks),
-  [Avalonia](https://github.com/AvaloniaUI/Avalonia/tree/master/tests/Avalonia.Benchmarks),
-  [ReactiveUI](https://github.com/reactiveui/ReactiveUI/tree/master/src/Benchmarks),
-  [SharpZipLib](https://github.com/icsharpcode/SharpZipLib/tree/master/benchmark/ICSharpCode.SharpZipLib.Benchmark),
-  [LiteDB](https://github.com/mbdavid/LiteDB/tree/master/LiteDB.Benchmarks),
-  [GraphQL for .NET](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.Benchmarks),
-  [.NET Docs](https://github.com/dotnet/docs/tree/master/samples/snippets/csharp/safe-efficient-code/benchmark),
-  [RestSharp](https://github.com/restsharp/RestSharp/tree/dev/benchmarks/RestSharp.Benchmarks),
-  [MediatR](https://github.com/jbogard/MediatR/tree/master/test/MediatR.Benchmarks),
-  [TensorFlow.NET](https://github.com/SciSharp/TensorFlow.NET/tree/master/src/TensorFlowNet.Benchmarks),
-  [Apache Thrift](https://github.com/apache/thrift/tree/master/lib/netstd/Benchmarks/Thrift.Benchmarks).  
 
 ## Learn more about benchmarking
 
