@@ -108,78 +108,73 @@ public class CommandLineParser
 
         WriteLine();
 
-        WriteHeader("Examples:");
-
-        WritePrefix();
-        Write(CallScriptName + " ");
-        WriteTask("restore");
-        WriteLine();
-
-        WritePrefix();
-        Write(CallScriptName + " ");
-        WriteTask("build ");
-        WriteOption("/p:");
-        WriteArg("Configuration");
-        WriteOption("=");
-        WriteArg("Debug");
-        WriteLine();
-
-        WritePrefix();
-        Write(CallScriptName + " ");
-        WriteTask("pack ");
-        WriteOption("/p:");
-        WriteArg("VersionPrefix");
-        WriteOption("=");
-        WriteArg("0.1.1729");
-        WriteOption(" /p:");
-        WriteArg("VersionSuffix");
-        WriteOption("=");
-        WriteArg("preview");
-        WriteLine();
-
-        WritePrefix();
-        Write(CallScriptName + " ");
-        WriteTask("unit-tests ");
-        WriteOption("--exclusive --verbosity ");
-        WriteArg("Diagnostic");
-        WriteLine();
-
-        WritePrefix();
-        Write(CallScriptName + " ");
-        WriteTask("docs-update ");
-        WriteOption("--depth ");
-        WriteArg("3");
-        WriteLine();
-
-        WritePrefix();
-        Write(CallScriptName + " ");
-        WriteTask("docs-build ");
-        WriteOption("--preview ");
-        WriteLine();
-
-        WriteLine();
+        PrintExamples(GetTasks().SelectMany(task => task.HelpInfo.Examples));
 
         PrintOptions(baseOptions);
 
         WriteHeader("Tasks:");
         var taskWidth = GetTaskNames().Max(name => name.Length) + 3;
-        foreach (var (taskName, taskDescription) in GetTasks())
+        foreach (var (taskName, taskDescription, _) in GetTasks())
         {
             if (taskName.Equals("Default", StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            if (taskDescription.StartsWith("OBSOLETE", StringComparison.OrdinalIgnoreCase))
-            {
-                WriteObsolete("    " + taskName.PadRight(taskWidth));
-                WriteObsolete(taskDescription);
-            }
-            else
-            {
-                WriteTask("    " + taskName.PadRight(taskWidth));
-                Write(taskDescription);
-            }
+            WriteTask("    " + taskName.PadRight(taskWidth));
+            Write(taskDescription);
 
             WriteLine();
+        }
+    }
+
+    private void PrintTaskHelp(string taskName)
+    {
+        var taskType = typeof(BuildContext).Assembly
+            .GetTypes()
+            .Where(type => type.IsSubclassOf(typeof(FrostingTask<BuildContext>)) && !type.IsAbstract)
+            .First(type => Is(type.GetCustomAttribute<TaskNameAttribute>()?.Name, taskName));
+        taskName = taskType.GetCustomAttribute<TaskNameAttribute>()!.Name;
+        var taskDescription = taskType.GetCustomAttribute<TaskDescriptionAttribute>()?.Description ?? "";
+        var helpInfo = GetHelpInfo(taskType);
+
+        WriteHeader("Description:");
+
+        WritePrefix();
+        WriteLine(!string.IsNullOrWhiteSpace(taskDescription)
+            ? $"Task '{taskName}': {taskDescription}"
+            : $"Task '{taskName}'");
+
+        if (string.IsNullOrWhiteSpace(helpInfo.Description))
+            foreach (var line in helpInfo.Description.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+            {
+                WritePrefix();
+                WriteLine(line.Trim());
+            }
+
+        WriteLine();
+
+        WriteHeader("Usage:");
+
+        WritePrefix();
+        Write(CallScriptName + " ");
+        WriteTask(taskName + " ");
+        WriteOption("[OPTIONS]");
+        WriteLine();
+
+        WriteLine();
+
+        PrintExamples(helpInfo.Examples);
+
+        PrintOptions(helpInfo.Options.Concat(baseOptions).ToArray());
+
+        if (helpInfo.EnvironmentVariables.Any())
+        {
+            WriteHeader("Environment variables:");
+            foreach (var variable in helpInfo.EnvironmentVariables)
+            {
+                WritePrefix();
+                WriteOption(variable);
+                WriteLine();
+            }
         }
     }
 
@@ -242,68 +237,36 @@ public class CommandLineParser
         WriteLine();
     }
 
-    private void PrintTaskHelp(string taskName)
+    private void PrintExamples(IEnumerable<Example> examples)
     {
-        var taskType = typeof(BuildContext).Assembly
-            .GetTypes()
-            .Where(type => type.IsSubclassOf(typeof(FrostingTask<BuildContext>)) && !type.IsAbstract)
-            .First(type => Is(type.GetCustomAttribute<TaskNameAttribute>()?.Name, taskName));
-        taskName = taskType.GetCustomAttribute<TaskNameAttribute>()!.Name;
-        var taskDescription = taskType.GetCustomAttribute<TaskDescriptionAttribute>()?.Description ?? "";
-        var taskInstance = Activator.CreateInstance(taskType);
-        var helpInfo = taskInstance is IHelpProvider helpProvider ? helpProvider.GetHelp() : new HelpInfo();
-
-        WriteHeader("Description:");
-
-        WritePrefix();
-        WriteLine($"Task '{taskName}'");
-        if (!string.IsNullOrWhiteSpace(taskDescription))
-        {
-            WritePrefix();
-            WriteLine(taskDescription);
-        }
-
-        if (string.IsNullOrWhiteSpace(helpInfo.Description))
-            foreach (var line in helpInfo.Description.Split('\n', StringSplitOptions.RemoveEmptyEntries))
-            {
-                WritePrefix();
-                WriteLine(line.Trim());
-            }
-
-        WriteLine();
-
-        WriteHeader("Usage:");
-
-        WritePrefix();
-        Write(CallScriptName + " ");
-        WriteTask(taskName + " ");
-        WriteOption("[OPTIONS]");
-        WriteLine();
-
-        WriteLine();
-
         WriteHeader("Examples:");
 
-        WritePrefix();
-        Write(ScriptName + " ");
-        WriteTask(taskName);
-        WriteLine();
-
-        WriteLine();
-
-        PrintOptions(helpInfo.Options.Concat(baseOptions).ToArray());
-
-        if (helpInfo.EnvironmentVariables.Any())
+        foreach (var example in examples)
         {
-            WriteHeader("Environment variables:");
-            foreach (var variable in helpInfo.EnvironmentVariables)
+            WritePrefix();
+            Write(CallScriptName + " ");
+            WriteTask(example.TaskName + " ");
+            foreach (var (name, value, isMsBuild) in example.Arguments)
             {
-                WritePrefix();
-                WriteOption(variable);
+                if (isMsBuild)
+                {
+                    WriteOption("/p:");
+                    WriteArg(name);
+                    WriteOption("=");
+                    WriteArg(value + " ");
+                }
+                else
+                {
+                    WriteOption(name + " ");
+                    if (value != null)
+                        WriteArg(value + " ");
+                }
             }
 
             WriteLine();
         }
+
+        WriteLine();
     }
 
     private static HashSet<string> GetTaskNames()
@@ -311,17 +274,25 @@ public class CommandLineParser
         return GetTasks().Select(task => task.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
     }
 
-    private static List<(string Name, string Description)> GetTasks()
+    private static List<(string Name, string Description, HelpInfo HelpInfo)> GetTasks()
     {
         return typeof(BuildContext).Assembly
             .GetTypes()
             .Where(type => type.IsSubclassOf(typeof(FrostingTask<BuildContext>)) && !type.IsAbstract)
             .Select(type => (
                 Name: type.GetCustomAttribute<TaskNameAttribute>()?.Name ?? "",
-                Description: type.GetCustomAttribute<TaskDescriptionAttribute>()?.Description ?? ""
+                Description: type.GetCustomAttribute<TaskDescriptionAttribute>()?.Description ?? "",
+                HelpInfo: GetHelpInfo(type)
             ))
             .Where(task => task.Name != "")
             .ToList();
+    }
+
+    private static HelpInfo GetHelpInfo(Type taskType)
+    {
+        return Activator.CreateInstance(taskType) is IHelpProvider helpProvider
+            ? helpProvider.GetHelp()
+            : new HelpInfo();
     }
 
     private static bool Is(string? arg, params string[] values) =>
