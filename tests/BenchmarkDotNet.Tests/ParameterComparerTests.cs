@@ -157,6 +157,70 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(4, ((ComplexParameter)sortedData[3].Items[0].Value).Value);
         }
 
+        [Fact]
+        public void ValueTupleWithNonIComparableInnerTypesComparisionTest()
+        {
+            var comparer = ParameterComparer.Instance;
+            var originalData = new[]
+            {
+                new ParameterInstances(new[]
+                {
+                    new ParameterInstance(sharedDefinition, (new ComplexNonIComparableParameter(), 1), null)
+                }),
+                new ParameterInstances(new[]
+                {
+                    new ParameterInstance(sharedDefinition, (new ComplexNonIComparableParameter(), 3), null)
+                }),
+                new ParameterInstances(new[]
+                {
+                    new ParameterInstance(sharedDefinition, (new ComplexNonIComparableParameter(), 2), null)
+                }),
+                new ParameterInstances(new[]
+                {
+                    new ParameterInstance(sharedDefinition, (new ComplexNonIComparableParameter(), 4), null)
+                })
+            };
+
+            var sortedData = originalData.OrderBy(d => d, comparer).ToArray();
+
+            Assert.Equal(1, (((ComplexNonIComparableParameter, int))sortedData[0].Items[0].Value).Item2);
+            Assert.Equal(2, (((ComplexNonIComparableParameter, int))sortedData[1].Items[0].Value).Item2);
+            Assert.Equal(3, (((ComplexNonIComparableParameter, int))sortedData[2].Items[0].Value).Item2);
+            Assert.Equal(4, (((ComplexNonIComparableParameter, int))sortedData[3].Items[0].Value).Item2);
+        }
+
+        [Fact]
+        public void TupleWithNonIComparableInnerTypesComparisionTest()
+        {
+            var comparer = ParameterComparer.Instance;
+            var originalData = new[]
+            {
+                new ParameterInstances(new[]
+                {
+                    new ParameterInstance(sharedDefinition, Tuple.Create(new ComplexNonIComparableParameter(), 1), null)
+                }),
+                new ParameterInstances(new[]
+                {
+                    new ParameterInstance(sharedDefinition, Tuple.Create(new ComplexNonIComparableParameter(), 3), null)
+                }),
+                new ParameterInstances(new[]
+                {
+                    new ParameterInstance(sharedDefinition, Tuple.Create(new ComplexNonIComparableParameter(), 2), null)
+                }),
+                new ParameterInstances(new[]
+                {
+                    new ParameterInstance(sharedDefinition, Tuple.Create(new ComplexNonIComparableParameter(), 4), null)
+                })
+            };
+
+            var sortedData = originalData.OrderBy(d => d, comparer).ToArray();
+
+            Assert.Equal(1, ((Tuple<ComplexNonIComparableParameter, int>)sortedData[0].Items[0].Value).Item2);
+            Assert.Equal(2, ((Tuple<ComplexNonIComparableParameter, int>)sortedData[1].Items[0].Value).Item2);
+            Assert.Equal(3, ((Tuple<ComplexNonIComparableParameter, int>)sortedData[2].Items[0].Value).Item2);
+            Assert.Equal(4, ((Tuple<ComplexNonIComparableParameter, int>)sortedData[3].Items[0].Value).Item2);
+        }
+
         private class ComplexParameter : IComparable<ComplexParameter>, IComparable
         {
             public ComplexParameter(int value, string name)
@@ -198,6 +262,10 @@ namespace BenchmarkDotNet.Tests
 
                 return CompareTo(other);
             }
+        }
+
+        private class ComplexNonIComparableParameter
+        {
         }
     }
 }

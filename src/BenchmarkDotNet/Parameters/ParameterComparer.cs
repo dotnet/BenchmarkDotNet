@@ -28,7 +28,16 @@ namespace BenchmarkDotNet.Parameters
             if (x != null && y != null && x.GetType() == y.GetType() &&
                 x is IComparable xComparable)
             {
-                return xComparable.CompareTo(y);
+                try
+                {
+                    return xComparable.CompareTo(y);
+                }
+                // Some types, such as Tuple and ValueTuple, have a fallible CompareTo implementation which can throw if the inner items don't implement IComparable.
+                // See: https://github.com/dotnet/BenchmarkDotNet/issues/2346
+                // For now, catch and ignore the exception, and fallback to string comparison below.
+                catch (ArgumentException)
+                {
+                }
             }
 
             // Anything else.
