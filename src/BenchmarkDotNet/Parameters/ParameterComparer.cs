@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Parameters
                 // Some types, such as Tuple and ValueTuple, have a fallible CompareTo implementation which can throw if the inner items don't implement IComparable.
                 // See: https://github.com/dotnet/BenchmarkDotNet/issues/2346
                 // For now, catch and ignore the exception, and fallback to string comparison below.
-                catch (ArgumentException)
+                catch (ArgumentException ex) when (ex.Message.Contains("At least one object must implement IComparable."))
                 {
                 }
             }
