@@ -40,10 +40,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
     <AssemblyOriginatorKeyFile>../../build/strongNameKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
@@ -111,7 +109,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\tests\BenchmarkDotNet.IntegrationTests\AllSetupAndCleanupTest.cs" />
+    <Compile Include="ClassicNetFrameworkTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\tests\BenchmarkDotNet.IntegrationTests\BenchmarkTestExecutor.cs" Link="BenchmarkTestExecutor.cs" />
     <Compile Include="..\..\tests\BenchmarkDotNet.IntegrationTests\Xunit\MisconfiguredEnvironmentException.cs" Link="MisconfiguredEnvironmentException.cs" />

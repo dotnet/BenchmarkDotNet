@@ -15,10 +15,12 @@ using BenchmarkDotNet.Properties;
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Diagnostics.Windows,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Diagnostics.dotTrace,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests.ClassicNetFramework,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
+[assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests.CsProjMultipleFrameworks,PublicKey=" + BenchmarkDotNetInfo.PublicKey)]
 #else
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Tests")]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests")]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Diagnostics.Windows")]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.Diagnostics.dotTrace")]
 [assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests.ClassicNetFramework")]
+[assembly: InternalsVisibleTo("BenchmarkDotNet.IntegrationTests.CsProjMultipleFrameworks")]
 #endif
