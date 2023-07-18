@@ -167,12 +167,9 @@ namespace BenchmarkDotNet.Engines
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStart(data.IterationMode, data.IterationStage, totalOperations);
 
-            Span<byte> stackMemory = randomizeMemory ? stackalloc byte[random.Next(32)] : Span<byte>.Empty;
-
-            // Measure
-            var clock = Clock.Start();
-            action(invokeCount / unrollFactor);
-            var clockSpan = clock.GetElapsed();
+            var clockSpan = randomizeMemory
+                ? MeasureWithRandomMemory(action, invokeCount / unrollFactor)
+                : Measure(action, invokeCount / unrollFactor);
 
             if (EngineEventSource.Log.IsEnabled())
                 EngineEventSource.Log.IterationStop(data.IterationMode, data.IterationStage, totalOperations);
@@ -191,9 +188,29 @@ namespace BenchmarkDotNet.Engines
             if (measurement.IterationStage == IterationStage.Jitting)
                 jittingMeasurements.Add(measurement);
 
-            Consume(stackMemory);
-
             return measurement;
+        }
+
+        // This is in a separate method, because stackalloc can affect code alignment,
+        // resulting in unexpected measurements on some AMD cpus,
+        // even if the stackalloc branch isn't executed. (#2366)
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private unsafe ClockSpan MeasureWithRandomMemory(Action<long> action, long invokeCount)
+        {
+            byte* stackMemory = stackalloc byte[random.Next(32)];
+            var clockSpan = Measure(action, invokeCount);
+            Consume(stackMemory);
+            return clockSpan;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private unsafe void Consume(byte* _) { }
+
+        private ClockSpan Measure(Action<long> action, long invokeCount)
+        {
+            var clock = Clock.Start();
+            action(invokeCount);
+            return clock.GetElapsed();
         }
 
         private (GcStats, ThreadingStats, double) GetExtraStats(IterationData data)
@@ -224,9 +241,6 @@ namespace BenchmarkDotNet.Engines
 
             return (gcStats, threadingStats, exceptionsStats.ExceptionsCount / (double)totalOperationsCount);
         }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private void Consume(in Span<byte> _) { }
 
         private void RandomizeManagedHeapMemory()
         {
