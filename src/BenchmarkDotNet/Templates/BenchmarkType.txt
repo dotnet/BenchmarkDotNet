@@ -113,7 +113,7 @@
 
         private BenchmarkDotNet.Engines.Consumer consumer = new BenchmarkDotNet.Engines.Consumer();
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -123,7 +123,7 @@
             }
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -133,7 +133,7 @@
             }
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -143,7 +143,7 @@
             }
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -167,7 +167,7 @@
 
 #elif RETURNS_NON_CONSUMABLE_STRUCT_$ID$
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -179,7 +179,7 @@
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -191,7 +191,7 @@
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -203,7 +203,7 @@
             NonGenericKeepAliveWithoutBoxing(result);
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -234,7 +234,7 @@
 
 #elif RETURNS_BYREF_$ID$
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -246,7 +246,7 @@
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -260,7 +260,7 @@
 
         private $WorkloadMethodReturnType$ workloadDefaultValueHolder = default($WorkloadMethodReturnType$);
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -272,7 +272,7 @@
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -297,7 +297,7 @@
         }
 #elif RETURNS_BYREF_READONLY_$ID$
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -309,7 +309,7 @@
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -323,7 +323,7 @@
 
         private $WorkloadMethodReturnType$ workloadDefaultValueHolder = default($WorkloadMethodReturnType$);
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -335,7 +335,7 @@
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(alias);
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -360,7 +360,7 @@
         }
 #elif RETURNS_VOID_$ID$
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -370,7 +370,7 @@
             }
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -380,7 +380,7 @@
             }
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -390,7 +390,7 @@
             }
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkActionFactory.AggressiveOptimization)]
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$

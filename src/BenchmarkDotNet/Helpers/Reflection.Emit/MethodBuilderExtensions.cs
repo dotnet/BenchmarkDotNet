@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BenchmarkDotNet.Portability;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -40,9 +41,8 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
 
         public static MethodBuilder SetAggressiveOptimizationImplementationFlag(this MethodBuilder methodBuilder)
         {
-            // AggressiveOptimization is not available in netstandard2.0, so just use the value casted to enum.
             methodBuilder.SetImplementationFlags(
-                methodBuilder.GetMethodImplementationFlags() | (MethodImplAttributes) 512);
+                methodBuilder.GetMethodImplementationFlags() | CodeGenHelper.AggressiveOptimizationOptionForEmit);
 
             return methodBuilder;
         }
