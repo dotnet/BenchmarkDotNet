@@ -587,7 +587,7 @@ namespace BenchmarkDotNet.Tests
             }
         }
 
-        [Fact]
+        [Fact(Skip = "This should be handled somehow at CommandLineParser level. See https://github.com/commandlineparser/commandline/pull/892")]
         public void UserCanSpecifyWasmArgs()
         {
             var parsedConfiguration = ConfigParser.Parse(new[] { "--runtimes", "wasm", "--wasmArgs", "--expose_wasm --module" }, new OutputLogger(Output));
@@ -597,6 +597,19 @@ namespace BenchmarkDotNet.Tests
             {
                 var wasmRuntime = Assert.IsType<WasmRuntime>(job.Environment.Runtime);
                 Assert.Equal(" --expose_wasm --module", wasmRuntime.JavaScriptEngineArguments);
+            }
+        }
+
+        [Fact]
+        public void UserCanSpecifyWasmArgsUsingEquals()
+        {
+            var parsedConfiguration = ConfigParser.Parse(new[] { "--runtimes", "wasm", "--wasmArgs=--expose_wasm --module" }, new OutputLogger(Output));
+            Assert.True(parsedConfiguration.isSuccess);
+            var jobs = parsedConfiguration.config.GetJobs();
+            foreach (var job in parsedConfiguration.config.GetJobs())
+            {
+                var wasmRuntime = Assert.IsType<WasmRuntime>(job.Environment.Runtime);
+                Assert.Equal("--expose_wasm --module", wasmRuntime.JavaScriptEngineArguments);
             }
         }
 
@@ -615,6 +628,8 @@ namespace BenchmarkDotNet.Tests
             foreach (var job in parsedConfiguration.config.GetJobs())
             {
                 var wasmRuntime = Assert.IsType<WasmRuntime>(job.Environment.Runtime);
+                // We may need change assertion to just "--expose_wasm --module"
+                // if https://github.com/commandlineparser/commandline/pull/892 lands
                 Assert.Equal(" --expose_wasm --module", wasmRuntime.JavaScriptEngineArguments);
             }
         }
