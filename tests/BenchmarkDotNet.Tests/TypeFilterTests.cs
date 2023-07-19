@@ -192,7 +192,7 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void MethodCanHanBeFilteredByParameters()
+        public void MethodCanBeFilteredByParameters()
         {
             var benchmarks = Filter(
                 new[] { typeof(ClassA), typeof(ClassB), typeof(ClassE), typeof(NOTTests.ClassD) },
