@@ -1,5 +1,9 @@
-﻿using System;
+﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Engines;
+using Perfolizer.Horology;
+using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
@@ -22,19 +26,36 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             public BenchmarkActionVoid(object instance, MethodInfo method, int unrollFactor)
             {
                 callback = CreateWorkloadOrOverhead<Action>(instance, method, OverheadStatic, OverheadInstance);
-                InvokeSingle = callback;
+                InvokeSingle = InvokeSingleHardcoded;
 
                 unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
+                InvokeUnroll = InvokeUnrollHardcoded;
+                InvokeNoUnroll = InvokeNoUnrollHardcoded;
             }
 
             private static void OverheadStatic() { }
             private void OverheadInstance() { }
 
-            private void InvokeMultipleHardcoded(long repeatCount)
+            private ValueTask InvokeSingleHardcoded()
             {
+                callback();
+                return new ValueTask();
+            }
+
+            private ValueTask<ClockSpan> InvokeUnrollHardcoded(long repeatCount, IClock clock)
+            {
+                var startedClock = clock.Start();
                 for (long i = 0; i < repeatCount; i++)
                     unrolledCallback();
+                return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+            }
+
+            private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
+            {
+                var startedClock = clock.Start();
+                for (long i = 0; i < repeatCount; i++)
+                    callback();
+                return new ValueTask<ClockSpan>(startedClock.GetElapsed());
             }
         }
 
@@ -50,145 +71,108 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 InvokeSingle = InvokeSingleHardcoded;
 
                 unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
+                InvokeUnroll = InvokeUnrollHardcoded;
+                InvokeNoUnroll = InvokeNoUnrollHardcoded;
             }
 
             private static T OverheadStatic() => default;
             private T OverheadInstance() => default;
 
-            private void InvokeSingleHardcoded() => result = callback();
-
-            private void InvokeMultipleHardcoded(long repeatCount)
+            private ValueTask InvokeSingleHardcoded()
             {
+                result = callback();
+                return new ValueTask();
+            }
+
+            private ValueTask<ClockSpan> InvokeUnrollHardcoded(long repeatCount, IClock clock)
+            {
+                var startedClock = clock.Start();
                 for (long i = 0; i < repeatCount; i++)
                     result = unrolledCallback();
+                return new ValueTask<ClockSpan>(startedClock.GetElapsed());
+            }
+
+            private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
+            {
+                var startedClock = clock.Start();
+                for (long i = 0; i < repeatCount; i++)
+                    result = callback();
+                return new ValueTask<ClockSpan>(startedClock.GetElapsed());
             }
 
             public override object LastRunResult => result;
         }
 
-        internal class BenchmarkActionTask : BenchmarkActionBase
+        private readonly struct AwaitableFunc<TAwaitable> : IFunc<TAwaitable>
         {
-            private readonly Func<Task> startTaskCallback;
-            private readonly Action callback;
-            private readonly Action unrolledCallback;
+            private readonly Func<TAwaitable> callback;
 
-            public BenchmarkActionTask(object instance, MethodInfo method, int unrollFactor)
+            internal AwaitableFunc(Func<TAwaitable> callback) => this.callback = callback;
+            public TAwaitable Invoke() => callback();
+        }
+
+        internal class BenchmarkActionAwaitable<TAsyncMethodBuilderAdapter, TAwaitableAdapter, TAwaitable, TAwaiter> : BenchmarkActionBase
+            where TAsyncMethodBuilderAdapter : IAsyncMethodBuilderAdapter, new()
+            where TAwaitableAdapter : IAwaitableAdapter<TAwaitable, TAwaiter>, new()
+            where TAwaiter : ICriticalNotifyCompletion
+        {
+            private readonly AsyncBenchmarkRunner asyncBenchmarkRunner;
+
+            public BenchmarkActionAwaitable(object instance, MethodInfo method, int unrollFactor)
             {
                 bool isIdle = method == null;
                 if (!isIdle)
                 {
-                    startTaskCallback = CreateWorkload<Func<Task>>(instance, method);
-                    callback = ExecuteBlocking;
+                    var callback = CreateWorkload<Func<TAwaitable>>(instance, method);
+                    asyncBenchmarkRunner = new AsyncWorkloadRunner<AwaitableFunc<TAwaitable>, TAsyncMethodBuilderAdapter, TAwaitableAdapter, TAwaitable, TAwaiter>(new (callback));
                 }
                 else
                 {
-                    callback = Overhead;
+                    asyncBenchmarkRunner = new AsyncOverheadRunner<AwaitableFunc<TAwaitable>, TAsyncMethodBuilderAdapter, TAwaitable, TAwaiter>(new (Overhead));
                 }
-
-                InvokeSingle = callback;
-
-                unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
-
+                InvokeSingle = InvokeSingleHardcoded;
+                InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcoded;
             }
 
-            // must be kept in sync with VoidDeclarationsProvider.IdleImplementation
-            private void Overhead() { }
+            private TAwaitable Overhead() => default;
 
-            // must be kept in sync with TaskDeclarationsProvider.TargetMethodDelegate
-            private void ExecuteBlocking() => startTaskCallback.Invoke().GetAwaiter().GetResult();
+            protected virtual ValueTask InvokeSingleHardcoded()
+                => asyncBenchmarkRunner.InvokeSingle();
 
-            private void InvokeMultipleHardcoded(long repeatCount)
-            {
-                for (long i = 0; i < repeatCount; i++)
-                    unrolledCallback();
-            }
+            private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
+                => asyncBenchmarkRunner.Invoke(repeatCount, clock);
         }
 
-        internal class BenchmarkActionTask<T> : BenchmarkActionBase
+        internal class BenchmarkActionAwaitable<TAsyncMethodBuilderAdapter, TAwaitableAdapter, TAwaitable, TAwaiter, TResult> : BenchmarkActionBase
+            where TAsyncMethodBuilderAdapter : IAsyncMethodBuilderAdapter, new()
+            where TAwaitableAdapter : IAwaitableAdapter<TAwaitable, TAwaiter, TResult>, new()
+            where TAwaiter : ICriticalNotifyCompletion
         {
-            private readonly Func<Task<T>> startTaskCallback;
-            private readonly Func<T> callback;
-            private readonly Func<T> unrolledCallback;
-            private T result;
+            private readonly AsyncBenchmarkRunner asyncBenchmarkRunner;
 
-            public BenchmarkActionTask(object instance, MethodInfo method, int unrollFactor)
+            public BenchmarkActionAwaitable(object instance, MethodInfo method, int unrollFactor)
             {
-                bool isOverhead = method == null;
-                if (!isOverhead)
+                bool isIdle = method == null;
+                if (!isIdle)
                 {
-                    startTaskCallback = CreateWorkload<Func<Task<T>>>(instance, method);
-                    callback = ExecuteBlocking;
+                    var callback = CreateWorkload<Func<TAwaitable>>(instance, method);
+                    asyncBenchmarkRunner = new AsyncWorkloadRunner<AwaitableFunc<TAwaitable>, TAsyncMethodBuilderAdapter, TAwaitableAdapter, TAwaitable, TAwaiter, TResult>(new (callback));
                 }
                 else
                 {
-                    callback = Overhead;
+                    asyncBenchmarkRunner = new AsyncOverheadRunner<AwaitableFunc<TAwaitable>, TAsyncMethodBuilderAdapter, TAwaitable, TAwaiter, TResult>(new (Overhead));
                 }
-
                 InvokeSingle = InvokeSingleHardcoded;
-
-                unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
+                InvokeUnroll = InvokeNoUnroll = InvokeNoUnrollHardcoded;
             }
 
-            private T Overhead() => default;
+            private TAwaitable Overhead() => default;
 
-            // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
-            private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
+            protected virtual ValueTask InvokeSingleHardcoded()
+                => asyncBenchmarkRunner.InvokeSingle();
 
-            private void InvokeSingleHardcoded() => result = callback();
-
-            private void InvokeMultipleHardcoded(long repeatCount)
-            {
-                for (long i = 0; i < repeatCount; i++)
-                    result = unrolledCallback();
-            }
-
-            public override object LastRunResult => result;
-        }
-
-        internal class BenchmarkActionValueTask<T> : BenchmarkActionBase
-        {
-            private readonly Func<ValueTask<T>> startTaskCallback;
-            private readonly Func<T> callback;
-            private readonly Func<T> unrolledCallback;
-            private T result;
-
-            public BenchmarkActionValueTask(object instance, MethodInfo method, int unrollFactor)
-            {
-                bool isOverhead = method == null;
-                if (!isOverhead)
-                {
-                    startTaskCallback = CreateWorkload<Func<ValueTask<T>>>(instance, method);
-                    callback = ExecuteBlocking;
-                }
-                else
-                {
-                    callback = Overhead;
-                }
-
-                InvokeSingle = InvokeSingleHardcoded;
-
-
-                unrolledCallback = Unroll(callback, unrollFactor);
-                InvokeMultiple = InvokeMultipleHardcoded;
-            }
-
-            private T Overhead() => default;
-
-            // must be kept in sync with GenericTaskDeclarationsProvider.TargetMethodDelegate
-            private T ExecuteBlocking() => startTaskCallback().GetAwaiter().GetResult();
-
-            private void InvokeSingleHardcoded() => result = callback();
-
-            private void InvokeMultipleHardcoded(long repeatCount)
-            {
-                for (long i = 0; i < repeatCount; i++)
-                    result = unrolledCallback();
-            }
-
-            public override object LastRunResult => result;
+            private ValueTask<ClockSpan> InvokeNoUnrollHardcoded(long repeatCount, IClock clock)
+                => asyncBenchmarkRunner.Invoke(repeatCount, clock);
         }
     }
 }

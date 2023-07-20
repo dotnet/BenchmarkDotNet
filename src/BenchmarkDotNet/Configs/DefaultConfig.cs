@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.IO;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Filters;
@@ -22,6 +24,15 @@ namespace BenchmarkDotNet.Configs
     {
         public static readonly IConfig Instance = new DefaultConfig();
         private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
+
+        // AsyncAdapterDefinition can be expensive to create, so we cache the defaults.
+        internal static ImmutableArray<AsyncAdapterDefinition> DefaultAsyncAdapterDefinitions { get; } =  new[]
+        {
+            new AsyncAdapterDefinition(typeof(TaskAdapter), typeof(AsyncTaskMethodBuilderAdapter)),
+            new AsyncAdapterDefinition(typeof(TaskAdapter<>), typeof(AsyncTaskMethodBuilderAdapter)),
+            new AsyncAdapterDefinition(typeof(ValueTaskAdapter), typeof(AsyncValueTaskMethodBuilderAdapter)),
+            new AsyncAdapterDefinition(typeof(ValueTaskAdapter<>), typeof(AsyncValueTaskMethodBuilderAdapter))
+        }.ToImmutableArray();
 
         private DefaultConfig()
         {
@@ -109,5 +120,9 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
 
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
+
+        // We don't expose the default adapters to users, they get combined with user-supplied adapters when the actual benchmark types are constructed.
+        // This is necessary so the defaults won't override user-supplied adapters when combining configs.
+        public IEnumerable<AsyncAdapterDefinition> GetAsyncAdapterDefinitions() => Array.Empty<AsyncAdapterDefinition>();
     }
 }

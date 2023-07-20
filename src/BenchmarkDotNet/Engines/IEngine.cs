@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Engines
 {
@@ -19,13 +21,13 @@ namespace BenchmarkDotNet.Engines
 
         long OperationsPerInvoke { get; }
 
-        Action? GlobalSetupAction { get; }
+        Func<ValueTask> GlobalSetupAction { get; }
 
-        Action? GlobalCleanupAction { get; }
+        Func<ValueTask> GlobalCleanupAction { get; }
 
-        Action<long> WorkloadAction { get; }
+        Func<long, IClock, ValueTask<ClockSpan>> WorkloadAction { get; }
 
-        Action<long> OverheadAction { get; }
+        Func<long, IClock, ValueTask<ClockSpan>> OverheadAction { get; }
 
         IResolver Resolver { get; }
 

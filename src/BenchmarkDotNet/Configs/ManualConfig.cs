@@ -6,6 +6,7 @@ using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
@@ -34,6 +35,7 @@ namespace BenchmarkDotNet.Configs
         private readonly List<IFilter> filters = new List<IFilter>();
         private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = new List<BenchmarkLogicalGroupRule>();
         private readonly List<IColumnHidingRule> columnHidingRules = new List<IColumnHidingRule>();
+        private readonly HashSet<AsyncAdapterDefinition> awaitableAdapters = new HashSet<AsyncAdapterDefinition>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
         public IEnumerable<IExporter> GetExporters() => exporters;
@@ -46,6 +48,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => columnHidingRules;
+        public IEnumerable<AsyncAdapterDefinition> GetAsyncAdapterDefinitions() => awaitableAdapters;
 
         [PublicAPI] public ConfigOptions Options { get; set; }
         [PublicAPI] public ConfigUnionRule UnionRule { get; set; } = ConfigUnionRule.Union;
@@ -103,6 +106,23 @@ namespace BenchmarkDotNet.Configs
         public ManualConfig WithBuildTimeout(TimeSpan buildTimeout)
         {
             BuildTimeout = buildTimeout;
+            return this;
+        }
+
+        /// <summary>
+        /// Adds an adapter to make a type awaitable. This type must implement <see cref="IAwaitableAdapter{TAwaitable, TAwaiter}"/> or <see cref="IAwaitableAdapter{TAwaitable, TAwaiter, TResult}"/>.
+        /// <para/>Optionally provide an async method builder adapter that will be used to consume the awaitable type. This type must implement <see cref="IAsyncMethodBuilderAdapter"/>.
+        /// If not provided, <paramref name="awaitableAdapterType"/> will be used if it implements <see cref="IAsyncMethodBuilderAdapter"/>, otherwise <see cref="AsyncTaskMethodBuilderAdapter"/> will be used.
+        /// </summary>
+        /// <remarks>
+        /// If an adapter already exists for the corresponding awaitable type, it will be overridden.
+        /// </remarks>
+        /// <param name="awaitableAdapterType">The awaitable type adapter.</param>
+        /// <param name="asyncMethodBuilderAdapterType">The async method builder adapter.</param>
+        /// <exception cref="ArgumentException"></exception>
+        public ManualConfig AddAsyncAdapter(Type awaitableAdapterType, Type asyncMethodBuilderAdapterType = null)
+        {
+            awaitableAdapters.Add(new AsyncAdapterDefinition(awaitableAdapterType, asyncMethodBuilderAdapterType));
             return this;
         }
 
@@ -261,6 +281,7 @@ namespace BenchmarkDotNet.Configs
             SummaryStyle = config.SummaryStyle ?? SummaryStyle;
             logicalGroupRules.AddRange(config.GetLogicalGroupRules());
             columnHidingRules.AddRange(config.GetColumnHidingRules());
+            awaitableAdapters.AddRange(config.GetAsyncAdapterDefinitions());
             Options |= config.Options;
             BuildTimeout = GetBuildTimeout(BuildTimeout, config.BuildTimeout);
         }

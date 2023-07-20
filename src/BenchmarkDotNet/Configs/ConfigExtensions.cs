@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -115,6 +119,19 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public static ManualConfig HideColumns(this IConfig config, params IColumn[] columns) => config.With(c => c.HideColumns(columns));
         [PublicAPI] public static ManualConfig HideColumns(this IConfig config, params IColumnHidingRule[] rules) => config.With(c => c.HideColumns(rules));
 
+        /// <summary>
+        /// Adds an adapter to make a type awaitable. This type must implement <see cref="IAwaitableAdapter{TAwaitable, TAwaiter}"/> or <see cref="IAwaitableAdapter{TAwaitable, TAwaiter, TResult}"/>.
+        /// <para/>Optionally provide an async method builder adapter that will be used to consume the awaitable type. This type must implement <see cref="IAsyncMethodBuilderAdapter"/>.
+        /// If not provided, <paramref name="awaitableAdapterType"/> will be used if it implements <see cref="IAsyncMethodBuilderAdapter"/>, otherwise <see cref="AsyncTaskMethodBuilderAdapter"/> will be used.
+        /// </summary>
+        /// <remarks>
+        /// If an adapter already exists for the corresponding awaitable type, it will be overridden.
+        /// </remarks>
+        /// <exception cref="ArgumentException"></exception>
+        [PublicAPI]
+        public static ManualConfig AddAsyncAdapter(this IConfig config, Type awaitableAdapterType, Type asyncMethodBuilderAdapterType = null)
+            => config.With(c => c.AddAsyncAdapter(awaitableAdapterType, asyncMethodBuilderAdapterType));
+
         public static ImmutableConfig CreateImmutableConfig(this IConfig config) => ImmutableConfigBuilder.Create(config);
 
         internal static ILogger GetNonNullCompositeLogger(this IConfig config)
@@ -131,6 +148,23 @@ namespace BenchmarkDotNet.Configs
             var manualConfig = ManualConfig.Create(config);
             addAction(manualConfig);
             return manualConfig;
+        }
+
+        internal static bool GetIsAwaitable(this IConfig config, Type type, out ConcreteAsyncAdapter adapter)
+        {
+            var asyncAdapterDefinitions = new HashSet<AsyncAdapterDefinition>(DefaultConfig.DefaultAsyncAdapterDefinitions);
+            asyncAdapterDefinitions.AddRange(config.GetAsyncAdapterDefinitions());
+            var arr = asyncAdapterDefinitions.ToArray();
+            Array.Sort(arr);
+            foreach (var adapterDefinition in arr)
+            {
+                if (adapterDefinition.TryMatch(type, out adapter))
+                {
+                    return true;
+                }
+            }
+            adapter = null;
+            return false;
         }
     }
 }

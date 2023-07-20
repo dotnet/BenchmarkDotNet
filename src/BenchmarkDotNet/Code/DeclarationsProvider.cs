@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -11,9 +12,6 @@ namespace BenchmarkDotNet.Code
 {
     internal abstract class DeclarationsProvider
     {
-        // "GlobalSetup" or "GlobalCleanup" methods are optional, so default to an empty delegate, so there is always something that can be invoked
-        private const string EmptyAction = "() => { }";
-
         protected readonly Descriptor Descriptor;
 
         internal DeclarationsProvider(Descriptor descriptor) => Descriptor = descriptor;
@@ -26,9 +24,9 @@ namespace BenchmarkDotNet.Code
 
         public string GlobalCleanupMethodName => GetMethodName(Descriptor.GlobalCleanupMethod);
 
-        public string IterationSetupMethodName => Descriptor.IterationSetupMethod?.Name ?? EmptyAction;
+        public string IterationSetupMethodName => GetMethodName(Descriptor.IterationSetupMethod);
 
-        public string IterationCleanupMethodName => Descriptor.IterationCleanupMethod?.Name ?? EmptyAction;
+        public string IterationCleanupMethodName => GetMethodName(Descriptor.IterationCleanupMethod);
 
         public abstract string ReturnsDefinition { get; }
 
@@ -48,13 +46,18 @@ namespace BenchmarkDotNet.Code
 
         public string OverheadMethodReturnTypeName => OverheadMethodReturnType.GetCorrectCSharpTypeName();
 
+        public virtual string GetInitializeAsyncBenchmarkRunnerFields(BenchmarkId id) => null;
+
+        public virtual void OverrideUnrollFactor(BenchmarkCase benchmarkCase) { }
+
         public abstract string OverheadImplementation { get; }
 
         private string GetMethodName(MethodInfo method)
         {
+            // "Setup" or "Cleanup" methods are optional, so default to a simple delegate, so there is always something that can be invoked
             if (method == null)
             {
-                return EmptyAction;
+                return "() => new System.Threading.Tasks.ValueTask()";
             }
 
             if (method.ReturnType == typeof(Task) ||
@@ -63,10 +66,10 @@ namespace BenchmarkDotNet.Code
                     (method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>) ||
                      method.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>))))
             {
-                return $"() => {method.Name}().GetAwaiter().GetResult()";
+                return $"() => BenchmarkDotNet.Helpers.AwaitHelper.ToValueTaskVoid({method.Name}())";
             }
 
-            return method.Name;
+            return $"() => {{ {method.Name}(); return new System.Threading.Tasks.ValueTask(); }}";
         }
     }
 
@@ -145,34 +148,42 @@ namespace BenchmarkDotNet.Code
         public override string WorkloadMethodReturnTypeModifiers => "ref readonly";
     }
 
-    internal class TaskDeclarationsProvider : VoidDeclarationsProvider
+    internal class AwaitableDeclarationsProvider : DeclarationsProvider
     {
-        public TaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
+        private readonly ConcreteAsyncAdapter adapter;
 
-        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way,
-        // and will eventually throw actual exception, not aggregated one
-        public override string WorkloadMethodDelegate(string passArguments)
-            => $"({passArguments}) => {{ {Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";
+        public AwaitableDeclarationsProvider(Descriptor descriptor, ConcreteAsyncAdapter adapter) : base(descriptor) => this.adapter = adapter;
 
-        public override string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult()";
+        public override string ReturnsDefinition => "RETURNS_AWAITABLE";
 
-        protected override Type WorkloadMethodReturnType => typeof(void);
-    }
+        public override string OverheadImplementation => $"return default({OverheadMethodReturnType.GetCorrectCSharpTypeName()});";
 
-    /// <summary>
-    /// declarations provider for <see cref="Task{TResult}" /> and <see cref="ValueTask{TResult}" />
-    /// </summary>
-    internal class GenericTaskDeclarationsProvider : NonVoidDeclarationsProvider
-    {
-        public GenericTaskDeclarationsProvider(Descriptor descriptor) : base(descriptor) { }
+        protected override Type OverheadMethodReturnType => WorkloadMethodReturnType.IsValueType && !WorkloadMethodReturnType.IsPrimitive
+            ? typeof(EmptyAwaiter) // we return this simple type so we don't include the cost of a large struct in the overhead
+            : WorkloadMethodReturnType;
 
-        protected override Type WorkloadMethodReturnType => Descriptor.WorkloadMethod.ReturnType.GetTypeInfo().GetGenericArguments().Single();
+        private string GetRunnableName(BenchmarkId id) => $"BenchmarkDotNet.Autogenerated.Runnable_{id}";
 
-        // we use GetAwaiter().GetResult() because it's fastest way to obtain the result in blocking way,
-        // and will eventually throw actual exception, not aggregated one
-        public override string WorkloadMethodDelegate(string passArguments)
-            => $"({passArguments}) => {{ return {Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult(); }}";
+        public override string GetInitializeAsyncBenchmarkRunnerFields(BenchmarkId id)
+        {
+            string awaitableAdapterTypeName = adapter.awaitableAdapterType.GetCorrectCSharpTypeName();
+            string asyncMethodBuilderAdapterTypeName = adapter.asyncMethodBuilderAdapterType.GetCorrectCSharpTypeName();
 
-        public override string GetWorkloadMethodCall(string passArguments) => $"{Descriptor.WorkloadMethod.Name}({passArguments}).GetAwaiter().GetResult()";
+            string awaiterTypeName = adapter.awaiterType.GetCorrectCSharpTypeName();
+            string overheadAwaiterTypeName = adapter.awaiterType.IsValueType
+                ? typeof(EmptyAwaiter).GetCorrectCSharpTypeName() // we use this simple type so we don't include the cost of a large struct in the overhead
+                : awaiterTypeName;
+            string appendResultType = adapter.resultType == null ? string.Empty : $", {adapter.resultType.GetCorrectCSharpTypeName()}";
+
+            string runnableName = GetRunnableName(id);
+
+            var workloadRunnerTypeName = $"BenchmarkDotNet.Engines.AsyncWorkloadRunner<{runnableName}.WorkloadFunc, {asyncMethodBuilderAdapterTypeName}, {awaitableAdapterTypeName}, {WorkloadMethodReturnTypeName}, {awaiterTypeName}{appendResultType}>";
+            var overheadRunnerTypeName = $"BenchmarkDotNet.Engines.AsyncOverheadRunner<{runnableName}.OverheadFunc, {asyncMethodBuilderAdapterTypeName}, {OverheadMethodReturnTypeName}, {overheadAwaiterTypeName}{appendResultType}>";
+
+            return $"__asyncWorkloadRunner = new {workloadRunnerTypeName}(new {runnableName}.WorkloadFunc(this));" + Environment.NewLine
+     + $"            __asyncOverheadRunner = new {overheadRunnerTypeName}(new {runnableName}.OverheadFunc(this));";
+        }
+
+        public override void OverrideUnrollFactor(BenchmarkCase benchmarkCase) => benchmarkCase.ForceUnrollFactorForAsync();
     }
 }

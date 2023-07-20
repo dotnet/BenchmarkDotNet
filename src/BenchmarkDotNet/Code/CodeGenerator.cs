@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
@@ -33,7 +34,9 @@ namespace BenchmarkDotNet.Code
             {
                 var benchmark = buildInfo.BenchmarkCase;
 
-                var provider = GetDeclarationsProvider(benchmark.Descriptor);
+                var provider = GetDeclarationsProvider(benchmark.Descriptor, benchmark.Config);
+
+                provider.OverrideUnrollFactor(benchmark);
 
                 string passArguments = GetPassArguments(benchmark);
 
@@ -49,6 +52,7 @@ namespace BenchmarkDotNet.Code
                     .Replace("$WorkloadMethodReturnType$", provider.WorkloadMethodReturnTypeName)
                     .Replace("$WorkloadMethodReturnTypeModifiers$", provider.WorkloadMethodReturnTypeModifiers)
                     .Replace("$OverheadMethodReturnTypeName$", provider.OverheadMethodReturnTypeName)
+                    .Replace("$InitializeAsyncBenchmarkRunnerFields$", provider.GetInitializeAsyncBenchmarkRunnerFields(buildInfo.Id))
                     .Replace("$GlobalSetupMethodName$", provider.GlobalSetupMethodName)
                     .Replace("$GlobalCleanupMethodName$", provider.GlobalCleanupMethodName)
                     .Replace("$IterationSetupMethodName$", provider.IterationSetupMethodName)
@@ -59,8 +63,10 @@ namespace BenchmarkDotNet.Code
                     .Replace("$ParamsContent$", GetParamsContent(benchmark))
                     .Replace("$ArgumentsDefinition$", GetArgumentsDefinition(benchmark))
                     .Replace("$DeclareArgumentFields$", GetDeclareArgumentFields(benchmark))
-                    .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark)).Replace("$LoadArguments$", GetLoadArguments(benchmark))
+                    .Replace("$InitializeArgumentFields$", GetInitializeArgumentFields(benchmark))
+                    .Replace("$LoadArguments$", GetLoadArguments(benchmark))
                     .Replace("$PassArguments$", passArguments)
+                    .Replace("$PassArgumentsDirect$", GetPassArgumentsDirect(benchmark))
                     .Replace("$EngineFactoryType$", GetEngineFactoryTypeName(benchmark))
                     .Replace("$MeasureExtraStats$", buildInfo.Config.HasExtraStatsDiagnoser() ? "true" : "false")
                     .Replace("$DisassemblerEntryMethodName$", DisassemblerConstants.DisassemblerEntryMethodName)
@@ -148,20 +154,9 @@ namespace BenchmarkDotNet.Code
                 Replace("; ", ";\n                ");
         }
 
-        private static DeclarationsProvider GetDeclarationsProvider(Descriptor descriptor)
+        private static DeclarationsProvider GetDeclarationsProvider(Descriptor descriptor, IConfig config)
         {
             var method = descriptor.WorkloadMethod;
-
-            if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask))
-            {
-                return new TaskDeclarationsProvider(descriptor);
-            }
-            if (method.ReturnType.GetTypeInfo().IsGenericType
-                && (method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
-                    || method.ReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)))
-            {
-                return new GenericTaskDeclarationsProvider(descriptor);
-            }
 
             if (method.ReturnType == typeof(void))
             {
@@ -181,6 +176,11 @@ namespace BenchmarkDotNet.Code
                     return new ByReadOnlyRefDeclarationsProvider(descriptor);
                 else
                     return new ByRefDeclarationsProvider(descriptor);
+            }
+
+            if (config.GetIsAwaitable(method.ReturnType, out var adapter))
+            {
+                return new AwaitableDeclarationsProvider(descriptor, adapter);
             }
 
             return new NonVoidDeclarationsProvider(descriptor);
@@ -223,6 +223,12 @@ namespace BenchmarkDotNet.Code
                 ", ",
                 benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
                     .Select((parameter, index) => $"{GetParameterModifier(parameter)} arg{index}"));
+
+        private static string GetPassArgumentsDirect(BenchmarkCase benchmarkCase)
+            => string.Join(
+                ", ",
+                benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
+                    .Select((parameter, index) => $"{GetParameterModifier(parameter)} __argField{index}"));
 
         private static string GetExtraAttributes(Descriptor descriptor)
             => descriptor.WorkloadMethod.GetCustomAttributes(false).OfType<STAThreadAttribute>().Any() ? "[System.STAThreadAttribute]" : string.Empty;

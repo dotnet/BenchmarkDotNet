@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             ilBuilder.EmitReturnDefault(ConsumableInfo.WorkloadMethodReturnType, disassemblyDiagnoserLocal);
         }
 
-        protected override void OnEmitCtorBodyOverride(ConstructorBuilder constructorBuilder, ILGenerator ilBuilder)
+        protected override void OnEmitCtorBodyOverride(ConstructorBuilder constructorBuilder, ILGenerator ilBuilder, RunnableEmitter runnableEmitter)
         {
             var ctor = typeof(Consumer).GetConstructor(Array.Empty<Type>());
             if (ctor == null)

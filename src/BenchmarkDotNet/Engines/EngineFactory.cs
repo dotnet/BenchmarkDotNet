@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Jobs;
 using Perfolizer.Horology;
 
@@ -25,7 +26,7 @@ namespace BenchmarkDotNet.Engines
             if (engineParameters.TargetJob == null)
                 throw new ArgumentNullException(nameof(engineParameters.TargetJob));
 
-            engineParameters.GlobalSetupAction?.Invoke(); // whatever the settings are, we MUST call global setup here, the global cleanup is part of Engine's Dispose
+            engineParameters.GlobalSetupAction.Invoke().AsTask().GetAwaiter().GetResult(); // whatever the settings are, we MUST call global setup here, the global cleanup is part of Engine's Dispose
 
             if (!engineParameters.NeedsJitting) // just create the engine, do NOT jit
                 return CreateMultiActionEngine(engineParameters);
@@ -109,7 +110,7 @@ namespace BenchmarkDotNet.Engines
                 engineParameters.OverheadActionNoUnroll,
                 engineParameters.WorkloadActionNoUnroll);
 
-        private static Engine CreateEngine(EngineParameters engineParameters, Job job, Action<long> idle, Action<long> main)
+        private static Engine CreateEngine(EngineParameters engineParameters, Job job, Func<long, IClock, ValueTask<ClockSpan>> idle, Func<long, IClock, ValueTask<ClockSpan>> main)
             => new Engine(
                 engineParameters.Host,
                 EngineParameters.DefaultResolver,
