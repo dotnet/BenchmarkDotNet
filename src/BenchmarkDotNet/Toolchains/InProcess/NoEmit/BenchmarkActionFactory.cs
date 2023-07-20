@@ -1,12 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
-
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
@@ -29,8 +28,39 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             if (resultType == typeof(void))
                 return new BenchmarkActionVoid(resultInstance, targetMethod, unrollFactor);
 
+            if (resultType == typeof(void*))
+                return new BenchmarkActionVoidPointer(resultInstance, targetMethod, unrollFactor);
+
+            if (resultType.IsPointer)
+                return Create(
+                    typeof(BenchmarkActionPointer<>).MakeGenericType(resultType.GetElementType()),
+                    resultInstance,
+                    targetMethod,
+                    unrollFactor);
+
+            if (resultType.IsByRef)
+            {
+                var returnParameter = targetMethod?.ReturnParameter ?? fallbackIdleSignature.ReturnParameter;
+                // System.Runtime.CompilerServices.IsReadOnlyAttribute is part of .NET Standard 2.1, we can't use it here..
+                if (returnParameter.GetCustomAttributes().Any(attribute => attribute.GetType().Name == "IsReadOnlyAttribute"))
+                    return Create(
+                        typeof(BenchmarkActionByRefReadonly<>).MakeGenericType(resultType.GetElementType()),
+                        resultInstance,
+                        targetMethod,
+                        unrollFactor);
+
+                return Create(
+                        typeof(BenchmarkActionByRef<>).MakeGenericType(resultType.GetElementType()),
+                        resultInstance,
+                        targetMethod,
+                        unrollFactor);
+            }
+
             if (resultType == typeof(Task))
                 return new BenchmarkActionTask(resultInstance, targetMethod, unrollFactor);
+
+            if (resultType == typeof(ValueTask))
+                return new BenchmarkActionValueTask(resultInstance, targetMethod, unrollFactor);
 
             if (resultType.GetTypeInfo().IsGenericType)
             {
@@ -50,10 +80,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                         targetMethod,
                         unrollFactor);
             }
-
-            if (targetMethod == null && resultType.GetTypeInfo().IsValueType)
-                // for Idle: we return int because creating bigger ValueType could take longer than benchmarked method itself.
-                resultType = typeof(int);
 
             return Create(
                 typeof(BenchmarkAction<>).MakeGenericType(resultType),
@@ -87,6 +113,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 bool isUsingAsyncKeyword = targetMethod?.HasAttribute<AsyncStateMachineAttribute>() ?? false;
                 if (isUsingAsyncKeyword)
                     throw new NotSupportedException("Async void is not supported by design.");
+            }
+            else if (resultType.IsByRefLike() || resultType.GetElementType()?.IsByRefLike() == true)
+            {
+                throw new NotSupportedException("InProcessNoEmitToolchain does not support consuming ByRefLike return types.");
             }
         }
 
