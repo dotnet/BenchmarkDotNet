@@ -55,8 +55,10 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 .Concat(
                     new[]
                     {
-                        benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly, // this assembly does not has to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
-                        typeof(BenchmarkCase).Assembly // BenchmarkDotNet
+                        benchmarkCase.Descriptor.Type.GetTypeInfo().Assembly, // this assembly does not have to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet
+                        typeof(BenchmarkCase).Assembly, // BenchmarkDotNet
+                        typeof(System.Threading.Tasks.ValueTask).Assembly, // TaskExtensions
+                        typeof(Perfolizer.Horology.IClock).Assembly // Perfolizer
                     })
                 .Distinct();
     }

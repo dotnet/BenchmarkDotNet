@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
@@ -31,7 +32,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
         {
             { OpCodes.Br_S, OpCodes.Br },
             { OpCodes.Blt_S, OpCodes.Blt },
-            { OpCodes.Bne_Un_S, OpCodes.Bne_Un }
+            { OpCodes.Bne_Un_S, OpCodes.Bne_Un },
+            { OpCodes.Bge_S, OpCodes.Bge },
+            { OpCodes.Brtrue_S, OpCodes.Brtrue },
         };
 
         public static void RunDiff(string roslynAssemblyPath, string emittedAssemblyPath, ILogger logger)
@@ -63,7 +66,15 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
 
         private static bool AreSameSignature(MethodReference left, MethodReference right)
         {
-            return (left.Name == right.Name || (left.Name.StartsWith("<.ctor>") && right.Name == "__Workload"))
+            var lookup = new HashSet<string>()
+            {
+                RunnableConstants.WorkloadImplementationMethodName,
+                RunnableConstants.GlobalSetupMethodName,
+                RunnableConstants.GlobalCleanupMethodName,
+                RunnableConstants.IterationSetupMethodName,
+                RunnableConstants.IterationCleanupMethodName
+            };
+            return (left.Name == right.Name || (left.Name.StartsWith("<.ctor>") && lookup.Contains(right.Name)))
                 && AreSameTypeIgnoreNested(left.ReturnType, right.ReturnType)
                 && left.Parameters.Count == right.Parameters.Count
                 && left.Parameters
@@ -80,7 +91,9 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             var result = new List<Instruction>(bodyInstructions.Count);
             foreach (var instruction in bodyInstructions)
             {
-                if (compareNops || instruction.OpCode != OpCodes.Nop)
+                // Skip leave instructions since the IlBuilder forces them differently than Roslyn.
+                if (instruction.OpCode != OpCodes.Leave && instruction.OpCode != OpCodes.Leave_S
+                    && (compareNops || instruction.OpCode != OpCodes.Nop))
                     result.Add(instruction);
             }
 
@@ -289,14 +302,17 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             }
 
             var methods2ByName = type2.Methods.ToLookup(f => f.Name);
+            var methods2ByComparison = new HashSet<MethodDefinition>(type2.Methods);
             foreach (var method1 in type1.Methods)
             {
                 logger.Write($"    method {method1.FullName}");
 
                 var method2 = methods2ByName[method1.Name].SingleOrDefault(m => AreSameSignature(method1, m));
                 if (method2 == null)
-                    method2 = type2.Methods.SingleOrDefault(m => AreSameSignature(method1, m));
-                if (method2 == null)
+                    method2 = methods2ByComparison.FirstOrDefault(m => AreSameSignature(method1, m));
+                if (method2 != null)
+                    methods2ByComparison.Remove(method2);
+                else
                     method2 = methods2ByName[method1.Name].SingleOrDefault();
 
                 if (Diff(method1, method2))

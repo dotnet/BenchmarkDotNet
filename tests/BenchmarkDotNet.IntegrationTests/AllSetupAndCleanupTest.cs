@@ -49,13 +49,20 @@ namespace BenchmarkDotNet.IntegrationTests
         private static string[] GetActualLogLines(Summary summary)
             => GetSingleStandardOutput(summary).Where(line => line.StartsWith(Prefix)).ToArray();
 
-        [Fact]
-        public void AllSetupAndCleanupMethodRunsTest()
+        [Theory]
+        [InlineData(typeof(AllSetupAndCleanupAttributeBenchmarks))]
+        [InlineData(typeof(AllSetupAndCleanupAttributeBenchmarksTask))]
+        [InlineData(typeof(AllSetupAndCleanupAttributeBenchmarksGenericTask))]
+        [InlineData(typeof(AllSetupAndCleanupAttributeBenchmarksValueTask))]
+        [InlineData(typeof(AllSetupAndCleanupAttributeBenchmarksGenericValueTask))]
+        [InlineData(typeof(AllSetupAndCleanupAttributeBenchmarksValueTaskSource))]
+        [InlineData(typeof(AllSetupAndCleanupAttributeBenchmarksGenericValueTaskSource))]
+        public void AllSetupAndCleanupMethodRunsTest(Type benchmarkType)
         {
             var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
             var config = CreateSimpleConfig(job: miniJob);
 
-            var summary = CanExecute<AllSetupAndCleanupAttributeBenchmarks>(config);
+            var summary = CanExecute(benchmarkType, config);
 
             var actualLogLines = GetActualLogLines(summary);
             foreach (string line in actualLogLines)
@@ -84,65 +91,16 @@ namespace BenchmarkDotNet.IntegrationTests
             public void Benchmark() => Console.WriteLine(BenchmarkCalled);
         }
 
-        [Fact]
-        public void AllSetupAndCleanupMethodRunsAsyncTest()
-        {
-            var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
-            var config = CreateSimpleConfig(job: miniJob);
-
-            var summary = CanExecute<AllSetupAndCleanupAttributeBenchmarksAsync>(config);
-
-            var actualLogLines = GetActualLogLines(summary);
-            foreach (string line in actualLogLines)
-                Output.WriteLine(line);
-            Assert.Equal(expectedLogLines, actualLogLines);
-        }
-
-        public class AllSetupAndCleanupAttributeBenchmarksAsync
+        public class AllSetupAndCleanupAttributeBenchmarksTask
         {
             private int setupCounter;
             private int cleanupCounter;
 
             [IterationSetup]
-            public void IterationSetup() => Console.WriteLine(IterationSetupCalled + " (" + ++setupCounter + ")");
+            public Task IterationSetup() => Console.Out.WriteLineAsync(IterationSetupCalled + " (" + ++setupCounter + ")");
 
             [IterationCleanup]
-            public void IterationCleanup() => Console.WriteLine(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
-
-            [GlobalSetup]
-            public Task GlobalSetup() => Console.Out.WriteLineAsync(GlobalSetupCalled);
-
-            [GlobalCleanup]
-            public Task GlobalCleanup() => Console.Out.WriteLineAsync(GlobalCleanupCalled);
-
-            [Benchmark]
-            public Task Benchmark() => Console.Out.WriteLineAsync(BenchmarkCalled);
-        }
-
-        [Fact]
-        public void AllSetupAndCleanupMethodRunsAsyncTaskSetupTest()
-        {
-            var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
-            var config = CreateSimpleConfig(job: miniJob);
-
-            var summary = CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncTaskSetup>(config);
-
-            var actualLogLines = GetActualLogLines(summary);
-            foreach (string line in actualLogLines)
-                Output.WriteLine(line);
-            Assert.Equal(expectedLogLines, actualLogLines);
-        }
-
-        public class AllSetupAndCleanupAttributeBenchmarksAsyncTaskSetup
-        {
-            private int setupCounter;
-            private int cleanupCounter;
-
-            [IterationSetup]
-            public void IterationSetup() => Console.WriteLine(IterationSetupCalled + " (" + ++setupCounter + ")");
-
-            [IterationCleanup]
-            public void IterationCleanup() => Console.WriteLine(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+            public Task IterationCleanup() => Console.Out.WriteLineAsync(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
 
             [GlobalSetup]
             public Task GlobalSetup() => Console.Out.WriteLineAsync(GlobalSetupCalled);
@@ -154,30 +112,26 @@ namespace BenchmarkDotNet.IntegrationTests
             public void Benchmark() => Console.WriteLine(BenchmarkCalled);
         }
 
-        [Fact]
-        public void AllSetupAndCleanupMethodRunsAsyncGenericTaskSetupTest()
-        {
-            var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
-            var config = CreateSimpleConfig(job: miniJob);
-
-            var summary = CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncGenericTaskSetup>(config);
-
-            var actualLogLines = GetActualLogLines(summary);
-            foreach (string line in actualLogLines)
-                Output.WriteLine(line);
-            Assert.Equal(expectedLogLines, actualLogLines);
-        }
-
-        public class AllSetupAndCleanupAttributeBenchmarksAsyncGenericTaskSetup
+        public class AllSetupAndCleanupAttributeBenchmarksGenericTask
         {
             private int setupCounter;
             private int cleanupCounter;
 
             [IterationSetup]
-            public void IterationSetup() => Console.WriteLine(IterationSetupCalled + " (" + ++setupCounter + ")");
+            public async Task<int> IterationSetup()
+            {
+                await Console.Out.WriteLineAsync(IterationSetupCalled + " (" + ++setupCounter + ")");
+
+                return 42;
+            }
 
             [IterationCleanup]
-            public void IterationCleanup() => Console.WriteLine(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+            public async Task<int> IterationCleanup()
+            {
+                await Console.Out.WriteLineAsync(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+
+                return 42;
+            }
 
             [GlobalSetup]
             public async Task<int> GlobalSetup()
@@ -199,30 +153,16 @@ namespace BenchmarkDotNet.IntegrationTests
             public void Benchmark() => Console.WriteLine(BenchmarkCalled);
         }
 
-        [Fact]
-        public void AllSetupAndCleanupMethodRunsAsyncValueTaskSetupTest()
-        {
-            var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
-            var config = CreateSimpleConfig(job: miniJob);
-
-            var summary = CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncValueTaskSetup>(config);
-
-            var actualLogLines = GetActualLogLines(summary);
-            foreach (string line in actualLogLines)
-                Output.WriteLine(line);
-            Assert.Equal(expectedLogLines, actualLogLines);
-        }
-
-        public class AllSetupAndCleanupAttributeBenchmarksAsyncValueTaskSetup
+        public class AllSetupAndCleanupAttributeBenchmarksValueTask
         {
             private int setupCounter;
             private int cleanupCounter;
 
             [IterationSetup]
-            public void IterationSetup() => Console.WriteLine(IterationSetupCalled + " (" + ++setupCounter + ")");
+            public ValueTask IterationSetup() => new ValueTask(Console.Out.WriteLineAsync(IterationSetupCalled + " (" + ++setupCounter + ")"));
 
             [IterationCleanup]
-            public void IterationCleanup() => Console.WriteLine(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+            public ValueTask IterationCleanup() => new ValueTask(Console.Out.WriteLineAsync(IterationCleanupCalled + " (" + ++cleanupCounter + ")"));
 
             [GlobalSetup]
             public ValueTask GlobalSetup() => new ValueTask(Console.Out.WriteLineAsync(GlobalSetupCalled));
@@ -234,30 +174,26 @@ namespace BenchmarkDotNet.IntegrationTests
             public void Benchmark() => Console.WriteLine(BenchmarkCalled);
         }
 
-        [FactNotGitHubActionsWindows]
-        public void AllSetupAndCleanupMethodRunsAsyncGenericValueTaskSetupTest()
-        {
-            var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
-            var config = CreateSimpleConfig(job: miniJob);
-
-            var summary = CanExecute<AllSetupAndCleanupAttributeBenchmarksAsyncGenericValueTaskSetup>(config);
-
-            var actualLogLines = GetActualLogLines(summary);
-            foreach (string line in actualLogLines)
-                Output.WriteLine(line);
-            Assert.Equal(expectedLogLines, actualLogLines);
-        }
-
-        public class AllSetupAndCleanupAttributeBenchmarksAsyncGenericValueTaskSetup
+        public class AllSetupAndCleanupAttributeBenchmarksGenericValueTask
         {
             private int setupCounter;
             private int cleanupCounter;
 
             [IterationSetup]
-            public void IterationSetup() => Console.WriteLine(IterationSetupCalled + " (" + ++setupCounter + ")");
+            public async ValueTask<int> IterationSetup()
+            {
+                await Console.Out.WriteLineAsync(IterationSetupCalled + " (" + ++setupCounter + ")");
+
+                return 42;
+            }
 
             [IterationCleanup]
-            public void IterationCleanup() => Console.WriteLine(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+            public async ValueTask<int> IterationCleanup()
+            {
+                await Console.Out.WriteLineAsync(IterationCleanupCalled + " (" + ++cleanupCounter + ")");
+
+                return 42;
+            }
 
             [GlobalSetup]
             public async ValueTask<int> GlobalSetup()
@@ -273,6 +209,90 @@ namespace BenchmarkDotNet.IntegrationTests
                 await Console.Out.WriteLineAsync(GlobalCleanupCalled);
 
                 return 42;
+            }
+
+            [Benchmark]
+            public void Benchmark() => Console.WriteLine(BenchmarkCalled);
+        }
+
+        public class AllSetupAndCleanupAttributeBenchmarksValueTaskSource
+        {
+            private readonly ValueTaskSource<int> valueTaskSource = new ();
+            private int setupCounter;
+            private int cleanupCounter;
+
+            [IterationSetup]
+            public ValueTask IterationSetup()
+            {
+                valueTaskSource.Reset();
+                Console.Out.WriteLineAsync(IterationSetupCalled + " (" + ++setupCounter + ")").ContinueWith(_ => valueTaskSource.SetResult(42));
+                return new ValueTask(valueTaskSource, valueTaskSource.Token);
+            }
+
+            [IterationCleanup]
+            public ValueTask IterationCleanup()
+            {
+                valueTaskSource.Reset();
+                Console.Out.WriteLineAsync(IterationCleanupCalled + " (" + ++cleanupCounter + ")").ContinueWith(_ => valueTaskSource.SetResult(42));
+                return new ValueTask(valueTaskSource, valueTaskSource.Token);
+            }
+
+            [GlobalSetup]
+            public ValueTask GlobalSetup()
+            {
+                valueTaskSource.Reset();
+                Console.Out.WriteLineAsync(GlobalSetupCalled).ContinueWith(_ => valueTaskSource.SetResult(42));
+                return new ValueTask(valueTaskSource, valueTaskSource.Token);
+            }
+
+            [GlobalCleanup]
+            public ValueTask GlobalCleanup()
+            {
+                valueTaskSource.Reset();
+                Console.Out.WriteLineAsync(GlobalCleanupCalled).ContinueWith(_ => valueTaskSource.SetResult(42));
+                return new ValueTask(valueTaskSource, valueTaskSource.Token);
+            }
+
+            [Benchmark]
+            public void Benchmark() => Console.WriteLine(BenchmarkCalled);
+        }
+
+        public class AllSetupAndCleanupAttributeBenchmarksGenericValueTaskSource
+        {
+            private readonly ValueTaskSource<int> valueTaskSource = new ();
+            private int setupCounter;
+            private int cleanupCounter;
+
+            [IterationSetup]
+            public ValueTask<int> IterationSetup()
+            {
+                valueTaskSource.Reset();
+                Console.Out.WriteLineAsync(IterationSetupCalled + " (" + ++setupCounter + ")").ContinueWith(_ => valueTaskSource.SetResult(42));
+                return new ValueTask<int>(valueTaskSource, valueTaskSource.Token);
+            }
+
+            [IterationCleanup]
+            public ValueTask<int> IterationCleanup()
+            {
+                valueTaskSource.Reset();
+                Console.Out.WriteLineAsync(IterationCleanupCalled + " (" + ++cleanupCounter + ")").ContinueWith(_ => valueTaskSource.SetResult(42));
+                return new ValueTask<int>(valueTaskSource, valueTaskSource.Token);
+            }
+
+            [GlobalSetup]
+            public ValueTask<int> GlobalSetup()
+            {
+                valueTaskSource.Reset();
+                Console.Out.WriteLineAsync(GlobalSetupCalled).ContinueWith(_ => valueTaskSource.SetResult(42));
+                return new ValueTask<int>(valueTaskSource, valueTaskSource.Token);
+            }
+
+            [GlobalCleanup]
+            public ValueTask<int> GlobalCleanup()
+            {
+                valueTaskSource.Reset();
+                Console.Out.WriteLineAsync(GlobalCleanupCalled).ContinueWith(_ => valueTaskSource.SetResult(42));
+                return new ValueTask<int>(valueTaskSource, valueTaskSource.Token);
             }
 
             [Benchmark]

@@ -32,6 +32,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
             if (resultType == typeof(Task))
                 return new BenchmarkActionTask(resultInstance, targetMethod, unrollFactor);
 
+            if (resultType == typeof(ValueTask))
+                return new BenchmarkActionValueTask(resultInstance, targetMethod, unrollFactor);
+
             if (resultType.GetTypeInfo().IsGenericType)
             {
                 var genericType = resultType.GetGenericTypeDefinition();
@@ -97,6 +100,21 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
         private static void FallbackMethod() { }
         private static readonly MethodInfo FallbackSignature = new Action(FallbackMethod).GetMethodInfo();
         private static readonly MethodInfo DummyMethod = typeof(DummyInstance).GetMethod(nameof(DummyInstance.Dummy));
+
+        internal static int GetUnrollFactor(BenchmarkCase benchmarkCase)
+        {
+            // Only support (Value)Task for async benchmarks.
+            var methodReturnType = benchmarkCase.Descriptor.WorkloadMethod.ReturnType;
+            bool isAwaitable = methodReturnType == typeof(Task) || methodReturnType == typeof(ValueTask)
+                || (methodReturnType.GetTypeInfo().IsGenericType
+                    && (methodReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(Task<>)
+                    || methodReturnType.GetTypeInfo().GetGenericTypeDefinition() == typeof(ValueTask<>)));
+            if (isAwaitable)
+            {
+                benchmarkCase.ForceUnrollFactorForAsync();
+            }
+            return benchmarkCase.Job.ResolveValue(Jobs.RunMode.UnrollFactorCharacteristic, Environments.EnvironmentResolver.Instance);
+        }
 
         /// <summary>Creates run benchmark action.</summary>
         /// <param name="descriptor">Descriptor info.</param>

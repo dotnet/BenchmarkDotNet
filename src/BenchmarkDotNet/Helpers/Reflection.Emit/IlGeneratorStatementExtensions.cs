@@ -143,5 +143,58 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
             ilBuilder.EmitLdarg(toArg);
             ilBuilder.Emit(OpCodes.Blt, loopStartLabel);
         }
+
+        public static void EmitLoopBeginFromFldTo0(
+            this ILGenerator ilBuilder,
+            Label loopStartLabel,
+            Label loopHeadLabel)
+        {
+            // IL_001b: br.s IL_0029 // loop start (head: IL_0029)
+            ilBuilder.Emit(OpCodes.Br, loopHeadLabel);
+
+            // loop start (head: IL_0036)
+            ilBuilder.MarkLabel(loopStartLabel);
+        }
+
+        public static void EmitLoopEndFromFldTo0(
+            this ILGenerator ilBuilder,
+            Label loopStartLabel,
+            Label loopHeadLabel,
+            FieldBuilder counterField,
+            LocalBuilder counterLocal)
+        {
+            // loop counter stored as loc0, loop max passed as arg1
+            /*
+                // while (--repeatsRemaining >= 0)
+                IL_0029: ldarg.0
+                IL_002a: ldarg.0
+                IL_002b: ldfld int64 BenchmarkRunner_0::repeatsRemaining
+                IL_0030: ldc.i4.1
+                IL_0031: conv.i8
+                IL_0032: sub
+                IL_0033: stloc.1
+                IL_0034: ldloc.1
+                IL_0035: stfld int64 BenchmarkRunner_0::repeatsRemaining
+                IL_003a: ldloc.1
+                IL_003b: ldc.i4.0
+                IL_003c: conv.i8
+                IL_003d: bge.s IL_001d
+                // end loop
+             */
+            ilBuilder.MarkLabel(loopHeadLabel);
+            ilBuilder.Emit(OpCodes.Ldarg_0);
+            ilBuilder.Emit(OpCodes.Ldarg_0);
+            ilBuilder.Emit(OpCodes.Ldfld, counterField);
+            ilBuilder.Emit(OpCodes.Ldc_I4_1);
+            ilBuilder.Emit(OpCodes.Conv_I8);
+            ilBuilder.Emit(OpCodes.Sub);
+            ilBuilder.EmitStloc(counterLocal);
+            ilBuilder.EmitLdloc(counterLocal);
+            ilBuilder.Emit(OpCodes.Stfld, counterField);
+            ilBuilder.EmitLdloc(counterLocal);
+            ilBuilder.Emit(OpCodes.Ldc_I4_0);
+            ilBuilder.Emit(OpCodes.Conv_I8);
+            ilBuilder.Emit(OpCodes.Bge, loopStartLabel);
+        }
     }
 }

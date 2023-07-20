@@ -1,6 +1,7 @@
 ﻿using System;
-
+using System.Threading.Tasks;
 using JetBrains.Annotations;
+using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
@@ -8,16 +9,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
     [PublicAPI]
     public abstract class BenchmarkAction
     {
-        /// <summary>Gets or sets invoke single callback.</summary>
-        /// <value>Invoke single callback.</value>
-        public Action InvokeSingle { get; protected set; }
-
-        /// <summary>Gets or sets invoke multiple times callback.</summary>
-        /// <value>Invoke multiple times callback.</value>
-        public Action<long> InvokeMultiple { get; protected set; }
-
-        /// <summary>Gets the last run result.</summary>
-        /// <value>The last run result.</value>
+        public Func<ValueTask> InvokeSingle { get; protected set; }
+        public Func<long, IClock, ValueTask<ClockSpan>> InvokeUnroll { get; protected set; }
+        public Func<long, IClock, ValueTask<ClockSpan>> InvokeNoUnroll { get; protected set; }
         public virtual object LastRunResult => null;
     }
 }

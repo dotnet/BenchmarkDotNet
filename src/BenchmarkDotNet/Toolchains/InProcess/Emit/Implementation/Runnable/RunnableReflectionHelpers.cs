@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
+using Perfolizer.Horology;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
@@ -104,9 +106,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             }
         }
 
-        public static Action CallbackFromField<T>(T instance, string memberName)
+        public static Func<ValueTask> CallbackFromField<T>(T instance, string memberName)
         {
-            return GetFieldValueCore<T, Action>(instance, memberName);
+            return GetFieldValueCore<T, Func<ValueTask>>(instance, memberName);
         }
 
         public static Action CallbackFromMethod<T>(T instance, string memberName)
@@ -114,9 +116,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             return GetDelegateCore<T, Action>(instance, memberName);
         }
 
-        public static Action<long> LoopCallbackFromMethod<T>(T instance, string memberName)
+        public static Func<long, IClock, ValueTask<ClockSpan>> LoopCallbackFromMethod<T>(T instance, string memberName)
         {
-            return GetDelegateCore<T, Action<long>>(instance, memberName);
+            return GetDelegateCore<T, Func<long, IClock, ValueTask<ClockSpan>>>(instance, memberName);
         }
 
         private static TResult GetFieldValueCore<T, TResult>(T instance, string memberName)
