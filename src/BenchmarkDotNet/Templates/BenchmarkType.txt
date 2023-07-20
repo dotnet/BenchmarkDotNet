@@ -113,9 +113,7 @@
 
         private BenchmarkDotNet.Engines.Consumer consumer = new BenchmarkDotNet.Engines.Consumer();
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -125,9 +123,7 @@
             }
         }
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -137,9 +133,7 @@
             }
         }
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -149,9 +143,7 @@
             }
         }
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -175,9 +167,7 @@
 
 #elif RETURNS_NON_CONSUMABLE_STRUCT_$ID$
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -189,9 +179,7 @@
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
         }
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -203,9 +191,7 @@
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
         }
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -217,9 +203,7 @@
             NonGenericKeepAliveWithoutBoxing(result);
         }
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -250,9 +234,7 @@
 
 #elif RETURNS_BYREF_$ID$
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -264,9 +246,7 @@
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
         }
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -280,9 +260,7 @@
 
         private $WorkloadMethodReturnType$ workloadDefaultValueHolder = default($WorkloadMethodReturnType$);
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -294,9 +272,7 @@
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(ref alias);
         }
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -321,9 +297,7 @@
         }
 #elif RETURNS_BYREF_READONLY_$ID$
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -335,9 +309,7 @@
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxing(value);
         }
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -351,9 +323,7 @@
 
         private $WorkloadMethodReturnType$ workloadDefaultValueHolder = default($WorkloadMethodReturnType$);
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -365,9 +335,7 @@
             BenchmarkDotNet.Engines.DeadCodeEliminationHelper.KeepAliveWithoutBoxingReadonly(alias);
         }
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -392,9 +360,7 @@
         }
 #elif RETURNS_VOID_$ID$
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -404,9 +370,7 @@
             }
         }
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void OverheadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -416,9 +380,7 @@
             }
         }
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
@@ -428,9 +390,7 @@
             }
         }
 
-#if NETCOREAPP3_0_OR_GREATER
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveOptimization)]
-#endif
+        [System.Runtime.CompilerServices.MethodImpl(BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption)]
         private void WorkloadActionNoUnroll(System.Int64 invokeCount)
         {
             $LoadArguments$
