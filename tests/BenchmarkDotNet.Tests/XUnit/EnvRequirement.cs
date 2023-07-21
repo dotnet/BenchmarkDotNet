@@ -6,6 +6,7 @@ public enum EnvRequirement
     NonWindows,
     NonLinux,
     FullFrameworkOnly,
+    NonFullFramework,
     DotNetCoreOnly,
     DotNetCore30Only
 }
