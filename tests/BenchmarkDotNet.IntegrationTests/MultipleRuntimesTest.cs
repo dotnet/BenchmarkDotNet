@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public MultipleRuntimesTest(ITestOutputHelper outputHelper) => output = outputHelper;
 
-        [FactWindowsOnly("CLR is a valid job only on Windows")]
+        [FactEnvSpecific("CLR is a valid job only on Windows", EnvRequirement.WindowsOnly)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void SingleBenchmarkCanBeExecutedForMultipleRuntimes()
         {

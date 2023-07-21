@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.IntegrationTests
         private const string RyuJitNotAvailable = "// ERROR:  RyuJIT is requested but it is not available in current environment";
         private const string ToolchainSupportsOnlyRyuJit = "Currently dotnet cli toolchain supports only RyuJit";
 
-        [TheoryWindowsOnly("CLR is a valid job only on Windows")]
+        [TheoryEnvSpecific("CLR is a valid job only on Windows", EnvRequirement.WindowsOnly)]
         [InlineData(Jit.LegacyJit, Platform.X86, null)]
         [InlineData(Jit.LegacyJit, Platform.X64, null)]
         [InlineData(Jit.RyuJit, Platform.X86, RyuJitNotAvailable)]

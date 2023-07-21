@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.IntegrationTests
 {
     public class MonoTests : BenchmarkTestExecutor
     {
-        [FactDotNetCoreOnly("UseMonoRuntime option is available in .NET Core only starting from .NET 6")]
+        [FactEnvSpecific("UseMonoRuntime option is available in .NET Core only starting from .NET 6", EnvRequirement.DotNetCoreOnly)]
         public void Mono70IsSupported()
         {
             var config = ManualConfig.CreateEmpty().AddJob(Job.Dry.WithRuntime(MonoRuntime.Mono70));

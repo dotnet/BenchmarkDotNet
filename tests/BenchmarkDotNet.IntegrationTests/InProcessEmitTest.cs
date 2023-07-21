@@ -104,7 +104,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryFullFrameworkOnly("We can't use Roslyn toolchain for .NET Core because we don't know which assemblies to reference and .NET Core does not support dynamic assembly saving")]
+        [TheoryEnvSpecific("We can't use Roslyn toolchain for .NET Core because we don't know which assemblies to reference and .NET Core does not support dynamic assembly saving", EnvRequirement.FullFrameworkOnly)]
         [InlineData(typeof(SampleBenchmark))]
         [InlineData(typeof(RunnableVoidCaseBenchmark))]
         [InlineData(typeof(RunnableRefStructCaseBenchmark))]

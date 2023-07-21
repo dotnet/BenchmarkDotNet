@@ -110,7 +110,9 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(RunStrategy.ColdStart, job.Run.RunStrategy);
         }
 
-        [FactDotNetCoreOnly("When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..")]
+        [FactEnvSpecific(
+            "When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..",
+            EnvRequirement.DotNetCoreOnly)]
         public void UnknownConfigMeansFailure()
         {
             Assert.False(ConfigParser.Parse(new[] { "--unknown" }, new OutputLogger(Output)).isSuccess);
@@ -133,7 +135,7 @@ namespace BenchmarkDotNet.Tests
             Assert.False(ConfigParser.Parse(new[] { "--coreRun", nonExistingFile }, new OutputLogger(Output)).isSuccess);
         }
 
-        [FactDotNetCoreOnly("Detecting current version of .NET Core works only for .NET Core processes")]
+        [FactEnvSpecific("Detecting current version of .NET Core works only for .NET Core processes", EnvRequirement.DotNetCoreOnly)]
         public void CoreRunConfigParsedCorrectlyWhenRuntimeNotSpecified()
         {
             var fakeDotnetCliPath = typeof(object).Assembly.Location;
@@ -150,7 +152,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(fakeRestorePackages, toolchain.RestorePath.FullName);
         }
 
-        [FactClassicDotNetOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.FullFrameworkOnly)]
         public void SpecifyingCoreRunWithFullFrameworkTargetsMostRecentTfm()
         {
             var fakePath = typeof(object).Assembly.Location;
@@ -163,7 +165,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal("net8.0", generator.TargetFrameworkMoniker);
         }
 
-        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
         public void SpecifyingCoreRunAndRuntimeCreatesTwoJobs()
         {
             const string runtime = "net7.0";
@@ -191,7 +193,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(fakeRestorePackages, generator.PackagesPath);
         }
 
-        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
         public void FirstJobIsBaseline_RuntimesCoreRun()
         {
             const string runtime1 = "net5.0";
@@ -205,7 +207,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(runtime1, ((DotNetCliGenerator)baselineJob.GetToolchain().Generator).TargetFrameworkMoniker);
         }
 
-        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
         public void FirstJobIsBaseline_CoreRunsRuntimes()
         {
             const string runtime1 = "net5.0";
@@ -219,7 +221,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(fakePath1, ((CoreRunToolchain)baselineJob.GetToolchain()).SourceCoreRun.FullName);
         }
 
-        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
         public void UserCanSpecifyMultipleCoreRunPaths()
         {
             var fakeCoreRunPath_1 = typeof(object).Assembly.Location;
@@ -244,7 +246,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime mono && mono.CustomPath == fakeMonoPath));
         }
 
-        [FactWindowsOnly("Testing local builds of Full .NET Framework is supported only on Windows")]
+        [FactEnvSpecific("Testing local builds of Full .NET Framework is supported only on Windows", EnvRequirement.WindowsOnly)]
         public void ClrVersionParsedCorrectly()
         {
             const string clrVersion = "secret";

@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
         }
 
-        [FactNotLinux("For some reason this test is unstable on Ubuntu for both AzureDevOps and Travis CI")]
+        [FactEnvSpecific("For some reason this test is unstable on Ubuntu for both AzureDevOps and Travis CI", EnvRequirement.NonLinux)]
         public void UserCanSpecifyCustomNuGetPackageDependency()
         {
             var toolchain = RuntimeInformation.GetCurrentRuntime().GetToolchain(preferMsBuildToolchains: true);
@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests
             CanExecute<WithCallToNewtonsoft>(config);
         }
 
-        [FactClassicDotNetOnly("Roslyn toolchain does not support .NET Core")]
+        [FactEnvSpecific("Roslyn toolchain does not support .NET Core", EnvRequirement.FullFrameworkOnly)]
         public void RoslynToolchainDoesNotSupportNuGetPackageDependency()
         {
             var toolchain = RoslynToolchain.Instance;

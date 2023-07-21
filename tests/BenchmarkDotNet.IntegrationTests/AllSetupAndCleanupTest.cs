@@ -234,7 +234,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public void Benchmark() => Console.WriteLine(BenchmarkCalled);
         }
 
-        [FactNotGitHubActionsWindows]
+        [FactEnvSpecific(EnvRequirement.NonWindows)]
         public void AllSetupAndCleanupMethodRunsAsyncGenericValueTaskSetupTest()
         {
             var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");
