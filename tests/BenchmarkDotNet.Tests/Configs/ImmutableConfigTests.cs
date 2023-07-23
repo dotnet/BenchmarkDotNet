@@ -428,7 +428,7 @@ namespace BenchmarkDotNet.Tests.Configs
 
                 var final = ImmutableConfigBuilder.Create(mutable);
 
-                Assert.Equal(1, final.ConfigAnalysisConclusion.Count);
+                Assert.Single(final.ConfigAnalysisConclusion);
             }
             finally
             {

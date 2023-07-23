@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Tests.Configs
             var job = new Job()
                 .WithEnvironmentVariables(new EnvironmentVariable("a", "b"))
                 .WithEnvironmentVariables(new EnvironmentVariable("c", "d"));
-            Assert.Equal(1, job.Environment.EnvironmentVariables.Count);
+            Assert.Single(job.Environment.EnvironmentVariables);
         }
 
         [Fact]

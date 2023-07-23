@@ -448,7 +448,7 @@ namespace BenchmarkDotNet.Tests.Configs
             //.WithNuGet extensions
 
             j = j.Freeze().WithNuGet("Newtonsoft.Json");
-            Assert.Equal(1, j.Infrastructure.NuGetReferences.Count);
+            Assert.Single(j.Infrastructure.NuGetReferences);
 
             j = j.WithNuGet("AutoMapper", "7.0.1");
             Assert.Collection(j.Infrastructure.NuGetReferences,
