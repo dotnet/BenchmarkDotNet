@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public LargeAddressAwareTest(ITestOutputHelper outputHelper) => output = outputHelper;
 
-        [FactWindowsOnly("CLR is a valid job only on Windows")]
+        [FactEnvSpecific("CLR is a valid job only on Windows", EnvRequirement.WindowsOnly)]
         public void BenchmarkCanAllocateMoreThan2Gb()
         {
             var summary = BenchmarkRunner

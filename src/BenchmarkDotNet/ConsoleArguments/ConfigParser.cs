@@ -126,15 +126,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 }
                 else
                 {
-                    if (arg.Contains(' '))
-                    {
-                        // Workaround for CommandLine library issue with parsing these kind of args.
-                        result.Add(" " + arg);
-                    }
-                    else
-                    {
-                        result.Add(arg);
-                    }
+                    result.Add(arg);
                 }
             }
 

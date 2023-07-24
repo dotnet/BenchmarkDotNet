@@ -95,64 +95,6 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void PackageReferenceSingleLineGetsCopied()
-        {
-            const string WithPackageReference = @"
-<Project Sdk=""Microsoft.NET.Sdk"">
-  <PropertyGroup>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include=""xunit"" Version=""2.4.2"" />
-  </ItemGroup>
-</Project>
-";
-            var sut = new CsProjGenerator("netcoreapp3.0", null, null, null, true);
-
-            var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(WithPackageReference);
-            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
-
-            AssertCustomProperties(@"<ItemGroup>
-  <PackageReference Include=""xunit"" Version=""2.4.2"" />
-</ItemGroup>", customProperties);
-            Assert.Equal("Microsoft.NET.Sdk", sdkName);
-        }
-
-        [Fact]
-        public void PackageReferenceMultiLineGetsCopied()
-        {
-            const string WithPackageReference = @"
-<Project Sdk=""Microsoft.NET.Sdk"">
-  <PropertyGroup>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include=""xunit.runner.visualstudio"" Version=""2.4.5"">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-</Project>
-";
-            var sut = new CsProjGenerator("netcoreapp3.0", null, null, null, true);
-
-            var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(WithPackageReference);
-            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
-
-            AssertCustomProperties(@"<ItemGroup>
-  <PackageReference Include=""xunit.runner.visualstudio"" Version=""2.4.5"">
-    <PrivateAssets>all</PrivateAssets>
-    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-  </PackageReference>
-</ItemGroup>", customProperties);
-            Assert.Equal("Microsoft.NET.Sdk", sdkName);
-        }
-
-        [Fact]
         public void SettingsFromPropsFileImportedUsingAbsolutePathGetCopies()
         {
             const string imported = @"

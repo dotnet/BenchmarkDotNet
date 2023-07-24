@@ -108,7 +108,9 @@ jobs:
         name: Setup node
         with:
           node-version: "16"
-      - run: npm install -g cspell
-        name: Install cSpell
-      - run: cspell --config ./cSpell.json "docs/**/*.md" --no-progress
-        name: Run cSpell
+      - name: Install cSpell
+        run: npm install -g cspell
+      - name: Copy cSpell config
+        run: cp ./build/cSpell.json ./cSpell.json
+      - name: Run cSpell
+        run: cspell --config ./cSpell.json "docs/**/*.md" --no-progress

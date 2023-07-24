@@ -17,6 +17,7 @@
     <Compile Include="..\..\tests\BenchmarkDotNet.IntegrationTests\Xunit\Extensions.cs" Link="Extensions.cs" />
     <Compile Include="..\..\tests\BenchmarkDotNet.IntegrationTests\TestConfigs.cs" Link="TestConfigs.cs" />
     <Compile Include="..\..\tests\BenchmarkDotNet.Tests\Loggers\OutputLogger.cs" Link="OutputLogger.cs" />
+    <Compile Include="..\..\tests\BenchmarkDotNet.Tests\XUnit\*.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json">

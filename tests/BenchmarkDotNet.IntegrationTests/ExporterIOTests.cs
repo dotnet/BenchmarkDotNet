@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [FactWindowsOnly("On Unix, it's possible to write to an opened file")]
+        [FactEnvSpecific("On Unix, it's possible to write to an opened file", EnvRequirement.WindowsOnly)]
         public void ExporterWorksWhenFileIsLocked()
         {
             string resultsDirectoryPath = Path.GetTempPath();

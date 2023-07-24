@@ -657,13 +657,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             }
 
             // .method private hidebysig
-            //    instance void OverheadActionUnroll(int64 invokeCount) cil managed
+            //    instance void OverheadActionUnroll(int64 invokeCount) cil managed aggressiveoptimization
             var toArg = new EmitParameterInfo(0, InvokeCountParamName, typeof(long));
             var actionMethodBuilder = runnableBuilder.DefineNonVirtualInstanceMethod(
                 methodName,
                 MethodAttributes.Private,
                 EmitParameterInfo.CreateReturnVoidParameter(),
-                toArg);
+                toArg)
+                .SetAggressiveOptimizationImplementationFlag();
             toArg.SetMember(actionMethodBuilder);
 
             // Emit impl

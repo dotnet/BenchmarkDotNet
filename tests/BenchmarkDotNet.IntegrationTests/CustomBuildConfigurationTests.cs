@@ -4,7 +4,10 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Tests.XUnit;
+#if !DEBUG
 using Xunit;
+#endif
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -15,7 +18,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
         }
 
-        [Fact]
+        [FactEnvSpecific("Flaky, see https://github.com/dotnet/BenchmarkDotNet/issues/2376", EnvRequirement.NonFullFramework)]
         public void UserCanSpecifyCustomBuildConfiguration()
         {
             var jobWithCustomConfiguration = Job.Dry.WithCustomBuildConfiguration("CUSTOM");

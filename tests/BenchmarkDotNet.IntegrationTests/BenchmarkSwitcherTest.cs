@@ -25,7 +25,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public BenchmarkSwitcherTest(ITestOutputHelper output) => Output = output;
 
-        [FactDotNetCoreOnly("When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..")]
+        [FactEnvSpecific(
+            "When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..",
+            EnvRequirement.DotNetCoreOnly)]
         public void WhenInvalidCommandLineArgumentIsPassedAnErrorMessageIsDisplayedAndNoBenchmarksAreExecuted()
         {
             var logger = new OutputLogger(Output);
@@ -332,7 +334,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Contains("static", logger.GetLog());
         }
 
-        [FactDotNetCoreOnly("For some reason this test is flaky on Full Framework")]
+        [FactEnvSpecific("For some reason this test is flaky on Full Framework", EnvRequirement.DotNetCoreOnly)]
         public void WhenUserAddTheResumeAttributeAndRunTheBenchmarks()
         {
             var logger = new OutputLogger(Output);
