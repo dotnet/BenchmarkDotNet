@@ -84,7 +84,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 ));
         }
 
-        [TheoryNetCoreOnly("To not repeat tests in both full Framework and Core")]
+        [TheoryEnvSpecific("To not repeat tests in both Full .NET Framework and Core", EnvRequirement.DotNetCoreOnly)]
         [MemberData(nameof(CoreData))]
         public void EmptyBenchmarksReportZeroTimeAndAllocated_Core(Type benchmarkType, RuntimeMoniker runtimeMoniker)
         {
@@ -94,7 +94,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 ));
         }
 
-        [TheoryFullFrameworkOnly("Can only run full Framework and Mono tests from Framework host")]
+        [TheoryEnvSpecific("Can only run Full .NET Framework and Mono tests from Framework host", EnvRequirement.FullFrameworkOnly)]
         [MemberData(nameof(FrameworkData))]
         public void EmptyBenchmarksReportZeroTimeAndAllocated_Framework(Type benchmarkType, RuntimeMoniker runtimeMoniker)
         {
@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 ));
         }
 
-        [TheoryNetCoreOnly("To not repeat tests in both full Framework and Core")]
+        [TheoryEnvSpecific("To not repeat tests in both Full .NET Framework and Core", EnvRequirement.DotNetCoreOnly)]
         [InlineData(RuntimeMoniker.Net70)]
         [InlineData(RuntimeMoniker.Mono70)]
         public void DifferentSizedStructsBenchmarksReportsNonZeroTimeAndZeroAllocated_Core(RuntimeMoniker runtimeMoniker)
@@ -149,7 +149,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 ));
         }
 
-        [TheoryFullFrameworkOnly("Can only run full Framework and Mono tests from Framework host")]
+        [TheoryEnvSpecific("Can only run Full .NET Framework and Mono tests from Framework host", EnvRequirement.FullFrameworkOnly)]
         [InlineData(RuntimeMoniker.Net462)]
         [InlineData(RuntimeMoniker.Mono)]
         public void DifferentSizedStructsBenchmarksReportsNonZeroTimeAndZeroAllocated_Framework(RuntimeMoniker runtimeMoniker)
