@@ -27,26 +27,23 @@ namespace BenchmarkDotNet.Toolchains
                 ? toolchain
                 : GetToolchain(
                     job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance),
-                    descriptor,
-                    job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic) || job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic));
+                    descriptor);
 
-        internal static IToolchain GetToolchain(this Runtime runtime, Descriptor descriptor = null, bool preferMsBuildToolchains = false)
+        internal static IToolchain GetToolchain(this Runtime runtime, Descriptor descriptor = null)
         {
             switch (runtime)
             {
                 case ClrRuntime clrRuntime:
-                {
-                    var toolchain = clrRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
+                    // Integration tests take too much time, because each benchmark run rebuilds the test suite and BenchmarkDotNet itself.
+                    // To reduce the total duration of the CI workflows, we just use RoslynToolchain.
+                    if (RuntimeInformation.IsFullFramework && XUnitHelper.IsIntegrationTest.Value)
+                        return RoslynToolchain.Instance;
+
+                    // Default to CsProjClassicNetToolchain, even if the host is Full Framework.
+                    // If it doesn't work because the user doesn't have dotnet SDK installed, they can manually use RoslynToolchain in their config.
+                    return clrRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
                         ? GetToolchain(clrRuntime.RuntimeMoniker)
                         : CsProjClassicNetToolchain.From(clrRuntime.MsBuildMoniker);
-                    return RuntimeInformation.IsNetCore || preferMsBuildToolchains
-                        ? toolchain
-                        // Integration tests take too much time because each benchmark run rebuilds the test suite and BenchmarkDotNet itself.
-                        // To reduce the total duration of the CI workflows, we just use RoslynToolchain.
-                        : XUnitHelper.IsIntegrationTest.Value
-                        ? RoslynToolchain.Instance
-                        : new CsProjWithRoslynFallbackToolchain(toolchain);
-                }
 
                 case MonoRuntime mono:
                     if (RuntimeInformation.IsAndroid())

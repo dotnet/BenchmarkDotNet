@@ -47,9 +47,12 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                     $"Classic .NET toolchain is supported only for Windows, benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
                     benchmarkCase);
             }
-            else if (IsCliPathInvalid(customDotNetCliPath: null, benchmarkCase, out var invalidCliError))
+            else if (IsCliPathInvalid(customDotNetCliPath: null, benchmarkCase, out _))
             {
-                yield return invalidCliError;
+                yield return new ValidationError(true,
+                    "CsProjClassicNetToolchain requires dotnet SDK to be installed or path to local dotnet cli provided in explicit way using `--cli` argument." +
+                    $" You may also use RoslynToolchain instead. Benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
+                    benchmarkCase);
             }
         }
     }

@@ -5,12 +5,10 @@ namespace BenchmarkDotNet.Toolchains.Results
 {
     public class GenerateResult
     {
-        public virtual ArtifactsPaths ArtifactsPaths { get; }
-        public virtual bool IsGenerateSuccess { get; }
-        public virtual Exception GenerateException { get; }
-        public virtual IReadOnlyCollection<string> ArtifactsToCleanup { get; }
-
-        public GenerateResult() { }
+        public ArtifactsPaths ArtifactsPaths { get; }
+        public bool IsGenerateSuccess { get; }
+        public Exception GenerateException { get; }
+        public IReadOnlyCollection<string> ArtifactsToCleanup { get; }
 
         public GenerateResult(ArtifactsPaths artifactsPaths, bool isGenerateSuccess, Exception generateException,
             IReadOnlyCollection<string> artifactsToCleanup)
