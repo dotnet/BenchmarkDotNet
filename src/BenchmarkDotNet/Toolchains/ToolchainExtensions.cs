@@ -34,13 +34,14 @@ namespace BenchmarkDotNet.Toolchains
             switch (runtime)
             {
                 case ClrRuntime clrRuntime:
-                    // Integration tests take too much time, because each benchmark run rebuilds the test suite and BenchmarkDotNet itself.
-                    // To reduce the total duration of the CI workflows, we just use RoslynToolchain.
-                    if (RuntimeInformation.IsFullFramework && XUnitHelper.IsIntegrationTest.Value)
+                    if (RuntimeInformation.IsFullFramework &&
+                        // If dotnet SDK is not installed, we use RoslynToolchain (CsProjClassicNetToolchain currently does not support custom cli path).
+                        (!HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled()
+                        // Integration tests take too much time, because each benchmark run rebuilds the test suite and BenchmarkDotNet itself.
+                        // To reduce the total duration of the CI workflows, we just use RoslynToolchain.
+                        || XUnitHelper.IsIntegrationTest.Value))
                         return RoslynToolchain.Instance;
 
-                    // Default to CsProjClassicNetToolchain, even if the host is Full Framework.
-                    // If it doesn't work because the user doesn't have dotnet SDK installed, they can manually use RoslynToolchain in their config.
                     return clrRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
                         ? GetToolchain(clrRuntime.RuntimeMoniker)
                         : CsProjClassicNetToolchain.From(clrRuntime.MsBuildMoniker);
