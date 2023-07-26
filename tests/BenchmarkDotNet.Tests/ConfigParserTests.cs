@@ -270,20 +270,30 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Theory]
-        [InlineData("netcoreapp2.0")]
-        [InlineData("netcoreapp2.1")]
-        [InlineData("netcoreapp2.2")]
-        [InlineData("netcoreapp3.0")]
-        public void DotNetCliParsedCorrectly(string tfm)
+        [InlineData("netcoreapp2.0", true)]
+        [InlineData("netcoreapp2.1", true)]
+        [InlineData("netcoreapp2.2", true)]
+        [InlineData("netcoreapp3.0", true)]
+        [InlineData("net462", false)]
+        [InlineData("net48", false)]
+        public void DotNetCliParsedCorrectly(string tfm, bool isCore)
         {
             var fakeDotnetCliPath = typeof(object).Assembly.Location;
             var config = ConfigParser.Parse(new[] { "-r", tfm, "--cli", fakeDotnetCliPath }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
-            CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
-            Assert.NotNull(toolchain);
+            var toolchain = config.GetJobs().Single().GetToolchain();
+            if (isCore)
+            {
+                Assert.True(toolchain is CsProjCoreToolchain);
+                Assert.Equal(fakeDotnetCliPath, ((CsProjCoreToolchain) toolchain).CustomDotNetCliPath);
+            }
+            else
+            {
+                Assert.True(toolchain is CsProjClassicNetToolchain);
+                Assert.Equal(fakeDotnetCliPath, ((CsProjClassicNetToolchain) toolchain).CustomDotNetCliPath);
+            }
             Assert.Equal(tfm, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
-            Assert.Equal(fakeDotnetCliPath, toolchain.CustomDotNetCliPath);
         }
 
         [Theory]

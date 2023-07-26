@@ -518,7 +518,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net481:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
-                        .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName));
+                        .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName, options.CliPath?.FullName));
 
                 case RuntimeMoniker.NetCoreApp20:
                 case RuntimeMoniker.NetCoreApp21:
