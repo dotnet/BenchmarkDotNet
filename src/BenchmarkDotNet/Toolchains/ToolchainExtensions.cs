@@ -27,15 +27,16 @@ namespace BenchmarkDotNet.Toolchains
                 ? toolchain
                 : GetToolchain(
                     job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance),
-                    descriptor);
+                    descriptor,
+                    job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic) || job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic));
 
-        internal static IToolchain GetToolchain(this Runtime runtime, Descriptor descriptor = null)
+        internal static IToolchain GetToolchain(this Runtime runtime, Descriptor descriptor = null, bool preferMsBuildToolchains = false)
         {
             switch (runtime)
             {
                 case ClrRuntime clrRuntime:
-                    if (RuntimeInformation.IsFullFramework &&
-                        // If dotnet SDK is not installed, we use RoslynToolchain (CsProjClassicNetToolchain currently does not support custom cli path).
+                    if (!preferMsBuildToolchains && RuntimeInformation.IsFullFramework &&
+                        // If dotnet SDK is not installed, we use RoslynToolchain.
                         (!HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled()
                         // Integration tests take too much time, because each benchmark run rebuilds the test suite and BenchmarkDotNet itself.
                         // To reduce the total duration of the CI workflows, we just use RoslynToolchain.

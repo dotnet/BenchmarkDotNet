@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("For some reason this test is unstable on Ubuntu for both AzureDevOps and Travis CI", EnvRequirement.NonLinux)]
         public void UserCanSpecifyCustomNuGetPackageDependency()
         {
-            var toolchain = RuntimeInformation.GetCurrentRuntime().GetToolchain();
+            var toolchain = RuntimeInformation.GetCurrentRuntime().GetToolchain(preferMsBuildToolchains: true);
 
             var job = Job.Dry.WithToolchain(toolchain).WithNuGet("Newtonsoft.Json", "13.0.2");
             var config = CreateSimpleConfig(job: job);
