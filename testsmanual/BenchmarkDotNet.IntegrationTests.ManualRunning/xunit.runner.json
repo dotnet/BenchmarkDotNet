@@ -1,0 +1,6 @@
+﻿{
+  "shadowCopy": false,
+  "methodDisplay": "method",
+  "diagnosticMessages": true,
+  "longRunningTestSeconds": 30
+}

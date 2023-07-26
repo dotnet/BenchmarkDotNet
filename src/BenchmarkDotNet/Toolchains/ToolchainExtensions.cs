@@ -41,7 +41,9 @@ namespace BenchmarkDotNet.Toolchains
                         // Integration tests take too much time, because each benchmark run rebuilds the test suite and BenchmarkDotNet itself.
                         // To reduce the total duration of the CI workflows, we just use RoslynToolchain.
                         || XUnitHelper.IsIntegrationTest.Value))
+                    {
                         return RoslynToolchain.Instance;
+                    }
 
                     return clrRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
                         ? GetToolchain(clrRuntime.RuntimeMoniker)
