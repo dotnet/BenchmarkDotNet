@@ -197,7 +197,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             [RankColumn, LogicalGroupColumn, BaselineColumn]
             [SimpleJob(id: "Job1"), SimpleJob(id: "Job2")]
-            [BenchmarkDotNet.Attributes.BenchmarkName(Name = "MyRenamedTestCase")]
+            [BenchmarkDotNet.Attributes.BenchmarkDescription(Description = "MyRenamedTestCase")]
             public class JobBaseline_RenameJob_MethodsJobs
             {
                 [Benchmark] public void Base() { }
