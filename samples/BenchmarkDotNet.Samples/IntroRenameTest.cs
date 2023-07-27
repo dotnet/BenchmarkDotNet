@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BenchmarkDotNet.Samples
 {
-    [BenchmarkName("Used to be 'IntroRenameTest', now is 'My Renamed Test'")]
+    [BenchmarkDescription("Used to be 'IntroRenameTest', now is 'My Renamed Test'")]
     public class IntroRenameTest
     {
         // And define a method with the Benchmark attribute
