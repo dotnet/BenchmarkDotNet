@@ -127,8 +127,10 @@ namespace BenchmarkDotNet.Running
                                                    GetTargetedMatchingMethod(methodInfo, iterationSetupMethods),
                                                    GetTargetedMatchingMethod(methodInfo, iterationCleanupMethods),
                                                    methodInfo.ResolveAttribute<BenchmarkAttribute>(),
+                                                   type.ResolveAttribute<BenchmarkDescriptionAttribute>(),
+                                                   methodInfo.ResolveAttribute<BenchmarkDescriptionAttribute>(),
                                                    targetMethods,
-                                                   config));
+                                                   config)) ;
         }
 
         private static MethodInfo GetTargetedMatchingMethod(MethodInfo benchmarkMethod, Tuple<MethodInfo, TargetedAttribute>[] methods)
@@ -155,10 +157,13 @@ namespace BenchmarkDotNet.Running
             MethodInfo iterationSetupMethod,
             MethodInfo iterationCleanupMethod,
             BenchmarkAttribute attr,
+            BenchmarkDescriptionAttribute descClass,
+            BenchmarkDescriptionAttribute descMethod,
             MethodInfo[] targetMethods,
             IConfig config)
         {
             var categoryDiscoverer = config.CategoryDiscoverer ?? DefaultCategoryDiscoverer.Instance;
+            var description = attr.Description ?? descMethod.Description ?? descClass.Description ?? methodInfo.Name;
             var target = new Descriptor(
                 type,
                 methodInfo,
@@ -166,7 +171,7 @@ namespace BenchmarkDotNet.Running
                 globalCleanupMethod,
                 iterationSetupMethod,
                 iterationCleanupMethod,
-                attr.Description,
+                description,
                 baseline: attr.Baseline,
                 categories: categoryDiscoverer.GetCategories(methodInfo),
                 operationsPerInvoke: attr.OperationsPerInvoke,
