@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -34,12 +35,19 @@ namespace BenchmarkDotNet.Toolchains
             switch (runtime)
             {
                 case ClrRuntime clrRuntime:
-                    if (RuntimeInformation.IsNetCore || preferMsBuildToolchains)
-                        return clrRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
-                            ? GetToolchain(clrRuntime.RuntimeMoniker)
-                            : CsProjClassicNetToolchain.From(clrRuntime.MsBuildMoniker);
+                    if (!preferMsBuildToolchains && RuntimeInformation.IsFullFramework &&
+                        // If dotnet SDK is not installed, we use RoslynToolchain.
+                        (!HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled()
+                        // Integration tests take too much time, because each benchmark run rebuilds the test suite and BenchmarkDotNet itself.
+                        // To reduce the total duration of the CI workflows, we just use RoslynToolchain.
+                        || XUnitHelper.IsIntegrationTest.Value))
+                    {
+                        return RoslynToolchain.Instance;
+                    }
 
-                    return RoslynToolchain.Instance;
+                    return clrRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
+                        ? GetToolchain(clrRuntime.RuntimeMoniker)
+                        : CsProjClassicNetToolchain.From(clrRuntime.MsBuildMoniker);
 
                 case MonoRuntime mono:
                     if (RuntimeInformation.IsAndroid())
