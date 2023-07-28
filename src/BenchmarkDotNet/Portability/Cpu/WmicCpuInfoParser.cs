@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
 using BenchmarkDotNet.Helpers;
-using JetBrains.Annotations;
 using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Portability.Cpu
 {
     internal static class WmicCpuInfoParser
     {
-        [NotNull]
-        internal static CpuInfo ParseOutput([CanBeNull] string content)
+        internal static CpuInfo ParseOutput(string? content)
         {
             var processors = SectionsHelper.ParseSections(content, '=');
 

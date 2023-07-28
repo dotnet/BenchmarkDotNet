@@ -127,7 +127,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             // Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.GetRuntimeIdentifier()
             // returns win10-x64, we want the simpler form win-x64
             // the values taken from https://docs.microsoft.com/en-us/dotnet/core/rid-catalog#macos-rids
-            string osPart = RuntimeInformation.IsWindows() ? "win" : (RuntimeInformation.IsMacOSX() ? "osx" : "linux");
+            string osPart = RuntimeInformation.IsWindows() ? "win" : (RuntimeInformation.IsMacOS() ? "osx" : "linux");
 
             string architecture =
 #if NETSTANDARD

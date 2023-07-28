@@ -33,6 +33,7 @@ namespace BenchmarkDotNet.Toolchains.Results
 
         internal readonly GcStats GcStats;
         internal readonly ThreadingStats ThreadingStats;
+        internal readonly double ExceptionFrequency;
         private readonly List<string> errors;
         private readonly List<Measurement> measurements;
 
@@ -48,10 +49,10 @@ namespace BenchmarkDotNet.Toolchains.Results
             ExitCode = exitCode;
             PrefixedLines = prefixedLines;
             StandardOutput = standardOutput;
-            Parse(results, prefixedLines, launchIndex, out measurements, out errors, out GcStats, out ThreadingStats);
+            Parse(results, prefixedLines, launchIndex, out measurements, out errors, out GcStats, out ThreadingStats, out ExceptionFrequency);
         }
 
-        internal ExecuteResult(List<Measurement> measurements, GcStats gcStats, ThreadingStats threadingStats)
+        internal ExecuteResult(List<Measurement> measurements, GcStats gcStats, ThreadingStats threadingStats, double exceptionFrequency)
         {
             FoundExecutable = true;
             ExitCode = 0;
@@ -60,15 +61,35 @@ namespace BenchmarkDotNet.Toolchains.Results
             this.measurements = measurements;
             GcStats = gcStats;
             ThreadingStats = threadingStats;
+            ExceptionFrequency = exceptionFrequency;
+        }
+
+        internal ExecuteResult(List<Measurement> measurements)
+        {
+            FoundExecutable = true;
+            ExitCode = 0;
+            errors = new List<string>();
+            PrefixedLines = Array.Empty<string>();
+            this.measurements = measurements;
+            GcStats = GcStats.Empty;
+            ThreadingStats = ThreadingStats.Empty;
+            ExceptionFrequency = 0;
         }
 
         internal static ExecuteResult FromRunResults(RunResults runResults, int exitCode)
             => exitCode != 0
                 ? CreateFailed(exitCode)
-                : new ExecuteResult(runResults.GetMeasurements().ToList(), runResults.GCStats, runResults.ThreadingStats);
+                : new ExecuteResult(runResults.GetAllMeasurements().ToList(), runResults.GCStats, runResults.ThreadingStats, runResults.ExceptionFrequency);
 
         internal static ExecuteResult CreateFailed(int exitCode = -1)
             => new ExecuteResult(false, exitCode, default, Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), 0);
+
+        internal static ExecuteResult CreateFailed(string error)
+        {
+            var result = new ExecuteResult(false, -1, default, Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), 0);
+            result.errors.Add(error);
+            return result;
+        }
 
         public override string ToString() => "ExecuteResult: " + (FoundExecutable ? "Found executable" : "Executable not found");
 
@@ -98,12 +119,13 @@ namespace BenchmarkDotNet.Toolchains.Results
         }
 
         private static void Parse(IReadOnlyList<string> results, IReadOnlyList<string> prefixedLines, int launchIndex, out List<Measurement> measurements,
-            out List<string> errors, out GcStats gcStats, out ThreadingStats threadingStats)
+            out List<string> errors, out GcStats gcStats, out ThreadingStats threadingStats, out double exceptionFrequency)
         {
             measurements = new List<Measurement>();
             errors = new List<string>();
             gcStats = default;
             threadingStats = default;
+            exceptionFrequency = 0;
 
             foreach (string line in results.Where(text => !string.IsNullOrEmpty(text)))
             {
@@ -127,6 +149,10 @@ namespace BenchmarkDotNet.Toolchains.Results
                 else if (line.StartsWith(ThreadingStats.ResultsLinePrefix))
                 {
                     threadingStats = ThreadingStats.Parse(line);
+                }
+                else if (line.StartsWith(ExceptionsStats.ResultsLinePrefix))
+                {
+                    exceptionFrequency = ExceptionsStats.Parse(line);
                 }
             }
 

@@ -50,8 +50,14 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             foreach (var hardwareCounter in validationParameters.Config.GetHardwareCounters())
             {
-                if (!EtwTranslations.TryGetValue(hardwareCounter, out var counterName))
-                    yield return new ValidationError(true, $"Counter {hardwareCounter} not recognized. Please make sure that you are using counter available on your machine. You can get the list of available counters by running `tracelog.exe -profilesources Help`");
+                if (!EtwTranslations.TryGetValue(hardwareCounter, out string counterName))
+                {
+                    yield return new ValidationError(true,
+                        $"Counter {hardwareCounter} not recognized. " +
+                        $"Please make sure that you are using counter available on your machine. " +
+                        $"You can get the list of available counters by running `tracelog.exe -profilesources Help`");
+                    continue;
+                }
 
                 if (!availableCpuCounters.ContainsKey(counterName))
                     yield return new ValidationError(true, $"The counter {counterName} is not available. Please make sure you are Windows 8+ without Hyper-V");

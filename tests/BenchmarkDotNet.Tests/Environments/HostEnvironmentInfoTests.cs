@@ -21,8 +21,8 @@ namespace BenchmarkDotNet.Tests.Environments
 
             string line = info.ToFormattedString().First();
 
-            string expected = $"{HostEnvironmentInfo.BenchmarkDotNetCaption}=v{info.BenchmarkDotNetVersion}, " +
-                              $"OS={info.OsVersion.Value}, VM={hypervisor.Name}";
+            string expected = $"{HostEnvironmentInfo.BenchmarkDotNetCaption} v{info.BenchmarkDotNetVersion}, " +
+                              $"{info.OsVersion.Value} ({hypervisor.Name})";
             Assert.Equal(expected, line);
         }
 
@@ -45,8 +45,8 @@ namespace BenchmarkDotNet.Tests.Environments
 
             string line = info.ToFormattedString().First();
 
-            string expected = $"{HostEnvironmentInfo.BenchmarkDotNetCaption}=v{info.BenchmarkDotNetVersion}, " +
-                              $"OS={info.OsVersion.Value}";
+            string expected = $"{HostEnvironmentInfo.BenchmarkDotNetCaption} v{info.BenchmarkDotNetVersion}, " +
+                              $"{info.OsVersion.Value}";
             Assert.Equal(expected, line);
         }
     }

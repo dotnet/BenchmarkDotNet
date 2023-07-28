@@ -22,14 +22,14 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public MultipleRuntimesTest(ITestOutputHelper outputHelper) => output = outputHelper;
 
-        [FactWindowsOnly("CLR is a valid job only on Windows")]
+        [FactEnvSpecific("CLR is a valid job only on Windows", EnvRequirement.WindowsOnly)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void SingleBenchmarkCanBeExecutedForMultipleRuntimes()
         {
             var summary = BenchmarkRunner
                 .Run<C>(
                     ManualConfig.CreateEmpty()
-                        .AddJob(Job.Dry.WithRuntime(CoreRuntime.Core60).WithPlatform(Platform.X64).WithId("Core"))
+                        .AddJob(Job.Dry.WithRuntime(CoreRuntime.Core70).WithPlatform(Platform.X64).WithId("Core"))
                         .AddJob(Job.Dry.WithRuntime(ClrRuntime.Net462).WithId("Framework"))
                         .AddColumnProvider(DefaultColumnProviders.Instance)
                         .AddLogger(new OutputLogger(output)));
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .Any());
 
             Assert.Contains(".NET Framework", summary.AllRuntimes);
-            Assert.Contains(".NET 6.0", summary.AllRuntimes);
+            Assert.Contains(".NET 7.0", summary.AllRuntimes);
         }
     }
 

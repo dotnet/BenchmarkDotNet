@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Environments
 
         protected HostEnvironmentInfo()
         {
-            BenchmarkDotNetVersion = BenchmarkDotNetInfo.FullVersion;
+            BenchmarkDotNetVersion = BenchmarkDotNetInfo.Instance.BrandVersion;
             OsVersion = new Lazy<string>(RuntimeInformation.GetOsVersion);
             CpuInfo = new Lazy<CpuInfo>(RuntimeInformation.GetCpuInfo);
             ChronometerFrequency = Chronometer.Frequency;
@@ -85,24 +85,24 @@ namespace BenchmarkDotNet.Environments
             string vmName = VirtualMachineHypervisor.Value?.Name;
 
             if (!string.IsNullOrEmpty(vmName))
-                yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}, VM={vmName}";
+                yield return $"{BenchmarkDotNetCaption} v{BenchmarkDotNetVersion}, {OsVersion.Value} ({vmName})";
             else if (RuntimeInformation.IsRunningInContainer)
-                yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value} (container)";
+                yield return $"{BenchmarkDotNetCaption} v{BenchmarkDotNetVersion}, {OsVersion.Value} (container)";
             else
-                yield return $"{BenchmarkDotNetCaption}=v{BenchmarkDotNetVersion}, OS={OsVersion.Value}";
+                yield return $"{BenchmarkDotNetCaption} v{BenchmarkDotNetVersion}, {OsVersion.Value}";
 
             yield return CpuInfoFormatter.Format(CpuInfo.Value);
             var cultureInfo = DefaultCultureInfo.Instance;
             if (HardwareTimerKind != HardwareTimerKind.Unknown)
-                yield return $"Frequency={ChronometerFrequency}, Resolution={ChronometerResolution.ToString(cultureInfo)}, Timer={HardwareTimerKind.ToString().ToUpper()}";
+                yield return $"Frequency: {ChronometerFrequency}, Resolution: {ChronometerResolution.ToString(cultureInfo)}, Timer: {HardwareTimerKind.ToString().ToUpper()}";
 
             if (RuntimeInformation.IsNetCore && IsDotNetCliInstalled())
             {
-                // this wonderfull version number contains words like "preview" and ... 5 segments so it can not be parsed by Version.Parse. Example: "5.0.100-preview.8.20362.3"
+                // this wonderful version number contains words like "preview" and ... 5 segments so it can not be parsed by Version.Parse. Example: "5.0.100-preview.8.20362.3"
                 if (int.TryParse(new string(DotNetSdkVersion.Value.TrimStart().TakeWhile(char.IsDigit).ToArray()), out int major) && major >= 5)
-                    yield return $".NET SDK={DotNetSdkVersion.Value}";
+                    yield return $".NET SDK {DotNetSdkVersion.Value}";
                 else
-                    yield return $".NET Core SDK={DotNetSdkVersion.Value}";
+                    yield return $".NET Core SDK {DotNetSdkVersion.Value}";
             }
         }
 

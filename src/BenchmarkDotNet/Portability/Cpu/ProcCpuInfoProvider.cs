@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Helpers;
-using JetBrains.Annotations;
 using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Portability.Cpu
@@ -12,47 +12,64 @@ namespace BenchmarkDotNet.Portability.Cpu
     /// </summary>
     internal static class ProcCpuInfoProvider
     {
-        internal static readonly Lazy<CpuInfo> ProcCpuInfo = new Lazy<CpuInfo>(Load);
+        internal static readonly Lazy<CpuInfo> ProcCpuInfo = new (Load);
 
-        [CanBeNull]
-        private static CpuInfo Load()
+        private static CpuInfo? Load()
         {
             if (RuntimeInformation.IsLinux())
             {
-                string content = ProcessHelper.RunAndReadOutput("cat", "/proc/cpuinfo");
-                string output = GetCpuSpeed();
-                content = content + output;
+                string content = ProcessHelper.RunAndReadOutput("cat", "/proc/cpuinfo") ?? "";
+                string output = GetCpuSpeed() ?? "";
+                content += output;
                 return ProcCpuInfoParser.ParseOutput(content);
             }
             return null;
         }
 
-        private static string GetCpuSpeed()
+        private static string? GetCpuSpeed()
         {
-            var output = ProcessHelper.RunAndReadOutput("/bin/bash", "-c \"lscpu | grep MHz\"")?
-                                      .Split('\n')
-                                      .SelectMany(x => x.Split(':'))
-                                      .ToArray();
+            try
+            {
+                string[]? output = ProcessHelper.RunAndReadOutput("/bin/bash", "-c \"lscpu | grep MHz\"")?
+                    .Split('\n')
+                    .SelectMany(x => x.Split(':'))
+                    .ToArray();
 
-            return ParseCpuFrequencies(output);
+                return ParseCpuFrequencies(output);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
-        private static string ParseCpuFrequencies(string[] input)
+        private static string? ParseCpuFrequencies(string[]? input)
         {
             // Example of output we trying to parse:
             //
             // CPU MHz: 949.154
             // CPU max MHz: 3200,0000
             // CPU min MHz: 800,0000
-            //
-            // And we don't need "CPU MHz" line
-            if (input == null || input.Length < 6)
+
+            if (input == null)
                 return null;
 
-            Frequency.TryParseMHz(input[3].Trim().Replace(',', '.'), out var minFrequency);
-            Frequency.TryParseMHz(input[5].Trim().Replace(',', '.'), out var maxFrequency);
+            var output = new StringBuilder();
+            for (int i = 0; i + 1 < input.Length; i += 2)
+            {
+                string name = input[i].Trim();
+                string value = input[i + 1].Trim();
 
-            return $"\n{ProcCpuInfoKeyNames.MinFrequency}\t:{minFrequency.ToMHz()}\n{ProcCpuInfoKeyNames.MaxFrequency}\t:{maxFrequency.ToMHz()}\n";
+                if (name.EqualsWithIgnoreCase("CPU min MHz"))
+                    if (Frequency.TryParseMHz(value.Replace(',', '.'), out var minFrequency))
+                        output.Append($"\n{ProcCpuInfoKeyNames.MinFrequency}\t:{minFrequency.ToMHz()}");
+
+                if (name.EqualsWithIgnoreCase("CPU max MHz"))
+                    if (Frequency.TryParseMHz(value.Replace(',', '.'), out var maxFrequency))
+                        output.Append($"\n{ProcCpuInfoKeyNames.MaxFrequency}\t:{maxFrequency.ToMHz()}");
+            }
+
+            return output.ToString();
         }
     }
 }

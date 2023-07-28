@@ -23,6 +23,12 @@ namespace BenchmarkDotNet.Engines
         internal List<Measurement> Run(IStoppingCriteria criteria, long invokeCount, IterationMode mode, IterationStage stage, int unrollFactor)
         {
             var measurements = new List<Measurement>(criteria.MaxIterationCount);
+            if (criteria.Evaluate(measurements).IsFinished)
+            {
+                WriteLine();
+                return measurements;
+            }
+
             int iterationCounter = 0;
             while (true)
             {

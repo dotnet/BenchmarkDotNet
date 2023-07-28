@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text;
+using System.Xml;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -42,28 +43,27 @@ namespace BenchmarkDotNet.Toolchains.MonoWasm
             BenchmarkCase benchmark = buildPartition.RepresentativeBenchmarkCase;
             var projectFile = GetProjectFilePath(benchmark.Descriptor.Type, logger);
 
-            WasmRuntime runtime = (WasmRuntime)buildPartition.Runtime;
+            WasmRuntime runtime = (WasmRuntime) buildPartition.Runtime;
 
-            using (var file = new StreamReader(File.OpenRead(projectFile.FullName)))
-            {
-                var (customProperties, sdkName) = GetSettingsThatNeedsToBeCopied(file, projectFile);
+            var xmlDoc = new XmlDocument();
+            xmlDoc.Load(projectFile.FullName);
+            var (customProperties, sdkName) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
 
-                string content = new StringBuilder(ResourceHelper.LoadTemplate("WasmCsProj.txt"))
-                    .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
-                    .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
-                    .Replace("$RUN_AOT$", aot.ToString().ToLower())
-                    .Replace("$CSPROJPATH$", projectFile.FullName)
-                    .Replace("$TFM$", TargetFrameworkMoniker)
-                    .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
-                    .Replace("$COPIEDSETTINGS$", customProperties)
-                    .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
-                    .Replace("$SDKNAME$", sdkName)
-                    .Replace("$WASMDATADIR$", runtime.WasmDataDir)
-                    .Replace("$TARGET$", CustomRuntimePack != null ? "PublishWithCustomRuntimePack" : "Publish")
-                .ToString();
+            string content = new StringBuilder(ResourceHelper.LoadTemplate("WasmCsProj.txt"))
+                .Replace("$PLATFORM$", buildPartition.Platform.ToConfig())
+                .Replace("$CODEFILENAME$", Path.GetFileName(artifactsPaths.ProgramCodePath))
+                .Replace("$RUN_AOT$", aot.ToString().ToLower())
+                .Replace("$CSPROJPATH$", projectFile.FullName)
+                .Replace("$TFM$", TargetFrameworkMoniker)
+                .Replace("$PROGRAMNAME$", artifactsPaths.ProgramName)
+                .Replace("$COPIEDSETTINGS$", customProperties)
+                .Replace("$CONFIGURATIONNAME$", buildPartition.BuildConfiguration)
+                .Replace("$SDKNAME$", sdkName)
+                .Replace("$WASMDATADIR$", runtime.WasmDataDir)
+                .Replace("$TARGET$", CustomRuntimePack != null ? "PublishWithCustomRuntimePack" : "Publish")
+            .ToString();
 
-                File.WriteAllText(artifactsPaths.ProjectFilePath, content);
-            }
+            File.WriteAllText(artifactsPaths.ProjectFilePath, content);
         }
 
         protected override string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, MainJS);

@@ -7,7 +7,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
 {
@@ -22,8 +21,7 @@ namespace BenchmarkDotNet.Running
             logger.WriteError("No benchmarks to choose from. Make sure you provided public non-sealed non-static types with public [Benchmark] methods.");
         }
 
-        [NotNull]
-        public IReadOnlyList<Type> AskUser([NotNull] IReadOnlyList<Type> allTypes, ILogger logger)
+        public IReadOnlyList<Type> AskUser(IReadOnlyList<Type> allTypes, ILogger logger)
         {
             var selectedTypes = new List<Type>();
             string benchmarkCaptionExample = allTypes.First().GetDisplayName();
@@ -39,6 +37,7 @@ namespace BenchmarkDotNet.Running
                 logger.WriteLineHelp($"You should select the target benchmark(s). Please, print a number of a benchmark (e.g. `0`) or a contained benchmark caption (e.g. `{benchmarkCaptionExample}`).");
                 logger.WriteLineHelp("If you want to select few, please separate them with space ` ` (e.g. `1 2 3`).");
                 logger.WriteLineHelp($"You can also provide the class name in console arguments by using --filter. (e.g. `{filterExample}`).");
+                logger.WriteLineHelp($"Enter the asterisk `*` to select all.");
 
                 string userInput = Console.ReadLine();
                 if (userInput == null)
@@ -53,7 +52,7 @@ namespace BenchmarkDotNet.Running
             return selectedTypes;
         }
 
-        public void PrintWrongFilterInfo(IReadOnlyList<Type> allTypes, ILogger logger, [NotNull] string[] userFilters)
+        public void PrintWrongFilterInfo(IReadOnlyList<Type> allTypes, ILogger logger, string[] userFilters)
         {
             var correctionSuggester = new CorrectionsSuggester(allTypes);
 
@@ -90,21 +89,26 @@ namespace BenchmarkDotNet.Running
             if (userInput.IsEmpty())
                 yield break;
 
+            var integerInput = userInput.Where(arg => IsInteger(arg)).ToArray();
+            var stringInput = userInput.Where(arg => !IsInteger(arg)).ToArray();
+
             for (int i = 0; i < allTypes.Count; i++)
             {
                 var type = allTypes[i];
 
-                if (userInput.Any(arg => type.GetDisplayName().ContainsWithIgnoreCase(arg))
-                    || userInput.Contains($"#{i}")
-                    || userInput.Contains(i.ToString())
-                    || userInput.Contains("*"))
+                if (stringInput.Any(arg => type.GetDisplayName().ContainsWithIgnoreCase(arg))
+                    || stringInput.Contains($"#{i}")
+                    || integerInput.Contains($"{i}")
+                    || stringInput.Contains("*"))
                 {
                     yield return type;
                 }
             }
+
+            static bool IsInteger(string str) => int.TryParse(str, out _);
         }
 
-        private static void PrintAvailable([NotNull] IReadOnlyList<Type> allTypes, ILogger logger)
+        private static void PrintAvailable(IReadOnlyList<Type> allTypes, ILogger logger)
         {
             logger.WriteLineHelp($"Available Benchmark{(allTypes.Count > 1 ? "s" : "")}:");
 

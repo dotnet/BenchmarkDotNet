@@ -1,6 +1,7 @@
-﻿using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Loggers;
+﻿using System.Collections.Generic;
+using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains
@@ -13,6 +14,6 @@ namespace BenchmarkDotNet.Toolchains
         IExecutor Executor { get; }
         bool IsInProcess { get; }
 
-        bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger, IResolver resolver);
+        IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase, IResolver resolver);
     }
 }

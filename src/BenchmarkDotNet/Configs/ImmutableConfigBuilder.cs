@@ -7,6 +7,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Configs
@@ -26,7 +27,9 @@ namespace BenchmarkDotNet.Configs
             ConfigValidator.DontFailOnError,
             ShadowCopyValidator.DontFailOnError,
             JitOptimizationsValidator.DontFailOnError,
-            DeferredExecutionValidator.DontFailOnError
+            DeferredExecutionValidator.DontFailOnError,
+            ParamsAllValuesValidator.FailOnError,
+            ParamsValidator.FailOnError
         };
 
         /// <summary>
@@ -38,7 +41,7 @@ namespace BenchmarkDotNet.Configs
             var uniqueLoggers = source.GetLoggers().ToImmutableHashSet();
             var configAnalyse = new List<Conclusion>();
 
-            var uniqueHardwareCounters = source.GetHardwareCounters().ToImmutableHashSet();
+            var uniqueHardwareCounters = source.GetHardwareCounters().Where(counter => counter != HardwareCounter.NotSet).ToImmutableHashSet();
             var uniqueDiagnosers = GetDiagnosers(source.GetDiagnosers(), uniqueHardwareCounters);
             var uniqueExporters = GetExporters(source.GetExporters(), uniqueDiagnosers, configAnalyse);
             var uniqueAnalyzers = GetAnalysers(source.GetAnalysers(), uniqueDiagnosers);
@@ -69,6 +72,7 @@ namespace BenchmarkDotNet.Configs
                 source.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath,
                 source.CultureInfo,
                 source.Orderer ?? DefaultOrderer.Instance,
+                source.CategoryDiscoverer ?? DefaultCategoryDiscoverer.Instance,
                 source.SummaryStyle ?? SummaryStyle.Default,
                 source.Options,
                 source.BuildTimeout,
@@ -129,7 +133,7 @@ namespace BenchmarkDotNet.Configs
                         AddWarning($"The exporter {exporterType} of {diagnoser.GetType().Name} is already present in configuration. There may be unexpected results.");
                     }
                     mergeDictionary[exporterType] = exporter;
-                };
+                }
 
             var result = mergeDictionary.Values.ToList();
 
@@ -216,7 +220,7 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         private static IReadOnlyList<Job> GetRunnableJobs(IEnumerable<Job> jobs)
         {
-            var unique = jobs.Distinct().ToArray();
+            var unique = jobs.Distinct(JobComparer.Instance).ToArray();
             var result = new List<Job>();
 
             foreach (var standardJob in unique.Where(job => !job.Meta.IsMutator && !job.Meta.IsDefault))

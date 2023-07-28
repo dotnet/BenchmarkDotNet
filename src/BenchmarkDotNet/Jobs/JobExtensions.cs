@@ -315,7 +315,7 @@ namespace BenchmarkDotNet.Jobs
         /// <param name="key">The key of the new environment variable</param>
         /// <param name="value">The value of the new environment variable</param>
         /// <returns>The new job with additional environment variable</returns>
-        public static Job WithEnvironmentVariable(this Job job, [NotNull] string key, [NotNull] string value)
+        public static Job WithEnvironmentVariable(this Job job, string key, string value)
             => job.WithEnvironmentVariable(new EnvironmentVariable(key, value));
 
         /// <summary>

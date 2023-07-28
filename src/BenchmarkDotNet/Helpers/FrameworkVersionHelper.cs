@@ -39,17 +39,17 @@ namespace BenchmarkDotNet.Helpers
         internal static string MapToReleaseVersion(string servicingVersion)
         {
             // the following code assumes that .NET 4.6.1 is the oldest supported version
-            if (string.Compare(servicingVersion, "4.6.2") < 0)
+            if (string.CompareOrdinal(servicingVersion, "4.6.2") < 0)
                 return "4.6.1";
-            if (string.Compare(servicingVersion, "4.7") < 0)
+            if (string.CompareOrdinal(servicingVersion, "4.7") < 0)
                 return "4.6.2";
-            if (string.Compare(servicingVersion, "4.7.1") < 0)
+            if (string.CompareOrdinal(servicingVersion, "4.7.1") < 0)
                 return "4.7";
-            if (string.Compare(servicingVersion, "4.7.2") < 0)
+            if (string.CompareOrdinal(servicingVersion, "4.7.2") < 0)
                 return "4.7.1";
-            if (string.Compare(servicingVersion, "4.8") < 0)
+            if (string.CompareOrdinal(servicingVersion, "4.8") < 0)
                 return "4.7.2";
-            if (string.Compare(servicingVersion, "4.8.9") < 0)
+            if (string.CompareOrdinal(servicingVersion, "4.8.9") < 0)
                 return "4.8";
 
             return "4.8.1"; // most probably the last major release of Full .NET Framework

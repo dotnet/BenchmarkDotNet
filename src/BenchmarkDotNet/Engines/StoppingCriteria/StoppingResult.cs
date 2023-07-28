@@ -1,21 +1,18 @@
-using JetBrains.Annotations;
-
 namespace BenchmarkDotNet.Engines
 {
     public struct StoppingResult
     {
         public readonly bool IsFinished;
 
-        [CanBeNull]
-        public readonly string Message;
+        public readonly string? Message;
 
-        private StoppingResult(bool isFinished, [CanBeNull] string message)
+        private StoppingResult(bool isFinished, string? message)
         {
             IsFinished = isFinished;
             Message = message;
         }
 
         public static readonly StoppingResult NotFinished = new StoppingResult(false, null);
-        public static StoppingResult CreateFinished([NotNull] string message) => new StoppingResult(true, message);
+        public static StoppingResult CreateFinished(string message) => new StoppingResult(true, message);
     }
 }

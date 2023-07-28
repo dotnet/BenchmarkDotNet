@@ -16,59 +16,75 @@
     <ComVisible>false</ComVisible>
 
     <UseSharedCompilation>false</UseSharedCompilation>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <SuppressNETCoreSdkPreviewMessage>True</SuppressNETCoreSdkPreviewMessage>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodingStyle.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)package-icon.png" Pack="True" PackagePath="" />
+    <None Include="$(MSBuildThisFileDirectory)package-icon.png" Pack="True" PackagePath=""/>
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)strongNameKey.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition=" '$(IsVisualBasic)' != 'true' AND '$(IsFsharp)' != 'true' ">
-    <LangVersion>9.0</LangVersion>
-    
-    <Major>0</Major>
-    <Minor>13</Minor>
-    <Revision>2</Revision>
-
-    <BuildNumber Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' ">$(APPVEYOR_BUILD_NUMBER)</BuildNumber>
-    <BuildNumber Condition=" '$(BuildNumber)' == '' ">0</BuildNumber>
-
-    <PrereleaseLabel>-develop</PrereleaseLabel>
-    <PrereleaseLabel Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' "></PrereleaseLabel>
-    <!-- <PrereleaseLabel></PrereleaseLabel> --> <!-- For release versions only -->
-
-    <PrereleaseLabelConstants></PrereleaseLabelConstants>
-    <PrereleaseLabelConstants Condition=" '$(PrereleaseLabel)' == '-develop' ">PRERELEASE_DEVELOP</PrereleaseLabelConstants>
-    <PrereleaseLabelConstants Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' ">PRERELEASE_NIGHTLY</PrereleaseLabelConstants>
-    <DefineConstants>$(DefineConstants);$(PrereleaseLabelConstants)</DefineConstants>
-
-    <AssemblyVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)</AssemblyVersion>
-    <AssemblyFileVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)</AssemblyFileVersion>
-    <InformationalVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)$(PrereleaseLabel)</InformationalVersion>
-    <PackageVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)$(PrereleaseLabel)</PackageVersion>
+    <LangVersion>11.0</LangVersion>
   </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(VersionPrefix)' == '' ">
+    <VersionPrefix>0.13.7</VersionPrefix>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(NoVersionSuffix)' == '' AND '$(VersionSuffix)' == '' ">
+    <VersionSuffix>develop</VersionSuffix>
+    <VersionSuffix Condition=" '$(BDN_CI_BUILD)' != '' ">ci</VersionSuffix>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
+    <AssemblyFileVersion>$(VersionPrefix)</AssemblyFileVersion>
+    <InformationalVersion>$(Version)</InformationalVersion>
+    <PackageVersion>$(Version)</PackageVersion>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup >
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.4">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
+
+  <UsingTask TaskName="ReplaceFileText"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <InputFilename ParameterType="System.String" Required="true" />
+      <OutputFilename ParameterType="System.String" Required="true" />
+      <MatchExpression ParameterType="System.String" Required="true" />
+      <ReplacementText ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+            File.WriteAllText(
+                OutputFilename,
+                Regex.Replace(File.ReadAllText(InputFilename), MatchExpression, ReplacementText)
+                );
+          ]]>
+      </Code>
+    </Task>
+  </UsingTask>
 </Project>

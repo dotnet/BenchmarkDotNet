@@ -8,6 +8,8 @@ namespace BenchmarkDotNet.Columns
 {
     public class MetricColumn : IColumn
     {
+        internal const string UnknownRepresentation = "?";
+
         private readonly IMetricDescriptor descriptor;
 
         public MetricColumn(IMetricDescriptor metricDescriptor) => descriptor = metricDescriptor;
@@ -23,13 +25,19 @@ namespace BenchmarkDotNet.Columns
 
         public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
 
-        public bool IsAvailable(Summary summary) => summary.Reports.Any(report => report.Metrics.ContainsKey(descriptor.Id));
+        public bool IsAvailable(Summary summary) => summary.Reports.Any(report =>
+                report.Metrics.TryGetValue(descriptor.Id, out var metric)
+                && metric.Descriptor.GetIsAvailable(metric));
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase) => GetValue(summary, benchmarkCase, SummaryStyle.Default);
 
         public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style)
         {
-            if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase].Metrics.TryGetValue(descriptor.Id, out Metric metric) || (metric.Value == 0.0 && !style.PrintZeroValuesInContent))
+            if (!summary.HasReport(benchmarkCase) || !summary[benchmarkCase].Metrics.TryGetValue(descriptor.Id, out Metric metric))
+                return "NA";
+            if (double.IsNaN(metric.Value))
+                return UnknownRepresentation;
+            if (metric.Value == 0.0 && !style.PrintZeroValuesInContent)
                 return "-";
 
             var cultureInfo = summary.GetCultureInfo();
@@ -38,9 +46,9 @@ namespace BenchmarkDotNet.Columns
             UnitPresentation unitPresentation = UnitPresentation.FromVisibility(style.PrintUnitsInContent);
 
             if (printUnits && descriptor.UnitType == UnitType.CodeSize)
-                return SizeValue.FromBytes((long)metric.Value).ToString(style.CodeSizeUnit, cultureInfo, descriptor.NumberFormat, unitPresentation);
+                return SizeValue.FromBytes((long) metric.Value).ToString(style.CodeSizeUnit, cultureInfo, descriptor.NumberFormat, unitPresentation);
             if (printUnits && descriptor.UnitType == UnitType.Size)
-                return SizeValue.FromBytes((long)metric.Value).ToString(style.SizeUnit, cultureInfo, descriptor.NumberFormat, unitPresentation);
+                return SizeValue.FromBytes((long) metric.Value).ToString(style.SizeUnit, cultureInfo, descriptor.NumberFormat, unitPresentation);
             if (printUnits && descriptor.UnitType == UnitType.Time)
                 return TimeInterval.FromNanoseconds(metric.Value).ToString(style.TimeUnit, cultureInfo, descriptor.NumberFormat, unitPresentation);
 

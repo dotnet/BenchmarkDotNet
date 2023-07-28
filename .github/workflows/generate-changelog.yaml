@@ -1,0 +1,35 @@
+name: generate-changelog
+run-name: Generate changelog / ${{ github.event.head_commit.message }}
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: master
+
+    - name: Download changelog
+      run: ./build.cmd docs-update --depth 1 --preview
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Push changelog
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: docs-changelog-details
+        FOLDER: docs/_changelog/details
+        GIT_CONFIG_NAME: Andrey Akinshin
+        GIT_CONFIG_EMAIL: andrey.akinshin@gmail.com
+        CLEAN: true

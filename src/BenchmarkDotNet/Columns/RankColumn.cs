@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Columns
                 .ToArray();
             int index = Array.IndexOf(logicalGroup, benchmarkCase);
             if (index == -1)
-                return "?";
+                return MetricColumn.UnknownRepresentation;
 
             var ranks = RankHelper.GetRanks(logicalGroup.Select(b => summary[b].ResultStatistics).ToArray());
             int rank = ranks[index];

@@ -4,7 +4,6 @@ using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
 {
@@ -59,7 +58,7 @@ namespace BenchmarkDotNet.Running
 
         public override string ToString() => DisplayInfo;
 
-        private static string FormatDescription([CanBeNull] string description)
+        private static string FormatDescription(string? description)
         {
             var specialSymbols = new[] { ' ', '\'', '[', ']' };
             return description != null && specialSymbols.Any(description.Contains)

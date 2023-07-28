@@ -20,6 +20,19 @@ namespace BenchmarkDotNet.Tests.Configs
     public class ImmutableConfigTests
     {
         [Fact]
+        public void DuplicateJobsAreExcluded()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+
+            mutable.AddJob(new Job());
+            mutable.AddJob(new Job());
+
+            var final = ImmutableConfigBuilder.Create(mutable);
+
+            Assert.Single(final.GetJobs());
+        }
+
+        [Fact]
         public void DuplicateColumnProvidersAreExcluded()
         {
             var mutable = ManualConfig.CreateEmpty();
@@ -58,7 +71,23 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Equal(HardwareCounter.CacheMisses, final.GetHardwareCounters().Single());
         }
 
-        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because NativeAOT compiler goes crazy when some dependency has reference to TraceEvent...")]
+        [Fact]
+        public void NoSetHardwareCounterIsExcluded()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+
+            mutable.AddHardwareCounters(HardwareCounter.NotSet);
+            mutable.AddHardwareCounters(HardwareCounter.CacheMisses);
+
+            var final = ImmutableConfigBuilder.Create(mutable);
+
+            Assert.Single(final.GetHardwareCounters());
+            Assert.Equal(HardwareCounter.CacheMisses, final.GetHardwareCounters().Single());
+        }
+
+        [FactEnvSpecific(
+            "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because NativeAOT compiler goes crazy when some dependency has reference to TraceEvent...",
+            EnvRequirement.FullFrameworkOnly)]
         public void WhenUserDefinesHardwareCountersWeChooseTheRightDiagnoser()
         {
             var mutable = ManualConfig.CreateEmpty();
@@ -71,7 +100,9 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Single(final.GetDiagnosers().OfType<IHardwareCountersDiagnoser>());
         }
 
-        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because NativeAOT compiler goes crazy when some dependency has reference to TraceEvent...")]
+        [FactEnvSpecific(
+            "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because NativeAOT compiler goes crazy when some dependency has reference to TraceEvent...",
+            EnvRequirement.FullFrameworkOnly)]
         public void WhenUserDefinesHardwareCountersAndUsesDisassemblyDiagnoserWeAddInstructionPointerExporter()
         {
             var mutable = ManualConfig.CreateEmpty();
@@ -397,7 +428,7 @@ namespace BenchmarkDotNet.Tests.Configs
 
                 var final = ImmutableConfigBuilder.Create(mutable);
 
-                Assert.Equal(1, final.ConfigAnalysisConclusion.Count);
+                Assert.Single(final.ConfigAnalysisConclusion);
             }
             finally
             {

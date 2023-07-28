@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.XUnit;
@@ -14,17 +15,15 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public NativeAotTests(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
-        [FactDotNetCoreOnly("It's impossible to reliably detect the version of NativeAOT if the process is not a .NET Core or NativeAOT process")]
+        [FactEnvSpecific("It's impossible to reliably detect the version of NativeAOT if the process is not a .NET Core or NativeAOT process", EnvRequirement.DotNetCoreOnly)]
         public void LatestNativeAotVersionIsSupported()
         {
             if (!RuntimeInformation.Is64BitPlatform()) // NativeAOT does not support 32bit yet
                 return;
             if (ContinuousIntegration.IsGitHubActionsOnWindows()) // no native dependencies installed
                 return;
-            if (ContinuousIntegration.IsAppVeyorOnWindows()) // too time consuming for AppVeyor (1h limit)
-                return;
-            if (NativeAotRuntime.GetCurrentVersion().RuntimeMoniker < RuntimeMoniker.NativeAot70) // we can't target net6.0 and use .NET 7 ILCompiler anymore (#2080)
-                return;
+            if (RuntimeInformation.IsMacOS())
+                return; // currently not supported
 
             var toolchain = NativeAotToolchain.CreateBuilder().UseNuGet().IlcInstructionSet(IsAvx2Supported() ? "avx2" : "").ToToolchain();
 
@@ -34,7 +33,17 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithToolchain(toolchain)
                     .WithEnvironmentVariable(NativeAotBenchmark.EnvVarKey, IsAvx2Supported().ToString().ToLower()));
 
-            CanExecute<NativeAotBenchmark>(config);
+            try
+            {
+                CanExecute<NativeAotBenchmark>(config);
+            }
+            catch (MisconfiguredEnvironmentException e)
+            {
+                if (ContinuousIntegration.IsLocalRun())
+                    Output.WriteLine(e.SkipMessage);
+                else
+                    throw;
+            }
         }
 
         private bool IsAvx2Supported()

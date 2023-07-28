@@ -37,6 +37,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('t', "threading", Required = false, Default = false, HelpText = "Prints threading statistics")]
         public bool UseThreadingDiagnoser { get; set; }
 
+        [Option("exceptions", Required = false, Default = false, HelpText = "Prints exception statistics")]
+        public bool UseExceptionDiagnoser { get; set; }
+
         [Option('d', "disasm", Required = false, Default = false, HelpText = "Gets disassembly of benchmarked code")]
         public bool UseDisassemblyDiagnoser
         {
@@ -214,6 +217,12 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         [Option("noForcedGCs", Required = false, HelpText = "Specifying would not forcefully induce any GCs.")]
         public bool NoForcedGCs { get; set; }
+
+        [Option("noOverheadEvaluation", Required = false, HelpText = "Specifying would not run the evaluation overhead iterations.")]
+        public bool NoEvaluationOverhead { get; set; }
+
+        [Option("resume", Required = false, Default = false, HelpText = "Continue the execution if the last run was stopped.")]
+        public bool Resume { get; set; }
 
         internal bool UserProvidedFilters => Filters.Any() || AttributeNames.Any() || AllCategories.Any() || AnyCategories.Any();
 

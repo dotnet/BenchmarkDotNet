@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <AssemblyTitle>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</AssemblyTitle>
+    <!-- We test the oldest frameworks supported by BDN (net461 and netcoreapp2.0), as well as newer versions of those frameworks. -->
+    <TargetFrameworks>net461;net48;netcoreapp2.0;net7.0</TargetFrameworks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</AssemblyName>
+    <PackageId>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</PackageId>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\BenchmarkTestExecutor.cs" Link="BenchmarkTestExecutor.cs" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Xunit\MisconfiguredEnvironmentException.cs" Link="MisconfiguredEnvironmentException.cs" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Xunit\Extensions.cs" Link="Extensions.cs" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\TestConfigs.cs" Link="TestConfigs.cs" />
+    <Compile Include="..\BenchmarkDotNet.Tests\Loggers\OutputLogger.cs" Link="OutputLogger.cs" />
+    <Compile Include="..\BenchmarkDotNet.Tests\XUnit\SmartAssert.cs" Link="SmartAssert.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETCore.Platforms" Version="5.0.0" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\BenchmarkDotNet.IntegrationTests.ManualRunning\xunit.runner.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Annotations\BenchmarkDotNet.Annotations.csproj" />
+    <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Microsoft.NET.Test.Sdk breaks netcoreapp2.0 -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.3" Condition=" '$(TargetFramework)' != 'netcoreapp2.0' " />
+    <PackageReference Include="xunit" Version="2.5.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

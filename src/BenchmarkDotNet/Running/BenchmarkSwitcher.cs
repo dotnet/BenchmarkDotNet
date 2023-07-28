@@ -53,15 +53,29 @@ namespace BenchmarkDotNet.Running
         /// <summary>
         /// Run all available benchmarks.
         /// </summary>
-        [PublicAPI] public IEnumerable<Summary> RunAll(IConfig config = null) => Run(new[] { "--filter", "*" }, config);
+        [PublicAPI] public IEnumerable<Summary> RunAll(IConfig? config = null, string[]? args = null)
+        {
+            args ??= Array.Empty<string>();
+            if (ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = new[] { "*" }))
+                args = updatedArgs;
+
+            return Run(args, config);
+        }
 
         /// <summary>
         /// Run all available benchmarks and join them to a single summary
         /// </summary>
-        [PublicAPI] public Summary RunAllJoined(IConfig config = null) => Run(new[] { "--filter", "*", "--join" }, config).Single();
+        [PublicAPI] public Summary RunAllJoined(IConfig? config = null, string[]? args = null)
+        {
+            args ??= Array.Empty<string>();
+            if (ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => (options.Join, options.Filters) = (true, new[] { "*" })))
+                args = updatedArgs;
+
+            return Run(args, config).Single();
+        }
 
         [PublicAPI]
-        public IEnumerable<Summary> Run(string[] args = null, IConfig config = null)
+        public IEnumerable<Summary> Run(string[]? args = null, IConfig? config = null)
         {
             // VS generates bad assembly binding redirects for ValueTuple for Full .NET Framework
             // we need to keep the logic that uses it in a separate method and create DirtyAssemblyResolveHelper first
@@ -71,7 +85,7 @@ namespace BenchmarkDotNet.Running
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[] args, IConfig config, bool askUserForInput)
+        internal IEnumerable<Summary> RunWithDirtyAssemblyResolveHelper(string[]? args, IConfig? config, bool askUserForInput)
         {
             var notNullArgs = args ?? Array.Empty<string>();
             var notNullConfig = config ?? DefaultConfig.Instance;
@@ -114,7 +128,7 @@ namespace BenchmarkDotNet.Running
 
             if (effectiveConfig.Options.HasFlag(ConfigOptions.ApplesToApples))
             {
-                return ApplesToApples(effectiveConfig, benchmarksToFilter, logger, options);
+                return ApplesToApples(ImmutableConfigBuilder.Create(effectiveConfig), benchmarksToFilter, logger, options);
             }
 
             var filteredBenchmarks = TypeFilter.Filter(effectiveConfig, benchmarksToFilter);
@@ -140,7 +154,7 @@ namespace BenchmarkDotNet.Running
             printer.Print(testNames, nonNullLogger);
         }
 
-        private IEnumerable<Summary> ApplesToApples(ManualConfig effectiveConfig, IReadOnlyList<Type> benchmarksToFilter, ILogger logger, CommandLineOptions options)
+        private IEnumerable<Summary> ApplesToApples(ImmutableConfig effectiveConfig, IReadOnlyList<Type> benchmarksToFilter, ILogger logger, CommandLineOptions options)
         {
             var jobs = effectiveConfig.GetJobs().ToArray();
             if (jobs.Length <= 1)

@@ -28,21 +28,21 @@ namespace BenchmarkDotNet.Columns
         [Pure] public static SizeValue operator *(SizeValue value, long k) => new SizeValue(value.Bytes * k);
         [Pure] public static SizeValue operator *(long k, SizeValue value) => new SizeValue(value.Bytes * k);
 
-        [Pure, NotNull]
+        [Pure]
         public string ToString(
-            [CanBeNull] CultureInfo cultureInfo,
-            [CanBeNull] string format = "0.##",
-            [CanBeNull] UnitPresentation unitPresentation = null)
+            CultureInfo? cultureInfo,
+            string? format = "0.##",
+            UnitPresentation? unitPresentation = null)
         {
             return ToString(null, cultureInfo, format, unitPresentation);
         }
 
-        [Pure, NotNull]
+        [Pure]
         public string ToString(
-            [CanBeNull] SizeUnit sizeUnit,
-            [CanBeNull] CultureInfo cultureInfo,
-            [CanBeNull] string format = "0.##",
-            [CanBeNull] UnitPresentation unitPresentation = null)
+            SizeUnit? sizeUnit,
+            CultureInfo? cultureInfo,
+            string? format = "0.##",
+            UnitPresentation? unitPresentation = null)
         {
             sizeUnit = sizeUnit ?? SizeUnit.GetBestSizeUnit(Bytes);
             cultureInfo = cultureInfo ?? DefaultCultureInfo.Instance;

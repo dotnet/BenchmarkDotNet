@@ -13,26 +13,49 @@ namespace BenchmarkDotNet.Loggers
 
         public void Write(LogKind logKind, string text)
         {
-            foreach (var logger in loggers)
-                logger.Write(logKind, text);
+            // BenchmarkRunner uses a single instance of CompositeLogger,
+            // it passes it as ILogger to various components, which may use it in parallel.
+            // We need to acquire the lock to avoid race conditions like #2125 and #2264
+            lock (this)
+            {
+                foreach (var logger in loggers)
+                {
+                    logger.Write(logKind, text);
+                }
+            }
         }
 
         public void WriteLine()
         {
-            foreach (var logger in loggers)
-                logger.WriteLine();
+            lock (this)
+            {
+                foreach (var logger in loggers)
+                {
+                    logger.WriteLine();
+                }
+            }
         }
 
         public void WriteLine(LogKind logKind, string text)
         {
-            foreach (var logger in loggers)
-                logger.WriteLine(logKind, text);
+            lock (this)
+            {
+                foreach (var logger in loggers)
+                {
+                    logger.WriteLine(logKind, text);
+                }
+            }
         }
 
         public void Flush()
         {
-            foreach (var logger in loggers)
-                logger.Flush();
+            lock (this)
+            {
+                foreach (var logger in loggers)
+                {
+                    logger.Flush();
+                }
+            }
         }
     }
 }

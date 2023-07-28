@@ -23,17 +23,18 @@ The `--filter` or just `-f` allows you to filter the benchmarks by their full na
 
 Examples:
 
-1. Run all benchmarks from System.Memory namespace: `-f System.Memory*`
-2. Run all benchmarks: `-f *`
-3. Run all benchmarks from ClassA and ClassB `-f *ClassA* *ClassB*`
+1. Run all benchmarks from System.Memory namespace: `-f 'System.Memory*'`
+2. Run all benchmarks: `-f '*'`
+3. Run all benchmarks from ClassA and ClassB `-f '*ClassA*' '*ClassB*'`
 
-**Note**: If you would like to **join** all the results into a **single summary**, you need to put `--join`. For example: `-f *ClassA* *ClassB* --join`
+**Note**: If you would like to **join** all the results into a **single summary**, you need to put `--join`. For example: `-f '*ClassA*' '*ClassB*' --join`
 
 ## List of benchmarks
 
-The `--list` allows you to print all of the available benchmark names. Available options are: 
+The `--list` allows you to print all of the available benchmark names. Available options are:
 
 * `flat` - prints list of the available benchmarks: `--list flat`
+
 ```ini
 BenchmarkDotNet.Samples.Algo_Md5VsSha256.Md5
 BenchmarkDotNet.Samples.Algo_Md5VsSha256.Sha256
@@ -45,7 +46,9 @@ BenchmarkDotNet.Samples.IntroArrayParam.ManualIndexOf
 BenchmarkDotNet.Samples.IntroBasic.Sleep
 [...]
 ```
+
 * `tree` - prints tree of the available benchmarks: `--list tree`
+
 ```ini
 BenchmarkDotNet
  └─Samples
@@ -68,6 +71,7 @@ BenchmarkDotNet
 The `--list` option works with the `--filter` option. Examples:
 
 * `--list flat --filter *IntroSetupCleanup*` prints:
+
 ```ini
 BenchmarkDotNet.Samples.IntroSetupCleanupGlobal.Logic
 BenchmarkDotNet.Samples.IntroSetupCleanupIteration.Benchmark
@@ -76,7 +80,9 @@ BenchmarkDotNet.Samples.IntroSetupCleanupTarget.BenchmarkB
 BenchmarkDotNet.Samples.IntroSetupCleanupTarget.BenchmarkC
 BenchmarkDotNet.Samples.IntroSetupCleanupTarget.BenchmarkD
 ```
+
 * `--list tree --filter *IntroSetupCleanup*` prints:
+
 ```ini
 BenchmarkDotNet
  └─Samples
@@ -103,12 +109,12 @@ You can also filter the benchmarks by categories:
 * `-m`, `--memory` - enables MemoryDiagnoser and prints memory statistics
 * `-t`, `--threading` - enables `ThreadingDiagnoser` and prints threading statistics
 * `-d`, `--disasm`- enables DisassemblyDiagnoser and exports diassembly of benchmarked code. When you enable this option, you can use:
-  - `--disasmDepth` - Sets the recursive depth for the disassembler.
-  - `--disasmDiff` - Generates diff reports for the disassembler.
+  * `--disasmDepth` - Sets the recursive depth for the disassembler.
+  * `--disasmDiff` - Generates diff reports for the disassembler.
 
 ## Runtimes
 
-The `--runtimes` or just `-r` allows you to run the benchmarks for selected Runtimes. Available options are: 
+The `--runtimes` or just `-r` allows you to run the benchmarks for selected Runtimes. Available options are:
 
 * Clr - BDN will either use Roslyn (if you run it as .NET app) or latest installed .NET SDK to build the benchmarks (if you run it as .NET Core app).
 * Core - if you run it as .NET Core app, BDN will use the same target framework moniker, if you run it as .NET app it's going to use netcoreapp2.1.
@@ -174,10 +180,25 @@ static IConfig GetGlobalConfig()
             .AsDefault()); // the KEY to get it working
 ```
 
-Now, the default settings are: `WarmupCount=1` but you might still overwrite it from console args like in the example below: 
+Now, the default settings are: `WarmupCount=1` but you might still overwrite it from console args like in the example below:
 
 ```log
 dotnet run -c Release -- --warmupCount 2
+```
+
+## Response files support
+
+Benchmark.NET supports parsing parameters via response files. for example you can create file `run.rsp` with following content
+```
+--warmupCount 1
+--minIterationCount 9
+--maxIterationCount 12
+```
+
+and run it using `dotnet run -c Release -- @run.rsp`. It would be equivalent to running following command line
+
+```log
+dotnet run -c Release -- --warmupCount 1 --minIterationCount 9 --maxIterationCount 12
 ```
 
 ## Statistical Test
@@ -198,7 +219,7 @@ dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --sta
 * `-e`, `--exporters` GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML.
 * `-i`, `--inProcess` (default: false) run benchmarks in the same process, without spawning child process per benchmark.
 * `-a`, `--artifacts` valid path to an accessible directory where output artifacts will be stored.
-* `--outliers` (default: RemoveUpper) DontRemove/RemoveUpper/RemoveLower/RemoveAll.
+* `--outliers` (default: RemoveUpper) `DontRemove`/`RemoveUpper`/`RemoveLower`/`RemoveAll`.
 * `--affinity` affinity mask to set for the benchmark process.
 * `--allStats` (default: false) Displays all statistics (min, max & more).
 * `--allCategories` categories to run. If few are provided, only the benchmarks which belong to all of them are going to be executed.
@@ -214,7 +235,7 @@ dotnet run -c Release -- --filter * --runtimes netcoreapp2.0 netcoreapp2.1 --sta
 * `--version` display version information.
 * `--keepFiles` (default: false) determines if all auto-generated files should be kept or removed after running the benchmarks.
 * `--noOverwrite` (default: false) determines if the exported result files should not be overwritten.
-* `--disableLogFile` disables the logfile.
+* `--disableLogFile` disables the log file.
 * `--maxWidth` max parameter column width, the default is 20.
 * `--envVars` colon separated environment variables (key:value).
 * `--strategy` the RunStrategy that should be used. Throughput/ColdStart/Monitoring.

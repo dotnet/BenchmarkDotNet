@@ -56,7 +56,7 @@ Example of `IntroJsonExport-report-brief.json`:
             "Runtime":"Host",
             "GcMode":"Host",
             "WarmupCount":"Auto",
-            "TargetCount":"Auto",
+            "IterationCount":"Auto",
             "LaunchCount":"Auto",
             "IterationTime":"Auto",
             "Affinity":"Auto"
@@ -114,7 +114,7 @@ Example of `IntroJsonExport-report-brief.json`:
             "Runtime":"Host",
             "GcMode":"Host",
             "WarmupCount":"Auto",
-            "TargetCount":"Auto",
+            "IterationCount":"Auto",
             "LaunchCount":"Auto",
             "IterationTime":"Auto",
             "Affinity":"Auto"

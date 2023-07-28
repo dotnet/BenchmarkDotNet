@@ -133,7 +133,7 @@ namespace BenchmarkDotNet.Diagnosers
         private static bool ShouldUseMonoDisassembler(BenchmarkCase benchmarkCase)
             => benchmarkCase.Job.Environment.Runtime is MonoRuntime || RuntimeInformation.IsMono;
 
-        // when we add  macOS support, RuntimeInformation.IsMacOSX() needs to be added here
+        // when we add  macOS support, RuntimeInformation.IsMacOS() needs to be added here
         private static bool ShouldUseClrMdDisassembler(BenchmarkCase benchmarkCase)
             => !ShouldUseMonoDisassembler(benchmarkCase) && (RuntimeInformation.IsWindows() || RuntimeInformation.IsLinux());
 
@@ -190,6 +190,7 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => SizeUnit.B.Name;
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory => 0;
+            public bool GetIsAvailable(Metric metric) => true;
         }
     }
 }

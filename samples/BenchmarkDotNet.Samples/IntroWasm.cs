@@ -3,7 +3,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using System.IO;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.MonoWasm;
@@ -39,7 +38,7 @@ namespace BenchmarkDotNet.Samples
             NetCoreAppSettings netCoreAppSettings = new NetCoreAppSettings(
                 targetFrameworkMoniker: "net5.0", runtimeFrameworkVersion: null, name: "Wasm",
                 customDotNetCliPath: cliPath);
-            IToolchain toolChain = WasmToolChain.From(netCoreAppSettings);
+            IToolchain toolChain = WasmToolchain.From(netCoreAppSettings);
 
             BenchmarkRunner.Run<IntroCustomMonoFluentConfig>(DefaultConfig.Instance
                 .AddJob(Job.ShortRun.WithRuntime(runtime).WithToolchain(toolChain)));

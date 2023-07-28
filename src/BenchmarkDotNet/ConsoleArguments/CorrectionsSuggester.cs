@@ -5,7 +5,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -32,7 +31,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
         }
 
-        public string[] SuggestFor([NotNull] string userInput)
+        public string[] SuggestFor(string userInput)
         {
             if (userInput == null)
                 throw new ArgumentNullException(nameof(userInput));

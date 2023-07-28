@@ -26,9 +26,9 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         /// Based on https://github.com/dotnet/runtimelab/blob/d0a37893a67c125f9b0cd8671846ff7d867df241/samples/HelloWorld/README.md#add-corert-to-your-project
         /// </summary>
         /// <param name="microsoftDotNetILCompilerVersion">the version of Microsoft.DotNet.ILCompiler which should be used. The default is empty which maps to latest version.</param>
-        /// <param name="nuGetFeedUrl">url to NuGet feed, The default is: "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json"</param>
+        /// <param name="nuGetFeedUrl">url to NuGet feed, The default is: "https://api.nuget.org/v3/index.json"</param>
         [PublicAPI]
-        public NativeAotToolchainBuilder UseNuGet(string microsoftDotNetILCompilerVersion = "", string nuGetFeedUrl = "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json")
+        public NativeAotToolchainBuilder UseNuGet(string microsoftDotNetILCompilerVersion = "", string nuGetFeedUrl = "https://api.nuget.org/v3/index.json")
         {
             ilCompilerVersion = microsoftDotNetILCompilerVersion;
 

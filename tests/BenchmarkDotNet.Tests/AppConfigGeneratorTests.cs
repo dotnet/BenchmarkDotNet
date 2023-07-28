@@ -142,7 +142,7 @@ namespace BenchmarkDotNet.Tests
             }
         }
 
-        [FactWindowsOnly("Full Framework is supported only on Windows")]
+        [FactEnvSpecific("Full Framework is supported only on Windows", EnvRequirement.WindowsOnly)]
         public void RemovesStartupSettingsForPrivateBuildsOfClr()
         {
             const string input =

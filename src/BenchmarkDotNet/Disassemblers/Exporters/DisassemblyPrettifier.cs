@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                     referencedAddresses.Add(asm.ReferencedAddress.Value);
                 }
 
-            // for every IP that is referenced, we emit a uinque label
+            // for every IP that is referenced, we emit a unique label
             var addressesToLabels = new Dictionary<ulong, string>();
             int currentLabelIndex = 0;
             foreach (var instruction in asmInstructions)
@@ -85,12 +85,12 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                             }
 
                             // call to a known method
-                            if (disassemblyResult.AddressToNameMapping.ContainsKey(referencedAddress))
+                            if (disassemblyResult.AddressToNameMapping.TryGetValue(referencedAddress, out string? referencedName))
                             {
                                 string comment = string.Empty;
                                 if (asm.IsReferencedAddressIndirect)
                                 {
-                                    comment = "; " + disassemblyResult.AddressToNameMapping[referencedAddress];
+                                    comment = "; " + referencedName;
                                 }
                                 prettified.Add(new Element(CodeFormatter.Format(asm, formatterWithGlobalSymbols, config.PrintInstructionAddresses, disassemblyResult.PointerSize, disassemblyResult.AddressToNameMapping) + comment, asm));
                                 continue;

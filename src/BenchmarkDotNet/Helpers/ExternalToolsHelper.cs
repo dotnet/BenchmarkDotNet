@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Helpers
         /// MacOSX only.
         /// </summary>
         public static readonly Lazy<Dictionary<string, string>> MacSystemProfilerData =
-            LazyParse(RuntimeInformation.IsMacOSX, "system_profiler", "SPSoftwareDataType", s => SectionsHelper.ParseSection(s, ':'));
+            LazyParse(RuntimeInformation.IsMacOS, "system_profiler", "SPSoftwareDataType", s => SectionsHelper.ParseSection(s, ':'));
 
         private static Lazy<T> LazyParse<T>(Func<bool> isAvailable, string fileName, string arguments, Func<string, T> parseFunc)
         {

@@ -49,30 +49,11 @@ It will be transformed to:
 
 ## Building documentation locally
 
-You can build documentation locally with the help of the `DocFX_Build` Cake target.
-Use the `DocFX_Serve` Cake target to build and run the documentation.
-
-Windows (PowerShell):
+You can build documentation locally with the help of the `docs-build` build task:
 
 ```
-.\build.ps1 --target DocFX_Build
-.\build.ps1 --target DocFX_Serve
+build.cmd docs-build
 ```
-
-Windows (Batch):
-
-```
-.\build.bat --target DocFX_Build
-.\build.bat --target DocFX_Serve
-```
-
-Linux/macOS (Bash):
-
-```
-./build.sh --target DocFX_Build
-./build.sh --target DocFX_Serve
-```
-
 
 ## See also
 

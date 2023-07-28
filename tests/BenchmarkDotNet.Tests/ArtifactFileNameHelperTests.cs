@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Tests
 {
     public class ArtifactFileNameHelperTests
     {
-        [FactWindowsOnly(nonWindowsSkipReason: "ETW Sessions can be created only on Windows")]
+        [FactEnvSpecific("ETW Sessions can be created only on Windows", EnvRequirement.WindowsOnly)]
         public void OnWindowsWeMustAlwaysUseOldLongPathsLimitForSessionFiles()
         {
             var config = DefaultConfig.Instance

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
@@ -16,7 +14,7 @@ using JetBrains.Annotations;
 namespace BenchmarkDotNet.Toolchains.InProcess
 {
     /// <summary>
-    ///     Validator to be used together with <see cref="InProcessToolchain" />
+    ///     Validator to be used together with <see cref="InProcessNoEmitToolchain" /> or <see cref="InProcessEmitToolchain"/>
     ///     to proof that the config matches the environment.
     /// </summary>
     /// <seealso cref="IValidator" />
@@ -83,9 +81,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         private static string ValidateToolchain(Job job, Characteristic characteristic) =>
             job.Infrastructure.Toolchain is InProcessEmitToolchain
             || job.Infrastructure.Toolchain is InProcessNoEmitToolchain
-#pragma warning disable 618
-            || job.Infrastructure.Toolchain is InProcessToolchain
-#pragma warning restore 618
                 ? null
                 : $"should be instance of {nameof(InProcessEmitToolchain)} or {nameof(InProcessNoEmitToolchain)}.";
 
@@ -95,26 +90,18 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         /// <summary>The instance of validator that DOES fail on error.</summary>
         public static readonly IValidator FailOnError = new InProcessValidator(true);
 
-        public static bool IsSupported(BenchmarkCase benchmarkCase, ILogger logger)
+        public static IEnumerable<ValidationError> Validate(BenchmarkCase benchmarkCase)
         {
-            var result = new List<ValidationError>();
-            result.AddRange(ValidateJob(benchmarkCase.Job, true));
-            if (benchmarkCase.HasArguments)
-                result.Add(new ValidationError(true, "Arguments are not supported by the InProcessToolchain yet, see #687 for more details"));
-
-            if (result.Any())
+            foreach (var validationError in ValidateJob(benchmarkCase.Job, true))
             {
-                logger.WriteLineInfo($"// Benchmark {benchmarkCase.DisplayInfo}");
-                logger.WriteLineInfo("// cannot be run in-process. Validation errors:");
-                foreach (var validationError in result)
-                {
-                    logger.WriteLineInfo($"//    * {validationError.Message}");
-                }
-                logger.WriteLine();
-
-                return false;
+                yield return new ValidationError(
+                    validationError.IsCritical,
+                    validationError.Message,
+                    benchmarkCase);
             }
-            return true;
+
+            if (benchmarkCase.HasArguments)
+                yield return new ValidationError(true, "Arguments are not supported by the InProcessToolchain yet, see #687 for more details", benchmarkCase);
         }
 
         private static IEnumerable<ValidationError> ValidateJob(Job job, bool isCritical)
@@ -139,7 +126,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess
 #endif
             }
         }
-
 
         private InProcessValidator(bool failOnErrors)
         {
@@ -167,8 +153,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                     $"Target {target} has {nameof(target.AdditionalLogic)} filled. AdditionalLogic is not supported by in-process toolchain.");
             }
 
-            foreach (var benchmarkWithArguments in validationParameters.Benchmarks.Where(benchmark => benchmark.HasArguments))
-                yield return new ValidationError(true, "Arguments are not supported by the InProcessToolchain yet, see #687 for more details", benchmarkWithArguments);
+            foreach (var benchmarkWithArguments in validationParameters.Benchmarks.Where(benchmark => benchmark.HasArguments && benchmark.GetToolchain() is InProcessNoEmitToolchain))
+                yield return new ValidationError(true, "Arguments are not supported by the InProcessNoEmitToolchain, see #687 for more details", benchmarkWithArguments);
 
             foreach (var validationError in validationParameters.Config.GetJobs().SelectMany(job => ValidateJob(job, TreatsWarningsAsErrors)))
                 yield return validationError;

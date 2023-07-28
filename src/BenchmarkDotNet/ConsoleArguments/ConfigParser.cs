@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Text;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
@@ -17,18 +18,19 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
-using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Toolchains.MonoAotLLVM;
+using BenchmarkDotNet.Toolchains.MonoWasm;
+using BenchmarkDotNet.Toolchains.NativeAot;
 using CommandLine;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
 using Perfolizer.Mathematics.SignificanceTesting;
 using Perfolizer.Mathematics.Thresholds;
+using BenchmarkDotNet.Toolchains.Mono;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -74,6 +76,13 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             (bool isSuccess, IConfig config, CommandLineOptions options) result = default;
 
+            var (expandSuccess, expandedArgs) = ExpandResponseFile(args, logger);
+            if (!expandSuccess)
+            {
+                return (false, default, default);
+            }
+
+            args = expandedArgs;
             using (var parser = CreateParser(logger))
             {
                 parser
@@ -83,6 +92,132 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
 
             return result;
+        }
+
+        private static (bool Success, string[] ExpandedTokens) ExpandResponseFile(string[] args, ILogger logger)
+        {
+            List<string> result = new ();
+            foreach (var arg in args)
+            {
+                if (arg.StartsWith("@"))
+                {
+                    var fileName = arg.Substring(1);
+                    try
+                    {
+                        if (File.Exists(fileName))
+                        {
+                            var lines = File.ReadAllLines(fileName);
+                            foreach (var line in lines)
+                            {
+                                result.AddRange(ConsumeTokens(line));
+                            }
+                        }
+                        else
+                        {
+                            logger.WriteLineError($"Response file {fileName} does not exists.");
+                            return (false, Array.Empty<string>());
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.WriteLineError($"Failed to parse RSP file: {fileName}, {ex.Message}");
+                        return (false, Array.Empty<string>());
+                    }
+                }
+                else
+                {
+                    result.Add(arg);
+                }
+            }
+
+            return (true, result.ToArray());
+        }
+
+        private static IEnumerable<string> ConsumeTokens(string line)
+        {
+            bool insideQuotes = false;
+            var token = new StringBuilder();
+            for (int i = 0; i < line.Length; i++)
+            {
+                char currentChar = line[i];
+                if (currentChar == ' ' && !insideQuotes)
+                {
+                    if (token.Length > 0)
+                    {
+                        yield return GetToken();
+                        token = new StringBuilder();
+                    }
+
+                    continue;
+                }
+
+                if (currentChar == '"')
+                {
+                    insideQuotes = !insideQuotes;
+                    continue;
+                }
+
+                if (currentChar == '\\' && insideQuotes)
+                {
+                    if (line[i + 1] == '"')
+                    {
+                        insideQuotes = false;
+                        i++;
+                        continue;
+                    }
+
+                    if (line[i + 1] == '\\')
+                    {
+                        token.Append('\\');
+                        i++;
+                        continue;
+                    }
+                }
+
+                token.Append(currentChar);
+            }
+
+            if (token.Length > 0)
+            {
+                yield return GetToken();
+            }
+
+            string GetToken()
+            {
+                var result = token.ToString();
+                if (result.Contains(' '))
+                {
+                    // Workaround for CommandLine library issue with parsing these kind of args.
+                    return " " + result;
+                }
+
+                return result;
+            }
+        }
+
+        internal static bool TryUpdateArgs(string[] args, out string[]? updatedArgs, Action<CommandLineOptions> updater)
+        {
+            (bool isSuccess, CommandLineOptions options) result = default;
+
+            ILogger logger = NullLogger.Instance;
+            using (var parser = CreateParser(logger))
+            {
+                parser
+                    .ParseArguments<CommandLineOptions>(args)
+                    .WithParsed(options => result = Validate(options, logger) ? (true, options) : (false, default))
+                    .WithNotParsed(errors => result = (false,  default));
+
+                if (!result.isSuccess)
+                {
+                    updatedArgs = null;
+                    return false;
+                }
+
+                updater(result.options);
+
+                updatedArgs = parser.FormatCommandLine(result.options, settings => settings.SkipDefault = true).Split();
+                return true;
+            }
         }
 
         private static Parser CreateParser(ILogger logger)
@@ -113,7 +248,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 }
                 else if (runtimeMoniker == RuntimeMoniker.MonoAOTLLVM && (options.AOTCompilerPath == null || options.AOTCompilerPath.IsNotNullButDoesNotExist()))
                 {
-                     logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{ options.AOTCompilerPath }\" does NOT exist. It MUST be provided.");
+                    logger.WriteLineError($"The provided {nameof(options.AOTCompilerPath)} \"{options.AOTCompilerPath}\" does NOT exist. It MUST be provided.");
                 }
             }
 
@@ -213,6 +348,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 config.AddDiagnoser(MemoryDiagnoser.Default);
             if (options.UseThreadingDiagnoser)
                 config.AddDiagnoser(ThreadingDiagnoser.Default);
+            if (options.UseExceptionDiagnoser)
+                config.AddDiagnoser(ExceptionDiagnoser.Default);
             if (options.UseDisassemblyDiagnoser)
                 config.AddDiagnoser(new DisassemblyDiagnoser(new DisassemblyDiagnoserConfig(
                     maxDepth: options.DisassemblerRecursiveDepth,
@@ -245,6 +382,10 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.WithOption(ConfigOptions.LogBuildOutput, options.LogBuildOutput);
             config.WithOption(ConfigOptions.GenerateMSBuildBinLog, options.GenerateMSBuildBinLog);
             config.WithOption(ConfigOptions.ApplesToApples, options.ApplesToApples);
+            config.WithOption(ConfigOptions.Resume, options.Resume);
+
+            if (config.Options.IsSet(ConfigOptions.GenerateMSBuildBinLog))
+                config.Options |= ConfigOptions.KeepBenchmarkFiles;
 
             if (options.MaxParameterColumnWidth.HasValue)
                 config.WithSummaryStyle(SummaryStyle.Default.WithMaxParameterColumnWidth(options.MaxParameterColumnWidth.Value));
@@ -265,7 +406,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithOutlierMode(options.Outliers);
 
             if (options.Affinity.HasValue)
-                baseJob = baseJob.WithAffinity((IntPtr) options.Affinity.Value);
+                baseJob = baseJob.WithAffinity((IntPtr)options.Affinity.Value);
 
             if (options.LaunchCount.HasValue)
                 baseJob = baseJob.WithLaunchCount(options.LaunchCount.Value);
@@ -297,6 +438,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithMemoryRandomization();
             if (options.NoForcedGCs)
                 baseJob = baseJob.WithGcForce(false);
+            if (options.NoEvaluationOverhead)
+                baseJob = baseJob.WithEvaluateOverhead(false);
 
             if (options.EnvironmentVariables.Any())
             {
@@ -375,7 +518,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net481:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
-                        .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName));
+                        .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName, options.CliPath?.FullName));
+
                 case RuntimeMoniker.NetCoreApp20:
                 case RuntimeMoniker.NetCoreApp21:
                 case RuntimeMoniker.NetCoreApp22:
@@ -387,29 +531,59 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net50:
                 case RuntimeMoniker.Net60:
                 case RuntimeMoniker.Net70:
+                case RuntimeMoniker.Net80:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
                         .WithToolchain(CsProjCoreToolchain.From(new NetCoreAppSettings(runtimeId, null, runtimeId, options.CliPath?.FullName, options.RestorePath?.FullName)));
+
                 case RuntimeMoniker.Mono:
                     return baseJob.WithRuntime(new MonoRuntime("Mono", options.MonoPath?.FullName));
+
                 case RuntimeMoniker.NativeAot60:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "6.0.0-*", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json");
+
                 case RuntimeMoniker.NativeAot70:
                     return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json");
+
+                case RuntimeMoniker.NativeAot80:
+                    return CreateAotJob(baseJob, options, runtimeMoniker, "", "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet8/nuget/v3/index.json");
+
                 case RuntimeMoniker.Wasm:
                     return MakeWasmJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net5.0", runtimeMoniker);
+
                 case RuntimeMoniker.WasmNet50:
                     return MakeWasmJob(baseJob, options, "net5.0", runtimeMoniker);
+
                 case RuntimeMoniker.WasmNet60:
                     return MakeWasmJob(baseJob, options, "net6.0", runtimeMoniker);
+
                 case RuntimeMoniker.WasmNet70:
                     return MakeWasmJob(baseJob, options, "net7.0", runtimeMoniker);
+
+                case RuntimeMoniker.WasmNet80:
+                    return MakeWasmJob(baseJob, options, "net8.0", runtimeMoniker);
+
                 case RuntimeMoniker.MonoAOTLLVM:
                     return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0");
+
                 case RuntimeMoniker.MonoAOTLLVMNet60:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net6.0");
+
                 case RuntimeMoniker.MonoAOTLLVMNet70:
                     return MakeMonoAOTLLVMJob(baseJob, options, "net7.0");
+
+                case RuntimeMoniker.MonoAOTLLVMNet80:
+                    return MakeMonoAOTLLVMJob(baseJob, options, "net8.0");
+
+                case RuntimeMoniker.Mono60:
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono60);
+
+                case RuntimeMoniker.Mono70:
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono70);
+
+                case RuntimeMoniker.Mono80:
+                    return MakeMonoJob(baseJob, options, MonoRuntime.Mono80);
+
                 default:
                     throw new NotSupportedException($"Runtime {runtimeId} is not supported");
             }
@@ -435,6 +609,19 @@ namespace BenchmarkDotNet.ConsoleArguments
             builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
 
             return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain());
+        }
+
+        private static Job MakeMonoJob(Job baseJob, CommandLineOptions options, MonoRuntime runtime)
+        {
+            return baseJob
+                .WithRuntime(runtime)
+                .WithToolchain(MonoToolchain.From(
+                    new NetCoreAppSettings(
+                        targetFrameworkMoniker: runtime.MsBuildMoniker,
+                        runtimeFrameworkVersion: null,
+                        name: runtime.Name,
+                        customDotNetCliPath: options.CliPath?.FullName,
+                        packagesPath: options.RestorePath?.FullName)));
         }
 
         private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker)
@@ -467,7 +654,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 wasmDataDir: options.WasmDataDirectory?.FullName,
                 moniker: moniker);
 
-            var toolChain = WasmToolChain.From(new NetCoreAppSettings(
+            var toolChain = WasmToolchain.From(new NetCoreAppSettings(
                 targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
                 runtimeFrameworkVersion: null,
                 name: wasmRuntime.Name,
@@ -554,7 +741,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                         break;
                     }
             }
-
 
             if (commonLongestPrefixIndex <= 1)
                 return coreRunPath.FullName;

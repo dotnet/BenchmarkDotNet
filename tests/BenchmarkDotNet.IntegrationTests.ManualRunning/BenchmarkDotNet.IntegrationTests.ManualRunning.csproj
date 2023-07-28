@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.ManualRunning</AssemblyTitle>
-    <TargetFrameworks>net462;net6.0</TargetFrameworks>
+    <TargetFrameworks>net462;net7.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests.ManualRunning</AssemblyName>
     <PackageId>BenchmarkDotNet.IntegrationTests.ManualRunning</PackageId>
@@ -13,8 +13,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\BenchmarkDotNet.IntegrationTests\BenchmarkTestExecutor.cs" Link="BenchmarkTestExecutor.cs" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Xunit\MisconfiguredEnvironmentException.cs" Link="MisconfiguredEnvironmentException.cs" />
+    <Compile Include="..\BenchmarkDotNet.IntegrationTests\Xunit\Extensions.cs" Link="Extensions.cs" />
     <Compile Include="..\BenchmarkDotNet.IntegrationTests\TestConfigs.cs" Link="TestConfigs.cs" />
     <Compile Include="..\BenchmarkDotNet.Tests\Loggers\OutputLogger.cs" Link="OutputLogger.cs" />
+    <Compile Include="..\BenchmarkDotNet.Tests\XUnit\*.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json">
@@ -26,8 +29,11 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
-    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
+    <PackageReference Include="xunit" Version="2.5.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>

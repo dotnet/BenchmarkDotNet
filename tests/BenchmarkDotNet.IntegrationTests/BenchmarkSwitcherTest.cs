@@ -25,7 +25,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public BenchmarkSwitcherTest(ITestOutputHelper output) => Output = output;
 
-        [FactDotNetCoreOnly("When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..")]
+        [FactEnvSpecific(
+            "When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..",
+            EnvRequirement.DotNetCoreOnly)]
         public void WhenInvalidCommandLineArgumentIsPassedAnErrorMessageIsDisplayedAndNoBenchmarksAreExecuted()
         {
             var logger = new OutputLogger(Output);
@@ -330,6 +332,21 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.True(summariesForAssembly.Single().HasCriticalValidationErrors);
             Assert.Contains("static", logger.GetLog());
+        }
+
+        [FactEnvSpecific("For some reason this test is flaky on Full Framework", EnvRequirement.DotNetCoreOnly)]
+        public void WhenUserAddTheResumeAttributeAndRunTheBenchmarks()
+        {
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty().AddLogger(logger);
+
+            var types = new[] { typeof(WithDryAttributeAndCategory) };
+            var switcher = new BenchmarkSwitcher(types);
+
+            // the first run should execute all benchmarks
+            Assert.Single(switcher.Run(new[] { "--filter", "*WithDryAttributeAndCategory*" }, config));
+            // resuming after succesfull run should run nothing
+            Assert.Empty(switcher.Run(new[] { "--resume", "--filter", "*WithDryAttributeAndCategory*" }, config));
         }
 
         private class UserInteractionMock : IUserInteraction

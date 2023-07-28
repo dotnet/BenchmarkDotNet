@@ -18,35 +18,35 @@ namespace BenchmarkDotNet.Running
     public static class BenchmarkRunner
     {
         [PublicAPI]
-        public static Summary Run<T>(IConfig config = null, string[] args = null)
+        public static Summary Run<T>(IConfig? config = null, string[]? args = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
                 return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(typeof(T), config, args));
         }
 
         [PublicAPI]
-        public static Summary Run(Type type, IConfig config = null, string[] args = null)
+        public static Summary Run(Type type, IConfig? config = null, string[]? args = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
                 return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(type, config, args));
         }
 
         [PublicAPI]
-        public static Summary[] Run(Type[] types, IConfig config = null, string[] args = null)
+        public static Summary[] Run(Type[] types, IConfig? config = null, string[]? args = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
                 return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(types, config, args));
         }
 
         [PublicAPI]
-        public static Summary Run(Type type, MethodInfo[] methods, IConfig config = null)
+        public static Summary Run(Type type, MethodInfo[] methods, IConfig? config = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
                 return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(type, methods, config));
         }
 
         [PublicAPI]
-        public static Summary[] Run(Assembly assembly, IConfig config = null, string[] args = null)
+        public static Summary[] Run(Assembly assembly, IConfig? config = null, string[]? args = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
                 return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(assembly, config, args));
@@ -66,47 +66,43 @@ namespace BenchmarkDotNet.Running
                 return RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(benchmarkRunInfos));
         }
 
-        /// <summary>
-        /// Supported only on Full .NET Framework. Not recommended.
-        /// </summary>
         [PublicAPI]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static Summary RunUrl(string url, IConfig config = null)
+        [Obsolete("This method will be removed soon as it is not supported in .NET Core")]
+        public static Summary RunUrl(string url, IConfig? config = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
                 return RunWithExceptionHandling(() => RunUrlWithDirtyAssemblyResolveHelper(url, config));
         }
 
-        /// <summary>
-        /// Supported only on Full .NET Framework. Not recommended.
-        /// </summary>
         [PublicAPI]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static Summary RunSource(string source, IConfig config = null)
+        [Obsolete("This method will be removed soon as it is not supported in .NET Core")]
+        public static Summary RunSource(string source, IConfig? config = null)
         {
             using (DirtyAssemblyResolveHelper.Create())
                 return RunWithExceptionHandling(() => RunSourceWithDirtyAssemblyResolveHelper(source, config));
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Summary RunWithDirtyAssemblyResolveHelper(Type type, IConfig config, string[] args)
+        private static Summary RunWithDirtyAssemblyResolveHelper(Type type, IConfig? config, string[]? args)
             => (args == null
                 ? BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.TypeToBenchmarks(type, config) })
                 : new BenchmarkSwitcher(new[] { type }).RunWithDirtyAssemblyResolveHelper(args, config, false))
                 .Single();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Summary RunWithDirtyAssemblyResolveHelper(Type type, MethodInfo[] methods, IConfig config = null)
+        private static Summary RunWithDirtyAssemblyResolveHelper(Type type, MethodInfo[] methods, IConfig? config = null)
             => BenchmarkRunnerClean.Run(new[] { BenchmarkConverter.MethodsToBenchmarks(type, methods, config) }).Single();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Summary[] RunWithDirtyAssemblyResolveHelper(Assembly assembly, IConfig config, string[] args)
+        private static Summary[] RunWithDirtyAssemblyResolveHelper(Assembly assembly, IConfig? config, string[]? args)
             => args == null
                 ? BenchmarkRunnerClean.Run(assembly.GetRunnableBenchmarks().Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray())
                 : new BenchmarkSwitcher(assembly).RunWithDirtyAssemblyResolveHelper(args, config, false).ToArray();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Summary[] RunWithDirtyAssemblyResolveHelper(Type[] types, IConfig config, string[] args)
+        private static Summary[] RunWithDirtyAssemblyResolveHelper(Type[] types, IConfig? config, string[]? args)
             => args == null
                 ? BenchmarkRunnerClean.Run(types.Select(type => BenchmarkConverter.TypeToBenchmarks(type, config)).ToArray())
                 : new BenchmarkSwitcher(types).RunWithDirtyAssemblyResolveHelper(args, config, false).ToArray();
@@ -115,17 +111,19 @@ namespace BenchmarkDotNet.Running
         private static Summary[] RunWithDirtyAssemblyResolveHelper(BenchmarkRunInfo[] benchmarkRunInfos)
             => BenchmarkRunnerClean.Run(benchmarkRunInfos);
 
+#pragma warning disable CS0618 // Use of obsolete symbol
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Summary RunUrlWithDirtyAssemblyResolveHelper(string url, IConfig config = null)
+        private static Summary RunUrlWithDirtyAssemblyResolveHelper(string url, IConfig? config = null)
             => RuntimeInformation.IsFullFramework
                 ? BenchmarkRunnerClean.Run(BenchmarkConverter.UrlToBenchmarks(url, config)).Single()
                 : throw new InvalidBenchmarkDeclarationException("Supported only on Full .NET Framework");
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Summary RunSourceWithDirtyAssemblyResolveHelper(string source, IConfig config = null)
+        private static Summary RunSourceWithDirtyAssemblyResolveHelper(string source, IConfig? config = null)
             => RuntimeInformation.IsFullFramework
                 ? BenchmarkRunnerClean.Run(BenchmarkConverter.SourceToBenchmarks(source, config)).Single()
                 : throw new InvalidBenchmarkDeclarationException("Supported only on Full .NET Framework");
+#pragma warning restore CS0618 // Use of obsolete symbol
 
         private static Summary RunWithExceptionHandling(Func<Summary> run)
         {
@@ -136,7 +134,7 @@ namespace BenchmarkDotNet.Running
             catch (InvalidBenchmarkDeclarationException e)
             {
                 ConsoleLogger.Default.WriteLineError(e.Message);
-                return Summary.NothingToRun(e.Message, string.Empty, string.Empty);
+                return Summary.ValidationFailed(e.Message, string.Empty, string.Empty);
             }
         }
 
@@ -149,7 +147,7 @@ namespace BenchmarkDotNet.Running
             catch (InvalidBenchmarkDeclarationException e)
             {
                 ConsoleLogger.Default.WriteLineError(e.Message);
-                return new[] { Summary.NothingToRun(e.Message, string.Empty, string.Empty) };
+                return new[] { Summary.ValidationFailed(e.Message, string.Empty, string.Empty) };
             }
         }
     }

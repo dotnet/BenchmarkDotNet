@@ -36,19 +36,10 @@ namespace BenchmarkDotNet.Validators
                 return true;
             if (obj.GetType() != this.GetType())
                 return false;
-            return Equals((ValidationError) obj);
+            return Equals((ValidationError)obj);
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hashCode = IsCritical.GetHashCode();
-                hashCode = (hashCode * 397) ^ (Message != null ? Message.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (BenchmarkCase != null ? BenchmarkCase.GetHashCode() : 0);
-                return hashCode;
-            }
-        }
+        public override int GetHashCode() => HashCode.Combine(IsCritical, Message, BenchmarkCase);
 
         public static bool operator ==(ValidationError left, ValidationError right) => Equals(left, right);
 

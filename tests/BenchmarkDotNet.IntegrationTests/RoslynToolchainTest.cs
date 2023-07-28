@@ -2,7 +2,7 @@
 using System.Threading;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.Roslyn;
 using Xunit;
 using Xunit.Abstractions;
@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public RoslynToolchainTest(ITestOutputHelper output) : base(output) { }
 
         /// <summary>Prooftest for #1039.</summary>
-        [Tests.XUnit.TheoryFullFrameworkOnly("Roslyn toolchain does not support .NET Core")]
+        [TheoryEnvSpecific("Roslyn toolchain does not support .NET Core", EnvRequirement.FullFrameworkOnly)]
         [InlineData("en-US")]
         [InlineData("fr-FR")]
         [InlineData("ru-RU")]

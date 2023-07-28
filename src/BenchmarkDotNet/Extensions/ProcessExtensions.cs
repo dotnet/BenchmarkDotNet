@@ -11,7 +11,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CoreRun;
-using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using JetBrains.Annotations;
 
 
@@ -45,7 +44,8 @@ namespace BenchmarkDotNet.Extensions
 
         private static IntPtr FixAffinity(IntPtr processorAffinity)
         {
-            int cpuMask = (1 << Environment.ProcessorCount) - 1;
+            // Max supported affinity without CPU groups is 64
+            long cpuMask = Environment.ProcessorCount >= 64 ? unchecked((long)0xFFFF_FFFF_FFFF_FFFF) : (1L << Environment.ProcessorCount) - 1;
 
             return RuntimeInformation.Is64BitPlatform()
                 ? new IntPtr(processorAffinity.ToInt64() & cpuMask)
@@ -53,9 +53,9 @@ namespace BenchmarkDotNet.Extensions
         }
 
         public static bool TrySetPriority(
-            [NotNull] this Process process,
+            this Process process,
             ProcessPriorityClass priority,
-            [NotNull] ILogger logger)
+            ILogger logger)
         {
             if (process == null)
                 throw new ArgumentNullException(nameof(process));
@@ -77,9 +77,9 @@ namespace BenchmarkDotNet.Extensions
         }
 
         public static bool TrySetAffinity(
-            [NotNull] this Process process,
+            this Process process,
             IntPtr processorAffinity,
-            [NotNull] ILogger logger)
+            ILogger logger)
         {
             if (process == null)
                 throw new ArgumentNullException(nameof(process));
@@ -103,7 +103,7 @@ namespace BenchmarkDotNet.Extensions
             return false;
         }
 
-        public static IntPtr? TryGetAffinity([NotNull] this Process process)
+        public static IntPtr? TryGetAffinity(this Process process)
         {
             if (process == null)
                 throw new ArgumentNullException(nameof(process));

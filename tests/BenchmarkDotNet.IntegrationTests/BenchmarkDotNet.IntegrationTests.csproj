@@ -2,7 +2,8 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests</AssemblyTitle>
-    <TargetFrameworks>net462;net6.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net462;net7.0</TargetFrameworks>
+    <TargetFramework Condition="'$(OS)' != 'Windows_NT'">net7.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests</AssemblyName>
     <PackageId>BenchmarkDotNet.IntegrationTests</PackageId>
@@ -10,7 +11,7 @@
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
-    <NoWarn>$(NoWarn);CA2007</NoWarn>
+    <NoWarn>$(NoWarn);CA2007;CA1825</NoWarn>
     <ServerGarbageCollection>true</ServerGarbageCollection>
   </PropertyGroup>
   <ItemGroup>
@@ -27,13 +28,16 @@
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.Static\BenchmarkDotNet.IntegrationTests.Static.csproj" />
     <ProjectReference Include="..\BenchmarkDotNet.Tests\BenchmarkDotNet.Tests.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotTrace\BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
-    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="xunit" Version="2.5.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Mono.Cecil" Version="0.11.1" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">
@@ -42,7 +46,8 @@
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
     <ProjectReference Include="..\BenchmarkDotNet.IntegrationTests.CustomPaths\BenchmarkDotNet.IntegrationTests.CustomPaths.csproj" />
-    <PackageReference Include="Microsoft.NETCore.Platforms" Version="2.2.0" />
+    <PackageReference Include="Microsoft.NETCore.Platforms" Version="5.0.0" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Threading.Tasks" />

@@ -1,0 +1,63 @@
+name: generate-gh-pages
+run-name: Generate gh-pages / ${{ github.event.head_commit.message }}
+
+on:
+  push:
+    branches:
+      - docs-stable
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  generate:
+    runs-on: windows-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: docs-stable
+
+    - name: Build BenchmarkDotNet
+      run: ./build.cmd build
+
+    - name: Download changelog
+      run: ./build.cmd docs-update --depth 1 --preview
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build documentation
+      run: ./build.cmd docs-build
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: site
+        path: docs/_site
+
+  deploy:
+    concurrency: ci-${{ github.ref }}
+    needs: [generate]
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: docs-stable
+
+    - name: Download Artifacts
+      uses: actions/download-artifact@v1
+      with:
+        name: site
+
+    - name: Deploy documentation
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: site
+        GIT_CONFIG_NAME: Andrey Akinshin
+        GIT_CONFIG_EMAIL: andrey.akinshin@gmail.com
+        CLEAN: true

@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public long Factorial() => FactorialWithoutTailing(7);
         }
 
-        [TheoryWindowsOnly(WindowsOnly)]
+        [TheoryEnvSpecific(WindowsOnly, EnvRequirement.WindowsOnly)]
         [MemberData(nameof(GetJits))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void TailCallDiagnoserCatchesTailCallEvents(Jit jit, Platform platform, Runtime runtime)
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Contains(output.CapturedOutput, x => x.Text.Contains(TAIL_CALL_MARK));
         }
 
-        [TheoryWindowsOnly(WindowsOnly)]
+        [TheoryEnvSpecific(WindowsOnly, EnvRequirement.WindowsOnly)]
         [MemberData(nameof(GetJits))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void TailCallDiagnoserNotCatchesTailCallEvents(Jit jit, Platform platform, Runtime runtime)

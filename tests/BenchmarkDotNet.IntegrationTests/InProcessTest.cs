@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
-using BenchmarkDotNet.Toolchains.InProcess;
+using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
@@ -56,22 +57,36 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void BenchmarkActionValueTaskOfTSupported() => TestInvoke(x => x.InvokeOnceValueTaskOfT(), UnrollFactor, DecimalResult);
 
+        [Fact]
+        public void BenchmarkDifferentPlatformReturnsValidationError()
+        {
+            var otherPlatform = IntPtr.Size == 8
+                ? Platform.X86
+                : Platform.X64;
+
+            var otherPlatformConfig = new ManualConfig()
+                .With(Job.Dry.With(InProcessNoEmitToolchain.Instance).With(otherPlatform))
+                .With(new OutputLogger(Output))
+                .With(DefaultColumnProviders.Instance);
+
+            var runInfo = BenchmarkConverter.TypeToBenchmarks(typeof(BenchmarkAllCases), otherPlatformConfig);
+            var summary = BenchmarkRunner.Run(runInfo);
+
+            Assert.NotEmpty(summary.ValidationErrors);
+        }
+
         [AssertionMethod]
         private void TestInvoke(Expression<Action<BenchmarkAllCases>> methodCall, int unrollFactor)
         {
-            var targetMethod = ((MethodCallExpression) methodCall.Body).Method;
+            var targetMethod = ((MethodCallExpression)methodCall.Body).Method;
             var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod, targetMethod, targetMethod);
 
             // Run mode
-            var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
-            TestInvoke(action, unrollFactor, false, null);
-            action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
+            var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), unrollFactor);
             TestInvoke(action, unrollFactor, false, null);
 
             // Idle mode
-            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
-            TestInvoke(action, unrollFactor, true, null);
-            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
+            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), unrollFactor);
             TestInvoke(action, unrollFactor, true, null);
 
             // GlobalSetup/GlobalCleanup
@@ -97,13 +112,11 @@ namespace BenchmarkDotNet.IntegrationTests
         [AssertionMethod]
         private void TestInvoke<T>(Expression<Func<BenchmarkAllCases, T>> methodCall, int unrollFactor, object expectedResult)
         {
-            var targetMethod = ((MethodCallExpression) methodCall.Body).Method;
+            var targetMethod = ((MethodCallExpression)methodCall.Body).Method;
             var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod);
 
             // Run mode
-            var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
-            TestInvoke(action, unrollFactor, false, expectedResult);
-            action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
+            var action = BenchmarkActionFactory.CreateWorkload(descriptor, new BenchmarkAllCases(), unrollFactor);
             TestInvoke(action, unrollFactor, false, expectedResult);
 
             // Idle mode
@@ -120,9 +133,7 @@ namespace BenchmarkDotNet.IntegrationTests
             else
                 idleExpected = GetDefault(expectedResult.GetType());
 
-            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.ReflectionEmit, unrollFactor);
-            TestInvoke(action, unrollFactor, true, idleExpected);
-            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), BenchmarkActionCodegen.DelegateCombine, unrollFactor);
+            action = BenchmarkActionFactory.CreateOverhead(descriptor, new BenchmarkAllCases(), unrollFactor);
             TestInvoke(action, unrollFactor, true, idleExpected);
         }
 
@@ -146,18 +157,18 @@ namespace BenchmarkDotNet.IntegrationTests
                 {
                     benchmarkAction.InvokeSingle();
                     Assert.Equal(0, BenchmarkAllCases.Counter);
-                    benchmarkAction.InvokeMultiple(0);
+                    benchmarkAction.InvokeUnroll(0);
                     Assert.Equal(0, BenchmarkAllCases.Counter);
-                    benchmarkAction.InvokeMultiple(11);
+                    benchmarkAction.InvokeUnroll(11);
                     Assert.Equal(0, BenchmarkAllCases.Counter);
                 }
                 else
                 {
                     benchmarkAction.InvokeSingle();
                     Assert.Equal(1, BenchmarkAllCases.Counter);
-                    benchmarkAction.InvokeMultiple(0);
+                    benchmarkAction.InvokeUnroll(0);
                     Assert.Equal(1, BenchmarkAllCases.Counter);
-                    benchmarkAction.InvokeMultiple(11);
+                    benchmarkAction.InvokeUnroll(11);
                     Assert.Equal(BenchmarkAllCases.Counter, 1 + unrollFactor * 11);
                 }
 
@@ -169,19 +180,19 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private IConfig CreateInProcessConfig(BenchmarkActionCodegen codegenMode, OutputLogger logger = null, IDiagnoser diagnoser = null)
+        private IConfig CreateInProcessConfig(OutputLogger logger = null)
         {
             return new ManualConfig()
-                .AddJob(Job.Dry.WithToolchain(new InProcessToolchain(TimeSpan.Zero, codegenMode, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
+                .AddJob(Job.Dry.WithToolchain(new InProcessNoEmitToolchain(TimeSpan.Zero, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))
                 .AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
                 .AddColumnProvider(DefaultColumnProviders.Instance);
         }
 
         [Fact]
-        public void InProcessBenchmarkAllCasesReflectionEmitSupported()
+        public void InProcessBenchmarkAllCasesSupported()
         {
             var logger = new OutputLogger(Output);
-            var config = CreateInProcessConfig(BenchmarkActionCodegen.ReflectionEmit, logger);
+            var config = CreateInProcessConfig(logger);
 
             try
             {
@@ -194,33 +205,10 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.DoesNotContain("No benchmarks found", logger.GetLog());
 
                 // Operations + GlobalSetup + GlobalCleanup
-                var expectedCount = summary.Reports.SelectMany(r => r.AllMeasurements).Sum(m => m.Operations + 2);
-                Assert.Equal(expectedCount, BenchmarkAllCases.Counter);
-            }
-            finally
-            {
-                BenchmarkAllCases.Counter = 0;
-            }
-        }
-
-        [Fact]
-        public void InProcessBenchmarkAllCasesDelegateCombineSupported()
-        {
-            var logger = new OutputLogger(Output);
-            var config = CreateInProcessConfig(BenchmarkActionCodegen.DelegateCombine, logger);
-
-            try
-            {
-                BenchmarkAllCases.Counter = 0;
-
-                var summary = CanExecute<BenchmarkAllCases>(config);
-
-                var testLog = logger.GetLog();
-                Assert.Contains("// Benchmark: BenchmarkAllCases.InvokeOnceVoid:", testLog);
-                Assert.DoesNotContain("No benchmarks found", logger.GetLog());
-
-                // Operations + GlobalSetup + GlobalCleanup
-                var expectedCount = summary.Reports.SelectMany(r => r.AllMeasurements).Sum(m => m.Operations + 2);
+                long expectedCount = summary.Reports
+                    .SelectMany(r => r.AllMeasurements)
+                    .Where(m => m.IterationStage != IterationStage.Result)
+                    .Sum(m => m.Operations + 2);
                 Assert.Equal(expectedCount, BenchmarkAllCases.Counter);
             }
             finally

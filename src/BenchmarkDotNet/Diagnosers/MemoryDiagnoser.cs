@@ -34,14 +34,14 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<Metric> ProcessResults(DiagnoserResults diagnoserResults)
         {
-            if (diagnoserResults.GcStats.Gen0Collections > 0 && Config.DisplayGenColumns)
-                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen0, diagnoserResults.GcStats.Gen0Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
-            if (diagnoserResults.GcStats.Gen1Collections > 0 && Config.DisplayGenColumns)
-                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen1, diagnoserResults.GcStats.Gen1Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
-            if (diagnoserResults.GcStats.Gen2Collections > 0 && Config.DisplayGenColumns)
-                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen2, diagnoserResults.GcStats.Gen2Collections / (double)diagnoserResults.GcStats.TotalOperations * 1000);
+            if (Config.DisplayGenColumns)
+            {
+                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen0, diagnoserResults.GcStats.Gen0Collections / (double) diagnoserResults.GcStats.TotalOperations * 1000);
+                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen1, diagnoserResults.GcStats.Gen1Collections / (double) diagnoserResults.GcStats.TotalOperations * 1000);
+                yield return new Metric(GarbageCollectionsMetricDescriptor.Gen2, diagnoserResults.GcStats.Gen2Collections / (double) diagnoserResults.GcStats.TotalOperations * 1000);
+            }
 
-            yield return new Metric(AllocatedMemoryMetricDescriptor.Instance, diagnoserResults.GcStats.GetBytesAllocatedPerOperation(diagnoserResults.BenchmarkCase));
+            yield return new Metric(AllocatedMemoryMetricDescriptor.Instance, diagnoserResults.GcStats.GetBytesAllocatedPerOperation(diagnoserResults.BenchmarkCase) ?? double.NaN);
         }
 
         private class GarbageCollectionsMetricDescriptor : IMetricDescriptor
@@ -66,6 +66,7 @@ namespace BenchmarkDotNet.Diagnosers
             public string Unit => "Count";
             public bool TheGreaterTheBetter => false;
             public int PriorityInCategory { get; }
+            public bool GetIsAvailable(Metric metric) => metric.Value > 0;
         }
     }
 }

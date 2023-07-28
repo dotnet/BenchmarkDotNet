@@ -110,7 +110,9 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(RunStrategy.ColdStart, job.Run.RunStrategy);
         }
 
-        [FactDotNetCoreOnly("When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..")]
+        [FactEnvSpecific(
+            "When CommandLineParser wants to display help, it tries to get the Title of the Entry Assembly which is an xunit runner, which has no Title and fails..",
+            EnvRequirement.DotNetCoreOnly)]
         public void UnknownConfigMeansFailure()
         {
             Assert.False(ConfigParser.Parse(new[] { "--unknown" }, new OutputLogger(Output)).isSuccess);
@@ -133,7 +135,7 @@ namespace BenchmarkDotNet.Tests
             Assert.False(ConfigParser.Parse(new[] { "--coreRun", nonExistingFile }, new OutputLogger(Output)).isSuccess);
         }
 
-        [FactDotNetCoreOnly("Detecting current version of .NET Core works only for .NET Core processes")]
+        [FactEnvSpecific("Detecting current version of .NET Core works only for .NET Core processes", EnvRequirement.DotNetCoreOnly)]
         public void CoreRunConfigParsedCorrectlyWhenRuntimeNotSpecified()
         {
             var fakeDotnetCliPath = typeof(object).Assembly.Location;
@@ -150,7 +152,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(fakeRestorePackages, toolchain.RestorePath.FullName);
         }
 
-        [FactClassicDotNetOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.FullFrameworkOnly)]
         public void SpecifyingCoreRunWithFullFrameworkTargetsMostRecentTfm()
         {
             var fakePath = typeof(object).Assembly.Location;
@@ -160,10 +162,10 @@ namespace BenchmarkDotNet.Tests
 
             CoreRunToolchain coreRunToolchain = (CoreRunToolchain)coreRunJob.GetToolchain();
             DotNetCliGenerator generator = (DotNetCliGenerator)coreRunToolchain.Generator;
-            Assert.Equal("net7.0", generator.TargetFrameworkMoniker);
+            Assert.Equal("net8.0", generator.TargetFrameworkMoniker);
         }
 
-        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
         public void SpecifyingCoreRunAndRuntimeCreatesTwoJobs()
         {
             const string runtime = "net7.0";
@@ -191,7 +193,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(fakeRestorePackages, generator.PackagesPath);
         }
 
-        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
         public void FirstJobIsBaseline_RuntimesCoreRun()
         {
             const string runtime1 = "net5.0";
@@ -205,7 +207,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(runtime1, ((DotNetCliGenerator)baselineJob.GetToolchain().Generator).TargetFrameworkMoniker);
         }
 
-        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
         public void FirstJobIsBaseline_CoreRunsRuntimes()
         {
             const string runtime1 = "net5.0";
@@ -219,7 +221,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(fakePath1, ((CoreRunToolchain)baselineJob.GetToolchain()).SourceCoreRun.FullName);
         }
 
-        [FactDotNetCoreOnly("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process")]
+        [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
         public void UserCanSpecifyMultipleCoreRunPaths()
         {
             var fakeCoreRunPath_1 = typeof(object).Assembly.Location;
@@ -244,7 +246,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is MonoRuntime mono && mono.CustomPath == fakeMonoPath));
         }
 
-        [FactWindowsOnly("Testing local builds of Full .NET Framework is supported only on Windows")]
+        [FactEnvSpecific("Testing local builds of Full .NET Framework is supported only on Windows", EnvRequirement.WindowsOnly)]
         public void ClrVersionParsedCorrectly()
         {
             const string clrVersion = "secret";
@@ -268,20 +270,30 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Theory]
-        [InlineData("netcoreapp2.0")]
-        [InlineData("netcoreapp2.1")]
-        [InlineData("netcoreapp2.2")]
-        [InlineData("netcoreapp3.0")]
-        public void DotNetCliParsedCorrectly(string tfm)
+        [InlineData("netcoreapp2.0", true)]
+        [InlineData("netcoreapp2.1", true)]
+        [InlineData("netcoreapp2.2", true)]
+        [InlineData("netcoreapp3.0", true)]
+        [InlineData("net462", false)]
+        [InlineData("net48", false)]
+        public void DotNetCliParsedCorrectly(string tfm, bool isCore)
         {
             var fakeDotnetCliPath = typeof(object).Assembly.Location;
             var config = ConfigParser.Parse(new[] { "-r", tfm, "--cli", fakeDotnetCliPath }, new OutputLogger(Output)).config;
 
             Assert.Single(config.GetJobs());
-            CsProjCoreToolchain toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
-            Assert.NotNull(toolchain);
+            var toolchain = config.GetJobs().Single().GetToolchain();
+            if (isCore)
+            {
+                Assert.True(toolchain is CsProjCoreToolchain);
+                Assert.Equal(fakeDotnetCliPath, ((CsProjCoreToolchain) toolchain).CustomDotNetCliPath);
+            }
+            else
+            {
+                Assert.True(toolchain is CsProjClassicNetToolchain);
+                Assert.Equal(fakeDotnetCliPath, ((CsProjClassicNetToolchain) toolchain).CustomDotNetCliPath);
+            }
             Assert.Equal(tfm, ((DotNetCliGenerator)toolchain.Generator).TargetFrameworkMoniker);
-            Assert.Equal(fakeDotnetCliPath, toolchain.CustomDotNetCliPath);
         }
 
         [Theory]
@@ -291,7 +303,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(ConfigOptions.StopOnFirstError, "--stopOnFirstError")]
         [InlineData(ConfigOptions.DisableLogFile, "--disableLogFile" )]
         [InlineData(ConfigOptions.LogBuildOutput, "--logBuildOutput")]
-        [InlineData(ConfigOptions.GenerateMSBuildBinLog, "--generateBinLog")]
+        [InlineData(ConfigOptions.GenerateMSBuildBinLog | ConfigOptions.KeepBenchmarkFiles, "--generateBinLog")]
         [InlineData(
             ConfigOptions.JoinSummary |
             ConfigOptions.KeepBenchmarkFiles |
@@ -373,6 +385,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("net50")]
         [InlineData("net60")]
         [InlineData("net70")]
+        [InlineData("net80")]
         public void NetMonikersAreRecognizedAsNetCoreMonikers(string tfm)
         {
             var config = ConfigParser.Parse(new[] { "-r", tfm }, new OutputLogger(Output)).config;
@@ -399,7 +412,7 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void CanCompareFewDifferentRuntimes()
         {
-            var config = ConfigParser.Parse(new[] { "--runtimes", "net462", "MONO", "netcoreapp3.0", "nativeaot6.0", "nativeAOT7.0"}, new OutputLogger(Output)).config;
+            var config = ConfigParser.Parse(new[] { "--runtimes", "net462", "MONO", "netcoreapp3.0", "nativeaot6.0", "nativeAOT7.0", "nativeAOT8.0" }, new OutputLogger(Output)).config;
 
             Assert.True(config.GetJobs().First().Meta.Baseline); // when the user provides multiple runtimes the first one should be marked as baseline
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.MsBuildMoniker == "net462"));
@@ -407,6 +420,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is CoreRuntime coreRuntime && coreRuntime.MsBuildMoniker == "netcoreapp3.0" && coreRuntime.RuntimeMoniker == RuntimeMoniker.NetCoreApp30));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net6.0" && nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot60));
             Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net7.0" && nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot70));
+            Assert.Single(config.GetJobs().Where(job => job.Environment.Runtime is NativeAotRuntime nativeAot && nativeAot.MsBuildMoniker == "net8.0" && nativeAot.RuntimeMoniker == RuntimeMoniker.NativeAot80));
         }
 
         [Theory]
@@ -571,6 +585,91 @@ namespace BenchmarkDotNet.Tests
             {
                 Assert.False(job.Environment.Gc.Force);
             }
+        }
+
+        [Fact]
+        public void UsersCanSpecifyWithoutOverheadEvalution()
+        {
+            var parsedConfiguration = ConfigParser.Parse(new[] { "--noOverheadEvaluation" }, new OutputLogger(Output));
+            Assert.True(parsedConfiguration.isSuccess);
+
+            foreach (var job in parsedConfiguration.config.GetJobs())
+            {
+                Assert.False(job.Accuracy.EvaluateOverhead);
+            }
+        }
+
+        [Fact(Skip = "This should be handled somehow at CommandLineParser level. See https://github.com/commandlineparser/commandline/pull/892")]
+        public void UserCanSpecifyWasmArgs()
+        {
+            var parsedConfiguration = ConfigParser.Parse(new[] { "--runtimes", "wasm", "--wasmArgs", "--expose_wasm --module" }, new OutputLogger(Output));
+            Assert.True(parsedConfiguration.isSuccess);
+            var jobs = parsedConfiguration.config.GetJobs();
+            foreach (var job in parsedConfiguration.config.GetJobs())
+            {
+                var wasmRuntime = Assert.IsType<WasmRuntime>(job.Environment.Runtime);
+                Assert.Equal(" --expose_wasm --module", wasmRuntime.JavaScriptEngineArguments);
+            }
+        }
+
+        [Fact]
+        public void UserCanSpecifyWasmArgsUsingEquals()
+        {
+            var parsedConfiguration = ConfigParser.Parse(new[] { "--runtimes", "wasm", "--wasmArgs=--expose_wasm --module" }, new OutputLogger(Output));
+            Assert.True(parsedConfiguration.isSuccess);
+            var jobs = parsedConfiguration.config.GetJobs();
+            foreach (var job in parsedConfiguration.config.GetJobs())
+            {
+                var wasmRuntime = Assert.IsType<WasmRuntime>(job.Environment.Runtime);
+                Assert.Equal("--expose_wasm --module", wasmRuntime.JavaScriptEngineArguments);
+            }
+        }
+
+        [Fact]
+        public void UserCanSpecifyWasmArgsViaResponseFile()
+        {
+            var tempResponseFile = Path.GetRandomFileName();
+            File.WriteAllLines(tempResponseFile, new[]
+            {
+                "--runtimes wasm",
+                "--wasmArgs \"--expose_wasm --module\""
+            });
+            var parsedConfiguration = ConfigParser.Parse(new[] { $"@{tempResponseFile}" }, new OutputLogger(Output));
+            Assert.True(parsedConfiguration.isSuccess);
+            var jobs = parsedConfiguration.config.GetJobs();
+            foreach (var job in parsedConfiguration.config.GetJobs())
+            {
+                var wasmRuntime = Assert.IsType<WasmRuntime>(job.Environment.Runtime);
+                // We may need change assertion to just "--expose_wasm --module"
+                // if https://github.com/commandlineparser/commandline/pull/892 lands
+                Assert.Equal(" --expose_wasm --module", wasmRuntime.JavaScriptEngineArguments);
+            }
+        }
+
+        [Theory]
+        [InlineData("--filter abc", "--filter *")]
+        [InlineData("-f abc", "--filter *")]
+        [InlineData("-f *", "--filter *")]
+        [InlineData("--runtimes net7.0 --join", "--filter * --join --runtimes net7.0")]
+        [InlineData("--join abc", "--filter * --join")]
+        public void CheckUpdateValidArgs(string strArgs, string expected)
+        {
+            var args = strArgs.Split();
+            _ = ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = new[] { "*" });
+
+            Assert.Equal(expected.Split(), updatedArgs);
+        }
+
+        [Theory]
+        [InlineData("--filter abc -f abc")]
+        [InlineData("--runtimes net")]
+        public void CheckUpdateInvalidArgs(string strArgs)
+        {
+            var args = strArgs.Split();
+            bool isSuccess = ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = new[] { "*" });
+
+            Assert.Null(updatedArgs);
+            Assert.False(isSuccess);
         }
     }
 }

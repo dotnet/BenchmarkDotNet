@@ -34,7 +34,6 @@ namespace BenchmarkDotNet.Configs
         private readonly List<IFilter> filters = new List<IFilter>();
         private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = new List<BenchmarkLogicalGroupRule>();
         private readonly List<IBenchmarkEventHandler> eventHandlers = new List<IBenchmarkEventHandler>();
-        private readonly static Conclusion[] emptyConclusion = Array.Empty<Conclusion>();
         private readonly List<IColumnHidingRule> columnHidingRules = new List<IColumnHidingRule>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
@@ -55,6 +54,7 @@ namespace BenchmarkDotNet.Configs
         [PublicAPI] public string ArtifactsPath { get; set; }
         [PublicAPI] public CultureInfo CultureInfo { get; set; }
         [PublicAPI] public IOrderer Orderer { get; set; }
+        [PublicAPI] public ICategoryDiscoverer CategoryDiscoverer { get; set; }
         [PublicAPI] public SummaryStyle SummaryStyle { get; set; }
         [PublicAPI] public TimeSpan BuildTimeout { get; set; } = DefaultConfig.Instance.BuildTimeout;
 
@@ -93,6 +93,12 @@ namespace BenchmarkDotNet.Configs
         public ManualConfig WithOrderer(IOrderer orderer)
         {
             Orderer = orderer;
+            return this;
+        }
+
+        public ManualConfig WithCategoryDiscoverer(ICategoryDiscoverer categoryDiscoverer)
+        {
+            CategoryDiscoverer = categoryDiscoverer;
             return this;
         }
 
@@ -257,6 +263,7 @@ namespace BenchmarkDotNet.Configs
             hardwareCounters.AddRange(config.GetHardwareCounters());
             filters.AddRange(config.GetFilters());
             Orderer = config.Orderer ?? Orderer;
+            CategoryDiscoverer = config.CategoryDiscoverer ?? CategoryDiscoverer;
             ArtifactsPath = config.ArtifactsPath ?? ArtifactsPath;
             CultureInfo = config.CultureInfo ?? CultureInfo;
             SummaryStyle = config.SummaryStyle ?? SummaryStyle;

@@ -10,19 +10,19 @@ namespace BenchmarkDotNet.Order
 {
     public interface IOrderer
     {
-        [PublicAPI, NotNull]
+        [PublicAPI]
         IEnumerable<BenchmarkCase> GetExecutionOrder(ImmutableArray<BenchmarkCase> benchmarksCase, IEnumerable<BenchmarkLogicalGroupRule> order = null);
 
-        [PublicAPI, NotNull]
-        IEnumerable<BenchmarkCase> GetSummaryOrder(ImmutableArray<BenchmarkCase> benchmarksCases, [NotNull] Summary summary);
+        [PublicAPI]
+        IEnumerable<BenchmarkCase> GetSummaryOrder(ImmutableArray<BenchmarkCase> benchmarksCases, Summary summary);
 
-        [PublicAPI, CanBeNull]
-        string GetHighlightGroupKey([NotNull] BenchmarkCase benchmarkCase);
+        [PublicAPI]
+        string? GetHighlightGroupKey(BenchmarkCase benchmarkCase);
 
-        [PublicAPI, CanBeNull]
-        string GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, [NotNull] BenchmarkCase benchmarkCase);
+        [PublicAPI]
+        string? GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, BenchmarkCase benchmarkCase);
 
-        [PublicAPI, NotNull]
+        [PublicAPI]
         IEnumerable<IGrouping<string, BenchmarkCase>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>> logicalGroups,
             IEnumerable<BenchmarkLogicalGroupRule> order = null);
 

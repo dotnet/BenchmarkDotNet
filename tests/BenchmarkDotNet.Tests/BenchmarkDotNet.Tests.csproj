@@ -2,12 +2,12 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.Tests</AssemblyTitle>
-    <TargetFrameworks>net462;net6.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;net462</TargetFrameworks>
     <AssemblyName>BenchmarkDotNet.Tests</AssemblyName>
     <PackageId>BenchmarkDotNet.Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);NU1701;1701;CA1018;CA2007</NoWarn>
+    <NoWarn>$(NoWarn);NU1701;1701;CA1018;CA2007;CA1825</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json">
@@ -15,21 +15,25 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.5.5" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="ApprovalTests" Version="3.1.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
+    <PackageReference Include="Verify.Xunit" Version="20.3.2" />
+    <PackageReference Include="xunit" Version="2.5.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
-    <PackageReference Include="Microsoft.NETCore.Platforms" Version="2.2.0" />
+    <PackageReference Include="Microsoft.NETCore.Platforms" Version="5.0.0" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Threading.Tasks" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotTrace\BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>

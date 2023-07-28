@@ -10,9 +10,12 @@ namespace BenchmarkDotNet.Loggers
     internal class AsyncProcessOutputReader : IDisposable
     {
         private readonly Process process;
-        private readonly ConcurrentQueue<string> output, error;
-        private readonly bool logOutput, readStandardError;
         private readonly ILogger logger;
+        private readonly bool logOutput, readStandardError;
+
+        private static readonly TimeSpan FinishEventTimeout = TimeSpan.FromSeconds(1);
+        private readonly AutoResetEvent outputFinishEvent, errorFinishEvent;
+        private readonly ConcurrentQueue<string> output, error;
 
         private long status;
 
@@ -28,6 +31,8 @@ namespace BenchmarkDotNet.Loggers
             this.process = process;
             output = new ConcurrentQueue<string>();
             error = new ConcurrentQueue<string>();
+            outputFinishEvent = new AutoResetEvent(false);
+            errorFinishEvent = new AutoResetEvent(false);
             status = (long)Status.Created;
             this.logOutput = logOutput;
             this.logger = logger;
@@ -39,6 +44,9 @@ namespace BenchmarkDotNet.Loggers
             Interlocked.Exchange(ref status, (long)Status.Disposed);
 
             Detach();
+
+            outputFinishEvent.Dispose();
+            errorFinishEvent.Dispose();
         }
 
         internal void BeginRead()
@@ -72,6 +80,10 @@ namespace BenchmarkDotNet.Loggers
             if (Interlocked.CompareExchange(ref status, (long)Status.Stopped, (long)Status.Started) != (long)Status.Started)
                 throw new InvalidOperationException("Only a started reader can be stopped");
 
+            outputFinishEvent.WaitOne(FinishEventTimeout);
+            if (readStandardError)
+                errorFinishEvent.WaitOne(FinishEventTimeout);
+
             Detach();
         }
 
@@ -103,34 +115,38 @@ namespace BenchmarkDotNet.Loggers
 
         private void ProcessOnOutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(e.Data))
+            if (e.Data != null)
             {
-                output.Enqueue(e.Data);
-
-                if (logOutput)
+                if (!string.IsNullOrEmpty(e.Data))
                 {
-                    lock (this) // #2125
+                    output.Enqueue(e.Data);
+
+                    if (logOutput)
                     {
                         logger.WriteLine(e.Data);
                     }
                 }
             }
+            else // 'e.Data == null' means EOF
+                outputFinishEvent.Set();
         }
 
         private void ProcessOnErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(e.Data))
+            if (e.Data != null)
             {
-                error.Enqueue(e.Data);
-
-                if (logOutput)
+                if (!string.IsNullOrEmpty(e.Data))
                 {
-                    lock (this) // #2125
+                    error.Enqueue(e.Data);
+
+                    if (logOutput)
                     {
                         logger.WriteLineError(e.Data);
                     }
                 }
             }
+            else // 'e.Data == null' means EOF
+                errorFinishEvent.Set();
         }
 
         private T ReturnIfStopped<T>(Func<T> getter)

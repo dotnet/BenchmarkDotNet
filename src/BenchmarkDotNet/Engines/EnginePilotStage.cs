@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Reports;
 using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Engines
@@ -8,6 +10,24 @@ namespace BenchmarkDotNet.Engines
     // TODO: use clockResolution
     internal class EnginePilotStage : EngineStage
     {
+        public readonly struct PilotStageResult
+        {
+            public long PerfectInvocationCount { get; }
+            public IReadOnlyList<Measurement> Measurements { get; }
+
+            public PilotStageResult(long perfectInvocationCount, List<Measurement> measurements)
+            {
+                PerfectInvocationCount = perfectInvocationCount;
+                Measurements = measurements;
+            }
+
+            public PilotStageResult(long perfectInvocationCount)
+            {
+                PerfectInvocationCount = perfectInvocationCount;
+                Measurements = Array.Empty<Measurement>();
+            }
+        }
+
         internal const long MaxInvokeCount = (long.MaxValue / 2 + 1) / 2;
 
         private readonly int unrollFactor;
@@ -30,11 +50,11 @@ namespace BenchmarkDotNet.Engines
         }
 
         /// <returns>Perfect invocation count</returns>
-        public long Run()
+        public PilotStageResult Run()
         {
             // If InvocationCount is specified, pilot stage should be skipped
             if (TargetJob.HasValue(RunMode.InvocationCountCharacteristic))
-                return TargetJob.Run.InvocationCount;
+                return new PilotStageResult(TargetJob.Run.InvocationCount);
 
             // Here we want to guess "perfect" amount of invocation
             return TargetJob.HasValue(RunMode.IterationTimeCharacteristic)
@@ -45,15 +65,17 @@ namespace BenchmarkDotNet.Engines
         /// <summary>
         /// A case where we don't have specific iteration time.
         /// </summary>
-        private long RunAuto()
+        private PilotStageResult RunAuto()
         {
             long invokeCount = Autocorrect(minInvokeCount);
+            var measurements = new List<Measurement>();
 
             int iterationCounter = 0;
             while (true)
             {
                 iterationCounter++;
                 var measurement = RunIteration(IterationMode.Workload, IterationStage.Pilot, iterationCounter, invokeCount, unrollFactor);
+                measurements.Add(measurement);
                 double iterationTime = measurement.Nanoseconds;
                 double operationError = 2.0 * resolution / invokeCount; // An operation error which has arisen due to the Chronometer precision
 
@@ -75,15 +97,16 @@ namespace BenchmarkDotNet.Engines
             }
             WriteLine();
 
-            return invokeCount;
+            return new PilotStageResult(invokeCount, measurements);
         }
 
         /// <summary>
         /// A case where we have specific iteration time.
         /// </summary>
-        private long RunSpecific()
+        private PilotStageResult RunSpecific()
         {
             long invokeCount = Autocorrect(Engine.MinInvokeCount);
+            var measurements = new List<Measurement>();
 
             int iterationCounter = 0;
 
@@ -92,6 +115,7 @@ namespace BenchmarkDotNet.Engines
             {
                 iterationCounter++;
                 var measurement = RunIteration(IterationMode.Workload, IterationStage.Pilot, iterationCounter, invokeCount, unrollFactor);
+                measurements.Add(measurement);
                 double actualIterationTime = measurement.Nanoseconds;
                 long newInvokeCount = Autocorrect(Math.Max(minInvokeCount, (long)Math.Round(invokeCount * targetIterationTime / actualIterationTime)));
 
@@ -105,7 +129,7 @@ namespace BenchmarkDotNet.Engines
             }
             WriteLine();
 
-            return invokeCount;
+            return new PilotStageResult(invokeCount, measurements);
         }
 
         private long Autocorrect(long count) => (count + unrollFactor - 1) / unrollFactor * unrollFactor;

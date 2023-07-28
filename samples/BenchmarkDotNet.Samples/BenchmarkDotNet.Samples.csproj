@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.Samples</AssemblyTitle>
-    <TargetFrameworks>net462;net6.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;net462</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.Samples</AssemblyName>
     <OutputType>Exe</OutputType>
@@ -10,17 +10,18 @@
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
-    <NoWarn>$(NoWarn);CA1018;CA5351</NoWarn>
+    <NoWarn>$(NoWarn);CA1018;CA5351;CA1825</NoWarn>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <Reference Include="System.Reflection" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="System.Drawing.Common" Version="4.5.1" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Drawing.Common" Version="4.7.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotTrace\BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
   </ItemGroup>

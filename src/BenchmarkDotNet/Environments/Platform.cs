@@ -40,6 +40,16 @@
         /// <summary>
         /// LOONGARCH64
         /// </summary>
-        LoongArch64
+        LoongArch64,
+
+        /// <summary>
+        /// A 32-bit ARMv6 processor architecture.
+        /// </summary>
+        Armv6,
+
+        /// <summary>
+        /// A PowerPC 64-bit (little-endian) processor architecture.
+        /// </summary>
+        Ppc64le,
     }
 }

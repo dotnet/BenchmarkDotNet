@@ -1,0 +1,27 @@
+name: report-test-results
+run-name: Report test results for '${{ github.event.workflow_run.head_branch }}' / ${{ github.event.workflow_run.head_commit.message }}
+
+on:
+  workflow_run:
+    workflows: [ 'run-tests' ]
+    types:
+      - completed
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Download Artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: ${{ github.event.workflow_run.workflow_id }}
+      - name: Display structure of downloaded files
+        run: ls -R
+      - name: Report tests results
+        uses: AndreyAkinshin/test-reporter@0e2c48ebec2007001dd77dd4bcbcd450b96d5a38
+        with:
+          name: report
+          path: "**/*.trx"
+          reporter: dotnet-trx
+          fail-on-error: true

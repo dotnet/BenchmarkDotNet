@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using JetBrains.Annotations;
 using Perfolizer.Mathematics.SignificanceTesting;
 using Perfolizer.Mathematics.Thresholds;
 
@@ -8,7 +7,7 @@ namespace BenchmarkDotNet.Mathematics
 {
     internal static class RankHelper
     {
-        public static int[] GetRanks([ItemNotNull] params Statistics[] stats)
+        public static int[] GetRanks(params Statistics[] stats)
         {
             var values = stats.
                 Select((s, index) => new { Stats = s, Index = index }).

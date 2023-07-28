@@ -12,7 +12,6 @@ using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Configs
 {
@@ -31,7 +30,8 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<IBenchmarkEventHandler> GetEventHandlers();
         IEnumerable<IColumnHidingRule> GetColumnHidingRules();
 
-        [CanBeNull] IOrderer Orderer { get; }
+        IOrderer? Orderer { get; }
+        ICategoryDiscoverer? CategoryDiscoverer { get; }
 
         SummaryStyle SummaryStyle { get; }
 
@@ -42,8 +42,7 @@ namespace BenchmarkDotNet.Configs
         /// </summary>
         string ArtifactsPath { get; }
 
-        [CanBeNull]
-        CultureInfo CultureInfo { get; }
+        CultureInfo? CultureInfo { get; }
 
         /// <summary>
         /// a set of custom flags that can enable/disable various settings

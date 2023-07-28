@@ -17,13 +17,13 @@ namespace BenchmarkDotNet.IntegrationTests
         {
         }
 
-        [FactWindowsOnly("Process.set_PriorityClass requires root on Unix")]
+        [FactEnvSpecific("Process.set_PriorityClass requires root on Unix", EnvRequirement.WindowsOnly)]
         public void HighPriorityIsSet()
         {
             CanExecute<HighPriority>();
         }
 
-        [FactWindowsOnly("Process.set_ProcessorAffinity requires root on Unix")]
+        [FactEnvSpecific("Process.set_ProcessorAffinity requires root on Unix", EnvRequirement.WindowsOnly)]
         public void CustomAffinityCanBeSet()
         {
             var config = ManualConfig.CreateEmpty()
@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 if (Process.GetCurrentProcess().ProcessorAffinity != Value)
                 {
-                    throw new InvalidOperationException("Did not set custom affinity");
+                    throw new InvalidOperationException($"Did not set custom affinity {Process.GetCurrentProcess().ProcessorAffinity} != {Value}");
                 }
             }
         }

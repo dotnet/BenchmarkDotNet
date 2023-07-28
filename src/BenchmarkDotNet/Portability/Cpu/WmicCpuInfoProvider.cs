@@ -1,6 +1,6 @@
 ﻿using System;
+using System.IO;
 using BenchmarkDotNet.Helpers;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Cpu
 {
@@ -10,15 +10,18 @@ namespace BenchmarkDotNet.Portability.Cpu
     /// </summary>
     internal static class WmicCpuInfoProvider
     {
-        internal static readonly Lazy<CpuInfo> WmicCpuInfo = new Lazy<CpuInfo>(Load);
+        internal static readonly Lazy<CpuInfo> WmicCpuInfo = new (Load);
 
-        [CanBeNull]
-        private static CpuInfo Load()
+        private const string DefaultWmicPath = @"C:\Windows\System32\wbem\WMIC.exe";
+
+        private static CpuInfo? Load()
         {
             if (RuntimeInformation.IsWindows())
             {
-                string argList = $"{WmicCpuInfoKeyNames.Name}, {WmicCpuInfoKeyNames.NumberOfCores}, {WmicCpuInfoKeyNames.NumberOfLogicalProcessors}, {WmicCpuInfoKeyNames.MaxClockSpeed}";
-                string content = ProcessHelper.RunAndReadOutput("wmic", $"cpu get {argList} /Format:List");
+                const string argList = $"{WmicCpuInfoKeyNames.Name}, {WmicCpuInfoKeyNames.NumberOfCores}, " +
+                                       $"{WmicCpuInfoKeyNames.NumberOfLogicalProcessors}, {WmicCpuInfoKeyNames.MaxClockSpeed}";
+                string wmicPath = File.Exists(DefaultWmicPath) ? DefaultWmicPath : "wmic";
+                string content = ProcessHelper.RunAndReadOutput(wmicPath, $"cpu get {argList} /Format:List");
                 return WmicCpuInfoParser.ParseOutput(content);
             }
             return null;

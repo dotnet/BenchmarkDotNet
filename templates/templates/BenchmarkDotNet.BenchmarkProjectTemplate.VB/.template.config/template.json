@@ -31,8 +31,54 @@
     },
     "framework": {
       "type": "parameter",
-      "datatype": "string",
-      "description": "The target framework for the project (e.g. netstandard2.0). Default \"net5.0\" if \"--console-app\" is true, \"netstandard2.0\" if \"--console-app\" is false",
+      "description": "The target framework for the project.",
+      "datatype": "choice",
+      "choices": [
+        {
+          "choice": "net8.0",
+          "description": ".NET 8"
+        },
+        {
+          "choice": "net7.0",
+          "description": ".NET 7"
+        },
+        {
+          "choice": "net6.0",
+          "description": ".NET 6"
+        },
+        {
+          "choice": "netstandard2.1",
+          "description": ".NET Standard 2.1"
+        },
+        {
+          "choice": "netstandard2.0",
+          "description": ".NET Standard 2.0"
+        },
+        {
+          "choice": "net481",
+          "description": ".NET Framework 4.8.1"
+        },
+        {
+          "choice": "net48",
+          "description": ".NET Framework 4.8"
+        },
+        {
+          "choice": "net472",
+          "description": ".NET Framework 4.7.2"
+        },
+        {
+          "choice": "net471",
+          "description": ".NET Framework 4.7.1"
+        },
+        {
+          "choice": "net47",
+          "description": ".NET Framework 4.7"
+        },
+        {
+          "choice": "net462",
+          "description": ".NET Framework 4.6.2"
+        }
+      ],
       "defaultValue": ""
     },
     "frameworkDefault": {
@@ -45,7 +91,7 @@
         "cases": [
           {
             "condition": "(framework == '' && consoleApp == true)",
-            "value": "net5.0"
+            "value": "net6.0"
           },
           {
             "condition": "(framework == '' && consoleApp == false)",
@@ -92,13 +138,13 @@
       "type": "parameter",
       "datatype": "bool",
       "description": "If specified, the project is set up as console app.",
-      "defaultValue": "false"
+      "defaultValue": "true"
     },
     "version": {
       "type": "parameter",
       "datatype": "string",
       "description": "Version of BenchmarkDotNet that will be referenced.",
-      "defaultValue": "0.12.1",
+      "defaultValue": "0.13.7",
       "replaces": "$(BenchmarkDotNetVersion)"
     }
   },

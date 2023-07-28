@@ -1,4 +1,5 @@
 ---
+#cspell:ignore runstrategy
 uid: BenchmarkDotNet.Samples.IntroMonitoring
 ---
 
@@ -15,7 +16,7 @@ It's a perfect mode for benchmarks which doesn't have a steady state and the per
 ### Usage
 
 ```cs
-[SimpleJob(RunStrategy.Monitoring, launchCount: 10, warmupCount: 0, targetCount: 100)]
+[SimpleJob(RunStrategy.Monitoring, launchCount: 10, warmupCount: 0, iterationCount: 100)]
 public class MyBenchmarkClass
 ```
 

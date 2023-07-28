@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Portability.Cpu;
+using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 
@@ -51,6 +51,7 @@ namespace BenchmarkDotNet.Environments
         public virtual IEnumerable<string> ToFormattedString()
         {
             yield return "Benchmark Process Environment Information:";
+            yield return $"{BenchmarkDotNetInfo.Instance.BrandTitle}";
             yield return $"{RuntimeInfoPrefix}{GetRuntimeInfo()}";
             yield return $"{GcInfoPrefix}{GetGcConcurrentFlag()} {GetGcServerFlag()}";
             yield return $"{HardwareIntrinsicsPrefix}{HardwareIntrinsics.GetFullInfo(RuntimeInformation.GetCurrentPlatform())} {HardwareIntrinsics.GetVectorSize()}";
@@ -60,7 +61,7 @@ namespace BenchmarkDotNet.Environments
             ? ""
             : Configuration;
 
-        [PublicAPI] protected string GetDebuggerFlag() => HasAttachedDebugger ? " [AttachedDebugger]" : "";
+        [PublicAPI] protected string GetDebuggerFlag() => HasAttachedDebugger ? "[AttachedDebugger]" : "";
         [PublicAPI] protected string GetGcServerFlag() => IsServerGC ? "Server" : "Workstation";
         [PublicAPI] protected string GetGcConcurrentFlag() => IsConcurrentGC ? "Concurrent" : "Non-concurrent";
 
@@ -70,7 +71,6 @@ namespace BenchmarkDotNet.Environments
             return $"{RuntimeVersion}, {Architecture} {jitInfo}";
         }
 
-        [SuppressMessage("ReSharper", "UnusedMember.Global")] // TODO: should be used or removed
         public static IEnumerable<ValidationError> Validate(Job job)
         {
             if (job.Environment.Jit == Jit.RyuJit && !RuntimeInformation.HasRyuJit())

@@ -11,3 +11,4 @@ _exported_templates
 docfx-bin
 api/*
 !api/index.md
+/index.md

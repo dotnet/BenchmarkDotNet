@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Exporters.Csv
 {
@@ -10,8 +9,7 @@ namespace BenchmarkDotNet.Exporters.Csv
         private const string TwoQuotes = "\"\"";
         private static readonly char[] ForbiddenSymbols = { '\n', '\r', '"', ',' };
 
-        [NotNull]
-        public static string Escape([CanBeNull] string value, string currentListSeparator)
+        public static string Escape(string? value, string currentListSeparator)
         {
             if (value == null)
                 return string.Empty;

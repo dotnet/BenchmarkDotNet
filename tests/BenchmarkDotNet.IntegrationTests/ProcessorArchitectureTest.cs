@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
 using Xunit.Abstractions;
@@ -15,17 +17,27 @@ namespace BenchmarkDotNet.IntegrationTests
         {
         }
 
-        [Fact]
-        public void SpecifiedProcessorArchitectureMustBeRespected()
+        public static IEnumerable<object[]> Arguments()
         {
-#if NETFRAMEWORK // dotnet cli does not support x86 compilation so far, so I disable this test
-            Verify(Platform.X86, typeof(X86Benchmark));
-#endif
-            Verify(Platform.X64, typeof(X64Benchmark));
-            Verify(Platform.AnyCpu, typeof(AnyCpuBenchmark));
+            Platform current = RuntimeInformation.GetCurrentPlatform();
+
+            if (RuntimeInformation.IsFullFramework && current is Platform.X64 or Platform.X86)
+            {
+                // RoslynToolchain (used for Full Framework) supports building and running for different architecture than the host process
+                yield return new object[]
+                {
+                    current is Platform.X64 ? Platform.X86 : Platform.X64,
+                    current is Platform.X64 ? typeof(Benchmark_32bit) : typeof(Benchmark_64bit)
+                };
+            }
+
+            yield return new object[] { current, IntPtr.Size == 8 ? typeof(Benchmark_64bit) : typeof(Benchmark_32bit) };
+            yield return new object[] { Platform.AnyCpu, typeof(AnyCpuBenchmark) };
         }
 
-        private void Verify(Platform platform, Type benchmark)
+        [Theory]
+        [MemberData(nameof(Arguments))]
+        public void SpecifiedProcessorArchitectureMustBeRespected(Platform platform, Type benchmark)
         {
             var config = ManualConfig.CreateEmpty()
                     .AddJob(Job.Dry.WithPlatform(platform))
@@ -35,10 +47,10 @@ namespace BenchmarkDotNet.IntegrationTests
             CanExecute(benchmark, config, fullValidation: true);
         }
 
-        public class X86Benchmark
+        public class Benchmark_32bit
         {
             [Benchmark]
-            public void _32Bit()
+            public void Verify()
             {
                 if (IntPtr.Size != 4)
                 {
@@ -47,10 +59,10 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        public class X64Benchmark
+        public class Benchmark_64bit
         {
             [Benchmark]
-            public void _64Bit()
+            public void Verify()
             {
                 if (IntPtr.Size != 8)
                 {

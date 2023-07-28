@@ -1,7 +1,6 @@
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Toolchains;
 using System;
 
 namespace BenchmarkDotNet.Disassemblers
@@ -9,16 +8,14 @@ namespace BenchmarkDotNet.Disassemblers
     internal class SameArchitectureDisassembler
     {
         private readonly DisassemblyDiagnoserConfig config;
-        private readonly ClrMdV2Disassembler clrMdV2Disassembler;
+        private ClrMdV2Disassembler? clrMdV2Disassembler;
 
-        internal SameArchitectureDisassembler(DisassemblyDiagnoserConfig config)
-        {
-            this.config = config;
-            clrMdV2Disassembler = CreateDisassemblerForCurrentArchitecture();
-        }
+        internal SameArchitectureDisassembler(DisassemblyDiagnoserConfig config) => this.config = config;
 
         internal DisassemblyResult Disassemble(DiagnoserActionParameters parameters)
-            => clrMdV2Disassembler.AttachAndDisassemble(BuildDisassemblerSettings(parameters));
+        // delay the creation to avoid exceptions at DisassemblyDiagnoser ctor
+            => (clrMdV2Disassembler ??= CreateDisassemblerForCurrentArchitecture())
+                    .AttachAndDisassemble(BuildDisassemblerSettings(parameters));
 
         private static ClrMdV2Disassembler CreateDisassemblerForCurrentArchitecture()
             => RuntimeInformation.GetCurrentPlatform() switch

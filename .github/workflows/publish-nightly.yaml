@@ -1,0 +1,31 @@
+name: publish-nightly
+run-name: Publish nightly nupkg / ${{ github.event.head_commit.message }}
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: ${{ github.repository == 'dotnet/BenchmarkDotNet' }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set date
+        run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+      - name: Pack
+        run: ./build.cmd pack /p:VersionSuffix=nightly.$DATE.$GITHUB_RUN_NUMBER
+      - name: Upload nupkg to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: nupkgs
+          path: "**/*.*nupkg"
+      - name: Publish nupkg
+        env:
+          MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
+        run: ./.dotnet/dotnet nuget push **/*.nupkg --source https://www.myget.org/F/benchmarkdotnet/api/v3/index.json --api-key $MYGET_API_KEY --timeout 600
+      - name: Publish snupkg
+        env:
+          MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
+        run: ./.dotnet/dotnet nuget push **/*.snupkg --source https://www.myget.org/F/benchmarkdotnet/api/v3/index.json --api-key $MYGET_API_KEY --timeout 600

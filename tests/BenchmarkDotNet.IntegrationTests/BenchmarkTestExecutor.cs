@@ -9,6 +9,7 @@ using BenchmarkDotNet.Tests.Loggers;
 using Xunit;
 using Xunit.Abstractions;
 using System.Collections.Generic;
+using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -49,7 +50,7 @@ namespace BenchmarkDotNet.IntegrationTests
         /// <param name="config">Optional custom config to be used instead of the default</param>
         /// <param name="fullValidation">Optional: disable validation (default = true/enabled)</param>
         /// <returns>The summary from the benchmark run</returns>
-        protected Reports.Summary CanExecute(Type type, IConfig config = null, bool fullValidation = true)
+        public Reports.Summary CanExecute(Type type, IConfig config = null, bool fullValidation = true)
         {
             // Add logging, so the Benchmark execution is in the TestRunner output (makes Debugging easier)
             if (config == null)
@@ -57,6 +58,8 @@ namespace BenchmarkDotNet.IntegrationTests
 
             if (!config.GetLoggers().OfType<OutputLogger>().Any())
                 config = config.AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default);
+            if (!config.GetLoggers().OfType<ConsoleLogger>().Any())
+                config = config.AddLogger(ConsoleLogger.Default);
 
             if (!config.GetColumnProviders().Any())
                 config = config.AddColumnProvider(DefaultColumnProviders.Instance);
@@ -69,6 +72,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 Assert.False(summary.HasCriticalValidationErrors, "The \"Summary\" should have NOT \"HasCriticalValidationErrors\"");
 
                 Assert.True(summary.Reports.Any(), "The \"Summary\" should contain at least one \"BenchmarkReport\" in the \"Reports\" collection");
+
+                summary.CheckPlatformLinkerIssues();
 
                 Assert.True(summary.Reports.All(r => r.BuildResult.IsBuildSuccess),
                     "The following benchmarks have failed to build: " +

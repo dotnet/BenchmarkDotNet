@@ -14,7 +14,7 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
-    <PackageReference Include="Microsoft.NETCore.Platforms" Version="2.2.0" />
+    <PackageReference Include="Microsoft.NETCore.Platforms" Version="5.0.0" />
     <Reference Include="System.Runtime" />
   </ItemGroup>
 

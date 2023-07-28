@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using BenchmarkDotNet.Environments;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Reports
 {
@@ -10,17 +9,13 @@ namespace BenchmarkDotNet.Reports
         private const string DisplayedGcInfoPrefix = "// " + BenchmarkEnvironmentInfo.GcInfoPrefix;
         private const string DisplayedHardwareIntrinsicsPrefix = "// " + BenchmarkEnvironmentInfo.HardwareIntrinsicsPrefix;
 
-        [CanBeNull]
-        public static string GetRuntimeInfo(this BenchmarkReport report) => report.GetInfoFromOutput(DisplayedRuntimeInfoPrefix);
+        public static string? GetRuntimeInfo(this BenchmarkReport report) => report.GetInfoFromOutput(DisplayedRuntimeInfoPrefix);
 
-        [CanBeNull]
-        public static string GetGcInfo(this BenchmarkReport report) => report.GetInfoFromOutput(DisplayedGcInfoPrefix);
+        public static string? GetGcInfo(this BenchmarkReport report) => report.GetInfoFromOutput(DisplayedGcInfoPrefix);
 
-        [CanBeNull]
-        public static string GetHardwareIntrinsicsInfo(this BenchmarkReport report) => report.GetInfoFromOutput(DisplayedHardwareIntrinsicsPrefix);
+        public static string? GetHardwareIntrinsicsInfo(this BenchmarkReport report) => report.GetInfoFromOutput(DisplayedHardwareIntrinsicsPrefix);
 
-        [CanBeNull]
-        private static string GetInfoFromOutput(this BenchmarkReport report, string prefix)
+        private static string? GetInfoFromOutput(this BenchmarkReport report, string prefix)
         {
             return (
                 from executeResults in report.ExecuteResults

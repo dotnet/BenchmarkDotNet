@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Characteristics;
 using JetBrains.Annotations;
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Jobs

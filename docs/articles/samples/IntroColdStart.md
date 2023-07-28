@@ -1,4 +1,5 @@
 ---
+#cspell:ignore runstrategy
 uid: BenchmarkDotNet.Samples.IntroColdStart
 ---
 
