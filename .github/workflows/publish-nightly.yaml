@@ -20,7 +20,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: nupkgs
-          path: "**/*.nupkg"
+          path: "**/*.*nupkg"
       - name: Publish nupkg
         env:
           MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
