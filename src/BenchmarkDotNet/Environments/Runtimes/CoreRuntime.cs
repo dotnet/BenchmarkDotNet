@@ -158,7 +158,7 @@ namespace BenchmarkDotNet.Environments
                 if (productName.IndexOf(".NET Framework", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     const string releaseVersionPrefix = "release/";
-                    int releaseVersionIndex = productVersion.IndexOf(releaseVersionPrefix);
+                    int releaseVersionIndex = productVersion.IndexOf(releaseVersionPrefix, StringComparison.Ordinal);
                     if (releaseVersionIndex > 0)
                     {
                         string releaseVersion = GetParsableVersionPart(productVersion.Substring(releaseVersionIndex + releaseVersionPrefix.Length));

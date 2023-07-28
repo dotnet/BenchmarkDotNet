@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
-using JetBrains.Annotations;
 using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Engines

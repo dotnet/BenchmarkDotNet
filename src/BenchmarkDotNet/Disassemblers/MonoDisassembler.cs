@@ -10,7 +10,6 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Disassemblers
 {

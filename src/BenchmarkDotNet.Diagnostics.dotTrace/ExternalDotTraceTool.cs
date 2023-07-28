@@ -1,9 +1,7 @@
 using System;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using JetBrains.Profiler.SelfApi;
 using ILogger = BenchmarkDotNet.Loggers.ILogger;

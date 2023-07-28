@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using BenchmarkDotNet.Loggers;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Helpers
 {

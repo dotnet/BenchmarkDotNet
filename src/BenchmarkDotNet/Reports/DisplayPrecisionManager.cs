@@ -4,7 +4,6 @@ using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Reports
 {

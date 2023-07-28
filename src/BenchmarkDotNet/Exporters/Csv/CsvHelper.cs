@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Exporters.Csv
 {

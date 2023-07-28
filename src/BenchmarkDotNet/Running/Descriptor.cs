@@ -4,7 +4,6 @@ using System.Reflection;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
 {

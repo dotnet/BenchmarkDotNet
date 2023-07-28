@@ -120,8 +120,8 @@ namespace BenchmarkDotNet.Environments
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
         internal static string? ParseIntelCoreMicroarchitecture(string modelNumber)
         {
-            if (KnownMicroarchitectures.Value.ContainsKey(modelNumber))
-                return KnownMicroarchitectures.Value[modelNumber];
+            if (KnownMicroarchitectures.Value.TryGetValue(modelNumber, out string? microarchitecture))
+                return microarchitecture;
 
             if (modelNumber.Length >= 3 && modelNumber.Substring(0, 3).All(char.IsDigit) &&
                 (modelNumber.Length == 3 || !char.IsDigit(modelNumber[3])))

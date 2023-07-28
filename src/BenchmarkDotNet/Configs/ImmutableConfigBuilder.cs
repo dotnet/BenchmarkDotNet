@@ -131,7 +131,7 @@ namespace BenchmarkDotNet.Configs
                         AddWarning($"The exporter {exporterType} of {diagnoser.GetType().Name} is already present in configuration. There may be unexpected results.");
                     }
                     mergeDictionary[exporterType] = exporter;
-                };
+                }
 
             var result = mergeDictionary.Values.ToList();
 

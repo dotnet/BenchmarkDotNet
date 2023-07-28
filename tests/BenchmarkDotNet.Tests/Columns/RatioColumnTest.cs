@@ -1,10 +1,8 @@
 using System;
 using System.Linq;
-using System.Xml.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.Mocks;
-using BenchmarkDotNet.Tests.Mocks.Toolchain;
 using Xunit;
 using Xunit.Abstractions;
 

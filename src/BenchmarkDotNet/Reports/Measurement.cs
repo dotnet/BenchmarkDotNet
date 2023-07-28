@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Loggers;
 using Perfolizer.Horology;
 
 namespace BenchmarkDotNet.Reports

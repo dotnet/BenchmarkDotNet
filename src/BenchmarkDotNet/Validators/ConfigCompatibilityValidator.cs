@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Reports;
 
 namespace BenchmarkDotNet.Validators

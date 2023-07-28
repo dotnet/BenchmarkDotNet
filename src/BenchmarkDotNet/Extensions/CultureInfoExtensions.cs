@@ -1,6 +1,5 @@
 using System.Globalization;
 using BenchmarkDotNet.Helpers;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Extensions
 {

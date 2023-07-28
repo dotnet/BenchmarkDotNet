@@ -1,5 +1,3 @@
-using JetBrains.Annotations;
-
 namespace BenchmarkDotNet.Engines
 {
     public struct StoppingResult

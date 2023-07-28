@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Attributes
     /// </summary>
     public abstract class TargetedAttribute : Attribute
     {
-        public string[] Targets { get; set; }
+        public string[] Targets { get; set; } = new string[0];
 
         /// <summary>
         /// Target method for attribute

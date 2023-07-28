@@ -2,7 +2,6 @@
 using System.Globalization;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Reports;
-using JetBrains.Annotations;
 using Perfolizer.Mathematics.Multimodality;
 
 namespace BenchmarkDotNet.Analysers
