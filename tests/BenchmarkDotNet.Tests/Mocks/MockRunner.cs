@@ -15,12 +15,15 @@ namespace BenchmarkDotNet.Tests.Mocks
 {
     public static class MockRunner
     {
-        public static Summary Run<T>(ITestOutputHelper output, Func<string, double[]> measurer)
-            => Run<T>(output, benchmarkCase => measurer(benchmarkCase.Descriptor.WorkloadMethod.Name)
-                        .Select((value, i) => new Measurement(1, IterationMode.Workload, IterationStage.Result, i, 1, value))
-                        .ToList());
+        public static Summary Run<T>(ITestOutputHelper output, Func<string, double[]> measurer, IConfig? config = null)
+        {
+            return Run<T>(output, benchmarkCase =>
+                measurer(benchmarkCase.Descriptor.WorkloadMethod.Name)
+                    .Select((value, i) => new Measurement(1, IterationMode.Workload, IterationStage.Result, i, 1, value))
+                    .ToList(), config);
+        }
 
-        public static Summary Run<T>(ITestOutputHelper output, Func<BenchmarkCase, List<Measurement>> measurer)
+        public static Summary Run<T>(ITestOutputHelper output, Func<BenchmarkCase, List<Measurement>> measurer, IConfig? config = null)
         {
             var job = new Job("MockJob")
             {
@@ -32,11 +35,13 @@ namespace BenchmarkDotNet.Tests.Mocks
 
             var logger = new AccumulationLogger();
 
-            var config = DefaultConfig.Instance
+            var targetConfig = DefaultConfig.Instance
                 .WithOptions(ConfigOptions.DisableOptimizationsValidator)
                 .AddJob(job)
                 .AddLogger(logger);
-            var summary = BenchmarkRunner.Run<T>(config);
+            if (config != null)
+                targetConfig.Add(config);
+            var summary = BenchmarkRunner.Run<T>(targetConfig);
 
             var exporter = MarkdownExporter.Mock;
             exporter.ExportToLog(summary, logger);

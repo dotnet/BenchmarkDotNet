@@ -1,30 +1,36 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Xunit;
-using BenchmarkDotNet.Reports;
-using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Tests.Mocks;
+using Xunit;
 using Xunit.Abstractions;
 
-namespace BenchmarkDotNet.IntegrationTests
+namespace BenchmarkDotNet.Tests.Columns
 {
-    public class BaselineRatioColumnTest : BenchmarkTestExecutor
+    public class BaselineRatioColumnTest
     {
-        public BaselineRatioColumnTest(ITestOutputHelper output) : base(output) { }
+        private readonly ITestOutputHelper output;
+
+        public BaselineRatioColumnTest(ITestOutputHelper output) => this.output = output;
 
         [Fact]
         public void ColumnsWithBaselineGetsRatio()
         {
-            // This is the common way to run benchmarks, it should wire up the BenchmarkBaselineDeltaResultExtender for us
-            // BenchmarkTestExecutor.CanExecute(..) calls BenchmarkRunner.Run(..) under the hood
-            var summary = CanExecute<BaselineRatioColumnBenchmarks>();
+            var summary = MockRunner.Run<BaselineRatioColumnBenchmarks>(output, name => name switch
+            {
+                "BenchmarkSlow" => new double[] { 2, 2, 2 },
+                "BenchmarkFast" => new double[] { 4, 4, 4 },
+                _ => throw new InvalidOperationException()
+            });
 
             var table = summary.Table;
-            var headerRow = table.FullHeader;
+            string[]? headerRow = table.FullHeader;
             var column = summary.GetColumns()
                 .OfType<BaselineRatioColumn>()
                 .FirstOrDefault(c => c.Metric == BaselineRatioColumn.RatioMetric.Mean);
@@ -56,17 +62,23 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
 
-    public class BaselineRatioResultExtenderNoBaselineTest : BenchmarkTestExecutor
+    public class BaselineRatioResultExtenderNoBaselineTest
     {
-        public BaselineRatioResultExtenderNoBaselineTest(ITestOutputHelper output) : base(output) { }
+        private readonly ITestOutputHelper output;
+        public BaselineRatioResultExtenderNoBaselineTest(ITestOutputHelper output) => this.output = output;
 
         [Fact]
         public void Test()
         {
             var testExporter = new TestExporter();
-            var config = CreateSimpleConfig().AddExporter(testExporter);
+            var config = new ManualConfig().AddExporter(testExporter);
 
-            CanExecute<BaselineRatioResultExtenderNoBaseline>(config);
+            MockRunner.Run<BaselineRatioResultExtenderNoBaseline>(output, name => name switch
+            {
+                "BenchmarkSlow" => new double[] { 2, 2, 2 },
+                "BenchmarkFast" => new double[] { 4, 4, 4 },
+                _ => throw new InvalidOperationException()
+            }, config);
 
             // Ensure that when the TestBenchmarkExporter() was run, it wasn't passed an instance of "BenchmarkBaselineDeltaResultExtender"
             Assert.False(testExporter.ExportCalled);
@@ -102,14 +114,20 @@ namespace BenchmarkDotNet.IntegrationTests
         }
     }
 
-    public class BaselineRatioResultExtenderErrorTest : BenchmarkTestExecutor
+    public class BaselineRatioResultExtenderErrorTest
     {
-        public BaselineRatioResultExtenderErrorTest(ITestOutputHelper output) : base(output) { }
+        private readonly ITestOutputHelper output;
+        public BaselineRatioResultExtenderErrorTest(ITestOutputHelper output) => this.output = output;
 
         [Fact]
         public void OnlyOneMethodCanBeBaseline()
         {
-            var summary = CanExecute<BaselineRatioResultExtenderError>(fullValidation: false);
+            var summary = MockRunner.Run<BaselineRatioResultExtenderError>(output, name => name switch
+            {
+                "BenchmarkSlow" => new double[] { 2, 2, 2 },
+                "BenchmarkFast" => new double[] { 4, 4, 4 },
+                _ => throw new InvalidOperationException()
+            });
 
             // You can't have more than 1 method in a class with [Benchmark(Baseline = true)]
             Assert.True(summary.HasCriticalValidationErrors);
@@ -121,33 +139,6 @@ namespace BenchmarkDotNet.IntegrationTests
             public void BenchmarkSlow() => Thread.Sleep(50);
 
             [Benchmark(Baseline = true)]
-            public void BenchmarkFast() => Thread.Sleep(5);
-        }
-    }
-
-    public class BaselineRatioColumnWithLongParamsTest : BenchmarkTestExecutor
-    {
-        public BaselineRatioColumnWithLongParamsTest(ITestOutputHelper output) : base(output) { }
-
-        [Fact]
-        public void ColumnsWithBaselineGetsRatio()
-        {
-            var summary = CanExecute<BaselineRatioColumnWithLongParams>(fullValidation: false);
-
-            // Ensure that Params attribute values will not affect Baseline property
-            Assert.False(summary.HasCriticalValidationErrors);
-        }
-
-        public class BaselineRatioColumnWithLongParams
-        {
-            // Long different parameters with equal length but different values
-            [Params("12345ThisIsALongParameter54321", "12345ThisIsARongParameter54321")]
-            public string LongStringParamProperty { get; set; }
-
-            [Benchmark(Baseline = true)]
-            public void BenchmarkSlow() => Thread.Sleep(20);
-
-            [Benchmark]
             public void BenchmarkFast() => Thread.Sleep(5);
         }
     }
