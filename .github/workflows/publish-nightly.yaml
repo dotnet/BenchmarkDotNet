@@ -24,8 +24,8 @@ jobs:
       - name: Publish nupkg
         env:
           MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
-        run: .dotnet/dotnet nuget push **/*.nupkg --source https://www.myget.org/F/benchmarkdotnet/api/v3/index.json --api-key $MYGET_API_KEY --timeout 600
+        run: ./.dotnet/dotnet nuget push **/*.nupkg --source https://www.myget.org/F/benchmarkdotnet/api/v3/index.json --api-key $MYGET_API_KEY --timeout 600
       - name: Publish snupkg
         env:
           MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
-        run: .dotnet/dotnet nuget push **/*.snupkg --source https://www.myget.org/F/benchmarkdotnet/api/v3/index.json --api-key $MYGET_API_KEY --timeout 600
+        run: ./.dotnet/dotnet nuget push **/*.snupkg --source https://www.myget.org/F/benchmarkdotnet/api/v3/index.json --api-key $MYGET_API_KEY --timeout 600
