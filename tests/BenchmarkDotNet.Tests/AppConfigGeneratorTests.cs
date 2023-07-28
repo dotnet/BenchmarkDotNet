@@ -1,21 +1,37 @@
-﻿using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains;
+﻿using BenchmarkDotNet.Toolchains;
 using System;
 using System.IO;
 using System.Text;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Running;
 using Xunit;
 using BenchmarkDotNet.Tests.XUnit;
 using System.Runtime;
+using BenchmarkDotNet.Jobs;
+using Job = BenchmarkDotNet.Jobs.Job;
 
 namespace BenchmarkDotNet.Tests
 {
     public class AppConfigGeneratorTests
     {
-        private static readonly IResolver Resolver = BenchmarkRunnerClean.DefaultResolver;
+        private class GcResolver : Resolver
+        {
+            public static readonly Resolver Instance = new GcResolver();
+
+            private GcResolver()
+            {
+                Register(GcMode.ServerCharacteristic, () => GCSettings.IsServerGC);
+                Register(GcMode.ConcurrentCharacteristic, () => GCSettings.LatencyMode != GCLatencyMode.Batch);
+            }
+        }
+
+        private static readonly IResolver Resolver = new CompositeResolver(GcResolver.Instance, EnvironmentResolver.Instance, InfrastructureResolver.Instance);
+
+        private void GenerateAppConfig(Job job, TextReader source, TextWriter destination)
+        {
+            AppConfigGenerator.Generate(job, source, destination, Resolver);
+        }
 
         [Fact]
         public void GeneratesMinimalRequiredAppConfigForEmptySource()
@@ -28,7 +44,7 @@ namespace BenchmarkDotNet.Tests
                     $"<runtime>{GcSettings}</runtime>" +
                     "</configuration>";
 
-                AppConfigGenerator.Generate(Job.Default, TextReader.Null, destination, Resolver);
+                GenerateAppConfig(Job.Default, TextReader.Null, destination);
 
                 AssertAreEqualIgnoringWhitespacesAndCase(expectedMinimal, destination.ToString());
             }
@@ -46,7 +62,7 @@ namespace BenchmarkDotNet.Tests
                     $"<runtime>{GcSettings}</runtime>" +
                     "</configuration>";
 
-                AppConfigGenerator.Generate(Job.Default, source, destination, Resolver);
+                GenerateAppConfig(Job.Default, source, destination);
 
                 AssertAreEqualIgnoringWhitespacesAndCase(expectedMinimal, destination.ToString());
             }
@@ -77,7 +93,7 @@ namespace BenchmarkDotNet.Tests
             using (var source = new StringReader(customSettingsWithoutRuntimeNode))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(Job.Default, source, destination, Resolver);
+                GenerateAppConfig(Job.Default, source, destination);
 
                 AssertAreEqualIgnoringWhitespacesAndCase(customSettingsWithRuntimeNode, destination.ToString());
             }
@@ -109,7 +125,7 @@ namespace BenchmarkDotNet.Tests
             using (var source = new StringReader(customSettingsBefore))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(Job.Default, source, destination, Resolver);
+                GenerateAppConfig(Job.Default, source, destination);
 
                 AssertAreEqualIgnoringWhitespacesAndCase(customSettingsAfter, destination.ToString());
             }
@@ -136,7 +152,7 @@ namespace BenchmarkDotNet.Tests
             using (var source = new StringReader(customSettings))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(new Job { Environment = { Jit = jit } }.Freeze(), source, destination, Resolver);
+                GenerateAppConfig(new Job { Environment = { Jit = jit } }.Freeze(), source, destination);
 
                 AssertAreEqualIgnoringWhitespacesAndCase(customSettingsAndJit, destination.ToString());
             }
@@ -160,7 +176,8 @@ namespace BenchmarkDotNet.Tests
             using (var source = new StringReader(input))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(new Job { Environment = { Runtime = ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "4.0")} }.Freeze(), source, destination, Resolver);
+                var job = new Job { Environment = { Runtime = ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "4.0") } }.Freeze();
+                GenerateAppConfig(job, source, destination);
 
                 AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
             }
@@ -185,7 +202,7 @@ namespace BenchmarkDotNet.Tests
             using (var source = new StringReader(input))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(new Job { Environment = { Runtime = ClrRuntime.Net462 } }.Freeze(), source, destination, Resolver);
+                GenerateAppConfig(new Job { Environment = { Runtime = ClrRuntime.Net462 } }.Freeze(), source, destination);
 
                 AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
             }
@@ -225,7 +242,7 @@ namespace BenchmarkDotNet.Tests
             using (var source = new StringReader(settingsWithBindings))
             using (var destination = new Utf8StringWriter())
             {
-                AppConfigGenerator.Generate(Job.RyuJitX64, source, destination, Resolver);
+                GenerateAppConfig(Job.RyuJitX64, source, destination);
 
                 AssertAreEqualIgnoringWhitespacesAndCase(settingsWithBindingsAndJit, destination.ToString());
             }
@@ -257,7 +274,8 @@ namespace BenchmarkDotNet.Tests
             return buffer.ToString();
         }
 
-        private static readonly string GcSettings = $"<gcConcurrentenabled=\"{(GCSettings.LatencyMode != GCLatencyMode.Batch).ToLowerCase()}\"/><gcServerenabled=\"{GCSettings.IsServerGC.ToLowerCase()}\"/>";
+        private static readonly string GcSettings =
+            $"<gcConcurrentenabled=\"{(GCSettings.LatencyMode != GCLatencyMode.Batch).ToLowerCase()}\"/><gcServerenabled=\"{GCSettings.IsServerGC.ToLowerCase()}\"/>";
     }
 
     internal class Utf8StringWriter : StringWriter

@@ -24,12 +24,12 @@ namespace BenchmarkDotNet.Tests.Builders
         private string runtimeVersion = "Clr 4.0.x.mock";
 
         private CpuInfo cpuInfo = new CpuInfo("MockIntel(R) Core(TM) i7-6700HQ CPU 2.60GHz",
-                                              physicalProcessorCount: 1,
-                                              physicalCoreCount: 4,
-                                              logicalCoreCount: 8,
-                                              nominalFrequency: Frequency.FromMHz(3100),
-                                              maxFrequency: Frequency.FromMHz(3100),
-                                              minFrequency: Frequency.FromMHz(3100));
+            physicalProcessorCount: 1,
+            physicalCoreCount: 4,
+            logicalCoreCount: 8,
+            nominalFrequency: Frequency.FromMHz(3100),
+            maxFrequency: Frequency.FromMHz(3100),
+            minFrequency: Frequency.FromMHz(3100));
 
         private VirtualMachineHypervisor virtualMachineHypervisor = HyperV.Default;
 
@@ -56,6 +56,24 @@ namespace BenchmarkDotNet.Tests.Builders
             return new MockHostEnvironmentInfo(architecture, benchmarkDotNetVersion, chronometerFrequency, configuration,
                 dotNetSdkVersion, hardwareTimerKind, hasAttachedDebugger, hasRyuJit, isConcurrentGC, isServerGC,
                 jitInfo, jitModules, osVersion, cpuInfo, runtimeVersion, virtualMachineHypervisor);
+        }
+
+        public IDisposable OverrideStaticInstanceCookie() => new Cookie(Build());
+
+        private class Cookie : IDisposable
+        {
+            private readonly HostEnvironmentInfo? oldHostEnvironmentInfo;
+
+            public Cookie(HostEnvironmentInfo info)
+            {
+                oldHostEnvironmentInfo = HostEnvironmentInfo.Current;
+                HostEnvironmentInfo.Current = info;
+            }
+
+            public void Dispose()
+            {
+                HostEnvironmentInfo.Current = oldHostEnvironmentInfo;
+            }
         }
     }
 

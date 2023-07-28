@@ -9,6 +9,7 @@ using BenchmarkDotNet.Tests.Mocks.Toolchain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BenchmarkDotNet.Tests.Builders;
 using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.Tests.Mocks
@@ -41,7 +42,12 @@ namespace BenchmarkDotNet.Tests.Mocks
                 .AddLogger(logger);
             if (config != null)
                 targetConfig.Add(config);
-            var summary = BenchmarkRunner.Run<T>(targetConfig);
+
+            Summary summary;
+            using (new HostEnvironmentInfoBuilder().OverrideStaticInstanceCookie())
+            {
+                summary = BenchmarkRunner.Run<T>(targetConfig);
+            }
 
             var exporter = MarkdownExporter.Mock;
             exporter.ExportToLog(summary, logger);
