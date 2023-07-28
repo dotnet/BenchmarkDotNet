@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -212,6 +212,20 @@ namespace BenchmarkDotNet.Tests.Running
                 Assert.Equal(nameof(BAC.C), info.BenchmarksCases[2].Descriptor.WorkloadMethod.Name);
             }
         }
+        [Fact]
+        public void DescriptorDescriptionNameOverride()
+        {
+            var description = BenchmarkConverter.TypeToBenchmarks(typeof(MethodDescriptionOverrideTests));
+
+            Assert.Equal("OverrideFromAttribute", description.BenchmarksCases[0].Descriptor.DisplayInfo);
+        }
+        [Fact]
+        public void ClassDescriptorDescriptionNameOverride()
+        {
+            var description = BenchmarkConverter.TypeToBenchmarks(typeof(MethodDescriptionOverrideTests));
+
+            Assert.Equal("ClassOverrideFromAttribute", description.BenchmarksCases[0].Descriptor.DisplayInfo);
+        }
 
         public class BAC
         {
@@ -277,6 +291,39 @@ namespace BenchmarkDotNet.Tests.Running
         {
             [IterationCleanup] private void X() { }
             [Benchmark] public void A() { }
+        }
+        public class MethodDescriptionOverrideTests
+        {
+            [Benchmark]
+            public void VoidTest() { }
+
+            [Benchmark(Description = "from Benchmark")]
+            public void BenchmarkAttributeOverride() {}
+
+            [Benchmark]
+            [BenchmarkDescription("OverrideFromAttribute")]
+            public void BenchmarkDescriptionAttributeOverride() { }
+
+            [Benchmark(Description = "Who are the winner?")]
+            [BenchmarkDescription("OverrideFromAttribute")]
+            public void BothAttributeOverride() { }
+        }
+        [BenchmarkDescription("FromClassDescription")]
+        public class ClassDescriptionOverrideTests
+        {
+            [Benchmark]
+            public void VoidTest() { }
+
+            [Benchmark(Description = "from Benchmark")]
+            public void ClassBenchmarkAttributeOverride() { }
+
+            [Benchmark]
+            [BenchmarkDescription("OverrideFromAttribute")]
+            public void ClassBenchmarkDescriptionAttributeOverride() { }
+
+            [Benchmark(Description = "Who are the winner?")]
+            [BenchmarkDescription("OverrideFromAttribute")]
+            public void ClassBothAttributeOverride() { }
         }
     }
 }
