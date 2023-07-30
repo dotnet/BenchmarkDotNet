@@ -100,8 +100,7 @@ namespace BenchmarkDotNet.Helpers
                 {
                     if (m.Name != nameof(AwaitHelper.GetResult)) return false;
                     Type paramType = m.GetParameters().First().ParameterType;
-                    // We have to compare the types indirectly, == check doesn't work.
-                    return paramType.Assembly == compareType.Assembly && paramType.Namespace == compareType.Namespace && paramType.Name == compareType.Name;
+                    return paramType.IsGenericType && paramType.GetGenericTypeDefinition() == compareType;
                 })
                 .MakeGenericMethod(new[] { resultType });
         }
