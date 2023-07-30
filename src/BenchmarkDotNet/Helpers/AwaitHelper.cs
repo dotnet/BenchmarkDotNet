@@ -26,26 +26,7 @@ namespace BenchmarkDotNet.Helpers
                 awaiterCallback = resetEvent.Set;
             }
 
-            // Hook up a callback instead of converting to Task to prevent extra allocations on each benchmark run.
-            internal void Wait(ConfiguredValueTaskAwaitable.ConfiguredValueTaskAwaiter awaiter)
-            {
-                resetEvent.Reset();
-                awaiter.UnsafeOnCompleted(awaiterCallback);
-
-                // The fastest way to wait for completion is to spin a bit before waiting on the event. This is the same logic that Task.GetAwaiter().GetResult() uses.
-                var spinner = new SpinWait();
-                while (!resetEvent.IsSet)
-                {
-                    if (spinner.NextSpinWillYield)
-                    {
-                        resetEvent.Wait();
-                        return;
-                    }
-                    spinner.SpinOnce();
-                }
-            }
-
-            internal void Wait<T>(ConfiguredValueTaskAwaitable<T>.ConfiguredValueTaskAwaiter awaiter)
+            internal void Wait<TAwaiter>(TAwaiter awaiter) where TAwaiter : ICriticalNotifyCompletion
             {
                 resetEvent.Reset();
                 awaiter.UnsafeOnCompleted(awaiterCallback);
@@ -70,7 +51,8 @@ namespace BenchmarkDotNet.Helpers
 
         public static T GetResult<T>(Task<T> task) => task.GetAwaiter().GetResult();
 
-        // ValueTask can be backed by an IValueTaskSource that only supports asynchronous awaits, so we have to hook up a callback instead of calling .GetAwaiter().GetResult() like we do for Task.
+        // ValueTask can be backed by an IValueTaskSource that only supports asynchronous awaits,
+        // so we have to hook up a callback instead of calling .GetAwaiter().GetResult() like we do for Task.
         // The alternative is to convert it to Task using .AsTask(), but that causes allocations which we must avoid for memory diagnoser.
         public static void GetResult(ValueTask task)
         {
