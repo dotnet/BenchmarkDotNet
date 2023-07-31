@@ -1,4 +1,4 @@
-﻿ using System;
+﻿using System;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -217,14 +217,20 @@ namespace BenchmarkDotNet.Tests.Running
         {
             var description = BenchmarkConverter.TypeToBenchmarks(typeof(MethodDescriptionOverrideTests));
 
-            Assert.Equal("OverrideFromAttribute", description.BenchmarksCases[0].Descriptor.DisplayInfo);
+            Assert.Equal("VoidTest", description.BenchmarksCases[0].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("\'from Benchmark\'", description.BenchmarksCases[1].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("BenchmarkDescriptionAttributeOverride", description.BenchmarksCases[2].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("\'Who are the winner?\'", description.BenchmarksCases[3].Descriptor.WorkloadMethodDisplayInfo);
         }
         [Fact]
         public void ClassDescriptorDescriptionNameOverride()
         {
-            var description = BenchmarkConverter.TypeToBenchmarks(typeof(MethodDescriptionOverrideTests));
+            var description = BenchmarkConverter.TypeToBenchmarks(typeof(ClassDescriptionOverrideTests));
 
-            Assert.Equal("ClassOverrideFromAttribute", description.BenchmarksCases[0].Descriptor.DisplayInfo);
+            Assert.Equal("\'FromClassDescription\'", description.BenchmarksCases[0].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("\'from Benchmark\'", description.BenchmarksCases[1].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("BenchmarkDescriptionAttributeOverride", description.BenchmarksCases[2].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("\'Who are the winner?\'", description.BenchmarksCases[3].Descriptor.WorkloadMethodDisplayInfo);
         }
 
         public class BAC

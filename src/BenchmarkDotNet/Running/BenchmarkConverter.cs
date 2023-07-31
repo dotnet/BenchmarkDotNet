@@ -119,6 +119,7 @@ namespace BenchmarkDotNet.Running
             Tuple<MethodInfo, TargetedAttribute>[] iterationCleanupMethods,
             IConfig config)
         {
+            var abc = type.GetCustomAttributes(typeof(BenchmarkDescriptionAttribute), false);
             return targetMethods
                 .Select(methodInfo => CreateDescriptor(type,
                                                    GetTargetedMatchingMethod(methodInfo, globalSetupMethods),
@@ -157,13 +158,26 @@ namespace BenchmarkDotNet.Running
             MethodInfo iterationSetupMethod,
             MethodInfo iterationCleanupMethod,
             BenchmarkAttribute attr,
-            BenchmarkDescriptionAttribute descClass,
-            BenchmarkDescriptionAttribute descMethod,
+            BenchmarkDescriptionAttribute? descClass,
+            BenchmarkDescriptionAttribute? descMethod,
             MethodInfo[] targetMethods,
             IConfig config)
         {
             var categoryDiscoverer = config.CategoryDiscoverer ?? DefaultCategoryDiscoverer.Instance;
-            var description = attr.Description ?? descMethod.Description ?? descClass.Description ?? methodInfo.Name;
+            string description;
+            if (attr != null)
+                description = attr.Description;
+            else {
+                if (descMethod != null)
+                    description = descMethod.Description;
+                else
+                {
+                    if (descClass != null)
+                        description = descClass.Description;
+                    else
+                        description = methodInfo.Name;
+                }
+            }
             var target = new Descriptor(
                 type,
                 methodInfo,
