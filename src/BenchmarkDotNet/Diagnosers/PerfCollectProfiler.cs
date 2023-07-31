@@ -194,10 +194,14 @@ namespace BenchmarkDotNet.Diagnosers
 
         private void EnsureSymbolsForNativeRuntime(DiagnoserActionParameters parameters)
         {
+            if (parameters.BenchmarkCase.GetToolchain() is CoreRunToolchain)
+            {
+                return; // it's not needed for a local build of dotnet runtime
+            }
+
             string cliPath = parameters.BenchmarkCase.GetToolchain() switch
             {
                 CsProjCoreToolchain core => core.CustomDotNetCliPath,
-                CoreRunToolchain coreRun => coreRun.CustomDotNetCliPath.FullName,
                 NativeAotToolchain nativeAot => nativeAot.CustomDotNetCliPath,
                 _ => DotNetCliCommandExecutor.DefaultDotNetCliPath.Value
             };
