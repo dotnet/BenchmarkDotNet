@@ -120,6 +120,7 @@ namespace BenchmarkDotNet.Running
             IConfig config)
         {
             var abc = type.GetCustomAttributes(typeof(BenchmarkDescriptionAttribute), false);
+            var classDescriptionAttribute = type.ResolveAttribute<BenchmarkDescriptionAttribute>();
             return targetMethods
                 .Select(methodInfo => CreateDescriptor(type,
                                                    GetTargetedMatchingMethod(methodInfo, globalSetupMethods),
@@ -128,7 +129,7 @@ namespace BenchmarkDotNet.Running
                                                    GetTargetedMatchingMethod(methodInfo, iterationSetupMethods),
                                                    GetTargetedMatchingMethod(methodInfo, iterationCleanupMethods),
                                                    methodInfo.ResolveAttribute<BenchmarkAttribute>(),
-                                                   type.ResolveAttribute<BenchmarkDescriptionAttribute>(),
+                                                   classDescriptionAttribute,
                                                    methodInfo.ResolveAttribute<BenchmarkDescriptionAttribute>(),
                                                    targetMethods,
                                                    config)) ;
@@ -158,26 +159,17 @@ namespace BenchmarkDotNet.Running
             MethodInfo iterationSetupMethod,
             MethodInfo iterationCleanupMethod,
             BenchmarkAttribute attr,
-            BenchmarkDescriptionAttribute? descClass,
-            BenchmarkDescriptionAttribute? descMethod,
+            BenchmarkDescriptionAttribute? classDescription,
+            BenchmarkDescriptionAttribute? methodDescription,
             MethodInfo[] targetMethods,
             IConfig config)
         {
             var categoryDiscoverer = config.CategoryDiscoverer ?? DefaultCategoryDiscoverer.Instance;
-            string description;
-            if (attr != null)
-                description = attr.Description;
-            else {
-                if (descMethod != null)
-                    description = descMethod.Description;
-                else
-                {
-                    if (descClass != null)
-                        description = descClass.Description;
-                    else
-                        description = methodInfo.Name;
-                }
-            }
+            string description = attr?.Description;
+                if (description is null)
+                    description = methodDescription?.Description;
+                if (description is null)
+                    description = classDescription?.Description;
             var target = new Descriptor(
                 type,
                 methodInfo,

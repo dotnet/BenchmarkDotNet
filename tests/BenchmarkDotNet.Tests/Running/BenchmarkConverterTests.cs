@@ -219,7 +219,7 @@ namespace BenchmarkDotNet.Tests.Running
 
             Assert.Equal("VoidTest", description.BenchmarksCases[0].Descriptor.WorkloadMethodDisplayInfo);
             Assert.Equal("\'from Benchmark\'", description.BenchmarksCases[1].Descriptor.WorkloadMethodDisplayInfo);
-            Assert.Equal("BenchmarkDescriptionAttributeOverride", description.BenchmarksCases[2].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("OverrideFromAttribute", description.BenchmarksCases[2].Descriptor.WorkloadMethodDisplayInfo);
             Assert.Equal("\'Who are the winner?\'", description.BenchmarksCases[3].Descriptor.WorkloadMethodDisplayInfo);
         }
         [Fact]
@@ -227,9 +227,9 @@ namespace BenchmarkDotNet.Tests.Running
         {
             var description = BenchmarkConverter.TypeToBenchmarks(typeof(ClassDescriptionOverrideTests));
 
-            Assert.Equal("\'FromClassDescription\'", description.BenchmarksCases[0].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("FromClassDescription", description.BenchmarksCases[0].Descriptor.WorkloadMethodDisplayInfo);
             Assert.Equal("\'from Benchmark\'", description.BenchmarksCases[1].Descriptor.WorkloadMethodDisplayInfo);
-            Assert.Equal("BenchmarkDescriptionAttributeOverride", description.BenchmarksCases[2].Descriptor.WorkloadMethodDisplayInfo);
+            Assert.Equal("OverrideFromAttribute", description.BenchmarksCases[2].Descriptor.WorkloadMethodDisplayInfo);
             Assert.Equal("\'Who are the winner?\'", description.BenchmarksCases[3].Descriptor.WorkloadMethodDisplayInfo);
         }
 
