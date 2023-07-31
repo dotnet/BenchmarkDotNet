@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
 using BenchmarkDotNet.Loggers;
@@ -92,6 +93,8 @@ namespace BenchmarkDotNet.Tests.Exporters
             yield return XmlExporter.BriefCompressed;
             yield return XmlExporter.Full;
             yield return XmlExporter.FullCompressed;
+            yield return CsvExporter.Default;
+            yield return CsvMeasurementsExporter.Default;
         }
 
         private static readonly IConfig config = ManualConfig.Create(DefaultConfig.Instance)
