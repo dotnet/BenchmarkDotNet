@@ -4,6 +4,7 @@ using System.Text;
 
 namespace BenchmarkDotNet.Attributes
 {
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class BenchmarkDescriptionAttribute : Attribute
     {
         public BenchmarkDescriptionAttribute(){        }

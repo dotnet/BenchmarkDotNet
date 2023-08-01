@@ -119,8 +119,7 @@ namespace BenchmarkDotNet.Running
             Tuple<MethodInfo, TargetedAttribute>[] iterationCleanupMethods,
             IConfig config)
         {
-            var abc = type.GetCustomAttributes(typeof(BenchmarkDescriptionAttribute), false);
-            var classDescriptionAttribute = type.ResolveAttribute<BenchmarkDescriptionAttribute>();
+
             return targetMethods
                 .Select(methodInfo => CreateDescriptor(type,
                                                    GetTargetedMatchingMethod(methodInfo, globalSetupMethods),
@@ -129,10 +128,10 @@ namespace BenchmarkDotNet.Running
                                                    GetTargetedMatchingMethod(methodInfo, iterationSetupMethods),
                                                    GetTargetedMatchingMethod(methodInfo, iterationCleanupMethods),
                                                    methodInfo.ResolveAttribute<BenchmarkAttribute>(),
-                                                   classDescriptionAttribute,
+                                                   type.ResolveAttribute<BenchmarkDescriptionAttribute>(),
                                                    methodInfo.ResolveAttribute<BenchmarkDescriptionAttribute>(),
                                                    targetMethods,
-                                                   config)) ;
+                                                   config));
         }
 
         private static MethodInfo GetTargetedMatchingMethod(MethodInfo benchmarkMethod, Tuple<MethodInfo, TargetedAttribute>[] methods)
@@ -167,7 +166,7 @@ namespace BenchmarkDotNet.Running
             var categoryDiscoverer = config.CategoryDiscoverer ?? DefaultCategoryDiscoverer.Instance;
             string description = attr?.Description;
                 if (description is null)
-                    description = methodDescription?.Description;
+                    description ??= methodDescription?.Description;
                 if (description is null)
                     description = classDescription?.Description;
             var target = new Descriptor(
