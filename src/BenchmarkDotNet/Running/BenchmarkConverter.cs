@@ -119,7 +119,6 @@ namespace BenchmarkDotNet.Running
             Tuple<MethodInfo, TargetedAttribute>[] iterationCleanupMethods,
             IConfig config)
         {
-
             return targetMethods
                 .Select(methodInfo => CreateDescriptor(type,
                                                    GetTargetedMatchingMethod(methodInfo, globalSetupMethods),
@@ -128,7 +127,6 @@ namespace BenchmarkDotNet.Running
                                                    GetTargetedMatchingMethod(methodInfo, iterationSetupMethods),
                                                    GetTargetedMatchingMethod(methodInfo, iterationCleanupMethods),
                                                    methodInfo.ResolveAttribute<BenchmarkAttribute>(),
-                                                   type.ResolveAttribute<BenchmarkDescriptionAttribute>(),
                                                    methodInfo.ResolveAttribute<BenchmarkDescriptionAttribute>(),
                                                    targetMethods,
                                                    config));
@@ -158,17 +156,15 @@ namespace BenchmarkDotNet.Running
             MethodInfo iterationSetupMethod,
             MethodInfo iterationCleanupMethod,
             BenchmarkAttribute attr,
-            BenchmarkDescriptionAttribute? classDescription,
             BenchmarkDescriptionAttribute? methodDescription,
             MethodInfo[] targetMethods,
             IConfig config)
         {
             var categoryDiscoverer = config.CategoryDiscoverer ?? DefaultCategoryDiscoverer.Instance;
+            if (attr?.Description != null && methodDescription?.Description != null)
+                throw new InvalidOperationException($"Benchmark {methodInfo.Name} has 2 descriptions from different attributes");
             string description = attr?.Description;
-                if (description is null)
-                    description ??= methodDescription?.Description;
-                if (description is null)
-                    description = classDescription?.Description;
+            description ??= methodDescription?.Description;
             var target = new Descriptor(
                 type,
                 methodInfo,
