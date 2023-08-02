@@ -20,10 +20,17 @@ namespace BenchmarkDotNet.Running
 
         public ConsoleTitler(string initialTitle)
         {
-            // Return without enabling if Console output is redirected.
-            if (Console.IsOutputRedirected)
+            try
             {
-                return;
+                // Return without enabling if Console output is redirected.
+                if (Console.IsOutputRedirected)
+                {
+                    return;
+                }
+            }
+            catch (PlatformNotSupportedException)
+            {
+                // Ignore the exception. Some platforms do not support Console.IsOutputRedirected.
             }
 
             try
