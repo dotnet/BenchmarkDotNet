@@ -4025,6 +4025,16 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/BenchmarkDotNet.Portability.CodeGenHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/BenchmarkDotNet.Portability.CodeGenHelper.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/BenchmarkDotNet.Portability.Cpu.CpuInfo.yml",
       "output": {
         ".html": {
@@ -6878,6 +6888,16 @@
       "output": {
         ".html": {
           "relative_path": "changelog/v0.13.6.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "changelog/v0.13.7.md",
+      "output": {
+        ".html": {
+          "relative_path": "changelog/v0.13.7.html"
         }
       },
       "version": ""

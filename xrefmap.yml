@@ -763,15 +763,15 @@ references:
   commentId: Overload:BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementOneSample
   fullName: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementOneSample
   nameWithType: ZeroMeasurementHelper.CheckZeroMeasurementOneSample
-- uid: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(System.Double[],System.Double[])
-  name: CheckZeroMeasurementTwoSamples(double[], double[])
-  href: api/BenchmarkDotNet.Analysers.ZeroMeasurementHelper.html#BenchmarkDotNet_Analysers_ZeroMeasurementHelper_CheckZeroMeasurementTwoSamples_System_Double___System_Double___
-  commentId: M:BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(System.Double[],System.Double[])
-  name.vb: CheckZeroMeasurementTwoSamples(Double(), Double())
-  fullName: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(double[], double[])
-  fullName.vb: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(Double(), Double())
-  nameWithType: ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(double[], double[])
-  nameWithType.vb: ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(Double(), Double())
+- uid: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(System.Double[],System.Double[],Perfolizer.Mathematics.Thresholds.Threshold)
+  name: CheckZeroMeasurementTwoSamples(double[], double[], Threshold)
+  href: api/BenchmarkDotNet.Analysers.ZeroMeasurementHelper.html#BenchmarkDotNet_Analysers_ZeroMeasurementHelper_CheckZeroMeasurementTwoSamples_System_Double___System_Double___Perfolizer_Mathematics_Thresholds_Threshold_
+  commentId: M:BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(System.Double[],System.Double[],Perfolizer.Mathematics.Thresholds.Threshold)
+  name.vb: CheckZeroMeasurementTwoSamples(Double(), Double(), Threshold)
+  fullName: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(double[], double[], Perfolizer.Mathematics.Thresholds.Threshold)
+  fullName.vb: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(Double(), Double(), Perfolizer.Mathematics.Thresholds.Threshold)
+  nameWithType: ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(double[], double[], Threshold)
+  nameWithType.vb: ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(Double(), Double(), Threshold)
 - uid: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples*
   name: CheckZeroMeasurementTwoSamples
   href: api/BenchmarkDotNet.Analysers.ZeroMeasurementHelper.html#BenchmarkDotNet_Analysers_ZeroMeasurementHelper_CheckZeroMeasurementTwoSamples_
@@ -27965,6 +27965,24 @@ references:
   commentId: Overload:BenchmarkDotNet.Portability.Antivirus.ToString
   fullName: BenchmarkDotNet.Portability.Antivirus.ToString
   nameWithType: Antivirus.ToString
+- uid: BenchmarkDotNet.Portability.CodeGenHelper
+  name: CodeGenHelper
+  href: api/BenchmarkDotNet.Portability.CodeGenHelper.html
+  commentId: T:BenchmarkDotNet.Portability.CodeGenHelper
+  fullName: BenchmarkDotNet.Portability.CodeGenHelper
+  nameWithType: CodeGenHelper
+- uid: BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption
+  name: AggressiveOptimizationOption
+  href: api/BenchmarkDotNet.Portability.CodeGenHelper.html#BenchmarkDotNet_Portability_CodeGenHelper_AggressiveOptimizationOption
+  commentId: F:BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption
+  fullName: BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOption
+  nameWithType: CodeGenHelper.AggressiveOptimizationOption
+- uid: BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOptionForEmit
+  name: AggressiveOptimizationOptionForEmit
+  href: api/BenchmarkDotNet.Portability.CodeGenHelper.html#BenchmarkDotNet_Portability_CodeGenHelper_AggressiveOptimizationOptionForEmit
+  commentId: F:BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOptionForEmit
+  fullName: BenchmarkDotNet.Portability.CodeGenHelper.AggressiveOptimizationOptionForEmit
+  nameWithType: CodeGenHelper.AggressiveOptimizationOptionForEmit
 - uid: BenchmarkDotNet.Portability.Cpu
   name: BenchmarkDotNet.Portability.Cpu
   href: api/BenchmarkDotNet.Portability.Cpu.html
@@ -32027,15 +32045,15 @@ references:
   commentId: T:BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain
   fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain
   nameWithType: CsProjClassicNetToolchain
-- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From(System.String,System.String)
-  name: From(string, string)
-  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.html#BenchmarkDotNet_Toolchains_CsProj_CsProjClassicNetToolchain_From_System_String_System_String_
-  commentId: M:BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From(System.String,System.String)
-  name.vb: From(String, String)
-  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From(string, string)
-  fullName.vb: BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From(String, String)
-  nameWithType: CsProjClassicNetToolchain.From(string, string)
-  nameWithType.vb: CsProjClassicNetToolchain.From(String, String)
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From(System.String,System.String,System.String)
+  name: From(string, string, string)
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.html#BenchmarkDotNet_Toolchains_CsProj_CsProjClassicNetToolchain_From_System_String_System_String_System_String_
+  commentId: M:BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From(System.String,System.String,System.String)
+  name.vb: From(String, String, String)
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From(string, string, string)
+  fullName.vb: BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From(String, String, String)
+  nameWithType: CsProjClassicNetToolchain.From(string, string, string)
+  nameWithType.vb: CsProjClassicNetToolchain.From(String, String, String)
 - uid: BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From*
   name: From
   href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.html#BenchmarkDotNet_Toolchains_CsProj_CsProjClassicNetToolchain_From_
@@ -34703,18 +34721,18 @@ references:
   fullName.vb: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.New
   nameWithType: BenchmarkAction.BenchmarkAction
   nameWithType.vb: BenchmarkAction.New
-- uid: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeMultiple
-  name: InvokeMultiple
-  href: api/BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.html#BenchmarkDotNet_Toolchains_InProcess_NoEmit_BenchmarkAction_InvokeMultiple
-  commentId: P:BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeMultiple
-  fullName: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeMultiple
-  nameWithType: BenchmarkAction.InvokeMultiple
-- uid: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeMultiple*
-  name: InvokeMultiple
-  href: api/BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.html#BenchmarkDotNet_Toolchains_InProcess_NoEmit_BenchmarkAction_InvokeMultiple_
-  commentId: Overload:BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeMultiple
-  fullName: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeMultiple
-  nameWithType: BenchmarkAction.InvokeMultiple
+- uid: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeNoUnroll
+  name: InvokeNoUnroll
+  href: api/BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.html#BenchmarkDotNet_Toolchains_InProcess_NoEmit_BenchmarkAction_InvokeNoUnroll
+  commentId: P:BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeNoUnroll
+  fullName: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeNoUnroll
+  nameWithType: BenchmarkAction.InvokeNoUnroll
+- uid: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeNoUnroll*
+  name: InvokeNoUnroll
+  href: api/BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.html#BenchmarkDotNet_Toolchains_InProcess_NoEmit_BenchmarkAction_InvokeNoUnroll_
+  commentId: Overload:BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeNoUnroll
+  fullName: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeNoUnroll
+  nameWithType: BenchmarkAction.InvokeNoUnroll
 - uid: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeSingle
   name: InvokeSingle
   href: api/BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.html#BenchmarkDotNet_Toolchains_InProcess_NoEmit_BenchmarkAction_InvokeSingle
@@ -34727,6 +34745,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeSingle
   fullName: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeSingle
   nameWithType: BenchmarkAction.InvokeSingle
+- uid: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeUnroll
+  name: InvokeUnroll
+  href: api/BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.html#BenchmarkDotNet_Toolchains_InProcess_NoEmit_BenchmarkAction_InvokeUnroll
+  commentId: P:BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeUnroll
+  fullName: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeUnroll
+  nameWithType: BenchmarkAction.InvokeUnroll
+- uid: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeUnroll*
+  name: InvokeUnroll
+  href: api/BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.html#BenchmarkDotNet_Toolchains_InProcess_NoEmit_BenchmarkAction_InvokeUnroll_
+  commentId: Overload:BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeUnroll
+  fullName: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.InvokeUnroll
+  nameWithType: BenchmarkAction.InvokeUnroll
 - uid: BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.LastRunResult
   name: LastRunResult
   href: api/BenchmarkDotNet.Toolchains.InProcess.NoEmit.BenchmarkAction.html#BenchmarkDotNet_Toolchains_InProcess_NoEmit_BenchmarkAction_LastRunResult
@@ -37788,6 +37818,9 @@ references:
 - uid: changelog.v0.13.6
   name: BenchmarkDotNet v0.13.6
   href: changelog/v0.13.6.html
+- uid: changelog.v0.13.7
+  name: BenchmarkDotNet v0.13.7
+  href: changelog/v0.13.7.html
 - uid: changelog.v0.7.0
   name: BenchmarkDotNet v0.7.0
   href: changelog/v0.7.0.html

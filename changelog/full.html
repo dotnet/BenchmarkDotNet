@@ -78,6 +78,109 @@
         <article data-uid="changelog.full">
 <h1 id="full-changelog">Full ChangeLog</h1>
 
+<h1 id="benchmarkdotnet-v0137">BenchmarkDotNet v0.13.7</h1>
+<h2 id="highlights">Highlights</h2>
+<p>This release contains important bug fixes listed below.</p>
+<h2 id="milestone-details">Milestone details</h2>
+<p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.13.7">v0.13.7</a> scope,
+11 issues were resolved and 13 pull requests were merged.
+This release includes 38 commits by 9 contributors.</p>
+<h2 id="resolved-issues-11">Resolved issues (11)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1773">#1773</a> Ability to recompile for each target runtime</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2311">#2311</a> Detect when MonoAOT compilation fails and abort the benchmark run</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2346">#2346</a> Can't use latest version of BenchmarkDotNet</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2356">#2356</a> Add tests for expected results (assignee: <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2364">#2364</a> Benchmark project using paket dependency manager fails to build auto-generated projects (assignee: <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2369">#2369</a> Unable to use variables for PackageReferences after #2347</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2373">#2373</a> Regression in parsing arguments with spaces (assignee: <a href="https://github.com/kant2002">@kant2002</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2377">#2377</a> Multiple nuget warnings/errors after moving to 0.13.6 breaking the build</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2378">#2378</a> BenchmarkDotNet requires dotnet cli to be installed</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2382">#2382</a> <code>-p perf</code> doesn't seem to work right with locally built runtime (assignee: <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2389">#2389</a> PlatformNotSupportedException thrown on Android in ConsoleTitler</li>
+</ul>
+<h2 id="merged-pull-requests-13">Merged pull requests (13)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2335">#2335</a> <code>AggressiveOptimization</code> in <code>InProcess</code> toolchains (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2361">#2361</a> Add expected results tests (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2365">#2365</a> Don't copy <code>PackageReference</code> in csproj (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2367">#2367</a> Improve build for mono aot (by <a href="https://github.com/radical">@radical</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2368">#2368</a> IComparable fallback for Tuple/ValueTuple (by <a href="https://github.com/mrahhal">@mrahhal</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2370">#2370</a> Rebuild .Net Framework projects (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2375">#2375</a> Fix regression in parsing arguments with spaces Closes #2373 (by <a href="https://github.com/kant2002">@kant2002</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2379">#2379</a> [chore]: fix error message (by <a href="https://github.com/BurakTaner">@BurakTaner</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2380">#2380</a> Cancel old jobs on push (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2381">#2381</a> Support <code>--cli</code> argument for <code>CsProjClassicNetToolchain</code> (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2384">#2384</a> perfcollect: don't restore symbols for local builds (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2385">#2385</a> Fix missing import on Debug build (by <a href="https://github.com/caaavik-msft">@caaavik-msft</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/pull/2390">#2390</a> Fix PlatformNotSupportedException thrown on Android in ConsoleTitler (by <a href="https://github.com/Adam--">@Adam--</a>)</li>
+</ul>
+<h2 id="commits-38">Commits (38)</h2>
+<ul>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c9347c9b319852e9e608182024f14583bc96ba60">c9347c</a> Set next BenchmarkDotNet version: 0.13.7 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/df4cedd86c1135b7a8fdcf25125f7c683bd9cd74">df4ced</a> Fix generate-gh-pages.yaml (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/142a89e11d17add923501368d9f46e514f8e0ade">142a89</a> DotNetCliCommand.cs: Fail the build if no-dependencies retry build fails (by <a href="https://github.com/radical">@radical</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c0311bf687c754ef828928771e205e125ab54db5">c0311b</a> MonoAOTLLVMCsProj.txt: Add auto-imports for extension props/targets (by <a href="https://github.com/radical">@radical</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f42b9757dd6af5db562cd4ca250558ab0001213d">f42b97</a> MonoAOTLLVMCsProj.txt: Imports the props file early enough to allow (by <a href="https://github.com/radical">@radical</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f6bc29bfc75b49387098ddd77ff5aeb096d6fdc2">f6bc29</a> MonoAOTLLVMCsProj.txt: Add SelfContained=true (by <a href="https://github.com/radical">@radical</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/e4c4f6f4a189e964f8dad4b92573662104355d32">e4c4f6</a> [build] Specify NuGet source to PushNupkg (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7de12a1d3ee2b37351465ff2175d03d2898f045e">7de12a</a> [build] rework command line argument parsing (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/3f890fd4a87dad5718a84a19a0ecff734413a278">3f890f</a> [build] Rename tasks (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c780b3cc6cd3f0e2c398956e49430afa47366061">c780b3</a> [build] Rework examples (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/398ae6545ec77aaf395a753d333299c59ab1f591">398ae6</a> [build] Rework ReleaseTask (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/8a7caa7acd6a2b2f5e49b57f225ccbabd268029b">8a7caa</a> [build] Rework ReadmeUpdater (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/7a8135baac605861635a0b379048c59f1683ca28">7a8135</a> IComparable fallback for Tuple/ValueTuple (#2368) (by <a href="https://github.com/mrahhal">@mrahhal</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fd2639ff7b9e8353bb48c0eb6668c8bf32d19792">fd2639</a> Removed <code>PackageReference</code> from copied settings. (#2365) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6f471cc036ad47c1d57d3723d0eb1a503a544adb">6f471c</a> Fix package version in BenchmarkDotNet.Templates (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/dc9b80443633c4b6837d10d65801868fc75af17c">dc9b80</a> Fix regression in parsing arguments with spaces Closes #2373 (#2375) (by <a href="https://github.com/kant2002">@kant2002</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/bc59d48367b4f4c41305494f265e1f65f8b3ace1">bc59d4</a> <code>AggressiveOptimization</code> in <code>InProcess</code> toolchains (#2335) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/70ebf609922be3fb128f9edbf7dcf5795c3eed3f">70ebf6</a> Update file layout (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/ab179469574a2c7aca9f56a1d692ef2c253cb77d">ab1794</a> Recover cSpell location (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/28809a13ae9a7f64b4d81468d3a419a8adc5ceca">28809a</a> Rework environment-specific custom xUnit attributes (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c682d5200e3b61bfd1866902ca0add014e7f4cad">c682d5</a> Skip UserCanSpecifyCustomBuildConfiguration on .NET Framework, see #2376 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/55a33765fa8dc0707484a3c2b094dae2fa5203ca">55a337</a> Move cSpell.json to build (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/29362726423896a3fa7dca52aff94330195eb47e">293627</a> Add expected results tests (#2361) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/60c3029fd6db84e2993e6a9f4d2f344c605dd2f3">60c302</a> Fix attribute usage in IntegrationTests.ManualRunning (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/6fa7a91444b01029cc2ed81c90e237ae3e36c595">6fa7a9</a> change dotnet &quot;cli&quot; to &quot;SDK&quot; in error message (#2379) (by <a href="https://github.com/BurakTaner">@BurakTaner</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/4d6f1681d0a592e5a27e2a4097ca586d4034598b">4d6f16</a> Update run-tests.yaml (#2380) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/64d05c6a779389b32c4b11fd35046328476f2c89">64d05c</a> Support <code>--cli</code> argument for <code>CsProjClassicNetToolchain</code> (#2381) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/d93490d1fc9a6c56ab20dc4ba75d8e8ac2e3ebfd">d93490</a> Rebuild .Net Framework projects (#2370) (by <a href="https://github.com/timcassell">@timcassell</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/f8ab51870b9a3d5493a861bc395fea9a0a6ace27">f8ab51</a> Enable nullable annotations for the whole solution (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/b912a8e70273761fd468a35c9176be0e50f7ed31">b912a8</a> Code cleanup (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/dc365e1cf06089d8cca7b4cb7c98b4b402c14681">dc365e</a> Add snupkg to nightly workflow artifacts (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/a89ad265c107dd4fd9a7eba1b020ad6d48d87094">a89ad2</a> Fix path in dotnet nuget push command (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/da02fdc4da2799d0a6ba520a97bbb3a7f234420a">da02fd</a> Upgrade setup-node in spellcheck-docs workflow (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/657342284766bbf72bd3fa91eec5aca12b73bf27">657342</a> Bump xUnit: 2.4.2-&gt;2.5.0 (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/90ef2aecd0bd0c2b935975999053e20d9cdaae74">90ef2a</a> Fix debug build (#2385) (by <a href="https://github.com/caaavik-msft">@caaavik-msft</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/914ee7187340761594728497a9f0163a1ecddf67">914ee7</a> perfcollect: don't restore symbols for local builds (#2384) (by <a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/fd5b76691505d53f3e934f8502629c006539e82c">fd5b76</a> Fix PlatformNotSupportedException thrown on Android in ConsoleTitler (#2390) (by <a href="https://github.com/Adam--">@Adam--</a>)</li>
+<li><a href="https://github.com/dotnet/BenchmarkDotNet/commit/c02aeaa23cc4a7d4c3bda367a659580d5340ee93">c02aea</a> Prepare v0.13.7 changelog (by <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+</ul>
+<h2 id="contributors-9">Contributors (9)</h2>
+<ul>
+<li>Adam Anderson (<a href="https://github.com/Adam--">@Adam--</a>)</li>
+<li>Adam Sitnik (<a href="https://github.com/adamsitnik">@adamsitnik</a>)</li>
+<li>Andrey Akinshin (<a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
+<li>Andrii Kurdiumov (<a href="https://github.com/kant2002">@kant2002</a>)</li>
+<li>Ankit Jain (<a href="https://github.com/radical">@radical</a>)</li>
+<li>Burak Taner (<a href="https://github.com/BurakTaner">@BurakTaner</a>)</li>
+<li>Cameron Aavik (<a href="https://github.com/caaavik-msft">@caaavik-msft</a>)</li>
+<li>Mohammad Rahhal (<a href="https://github.com/mrahhal">@mrahhal</a>)</li>
+<li>Tim Cassell (<a href="https://github.com/timcassell">@timcassell</a>)</li>
+</ul>
+<p>Thank you very much!</p>
+<h2 id="additional-details">Additional details</h2>
+<p><em>Date: August 04, 2023</em></p>
+<p><em>Milestone: <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone%3Av0.13.7">v0.13.7</a></em>
+(<a href="https://github.com/dotnet/BenchmarkDotNet/compare/v0.13.6...v0.13.7">List of commits</a>)</p>
+<p><em>NuGet Packages:</em></p>
+<ul>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet/0.13.7">https://www.nuget.org/packages/BenchmarkDotNet/0.13.7</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.13.7">https://www.nuget.org/packages/BenchmarkDotNet.Annotations/0.13.7</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotTrace/0.13.7">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.dotTrace/0.13.7</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.13.7">https://www.nuget.org/packages/BenchmarkDotNet.Diagnostics.Windows/0.13.7</a></li>
+<li><a href="https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.13.7">https://www.nuget.org/packages/BenchmarkDotNet.Templates/0.13.7</a></li>
+</ul>
 <h1 id="benchmarkdotnet-v0136">BenchmarkDotNet v0.13.6</h1>
 <h2 id="highlights">Highlights</h2>
 <ul>
@@ -105,9 +208,9 @@ Now it's possible to pass additional arguments to BenchmarkDotNet using <code>@f
 </ul>
 <h2 id="milestone-details">Milestone details</h2>
 <p>In the <a href="https://github.com/dotnet/BenchmarkDotNet/issues?q=milestone:v0.13.6">v0.13.6</a> scope,
-19 issues were resolved and 33 pull requests were merged.
+18 issues were resolved and 33 pull requests were merged.
 This release includes 127 commits by 14 contributors.</p>
-<h2 id="resolved-issues-19">Resolved issues (19)</h2>
+<h2 id="resolved-issues-18">Resolved issues (18)</h2>
 <ul>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1658">#1658</a> Pass arguments to runner in dotnet new templates</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/1694">#1694</a> Length cannot be less than zero</li>
@@ -126,7 +229,6 @@ This release includes 127 commits by 14 contributors.</p>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2306">#2306</a> Allow for benchmark categories composition using inheritance (assignee: <a href="https://github.com/AndreyAkinshin">@AndreyAkinshin</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2312">#2312</a> CodeAnalysisTreatWarningsAsErrors=true in Directory.Build.props breaks auto-generated benchmark assembly build (assignee: <a href="https://github.com/viktorz">@viktorz</a>)</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2333">#2333</a> Cannot benchmark netcoreapp3.0</li>
-<li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2344">#2344</a> Build fails when returning type from PackageReference</li>
 <li><a href="https://github.com/dotnet/BenchmarkDotNet/issues/2358">#2358</a> System.MissingMethodException: Method not found: 'System.String Perfolizer.Horology.TimeInterval.ToString(System.Globalization.CultureInfo, System.String, Perfolizer.Common.UnitPresentation)'</li>
 </ul>
 <h2 id="merged-pull-requests-33">Merged pull requests (33)</h2>
