@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Tests.Mocks;
@@ -45,14 +49,14 @@ namespace BenchmarkDotNet.Tests.Exporters
         {
             var cultureInfo = CultureInfos[cultureInfoName];
             Thread.CurrentThread.CurrentCulture = cultureInfo;
-
+            EnvironmentResolver.Default.Register(EnvironmentMode.AffinityCharacteristic, () => new IntPtr(0xFF));
             var logger = new AccumulationLogger();
-
             var exporters = GetExporters();
             foreach (var exporter in exporters)
             {
                 PrintTitle(logger, exporter);
-                exporter.ExportToLog(MockFactory.CreateSummary(config.WithCultureInfo(cultureInfo)), logger);
+                var summary = MockFactory.CreateSummary(config.WithCultureInfo(cultureInfo));
+                exporter.ExportToLog(summary, logger);
             }
 
             var settings = VerifySettingsFactory.Create();
