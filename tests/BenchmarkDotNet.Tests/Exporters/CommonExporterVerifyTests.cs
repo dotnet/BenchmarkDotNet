@@ -50,13 +50,14 @@ namespace BenchmarkDotNet.Tests.Exporters
             var cultureInfo = CultureInfos[cultureInfoName];
             Thread.CurrentThread.CurrentCulture = cultureInfo;
             EnvironmentResolver.Default.Register(EnvironmentMode.AffinityCharacteristic, () => new IntPtr(0xFF));
+
             var logger = new AccumulationLogger();
+
             var exporters = GetExporters();
             foreach (var exporter in exporters)
             {
                 PrintTitle(logger, exporter);
-                var summary = MockFactory.CreateSummary(config.WithCultureInfo(cultureInfo));
-                exporter.ExportToLog(summary, logger);
+                exporter.ExportToLog(MockFactory.CreateSummary(config.WithCultureInfo(cultureInfo)), logger);
             }
 
             var settings = VerifySettingsFactory.Create();
