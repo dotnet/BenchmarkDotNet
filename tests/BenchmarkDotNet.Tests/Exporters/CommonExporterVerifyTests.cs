@@ -81,7 +81,6 @@ namespace BenchmarkDotNet.Tests.Exporters
 
         private static IEnumerable<IExporter> GetExporters()
         {
-            //todo add CsvExporter and CsvMeasurementsExporter (need to mock RuntimeInformation)
             yield return AsciiDocExporter.Default;
             yield return HtmlExporter.Default;
             yield return JsonExporter.Brief;
