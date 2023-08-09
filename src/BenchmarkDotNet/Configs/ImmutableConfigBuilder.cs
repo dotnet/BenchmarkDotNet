@@ -1,4 +1,7 @@
-﻿using BenchmarkDotNet.Analysers;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
@@ -6,9 +9,6 @@ using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
 
 namespace BenchmarkDotNet.Configs
 {
