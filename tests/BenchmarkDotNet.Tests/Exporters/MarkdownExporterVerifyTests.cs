@@ -15,8 +15,6 @@ using JetBrains.Annotations;
 using VerifyXunit;
 using Xunit;
 
-using static BenchmarkDotNet.Tests.Exporters.MarkdownExporterVerifyTests.BaselinesBenchmarks;
-
 namespace BenchmarkDotNet.Tests.Exporters
 {
     [Collection("VerifyTests")]
