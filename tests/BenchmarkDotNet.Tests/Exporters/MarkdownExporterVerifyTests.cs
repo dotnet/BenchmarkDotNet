@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             return Verifier.Verify(logger.GetLog(), settings);
         }
         [Fact]
-        public Task GroupExporterArrayTest()
+        public Task GroupExporterMultipleTypesTest()
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             var logger = new AccumulationLogger();
