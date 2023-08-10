@@ -15,6 +15,8 @@ using JetBrains.Annotations;
 using VerifyXunit;
 using Xunit;
 
+using static BenchmarkDotNet.Tests.Exporters.MarkdownExporterVerifyTests.BaselinesBenchmarks;
+
 namespace BenchmarkDotNet.Tests.Exporters
 {
     [Collection("VerifyTests")]
@@ -62,7 +64,6 @@ namespace BenchmarkDotNet.Tests.Exporters
         [Fact]
         public Task GroupExporterMultipleTypesTest()
         {
-
             Type[] benchmarkTypes = new Type[] { typeof(JobBaseline_MethodsJobs_WithAttribute), typeof(JobBaseline_MethodsJobs) };
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             var logger = new AccumulationLogger();
