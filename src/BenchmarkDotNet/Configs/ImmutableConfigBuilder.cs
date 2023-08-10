@@ -109,28 +109,28 @@ namespace BenchmarkDotNet.Configs
                 configAnalyse.Add(conclusion);
             }
 
-            var mergeDictionary = new Dictionary<System.Type, IExporter>();
+            var mergeDictionary = new Dictionary<string, IExporter>();
 
             foreach (var exporter in exporters)
             {
-                var exporterType = exporter.GetType();
-                if (mergeDictionary.ContainsKey(exporterType))
+                var exporterName = exporter.Name;
+                if (mergeDictionary.ContainsKey(exporterName))
                 {
-                    AddWarning($"The exporter {exporterType} is already present in configuration. There may be unexpected results.");
+                    AddWarning($"The exporter {exporterName} is already present in configuration. There may be unexpected results.");
                 }
-                mergeDictionary[exporterType] = exporter;
+                mergeDictionary[exporterName] = exporter;
             }
 
 
             foreach (var diagnoser in uniqueDiagnosers)
                 foreach (var exporter in diagnoser.Exporters)
                 {
-                    var exporterType = exporter.GetType();
-                    if (mergeDictionary.ContainsKey(exporterType))
+                    var exporterName = exporter.Name;
+                    if (mergeDictionary.ContainsKey(exporterName))
                     {
-                        AddWarning($"The exporter {exporterType} of {diagnoser.GetType().Name} is already present in configuration. There may be unexpected results.");
+                        AddWarning($"The exporter {exporterName} of {diagnoser.GetType().Name} is already present in configuration. There may be unexpected results.");
                     }
-                    mergeDictionary[exporterType] = exporter;
+                    mergeDictionary[exporterName] = exporter;
                 }
 
             var result = mergeDictionary.Values.ToList();
@@ -143,7 +143,7 @@ namespace BenchmarkDotNet.Configs
             if (hardwareCounterDiagnoser != default(IHardwareCountersDiagnoser) && disassemblyDiagnoser != default(DisassemblyDiagnoser))
                 result.Add(new InstructionPointerExporter(hardwareCounterDiagnoser, disassemblyDiagnoser));
 
-            for (int i = result.Count - 1; i >=0; i--)
+            for (int i = result.Count - 1; i >= 0; i--)
                 if (result[i] is IExporterDependencies exporterDependencies)
                     foreach (var dependency in exporterDependencies.Dependencies)
                         /*
@@ -165,7 +165,7 @@ namespace BenchmarkDotNet.Configs
                          *  "The CsvMeasurementsExporter is already present in the configuration. There may be unexpected results of RPlotExporter.
                          *
                          */
-                        if (!result.Any(exporter=> exporter.GetType() == dependency.GetType()))
+                        if (!result.Any(exporter => exporter.GetType() == dependency.GetType()))
                             result.Insert(i, dependency); // All the exporter dependencies should be added before the exporter
                         else
                         {
@@ -186,9 +186,9 @@ namespace BenchmarkDotNet.Configs
                     builder.Add(analyser);
 
             foreach (var diagnoser in uniqueDiagnosers)
-            foreach (var analyser in diagnoser.Analysers)
-                if (!builder.Contains(analyser))
-                    builder.Add(analyser);
+                foreach (var analyser in diagnoser.Analysers)
+                    if (!builder.Contains(analyser))
+                        builder.Add(analyser);
 
             return builder.ToImmutable();
         }
