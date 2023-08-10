@@ -4,17 +4,16 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Tests.Mocks;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using VerifyXunit;
 using Xunit;
-using static BenchmarkDotNet.Tests.Exporters.JobBaseline_MethodsJobs_WithAttribute;
 using static BenchmarkDotNet.Tests.Exporters.MarkdownExporterVerifyTests.BaselinesBenchmarks;
 
 namespace BenchmarkDotNet.Tests.Exporters
@@ -23,7 +22,6 @@ namespace BenchmarkDotNet.Tests.Exporters
     [UsesVerify]
     public class MarkdownExporterVerifyTests : IDisposable
     {
-        public Type[] benchmarkTypes = new Type[] { typeof(JobBaseline_MethodsJobs_WithAttribute), typeof(JobBaseline_MethodsJobs) };
         private readonly CultureInfo initCulture;
 
         public MarkdownExporterVerifyTests() => initCulture = Thread.CurrentThread.CurrentCulture;
@@ -61,9 +59,12 @@ namespace BenchmarkDotNet.Tests.Exporters
             settings.UseTextForParameters(benchmarkType.Name);
             return Verifier.Verify(logger.GetLog(), settings);
         }
+
         [Fact]
         public Task GroupExporterMultipleTypesTest()
         {
+
+            Type[] benchmarkTypes = new Type[] { typeof(JobBaseline_MethodsJobs_WithAttribute), typeof(JobBaseline_MethodsJobs) };
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             var logger = new AccumulationLogger();
             logger.WriteLine("=== " + benchmarkTypes + " ===");
