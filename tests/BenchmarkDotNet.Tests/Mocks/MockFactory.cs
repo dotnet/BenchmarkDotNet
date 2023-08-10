@@ -17,12 +17,13 @@ namespace BenchmarkDotNet.Tests.Mocks
 {
     public static class MockFactory
     {
-        public static Summary CreateSummary(Type benchmarkType)
+        public static Summary CreateSummary(Type benchmarkType) => CreateSummary(new Type[] { benchmarkType });
+        public static Summary CreateSummary(Type[] benchmarkTypes)
         {
-            var runInfo = BenchmarkConverter.TypeToBenchmarks(benchmarkType);
+            var runInfos = benchmarkTypes.Select(benchmarkType => BenchmarkConverter.TypeToBenchmarks(benchmarkType));
             return new Summary(
                 "MockSummary",
-                runInfo.BenchmarksCases.Select((benchmark, index) => CreateReport(benchmark, 5, (index + 1) * 100)).ToImmutableArray(),
+                runInfos.SelectMany(runInfo => runInfo.BenchmarksCases).Select((benchmark, index) => CreateReport(benchmark, 5, (index + 1) * 100)).ToImmutableArray(),
                 new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
                 string.Empty,
                 string.Empty,
