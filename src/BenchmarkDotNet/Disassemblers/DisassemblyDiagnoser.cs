@@ -14,6 +14,8 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Validators;
 
@@ -71,6 +73,11 @@ namespace BenchmarkDotNet.Diagnosers
 
             switch (signal)
             {
+                case HostSignal.AfterAll when benchmark.GetToolchain().IsInProcess:
+                    if (!IsOutOfProcessDisassemblerSupportedForCurrentPlatform())
+                        throw new PlatformNotSupportedException("The current platform does not support disassembling in-process.");
+                    results.Add(benchmark, windowsDifferentArchitectureDisassembler.Disassemble(parameters));
+                    break;
                 case HostSignal.AfterAll when ShouldUseSameArchitectureDisassembler(benchmark, parameters):
                     results.Add(benchmark, sameArchitectureDisassembler.Disassemble(parameters));
                     break;
@@ -100,9 +107,16 @@ namespace BenchmarkDotNet.Diagnosers
 
             foreach (var benchmark in validationParameters.Benchmarks)
             {
-                if (benchmark.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is InProcessNoEmitToolchain)
+                if (benchmark.Job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain.IsInProcess)
                 {
-                    yield return new ValidationError(true, "InProcessToolchain has no DisassemblyDiagnoser support", benchmark);
+                    if (toolchain is InProcessNoEmitToolchain)
+                    {
+                        yield return new ValidationError(true, "InProcessNoEmitToolchain has no DisassemblyDiagnoser support", benchmark);
+                    }
+                    if (toolchain is InProcessEmitToolchain && !IsOutOfProcessDisassemblerSupportedForCurrentPlatform())
+                    {
+                        yield return new ValidationError(true, "InProcessEmitToolchain has no DisassemblyDiagnoser support on this platform", benchmark);
+                    }
                 }
                 else if (benchmark.Job.IsNativeAOT())
                 {
@@ -154,6 +168,11 @@ namespace BenchmarkDotNet.Diagnosers
 
             return false;
         }
+
+        private static bool IsOutOfProcessDisassemblerSupportedForCurrentPlatform()
+            => RuntimeInformation.IsWindows()
+                && RuntimeInformation.GetCurrentPlatform() is Platform.X64 or Platform.X86
+                && !RuntimeInformation.IsMono && !RuntimeInformation.IsWasm && !RuntimeInformation.IsAot;
 
         private static IEnumerable<IExporter> GetExporters(Dictionary<BenchmarkCase, DisassemblyResult> results, DisassemblyDiagnoserConfig config)
         {
