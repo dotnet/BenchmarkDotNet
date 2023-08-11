@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using JetBrains.Annotations;
 using BdnRuntimeInformation = BenchmarkDotNet.Portability.RuntimeInformation;
@@ -22,6 +23,7 @@ public static class EnvRequirementChecker
         EnvRequirement.NonFullFramework => !BdnRuntimeInformation.IsFullFramework ? null : "Non-Full .NET Framework test",
         EnvRequirement.DotNetCoreOnly => BdnRuntimeInformation.IsNetCore ? null : ".NET/.NET Core-only test",
         EnvRequirement.DotNetCore30Only => IsRuntime(RuntimeMoniker.NetCoreApp30) ? null : ".NET Core 3.0-only test",
+        EnvRequirement.X86X64Only => BdnRuntimeInformation.GetCurrentPlatform() is Platform.X64 or Platform.X86 ? null : "x86- or x64-only test",
         _ => throw new ArgumentOutOfRangeException(nameof(requirement), requirement, "Unknown value")
     };
 

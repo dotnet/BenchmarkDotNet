@@ -8,5 +8,6 @@ public enum EnvRequirement
     FullFrameworkOnly,
     NonFullFramework,
     DotNetCoreOnly,
-    DotNetCore30Only
+    DotNetCore30Only,
+    X86X64Only
 }

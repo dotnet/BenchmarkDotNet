@@ -13,6 +13,8 @@ using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
+using BenchmarkDotNet.Tests.XUnit;
+using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -97,6 +99,33 @@ namespace BenchmarkDotNet.IntegrationTests
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
             CanExecute<WithCalls>(CreateConfig(jit, platform, runtime, disassemblyDiagnoser, RunStrategy.ColdStart));
+
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Int32)");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Boolean)");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Static)}()");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Instance)}()");
+            AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Recursive)}()");
+        }
+
+        // For some reason the GitHub runner with Core cannot fully disassemble, so we skip it.
+        [FactEnvSpecific("InProcess disassembly only supported on Windows x86/64.", EnvRequirement.WindowsOnly, EnvRequirement.X86X64Only, EnvRequirement.FullFrameworkOnly)]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void CanDisassembleAllMethodCallsInProcess()
+        {
+            var disassemblyDiagnoser = new DisassemblyDiagnoser(
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
+
+            var config = ManualConfig.CreateEmpty()
+                .AddJob(Job.Dry
+                    .WithStrategy(RunStrategy.ColdStart)
+                    .WithToolchain(InProcessEmitToolchain.Instance)
+                )
+                .AddLogger(DefaultConfig.Instance.GetLoggers().ToArray())
+                .AddColumnProvider(DefaultColumnProviders.Instance)
+                .AddDiagnoser(disassemblyDiagnoser)
+                .AddLogger(new OutputLogger(Output));
+
+            CanExecute<WithCalls>(config);
 
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Int32)");
             AssertDisassembled(disassemblyDiagnoser, $"{nameof(WithCalls.Benchmark)}(Boolean)");
