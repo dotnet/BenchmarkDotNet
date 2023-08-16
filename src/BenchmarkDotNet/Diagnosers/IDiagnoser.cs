@@ -29,6 +29,20 @@ namespace BenchmarkDotNet.Diagnosers
         IEnumerable<ValidationError> Validate(ValidationParameters validationParameters);
     }
 
+    public interface IDiagnoserSummaryEx : IDiagnoser
+    {
+        [PublicAPI] void OnSummary(Summary summary);
+    }
+
+    public static class DiagnoserSummaryExtensions
+    {
+        public static void OnSummaryCallback(this IDiagnoser diagnoser, Summary summary)
+        {
+            if (diagnoser is IDiagnoserSummaryEx diagnoserSummaryEx)
+                diagnoserSummaryEx.OnSummary(summary);
+        }
+    }
+
     public interface IConfigurableDiagnoser<in TConfig> : IDiagnoser
     {
         [PublicAPI] IConfigurableDiagnoser<TConfig> Configure(TConfig config);

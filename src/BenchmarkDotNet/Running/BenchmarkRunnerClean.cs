@@ -319,6 +319,7 @@ namespace BenchmarkDotNet.Running
             {
                 logger.WriteLine();
                 config.GetCompositeDiagnoser().DisplayResults(logger);
+                config.GetCompositeDiagnoser().OnSummaryCallback(summary);
             }
 
             logger.WriteLine();

@@ -12,7 +12,7 @@ using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Diagnosers
 {
-    public class CompositeDiagnoser : IDiagnoser
+    public class CompositeDiagnoser : IDiagnoser, IDiagnoserSummaryEx
     {
         private readonly ImmutableHashSet<IDiagnoser> diagnosers;
 
@@ -52,5 +52,13 @@ namespace BenchmarkDotNet.Diagnosers
 
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters)
             => diagnosers.SelectMany(diagnoser => diagnoser.Validate(validationParameters));
+
+        public void OnSummary(Summary summary)
+        {
+            foreach (var diagnoser in diagnosers)
+            {
+                diagnoser.OnSummaryCallback(summary);
+            }
+        }
     }
 }
