@@ -318,8 +318,8 @@ namespace BenchmarkDotNet.Running
             if (config.GetDiagnosers().Any())
             {
                 logger.WriteLine();
-                config.GetCompositeDiagnoser().DisplayResults(logger);
                 config.GetCompositeDiagnoser().OnSummaryCallback(summary);
+                config.GetCompositeDiagnoser().DisplayResults(logger);
             }
 
             logger.WriteLine();
