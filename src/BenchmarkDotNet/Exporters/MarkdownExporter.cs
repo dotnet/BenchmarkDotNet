@@ -22,6 +22,8 @@ namespace BenchmarkDotNet.Exporters
         protected override string FileExtension => "md";
         protected override string FileNameSuffix => $"-{Dialect.ToLower()}";
 
+        [PublicAPI] protected string Dialect { get; set; }
+
         public static readonly IExporter Default = new MarkdownExporter
         {
             Dialect = nameof(Default),
@@ -72,7 +74,6 @@ namespace BenchmarkDotNet.Exporters
             StartOfGroupHighlightStrategy = MarkdownHighlightStrategy.Marker
         };
 
-        [PublicAPI] protected string Dialect { get; set; }
         [PublicAPI] protected string Prefix = string.Empty;
         [PublicAPI] protected bool UseCodeBlocks;
         [PublicAPI] protected string CodeBlockStart = "```";
