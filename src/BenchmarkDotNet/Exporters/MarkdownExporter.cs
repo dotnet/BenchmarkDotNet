@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Exporters
         protected override string FileExtension => "md";
         protected override string FileNameSuffix => $"-{Dialect.ToLower()}";
 
-        [PublicAPI] protected string Dialect { get; set; }
+        protected string Dialect { get; set; }
 
         public static readonly IExporter Default = new MarkdownExporter
         {
