@@ -3,15 +3,15 @@ using System.IO;
 
 namespace BenchmarkDotNet.Loggers
 {
-    public class TextWriterLogger : ILogger, IDisposable
+    public class TextLogger : ILogger, IDisposable
     {
         private readonly TextWriter writer;
 
-        public TextWriterLogger(TextWriter writer) => this.writer = writer;
+        public TextLogger(TextWriter writer) => this.writer = writer;
 
         public void Dispose() => writer.Dispose();
 
-        public string Id => nameof(TextWriterLogger);
+        public string Id => nameof(TextLogger);
         public int Priority => 0;
         public void Write(LogKind logKind, string text) => writer.Write(text);
 

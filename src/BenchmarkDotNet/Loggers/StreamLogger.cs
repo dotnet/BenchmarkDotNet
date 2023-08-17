@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Loggers
 {
-    public class StreamLogger : TextWriterLogger
+    public class StreamLogger : TextLogger
     {
         public StreamLogger(StreamWriter writer) : base(writer) { }
 
