@@ -11,5 +11,7 @@ namespace BenchmarkDotNet.Loggers
         public StreamLogger(string filePath, bool append = false)
             : this(new StreamWriter(filePath, append))
         { }
+
+        public override string Id => nameof(StreamLogger);
     }
 }

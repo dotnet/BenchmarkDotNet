@@ -11,8 +11,9 @@ namespace BenchmarkDotNet.Loggers
 
         public void Dispose() => writer.Dispose();
 
-        public string Id => nameof(TextLogger);
+        public virtual string Id => nameof(TextLogger);
         public int Priority => 0;
+
         public void Write(LogKind logKind, string text) => writer.Write(text);
 
         public void WriteLine() => writer.WriteLine();
