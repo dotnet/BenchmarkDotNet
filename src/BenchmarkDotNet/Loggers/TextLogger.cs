@@ -9,8 +9,6 @@ namespace BenchmarkDotNet.Loggers
 
         public TextLogger(TextWriter writer) => this.writer = writer;
 
-        public void Dispose() => writer.Dispose();
-
         public virtual string Id => nameof(TextLogger);
         public int Priority => 0;
 
@@ -21,5 +19,7 @@ namespace BenchmarkDotNet.Loggers
         public void WriteLine(LogKind logKind, string text) => writer.WriteLine(text);
 
         public void Flush() => writer.Flush();
+
+        public void Dispose() => writer.Dispose();
     }
 }
