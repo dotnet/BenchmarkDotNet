@@ -46,19 +46,21 @@ namespace BenchmarkDotNet.Tests.Reports
         }
 
         [Fact]
-        public void NumericColumnIsRightJustified()
+        public void RightJustificationWorks()
         {
-            var config = ManualConfig.Create(DefaultConfig.Instance).AddColumn(StatisticColumn.Mean);
+            var config = ManualConfig.Create(DefaultConfig.Instance).AddColumn(new ParamColumn("Param"));
+            config.SummaryStyle = MockFactory.CreateSummaryStyle(defaultTextJustification: SummaryTable.SummaryTableColumn.TextJustification.Right);
             var summary = MockFactory.CreateSummary(config);
             var table = new SummaryTable(summary);
 
-            Assert.Equal(SummaryTable.SummaryTableColumn.TextJustification.Right, table.Columns.First(c => c.Header == "Mean").Justify);
+            Assert.Equal(SummaryTable.SummaryTableColumn.TextJustification.Right, table.Columns.First(c => c.Header == "Param").Justify);
         }
 
         [Fact]
-        public void TextColumnIsLeftJustified()
+        public void LeftJustificationWorks()
         {
             var config = ManualConfig.Create(DefaultConfig.Instance).AddColumn(new ParamColumn("Param"));
+            config.SummaryStyle = MockFactory.CreateSummaryStyle(defaultTextJustification: SummaryTable.SummaryTableColumn.TextJustification.Left);
             var summary = MockFactory.CreateSummary(config);
             var table = new SummaryTable(summary);
 

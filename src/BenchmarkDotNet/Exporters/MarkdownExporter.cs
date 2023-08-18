@@ -170,7 +170,7 @@ namespace BenchmarkDotNet.Exporters
                 }
 
                 logger.WriteLineStatistic(string.Join("",
-                    table.Columns.Where(c => c.NeedToShow).Select(column => new string('-', column.Width) + GetJustificationIndicator(column.Justify) + "|")));
+                    table.Columns.Where(c => c.NeedToShow).Select(column => new string('-', column.Width) + GetHeaderSeparatorIndicator(column.OriginalColumn.IsNumeric) + "|")));
             }
 
             int rowCounter = 0;
@@ -202,17 +202,9 @@ namespace BenchmarkDotNet.Exporters
             }
         }
 
-        private static string GetJustificationIndicator(SummaryTable.SummaryTableColumn.TextJustification textJustification)
+        private static string GetHeaderSeparatorIndicator(bool isNumeric)
         {
-            switch (textJustification)
-            {
-                case SummaryTable.SummaryTableColumn.TextJustification.Left:
-                    return " ";
-                case SummaryTable.SummaryTableColumn.TextJustification.Right:
-                    return ":";
-                default:
-                    return " ";
-            }
+            return isNumeric ? ":" : " ";
         }
     }
 }

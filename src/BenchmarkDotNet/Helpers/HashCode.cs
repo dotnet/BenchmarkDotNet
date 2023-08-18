@@ -109,6 +109,22 @@ namespace BenchmarkDotNet
             return hashCode;
         }
 
+        public static int Combine<T1, T2, T3, T4, T5, T6, T7, T8, T9>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6, T7 value7, T8 value8,
+            T9 value9)
+        {
+            int hashCode = 0;
+            hashCode = Hash(hashCode, value1);
+            hashCode = Hash(hashCode, value2);
+            hashCode = Hash(hashCode, value3);
+            hashCode = Hash(hashCode, value4);
+            hashCode = Hash(hashCode, value5);
+            hashCode = Hash(hashCode, value6);
+            hashCode = Hash(hashCode, value7);
+            hashCode = Hash(hashCode, value8);
+            hashCode = Hash(hashCode, value9);
+            return hashCode;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int Hash<T>(int hashCode, T value)
         {
@@ -128,7 +144,8 @@ namespace BenchmarkDotNet
         }
 
 #pragma warning disable CS0809 // Obsolete member 'HashCode.GetHashCode()' overrides non-obsolete member 'object.GetHashCode()'
-        [Obsolete("HashCode is a mutable struct and should not be compared with other HashCodes. Use ToHashCode to retrieve the computed hash code.", error: true)]
+        [Obsolete("HashCode is a mutable struct and should not be compared with other HashCodes. Use ToHashCode to retrieve the computed hash code.",
+            error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override int GetHashCode() => throw new NotSupportedException();
 
