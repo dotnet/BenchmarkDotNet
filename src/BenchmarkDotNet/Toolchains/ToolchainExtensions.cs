@@ -28,19 +28,17 @@ namespace BenchmarkDotNet.Toolchains
                 : GetToolchain(
                     job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance),
                     descriptor,
-                    job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic) || job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic));
+                    job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic)
+                    || job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic)
+                    || job.HasValue(InfrastructureMode.ArgumentsCharacteristic));
 
         internal static IToolchain GetToolchain(this Runtime runtime, Descriptor descriptor = null, bool preferMsBuildToolchains = false)
         {
             switch (runtime)
             {
                 case ClrRuntime clrRuntime:
-                    if (!preferMsBuildToolchains && RuntimeInformation.IsFullFramework &&
-                        // If dotnet SDK is not installed, we use RoslynToolchain.
-                        (!HostEnvironmentInfo.GetCurrent().IsDotNetCliInstalled()
-                        // Integration tests take too much time, because each benchmark run rebuilds the test suite and BenchmarkDotNet itself.
-                        // To reduce the total duration of the CI workflows, we just use RoslynToolchain.
-                        || XUnitHelper.IsIntegrationTest.Value))
+                    if (!preferMsBuildToolchains && RuntimeInformation.IsFullFramework
+                        && RuntimeInformation.GetCurrentRuntime().MsBuildMoniker == runtime.MsBuildMoniker)
                     {
                         return RoslynToolchain.Instance;
                     }
