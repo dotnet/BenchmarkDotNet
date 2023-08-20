@@ -159,8 +159,9 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
         private string GetTrimmingSettings()
             => rootAllApplicationAssemblies
-                ? "" // use the defaults
-                     // TrimMode is set in explicit way as for older versions it might have different default value
+                // Use the defaults
+                ? ""
+                // TrimMode is set in explicit way as for older versions it might have different default value
                 : "<TrimMode>link</TrimMode><TrimmerDefaultAction>link</TrimmerDefaultAction>";
 
         private string GetInstructionSetSettings(BuildPartition buildPartition)
