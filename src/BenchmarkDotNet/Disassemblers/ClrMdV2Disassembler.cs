@@ -15,9 +15,9 @@ namespace BenchmarkDotNet.Disassemblers
     internal abstract class ClrMdV2Disassembler
     {
         // Translating an address to a method can cause AV and a process crash (https://github.com/dotnet/BenchmarkDotNet/issues/2070).
-        // It was fixed in https://github.com/dotnet/runtime/pull/79846,
-        // and most likely will be backported to 7.0.2 very soon (https://github.com/dotnet/runtime/pull/79862).
-        protected static readonly bool IsVulnerableToAvInDac = !RuntimeInformation.IsWindows() && Environment.Version < new Version(7, 0, 2);
+        // It was partially fixed in https://github.com/dotnet/runtime/pull/79846,
+        // fully fixed in https://github.com/dotnet/runtime/pull/90797.
+        protected static readonly bool IsVulnerableToAvInDac = !RuntimeInformation.IsWindows() && Environment.Version < new Version(8, 0);
 
         internal DisassemblyResult AttachAndDisassemble(Settings settings)
         {
