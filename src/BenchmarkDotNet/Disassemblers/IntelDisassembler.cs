@@ -84,10 +84,7 @@ namespace BenchmarkDotNet.Disassemblers
 
                     if (address > ushort.MaxValue)
                     {
-                        if (!IsVulnerableToAvInDac || IsCallOrJump(instruction))
-                        {
-                            TryTranslateAddressToName(address, isPrestubMD, state, isIndirect, depth, currentMethod);
-                        }
+                        TryTranslateAddressToName(address, isPrestubMD, state, isIndirect, depth, currentMethod);
                     }
                 }
 

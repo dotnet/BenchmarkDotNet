@@ -14,11 +14,6 @@ namespace BenchmarkDotNet.Disassemblers
     // This Disassembler uses ClrMd v2x. Please keep it in sync with ClrMdV1Disassembler (if possible).
     internal abstract class ClrMdV2Disassembler
     {
-        // Translating an address to a method can cause AV and a process crash (https://github.com/dotnet/BenchmarkDotNet/issues/2070).
-        // It was partially fixed in https://github.com/dotnet/runtime/pull/79846,
-        // fully fixed in https://github.com/dotnet/runtime/pull/90797.
-        protected static readonly bool IsVulnerableToAvInDac = !RuntimeInformation.IsWindows() && Environment.Version < new Version(8, 0);
-
         internal DisassemblyResult AttachAndDisassemble(Settings settings)
         {
             using (var dataTarget = DataTarget.AttachToProcess(
@@ -247,10 +242,14 @@ namespace BenchmarkDotNet.Disassemblers
 
         protected void TryTranslateAddressToName(ulong address, bool isAddressPrecodeMD, State state, bool isIndirectCallOrJump, int depth, ClrMethod currentMethod)
         {
-            var runtime = state.Runtime;
+            // 0 or -1 (ulong.MaxValue) addresses are invalid, and will crash the runtime in older runtimes. https://github.com/dotnet/runtime/pull/90794
+            if (address == 0 || address == ulong.MaxValue)
+                return;
 
             if (state.AddressToNameMapping.ContainsKey(address))
                 return;
+
+            var runtime = state.Runtime;
 
             var jitHelperFunctionName = runtime.GetJitHelperFunctionName(address);
             if (!string.IsNullOrEmpty(jitHelperFunctionName))
@@ -276,7 +275,7 @@ namespace BenchmarkDotNet.Disassemblers
 
             if (method is null)
             {
-                if (isAddressPrecodeMD || !IsVulnerableToAvInDac)
+                if (isAddressPrecodeMD)
                 {
                     var methodDescriptor = runtime.GetMethodByHandle(address);
                     if (!(methodDescriptor is null))
@@ -293,14 +292,11 @@ namespace BenchmarkDotNet.Disassemblers
                     }
                 }
 
-                if (!IsVulnerableToAvInDac)
+                var methodTableName = runtime.DacLibrary.SOSDacInterface.GetMethodTableName(address);
+                if (!string.IsNullOrEmpty(methodTableName))
                 {
-                    var methodTableName = runtime.DacLibrary.SOSDacInterface.GetMethodTableName(address);
-                    if (!string.IsNullOrEmpty(methodTableName))
-                    {
-                        state.AddressToNameMapping.Add(address, $"MT_{methodTableName}");
-                        return;
-                    }
+                    state.AddressToNameMapping.Add(address, $"MT_{methodTableName}");
+                    return;
                 }
                 return;
             }
