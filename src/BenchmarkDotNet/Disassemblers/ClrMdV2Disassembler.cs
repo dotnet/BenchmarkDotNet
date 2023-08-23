@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Portability;
-using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Disassemblers
 {
@@ -31,9 +30,17 @@ namespace BenchmarkDotNet.Disassemblers
                 };
             if (RuntimeInformation.IsLinux())
             {
-                string? minAddrResult = ProcessHelper.RunAndReadOutput("/bin/bash", "sudo cat /proc/sys/vm/mmap_min_addr");
-                ulong.TryParse(minAddrResult, out ulong minAddress);
-                return minAddress;
+                try
+                {
+                    if (File.Exists("/proc/sys/vm/mmap_min_addr"))
+                    {
+                        string? minAddrResult = File.ReadAllText("/proc/sys/vm/mmap_min_addr");
+                        ulong.TryParse(minAddrResult, out ulong minAddress);
+                        return minAddress;
+                    }
+                }
+                catch { }
+                return 0;
             }
             throw new NotSupportedException($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} is not supported");
         }
