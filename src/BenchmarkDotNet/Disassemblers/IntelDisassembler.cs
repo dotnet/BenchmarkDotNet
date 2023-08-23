@@ -81,11 +81,7 @@ namespace BenchmarkDotNet.Disassemblers
                             }
                         }
                     }
-
-                    if (address > ushort.MaxValue)
-                    {
-                        TryTranslateAddressToName(address, isPrestubMD, state, isIndirect, depth, currentMethod);
-                    }
+                    TryTranslateAddressToName(address, isPrestubMD, state, isIndirect, depth, currentMethod);
                 }
 
                 yield return new IntelAsm

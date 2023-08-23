@@ -8,12 +8,36 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Disassemblers
 {
     // This Disassembler uses ClrMd v2x. Please keep it in sync with ClrMdV1Disassembler (if possible).
     internal abstract class ClrMdV2Disassembler
     {
+        private static readonly ulong MinValidAddress = GetMinValidAddress();
+
+        private static ulong GetMinValidAddress()
+        {
+            // https://github.com/dotnet/BenchmarkDotNet/pull/2413#issuecomment-1688100117
+            if (RuntimeInformation.IsWindows())
+                return 65536;
+            if (RuntimeInformation.IsMacOS())
+                return RuntimeInformation.GetCurrentPlatform() switch
+                {
+                    Environments.Platform.X86 or Environments.Platform.X64 => 4096,
+                    Environments.Platform.Arm64 => 0x100000000,
+                    _ => throw new NotSupportedException($"{RuntimeInformation.GetCurrentPlatform()} is not supported")
+                };
+            if (RuntimeInformation.IsLinux())
+            {
+                string? minAddrResult = ProcessHelper.RunAndReadOutput("/bin/bash", "sudo cat /proc/sys/vm/mmap_min_addr");
+                ulong.TryParse(minAddrResult, out ulong minAddress);
+                return minAddress;
+            }
+            throw new NotSupportedException($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} is not supported");
+        }
+
         internal DisassemblyResult AttachAndDisassemble(Settings settings)
         {
             using (var dataTarget = DataTarget.AttachToProcess(
@@ -242,8 +266,10 @@ namespace BenchmarkDotNet.Disassemblers
 
         protected void TryTranslateAddressToName(ulong address, bool isAddressPrecodeMD, State state, bool isIndirectCallOrJump, int depth, ClrMethod currentMethod)
         {
-            // 0 or -1 (ulong.MaxValue) addresses are invalid, and will crash the runtime in older runtimes. https://github.com/dotnet/runtime/pull/90794
-            if (address == 0 || address == ulong.MaxValue)
+            // -1 (ulong.MaxValue) address is invalid, and will crash the runtime in older runtimes. https://github.com/dotnet/runtime/pull/90794
+            // 0 is NULL and therefore never valid.
+            // Addresses less than the minimum virtual address are also invalid.
+            if (address == ulong.MaxValue || address == 0 || address < MinValidAddress)
                 return;
 
             if (state.AddressToNameMapping.ContainsKey(address))
@@ -259,7 +285,7 @@ namespace BenchmarkDotNet.Disassemblers
             }
 
             var method = runtime.GetMethodByInstructionPointer(address);
-            if (method is null && (address & ((uint)runtime.DataTarget.DataReader.PointerSize - 1)) == 0)
+            if (method is null && (address & ((uint) runtime.DataTarget.DataReader.PointerSize - 1)) == 0)
             {
                 if (runtime.DataTarget.DataReader.ReadPointer(address, out ulong newAddress) && newAddress > ushort.MaxValue)
                 {
@@ -275,28 +301,24 @@ namespace BenchmarkDotNet.Disassemblers
 
             if (method is null)
             {
-                if (isAddressPrecodeMD)
+                var methodDescriptor = runtime.GetMethodByHandle(address);
+                if (methodDescriptor is not null)
                 {
-                    var methodDescriptor = runtime.GetMethodByHandle(address);
-                    if (!(methodDescriptor is null))
+                    if (isAddressPrecodeMD)
                     {
-                        if (isAddressPrecodeMD)
-                        {
-                            state.AddressToNameMapping.Add(address, $"Precode of {methodDescriptor.Signature}");
-                        }
-                        else
-                        {
-                            state.AddressToNameMapping.Add(address, $"MD_{methodDescriptor.Signature}");
-                        }
-                        return;
+                        state.AddressToNameMapping.Add(address, $"Precode of {methodDescriptor.Signature}");
                     }
+                    else
+                    {
+                        state.AddressToNameMapping.Add(address, $"MD_{methodDescriptor.Signature}");
+                    }
+                    return;
                 }
 
                 var methodTableName = runtime.DacLibrary.SOSDacInterface.GetMethodTableName(address);
                 if (!string.IsNullOrEmpty(methodTableName))
                 {
                     state.AddressToNameMapping.Add(address, $"MT_{methodTableName}");
-                    return;
                 }
                 return;
             }
