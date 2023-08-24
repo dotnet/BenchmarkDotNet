@@ -1,28 +1,17 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Loggers
 {
-    public class StreamLogger : ILogger, IDisposable
+    public class StreamLogger : TextLogger
     {
-        private readonly StreamWriter writer;
-
-        public StreamLogger(StreamWriter writer) => this.writer = writer;
-
-        public void Dispose() => writer.Dispose();
+        public StreamLogger(StreamWriter writer) : base(writer) { }
 
         [PublicAPI]
-        public StreamLogger(string filePath, bool append = false) => writer = new StreamWriter(filePath, append);
+        public StreamLogger(string filePath, bool append = false)
+            : this(new StreamWriter(filePath, append))
+        { }
 
-        public string Id => nameof(StreamLogger);
-        public int Priority => 0;
-        public void Write(LogKind logKind, string text) => writer.Write(text);
-
-        public void WriteLine() => writer.WriteLine();
-
-        public void WriteLine(LogKind logKind, string text) => writer.WriteLine(text);
-
-        public void Flush() => writer.Flush();
+        public override string Id => nameof(StreamLogger);
     }
 }

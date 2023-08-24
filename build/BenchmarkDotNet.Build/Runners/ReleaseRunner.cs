@@ -101,7 +101,7 @@ public class ReleaseRunner
         var nuGetToken = EnvVar.NuGetToken.GetValue();
 
         var files = context
-            .GetFiles(context.ArtifactsDirectory.CombineWithFilePath("*").FullPath)
+            .GetFiles(context.ArtifactsDirectory.CombineWithFilePath("*.nupkg").FullPath)
             .OrderBy(file => file.FullPath);
         var settings = new DotNetNuGetPushSettings
         {

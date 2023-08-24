@@ -144,6 +144,19 @@ namespace BenchmarkDotNet.Tests.Configs
         }
 
         [Fact]
+        public void MultipleExportersOfSameTypeWithDifferentNamesAreAccepted()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+
+            mutable.AddExporter(MarkdownExporter.GitHub);
+            mutable.AddExporter(MarkdownExporter.Atlassian);
+
+            var final = ImmutableConfigBuilder.Create(mutable);
+
+            Assert.Equal(2, final.GetExporters().Count());
+        }
+
+        [Fact]
         public void DuplicateAnalyzersAreExcluded()
         {
             var mutable = ManualConfig.CreateEmpty();
@@ -380,7 +393,7 @@ namespace BenchmarkDotNet.Tests.Configs
             var leftAddedToTheRight = ManualConfig.Create(right);
             leftAddedToTheRight.Add(left);
 
-            return new[]{ rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig() };
+            return new[] { rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig() };
         }
 
         public class TestExporter : IExporter, IExporterDependencies
