@@ -21,6 +21,8 @@ namespace BenchmarkDotNet.Disassemblers
             // https://github.com/dotnet/BenchmarkDotNet/pull/2413#issuecomment-1688100117
             if (RuntimeInformation.IsWindows())
                 return 65536;
+            if (RuntimeInformation.IsLinux())
+                return (ulong) Environment.SystemPageSize;
             if (RuntimeInformation.IsMacOS())
                 return RuntimeInformation.GetCurrentPlatform() switch
                 {
@@ -28,20 +30,6 @@ namespace BenchmarkDotNet.Disassemblers
                     Environments.Platform.Arm64 => 0x100000000,
                     _ => throw new NotSupportedException($"{RuntimeInformation.GetCurrentPlatform()} is not supported")
                 };
-            if (RuntimeInformation.IsLinux())
-            {
-                try
-                {
-                    if (File.Exists("/proc/sys/vm/mmap_min_addr"))
-                    {
-                        string? minAddrResult = File.ReadAllText("/proc/sys/vm/mmap_min_addr");
-                        ulong.TryParse(minAddrResult, out ulong minAddress);
-                        return minAddress;
-                    }
-                }
-                catch { }
-                return 0;
-            }
             throw new NotSupportedException($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} is not supported");
         }
 
