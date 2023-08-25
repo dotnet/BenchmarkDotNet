@@ -79,8 +79,8 @@ namespace BenchmarkDotNet.Exporters
         [PublicAPI] protected string CodeBlockStart = "```";
         [PublicAPI] protected string CodeBlockEnd = "```";
         [PublicAPI] protected MarkdownHighlightStrategy StartOfGroupHighlightStrategy = MarkdownHighlightStrategy.None;
-        [PublicAPI] protected string TableHeaderSeparator = " |";
-        [PublicAPI] protected string TableColumnSeparator = " |";
+        [PublicAPI] protected string TableHeaderSeparator = " | ";
+        [PublicAPI] protected string TableColumnSeparator = " | ";
         [PublicAPI] protected bool UseHeaderSeparatingRow = true;
         [PublicAPI] protected bool ColumnsStartWithSeparator;
         [PublicAPI] protected string BoldMarkupFormat = "**{0}**";
@@ -166,11 +166,13 @@ namespace BenchmarkDotNet.Exporters
             {
                 if (ColumnsStartWithSeparator)
                 {
-                    logger.WriteStatistic(TableHeaderSeparator.TrimStart());
+                    logger.WriteStatistic(TableHeaderSeparator.TrimStart().TrimEnd() + "-");
                 }
 
                 logger.WriteLineStatistic(string.Join("",
-                    table.Columns.Where(c => c.NeedToShow).Select(column => new string('-', column.Width) + GetHeaderSeparatorIndicator(column.OriginalColumn.IsNumeric) + "|")));
+                    table.Columns.Where(c => c.NeedToShow).Select(column =>
+                        new string('-', column.Width - 1) + GetHeaderSeparatorIndicator(column.OriginalColumn.IsNumeric) +
+                        GetHeaderSeparatorColumnDivider(column.Index, table.ColumnCount))));
             }
 
             int rowCounter = 0;
@@ -205,6 +207,12 @@ namespace BenchmarkDotNet.Exporters
         private static string GetHeaderSeparatorIndicator(bool isNumeric)
         {
             return isNumeric ? ":" : " ";
+        }
+
+        private static string GetHeaderSeparatorColumnDivider(int columnIndex, int columnCount)
+        {
+            var isLastColumn = columnIndex != columnCount - 1;
+            return isLastColumn ? "|-" : "|";
         }
     }
 }

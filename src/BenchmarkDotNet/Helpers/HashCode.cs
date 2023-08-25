@@ -109,8 +109,8 @@ namespace BenchmarkDotNet
             return hashCode;
         }
 
-        public static int Combine<T1, T2, T3, T4, T5, T6, T7, T8, T9>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6, T7 value7, T8 value8,
-            T9 value9)
+        public static int Combine<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6, T7 value7,
+            T8 value8, T9 value9, T10 value10)
         {
             int hashCode = 0;
             hashCode = Hash(hashCode, value1);
@@ -122,6 +122,7 @@ namespace BenchmarkDotNet
             hashCode = Hash(hashCode, value7);
             hashCode = Hash(hashCode, value8);
             hashCode = Hash(hashCode, value9);
+            hashCode = Hash(hashCode, value10);
             return hashCode;
         }
 

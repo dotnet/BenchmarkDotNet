@@ -122,7 +122,7 @@ namespace BenchmarkDotNet.Reports
                 IsDefault = table.IsDefault[index];
                 OriginalColumn = column;
 
-                Justify = table.EffectiveSummaryStyle.DefaultTextJustification;
+                Justify = column.IsNumeric ? table.EffectiveSummaryStyle.NumericColumnJustification : table.EffectiveSummaryStyle.TextColumnJustification;
 
                 bool needToShow = column.AlwaysShow || Content.Distinct().Count() > 1;
                 NeedToShow = !hide && needToShow;

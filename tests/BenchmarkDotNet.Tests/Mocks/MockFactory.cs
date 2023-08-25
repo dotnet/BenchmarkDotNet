@@ -74,9 +74,11 @@ namespace BenchmarkDotNet.Tests.Mocks
             ImmutableArray<IColumnHidingRule>.Empty);
 
         public static SummaryStyle CreateSummaryStyle(bool printUnitsInHeader = false, bool printUnitsInContent = true, bool printZeroValuesInContent = false,
-            SizeUnit sizeUnit = null, TimeUnit timeUnit = null, TextJustification defaultTextJustification = TextJustification.Left)
+            SizeUnit sizeUnit = null, TimeUnit timeUnit = null, TextJustification textColumnJustification = TextJustification.Left,
+            TextJustification numericColumnJustification = TextJustification.Left)
             => new SummaryStyle(DefaultCultureInfo.Instance, printUnitsInHeader, sizeUnit, timeUnit, printUnitsInContent: printUnitsInContent,
-                printZeroValuesInContent: printZeroValuesInContent, defaultTextJustification: defaultTextJustification);
+                printZeroValuesInContent: printZeroValuesInContent, textColumnJustification: textColumnJustification,
+                numericColumnJustification: numericColumnJustification);
 
         private static ImmutableArray<BenchmarkReport> CreateReports(IConfig config)
             => CreateBenchmarks<MockBenchmarkClass>(config).Select(CreateSimpleReport).ToImmutableArray();
