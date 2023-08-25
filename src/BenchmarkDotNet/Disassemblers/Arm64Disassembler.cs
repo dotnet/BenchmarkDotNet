@@ -141,45 +141,63 @@ namespace BenchmarkDotNet.Disassemblers
 
     internal class Arm64Disassembler : ClrMdV2Disassembler
     {
-        // See dotnet/runtime src/coreclr/vm/arm64/thunktemplates.asm/.S for the stub code
-        // ldr  x9, DATA_SLOT(CallCountingStub, RemainingCallCountCell)
-        // ldrh w10, [x9]
-        // subs w10, w10, #0x1
-        private static byte[] callCountingStubTemplate = new byte[12] { 0x09, 0x00, 0x00, 0x58, 0x2a, 0x01, 0x40, 0x79, 0x4a, 0x05, 0x00, 0x71 };
-        // ldr x10, DATA_SLOT(StubPrecode, Target)
-        // ldr x12, DATA_SLOT(StubPrecode, MethodDesc)
-        // br x10
-        private static byte[] stubPrecodeTemplate = new byte[12] { 0x4a, 0x00, 0x00, 0x58, 0xec, 0x00, 0x00, 0x58, 0x40, 0x01, 0x1f, 0xd6 };
-        // ldr x11, DATA_SLOT(FixupPrecode, Target)
-        // br  x11
-        // ldr x12, DATA_SLOT(FixupPrecode, MethodDesc)
-        private static byte[] fixupPrecodeTemplate = new byte[12] { 0x0b, 0x00, 0x00, 0x58, 0x60, 0x01, 0x1f, 0xd6, 0x0c, 0x00, 0x00, 0x58 };
-
-        static Arm64Disassembler()
+        internal sealed class RuntimeSpecificData
         {
-            // The stubs code depends on the current OS memory page size, so we need to update the templates to reflect that
-            int pageSizeShifted = Environment.SystemPageSize / 32;
-            // Calculate the ldr x9, #offset instruction with offset based on the page size
-            callCountingStubTemplate[1] = (byte)(pageSizeShifted & 0xff);
-            callCountingStubTemplate[2] = (byte)(pageSizeShifted >> 8);
+            // See dotnet/runtime src/coreclr/vm/arm64/thunktemplates.asm/.S for the stub code
+            // ldr  x9, DATA_SLOT(CallCountingStub, RemainingCallCountCell)
+            // ldrh w10, [x9]
+            // subs w10, w10, #0x1
+            internal readonly byte[] callCountingStubTemplate = new byte[12] { 0x09, 0x00, 0x00, 0x58, 0x2a, 0x01, 0x40, 0x79, 0x4a, 0x05, 0x00, 0x71 };
+            // ldr x10, DATA_SLOT(StubPrecode, Target)
+            // ldr x12, DATA_SLOT(StubPrecode, MethodDesc)
+            // br x10
+            internal readonly byte[] stubPrecodeTemplate = new byte[12] { 0x4a, 0x00, 0x00, 0x58, 0xec, 0x00, 0x00, 0x58, 0x40, 0x01, 0x1f, 0xd6 };
+            // ldr x11, DATA_SLOT(FixupPrecode, Target)
+            // br  x11
+            // ldr x12, DATA_SLOT(FixupPrecode, MethodDesc)
+            internal readonly byte[] fixupPrecodeTemplate = new byte[12] { 0x0b, 0x00, 0x00, 0x58, 0x60, 0x01, 0x1f, 0xd6, 0x0c, 0x00, 0x00, 0x58 };
+            internal readonly ulong stubPageSize;
 
-            // Calculate the ldr x10, #offset instruction with offset based on the page size
-            stubPrecodeTemplate[1] = (byte)(pageSizeShifted & 0xff);
-            stubPrecodeTemplate[2] = (byte)(pageSizeShifted >> 8);
-            // Calculate the ldr x12, #offset instruction with offset based on the page size
-            stubPrecodeTemplate[5] = (byte)((pageSizeShifted - 1) & 0xff);
-            stubPrecodeTemplate[6] = (byte)((pageSizeShifted - 1) >> 8);
+            internal RuntimeSpecificData(State state)
+            {
+                stubPageSize = (ulong)Environment.SystemPageSize;
+                if (state.RuntimeVersion.Major >= 8)
+                {
+                    // In .NET 8, the stub page size was changed to min 16kB
+                    stubPageSize = Math.Max(stubPageSize, 16384);
+                }
 
-            // Calculate the ldr x11, #offset instruction with offset based on the page size
-            fixupPrecodeTemplate[1] = (byte)(pageSizeShifted & 0xff);
-            fixupPrecodeTemplate[2] = (byte)(pageSizeShifted >> 8);
-            // Calculate the ldr x12, #offset instruction with offset based on the page size
-            fixupPrecodeTemplate[9] = (byte)(pageSizeShifted & 0xff);
-            fixupPrecodeTemplate[10] = (byte)(pageSizeShifted >> 8);
+                // The stubs code depends on the current OS memory page size, so we need to update the templates to reflect that
+                ulong pageSizeShifted = stubPageSize / 32;
+                // Calculate the ldr x9, #offset instruction with offset based on the page size
+                callCountingStubTemplate[1] = (byte)(pageSizeShifted & 0xff);
+                callCountingStubTemplate[2] = (byte)(pageSizeShifted >> 8);
+
+                // Calculate the ldr x10, #offset instruction with offset based on the page size
+                stubPrecodeTemplate[1] = (byte)(pageSizeShifted & 0xff);
+                stubPrecodeTemplate[2] = (byte)(pageSizeShifted >> 8);
+                // Calculate the ldr x12, #offset instruction with offset based on the page size
+                stubPrecodeTemplate[5] = (byte)((pageSizeShifted - 1) & 0xff);
+                stubPrecodeTemplate[6] = (byte)((pageSizeShifted - 1) >> 8);
+
+                // Calculate the ldr x11, #offset instruction with offset based on the page size
+                fixupPrecodeTemplate[1] = (byte)(pageSizeShifted & 0xff);
+                fixupPrecodeTemplate[2] = (byte)(pageSizeShifted >> 8);
+                // Calculate the ldr x12, #offset instruction with offset based on the page size
+                fixupPrecodeTemplate[9] = (byte)(pageSizeShifted & 0xff);
+                fixupPrecodeTemplate[10] = (byte)(pageSizeShifted >> 8);
+            }
         }
+
+        private static readonly Dictionary<Version, RuntimeSpecificData> runtimeSpecificData = new ();
 
         protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax)
         {
+            if (!runtimeSpecificData.TryGetValue(state.RuntimeVersion, out RuntimeSpecificData data))
+            {
+                runtimeSpecificData.Add(state.RuntimeVersion, data = new RuntimeSpecificData(state));
+            }
+
             const Arm64DisassembleMode disassembleMode = Arm64DisassembleMode.Arm;
             using (CapstoneArm64Disassembler disassembler = CapstoneDisassembler.CreateArm64Disassembler(disassembleMode))
             {
@@ -210,21 +228,21 @@ namespace BenchmarkDotNet.Disassemblers
 
                             if (state.Runtime.DataTarget.DataReader.Read(address, buffer) == buffer.Length)
                             {
-                                if (buffer.SequenceEqual(callCountingStubTemplate))
+                                if (buffer.SequenceEqual(data.callCountingStubTemplate))
                                 {
                                     const ulong TargetMethodAddressSlotOffset = 8;
-                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + (ulong)Environment.SystemPageSize + TargetMethodAddressSlotOffset);
+                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + data.stubPageSize + TargetMethodAddressSlotOffset);
                                 }
-                                else if (buffer.SequenceEqual(stubPrecodeTemplate))
+                                else if (buffer.SequenceEqual(data.stubPrecodeTemplate))
                                 {
                                     const ulong MethodDescSlotOffset = 0;
-                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + (ulong)Environment.SystemPageSize + MethodDescSlotOffset);
+                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + data.stubPageSize + MethodDescSlotOffset);
                                     isPrestubMD = true;
                                 }
-                                else if (buffer.SequenceEqual(fixupPrecodeTemplate))
+                                else if (buffer.SequenceEqual(data.fixupPrecodeTemplate))
                                 {
                                     const ulong MethodDescSlotOffset = 8;
-                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + (ulong)Environment.SystemPageSize + MethodDescSlotOffset);
+                                    address = state.Runtime.DataTarget.DataReader.ReadPointer(address + data.stubPageSize + MethodDescSlotOffset);
                                     isPrestubMD = true;
                                 }
                             }
