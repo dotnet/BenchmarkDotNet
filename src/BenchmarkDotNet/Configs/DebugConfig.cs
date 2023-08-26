@@ -4,6 +4,7 @@ using System.Globalization;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.EventHandlers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
@@ -61,7 +62,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<IDiagnoser> GetDiagnosers() => Array.Empty<IDiagnoser>();
         public IEnumerable<IAnalyser> GetAnalysers() => Array.Empty<IAnalyser>();
         public IEnumerable<HardwareCounter> GetHardwareCounters() => Array.Empty<HardwareCounter>();
-        public IEnumerable<IBenchmarkEventHandler> GetEventHandlers() => Array.Empty<IBenchmarkEventHandler>();
+        public IEnumerable<IEventHandler> GetEventHandlers() => Array.Empty<IEventHandler>();
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
 

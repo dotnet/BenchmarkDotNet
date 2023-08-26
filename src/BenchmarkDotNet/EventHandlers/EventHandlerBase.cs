@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
 
-namespace BenchmarkDotNet.Running
+namespace BenchmarkDotNet.EventHandlers
 {
-    public class BenchmarkEventHandlerBase : IBenchmarkEventHandler
+    public class EventHandlerBase : IEventHandler
     {
         public virtual void HandleBuildFailed(BenchmarkCase benchmarkCase, BuildResult buildResult)
         {

@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
 
-namespace BenchmarkDotNet.Running
+namespace BenchmarkDotNet.EventHandlers
 {
-    public class CompositeBenchmarkEventHandler : IBenchmarkEventHandler
+    public class CompositeEventHandler : IEventHandler
     {
-        private readonly IReadOnlyCollection<IBenchmarkEventHandler> eventHandlers;
+        private readonly IReadOnlyCollection<IEventHandler> eventHandlers;
 
-        public CompositeBenchmarkEventHandler(IReadOnlyCollection<IBenchmarkEventHandler> eventHandlers)
+        public CompositeEventHandler(IReadOnlyCollection<IEventHandler> eventHandlers)
         {
             this.eventHandlers = eventHandlers;
         }

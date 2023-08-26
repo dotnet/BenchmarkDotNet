@@ -6,6 +6,7 @@ using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.EventHandlers;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
@@ -31,7 +32,7 @@ namespace BenchmarkDotNet.Configs
         private readonly ImmutableHashSet<HardwareCounter> hardwareCounters;
         private readonly ImmutableHashSet<IFilter> filters;
         private readonly ImmutableArray<BenchmarkLogicalGroupRule> rules;
-        private readonly ImmutableHashSet<IBenchmarkEventHandler> eventHandlers;
+        private readonly ImmutableHashSet<IEventHandler> eventHandlers;
         private readonly ImmutableArray<IColumnHidingRule> columnHidingRules;
 
         internal ImmutableConfig(
@@ -46,7 +47,7 @@ namespace BenchmarkDotNet.Configs
             ImmutableArray<BenchmarkLogicalGroupRule> uniqueRules,
             ImmutableArray<IColumnHidingRule> uniqueColumnHidingRules,
             ImmutableHashSet<Job> uniqueRunnableJobs,
-            ImmutableHashSet<IBenchmarkEventHandler> uniqueEventHandlers,
+            ImmutableHashSet<IEventHandler> uniqueEventHandlers,
             ConfigUnionRule unionRule,
             string artifactsPath,
             CultureInfo cultureInfo,
@@ -99,7 +100,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => rules;
-        public IEnumerable<IBenchmarkEventHandler> GetEventHandlers() => eventHandlers;
+        public IEnumerable<IEventHandler> GetEventHandlers() => eventHandlers;
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => columnHidingRules;
 
         public ILogger GetCompositeLogger() => new CompositeLogger(loggers);
@@ -107,7 +108,7 @@ namespace BenchmarkDotNet.Configs
         public IValidator GetCompositeValidator() => new CompositeValidator(validators);
         public IAnalyser GetCompositeAnalyser() => new CompositeAnalyser(analysers);
         public IDiagnoser GetCompositeDiagnoser() => new CompositeDiagnoser(diagnosers);
-        public IBenchmarkEventHandler GetCompositeEventHandler() => new CompositeBenchmarkEventHandler(eventHandlers);
+        public IEventHandler GetCompositeEventHandler() => new CompositeEventHandler(eventHandlers);
 
         public bool HasMemoryDiagnoser() => diagnosers.OfType<MemoryDiagnoser>().Any();
 

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
 
-namespace BenchmarkDotNet.Running
+namespace BenchmarkDotNet.EventHandlers
 {
-    public interface IBenchmarkEventHandler
+    public interface IEventHandler
     {
         void HandleStartValidationStage();
         void HandleUnsupportedBenchmark(BenchmarkCase benchmarkCase);
