@@ -44,7 +44,7 @@ namespace BenchmarkDotNet.Characteristics
             sharedValues = new Dictionary<Characteristic, object>();
         }
 
-        protected CharacteristicObject(string id) : this()
+        protected CharacteristicObject(string? id) : this()
         {
             if (!string.IsNullOrEmpty(id))
             {
@@ -98,7 +98,7 @@ namespace BenchmarkDotNet.Characteristics
 
         #region Properties
 
-        private CharacteristicObject Owner { get; set; }
+        private CharacteristicObject? Owner { get; set; }
 
         protected CharacteristicObject OwnerOrSelf => Owner ?? this;
 

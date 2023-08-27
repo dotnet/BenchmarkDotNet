@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Analysers
         /// Checks distribution against Zero Measurement hypothesis in case of two samples
         /// </summary>
         /// <returns>True if measurement is ZeroMeasurement</returns>
-        public static bool CheckZeroMeasurementTwoSamples(double[] workload, double[] overhead, Threshold threshold = null)
+        public static bool CheckZeroMeasurementTwoSamples(double[] workload, double[] overhead, Threshold? threshold = null)
         {
             if (workload.Length < 3 || overhead.Length < 3)
                 return false;
