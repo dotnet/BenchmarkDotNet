@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Attributes
             SourceCodeFile = sourceCodeFile;
         }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public bool Baseline { get; set; }
 
