@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Characteristics
         internal Characteristic(
             string id,
             Type declaringType,
-            Func<CharacteristicObject, T, T> resolver,
+            Func<CharacteristicObject, T, T>? resolver,
             T fallbackValue,
             bool ignoreOnApply,
             bool dontShowInSummary = false)
@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Characteristics
             FallbackValue = fallbackValue;
         }
 
-        private Func<CharacteristicObject, T, T> Resolver { get; }
+        private Func<CharacteristicObject, T, T>? Resolver { get; }
 
         public T FallbackValue { get; }
 

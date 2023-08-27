@@ -296,7 +296,7 @@ namespace BenchmarkDotNet.Code
                 builder = new StringBuilder(text);
             }
 
-            public SmartStringBuilder Replace(string oldValue, string newValue)
+            public SmartStringBuilder Replace(string oldValue, string? newValue)
             {
                 if (originalText.Contains(oldValue))
                     builder.Replace(oldValue, newValue);
