@@ -13,7 +13,6 @@ using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
-
     public class ExceptionDiagnoserTests
     {
         [Fact]
