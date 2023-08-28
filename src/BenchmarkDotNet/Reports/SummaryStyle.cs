@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Reports
 
         public SummaryStyle(CultureInfo? cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true,
             bool printZeroValuesInContent = false, int maxParameterColumnWidth = DefaultMaxParameterColumnWidth, RatioStyle ratioStyle = RatioStyle.Value,
-            TextJustification textColumnJustification = TextJustification.Left, TextJustification numericColumnJustification = TextJustification.Left)
+            TextJustification textColumnJustification = TextJustification.Left, TextJustification numericColumnJustification = TextJustification.Right)
         {
             if (maxParameterColumnWidth < DefaultMaxParameterColumnWidth)
                 throw new ArgumentOutOfRangeException(nameof(maxParameterColumnWidth), $"{DefaultMaxParameterColumnWidth} is the minimum.");

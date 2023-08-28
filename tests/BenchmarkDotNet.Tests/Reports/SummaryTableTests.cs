@@ -48,9 +48,7 @@ namespace BenchmarkDotNet.Tests.Reports
         [Fact]
         public void NumericColumnIsRightJustified()
         {
-            var config = ManualConfig.Create(DefaultConfig.Instance);
-
-            config.SummaryStyle = MockFactory.CreateSummaryStyle(numericColumnJustification: SummaryTable.SummaryTableColumn.TextJustification.Right);
+            var config = ManualConfig.Create(DefaultConfig.Instance).AddColumn(StatisticColumn.Mean);
             var summary = MockFactory.CreateSummary(config);
             var table = new SummaryTable(summary);
 
@@ -61,11 +59,32 @@ namespace BenchmarkDotNet.Tests.Reports
         public void TextColumnIsLeftJustified()
         {
             var config = ManualConfig.Create(DefaultConfig.Instance).AddColumn(new ParamColumn("Param"));
-            config.SummaryStyle = MockFactory.CreateSummaryStyle(textColumnJustification: SummaryTable.SummaryTableColumn.TextJustification.Left);
             var summary = MockFactory.CreateSummary(config);
             var table = new SummaryTable(summary);
 
             Assert.Equal(SummaryTable.SummaryTableColumn.TextJustification.Left, table.Columns.First(c => c.Header == "Param").Justify);
+        }
+
+        [Fact]
+        public void NumericColumnWithLeftJustification()
+        {
+            var config = ManualConfig.Create(DefaultConfig.Instance).AddColumn(StatisticColumn.Mean);
+            config.SummaryStyle = MockFactory.CreateSummaryStyle(numericColumnJustification: SummaryTable.SummaryTableColumn.TextJustification.Left);
+            var summary = MockFactory.CreateSummary(config);
+            var table = new SummaryTable(summary);
+
+            Assert.Equal(SummaryTable.SummaryTableColumn.TextJustification.Left, table.Columns.First(c => c.Header == "Mean").Justify);
+        }
+
+        [Fact]
+        public void TextColumnWithRightJustification()
+        {
+            var config = ManualConfig.Create(DefaultConfig.Instance).AddColumn(new ParamColumn("Param"));
+            config.SummaryStyle = MockFactory.CreateSummaryStyle(textColumnJustification: SummaryTable.SummaryTableColumn.TextJustification.Right);
+            var summary = MockFactory.CreateSummary(config);
+            var table = new SummaryTable(summary);
+
+            Assert.Equal(SummaryTable.SummaryTableColumn.TextJustification.Right, table.Columns.First(c => c.Header == "Param").Justify);
         }
 
         [Fact] // Issue #1070

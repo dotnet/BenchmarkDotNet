@@ -97,7 +97,8 @@ namespace BenchmarkDotNet.Reports
             {
                 AddPadding(table, line, leftDel, rightDel, columnIndex, buffer);
             }
-            buffer.Append(rightDel);
+            var isLastColumn = columnIndex == table.ColumnCount - 1;
+            buffer.Append(isLastColumn ? rightDel.TrimEnd() : rightDel);
 
             return buffer.ToString();
         }
@@ -119,7 +120,8 @@ namespace BenchmarkDotNet.Reports
             {
                 AddPadding(table, line, leftDel, rightDel, columnIndex, buffer);
             }
-            buffer.Append(rightDel);
+            var isLastColumn = columnIndex == table.ColumnCount - 1;
+            buffer.Append(isLastColumn ? rightDel.TrimEnd() : rightDel);
 
             return buffer.ToString();
         }
