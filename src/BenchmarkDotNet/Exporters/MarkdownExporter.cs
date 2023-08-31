@@ -156,7 +156,7 @@ namespace BenchmarkDotNet.Exporters
                 logger.WriteLine();
             }
 
-            logger.WriteStatistic(ColumnsStartWithSeparator ? TableColumnSeparator.TrimStart() : " ");
+            logger.WriteStatistic(ColumnsStartWithSeparator ? TableHeaderSeparator.TrimStart() : " ");
 
             table.PrintLine(table.FullHeader, logger, string.Empty, TableHeaderSeparator);
             if (UseHeaderSeparatingRow)

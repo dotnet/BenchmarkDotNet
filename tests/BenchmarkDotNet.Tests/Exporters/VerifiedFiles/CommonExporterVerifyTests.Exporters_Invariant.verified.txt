@@ -429,7 +429,7 @@ Job=LongRun  IterationCount=100  LaunchCount=3
 WarmupCount=15  
 
 {noformat}
-| Method ||Mean     ||Error ||StdDev   ||P67      ||
+||Method ||Mean     ||Error ||StdDev   ||P67      ||
 | Foo    | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
 | Bar    | 1.000 ns |    NA | 0.000 ns | 1.000 ns |
 ############################################
