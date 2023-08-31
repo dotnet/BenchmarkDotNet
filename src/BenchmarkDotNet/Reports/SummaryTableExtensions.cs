@@ -83,7 +83,8 @@ namespace BenchmarkDotNet.Reports
         private static string BuildStandardText(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex)
         {
             var buffer = GetClearBuffer();
-            var columnJustification = table.Columns[columnIndex].Justify;
+            var isBuildingHeader = table.FullHeader[columnIndex] == line[columnIndex];
+            var columnJustification = isBuildingHeader ? SummaryTable.SummaryTableColumn.TextJustification.Left : table.Columns[columnIndex].Justify;
 
             buffer.Append(leftDel);
             if (columnJustification == SummaryTable.SummaryTableColumn.TextJustification.Right)
@@ -106,7 +107,8 @@ namespace BenchmarkDotNet.Reports
         private static string BuildBoldText(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex, string boldMarkupFormat)
         {
             var buffer = GetClearBuffer();
-            var columnJustification = table.Columns[columnIndex].Justify;
+            var isBuildingHeader = table.FullHeader[columnIndex] == line[columnIndex];
+            var columnJustification = isBuildingHeader ? SummaryTable.SummaryTableColumn.TextJustification.Left : table.Columns[columnIndex].Justify;
 
             buffer.Append(leftDel);
             if (columnJustification == SummaryTable.SummaryTableColumn.TextJustification.Right)

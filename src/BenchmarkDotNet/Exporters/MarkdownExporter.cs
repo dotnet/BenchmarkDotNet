@@ -156,18 +156,12 @@ namespace BenchmarkDotNet.Exporters
                 logger.WriteLine();
             }
 
-            if (ColumnsStartWithSeparator)
-            {
-                logger.WriteStatistic(TableHeaderSeparator.TrimStart());
-            }
+            logger.WriteStatistic(ColumnsStartWithSeparator ? TableColumnSeparator.TrimStart() : " ");
 
             table.PrintLine(table.FullHeader, logger, string.Empty, TableHeaderSeparator);
             if (UseHeaderSeparatingRow)
             {
-                if (ColumnsStartWithSeparator)
-                {
-                    logger.WriteStatistic(TableHeaderSeparator.TrimStart().TrimEnd() + "-");
-                }
+                logger.WriteStatistic(ColumnsStartWithSeparator ? TableHeaderSeparator.TrimStart().TrimEnd() + "-" : "-");
 
                 logger.WriteLineStatistic(string.Join("",
                     table.Columns.Where(c => c.NeedToShow).Select(column =>
@@ -183,8 +177,8 @@ namespace BenchmarkDotNet.Exporters
                 if (rowCounter > 0 && table.FullContentStartOfLogicalGroup[rowCounter] && table.SeparateLogicalGroups)
                 {
                     // Print logical separator
-                    if (ColumnsStartWithSeparator)
-                        logger.WriteStatistic(TableColumnSeparator.TrimStart());
+                    logger.WriteStatistic(ColumnsStartWithSeparator ? TableColumnSeparator.TrimStart() : " ");
+
                     table.PrintLine(separatorLine, logger, string.Empty, TableColumnSeparator, highlightRow, false, StartOfGroupHighlightStrategy,
                         BoldMarkupFormat, false);
                 }
@@ -195,8 +189,8 @@ namespace BenchmarkDotNet.Exporters
                     highlightRow = !highlightRow;
                 }
 
-                if (ColumnsStartWithSeparator)
-                    logger.WriteStatistic(TableColumnSeparator.TrimStart());
+
+                logger.WriteStatistic(ColumnsStartWithSeparator ? TableColumnSeparator.TrimStart() : " ");
 
                 table.PrintLine(line, logger, string.Empty, TableColumnSeparator, highlightRow, table.FullContentStartOfHighlightGroup[rowCounter],
                     StartOfGroupHighlightStrategy, BoldMarkupFormat, EscapeHtml);
