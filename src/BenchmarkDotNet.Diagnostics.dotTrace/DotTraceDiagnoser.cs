@@ -19,10 +19,10 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
 {
     public class DotTraceDiagnoser : IProfiler
     {
-        private readonly Uri nugetUrl;
-        private readonly string toolsDownloadFolder;
+        private readonly Uri? nugetUrl;
+        private readonly string? toolsDownloadFolder;
 
-        public DotTraceDiagnoser(Uri nugetUrl = null, string toolsDownloadFolder = null)
+        public DotTraceDiagnoser(Uri? nugetUrl = null, string? toolsDownloadFolder = null)
         {
             this.nugetUrl = nugetUrl;
             this.toolsDownloadFolder = toolsDownloadFolder;

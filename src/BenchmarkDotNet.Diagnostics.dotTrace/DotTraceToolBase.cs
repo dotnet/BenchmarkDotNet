@@ -11,11 +11,11 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
     internal abstract class DotTraceToolBase
     {
         private readonly ILogger logger;
-        private readonly Uri nugetUrl;
+        private readonly Uri? nugetUrl;
         private readonly NuGetApi nugetApi;
-        private readonly string downloadTo;
+        private readonly string? downloadTo;
 
-        protected DotTraceToolBase(ILogger logger, Uri nugetUrl = null, NuGetApi nugetApi = NuGetApi.V3, string downloadTo = null)
+        protected DotTraceToolBase(ILogger logger, Uri? nugetUrl = null, NuGetApi nugetApi = NuGetApi.V3, string? downloadTo = null)
         {
             this.logger = logger;
             this.nugetUrl = nugetUrl;
@@ -48,9 +48,9 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
         public string Start(DiagnoserActionParameters parameters)
         {
             string snapshotFile = ArtifactFileNameHelper.GetFilePath(parameters, "snapshots", DateTime.Now, "dtp", ".0000".Length);
-            string snapshotDirectory = Path.GetDirectoryName(snapshotFile);
+            string? snapshotDirectory = Path.GetDirectoryName(snapshotFile);
             logger.WriteLineInfo($"Target snapshot file: {snapshotFile}");
-            if (!Directory.Exists(snapshotDirectory))
+            if (!Directory.Exists(snapshotDirectory) && snapshotDirectory != null)
             {
                 try
                 {
@@ -126,7 +126,7 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
             if (consoleRunnerPackageField == null)
                 throw new InvalidOperationException("Field 'ConsoleRunnerPackage' not found.");
 
-            object consoleRunnerPackage = consoleRunnerPackageField.GetValue(null);
+            object? consoleRunnerPackage = consoleRunnerPackageField.GetValue(null);
             if (consoleRunnerPackage == null)
                 throw new InvalidOperationException("Unable to get value of 'ConsoleRunnerPackage'.");
 
@@ -135,7 +135,7 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
             if (getRunnerPathMethod == null)
                 throw new InvalidOperationException("Method 'GetRunnerPath' not found.");
 
-            string runnerPath = getRunnerPathMethod.Invoke(consoleRunnerPackage, null) as string;
+            string? runnerPath = getRunnerPathMethod.Invoke(consoleRunnerPackage, null) as string;
             if (runnerPath == null)
                 throw new InvalidOperationException("Unable to invoke 'GetRunnerPath'.");
 
