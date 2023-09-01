@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
 {
     internal class InProcessDotTraceTool : DotTraceToolBase
     {
-        public InProcessDotTraceTool(ILogger logger, Uri nugetUrl = null, NuGetApi nugetApi = NuGetApi.V3, string downloadTo = null) :
+        public InProcessDotTraceTool(ILogger logger, Uri? nugetUrl = null, NuGetApi nugetApi = NuGetApi.V3, string? downloadTo = null) :
             base(logger, nugetUrl, nugetApi, downloadTo) { }
 
         protected override bool AttachOnly => false;
