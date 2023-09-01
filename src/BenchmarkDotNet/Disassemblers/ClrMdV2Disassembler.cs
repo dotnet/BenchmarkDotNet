@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Disassemblers
         {
             // https://github.com/dotnet/BenchmarkDotNet/pull/2413#issuecomment-1688100117
             if (RuntimeInformation.IsWindows())
-                return 65536;
+                return ushort.MaxValue + 1;
             if (RuntimeInformation.IsLinux())
                 return (ulong) Environment.SystemPageSize;
             if (RuntimeInformation.IsMacOS())
@@ -32,6 +32,14 @@ namespace BenchmarkDotNet.Disassemblers
                 };
             throw new NotSupportedException($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} is not supported");
         }
+
+        private static bool IsValidAddress(ulong address)
+            // -1 (ulong.MaxValue) address is invalid, and will crash the runtime in older runtimes. https://github.com/dotnet/runtime/pull/90794
+            // 0 is NULL and therefore never valid.
+            // Addresses less than the minimum virtual address are also invalid.
+            => address != ulong.MaxValue
+                && address != 0
+                && address >= MinValidAddress;
 
         internal DisassemblyResult AttachAndDisassemble(Settings settings)
         {
@@ -259,15 +267,9 @@ namespace BenchmarkDotNet.Disassemblers
             return false;
         }
 
-        protected void TryTranslateAddressToName(ulong address, bool isAddressPrecodeMD, State state, bool isIndirectCallOrJump, int depth, ClrMethod currentMethod)
+        protected void TryTranslateAddressToName(ulong address, bool isAddressPrecodeMD, State state, int depth, ClrMethod currentMethod)
         {
-            // -1 (ulong.MaxValue) address is invalid, and will crash the runtime in older runtimes. https://github.com/dotnet/runtime/pull/90794
-            // 0 is NULL and therefore never valid.
-            // Addresses less than the minimum virtual address are also invalid.
-            if (address == ulong.MaxValue || address == 0 || address < MinValidAddress)
-                return;
-
-            if (state.AddressToNameMapping.ContainsKey(address))
+            if (!IsValidAddress(address) || state.AddressToNameMapping.ContainsKey(address))
                 return;
 
             var runtime = state.Runtime;
@@ -282,7 +284,7 @@ namespace BenchmarkDotNet.Disassemblers
             var method = runtime.GetMethodByInstructionPointer(address);
             if (method is null && (address & ((uint) runtime.DataTarget.DataReader.PointerSize - 1)) == 0)
             {
-                if (runtime.DataTarget.DataReader.ReadPointer(address, out ulong newAddress) && newAddress > ushort.MaxValue)
+                if (runtime.DataTarget.DataReader.ReadPointer(address, out ulong newAddress) && IsValidAddress(newAddress))
                 {
                     method = runtime.GetMethodByInstructionPointer(newAddress);
 

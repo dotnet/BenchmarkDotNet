@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Disassemblers
                             }
                         }
                     }
-                    TryTranslateAddressToName(address, isPrestubMD, state, isIndirect, depth, currentMethod);
+                    TryTranslateAddressToName(address, isPrestubMD, state, depth, currentMethod);
                 }
 
                 yield return new IntelAsm
@@ -94,17 +94,6 @@ namespace BenchmarkDotNet.Disassemblers
                 };
             }
         }
-
-        private static bool IsCallOrJump(Instruction instruction)
-            => instruction.FlowControl switch
-            {
-                FlowControl.Call => true,
-                FlowControl.IndirectCall => true,
-                FlowControl.ConditionalBranch => true,
-                FlowControl.IndirectBranch => true,
-                FlowControl.UnconditionalBranch => true,
-                _ => false
-            };
 
         private static bool TryGetReferencedAddress(Instruction instruction, uint pointerSize, out ulong referencedAddress)
         {

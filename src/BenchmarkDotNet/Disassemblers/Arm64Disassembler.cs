@@ -229,7 +229,7 @@ namespace BenchmarkDotNet.Disassemblers
                                 }
                             }
                         }
-                        TryTranslateAddressToName(address, isPrestubMD, state, isIndirect, depth, currentMethod);
+                        TryTranslateAddressToName(address, isPrestubMD, state, depth, currentMethod);
                     }
 
                     accumulator.Feed(instruction);
