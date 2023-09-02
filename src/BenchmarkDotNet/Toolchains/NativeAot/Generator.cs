@@ -61,10 +61,10 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
 
         protected override string GetExecutableExtension() => OsDetector.ExecutableExtension;
 
-        protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
+        protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programDirectory)
             => useTempFolderForRestore
-                ? Path.Combine(Path.GetTempPath(), programName) // store everything in temp to avoid collisions with IDE
-                : base.GetBuildArtifactsDirectoryPath(buildPartition, programName);
+                ? Path.Combine(Path.GetTempPath(), programDirectory) // store everything in temp to avoid collisions with IDE
+                : base.GetBuildArtifactsDirectoryPath(buildPartition, programDirectory);
 
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, runtimeIdentifier, "publish");

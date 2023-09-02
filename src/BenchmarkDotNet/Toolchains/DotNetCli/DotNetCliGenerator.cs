@@ -36,11 +36,11 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// we are limited by xprojs (by default compiles all .cs files in all subfolders, Program.cs could be doubled and fail the build)
         /// and also by NuGet internal implementation like looking for global.json file in parent folders
         /// </summary>
-        protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
+        protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programDirectory)
         {
             if (GetSolutionRootDirectory(out var directoryInfo))
             {
-                return Path.Combine(directoryInfo.FullName, programName);
+                return Path.Combine(directoryInfo.FullName, programDirectory);
             }
 
             // we did not find global.json or any Visual Studio solution file?
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             var parent = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent;
             if (parent == null)
                 throw new DirectoryNotFoundException("Parent directory for current directory");
-            return Path.Combine(parent.FullName, programName);
+            return Path.Combine(parent.FullName, programDirectory);
         }
 
         internal static bool GetSolutionRootDirectory(out DirectoryInfo directoryInfo)
