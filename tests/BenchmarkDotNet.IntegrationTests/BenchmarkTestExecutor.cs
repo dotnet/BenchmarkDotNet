@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.IntegrationTests
         /// <param name="config">Optional custom config to be used instead of the default</param>
         /// <param name="fullValidation">Optional: disable validation (default = true/enabled)</param>
         /// <returns>The summary from the benchmark run</returns>
-        public Reports.Summary CanExecute<TBenchmark>(IConfig config = null, bool fullValidation = true)
+        public Reports.Summary CanExecute<TBenchmark>(IConfig? config = null, bool fullValidation = true)
         {
             return CanExecute(typeof(TBenchmark), config, fullValidation);
         }
@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.IntegrationTests
         /// <param name="config">Optional custom config to be used instead of the default</param>
         /// <param name="fullValidation">Optional: disable validation (default = true/enabled)</param>
         /// <returns>The summary from the benchmark run</returns>
-        public Reports.Summary CanExecute(Type type, IConfig config = null, bool fullValidation = true)
+        public Reports.Summary CanExecute(Type type, IConfig? config = null, bool fullValidation = true)
         {
             // Add logging, so the Benchmark execution is in the TestRunner output (makes Debugging easier)
             if (config == null)
@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.IntegrationTests
             return summary;
         }
 
-        protected IConfig CreateSimpleConfig(OutputLogger logger = null, Job job = null)
+        protected IConfig CreateSimpleConfig(OutputLogger? logger = null, Job? job = null)
         {
             var baseConfig = job == null ? (IConfig)new SingleRunFastConfig() : new SingleJobConfig(job);
             return baseConfig

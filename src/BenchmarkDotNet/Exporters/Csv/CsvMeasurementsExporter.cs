@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Exporters.Csv
         private static readonly Lazy<MeasurementColumn[]> Columns = new Lazy<MeasurementColumn[]>(BuildColumns);
 
         private readonly CsvSeparator separator;
-        public CsvMeasurementsExporter(CsvSeparator separator, SummaryStyle style = null)
+        public CsvMeasurementsExporter(CsvSeparator separator, SummaryStyle? style = null)
         {
             this.separator = separator;
             Style = style ?? SummaryStyle.Default;

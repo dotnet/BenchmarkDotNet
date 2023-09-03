@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             ),
         };
 
-        internal static bool TryToExplainFailureReason(BuildResult buildResult, out string reason)
+        internal static bool TryToExplainFailureReason(BuildResult buildResult, out string? reason)
         {
             reason = null;
 

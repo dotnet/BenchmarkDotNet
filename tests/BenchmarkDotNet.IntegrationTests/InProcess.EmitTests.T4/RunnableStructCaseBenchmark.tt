@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
     }
 }<#+
 
-    private void EmitStructCaseBenchmark(ref int counter, string type, string argValue = null)
+    private void EmitStructCaseBenchmark(ref int counter, string type, string? argValue = null)
     {
 #>
         // ---- Begin StructCase(<#=type#>) ----

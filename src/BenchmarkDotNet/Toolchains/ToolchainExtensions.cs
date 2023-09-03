@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Toolchains
                     descriptor,
                     job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic) || job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic));
 
-        internal static IToolchain GetToolchain(this Runtime runtime, Descriptor descriptor = null, bool preferMsBuildToolchains = false)
+        internal static IToolchain GetToolchain(this Runtime runtime, Descriptor? descriptor = null, bool preferMsBuildToolchains = false)
         {
             switch (runtime)
             {

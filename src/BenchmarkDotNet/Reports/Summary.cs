@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Reports
             CultureInfo cultureInfo,
             ImmutableArray<ValidationError> validationErrors,
             ImmutableArray<IColumnHidingRule> columnHidingRules,
-            SummaryStyle summaryStyle = null)
+            SummaryStyle? summaryStyle = null)
         {
             Title = title;
             ResultsDirectoryPath = resultsDirectoryPath;
