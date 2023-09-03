@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Engines
         private double doubleHolder;
         private long longHolder;
         private ulong ulongHolder;
-        private volatile object objectHolder;
+        private volatile object? objectHolder;
         private volatile IntPtr ptrHolder;
         private volatile UIntPtr uptrHolder;
 #pragma warning restore IDE0052 // Remove unread private members
@@ -157,7 +157,7 @@ namespace BenchmarkDotNet.Engines
         internal static bool IsConsumable(Type type)
             => SupportedTypes.Contains(type) || type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface;
 
-        internal static bool HasConsumableField(Type type, out FieldInfo consumableField)
+        internal static bool HasConsumableField(Type type, out FieldInfo? consumableField)
         {
             var typeInfo = type.GetTypeInfo();
 

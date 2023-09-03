@@ -434,7 +434,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
                 Type argLocalsType;
                 Type argFieldType;
-                MethodInfo opConversion = null;
+                MethodInfo? opConversion = null;
                 if (parameterType.IsByRef)
                 {
                     argLocalsType = parameterType;
@@ -833,8 +833,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             var skipFirstArg = workloadMethod.IsStatic;
             var argLocals = EmitDeclareArgLocals(ilBuilder, skipFirstArg);
 
-            LocalBuilder callResultLocal = null;
-            LocalBuilder awaiterLocal = null;
+            LocalBuilder? callResultLocal = null;
+            LocalBuilder? awaiterLocal = null;
             if (consumableInfo.IsAwaitable)
             {
                 var callResultType = consumableInfo.OriginMethodReturnType;

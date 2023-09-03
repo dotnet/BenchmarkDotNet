@@ -95,7 +95,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             var heapParser = new HeapTraceProviderTraceEventParser(eventSource);
             // We index by heap address and then within the heap we remember the allocation stack
             var heaps = new Dictionary<Address, Dictionary<Address, long>>();
-            Dictionary<Address, long> lastHeapAllocs = null;
+            Dictionary<Address, long>? lastHeapAllocs = null;
 
             Address lastHeapHandle = 0;
 

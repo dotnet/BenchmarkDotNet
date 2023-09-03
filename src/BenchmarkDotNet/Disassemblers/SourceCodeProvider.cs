@@ -150,7 +150,7 @@ namespace BenchmarkDotNet.Disassemblers
             ClrModule module = method?.Type?.Module;
             PdbInfo info = module?.Pdb;
 
-            ManagedSymbolModule reader = null;
+            ManagedSymbolModule? reader = null;
             if (info != null)
             {
                 if (!s_pdbReaders.TryGetValue(info, out reader))
