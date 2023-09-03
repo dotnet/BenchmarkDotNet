@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Loggers
 
         private long status;
 
-        internal AsyncProcessOutputReader(Process process, bool logOutput = false, ILogger logger = null, bool readStandardError = true)
+        internal AsyncProcessOutputReader(Process process, bool logOutput = false, ILogger? logger = null, bool readStandardError = true)
         {
             if (!process.StartInfo.RedirectStandardOutput)
                 throw new NotSupportedException("set RedirectStandardOutput to true first");

@@ -44,10 +44,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             string targetFrameworkMoniker,
             string runtimeFrameworkVersion,
             string name,
-            string customDotNetCliPath = null,
-            string packagesPath = null,
-            string customRuntimePack = null,
-            string aotCompilerPath = null,
+            string? customDotNetCliPath = null,
+            string? packagesPath = null,
+            string? customRuntimePack = null,
+            string? aotCompilerPath = null,
             MonoAotCompilerMode aotCompilerMode = MonoAotCompilerMode.mini
             )
         {
@@ -96,10 +96,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         public MonoAotCompilerMode AOTCompilerMode { get; }
 
-        public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string displayName = null)
+        public NetCoreAppSettings WithCustomDotNetCliPath(string customDotNetCliPath, string? displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, customDotNetCliPath, PackagesPath);
 
-        public NetCoreAppSettings WithCustomPackagesRestorePath(string packagesPath, string displayName = null)
+        public NetCoreAppSettings WithCustomPackagesRestorePath(string packagesPath, string? displayName = null)
             => new NetCoreAppSettings(TargetFrameworkMoniker, RuntimeFrameworkVersion, displayName ?? Name, CustomDotNetCliPath, packagesPath);
     }
 }

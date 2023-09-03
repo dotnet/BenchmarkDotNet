@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
         /// </summary>
         /// <param name="logFailuresOnly">only the methods that failed to get inlined. True by default.</param>
         /// <param name="allowedNamespaces">list of namespaces from which inlining message should be print.</param>
-        public InliningDiagnoser(bool logFailuresOnly = true, string[] allowedNamespaces = null)
+        public InliningDiagnoser(bool logFailuresOnly = true, string[]? allowedNamespaces = null)
         {
             this.logFailuresOnly = logFailuresOnly;
             this.allowedNamespaces = allowedNamespaces;

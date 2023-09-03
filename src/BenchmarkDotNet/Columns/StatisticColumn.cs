@@ -107,7 +107,7 @@ namespace BenchmarkDotNet.Columns
         private readonly IStatisticColumn parentColumn;
 
         private StatisticColumn(string columnName, string legend, Func<Statistics, double> calc, Priority priority, UnitType type = UnitType.Time,
-            IStatisticColumn parentColumn = null)
+            IStatisticColumn? parentColumn = null)
         {
             this.calc = calc;
             this.priority = priority;

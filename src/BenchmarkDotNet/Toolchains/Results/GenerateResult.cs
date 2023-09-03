@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.Results
         public static GenerateResult Success(ArtifactsPaths artifactsPaths, IReadOnlyCollection<string> artifactsToCleanup)
             => new GenerateResult(artifactsPaths, true, null, artifactsToCleanup);
 
-        public static GenerateResult Failure(ArtifactsPaths artifactsPaths, IReadOnlyCollection<string> artifactsToCleanup, Exception exception = null)
+        public static GenerateResult Failure(ArtifactsPaths artifactsPaths, IReadOnlyCollection<string> artifactsToCleanup, Exception? exception = null)
             => new GenerateResult(artifactsPaths, false, exception, artifactsToCleanup);
 
         public override string ToString() => "GenerateResult: " + (IsGenerateSuccess ? "Success" : "Fail");

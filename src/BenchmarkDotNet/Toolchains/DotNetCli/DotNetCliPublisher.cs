@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     public class DotNetCliPublisher : IBuilder
     {
-        public DotNetCliPublisher(string customDotNetCliPath = null, string extraArguments = null, IReadOnlyList<EnvironmentVariable> environmentVariables = null)
+        public DotNetCliPublisher(string? customDotNetCliPath = null, string? extraArguments = null, IReadOnlyList<EnvironmentVariable> environmentVariables = null)
         {
             CustomDotNetCliPath = customDotNetCliPath;
             ExtraArguments = extraArguments;

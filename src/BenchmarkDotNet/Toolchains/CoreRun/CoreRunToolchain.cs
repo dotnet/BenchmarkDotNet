@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         /// <param name="restorePath">the directory to restore packages to</param>
         public CoreRunToolchain(FileInfo coreRun, bool createCopy = true,
             string targetFrameworkMoniker = "netcoreapp2.1",
-            FileInfo customDotNetCliPath = null, DirectoryInfo restorePath = null,
+            FileInfo? customDotNetCliPath = null, DirectoryInfo? restorePath = null,
             string displayName = "CoreRun")
         {
             if (coreRun == null) throw new ArgumentNullException(nameof(coreRun));

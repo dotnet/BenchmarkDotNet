@@ -144,7 +144,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private ImmutableArray<BenchmarkReport> CreateReports(Type[] types, IConfig config = null)
+        private ImmutableArray<BenchmarkReport> CreateReports(Type[] types, IConfig? config = null)
             => CreateBenchmarks(types, config).Select(CreateReport).ToImmutableArray();
 
         private BenchmarkCase[] CreateBenchmarks(Type[] types, IConfig config)

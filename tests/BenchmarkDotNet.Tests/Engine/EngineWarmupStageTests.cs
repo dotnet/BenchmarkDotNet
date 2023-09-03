@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.Tests.Engine
             public void Method() { }
         }
 
-        private void AutoTest(Func<IterationData, TimeInterval> measure, int min, int max = -1, IterationMode mode = IterationMode.Workload, Job job = null)
+        private void AutoTest(Func<IterationData, TimeInterval> measure, int min, int max = -1, IterationMode mode = IterationMode.Workload, Job? job = null)
         {
             if (max == -1)
                 max = min;

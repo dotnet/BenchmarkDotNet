@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Configs
             Config = ManualConfig.CreateEmpty().AddDiagnoser(new InliningDiagnoser(logFailuresOnly, filterByNamespace));
         }
 
-        public InliningDiagnoserAttribute(bool logFailuresOnly = true, string[] allowedNamespaces = null)
+        public InliningDiagnoserAttribute(bool logFailuresOnly = true, string[]? allowedNamespaces = null)
         {
             Config = ManualConfig.CreateEmpty().AddDiagnoser(new InliningDiagnoser(logFailuresOnly, allowedNamespaces));
         }

@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Reports
         public SummaryStyle EffectiveSummaryStyle { get; }
         public bool SeparateLogicalGroups { get; }
 
-        internal SummaryTable(Summary summary, SummaryStyle style = null)
+        internal SummaryTable(Summary summary, SummaryStyle? style = null)
         {
             Summary = summary;
 

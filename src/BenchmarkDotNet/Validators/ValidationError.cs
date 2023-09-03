@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Validators
 {
     public class ValidationError : IEquatable<ValidationError>
     {
-        public ValidationError(bool isCritical, string message, BenchmarkCase benchmarkCase = null)
+        public ValidationError(bool isCritical, string message, BenchmarkCase? benchmarkCase = null)
         {
             IsCritical = isCritical;
             Message = message;

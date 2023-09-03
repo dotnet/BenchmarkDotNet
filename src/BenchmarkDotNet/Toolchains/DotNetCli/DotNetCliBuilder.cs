@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         private bool RetryFailedBuildWithNoDeps { get; }
 
         [PublicAPI]
-        public DotNetCliBuilder(string targetFrameworkMoniker, string customDotNetCliPath = null, bool logOutput = false, bool retryFailedBuildWithNoDeps = true)
+        public DotNetCliBuilder(string targetFrameworkMoniker, string? customDotNetCliPath = null, bool logOutput = false, bool retryFailedBuildWithNoDeps = true)
         {
             TargetFrameworkMoniker = targetFrameworkMoniker;
             CustomDotNetCliPath = customDotNetCliPath;
