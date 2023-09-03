@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         private readonly bool logFailuresOnly = true;
         private readonly bool filterByNamespace = true;
-        private readonly string[] allowedNamespaces = null;
+        private readonly string[]? allowedNamespaces = null;
         private string defaultNamespace;
 
         // ReSharper disable once EmptyConstructor parameterless ctor is mandatory for DiagnosersLoader.CreateDiagnoser

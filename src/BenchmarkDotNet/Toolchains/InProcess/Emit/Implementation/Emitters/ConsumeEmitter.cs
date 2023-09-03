@@ -31,9 +31,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
         protected ConsumableTypeInfo ConsumableInfo { get; }
 
-        protected ILGenerator IlBuilder { get; private set; }
-        protected MethodBuilder ActionMethodBuilder { get; private set; }
-        protected MethodInfo ActionInvokeMethod { get; private set; }
+        protected ILGenerator? IlBuilder { get; private set; }
+        protected MethodBuilder? ActionMethodBuilder { get; private set; }
+        protected MethodInfo? ActionInvokeMethod { get; private set; }
         protected RunnableActionKind? ActionKind { get; private set; }
 
         [AssertionMethod]

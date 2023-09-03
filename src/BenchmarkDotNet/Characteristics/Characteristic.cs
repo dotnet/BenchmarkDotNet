@@ -86,7 +86,7 @@ namespace BenchmarkDotNet.Characteristics
 
         private object FallbackValue { get; }
 
-        public object this[CharacteristicObject obj]
+        public object? this[CharacteristicObject obj]
         {
             get { return obj.GetValue(this); }
             set { obj.SetValue(this, value); }

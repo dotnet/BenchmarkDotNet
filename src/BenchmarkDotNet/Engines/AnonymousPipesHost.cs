@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Engines
         public void ReportResults(RunResults runResults) => runResults.Print(outWriter);
 
         [PublicAPI] // called from generated code
-        public static bool TryGetFileHandles(string[] args, out string writeHandle, out string readHandle)
+        public static bool TryGetFileHandles(string[] args, out string? writeHandle, out string? readHandle)
         {
             for (int i = 0; i < args.Length; i++)
             {
