@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 {
     public sealed class EngineEventLogParser : TraceEventParser
     {
-        private static volatile TraceEvent[] templates;
+        private static volatile TraceEvent[]? templates;
 
         public EngineEventLogParser(TraceEventSource source, bool dontRegister = false) : base(source, dontRegister) { }
 
@@ -114,69 +114,69 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
         protected override string GetProviderName() { return ProviderName; }
 
-        private static IterationEvent BenchmarkStartTemplate(Action<IterationEvent> action)
+        private static IterationEvent BenchmarkStartTemplate(Action<IterationEvent>? action)
         {                  // action, eventid, taskid, taskName, taskGuid, opcode, opcodeName, providerGuid, providerName
             return new IterationEvent(action, EngineEventSource.BenchmarkStartEventId, (int)EngineEventSource.Tasks.Benchmark, nameof(EngineEventSource.Tasks.Benchmark), Guid.Empty, (int)EventOpcode.Start, nameof(EventOpcode.Start), ProviderGuid, ProviderName);
         }
 
-        private static IterationEvent BenchmarkStopTemplate(Action<IterationEvent> action)
+        private static IterationEvent BenchmarkStopTemplate(Action<IterationEvent>? action)
         {                  // action, eventid, taskid, taskName, taskGuid, opcode, opcodeName, providerGuid, providerName
             return new IterationEvent(action, EngineEventSource.BenchmarkStopEventId, (int)EngineEventSource.Tasks.Benchmark, nameof(EngineEventSource.Tasks.Benchmark), Guid.Empty, (int)EventOpcode.Stop, nameof(EventOpcode.Stop), ProviderGuid, ProviderName);
         }
 
-        private static IterationEvent OverheadJittingStartTemplate(Action<IterationEvent> action)
+        private static IterationEvent OverheadJittingStartTemplate(Action<IterationEvent>? action)
             => CreateIterationStartTemplate(action, EngineEventSource.OverheadJittingStartEventId, EngineEventSource.Tasks.OverheadJitting);
 
-        private static IterationEvent OverheadJittingStopTemplate(Action<IterationEvent> action)
+        private static IterationEvent OverheadJittingStopTemplate(Action<IterationEvent>? action)
             => CreateIterationStopTemplate(action, EngineEventSource.OverheadJittingStopEventId, EngineEventSource.Tasks.OverheadJitting);
 
-        private static IterationEvent WorkloadJittingStartTemplate(Action<IterationEvent> action)
+        private static IterationEvent WorkloadJittingStartTemplate(Action<IterationEvent>? action)
             => CreateIterationStartTemplate(action, EngineEventSource.WorkloadJittingStartEventId, EngineEventSource.Tasks.WorkloadJitting);
 
-        private static IterationEvent WorkloadJittingStopTemplate(Action<IterationEvent> action)
+        private static IterationEvent WorkloadJittingStopTemplate(Action<IterationEvent>? action)
             => CreateIterationStopTemplate(action, EngineEventSource.WorkloadJittingStopEventId, EngineEventSource.Tasks.WorkloadJitting);
 
-        private static IterationEvent WorkloadPilotStartTemplate(Action<IterationEvent> action)
+        private static IterationEvent WorkloadPilotStartTemplate(Action<IterationEvent>? action)
             => CreateIterationStartTemplate(action, EngineEventSource.WorkloadPilotStartEventId, EngineEventSource.Tasks.WorkloadPilot);
 
-        private static IterationEvent WorkloadPilotStopTemplate(Action<IterationEvent> action)
+        private static IterationEvent WorkloadPilotStopTemplate(Action<IterationEvent>? action)
             => CreateIterationStopTemplate(action, EngineEventSource.WorkloadPilotStopEventId, EngineEventSource.Tasks.WorkloadPilot);
 
-        private static IterationEvent OverheadWarmupStartTemplate(Action<IterationEvent> action)
+        private static IterationEvent OverheadWarmupStartTemplate(Action<IterationEvent>? action)
             => CreateIterationStartTemplate(action, EngineEventSource.OverheadWarmupStartEventId, EngineEventSource.Tasks.OverheadWarmup);
 
-        private static IterationEvent OverheadWarmupStopTemplate(Action<IterationEvent> action)
+        private static IterationEvent OverheadWarmupStopTemplate(Action<IterationEvent>? action)
             => CreateIterationStopTemplate(action, EngineEventSource.OverheadWarmupStopEventId, EngineEventSource.Tasks.OverheadWarmup);
 
-        private static IterationEvent WorkloadWarmupStartTemplate(Action<IterationEvent> action)
+        private static IterationEvent WorkloadWarmupStartTemplate(Action<IterationEvent>? action)
             => CreateIterationStartTemplate(action, EngineEventSource.WorkloadWarmupStartEventId, EngineEventSource.Tasks.WorkloadWarmup);
 
-        private static IterationEvent WorkloadWarmupStopTemplate(Action<IterationEvent> action)
+        private static IterationEvent WorkloadWarmupStopTemplate(Action<IterationEvent>? action)
             => CreateIterationStopTemplate(action, EngineEventSource.WorkloadWarmupStopEventId, EngineEventSource.Tasks.WorkloadWarmup);
 
-        private static IterationEvent OverheadActualStartTemplate(Action<IterationEvent> action)
+        private static IterationEvent OverheadActualStartTemplate(Action<IterationEvent>? action)
             => CreateIterationStartTemplate(action, EngineEventSource.OverheadActualStartEventId, EngineEventSource.Tasks.OverheadActual);
 
-        private static IterationEvent OverheadActualStopTemplate(Action<IterationEvent> action)
+        private static IterationEvent OverheadActualStopTemplate(Action<IterationEvent>? action)
             => CreateIterationStopTemplate(action, EngineEventSource.OverheadActualStopEventId, EngineEventSource.Tasks.OverheadActual);
 
-        private static IterationEvent WorkloadActualStartTemplate(Action<IterationEvent> action)
+        private static IterationEvent WorkloadActualStartTemplate(Action<IterationEvent>? action)
             => CreateIterationStartTemplate(action, EngineEventSource.WorkloadActualStartEventId, EngineEventSource.Tasks.WorkloadActual);
 
-        private static IterationEvent WorkloadActualStopTemplate(Action<IterationEvent> action)
+        private static IterationEvent WorkloadActualStopTemplate(Action<IterationEvent>? action)
             => CreateIterationStopTemplate(action, EngineEventSource.WorkloadActualStopEventId, EngineEventSource.Tasks.WorkloadActual);
 
-        private static IterationEvent CreateIterationStartTemplate(Action<IterationEvent> action, int eventId, EventTask eventTask)
+        private static IterationEvent CreateIterationStartTemplate(Action<IterationEvent>? action, int eventId, EventTask eventTask)
         {                  // action, eventid, taskid, taskName, taskGuid, opcode, opcodeName, providerGuid, providerName
             return new IterationEvent(action, eventId, (int)eventTask, eventTask.ToString(), Guid.Empty, (int)EventOpcode.Start, nameof(EventOpcode.Start), ProviderGuid, ProviderName);
         }
 
-        private static IterationEvent CreateIterationStopTemplate(Action<IterationEvent> action, int eventId, EventTask eventTask)
+        private static IterationEvent CreateIterationStopTemplate(Action<IterationEvent>? action, int eventId, EventTask eventTask)
         {                  // action, eventid, taskid, taskName, taskGuid, opcode, opcodeName, providerGuid, providerName
             return new IterationEvent(action, eventId, (int)eventTask, eventTask.ToString(), Guid.Empty, (int)EventOpcode.Stop, nameof(EventOpcode.Stop), ProviderGuid, ProviderName);
         }
 
-        protected override void EnumerateTemplates(Func<string, string, EventFilterResponse> eventsToObserve, Action<TraceEvent> callback)
+        protected override void EnumerateTemplates(Func<string, string, EventFilterResponse>? eventsToObserve, Action<TraceEvent> callback)
         {
             if (templates == null)
             {
