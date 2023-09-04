@@ -20,6 +20,6 @@ namespace BenchmarkDotNet.Attributes
             set => Targets = string.IsNullOrEmpty(value) ? new string[0] : value.Split(','); // , is for backward compat
         }
 
-        public bool Match(MethodInfo method) => Targets == null || Targets.Length == 0 || Targets.Contains(method.Name);
+        public bool Match(MethodInfo method) => Targets.Length == 0 || Targets.Contains(method.Name);
     }
 }
