@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Configs
             var uniqueHidingRules = source.GetColumnHidingRules().ToImmutableArray();
 
             var uniqueRunnableJobs = GetRunnableJobs(source.GetJobs()).ToImmutableHashSet();
-            var uniqueEventHandlers = source.GetEventHandlers().ToImmutableHashSet();
+            var uniqueEventHandlers = source.GetBenchmarkEventHandlers().ToImmutableHashSet();
 
             return new ImmutableConfig(
                 uniqueColumnProviders,

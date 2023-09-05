@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Configs
         private readonly HashSet<HardwareCounter> hardwareCounters = new HashSet<HardwareCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
         private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = new List<BenchmarkLogicalGroupRule>();
-        private readonly List<IEventHandler> eventHandlers = new List<IEventHandler>();
+        private readonly List<BenchmarkEventHandlerBase> eventHandlers = new List<BenchmarkEventHandlerBase>();
         private readonly List<IColumnHidingRule> columnHidingRules = new List<IColumnHidingRule>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
-        public IEnumerable<IEventHandler> GetEventHandlers() => eventHandlers;
+        public IEnumerable<BenchmarkEventHandlerBase> GetBenchmarkEventHandlers() => eventHandlers;
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => columnHidingRules;
 
         [PublicAPI] public ConfigOptions Options { get; set; }
@@ -224,9 +224,9 @@ namespace BenchmarkDotNet.Configs
             return this;
         }
 
-        public ManualConfig AddEventHandler(params IEventHandler[] eventHandlers)
+        public ManualConfig AddBenchmarkEventHandler(BenchmarkEventHandlerBase eventHandler)
         {
-            this.eventHandlers.AddRange(eventHandlers);
+            this.eventHandlers.Add(eventHandler);
             return this;
         }
 
