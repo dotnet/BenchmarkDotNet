@@ -380,19 +380,18 @@ namespace BenchmarkDotNet.Running
 
             var buildResults = buildPartitions
                 .AsParallel()
-                .ToDictionary(
-                    buildPartition => buildPartition,
-                    buildPartition =>
-                    {
-                        var buildResult = Build(buildPartition, rootArtifactsFolderPath, buildLogger);
+                .Select(buildPartition => (Partition: buildPartition, Result: Build(buildPartition, rootArtifactsFolderPath, buildLogger)))
+                .AsSequential() // Ensure that build completion events are processed sequentially
+                .Select(build =>
+                {
+                    // If the generation was successful, but the build was not, we will try building sequentially
+                    // so don't send the OnBuildComplete event yet.
+                    if (buildPartitions.Length <= 1 || !build.Result.IsGenerateSuccess || build.Result.IsBuildSuccess)
+                        eventProcessor.OnBuildComplete(build.Partition, build.Result);
 
-                        // If the generation was successful, but the build was not, we will try building sequentially
-                        // so don't send the OnBuildComplete event yet.
-                        if (buildPartitions.Length <= 1 || !buildResult.IsGenerateSuccess || buildResult.IsBuildSuccess)
-                            eventProcessor.OnBuildComplete(buildPartition, buildResult);
-
-                        return buildResult;
-                    });
+                    return build;
+                })
+                .ToDictionary(build => build.Partition, build => build.Result);
 
             var afterParallelBuild = globalChronometer.GetElapsed();
 
