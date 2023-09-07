@@ -5,7 +5,7 @@ using System.IO;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.EventHandlers;
+using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Filters;
@@ -109,7 +109,7 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
 
-        public IEnumerable<BenchmarkEventHandlerBase> GetBenchmarkEventHandlers() => Array.Empty<BenchmarkEventHandlerBase>();
+        public IEnumerable<EventProcessorBase> GetEventProcessors() => Array.Empty<EventProcessorBase>();
 
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
     }

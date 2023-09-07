@@ -5,15 +5,15 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
 
-namespace BenchmarkDotNet.EventHandlers
+namespace BenchmarkDotNet.EventProcessors
 {
-    public abstract class BenchmarkEventHandlerBase
+    public abstract class EventProcessorBase
     {
         public virtual void OnStartValidationStage() { }
         public virtual void OnValidationError(ValidationError validationError) { }
         public virtual void OnEndValidationStage() { }
-        public virtual void OnStartBuildStage() { }
-        public virtual void OnBuildFailed(BenchmarkCase benchmarkCase, BuildResult buildResult) { }
+        public virtual void OnStartBuildStage(IReadOnlyList<BuildPartition> partitions) { }
+        public virtual void OnBuildComplete(BuildPartition benchmarkCase, BuildResult buildResult) { }
         public virtual void OnEndBuildStage() { }
         public virtual void OnStartRunStage() { }
         public virtual void OnStartRunBenchmarksInType(Type type, IReadOnlyList<BenchmarkCase> benchmarks) { }

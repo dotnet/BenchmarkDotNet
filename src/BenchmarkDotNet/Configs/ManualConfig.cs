@@ -6,7 +6,7 @@ using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.EventHandlers;
+using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Configs
         private readonly HashSet<HardwareCounter> hardwareCounters = new HashSet<HardwareCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
         private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = new List<BenchmarkLogicalGroupRule>();
-        private readonly List<BenchmarkEventHandlerBase> eventHandlers = new List<BenchmarkEventHandlerBase>();
+        private readonly List<EventProcessorBase> eventProcessors = new List<EventProcessorBase>();
         private readonly List<IColumnHidingRule> columnHidingRules = new List<IColumnHidingRule>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
-        public IEnumerable<BenchmarkEventHandlerBase> GetBenchmarkEventHandlers() => eventHandlers;
+        public IEnumerable<EventProcessorBase> GetEventProcessors() => eventProcessors;
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => columnHidingRules;
 
         [PublicAPI] public ConfigOptions Options { get; set; }
@@ -224,9 +224,9 @@ namespace BenchmarkDotNet.Configs
             return this;
         }
 
-        public ManualConfig AddBenchmarkEventHandler(BenchmarkEventHandlerBase eventHandler)
+        public ManualConfig AddEventProcessor(EventProcessorBase eventProcessor)
         {
-            this.eventHandlers.Add(eventHandler);
+            this.eventProcessors.Add(eventProcessor);
             return this;
         }
 

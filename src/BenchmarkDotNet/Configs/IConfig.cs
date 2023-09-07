@@ -4,7 +4,7 @@ using System.Globalization;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.EventHandlers;
+using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<HardwareCounter> GetHardwareCounters();
         IEnumerable<IFilter> GetFilters();
         IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
-        IEnumerable<BenchmarkEventHandlerBase> GetBenchmarkEventHandlers();
+        IEnumerable<EventProcessorBase> GetEventProcessors();
         IEnumerable<IColumnHidingRule> GetColumnHidingRules();
 
         IOrderer? Orderer { get; }
