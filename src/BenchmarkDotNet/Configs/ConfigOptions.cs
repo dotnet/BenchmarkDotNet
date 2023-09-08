@@ -48,7 +48,11 @@ namespace BenchmarkDotNet.Configs
         /// <summary>
         /// Continue the execution if the last run was stopped.
         /// </summary>
-        Resume = 1 << 9
+        Resume = 1 << 9,
+        /// <summary>
+        /// Don't run the benchmark after it's generated and built.
+        /// </summary>
+        GenerateAndBuildOnly = 1 << 10
     }
 
     internal static class ConfigOptionsExtensions

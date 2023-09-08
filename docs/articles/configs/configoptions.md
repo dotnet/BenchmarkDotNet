@@ -10,6 +10,7 @@ The config options let you customize some behavior of BenchmarkDotNet - mainly r
 Available config options are:
 
 * `ConfigOptions.Default` - No configuration option is set - this is the default.
+* `ConfigOptions.GenerateAndBuildOnly` - Only run toolchain generator and builder without executor. Then performs normal cleanup.
 * `ConfigOptions.KeepBenchmarkFiles` - All auto-generated files should be kept after running the benchmarks (by default they are removed).
 * `ConfigOptions.JoinSummary` - All benchmarks results should be joined into a single summary (by default we have a summary per type).
 * `ConfigOptions.StopOnFirstError` - Benchmarking should be stopped after the first error (by default it's not).

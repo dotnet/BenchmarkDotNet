@@ -198,7 +198,15 @@ namespace BenchmarkDotNet.Running
                         if (!config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
                             artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
 
-                        var report = RunCore(benchmark, info.benchmarkId, logger, resolver, buildResult);
+                        BenchmarkReport report;
+                        if (config.Options.IsSet(ConfigOptions.GenerateAndBuildOnly))
+                        {
+                            report = new BenchmarkReport(benchmark, buildResult, buildResult);
+                            reports.Add(report);
+                            continue;
+                        }
+
+                        report = RunCore(benchmark, info.benchmarkId, logger, resolver, buildResult);
                         if (report.AllMeasurements.Any(m => m.Operations == 0))
                             throw new InvalidOperationException("An iteration with 'Operations == 0' detected");
                         reports.Add(report);

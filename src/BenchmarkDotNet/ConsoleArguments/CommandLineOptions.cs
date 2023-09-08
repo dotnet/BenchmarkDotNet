@@ -86,6 +86,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("keepFiles", Required = false, Default = false, HelpText = "Determines if all auto-generated files should be kept or removed after running the benchmarks.")]
         public bool KeepBenchmarkFiles { get; set; }
 
+        [Option("generateAndBuildOnly", Required = false, Default = false, HelpText = "Determines if we only run generator and builder without executor.")]
+        public bool GenerateAndBuildOnly { get; set; }
+
         [Option("noOverwrite", Required = false, Default = false, HelpText = "Determines if the exported result files should not be overwritten (be default they are overwritten).")]
         public bool DontOverwriteResults { get; set; }
 
