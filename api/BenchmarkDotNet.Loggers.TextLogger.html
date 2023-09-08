@@ -2,10 +2,10 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Class StreamLogger
+      <title>Class TextLogger
  | BenchmarkDotNet </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Class StreamLogger
+      <meta name="title" content="Class TextLogger
  | BenchmarkDotNet ">
       
       <link rel="icon" href="../logo/icon-32.png">
@@ -77,12 +77,12 @@
           <nav id="breadcrumb"></nav>
         </div>
 
-        <article data-uid="BenchmarkDotNet.Loggers.StreamLogger">
+        <article data-uid="BenchmarkDotNet.Loggers.TextLogger">
 
 
 
-  <h1 id="BenchmarkDotNet_Loggers_StreamLogger" data-uid="BenchmarkDotNet.Loggers.StreamLogger" class="text-break">
-    Class StreamLogger
+  <h1 id="BenchmarkDotNet_Loggers_TextLogger" data-uid="BenchmarkDotNet.Loggers.TextLogger" class="text-break">
+    Class TextLogger
   
   </h1>
 
@@ -95,7 +95,7 @@
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class StreamLogger : TextLogger, ILogger, IDisposable</code></pre>
+    <pre><code class="lang-csharp hljs">public class TextLogger : ILogger, IDisposable</code></pre>
   </div>
 
 
@@ -105,8 +105,7 @@
     <dt>Inheritance</dt>
     <dd>
       <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
-      <div><a class="xref" href="BenchmarkDotNet.Loggers.TextLogger.html">TextLogger</a></div>
-      <div><span class="xref">StreamLogger</span></div>
+      <div><span class="xref">TextLogger</span></div>
     </dd>
   </dl>
 
@@ -118,29 +117,13 @@
     </dd>
   </dl>
 
-
   <dl class="typelist derived">
-    <dt>Inherited Members</dt>
+    <dt>Derived</dt>
     <dd>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_Write_BenchmarkDotNet_Loggers_LogKind_System_String_">TextLogger.Write(LogKind, string)</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_WriteLine">TextLogger.WriteLine()</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_WriteLine_BenchmarkDotNet_Loggers_LogKind_System_String_">TextLogger.WriteLine(LogKind, string)</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_Flush">TextLogger.Flush()</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_Dispose">TextLogger.Dispose()</a>
-    </div>
-    <div>
-      <a class="xref" href="BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_Priority">TextLogger.Priority</a>
-    </div>
-  </dd></dl>
+      <div><a class="xref" href="BenchmarkDotNet.Loggers.StreamLogger.html">StreamLogger</a></div>
+    </dd>
+  </dl>
+
 
   <dl class="typelist extensionMethods">
     <dt>Extension Methods</dt>
@@ -203,10 +186,10 @@
 </h2>
 
 
-  <a id="BenchmarkDotNet_Loggers_StreamLogger__ctor_" data-uid="BenchmarkDotNet.Loggers.StreamLogger.#ctor*"></a>
+  <a id="BenchmarkDotNet_Loggers_TextLogger__ctor_" data-uid="BenchmarkDotNet.Loggers.TextLogger.#ctor*"></a>
 
-  <h3 id="BenchmarkDotNet_Loggers_StreamLogger__ctor_System_IO_StreamWriter_" data-uid="BenchmarkDotNet.Loggers.StreamLogger.#ctor(System.IO.StreamWriter)">
-  StreamLogger(StreamWriter)
+  <h3 id="BenchmarkDotNet_Loggers_TextLogger__ctor_System_IO_TextWriter_" data-uid="BenchmarkDotNet.Loggers.TextLogger.#ctor(System.IO.TextWriter)">
+  TextLogger(TextWriter)
   
   </h3>
 
@@ -214,45 +197,12 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StreamLogger(StreamWriter writer)</code></pre>
+    <pre><code class="lang-csharp hljs">public TextLogger(TextWriter writer)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
-    <dt><code>writer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.streamwriter">StreamWriter</a></dt>
-    <dd></dd>
-  </dl>
-
-
-
-
-
-
-
-
-
-
-
-
-  <a id="BenchmarkDotNet_Loggers_StreamLogger__ctor_" data-uid="BenchmarkDotNet.Loggers.StreamLogger.#ctor*"></a>
-
-  <h3 id="BenchmarkDotNet_Loggers_StreamLogger__ctor_System_String_System_Boolean_" data-uid="BenchmarkDotNet.Loggers.StreamLogger.#ctor(System.String,System.Boolean)">
-  StreamLogger(string, bool)
-  
-  </h3>
-
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StreamLogger(string filePath, bool append = false)</code></pre>
-  </div>
-
-  <h4 class="section">Parameters</h4>
-  <dl class="parameters">
-    <dt><code>filePath</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
-    <dd></dd>
-    <dt><code>append</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dt><code>writer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textwriter">TextWriter</a></dt>
     <dd></dd>
   </dl>
 
@@ -271,9 +221,9 @@
 </h2>
 
 
-  <a id="BenchmarkDotNet_Loggers_StreamLogger_Id_" data-uid="BenchmarkDotNet.Loggers.StreamLogger.Id*"></a>
+  <a id="BenchmarkDotNet_Loggers_TextLogger_Id_" data-uid="BenchmarkDotNet.Loggers.TextLogger.Id*"></a>
 
-  <h3 id="BenchmarkDotNet_Loggers_StreamLogger_Id" data-uid="BenchmarkDotNet.Loggers.StreamLogger.Id">
+  <h3 id="BenchmarkDotNet_Loggers_TextLogger_Id" data-uid="BenchmarkDotNet.Loggers.TextLogger.Id">
   Id
   
   </h3>
@@ -282,7 +232,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override string Id { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual string Id { get; }</code></pre>
   </div>
 
 
@@ -294,6 +244,187 @@
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
     <dd></dd>
   </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Loggers_TextLogger_Priority_" data-uid="BenchmarkDotNet.Loggers.TextLogger.Priority*"></a>
+
+  <h3 id="BenchmarkDotNet_Loggers_TextLogger_Priority" data-uid="BenchmarkDotNet.Loggers.TextLogger.Priority">
+  Priority
+  
+  </h3>
+
+  <div class="markdown level1 summary"><p>If there are several loggers with the same <a class="xref" href="BenchmarkDotNet.Loggers.ILogger.html#BenchmarkDotNet_Loggers_ILogger_Id">Id</a>,
+only logger with the highest priority will be used.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Priority { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="BenchmarkDotNet_Loggers_TextLogger_Dispose_" data-uid="BenchmarkDotNet.Loggers.TextLogger.Dispose*"></a>
+
+  <h3 id="BenchmarkDotNet_Loggers_TextLogger_Dispose" data-uid="BenchmarkDotNet.Loggers.TextLogger.Dispose">
+  Dispose()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Loggers_TextLogger_Flush_" data-uid="BenchmarkDotNet.Loggers.TextLogger.Flush*"></a>
+
+  <h3 id="BenchmarkDotNet_Loggers_TextLogger_Flush" data-uid="BenchmarkDotNet.Loggers.TextLogger.Flush">
+  Flush()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Flush()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Loggers_TextLogger_Write_" data-uid="BenchmarkDotNet.Loggers.TextLogger.Write*"></a>
+
+  <h3 id="BenchmarkDotNet_Loggers_TextLogger_Write_BenchmarkDotNet_Loggers_LogKind_System_String_" data-uid="BenchmarkDotNet.Loggers.TextLogger.Write(BenchmarkDotNet.Loggers.LogKind,System.String)">
+  Write(LogKind, string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Write(LogKind logKind, string text)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>logKind</code> <a class="xref" href="BenchmarkDotNet.Loggers.LogKind.html">LogKind</a></dt>
+    <dd></dd>
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Loggers_TextLogger_WriteLine_" data-uid="BenchmarkDotNet.Loggers.TextLogger.WriteLine*"></a>
+
+  <h3 id="BenchmarkDotNet_Loggers_TextLogger_WriteLine" data-uid="BenchmarkDotNet.Loggers.TextLogger.WriteLine">
+  WriteLine()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void WriteLine()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Loggers_TextLogger_WriteLine_" data-uid="BenchmarkDotNet.Loggers.TextLogger.WriteLine*"></a>
+
+  <h3 id="BenchmarkDotNet_Loggers_TextLogger_WriteLine_BenchmarkDotNet_Loggers_LogKind_System_String_" data-uid="BenchmarkDotNet.Loggers.TextLogger.WriteLine(BenchmarkDotNet.Loggers.LogKind,System.String)">
+  WriteLine(LogKind, string)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void WriteLine(LogKind logKind, string text)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>logKind</code> <a class="xref" href="BenchmarkDotNet.Loggers.LogKind.html">LogKind</a></dt>
+    <dd></dd>
+    <dt><code>text</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
 
 
 

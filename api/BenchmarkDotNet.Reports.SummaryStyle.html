@@ -129,8 +129,8 @@
 
   <a id="BenchmarkDotNet_Reports_SummaryStyle__ctor_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.#ctor*"></a>
 
-  <h3 id="BenchmarkDotNet_Reports_SummaryStyle__ctor_System_Globalization_CultureInfo_System_Boolean_BenchmarkDotNet_Columns_SizeUnit_Perfolizer_Horology_TimeUnit_System_Boolean_System_Boolean_System_Int32_BenchmarkDotNet_Columns_RatioStyle_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle)">
-  SummaryStyle(CultureInfo?, bool, SizeUnit, TimeUnit, bool, bool, int, RatioStyle)
+  <h3 id="BenchmarkDotNet_Reports_SummaryStyle__ctor_System_Globalization_CultureInfo_System_Boolean_BenchmarkDotNet_Columns_SizeUnit_Perfolizer_Horology_TimeUnit_System_Boolean_System_Boolean_System_Int32_BenchmarkDotNet_Columns_RatioStyle_BenchmarkDotNet_Reports_SummaryTable_SummaryTableColumn_TextJustification_BenchmarkDotNet_Reports_SummaryTable_SummaryTableColumn_TextJustification_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)">
+  SummaryStyle(CultureInfo?, bool, SizeUnit, TimeUnit, bool, bool, int, RatioStyle, TextJustification, TextJustification)
   
   </h3>
 
@@ -138,7 +138,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public SummaryStyle(CultureInfo? cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true, bool printZeroValuesInContent = false, int maxParameterColumnWidth = 20, RatioStyle ratioStyle = RatioStyle.Value)</code></pre>
+    <pre><code class="lang-csharp hljs">public SummaryStyle(CultureInfo? cultureInfo, bool printUnitsInHeader, SizeUnit sizeUnit, TimeUnit timeUnit, bool printUnitsInContent = true, bool printZeroValuesInContent = false, int maxParameterColumnWidth = 20, RatioStyle ratioStyle = RatioStyle.Value, SummaryTable.SummaryTableColumn.TextJustification textColumnJustification = TextJustification.Left, SummaryTable.SummaryTableColumn.TextJustification numericColumnJustification = TextJustification.Right)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -158,6 +158,10 @@
     <dt><code>maxParameterColumnWidth</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
     <dd></dd>
     <dt><code>ratioStyle</code> <a class="xref" href="BenchmarkDotNet.Columns.RatioStyle.html">RatioStyle</a></dt>
+    <dd></dd>
+    <dt><code>textColumnJustification</code> <a class="xref" href="BenchmarkDotNet.Reports.SummaryTable.html">SummaryTable</a>.<a class="xref" href="BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.html">SummaryTableColumn</a>.<a class="xref" href="BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification.html">TextJustification</a></dt>
+    <dd></dd>
+    <dt><code>numericColumnJustification</code> <a class="xref" href="BenchmarkDotNet.Reports.SummaryTable.html">SummaryTable</a>.<a class="xref" href="BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.html">SummaryTableColumn</a>.<a class="xref" href="BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification.html">TextJustification</a></dt>
     <dd></dd>
   </dl>
 
@@ -262,6 +266,37 @@
   <h4 class="section">Property Value</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_SummaryStyle_NumericColumnJustification_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.NumericColumnJustification*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_SummaryStyle_NumericColumnJustification" data-uid="BenchmarkDotNet.Reports.SummaryStyle.NumericColumnJustification">
+  NumericColumnJustification
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SummaryTable.SummaryTableColumn.TextJustification NumericColumnJustification { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Reports.SummaryTable.html">SummaryTable</a>.<a class="xref" href="BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.html">SummaryTableColumn</a>.<a class="xref" href="BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification.html">TextJustification</a></dt>
     <dd></dd>
   </dl>
 
@@ -417,6 +452,37 @@
   <h4 class="section">Property Value</h4>
   <dl class="parameters">
     <dt><a class="xref" href="BenchmarkDotNet.Columns.SizeUnit.html">SizeUnit</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_Reports_SummaryStyle_TextColumnJustification_" data-uid="BenchmarkDotNet.Reports.SummaryStyle.TextColumnJustification*"></a>
+
+  <h3 id="BenchmarkDotNet_Reports_SummaryStyle_TextColumnJustification" data-uid="BenchmarkDotNet.Reports.SummaryStyle.TextColumnJustification">
+  TextColumnJustification
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SummaryTable.SummaryTableColumn.TextJustification TextColumnJustification { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="BenchmarkDotNet.Reports.SummaryTable.html">SummaryTable</a>.<a class="xref" href="BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.html">SummaryTableColumn</a>.<a class="xref" href="BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification.html">TextJustification</a></dt>
     <dd></dd>
   </dl>
 

@@ -142,8 +142,8 @@
 
   <a id="BenchmarkDotNet_Reports_Summary__ctor_" data-uid="BenchmarkDotNet.Reports.Summary.#ctor*"></a>
 
-  <h3 id="BenchmarkDotNet_Reports_Summary__ctor_System_String_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Reports_BenchmarkReport__BenchmarkDotNet_Environments_HostEnvironmentInfo_System_String_System_String_System_TimeSpan_System_Globalization_CultureInfo_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Validators_ValidationError__System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Columns_IColumnHidingRule__" data-uid="BenchmarkDotNet.Reports.Summary.#ctor(System.String,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Reports.BenchmarkReport},BenchmarkDotNet.Environments.HostEnvironmentInfo,System.String,System.String,System.TimeSpan,System.Globalization.CultureInfo,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Validators.ValidationError},System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Columns.IColumnHidingRule})">
-  Summary(string, ImmutableArray&lt;BenchmarkReport&gt;, HostEnvironmentInfo, string, string, TimeSpan, CultureInfo, ImmutableArray&lt;ValidationError&gt;, ImmutableArray&lt;IColumnHidingRule&gt;)
+  <h3 id="BenchmarkDotNet_Reports_Summary__ctor_System_String_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Reports_BenchmarkReport__BenchmarkDotNet_Environments_HostEnvironmentInfo_System_String_System_String_System_TimeSpan_System_Globalization_CultureInfo_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Validators_ValidationError__System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Columns_IColumnHidingRule__BenchmarkDotNet_Reports_SummaryStyle_" data-uid="BenchmarkDotNet.Reports.Summary.#ctor(System.String,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Reports.BenchmarkReport},BenchmarkDotNet.Environments.HostEnvironmentInfo,System.String,System.String,System.TimeSpan,System.Globalization.CultureInfo,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Validators.ValidationError},System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Columns.IColumnHidingRule},BenchmarkDotNet.Reports.SummaryStyle)">
+  Summary(string, ImmutableArray&lt;BenchmarkReport&gt;, HostEnvironmentInfo, string, string, TimeSpan, CultureInfo, ImmutableArray&lt;ValidationError&gt;, ImmutableArray&lt;IColumnHidingRule&gt;, SummaryStyle)
   
   </h3>
 
@@ -151,7 +151,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Summary(string title, ImmutableArray&lt;BenchmarkReport&gt; reports, HostEnvironmentInfo hostEnvironmentInfo, string resultsDirectoryPath, string logFilePath, TimeSpan totalTime, CultureInfo cultureInfo, ImmutableArray&lt;ValidationError&gt; validationErrors, ImmutableArray&lt;IColumnHidingRule&gt; columnHidingRules)</code></pre>
+    <pre><code class="lang-csharp hljs">public Summary(string title, ImmutableArray&lt;BenchmarkReport&gt; reports, HostEnvironmentInfo hostEnvironmentInfo, string resultsDirectoryPath, string logFilePath, TimeSpan totalTime, CultureInfo cultureInfo, ImmutableArray&lt;ValidationError&gt; validationErrors, ImmutableArray&lt;IColumnHidingRule&gt; columnHidingRules, SummaryStyle summaryStyle = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -173,6 +173,8 @@
     <dt><code>validationErrors</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a>&gt;</dt>
     <dd></dd>
     <dt><code>columnHidingRules</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1">ImmutableArray</a>&lt;<a class="xref" href="BenchmarkDotNet.Columns.IColumnHidingRule.html">IColumnHidingRule</a>&gt;</dt>
+    <dd></dd>
+    <dt><code>summaryStyle</code> <a class="xref" href="BenchmarkDotNet.Reports.SummaryStyle.html">SummaryStyle</a></dt>
     <dd></dd>
   </dl>
 

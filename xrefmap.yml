@@ -290,19 +290,22 @@ references:
   fullName: BenchmarkDotNet.Analysers.Conclusion.CreateWarning
   nameWithType: Conclusion.CreateWarning
 - uid: BenchmarkDotNet.Analysers.Conclusion.Equals(BenchmarkDotNet.Analysers.Conclusion)
-  name: Equals(Conclusion)
+  name: Equals(Conclusion?)
   href: api/BenchmarkDotNet.Analysers.Conclusion.html#BenchmarkDotNet_Analysers_Conclusion_Equals_BenchmarkDotNet_Analysers_Conclusion_
   commentId: M:BenchmarkDotNet.Analysers.Conclusion.Equals(BenchmarkDotNet.Analysers.Conclusion)
-  fullName: BenchmarkDotNet.Analysers.Conclusion.Equals(BenchmarkDotNet.Analysers.Conclusion)
-  nameWithType: Conclusion.Equals(Conclusion)
+  name.vb: Equals(Conclusion)
+  fullName: BenchmarkDotNet.Analysers.Conclusion.Equals(BenchmarkDotNet.Analysers.Conclusion?)
+  fullName.vb: BenchmarkDotNet.Analysers.Conclusion.Equals(BenchmarkDotNet.Analysers.Conclusion)
+  nameWithType: Conclusion.Equals(Conclusion?)
+  nameWithType.vb: Conclusion.Equals(Conclusion)
 - uid: BenchmarkDotNet.Analysers.Conclusion.Equals(System.Object)
-  name: Equals(object)
+  name: Equals(object?)
   href: api/BenchmarkDotNet.Analysers.Conclusion.html#BenchmarkDotNet_Analysers_Conclusion_Equals_System_Object_
   commentId: M:BenchmarkDotNet.Analysers.Conclusion.Equals(System.Object)
   name.vb: Equals(Object)
-  fullName: BenchmarkDotNet.Analysers.Conclusion.Equals(object)
+  fullName: BenchmarkDotNet.Analysers.Conclusion.Equals(object?)
   fullName.vb: BenchmarkDotNet.Analysers.Conclusion.Equals(Object)
-  nameWithType: Conclusion.Equals(object)
+  nameWithType: Conclusion.Equals(object?)
   nameWithType.vb: Conclusion.Equals(Object)
 - uid: BenchmarkDotNet.Analysers.Conclusion.Equals*
   name: Equals
@@ -764,13 +767,13 @@ references:
   fullName: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementOneSample
   nameWithType: ZeroMeasurementHelper.CheckZeroMeasurementOneSample
 - uid: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(System.Double[],System.Double[],Perfolizer.Mathematics.Thresholds.Threshold)
-  name: CheckZeroMeasurementTwoSamples(double[], double[], Threshold)
+  name: CheckZeroMeasurementTwoSamples(double[], double[], Threshold?)
   href: api/BenchmarkDotNet.Analysers.ZeroMeasurementHelper.html#BenchmarkDotNet_Analysers_ZeroMeasurementHelper_CheckZeroMeasurementTwoSamples_System_Double___System_Double___Perfolizer_Mathematics_Thresholds_Threshold_
   commentId: M:BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(System.Double[],System.Double[],Perfolizer.Mathematics.Thresholds.Threshold)
   name.vb: CheckZeroMeasurementTwoSamples(Double(), Double(), Threshold)
-  fullName: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(double[], double[], Perfolizer.Mathematics.Thresholds.Threshold)
+  fullName: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(double[], double[], Perfolizer.Mathematics.Thresholds.Threshold?)
   fullName.vb: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(Double(), Double(), Perfolizer.Mathematics.Thresholds.Threshold)
-  nameWithType: ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(double[], double[], Threshold)
+  nameWithType: ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(double[], double[], Threshold?)
   nameWithType.vb: ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples(Double(), Double(), Threshold)
 - uid: BenchmarkDotNet.Analysers.ZeroMeasurementHelper.CheckZeroMeasurementTwoSamples*
   name: CheckZeroMeasurementTwoSamples
@@ -890,13 +893,13 @@ references:
   nameWithType: ArgumentsAttribute.ArgumentsAttribute()
   nameWithType.vb: ArgumentsAttribute.New()
 - uid: BenchmarkDotNet.Attributes.ArgumentsAttribute.#ctor(System.Object[])
-  name: ArgumentsAttribute(params object[])
+  name: ArgumentsAttribute(params object?[]?)
   href: api/BenchmarkDotNet.Attributes.ArgumentsAttribute.html#BenchmarkDotNet_Attributes_ArgumentsAttribute__ctor_System_Object___
   commentId: M:BenchmarkDotNet.Attributes.ArgumentsAttribute.#ctor(System.Object[])
   name.vb: New(ParamArray Object())
-  fullName: BenchmarkDotNet.Attributes.ArgumentsAttribute.ArgumentsAttribute(params object[])
+  fullName: BenchmarkDotNet.Attributes.ArgumentsAttribute.ArgumentsAttribute(params object?[]?)
   fullName.vb: BenchmarkDotNet.Attributes.ArgumentsAttribute.New(ParamArray Object())
-  nameWithType: ArgumentsAttribute.ArgumentsAttribute(params object[])
+  nameWithType: ArgumentsAttribute.ArgumentsAttribute(params object?[]?)
   nameWithType.vb: ArgumentsAttribute.New(ParamArray Object())
 - uid: BenchmarkDotNet.Attributes.ArgumentsAttribute.#ctor*
   name: ArgumentsAttribute
@@ -1898,13 +1901,13 @@ references:
   fullName: BenchmarkDotNet.Attributes.Filters.AotFilterAttribute
   nameWithType: AotFilterAttribute
 - uid: BenchmarkDotNet.Attributes.Filters.AotFilterAttribute.#ctor(System.String)
-  name: AotFilterAttribute(string)
+  name: AotFilterAttribute(string?)
   href: api/BenchmarkDotNet.Attributes.Filters.AotFilterAttribute.html#BenchmarkDotNet_Attributes_Filters_AotFilterAttribute__ctor_System_String_
   commentId: M:BenchmarkDotNet.Attributes.Filters.AotFilterAttribute.#ctor(System.String)
   name.vb: New(String)
-  fullName: BenchmarkDotNet.Attributes.Filters.AotFilterAttribute.AotFilterAttribute(string)
+  fullName: BenchmarkDotNet.Attributes.Filters.AotFilterAttribute.AotFilterAttribute(string?)
   fullName.vb: BenchmarkDotNet.Attributes.Filters.AotFilterAttribute.New(String)
-  nameWithType: AotFilterAttribute.AotFilterAttribute(string)
+  nameWithType: AotFilterAttribute.AotFilterAttribute(string?)
   nameWithType.vb: AotFilterAttribute.New(String)
 - uid: BenchmarkDotNet.Attributes.Filters.AotFilterAttribute.#ctor*
   name: AotFilterAttribute
@@ -3632,13 +3635,13 @@ references:
   nameWithType: ParamsAttribute.ParamsAttribute()
   nameWithType.vb: ParamsAttribute.New()
 - uid: BenchmarkDotNet.Attributes.ParamsAttribute.#ctor(System.Object[])
-  name: ParamsAttribute(params object[])
+  name: ParamsAttribute(params object?[]?)
   href: api/BenchmarkDotNet.Attributes.ParamsAttribute.html#BenchmarkDotNet_Attributes_ParamsAttribute__ctor_System_Object___
   commentId: M:BenchmarkDotNet.Attributes.ParamsAttribute.#ctor(System.Object[])
   name.vb: New(ParamArray Object())
-  fullName: BenchmarkDotNet.Attributes.ParamsAttribute.ParamsAttribute(params object[])
+  fullName: BenchmarkDotNet.Attributes.ParamsAttribute.ParamsAttribute(params object?[]?)
   fullName.vb: BenchmarkDotNet.Attributes.ParamsAttribute.New(ParamArray Object())
-  nameWithType: ParamsAttribute.ParamsAttribute(params object[])
+  nameWithType: ParamsAttribute.ParamsAttribute(params object?[]?)
   nameWithType.vb: ParamsAttribute.New(ParamArray Object())
 - uid: BenchmarkDotNet.Attributes.ParamsAttribute.#ctor*
   name: ParamsAttribute
@@ -4067,40 +4070,40 @@ references:
   fullName: BenchmarkDotNet.Attributes.SimpleJobAttribute
   nameWithType: SimpleJobAttribute
 - uid: BenchmarkDotNet.Attributes.SimpleJobAttribute.#ctor(BenchmarkDotNet.Engines.RunStrategy,BenchmarkDotNet.Jobs.RuntimeMoniker,System.Int32,System.Int32,System.Int32,System.Int32,System.String,System.Boolean)
-  name: SimpleJobAttribute(RunStrategy, RuntimeMoniker, int, int, int, int, string, bool)
+  name: SimpleJobAttribute(RunStrategy, RuntimeMoniker, int, int, int, int, string?, bool)
   href: api/BenchmarkDotNet.Attributes.SimpleJobAttribute.html#BenchmarkDotNet_Attributes_SimpleJobAttribute__ctor_BenchmarkDotNet_Engines_RunStrategy_BenchmarkDotNet_Jobs_RuntimeMoniker_System_Int32_System_Int32_System_Int32_System_Int32_System_String_System_Boolean_
   commentId: M:BenchmarkDotNet.Attributes.SimpleJobAttribute.#ctor(BenchmarkDotNet.Engines.RunStrategy,BenchmarkDotNet.Jobs.RuntimeMoniker,System.Int32,System.Int32,System.Int32,System.Int32,System.String,System.Boolean)
   name.vb: New(RunStrategy, RuntimeMoniker, Integer, Integer, Integer, Integer, String, Boolean)
-  fullName: BenchmarkDotNet.Attributes.SimpleJobAttribute.SimpleJobAttribute(BenchmarkDotNet.Engines.RunStrategy, BenchmarkDotNet.Jobs.RuntimeMoniker, int, int, int, int, string, bool)
+  fullName: BenchmarkDotNet.Attributes.SimpleJobAttribute.SimpleJobAttribute(BenchmarkDotNet.Engines.RunStrategy, BenchmarkDotNet.Jobs.RuntimeMoniker, int, int, int, int, string?, bool)
   fullName.vb: BenchmarkDotNet.Attributes.SimpleJobAttribute.New(BenchmarkDotNet.Engines.RunStrategy, BenchmarkDotNet.Jobs.RuntimeMoniker, Integer, Integer, Integer, Integer, String, Boolean)
-  nameWithType: SimpleJobAttribute.SimpleJobAttribute(RunStrategy, RuntimeMoniker, int, int, int, int, string, bool)
+  nameWithType: SimpleJobAttribute.SimpleJobAttribute(RunStrategy, RuntimeMoniker, int, int, int, int, string?, bool)
   nameWithType.vb: SimpleJobAttribute.New(RunStrategy, RuntimeMoniker, Integer, Integer, Integer, Integer, String, Boolean)
 - uid: BenchmarkDotNet.Attributes.SimpleJobAttribute.#ctor(BenchmarkDotNet.Engines.RunStrategy,System.Int32,System.Int32,System.Int32,System.Int32,System.String,System.Boolean)
-  name: SimpleJobAttribute(RunStrategy, int, int, int, int, string, bool)
+  name: SimpleJobAttribute(RunStrategy, int, int, int, int, string?, bool)
   href: api/BenchmarkDotNet.Attributes.SimpleJobAttribute.html#BenchmarkDotNet_Attributes_SimpleJobAttribute__ctor_BenchmarkDotNet_Engines_RunStrategy_System_Int32_System_Int32_System_Int32_System_Int32_System_String_System_Boolean_
   commentId: M:BenchmarkDotNet.Attributes.SimpleJobAttribute.#ctor(BenchmarkDotNet.Engines.RunStrategy,System.Int32,System.Int32,System.Int32,System.Int32,System.String,System.Boolean)
   name.vb: New(RunStrategy, Integer, Integer, Integer, Integer, String, Boolean)
-  fullName: BenchmarkDotNet.Attributes.SimpleJobAttribute.SimpleJobAttribute(BenchmarkDotNet.Engines.RunStrategy, int, int, int, int, string, bool)
+  fullName: BenchmarkDotNet.Attributes.SimpleJobAttribute.SimpleJobAttribute(BenchmarkDotNet.Engines.RunStrategy, int, int, int, int, string?, bool)
   fullName.vb: BenchmarkDotNet.Attributes.SimpleJobAttribute.New(BenchmarkDotNet.Engines.RunStrategy, Integer, Integer, Integer, Integer, String, Boolean)
-  nameWithType: SimpleJobAttribute.SimpleJobAttribute(RunStrategy, int, int, int, int, string, bool)
+  nameWithType: SimpleJobAttribute.SimpleJobAttribute(RunStrategy, int, int, int, int, string?, bool)
   nameWithType.vb: SimpleJobAttribute.New(RunStrategy, Integer, Integer, Integer, Integer, String, Boolean)
 - uid: BenchmarkDotNet.Attributes.SimpleJobAttribute.#ctor(BenchmarkDotNet.Jobs.RuntimeMoniker,System.Int32,System.Int32,System.Int32,System.Int32,System.String,System.Boolean)
-  name: SimpleJobAttribute(RuntimeMoniker, int, int, int, int, string, bool)
+  name: SimpleJobAttribute(RuntimeMoniker, int, int, int, int, string?, bool)
   href: api/BenchmarkDotNet.Attributes.SimpleJobAttribute.html#BenchmarkDotNet_Attributes_SimpleJobAttribute__ctor_BenchmarkDotNet_Jobs_RuntimeMoniker_System_Int32_System_Int32_System_Int32_System_Int32_System_String_System_Boolean_
   commentId: M:BenchmarkDotNet.Attributes.SimpleJobAttribute.#ctor(BenchmarkDotNet.Jobs.RuntimeMoniker,System.Int32,System.Int32,System.Int32,System.Int32,System.String,System.Boolean)
   name.vb: New(RuntimeMoniker, Integer, Integer, Integer, Integer, String, Boolean)
-  fullName: BenchmarkDotNet.Attributes.SimpleJobAttribute.SimpleJobAttribute(BenchmarkDotNet.Jobs.RuntimeMoniker, int, int, int, int, string, bool)
+  fullName: BenchmarkDotNet.Attributes.SimpleJobAttribute.SimpleJobAttribute(BenchmarkDotNet.Jobs.RuntimeMoniker, int, int, int, int, string?, bool)
   fullName.vb: BenchmarkDotNet.Attributes.SimpleJobAttribute.New(BenchmarkDotNet.Jobs.RuntimeMoniker, Integer, Integer, Integer, Integer, String, Boolean)
-  nameWithType: SimpleJobAttribute.SimpleJobAttribute(RuntimeMoniker, int, int, int, int, string, bool)
+  nameWithType: SimpleJobAttribute.SimpleJobAttribute(RuntimeMoniker, int, int, int, int, string?, bool)
   nameWithType.vb: SimpleJobAttribute.New(RuntimeMoniker, Integer, Integer, Integer, Integer, String, Boolean)
 - uid: BenchmarkDotNet.Attributes.SimpleJobAttribute.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.String,System.Boolean)
-  name: SimpleJobAttribute(int, int, int, int, string, bool)
+  name: SimpleJobAttribute(int, int, int, int, string?, bool)
   href: api/BenchmarkDotNet.Attributes.SimpleJobAttribute.html#BenchmarkDotNet_Attributes_SimpleJobAttribute__ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_String_System_Boolean_
   commentId: M:BenchmarkDotNet.Attributes.SimpleJobAttribute.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.String,System.Boolean)
   name.vb: New(Integer, Integer, Integer, Integer, String, Boolean)
-  fullName: BenchmarkDotNet.Attributes.SimpleJobAttribute.SimpleJobAttribute(int, int, int, int, string, bool)
+  fullName: BenchmarkDotNet.Attributes.SimpleJobAttribute.SimpleJobAttribute(int, int, int, int, string?, bool)
   fullName.vb: BenchmarkDotNet.Attributes.SimpleJobAttribute.New(Integer, Integer, Integer, Integer, String, Boolean)
-  nameWithType: SimpleJobAttribute.SimpleJobAttribute(int, int, int, int, string, bool)
+  nameWithType: SimpleJobAttribute.SimpleJobAttribute(int, int, int, int, string?, bool)
   nameWithType.vb: SimpleJobAttribute.New(Integer, Integer, Integer, Integer, String, Boolean)
 - uid: BenchmarkDotNet.Attributes.SimpleJobAttribute.#ctor*
   name: SimpleJobAttribute
@@ -4992,13 +4995,13 @@ references:
   nameWithType: CharacteristicObject.CharacteristicObject()
   nameWithType.vb: CharacteristicObject.New()
 - uid: BenchmarkDotNet.Characteristics.CharacteristicObject.#ctor(System.String)
-  name: CharacteristicObject(string)
+  name: CharacteristicObject(string?)
   href: api/BenchmarkDotNet.Characteristics.CharacteristicObject.html#BenchmarkDotNet_Characteristics_CharacteristicObject__ctor_System_String_
   commentId: M:BenchmarkDotNet.Characteristics.CharacteristicObject.#ctor(System.String)
   name.vb: New(String)
-  fullName: BenchmarkDotNet.Characteristics.CharacteristicObject.CharacteristicObject(string)
+  fullName: BenchmarkDotNet.Characteristics.CharacteristicObject.CharacteristicObject(string?)
   fullName.vb: BenchmarkDotNet.Characteristics.CharacteristicObject.New(String)
-  nameWithType: CharacteristicObject.CharacteristicObject(string)
+  nameWithType: CharacteristicObject.CharacteristicObject(string?)
   nameWithType.vb: CharacteristicObject.New(String)
 - uid: BenchmarkDotNet.Characteristics.CharacteristicObject.#ctor*
   name: CharacteristicObject
@@ -5289,13 +5292,13 @@ references:
   nameWithType: CharacteristicObject<T>.CharacteristicObject()
   nameWithType.vb: CharacteristicObject(Of T).New()
 - uid: BenchmarkDotNet.Characteristics.CharacteristicObject`1.#ctor(System.String)
-  name: CharacteristicObject(string)
+  name: CharacteristicObject(string?)
   href: api/BenchmarkDotNet.Characteristics.CharacteristicObject-1.html#BenchmarkDotNet_Characteristics_CharacteristicObject_1__ctor_System_String_
   commentId: M:BenchmarkDotNet.Characteristics.CharacteristicObject`1.#ctor(System.String)
   name.vb: New(String)
-  fullName: BenchmarkDotNet.Characteristics.CharacteristicObject<T>.CharacteristicObject(string)
+  fullName: BenchmarkDotNet.Characteristics.CharacteristicObject<T>.CharacteristicObject(string?)
   fullName.vb: BenchmarkDotNet.Characteristics.CharacteristicObject(Of T).New(String)
-  nameWithType: CharacteristicObject<T>.CharacteristicObject(string)
+  nameWithType: CharacteristicObject<T>.CharacteristicObject(string?)
   nameWithType.vb: CharacteristicObject(Of T).New(String)
 - uid: BenchmarkDotNet.Characteristics.CharacteristicObject`1.#ctor*
   name: CharacteristicObject
@@ -21314,6 +21317,24 @@ references:
   commentId: T:BenchmarkDotNet.Exporters.MarkdownExporter
   fullName: BenchmarkDotNet.Exporters.MarkdownExporter
   nameWithType: MarkdownExporter
+- uid: BenchmarkDotNet.Exporters.MarkdownExporter.#ctor
+  name: MarkdownExporter()
+  href: api/BenchmarkDotNet.Exporters.MarkdownExporter.html#BenchmarkDotNet_Exporters_MarkdownExporter__ctor
+  commentId: M:BenchmarkDotNet.Exporters.MarkdownExporter.#ctor
+  name.vb: New()
+  fullName: BenchmarkDotNet.Exporters.MarkdownExporter.MarkdownExporter()
+  fullName.vb: BenchmarkDotNet.Exporters.MarkdownExporter.New()
+  nameWithType: MarkdownExporter.MarkdownExporter()
+  nameWithType.vb: MarkdownExporter.New()
+- uid: BenchmarkDotNet.Exporters.MarkdownExporter.#ctor*
+  name: MarkdownExporter
+  href: api/BenchmarkDotNet.Exporters.MarkdownExporter.html#BenchmarkDotNet_Exporters_MarkdownExporter__ctor_
+  commentId: Overload:BenchmarkDotNet.Exporters.MarkdownExporter.#ctor
+  name.vb: New
+  fullName: BenchmarkDotNet.Exporters.MarkdownExporter.MarkdownExporter
+  fullName.vb: BenchmarkDotNet.Exporters.MarkdownExporter.New
+  nameWithType: MarkdownExporter.MarkdownExporter
+  nameWithType.vb: MarkdownExporter.New
 - uid: BenchmarkDotNet.Exporters.MarkdownExporter.Atlassian
   name: Atlassian
   href: api/BenchmarkDotNet.Exporters.MarkdownExporter.html#BenchmarkDotNet_Exporters_MarkdownExporter_Atlassian
@@ -21356,6 +21377,18 @@ references:
   commentId: F:BenchmarkDotNet.Exporters.MarkdownExporter.Default
   fullName: BenchmarkDotNet.Exporters.MarkdownExporter.Default
   nameWithType: MarkdownExporter.Default
+- uid: BenchmarkDotNet.Exporters.MarkdownExporter.Dialect
+  name: Dialect
+  href: api/BenchmarkDotNet.Exporters.MarkdownExporter.html#BenchmarkDotNet_Exporters_MarkdownExporter_Dialect
+  commentId: P:BenchmarkDotNet.Exporters.MarkdownExporter.Dialect
+  fullName: BenchmarkDotNet.Exporters.MarkdownExporter.Dialect
+  nameWithType: MarkdownExporter.Dialect
+- uid: BenchmarkDotNet.Exporters.MarkdownExporter.Dialect*
+  name: Dialect
+  href: api/BenchmarkDotNet.Exporters.MarkdownExporter.html#BenchmarkDotNet_Exporters_MarkdownExporter_Dialect_
+  commentId: Overload:BenchmarkDotNet.Exporters.MarkdownExporter.Dialect
+  fullName: BenchmarkDotNet.Exporters.MarkdownExporter.Dialect
+  nameWithType: MarkdownExporter.Dialect
 - uid: BenchmarkDotNet.Exporters.MarkdownExporter.EscapeHtml
   name: EscapeHtml
   href: api/BenchmarkDotNet.Exporters.MarkdownExporter.html#BenchmarkDotNet_Exporters_MarkdownExporter_EscapeHtml
@@ -23340,31 +23373,31 @@ references:
   nameWithType: Job.Job(params CharacteristicObject[])
   nameWithType.vb: Job.New(ParamArray CharacteristicObject())
 - uid: BenchmarkDotNet.Jobs.Job.#ctor(System.String,BenchmarkDotNet.Characteristics.CharacteristicObject)
-  name: Job(string, CharacteristicObject)
+  name: Job(string?, CharacteristicObject)
   href: api/BenchmarkDotNet.Jobs.Job.html#BenchmarkDotNet_Jobs_Job__ctor_System_String_BenchmarkDotNet_Characteristics_CharacteristicObject_
   commentId: M:BenchmarkDotNet.Jobs.Job.#ctor(System.String,BenchmarkDotNet.Characteristics.CharacteristicObject)
   name.vb: New(String, CharacteristicObject)
-  fullName: BenchmarkDotNet.Jobs.Job.Job(string, BenchmarkDotNet.Characteristics.CharacteristicObject)
+  fullName: BenchmarkDotNet.Jobs.Job.Job(string?, BenchmarkDotNet.Characteristics.CharacteristicObject)
   fullName.vb: BenchmarkDotNet.Jobs.Job.New(String, BenchmarkDotNet.Characteristics.CharacteristicObject)
-  nameWithType: Job.Job(string, CharacteristicObject)
+  nameWithType: Job.Job(string?, CharacteristicObject)
   nameWithType.vb: Job.New(String, CharacteristicObject)
 - uid: BenchmarkDotNet.Jobs.Job.#ctor(System.String,BenchmarkDotNet.Characteristics.CharacteristicObject[])
-  name: Job(string, params CharacteristicObject[])
+  name: Job(string?, params CharacteristicObject[])
   href: api/BenchmarkDotNet.Jobs.Job.html#BenchmarkDotNet_Jobs_Job__ctor_System_String_BenchmarkDotNet_Characteristics_CharacteristicObject___
   commentId: M:BenchmarkDotNet.Jobs.Job.#ctor(System.String,BenchmarkDotNet.Characteristics.CharacteristicObject[])
   name.vb: New(String, ParamArray CharacteristicObject())
-  fullName: BenchmarkDotNet.Jobs.Job.Job(string, params BenchmarkDotNet.Characteristics.CharacteristicObject[])
+  fullName: BenchmarkDotNet.Jobs.Job.Job(string?, params BenchmarkDotNet.Characteristics.CharacteristicObject[])
   fullName.vb: BenchmarkDotNet.Jobs.Job.New(String, ParamArray BenchmarkDotNet.Characteristics.CharacteristicObject())
-  nameWithType: Job.Job(string, params CharacteristicObject[])
+  nameWithType: Job.Job(string?, params CharacteristicObject[])
   nameWithType.vb: Job.New(String, ParamArray CharacteristicObject())
 - uid: BenchmarkDotNet.Jobs.Job.#ctor(System.String)
-  name: Job(string)
+  name: Job(string?)
   href: api/BenchmarkDotNet.Jobs.Job.html#BenchmarkDotNet_Jobs_Job__ctor_System_String_
   commentId: M:BenchmarkDotNet.Jobs.Job.#ctor(System.String)
   name.vb: New(String)
-  fullName: BenchmarkDotNet.Jobs.Job.Job(string)
+  fullName: BenchmarkDotNet.Jobs.Job.Job(string?)
   fullName.vb: BenchmarkDotNet.Jobs.Job.New(String)
-  nameWithType: Job.Job(string)
+  nameWithType: Job.Job(string?)
   nameWithType.vb: Job.New(String)
 - uid: BenchmarkDotNet.Jobs.Job.#ctor*
   name: Job
@@ -24336,13 +24369,13 @@ references:
   nameWithType: JobMode<T>.JobMode()
   nameWithType.vb: JobMode(Of T).New()
 - uid: BenchmarkDotNet.Jobs.JobMode`1.#ctor(System.String)
-  name: JobMode(string)
+  name: JobMode(string?)
   href: api/BenchmarkDotNet.Jobs.JobMode-1.html#BenchmarkDotNet_Jobs_JobMode_1__ctor_System_String_
   commentId: M:BenchmarkDotNet.Jobs.JobMode`1.#ctor(System.String)
   name.vb: New(String)
-  fullName: BenchmarkDotNet.Jobs.JobMode<T>.JobMode(string)
+  fullName: BenchmarkDotNet.Jobs.JobMode<T>.JobMode(string?)
   fullName.vb: BenchmarkDotNet.Jobs.JobMode(Of T).New(String)
-  nameWithType: JobMode<T>.JobMode(string)
+  nameWithType: JobMode<T>.JobMode(string?)
   nameWithType.vb: JobMode(Of T).New(String)
 - uid: BenchmarkDotNet.Jobs.JobMode`1.#ctor*
   name: JobMode
@@ -26303,30 +26336,6 @@ references:
   fullName.vb: BenchmarkDotNet.Loggers.StreamLogger.New
   nameWithType: StreamLogger.StreamLogger
   nameWithType.vb: StreamLogger.New
-- uid: BenchmarkDotNet.Loggers.StreamLogger.Dispose
-  name: Dispose()
-  href: api/BenchmarkDotNet.Loggers.StreamLogger.html#BenchmarkDotNet_Loggers_StreamLogger_Dispose
-  commentId: M:BenchmarkDotNet.Loggers.StreamLogger.Dispose
-  fullName: BenchmarkDotNet.Loggers.StreamLogger.Dispose()
-  nameWithType: StreamLogger.Dispose()
-- uid: BenchmarkDotNet.Loggers.StreamLogger.Dispose*
-  name: Dispose
-  href: api/BenchmarkDotNet.Loggers.StreamLogger.html#BenchmarkDotNet_Loggers_StreamLogger_Dispose_
-  commentId: Overload:BenchmarkDotNet.Loggers.StreamLogger.Dispose
-  fullName: BenchmarkDotNet.Loggers.StreamLogger.Dispose
-  nameWithType: StreamLogger.Dispose
-- uid: BenchmarkDotNet.Loggers.StreamLogger.Flush
-  name: Flush()
-  href: api/BenchmarkDotNet.Loggers.StreamLogger.html#BenchmarkDotNet_Loggers_StreamLogger_Flush
-  commentId: M:BenchmarkDotNet.Loggers.StreamLogger.Flush
-  fullName: BenchmarkDotNet.Loggers.StreamLogger.Flush()
-  nameWithType: StreamLogger.Flush()
-- uid: BenchmarkDotNet.Loggers.StreamLogger.Flush*
-  name: Flush
-  href: api/BenchmarkDotNet.Loggers.StreamLogger.html#BenchmarkDotNet_Loggers_StreamLogger_Flush_
-  commentId: Overload:BenchmarkDotNet.Loggers.StreamLogger.Flush
-  fullName: BenchmarkDotNet.Loggers.StreamLogger.Flush
-  nameWithType: StreamLogger.Flush
 - uid: BenchmarkDotNet.Loggers.StreamLogger.Id
   name: Id
   href: api/BenchmarkDotNet.Loggers.StreamLogger.html#BenchmarkDotNet_Loggers_StreamLogger_Id
@@ -26339,54 +26348,114 @@ references:
   commentId: Overload:BenchmarkDotNet.Loggers.StreamLogger.Id
   fullName: BenchmarkDotNet.Loggers.StreamLogger.Id
   nameWithType: StreamLogger.Id
-- uid: BenchmarkDotNet.Loggers.StreamLogger.Priority
+- uid: BenchmarkDotNet.Loggers.TextLogger
+  name: TextLogger
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html
+  commentId: T:BenchmarkDotNet.Loggers.TextLogger
+  fullName: BenchmarkDotNet.Loggers.TextLogger
+  nameWithType: TextLogger
+- uid: BenchmarkDotNet.Loggers.TextLogger.#ctor(System.IO.TextWriter)
+  name: TextLogger(TextWriter)
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger__ctor_System_IO_TextWriter_
+  commentId: M:BenchmarkDotNet.Loggers.TextLogger.#ctor(System.IO.TextWriter)
+  name.vb: New(TextWriter)
+  fullName: BenchmarkDotNet.Loggers.TextLogger.TextLogger(System.IO.TextWriter)
+  fullName.vb: BenchmarkDotNet.Loggers.TextLogger.New(System.IO.TextWriter)
+  nameWithType: TextLogger.TextLogger(TextWriter)
+  nameWithType.vb: TextLogger.New(TextWriter)
+- uid: BenchmarkDotNet.Loggers.TextLogger.#ctor*
+  name: TextLogger
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger__ctor_
+  commentId: Overload:BenchmarkDotNet.Loggers.TextLogger.#ctor
+  name.vb: New
+  fullName: BenchmarkDotNet.Loggers.TextLogger.TextLogger
+  fullName.vb: BenchmarkDotNet.Loggers.TextLogger.New
+  nameWithType: TextLogger.TextLogger
+  nameWithType.vb: TextLogger.New
+- uid: BenchmarkDotNet.Loggers.TextLogger.Dispose
+  name: Dispose()
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_Dispose
+  commentId: M:BenchmarkDotNet.Loggers.TextLogger.Dispose
+  fullName: BenchmarkDotNet.Loggers.TextLogger.Dispose()
+  nameWithType: TextLogger.Dispose()
+- uid: BenchmarkDotNet.Loggers.TextLogger.Dispose*
+  name: Dispose
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_Dispose_
+  commentId: Overload:BenchmarkDotNet.Loggers.TextLogger.Dispose
+  fullName: BenchmarkDotNet.Loggers.TextLogger.Dispose
+  nameWithType: TextLogger.Dispose
+- uid: BenchmarkDotNet.Loggers.TextLogger.Flush
+  name: Flush()
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_Flush
+  commentId: M:BenchmarkDotNet.Loggers.TextLogger.Flush
+  fullName: BenchmarkDotNet.Loggers.TextLogger.Flush()
+  nameWithType: TextLogger.Flush()
+- uid: BenchmarkDotNet.Loggers.TextLogger.Flush*
+  name: Flush
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_Flush_
+  commentId: Overload:BenchmarkDotNet.Loggers.TextLogger.Flush
+  fullName: BenchmarkDotNet.Loggers.TextLogger.Flush
+  nameWithType: TextLogger.Flush
+- uid: BenchmarkDotNet.Loggers.TextLogger.Id
+  name: Id
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_Id
+  commentId: P:BenchmarkDotNet.Loggers.TextLogger.Id
+  fullName: BenchmarkDotNet.Loggers.TextLogger.Id
+  nameWithType: TextLogger.Id
+- uid: BenchmarkDotNet.Loggers.TextLogger.Id*
+  name: Id
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_Id_
+  commentId: Overload:BenchmarkDotNet.Loggers.TextLogger.Id
+  fullName: BenchmarkDotNet.Loggers.TextLogger.Id
+  nameWithType: TextLogger.Id
+- uid: BenchmarkDotNet.Loggers.TextLogger.Priority
   name: Priority
-  href: api/BenchmarkDotNet.Loggers.StreamLogger.html#BenchmarkDotNet_Loggers_StreamLogger_Priority
-  commentId: P:BenchmarkDotNet.Loggers.StreamLogger.Priority
-  fullName: BenchmarkDotNet.Loggers.StreamLogger.Priority
-  nameWithType: StreamLogger.Priority
-- uid: BenchmarkDotNet.Loggers.StreamLogger.Priority*
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_Priority
+  commentId: P:BenchmarkDotNet.Loggers.TextLogger.Priority
+  fullName: BenchmarkDotNet.Loggers.TextLogger.Priority
+  nameWithType: TextLogger.Priority
+- uid: BenchmarkDotNet.Loggers.TextLogger.Priority*
   name: Priority
-  href: api/BenchmarkDotNet.Loggers.StreamLogger.html#BenchmarkDotNet_Loggers_StreamLogger_Priority_
-  commentId: Overload:BenchmarkDotNet.Loggers.StreamLogger.Priority
-  fullName: BenchmarkDotNet.Loggers.StreamLogger.Priority
-  nameWithType: StreamLogger.Priority
-- uid: BenchmarkDotNet.Loggers.StreamLogger.Write(BenchmarkDotNet.Loggers.LogKind,System.String)
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_Priority_
+  commentId: Overload:BenchmarkDotNet.Loggers.TextLogger.Priority
+  fullName: BenchmarkDotNet.Loggers.TextLogger.Priority
+  nameWithType: TextLogger.Priority
+- uid: BenchmarkDotNet.Loggers.TextLogger.Write(BenchmarkDotNet.Loggers.LogKind,System.String)
   name: Write(LogKind, string)
-  href: api/BenchmarkDotNet.Loggers.StreamLogger.html#BenchmarkDotNet_Loggers_StreamLogger_Write_BenchmarkDotNet_Loggers_LogKind_System_String_
-  commentId: M:BenchmarkDotNet.Loggers.StreamLogger.Write(BenchmarkDotNet.Loggers.LogKind,System.String)
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_Write_BenchmarkDotNet_Loggers_LogKind_System_String_
+  commentId: M:BenchmarkDotNet.Loggers.TextLogger.Write(BenchmarkDotNet.Loggers.LogKind,System.String)
   name.vb: Write(LogKind, String)
-  fullName: BenchmarkDotNet.Loggers.StreamLogger.Write(BenchmarkDotNet.Loggers.LogKind, string)
-  fullName.vb: BenchmarkDotNet.Loggers.StreamLogger.Write(BenchmarkDotNet.Loggers.LogKind, String)
-  nameWithType: StreamLogger.Write(LogKind, string)
-  nameWithType.vb: StreamLogger.Write(LogKind, String)
-- uid: BenchmarkDotNet.Loggers.StreamLogger.Write*
+  fullName: BenchmarkDotNet.Loggers.TextLogger.Write(BenchmarkDotNet.Loggers.LogKind, string)
+  fullName.vb: BenchmarkDotNet.Loggers.TextLogger.Write(BenchmarkDotNet.Loggers.LogKind, String)
+  nameWithType: TextLogger.Write(LogKind, string)
+  nameWithType.vb: TextLogger.Write(LogKind, String)
+- uid: BenchmarkDotNet.Loggers.TextLogger.Write*
   name: Write
-  href: api/BenchmarkDotNet.Loggers.StreamLogger.html#BenchmarkDotNet_Loggers_StreamLogger_Write_
-  commentId: Overload:BenchmarkDotNet.Loggers.StreamLogger.Write
-  fullName: BenchmarkDotNet.Loggers.StreamLogger.Write
-  nameWithType: StreamLogger.Write
-- uid: BenchmarkDotNet.Loggers.StreamLogger.WriteLine
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_Write_
+  commentId: Overload:BenchmarkDotNet.Loggers.TextLogger.Write
+  fullName: BenchmarkDotNet.Loggers.TextLogger.Write
+  nameWithType: TextLogger.Write
+- uid: BenchmarkDotNet.Loggers.TextLogger.WriteLine
   name: WriteLine()
-  href: api/BenchmarkDotNet.Loggers.StreamLogger.html#BenchmarkDotNet_Loggers_StreamLogger_WriteLine
-  commentId: M:BenchmarkDotNet.Loggers.StreamLogger.WriteLine
-  fullName: BenchmarkDotNet.Loggers.StreamLogger.WriteLine()
-  nameWithType: StreamLogger.WriteLine()
-- uid: BenchmarkDotNet.Loggers.StreamLogger.WriteLine(BenchmarkDotNet.Loggers.LogKind,System.String)
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_WriteLine
+  commentId: M:BenchmarkDotNet.Loggers.TextLogger.WriteLine
+  fullName: BenchmarkDotNet.Loggers.TextLogger.WriteLine()
+  nameWithType: TextLogger.WriteLine()
+- uid: BenchmarkDotNet.Loggers.TextLogger.WriteLine(BenchmarkDotNet.Loggers.LogKind,System.String)
   name: WriteLine(LogKind, string)
-  href: api/BenchmarkDotNet.Loggers.StreamLogger.html#BenchmarkDotNet_Loggers_StreamLogger_WriteLine_BenchmarkDotNet_Loggers_LogKind_System_String_
-  commentId: M:BenchmarkDotNet.Loggers.StreamLogger.WriteLine(BenchmarkDotNet.Loggers.LogKind,System.String)
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_WriteLine_BenchmarkDotNet_Loggers_LogKind_System_String_
+  commentId: M:BenchmarkDotNet.Loggers.TextLogger.WriteLine(BenchmarkDotNet.Loggers.LogKind,System.String)
   name.vb: WriteLine(LogKind, String)
-  fullName: BenchmarkDotNet.Loggers.StreamLogger.WriteLine(BenchmarkDotNet.Loggers.LogKind, string)
-  fullName.vb: BenchmarkDotNet.Loggers.StreamLogger.WriteLine(BenchmarkDotNet.Loggers.LogKind, String)
-  nameWithType: StreamLogger.WriteLine(LogKind, string)
-  nameWithType.vb: StreamLogger.WriteLine(LogKind, String)
-- uid: BenchmarkDotNet.Loggers.StreamLogger.WriteLine*
+  fullName: BenchmarkDotNet.Loggers.TextLogger.WriteLine(BenchmarkDotNet.Loggers.LogKind, string)
+  fullName.vb: BenchmarkDotNet.Loggers.TextLogger.WriteLine(BenchmarkDotNet.Loggers.LogKind, String)
+  nameWithType: TextLogger.WriteLine(LogKind, string)
+  nameWithType.vb: TextLogger.WriteLine(LogKind, String)
+- uid: BenchmarkDotNet.Loggers.TextLogger.WriteLine*
   name: WriteLine
-  href: api/BenchmarkDotNet.Loggers.StreamLogger.html#BenchmarkDotNet_Loggers_StreamLogger_WriteLine_
-  commentId: Overload:BenchmarkDotNet.Loggers.StreamLogger.WriteLine
-  fullName: BenchmarkDotNet.Loggers.StreamLogger.WriteLine
-  nameWithType: StreamLogger.WriteLine
+  href: api/BenchmarkDotNet.Loggers.TextLogger.html#BenchmarkDotNet_Loggers_TextLogger_WriteLine_
+  commentId: Overload:BenchmarkDotNet.Loggers.TextLogger.WriteLine
+  fullName: BenchmarkDotNet.Loggers.TextLogger.WriteLine
+  nameWithType: TextLogger.WriteLine
 - uid: BenchmarkDotNet.Mathematics
   name: BenchmarkDotNet.Mathematics
   href: api/BenchmarkDotNet.Mathematics.html
@@ -29069,15 +29138,15 @@ references:
   commentId: T:BenchmarkDotNet.Reports.Summary
   fullName: BenchmarkDotNet.Reports.Summary
   nameWithType: Summary
-- uid: BenchmarkDotNet.Reports.Summary.#ctor(System.String,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Reports.BenchmarkReport},BenchmarkDotNet.Environments.HostEnvironmentInfo,System.String,System.String,System.TimeSpan,System.Globalization.CultureInfo,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Validators.ValidationError},System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Columns.IColumnHidingRule})
-  name: Summary(string, ImmutableArray<BenchmarkReport>, HostEnvironmentInfo, string, string, TimeSpan, CultureInfo, ImmutableArray<ValidationError>, ImmutableArray<IColumnHidingRule>)
-  href: api/BenchmarkDotNet.Reports.Summary.html#BenchmarkDotNet_Reports_Summary__ctor_System_String_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Reports_BenchmarkReport__BenchmarkDotNet_Environments_HostEnvironmentInfo_System_String_System_String_System_TimeSpan_System_Globalization_CultureInfo_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Validators_ValidationError__System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Columns_IColumnHidingRule__
-  commentId: M:BenchmarkDotNet.Reports.Summary.#ctor(System.String,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Reports.BenchmarkReport},BenchmarkDotNet.Environments.HostEnvironmentInfo,System.String,System.String,System.TimeSpan,System.Globalization.CultureInfo,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Validators.ValidationError},System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Columns.IColumnHidingRule})
-  name.vb: New(String, ImmutableArray(Of BenchmarkReport), HostEnvironmentInfo, String, String, TimeSpan, CultureInfo, ImmutableArray(Of ValidationError), ImmutableArray(Of IColumnHidingRule))
-  fullName: BenchmarkDotNet.Reports.Summary.Summary(string, System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Reports.BenchmarkReport>, BenchmarkDotNet.Environments.HostEnvironmentInfo, string, string, System.TimeSpan, System.Globalization.CultureInfo, System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Validators.ValidationError>, System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Columns.IColumnHidingRule>)
-  fullName.vb: BenchmarkDotNet.Reports.Summary.New(String, System.Collections.Immutable.ImmutableArray(Of BenchmarkDotNet.Reports.BenchmarkReport), BenchmarkDotNet.Environments.HostEnvironmentInfo, String, String, System.TimeSpan, System.Globalization.CultureInfo, System.Collections.Immutable.ImmutableArray(Of BenchmarkDotNet.Validators.ValidationError), System.Collections.Immutable.ImmutableArray(Of BenchmarkDotNet.Columns.IColumnHidingRule))
-  nameWithType: Summary.Summary(string, ImmutableArray<BenchmarkReport>, HostEnvironmentInfo, string, string, TimeSpan, CultureInfo, ImmutableArray<ValidationError>, ImmutableArray<IColumnHidingRule>)
-  nameWithType.vb: Summary.New(String, ImmutableArray(Of BenchmarkReport), HostEnvironmentInfo, String, String, TimeSpan, CultureInfo, ImmutableArray(Of ValidationError), ImmutableArray(Of IColumnHidingRule))
+- uid: BenchmarkDotNet.Reports.Summary.#ctor(System.String,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Reports.BenchmarkReport},BenchmarkDotNet.Environments.HostEnvironmentInfo,System.String,System.String,System.TimeSpan,System.Globalization.CultureInfo,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Validators.ValidationError},System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Columns.IColumnHidingRule},BenchmarkDotNet.Reports.SummaryStyle)
+  name: Summary(string, ImmutableArray<BenchmarkReport>, HostEnvironmentInfo, string, string, TimeSpan, CultureInfo, ImmutableArray<ValidationError>, ImmutableArray<IColumnHidingRule>, SummaryStyle)
+  href: api/BenchmarkDotNet.Reports.Summary.html#BenchmarkDotNet_Reports_Summary__ctor_System_String_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Reports_BenchmarkReport__BenchmarkDotNet_Environments_HostEnvironmentInfo_System_String_System_String_System_TimeSpan_System_Globalization_CultureInfo_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Validators_ValidationError__System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Columns_IColumnHidingRule__BenchmarkDotNet_Reports_SummaryStyle_
+  commentId: M:BenchmarkDotNet.Reports.Summary.#ctor(System.String,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Reports.BenchmarkReport},BenchmarkDotNet.Environments.HostEnvironmentInfo,System.String,System.String,System.TimeSpan,System.Globalization.CultureInfo,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Validators.ValidationError},System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Columns.IColumnHidingRule},BenchmarkDotNet.Reports.SummaryStyle)
+  name.vb: New(String, ImmutableArray(Of BenchmarkReport), HostEnvironmentInfo, String, String, TimeSpan, CultureInfo, ImmutableArray(Of ValidationError), ImmutableArray(Of IColumnHidingRule), SummaryStyle)
+  fullName: BenchmarkDotNet.Reports.Summary.Summary(string, System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Reports.BenchmarkReport>, BenchmarkDotNet.Environments.HostEnvironmentInfo, string, string, System.TimeSpan, System.Globalization.CultureInfo, System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Validators.ValidationError>, System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Columns.IColumnHidingRule>, BenchmarkDotNet.Reports.SummaryStyle)
+  fullName.vb: BenchmarkDotNet.Reports.Summary.New(String, System.Collections.Immutable.ImmutableArray(Of BenchmarkDotNet.Reports.BenchmarkReport), BenchmarkDotNet.Environments.HostEnvironmentInfo, String, String, System.TimeSpan, System.Globalization.CultureInfo, System.Collections.Immutable.ImmutableArray(Of BenchmarkDotNet.Validators.ValidationError), System.Collections.Immutable.ImmutableArray(Of BenchmarkDotNet.Columns.IColumnHidingRule), BenchmarkDotNet.Reports.SummaryStyle)
+  nameWithType: Summary.Summary(string, ImmutableArray<BenchmarkReport>, HostEnvironmentInfo, string, string, TimeSpan, CultureInfo, ImmutableArray<ValidationError>, ImmutableArray<IColumnHidingRule>, SummaryStyle)
+  nameWithType.vb: Summary.New(String, ImmutableArray(Of BenchmarkReport), HostEnvironmentInfo, String, String, TimeSpan, CultureInfo, ImmutableArray(Of ValidationError), ImmutableArray(Of IColumnHidingRule), SummaryStyle)
 - uid: BenchmarkDotNet.Reports.Summary.#ctor*
   name: Summary
   href: api/BenchmarkDotNet.Reports.Summary.html#BenchmarkDotNet_Reports_Summary__ctor_
@@ -29426,15 +29495,15 @@ references:
   commentId: T:BenchmarkDotNet.Reports.SummaryStyle
   fullName: BenchmarkDotNet.Reports.SummaryStyle
   nameWithType: SummaryStyle
-- uid: BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle)
-  name: SummaryStyle(CultureInfo?, bool, SizeUnit, TimeUnit, bool, bool, int, RatioStyle)
-  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle__ctor_System_Globalization_CultureInfo_System_Boolean_BenchmarkDotNet_Columns_SizeUnit_Perfolizer_Horology_TimeUnit_System_Boolean_System_Boolean_System_Int32_BenchmarkDotNet_Columns_RatioStyle_
-  commentId: M:BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle)
-  name.vb: New(CultureInfo, Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Integer, RatioStyle)
-  fullName: BenchmarkDotNet.Reports.SummaryStyle.SummaryStyle(System.Globalization.CultureInfo?, bool, BenchmarkDotNet.Columns.SizeUnit, Perfolizer.Horology.TimeUnit, bool, bool, int, BenchmarkDotNet.Columns.RatioStyle)
-  fullName.vb: BenchmarkDotNet.Reports.SummaryStyle.New(System.Globalization.CultureInfo, Boolean, BenchmarkDotNet.Columns.SizeUnit, Perfolizer.Horology.TimeUnit, Boolean, Boolean, Integer, BenchmarkDotNet.Columns.RatioStyle)
-  nameWithType: SummaryStyle.SummaryStyle(CultureInfo?, bool, SizeUnit, TimeUnit, bool, bool, int, RatioStyle)
-  nameWithType.vb: SummaryStyle.New(CultureInfo, Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Integer, RatioStyle)
+- uid: BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
+  name: SummaryStyle(CultureInfo?, bool, SizeUnit, TimeUnit, bool, bool, int, RatioStyle, TextJustification, TextJustification)
+  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle__ctor_System_Globalization_CultureInfo_System_Boolean_BenchmarkDotNet_Columns_SizeUnit_Perfolizer_Horology_TimeUnit_System_Boolean_System_Boolean_System_Int32_BenchmarkDotNet_Columns_RatioStyle_BenchmarkDotNet_Reports_SummaryTable_SummaryTableColumn_TextJustification_BenchmarkDotNet_Reports_SummaryTable_SummaryTableColumn_TextJustification_
+  commentId: M:BenchmarkDotNet.Reports.SummaryStyle.#ctor(System.Globalization.CultureInfo,System.Boolean,BenchmarkDotNet.Columns.SizeUnit,Perfolizer.Horology.TimeUnit,System.Boolean,System.Boolean,System.Int32,BenchmarkDotNet.Columns.RatioStyle,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification,BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
+  name.vb: New(CultureInfo, Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Integer, RatioStyle, TextJustification, TextJustification)
+  fullName: BenchmarkDotNet.Reports.SummaryStyle.SummaryStyle(System.Globalization.CultureInfo?, bool, BenchmarkDotNet.Columns.SizeUnit, Perfolizer.Horology.TimeUnit, bool, bool, int, BenchmarkDotNet.Columns.RatioStyle, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
+  fullName.vb: BenchmarkDotNet.Reports.SummaryStyle.New(System.Globalization.CultureInfo, Boolean, BenchmarkDotNet.Columns.SizeUnit, Perfolizer.Horology.TimeUnit, Boolean, Boolean, Integer, BenchmarkDotNet.Columns.RatioStyle, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification, BenchmarkDotNet.Reports.SummaryTable.SummaryTableColumn.TextJustification)
+  nameWithType: SummaryStyle.SummaryStyle(CultureInfo?, bool, SizeUnit, TimeUnit, bool, bool, int, RatioStyle, SummaryTable.SummaryTableColumn.TextJustification, SummaryTable.SummaryTableColumn.TextJustification)
+  nameWithType.vb: SummaryStyle.New(CultureInfo, Boolean, SizeUnit, TimeUnit, Boolean, Boolean, Integer, RatioStyle, SummaryTable.SummaryTableColumn.TextJustification, SummaryTable.SummaryTableColumn.TextJustification)
 - uid: BenchmarkDotNet.Reports.SummaryStyle.#ctor*
   name: SummaryStyle
   href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle__ctor_
@@ -29507,6 +29576,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Reports.SummaryStyle.MaxParameterColumnWidth
   fullName: BenchmarkDotNet.Reports.SummaryStyle.MaxParameterColumnWidth
   nameWithType: SummaryStyle.MaxParameterColumnWidth
+- uid: BenchmarkDotNet.Reports.SummaryStyle.NumericColumnJustification
+  name: NumericColumnJustification
+  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle_NumericColumnJustification
+  commentId: P:BenchmarkDotNet.Reports.SummaryStyle.NumericColumnJustification
+  fullName: BenchmarkDotNet.Reports.SummaryStyle.NumericColumnJustification
+  nameWithType: SummaryStyle.NumericColumnJustification
+- uid: BenchmarkDotNet.Reports.SummaryStyle.NumericColumnJustification*
+  name: NumericColumnJustification
+  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle_NumericColumnJustification_
+  commentId: Overload:BenchmarkDotNet.Reports.SummaryStyle.NumericColumnJustification
+  fullName: BenchmarkDotNet.Reports.SummaryStyle.NumericColumnJustification
+  nameWithType: SummaryStyle.NumericColumnJustification
 - uid: BenchmarkDotNet.Reports.SummaryStyle.op_Equality(BenchmarkDotNet.Reports.SummaryStyle,BenchmarkDotNet.Reports.SummaryStyle)
   name: operator ==(SummaryStyle, SummaryStyle)
   href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle_op_Equality_BenchmarkDotNet_Reports_SummaryStyle_BenchmarkDotNet_Reports_SummaryStyle_
@@ -29603,6 +29684,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Reports.SummaryStyle.SizeUnit
   fullName: BenchmarkDotNet.Reports.SummaryStyle.SizeUnit
   nameWithType: SummaryStyle.SizeUnit
+- uid: BenchmarkDotNet.Reports.SummaryStyle.TextColumnJustification
+  name: TextColumnJustification
+  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle_TextColumnJustification
+  commentId: P:BenchmarkDotNet.Reports.SummaryStyle.TextColumnJustification
+  fullName: BenchmarkDotNet.Reports.SummaryStyle.TextColumnJustification
+  nameWithType: SummaryStyle.TextColumnJustification
+- uid: BenchmarkDotNet.Reports.SummaryStyle.TextColumnJustification*
+  name: TextColumnJustification
+  href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle_TextColumnJustification_
+  commentId: Overload:BenchmarkDotNet.Reports.SummaryStyle.TextColumnJustification
+  fullName: BenchmarkDotNet.Reports.SummaryStyle.TextColumnJustification
+  nameWithType: SummaryStyle.TextColumnJustification
 - uid: BenchmarkDotNet.Reports.SummaryStyle.TimeUnit
   name: TimeUnit
   href: api/BenchmarkDotNet.Reports.SummaryStyle.html#BenchmarkDotNet_Reports_SummaryStyle_TimeUnit
@@ -37821,6 +37914,9 @@ references:
 - uid: changelog.v0.13.7
   name: BenchmarkDotNet v0.13.7
   href: changelog/v0.13.7.html
+- uid: changelog.v0.13.8
+  name: BenchmarkDotNet v0.13.8
+  href: changelog/v0.13.8.html
 - uid: changelog.v0.7.0
   name: BenchmarkDotNet v0.7.0
   href: changelog/v0.7.0.html
