@@ -134,4 +134,5 @@ namespace BenchmarkDotNet.Configs
             addAction(manualConfig);
             return manualConfig;
         }
+    }
 }
