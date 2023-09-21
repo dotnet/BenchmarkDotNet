@@ -109,7 +109,7 @@ namespace BenchmarkDotNet.Configs
 
         public IEnumerable<IFilter> GetFilters() => Array.Empty<IFilter>();
 
-        public IEnumerable<EventProcessorBase> GetEventProcessors() => Array.Empty<EventProcessorBase>();
+        public IEnumerable<EventProcessor> GetEventProcessors() => Array.Empty<EventProcessor>();
 
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => Array.Empty<IColumnHidingRule>();
     }

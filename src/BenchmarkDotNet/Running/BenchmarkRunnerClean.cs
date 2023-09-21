@@ -175,7 +175,7 @@ namespace BenchmarkDotNet.Running
                                    Dictionary<BenchmarkCase, (BenchmarkId benchmarkId, BuildResult buildResult)> buildResults,
                                    IResolver resolver,
                                    ILogger logger,
-                                   EventProcessorBase eventProcessor,
+                                   EventProcessor eventProcessor,
                                    List<string> artifactsToCleanup,
                                    string resultsFolderPath,
                                    string logFilePath,
@@ -370,7 +370,7 @@ namespace BenchmarkDotNet.Running
             return validationErrors.ToImmutableArray();
         }
 
-        private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer, EventProcessorBase eventProcessor)
+        private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer, EventProcessor eventProcessor)
         {
             logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Parallel: Start   *****");
 

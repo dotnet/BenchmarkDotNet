@@ -7,13 +7,13 @@ using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.EventProcessors
 {
-    public abstract class EventProcessorBase
+    public abstract class EventProcessor
     {
         public virtual void OnStartValidationStage() { }
         public virtual void OnValidationError(ValidationError validationError) { }
         public virtual void OnEndValidationStage() { }
         public virtual void OnStartBuildStage(IReadOnlyList<BuildPartition> partitions) { }
-        public virtual void OnBuildComplete(BuildPartition benchmarkCase, BuildResult buildResult) { }
+        public virtual void OnBuildComplete(BuildPartition partition, BuildResult buildResult) { }
         public virtual void OnEndBuildStage() { }
         public virtual void OnStartRunStage() { }
         public virtual void OnStartRunBenchmarksInType(Type type, IReadOnlyList<BenchmarkCase> benchmarks) { }

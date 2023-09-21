@@ -111,7 +111,7 @@ namespace BenchmarkDotNet.Configs
         [Obsolete("This method will soon be removed, please start using .AddLogicalGroupRules() instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)] public static IConfig With(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.AddLogicalGroupRules(rules);
         [PublicAPI] public static ManualConfig AddLogicalGroupRules(this IConfig config, params BenchmarkLogicalGroupRule[] rules) => config.With(c => c.AddLogicalGroupRules(rules));
-        [PublicAPI] public static ManualConfig AddEventProcessor(this IConfig config, EventProcessorBase eventProcessor) => config.With(c => c.AddEventProcessor(eventProcessor));
+        [PublicAPI] public static ManualConfig AddEventProcessor(this IConfig config, EventProcessor eventProcessor) => config.With(c => c.AddEventProcessor(eventProcessor));
 
         [PublicAPI] public static ManualConfig HideColumns(this IConfig config, params string[] columnNames) => config.With(c => c.HideColumns(columnNames));
         [PublicAPI] public static ManualConfig HideColumns(this IConfig config, params IColumn[] columns) => config.With(c => c.HideColumns(columns));
@@ -134,5 +134,4 @@ namespace BenchmarkDotNet.Configs
             addAction(manualConfig);
             return manualConfig;
         }
-    }
 }

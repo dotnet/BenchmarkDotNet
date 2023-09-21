@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Configs
         private readonly ImmutableHashSet<HardwareCounter> hardwareCounters;
         private readonly ImmutableHashSet<IFilter> filters;
         private readonly ImmutableArray<BenchmarkLogicalGroupRule> rules;
-        private readonly ImmutableHashSet<EventProcessorBase> eventProcessors;
+        private readonly ImmutableHashSet<EventProcessor> eventProcessors;
         private readonly ImmutableArray<IColumnHidingRule> columnHidingRules;
 
         internal ImmutableConfig(
@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Configs
             ImmutableArray<BenchmarkLogicalGroupRule> uniqueRules,
             ImmutableArray<IColumnHidingRule> uniqueColumnHidingRules,
             ImmutableHashSet<Job> uniqueRunnableJobs,
-            ImmutableHashSet<EventProcessorBase> uniqueEventProcessors,
+            ImmutableHashSet<EventProcessor> uniqueEventProcessors,
             ConfigUnionRule unionRule,
             string artifactsPath,
             CultureInfo cultureInfo,
@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => rules;
-        public IEnumerable<EventProcessorBase> GetEventProcessors() => eventProcessors;
+        public IEnumerable<EventProcessor> GetEventProcessors() => eventProcessors;
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => columnHidingRules;
 
         public ILogger GetCompositeLogger() => new CompositeLogger(loggers);

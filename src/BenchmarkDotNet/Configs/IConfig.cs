@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Configs
         IEnumerable<HardwareCounter> GetHardwareCounters();
         IEnumerable<IFilter> GetFilters();
         IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules();
-        IEnumerable<EventProcessorBase> GetEventProcessors();
+        IEnumerable<EventProcessor> GetEventProcessors();
         IEnumerable<IColumnHidingRule> GetColumnHidingRules();
 
         IOrderer? Orderer { get; }

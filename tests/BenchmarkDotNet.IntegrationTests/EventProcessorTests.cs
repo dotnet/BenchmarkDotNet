@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var events = RunBenchmarksAndRecordEvents(new[] { typeof(ClassEmpty) });
             Assert.Single(events);
-            Assert.Equal(nameof(EventProcessorBase.OnStartValidationStage), events[0].EventType);
+            Assert.Equal(nameof(EventProcessor.OnStartValidationStage), events[0].EventType);
         }
 
         [Fact]
@@ -34,12 +34,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.Equal(13, events.Count);
 
-            Assert.Equal(nameof(EventProcessorBase.OnStartValidationStage), events[0].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnEndValidationStage), events[1].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnStartBuildStage), events[2].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnBuildComplete), events[3].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnEndBuildStage), events[4].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnStartRunStage), events[5].EventType);
+            Assert.Equal(nameof(EventProcessor.OnStartValidationStage), events[0].EventType);
+            Assert.Equal(nameof(EventProcessor.OnEndValidationStage), events[1].EventType);
+            Assert.Equal(nameof(EventProcessor.OnStartBuildStage), events[2].EventType);
+            Assert.Equal(nameof(EventProcessor.OnBuildComplete), events[3].EventType);
+            Assert.Equal(nameof(EventProcessor.OnEndBuildStage), events[4].EventType);
+            Assert.Equal(nameof(EventProcessor.OnStartRunStage), events[5].EventType);
 
             var benchmarkTypeAndMethods = new List<(Type Type, string[] MethodNames)>
             {
@@ -49,24 +49,24 @@ namespace BenchmarkDotNet.IntegrationTests
             int eventIndex = 6;
             foreach ((var type, var methodNames) in benchmarkTypeAndMethods)
             {
-                Assert.Equal(nameof(EventProcessorBase.OnStartRunBenchmarksInType), events[eventIndex].EventType);
+                Assert.Equal(nameof(EventProcessor.OnStartRunBenchmarksInType), events[eventIndex].EventType);
                 Assert.Equal(type, events[eventIndex++].Args[0] as Type);
 
                 foreach (var method in methodNames)
                 {
                     var methodDescriptor = type.GetMethod(method);
-                    Assert.Equal(nameof(EventProcessorBase.OnStartRunBenchmark), events[eventIndex].EventType);
+                    Assert.Equal(nameof(EventProcessor.OnStartRunBenchmark), events[eventIndex].EventType);
                     Assert.Equal(methodDescriptor, (events[eventIndex++].Args[0] as BenchmarkCase).Descriptor.WorkloadMethod);
 
-                    Assert.Equal(nameof(EventProcessorBase.OnEndRunBenchmark), events[eventIndex].EventType);
+                    Assert.Equal(nameof(EventProcessor.OnEndRunBenchmark), events[eventIndex].EventType);
                     Assert.Equal(methodDescriptor, (events[eventIndex++].Args[0] as BenchmarkCase).Descriptor.WorkloadMethod);
                 }
 
-                Assert.Equal(nameof(EventProcessorBase.OnEndRunBenchmarksInType), events[eventIndex].EventType);
+                Assert.Equal(nameof(EventProcessor.OnEndRunBenchmarksInType), events[eventIndex].EventType);
                 Assert.Equal(type, events[eventIndex++].Args[0] as Type);
             }
 
-            Assert.Equal(nameof(EventProcessorBase.OnEndRunStage), events[eventIndex].EventType);
+            Assert.Equal(nameof(EventProcessor.OnEndRunStage), events[eventIndex].EventType);
         }
 
         [Fact]
@@ -76,12 +76,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.Equal(23, events.Count);
 
-            Assert.Equal(nameof(EventProcessorBase.OnStartValidationStage), events[0].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnEndValidationStage), events[1].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnStartBuildStage), events[2].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnBuildComplete), events[3].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnEndBuildStage), events[4].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnStartRunStage), events[5].EventType);
+            Assert.Equal(nameof(EventProcessor.OnStartValidationStage), events[0].EventType);
+            Assert.Equal(nameof(EventProcessor.OnEndValidationStage), events[1].EventType);
+            Assert.Equal(nameof(EventProcessor.OnStartBuildStage), events[2].EventType);
+            Assert.Equal(nameof(EventProcessor.OnBuildComplete), events[3].EventType);
+            Assert.Equal(nameof(EventProcessor.OnEndBuildStage), events[4].EventType);
+            Assert.Equal(nameof(EventProcessor.OnStartRunStage), events[5].EventType);
 
             var benchmarkTypeAndMethods = new List<(Type Type, string[] MethodNames)>
             {
@@ -92,24 +92,24 @@ namespace BenchmarkDotNet.IntegrationTests
             int eventIndex = 6;
             foreach ((var type, var methodNames) in benchmarkTypeAndMethods)
             {
-                Assert.Equal(nameof(EventProcessorBase.OnStartRunBenchmarksInType), events[eventIndex].EventType);
+                Assert.Equal(nameof(EventProcessor.OnStartRunBenchmarksInType), events[eventIndex].EventType);
                 Assert.Equal(type, events[eventIndex++].Args[0] as Type);
 
                 foreach (var method in methodNames)
                 {
                     var methodDescriptor = type.GetMethod(method);
-                    Assert.Equal(nameof(EventProcessorBase.OnStartRunBenchmark), events[eventIndex].EventType);
+                    Assert.Equal(nameof(EventProcessor.OnStartRunBenchmark), events[eventIndex].EventType);
                     Assert.Equal(methodDescriptor, (events[eventIndex++].Args[0] as BenchmarkCase).Descriptor.WorkloadMethod);
 
-                    Assert.Equal(nameof(EventProcessorBase.OnEndRunBenchmark), events[eventIndex].EventType);
+                    Assert.Equal(nameof(EventProcessor.OnEndRunBenchmark), events[eventIndex].EventType);
                     Assert.Equal(methodDescriptor, (events[eventIndex++].Args[0] as BenchmarkCase).Descriptor.WorkloadMethod);
                 }
 
-                Assert.Equal(nameof(EventProcessorBase.OnEndRunBenchmarksInType), events[eventIndex].EventType);
+                Assert.Equal(nameof(EventProcessor.OnEndRunBenchmarksInType), events[eventIndex].EventType);
                 Assert.Equal(type, events[eventIndex++].Args[0] as Type);
             }
 
-            Assert.Equal(nameof(EventProcessorBase.OnEndRunStage), events[eventIndex].EventType);
+            Assert.Equal(nameof(EventProcessor.OnEndRunStage), events[eventIndex].EventType);
         }
 
         [Fact]
@@ -119,13 +119,13 @@ namespace BenchmarkDotNet.IntegrationTests
             var events = RunBenchmarksAndRecordEvents(new[] { typeof(ClassA) }, validator);
 
             Assert.Equal(15, events.Count);
-            Assert.Equal(nameof(EventProcessorBase.OnStartValidationStage), events[0].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnValidationError), events[1].EventType);
+            Assert.Equal(nameof(EventProcessor.OnStartValidationStage), events[0].EventType);
+            Assert.Equal(nameof(EventProcessor.OnValidationError), events[1].EventType);
             Assert.Equal(typeof(ClassA).GetMethod(nameof(ClassA.Method1)), (events[1].Args[0] as ValidationError).BenchmarkCase.Descriptor.WorkloadMethod);
-            Assert.Equal(nameof(EventProcessorBase.OnValidationError), events[2].EventType);
+            Assert.Equal(nameof(EventProcessor.OnValidationError), events[2].EventType);
             Assert.Equal(typeof(ClassA).GetMethod(nameof(ClassA.Method2)), (events[2].Args[0] as ValidationError).BenchmarkCase.Descriptor.WorkloadMethod);
-            Assert.Equal(nameof(EventProcessorBase.OnEndValidationStage), events[3].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnStartBuildStage), events[4].EventType);
+            Assert.Equal(nameof(EventProcessor.OnEndValidationStage), events[3].EventType);
+            Assert.Equal(nameof(EventProcessor.OnStartBuildStage), events[4].EventType);
         }
 
         [Fact]
@@ -135,10 +135,10 @@ namespace BenchmarkDotNet.IntegrationTests
             var events = RunBenchmarksAndRecordEvents(new[] { typeof(ClassA) }, toolchain: toolchain);
 
             Assert.Equal(3, events.Count);
-            Assert.Equal(nameof(EventProcessorBase.OnStartValidationStage), events[0].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnValidationError), events[1].EventType);
+            Assert.Equal(nameof(EventProcessor.OnStartValidationStage), events[0].EventType);
+            Assert.Equal(nameof(EventProcessor.OnValidationError), events[1].EventType);
             Assert.Equal(typeof(ClassA).GetMethod(nameof(ClassA.Method1)), (events[1].Args[0] as ValidationError).BenchmarkCase.Descriptor.WorkloadMethod);
-            Assert.Equal(nameof(EventProcessorBase.OnValidationError), events[2].EventType);
+            Assert.Equal(nameof(EventProcessor.OnValidationError), events[2].EventType);
             Assert.Equal(typeof(ClassA).GetMethod(nameof(ClassA.Method2)), (events[2].Args[0] as ValidationError).BenchmarkCase.Descriptor.WorkloadMethod);
         }
 
@@ -149,13 +149,13 @@ namespace BenchmarkDotNet.IntegrationTests
             var events = RunBenchmarksAndRecordEvents(new[] { typeof(ClassA) }, toolchain: toolchain);
 
             Assert.Equal(9, events.Count);
-            Assert.Equal(nameof(EventProcessorBase.OnStartValidationStage), events[0].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnEndValidationStage), events[1].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnStartBuildStage), events[2].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnBuildComplete), events[3].EventType);
+            Assert.Equal(nameof(EventProcessor.OnStartValidationStage), events[0].EventType);
+            Assert.Equal(nameof(EventProcessor.OnEndValidationStage), events[1].EventType);
+            Assert.Equal(nameof(EventProcessor.OnStartBuildStage), events[2].EventType);
+            Assert.Equal(nameof(EventProcessor.OnBuildComplete), events[3].EventType);
             Assert.False((events[3].Args[1] as BuildResult).IsGenerateSuccess);
-            Assert.Equal(nameof(EventProcessorBase.OnEndBuildStage), events[4].EventType);
-            Assert.Equal(nameof(EventProcessorBase.OnStartRunStage), events[5].EventType);
+            Assert.Equal(nameof(EventProcessor.OnEndBuildStage), events[4].EventType);
+            Assert.Equal(nameof(EventProcessor.OnStartRunStage), events[5].EventType);
         }
 
         private List<LoggingEventProcessor.EventData> RunBenchmarksAndRecordEvents(Type[] types, IValidator? validator = null, IToolchain? toolchain = null)
@@ -232,7 +232,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        public class LoggingEventProcessor : EventProcessorBase
+        public class LoggingEventProcessor : EventProcessor
         {
             public class EventData
             {

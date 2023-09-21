@@ -8,22 +8,17 @@ using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.EventProcessors
 {
-    internal sealed class CompositeEventProcessor : EventProcessorBase
+    internal sealed class CompositeEventProcessor : EventProcessor
     {
-        private readonly IReadOnlyCollection<EventProcessorBase> eventProcessors;
+        private readonly HashSet<EventProcessor> eventProcessors;
 
         public CompositeEventProcessor(BenchmarkRunInfo[] benchmarkRunInfos)
         {
-            var eventProcessors = new HashSet<EventProcessorBase>();
+            var eventProcessors = new HashSet<EventProcessor>();
 
             foreach (var info in benchmarkRunInfos)
                 eventProcessors.AddRange(info.Config.GetEventProcessors());
 
-            this.eventProcessors = eventProcessors;
-        }
-
-        public CompositeEventProcessor(IReadOnlyCollection<EventProcessorBase> eventProcessors)
-        {
             this.eventProcessors = eventProcessors;
         }
 
