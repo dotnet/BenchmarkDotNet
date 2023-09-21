@@ -6,6 +6,7 @@ using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
@@ -33,6 +34,7 @@ namespace BenchmarkDotNet.Configs
         private readonly HashSet<HardwareCounter> hardwareCounters = new HashSet<HardwareCounter>();
         private readonly List<IFilter> filters = new List<IFilter>();
         private readonly List<BenchmarkLogicalGroupRule> logicalGroupRules = new List<BenchmarkLogicalGroupRule>();
+        private readonly List<EventProcessor> eventProcessors = new List<EventProcessor>();
         private readonly List<IColumnHidingRule> columnHidingRules = new List<IColumnHidingRule>();
 
         public IEnumerable<IColumnProvider> GetColumnProviders() => columnProviders;
@@ -45,6 +47,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => logicalGroupRules;
+        public IEnumerable<EventProcessor> GetEventProcessors() => eventProcessors;
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => columnHidingRules;
 
         [PublicAPI] public ConfigOptions Options { get; set; }
@@ -218,6 +221,12 @@ namespace BenchmarkDotNet.Configs
                     logicalGroupRules.Remove(rule);
                 logicalGroupRules.Add(rule);
             }
+            return this;
+        }
+
+        public ManualConfig AddEventProcessor(EventProcessor eventProcessor)
+        {
+            this.eventProcessors.Add(eventProcessor);
             return this;
         }
 

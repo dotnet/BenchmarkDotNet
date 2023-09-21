@@ -53,6 +53,7 @@ namespace BenchmarkDotNet.Configs
             var uniqueHidingRules = source.GetColumnHidingRules().ToImmutableArray();
 
             var uniqueRunnableJobs = GetRunnableJobs(source.GetJobs()).ToImmutableHashSet();
+            var uniqueEventProcessors = source.GetEventProcessors().ToImmutableHashSet();
 
             return new ImmutableConfig(
                 uniqueColumnProviders,
@@ -66,6 +67,7 @@ namespace BenchmarkDotNet.Configs
                 uniqueRules,
                 uniqueHidingRules,
                 uniqueRunnableJobs,
+                uniqueEventProcessors,
                 source.UnionRule,
                 source.ArtifactsPath ?? DefaultConfig.Instance.ArtifactsPath,
                 source.CultureInfo,
