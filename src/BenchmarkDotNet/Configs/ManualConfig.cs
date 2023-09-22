@@ -224,9 +224,9 @@ namespace BenchmarkDotNet.Configs
             return this;
         }
 
-        public ManualConfig AddEventProcessor(EventProcessor eventProcessor)
+        public ManualConfig AddEventProcessor(params EventProcessor[] newEventProcessors)
         {
-            this.eventProcessors.Add(eventProcessor);
+            this.eventProcessors.AddRange(newEventProcessors);
             return this;
         }
 
@@ -263,6 +263,7 @@ namespace BenchmarkDotNet.Configs
             validators.AddRange(config.GetValidators());
             hardwareCounters.AddRange(config.GetHardwareCounters());
             filters.AddRange(config.GetFilters());
+            eventProcessors.AddRange(config.GetEventProcessors());
             Orderer = config.Orderer ?? Orderer;
             CategoryDiscoverer = config.CategoryDiscoverer ?? CategoryDiscoverer;
             ArtifactsPath = config.ArtifactsPath ?? ArtifactsPath;
