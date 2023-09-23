@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</AssemblyTitle>
     <!-- We test the oldest frameworks supported by BDN (net461 and netcoreapp2.0), as well as newer versions of those frameworks. -->
-    <WarningsNotAsErrors>NU1904</WarningsNotAsErrors>
+    <WarningsNotAsErrors>NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
     <TargetFrameworks>net461;net48;netcoreapp2.0;net7.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks</AssemblyName>
