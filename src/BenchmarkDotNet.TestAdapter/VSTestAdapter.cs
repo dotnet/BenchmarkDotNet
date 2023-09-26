@@ -1,0 +1,208 @@
+﻿using BenchmarkDotNet.TestAdapter.Remoting;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+
+namespace BenchmarkDotNet.TestAdapter
+{
+    /// <summary>
+    /// Discovers and executes benchmarks using the VSTest protocol.
+    /// </summary>
+    [ExtensionUri(ExecutorUriString)]
+    [DefaultExecutorUri(ExecutorUriString)]
+    [FileExtension(".dll")]
+    [FileExtension(".exe")]
+    public class VSTestAdapter : ITestExecutor, ITestDiscoverer
+    {
+        // This URI is used to identify the adapter.
+        internal const string ExecutorUriString = "executor://BenchmarkDotNet.TestAdapter";
+        internal static readonly Uri ExecutorUri = new Uri(ExecutorUriString);
+
+        /// <summary>
+        /// Cancellation token used to stop any benchmarks that are currently running.
+        /// </summary>
+        private CancellationTokenSource? cts = null;
+
+        /// <summary>
+        /// Discovers the benchmarks.
+        /// </summary>
+        /// <param name="sources">List of assemblies to search for benchmarks in.</param>
+        /// <param name="discoveryContext">A context that the discovery is performed in.</param>
+        /// <param name="logger">Logger that sends messages back to VSTest host.</param>
+        /// <param name="discoverySink">Interface that provides methods for sending discovered benchmarks back to the host.</param>
+        public void DiscoverTests(
+            IEnumerable<string> sources,
+            IDiscoveryContext discoveryContext,
+            IMessageLogger logger,
+            ITestCaseDiscoverySink discoverySink)
+        {
+            foreach (var source in sources)
+            {
+                ValidateSourceOrThrow(source);
+                foreach (var testCase in GetVSTestCasesFromSource(source, logger))
+                {
+                    discoverySink.SendTestCase(testCase);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Runs a given set of test cases that represent benchmarks.
+        /// </summary>
+        /// <param name="tests">The tests to run.</param>
+        /// <param name="runContext">A context that the run is performed in.</param>
+        /// <param name="frameworkHandle">Interface used for communicating with the VSTest host.</param>
+        public void RunTests(IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
+        {
+            if (tests == null)
+                throw new ArgumentNullException(nameof(tests));
+            if (frameworkHandle == null)
+                throw new ArgumentNullException(nameof(frameworkHandle));
+
+            cts ??= new CancellationTokenSource();
+
+            foreach (var testsPerSource in tests.GroupBy(t => t.Source))
+                RunBenchmarks(testsPerSource.Key, frameworkHandle, testsPerSource);
+
+            cts = null;
+        }
+
+        /// <summary>
+        /// Runs all benchmarks in the given set of sources (assemblies).
+        /// </summary>
+        /// <param name="sources">The assemblies to run.</param>
+        /// <param name="runContext">A context that the run is performed in.</param>
+        /// <param name="frameworkHandle">Interface used for communicating with the VSTest host.</param>
+        public void RunTests(IEnumerable<string>? sources, IRunContext? runContext, IFrameworkHandle? frameworkHandle)
+        {
+            if (sources == null)
+                throw new ArgumentNullException(nameof(sources));
+            if (frameworkHandle == null)
+                throw new ArgumentNullException(nameof(frameworkHandle));
+
+            cts ??= new CancellationTokenSource();
+
+            foreach (var source in sources)
+                RunBenchmarks(source, frameworkHandle);
+
+            cts = null;
+        }
+
+        /// <summary>
+        /// Stops any currently running benchmarks.
+        /// </summary>
+        public void Cancel()
+        {
+            cts?.Cancel();
+        }
+
+        /// <summary>
+        /// Gets the VSTest test cases in the given source.
+        /// </summary>
+        /// <param name="source">The dll or exe of the benchmark project.</param>
+        /// <param name="logger">A logger that sends logs to VSTest.</param>
+        /// <returns>The VSTest test cases inside the given source.</returns>
+        private static List<TestCase> GetVSTestCasesFromSource(string source, IMessageLogger logger)
+        {
+            ValidateSourceOrThrow(source);
+
+            try
+            {
+                // Ensure that the test enumeration is done inside the context of the source directory.
+                var enumerator = (BenchmarkEnumeratorWrapper)CreateIsolatedType(typeof(BenchmarkEnumeratorWrapper), source);
+                var testCases = enumerator
+                    .GetTestCasesFromSourceSerialized(source)
+                    .Select(SerializationHelpers.Deserialize<TestCase>)
+                    .ToList();
+
+                // Validate that all test ids are unique
+                var idLookup = new Dictionary<Guid, string>();
+                foreach (var testCase in testCases)
+                {
+                    if (idLookup.TryGetValue(testCase.Id, out var matchingCase))
+                        throw new Exception($"Encountered Duplicate Test ID: '{testCase.DisplayName}' and '{matchingCase}'");
+
+                    idLookup[testCase.Id] = testCase.DisplayName;
+                }
+
+                return testCases;
+            }
+            catch (Exception ex)
+            {
+                logger.SendMessage(TestMessageLevel.Error, $"Failed to load benchmarks from source\n{ex}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Runs the benchmarks in the given source.
+        /// </summary>
+        /// <param name="source">The dll or exe of the benchmark project.</param>
+        /// <param name="frameworkHandle">An interface used to communicate with the VSTest host.</param>
+        /// <param name="testCases">
+        /// The specific test cases to be run if specified.
+        /// If unspecified, runs all the test cases in the source.
+        /// </param>
+        private void RunBenchmarks(string source, IFrameworkHandle frameworkHandle, IEnumerable<TestCase>? testCases = null)
+        {
+            ValidateSourceOrThrow(source);
+
+            // Create a HashSet of all the TestCase IDs to be run if specified.
+            var caseIds = testCases == null ? null : new HashSet<Guid>(testCases.Select(c => c.Id));
+
+            try
+            {
+                // Ensure that test execution is done inside the context of the source directory.
+                var executor = (BenchmarkExecutorWrapper)CreateIsolatedType(typeof(BenchmarkExecutorWrapper), source);
+                cts?.Token.Register(executor.Cancel);
+
+                executor.RunBenchmarks(source, new TestExecutionRecorderWrapper(frameworkHandle), caseIds);
+            }
+            catch (Exception ex)
+            {
+                frameworkHandle.SendMessage(TestMessageLevel.Error, $"Failed to run benchmarks in source\n{ex}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// This will create the given type in a child AppDomain when used in .NET Framework.
+        /// If not in the .NET Framework, it will use the current
+        /// </summary>
+        /// <param name="type">The type to create.</param>
+        /// <param name="source">The dll or exe of the benchmark project.</param>
+        /// <returns>The created object.</returns>
+        private static object CreateIsolatedType(Type type, string source)
+        {
+#if NETFRAMEWORK
+            var appBase = Path.GetDirectoryName(source);
+            var setup = new AppDomainSetup { ApplicationBase = appBase };
+            var domainName = $"Isolated Domain for {type.Name}";
+            var appDomain = AppDomain.CreateDomain(domainName, null, setup);
+            return appDomain.CreateInstanceAndUnwrap(
+                type.Assembly.FullName, type.FullName, false, BindingFlags.Default, null, null, null, null);
+#else
+            return Activator.CreateInstance(type);
+#endif
+        }
+
+        private static void ValidateSourceOrThrow(string source)
+        {
+            if (string.IsNullOrEmpty(source))
+                throw new ArgumentException($"'{nameof(source)}' cannot be null or whitespace.", nameof(source));
+
+            if (!Path.HasExtension(source))
+                throw new NotSupportedException($"Missing extension on source '{source}', must have the extension '.dll' or '.exe'.");
+
+            var extension = Path.GetExtension(source);
+            if (!string.Equals(extension, ".dll") && !string.Equals(extension, ".exe"))
+                throw new NotSupportedException($"Unsupported extension on source '{source}', must have the extension '.dll' or '.exe'.");
+        }
+    }
+}
