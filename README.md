@@ -10,7 +10,7 @@
   [![MyGet](https://img.shields.io/myget/benchmarkdotnet/vpre/benchmarkdotnet?label=myget)](https://www.myget.org/feed/benchmarkdotnet/package/nuget/BenchmarkDotNet)
   [![Downloads](https://img.shields.io/nuget/dt/benchmarkdotnet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/)
   [![Stars](https://img.shields.io/github/stars/dotnet/BenchmarkDotNet?color=brightgreen)](https://github.com/dotnet/BenchmarkDotNet/stargazers)
-  ![License](https://img.shields.io/badge/license-MIT-blue.svg)
+  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dotnet/BenchmarkDotNet/blob/master/LICENSE.md)
   [![Twitter](https://img.shields.io/twitter/follow/BenchmarkDotNet?style=social&label=Twitter)](https://twitter.com/BenchmarkDotNet)
 
 </div>
