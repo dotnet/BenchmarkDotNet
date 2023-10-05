@@ -4,8 +4,8 @@
       "src": [
         {
           "files": [
-            "src/BenchmarkDotNet/BenchmarkDotNet.csproj",
-            "src/BenchmarkDotNet.Annotations/BenchmarkDotNet.Annotations.csproj"
+            "src/BenchmarkDotNet/bin/Release/netstandard2.0/BenchmarkDotNet.dll",
+            "src/BenchmarkDotNet/bin/Release/netstandard2.0/BenchmarkDotNet.Annotations.dll"
           ],
           "src": ".."
         }
