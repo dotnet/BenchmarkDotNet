@@ -1,0 +1,542 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class EventProcessor
+ | BenchmarkDotNet </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class EventProcessor
+ | BenchmarkDotNet ">
+      
+      <link rel="icon" href="../logo/icon-32.png">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+  </head>
+
+  <script type="module">
+    import options from './../public/main.js'
+    import { init } from './../public/docfx.min.js'
+    init(options)
+  </script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo/icon.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="BenchmarkDotNet.EventProcessors.EventProcessor">
+
+
+
+  <h1 id="BenchmarkDotNet_EventProcessors_EventProcessor" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor" class="text-break">
+    Class EventProcessor
+  
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="BenchmarkDotNet.html">BenchmarkDotNet</a>.<a class="xref" href="BenchmarkDotNet.EventProcessors.html">EventProcessors</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>BenchmarkDotNet.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"></div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract class EventProcessor</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">EventProcessor</span></div>
+    </dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="constructors">Constructors
+</h2>
+
+
+  <a id="BenchmarkDotNet_EventProcessors_EventProcessor__ctor_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.#ctor*"></a>
+
+  <h3 id="BenchmarkDotNet_EventProcessors_EventProcessor__ctor" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.#ctor">
+  EventProcessor()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected EventProcessor()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="BenchmarkDotNet_EventProcessors_EventProcessor_OnBuildComplete_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnBuildComplete*"></a>
+
+  <h3 id="BenchmarkDotNet_EventProcessors_EventProcessor_OnBuildComplete_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Toolchains_Results_BuildResult_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnBuildComplete(BenchmarkDotNet.Running.BuildPartition,BenchmarkDotNet.Toolchains.Results.BuildResult)">
+  OnBuildComplete(BuildPartition, BuildResult)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnBuildComplete(BuildPartition partition, BuildResult buildResult)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>partition</code> <a class="xref" href="BenchmarkDotNet.Running.BuildPartition.html">BuildPartition</a></dt>
+    <dd></dd>
+    <dt><code>buildResult</code> <a class="xref" href="BenchmarkDotNet.Toolchains.Results.BuildResult.html">BuildResult</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_EventProcessors_EventProcessor_OnEndBuildStage_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnEndBuildStage*"></a>
+
+  <h3 id="BenchmarkDotNet_EventProcessors_EventProcessor_OnEndBuildStage" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnEndBuildStage">
+  OnEndBuildStage()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnEndBuildStage()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_EventProcessors_EventProcessor_OnEndRunBenchmark_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmark*"></a>
+
+  <h3 id="BenchmarkDotNet_EventProcessors_EventProcessor_OnEndRunBenchmark_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Reports_BenchmarkReport_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmark(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Reports.BenchmarkReport)">
+  OnEndRunBenchmark(BenchmarkCase, BenchmarkReport)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnEndRunBenchmark(BenchmarkCase benchmarkCase, BenchmarkReport report)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>benchmarkCase</code> <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></dt>
+    <dd></dd>
+    <dt><code>report</code> <a class="xref" href="BenchmarkDotNet.Reports.BenchmarkReport.html">BenchmarkReport</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_EventProcessors_EventProcessor_OnEndRunBenchmarksInType_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmarksInType*"></a>
+
+  <h3 id="BenchmarkDotNet_EventProcessors_EventProcessor_OnEndRunBenchmarksInType_System_Type_BenchmarkDotNet_Reports_Summary_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmarksInType(System.Type,BenchmarkDotNet.Reports.Summary)">
+  OnEndRunBenchmarksInType(Type, Summary)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnEndRunBenchmarksInType(Type type, Summary summary)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>type</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></dt>
+    <dd></dd>
+    <dt><code>summary</code> <a class="xref" href="BenchmarkDotNet.Reports.Summary.html">Summary</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_EventProcessors_EventProcessor_OnEndRunStage_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunStage*"></a>
+
+  <h3 id="BenchmarkDotNet_EventProcessors_EventProcessor_OnEndRunStage" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunStage">
+  OnEndRunStage()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnEndRunStage()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_EventProcessors_EventProcessor_OnEndValidationStage_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnEndValidationStage*"></a>
+
+  <h3 id="BenchmarkDotNet_EventProcessors_EventProcessor_OnEndValidationStage" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnEndValidationStage">
+  OnEndValidationStage()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnEndValidationStage()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_EventProcessors_EventProcessor_OnStartBuildStage_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnStartBuildStage*"></a>
+
+  <h3 id="BenchmarkDotNet_EventProcessors_EventProcessor_OnStartBuildStage_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Running_BuildPartition__" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnStartBuildStage(System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Running.BuildPartition})">
+  OnStartBuildStage(IReadOnlyList&lt;BuildPartition&gt;)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnStartBuildStage(IReadOnlyList&lt;BuildPartition&gt; partitions)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>partitions</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Running.BuildPartition.html">BuildPartition</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_EventProcessors_EventProcessor_OnStartRunBenchmark_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmark*"></a>
+
+  <h3 id="BenchmarkDotNet_EventProcessors_EventProcessor_OnStartRunBenchmark_BenchmarkDotNet_Running_BenchmarkCase_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmark(BenchmarkDotNet.Running.BenchmarkCase)">
+  OnStartRunBenchmark(BenchmarkCase)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnStartRunBenchmark(BenchmarkCase benchmarkCase)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>benchmarkCase</code> <a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_EventProcessors_EventProcessor_OnStartRunBenchmarksInType_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmarksInType*"></a>
+
+  <h3 id="BenchmarkDotNet_EventProcessors_EventProcessor_OnStartRunBenchmarksInType_System_Type_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Running_BenchmarkCase__" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmarksInType(System.Type,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Running.BenchmarkCase})">
+  OnStartRunBenchmarksInType(Type, IReadOnlyList&lt;BenchmarkCase&gt;)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnStartRunBenchmarksInType(Type type, IReadOnlyList&lt;BenchmarkCase&gt; benchmarks)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>type</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></dt>
+    <dd></dd>
+    <dt><code>benchmarks</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="BenchmarkDotNet.Running.BenchmarkCase.html">BenchmarkCase</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_EventProcessors_EventProcessor_OnStartRunStage_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunStage*"></a>
+
+  <h3 id="BenchmarkDotNet_EventProcessors_EventProcessor_OnStartRunStage" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunStage">
+  OnStartRunStage()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnStartRunStage()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_EventProcessors_EventProcessor_OnStartValidationStage_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnStartValidationStage*"></a>
+
+  <h3 id="BenchmarkDotNet_EventProcessors_EventProcessor_OnStartValidationStage" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnStartValidationStage">
+  OnStartValidationStage()
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnStartValidationStage()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a id="BenchmarkDotNet_EventProcessors_EventProcessor_OnValidationError_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnValidationError*"></a>
+
+  <h3 id="BenchmarkDotNet_EventProcessors_EventProcessor_OnValidationError_BenchmarkDotNet_Validators_ValidationError_" data-uid="BenchmarkDotNet.EventProcessors.EventProcessor.OnValidationError(BenchmarkDotNet.Validators.ValidationError)">
+  OnValidationError(ValidationError)
+  
+  </h3>
+
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnValidationError(ValidationError validationError)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>validationError</code> <a class="xref" href="BenchmarkDotNet.Validators.ValidationError.html">ValidationError</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+        
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Copyright &copy; 2013–2023 .NET Foundation and contributors
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

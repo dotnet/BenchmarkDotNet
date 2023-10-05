@@ -18,6 +18,17 @@
       
       
       
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
   </head>
 
   <script type="module">
@@ -130,7 +141,7 @@
   <a id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliBuilder__ctor_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.#ctor*"></a>
 
   <h3 id="BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliBuilder__ctor_System_String_System_String_System_Boolean_System_Boolean_" data-uid="BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.#ctor(System.String,System.String,System.Boolean,System.Boolean)">
-  DotNetCliBuilder(string, string, bool, bool)
+  DotNetCliBuilder(string, string?, bool, bool)
   
   </h3>
 
@@ -138,7 +149,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DotNetCliBuilder(string targetFrameworkMoniker, string customDotNetCliPath = null, bool logOutput = false, bool retryFailedBuildWithNoDeps = true)</code></pre>
+    <pre><code class="lang-csharp hljs">public DotNetCliBuilder(string targetFrameworkMoniker, string? customDotNetCliPath = null, bool logOutput = false, bool retryFailedBuildWithNoDeps = true)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>

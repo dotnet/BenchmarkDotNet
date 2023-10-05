@@ -18,6 +18,17 @@
       
       
       
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
   </head>
 
   <script type="module">
@@ -130,7 +141,7 @@
   <a id="BenchmarkDotNet_Running_Descriptor__ctor_" data-uid="BenchmarkDotNet.Running.Descriptor.#ctor*"></a>
 
   <h3 id="BenchmarkDotNet_Running_Descriptor__ctor_System_Type_System_Reflection_MethodInfo_System_Reflection_MethodInfo_System_Reflection_MethodInfo_System_Reflection_MethodInfo_System_Reflection_MethodInfo_System_String_System_String_System_Boolean_System_String___System_Int32_System_Int32_" data-uid="BenchmarkDotNet.Running.Descriptor.#ctor(System.Type,System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.String,System.String,System.Boolean,System.String[],System.Int32,System.Int32)">
-  Descriptor(Type, MethodInfo, MethodInfo, MethodInfo, MethodInfo, MethodInfo, string, string, bool, string[], int, int)
+  Descriptor(Type, MethodInfo, MethodInfo?, MethodInfo?, MethodInfo?, MethodInfo?, string?, string?, bool, string[]?, int, int)
   
   </h3>
 
@@ -138,7 +149,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Descriptor(Type type, MethodInfo workloadMethod, MethodInfo globalSetupMethod = null, MethodInfo globalCleanupMethod = null, MethodInfo iterationSetupMethod = null, MethodInfo iterationCleanupMethod = null, string description = null, string additionalLogic = null, bool baseline = false, string[] categories = null, int operationsPerInvoke = 1, int methodIndex = 0)</code></pre>
+    <pre><code class="lang-csharp hljs">public Descriptor(Type type, MethodInfo workloadMethod, MethodInfo? globalSetupMethod = null, MethodInfo? globalCleanupMethod = null, MethodInfo? iterationSetupMethod = null, MethodInfo? iterationCleanupMethod = null, string? description = null, string? additionalLogic = null, bool baseline = false, string[]? categories = null, int operationsPerInvoke = 1, int methodIndex = 0)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>

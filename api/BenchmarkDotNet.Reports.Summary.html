@@ -18,6 +18,17 @@
       
       
       
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
   </head>
 
   <script type="module">
@@ -143,7 +154,7 @@
   <a id="BenchmarkDotNet_Reports_Summary__ctor_" data-uid="BenchmarkDotNet.Reports.Summary.#ctor*"></a>
 
   <h3 id="BenchmarkDotNet_Reports_Summary__ctor_System_String_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Reports_BenchmarkReport__BenchmarkDotNet_Environments_HostEnvironmentInfo_System_String_System_String_System_TimeSpan_System_Globalization_CultureInfo_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Validators_ValidationError__System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Columns_IColumnHidingRule__BenchmarkDotNet_Reports_SummaryStyle_" data-uid="BenchmarkDotNet.Reports.Summary.#ctor(System.String,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Reports.BenchmarkReport},BenchmarkDotNet.Environments.HostEnvironmentInfo,System.String,System.String,System.TimeSpan,System.Globalization.CultureInfo,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Validators.ValidationError},System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Columns.IColumnHidingRule},BenchmarkDotNet.Reports.SummaryStyle)">
-  Summary(string, ImmutableArray&lt;BenchmarkReport&gt;, HostEnvironmentInfo, string, string, TimeSpan, CultureInfo, ImmutableArray&lt;ValidationError&gt;, ImmutableArray&lt;IColumnHidingRule&gt;, SummaryStyle)
+  Summary(string, ImmutableArray&lt;BenchmarkReport&gt;, HostEnvironmentInfo, string, string, TimeSpan, CultureInfo, ImmutableArray&lt;ValidationError&gt;, ImmutableArray&lt;IColumnHidingRule&gt;, SummaryStyle?)
   
   </h3>
 
@@ -151,7 +162,7 @@
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Summary(string title, ImmutableArray&lt;BenchmarkReport&gt; reports, HostEnvironmentInfo hostEnvironmentInfo, string resultsDirectoryPath, string logFilePath, TimeSpan totalTime, CultureInfo cultureInfo, ImmutableArray&lt;ValidationError&gt; validationErrors, ImmutableArray&lt;IColumnHidingRule&gt; columnHidingRules, SummaryStyle summaryStyle = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public Summary(string title, ImmutableArray&lt;BenchmarkReport&gt; reports, HostEnvironmentInfo hostEnvironmentInfo, string resultsDirectoryPath, string logFilePath, TimeSpan totalTime, CultureInfo cultureInfo, ImmutableArray&lt;ValidationError&gt; validationErrors, ImmutableArray&lt;IColumnHidingRule&gt; columnHidingRules, SummaryStyle? summaryStyle = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>

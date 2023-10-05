@@ -10297,6 +10297,21 @@ references:
   commentId: Overload:BenchmarkDotNet.Configs.ConfigExtensions.AddDiagnoser
   fullName: BenchmarkDotNet.Configs.ConfigExtensions.AddDiagnoser
   nameWithType: ConfigExtensions.AddDiagnoser
+- uid: BenchmarkDotNet.Configs.ConfigExtensions.AddEventProcessor(BenchmarkDotNet.Configs.IConfig,BenchmarkDotNet.EventProcessors.EventProcessor[])
+  name: AddEventProcessor(IConfig, params EventProcessor[])
+  href: api/BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddEventProcessor_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_EventProcessors_EventProcessor___
+  commentId: M:BenchmarkDotNet.Configs.ConfigExtensions.AddEventProcessor(BenchmarkDotNet.Configs.IConfig,BenchmarkDotNet.EventProcessors.EventProcessor[])
+  name.vb: AddEventProcessor(IConfig, ParamArray EventProcessor())
+  fullName: BenchmarkDotNet.Configs.ConfigExtensions.AddEventProcessor(BenchmarkDotNet.Configs.IConfig, params BenchmarkDotNet.EventProcessors.EventProcessor[])
+  fullName.vb: BenchmarkDotNet.Configs.ConfigExtensions.AddEventProcessor(BenchmarkDotNet.Configs.IConfig, ParamArray BenchmarkDotNet.EventProcessors.EventProcessor())
+  nameWithType: ConfigExtensions.AddEventProcessor(IConfig, params EventProcessor[])
+  nameWithType.vb: ConfigExtensions.AddEventProcessor(IConfig, ParamArray EventProcessor())
+- uid: BenchmarkDotNet.Configs.ConfigExtensions.AddEventProcessor*
+  name: AddEventProcessor
+  href: api/BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddEventProcessor_
+  commentId: Overload:BenchmarkDotNet.Configs.ConfigExtensions.AddEventProcessor
+  fullName: BenchmarkDotNet.Configs.ConfigExtensions.AddEventProcessor
+  nameWithType: ConfigExtensions.AddEventProcessor
 - uid: BenchmarkDotNet.Configs.ConfigExtensions.AddExporter(BenchmarkDotNet.Configs.IConfig,BenchmarkDotNet.Exporters.IExporter[])
   name: AddExporter(IConfig, params IExporter[])
   href: api/BenchmarkDotNet.Configs.ConfigExtensions.html#BenchmarkDotNet_Configs_ConfigExtensions_AddExporter_BenchmarkDotNet_Configs_IConfig_BenchmarkDotNet_Exporters_IExporter___
@@ -10843,6 +10858,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Configs.DebugConfig.GetDiagnosers
   fullName: BenchmarkDotNet.Configs.DebugConfig.GetDiagnosers
   nameWithType: DebugConfig.GetDiagnosers
+- uid: BenchmarkDotNet.Configs.DebugConfig.GetEventProcessors
+  name: GetEventProcessors()
+  href: api/BenchmarkDotNet.Configs.DebugConfig.html#BenchmarkDotNet_Configs_DebugConfig_GetEventProcessors
+  commentId: M:BenchmarkDotNet.Configs.DebugConfig.GetEventProcessors
+  fullName: BenchmarkDotNet.Configs.DebugConfig.GetEventProcessors()
+  nameWithType: DebugConfig.GetEventProcessors()
+- uid: BenchmarkDotNet.Configs.DebugConfig.GetEventProcessors*
+  name: GetEventProcessors
+  href: api/BenchmarkDotNet.Configs.DebugConfig.html#BenchmarkDotNet_Configs_DebugConfig_GetEventProcessors_
+  commentId: Overload:BenchmarkDotNet.Configs.DebugConfig.GetEventProcessors
+  fullName: BenchmarkDotNet.Configs.DebugConfig.GetEventProcessors
+  nameWithType: DebugConfig.GetEventProcessors
 - uid: BenchmarkDotNet.Configs.DebugConfig.GetExporters
   name: GetExporters()
   href: api/BenchmarkDotNet.Configs.DebugConfig.html#BenchmarkDotNet_Configs_DebugConfig_GetExporters
@@ -11125,6 +11152,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Configs.DefaultConfig.GetDiagnosers
   fullName: BenchmarkDotNet.Configs.DefaultConfig.GetDiagnosers
   nameWithType: DefaultConfig.GetDiagnosers
+- uid: BenchmarkDotNet.Configs.DefaultConfig.GetEventProcessors
+  name: GetEventProcessors()
+  href: api/BenchmarkDotNet.Configs.DefaultConfig.html#BenchmarkDotNet_Configs_DefaultConfig_GetEventProcessors
+  commentId: M:BenchmarkDotNet.Configs.DefaultConfig.GetEventProcessors
+  fullName: BenchmarkDotNet.Configs.DefaultConfig.GetEventProcessors()
+  nameWithType: DefaultConfig.GetEventProcessors()
+- uid: BenchmarkDotNet.Configs.DefaultConfig.GetEventProcessors*
+  name: GetEventProcessors
+  href: api/BenchmarkDotNet.Configs.DefaultConfig.html#BenchmarkDotNet_Configs_DefaultConfig_GetEventProcessors_
+  commentId: Overload:BenchmarkDotNet.Configs.DefaultConfig.GetEventProcessors
+  fullName: BenchmarkDotNet.Configs.DefaultConfig.GetEventProcessors
+  nameWithType: DefaultConfig.GetEventProcessors
 - uid: BenchmarkDotNet.Configs.DefaultConfig.GetExporters
   name: GetExporters()
   href: api/BenchmarkDotNet.Configs.DefaultConfig.html#BenchmarkDotNet_Configs_DefaultConfig_GetExporters
@@ -11377,6 +11416,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Configs.IConfig.GetDiagnosers
   fullName: BenchmarkDotNet.Configs.IConfig.GetDiagnosers
   nameWithType: IConfig.GetDiagnosers
+- uid: BenchmarkDotNet.Configs.IConfig.GetEventProcessors
+  name: GetEventProcessors()
+  href: api/BenchmarkDotNet.Configs.IConfig.html#BenchmarkDotNet_Configs_IConfig_GetEventProcessors
+  commentId: M:BenchmarkDotNet.Configs.IConfig.GetEventProcessors
+  fullName: BenchmarkDotNet.Configs.IConfig.GetEventProcessors()
+  nameWithType: IConfig.GetEventProcessors()
+- uid: BenchmarkDotNet.Configs.IConfig.GetEventProcessors*
+  name: GetEventProcessors
+  href: api/BenchmarkDotNet.Configs.IConfig.html#BenchmarkDotNet_Configs_IConfig_GetEventProcessors_
+  commentId: Overload:BenchmarkDotNet.Configs.IConfig.GetEventProcessors
+  fullName: BenchmarkDotNet.Configs.IConfig.GetEventProcessors
+  nameWithType: IConfig.GetEventProcessors
 - uid: BenchmarkDotNet.Configs.IConfig.GetExporters
   name: GetExporters()
   href: api/BenchmarkDotNet.Configs.IConfig.html#BenchmarkDotNet_Configs_IConfig_GetExporters
@@ -11707,6 +11758,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Configs.ImmutableConfig.GetDiagnosers
   fullName: BenchmarkDotNet.Configs.ImmutableConfig.GetDiagnosers
   nameWithType: ImmutableConfig.GetDiagnosers
+- uid: BenchmarkDotNet.Configs.ImmutableConfig.GetEventProcessors
+  name: GetEventProcessors()
+  href: api/BenchmarkDotNet.Configs.ImmutableConfig.html#BenchmarkDotNet_Configs_ImmutableConfig_GetEventProcessors
+  commentId: M:BenchmarkDotNet.Configs.ImmutableConfig.GetEventProcessors
+  fullName: BenchmarkDotNet.Configs.ImmutableConfig.GetEventProcessors()
+  nameWithType: ImmutableConfig.GetEventProcessors()
+- uid: BenchmarkDotNet.Configs.ImmutableConfig.GetEventProcessors*
+  name: GetEventProcessors
+  href: api/BenchmarkDotNet.Configs.ImmutableConfig.html#BenchmarkDotNet_Configs_ImmutableConfig_GetEventProcessors_
+  commentId: Overload:BenchmarkDotNet.Configs.ImmutableConfig.GetEventProcessors
+  fullName: BenchmarkDotNet.Configs.ImmutableConfig.GetEventProcessors
+  nameWithType: ImmutableConfig.GetEventProcessors
 - uid: BenchmarkDotNet.Configs.ImmutableConfig.GetExporters
   name: GetExporters()
   href: api/BenchmarkDotNet.Configs.ImmutableConfig.html#BenchmarkDotNet_Configs_ImmutableConfig_GetExporters
@@ -12001,6 +12064,21 @@ references:
   commentId: Overload:BenchmarkDotNet.Configs.ManualConfig.AddDiagnoser
   fullName: BenchmarkDotNet.Configs.ManualConfig.AddDiagnoser
   nameWithType: ManualConfig.AddDiagnoser
+- uid: BenchmarkDotNet.Configs.ManualConfig.AddEventProcessor(BenchmarkDotNet.EventProcessors.EventProcessor[])
+  name: AddEventProcessor(params EventProcessor[])
+  href: api/BenchmarkDotNet.Configs.ManualConfig.html#BenchmarkDotNet_Configs_ManualConfig_AddEventProcessor_BenchmarkDotNet_EventProcessors_EventProcessor___
+  commentId: M:BenchmarkDotNet.Configs.ManualConfig.AddEventProcessor(BenchmarkDotNet.EventProcessors.EventProcessor[])
+  name.vb: AddEventProcessor(ParamArray EventProcessor())
+  fullName: BenchmarkDotNet.Configs.ManualConfig.AddEventProcessor(params BenchmarkDotNet.EventProcessors.EventProcessor[])
+  fullName.vb: BenchmarkDotNet.Configs.ManualConfig.AddEventProcessor(ParamArray BenchmarkDotNet.EventProcessors.EventProcessor())
+  nameWithType: ManualConfig.AddEventProcessor(params EventProcessor[])
+  nameWithType.vb: ManualConfig.AddEventProcessor(ParamArray EventProcessor())
+- uid: BenchmarkDotNet.Configs.ManualConfig.AddEventProcessor*
+  name: AddEventProcessor
+  href: api/BenchmarkDotNet.Configs.ManualConfig.html#BenchmarkDotNet_Configs_ManualConfig_AddEventProcessor_
+  commentId: Overload:BenchmarkDotNet.Configs.ManualConfig.AddEventProcessor
+  fullName: BenchmarkDotNet.Configs.ManualConfig.AddEventProcessor
+  nameWithType: ManualConfig.AddEventProcessor
 - uid: BenchmarkDotNet.Configs.ManualConfig.AddExporter(BenchmarkDotNet.Exporters.IExporter[])
   name: AddExporter(params IExporter[])
   href: api/BenchmarkDotNet.Configs.ManualConfig.html#BenchmarkDotNet_Configs_ManualConfig_AddExporter_BenchmarkDotNet_Exporters_IExporter___
@@ -12250,6 +12328,18 @@ references:
   commentId: Overload:BenchmarkDotNet.Configs.ManualConfig.GetDiagnosers
   fullName: BenchmarkDotNet.Configs.ManualConfig.GetDiagnosers
   nameWithType: ManualConfig.GetDiagnosers
+- uid: BenchmarkDotNet.Configs.ManualConfig.GetEventProcessors
+  name: GetEventProcessors()
+  href: api/BenchmarkDotNet.Configs.ManualConfig.html#BenchmarkDotNet_Configs_ManualConfig_GetEventProcessors
+  commentId: M:BenchmarkDotNet.Configs.ManualConfig.GetEventProcessors
+  fullName: BenchmarkDotNet.Configs.ManualConfig.GetEventProcessors()
+  nameWithType: ManualConfig.GetEventProcessors()
+- uid: BenchmarkDotNet.Configs.ManualConfig.GetEventProcessors*
+  name: GetEventProcessors
+  href: api/BenchmarkDotNet.Configs.ManualConfig.html#BenchmarkDotNet_Configs_ManualConfig_GetEventProcessors_
+  commentId: Overload:BenchmarkDotNet.Configs.ManualConfig.GetEventProcessors
+  fullName: BenchmarkDotNet.Configs.ManualConfig.GetEventProcessors
+  nameWithType: ManualConfig.GetEventProcessors
 - uid: BenchmarkDotNet.Configs.ManualConfig.GetExporters
   name: GetExporters()
   href: api/BenchmarkDotNet.Configs.ManualConfig.html#BenchmarkDotNet_Configs_ManualConfig_GetExporters
@@ -13370,13 +13460,13 @@ references:
   fullName: BenchmarkDotNet.ConsoleArguments.ConfigParser
   nameWithType: ConfigParser
 - uid: BenchmarkDotNet.ConsoleArguments.ConfigParser.Parse(System.String[],BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Configs.IConfig)
-  name: Parse(string[], ILogger, IConfig)
+  name: Parse(string[], ILogger, IConfig?)
   href: api/BenchmarkDotNet.ConsoleArguments.ConfigParser.html#BenchmarkDotNet_ConsoleArguments_ConfigParser_Parse_System_String___BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Configs_IConfig_
   commentId: M:BenchmarkDotNet.ConsoleArguments.ConfigParser.Parse(System.String[],BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Configs.IConfig)
   name.vb: Parse(String(), ILogger, IConfig)
-  fullName: BenchmarkDotNet.ConsoleArguments.ConfigParser.Parse(string[], BenchmarkDotNet.Loggers.ILogger, BenchmarkDotNet.Configs.IConfig)
+  fullName: BenchmarkDotNet.ConsoleArguments.ConfigParser.Parse(string[], BenchmarkDotNet.Loggers.ILogger, BenchmarkDotNet.Configs.IConfig?)
   fullName.vb: BenchmarkDotNet.ConsoleArguments.ConfigParser.Parse(String(), BenchmarkDotNet.Loggers.ILogger, BenchmarkDotNet.Configs.IConfig)
-  nameWithType: ConfigParser.Parse(string[], ILogger, IConfig)
+  nameWithType: ConfigParser.Parse(string[], ILogger, IConfig?)
   nameWithType.vb: ConfigParser.Parse(String(), ILogger, IConfig)
 - uid: BenchmarkDotNet.ConsoleArguments.ConfigParser.Parse*
   name: Parse
@@ -13910,13 +14000,13 @@ references:
   fullName: BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig
   nameWithType: DisassemblyDiagnoserConfig
 - uid: BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.#ctor(System.Int32,BenchmarkDotNet.Diagnosers.DisassemblySyntax,System.String[],Iced.Intel.FormatterOptions,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)
-  name: DisassemblyDiagnoserConfig(int, DisassemblySyntax, string[], FormatterOptions, bool, bool, bool, bool, bool, bool)
+  name: DisassemblyDiagnoserConfig(int, DisassemblySyntax, string[]?, FormatterOptions?, bool, bool, bool, bool, bool, bool)
   href: api/BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.html#BenchmarkDotNet_Diagnosers_DisassemblyDiagnoserConfig__ctor_System_Int32_BenchmarkDotNet_Diagnosers_DisassemblySyntax_System_String___Iced_Intel_FormatterOptions_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Boolean_System_Boolean_
   commentId: M:BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.#ctor(System.Int32,BenchmarkDotNet.Diagnosers.DisassemblySyntax,System.String[],Iced.Intel.FormatterOptions,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)
   name.vb: New(Integer, DisassemblySyntax, String(), FormatterOptions, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean)
-  fullName: BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.DisassemblyDiagnoserConfig(int, BenchmarkDotNet.Diagnosers.DisassemblySyntax, string[], Iced.Intel.FormatterOptions, bool, bool, bool, bool, bool, bool)
+  fullName: BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.DisassemblyDiagnoserConfig(int, BenchmarkDotNet.Diagnosers.DisassemblySyntax, string[]?, Iced.Intel.FormatterOptions?, bool, bool, bool, bool, bool, bool)
   fullName.vb: BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.New(Integer, BenchmarkDotNet.Diagnosers.DisassemblySyntax, String(), Iced.Intel.FormatterOptions, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean)
-  nameWithType: DisassemblyDiagnoserConfig.DisassemblyDiagnoserConfig(int, DisassemblySyntax, string[], FormatterOptions, bool, bool, bool, bool, bool, bool)
+  nameWithType: DisassemblyDiagnoserConfig.DisassemblyDiagnoserConfig(int, DisassemblySyntax, string[]?, FormatterOptions?, bool, bool, bool, bool, bool, bool)
   nameWithType.vb: DisassemblyDiagnoserConfig.New(Integer, DisassemblySyntax, String(), FormatterOptions, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean)
 - uid: BenchmarkDotNet.Diagnosers.DisassemblyDiagnoserConfig.#ctor*
   name: DisassemblyDiagnoserConfig
@@ -14117,13 +14207,13 @@ references:
   nameWithType: EventPipeProfiler.EventPipeProfiler()
   nameWithType.vb: EventPipeProfiler.New()
 - uid: BenchmarkDotNet.Diagnosers.EventPipeProfiler.#ctor(BenchmarkDotNet.Diagnosers.EventPipeProfile,System.Collections.Generic.IReadOnlyCollection{Microsoft.Diagnostics.NETCore.Client.EventPipeProvider},System.Boolean)
-  name: EventPipeProfiler(EventPipeProfile, IReadOnlyCollection<EventPipeProvider>, bool)
+  name: EventPipeProfiler(EventPipeProfile, IReadOnlyCollection<EventPipeProvider>?, bool)
   href: api/BenchmarkDotNet.Diagnosers.EventPipeProfiler.html#BenchmarkDotNet_Diagnosers_EventPipeProfiler__ctor_BenchmarkDotNet_Diagnosers_EventPipeProfile_System_Collections_Generic_IReadOnlyCollection_Microsoft_Diagnostics_NETCore_Client_EventPipeProvider__System_Boolean_
   commentId: M:BenchmarkDotNet.Diagnosers.EventPipeProfiler.#ctor(BenchmarkDotNet.Diagnosers.EventPipeProfile,System.Collections.Generic.IReadOnlyCollection{Microsoft.Diagnostics.NETCore.Client.EventPipeProvider},System.Boolean)
   name.vb: New(EventPipeProfile, IReadOnlyCollection(Of EventPipeProvider), Boolean)
-  fullName: BenchmarkDotNet.Diagnosers.EventPipeProfiler.EventPipeProfiler(BenchmarkDotNet.Diagnosers.EventPipeProfile, System.Collections.Generic.IReadOnlyCollection<Microsoft.Diagnostics.NETCore.Client.EventPipeProvider>, bool)
+  fullName: BenchmarkDotNet.Diagnosers.EventPipeProfiler.EventPipeProfiler(BenchmarkDotNet.Diagnosers.EventPipeProfile, System.Collections.Generic.IReadOnlyCollection<Microsoft.Diagnostics.NETCore.Client.EventPipeProvider>?, bool)
   fullName.vb: BenchmarkDotNet.Diagnosers.EventPipeProfiler.New(BenchmarkDotNet.Diagnosers.EventPipeProfile, System.Collections.Generic.IReadOnlyCollection(Of Microsoft.Diagnostics.NETCore.Client.EventPipeProvider), Boolean)
-  nameWithType: EventPipeProfiler.EventPipeProfiler(EventPipeProfile, IReadOnlyCollection<EventPipeProvider>, bool)
+  nameWithType: EventPipeProfiler.EventPipeProfiler(EventPipeProfile, IReadOnlyCollection<EventPipeProvider>?, bool)
   nameWithType.vb: EventPipeProfiler.New(EventPipeProfile, IReadOnlyCollection(Of EventPipeProvider), Boolean)
 - uid: BenchmarkDotNet.Diagnosers.EventPipeProfiler.#ctor*
   name: EventPipeProfiler
@@ -16044,13 +16134,13 @@ references:
   fullName: BenchmarkDotNet.Engines.AnonymousPipesHost.SendSignal
   nameWithType: AnonymousPipesHost.SendSignal
 - uid: BenchmarkDotNet.Engines.AnonymousPipesHost.TryGetFileHandles(System.String[],System.String@,System.String@)
-  name: TryGetFileHandles(string[], out string, out string)
+  name: TryGetFileHandles(string[], out string?, out string?)
   href: api/BenchmarkDotNet.Engines.AnonymousPipesHost.html#BenchmarkDotNet_Engines_AnonymousPipesHost_TryGetFileHandles_System_String___System_String__System_String__
   commentId: M:BenchmarkDotNet.Engines.AnonymousPipesHost.TryGetFileHandles(System.String[],System.String@,System.String@)
   name.vb: TryGetFileHandles(String(), String, String)
-  fullName: BenchmarkDotNet.Engines.AnonymousPipesHost.TryGetFileHandles(string[], out string, out string)
+  fullName: BenchmarkDotNet.Engines.AnonymousPipesHost.TryGetFileHandles(string[], out string?, out string?)
   fullName.vb: BenchmarkDotNet.Engines.AnonymousPipesHost.TryGetFileHandles(String(), String, String)
-  nameWithType: AnonymousPipesHost.TryGetFileHandles(string[], out string, out string)
+  nameWithType: AnonymousPipesHost.TryGetFileHandles(string[], out string?, out string?)
   nameWithType.vb: AnonymousPipesHost.TryGetFileHandles(String(), String, String)
 - uid: BenchmarkDotNet.Engines.AnonymousPipesHost.TryGetFileHandles*
   name: TryGetFileHandles
@@ -20373,13 +20463,13 @@ references:
   fullName: BenchmarkDotNet.Environments.WasmRuntime
   nameWithType: WasmRuntime
 - uid: BenchmarkDotNet.Environments.WasmRuntime.#ctor(System.String,System.String,System.String,System.String,System.Boolean,System.String,BenchmarkDotNet.Jobs.RuntimeMoniker)
-  name: WasmRuntime(string, string, string, string, bool, string, RuntimeMoniker)
+  name: WasmRuntime(string, string, string, string, bool, string?, RuntimeMoniker)
   href: api/BenchmarkDotNet.Environments.WasmRuntime.html#BenchmarkDotNet_Environments_WasmRuntime__ctor_System_String_System_String_System_String_System_String_System_Boolean_System_String_BenchmarkDotNet_Jobs_RuntimeMoniker_
   commentId: M:BenchmarkDotNet.Environments.WasmRuntime.#ctor(System.String,System.String,System.String,System.String,System.Boolean,System.String,BenchmarkDotNet.Jobs.RuntimeMoniker)
   name.vb: New(String, String, String, String, Boolean, String, RuntimeMoniker)
-  fullName: BenchmarkDotNet.Environments.WasmRuntime.WasmRuntime(string, string, string, string, bool, string, BenchmarkDotNet.Jobs.RuntimeMoniker)
+  fullName: BenchmarkDotNet.Environments.WasmRuntime.WasmRuntime(string, string, string, string, bool, string?, BenchmarkDotNet.Jobs.RuntimeMoniker)
   fullName.vb: BenchmarkDotNet.Environments.WasmRuntime.New(String, String, String, String, Boolean, String, BenchmarkDotNet.Jobs.RuntimeMoniker)
-  nameWithType: WasmRuntime.WasmRuntime(string, string, string, string, bool, string, RuntimeMoniker)
+  nameWithType: WasmRuntime.WasmRuntime(string, string, string, string, bool, string?, RuntimeMoniker)
   nameWithType.vb: WasmRuntime.New(String, String, String, String, Boolean, String, RuntimeMoniker)
 - uid: BenchmarkDotNet.Environments.WasmRuntime.#ctor*
   name: WasmRuntime
@@ -20471,6 +20561,186 @@ references:
   commentId: Overload:BenchmarkDotNet.Environments.WasmRuntime.WasmDataDir
   fullName: BenchmarkDotNet.Environments.WasmRuntime.WasmDataDir
   nameWithType: WasmRuntime.WasmDataDir
+- uid: BenchmarkDotNet.EventProcessors
+  name: BenchmarkDotNet.EventProcessors
+  href: api/BenchmarkDotNet.EventProcessors.html
+  commentId: N:BenchmarkDotNet.EventProcessors
+  fullName: BenchmarkDotNet.EventProcessors
+  nameWithType: BenchmarkDotNet.EventProcessors
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor
+  name: EventProcessor
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html
+  commentId: T:BenchmarkDotNet.EventProcessors.EventProcessor
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor
+  nameWithType: EventProcessor
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.#ctor
+  name: EventProcessor()
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor__ctor
+  commentId: M:BenchmarkDotNet.EventProcessors.EventProcessor.#ctor
+  name.vb: New()
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.EventProcessor()
+  fullName.vb: BenchmarkDotNet.EventProcessors.EventProcessor.New()
+  nameWithType: EventProcessor.EventProcessor()
+  nameWithType.vb: EventProcessor.New()
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.#ctor*
+  name: EventProcessor
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor__ctor_
+  commentId: Overload:BenchmarkDotNet.EventProcessors.EventProcessor.#ctor
+  name.vb: New
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.EventProcessor
+  fullName.vb: BenchmarkDotNet.EventProcessors.EventProcessor.New
+  nameWithType: EventProcessor.EventProcessor
+  nameWithType.vb: EventProcessor.New
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnBuildComplete(BenchmarkDotNet.Running.BuildPartition,BenchmarkDotNet.Toolchains.Results.BuildResult)
+  name: OnBuildComplete(BuildPartition, BuildResult)
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnBuildComplete_BenchmarkDotNet_Running_BuildPartition_BenchmarkDotNet_Toolchains_Results_BuildResult_
+  commentId: M:BenchmarkDotNet.EventProcessors.EventProcessor.OnBuildComplete(BenchmarkDotNet.Running.BuildPartition,BenchmarkDotNet.Toolchains.Results.BuildResult)
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnBuildComplete(BenchmarkDotNet.Running.BuildPartition, BenchmarkDotNet.Toolchains.Results.BuildResult)
+  nameWithType: EventProcessor.OnBuildComplete(BuildPartition, BuildResult)
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnBuildComplete*
+  name: OnBuildComplete
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnBuildComplete_
+  commentId: Overload:BenchmarkDotNet.EventProcessors.EventProcessor.OnBuildComplete
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnBuildComplete
+  nameWithType: EventProcessor.OnBuildComplete
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndBuildStage
+  name: OnEndBuildStage()
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnEndBuildStage
+  commentId: M:BenchmarkDotNet.EventProcessors.EventProcessor.OnEndBuildStage
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndBuildStage()
+  nameWithType: EventProcessor.OnEndBuildStage()
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndBuildStage*
+  name: OnEndBuildStage
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnEndBuildStage_
+  commentId: Overload:BenchmarkDotNet.EventProcessors.EventProcessor.OnEndBuildStage
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndBuildStage
+  nameWithType: EventProcessor.OnEndBuildStage
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmark(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Reports.BenchmarkReport)
+  name: OnEndRunBenchmark(BenchmarkCase, BenchmarkReport)
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnEndRunBenchmark_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Reports_BenchmarkReport_
+  commentId: M:BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmark(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Reports.BenchmarkReport)
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmark(BenchmarkDotNet.Running.BenchmarkCase, BenchmarkDotNet.Reports.BenchmarkReport)
+  nameWithType: EventProcessor.OnEndRunBenchmark(BenchmarkCase, BenchmarkReport)
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmark*
+  name: OnEndRunBenchmark
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnEndRunBenchmark_
+  commentId: Overload:BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmark
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmark
+  nameWithType: EventProcessor.OnEndRunBenchmark
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmarksInType(System.Type,BenchmarkDotNet.Reports.Summary)
+  name: OnEndRunBenchmarksInType(Type, Summary)
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnEndRunBenchmarksInType_System_Type_BenchmarkDotNet_Reports_Summary_
+  commentId: M:BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmarksInType(System.Type,BenchmarkDotNet.Reports.Summary)
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmarksInType(System.Type, BenchmarkDotNet.Reports.Summary)
+  nameWithType: EventProcessor.OnEndRunBenchmarksInType(Type, Summary)
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmarksInType*
+  name: OnEndRunBenchmarksInType
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnEndRunBenchmarksInType_
+  commentId: Overload:BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmarksInType
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunBenchmarksInType
+  nameWithType: EventProcessor.OnEndRunBenchmarksInType
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunStage
+  name: OnEndRunStage()
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnEndRunStage
+  commentId: M:BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunStage
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunStage()
+  nameWithType: EventProcessor.OnEndRunStage()
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunStage*
+  name: OnEndRunStage
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnEndRunStage_
+  commentId: Overload:BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunStage
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndRunStage
+  nameWithType: EventProcessor.OnEndRunStage
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndValidationStage
+  name: OnEndValidationStage()
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnEndValidationStage
+  commentId: M:BenchmarkDotNet.EventProcessors.EventProcessor.OnEndValidationStage
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndValidationStage()
+  nameWithType: EventProcessor.OnEndValidationStage()
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndValidationStage*
+  name: OnEndValidationStage
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnEndValidationStage_
+  commentId: Overload:BenchmarkDotNet.EventProcessors.EventProcessor.OnEndValidationStage
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnEndValidationStage
+  nameWithType: EventProcessor.OnEndValidationStage
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartBuildStage(System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Running.BuildPartition})
+  name: OnStartBuildStage(IReadOnlyList<BuildPartition>)
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnStartBuildStage_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Running_BuildPartition__
+  commentId: M:BenchmarkDotNet.EventProcessors.EventProcessor.OnStartBuildStage(System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Running.BuildPartition})
+  name.vb: OnStartBuildStage(IReadOnlyList(Of BuildPartition))
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartBuildStage(System.Collections.Generic.IReadOnlyList<BenchmarkDotNet.Running.BuildPartition>)
+  fullName.vb: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartBuildStage(System.Collections.Generic.IReadOnlyList(Of BenchmarkDotNet.Running.BuildPartition))
+  nameWithType: EventProcessor.OnStartBuildStage(IReadOnlyList<BuildPartition>)
+  nameWithType.vb: EventProcessor.OnStartBuildStage(IReadOnlyList(Of BuildPartition))
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartBuildStage*
+  name: OnStartBuildStage
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnStartBuildStage_
+  commentId: Overload:BenchmarkDotNet.EventProcessors.EventProcessor.OnStartBuildStage
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartBuildStage
+  nameWithType: EventProcessor.OnStartBuildStage
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmark(BenchmarkDotNet.Running.BenchmarkCase)
+  name: OnStartRunBenchmark(BenchmarkCase)
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnStartRunBenchmark_BenchmarkDotNet_Running_BenchmarkCase_
+  commentId: M:BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmark(BenchmarkDotNet.Running.BenchmarkCase)
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmark(BenchmarkDotNet.Running.BenchmarkCase)
+  nameWithType: EventProcessor.OnStartRunBenchmark(BenchmarkCase)
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmark*
+  name: OnStartRunBenchmark
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnStartRunBenchmark_
+  commentId: Overload:BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmark
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmark
+  nameWithType: EventProcessor.OnStartRunBenchmark
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmarksInType(System.Type,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Running.BenchmarkCase})
+  name: OnStartRunBenchmarksInType(Type, IReadOnlyList<BenchmarkCase>)
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnStartRunBenchmarksInType_System_Type_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Running_BenchmarkCase__
+  commentId: M:BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmarksInType(System.Type,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Running.BenchmarkCase})
+  name.vb: OnStartRunBenchmarksInType(Type, IReadOnlyList(Of BenchmarkCase))
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmarksInType(System.Type, System.Collections.Generic.IReadOnlyList<BenchmarkDotNet.Running.BenchmarkCase>)
+  fullName.vb: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmarksInType(System.Type, System.Collections.Generic.IReadOnlyList(Of BenchmarkDotNet.Running.BenchmarkCase))
+  nameWithType: EventProcessor.OnStartRunBenchmarksInType(Type, IReadOnlyList<BenchmarkCase>)
+  nameWithType.vb: EventProcessor.OnStartRunBenchmarksInType(Type, IReadOnlyList(Of BenchmarkCase))
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmarksInType*
+  name: OnStartRunBenchmarksInType
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnStartRunBenchmarksInType_
+  commentId: Overload:BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmarksInType
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunBenchmarksInType
+  nameWithType: EventProcessor.OnStartRunBenchmarksInType
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunStage
+  name: OnStartRunStage()
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnStartRunStage
+  commentId: M:BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunStage
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunStage()
+  nameWithType: EventProcessor.OnStartRunStage()
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunStage*
+  name: OnStartRunStage
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnStartRunStage_
+  commentId: Overload:BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunStage
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartRunStage
+  nameWithType: EventProcessor.OnStartRunStage
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartValidationStage
+  name: OnStartValidationStage()
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnStartValidationStage
+  commentId: M:BenchmarkDotNet.EventProcessors.EventProcessor.OnStartValidationStage
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartValidationStage()
+  nameWithType: EventProcessor.OnStartValidationStage()
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartValidationStage*
+  name: OnStartValidationStage
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnStartValidationStage_
+  commentId: Overload:BenchmarkDotNet.EventProcessors.EventProcessor.OnStartValidationStage
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnStartValidationStage
+  nameWithType: EventProcessor.OnStartValidationStage
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnValidationError(BenchmarkDotNet.Validators.ValidationError)
+  name: OnValidationError(ValidationError)
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnValidationError_BenchmarkDotNet_Validators_ValidationError_
+  commentId: M:BenchmarkDotNet.EventProcessors.EventProcessor.OnValidationError(BenchmarkDotNet.Validators.ValidationError)
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnValidationError(BenchmarkDotNet.Validators.ValidationError)
+  nameWithType: EventProcessor.OnValidationError(ValidationError)
+- uid: BenchmarkDotNet.EventProcessors.EventProcessor.OnValidationError*
+  name: OnValidationError
+  href: api/BenchmarkDotNet.EventProcessors.EventProcessor.html#BenchmarkDotNet_EventProcessors_EventProcessor_OnValidationError_
+  commentId: Overload:BenchmarkDotNet.EventProcessors.EventProcessor.OnValidationError
+  fullName: BenchmarkDotNet.EventProcessors.EventProcessor.OnValidationError
+  nameWithType: EventProcessor.OnValidationError
 - uid: BenchmarkDotNet.Exporters
   name: BenchmarkDotNet.Exporters
   href: api/BenchmarkDotNet.Exporters.html
@@ -20685,13 +20955,13 @@ references:
   fullName: BenchmarkDotNet.Exporters.Csv.CsvMeasurementsExporter
   nameWithType: CsvMeasurementsExporter
 - uid: BenchmarkDotNet.Exporters.Csv.CsvMeasurementsExporter.#ctor(BenchmarkDotNet.Exporters.Csv.CsvSeparator,BenchmarkDotNet.Reports.SummaryStyle)
-  name: CsvMeasurementsExporter(CsvSeparator, SummaryStyle)
+  name: CsvMeasurementsExporter(CsvSeparator, SummaryStyle?)
   href: api/BenchmarkDotNet.Exporters.Csv.CsvMeasurementsExporter.html#BenchmarkDotNet_Exporters_Csv_CsvMeasurementsExporter__ctor_BenchmarkDotNet_Exporters_Csv_CsvSeparator_BenchmarkDotNet_Reports_SummaryStyle_
   commentId: M:BenchmarkDotNet.Exporters.Csv.CsvMeasurementsExporter.#ctor(BenchmarkDotNet.Exporters.Csv.CsvSeparator,BenchmarkDotNet.Reports.SummaryStyle)
   name.vb: New(CsvSeparator, SummaryStyle)
-  fullName: BenchmarkDotNet.Exporters.Csv.CsvMeasurementsExporter.CsvMeasurementsExporter(BenchmarkDotNet.Exporters.Csv.CsvSeparator, BenchmarkDotNet.Reports.SummaryStyle)
+  fullName: BenchmarkDotNet.Exporters.Csv.CsvMeasurementsExporter.CsvMeasurementsExporter(BenchmarkDotNet.Exporters.Csv.CsvSeparator, BenchmarkDotNet.Reports.SummaryStyle?)
   fullName.vb: BenchmarkDotNet.Exporters.Csv.CsvMeasurementsExporter.New(BenchmarkDotNet.Exporters.Csv.CsvSeparator, BenchmarkDotNet.Reports.SummaryStyle)
-  nameWithType: CsvMeasurementsExporter.CsvMeasurementsExporter(CsvSeparator, SummaryStyle)
+  nameWithType: CsvMeasurementsExporter.CsvMeasurementsExporter(CsvSeparator, SummaryStyle?)
   nameWithType.vb: CsvMeasurementsExporter.New(CsvSeparator, SummaryStyle)
 - uid: BenchmarkDotNet.Exporters.Csv.CsvMeasurementsExporter.#ctor*
   name: CsvMeasurementsExporter
@@ -24198,13 +24468,13 @@ references:
   fullName: BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job, BenchmarkDotNet.Jobs.NuGetReferenceList)
   nameWithType: JobExtensions.WithNuGet(Job, NuGetReferenceList)
 - uid: BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,System.String,System.String,System.Uri,System.Boolean)
-  name: WithNuGet(Job, string, string, Uri, bool)
+  name: WithNuGet(Job, string, string?, Uri?, bool)
   href: api/BenchmarkDotNet.Jobs.JobExtensions.html#BenchmarkDotNet_Jobs_JobExtensions_WithNuGet_BenchmarkDotNet_Jobs_Job_System_String_System_String_System_Uri_System_Boolean_
   commentId: M:BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job,System.String,System.String,System.Uri,System.Boolean)
   name.vb: WithNuGet(Job, String, String, Uri, Boolean)
-  fullName: BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job, string, string, System.Uri, bool)
+  fullName: BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job, string, string?, System.Uri?, bool)
   fullName.vb: BenchmarkDotNet.Jobs.JobExtensions.WithNuGet(BenchmarkDotNet.Jobs.Job, String, String, System.Uri, Boolean)
-  nameWithType: JobExtensions.WithNuGet(Job, string, string, Uri, bool)
+  nameWithType: JobExtensions.WithNuGet(Job, string, string?, Uri?, bool)
   nameWithType.vb: JobExtensions.WithNuGet(Job, String, String, Uri, Boolean)
 - uid: BenchmarkDotNet.Jobs.JobExtensions.WithNuGet*
   name: WithNuGet
@@ -24543,13 +24813,13 @@ references:
   fullName: BenchmarkDotNet.Jobs.NuGetReference
   nameWithType: NuGetReference
 - uid: BenchmarkDotNet.Jobs.NuGetReference.#ctor(System.String,System.String,System.Uri,System.Boolean)
-  name: NuGetReference(string, string, Uri, bool)
+  name: NuGetReference(string, string, Uri?, bool)
   href: api/BenchmarkDotNet.Jobs.NuGetReference.html#BenchmarkDotNet_Jobs_NuGetReference__ctor_System_String_System_String_System_Uri_System_Boolean_
   commentId: M:BenchmarkDotNet.Jobs.NuGetReference.#ctor(System.String,System.String,System.Uri,System.Boolean)
   name.vb: New(String, String, Uri, Boolean)
-  fullName: BenchmarkDotNet.Jobs.NuGetReference.NuGetReference(string, string, System.Uri, bool)
+  fullName: BenchmarkDotNet.Jobs.NuGetReference.NuGetReference(string, string, System.Uri?, bool)
   fullName.vb: BenchmarkDotNet.Jobs.NuGetReference.New(String, String, System.Uri, Boolean)
-  nameWithType: NuGetReference.NuGetReference(string, string, Uri, bool)
+  nameWithType: NuGetReference.NuGetReference(string, string, Uri?, bool)
   nameWithType.vb: NuGetReference.New(String, String, Uri, Boolean)
 - uid: BenchmarkDotNet.Jobs.NuGetReference.#ctor*
   name: NuGetReference
@@ -25368,13 +25638,13 @@ references:
   fullName: BenchmarkDotNet.Loggers.ConsoleLogger
   nameWithType: ConsoleLogger
 - uid: BenchmarkDotNet.Loggers.ConsoleLogger.#ctor(System.Boolean,System.Collections.Generic.Dictionary{BenchmarkDotNet.Loggers.LogKind,System.ConsoleColor})
-  name: ConsoleLogger(bool, Dictionary<LogKind, ConsoleColor>)
+  name: ConsoleLogger(bool, Dictionary<LogKind, ConsoleColor>?)
   href: api/BenchmarkDotNet.Loggers.ConsoleLogger.html#BenchmarkDotNet_Loggers_ConsoleLogger__ctor_System_Boolean_System_Collections_Generic_Dictionary_BenchmarkDotNet_Loggers_LogKind_System_ConsoleColor__
   commentId: M:BenchmarkDotNet.Loggers.ConsoleLogger.#ctor(System.Boolean,System.Collections.Generic.Dictionary{BenchmarkDotNet.Loggers.LogKind,System.ConsoleColor})
   name.vb: New(Boolean, Dictionary(Of LogKind, ConsoleColor))
-  fullName: BenchmarkDotNet.Loggers.ConsoleLogger.ConsoleLogger(bool, System.Collections.Generic.Dictionary<BenchmarkDotNet.Loggers.LogKind, System.ConsoleColor>)
+  fullName: BenchmarkDotNet.Loggers.ConsoleLogger.ConsoleLogger(bool, System.Collections.Generic.Dictionary<BenchmarkDotNet.Loggers.LogKind, System.ConsoleColor>?)
   fullName.vb: BenchmarkDotNet.Loggers.ConsoleLogger.New(Boolean, System.Collections.Generic.Dictionary(Of BenchmarkDotNet.Loggers.LogKind, System.ConsoleColor))
-  nameWithType: ConsoleLogger.ConsoleLogger(bool, Dictionary<LogKind, ConsoleColor>)
+  nameWithType: ConsoleLogger.ConsoleLogger(bool, Dictionary<LogKind, ConsoleColor>?)
   nameWithType.vb: ConsoleLogger.New(Boolean, Dictionary(Of LogKind, ConsoleColor))
 - uid: BenchmarkDotNet.Loggers.ConsoleLogger.#ctor*
   name: ConsoleLogger
@@ -27201,13 +27471,13 @@ references:
   nameWithType: DefaultOrderer.DefaultOrderer
   nameWithType.vb: DefaultOrderer.New
 - uid: BenchmarkDotNet.Order.DefaultOrderer.GetExecutionOrder(System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Running.BenchmarkCase},System.Collections.Generic.IEnumerable{BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule})
-  name: GetExecutionOrder(ImmutableArray<BenchmarkCase>, IEnumerable<BenchmarkLogicalGroupRule>)
+  name: GetExecutionOrder(ImmutableArray<BenchmarkCase>, IEnumerable<BenchmarkLogicalGroupRule>?)
   href: api/BenchmarkDotNet.Order.DefaultOrderer.html#BenchmarkDotNet_Order_DefaultOrderer_GetExecutionOrder_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Running_BenchmarkCase__System_Collections_Generic_IEnumerable_BenchmarkDotNet_Configs_BenchmarkLogicalGroupRule__
   commentId: M:BenchmarkDotNet.Order.DefaultOrderer.GetExecutionOrder(System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Running.BenchmarkCase},System.Collections.Generic.IEnumerable{BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule})
   name.vb: GetExecutionOrder(ImmutableArray(Of BenchmarkCase), IEnumerable(Of BenchmarkLogicalGroupRule))
-  fullName: BenchmarkDotNet.Order.DefaultOrderer.GetExecutionOrder(System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Running.BenchmarkCase>, System.Collections.Generic.IEnumerable<BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule>)
+  fullName: BenchmarkDotNet.Order.DefaultOrderer.GetExecutionOrder(System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Running.BenchmarkCase>, System.Collections.Generic.IEnumerable<BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule>?)
   fullName.vb: BenchmarkDotNet.Order.DefaultOrderer.GetExecutionOrder(System.Collections.Immutable.ImmutableArray(Of BenchmarkDotNet.Running.BenchmarkCase), System.Collections.Generic.IEnumerable(Of BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule))
-  nameWithType: DefaultOrderer.GetExecutionOrder(ImmutableArray<BenchmarkCase>, IEnumerable<BenchmarkLogicalGroupRule>)
+  nameWithType: DefaultOrderer.GetExecutionOrder(ImmutableArray<BenchmarkCase>, IEnumerable<BenchmarkLogicalGroupRule>?)
   nameWithType.vb: DefaultOrderer.GetExecutionOrder(ImmutableArray(Of BenchmarkCase), IEnumerable(Of BenchmarkLogicalGroupRule))
 - uid: BenchmarkDotNet.Order.DefaultOrderer.GetExecutionOrder*
   name: GetExecutionOrder
@@ -27243,13 +27513,13 @@ references:
   fullName: BenchmarkDotNet.Order.DefaultOrderer.GetLogicalGroupKey
   nameWithType: DefaultOrderer.GetLogicalGroupKey
 - uid: BenchmarkDotNet.Order.DefaultOrderer.GetLogicalGroupOrder(System.Collections.Generic.IEnumerable{System.Linq.IGrouping{System.String,BenchmarkDotNet.Running.BenchmarkCase}},System.Collections.Generic.IEnumerable{BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule})
-  name: GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>>, IEnumerable<BenchmarkLogicalGroupRule>)
+  name: GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>>, IEnumerable<BenchmarkLogicalGroupRule>?)
   href: api/BenchmarkDotNet.Order.DefaultOrderer.html#BenchmarkDotNet_Order_DefaultOrderer_GetLogicalGroupOrder_System_Collections_Generic_IEnumerable_System_Linq_IGrouping_System_String_BenchmarkDotNet_Running_BenchmarkCase___System_Collections_Generic_IEnumerable_BenchmarkDotNet_Configs_BenchmarkLogicalGroupRule__
   commentId: M:BenchmarkDotNet.Order.DefaultOrderer.GetLogicalGroupOrder(System.Collections.Generic.IEnumerable{System.Linq.IGrouping{System.String,BenchmarkDotNet.Running.BenchmarkCase}},System.Collections.Generic.IEnumerable{BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule})
   name.vb: GetLogicalGroupOrder(IEnumerable(Of IGrouping(Of String, BenchmarkCase)), IEnumerable(Of BenchmarkLogicalGroupRule))
-  fullName: BenchmarkDotNet.Order.DefaultOrderer.GetLogicalGroupOrder(System.Collections.Generic.IEnumerable<System.Linq.IGrouping<string, BenchmarkDotNet.Running.BenchmarkCase>>, System.Collections.Generic.IEnumerable<BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule>)
+  fullName: BenchmarkDotNet.Order.DefaultOrderer.GetLogicalGroupOrder(System.Collections.Generic.IEnumerable<System.Linq.IGrouping<string, BenchmarkDotNet.Running.BenchmarkCase>>, System.Collections.Generic.IEnumerable<BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule>?)
   fullName.vb: BenchmarkDotNet.Order.DefaultOrderer.GetLogicalGroupOrder(System.Collections.Generic.IEnumerable(Of System.Linq.IGrouping(Of String, BenchmarkDotNet.Running.BenchmarkCase)), System.Collections.Generic.IEnumerable(Of BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule))
-  nameWithType: DefaultOrderer.GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>>, IEnumerable<BenchmarkLogicalGroupRule>)
+  nameWithType: DefaultOrderer.GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>>, IEnumerable<BenchmarkLogicalGroupRule>?)
   nameWithType.vb: DefaultOrderer.GetLogicalGroupOrder(IEnumerable(Of IGrouping(Of String, BenchmarkCase)), IEnumerable(Of BenchmarkLogicalGroupRule))
 - uid: BenchmarkDotNet.Order.DefaultOrderer.GetLogicalGroupOrder*
   name: GetLogicalGroupOrder
@@ -27336,13 +27606,13 @@ references:
   fullName: BenchmarkDotNet.Order.IOrderer
   nameWithType: IOrderer
 - uid: BenchmarkDotNet.Order.IOrderer.GetExecutionOrder(System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Running.BenchmarkCase},System.Collections.Generic.IEnumerable{BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule})
-  name: GetExecutionOrder(ImmutableArray<BenchmarkCase>, IEnumerable<BenchmarkLogicalGroupRule>)
+  name: GetExecutionOrder(ImmutableArray<BenchmarkCase>, IEnumerable<BenchmarkLogicalGroupRule>?)
   href: api/BenchmarkDotNet.Order.IOrderer.html#BenchmarkDotNet_Order_IOrderer_GetExecutionOrder_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Running_BenchmarkCase__System_Collections_Generic_IEnumerable_BenchmarkDotNet_Configs_BenchmarkLogicalGroupRule__
   commentId: M:BenchmarkDotNet.Order.IOrderer.GetExecutionOrder(System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Running.BenchmarkCase},System.Collections.Generic.IEnumerable{BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule})
   name.vb: GetExecutionOrder(ImmutableArray(Of BenchmarkCase), IEnumerable(Of BenchmarkLogicalGroupRule))
-  fullName: BenchmarkDotNet.Order.IOrderer.GetExecutionOrder(System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Running.BenchmarkCase>, System.Collections.Generic.IEnumerable<BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule>)
+  fullName: BenchmarkDotNet.Order.IOrderer.GetExecutionOrder(System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Running.BenchmarkCase>, System.Collections.Generic.IEnumerable<BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule>?)
   fullName.vb: BenchmarkDotNet.Order.IOrderer.GetExecutionOrder(System.Collections.Immutable.ImmutableArray(Of BenchmarkDotNet.Running.BenchmarkCase), System.Collections.Generic.IEnumerable(Of BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule))
-  nameWithType: IOrderer.GetExecutionOrder(ImmutableArray<BenchmarkCase>, IEnumerable<BenchmarkLogicalGroupRule>)
+  nameWithType: IOrderer.GetExecutionOrder(ImmutableArray<BenchmarkCase>, IEnumerable<BenchmarkLogicalGroupRule>?)
   nameWithType.vb: IOrderer.GetExecutionOrder(ImmutableArray(Of BenchmarkCase), IEnumerable(Of BenchmarkLogicalGroupRule))
 - uid: BenchmarkDotNet.Order.IOrderer.GetExecutionOrder*
   name: GetExecutionOrder
@@ -27378,13 +27648,13 @@ references:
   fullName: BenchmarkDotNet.Order.IOrderer.GetLogicalGroupKey
   nameWithType: IOrderer.GetLogicalGroupKey
 - uid: BenchmarkDotNet.Order.IOrderer.GetLogicalGroupOrder(System.Collections.Generic.IEnumerable{System.Linq.IGrouping{System.String,BenchmarkDotNet.Running.BenchmarkCase}},System.Collections.Generic.IEnumerable{BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule})
-  name: GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>>, IEnumerable<BenchmarkLogicalGroupRule>)
+  name: GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>>, IEnumerable<BenchmarkLogicalGroupRule>?)
   href: api/BenchmarkDotNet.Order.IOrderer.html#BenchmarkDotNet_Order_IOrderer_GetLogicalGroupOrder_System_Collections_Generic_IEnumerable_System_Linq_IGrouping_System_String_BenchmarkDotNet_Running_BenchmarkCase___System_Collections_Generic_IEnumerable_BenchmarkDotNet_Configs_BenchmarkLogicalGroupRule__
   commentId: M:BenchmarkDotNet.Order.IOrderer.GetLogicalGroupOrder(System.Collections.Generic.IEnumerable{System.Linq.IGrouping{System.String,BenchmarkDotNet.Running.BenchmarkCase}},System.Collections.Generic.IEnumerable{BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule})
   name.vb: GetLogicalGroupOrder(IEnumerable(Of IGrouping(Of String, BenchmarkCase)), IEnumerable(Of BenchmarkLogicalGroupRule))
-  fullName: BenchmarkDotNet.Order.IOrderer.GetLogicalGroupOrder(System.Collections.Generic.IEnumerable<System.Linq.IGrouping<string, BenchmarkDotNet.Running.BenchmarkCase>>, System.Collections.Generic.IEnumerable<BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule>)
+  fullName: BenchmarkDotNet.Order.IOrderer.GetLogicalGroupOrder(System.Collections.Generic.IEnumerable<System.Linq.IGrouping<string, BenchmarkDotNet.Running.BenchmarkCase>>, System.Collections.Generic.IEnumerable<BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule>?)
   fullName.vb: BenchmarkDotNet.Order.IOrderer.GetLogicalGroupOrder(System.Collections.Generic.IEnumerable(Of System.Linq.IGrouping(Of String, BenchmarkDotNet.Running.BenchmarkCase)), System.Collections.Generic.IEnumerable(Of BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule))
-  nameWithType: IOrderer.GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>>, IEnumerable<BenchmarkLogicalGroupRule>)
+  nameWithType: IOrderer.GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>>, IEnumerable<BenchmarkLogicalGroupRule>?)
   nameWithType.vb: IOrderer.GetLogicalGroupOrder(IEnumerable(Of IGrouping(Of String, BenchmarkCase)), IEnumerable(Of BenchmarkLogicalGroupRule))
 - uid: BenchmarkDotNet.Order.IOrderer.GetLogicalGroupOrder*
   name: GetLogicalGroupOrder
@@ -29139,13 +29409,13 @@ references:
   fullName: BenchmarkDotNet.Reports.Summary
   nameWithType: Summary
 - uid: BenchmarkDotNet.Reports.Summary.#ctor(System.String,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Reports.BenchmarkReport},BenchmarkDotNet.Environments.HostEnvironmentInfo,System.String,System.String,System.TimeSpan,System.Globalization.CultureInfo,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Validators.ValidationError},System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Columns.IColumnHidingRule},BenchmarkDotNet.Reports.SummaryStyle)
-  name: Summary(string, ImmutableArray<BenchmarkReport>, HostEnvironmentInfo, string, string, TimeSpan, CultureInfo, ImmutableArray<ValidationError>, ImmutableArray<IColumnHidingRule>, SummaryStyle)
+  name: Summary(string, ImmutableArray<BenchmarkReport>, HostEnvironmentInfo, string, string, TimeSpan, CultureInfo, ImmutableArray<ValidationError>, ImmutableArray<IColumnHidingRule>, SummaryStyle?)
   href: api/BenchmarkDotNet.Reports.Summary.html#BenchmarkDotNet_Reports_Summary__ctor_System_String_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Reports_BenchmarkReport__BenchmarkDotNet_Environments_HostEnvironmentInfo_System_String_System_String_System_TimeSpan_System_Globalization_CultureInfo_System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Validators_ValidationError__System_Collections_Immutable_ImmutableArray_BenchmarkDotNet_Columns_IColumnHidingRule__BenchmarkDotNet_Reports_SummaryStyle_
   commentId: M:BenchmarkDotNet.Reports.Summary.#ctor(System.String,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Reports.BenchmarkReport},BenchmarkDotNet.Environments.HostEnvironmentInfo,System.String,System.String,System.TimeSpan,System.Globalization.CultureInfo,System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Validators.ValidationError},System.Collections.Immutable.ImmutableArray{BenchmarkDotNet.Columns.IColumnHidingRule},BenchmarkDotNet.Reports.SummaryStyle)
   name.vb: New(String, ImmutableArray(Of BenchmarkReport), HostEnvironmentInfo, String, String, TimeSpan, CultureInfo, ImmutableArray(Of ValidationError), ImmutableArray(Of IColumnHidingRule), SummaryStyle)
-  fullName: BenchmarkDotNet.Reports.Summary.Summary(string, System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Reports.BenchmarkReport>, BenchmarkDotNet.Environments.HostEnvironmentInfo, string, string, System.TimeSpan, System.Globalization.CultureInfo, System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Validators.ValidationError>, System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Columns.IColumnHidingRule>, BenchmarkDotNet.Reports.SummaryStyle)
+  fullName: BenchmarkDotNet.Reports.Summary.Summary(string, System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Reports.BenchmarkReport>, BenchmarkDotNet.Environments.HostEnvironmentInfo, string, string, System.TimeSpan, System.Globalization.CultureInfo, System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Validators.ValidationError>, System.Collections.Immutable.ImmutableArray<BenchmarkDotNet.Columns.IColumnHidingRule>, BenchmarkDotNet.Reports.SummaryStyle?)
   fullName.vb: BenchmarkDotNet.Reports.Summary.New(String, System.Collections.Immutable.ImmutableArray(Of BenchmarkDotNet.Reports.BenchmarkReport), BenchmarkDotNet.Environments.HostEnvironmentInfo, String, String, System.TimeSpan, System.Globalization.CultureInfo, System.Collections.Immutable.ImmutableArray(Of BenchmarkDotNet.Validators.ValidationError), System.Collections.Immutable.ImmutableArray(Of BenchmarkDotNet.Columns.IColumnHidingRule), BenchmarkDotNet.Reports.SummaryStyle)
-  nameWithType: Summary.Summary(string, ImmutableArray<BenchmarkReport>, HostEnvironmentInfo, string, string, TimeSpan, CultureInfo, ImmutableArray<ValidationError>, ImmutableArray<IColumnHidingRule>, SummaryStyle)
+  nameWithType: Summary.Summary(string, ImmutableArray<BenchmarkReport>, HostEnvironmentInfo, string, string, TimeSpan, CultureInfo, ImmutableArray<ValidationError>, ImmutableArray<IColumnHidingRule>, SummaryStyle?)
   nameWithType.vb: Summary.New(String, ImmutableArray(Of BenchmarkReport), HostEnvironmentInfo, String, String, TimeSpan, CultureInfo, ImmutableArray(Of ValidationError), ImmutableArray(Of IColumnHidingRule), SummaryStyle)
 - uid: BenchmarkDotNet.Reports.Summary.#ctor*
   name: Summary
@@ -31086,13 +31356,13 @@ references:
   fullName: BenchmarkDotNet.Running.Descriptor
   nameWithType: Descriptor
 - uid: BenchmarkDotNet.Running.Descriptor.#ctor(System.Type,System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.String,System.String,System.Boolean,System.String[],System.Int32,System.Int32)
-  name: Descriptor(Type, MethodInfo, MethodInfo, MethodInfo, MethodInfo, MethodInfo, string, string, bool, string[], int, int)
+  name: Descriptor(Type, MethodInfo, MethodInfo?, MethodInfo?, MethodInfo?, MethodInfo?, string?, string?, bool, string[]?, int, int)
   href: api/BenchmarkDotNet.Running.Descriptor.html#BenchmarkDotNet_Running_Descriptor__ctor_System_Type_System_Reflection_MethodInfo_System_Reflection_MethodInfo_System_Reflection_MethodInfo_System_Reflection_MethodInfo_System_Reflection_MethodInfo_System_String_System_String_System_Boolean_System_String___System_Int32_System_Int32_
   commentId: M:BenchmarkDotNet.Running.Descriptor.#ctor(System.Type,System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.String,System.String,System.Boolean,System.String[],System.Int32,System.Int32)
   name.vb: New(Type, MethodInfo, MethodInfo, MethodInfo, MethodInfo, MethodInfo, String, String, Boolean, String(), Integer, Integer)
-  fullName: BenchmarkDotNet.Running.Descriptor.Descriptor(System.Type, System.Reflection.MethodInfo, System.Reflection.MethodInfo, System.Reflection.MethodInfo, System.Reflection.MethodInfo, System.Reflection.MethodInfo, string, string, bool, string[], int, int)
+  fullName: BenchmarkDotNet.Running.Descriptor.Descriptor(System.Type, System.Reflection.MethodInfo, System.Reflection.MethodInfo?, System.Reflection.MethodInfo?, System.Reflection.MethodInfo?, System.Reflection.MethodInfo?, string?, string?, bool, string[]?, int, int)
   fullName.vb: BenchmarkDotNet.Running.Descriptor.New(System.Type, System.Reflection.MethodInfo, System.Reflection.MethodInfo, System.Reflection.MethodInfo, System.Reflection.MethodInfo, System.Reflection.MethodInfo, String, String, Boolean, String(), Integer, Integer)
-  nameWithType: Descriptor.Descriptor(Type, MethodInfo, MethodInfo, MethodInfo, MethodInfo, MethodInfo, string, string, bool, string[], int, int)
+  nameWithType: Descriptor.Descriptor(Type, MethodInfo, MethodInfo?, MethodInfo?, MethodInfo?, MethodInfo?, string?, string?, bool, string[]?, int, int)
   nameWithType.vb: Descriptor.New(Type, MethodInfo, MethodInfo, MethodInfo, MethodInfo, MethodInfo, String, String, Boolean, String(), Integer, Integer)
 - uid: BenchmarkDotNet.Running.Descriptor.#ctor*
   name: Descriptor
@@ -31941,13 +32211,13 @@ references:
   fullName: BenchmarkDotNet.Toolchains.CoreRun.CoreRunPublisher
   nameWithType: CoreRunPublisher
 - uid: BenchmarkDotNet.Toolchains.CoreRun.CoreRunPublisher.#ctor(System.IO.FileInfo,System.IO.FileInfo)
-  name: CoreRunPublisher(FileInfo, FileInfo)
+  name: CoreRunPublisher(FileInfo, FileInfo?)
   href: api/BenchmarkDotNet.Toolchains.CoreRun.CoreRunPublisher.html#BenchmarkDotNet_Toolchains_CoreRun_CoreRunPublisher__ctor_System_IO_FileInfo_System_IO_FileInfo_
   commentId: M:BenchmarkDotNet.Toolchains.CoreRun.CoreRunPublisher.#ctor(System.IO.FileInfo,System.IO.FileInfo)
   name.vb: New(FileInfo, FileInfo)
-  fullName: BenchmarkDotNet.Toolchains.CoreRun.CoreRunPublisher.CoreRunPublisher(System.IO.FileInfo, System.IO.FileInfo)
+  fullName: BenchmarkDotNet.Toolchains.CoreRun.CoreRunPublisher.CoreRunPublisher(System.IO.FileInfo, System.IO.FileInfo?)
   fullName.vb: BenchmarkDotNet.Toolchains.CoreRun.CoreRunPublisher.New(System.IO.FileInfo, System.IO.FileInfo)
-  nameWithType: CoreRunPublisher.CoreRunPublisher(FileInfo, FileInfo)
+  nameWithType: CoreRunPublisher.CoreRunPublisher(FileInfo, FileInfo?)
   nameWithType.vb: CoreRunPublisher.New(FileInfo, FileInfo)
 - uid: BenchmarkDotNet.Toolchains.CoreRun.CoreRunPublisher.#ctor*
   name: CoreRunPublisher
@@ -31977,13 +32247,13 @@ references:
   fullName: BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain
   nameWithType: CoreRunToolchain
 - uid: BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.#ctor(System.IO.FileInfo,System.Boolean,System.String,System.IO.FileInfo,System.IO.DirectoryInfo,System.String)
-  name: CoreRunToolchain(FileInfo, bool, string, FileInfo, DirectoryInfo, string)
+  name: CoreRunToolchain(FileInfo, bool, string, FileInfo?, DirectoryInfo?, string)
   href: api/BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.html#BenchmarkDotNet_Toolchains_CoreRun_CoreRunToolchain__ctor_System_IO_FileInfo_System_Boolean_System_String_System_IO_FileInfo_System_IO_DirectoryInfo_System_String_
   commentId: M:BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.#ctor(System.IO.FileInfo,System.Boolean,System.String,System.IO.FileInfo,System.IO.DirectoryInfo,System.String)
   name.vb: New(FileInfo, Boolean, String, FileInfo, DirectoryInfo, String)
-  fullName: BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.CoreRunToolchain(System.IO.FileInfo, bool, string, System.IO.FileInfo, System.IO.DirectoryInfo, string)
+  fullName: BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.CoreRunToolchain(System.IO.FileInfo, bool, string, System.IO.FileInfo?, System.IO.DirectoryInfo?, string)
   fullName.vb: BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.New(System.IO.FileInfo, Boolean, String, System.IO.FileInfo, System.IO.DirectoryInfo, String)
-  nameWithType: CoreRunToolchain.CoreRunToolchain(FileInfo, bool, string, FileInfo, DirectoryInfo, string)
+  nameWithType: CoreRunToolchain.CoreRunToolchain(FileInfo, bool, string, FileInfo?, DirectoryInfo?, string)
   nameWithType.vb: CoreRunToolchain.New(FileInfo, Boolean, String, FileInfo, DirectoryInfo, String)
 - uid: BenchmarkDotNet.Toolchains.CoreRun.CoreRunToolchain.#ctor*
   name: CoreRunToolchain
@@ -32139,13 +32409,13 @@ references:
   fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain
   nameWithType: CsProjClassicNetToolchain
 - uid: BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From(System.String,System.String,System.String)
-  name: From(string, string, string)
+  name: From(string, string?, string?)
   href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.html#BenchmarkDotNet_Toolchains_CsProj_CsProjClassicNetToolchain_From_System_String_System_String_System_String_
   commentId: M:BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From(System.String,System.String,System.String)
   name.vb: From(String, String, String)
-  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From(string, string, string)
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From(string, string?, string?)
   fullName.vb: BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From(String, String, String)
-  nameWithType: CsProjClassicNetToolchain.From(string, string, string)
+  nameWithType: CsProjClassicNetToolchain.From(string, string?, string?)
   nameWithType.vb: CsProjClassicNetToolchain.From(String, String, String)
 - uid: BenchmarkDotNet.Toolchains.CsProj.CsProjClassicNetToolchain.From*
   name: From
@@ -32691,13 +32961,13 @@ references:
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder
   nameWithType: DotNetCliBuilder
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.#ctor(System.String,System.String,System.Boolean,System.Boolean)
-  name: DotNetCliBuilder(string, string, bool, bool)
+  name: DotNetCliBuilder(string, string?, bool, bool)
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliBuilder__ctor_System_String_System_String_System_Boolean_System_Boolean_
   commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.#ctor(System.String,System.String,System.Boolean,System.Boolean)
   name.vb: New(String, String, Boolean, Boolean)
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.DotNetCliBuilder(string, string, bool, bool)
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.DotNetCliBuilder(string, string?, bool, bool)
   fullName.vb: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.New(String, String, Boolean, Boolean)
-  nameWithType: DotNetCliBuilder.DotNetCliBuilder(string, string, bool, bool)
+  nameWithType: DotNetCliBuilder.DotNetCliBuilder(string, string?, bool, bool)
   nameWithType.vb: DotNetCliBuilder.New(String, String, Boolean, Boolean)
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliBuilder.#ctor*
   name: DotNetCliBuilder
@@ -33321,13 +33591,13 @@ references:
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher
   nameWithType: DotNetCliPublisher
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher.#ctor(System.String,System.String,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable})
-  name: DotNetCliPublisher(string, string, IReadOnlyList<EnvironmentVariable>)
+  name: DotNetCliPublisher(string?, string?, IReadOnlyList<EnvironmentVariable>)
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher.html#BenchmarkDotNet_Toolchains_DotNetCli_DotNetCliPublisher__ctor_System_String_System_String_System_Collections_Generic_IReadOnlyList_BenchmarkDotNet_Jobs_EnvironmentVariable__
   commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher.#ctor(System.String,System.String,System.Collections.Generic.IReadOnlyList{BenchmarkDotNet.Jobs.EnvironmentVariable})
   name.vb: New(String, String, IReadOnlyList(Of EnvironmentVariable))
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher.DotNetCliPublisher(string, string, System.Collections.Generic.IReadOnlyList<BenchmarkDotNet.Jobs.EnvironmentVariable>)
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher.DotNetCliPublisher(string?, string?, System.Collections.Generic.IReadOnlyList<BenchmarkDotNet.Jobs.EnvironmentVariable>)
   fullName.vb: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher.New(String, String, System.Collections.Generic.IReadOnlyList(Of BenchmarkDotNet.Jobs.EnvironmentVariable))
-  nameWithType: DotNetCliPublisher.DotNetCliPublisher(string, string, IReadOnlyList<EnvironmentVariable>)
+  nameWithType: DotNetCliPublisher.DotNetCliPublisher(string?, string?, IReadOnlyList<EnvironmentVariable>)
   nameWithType.vb: DotNetCliPublisher.New(String, String, IReadOnlyList(Of EnvironmentVariable))
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.DotNetCliPublisher.#ctor*
   name: DotNetCliPublisher
@@ -33357,13 +33627,13 @@ references:
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings
   nameWithType: NetCoreAppSettings
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.String,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
-  name: NetCoreAppSettings(string, string, string, string, string, string, string, MonoAotCompilerMode)
+  name: NetCoreAppSettings(string, string, string, string?, string?, string?, string?, MonoAotCompilerMode)
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings__ctor_System_String_System_String_System_String_System_String_System_String_System_String_System_String_BenchmarkDotNet_Toolchains_MonoAotLLVM_MonoAotCompilerMode_
   commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.String,BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
   name.vb: New(String, String, String, String, String, String, String, MonoAotCompilerMode)
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreAppSettings(string, string, string, string, string, string, string, BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreAppSettings(string, string, string, string?, string?, string?, string?, BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
   fullName.vb: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.New(String, String, String, String, String, String, String, BenchmarkDotNet.Toolchains.MonoAotLLVM.MonoAotCompilerMode)
-  nameWithType: NetCoreAppSettings.NetCoreAppSettings(string, string, string, string, string, string, string, MonoAotCompilerMode)
+  nameWithType: NetCoreAppSettings.NetCoreAppSettings(string, string, string, string?, string?, string?, string?, MonoAotCompilerMode)
   nameWithType.vb: NetCoreAppSettings.New(String, String, String, String, String, String, String, MonoAotCompilerMode)
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.#ctor*
   name: NetCoreAppSettings
@@ -33525,13 +33795,13 @@ references:
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.TargetFrameworkMoniker
   nameWithType: NetCoreAppSettings.TargetFrameworkMoniker
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithCustomDotNetCliPath(System.String,System.String)
-  name: WithCustomDotNetCliPath(string, string)
+  name: WithCustomDotNetCliPath(string, string?)
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_WithCustomDotNetCliPath_System_String_System_String_
   commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithCustomDotNetCliPath(System.String,System.String)
   name.vb: WithCustomDotNetCliPath(String, String)
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithCustomDotNetCliPath(string, string)
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithCustomDotNetCliPath(string, string?)
   fullName.vb: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithCustomDotNetCliPath(String, String)
-  nameWithType: NetCoreAppSettings.WithCustomDotNetCliPath(string, string)
+  nameWithType: NetCoreAppSettings.WithCustomDotNetCliPath(string, string?)
   nameWithType.vb: NetCoreAppSettings.WithCustomDotNetCliPath(String, String)
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithCustomDotNetCliPath*
   name: WithCustomDotNetCliPath
@@ -33540,13 +33810,13 @@ references:
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithCustomDotNetCliPath
   nameWithType: NetCoreAppSettings.WithCustomDotNetCliPath
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithCustomPackagesRestorePath(System.String,System.String)
-  name: WithCustomPackagesRestorePath(string, string)
+  name: WithCustomPackagesRestorePath(string, string?)
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_WithCustomPackagesRestorePath_System_String_System_String_
   commentId: M:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithCustomPackagesRestorePath(System.String,System.String)
   name.vb: WithCustomPackagesRestorePath(String, String)
-  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithCustomPackagesRestorePath(string, string)
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithCustomPackagesRestorePath(string, string?)
   fullName.vb: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithCustomPackagesRestorePath(String, String)
-  nameWithType: NetCoreAppSettings.WithCustomPackagesRestorePath(string, string)
+  nameWithType: NetCoreAppSettings.WithCustomPackagesRestorePath(string, string?)
   nameWithType.vb: NetCoreAppSettings.WithCustomPackagesRestorePath(String, String)
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.WithCustomPackagesRestorePath*
   name: WithCustomPackagesRestorePath
@@ -36135,13 +36405,13 @@ references:
   fullName: BenchmarkDotNet.Toolchains.Parameters.ExecuteParameters
   nameWithType: ExecuteParameters
 - uid: BenchmarkDotNet.Toolchains.Parameters.ExecuteParameters.#ctor(BenchmarkDotNet.Toolchains.Results.BuildResult,BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Running.BenchmarkId,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Characteristics.IResolver,System.Int32,BenchmarkDotNet.Diagnosers.IDiagnoser)
-  name: ExecuteParameters(BuildResult, BenchmarkCase, BenchmarkId, ILogger, IResolver, int, IDiagnoser)
+  name: ExecuteParameters(BuildResult, BenchmarkCase, BenchmarkId, ILogger, IResolver, int, IDiagnoser?)
   href: api/BenchmarkDotNet.Toolchains.Parameters.ExecuteParameters.html#BenchmarkDotNet_Toolchains_Parameters_ExecuteParameters__ctor_BenchmarkDotNet_Toolchains_Results_BuildResult_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Running_BenchmarkId_BenchmarkDotNet_Loggers_ILogger_BenchmarkDotNet_Characteristics_IResolver_System_Int32_BenchmarkDotNet_Diagnosers_IDiagnoser_
   commentId: M:BenchmarkDotNet.Toolchains.Parameters.ExecuteParameters.#ctor(BenchmarkDotNet.Toolchains.Results.BuildResult,BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Running.BenchmarkId,BenchmarkDotNet.Loggers.ILogger,BenchmarkDotNet.Characteristics.IResolver,System.Int32,BenchmarkDotNet.Diagnosers.IDiagnoser)
   name.vb: New(BuildResult, BenchmarkCase, BenchmarkId, ILogger, IResolver, Integer, IDiagnoser)
-  fullName: BenchmarkDotNet.Toolchains.Parameters.ExecuteParameters.ExecuteParameters(BenchmarkDotNet.Toolchains.Results.BuildResult, BenchmarkDotNet.Running.BenchmarkCase, BenchmarkDotNet.Running.BenchmarkId, BenchmarkDotNet.Loggers.ILogger, BenchmarkDotNet.Characteristics.IResolver, int, BenchmarkDotNet.Diagnosers.IDiagnoser)
+  fullName: BenchmarkDotNet.Toolchains.Parameters.ExecuteParameters.ExecuteParameters(BenchmarkDotNet.Toolchains.Results.BuildResult, BenchmarkDotNet.Running.BenchmarkCase, BenchmarkDotNet.Running.BenchmarkId, BenchmarkDotNet.Loggers.ILogger, BenchmarkDotNet.Characteristics.IResolver, int, BenchmarkDotNet.Diagnosers.IDiagnoser?)
   fullName.vb: BenchmarkDotNet.Toolchains.Parameters.ExecuteParameters.New(BenchmarkDotNet.Toolchains.Results.BuildResult, BenchmarkDotNet.Running.BenchmarkCase, BenchmarkDotNet.Running.BenchmarkId, BenchmarkDotNet.Loggers.ILogger, BenchmarkDotNet.Characteristics.IResolver, Integer, BenchmarkDotNet.Diagnosers.IDiagnoser)
-  nameWithType: ExecuteParameters.ExecuteParameters(BuildResult, BenchmarkCase, BenchmarkId, ILogger, IResolver, int, IDiagnoser)
+  nameWithType: ExecuteParameters.ExecuteParameters(BuildResult, BenchmarkCase, BenchmarkId, ILogger, IResolver, int, IDiagnoser?)
   nameWithType.vb: ExecuteParameters.New(BuildResult, BenchmarkCase, BenchmarkId, ILogger, IResolver, Integer, IDiagnoser)
 - uid: BenchmarkDotNet.Toolchains.Parameters.ExecuteParameters.#ctor*
   name: ExecuteParameters
@@ -36522,13 +36792,13 @@ references:
   fullName: BenchmarkDotNet.Toolchains.Results.GenerateResult.ArtifactsToCleanup
   nameWithType: GenerateResult.ArtifactsToCleanup
 - uid: BenchmarkDotNet.Toolchains.Results.GenerateResult.Failure(BenchmarkDotNet.Toolchains.ArtifactsPaths,System.Collections.Generic.IReadOnlyCollection{System.String},System.Exception)
-  name: Failure(ArtifactsPaths, IReadOnlyCollection<string>, Exception)
+  name: Failure(ArtifactsPaths, IReadOnlyCollection<string>, Exception?)
   href: api/BenchmarkDotNet.Toolchains.Results.GenerateResult.html#BenchmarkDotNet_Toolchains_Results_GenerateResult_Failure_BenchmarkDotNet_Toolchains_ArtifactsPaths_System_Collections_Generic_IReadOnlyCollection_System_String__System_Exception_
   commentId: M:BenchmarkDotNet.Toolchains.Results.GenerateResult.Failure(BenchmarkDotNet.Toolchains.ArtifactsPaths,System.Collections.Generic.IReadOnlyCollection{System.String},System.Exception)
   name.vb: Failure(ArtifactsPaths, IReadOnlyCollection(Of String), Exception)
-  fullName: BenchmarkDotNet.Toolchains.Results.GenerateResult.Failure(BenchmarkDotNet.Toolchains.ArtifactsPaths, System.Collections.Generic.IReadOnlyCollection<string>, System.Exception)
+  fullName: BenchmarkDotNet.Toolchains.Results.GenerateResult.Failure(BenchmarkDotNet.Toolchains.ArtifactsPaths, System.Collections.Generic.IReadOnlyCollection<string>, System.Exception?)
   fullName.vb: BenchmarkDotNet.Toolchains.Results.GenerateResult.Failure(BenchmarkDotNet.Toolchains.ArtifactsPaths, System.Collections.Generic.IReadOnlyCollection(Of String), System.Exception)
-  nameWithType: GenerateResult.Failure(ArtifactsPaths, IReadOnlyCollection<string>, Exception)
+  nameWithType: GenerateResult.Failure(ArtifactsPaths, IReadOnlyCollection<string>, Exception?)
   nameWithType.vb: GenerateResult.Failure(ArtifactsPaths, IReadOnlyCollection(Of String), Exception)
 - uid: BenchmarkDotNet.Toolchains.Results.GenerateResult.Failure*
   name: Failure
@@ -37578,13 +37848,13 @@ references:
   fullName: BenchmarkDotNet.Validators.ValidationError
   nameWithType: ValidationError
 - uid: BenchmarkDotNet.Validators.ValidationError.#ctor(System.Boolean,System.String,BenchmarkDotNet.Running.BenchmarkCase)
-  name: ValidationError(bool, string, BenchmarkCase)
+  name: ValidationError(bool, string, BenchmarkCase?)
   href: api/BenchmarkDotNet.Validators.ValidationError.html#BenchmarkDotNet_Validators_ValidationError__ctor_System_Boolean_System_String_BenchmarkDotNet_Running_BenchmarkCase_
   commentId: M:BenchmarkDotNet.Validators.ValidationError.#ctor(System.Boolean,System.String,BenchmarkDotNet.Running.BenchmarkCase)
   name.vb: New(Boolean, String, BenchmarkCase)
-  fullName: BenchmarkDotNet.Validators.ValidationError.ValidationError(bool, string, BenchmarkDotNet.Running.BenchmarkCase)
+  fullName: BenchmarkDotNet.Validators.ValidationError.ValidationError(bool, string, BenchmarkDotNet.Running.BenchmarkCase?)
   fullName.vb: BenchmarkDotNet.Validators.ValidationError.New(Boolean, String, BenchmarkDotNet.Running.BenchmarkCase)
-  nameWithType: ValidationError.ValidationError(bool, string, BenchmarkCase)
+  nameWithType: ValidationError.ValidationError(bool, string, BenchmarkCase?)
   nameWithType.vb: ValidationError.New(Boolean, String, BenchmarkCase)
 - uid: BenchmarkDotNet.Validators.ValidationError.#ctor*
   name: ValidationError
@@ -37917,6 +38187,9 @@ references:
 - uid: changelog.v0.13.8
   name: BenchmarkDotNet v0.13.8
   href: changelog/v0.13.8.html
+- uid: changelog.v0.13.9
+  name: BenchmarkDotNet v0.13.9
+  href: changelog/v0.13.9.html
 - uid: changelog.v0.7.0
   name: BenchmarkDotNet v0.7.0
   href: changelog/v0.7.0.html
