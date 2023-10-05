@@ -18,6 +18,7 @@
     <UseSharedCompilation>false</UseSharedCompilation>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <SuppressNETCoreSdkPreviewMessage>True</SuppressNETCoreSdkPreviewMessage>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodingStyle.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
