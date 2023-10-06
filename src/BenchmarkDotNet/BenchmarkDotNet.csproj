@@ -58,8 +58,8 @@
   </ItemGroup>
   <!-- Include files in nuget package for generating entry point -->
   <ItemGroup>
-    <Compile Remove="build\BenchmarkDotNet.cs" />
-    <None Include="build\BenchmarkDotNet.cs" Pack="true" PackagePath="entrypoints\" />
-    <None Include="build\BenchmarkDotNet.props" Pack="true" PackagePath="build" />
+    <Compile Remove="Package\EntryPoint.*" />
+    <None Include="Package\EntryPoint.*" Pack="true" PackagePath="entrypoints\" />
+    <None Include="Package\BenchmarkDotNet.props" Pack="true" PackagePath="build\" />
   </ItemGroup>
 </Project>

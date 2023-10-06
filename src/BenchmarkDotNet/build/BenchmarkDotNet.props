@@ -1,9 +1,0 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <!-- Disables generation of MSTest entrypoint -->
-    <GenerateProgramFile>false</GenerateProgramFile>
-  </PropertyGroup>
-  <ItemGroup Condition="'$(GenerateBDNEntryPoint)' == 'true'">
-    <Compile Include="$(MSBuildThisFileDirectory)..\entrypoints\BenchmarkDotNet.cs"/>
-  </ItemGroup>
-</Project>

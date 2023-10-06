@@ -19,13 +19,10 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Drawing.Common" Version="4.7.2" />
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.9-local.entrypointless"/>
-    <PackageReference Include="BenchmarkDotNet.Diagnostics.dotTrace" Version="0.13.9-local.entrypointless"/>
-    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.9-local.entrypointless"/>
   </ItemGroup>
   <ItemGroup>
-    <!--<ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotTrace\BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.dotTrace\BenchmarkDotNet.Diagnostics.dotTrace.csproj" />
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
-    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />-->
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.Diagnostics.Windows\BenchmarkDotNet.Diagnostics.Windows.csproj" />
   </ItemGroup>
 </Project>
