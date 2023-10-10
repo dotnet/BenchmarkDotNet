@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Properties
             var assembly = typeof(BenchmarkDotNetInfo).GetTypeInfo().Assembly;
             var assemblyVersion = assembly.GetName().Version;
             string informationVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion ?? "";
-            return new BenchmarkDotNetInfo(assemblyVersion, informationVersion);
+            return new BenchmarkDotNetInfo(assemblyVersion, RemoveVersionMetadata(informationVersion));
         });
 
         public static BenchmarkDotNetInfo Instance { get; } = LazyInstance.Value;
@@ -47,6 +47,12 @@ namespace BenchmarkDotNet.Properties
                 : "";
             BrandVersion = FullVersion + brandVersionSuffix;
             BrandTitle = "BenchmarkDotNet v" + BrandVersion;
+        }
+
+        internal static string RemoveVersionMetadata(string version)
+        {
+            int index = version.IndexOf('+');
+            return index >= 0 ? version.Substring(0, index) : version;
         }
 
         internal const string PublicKey =
