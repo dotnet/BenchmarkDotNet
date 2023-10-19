@@ -108,6 +108,7 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
                 case RuntimeMoniker.WasmNet60:
                 case RuntimeMoniker.WasmNet70:
                 case RuntimeMoniker.WasmNet80:
+                case RuntimeMoniker.WasmNet90:
                 case RuntimeMoniker.MonoAOTLLVM:
                 case RuntimeMoniker.MonoAOTLLVMNet60:
                 case RuntimeMoniker.MonoAOTLLVMNet70:
