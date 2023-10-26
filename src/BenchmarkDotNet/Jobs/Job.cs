@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Characteristics;
 using JetBrains.Annotations;
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Jobs
@@ -31,9 +30,9 @@ namespace BenchmarkDotNet.Jobs
         public static readonly Job InProcess = new Job(nameof(InProcess), InfrastructureMode.InProcess);
         public static readonly Job InProcessDontLogOutput = new Job(nameof(InProcessDontLogOutput), InfrastructureMode.InProcessDontLogOutput);
 
-        public Job() : this((string)null) { }
+        public Job() : this((string?)null) { }
 
-        public Job(string id) : base(id)
+        public Job(string? id) : base(id)
         {
             EnvironmentCharacteristic[this] = new EnvironmentMode();
             RunCharacteristic[this] = new RunMode();
@@ -42,7 +41,7 @@ namespace BenchmarkDotNet.Jobs
             MetaCharacteristic[this] = new MetaMode();
         }
 
-        public Job(CharacteristicObject other) : this((string)null, other)
+        public Job(CharacteristicObject other) : this((string?)null, other)
         {
         }
 
@@ -50,12 +49,12 @@ namespace BenchmarkDotNet.Jobs
         {
         }
 
-        public Job(string id, CharacteristicObject other) : this(id)
+        public Job(string? id, CharacteristicObject other) : this(id)
         {
             Apply(other);
         }
 
-        public Job(string id, params CharacteristicObject[] others) : this(id)
+        public Job(string? id, params CharacteristicObject[] others) : this(id)
         {
             Apply(others);
         }

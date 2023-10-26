@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Code
         public string ToSourceCode() =>
             $"({type.GetCorrectCSharpTypeName()})({ToInvariantCultureString()})";
 
-        internal static IParam FromObject(object value, Type type = null)
+        internal static IParam FromObject(object value, Type? type = null)
         {
             type = type ?? value.GetType();
             if (!type.IsEnum)

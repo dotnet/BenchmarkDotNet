@@ -61,17 +61,25 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return GetRootDirectory(IsRootProjectFolder, out directoryInfo);
         }
 
-        internal static bool GetRootDirectory(Func<DirectoryInfo, bool> condition, out DirectoryInfo directoryInfo)
+        internal static bool GetRootDirectory(Func<DirectoryInfo, bool> condition, out DirectoryInfo? directoryInfo)
         {
-            directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
-            while (directoryInfo != null)
+            directoryInfo = null;
+            try
             {
-                if (condition(directoryInfo))
+                directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
+                while (directoryInfo != null)
                 {
-                    return true;
-                }
+                    if (condition(directoryInfo))
+                    {
+                        return true;
+                    }
 
-                directoryInfo = directoryInfo.Parent;
+                    directoryInfo = directoryInfo.Parent;
+                }
+            }
+            catch
+            {
+                return false;
             }
 
             return false;

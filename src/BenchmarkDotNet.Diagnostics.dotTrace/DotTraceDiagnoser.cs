@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -21,10 +19,10 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
 {
     public class DotTraceDiagnoser : IProfiler
     {
-        private readonly Uri nugetUrl;
-        private readonly string toolsDownloadFolder;
+        private readonly Uri? nugetUrl;
+        private readonly string? toolsDownloadFolder;
 
-        public DotTraceDiagnoser(Uri nugetUrl = null, string toolsDownloadFolder = null)
+        public DotTraceDiagnoser(Uri? nugetUrl = null, string? toolsDownloadFolder = null)
         {
             this.nugetUrl = nugetUrl;
             this.toolsDownloadFolder = toolsDownloadFolder;
@@ -110,6 +108,7 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
                 case RuntimeMoniker.WasmNet60:
                 case RuntimeMoniker.WasmNet70:
                 case RuntimeMoniker.WasmNet80:
+                case RuntimeMoniker.WasmNet90:
                 case RuntimeMoniker.MonoAOTLLVM:
                 case RuntimeMoniker.MonoAOTLLVMNet60:
                 case RuntimeMoniker.MonoAOTLLVMNet70:

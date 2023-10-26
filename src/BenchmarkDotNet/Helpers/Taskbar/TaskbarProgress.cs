@@ -165,7 +165,7 @@ namespace BenchmarkDotNet.Helpers
                     case TaskbarProgressState.Warning:
                         Console.Write("\x1b]9;4;4;0\x1b\\");
                         break;
-                };
+                }
                 SetConsoleMode(consoleHandle, previousConsoleMode);
             }
         }

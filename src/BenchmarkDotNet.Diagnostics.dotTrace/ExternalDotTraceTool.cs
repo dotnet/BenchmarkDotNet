@@ -1,9 +1,7 @@
 using System;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using JetBrains.Profiler.SelfApi;
 using ILogger = BenchmarkDotNet.Loggers.ILogger;
@@ -14,7 +12,7 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
     {
         private static readonly TimeSpan AttachTimeout = TimeSpan.FromMinutes(5);
 
-        public ExternalDotTraceTool(ILogger logger, Uri nugetUrl = null, NuGetApi nugetApi = NuGetApi.V3, string downloadTo = null) :
+        public ExternalDotTraceTool(ILogger logger, Uri? nugetUrl = null, NuGetApi nugetApi = NuGetApi.V3, string? downloadTo = null) :
             base(logger, nugetUrl, nugetApi, downloadTo) { }
 
         protected override bool AttachOnly => true;
@@ -46,7 +44,7 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
             {
                 process.OutputDataReceived += (_, args) =>
                 {
-                    string content = args.Data;
+                    string? content = args.Data;
                     if (content != null)
                     {
                         logger.WriteLineInfo("[dotTrace] " + content);
@@ -56,7 +54,7 @@ namespace BenchmarkDotNet.Diagnostics.dotTrace
                 };
                 process.ErrorDataReceived += (_, args) =>
                 {
-                    string content = args.Data;
+                    string? content = args.Data;
                     if (content != null)
                         logger.WriteLineError("[dotTrace] " + args.Data);
                 };

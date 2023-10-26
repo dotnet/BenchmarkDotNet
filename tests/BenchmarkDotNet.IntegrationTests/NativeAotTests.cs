@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public NativeAotTests(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
-        [FactDotNetCoreOnly("It's impossible to reliably detect the version of NativeAOT if the process is not a .NET Core or NativeAOT process")]
+        [FactEnvSpecific("It's impossible to reliably detect the version of NativeAOT if the process is not a .NET Core or NativeAOT process", EnvRequirement.DotNetCoreOnly)]
         public void LatestNativeAotVersionIsSupported()
         {
             if (!RuntimeInformation.Is64BitPlatform()) // NativeAOT does not support 32bit yet

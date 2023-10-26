@@ -151,7 +151,8 @@ namespace BenchmarkDotNet.Tests
             [Benchmark] public T Create() => default;
         }
 
-        [FactDotNetCoreOnly("the implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)")]
+        [FactEnvSpecific("The implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)",
+            EnvRequirement.DotNetCoreOnly)]
         public void StringCanBeUsedAsReadOnlySpanOfCharArgument() => Assert.True(typeof(ReadOnlySpan<char>).IsStackOnlyWithImplicitCast("a string"));
 
         [Fact]

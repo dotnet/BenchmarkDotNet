@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Reports
         public SummaryStyle EffectiveSummaryStyle { get; }
         public bool SeparateLogicalGroups { get; }
 
-        internal SummaryTable(Summary summary, SummaryStyle style = null)
+        internal SummaryTable(Summary summary, SummaryStyle? style = null)
         {
             Summary = summary;
 
@@ -55,6 +55,7 @@ namespace BenchmarkDotNet.Reports
                     .Select(r => r.GcStats.GetBytesAllocatedPerOperation(r.BenchmarkCase).Value)
                     .ToArray()));
             }
+            EffectiveSummaryStyle = style;
 
             var columns = summary.GetColumns();
             ColumnCount = columns.Length;
@@ -96,8 +97,6 @@ namespace BenchmarkDotNet.Reports
                 bool hide = summary.ColumnHidingRules.Any(rule => rule.NeedToHide(column));
                 Columns[i] = new SummaryTableColumn(this, i, column, hide);
             }
-
-            EffectiveSummaryStyle = style;
         }
 
         public class SummaryTableColumn
@@ -123,7 +122,7 @@ namespace BenchmarkDotNet.Reports
                 IsDefault = table.IsDefault[index];
                 OriginalColumn = column;
 
-                Justify = column.IsNumeric ? TextJustification.Right : TextJustification.Left;
+                Justify = column.IsNumeric ? table.EffectiveSummaryStyle.NumericColumnJustification : table.EffectiveSummaryStyle.TextColumnJustification;
 
                 bool needToShow = column.AlwaysShow || Content.Distinct().Count() > 1;
                 NeedToShow = !hide && needToShow;

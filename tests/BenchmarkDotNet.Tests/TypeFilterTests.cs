@@ -192,6 +192,17 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
+        public void MethodCanBeFilteredByParameters()
+        {
+            var benchmarks = Filter(
+                new[] { typeof(ClassA), typeof(ClassB), typeof(ClassE), typeof(NOTTests.ClassD) },
+                new[] { "--filter", "BenchmarkDotNet.Tests.ClassE.Method1(value: 0)" });
+
+            Assert.Single(benchmarks);
+            Assert.Contains("ClassE.Method1", benchmarks);
+        }
+
+        [Fact]
         public void GenericTypesCanBeFilteredByDisplayName()
         {
             var benchmarks = Filter(
@@ -202,7 +213,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Contains("SomeGeneric<Int32>.Create", benchmarks);
         }
 
-        private HashSet<string> Filter(Type[] types, string[] args, ILogger logger = null)
+        private HashSet<string> Filter(Type[] types, string[] args, ILogger? logger = null)
         {
             var nonNullLogger = logger ?? new OutputLogger(Output);
 
@@ -265,6 +276,21 @@ namespace BenchmarkDotNet.Tests
     {
         [Benchmark]
         public T Create() => Activator.CreateInstance<T>();
+    }
+
+    [Run]
+    public class ClassE
+    {
+        public static IEnumerable<object> Values => new object[]
+        {
+            uint.MinValue,
+            (uint)12345, // same value used by other tests to compare the perf
+            uint.MaxValue,
+        };
+
+        [Benchmark]
+        [ArgumentsSource(nameof(Values))]
+        public string Method1(uint value) => value.ToString();
     }
 }
 

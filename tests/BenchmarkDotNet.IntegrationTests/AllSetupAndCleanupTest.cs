@@ -5,7 +5,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using Xunit;
 using Xunit.Abstractions;
@@ -234,7 +233,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public void Benchmark() => Console.WriteLine(BenchmarkCalled);
         }
 
-        [FactNotGitHubActionsWindows]
+        [FactEnvSpecific(EnvRequirement.NonWindows)]
         public void AllSetupAndCleanupMethodRunsAsyncGenericValueTaskSetupTest()
         {
             var miniJob = Job.Default.WithStrategy(RunStrategy.Monitoring).WithWarmupCount(2).WithIterationCount(3).WithInvocationCount(1).WithUnrollFactor(1).WithId("MiniJob");

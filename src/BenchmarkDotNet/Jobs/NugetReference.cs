@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace BenchmarkDotNet.Jobs
 {
     public class NuGetReference : IEquatable<NuGetReference>
     {
-        public NuGetReference(string packageName, string packageVersion, Uri source = null, bool prerelease = false)
+        public NuGetReference(string packageName, string packageVersion, Uri? source = null, bool prerelease = false)
         {
             if (string.IsNullOrWhiteSpace(packageName))
                 throw new ArgumentException("message", nameof(packageName));

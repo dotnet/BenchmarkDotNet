@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [FactWindowsOnly("On Unix, it's possible to write to an opened file")]
+        [FactEnvSpecific("On Unix, it's possible to write to an opened file", EnvRequirement.WindowsOnly)]
         public void ExporterWorksWhenFileIsLocked()
         {
             string resultsDirectoryPath = Path.GetTempPath();
@@ -81,7 +81,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var exporter = new MockExporter();
             var mockSummary = GetMockSummary(resultsDirectoryPath, config: null, typeof(Generic<int>));
             var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, "BenchmarkDotNet.IntegrationTests.Generic_Int32_")}-report.txt";
-            string actualFilePath = null;
+            string? actualFilePath = null;
 
             try
             {
@@ -104,7 +104,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var joinConfig = ManualConfig.CreateEmpty().WithOptions(ConfigOptions.JoinSummary);
             var mockSummary = GetMockSummary(resultsDirectoryPath, joinConfig, typeof(ClassA), typeof(ClassB));
             var expectedFilePath = $"{Path.Combine(mockSummary.ResultsDirectoryPath, mockSummary.Title)}-report.txt";
-            string actualFilePath = null;
+            string? actualFilePath = null;
 
             try
             {
@@ -144,7 +144,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private ImmutableArray<BenchmarkReport> CreateReports(Type[] types, IConfig config = null)
+        private ImmutableArray<BenchmarkReport> CreateReports(Type[] types, IConfig? config = null)
             => CreateBenchmarks(types, config).Select(CreateReport).ToImmutableArray();
 
         private BenchmarkCase[] CreateBenchmarks(Type[] types, IConfig config)

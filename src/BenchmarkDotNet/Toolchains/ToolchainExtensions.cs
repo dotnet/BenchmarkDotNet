@@ -1,6 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -27,19 +28,24 @@ namespace BenchmarkDotNet.Toolchains
                 : GetToolchain(
                     job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance),
                     descriptor,
-                    job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic) || job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic));
+                    job.HasValue(InfrastructureMode.NuGetReferencesCharacteristic)
+                    || job.HasValue(InfrastructureMode.BuildConfigurationCharacteristic)
+                    || job.HasValue(InfrastructureMode.ArgumentsCharacteristic));
 
-        internal static IToolchain GetToolchain(this Runtime runtime, Descriptor descriptor = null, bool preferMsBuildToolchains = false)
+        internal static IToolchain GetToolchain(this Runtime runtime, Descriptor? descriptor = null, bool preferMsBuildToolchains = false)
         {
             switch (runtime)
             {
                 case ClrRuntime clrRuntime:
-                    if (RuntimeInformation.IsNetCore || preferMsBuildToolchains)
-                        return clrRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
-                            ? GetToolchain(clrRuntime.RuntimeMoniker)
-                            : CsProjClassicNetToolchain.From(clrRuntime.MsBuildMoniker);
+                    if (!preferMsBuildToolchains && RuntimeInformation.IsFullFramework
+                        && RuntimeInformation.GetCurrentRuntime().MsBuildMoniker == runtime.MsBuildMoniker)
+                    {
+                        return RoslynToolchain.Instance;
+                    }
 
-                    return RoslynToolchain.Instance;
+                    return clrRuntime.RuntimeMoniker != RuntimeMoniker.NotRecognized
+                        ? GetToolchain(clrRuntime.RuntimeMoniker)
+                        : CsProjClassicNetToolchain.From(clrRuntime.MsBuildMoniker);
 
                 case MonoRuntime mono:
                     if (RuntimeInformation.IsAndroid())

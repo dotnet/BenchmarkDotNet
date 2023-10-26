@@ -13,13 +13,13 @@ The template exists for each major .NET language ([C#](https://learn.microsoft.c
 The templates requires the [.NET Core SDK](https://www.microsoft.com/net/download). Once installed, run the following command to install the templates:
 
 ```log
-dotnet new -i BenchmarkDotNet.Templates
+dotnet new install BenchmarkDotNet.Templates
 ```
 
 If you want to uninstall all BenchmarkDotNet templates:
 
 ```log
-dotnet new -u BenchmarkDotNet.Templates
+dotnet new uninstall BenchmarkDotNet.Templates
 ```
 
 The template is a nuget package distributed over nuget: [BenchmarkDotNet.Templates](https://www.nuget.org/packages/BenchmarkDotNet.Templates/).

@@ -222,7 +222,10 @@ public class ReleaseTask : FrostingTask<BuildContext>, IHelpProvider
         {
             new Example(Name)
                 .WithArgument(KnownOptions.Stable)
-                .WithArgument(KnownOptions.NextVersion, "v0.1.1729")
+                .WithArgument(KnownOptions.NextVersion, "0.1.1729")
+                .WithArgument(KnownOptions.Push),
+            new Example(Name)
+                .WithArgument(KnownOptions.Stable)
                 .WithArgument(KnownOptions.Push)
         }
     };

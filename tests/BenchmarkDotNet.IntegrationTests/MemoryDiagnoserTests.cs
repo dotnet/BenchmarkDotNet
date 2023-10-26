@@ -9,7 +9,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
@@ -70,7 +69,7 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
-        [FactDotNetCoreOnly("We don't want to test NativeAOT twice (for .NET Framework 4.6.2 and .NET 7.0)")]
+        [FactEnvSpecific("We don't want to test NativeAOT twice (for .NET Framework 4.6.2 and .NET 7.0)", EnvRequirement.DotNetCoreOnly)]
         public void MemoryDiagnoserSupportsNativeAOT()
         {
             if (RuntimeInformation.IsMacOS())
@@ -82,7 +81,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     .ToToolchain());
         }
 
-        [FactDotNetCoreOnly("We don't want to test MonoVM twice (for .NET Framework 4.6.2 and .NET 7.0)")]
+        [FactEnvSpecific("We don't want to test MonoVM twice (for .NET Framework 4.6.2 and .NET 7.0)", EnvRequirement.DotNetCoreOnly)]
         public void MemoryDiagnoserSupportsModernMono()
         {
             MemoryDiagnoserIsAccurate(MonoToolchain.Mono70);
@@ -263,7 +262,9 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryNetCore30(".NET Core 3.0 preview6+ exposes a GC.GetTotalAllocatedBytes method which makes it possible to work"), MemberData(nameof(GetToolchains))]
+        [TheoryEnvSpecific(".NET Core 3.0 preview6+ exposes a GC.GetTotalAllocatedBytes method which makes it possible to work",
+            EnvRequirement.DotNetCore30Only)]
+        [MemberData(nameof(GetToolchains))]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserIsAccurateForMultiThreadedBenchmarks(IToolchain toolchain)
         {

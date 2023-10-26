@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using JetBrains.Annotations;
 using BenchmarkDotNet.Extensions;
 
 namespace BenchmarkDotNet.Environments
@@ -161,6 +160,7 @@ namespace BenchmarkDotNet.Environments
                 // Windows 11
                 new Windows1XVersion("21H2", "Sun Valley", null, 22000),
                 new Windows1XVersion("22H2", "Sun Valley 2", "2022 Update", 22621),
+                new Windows1XVersion("23H2", "Sun Valley 3", "2023 Update", 22631),
             };
 
             public static Windows1XVersion? Resolve(string osVersionString)

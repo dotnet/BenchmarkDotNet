@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.Code
 
         private static void AddNonEmptyUnique(HashSet<string> items, string value)
         {
-            if (!string.IsNullOrEmpty(value) && !items.Contains(value))
+            if (!string.IsNullOrEmpty(value))
                 items.Add(value);
         }
 
@@ -296,7 +296,7 @@ namespace BenchmarkDotNet.Code
                 builder = new StringBuilder(text);
             }
 
-            public SmartStringBuilder Replace(string oldValue, string newValue)
+            public SmartStringBuilder Replace(string oldValue, string? newValue)
             {
                 if (originalText.Contains(oldValue))
                     builder.Replace(oldValue, newValue);

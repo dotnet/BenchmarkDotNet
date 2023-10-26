@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Tests.Running
             [Benchmark] public void M2() { }
         }
 
-        [FactWindowsOnly("Full Framework is supported only on Windows")]
+        [FactEnvSpecific("Full Framework is supported only on Windows", EnvRequirement.WindowsOnly)]
         public void CustomClrBuildJobsAreGroupedByVersion()
         {
             const string version = "abcd";

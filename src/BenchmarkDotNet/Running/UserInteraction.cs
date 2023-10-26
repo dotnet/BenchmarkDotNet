@@ -7,7 +7,6 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Running
 {

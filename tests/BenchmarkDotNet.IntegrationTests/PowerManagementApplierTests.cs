@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public PowerManagementApplierTests(ITestOutputHelper output) : base(output) { }
 
-        [FactWindowsOnly("Setting high-performance plan is suitable only on Windows")]
+        [FactEnvSpecific("Setting high-performance plan is suitable only on Windows", EnvRequirement.WindowsOnly)]
         public void TestSettingAndRevertingBackGuid()
         {
             var userPlan = PowerManagementHelper.CurrentPlan;
@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal(userPlan, PowerManagementHelper.CurrentPlan);
         }
 
-        [FactWindowsOnly("Setting high-performance plan is suitable only on Windows")]
+        [FactEnvSpecific("Setting high-performance plan is suitable only on Windows", EnvRequirement.WindowsOnly)]
         public void TestPowerPlanShouldNotChange()
         {
             var userPlan = PowerManagementHelper.CurrentPlan;

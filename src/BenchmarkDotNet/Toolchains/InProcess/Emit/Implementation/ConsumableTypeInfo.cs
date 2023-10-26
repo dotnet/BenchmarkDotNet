@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Engines;
-using JetBrains.Annotations;
 using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;

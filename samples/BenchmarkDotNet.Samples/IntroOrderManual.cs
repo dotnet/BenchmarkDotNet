@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Samples
             private class FastestToSlowestOrderer : IOrderer
             {
                 public IEnumerable<BenchmarkCase> GetExecutionOrder(ImmutableArray<BenchmarkCase> benchmarksCase,
-                    IEnumerable<BenchmarkLogicalGroupRule> order = null) =>
+                    IEnumerable<BenchmarkLogicalGroupRule>? order = null) =>
                     from benchmark in benchmarksCase
                     orderby benchmark.Parameters["X"] descending,
                         benchmark.Descriptor.WorkloadMethodDisplayInfo
@@ -39,7 +39,7 @@ namespace BenchmarkDotNet.Samples
                     benchmarkCase.Job.DisplayInfo + "_" + benchmarkCase.Parameters.DisplayInfo;
 
                 public IEnumerable<IGrouping<string, BenchmarkCase>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>> logicalGroups,
-                    IEnumerable<BenchmarkLogicalGroupRule> order = null) =>
+                    IEnumerable<BenchmarkLogicalGroupRule>? order = null) =>
                     logicalGroups.OrderBy(it => it.Key);
 
                 public bool SeparateLogicalGroups => true;

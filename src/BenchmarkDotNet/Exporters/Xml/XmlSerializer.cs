@@ -110,7 +110,7 @@ namespace BenchmarkDotNet.Exporters.Xml
 
             writer.WriteStartElement(property.Name);
 
-            string itemName = null;
+            string? itemName = null;
 
             foreach (var item in collection)
             {

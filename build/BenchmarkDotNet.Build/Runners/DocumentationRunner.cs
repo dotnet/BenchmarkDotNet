@@ -133,8 +133,8 @@ public class DocumentationRunner
 
         var currentDirectory = Directory.GetCurrentDirectory();
         Directory.SetCurrentDirectory(docfxJsonFile.GetDirectory().FullPath);
-        Microsoft.DocAsCode.Dotnet.DotnetApiCatalog.GenerateManagedReferenceYamlFiles(docfxJsonFile.FullPath).Wait();
-        Microsoft.DocAsCode.Docset.Build(docfxJsonFile.FullPath).Wait();
+        Docfx.Dotnet.DotnetApiCatalog.GenerateManagedReferenceYamlFiles(docfxJsonFile.FullPath).Wait();
+        Docfx.Docset.Build(docfxJsonFile.FullPath).Wait();
         Directory.SetCurrentDirectory(currentDirectory);
     }
 

@@ -11,6 +11,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
@@ -54,12 +55,18 @@ namespace BenchmarkDotNet.Running
             using (var streamLogger = new StreamLogger(GetLogFileStreamWriter(benchmarkRunInfos, logFilePath)))
             {
                 var compositeLogger = CreateCompositeLogger(benchmarkRunInfos, streamLogger);
+                var eventProcessor = new CompositeEventProcessor(benchmarkRunInfos);
+
+                eventProcessor.OnStartValidationStage();
 
                 compositeLogger.WriteLineInfo("// Validating benchmarks:");
 
                 var (supportedBenchmarks, validationErrors) = GetSupportedBenchmarks(benchmarkRunInfos, resolver);
 
                 validationErrors.AddRange(Validate(supportedBenchmarks));
+
+                foreach (var validationError in validationErrors)
+                    eventProcessor.OnValidationError(validationError);
 
                 PrintValidationErrors(compositeLogger, validationErrors);
 
@@ -69,15 +76,23 @@ namespace BenchmarkDotNet.Running
                 if (!supportedBenchmarks.Any(benchmarks => benchmarks.BenchmarksCases.Any()))
                     return new[] { Summary.ValidationFailed(title, resultsFolderPath, logFilePath) };
 
+                eventProcessor.OnEndValidationStage();
+
                 int totalBenchmarkCount = supportedBenchmarks.Sum(benchmarkInfo => benchmarkInfo.BenchmarksCases.Length);
                 int benchmarksToRunCount = totalBenchmarkCount - (idToResume + 1); // ids are indexed from 0
                 compositeLogger.WriteLineHeader("// ***** BenchmarkRunner: Start   *****");
                 compositeLogger.WriteLineHeader($"// ***** Found {totalBenchmarkCount} benchmark(s) in total *****");
                 var globalChronometer = Chronometer.Start();
 
+
                 var buildPartitions = BenchmarkPartitioner.CreateForBuild(supportedBenchmarks, resolver);
-                var buildResults = BuildInParallel(compositeLogger, rootArtifactsFolderPath, buildPartitions, in globalChronometer);
+                eventProcessor.OnStartBuildStage(buildPartitions);
+                var buildResults = BuildInParallel(compositeLogger, rootArtifactsFolderPath, buildPartitions, in globalChronometer, eventProcessor);
+
                 var allBuildsHaveFailed = buildResults.Values.All(buildResult => !buildResult.IsBuildSuccess);
+
+                eventProcessor.OnEndBuildStage();
+                eventProcessor.OnStartRunStage();
 
                 try
                 {
@@ -102,9 +117,11 @@ namespace BenchmarkDotNet.Running
                             }
                         }
 
-                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, artifactsToCleanup,
+                        eventProcessor.OnStartRunBenchmarksInType(benchmarkRunInfo.Type, benchmarkRunInfo.BenchmarksCases);
+                        var summary = Run(benchmarkRunInfo, benchmarkToBuildResult, resolver, compositeLogger, eventProcessor, artifactsToCleanup,
                             resultsFolderPath, logFilePath, totalBenchmarkCount, in runsChronometer, ref benchmarksToRunCount,
                             taskbarProgress);
+                        eventProcessor.OnEndRunBenchmarksInType(benchmarkRunInfo.Type, summary);
 
                         if (!benchmarkRunInfo.Config.Options.IsSet(ConfigOptions.JoinSummary))
                             PrintSummary(compositeLogger, benchmarkRunInfo.Config, summary);
@@ -148,6 +165,8 @@ namespace BenchmarkDotNet.Running
                     Cleanup(compositeLogger, new HashSet<string>(artifactsToCleanup.Distinct()));
                     compositeLogger.WriteLineInfo("Artifacts cleanup is finished");
                     compositeLogger.Flush();
+
+                    eventProcessor.OnEndRunStage();
                 }
             }
         }
@@ -156,6 +175,7 @@ namespace BenchmarkDotNet.Running
                                    Dictionary<BenchmarkCase, (BenchmarkId benchmarkId, BuildResult buildResult)> buildResults,
                                    IResolver resolver,
                                    ILogger logger,
+                                   EventProcessor eventProcessor,
                                    List<string> artifactsToCleanup,
                                    string resultsFolderPath,
                                    string logFilePath,
@@ -198,7 +218,10 @@ namespace BenchmarkDotNet.Running
                         if (!config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
                             artifactsToCleanup.AddRange(buildResult.ArtifactsToCleanup);
 
+                        eventProcessor.OnStartRunBenchmark(benchmark);
                         var report = RunCore(benchmark, info.benchmarkId, logger, resolver, buildResult);
+                        eventProcessor.OnEndRunBenchmark(benchmark, report);
+
                         if (report.AllMeasurements.Any(m => m.Operations == 0))
                             throw new InvalidOperationException("An iteration with 'Operations == 0' detected");
                         reports.Add(report);
@@ -219,7 +242,7 @@ namespace BenchmarkDotNet.Running
                         reports.Add(new BenchmarkReport(false, benchmark, buildResult, buildResult, default, default));
 
                         if (buildResult.GenerateException != null)
-                            logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException.Message}");
+                            logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException}");
                         else if (!buildResult.IsBuildSuccess && buildResult.TryToExplainFailureReason(out string reason))
                             logger.WriteLineError($"// Build Error: {reason}");
                         else if (buildResult.ErrorMessage != null)
@@ -347,7 +370,7 @@ namespace BenchmarkDotNet.Running
             return validationErrors.ToImmutableArray();
         }
 
-        private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer)
+        private static Dictionary<BuildPartition, BuildResult> BuildInParallel(ILogger logger, string rootArtifactsFolderPath, BuildPartition[] buildPartitions, in StartedClock globalChronometer, EventProcessor eventProcessor)
         {
             logger.WriteLineHeader($"// ***** Building {buildPartitions.Length} exe(s) in Parallel: Start   *****");
 
@@ -357,8 +380,18 @@ namespace BenchmarkDotNet.Running
 
             var buildResults = buildPartitions
                 .AsParallel()
-                .Select(buildPartition => (buildPartition, buildResult: Build(buildPartition, rootArtifactsFolderPath, buildLogger)))
-                .ToDictionary(result => result.buildPartition, result => result.buildResult);
+                .Select(buildPartition => (Partition: buildPartition, Result: Build(buildPartition, rootArtifactsFolderPath, buildLogger)))
+                .AsSequential() // Ensure that build completion events are processed sequentially
+                .Select(build =>
+                {
+                    // If the generation was successful, but the build was not, we will try building sequentially
+                    // so don't send the OnBuildComplete event yet.
+                    if (buildPartitions.Length <= 1 || !build.Result.IsGenerateSuccess || build.Result.IsBuildSuccess)
+                        eventProcessor.OnBuildComplete(build.Partition, build.Result);
+
+                    return build;
+                })
+                .ToDictionary(build => build.Partition, build => build.Result);
 
             var afterParallelBuild = globalChronometer.GetElapsed();
 
@@ -370,8 +403,15 @@ namespace BenchmarkDotNet.Running
             logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build   *****");
 
             foreach (var buildPartition in buildPartitions)
-                if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess && !buildResults[buildPartition].TryToExplainFailureReason(out string _))
-                    buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, buildLogger);
+            {
+                if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess)
+                {
+                    if (!buildResults[buildPartition].TryToExplainFailureReason(out string _))
+                        buildResults[buildPartition] = Build(buildPartition, rootArtifactsFolderPath, buildLogger);
+
+                    eventProcessor.OnBuildComplete(buildPartition, buildResults[buildPartition]);
+                }
+            }
 
             var afterSequentialBuild = globalChronometer.GetElapsed();
 
@@ -672,9 +712,9 @@ namespace BenchmarkDotNet.Running
                 $" Estimated finish {estimatedEnd:yyyy-MM-dd H:mm} ({(int)fromNow.TotalHours}h {fromNow.Minutes}m from now) **";
             logger.WriteLineHeader(message);
 
-            consoleTitler.UpdateTitle ($"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining - {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish");
+            consoleTitler.UpdateTitle($"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining - {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish");
 
-            taskbarProgress.SetProgress((float) executedBenchmarkCount / totalBenchmarkCount);
+            taskbarProgress.SetProgress((float)executedBenchmarkCount / totalBenchmarkCount);
         }
 
         private static TimeSpan GetEstimatedFinishTime(in StartedClock runsChronometer, int benchmarksToRunCount, int executedBenchmarkCount)

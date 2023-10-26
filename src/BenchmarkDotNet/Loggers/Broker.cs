@@ -78,9 +78,8 @@ namespace BenchmarkDotNet.Loggers
             using StreamWriter writer = new (acknowledgments, AnonymousPipesHost.UTF8NoBOM, bufferSize: 1);
             // Flush the data to the Stream after each write, otherwise the client will wait for input endlessly!
             writer.AutoFlush = true;
-            string line = null;
 
-            while ((line = reader.ReadLine()) is not null)
+            while (reader.ReadLine() is { } line)
             {
                 // TODO: implement Silent mode here
                 logger.WriteLine(LogKind.Default, line);

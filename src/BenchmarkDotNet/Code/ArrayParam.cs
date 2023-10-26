@@ -10,15 +10,15 @@ namespace BenchmarkDotNet.Code
     internal static class ArrayParam
     {
         public static string GetDisplayString(Array array)
-            => $"{array.GetType().GetElementType().GetDisplayName()}[{array.Length}]";
+            => $"{array.GetType().GetElementType()?.GetDisplayName()}[{array.Length}]";
     }
 
     public class ArrayParam<T> : IParam
     {
         private readonly T[] array;
-        private readonly Func<T, string> toSourceCode;
+        private readonly Func<T, string>? toSourceCode;
 
-        private ArrayParam(T[] array, Func<T, string> toSourceCode = null)
+        private ArrayParam(T[] array, Func<T, string>? toSourceCode = null)
         {
             this.array = array;
             this.toSourceCode = toSourceCode;
@@ -45,19 +45,22 @@ namespace BenchmarkDotNet.Code
         /// </param>
         [PublicAPI] public static ArrayParam<T> ForComplexTypes(T[] array, Func<T, string> toSourceCode) => new ArrayParam<T>(array, toSourceCode);
 
-        internal static IParam FromObject(object array)
+        internal static IParam? FromObject(object array)
         {
             var type = array.GetType();
             if (!type.IsArray)
                 throw new InvalidOperationException("The argument must be an array");
-            if (!SourceCodeHelper.IsCompilationTimeConstant(type.GetElementType()))
+            var elementType = type.GetElementType();
+            if (elementType == null)
+                throw new InvalidOperationException("Failed to determine type of array elements");
+            if (!SourceCodeHelper.IsCompilationTimeConstant(elementType))
                 throw new InvalidOperationException("The argument must be an array of primitives");
 
-            var arrayParamType = typeof(ArrayParam<>).MakeGenericType(type.GetElementType());
+            var arrayParamType = typeof(ArrayParam<>).MakeGenericType(elementType);
 
             var methodInfo = arrayParamType.GetMethod(nameof(ForPrimitives), BindingFlags.Public | BindingFlags.Static)
                 ?? throw new InvalidOperationException($"{nameof(ForPrimitives)} not found");
-            return (IParam)methodInfo.Invoke(null, new[]{ array});
+            return (IParam?)methodInfo.Invoke(null, new[]{ array});
         }
     }
 }

@@ -123,7 +123,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             bool isValueTask = typeof(T).IsConstructedGenericType && typeof(T).GetGenericTypeDefinition() == typeof(ValueTask<>);
 
-            object idleExpected;
+            object? idleExpected;
             if (isValueTask)
                 idleExpected = GetDefault(typeof(T).GetGenericArguments()[0]);
             else if (typeof(T).GetTypeInfo().IsValueType)
@@ -157,18 +157,18 @@ namespace BenchmarkDotNet.IntegrationTests
                 {
                     benchmarkAction.InvokeSingle();
                     Assert.Equal(0, BenchmarkAllCases.Counter);
-                    benchmarkAction.InvokeMultiple(0);
+                    benchmarkAction.InvokeUnroll(0);
                     Assert.Equal(0, BenchmarkAllCases.Counter);
-                    benchmarkAction.InvokeMultiple(11);
+                    benchmarkAction.InvokeUnroll(11);
                     Assert.Equal(0, BenchmarkAllCases.Counter);
                 }
                 else
                 {
                     benchmarkAction.InvokeSingle();
                     Assert.Equal(1, BenchmarkAllCases.Counter);
-                    benchmarkAction.InvokeMultiple(0);
+                    benchmarkAction.InvokeUnroll(0);
                     Assert.Equal(1, BenchmarkAllCases.Counter);
-                    benchmarkAction.InvokeMultiple(11);
+                    benchmarkAction.InvokeUnroll(11);
                     Assert.Equal(BenchmarkAllCases.Counter, 1 + unrollFactor * 11);
                 }
 
@@ -180,7 +180,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private IConfig CreateInProcessConfig(OutputLogger logger = null)
+        private IConfig CreateInProcessConfig(OutputLogger? logger = null)
         {
             return new ManualConfig()
                 .AddJob(Job.Dry.WithToolchain(new InProcessNoEmitToolchain(TimeSpan.Zero, true)).WithInvocationCount(UnrollFactor).WithUnrollFactor(UnrollFactor))

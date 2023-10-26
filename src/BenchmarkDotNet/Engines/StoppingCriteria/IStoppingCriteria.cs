@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Reports;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Engines
 {

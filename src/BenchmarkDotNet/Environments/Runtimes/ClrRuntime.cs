@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Environments
 
         public string Version { get; }
 
-        private ClrRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName, string version = null)
+        private ClrRuntime(RuntimeMoniker runtimeMoniker, string msBuildMoniker, string displayName, string? version = null)
             : base(runtimeMoniker, msBuildMoniker, displayName)
         {
             Version = version;

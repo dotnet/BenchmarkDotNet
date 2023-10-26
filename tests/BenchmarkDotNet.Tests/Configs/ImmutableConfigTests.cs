@@ -85,7 +85,9 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Equal(HardwareCounter.CacheMisses, final.GetHardwareCounters().Single());
         }
 
-        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because NativeAOT compiler goes crazy when some dependency has reference to TraceEvent...")]
+        [FactEnvSpecific(
+            "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because NativeAOT compiler goes crazy when some dependency has reference to TraceEvent...",
+            EnvRequirement.FullFrameworkOnly)]
         public void WhenUserDefinesHardwareCountersWeChooseTheRightDiagnoser()
         {
             var mutable = ManualConfig.CreateEmpty();
@@ -98,7 +100,9 @@ namespace BenchmarkDotNet.Tests.Configs
             Assert.Single(final.GetDiagnosers().OfType<IHardwareCountersDiagnoser>());
         }
 
-        [FactClassicDotNetOnly(skipReason: "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because NativeAOT compiler goes crazy when some dependency has reference to TraceEvent...")]
+        [FactEnvSpecific(
+            "We have hardware counters diagnosers only for Windows. This test is disabled for .NET Core because NativeAOT compiler goes crazy when some dependency has reference to TraceEvent...",
+            EnvRequirement.FullFrameworkOnly)]
         public void WhenUserDefinesHardwareCountersAndUsesDisassemblyDiagnoserWeAddInstructionPointerExporter()
         {
             var mutable = ManualConfig.CreateEmpty();
@@ -137,6 +141,19 @@ namespace BenchmarkDotNet.Tests.Configs
             var final = ImmutableConfigBuilder.Create(mutable);
 
             Assert.Same(MarkdownExporter.GitHub, final.GetExporters().Single());
+        }
+
+        [Fact]
+        public void MultipleExportersOfSameTypeWithDifferentNamesAreAccepted()
+        {
+            var mutable = ManualConfig.CreateEmpty();
+
+            mutable.AddExporter(MarkdownExporter.GitHub);
+            mutable.AddExporter(MarkdownExporter.Atlassian);
+
+            var final = ImmutableConfigBuilder.Create(mutable);
+
+            Assert.Equal(2, final.GetExporters().Count());
         }
 
         [Fact]
@@ -376,7 +393,7 @@ namespace BenchmarkDotNet.Tests.Configs
             var leftAddedToTheRight = ManualConfig.Create(right);
             leftAddedToTheRight.Add(left);
 
-            return new[]{ rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig() };
+            return new[] { rightAddedToLeft.CreateImmutableConfig(), leftAddedToTheRight.CreateImmutableConfig() };
         }
 
         public class TestExporter : IExporter, IExporterDependencies
@@ -424,7 +441,7 @@ namespace BenchmarkDotNet.Tests.Configs
 
                 var final = ImmutableConfigBuilder.Create(mutable);
 
-                Assert.Equal(1, final.ConfigAnalysisConclusion.Count);
+                Assert.Single(final.ConfigAnalysisConclusion);
             }
             finally
             {

@@ -1,6 +1,5 @@
 ﻿using System;
 using BenchmarkDotNet.Helpers;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Portability.Cpu
 {

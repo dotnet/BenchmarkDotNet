@@ -77,7 +77,7 @@ namespace BenchmarkDotNet.Environments
             }
         }
 
-        internal static bool TryGetVersion(out Version version)
+        internal static bool TryGetVersion(out Version? version)
         {
             // we can't just use System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription
             // because it can be null and it reports versions like 4.6.* for .NET Core 2.*
@@ -124,7 +124,7 @@ namespace BenchmarkDotNet.Environments
         // sample input:
         // for dotnet run: C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.1.12\
         // for dotnet publish: C:\Users\adsitnik\source\repos\ConsoleApp25\ConsoleApp25\bin\Release\netcoreapp2.0\win-x64\publish\
-        internal static bool TryGetVersionFromRuntimeDirectory(string runtimeDirectory, out Version version)
+        internal static bool TryGetVersionFromRuntimeDirectory(string runtimeDirectory, out Version? version)
         {
             if (!string.IsNullOrEmpty(runtimeDirectory) && Version.TryParse(GetParsableVersionPart(new DirectoryInfo(runtimeDirectory).Name), out version))
             {
@@ -141,7 +141,7 @@ namespace BenchmarkDotNet.Environments
         // 2.2: 4.6.27817.03 @BuiltBy: dlab14-DDVSOWINAGE101 @Branch: release/2.2 @SrcCode: https://github.com/dotnet/coreclr/tree/ce1d090d33b400a25620c0145046471495067cc7, Microsoft .NET Framework
         // 3.0: 3.0.0-preview8.19379.2+ac25be694a5385a6a1496db40de932df0689b742, Microsoft .NET Core
         // 5.0: 5.0.0-alpha1.19413.7+0ecefa44c9d66adb8a997d5778dc6c246ad393a7, Microsoft .NET Core
-        internal static bool TryGetVersionFromProductInfo(string productVersion, string productName, out Version version)
+        internal static bool TryGetVersionFromProductInfo(string productVersion, string productName, out Version? version)
         {
             if (!string.IsNullOrEmpty(productVersion) && !string.IsNullOrEmpty(productName))
             {
@@ -158,7 +158,7 @@ namespace BenchmarkDotNet.Environments
                 if (productName.IndexOf(".NET Framework", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     const string releaseVersionPrefix = "release/";
-                    int releaseVersionIndex = productVersion.IndexOf(releaseVersionPrefix);
+                    int releaseVersionIndex = productVersion.IndexOf(releaseVersionPrefix, StringComparison.Ordinal);
                     if (releaseVersionIndex > 0)
                     {
                         string releaseVersion = GetParsableVersionPart(productVersion.Substring(releaseVersionIndex + releaseVersionPrefix.Length));
@@ -175,7 +175,7 @@ namespace BenchmarkDotNet.Environments
         // sample input:
         // .NETCoreApp,Version=v2.0
         // .NETCoreApp,Version=v2.1
-        internal static bool TryGetVersionFromFrameworkName(string frameworkName, out Version version)
+        internal static bool TryGetVersionFromFrameworkName(string frameworkName, out Version? version)
         {
             const string versionPrefix = ".NETCoreApp,Version=v";
             if (!string.IsNullOrEmpty(frameworkName) && frameworkName.StartsWith(versionPrefix))

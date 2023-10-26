@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "fullxml", new[] { XmlExporter.Full } }
             };
 
-        public static (bool isSuccess, IConfig config, CommandLineOptions options) Parse(string[] args, ILogger logger, IConfig globalConfig = null)
+        public static (bool isSuccess, IConfig config, CommandLineOptions options) Parse(string[] args, ILogger logger, IConfig? globalConfig = null)
         {
             (bool isSuccess, IConfig config, CommandLineOptions options) result = default;
 
@@ -126,15 +126,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 }
                 else
                 {
-                    if (arg.Contains(' '))
-                    {
-                        // Workaround for CommandLine library issue with parsing these kind of args.
-                        result.Add(" " + arg);
-                    }
-                    else
-                    {
-                        result.Add(arg);
-                    }
+                    result.Add(arg);
                 }
             }
 
@@ -526,7 +518,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 case RuntimeMoniker.Net481:
                     return baseJob
                         .WithRuntime(runtimeMoniker.GetRuntime())
-                        .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName));
+                        .WithToolchain(CsProjClassicNetToolchain.From(runtimeId, options.RestorePath?.FullName, options.CliPath?.FullName));
 
                 case RuntimeMoniker.NetCoreApp20:
                 case RuntimeMoniker.NetCoreApp21:
@@ -570,6 +562,9 @@ namespace BenchmarkDotNet.ConsoleArguments
 
                 case RuntimeMoniker.WasmNet80:
                     return MakeWasmJob(baseJob, options, "net8.0", runtimeMoniker);
+
+                case RuntimeMoniker.WasmNet90:
+                    return MakeWasmJob(baseJob, options, "net9.0", runtimeMoniker);
 
                 case RuntimeMoniker.MonoAOTLLVM:
                     return MakeMonoAOTLLVMJob(baseJob, options, RuntimeInformation.IsNetCore ? CoreRuntime.GetCurrentVersion().MsBuildMoniker : "net6.0");

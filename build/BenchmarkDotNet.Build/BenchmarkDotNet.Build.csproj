@@ -9,7 +9,7 @@
     <PackageReference Include="Cake.Frosting" Version="3.0.0" />
     <PackageReference Include="Cake.FileHelpers" Version="6.1.3" />
     <PackageReference Include="Cake.Git" Version="3.0.0" />
-    <PackageReference Include="Microsoft.DocAsCode.App" Version="2.67.5" />
+    <PackageReference Include="Docfx.App" Version="2.71.1" />
     <PackageReference Include="Octokit" Version="7.0.0" />
   </ItemGroup>
 </Project>

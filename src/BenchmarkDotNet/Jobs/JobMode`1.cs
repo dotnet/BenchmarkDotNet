@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Jobs
 
         protected JobMode() { }
 
-        protected JobMode(string id) : base(id) { }
+        protected JobMode(string? id) : base(id) { }
 
         [PublicAPI] public Job Job => OwnerOrSelf as Job;
     }

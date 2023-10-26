@@ -1,5 +1,3 @@
-using JetBrains.Annotations;
-
 namespace BenchmarkDotNet.Helpers
 {
     internal static class AsciiHelper

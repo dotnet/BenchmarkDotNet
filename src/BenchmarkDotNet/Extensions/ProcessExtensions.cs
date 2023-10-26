@@ -11,7 +11,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CoreRun;
-using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using JetBrains.Annotations;
 
 
@@ -33,7 +32,7 @@ namespace BenchmarkDotNet.Extensions
             }
             catch (Exception ex)
             {
-                logger.WriteLineError($"Failed to set up high priority. Make sure you have the right permissions. Message: {ex.Message}");
+                logger.WriteLineInfo($"// Failed to set up high priority ({ex.Message}). In order to run benchmarks with high priority, make sure you have the right permissions.");
             }
         }
 

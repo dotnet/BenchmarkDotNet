@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 
-using JetBrains.Annotations;
-
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 {
     /// <summary>Helper class that creates <see cref="BenchmarkAction"/> instances. </summary>

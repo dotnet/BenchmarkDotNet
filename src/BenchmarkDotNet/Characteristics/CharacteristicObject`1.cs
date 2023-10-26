@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Characteristics
     {
         protected CharacteristicObject() { }
 
-        protected CharacteristicObject(string id) : base(id) { }
+        protected CharacteristicObject(string? id) : base(id) { }
 
         public new T Apply(CharacteristicObject other) => (T)ApplyCore(other);
 

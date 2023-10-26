@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Management;
-using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -186,11 +185,27 @@ namespace BenchmarkDotNet.Portability
                 return null;
             try
             {
-                return LinuxOsReleaseHelper.GetNameByOsRelease(File.ReadAllLines("/etc/os-release"));
+                string version = LinuxOsReleaseHelper.GetNameByOsRelease(File.ReadAllLines("/etc/os-release"));
+                bool wsl = IsUnderWsl();
+                return wsl ? version + " WSL" : version;
             }
             catch (Exception)
             {
                 return null;
+            }
+        }
+
+        private static bool IsUnderWsl()
+        {
+            if (!IsLinux())
+                return false;
+            try
+            {
+                return File.Exists("/proc/sys/fs/binfmt_misc/WSLInterop"); // https://superuser.com/a/1749811
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 

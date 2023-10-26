@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Loggers
         private readonly Dictionary<LogKind, ConsoleColor> colorScheme;
 
         [PublicAPI]
-        public ConsoleLogger(bool unicodeSupport = false, Dictionary<LogKind, ConsoleColor> colorScheme = null)
+        public ConsoleLogger(bool unicodeSupport = false, Dictionary<LogKind, ConsoleColor>? colorScheme = null)
         {
             this.unicodeSupport = unicodeSupport;
             this.colorScheme = colorScheme ?? CreateColorfulScheme();

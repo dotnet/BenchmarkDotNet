@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Attributes
             int warmupCount = DefaultValue,
             int iterationCount = DefaultValue,
             int invocationCount = DefaultValue,
-            string id = null,
+            string? id = null,
             bool baseline = false
         ) : base(CreateJob(id, launchCount, warmupCount, iterationCount, invocationCount, null, baseline)) { }
 
@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Attributes
             int warmupCount = DefaultValue,
             int iterationCount = DefaultValue,
             int invocationCount = DefaultValue,
-            string id = null,
+            string? id = null,
             bool baseline = false
         ) : base(CreateJob(id, launchCount, warmupCount, iterationCount, invocationCount, runStrategy, baseline)) { }
 
@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Attributes
             int warmupCount = DefaultValue,
             int iterationCount = DefaultValue,
             int invocationCount = DefaultValue,
-            string id = null,
+            string? id = null,
             bool baseline = false
         ) : base(CreateJob(id, launchCount, warmupCount, iterationCount, invocationCount, null, baseline, runtimeMoniker)) { }
 
@@ -52,11 +52,11 @@ namespace BenchmarkDotNet.Attributes
             int warmupCount = DefaultValue,
             int iterationCount = DefaultValue,
             int invocationCount = DefaultValue,
-            string id = null,
+            string? id = null,
             bool baseline = false
         ) : base(CreateJob(id, launchCount, warmupCount, iterationCount, invocationCount, runStrategy, baseline, runtimeMoniker)) { }
 
-        private static Job CreateJob(string id, int launchCount, int warmupCount, int iterationCount, int invocationCount, RunStrategy? runStrategy,
+        private static Job CreateJob(string? id, int launchCount, int warmupCount, int iterationCount, int invocationCount, RunStrategy? runStrategy,
             bool baseline, RuntimeMoniker runtimeMoniker = RuntimeMoniker.HostProcess)
         {
             var job = new Job(id);

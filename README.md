@@ -7,10 +7,10 @@
 <div align="center">
 
   [![NuGet](https://img.shields.io/nuget/v/BenchmarkDotNet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/)
-  [![MyGet](https://img.shields.io/myget/benchmarkdotnet/vpre/benchmarkdotnet?label=myget)](https://www.myget.org/feed/Packages/benchmarkdotnet)
+  [![MyGet](https://img.shields.io/myget/benchmarkdotnet/vpre/benchmarkdotnet?label=myget)](https://www.myget.org/feed/benchmarkdotnet/package/nuget/BenchmarkDotNet)
   [![Downloads](https://img.shields.io/nuget/dt/benchmarkdotnet.svg)](https://www.nuget.org/packages/BenchmarkDotNet/)
   [![Stars](https://img.shields.io/github/stars/dotnet/BenchmarkDotNet?color=brightgreen)](https://github.com/dotnet/BenchmarkDotNet/stargazers)
-  ![License](https://img.shields.io/badge/license-MIT-blue.svg)
+  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dotnet/BenchmarkDotNet/blob/master/LICENSE.md)
   [![Twitter](https://img.shields.io/twitter/follow/BenchmarkDotNet?style=social&label=Twitter)](https://twitter.com/BenchmarkDotNet)
 
 </div>
@@ -30,7 +30,7 @@ It's no harder than writing unit tests!
 Under the hood, it performs a lot of [magic](#automation) that guarantees [reliable and precise](#reliability) results thanks to the [perfolizer](https://github.com/AndreyAkinshin/perfolizer) statistical engine.
 BenchmarkDotNet protects you from popular benchmarking mistakes and warns you if something is wrong with your benchmark design or obtained measurements.
 The results are presented in a [user-friendly](#friendliness) form that highlights all the important facts about your experiment.
-BenchmarkDotNet is already adopted by [16600+ GitHub projects](https://github.com/dotnet/BenchmarkDotNet/network/dependents) including
+BenchmarkDotNet is already adopted by [17700+ GitHub projects](https://github.com/dotnet/BenchmarkDotNet/network/dependents) including
   [.NET Runtime](https://github.com/dotnet/runtime),
   [.NET Compiler](https://github.com/dotnet/roslyn),
   [.NET Performance](https://github.com/dotnet/performance),
