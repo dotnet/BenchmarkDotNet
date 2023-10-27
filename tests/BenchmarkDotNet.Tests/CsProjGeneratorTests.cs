@@ -18,6 +18,11 @@ namespace BenchmarkDotNet.Tests
     public class CsProjGeneratorTests
     {
         private FileInfo TestAssemblyFileInfo = new FileInfo(typeof(CsProjGeneratorTests).Assembly.Location);
+        private const string runtimeHostConfigurationOptionChunk = """
+<ItemGroup>
+  <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />
+</ItemGroup>
+""";
 
         [Theory]
         [InlineData("net471", false)]
@@ -68,7 +73,7 @@ namespace BenchmarkDotNet.Tests
 
         private static void AssertCustomProperties(string expected, string actual)
         {
-            Assert.Equal(expected.Replace(Environment.NewLine, "\n").Replace("\n", Environment.NewLine), actual);
+            Assert.Equal(expected.Replace("\r", "").Replace("\n", Environment.NewLine), actual);
         }
 
         [Fact]
@@ -156,6 +161,24 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal("Microsoft.NET.Sdk", sdkName);
 
             File.Delete(propsFilePath);
+        }
+
+        [Fact]
+        public void RuntimeHostConfigurationOptionIsCopied()
+        {
+            string source = $@"
+<Project Sdk=""Microsoft.NET.Sdk"">
+{runtimeHostConfigurationOptionChunk}
+</Project>";
+
+            var sut = new CsProjGenerator("netcoreapp3.0", null, null, null, true);
+
+            var xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(source);
+            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
+
+            AssertCustomProperties(runtimeHostConfigurationOptionChunk, customProperties);
+            Assert.Equal("Microsoft.NET.Sdk", sdkName);
         }
 
         [Fact]
