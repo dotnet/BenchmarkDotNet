@@ -196,6 +196,10 @@ namespace BenchmarkDotNet.Configs
         public ManualConfig AddHardwareCounters(params HardwareCounter[] newHardwareCounters)
         {
             hardwareCounters.AddRange(newHardwareCounters);
+            columnProviders.AddRange(
+                newHardwareCounters
+                    .Select(h => new MetricColumn(new HardwareCounterDescriptor(h)))
+                    .Select(c => c.ToProvider()));
             return this;
         }
 
