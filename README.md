@@ -30,7 +30,7 @@ It's no harder than writing unit tests!
 Under the hood, it performs a lot of [magic](#automation) that guarantees [reliable and precise](#reliability) results thanks to the [perfolizer](https://github.com/AndreyAkinshin/perfolizer) statistical engine.
 BenchmarkDotNet protects you from popular benchmarking mistakes and warns you if something is wrong with your benchmark design or obtained measurements.
 The results are presented in a [user-friendly](#friendliness) form that highlights all the important facts about your experiment.
-BenchmarkDotNet is already adopted by [17700+ GitHub projects](https://github.com/dotnet/BenchmarkDotNet/network/dependents) including
+BenchmarkDotNet is already adopted by [18100+ GitHub projects](https://github.com/dotnet/BenchmarkDotNet/network/dependents) including
   [.NET Runtime](https://github.com/dotnet/runtime),
   [.NET Compiler](https://github.com/dotnet/roslyn),
   [.NET Performance](https://github.com/dotnet/performance),
