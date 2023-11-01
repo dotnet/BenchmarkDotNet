@@ -29,11 +29,7 @@
       <meta name="loc:copy" content="Copy">
   </head>
 
-  <script type="module">
-    import options from './../../public/main.js'
-    import { init } from './../../public/docfx.min.js'
-    init(options)
-  </script>
+  <script type="module" src="./../../public/docfx.min.js"></script>
 
   <script>
     const theme = localStorage.getItem('theme') || 'auto'
@@ -596,11 +592,12 @@ namespace BenchmarkDotNet.Samples
 <p>And the runtime pack should be generated here:</p>
 <pre><code>&lt;runtimeroot&gt;artifacts/bin/microsoft.netcore.app.runtime.osx-x64/Release/
 </code></pre>
+
 </article>
 
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>
-        
+
       </div>
 
       <div class="affix">

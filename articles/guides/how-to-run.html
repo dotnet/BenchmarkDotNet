@@ -29,11 +29,7 @@
       <meta name="loc:copy" content="Copy">
   </head>
 
-  <script type="module">
-    import options from './../../public/main.js'
-    import { init } from './../../public/docfx.min.js'
-    init(options)
-  </script>
+  <script type="module" src="./../../public/docfx.min.js"></script>
 
   <script>
     const theme = localStorage.getItem('theme') || 'auto'
@@ -104,11 +100,12 @@ var summary = BenchmarkRunner.Run(typeof(MyBenchmarkClass));
 <pre><code class="lang-log">dotnet run -c Release -- --job short --runtimes net472 net7.0 --filter *BenchmarkClass1*
 </code></pre>
 <p>The most important thing about <code>BenchmarkSwitcher</code> is that you need to pass the <code>args</code> from <code>Main</code> to the <code>Run</code> method. If you don't, it won't parse the arguments.</p>
+
 </article>
 
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>
-        
+
       </div>
 
       <div class="affix">

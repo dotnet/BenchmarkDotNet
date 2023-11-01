@@ -29,11 +29,7 @@
       <meta name="loc:copy" content="Copy">
   </head>
 
-  <script type="module">
-    import options from './../../public/main.js'
-    import { init } from './../../public/docfx.min.js'
-    init(options)
-  </script>
+  <script type="module" src="./../../public/docfx.min.js"></script>
 
   <script>
     const theme = localStorage.getItem('theme') || 'auto'
@@ -102,11 +98,12 @@
 <li>The expected value for each test is stored in a <code>*.verified.txt</code> file located near the test source file in the repository. Verify generates verified file's names automatically according test name and its parameters. This files must be added under the source control.</li>
 <li>It also creates a <code>*.received</code> file for each failed test. You can use diff tools for convenient file comparison. By default you can find test run results on the test runner console as usual. You can comment out the line <code>result.DisableDiff()</code> in <code>VerifySettingsFactory.Create</code> method and then Verify will open KDiff for each failed test. This way you can easily understand what's the difference between verified and received values and choose the correct one.</li>
 </ul>
+
 </article>
 
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>
-        
+
       </div>
 
       <div class="affix">

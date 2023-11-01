@@ -29,11 +29,7 @@
       <meta name="loc:copy" content="Copy">
   </head>
 
-  <script type="module">
-    import options from './../../public/main.js'
-    import { init } from './../../public/docfx.min.js'
-    init(options)
-  </script>
+  <script type="module" src="./../../public/docfx.min.js"></script>
 
   <script>
     const theme = localStorage.getItem('theme') || 'auto'
@@ -135,11 +131,12 @@
 <p>In order to run various build tasks from terminal, use <code>build.cmd</code> file in the repository root.
 <code>build.cmd</code> is a cross-platform script that can be used the same way on Windows, Linux, and macOS.
 When executed without arguments, it prints help information with list of all available build tasks.</p>
+
 </article>
 
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>
-        
+
       </div>
 
       <div class="affix">

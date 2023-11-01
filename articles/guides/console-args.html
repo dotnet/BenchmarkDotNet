@@ -29,11 +29,7 @@
       <meta name="loc:copy" content="Copy">
   </head>
 
-  <script type="module">
-    import options from './../../public/main.js'
-    import { init } from './../../public/docfx.min.js'
-    init(options)
-  </script>
+  <script type="module" src="./../../public/docfx.min.js"></script>
 
   <script>
     const theme = localStorage.getItem('theme') || 'auto'
@@ -288,11 +284,12 @@ static IConfig GetGlobalConfig()
 <li><code>--expose_wasm</code> arguments for the JavaScript engine used by Wasm toolchain.</li>
 <li><code>--customRuntimePack</code> specify the path to a custom runtime pack. Only used for wasm currently.</li>
 </ul>
+
 </article>
 
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>
-        
+
       </div>
 
       <div class="affix">

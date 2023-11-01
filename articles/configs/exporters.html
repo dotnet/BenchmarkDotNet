@@ -29,11 +29,7 @@
       <meta name="loc:copy" content="Copy">
   </head>
 
-  <script type="module">
-    import options from './../../public/main.js'
-    import { init } from './../../public/docfx.min.js'
-    init(options)
-  </script>
+  <script type="module" src="./../../public/docfx.min.js"></script>
 
   <script>
     const theme = localStorage.getItem('theme') || 'auto'
@@ -552,11 +548,12 @@ var config = ManualConfig.CreateMinimumViable().AddExporter(exporter);
 <pre><code>Method,...,Mean [us],Error [us],StdDev [us],Min [us],Max [us],Allocated [KB]
 Benchmark,...,&quot;37,647.6&quot;,&quot;32,717.9&quot;,&quot;21,640.9&quot;,&quot;11,209.2&quot;,&quot;59,492.6&quot;,1.58
 </code></pre>
+
 </article>
 
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>
-        
+
       </div>
 
       <div class="affix">

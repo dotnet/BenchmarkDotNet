@@ -29,11 +29,7 @@
       <meta name="loc:copy" content="Copy">
   </head>
 
-  <script type="module">
-    import options from './../../public/main.js'
-    import { init } from './../../public/docfx.min.js'
-    init(options)
-  </script>
+  <script type="module" src="./../../public/docfx.min.js"></script>
 
   <script>
     const theme = localStorage.getItem('theme') || 'auto'
@@ -153,11 +149,12 @@ This is why we have two disassemblers: x64 and x86. The code is the same (single
 <p><code>13672 Sample.Program Benchmark True 7 C:\Users\adsitnik\AppData\Local\Temp\tmpDCB9.tmp.xml</code></p>
 <p>Now you go to BenchmarkDotNet solution, select desired Disassembler project in the Solution Explorer and Set it as Startup project. After this you go to the project's properties and in the Debug tab copy-paste the arguments for the disassembler. Now when you start debugging, your IDE will spawn new process of the disassembler with the right arguments to attach to the desired exe. You should be able to debug it like any other app.</p>
 <p>Please keep in mind that you should always use the disassembler for the correct processor architecture. If you fail to debug it, you are most probably using the wrong one.</p>
+
 </article>
 
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>
-        
+
       </div>
 
       <div class="affix">

@@ -19538,6 +19538,12 @@ references:
   commentId: F:BenchmarkDotNet.Environments.CoreRuntime.Core80
   fullName: BenchmarkDotNet.Environments.CoreRuntime.Core80
   nameWithType: CoreRuntime.Core80
+- uid: BenchmarkDotNet.Environments.CoreRuntime.Core90
+  name: Core90
+  href: api/BenchmarkDotNet.Environments.CoreRuntime.html#BenchmarkDotNet_Environments_CoreRuntime_Core90
+  commentId: F:BenchmarkDotNet.Environments.CoreRuntime.Core90
+  fullName: BenchmarkDotNet.Environments.CoreRuntime.Core90
+  nameWithType: CoreRuntime.Core90
 - uid: BenchmarkDotNet.Environments.CoreRuntime.CreateForNewVersion(System.String,System.String)
   name: CreateForNewVersion(string, string)
   href: api/BenchmarkDotNet.Environments.CoreRuntime.html#BenchmarkDotNet_Environments_CoreRuntime_CreateForNewVersion_System_String_System_String_
@@ -20102,6 +20108,12 @@ references:
   commentId: F:BenchmarkDotNet.Environments.MonoRuntime.Mono80
   fullName: BenchmarkDotNet.Environments.MonoRuntime.Mono80
   nameWithType: MonoRuntime.Mono80
+- uid: BenchmarkDotNet.Environments.MonoRuntime.Mono90
+  name: Mono90
+  href: api/BenchmarkDotNet.Environments.MonoRuntime.html#BenchmarkDotNet_Environments_MonoRuntime_Mono90
+  commentId: F:BenchmarkDotNet.Environments.MonoRuntime.Mono90
+  fullName: BenchmarkDotNet.Environments.MonoRuntime.Mono90
+  nameWithType: MonoRuntime.Mono90
 - uid: BenchmarkDotNet.Environments.MonoRuntime.MonoBclPath
   name: MonoBclPath
   href: api/BenchmarkDotNet.Environments.MonoRuntime.html#BenchmarkDotNet_Environments_MonoRuntime_MonoBclPath
@@ -20162,6 +20174,12 @@ references:
   commentId: F:BenchmarkDotNet.Environments.NativeAotRuntime.Net80
   fullName: BenchmarkDotNet.Environments.NativeAotRuntime.Net80
   nameWithType: NativeAotRuntime.Net80
+- uid: BenchmarkDotNet.Environments.NativeAotRuntime.Net90
+  name: Net90
+  href: api/BenchmarkDotNet.Environments.NativeAotRuntime.html#BenchmarkDotNet_Environments_NativeAotRuntime_Net90
+  commentId: F:BenchmarkDotNet.Environments.NativeAotRuntime.Net90
+  fullName: BenchmarkDotNet.Environments.NativeAotRuntime.Net90
+  nameWithType: NativeAotRuntime.Net90
 - uid: BenchmarkDotNet.Environments.OsBrandStringHelper
   name: OsBrandStringHelper
   href: api/BenchmarkDotNet.Environments.OsBrandStringHelper.html
@@ -25325,6 +25343,12 @@ references:
   commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.Mono80
   fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.Mono80
   nameWithType: RuntimeMoniker.Mono80
+- uid: BenchmarkDotNet.Jobs.RuntimeMoniker.Mono90
+  name: Mono90
+  href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_Mono90
+  commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.Mono90
+  fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.Mono90
+  nameWithType: RuntimeMoniker.Mono90
 - uid: BenchmarkDotNet.Jobs.RuntimeMoniker.MonoAOTLLVM
   name: MonoAOTLLVM
   href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVM
@@ -25349,6 +25373,12 @@ references:
   commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.MonoAOTLLVMNet80
   fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.MonoAOTLLVMNet80
   nameWithType: RuntimeMoniker.MonoAOTLLVMNet80
+- uid: BenchmarkDotNet.Jobs.RuntimeMoniker.MonoAOTLLVMNet90
+  name: MonoAOTLLVMNet90
+  href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVMNet90
+  commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.MonoAOTLLVMNet90
+  fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.MonoAOTLLVMNet90
+  nameWithType: RuntimeMoniker.MonoAOTLLVMNet90
 - uid: BenchmarkDotNet.Jobs.RuntimeMoniker.NativeAot60
   name: NativeAot60
   href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_NativeAot60
@@ -25367,6 +25397,12 @@ references:
   commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.NativeAot80
   fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.NativeAot80
   nameWithType: RuntimeMoniker.NativeAot80
+- uid: BenchmarkDotNet.Jobs.RuntimeMoniker.NativeAot90
+  name: NativeAot90
+  href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_NativeAot90
+  commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.NativeAot90
+  fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.NativeAot90
+  nameWithType: RuntimeMoniker.NativeAot90
 - uid: BenchmarkDotNet.Jobs.RuntimeMoniker.Net461
   name: Net461
   href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_Net461
@@ -25433,6 +25469,12 @@ references:
   commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.Net80
   fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.Net80
   nameWithType: RuntimeMoniker.Net80
+- uid: BenchmarkDotNet.Jobs.RuntimeMoniker.Net90
+  name: Net90
+  href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_Net90
+  commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.Net90
+  fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.Net90
+  nameWithType: RuntimeMoniker.Net90
 - uid: BenchmarkDotNet.Jobs.RuntimeMoniker.NetCoreApp20
   name: NetCoreApp20
   href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_NetCoreApp20
@@ -25505,6 +25547,12 @@ references:
   commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.WasmNet80
   fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.WasmNet80
   nameWithType: RuntimeMoniker.WasmNet80
+- uid: BenchmarkDotNet.Jobs.RuntimeMoniker.WasmNet90
+  name: WasmNet90
+  href: api/BenchmarkDotNet.Jobs.RuntimeMoniker.html#BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet90
+  commentId: F:BenchmarkDotNet.Jobs.RuntimeMoniker.WasmNet90
+  fullName: BenchmarkDotNet.Jobs.RuntimeMoniker.WasmNet90
+  nameWithType: RuntimeMoniker.WasmNet90
 - uid: BenchmarkDotNet.Loggers
   name: BenchmarkDotNet.Loggers
   href: api/BenchmarkDotNet.Loggers.html
@@ -32582,6 +32630,12 @@ references:
   commentId: F:BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.NetCoreApp80
   fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.NetCoreApp80
   nameWithType: CsProjCoreToolchain.NetCoreApp80
+- uid: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.NetCoreApp90
+  name: NetCoreApp90
+  href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.html#BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_NetCoreApp90
+  commentId: F:BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.NetCoreApp90
+  fullName: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.NetCoreApp90
+  nameWithType: CsProjCoreToolchain.NetCoreApp90
 - uid: BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.Validate(BenchmarkDotNet.Running.BenchmarkCase,BenchmarkDotNet.Characteristics.IResolver)
   name: Validate(BenchmarkCase, IResolver)
   href: api/BenchmarkDotNet.Toolchains.CsProj.CsProjCoreToolchain.html#BenchmarkDotNet_Toolchains_CsProj_CsProjCoreToolchain_Validate_BenchmarkDotNet_Running_BenchmarkCase_BenchmarkDotNet_Characteristics_IResolver_
@@ -33758,6 +33812,12 @@ references:
   commentId: F:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreApp80
   fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreApp80
   nameWithType: NetCoreAppSettings.NetCoreApp80
+- uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreApp90
+  name: NetCoreApp90
+  href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_NetCoreApp90
+  commentId: F:BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreApp90
+  fullName: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.NetCoreApp90
+  nameWithType: NetCoreAppSettings.NetCoreApp90
 - uid: BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.PackagesPath
   name: PackagesPath
   href: api/BenchmarkDotNet.Toolchains.DotNetCli.NetCoreAppSettings.html#BenchmarkDotNet_Toolchains_DotNetCli_NetCoreAppSettings_PackagesPath
@@ -35813,6 +35873,12 @@ references:
   commentId: F:BenchmarkDotNet.Toolchains.Mono.MonoToolchain.Mono80
   fullName: BenchmarkDotNet.Toolchains.Mono.MonoToolchain.Mono80
   nameWithType: MonoToolchain.Mono80
+- uid: BenchmarkDotNet.Toolchains.Mono.MonoToolchain.Mono90
+  name: Mono90
+  href: api/BenchmarkDotNet.Toolchains.Mono.MonoToolchain.html#BenchmarkDotNet_Toolchains_Mono_MonoToolchain_Mono90
+  commentId: F:BenchmarkDotNet.Toolchains.Mono.MonoToolchain.Mono90
+  fullName: BenchmarkDotNet.Toolchains.Mono.MonoToolchain.Mono90
+  nameWithType: MonoToolchain.Mono90
 - uid: BenchmarkDotNet.Toolchains.MonoAotLLVM
   name: BenchmarkDotNet.Toolchains.MonoAotLLVM
   href: api/BenchmarkDotNet.Toolchains.MonoAotLLVM.html
@@ -36227,6 +36293,12 @@ references:
   commentId: F:BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.Net80
   fullName: BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.Net80
   nameWithType: NativeAotToolchain.Net80
+- uid: BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.Net90
+  name: Net90
+  href: api/BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.html#BenchmarkDotNet_Toolchains_NativeAot_NativeAotToolchain_Net90
+  commentId: F:BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.Net90
+  fullName: BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchain.Net90
+  nameWithType: NativeAotToolchain.Net90
 - uid: BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder
   name: NativeAotToolchainBuilder
   href: api/BenchmarkDotNet.Toolchains.NativeAot.NativeAotToolchainBuilder.html
@@ -38166,6 +38238,9 @@ references:
 - uid: changelog.v0.13.1
   name: BenchmarkDotNet v0.13.1
   href: changelog/v0.13.1.html
+- uid: changelog.v0.13.10
+  name: BenchmarkDotNet v0.13.10
+  href: changelog/v0.13.10.html
 - uid: changelog.v0.13.2
   name: BenchmarkDotNet v0.13.2
   href: changelog/v0.13.2.html

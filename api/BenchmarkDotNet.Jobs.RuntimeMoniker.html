@@ -31,11 +31,7 @@
       <meta name="loc:copy" content="Copy">
   </head>
 
-  <script type="module">
-    import options from './../public/main.js'
-    import { init } from './../public/docfx.min.js'
-    init(options)
-  </script>
+  <script type="module" src="./../public/docfx.min.js"></script>
 
   <script>
     const theme = localStorage.getItem('theme') || 'auto'
@@ -127,35 +123,44 @@
     <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono"><code>Mono = 2</code></dt>
     <dd><p>Mono</p>
 </dd>
-    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono60"><code>Mono60 = 32</code></dt>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono60"><code>Mono60 = 36</code></dt>
     <dd><p>.NET 6 using MonoVM (not CLR which is the default)</p>
 </dd>
-    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono70"><code>Mono70 = 33</code></dt>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono70"><code>Mono70 = 37</code></dt>
     <dd><p>.NET 7 using MonoVM (not CLR which is the default)</p>
 </dd>
-    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono80"><code>Mono80 = 34</code></dt>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono80"><code>Mono80 = 38</code></dt>
     <dd><p>.NET 8 using MonoVM (not CLR which is the default)</p>
 </dd>
-    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVM"><code>MonoAOTLLVM = 28</code></dt>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Mono90"><code>Mono90 = 39</code></dt>
+    <dd><p>.NET 9 using MonoVM (not CLR which is the default)</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVM"><code>MonoAOTLLVM = 31</code></dt>
     <dd><p>Mono with the Ahead of Time LLVM Compiler backend</p>
 </dd>
-    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVMNet60"><code>MonoAOTLLVMNet60 = 29</code></dt>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVMNet60"><code>MonoAOTLLVMNet60 = 32</code></dt>
     <dd><p>Mono with the Ahead of Time LLVM Compiler backend and net6.0</p>
 </dd>
-    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVMNet70"><code>MonoAOTLLVMNet70 = 30</code></dt>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVMNet70"><code>MonoAOTLLVMNet70 = 33</code></dt>
     <dd><p>Mono with the Ahead of Time LLVM Compiler backend and net7.0</p>
 </dd>
-    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVMNet80"><code>MonoAOTLLVMNet80 = 31</code></dt>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVMNet80"><code>MonoAOTLLVMNet80 = 34</code></dt>
     <dd><p>Mono with the Ahead of Time LLVM Compiler backend and net8.0</p>
 </dd>
-    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NativeAot60"><code>NativeAot60 = 20</code></dt>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_MonoAOTLLVMNet90"><code>MonoAOTLLVMNet90 = 35</code></dt>
+    <dd><p>Mono with the Ahead of Time LLVM Compiler backend and net9.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NativeAot60"><code>NativeAot60 = 21</code></dt>
     <dd><p>NativeAOT compiled as net6.0</p>
 </dd>
-    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NativeAot70"><code>NativeAot70 = 21</code></dt>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NativeAot70"><code>NativeAot70 = 22</code></dt>
     <dd><p>NativeAOT compiled as net7.0</p>
 </dd>
-    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NativeAot80"><code>NativeAot80 = 22</code></dt>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NativeAot80"><code>NativeAot80 = 23</code></dt>
     <dd><p>NativeAOT compiled as net8.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NativeAot90"><code>NativeAot90 = 24</code></dt>
+    <dd><p>NativeAOT compiled as net9.0</p>
 </dd>
     <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net461"><code>Net461 = 3</code></dt>
     <dd><p>.NET 4.6.1</p>
@@ -190,6 +195,9 @@
     <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net80"><code>Net80 = 19</code></dt>
     <dd><p>.NET 8.0</p>
 </dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Net90"><code>Net90 = 20</code></dt>
+    <dd><p>.NET 9.0</p>
+</dd>
     <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NetCoreApp20"><code>NetCoreApp20 = 10</code></dt>
     <dd><p>.NET Core 2.0</p>
 </dd>
@@ -212,20 +220,23 @@ NetCoreApp50 = 15</code></dt>
     <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_NotRecognized"><code>NotRecognized = 1</code></dt>
     <dd><p>not recognized, possibly a new version of .NET Core</p>
 </dd>
-    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Wasm"><code>Wasm = 23</code></dt>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_Wasm"><code>Wasm = 25</code></dt>
     <dd><p>WebAssembly with default .Net version</p>
 </dd>
-    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet50"><code>WasmNet50 = 24</code></dt>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet50"><code>WasmNet50 = 26</code></dt>
     <dd><p>WebAssembly with net5.0</p>
 </dd>
-    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet60"><code>WasmNet60 = 25</code></dt>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet60"><code>WasmNet60 = 27</code></dt>
     <dd><p>WebAssembly with net6.0</p>
 </dd>
-    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet70"><code>WasmNet70 = 26</code></dt>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet70"><code>WasmNet70 = 28</code></dt>
     <dd><p>WebAssembly with net7.0</p>
 </dd>
-    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet80"><code>WasmNet80 = 27</code></dt>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet80"><code>WasmNet80 = 29</code></dt>
     <dd><p>WebAssembly with net8.0</p>
+</dd>
+    <dt id="BenchmarkDotNet_Jobs_RuntimeMoniker_WasmNet90"><code>WasmNet90 = 30</code></dt>
+    <dd><p>WebAssembly with net9.0</p>
 </dd>
   </dl>
 
@@ -234,7 +245,7 @@ NetCoreApp50 = 15</code></dt>
 </article>
 
 
-        
+
       </div>
 
       <div class="affix">
