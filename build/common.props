@@ -40,7 +40,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(VersionPrefix)' == '' ">
-    <VersionPrefix>0.13.10</VersionPrefix>
+    <VersionPrefix>0.13.11</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(NoVersionSuffix)' == '' AND '$(VersionSuffix)' == '' ">
