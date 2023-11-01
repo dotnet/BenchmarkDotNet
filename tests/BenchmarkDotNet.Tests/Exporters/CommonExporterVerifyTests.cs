@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.Xml;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Tests.Builders;
 using BenchmarkDotNet.Tests.Mocks;
@@ -44,6 +49,7 @@ namespace BenchmarkDotNet.Tests.Exporters
         {
             var cultureInfo = CultureInfos[cultureInfoName];
             Thread.CurrentThread.CurrentCulture = cultureInfo;
+            EnvironmentResolver.Default.Register(EnvironmentMode.AffinityCharacteristic, () => new IntPtr(0xFF));
 
             var logger = new AccumulationLogger();
 
@@ -75,7 +81,6 @@ namespace BenchmarkDotNet.Tests.Exporters
 
         private static IEnumerable<IExporter> GetExporters()
         {
-            //todo add CsvExporter and CsvMeasurementsExporter (need to mock RuntimeInformation)
             yield return AsciiDocExporter.Default;
             yield return HtmlExporter.Default;
             yield return JsonExporter.Brief;
@@ -92,6 +97,8 @@ namespace BenchmarkDotNet.Tests.Exporters
             yield return XmlExporter.BriefCompressed;
             yield return XmlExporter.Full;
             yield return XmlExporter.FullCompressed;
+            yield return CsvExporter.Default;
+            yield return CsvMeasurementsExporter.Default;
         }
 
         private static readonly IConfig config = ManualConfig.Create(DefaultConfig.Instance)

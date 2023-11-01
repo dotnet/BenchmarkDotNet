@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Jobs;
@@ -11,8 +12,13 @@ namespace BenchmarkDotNet.Environments
     {
         public const int DefaultUnrollFactorForThroughput = 16;
 
-        public static readonly IResolver Instance = new CompositeResolver(new EnvironmentResolver(), GcResolver.Instance);
+        internal static readonly EnvironmentResolver Default = new EnvironmentResolver();
 
+        public static readonly IResolver Instance = new CompositeResolver(Default, GcResolver.Instance);
+        internal new void Register<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, Func<T> resolver)
+        {
+            base.Register(characteristic, resolver);
+        }
         private EnvironmentResolver()
         {
             Register(EnvironmentMode.PlatformCharacteristic, RuntimeInformation.GetCurrentPlatform);
