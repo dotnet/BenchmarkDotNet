@@ -238,6 +238,7 @@ namespace BenchmarkDotNet.Engines
         public override int GetHashCode() => HashCode.Combine(Gen0Collections, Gen1Collections, Gen2Collections, AllocatedBytes, TotalOperations);
 
 #if !NET6_0_OR_GREATER
+        // separate class to have the cctor run lazily
         private static class GcHelpers
         {
             // do not reorder these, CheckMonitoringTotalAllocatedMemorySize relies on GetTotalAllocatedBytesDelegate being initialized first
