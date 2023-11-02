@@ -109,6 +109,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             .AddColumn(StatisticColumn.StdDev)
             .AddColumn(StatisticColumn.P67)
             .AddHardwareCounters(HardwareCounter.CacheMisses)
+            .AddColumnProvider(DefaultColumnProviders.Metrics)
             .AddDiagnoser(Diagnosers.MemoryDiagnoser.Default);
 
         public void Dispose()
