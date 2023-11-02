@@ -237,7 +237,7 @@ namespace BenchmarkDotNet.Engines
 
         public override int GetHashCode() => HashCode.Combine(Gen0Collections, Gen1Collections, Gen2Collections, AllocatedBytes, TotalOperations);
 
-        #if !NET6_0_OR_GREATER
+#if !NET6_0_OR_GREATER
         private static class ReflectionHelper
         {
             // do not reorder these, CheckMonitoringTotalAllocatedMemorySize relies on GetTotalAllocatedBytesDelegate being initialized first
