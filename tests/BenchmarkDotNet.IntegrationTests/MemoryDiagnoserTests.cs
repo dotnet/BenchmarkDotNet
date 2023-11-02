@@ -34,9 +34,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public static IEnumerable<object[]> GetToolchains()
         {
-            if (RuntimeInformation.IsOldMono) // https://github.com/mono/mono/issues/8397
-                yield break;
-
             yield return new object[] { Job.Default.GetToolchain() };
             yield return new object[] { InProcessEmitToolchain.Instance };
         }
