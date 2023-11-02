@@ -150,14 +150,14 @@ namespace BenchmarkDotNet.Engines
 #if NET6_0_OR_GREATER
             return GC.GetTotalAllocatedBytes(precise: true);
 #else
-            if (ReflectionHelper.GetTotalAllocatedBytesDelegate != null) // it's .NET Core 3.0 with the new API available
-                return ReflectionHelper.GetTotalAllocatedBytesDelegate.Invoke(true); // true for the "precise" argument
+            if (GcHelpers.GetTotalAllocatedBytesDelegate != null) // it's .NET Core 3.0 with the new API available
+                return GcHelpers.GetTotalAllocatedBytesDelegate.Invoke(true); // true for the "precise" argument
 
-            if (ReflectionHelper.CanUseMonitoringTotalAllocatedMemorySize) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
+            if (GcHelpers.CanUseMonitoringTotalAllocatedMemorySize) // Monitoring is not available in Mono, see http://stackoverflow.com/questions/40234948/how-to-get-the-number-of-allocated-bytes-
                 return AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize;
 
-            if (ReflectionHelper.GetAllocatedBytesForCurrentThreadDelegate != null)
-                return ReflectionHelper.GetAllocatedBytesForCurrentThreadDelegate.Invoke();
+            if (GcHelpers.GetAllocatedBytesForCurrentThreadDelegate != null)
+                return GcHelpers.GetAllocatedBytesForCurrentThreadDelegate.Invoke();
 
             return null;
 #endif
@@ -238,7 +238,7 @@ namespace BenchmarkDotNet.Engines
         public override int GetHashCode() => HashCode.Combine(Gen0Collections, Gen1Collections, Gen2Collections, AllocatedBytes, TotalOperations);
 
 #if !NET6_0_OR_GREATER
-        private static class ReflectionHelper
+        private static class GcHelpers
         {
             // do not reorder these, CheckMonitoringTotalAllocatedMemorySize relies on GetTotalAllocatedBytesDelegate being initialized first
             public static readonly Func<bool, long> GetTotalAllocatedBytesDelegate = CreateGetTotalAllocatedBytesDelegate();
