@@ -49,6 +49,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             { "verylong", Job.VeryLongRun }
         };
 
+        public static void RegisterCustomExporter(string commandLineName, IExporter exporter) => CustomExporters.Add(commandLineName, exporter);
+        private static readonly IDictionary<string, IExporter> CustomExporters = new Dictionary<string, IExporter>();
+
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
         [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
         private static readonly IReadOnlyDictionary<string, IExporter[]> AvailableExporters =
@@ -252,6 +255,20 @@ namespace BenchmarkDotNet.ConsoleArguments
                 }
             }
 
+            if (!string.IsNullOrWhiteSpace(options.CustomExporter))
+            {
+                try
+                {
+                    var customExporter = Activator.CreateInstance(Type.GetType(options.CustomExporter));
+                    CustomExporters["customExporter"] = (IExporter)customExporter;
+                }
+                catch (Exception ex)
+                {
+                    logger.WriteLineError(ex.ToString());
+                }
+
+            }
+
             foreach (string exporter in options.Exporters)
                 if (!AvailableExporters.ContainsKey(exporter))
                 {
@@ -339,6 +356,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 config.AddJob(baseJob);
 
             config.AddExporter(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
+            config.AddExporter(CustomExporters.Select(c => c.Value).ToArray());
 
             config.AddHardwareCounters(options.HardwareCounters
                 .Select(counterName => (HardwareCounter)Enum.Parse(typeof(HardwareCounter), counterName, ignoreCase: true))

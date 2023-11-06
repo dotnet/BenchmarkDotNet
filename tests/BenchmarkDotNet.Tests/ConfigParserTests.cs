@@ -25,14 +25,30 @@ using BenchmarkDotNet.Portability;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.SignificanceTesting;
 using Perfolizer.Mathematics.Thresholds;
+using BenchmarkDotNet.Exporters.Json;
 
 namespace BenchmarkDotNet.Tests
 {
+    public class CustomExporterTestClass : JsonExporterBase { }
     public class ConfigParserTests
     {
         public ITestOutputHelper Output { get; }
 
         public ConfigParserTests(ITestOutputHelper output) => Output = output;
+
+        [Theory]
+        [InlineData("--customExporter", "BenchmarkDotNet.Tests.CustomExporterTestClass, BenchmarkDotNet.Tests")]
+        public void CustomExporterConfigParsedCorrectly(params string[] args)
+        {
+            var config = ConfigParser.Parse(args, new OutputLogger(Output)).config;
+
+            var customExporter = config.GetExporters().ToList();
+            Assert.Equal("CustomExporterTestClass", customExporter[0].Name);
+            Assert.Empty(config.GetColumnProviders());
+            Assert.Empty(config.GetDiagnosers());
+            Assert.Empty(config.GetAnalysers());
+            Assert.Empty(config.GetLoggers());
+        }
 
         [Theory]
         [InlineData("--job=dry", "--exporters", "html", "rplot")]
