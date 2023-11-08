@@ -168,7 +168,7 @@ namespace BenchmarkDotNet.Tests
         [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
         public void SpecifyingCoreRunAndRuntimeCreatesTwoJobs()
         {
-            const string runtime = "net7.0";
+            const string runtime = "net8.0";
             var fakeDotnetCliPath = typeof(object).Assembly.Location;
             var fakeCoreRunPath = typeof(ConfigParserTests).Assembly.Location;
             var fakeRestorePackages = Path.GetTempPath();

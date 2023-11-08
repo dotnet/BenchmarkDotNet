@@ -5,7 +5,7 @@
   </PropertyGroup>
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
-    <TargetFrameworks>net462;net7.0</TargetFrameworks>
+    <TargetFrameworks>net462;net8.0</TargetFrameworks>
     <PublicSign>false</PublicSign>
   </PropertyGroup>
   <ItemGroup>
