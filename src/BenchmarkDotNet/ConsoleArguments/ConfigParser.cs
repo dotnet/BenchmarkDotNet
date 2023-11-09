@@ -49,12 +49,9 @@ namespace BenchmarkDotNet.ConsoleArguments
             { "verylong", Job.VeryLongRun }
         };
 
-        public static void RegisterCustomExporter(string commandLineName, IExporter exporter) => CustomExporters.Add(commandLineName, exporter);
-        private static readonly IDictionary<string, IExporter> CustomExporters = new Dictionary<string, IExporter>();
-
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
         [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
-        private static readonly IReadOnlyDictionary<string, IExporter[]> AvailableExporters =
+        private static readonly IDictionary<string, IExporter[]> AvailableExporters =
             new Dictionary<string, IExporter[]>(StringComparer.InvariantCultureIgnoreCase)
             {
                 { "csv", new[] { CsvExporter.Default } },
@@ -74,6 +71,21 @@ namespace BenchmarkDotNet.ConsoleArguments
                 { "briefxml", new[] { XmlExporter.Brief } },
                 { "fullxml", new[] { XmlExporter.Full } }
             };
+
+
+        private static bool TryCreateCustomExporter(string customExporterName)
+        {
+            try
+            {
+                var customExporter = Activator.CreateInstance(Type.GetType(customExporterName));
+                AvailableExporters.Add(customExporterName, new IExporter[] { (IExporter)customExporter });
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
         public static (bool isSuccess, IConfig config, CommandLineOptions options) Parse(string[] args, ILogger logger, IConfig? globalConfig = null)
         {
@@ -255,26 +267,18 @@ namespace BenchmarkDotNet.ConsoleArguments
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(options.CustomExporter))
-            {
-                try
-                {
-                    var customExporter = Activator.CreateInstance(Type.GetType(options.CustomExporter));
-                    CustomExporters["customExporter"] = (IExporter)customExporter;
-                }
-                catch (Exception ex)
-                {
-                    logger.WriteLineError(ex.ToString());
-                }
-
-            }
-
             foreach (string exporter in options.Exporters)
-                if (!AvailableExporters.ContainsKey(exporter))
+            {
+                if (AvailableExporters.ContainsKey(exporter) || TryCreateCustomExporter(exporter))
                 {
-                    logger.WriteLineError($"The provided exporter \"{exporter}\" is invalid. Available options are: {string.Join(", ", AvailableExporters.Keys)}.");
+                    continue;
+                }
+                else
+                {
+                    logger.WriteLineError($"The provided exporter \"{exporter}\" is invalid. Available options are: {string.Join(", ", AvailableExporters.Keys)} or custom exporter by assembly-qualified name.");
                     return false;
                 }
+            }
 
             if (options.CliPath.IsNotNullButDoesNotExist())
             {
@@ -356,7 +360,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                 config.AddJob(baseJob);
 
             config.AddExporter(options.Exporters.SelectMany(exporter => AvailableExporters[exporter]).ToArray());
-            config.AddExporter(CustomExporters.Select(c => c.Value).ToArray());
 
             config.AddHardwareCounters(options.HardwareCounters
                 .Select(counterName => (HardwareCounter)Enum.Parse(typeof(HardwareCounter), counterName, ignoreCase: true))

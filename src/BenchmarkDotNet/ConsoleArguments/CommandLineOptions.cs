@@ -31,9 +31,6 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option('e', "exporters", Required = false, HelpText = "GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML")]
         public IEnumerable<string> Exporters { get; set; }
 
-        [Option( "customExporter", Required = false, HelpText = "The assembly-qualified name of the Custom Exporter type")]
-        public string CustomExporter { get; set; }
-
         [Option('m', "memory", Required = false, Default = false, HelpText = "Prints memory statistics")]
         public bool UseMemoryDiagnoser { get; set; }
 

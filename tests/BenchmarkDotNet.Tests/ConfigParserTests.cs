@@ -26,6 +26,7 @@ using Perfolizer.Horology;
 using Perfolizer.Mathematics.SignificanceTesting;
 using Perfolizer.Mathematics.Thresholds;
 using BenchmarkDotNet.Exporters.Json;
+using BenchmarkDotNet.Exporters.Xml;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -37,13 +38,18 @@ namespace BenchmarkDotNet.Tests
         public ConfigParserTests(ITestOutputHelper output) => Output = output;
 
         [Theory]
-        [InlineData("--customExporter", "BenchmarkDotNet.Tests.CustomExporterTestClass, BenchmarkDotNet.Tests")]
+        [InlineData("--exporters", "BenchmarkDotNet.Tests.CustomExporterTestClass, BenchmarkDotNet.Tests", "html", "xml")]
+        [InlineData("--exporters", "html", "BenchmarkDotNet.Tests.CustomExporterTestClass, BenchmarkDotNet.Tests", "xml")]
+        [InlineData("--exporters", "html", "xml", "BenchmarkDotNet.Tests.CustomExporterTestClass, BenchmarkDotNet.Tests")]
         public void CustomExporterConfigParsedCorrectly(params string[] args)
         {
             var config = ConfigParser.Parse(args, new OutputLogger(Output)).config;
 
-            var customExporter = config.GetExporters().ToList();
-            Assert.Equal("CustomExporterTestClass", customExporter[0].Name);
+            Assert.Equal(3, config.GetExporters().Count());
+            Assert.Contains(typeof(CustomExporterTestClass).Name, config.GetExporters().Select(e => e.Name));
+            Assert.Contains(HtmlExporter.Default, config.GetExporters());
+            Assert.Contains(XmlExporter.Default, config.GetExporters());
+
             Assert.Empty(config.GetColumnProviders());
             Assert.Empty(config.GetDiagnosers());
             Assert.Empty(config.GetAnalysers());
