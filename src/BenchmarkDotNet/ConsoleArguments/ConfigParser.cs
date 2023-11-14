@@ -763,7 +763,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             return coreRunPath.FullName.Substring(lastCommonDirectorySeparatorIndex);
         }
 
-        private static bool TryParse(string runtime, out RuntimeMoniker runtimeMoniker)
+        internal static bool TryParse(string runtime, out RuntimeMoniker runtimeMoniker)
         {
             int index = runtime.IndexOf('-');
 

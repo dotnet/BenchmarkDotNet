@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Portability.Cpu;
@@ -219,8 +221,20 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             => string.Join(",", GetCurrentProcessInstructionSets(platform));
 
         // based on https://github.com/dotnet/runtime/blob/ce61c09a5f6fc71d8f717d3fc4562f42171869a0/src/coreclr/tools/Common/JitInterface/CorInfoInstructionSet.cs#L727
-        private static IEnumerable<string> GetCurrentProcessInstructionSets(Platform platform)
+        private IEnumerable<string> GetCurrentProcessInstructionSets(Platform platform)
         {
+            if (!ConfigParser.TryParse(TargetFrameworkMoniker, out RuntimeMoniker runtimeMoniker))
+            {
+                throw new NotSupportedException($"Invalid TFM: '{TargetFrameworkMoniker}'");
+            }
+
+            if (platform == RuntimeInformation.GetCurrentPlatform() // "native" does not support cross-compilation (so does BDN for now)
+                && runtimeMoniker >= RuntimeMoniker.NativeAot80)
+            {
+                yield return "native"; // added in .NET 8 https://github.com/dotnet/runtime/pull/87865
+                yield break;
+            }
+
             switch (platform)
             {
                 case Platform.X86:
@@ -242,7 +256,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     if (HardwareIntrinsics.IsX86PclmulqdqSupported) yield return "pclmul";
                     if (HardwareIntrinsics.IsX86PopcntSupported) yield return "popcnt";
                     if (HardwareIntrinsics.IsX86AvxVnniSupported) yield return "avxvnni";
-                    if (HardwareIntrinsics.IsX86SerializeSupported) yield return "serialize";
+                    if (HardwareIntrinsics.IsX86SerializeSupported && runtimeMoniker > RuntimeMoniker.NativeAot70) yield return "serialize"; // https://github.com/dotnet/BenchmarkDotNet/issues/2463#issuecomment-1809625008
                     break;
                 case Platform.Arm64:
                     if (HardwareIntrinsics.IsArmBaseSupported) yield return "base";
