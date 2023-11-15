@@ -63,8 +63,8 @@ public class UnitTestRunner
     public void RunUnitTests()
     {
         var targetFrameworks = context.IsRunningOnWindows()
-            ? new[] { "net462", "net7.0" }
-            : new[] { "net7.0" };
+            ? new[] { "net462", "net8.0" }
+            : new[] { "net8.0" };
 
         foreach (var targetFramework in targetFrameworks)
             RunUnitTests(targetFramework);

@@ -34,11 +34,11 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 if (RuntimeInformation.GetCurrentPlatform() is Platform.X86 or Platform.X64)
                 {
-                    yield return new object[] { Jit.RyuJit, Platform.X64, CoreRuntime.Core70 }; // .NET Core x64
+                    yield return new object[] { Jit.RyuJit, Platform.X64, CoreRuntime.Core80 }; // .NET Core x64
                 }
                 else if (RuntimeInformation.GetCurrentPlatform() is Platform.Arm64 && RuntimeInformation.IsLinux())
                 {
-                    yield return new object[] { Jit.RyuJit, Platform.Arm64, CoreRuntime.Core70 }; // .NET Core arm64
+                    yield return new object[] { Jit.RyuJit, Platform.Arm64, CoreRuntime.Core80 }; // .NET Core arm64
                 }
             }
             if (RuntimeInformation.IsMacOS())

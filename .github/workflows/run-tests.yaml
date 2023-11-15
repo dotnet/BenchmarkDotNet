@@ -20,12 +20,10 @@ jobs:
       - uses: actions/checkout@v3
       - name: Run task 'build'
         shell: cmd
-        run: |
-          ./build.cmd build
+        run: ./build.cmd build
       - name: Run task 'in-tests-core'
         shell: cmd
-        run: |
-          ./build.cmd in-tests-core -e
+        run: ./build.cmd in-tests-core -e
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
@@ -42,12 +40,10 @@ jobs:
       - uses: actions/checkout@v3
       - name: Run task 'build'
         shell: cmd
-        run: |
-          ./build.cmd build
+        run: ./build.cmd build
       - name: Run task 'in-tests-full'
         shell: cmd
-        run: |
-          ./build.cmd in-tests-full -e
+        run: ./build.cmd in-tests-full -e
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()

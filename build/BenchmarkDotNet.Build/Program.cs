@@ -98,7 +98,7 @@ public class InTestsFullTask : FrostingTask<BuildContext>, IHelpProvider
 public class InTestsCoreTask : FrostingTask<BuildContext>, IHelpProvider
 {
     private const string Name = "in-tests-core";
-    public override void Run(BuildContext context) => context.UnitTestRunner.RunInTests("net7.0");
+    public override void Run(BuildContext context) => context.UnitTestRunner.RunInTests("net8.0");
     public HelpInfo GetHelp() => new();
 }
 

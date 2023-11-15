@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.EnabledOptimizations</AssemblyTitle>
-    <TargetFrameworks>net462;net7.0</TargetFrameworks>
+    <TargetFrameworks>net462;net8.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests.EnabledOptimizations</AssemblyName>
     <PackageId>BenchmarkDotNet.IntegrationTests.EnabledOptimizations</PackageId>

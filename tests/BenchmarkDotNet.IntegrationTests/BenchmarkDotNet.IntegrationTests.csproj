@@ -2,8 +2,8 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests</AssemblyTitle>
-    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net462;net7.0</TargetFrameworks>
-    <TargetFramework Condition="'$(OS)' != 'Windows_NT'">net7.0</TargetFramework>
+    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net462;net8.0</TargetFrameworks>
+    <TargetFramework Condition="'$(OS)' != 'Windows_NT'">net8.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests</AssemblyName>
     <PackageId>BenchmarkDotNet.IntegrationTests</PackageId>
