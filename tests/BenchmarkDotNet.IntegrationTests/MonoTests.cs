@@ -4,16 +4,23 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
+using Xunit.Abstractions;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
     public class MonoTests : BenchmarkTestExecutor
     {
+        public MonoTests(ITestOutputHelper output) : base(output) { }
+
         [FactEnvSpecific("UseMonoRuntime option is available in .NET Core only starting from .NET 6", EnvRequirement.DotNetCoreOnly)]
-        public void Mono70IsSupported()
+        public void Mono80IsSupported()
         {
-            var config = ManualConfig.CreateEmpty().AddJob(Job.Dry.WithRuntime(MonoRuntime.Mono70));
+            var logger = new OutputLogger(Output);
+            var config = ManualConfig.CreateEmpty()
+                .AddLogger(logger)
+                .AddJob(Job.Dry.WithRuntime(MonoRuntime.Mono80));
             CanExecute<MonoBenchmark>(config);
         }
 
@@ -27,7 +34,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     throw new Exception("This is not Mono runtime");
                 }
 
-                if (RuntimeInformation.GetCurrentRuntime() != MonoRuntime.Mono70)
+                if (RuntimeInformation.GetCurrentRuntime() != MonoRuntime.Mono80)
                 {
                     throw new Exception("Incorrect runtime detection");
                 }
