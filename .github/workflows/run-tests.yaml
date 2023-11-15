@@ -21,12 +21,10 @@ jobs:
       - name: Run task 'build'
         shell: cmd
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           ./build.cmd build
       - name: Run task 'in-tests-core'
         shell: cmd
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           ./build.cmd in-tests-core -e
       - name: Upload test results
         uses: actions/upload-artifact@v3
@@ -45,12 +43,10 @@ jobs:
       - name: Run task 'build'
         shell: cmd
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           ./build.cmd build
       - name: Run task 'in-tests-full'
         shell: cmd
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           ./build.cmd in-tests-full -e
       - name: Upload test results
         uses: actions/upload-artifact@v3
