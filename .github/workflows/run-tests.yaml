@@ -107,9 +107,9 @@ jobs:
       - uses: actions/setup-node@v3
         name: Setup node
         with:
-          node-version: "16"
+          node-version: "18"
       - name: Install cSpell
-        run: npm install -g cspell
+        run: npm install -g cspell@8.0.0
       - name: Copy cSpell config
         run: cp ./build/cSpell.json ./cSpell.json
       - name: Run cSpell
