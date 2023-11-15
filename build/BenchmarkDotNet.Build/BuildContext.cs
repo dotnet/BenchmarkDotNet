@@ -59,6 +59,9 @@ public class BuildContext : FrostingContext
         BuildDirectory = RootDirectory.Combine("build");
         ArtifactsDirectory = RootDirectory.Combine("artifacts");
 
+        var toolFileName = context.IsRunningOnWindows() ? "dotnet.exe" : "dotnet";
+        var toolFilePath = RootDirectory.Combine(".dotnet").CombineWithFilePath(toolFileName);
+        context.Tools.RegisterFile(toolFilePath);
 
         SolutionFile = RootDirectory.CombineWithFilePath("BenchmarkDotNet.sln");
 
