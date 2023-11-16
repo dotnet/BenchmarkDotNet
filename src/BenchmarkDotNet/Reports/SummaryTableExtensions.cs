@@ -48,7 +48,8 @@ namespace BenchmarkDotNet.Reports
         }
 
         public static void PrintLine(this SummaryTable table, string[] line, ILogger logger, string leftDel, string rightDel,
-                                     bool highlightRow, bool startOfGroup, MarkdownExporter.MarkdownHighlightStrategy startOfGroupHighlightStrategy, string boldMarkupFormat, bool escapeHtml)
+            bool highlightRow, bool startOfGroup, MarkdownExporter.MarkdownHighlightStrategy startOfGroupHighlightStrategy, string boldMarkupFormat,
+            bool escapeHtml)
         {
             for (int columnIndex = 0; columnIndex < table.ColumnCount; columnIndex++)
             {
@@ -82,11 +83,23 @@ namespace BenchmarkDotNet.Reports
         private static string BuildStandardText(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex)
         {
             var buffer = GetClearBuffer();
+            var isBuildingHeader = table.FullHeader[columnIndex] == line[columnIndex];
+            var columnJustification = isBuildingHeader ? SummaryTable.SummaryTableColumn.TextJustification.Left : table.Columns[columnIndex].Justify;
 
             buffer.Append(leftDel);
-            PadLeft(table, line, leftDel, rightDel, columnIndex, buffer);
+            if (columnJustification == SummaryTable.SummaryTableColumn.TextJustification.Right)
+            {
+                AddPadding(table, line, leftDel, rightDel, columnIndex, buffer);
+            }
+
             buffer.Append(line[columnIndex]);
-            buffer.Append(rightDel);
+
+            if (columnJustification == SummaryTable.SummaryTableColumn.TextJustification.Left)
+            {
+                AddPadding(table, line, leftDel, rightDel, columnIndex, buffer);
+            }
+            var isLastColumn = columnIndex == table.ColumnCount - 1;
+            buffer.Append(isLastColumn ? rightDel.TrimEnd() : rightDel);
 
             return buffer.ToString();
         }
@@ -94,11 +107,23 @@ namespace BenchmarkDotNet.Reports
         private static string BuildBoldText(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex, string boldMarkupFormat)
         {
             var buffer = GetClearBuffer();
+            var isBuildingHeader = table.FullHeader[columnIndex] == line[columnIndex];
+            var columnJustification = isBuildingHeader ? SummaryTable.SummaryTableColumn.TextJustification.Left : table.Columns[columnIndex].Justify;
 
             buffer.Append(leftDel);
-            PadLeft(table, line, leftDel, rightDel, columnIndex, buffer);
+            if (columnJustification == SummaryTable.SummaryTableColumn.TextJustification.Right)
+            {
+                AddPadding(table, line, leftDel, rightDel, columnIndex, buffer);
+            }
+
             buffer.AppendFormat(boldMarkupFormat, line[columnIndex]);
-            buffer.Append(rightDel);
+
+            if (columnJustification == SummaryTable.SummaryTableColumn.TextJustification.Left)
+            {
+                AddPadding(table, line, leftDel, rightDel, columnIndex, buffer);
+            }
+            var isLastColumn = columnIndex == table.ColumnCount - 1;
+            buffer.Append(isLastColumn ? rightDel.TrimEnd() : rightDel);
 
             return buffer.ToString();
         }
@@ -116,7 +141,7 @@ namespace BenchmarkDotNet.Reports
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void PadLeft(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex, StringBuilder buffer)
+        private static void AddPadding(SummaryTable table, string[] line, string leftDel, string rightDel, int columnIndex, StringBuilder buffer)
         {
             const char space = ' ';
             const int extraWidth = 2; // " |".Length is not included in the column's Width

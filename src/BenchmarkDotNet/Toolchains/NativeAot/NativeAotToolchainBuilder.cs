@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot
         private bool ilcGenerateCompleteTypeMetadata = true;
         private bool ilcGenerateStackTraceData = true;
         private string ilcOptimizationPreference = "Speed";
-        private string ilcInstructionSet = null;
+        private string? ilcInstructionSet = null;
 
         private bool isIlCompilerConfigured;
 

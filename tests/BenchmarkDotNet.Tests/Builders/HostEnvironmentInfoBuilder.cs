@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Tests.Builders
         private string benchmarkDotNetVersion = "0.10.x-mock";
         private Frequency chronometerFrequency = new Frequency(2531248);
         private string configuration = "CONFIGURATION";
-        private string dotNetSdkVersion = "1.0.x.mock";
+        private string? dotNetSdkVersion = "1.0.x.mock";
         private HardwareTimerKind hardwareTimerKind = HardwareTimerKind.Tsc;
         private bool hasAttachedDebugger = false;
         private bool hasRyuJit = true;
@@ -31,7 +31,7 @@ namespace BenchmarkDotNet.Tests.Builders
                                               maxFrequency: Frequency.FromMHz(3100),
                                               minFrequency: Frequency.FromMHz(3100));
 
-        private VirtualMachineHypervisor virtualMachineHypervisor = HyperV.Default;
+        private VirtualMachineHypervisor? virtualMachineHypervisor = HyperV.Default;
 
         public HostEnvironmentInfoBuilder WithVMHypervisor(VirtualMachineHypervisor hypervisor)
         {

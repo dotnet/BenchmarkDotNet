@@ -14,10 +14,32 @@ namespace BenchmarkDotNet.Disassemblers
     // This Disassembler uses ClrMd v2x. Please keep it in sync with ClrMdV1Disassembler (if possible).
     internal abstract class ClrMdV2Disassembler
     {
-        // Translating an address to a method can cause AV and a process crash (https://github.com/dotnet/BenchmarkDotNet/issues/2070).
-        // It was fixed in https://github.com/dotnet/runtime/pull/79846,
-        // and most likely will be backported to 7.0.2 very soon (https://github.com/dotnet/runtime/pull/79862).
-        protected static readonly bool IsVulnerableToAvInDac = !RuntimeInformation.IsWindows() && Environment.Version < new Version(7, 0, 2);
+        private static readonly ulong MinValidAddress = GetMinValidAddress();
+
+        private static ulong GetMinValidAddress()
+        {
+            // https://github.com/dotnet/BenchmarkDotNet/pull/2413#issuecomment-1688100117
+            if (RuntimeInformation.IsWindows())
+                return ushort.MaxValue + 1;
+            if (RuntimeInformation.IsLinux())
+                return (ulong) Environment.SystemPageSize;
+            if (RuntimeInformation.IsMacOS())
+                return RuntimeInformation.GetCurrentPlatform() switch
+                {
+                    Environments.Platform.X86 or Environments.Platform.X64 => 4096,
+                    Environments.Platform.Arm64 => 0x100000000,
+                    _ => throw new NotSupportedException($"{RuntimeInformation.GetCurrentPlatform()} is not supported")
+                };
+            throw new NotSupportedException($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} is not supported");
+        }
+
+        private static bool IsValidAddress(ulong address)
+            // -1 (ulong.MaxValue) address is invalid, and will crash the runtime in older runtimes. https://github.com/dotnet/runtime/pull/90794
+            // 0 is NULL and therefore never valid.
+            // Addresses less than the minimum virtual address are also invalid.
+            => address != ulong.MaxValue
+                && address != 0
+                && address >= MinValidAddress;
 
         internal DisassemblyResult AttachAndDisassemble(Settings settings)
         {
@@ -245,12 +267,12 @@ namespace BenchmarkDotNet.Disassemblers
             return false;
         }
 
-        protected void TryTranslateAddressToName(ulong address, bool isAddressPrecodeMD, State state, bool isIndirectCallOrJump, int depth, ClrMethod currentMethod)
+        protected void TryTranslateAddressToName(ulong address, bool isAddressPrecodeMD, State state, int depth, ClrMethod currentMethod)
         {
-            var runtime = state.Runtime;
-
-            if (state.AddressToNameMapping.ContainsKey(address))
+            if (!IsValidAddress(address) || state.AddressToNameMapping.ContainsKey(address))
                 return;
+
+            var runtime = state.Runtime;
 
             var jitHelperFunctionName = runtime.GetJitHelperFunctionName(address);
             if (!string.IsNullOrEmpty(jitHelperFunctionName))
@@ -260,9 +282,9 @@ namespace BenchmarkDotNet.Disassemblers
             }
 
             var method = runtime.GetMethodByInstructionPointer(address);
-            if (method is null && (address & ((uint)runtime.DataTarget.DataReader.PointerSize - 1)) == 0)
+            if (method is null && (address & ((uint) runtime.DataTarget.DataReader.PointerSize - 1)) == 0)
             {
-                if (runtime.DataTarget.DataReader.ReadPointer(address, out ulong newAddress) && newAddress > ushort.MaxValue)
+                if (runtime.DataTarget.DataReader.ReadPointer(address, out ulong newAddress) && IsValidAddress(newAddress))
                 {
                     method = runtime.GetMethodByInstructionPointer(newAddress);
 
@@ -276,31 +298,24 @@ namespace BenchmarkDotNet.Disassemblers
 
             if (method is null)
             {
-                if (isAddressPrecodeMD || !IsVulnerableToAvInDac)
+                var methodDescriptor = runtime.GetMethodByHandle(address);
+                if (methodDescriptor is not null)
                 {
-                    var methodDescriptor = runtime.GetMethodByHandle(address);
-                    if (!(methodDescriptor is null))
+                    if (isAddressPrecodeMD)
                     {
-                        if (isAddressPrecodeMD)
-                        {
-                            state.AddressToNameMapping.Add(address, $"Precode of {methodDescriptor.Signature}");
-                        }
-                        else
-                        {
-                            state.AddressToNameMapping.Add(address, $"MD_{methodDescriptor.Signature}");
-                        }
-                        return;
+                        state.AddressToNameMapping.Add(address, $"Precode of {methodDescriptor.Signature}");
                     }
+                    else
+                    {
+                        state.AddressToNameMapping.Add(address, $"MD_{methodDescriptor.Signature}");
+                    }
+                    return;
                 }
 
-                if (!IsVulnerableToAvInDac)
+                var methodTableName = runtime.DacLibrary.SOSDacInterface.GetMethodTableName(address);
+                if (!string.IsNullOrEmpty(methodTableName))
                 {
-                    var methodTableName = runtime.DacLibrary.SOSDacInterface.GetMethodTableName(address);
-                    if (!string.IsNullOrEmpty(methodTableName))
-                    {
-                        state.AddressToNameMapping.Add(address, $"MT_{methodTableName}");
-                        return;
-                    }
+                    state.AddressToNameMapping.Add(address, $"MT_{methodTableName}");
                 }
                 return;
             }

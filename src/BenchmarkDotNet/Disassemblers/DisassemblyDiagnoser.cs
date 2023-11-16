@@ -109,23 +109,30 @@ namespace BenchmarkDotNet.Diagnosers
                     yield return new ValidationError(true, "Currently NativeAOT has no DisassemblyDiagnoser support", benchmark);
                 }
 
-                if (RuntimeInformation.IsLinux() && ShouldUseClrMdDisassembler(benchmark))
+                if (ShouldUseClrMdDisassembler(benchmark))
                 {
-                    var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance);
+                    if (RuntimeInformation.IsLinux())
+                    {
+                        var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance);
 
-                    if (runtime.RuntimeMoniker < RuntimeMoniker.NetCoreApp30)
-                    {
-                        yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} supports only .NET Core 3.0+", benchmark);
-                    }
+                        if (runtime.RuntimeMoniker < RuntimeMoniker.NetCoreApp30)
+                        {
+                            yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} supports only .NET Core 3.0+", benchmark);
+                        }
 
-                    if (ptrace_scope.Value == "2")
-                    {
-                        yield return new ValidationError(false, $"ptrace_scope is set to 2, {nameof(DisassemblyDiagnoser)} is going to work only if you run as sudo");
+                        if (ptrace_scope.Value == "2")
+                        {
+                            yield return new ValidationError(false, $"ptrace_scope is set to 2, {nameof(DisassemblyDiagnoser)} is going to work only if you run as sudo");
+                        }
+                        else if (ptrace_scope.Value == "3")
+                        {
+                            yield return new ValidationError(true, $"ptrace_scope is set to 3, {nameof(DisassemblyDiagnoser)} is not going to work");
+                        }
                     }
-                    else if (ptrace_scope.Value == "3")
-                    {
-                        yield return new ValidationError(true, $"ptrace_scope is set to 3, {nameof(DisassemblyDiagnoser)} is not going to work");
-                    }
+                }
+                else if (!ShouldUseMonoDisassembler(benchmark))
+                {
+                    yield return new ValidationError(true, $"Only Windows and Linux are supported in DisassemblyDiagnoser without Mono. Current OS is {System.Runtime.InteropServices.RuntimeInformation.OSDescription}");
                 }
             }
         }

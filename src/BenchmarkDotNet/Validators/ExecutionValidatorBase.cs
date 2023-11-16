@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Validators
             return errors;
         }
 
-        private bool TryCreateBenchmarkTypeInstance(Type type, List<ValidationError> errors, out object instance)
+        private bool TryCreateBenchmarkTypeInstance(Type type, List<ValidationError> errors, out object? instance)
         {
             try
             {

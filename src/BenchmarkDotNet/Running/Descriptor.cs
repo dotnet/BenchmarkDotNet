@@ -31,14 +31,14 @@ namespace BenchmarkDotNet.Running
         public Descriptor(
             Type type,
             MethodInfo workloadMethod,
-            MethodInfo globalSetupMethod = null,
-            MethodInfo globalCleanupMethod = null,
-            MethodInfo iterationSetupMethod = null,
-            MethodInfo iterationCleanupMethod = null,
-            string description = null,
-            string additionalLogic = null,
+            MethodInfo? globalSetupMethod = null,
+            MethodInfo? globalCleanupMethod = null,
+            MethodInfo? iterationSetupMethod = null,
+            MethodInfo? iterationCleanupMethod = null,
+            string? description = null,
+            string? additionalLogic = null,
             bool baseline = false,
-            string[] categories = null,
+            string[]? categories = null,
             int operationsPerInvoke = 1,
             int methodIndex = 0)
         {

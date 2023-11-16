@@ -134,7 +134,7 @@ namespace BenchmarkDotNet.Disassemblers
                 return null;
 
             int distance = int.MaxValue;
-            SourceLocation nearest = null;
+            SourceLocation? nearest = null;
 
             foreach (PdbSequencePointCollection sequenceCollection in function.SequencePoints)
             {
@@ -183,7 +183,7 @@ namespace BenchmarkDotNet.Disassemblers
             ClrModule module = method?.Type?.Module;
             PdbInfo info = module?.Pdb;
 
-            PdbReader reader = null;
+            PdbReader? reader = null;
             if (info != null)
             {
                 if (!s_pdbReaders.TryGetValue(info, out reader))

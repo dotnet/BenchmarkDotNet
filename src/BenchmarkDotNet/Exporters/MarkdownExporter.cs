@@ -79,8 +79,8 @@ namespace BenchmarkDotNet.Exporters
         [PublicAPI] protected string CodeBlockStart = "```";
         [PublicAPI] protected string CodeBlockEnd = "```";
         [PublicAPI] protected MarkdownHighlightStrategy StartOfGroupHighlightStrategy = MarkdownHighlightStrategy.None;
-        [PublicAPI] protected string TableHeaderSeparator = " |";
-        [PublicAPI] protected string TableColumnSeparator = " |";
+        [PublicAPI] protected string TableHeaderSeparator = " | ";
+        [PublicAPI] protected string TableColumnSeparator = " | ";
         [PublicAPI] protected bool UseHeaderSeparatingRow = true;
         [PublicAPI] protected bool ColumnsStartWithSeparator;
         [PublicAPI] protected string BoldMarkupFormat = "**{0}**";
@@ -156,21 +156,17 @@ namespace BenchmarkDotNet.Exporters
                 logger.WriteLine();
             }
 
-            if (ColumnsStartWithSeparator)
-            {
-                logger.WriteStatistic(TableHeaderSeparator.TrimStart());
-            }
+            logger.WriteStatistic(ColumnsStartWithSeparator ? TableHeaderSeparator.TrimStart() : " ");
 
             table.PrintLine(table.FullHeader, logger, string.Empty, TableHeaderSeparator);
             if (UseHeaderSeparatingRow)
             {
-                if (ColumnsStartWithSeparator)
-                {
-                    logger.WriteStatistic(TableHeaderSeparator.TrimStart());
-                }
+                logger.WriteStatistic(ColumnsStartWithSeparator ? TableHeaderSeparator.TrimStart().TrimEnd() + "-" : "-");
 
                 logger.WriteLineStatistic(string.Join("",
-                    table.Columns.Where(c => c.NeedToShow).Select(column => new string('-', column.Width) + GetJustificationIndicator(column.Justify) + "|")));
+                    table.Columns.Where(c => c.NeedToShow).Select(column =>
+                        new string('-', column.Width - 1) + GetHeaderSeparatorIndicator(column.OriginalColumn.IsNumeric) +
+                        GetHeaderSeparatorColumnDivider(column.Index, table.ColumnCount))));
             }
 
             int rowCounter = 0;
@@ -181,8 +177,8 @@ namespace BenchmarkDotNet.Exporters
                 if (rowCounter > 0 && table.FullContentStartOfLogicalGroup[rowCounter] && table.SeparateLogicalGroups)
                 {
                     // Print logical separator
-                    if (ColumnsStartWithSeparator)
-                        logger.WriteStatistic(TableColumnSeparator.TrimStart());
+                    logger.WriteStatistic(ColumnsStartWithSeparator ? TableColumnSeparator.TrimStart() : " ");
+
                     table.PrintLine(separatorLine, logger, string.Empty, TableColumnSeparator, highlightRow, false, StartOfGroupHighlightStrategy,
                         BoldMarkupFormat, false);
                 }
@@ -193,8 +189,8 @@ namespace BenchmarkDotNet.Exporters
                     highlightRow = !highlightRow;
                 }
 
-                if (ColumnsStartWithSeparator)
-                    logger.WriteStatistic(TableColumnSeparator.TrimStart());
+
+                logger.WriteStatistic(ColumnsStartWithSeparator ? TableColumnSeparator.TrimStart() : " ");
 
                 table.PrintLine(line, logger, string.Empty, TableColumnSeparator, highlightRow, table.FullContentStartOfHighlightGroup[rowCounter],
                     StartOfGroupHighlightStrategy, BoldMarkupFormat, EscapeHtml);
@@ -202,17 +198,15 @@ namespace BenchmarkDotNet.Exporters
             }
         }
 
-        private static string GetJustificationIndicator(SummaryTable.SummaryTableColumn.TextJustification textJustification)
+        private static string GetHeaderSeparatorIndicator(bool isNumeric)
         {
-            switch (textJustification)
-            {
-                case SummaryTable.SummaryTableColumn.TextJustification.Left:
-                    return " ";
-                case SummaryTable.SummaryTableColumn.TextJustification.Right:
-                    return ":";
-                default:
-                    return " ";
-            }
+            return isNumeric ? ":" : " ";
+        }
+
+        private static string GetHeaderSeparatorColumnDivider(int columnIndex, int columnCount)
+        {
+            var isLastColumn = columnIndex != columnCount - 1;
+            return isLastColumn ? "|-" : "|";
         }
     }
 }

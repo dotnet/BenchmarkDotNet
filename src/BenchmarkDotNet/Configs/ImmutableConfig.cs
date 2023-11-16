@@ -6,6 +6,7 @@ using System.Linq;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.EventProcessors;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Jobs;
@@ -31,6 +32,7 @@ namespace BenchmarkDotNet.Configs
         private readonly ImmutableHashSet<HardwareCounter> hardwareCounters;
         private readonly ImmutableHashSet<IFilter> filters;
         private readonly ImmutableArray<BenchmarkLogicalGroupRule> rules;
+        private readonly ImmutableHashSet<EventProcessor> eventProcessors;
         private readonly ImmutableArray<IColumnHidingRule> columnHidingRules;
 
         internal ImmutableConfig(
@@ -45,6 +47,7 @@ namespace BenchmarkDotNet.Configs
             ImmutableArray<BenchmarkLogicalGroupRule> uniqueRules,
             ImmutableArray<IColumnHidingRule> uniqueColumnHidingRules,
             ImmutableHashSet<Job> uniqueRunnableJobs,
+            ImmutableHashSet<EventProcessor> uniqueEventProcessors,
             ConfigUnionRule unionRule,
             string artifactsPath,
             CultureInfo cultureInfo,
@@ -66,6 +69,7 @@ namespace BenchmarkDotNet.Configs
             rules = uniqueRules;
             columnHidingRules = uniqueColumnHidingRules;
             jobs = uniqueRunnableJobs;
+            eventProcessors = uniqueEventProcessors;
             UnionRule = unionRule;
             ArtifactsPath = artifactsPath;
             CultureInfo = cultureInfo;
@@ -96,6 +100,7 @@ namespace BenchmarkDotNet.Configs
         public IEnumerable<HardwareCounter> GetHardwareCounters() => hardwareCounters;
         public IEnumerable<IFilter> GetFilters() => filters;
         public IEnumerable<BenchmarkLogicalGroupRule> GetLogicalGroupRules() => rules;
+        public IEnumerable<EventProcessor> GetEventProcessors() => eventProcessors;
         public IEnumerable<IColumnHidingRule> GetColumnHidingRules() => columnHidingRules;
 
         public ILogger GetCompositeLogger() => new CompositeLogger(loggers);

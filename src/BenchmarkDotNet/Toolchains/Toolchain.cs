@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        internal static bool IsCliPathInvalid(string customDotNetCliPath, BenchmarkCase benchmarkCase, out ValidationError validationError)
+        internal static bool IsCliPathInvalid(string customDotNetCliPath, BenchmarkCase benchmarkCase, out ValidationError? validationError)
         {
             validationError = null;
 

@@ -135,7 +135,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = ManualConfig.CreateEmpty().AddLogger(logger).WithOptions(ConfigOptions.DisableLogFile).AddJob(Job.Dry);
 
-            string logFilePath = null;
+            string? logFilePath = null;
             try
             {
                 var summaries = BenchmarkSwitcher
@@ -161,7 +161,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = ManualConfig.CreateEmpty().AddLogger(logger).AddJob(Job.Dry);
 
-            string logFilePath = null;
+            string? logFilePath = null;
             try
             {
                 var summaries = BenchmarkSwitcher

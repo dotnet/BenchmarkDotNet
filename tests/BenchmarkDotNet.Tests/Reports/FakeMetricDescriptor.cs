@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Tests.Reports
 {
     internal sealed class FakeMetricDescriptor : IMetricDescriptor
     {
-        public FakeMetricDescriptor(string id, string legend, string numberFormat = null)
+        public FakeMetricDescriptor(string id, string legend, string? numberFormat = null)
         {
             Id = id;
             Legend = legend;

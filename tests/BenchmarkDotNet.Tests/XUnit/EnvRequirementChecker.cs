@@ -9,11 +9,9 @@ namespace BenchmarkDotNet.Tests.XUnit;
 
 public static class EnvRequirementChecker
 {
-    [CanBeNull]
-    public static string GetSkip(params EnvRequirement[] requirements) => requirements.Select(GetSkip).FirstOrDefault(skip => skip != null);
+    public static string? GetSkip(params EnvRequirement[] requirements) => requirements.Select(GetSkip).FirstOrDefault(skip => skip != null);
 
-    [CanBeNull]
-    internal static string GetSkip(EnvRequirement requirement) => requirement switch
+    internal static string? GetSkip(EnvRequirement requirement) => requirement switch
     {
         EnvRequirement.WindowsOnly => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? null : "Windows-only test",
         EnvRequirement.NonWindows => !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? null : "Non-Windows test",

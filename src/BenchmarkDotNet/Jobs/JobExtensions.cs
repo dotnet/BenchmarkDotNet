@@ -339,7 +339,7 @@ namespace BenchmarkDotNet.Jobs
         /// <param name="source">(optional)Indicate the URI of the NuGet package source to use during the restore operation.</param>
         /// <param name="prerelease">(optional)Allows prerelease packages to be installed.</param>
         /// <returns></returns>
-        public static Job WithNuGet(this Job job, string packageName, string packageVersion = null, Uri source = null, bool prerelease = false) =>
+        public static Job WithNuGet(this Job job, string packageName, string? packageVersion = null, Uri? source = null, bool prerelease = false) =>
             job.WithCore(j => j.Infrastructure.NuGetReferences =
                 new NuGetReferenceList(j.Infrastructure.NuGetReferences ?? Array.Empty<NuGetReference>())
                     {

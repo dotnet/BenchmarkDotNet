@@ -9,15 +9,15 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
     {
         public long TotalOperations => GetInt64At(0);
 
-        private event Action<IterationEvent> target;
+        private event Action<IterationEvent>? target;
 
-        internal IterationEvent(Action<IterationEvent> target, int eventID, int task, string taskName, Guid taskGuid, int opcode, string opcodeName, Guid providerGuid, string providerName)
-            : base(eventID, task, taskName, taskGuid, opcode, opcodeName, providerGuid, providerName)
+        internal IterationEvent(Action<IterationEvent>? target, int eventId, int task, string taskName, Guid taskGuid, int opcode, string opcodeName, Guid providerGuid, string providerName)
+            : base(eventId, task, taskName, taskGuid, opcode, opcodeName, providerGuid, providerName)
         {
             this.target = target;
         }
 
-        protected override Delegate Target
+        protected override Delegate? Target
         {
             get => target;
             set => target = (Action<IterationEvent>)value;
@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             return sb;
         }
 
-        public override object PayloadValue(int index) => index == 0 ? (object)TotalOperations : null;
+        public override object? PayloadValue(int index) => index == 0 ? TotalOperations : null;
 
         protected override void Dispatch() => target?.Invoke(this);
 

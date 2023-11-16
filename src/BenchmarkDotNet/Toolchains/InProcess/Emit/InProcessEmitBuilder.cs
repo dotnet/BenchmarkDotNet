@@ -11,8 +11,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
     {
         public BuildResult Build(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
         {
-            Assembly assembly = null;
-            Exception buildError = null;
+            Assembly? assembly = null;
+            Exception? buildError = null;
             try
             {
                 assembly = RunnableEmitter.EmitPartitionAssembly(generateResult, buildPartition, logger);

@@ -58,11 +58,10 @@ if (!(Test-Path $InstallPath)) {
     $ScriptPath = Join-Path $InstallPath 'dotnet-install.ps1'
     (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, $ScriptPath);
     & $ScriptPath -JSonFile $GlobalJsonPath -InstallDir $InstallPath;
-
-    Remove-PathVariable "$InstallPath"
-    $env:PATH = "$InstallPath;$env:PATH"
 }
 
+Remove-PathVariable "$InstallPath"
+$env:PATH = "$InstallPath;$env:PATH"
 $env:DOTNET_ROOT=$InstallPath
 
 ###########################################################################

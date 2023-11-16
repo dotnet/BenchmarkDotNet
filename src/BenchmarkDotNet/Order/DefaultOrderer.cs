@@ -37,7 +37,7 @@ namespace BenchmarkDotNet.Order
         [PublicAPI]
         public virtual IEnumerable<BenchmarkCase> GetExecutionOrder(
             ImmutableArray<BenchmarkCase> benchmarkCases,
-            IEnumerable<BenchmarkLogicalGroupRule> order = null)
+            IEnumerable<BenchmarkLogicalGroupRule>? order = null)
         {
             var benchmarkComparer = new BenchmarkComparer(categoryComparer, paramsComparer, jobComparer, targetComparer, order);
             var list = benchmarkCases.ToList();
@@ -137,7 +137,7 @@ namespace BenchmarkDotNet.Order
 
         public virtual IEnumerable<IGrouping<string, BenchmarkCase>> GetLogicalGroupOrder(
             IEnumerable<IGrouping<string, BenchmarkCase>> logicalGroups,
-            IEnumerable<BenchmarkLogicalGroupRule> order = null)
+            IEnumerable<BenchmarkLogicalGroupRule>? order = null)
         {
             var benchmarkComparer = new BenchmarkComparer(categoryComparer, paramsComparer, jobComparer, targetComparer, order);
             var logicalGroupComparer = new LogicalGroupComparer(benchmarkComparer);

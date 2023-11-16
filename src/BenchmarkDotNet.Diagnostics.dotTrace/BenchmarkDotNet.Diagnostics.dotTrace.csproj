@@ -6,6 +6,7 @@
         <AssemblyTitle>BenchmarkDotNet.Diagnostics.dotTrace</AssemblyTitle>
         <AssemblyName>BenchmarkDotNet.Diagnostics.dotTrace</AssemblyName>
         <PackageId>BenchmarkDotNet.Diagnostics.dotTrace</PackageId>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>

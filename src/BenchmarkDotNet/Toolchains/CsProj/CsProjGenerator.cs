@@ -34,7 +34,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             "CopyLocalLockFileAssemblies",
             "PreserveCompilationContext",
             "UserSecretsId",
-            "EnablePreviewFeatures"
+            "EnablePreviewFeatures",
+            "RuntimeHostConfigurationOption",
         }.ToImmutableArray();
 
         public string RuntimeFrameworkVersion { get; }
@@ -121,7 +122,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             // custom SDKs are not added for non-netcoreapp apps (like net471), so when the TFM != netcoreapp we dont parse "<Import Sdk="
             // we don't allow for that mostly to prevent from edge cases like the following
             // <Import Sdk="Microsoft.NET.Sdk.WindowsDesktop" Project="Sdk.props" Condition="'$(TargetFramework)'=='netcoreapp3.0'"/>
-            string sdkName = null;
+            string? sdkName = null;
             if (TargetFrameworkMoniker.StartsWith("netcoreapp", StringComparison.InvariantCultureIgnoreCase))
             {
                 foreach (XmlElement importElement in projectElement.GetElementsByTagName("Import"))
@@ -161,8 +162,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 sdkName = DefaultSdkName;
             }
 
-            XmlDocument itemGroupsettings = null;
-            XmlDocument propertyGroupSettings = null;
+            XmlDocument? itemGroupsettings = null;
+            XmlDocument? propertyGroupSettings = null;
 
             GetSettingsThatNeedToBeCopied(projectElement, ref itemGroupsettings, ref propertyGroupSettings, projectFile);
 

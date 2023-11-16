@@ -22,8 +22,8 @@ namespace BenchmarkDotNet.Diagnosers
         public DisassemblyDiagnoserConfig(
             int maxDepth = 1,
             DisassemblySyntax syntax = DisassemblySyntax.Masm,
-            string[] filters = null,
-            FormatterOptions formatterOptions = null,
+            string[]? filters = null,
+            FormatterOptions? formatterOptions = null,
             bool printSource = false,
             bool printInstructionAddresses = false,
             bool exportGithubMarkdown = true,

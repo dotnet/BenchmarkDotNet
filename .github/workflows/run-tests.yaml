@@ -20,14 +20,10 @@ jobs:
       - uses: actions/checkout@v3
       - name: Run task 'build'
         shell: cmd
-        run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          ./build.cmd build
+        run: ./build.cmd build
       - name: Run task 'in-tests-core'
         shell: cmd
-        run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          ./build.cmd in-tests-core -e
+        run: ./build.cmd in-tests-core -e
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
@@ -44,14 +40,10 @@ jobs:
       - uses: actions/checkout@v3
       - name: Run task 'build'
         shell: cmd
-        run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          ./build.cmd build
+        run: ./build.cmd build
       - name: Run task 'in-tests-full'
         shell: cmd
-        run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          ./build.cmd in-tests-full -e
+        run: ./build.cmd in-tests-full -e
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
@@ -107,9 +99,9 @@ jobs:
       - uses: actions/setup-node@v3
         name: Setup node
         with:
-          node-version: "16"
+          node-version: "18"
       - name: Install cSpell
-        run: npm install -g cspell
+        run: npm install -g cspell@8.0.0
       - name: Copy cSpell config
         run: cp ./build/cSpell.json ./cSpell.json
       - name: Run cSpell

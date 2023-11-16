@@ -41,8 +41,8 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             float cpuSampleIntervalInMilliseconds = 1.0f,
             KernelTraceEventParser.Keywords kernelKeywords = KernelTraceEventParser.Keywords.ImageLoad | KernelTraceEventParser.Keywords.Profile,
             KernelTraceEventParser.Keywords kernelStackKeywords = KernelTraceEventParser.Keywords.Profile,
-            IReadOnlyDictionary<HardwareCounter, Func<ProfileSourceInfo, int>> intervalSelectors = null,
-            IReadOnlyCollection<(Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)> providers = null,
+            IReadOnlyDictionary<HardwareCounter, Func<ProfileSourceInfo, int>>? intervalSelectors = null,
+            IReadOnlyCollection<(Guid providerGuid, TraceEventLevel providerLevel, ulong keywords, TraceEventProviderOptions options)>? providers = null,
             bool createHeapSession = false)
         {
             CreateHeapSession = createHeapSession;

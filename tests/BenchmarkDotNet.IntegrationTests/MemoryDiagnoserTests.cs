@@ -34,9 +34,6 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public static IEnumerable<object[]> GetToolchains()
         {
-            if (RuntimeInformation.IsOldMono) // https://github.com/mono/mono/issues/8397
-                yield break;
-
             yield return new object[] { Job.Default.GetToolchain() };
             yield return new object[] { InProcessEmitToolchain.Instance };
         }
@@ -81,10 +78,10 @@ namespace BenchmarkDotNet.IntegrationTests
                     .ToToolchain());
         }
 
-        [FactEnvSpecific("We don't want to test MonoVM twice (for .NET Framework 4.6.2 and .NET 7.0)", EnvRequirement.DotNetCoreOnly)]
+        [FactEnvSpecific("We don't want to test MonoVM twice (for .NET Framework 4.6.2 and .NET 8.0)", EnvRequirement.DotNetCoreOnly)]
         public void MemoryDiagnoserSupportsModernMono()
         {
-            MemoryDiagnoserIsAccurate(MonoToolchain.Mono70);
+            MemoryDiagnoserIsAccurate(MonoToolchain.Mono80);
         }
 
         public class AllocatingGlobalSetupAndCleanup
