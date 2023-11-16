@@ -34,9 +34,7 @@ namespace BenchmarkDotNet.IntegrationTests
             if (!ContinuousIntegration.IsGitHubActionsOnWindows() // no native dependencies
                 && !RuntimeInformation.IsMacOS()) // currently not supported
             {
-                yield return new object[]{ NativeAotToolchain.CreateBuilder()
-                    .UseNuGet("7.0.0", "https://api.nuget.org/v3/index.json")
-                    .ToToolchain() };
+                yield return new object[]{ NativeAotToolchain.Net80 };
             }
             // TODO: Support InProcessEmitToolchain.Instance
             // yield return new object[] { InProcessEmitToolchain.Instance };
