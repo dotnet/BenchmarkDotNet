@@ -72,10 +72,7 @@ namespace BenchmarkDotNet.IntegrationTests
             if (RuntimeInformation.IsMacOS())
                 return; // currently not supported
 
-            MemoryDiagnoserIsAccurate(
-                NativeAotToolchain.CreateBuilder()
-                    .UseNuGet("7.0.0", "https://api.nuget.org/v3/index.json")
-                    .ToToolchain());
+            MemoryDiagnoserIsAccurate(NativeAotToolchain.Net80);
         }
 
         [FactEnvSpecific("We don't want to test MonoVM twice (for .NET Framework 4.6.2 and .NET 8.0)", EnvRequirement.DotNetCoreOnly)]
