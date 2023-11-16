@@ -87,6 +87,22 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 .ToString();
 
             File.WriteAllText(artifactsPaths.ProjectFilePath, content);
+
+            // We create an empty Directory.Build.props file next to the project file to ignore other prop files
+            // https://github.com/dotnet/BenchmarkDotNet/issues/2371#issuecomment-1814709479
+            string propsFilePath = Path.Combine(Path.GetDirectoryName(artifactsPaths.ProjectFilePath), "Directory.Build.props");
+            if (!File.Exists(propsFilePath))
+            {
+                File.WriteAllText(propsFilePath, @"
+<Project>
+  <!-- This is an empty Directory.Build.props file to prevent projects which reside
+       under this directory to use any of the repository local settings. -->
+  <PropertyGroup>
+    <ImportDirectoryPackagesProps>false</ImportDirectoryPackagesProps>
+    <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+  </PropertyGroup>
+</Project>");
+            }
         }
 
         /// <summary>
