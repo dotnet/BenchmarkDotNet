@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using BenchmarkDotNet.Environments;
+using System.Text;
+
 #if NET6_0_OR_GREATER
 using System.Runtime.Intrinsics.X86;
 using System.Runtime.Intrinsics.Arm;
@@ -17,7 +19,7 @@ namespace BenchmarkDotNet.Portability.Cpu
         internal static string GetShortInfo()
         {
             if (IsX86Avx512FSupported)
-                return "AVX-512";
+                return GetShortAvx512Representation();
             if (IsX86Avx2Supported)
                 return "AVX2";
             else if (IsX86AvxSupported)
@@ -54,13 +56,9 @@ namespace BenchmarkDotNet.Portability.Cpu
                 {
                     case Platform.X86:
                     case Platform.X64:
-                        if (IsX86Avx512FSupported) yield return "AVX-512F";
-                        if (IsX86Avx512BWSupported) yield return "AVX-512BW";
-                        if (IsX86Avx512CDSupported) yield return "AVX-512CD";
-                        if (IsX86Avx512DQSupported) yield return "AVX-512DQ";
-                        if (IsX86Avx512VbmiSupported) yield return "AVX-512VBMI";
 
-                        if (IsX86Avx2Supported) yield return "AVX2";
+                        if (IsX86Avx512FSupported) yield return GetShortAvx512Representation();
+                        else if (IsX86Avx2Supported) yield return "AVX2";
                         else if (IsX86AvxSupported) yield return "AVX";
                         else if (IsX86Sse42Supported) yield return "SSE4.2";
                         else if (IsX86Sse41Supported) yield return "SSE4.1";
@@ -96,6 +94,18 @@ namespace BenchmarkDotNet.Portability.Cpu
                         yield break;
                 }
             }
+        }
+
+        private static string GetShortAvx512Representation()
+        {
+            StringBuilder avx512 = new ("AVX-512F");
+            if (IsX86Avx512CDSupported) avx512.Append("+CD");
+            if (IsX86Avx512BWSupported) avx512.Append("+BW");
+            if (IsX86Avx512DQSupported) avx512.Append("+DQ");
+            if (IsX86Avx512FVLSupported) avx512.Append("+VL");
+            if (IsX86Avx512VbmiSupported) avx512.Append("+VBMI");
+
+            return avx512.ToString();
         }
 
         internal static bool IsX86BaseSupported =>
@@ -166,6 +176,13 @@ namespace BenchmarkDotNet.Portability.Cpu
             Avx512F.IsSupported;
 #else
             GetIsSupported("System.Runtime.Intrinsics.X86.Avx512F");
+#endif
+
+        internal static bool IsX86Avx512FVLSupported =>
+#if NET8_0_OR_GREATER
+            Avx512F.VL.IsSupported;
+#else
+            GetIsSupported("System.Runtime.Intrinsics.X86.Avx512F+VL");
 #endif
 
         internal static bool IsX86Avx512BWSupported =>
@@ -254,8 +271,12 @@ namespace BenchmarkDotNet.Portability.Cpu
             GetIsSupported("System.Runtime.Intrinsics.X86.AvxVnni");
 #endif
 
-        // X86Serialize was introduced in .NET 7.0, BDN does not target it so we need to use reflection
-        internal static bool IsX86SerializeSupported => GetIsSupported("System.Runtime.Intrinsics.X86.X86Serialize");
+        internal static bool IsX86SerializeSupported =>
+#if NET7_0_OR_GREATER
+            X86Serialize.IsSupported;
+#else
+            GetIsSupported("System.Runtime.Intrinsics.X86.X86Serialize");
+#endif
 
         internal static bool IsArmBaseSupported =>
 #if NET6_0_OR_GREATER
