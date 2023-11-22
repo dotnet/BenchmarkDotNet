@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Columns;
 using JetBrains.Annotations;
 
-namespace BenchmarkDotNet.Attributes 
+namespace BenchmarkDotNet.Attributes
 {
     public class OperationsPerSecondAttribute : ColumnConfigBaseAttribute
     {
