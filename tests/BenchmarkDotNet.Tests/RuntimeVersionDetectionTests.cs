@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("")]
         [InlineData(".NETCoreApp,Version=v")]
         [InlineData("just wrong")]
-        public void TryGetVersionFromFrameworkNameHandlesInvalidInput(string frameworkName)
+        public void TryGetVersionFromFrameworkNameHandlesInvalidInput(string? frameworkName)
         {
             Assert.False(CoreRuntime.TryGetVersionFromFrameworkName(frameworkName, out _));
         }
@@ -60,7 +60,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("", "")]
         [InlineData("not", "ok")]
         [InlineData("Microsoft .NET Framework", "4.6.26614.01 @BuiltBy: dlab14-DDVSOWINAGE018 @Commit: a536e7eec55c538c94639cefe295aa672996bf9b")] // this is an actual output for 2.0 but it simply does not contain enough info
-        public void TryGetVersionFromProductInfoHandlesInvalidInput(string productName, string productVersion)
+        public void TryGetVersionFromProductInfoHandlesInvalidInput(string? productName, string? productVersion)
         {
             Assert.False(CoreRuntime.TryGetVersionFromProductInfo(productVersion, productName, out _));
         }
