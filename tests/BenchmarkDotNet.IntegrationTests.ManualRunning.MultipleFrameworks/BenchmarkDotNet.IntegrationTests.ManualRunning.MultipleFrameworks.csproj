@@ -24,7 +24,7 @@
     <Compile Include="..\BenchmarkDotNet.Tests\XUnit\SmartAssert.cs" Link="SmartAssert.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NETCore.Platforms" Version="5.0.0" />
+    <PackageReference Include="Microsoft.NETCore.Platforms" Version="6.0.0" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
   </ItemGroup>
   <ItemGroup>
